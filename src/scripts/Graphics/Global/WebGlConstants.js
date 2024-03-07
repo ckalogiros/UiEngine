@@ -1,0 +1,25 @@
+"use strict";
+
+
+
+const SHADER_PROGAM_ATTRIBS_TYPE = {
+
+   // FLOAT: 5126,
+   FLOAT_32_UNSIGNED_INT_24_8_REV: 36269,
+   FLOAT_MAT2: 35674,
+   FLOAT_MAT2x3: 35685,
+   FLOAT_MAT2x4: 35686,
+   FLOAT_MAT3: 35675,
+   FLOAT_MAT3x2: 35687,
+   FLOAT_MAT3x4: 35688,
+   FLOAT_MAT4: 35676,
+   FLOAT_MAT4x2: 35689,
+   FLOAT_MAT4x3: 35690,
+   FLOAT_VEC2: 35664,
+   FLOAT_VEC3: 35665,
+   FLOAT_VEC4: 35666,
+}
+
+function GL_GET_ERROR(line){
+   console.error('line:', line, ' Error code:', gfxCtx.gl.getError())
+}

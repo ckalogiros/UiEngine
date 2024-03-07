@@ -1,0 +1,336 @@
+--------------------------------------------------- Milestones!
+-Convert all mesh attribes to indexes in a vertex buffer
+-Resizing
+-Horizontal scrolling
+-Dynamic Creation and Connection of sliders to utilities
+-DragNdrop
+-Animations
+-Save 
+-Undo
+-Implement shaders with INT attributes: Color, wposition
+-3D
+-Android Phone
+--------------------------------------------------- Milestones!
+
+--------------------------------------------------- Ideas!
+- What if we have a buffer per mesh with all its TREE children via indexes to the scenes gfxbuffer indexes?
+  That way we do not need to run recursively.
+- What if we have a buffer at every top root with all its TREE children?
+  And every time we want to run recursion on the root,we use that buffer of indexes/ponters(?).
+
+- Implement Draw Commands, so that we can later implement UNDO command.
+  Batch is allready a kind of command gathering(keeps the move values)
+
+- For Animatiions, have a MAX size buffer and a queue.
+  If the animations buffer is full, store to queue 
+  and when buffer element is free, run animations from queue 
+--------------------------------------------------- Ideas!
+
+
+
+--------------------------------------------------- TESTING!
+. Implement a smooth fps timer, by addding
+  on each frame the new delta time but
+  subtracting the 'oldest' one, with a constant counter.
+  The 'oldest' value is up to dicision. For example
+  we could set 1000 samples, so the oldest will be the -100 delta. 
+--------------------------------------------------- TESTING!
+
+--------------------------------------------------- IMIDIATE!
+
+. Any new mesh or existing mesh update to the gfx buffers should be an One Time Event().
+  ??
+    DispatchEvent(update gfx pipeline), which runs for every update separately
+    Or 
+    gather all updates {
+      IF: scene's progidx needsUpdate = true 
+      IF: scene's vbidx needsUpdate = true
+      IF: scene's mesh needsUpdate = true
+    }
+    which  runs all updates at once
+    but we have to check for updates on each frame
+  ??
+
+  with the Scene being responsible to run for the 'gfx.prog[i].vb[j].mesh.Render() ' functionality. 
+
+. Implement set render queue priority for meshes inside a vb.
+
+. Implement destruction of gfx buffers and gl program.
+  (Also make sure all suposed private buffers are set private).
+--------------------------------------------------- IMIDIATE!
+
+--------------------------------------------------- 
+
+// MEDDLE with
+-// root.UpdateGfxPosDimRecursive(root);
+
+Set UpdatePosXYZ() in Mesh to update with the Batch.
+
+{ now
+  1. Implement the minimizer with a label
+  2. create the Help tip to display all the shortcuts for printing
+  3. Establish a good print debug for any concepts - like printing the root meshes of a scene
+}
+
+
+
+BUG:
+I think on collapsing an inner dropdown (fake removing by alpha), the listeners are still there. 
+Proven by when PRE_MULTIPLY is off and the actual collapsed menu is still hovered
+
+
+
+IMPORTANT: 
+If we want faster recalculation ONLY for a sections items positions,
+??? NOT IMPLEMENTED
+
+IMPORTANT: 
+If we want to add a close/minimize to a widget, and that widget is an item of a root section,
+then we need to build the item widget in PRIVATE gfx buffer.
+HOW TO IMPLEMENT AN AUTOMATIC DETECTION OF PRIVATE TO ROOT AND PRIVATE SEPERATE???
+
+IMPORTANT: 
+In order to implement the framebuffer rendering for the portion of the widget, must:
+* Move the widget at the 0,0 left-bottom of the screen.
+* The position of the mesh must remain on the original position, so the event listeners sample from that space.
+That means we need an extra position array 
+Or
+just move the mesh and leave the position untouched.
+* Upon moving the framebuffer mesh, we move only one rect
+BUT when the move finishes(onGrabbed = false), we must Move the actual widget to the new position,
+so the listeners sample from the new space.
+So what needs to be done is:
+1. For the rendering position of the widget we only set the vertexbuffer's position so it will be rendered at the bottom-left corner
+2. But the meshes position must follow the position of the framebuffer mesh. 
+
+
+// CONTINUE:
+
+
+
+IMIDIATELY:
+If all dropdown menus are TOP-DOWN aligned,
+maybe we do not need to calculate positionss for root,
+rather from the clicked dp and down.
+ALSO: remove any reduntant work in Calc()->Resize. Maybe address only nested meshes and tree parants that are effected from the dp menu open
+
+IMIDIATELY:
+The alpha value param in FakeAddFromGfxAlpha is reduntant 
+Either we use on function with alpha value as param OR 2 separate for Add/Remove with no param
+
+IMIDIATELY:
+Clean up the 'params' passed in the time intervals and the events
+
+IMIDIATELY:
+maybe draw every large text menu to a framebuffer
+and do not render the text at all.
+
+IMIDIATELY:
+Implement the passing of specific start and end ib indexes for framebuffer Drawing to texture,
+so we can have a scroller in the same buffers as the dropdown menu
+and then create a framebuffer for the scroller and FAKE remove the scrolled sectio meshes
+
+IMIDIATELY:
+Find and replace,where posible, all 'Recalc()' to just repositioning with 'Calculate_positions_recursive()' 
+
+******************** GFX
+
+IMIDIATELY:
+Must group all vertex buffers in render queue (of texture programs)
+so that in the Draw function we do not switch textures because of interleaved vbs with different textures.
+Also every time we add to the render queue we must check for the grouping.
+
+
+IMIDIATELY:
+It is very complicated that we do not have a pipeline for the "mesh update gfx buffers". 
+So every time we want to implement something that is triggered from a meshes update,
+we need to go through many classes and functions to make it work.
+For example: to update the framebuffer_needs_update variable we go through:
+Mesh{all the Gl_Set functions}
+Widget_label
+Widget_Rect
+Widget_Text
+section
+.
+.
+.
+We need something more concrete  as to where the updates are passing through
+
+The same acounts for the recursive functionality of the parent-children relationship 
+
+
+IMIDIATELY:
+Replace any js timeInterval with App's time intervals
+
+IMIDIATELY:
+If OnMove mesh, keep the Batch buffer to use on next frame!!!
+
+
+
+
+
+TODO:
+Find a way of arbitrarily change the vertex buffers (via indexing) in order to
+keep the vertex buffer size as small as possible.
+Example: In dropdown menus, when meshes are deactivated and removed from the vertex buffer,
+the total size is still the maximum of any previous state.
+
+
+TODO:
+Try implementing Framebuffer rendering for scrolled meshes, just like clamping.
+Divide the mesh into chunks represented by framebuffer textures, and switch the texture and position to render the scrolled section
+
+TODO: Implement glBufferSubData()
+
+TODO: Use glMapBuffer for manipulating the vertex buffer on cpu side
+https://registry.khronos.org/OpenGL-Refpages/gl4/html/glMapBuffer.xhtml
+
+TODO: For hovering.
+If a widget has many meshes that have hover, in a parent child tree structure,
+maybe the root widget decides what mesh gets to color hover (or many meshes at once),
+to avoid the crazy color hover.
+Or each mesh stays hovered if the mouse has not left the boundraries, even if the mouse is hovering another mesh inside it.
+
+TODO: Implement the concept of "Listen event" and "Callback event" 
+Listen event is listening in the App loop,
+the callback event is called on a trigger.
+
+TODO:
+Implement the concept of distributing intense work over multiple frames.
+Like the removal of widgets, or the batch proccess.
+
+TODO:
+Any large kind of large data that Mesh or any other widget may have,
+should be implemented in a buffer some place elsewhere and have an index to that data
+
+TODO:
+Implement the concept of "sparse array to a condence array"
+
+TODO: 
+Implement widget table. 
+
+TODO:
+Set batch for removing meshes (from vertexbuffers)
+
+TODO:
+For time intervals that need updated every frame,
+set a special case, pass a CONSTANT as a number in milisecs,
+that will update the intervals callback on every frame of the application,
+without checking a timer.
+
+TODO: Minimize Memory Fototprint
+*Gfx attributes may be removed from the mesh, 
+and instead have an index to a color buffer
+
+
+TODO:
+Dive into how we can efficiently not draw specific vertices.
+1. Like reconstructing the index buffer by exluding the indices not to be drawn (for vertices that are not contiguous in vertex buffer)
+2. If vertices are contiguous, change the start and end of the index buffer on GlDraw()
+
+TODO:
+Implement all class names to an array and class has only an index to the name.
+In order to see the text name for debugging, create a conditional: if(DEBUG.see names) name=string Else name=index
+and enable-disable with DEBUG.see name = true/false
+
+TODO:
+Remove any duplicate methods of Mesh, Text_Mesh, Rect_Mesh and the rest.
+(Remove all functions from geometry and material and have the Mesh calling directly)
+Also organize all the methods of the Mesh class with the widget class deriving from them
+
+TODO:
+On a dropdown menu deactivation,
+  check if the attributes of the meshes to be removed are in a concecutive order at the end of the gfx buffer,
+  so that we can simply remove the indexes and reduce the vertexbuffer's count
+
+TODO:
+Create a DEBUG hover listeners buffer, only for the tip tool.
+By  calling one function with a root widget and run recursive down the tree.
+
+TODO:
+Learn how VAO's work and use them properly
+
+TODO:
+Go Workers!
+
+TODO: 
+Render all the meshes that are static to a frame buffer texture and render the texture.
+
+TODO:
+Create a SID flag for textured meshes, since different texture units ought to be drawn in separate vertex buffers.  
+
+TODO: 
+Write down to a piece of paper all the possible updates of a mesh/widget and of the gfx attributes updates too,
+to have a clear understanding of the system in order to find a solution as to how the batch update should be best implemented
+
+
+
+
+. Implement second popup menu(from the main popup menu)
+
+. Maybe we should implement timeIntervals for the Gl_draw function. 
+. Or have static meshes in specific programs and buffers. 
+
+. Create a division of canvas, for colission detection, 
+  implement meshes in 2D(like UI) and many more.
+. Finish a good implementation for Animations.
+. Event driven system and how it can offer efficiency and/or flexibility.
+. Implement glBufferSubData.
+. Implement the strategy for divide meshes into static draw and dynamic draw.
+
+. - Index Buffers - 
+  . Test draw specific meshes from creating another index buffer, 
+    or if possible select indices from an index buffer.
+  . Maybe create groups of indices stored in meshes, that
+    will allow the re-rendering of certain groups of meshes,
+    also maybe we implement an index-based solution to
+    address vertices and its attributes instead of gfxInfo start????  
+
+. - More Geometry -
+  . Line
+  . BezierCurve
+  . Triangle2D
+  . Triangle3D
+  . etc
+--------------------------------------------------- // TODO
+
+--------------------------------------------------- CONTINUE
+
+* Fix the loop start and end -2 +2, for accessing only the scroll section children
+
+DONE! * Set the CreateScroller() test to use the old system of clamp, to compare it with the new
+
+* Implement a more efficient TEMP_RERENDER. A batch kind I assume to re-render to gfx
+
+* Implement all move recursive functions with loops: (Recurse_reset_gfxbuffers_from_mesh_tree())
+
+--------------------------------------------------- CONTINUE
+
+
+--------------------------------------------------- ISSUES
+Not Updating GfxInfoUi
+{ 
+  1. Open the UiGfxInfo dropdown
+  2. Open the mouse infoUi 
+  3. Deactivate UiGfxInfo (from the switch button)
+  4. Deactivate the mouse infoUi
+
+  If we reactivate the UiGfxInfo, the deactivated mouse infoUi dropdown
+  is still showing in the UiGfxInfo. 
+
+  SOLUTIONS:
+  Is the UiGfxInfo updating the real vertex buffers????
+
+}
+
+Still rendering on FAKE removal of attributes from vertex buffers(set alpha to 0)
+{
+  When a dropdown is closed, via the alpha value of it's attributes set to 0,
+  the meshes of the menu of that dropdown:
+  1. Remain visible
+  1. The event listeners do not get destroyed, if they are not children events of the dp/menu events
+}
+--------------------------------------------------- ISSUES
+
+
+
