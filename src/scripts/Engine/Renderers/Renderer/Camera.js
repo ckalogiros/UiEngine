@@ -1,7 +1,6 @@
 import { MouseGetPosDif, MouseGetWheel } from '../../Controls/Input/Mouse.js';
 import { TimerGetGlobalTimer } from '../../Timers/Timers.js';
 import { Matrix4 } from '../../../Helpers/Math/Matrix4.js';
-import { Uniform_update_projection_matrix } from '../../../Graphics/ShaderPrograms.js';
 
 
 
@@ -60,26 +59,7 @@ export class Camera extends Matrix4 {
 			this.Rotate();
 		}
 
-		// this.UpdateProjectionUniformAll(gl);
 	}
-	// UpdateProjectionUniformAll(gl){  // HOT-PATH
-
-	// 	// Update proj matrix for all gl programs
-	// 	const groups_count = Gl_get_progam_group_count();
-	// 	for(let i=0; i<groups_count; i++){
-			
-	// 		const progs_count = Gl_get_progams_count(i);
-	// 		for(let j=0; j<progs_count; j++){
-	// 			Uniform_update_projection_matrix(gl, i, j, this.matrix);
-	// 		}
-	// 	}
-	// }
-
-
-	// UpdateProjectionUniform(gl, progidx, progs_group){
-		
-	// 	Uniform_update_projection_matrix(gl, progs_group, progidx, this.matrix);
-	// }
 
 
 
@@ -169,6 +149,8 @@ export class CameraOrthographic extends Camera {
 
 		this.makeOrthographic( left, right, top, bottom, near, far );
 		this.isSet = true;
+
+		console.log('Camera Projection:', this.matrix)
 	}
 
 }

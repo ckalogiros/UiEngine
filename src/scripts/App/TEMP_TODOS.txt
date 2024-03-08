@@ -197,3 +197,88 @@ void main(void)
    color = Stylize();
   frag_color = color;
 }
+
+
+
+
+
+#version 300 es
+// Vertex Shader
+precision mediump float;
+//
+//
+in vec4 a_col;
+in vec4 a_wpos_time;
+in vec2 a_pos;
+in vec2 a_tex;
+//
+uniform mat4 u_projection;
+//
+out vec4 v_col; 
+out vec2 v_tex_coord;
+//
+void main(void) 
+{
+  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);
+  v_col = a_col;
+  v_tex_coord = a_tex;
+   gl_PointSize = 10.
+
+
+
+#version 300 es
+// Fragment Shader
+//
+precision mediump float;
+out vec4 frag_color;
+//
+in vec4 v_col;
+in vec2 v_tex_coord;
+//
+uniform sampler2D u_sampler0;
+
+// set to distance fields pixel range
+// uniform float pxRange;
+// float pxRange = 22.5;
+float pxRange = 15.5;
+// float pxRange = 6.5; // minimum
+
+float median(float r, float g, float b) {
+  return max(min(r, g), min(max(r, g), b));
+}
+float screenPxRange() {
+  vec2 unitRange = vec2(pxRange)/vec2(textureSize(u_sampler0, 0));
+  // vec2 unitRange = vec2(pxRange);
+  vec2 screenTexSize = vec2(1.0)/fwidth(v_tex_coord);
+  return max(0.5*dot(unitRange, screenTexSize), 1.0);
+}
+
+
+// VERY SIMPLE BLUR FOR GLOWING EFFECT.
+float Glow()
+{
+  float dist2 = 0.001;
+  float blur = texture(u_sampler0, v_tex_coord + vec2(dist2, 0.0)).a +
+               texture(u_sampler0, v_tex_coord - vec2(dist2, 0.0)).a +
+               texture(u_sampler0, v_tex_coord + vec2(0.0, dist2)).a +
+               texture(u_sampler0, v_tex_coord - vec2(0.0, dist2)).a;
+  
+  return blur /= 8.0;
+}
+vec4 Msdf() {
+  vec4 texel = texture(u_sampler0, v_tex_coord);
+  float dist = median(texel.r, texel.g, texel.b);
+  float pxDist = screenPxRange() * (dist - 0.5);
+  float opacity = clamp(pxDist + 0.5, 0.0, 1.0);
+  // opacity += Glow() * 2.4; // Combine the original texture with the blurred alpha
+  vec4 alpha = vec4(opacity+.0); 
+  return alpha; 
+}
+
+void main(void) 
+{
+  vec4 color = v_col;
+  color *= Msdf();
+  frag_color = color;
+  frag_color.rgb *= v_col.a; 
+}

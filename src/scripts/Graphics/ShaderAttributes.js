@@ -187,14 +187,13 @@ export function Shader_attributes_create(sid, shader_program) {
 
 export function Shader_attributes_enable(attribsidx){
 
-   const buffer_type = FLOAT; // TODO: Who handles and owns the buffer type???
    const gl_type = gfxCtx.gl.FLOAT; // TODO: store the gl.type inside the shaderinfo???
 
    const shader_attribs = _shader_attribs_buffer.buffer[attribsidx];
 
    const len = shader_attribs.locs.length;
    for (let i = 0; i < len; i++) {
-      gfxCtx.gl.vertexAttribPointer(shader_attribs.locs[i], shader_attribs.sizes[i], gl_type, false, shader_attribs.attribs_per_vertex * FLOAT, shader_attribs.offsets[i] * FLOAT);
+      gfxCtx.gl.vertexAttribPointer(shader_attribs.locs[i], shader_attribs.sizes[i], gl_type, false, shader_attribs.attribs_per_vertex * FLOAT32_BYTE_SIZE, shader_attribs.offsets[i] * FLOAT32_BYTE_SIZE);
       
       gfxCtx.gl.enableVertexAttribArray(shader_attribs.locs[i]);
    }

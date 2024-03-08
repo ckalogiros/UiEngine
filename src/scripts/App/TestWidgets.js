@@ -67,7 +67,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    const uidbg = Debug_info_ui_performance(scene);
+    // const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -76,7 +76,7 @@ export function TestWidgetsGeneric(scene) {
 
 
     /** Lines */
-    // SdfLine(BLUE_10_120_220, [500, 200, 5], [800, 10]);
+    SdfLine(BLUE_10_120_220, [500, 200, 5], [800, 10]);
     // SdfLine(GREEN_140_240_10, [500, 600, 5], [800, 10]);
     // SdfLine(PINK_240_60_160, [500, 400, 5], [800, 10]);
 
@@ -95,7 +95,7 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    // const label = CreateLabel('LABEL');
+    const label = CreateLabel('LABEL');
     // CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
@@ -224,6 +224,10 @@ function CreateLabel(name = 'Label ') {
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.ConstructListeners();
 
+    // label.sid.unif |= SID.UNIF.BLOCK | SID.UNIF.GENERIC1;
+    // label.text_mesh.sid.unif |= SID.UNIF.BLOCK | SID.UNIF.GENERIC;
+    // label.text_mesh.sid.unif |= SID.UNIF.BLOCK | SID.UNIF.GENERIC2;
+
     // const pos = [halfw, VIEWPORT.HEIGHT-halfh, 0];
 
     label.Activate();
@@ -306,7 +310,7 @@ function SdfLine(col, pos, dim) {
     // line1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     // line.AddItem(line1)
     
-    
+    // line.sid.unif |=  SID.UNIF.SHARED_BLOCK | SID.UNIF.PROJECTION_MATRIX;
     
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     line.Activate();

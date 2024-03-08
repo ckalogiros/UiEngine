@@ -8,7 +8,7 @@ import { _pt_test_misc_1 } from '../Engine/Timers/PerformanceTimers.js';
 
 
 
-
+let temp_change = false;
 
 export function Gl_draw(gl) {
 
@@ -18,8 +18,15 @@ export function Gl_draw(gl) {
     
     gl.clearColor(0.18, 0.18, 0.18, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
-    
+
+    if(temp_change){
+
+        // UBO_change_val();
+        // UBO_update();
+        temp_change = false;
+    }
+
+
     for (let i = 0; i < drawQueueCount; i++) {
         
         const groupidx = drawQueue[i].groupidx;
@@ -43,7 +50,6 @@ export function Gl_draw(gl) {
         
         if (GL.BOUND_VAO !== vb_info.vao){
             gl.bindVertexArray(vb_info.vao)
-            // console.log('000000000000000', vb_info.vaoidx, vb_info.vao)
         }
         if (GL.BOUND_TEXTURE_IDX !== vb_info.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_info.texidx !== INT_NULL ) {
             const texture = Texture_get_texture_byidx(vb_info.texidx);
@@ -66,7 +72,11 @@ export function Gl_draw(gl) {
             // const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
             // Shader_attributes_enable(attribsidx);
             _pt_test_misc_1.timer.Stop();
+
+            temp_change = true;
+
         }
+
         
         
         if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE){

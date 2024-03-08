@@ -34,7 +34,7 @@ const PROGRAMS_GROUPS = {
 
     DEFAULT: {
         IDX: INT_NULL, // The default group stores shader programs for 
-        MASK: _cnt<<=0x1,
+        MASK: _cnt <<= 0x1,
     },
 
     // SIZE: 2,
@@ -44,9 +44,9 @@ const PROGRAMS_GROUPS = {
         else if (mask & this.DEBUG.MASK) return this.DEBUG.IDX;
     },
 
-    /**DEBUG */ GetName(idx){
-        if(this.DEBUG.IDX === idx) return 'DEBUG progs group'
-        else if(this.DEFAULT.IDX === idx) return 'DEFAULT progs group'
+    /**DEBUG */ GetName(idx) {
+        if (this.DEBUG.IDX === idx) return 'DEBUG progs group'
+        else if (this.DEFAULT.IDX === idx) return 'DEFAULT progs group'
         else return `UNKOWN progs group index. index:${idx}`
     },
 }
@@ -88,9 +88,12 @@ const SID = {
     },
 
     UNIF: {
-        PROJECTION: 0x1,
-        U_BUFFER: 0x2,
-        BUFFER_RES: 0x4,
+        U_BUFFER: BIT5 <<= 0x1,
+        BUFFER_RES: BIT5 <<= 0x1,
+
+        SHARED_BLOCK: BIT5 <<= 0x1,
+        PROJECTION_MATRIX: BIT5 <<= 0x1,
+        SCREEN_RESOLUTION: BIT5 <<= 0x1,
     },
 
     // FX
@@ -136,10 +139,10 @@ const SID = {
             sid1.unif === sid2.unif &&
             sid1.pass === sid2.pass &&
             sid1.progs_group === sid2.progs_group
-        ){
+        ) {
             return true;
         }
-        
+
         return false;
     },
 
@@ -156,7 +159,7 @@ const SID = {
 
 const GRAPHICS_LAYOUT = {
     ONE_ATTR_SIZE: 1,
-    ATTR_SIZES:{
+    ATTR_SIZES: {
         COL4: 4,
         WPOS4: 4,
         PARAMS1: 4,
@@ -165,7 +168,7 @@ const GRAPHICS_LAYOUT = {
         XY: 2,
         XYZ: 3,
     },
-    ATTR_SELF_OFFSETS:{
+    ATTR_SELF_OFFSETS: {
         ALPHA: 3, // the third float in a col4
         WPOS_Y: 1, // The second attribute in a WPOS-X
         DIM_Y: 1, // The second attribute in a DIM2
@@ -198,18 +201,6 @@ const V_SDF_COUNT = 2;
 const V_ROUND_CORNER_STRIDE = 0;
 const V_BORDER_WIDTH_STRIDE = 1;
 const V_BORDER_FEATHER_STRIDE = 2;
-
-
-const NO_SPECIFIC_GL_BUFFER = INT_NULL;
-const GL_VB = {
-
-    // Let the application decide. If a vertex buffer with the same ...
-    ANY: 0, // SID exists, it will use it, else it will create a new one.
-    NEW: 1, // Create a new vertexBuffer.
-    SPECIFIC: 2, // Use specific index of a vertex buffer.
-    // Use private vertex buffer. If a private and inactive buffer exists it will use that, ...
-    PRIVATE: 3, // ... else it will create a new buffer and render it as private
-};
 
 
 _cnt = 0x1;
@@ -254,7 +245,6 @@ const GFX_CTX_FLAGS = {
     DYNAMIC: _cnt <<= 0x1, // Choose a buffer that is going to be updated every frame
 };
 
-const MAX_RESERVED_BUFFERS = 10;
 
 
 
@@ -272,11 +262,14 @@ const BUFFER_STATE = {
     // isPrivate = false; // SEE ## PRIVATE_BUFFERS
 };
 
+
+
+
 _cnt = 0x1;
 const BUFFER_TYPE = {
 
-   FLOAT32: _cnt,
-   UINT16: _cnt<<=0x1,
+    FLOAT32: _cnt,
+    UINT16: _cnt <<= 0x1,
 
 }
 
@@ -285,7 +278,7 @@ const BUFFER_TYPE = {
 _cnt = 0x1;
 const PROGRAM_STATE = {
     ACTIVE: _cnt, // UNNECESSARY: Possibly has no usefuleness
-    UNIFORMS_NEED_UPDATE: _cnt<<=0x1,
+    UNIFORMS_NEED_UPDATE: _cnt <<= 0x1,
     // NEEDS_UPDATE: _cnt <<= 0x1,
 };
 
@@ -304,82 +297,7 @@ let cntPart = 0;
 /*************************************************************************************************/
 // UNIFORMS
 
- const UNIFORM_PARAMS = {
-    WHT: { // Width, Height, Time
-        widthIdx: 0,
-        heightIdx: 1,
-        timeIdx: 2,
-        count: 3,
-        progidx: INT_NULL,  // reference to the program
-    },
-    defaultVertex: { // Uniform buffer indexes to pass default vertex shader params
-        widthIdx: cnt1++,
-        heightIdx: cnt1++,
-        timeIdx: cnt1++,
-        mouseXPosIdx: cnt1++,
-        mouseYPosIdx: cnt1++,
-        count: cnt1,
-        progidx: INT_NULL,  // reference to the program
-    },
-    sdf: { // Uniform buffer indexes to pass sdf params
-        innerIdx: cnt2++,
-        outerIdx: cnt2++,
-        count: cnt2,
-        progidx: INT_NULL,
-    },
-    NOISE: {
-        widthIdx: 0,
-        heightIdx: 1,
-        timeIdx: 1,
-        dirIdx: 1,
-        count: 2,
-        progidx: INT_NULL,  // reference to the program
-    },
-    GLOW: {
-        widthIdx: 0,
-        heightIdx: 1,
-        glowSize: 2,
-        count: 3,
-        progidx: INT_NULL,  // reference to the program
-    },
-    VORTEX: {
-        widthIdx: 0,
-        heightIdx: 1,
-        radiusIdx: 2,
-        count: 3,
-        progidx: INT_NULL,  // reference to the program
-    },
-    TWIST: {
-        widthIdx: 0,
-        heightIdx: 1,
-        timeIdx: 2,
-        dirIdx: 3,
-        count: 4,
-        progidx: INT_NULL,  // reference to the program
-    },
-    particles: { // Uniform buffer indexes to pass default vertex shader params
-        widthIdx: cntPart++,
-        heightIdx: cntPart++,
-        speedIdx: cntPart++,
-        count: cntPart,
-        progidx: INT_NULL,  // reference to the program
-    },
-    CRAMBLE: {
-        widthIdx: 0,
-        heightIdx: 1,
-        timeIdx: 2,
-        count: 3,
-        progidx: INT_NULL,  // reference to the program
-    },
-    VORONOI_EXPLOSION: {
-        widthIdx: 0,
-        heightIdx: 1,
-        timeIdx: 2,
-        count: 3,
-        progidx: INT_NULL,  // reference to the program
-    },
 
-};
 
 // Store key-value pairs of texture name - texture index(for the global texture array. See GlTextures.js)
 // TODO: Create buffers of fonts and farmebuffers
@@ -415,7 +333,6 @@ const UNIF_TYPE = {
     UIVEC4: 0x8dc8, // _VEC4
 };
 
-const FLOAT = 4; // 4 Bytes
 
 
 

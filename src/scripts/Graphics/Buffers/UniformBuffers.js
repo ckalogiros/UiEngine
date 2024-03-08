@@ -1,6 +1,8 @@
 "use strict";
 
+import { GetRandomColor } from "../../Helpers/Helpers";
 import { Program_use_program } from "../ShaderPrograms";
+import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilder";
 
 
 // Array of scalars
@@ -43,7 +45,7 @@ function SetValueV4ui(gl, loc, val) { gl.uniform4uiv(loc, val); }
 
 export class Uniform {
 
-   
+
    constructor(val = null, loc = null, type = null) {
 
       this.val = val;// Uniform value
@@ -94,7 +96,7 @@ export class Uniform {
 
 
 export class UniformsBuffer {
-   
+
    ub;
    names; // A way to get a specific uniforms index.
    count;
@@ -102,7 +104,7 @@ export class UniformsBuffer {
    needsUpdate;
 
    constructor(gl, prog, size) {
-      
+
       this.needsUpdate = false;
       this.count = 0;
 
@@ -140,3 +142,222 @@ export class UniformsBuffer {
    }
 
 }
+
+
+
+export class BufferLayout {
+
+   constructor() {
+
+      this.buffer = null;
+      this.layout = {
+         locs: [],
+         sizes: [],
+         names: [],
+      }
+   }
+
+   AddLayout(type, typeid, name) {
+
+      const size = TYPES.GetSizeInBytes(type, typeid) / FLOAT32_BYTE_SIZE;
+
+      // Initialize
+      if (!this.buffer) {
+         this.buffer = new Float32Array(size);
+      }
+
+      this.layout.sizes.push(size);
+      this.layout.names.push(name);
+
+      const len = this.layout.locs.length;
+      if (len === 0) {
+         const locidx = this.layout.locs.push(0) - 1;
+         return locidx;
+      }
+      else {
+         const start = this.layout.locs[len];
+         const locidx = this.layout.locs.push(start) - 1;
+         return locidx;
+      }
+
+   }
+
+
+   SetVal(locidx, val) {
+
+      // IMPORTANT: We must check if val is array 
+
+      const start = this.layout.locs[locidx];
+      const size = this.layout.sizes[locidx];
+
+      const len = val.length;
+      if (len !== size) { console.error('Size mismatch'); alert('SEE console error. Size mismatch'); }
+
+      let cnt = start;
+      for (let i = 0; i < len; i++) {
+         this.buffer[cnt++] = val[i];
+      }
+   }
+
+}
+
+
+
+
+const _uniform_shared_block = {
+   block: null,
+   gl_layout: null,
+   needsUpdate: false,
+};
+
+export function UBO_SetUniform(uniform_locidx, val) {
+   _uniform_shared_block.block.SetVal(uniform_locidx, val);
+   _uniform_shared_block.needsUpdate = true;
+}
+
+
+
+let ubs_counter = 0;
+
+
+export class UniformsSharedBlock {
+
+   constructor(gl, program, uniform_block_name, progidx) {
+
+      this.binding_index = ubs_counter++;
+      this.name = uniform_block_name;
+      this.progidx = progidx;
+
+      this.loc = gl.getUniformBlockIndex(program, uniform_block_name);
+      gl.uniformBlockBinding(program, this.loc, this.binding_index);
+
+      this.glbuffer = gl.createBuffer();
+      gl.bindBufferBase(gl.UNIFORM_BUFFER, this.binding_index, this.glbuffer);
+
+   }
+
+}
+
+
+
+export function UBO_create(program, sid, progidx) {
+
+   const gl = gfxCtx.gl;
+
+   
+   // Create the shared block buffer if it is not yet created
+   if (!_uniform_shared_block.block) {
+      
+      _uniform_shared_block.gl_layout = new UniformsSharedBlock(gl, program, UNIFORM_BLOCK_SHARED_NAME, progidx);
+      const shared_buffer = new BufferLayout(FLOAT32_BYTE_SIZE)
+      _uniform_shared_block.block = shared_buffer;
+   }
+
+   if (sid & SID.UNIF.PROJECTION_MATRIX) {
+      UBS.PROJECTION_LOC = _uniform_shared_block.block.AddLayout(TYPES.MAT4X4, TYPES.ID, 'UBS Projection');
+   };
+   if (sid & SID.UNIF.SCREEN_RESOLUTION) {
+      UBS.RESOLUTION_LOC = _uniform_shared_block.block.AddLayout(TYPES.VEC2, TYPES.ID, 'UBS screen Resolution');
+   }
+
+   // 
+   gl.bindBufferBase(gl.UNIFORM_BUFFER, _uniform_shared_block.gl_layout.binding_index, _uniform_shared_block.gl_layout.glbuffer);
+   gl.bufferData(gl.UNIFORM_BUFFER, _uniform_shared_block.block.buffer, gl.DYNAMIC_DRAW);
+
+   console.log('---- Uniform Shared Block', _uniform_shared_block)
+}
+
+
+
+
+export function UBO_update() { // HOT-PATH
+
+   if (!_uniform_shared_block.needsUpdate) {
+      return;
+   }
+
+
+   const gl = gfxCtx.gl;
+
+   gl.bindBufferBase(gl.UNIFORM_BUFFER, _uniform_shared_block.gl_layout.binding_index, _uniform_shared_block.gl_layout.glbuffer);
+   // // gl.bufferData(gl.UNIFORM_BUFFER, Block, gl.DYNAMIC_DRAW);
+
+   // // bufferSubData(target, dstByteOffset, srcData, srcOffset, length)
+   gl.bufferSubData(gl.UNIFORM_BUFFER, 0, _uniform_shared_block.block.buffer, 0, 0);
+
+   _uniform_shared_block.needsUpdate = false;
+
+}
+
+
+
+// export function UBO_change_val(){
+
+//    const col = GetRandomColor();
+//    Block[0] = col[0];
+//    Block[1] = col[1];
+//    Block[2] = col[2];
+//    Block[3] = col[3];
+//    const col2 = GetRandomColor();
+//    Block[4] = col2[0];
+//    Block[5] = col2[1];
+//    Block[6] = col2[2];
+//    Block[7] = col2[3];
+// }
+
+
+/** SAVE initial UB Block Test */
+// export const UNIFORM_BLOCK_BINDING_POINT = 0;
+// // export const Block = new Float32Array(RED);
+// export const Block = new Float32Array([
+//    1.0, 0.0, 0.0, 1.0,
+//    1.0, 0.0, 1.0, 1.0,
+// ]);
+
+// const buffers = []
+
+// export function UBO_create(program){
+
+//    const gl = gfxCtx.gl;
+
+//    const loc = gl.getUniformBlockIndex(program, 'Block');
+
+//    gl.uniformBlockBinding(program, loc, UNIFORM_BLOCK_BINDING_POINT);
+
+//    const buffer = gl.createBuffer();
+//    buffers[0] = buffer;
+
+//    gl.bindBufferBase(gl.UNIFORM_BUFFER, UNIFORM_BLOCK_BINDING_POINT, buffer);
+
+//    gl.bufferData(gl.UNIFORM_BUFFER, Block, gl.DYNAMIC_DRAW);
+
+// }
+
+// export function UBO_change_val(){
+
+//    const col = GetRandomColor();
+//    Block[0] = col[0];
+//    Block[1] = col[1];
+//    Block[2] = col[2];
+//    Block[3] = col[3];
+//    const col2 = GetRandomColor();
+//    Block[4] = col2[0];
+//    Block[5] = col2[1];
+//    Block[6] = col2[2];
+//    Block[7] = col2[3];
+// }
+
+// let srcOffset = 0;
+// const stride = 4;
+
+// export function UBO_update(){
+
+//    const gl = gfxCtx.gl;
+
+//    gl.bindBufferBase(gl.UNIFORM_BUFFER, UNIFORM_BLOCK_BINDING_POINT, buffers[0]);
+//    // gl.bufferData(gl.UNIFORM_BUFFER, Block, gl.DYNAMIC_DRAW);
+
+//    // bufferSubData(target, dstByteOffset, srcData, srcOffset, length)
+//    gl.bufferSubData(gl.UNIFORM_BUFFER, 0, Block, 4, 0);
+
+// }

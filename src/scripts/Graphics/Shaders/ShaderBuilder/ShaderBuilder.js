@@ -70,17 +70,34 @@ export const SHADER_CONSTANTS = {
 
 
 
+export const UNIFORM_BLOCK_SHARED_NAME = 'Uniform_block_shared';
+// export const UNIFORM_BLOCK_BINDING_POINT = ubs_counter++;
+
+
+
 export function Shaders_build_vertex_shader(sid){
    const vs_chunks = [
 
       '#version 300 es',
       '// Vertex Shader',
       '#include <precision_medium>', // TODO: Let the app decide the precision
-      '//',
+      '\n',
+     
+     
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // DEFINES
       (sid.unif & SID.UNIF.U_BUFFER) ? `#define UNIFORM_BUFFER_COUNT ${SHADER_CONSTANTS.UNIFORM_BUFFER_COUNT}` : '',
-      '//',
+      '\n',
+      
+      
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Uniform Block
+      (sid.unif & SID.UNIF.SHARED_BLOCK) ? `layout(std140) uniform ${UNIFORM_BLOCK_SHARED_NAME} {` : '',
+      (sid.unif & SID.UNIF.PROJECTION_MATRIX) ? ' mat4 u_projection;' : '',
+      (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? ' vec2 u_screen_res;' : '',
+      (sid.unif & SID.UNIF.SHARED_BLOCK) ? '};' : '',
+      '\n',
+      
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // INS
@@ -91,14 +108,16 @@ export function Shaders_build_vertex_shader(sid){
       (sid.attr & SID.ATTR.TEX2) ? 'in vec2 a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <in_attr_sdf2>' : '',
       (sid.attr & SID.ATTR.POS3) ? 'in vec3 a_pos;' : '',
-      '//',
+      '\n',
       
+
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // UNIFORMS
-      (sid.unif & SID.UNIF.PROJECTION) ? 'uniform mat4 u_projection;' : '',
+      // (sid.unif & SID.UNIF.PROJECTION) ? 'uniform mat4 u_projection;' : '',
       (sid.unif & SID.UNIF.U_BUFFER) ? 'uniform float uniforms_buffer[UNIFORM_BUFFER_COUNT];' : '',
-      '//',
+      '\n',
       
+
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // OUTS
       (sid.unif & SID.UNIF.U_BUFFER) ? 'out float v_uniforms_buffer[UNIFORM_BUFFER_COUNT];' : '',
@@ -112,14 +131,17 @@ export function Shaders_build_vertex_shader(sid){
       (sid.attr & SID.ATTR.FEATHER) ? '#include <out_border_feather>' : '',
       (sid.pass & SID.PASS.TIME1) ? '#include <out_vtime1>' : '',
       (sid.pass & SID.PASS.RES2) ? '#include <out_vres2>' : '',
-      '//',
+      '\n',
       
+
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       'void main(void) ',
       '{',
-      (sid.unif & SID.UNIF.PROJECTION) 
+      (sid.unif & SID.UNIF.SHARED_BLOCK) 
          ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);' 
+         // ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);' 
          : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
+
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // ASSIGNMENTS
@@ -134,6 +156,9 @@ export function Shaders_build_vertex_shader(sid){
       (sid.attr & SID.ATTR.FEATHER) ? '  v_border_feather = a_params1.z;' : '',
       (sid.unif & SID.UNIF.U_BUFFER) ? '  v_uniforms_buffer = uniforms_buffer;' : '',
       (true) ? '   gl_PointSize = 10.0;' : '',
+      // (sid.unif & SID.UNIF.BLOCK) ? '   v_col = generic;' : '',
+      // (sid.unif & SID.UNIF.BLOCK && sid.unif & SID.UNIF.GENERIC1) ? '   v_col = generic1;' : '',
+      // (sid.unif & SID.UNIF.BLOCK && sid.unif & SID.UNIF.GENERIC2) ? '   v_col = generic2;' : '',
       '}',
 
    ];
@@ -146,6 +171,7 @@ export function Shaders_build_vertex_shader(sid){
    return vs;
 }
 
+
 export function Shaders_build_fragment_shader(sid){
 
    const fs_chunks = [
@@ -155,7 +181,7 @@ export function Shaders_build_fragment_shader(sid){
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // DEFINES
-      '//',
+      '\n',
       (sid.unif & SID.UNIF.U_BUFFER) ? '#define UNIFORM_BUFFER_COUNT 5' : '',
       (sid.unif & SID.UNIF.BUFFER_RES) ? '#define UB_HAS_RESOLUTION' : '',
       (sid.unif & SID.UNIF.BUFFER_RES) ? '#define UB_IDX0 0' : '',
@@ -165,7 +191,7 @@ export function Shaders_build_fragment_shader(sid){
       
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // In
-      '//',
+      '\n',
       (sid.unif & SID.UNIF.U_BUFFER) ? '#include <in_frag_v_uniforms_buffer>': '',
       (sid.pass & SID.PASS.COL4) ? '#include <in_frag_col4>' : '',
       (sid.pass & SID.PASS.DIM2) ? '#include <in_frag_dim2>'   : '',
@@ -175,7 +201,7 @@ export function Shaders_build_fragment_shader(sid){
       (sid.attr & SID.ATTR.R_CORNERS) ? '#include <in_frag_rCorners>' : '',
       (sid.attr & SID.ATTR.FEATHER) ? '#include <in_frag_border_feather>' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <in_frag_sdf2>' : '',
-      '//',
+      '\n',
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

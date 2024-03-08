@@ -1,6 +1,5 @@
 "use strict";
 
-import { Section } from "../Meshes/Section.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { M_Buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
@@ -11,7 +10,8 @@ import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_get_rootidx, Widget_group_rerender, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
 import { Clipy_from_widget_root } from "../Operations/Clip.js";
-import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { Section } from "../Meshes/Section.js";
 
 /**
  * SEE: ### Widget_Dropdown

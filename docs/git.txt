@@ -38,17 +38,11 @@ Create a new branch
 
 
 
+
 /***************************
 # Clone specific branch 
 git clone -b branchName git@github.com:user/myproject.git
 
-/***************************
-#add all untract files
-    git add -i
-THEN
-    'a' and enter // for untract
-    '*' and enter // select all 
-    'q' to exit
 
 
 /***************************
@@ -63,6 +57,17 @@ AND THEN
 
 /***************************
 #Rewrite a repo (duplicate a git project)
+
+
+
+/***************************
+#add all untract files
+    git add -i
+THEN
+    'a' and enter // for untract
+    '*' and enter // select all 
+    'q' to exit
+
 
 
 /***************************

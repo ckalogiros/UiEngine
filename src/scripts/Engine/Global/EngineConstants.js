@@ -1,5 +1,6 @@
 "use strict";
 
+let _cnt = 0x1;
 
 const INT_NULL = -1; // For case like 0 index arrays, where the number 0 index cannot be used as null element for a buffer
 // const FLOAT_NULL = 0xFFFFFFFF; // Same for float 32 buffer indexing.
@@ -39,7 +40,87 @@ const LAST = 2;
 const TEST_CLIP_TOP = -110;
 const TEST_CLIP_BOTTOM = 700;
 
-let _cnt = 0x1;
+
+//
+const TYPES = {
+
+	ID: 'TYPES',
+
+	BOOL: 	_cnt <<= 0x1,
+	INT8: 	_cnt <<= 0x1,
+	INT16: 	_cnt <<= 0x1,
+	INT32: 	_cnt <<= 0x1,
+	UINT8: 	_cnt <<= 0x1,
+	UINT16: 	_cnt <<= 0x1,
+	UINT32: 	_cnt <<= 0x1,
+	FLOAT32: _cnt <<= 0x1,
+	VEC2: 	_cnt <<= 0x1,
+	VEC3: 	_cnt <<= 0x1,
+	VEC4: 	_cnt <<= 0x1,
+	MAT2X2: 	_cnt <<= 0x1,
+	MAT4X4: 	_cnt <<= 0x1,
+
+	GetSizeInBytes(type, id){
+
+		if(id === undefined || id !== this.ID) alert('type not match');
+
+		let size = 0;
+		if (type & this.FLOAT32) size += FLOAT32_BYTE_SIZE;
+      else if (type & this.INT8 || type & this.UINT8) size += INT8_BYTE_SIZE;
+      else if (type & this.INT16 || type & this.UINT16) size += INT16_BYTE_SIZE;
+      else if (type & this.INT32 || type & this.UINT32) size += INT32_BYTE_SIZE;
+      else if (type & this.MAT2X2) size += MAT2X2_BYTE_SIZE;
+      else if (type & this.MAT4X4) size += MAT4X4_BYTE_SIZE;
+
+		return size;
+	}
+}
+
+
+// Type Sizes in bytes
+const INT8_BYTE_SIZE    = 1; // 1 Bytes
+const INT16_BYTE_SIZE   = 2; // 2 Bytes
+const INT32_BYTE_SIZE   = 4; // 4 Bytes
+const UINT8_BYTE_SIZE   = 1; // 1 Bytes
+const UINT16_BYTE_SIZE  = 2; // 2 Bytes
+const UINT32_BYTE_SIZE  = 4; // 4 Bytes
+const FLOAT32_BYTE_SIZE = 4; // 4 Bytes
+const VEC2_BYTE_SIZE    = 2 * FLOAT32_BYTE_SIZE; // 8 Bytes
+const VEC3_BYTE_SIZE    = 3 * FLOAT32_BYTE_SIZE; // 12 Bytes
+const VEC4_BYTE_SIZE    = 4 * FLOAT32_BYTE_SIZE; // 16 Bytes
+const MAT2X2_BYTE_SIZE  = 2 * VEC2_BYTE_SIZE; // 16 Bytes
+const MAT4X4_BYTE_SIZE  = 4 * VEC4_BYTE_SIZE; // 64 Bytes
+
+
+
+
+
+
+
+
+// In order to update the correct uniform of the shared block, we store the index to the block'a uniform location.
+const UBS = {
+   PROJECTION_LOC:INT_NULL,
+   RESOLUTION_LOC:INT_NULL,
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 let _idx = 0;
 
 /*************************************************************************************************/

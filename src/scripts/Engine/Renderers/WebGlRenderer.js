@@ -9,6 +9,7 @@ import { PerformanceTimersTick, _pt_loop, _pt_gl_draw, _pt_all_timers, _pt_batch
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
 import { Update_read_write_test } from "../../../Tests/ReadWrite.js";
 import { Batch_update } from "../Batch/Batch.js";
+import { UBO_update } from "../../Graphics/Buffers/UniformBuffers.js";
 
 
 
@@ -67,6 +68,9 @@ export class WebGlRenderer {
       this.scene = scene;
       scene.SetCamera(camera);
       camera.Init();
+
+
+
       STATE.scene.active = this.scene;
       STATE.scene.active_idx = this.scene.sceneidx;
 
@@ -79,8 +83,6 @@ export class WebGlRenderer {
    Render() {
 
       if (STATE.loop.paused === false) {
-
-         // this.scene.camera.UpdateProjectionUniformAll(gfxCtx.gl); // FIXME: Do we need to update the camera uniform every frame????
 
          TimeUpdate();
          _pt_loop.timer.Start();
@@ -96,6 +98,8 @@ export class WebGlRenderer {
          _pt_scene_update.timer.Start(); this.scene.OnUpdate(); _pt_scene_update.timer.Stop();
 
          Batch_update()
+
+         UBO_update();
          
          _pt_gl_draw.timer.Start(); Gl_draw(this.gl); _pt_gl_draw.timer.Stop();
 

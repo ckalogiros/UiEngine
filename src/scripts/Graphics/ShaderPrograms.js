@@ -1,6 +1,6 @@
 "use strict";
 import { Shaders_load } from './GlShaders.js';
-import { Uniform, UniformsBuffer } from './Buffers/UniformBuffers.js';
+import { UBO_create, UBO_update, Uniform, UniformsBuffer } from './Buffers/UniformBuffers.js';
 import { SHADER_CONSTANTS } from './Shaders/ShaderBuilder/ShaderBuilder.js';
 import { Gfx_create_group_buffer } from '../Engine/Interfaces/Gfx/MeshGfxContext.js';
 import { Int8Buffer, M_Buffer } from '../Engine/Core/Buffers.js';
@@ -136,6 +136,7 @@ function Create_program(sid) {
 	// Create Shader Program
 	const prog = new Gl_Program(gfxCtx.gl, sid);
 	const progidx = _program_groups.buffer[groupidx].Add(prog);
+	prog.idx = progidx; // Store the programs index to self
 
 	return { groupidx: groupidx, progidx: progidx };
 	
@@ -166,6 +167,12 @@ export function Program_create_program(sid) {
 		prog.UniformsSetBufferUniform(VIEWPORT.HEIGHT, unifBufferResIdx.resYidx);
 	}
 
+	// Enable Uniform Shared Block
+	if(sid.unif & SID.UNIF.SHARED_BLOCK){
+		UBO_create(prog.shader_program, sid.unif, progidx)
+		// UBO_update()
+	}
+
 	// Enable global timer uniform (float)
 	if (sid.unif & SID.UNIF.BUFFER_RES) {
 		const step = 0.1;
@@ -185,6 +192,8 @@ class Gl_Program {
 		this.sid = sid; // Shader Type ID (E.g. ATTR_COL4 | ATTR_POS2 | INDEXED)
 		this.state = { mask:0x0 };
 
+		this.idx = INT_NULL; // Self index to the Programs buffer
+
 		this.shader_program = Shaders_load(gfxCtx.gl, sid);
 
 		this.vb = new Int8Buffer(1);
@@ -199,21 +208,18 @@ class Gl_Program {
 		this.attribsidx = Shader_attributes_create(sid, this.shader_program);
 		this.attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(this.attribsidx);
 
-		// this.attribs_per_name = Shader_attributes_create_struct_by_name();
-
 		// Store the function's index that is responsible of been used to add mesh data to apropriately to a vertex buffer
 		this.add_to_vb_fnidx = Select_fnidx_to_fill_vertex_buffer(this.attribsidx);
 
-		// PrintShaderInfo(this);
 
 		this.shaderinfo = {
 			uniforms: {
-				// Static uniforms
-				projection: new Uniform(
-					/* value */ 	0,
-					/* Location */ gl.getUniformLocation(this.shader_program, 'u_projection'),
-					/* type */		UNIF_TYPE.MAT4,
-				),
+				// // Static uniforms
+				// projection: new Uniform(
+				// 	/* value */ 	0,
+				// 	/* Location */ gl.getUniformLocation(this.shader_program, 'u_projection'),
+				// 	/* type */		UNIF_TYPE.MAT4,
+				// ),
 				sampler: gl.getUniformLocation(this.shader_program, 'u_sampler0'),	// Sampler for texture units 	
 
 				// Uniforms buffer. Stores any uniform as an array of values.
@@ -383,16 +389,6 @@ export function Program_use_program(shader_program, progidx) {
 
 
 
-
-
-
-export function Uniform_update_projection_matrix(gl, groupidx = INT_NULL, progidx, mat4) {
-
-	const prog = _program_groups.buffer[groupidx].buffer[progidx];
-	Program_use_program(prog.shader_program);
-	prog.UniformsSetUpdateProjectionMatrix(gl, mat4);
-
-}
 
 
 

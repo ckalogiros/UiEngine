@@ -9,7 +9,7 @@ import { Program_store_vertex_buffer_idx, Program_create_program, Program_progra
 import { M_Buffer } from "../../Core/Buffers.js";
 import { Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
-import { Scenes_bind_camera_to_uniform_projection } from "../../Scenes.js";
+import { Scene_set_projection_matrix } from "../../Scenes.js";
 
 
 
@@ -363,7 +363,7 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
          // Create new entry for the new vertex buffer in widget root gfx buffer
          Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx);
 
-         Scenes_bind_camera_to_uniform_projection(sceneidx, groupidx, progidx)
+         Scene_set_projection_matrix(sceneidx)
 
          
       }

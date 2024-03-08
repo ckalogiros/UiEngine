@@ -591,7 +591,6 @@ export class Int16Buffer extends Buffer_Interface {
 
 
 
-
 // export class Int8_2DBuffer {
 
 //    buffer;

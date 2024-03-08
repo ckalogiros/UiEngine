@@ -1,8 +1,6 @@
 "use strict";
-import { Uniform_update_projection_matrix } from '../Graphics/ShaderPrograms.js';
+import { UBO_SetUniform } from '../Graphics/Buffers/UniformBuffers.js';
 import { M_Buffer } from './Core/Buffers.js';
-import { Widget_Dropdown } from './Drawables/Widgets/Widget_Dropdown.js';
-import { Widget_Text } from './Drawables/Widgets/WidgetText.js';
 import { HandleEvents } from './Events/Events.js';
 
 
@@ -78,9 +76,9 @@ export function Scenes_get_count() { return _scenes.active_count; }
 
 
 
-export function Scenes_bind_camera_to_uniform_projection(sceneidx, groupidx, progidx) { 
+export function Scene_set_projection_matrix(sceneidx) { 
 
-    Uniform_update_projection_matrix(gfxCtx.gl, groupidx, progidx, _scenes.buffer[sceneidx].camera.matrix);
+    UBO_SetUniform(UBS.PROJECTION_LOC, _scenes.buffer[sceneidx].camera.matrix);
 }
 
 
