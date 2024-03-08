@@ -86,11 +86,11 @@ export function Shaders_build_vertex_shader(sid){
       // INS
       (sid.attr & SID.ATTR.COL4) ? 'in vec4 a_col;' : '',
       (sid.attr & SID.ATTR.WPOS_TIME4) ? 'in vec4 a_wpos_time;' : '',
+      (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? '#include <in_a_vec4_params1>' : '',
       (sid.attr & SID.ATTR.POS2) ? 'in vec2 a_pos;' : '',
-      (sid.attr & SID.ATTR.POS3) ? 'in vec3 a_pos;' : '',
       (sid.attr & SID.ATTR.TEX2) ? 'in vec2 a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <in_attr_sdf2>' : '',
-      (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? '#include <in_a_vec4_params1>' : '',
+      (sid.attr & SID.ATTR.POS3) ? 'in vec3 a_pos;' : '',
       '//',
       
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

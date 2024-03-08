@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_set_texidx } from "../../../Graphics/Buffers/GL/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_get_attrib_value_from_vb_byidx, Vertex_buffer_set_texidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { AddArr3, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Gfx_generate_context, GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js"; ``
@@ -8,10 +8,11 @@ import { Geometry2D_Text } from "../Geometry/Geometry2DText.js";
 import { FontMaterial } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Font_get_char_plane_bounds, Font_get_char_uv_coords, Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
-import { GlSetDim, GlSetTex, GlSetWposXY } from "../../../Graphics/Buffers/GlBufferOps.js";
+import { Gl_set_dim_XY, Gl_set_uv, Gl_set_uv2, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_group_update_increment, Widget_root_batch_update_increment_accumulator } from "../../Core/MeshBuffer.js";
 import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { Index_buffer_add_indices, Index_buffer_add_indices_from_non_existant_mesh } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
 
 
 
@@ -19,6 +20,7 @@ export class Text_Mesh extends Mesh {
 
    fontsize; // TODO: TEMP. Move it to mat or geom or Mesh?
    advancex; // The advancex is a ratio with which we calculate the correct width of any text
+   last_charidx; // An index to the last char of each state of the current text.(dynamic text changes, so it is good to always have the last char).
 
    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.MSDF_CONSOLAS_1024, scale = [1, 1]) {
    constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.MSDF_CONSOLAS_1024, scale = [1, 1]) {
@@ -29,6 +31,8 @@ export class Text_Mesh extends Mesh {
       const geom = new Geometry2D_Text(pos, fontsize, scale, text, font);
 
       super(geom, mat);
+
+      this.last_charidx = text.length;
 
       this.SetName(text);
       this.type |= MESH_TYPES_DBG.TEXT_MESH;
@@ -286,13 +290,27 @@ export class Text_Mesh extends Mesh {
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
+
       const advancex = Font_get_font_advancex(this.mat.texidx);
 
       const numchars = text.length;
       // NOTE: We want to run for max chars to reset any extra from the current text
-      const len = (this.geom.num_faces > numchars) ? this.geom.num_faces :
-         (numchars > this.geom.num_faces ? this.geom.num_faces : numchars);
+      // const len = (this.geom.num_faces > numchars) ? this.geom.num_faces :
+      //    (numchars > this.geom.num_faces ? this.geom.num_faces : numchars);
+      
+      let len = 0;
+      if(numchars > this.last_charidx){
+         len = numchars<this.geom.num_faces ? numchars : this.geom.num_faces;
+         this.last_charidx = len
+      }
+      else {//if(numchars <= this.last_charidx){
+         len = this.last_charidx;
+         this.last_charidx = numchars
+      }
+      // console.log(len, text)
 
+
+      const attr = Shader_attributes_get_attribs_offset_size(gfx_copy.prog.attribsidx, SHADER_ATTRIBUTES.TEX2);
 
       // Update text faces
       for (let i = 0; i < len; i++) {
@@ -305,11 +323,11 @@ export class Text_Mesh extends Mesh {
             const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, text[i]);
             geom_copy.dim[0] *= plane_bounds.width;
             geom_copy.dim[1] *= plane_bounds.height;
-            GlSetDim(gfx_copy, geom_copy.dim);
+            Gl_set_dim_XY(gfx_copy, geom_copy.dim);
 
-            // Set character y position and advance.
+            // // Set character y position and advance.
             geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
-            GlSetWposXY(gfx_copy, geom_copy.pos);
+            Gl_set_wpos_XY(gfx_copy, geom_copy.pos);
             geom_copy.pos[0] += Floor(this.fontsize * 2 * advancex);
 
             // Get the correct uv coordinates.
@@ -318,9 +336,14 @@ export class Text_Mesh extends Mesh {
             geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
          }
 
-         GlSetTex(gfx_copy, uvs);
+         Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex)
+         // Gl_set_uv(gfx_copy, uvs);
          gfx_copy.vb.start += gfx_copy.vb.count
       }
+
+      // this.last_charidx = len;
+
+      Vertex_buffer_state_enable(gfx_copy.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 
       // HERE !!!!
       /**
@@ -364,17 +387,17 @@ export class Text_Mesh extends Mesh {
       // Set character dimentions. 
       geom_copy.dim[0] *= plane_bounds.width;
       geom_copy.dim[1] *= plane_bounds.height;
-      GlSetDim(gfx_copy, geom_copy.dim);
+      Gl_set_dim_XY(gfx_copy, geom_copy.dim);
 
       // Set character y position and advance.
       geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
-      // geom_copy.pos[0] += this.geom.dim[0];
+      geom_copy.pos[0] += this.geom.dim[0];
       geom_copy.pos[0] += Floor(this.fontsize * advancex);
-      GlSetWposXY(gfx_copy, geom_copy.pos);
+      // Gl_set_wpos_XY(gfx_copy, geom_copy.pos);
 
       // Set the correct uv coordinates.
       const uvs = Font_get_char_uv_coords(this.mat.uvIdx, _text);
-      GlSetTex(gfx_copy, uvs);
+      Gl_set_uv(gfx_copy, uvs);
 
    }
 

@@ -4,7 +4,6 @@ import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperation
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { GlSetDimX, GlSetWposX } from "../../../Graphics/Buffers/GlBufferOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
 import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh, Widget_root_batch_get, Widget_root_create_root, Widget_root_buffer_get_byidx, Widget_group_get, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3 } from "../../Core/MeshBuffer.js";

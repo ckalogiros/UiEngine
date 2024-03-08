@@ -509,12 +509,12 @@ function Reset_gfx_from_parent_recursive(mesh){
 
    // NOTE: Avoid calling Reset on an alredy reseted buffer should take place in Vertex_buffer_reset() and Index_buffer_reset()
    Vertex_buffer_reset(mesh.gfx);
-   Index_buffer_reset(mesh.gfx);
+   Index_buffer_reset(mesh.gfx.ib.idx);
    
    mesh.is_gfx_inserted = false; // So that we can re-render the mesh to the vertex buffer.
    if(mesh.text_mesh) { // Do this for any text meshes.
       Vertex_buffer_reset(mesh.text_mesh.gfx);
-      Index_buffer_reset(mesh.text_mesh.gfx);
+      Index_buffer_reset(mesh.text_mesh.gfx.ib.idx);
       mesh.text_mesh.is_gfx_inserted = false;
    }
 }

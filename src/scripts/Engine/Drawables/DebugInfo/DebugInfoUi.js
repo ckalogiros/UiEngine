@@ -1,10 +1,10 @@
 "use strict";
 
-import { Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/GL/VertexBuffers.js";
+import { Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown";
 import { PerformanceTimersGetBestFps, PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, Performance_timers_get_ms_1sec_reset, _pt_all_timers, _pt_batch2_update, _pt_batch_update, _pt_event_listener, _pt_framebuffer_rendering, _pt_gl_draw, _pt_hover_listener, _pt_loop, _pt_mesh_info_tip, _pt_scene_update } from "../../Timers/PerformanceTimers";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners";
-import { Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_switch, Create_widget_text } from "../../Core/CreateWidget";
+import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget";
 import { Mesh_buffer_get_mesh_byidx, Widget_group_create, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
 import { Scroller_clampy_and_render } from "../Widgets/WidgetScroller";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals";
@@ -62,42 +62,12 @@ export function Debug_info_ui_performance(scene) {
    // Gfx Info
    const gfx_ui = Dbg_ui_create('Gfx', dp, fontsize, Debug_info_create_gfx_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
    dp.AddToMenu(gfx_ui);
-   {
-      // const section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zindex + 1], [0, 0], section_col, 'InfoUi-Gfx section');
-      // section.SetName('InfoUi-Gfx section');
-      // dp.AddToMenu(section);
-
-      // const label = Create_widget_label(_, 'Gfx Info', (ALIGN.BOTTOM | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, label_col, label_text_col, label_pad, _, label_style);
-      // label.SetName(`InfoUi-Gfx label`);
-      // section.AddItem(label);
-
-      // const ui_switch = Create_widget_switch(_, 'on', 'off', [0, 0, zindex + 2], switch_fontsize, switch_col, switch_textcol, switch_pad);
-      // ui_switch.Bind(Debug_info_create_gfx_info, null, scene);
-      // ui_switch.SetName(`InfoUi-Gfx switch`);
-      // section.AddItem(ui_switch);
-
-   }
 
 
    /************************************************************************************************************************************************/
    // Mesh Info
    const mesh_ui = Dbg_ui_create('Mesh', dp, fontsize, Debug_info_create_mesh_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
    dp.AddToMenu(mesh_ui);
-   {
-      // const section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zindex + 1], [0, 0], section_col, 'InfoUi-Mesh section');
-      // section.SetName('InfoUi-Mesh section');
-      // dp.AddToMenu(section);
-
-      // const label = Create_widget_label(_, 'Mesh Info', (ALIGN.BOTTOM | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, label_col, label_text_col, label_pad, _, label_style);
-      // label.SetName(`InfoUi-Mesh label`);
-      // section.AddItem(label);
-
-      // const ui_switch = Create_widget_switch(_, 'on', 'off', [0, 0, zindex + 2], switch_fontsize, switch_col, switch_textcol, switch_pad);
-      // ui_switch.Bind(Debug_info_create_mesh_info, null, scene);
-      // ui_switch.SetName(`InfoUi-Mesh switch`);
-      // section.AddItem(ui_switch);
-
-   }
 
 
    /************************************************************************************************************************************************/
@@ -110,21 +80,7 @@ export function Debug_info_ui_performance(scene) {
    // Vertexbuffer 2D representation
    const vb2D_ui = Dbg_ui_create('Vb2D', dp, fontsize, Debug_info_create_vertexbuffer_2D, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
    dp.AddToMenu(vb2D_ui);
-   {
-      // const section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zindex + 1], [0, 0], section_col, 'InfoUi-Vertexbuffer2D section');
-      // section.SetName('InfoUi-Vertexbuffer2D section');
-      // dp.AddToMenu(section);
 
-      // const label = Create_widget_label(_, 'Vertexbuffer2D', (ALIGN.BOTTOM | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, label_col, label_text_col, label_pad, _, label_style);
-      // label.SetName(`InfoUi-Mesh label`);
-      // section.AddItem(label);
-
-      // const ui_switch = Create_widget_switch(_, 'on', 'off', [0, 0, zindex + 2], switch_fontsize, switch_col, switch_textcol, switch_pad);
-      // ui_switch.Bind(Debug_info_create_vertexbuffer_2D, null, scene);
-      // ui_switch.SetName(`InfoUi-Vertexbuffer2D switch`);
-      // section.AddItem(ui_switch);
-
-   }
 
 
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);

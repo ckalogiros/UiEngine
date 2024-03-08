@@ -1,5 +1,5 @@
 --------------------------------------------------- Milestones!
--Convert all mesh attribes to indexes in a vertex buffer
+-Convert all mesh attribs to indexes in a vertex buffer
 -Resizing
 -Horizontal scrolling
 -Dynamic Creation and Connection of sliders to utilities

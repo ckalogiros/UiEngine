@@ -39,7 +39,7 @@ const assign_out_border_width    = '  v_border_width = a_params1.x;';
 const assign_out_rCorners        = '  v_rCorners = a_params1.y;';
 const assign_out_border_feather  = '  v_border_feather = a_params1.z;';
 const u_params_assign            = '  v_uniforms_buffer = uniforms_buffer;';
-const gl_position                = '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);';
+// const gl_position                = '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);';
 
 export const vertex_shader_chunks = {
    version                 : version,
@@ -75,7 +75,7 @@ export const vertex_shader_chunks = {
    sdf2_assign_sdf2        : sdf2_assign_sdf2,
    a_params4_1_assign      : a_params4_1_assign,
    u_params_assign         : u_params_assign,
-   gl_position             : gl_position,
+   // gl_position             : gl_position,
 
    out_border_width        : out_border_width,
    out_border_feather      : out_border_feather,         

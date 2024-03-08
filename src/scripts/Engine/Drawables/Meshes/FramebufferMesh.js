@@ -59,5 +59,5 @@ export function Framebuffer_moveY(fbidx, y, move_ratio){
    // console.log(':::::: FRAMEBUFFER: ',rect.mat.uv[2],rect.mat.uv[3])
    // console.log(':::::: FRAMEBUFFER: ',i, rect.geom.dim[1], move_ratio)
 
-   // GlSetAttrTex(rect.gfx, rect.mat.uv)
+   // Gl_set_uv(rect.gfx, rect.mat.uv)
 }

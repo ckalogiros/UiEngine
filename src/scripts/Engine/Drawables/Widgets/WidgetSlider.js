@@ -8,7 +8,7 @@ import { Find_gfx_match_widget_root_impl } from '../../Interfaces/Gfx/GfxContext
 import { AddArr2, RoundFloat1Decimal } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js';
 import { Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh } from '../../Core/MeshBuffer.js';
-import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/GL/VertexBuffers.js';
+import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { Index_buffer_add_indices } from '../../../Graphics/Buffers/IndexBuffers.js';
 
 

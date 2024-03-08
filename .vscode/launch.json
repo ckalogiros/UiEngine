@@ -1,12 +1,14 @@
 {
-   "configurations": [
-      {
-         "type": "cmake",
-         "request": "launch",
-         "name": "Debug portfile(s)",
-         "cmakeDebugType": "external",
-         "pipeName": "\\\\.\\pipe\\vcpkg_ext_portfile_dbg",
-         "preLaunchTask": "Debug vcpkg commands"
-      }
-   ]
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "sourceMaps": true,
+            "url": "http://localhost:6001",
+            "webRoot": "${workspaceFolder}/src"
+        },
+    ],
 }

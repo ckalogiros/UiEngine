@@ -220,8 +220,6 @@ class Gl_Program {
 				buffer: new UniformsBuffer(gfxCtx.gl, this, SHADER_CONSTANTS.UNIFORM_BUFFER_COUNT),
 			},
 
-			// attribsPerVertex: 0,
-			// verticesPerRect: 0,
 		};
 
 		this.timer = {

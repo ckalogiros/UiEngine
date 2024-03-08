@@ -216,6 +216,14 @@ class Index_Buffer_Info {
 
    Add(num_faces) {
 
+      /**
+       * // UNNECESSARY work
+       * On remove or reset, the buffer elements are intact, only the count changes.
+       * But yet on adding we calculate and adding new index elements.
+       * So we could use the length of the Uint16 array buffer to tell
+       * up at which point are the indices calculated, and if it is enough 
+       * we just change the count
+       */
       const offset = VERTS_PER_RECT_INDEXED;
 
       const data = _index_buffers.buffer[this.ibidx];
@@ -261,12 +269,6 @@ class Index_Buffer_Info {
    }
 
 
-   Reset() {
-      this.count = 0;
-      this.vCount = 0;
-      this.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-   }
-
 
    ResetToIndex(index, vertices_per_rect) {
 
@@ -299,13 +301,9 @@ class Index_Buffer_Info {
       if (cur_size + extra_size < 128) { return 128; }
       if (cur_size + extra_size < 256) { return 256; }
       if (cur_size + extra_size < 512) { return 512; }
-      // else if (cur_size > 64536) {stride = 0xb;}
       else if (cur_size > 32768) { stride = 2048; }
       else if (cur_size > 16384) { stride = 1024; }
-      // else if (cur_size > 8192)  {stride = 2048;}
       else if (cur_size > 4096) { stride = 128; }
-      // else if (cur_size > 1024)  {stride = 512;}
-      // else if (cur_size > 512)   {stride = 64;} 
 
 
       let new_size = cur_size;
@@ -324,11 +322,11 @@ class Index_Buffer_Info {
 
 
 
-export function Index_buffer_reset(gfx) {
-   console.error('IMPLEMENT ME')
-   const ib = Gl_progs_get_ib_byidx(gfx.prog.groupidx, gfx.prog.idx, gfx.ib.idx);
-   if (ib.count > 0) // If the vertex buffer has data(mainly for recursive functions that call reset even if the vb is already been reseted).
-       ib.Reset();
+
+export function Index_buffer_reset(ibidx) {
+   _index_buffers_info.buffer[ibidx].count = 0;
+   _index_buffers_info.buffer[ibidx].vCount = 0;
+   _index_buffers_info.buffer[ibidx].state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 }
 
 
@@ -392,6 +390,19 @@ export function Index_buffer_add_indices_from_non_existant_mesh(ib_gfx, dbg_mesh
 
    return start;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

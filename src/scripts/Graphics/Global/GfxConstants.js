@@ -154,6 +154,27 @@ const SID = {
 };
 
 
+const GRAPHICS_LAYOUT = {
+    ONE_ATTR_SIZE: 1,
+    ATTR_SIZES:{
+        COL4: 4,
+        WPOS4: 4,
+        PARAMS1: 4,
+        POS2: 2,
+        TEX2: 2,
+        XY: 2,
+        XYZ: 3,
+    },
+    ATTR_SELF_OFFSETS:{
+        ALPHA: 3, // the third float in a col4
+        WPOS_Y: 1, // The second attribute in a WPOS-X
+        DIM_Y: 1, // The second attribute in a DIM2
+        WPOS_Z: 2, // The second attribute in a WPOS-X
+        WPOS4_TIME: 3, // The second attribute in a WPOS-X
+    },
+};
+
+
 // TODO: Create a smaller buffer that ca resize its self
 const MAX_VERTEX_BUFFER_SIZE = 256;
 const MAX_INDEX_BUFFER_SIZE = 64;

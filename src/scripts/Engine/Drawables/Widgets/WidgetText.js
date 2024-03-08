@@ -1,6 +1,6 @@
 "use strict";
 
-import { GlSetColorAlphaFrom } from "../../../Graphics/Buffers/GlBufferOps.js";
+import { Gl_set_alpha_from_offset } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { AddArr2, CopyArr2, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
@@ -172,8 +172,8 @@ export class Widget_Text extends Text_Mesh {
 			// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
 
 			const ommited_chars = this.mat.text.length - this.geom.num_faces - 1;
-			GlSetColorAlphaFrom(this.gfx, 0, this.geom.num_faces - 1, ommited_chars); // Update alpha in text vertex buffer
-			// GlSetColorAlphaFrom(this.gfx, 0, this.geom.num_faces, this.geom.num_faces); // Update alpha in text vertex buffer
+			Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces - 1, ommited_chars); // Update alpha in text vertex buffer
+			// Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, this.geom.num_faces); // Update alpha in text vertex buffer
 		}
 	}
 
@@ -697,7 +697,6 @@ export class Widget_Multi_Text extends Widget_Text {
 			/** Destroy old timeInterval and create a new one with all the previous meshes and their callbacks and callback_params */
 			TimeIntervalsDestroyByIdx(interval.idx);
 			const tIdx = TimeIntervalsCreate(msInterval, name, TIME_INTERVAL_REPEAT_ALWAYS, this.Update, params);
-			// this.timeIntervalsIdxBuffer[0] = tIdx;
 			this.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 		}
 	}
@@ -726,6 +725,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 			const text = `${val}`;
 			meshes[i].UpdateText(text);
+			// console.log(meshes[i].GetName())
 		}
 
 	}
@@ -861,7 +861,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
 
 			const ommited_chars = this.mat.text.length - (k + 1);
-			GlSetColorAlphaFrom(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
+			Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
 		}
 
 		for (let i = 0; i < this.children.boundary; i++) {
@@ -882,7 +882,7 @@ export class Widget_Multi_Text extends Widget_Text {
 					// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
 
 					const ommited_chars = this.mat.text.length - (k + 1);
-					GlSetColorAlphaFrom(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
+					Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
 				}
 			}
 		}

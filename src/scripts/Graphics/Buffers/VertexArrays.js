@@ -1,6 +1,6 @@
 "use strict";
 
-import { M_Buffer } from "../../../Engine/Core/Buffers.js";
+import { M_Buffer } from "../../Engine/Core/Buffers.js";
 
 
 

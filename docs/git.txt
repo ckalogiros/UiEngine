@@ -12,6 +12,8 @@
     git push -u origin main 
 
 
+
+
 /***************************
 #push
     git status
@@ -22,11 +24,19 @@
     git push -u origin main
 
 
+
 /***************************
-# remove files from Cash
-git rm --cached resources/ // Where 'resources' is a folder
-AND recursive remove all sub-content with -r
-git rm --cached -r resources/
+Create a new branch
+    git branch <new branch name>
+    git checkout <branch name> // Switch to branch 
+    git switch <branch name>   // Switch to branch
+
+    git switch|checkout <branch name> // to navigate to another branch
+
+/***************************
+    git filter-branch
+
+
 
 /***************************
 # Clone specific branch 
@@ -56,13 +66,11 @@ AND THEN
 
 
 /***************************
-Create a new branch
-    git branch <new branch name>
-    git checkout <branch name> // Switch to branch 
-    git switch <branch name>   // Switch to branch
+# remove files from Cash
+git rm --cached resources/ // Where 'resources' is a folder
+AND recursive remove all sub-content with -r
+git rm --cached -r resources/
 
-/***************************
-    git filter-branch
 
 /***************************
 Watchers:

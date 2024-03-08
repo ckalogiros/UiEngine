@@ -1,9 +1,9 @@
 "use strict";
 
-import { PrintAttributes, PrintIndexBuffer, PrintIndexBufferAll, PrintVertexBufferDataAndNames, PrintVertexDataAll } from "../../../Graphics/Debug/GfxDebug.js";
+import { PrintAttributes, PrintIndexBuffer, PrintVertexBufferDataAndNames } from "../../../Graphics/Debug/GfxDebug.js";
 import { Listener_debug_print_all, Listener_debug_print_info } from "../../Events/EventListeners.js";
 import { Renderqueue_get } from "../../Renderers/Renderer/RenderQueue.js";
-import { ScenesPrintAllMeshes, ScenesPrintRootMeshes, Scenes_get_scene_by_idx } from "../../Scenes.js";
+import { Scenes_get_scene_by_idx } from "../../Scenes.js";
 // import { FpsGet } from "../../Timers/Time.js";
 import { TimeIntervalsPrintAll } from "../../Timers/TimeIntervals.js";
 import { Gfx_pool_print } from "../../Interfaces/Gfx/MeshGfxContext.js";
@@ -13,9 +13,9 @@ import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget
 import { Info_listener_print_buffer } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { Meshbuffer_print, Meshbuffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widget_group_buffer_print_w5, Widgetroot_buffer_print_w6 } from "../../Core/MeshBuffer.js";
 import { Str_buffer_print } from "../../Core/StringBuffer.js";
-import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/GL/VertexBuffers.js";
+import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js";
-import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/GL/VertexArrays.js";
+import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/VertexArrays.js";
 import { Gl_program_print } from "../../../Graphics/ShaderPrograms.js";
 import { Shader_attributes_print } from "../../../Graphics/ShaderAttributes.js";
 

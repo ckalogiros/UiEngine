@@ -1,7 +1,7 @@
 "use strict";
 
 import { Mesh } from "./Base/Mesh.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_set_texidx } from "../../../Graphics/Buffers/GL/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_set_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
@@ -168,7 +168,7 @@ export class Textured_Mesh extends Mesh {
       // mesh.mat.uv[1] += -mouse_pos.x *.001;
       // mesh.mat.uv[2] += mouse_pos.y  *.001;
       // mesh.mat.uv[3] += mouse_pos.y  *.001;
-      // GlSetTex(mesh.gfx, mesh.mat.uv);
+      // Gl_set_uv(mesh.gfx, mesh.mat.uv);
    }
 
 

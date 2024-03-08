@@ -3,43 +3,75 @@
 import { Program_use_program } from "../ShaderPrograms";
 
 
+// Array of scalars
+function SetValueV1f(gl, loc, val) { gl.uniform1fv(loc, val); }
+
+
+// Array of vectors (from flat array or array of THREE.VectorN)
+function SetValueV2f(gl, loc, val) { gl.uniform2fv(loc, val); }
+function SetValueV3f(gl, loc, val) { gl.uniform3fv(loc, val); }
+function SetValueV4f(gl, loc, val) { gl.uniform4fv(loc, val); }
+
+
+// Array of matrices (from flat array or array of THREE.MatrixN)
+function SetValueM2(gl, loc, val) { gl.uniformMatrix2fv(loc, false, val); }
+function SetValueM3(gl, loc, val) { gl.uniformMatrix3fv(loc, false, val); }
+function SetValueM4(gl, loc, val) { gl.uniformMatrix4fv(loc, false, val); }
+
+
+// Array of integer / boolean
+function SetValueV1i(gl, loc, val) { gl.uniform1iv(loc, val); }
+
+
+// Array of integer / boolean vectors (from flat array)
+function SetValueV2i(gl, loc, val) { gl.uniform2iv(loc, val); }
+function SetValueV3i(gl, loc, val) { gl.uniform3iv(loc, val); }
+function SetValueV4i(gl, loc, val) { gl.uniform4iv(loc, val); }
+
+
+// Array of unsigned integer
+function SetValueV1ui(gl, loc, val) { gl.uniform1uiv(loc, val); }
+
+
+// Array of unsigned integer vectors (from flat array)
+function SetValueV2ui(gl, loc, val) { gl.uniform2uiv(loc, val); }
+function SetValueV3ui(gl, loc, val) { gl.uniform3uiv(loc, val); }
+function SetValueV4ui(gl, loc, val) { gl.uniform4uiv(loc, val); }
+
 
 
 
 export class Uniform {
 
-   val;
-   loc;
-   Update;
    
    constructor(val = null, loc = null, type = null) {
 
       this.val = val;// Uniform value
       this.loc = loc; // Uniform Location
       this.needsUpdate = false;
-      this.Update = null; // Function
+      this.UpdateUniform = null; // Function
 
       switch (type) {
          // From THREE.js
-         case UNIF_TYPE.FLOAT: { this.Update = this.SetValueV1f; break; } // FLOAT
-         case UNIF_TYPE.FVEC2: { this.Update = this.SetValueV2f; break; } // F_VEC2
-         case UNIF_TYPE.FVEC3: { this.Update = this.SetValueV3f; break; } // F_VEC3
-         case UNIF_TYPE.FVEC4: { this.Update = this.SetValueV4f; break; } // F_VEC4
+         case UNIF_TYPE.FLOAT: { this.UpdateUniform = SetValueV1f; break; } // FLOAT
+         case UNIF_TYPE.FVEC2: { this.UpdateUniform = SetValueV2f; break; } // F_VEC2
+         case UNIF_TYPE.FVEC3: { this.UpdateUniform = SetValueV3f; break; } // F_VEC3
+         case UNIF_TYPE.FVEC4: { this.UpdateUniform = SetValueV4f; break; } // F_VEC4
 
-         case UNIF_TYPE.MAT2: { this.Update = this.SetValueM2; break; } // F_MAT2
-         case UNIF_TYPE.MAT3: { this.Update = this.SetValueM3; break; } // F_MAT3
-         case UNIF_TYPE.MAT4: { this.Update = this.SetValueM4; break; } // F_MAT4
+         case UNIF_TYPE.MAT2: { this.UpdateUniform = SetValueM2; break; } // F_MAT2
+         case UNIF_TYPE.MAT3: { this.UpdateUniform = SetValueM3; break; } // F_MAT3
+         case UNIF_TYPE.MAT4: { this.UpdateUniform = SetValueM4; break; } // F_MAT4
 
-         case UNIF_TYPE.INT: { this.Update = this.SetValueV1i; break; } // INT, BOOL
-         case UNIF_TYPE.BOOL: { this.Update = this.SetValueV1i; break; } // INT, BOOL
-         case UNIF_TYPE.IVEC2: { this.Update = this.SetValueV2i; break; } // I_VEC2
-         case UNIF_TYPE.IVEC3: { this.Update = this.SetValueV3i; break; } // I_VEC3
-         case UNIF_TYPE.UIVEC4: { this.Update = this.SetValueV4i; break; } // I_VEC4
+         case UNIF_TYPE.INT: { this.UpdateUniform = SetValueV1i; break; } // INT, BOOL
+         case UNIF_TYPE.BOOL: { this.UpdateUniform = SetValueV1i; break; } // INT, BOOL
+         case UNIF_TYPE.IVEC2: { this.UpdateUniform = SetValueV2i; break; } // I_VEC2
+         case UNIF_TYPE.IVEC3: { this.UpdateUniform = SetValueV3i; break; } // I_VEC3
+         case UNIF_TYPE.UIVEC4: { this.UpdateUniform = SetValueV4i; break; } // I_VEC4
 
-         case UNIF_TYPE.UINT: { this.Update = this.SetValueV1ui; break; } // UINT
-         case UNIF_TYPE.UIVEC2: { this.Update = this.SetValueV2ui; break; } // UI_VEC2
-         case UNIF_TYPE.UIVEC3: { this.Update = this.SetValueV3ui; break; } // UI_VEC3
-         case UNIF_TYPE.UIVEC4: { this.Update = this.SetValueV4ui; break; } // UI_VEC4
+         case UNIF_TYPE.UINT: { this.UpdateUniform = SetValueV1ui; break; } // UINT
+         case UNIF_TYPE.UIVEC2: { this.UpdateUniform = SetValueV2ui; break; } // UI_VEC2
+         case UNIF_TYPE.UIVEC3: { this.UpdateUniform = SetValueV3ui; break; } // UI_VEC3
+         case UNIF_TYPE.UIVEC4: { this.UpdateUniform = SetValueV4ui; break; } // UI_VEC4
 
          default: { console.error('The type of the uniform\'s value is unknown'); break; }
 
@@ -53,47 +85,10 @@ export class Uniform {
    }
 
 
-   Update(gl, val) {
-      this.Update(gl, val);
+   Update(gl) {
+      this.UpdateUniform(gl, this.loc, this.val);
       this.needsUpdate = false;
    }
-
-
-   // Array of scalars
-   SetValueV1f(gl) { gl.uniform1fv(this.loc, this.val); }
-
-
-   // Array of vectors (from flat array or array of THREE.VectorN)
-   SetValueV2f(gl) { gl.uniform2fv(this.loc, this.val); }
-   SetValueV3f(gl) { gl.uniform3fv(this.loc, this.val); }
-   SetValueV4f(gl) { gl.uniform4fv(this.loc, this.val); }
-
-
-   // Array of matrices (from flat array or array of THREE.MatrixN)
-   SetValueM2(gl) { gl.uniformMatrix2fv(this.loc, false, this.val); }
-   SetValueM3(gl) { gl.uniformMatrix3fv(this.loc, false, this.val); }
-   SetValueM4(gl) { gl.uniformMatrix4fv(this.loc, false, this.val); }
-
-
-   // Array of integer / boolean
-   SetValueV1i(gl) { gl.uniform1iv(this.loc, this.val); }
-
-
-   // Array of integer / boolean vectors (from flat array)
-   SetValueV2i(gl) { gl.uniform2iv(this.loc, this.val); }
-   SetValueV3i(gl) { gl.uniform3iv(this.loc, this.val); }
-   SetValueV4i(gl) { gl.uniform4iv(this.loc, this.val); }
-
-
-   // Array of unsigned integer
-   SetValueV1ui(gl) { gl.uniform1uiv(this.loc, this.val); }
-
-
-   // Array of unsigned integer vectors (from flat array)
-   SetValueV2ui(gl) { gl.uniform2uiv(this.loc, this.val); }
-   SetValueV3ui(gl) { gl.uniform3uiv(this.loc, this.val); }
-   SetValueV4ui(gl) { gl.uniform4uiv(this.loc, this.val); }
-
 }
 
 

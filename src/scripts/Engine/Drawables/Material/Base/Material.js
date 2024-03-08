@@ -1,7 +1,7 @@
 "use strict";
 
 import * as math from '../../../../Helpers/Math/MathOperations.js'
-import { GlSetColor, GlSetColorAlpha, GlSetColorPerVertex } from "../../../../Graphics/Buffers/GlBufferOps.js";
+import { Gl_set_RGBA, Gl_set_alpha, Gl_set_RGBA_per_vertex} from '../../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 
 
@@ -55,48 +55,48 @@ export class Material {
    SetColor(col, gfx) {
       if(gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX){
          math.CopyMat4(this.col, col);
-         GlSetColorPerVertex(gfx, this.col);
+         Gl_set_RGBA_per_vertex(gfx, this.col);
       }
       else {
          math.CopyArr4(this.col, col);
-         GlSetColor(gfx, this.col);
+         Gl_set_RGBA(gfx, this.col);
       }
    }
 
    SetHoverColor(gfx) {
       const intensity = 1.4;
       if(gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX){
-         GlSetColorPerVertex(gfx, math.Mult_mat4_scalar2(this.col, intensity));
+         Gl_set_RGBA_per_vertex(gfx, math.Mult_mat4_scalar2(this.col, intensity));
       }
       else {
-         GlSetColor(gfx, math.Mult_arr4_scalar2(this.col, intensity));
+         Gl_set_RGBA(gfx, math.Mult_arr4_scalar2(this.col, intensity));
       }
    }
 
    SeHoverColortDefault(gfx) {
       if(gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX){
          math.CopyMat4(this.col, this.defCol);
-         GlSetColorPerVertex(gfx, this.col);
+         Gl_set_RGBA_per_vertex(gfx, this.col);
       }
       else {
          math.CopyArr4(this.col, this.defCol);
-         GlSetColor(gfx, this.col);
+         Gl_set_RGBA(gfx, this.col);
       }
    }
 
    SetDefaultColor(gfx, num_faces) {
       math.CopyArr4(this.col, this.defCol);
-      GlSetColor(gfx, this.col, num_faces);
+      Gl_set_RGBA(gfx, this.col, num_faces);
    }
 
    SetColorRGB(col, gfx, num_faces) {
       math.CopyArr3(this.col, col);
-      GlSetColor(gfx, this.col, num_faces);
+      Gl_set_RGBA(gfx, this.col, num_faces);
    }
 
    SetColorAlpha(alpha, gfx, num_faces) {
       this.col[3] = alpha;
-      GlSetColorAlpha(gfx, this.col[3], num_faces);
+      Gl_set_alpha(gfx, this.col[3], num_faces);
    }
 
    SetStyle(style) {

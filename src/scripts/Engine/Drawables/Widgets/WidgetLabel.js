@@ -9,7 +9,7 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/Tim
 import { Rect } from "../Meshes/Rect_Mesh.js";
 import { Align_self } from "../Operations/Alignment.js";
 import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
-import { GlSetColorAlphaFrom, GlSetDimX, GlSetWposX } from "../../../Graphics/Buffers/GlBufferOps.js";
+import { Gl_set_alpha_from_offset, Gl_set_dim_X, Gl_set_wpos_X } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
@@ -341,7 +341,7 @@ export class Widget_Label extends Rect {
     Reposition_pre(pos_dif) { // Update the widget's position, after it is added to the gfx buffers
 
         AddArr2(this.geom.pos, pos_dif);
-        AddArr2(this.geom.pos_dif, pos_dif);
+        // AddArr2(this.geom.pos_dif, pos_dif);
 
         if (this.batch_fnidx === INT_NULL)
             this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
@@ -353,7 +353,7 @@ export class Widget_Label extends Rect {
         Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data);
         
         AddArr2(this.text_mesh.geom.pos, pos_dif);
-        AddArr2(this.text_mesh.geom.pos_dif, pos_dif);
+        // AddArr2(this.text_mesh.geom.pos_dif, pos_dif);
         
         if (this.text_mesh.batch_fnidx === INT_NULL)
             this.text_mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
@@ -467,10 +467,10 @@ export class Widget_Label extends Rect {
         // Update the gfx buffers, if the mesh is already inserted.
         if (this.is_gfx_inserted) {
             // TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
-            GlSetDimX(this.gfx, this.geom.dim[0]); // Update dim in vertex buffer
-            GlSetWposX(this.gfx, this.geom.pos[0]); // Update pos in vertex buffer
+            Gl_set_dim_X(this.gfx, this.geom.dim[0]); // Update dim in vertex buffer
+            Gl_set_wpos_X(this.gfx, this.geom.pos[0]); // Update pos in vertex buffer
             const ommited_chars = this.text_mesh.mat.text.length - (k + 1);
-            GlSetColorAlphaFrom(this.text_mesh.gfx, 0, this.text_mesh.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
+            Gl_set_alpha_from_offset(this.text_mesh.gfx, 0, this.text_mesh.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
         }
     }
 

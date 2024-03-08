@@ -1,7 +1,7 @@
 "use strict";
 
 import * as math from '../../../../Helpers/Math/MathOperations.js'
-import * as glBufferOps from '../../../../Graphics/Buffers/GlBufferOps.js'
+import * as glBufferOps from '../../../../Graphics/Buffers/VertexBuffersOps.js'
 
 let _geometryId = 0;
 
@@ -14,12 +14,9 @@ export class Geometry2D {
     defPos = [0, 0, 0];
     defDim = [0, 0];
     defScale = [0, 0];
-    pos_dif = [0, 0]; // UNNECESSARY
     zIndex = 0;
     type = 0;
     num_faces;
-    // pos_id; // An index to the Str_buffer. As a name is the name of the shader's world position attribute. 
-    // dim_id; // An index to the Str_buffer. As a name is the name of the shader's vertex position attribute. 
 
     constructor(pos = [0, 0, 0], dim = [0, 0], scale = [1, 1]) {
 
@@ -43,8 +40,6 @@ export class Geometry2D {
         this.num_faces = 1;
         this.type |= MESH_TYPES_DBG.GEOMETRY2D;
 
-        // this.pos_id = INT_NULL;
-        // this.dim_id = INT_NULL;
 
         /** Debug properties */
         if (DEBUG.GEOMETRY) {
@@ -59,61 +54,61 @@ export class Geometry2D {
         this.pos[0] = pos[0];
         this.pos[1] = pos[1];
         this.pos[2] = pos[2];
-        glBufferOps.GlSetWpos(gfx, pos, numFaces);
+        glBufferOps.Gl_set_wpos_XYZ(gfx, pos, numFaces);
     }
     SetPosXY(pos, gfx) {
         this.pos[0] = pos[0];
         this.pos[1] = pos[1];
-        glBufferOps.GlSetWposXY(gfx, pos);
+        glBufferOps.Gl_set_wpos_XY(gfx, pos);
     }
     SetPosX(x, gfx, numFaces) {
         this.pos[0] = x;
-        glBufferOps.GlSetWposX(gfx, x, numFaces);
+        glBufferOps.Gl_set_wpos_X(gfx, x, numFaces);
     }
     SetPosY(y, gfx, numFaces) {
         this.pos[1] = y;
-        glBufferOps.GlSetWposY(gfx, y, numFaces);
+        glBufferOps.Gl_set_wpos_Y(gfx, y, numFaces);
     }
     UpdatePosXYZ(gfx) {
-        glBufferOps.GlSetWpos(gfx, this.pos);
+        glBufferOps.Gl_set_wpos_XYZ(gfx, this.pos);
     }
     UpdateFromPosXYZ(gfx, pos) {
-        glBufferOps.GlSetWpos(gfx, pos);
+        glBufferOps.Gl_set_wpos_XYZ(gfx, pos);
     }
     UpdatePosXY(gfx) {
-        glBufferOps.GlSetWposXY(gfx, this.pos);
+        glBufferOps.Gl_set_wpos_XY(gfx, this.pos);
     }
     SetDefaultPosXY(gfx) {
         this.pos[0] = this.defPos[0];
         this.pos[1] = this.defPos[1];
-        glBufferOps.GlSetWposXY(gfx, this.defPos);
+        glBufferOps.Gl_set_wpos_XY(gfx, this.defPos);
     }
     UpdatePosZ(z, gfx, numFaces) {
         this.pos[2] = z;
-        glBufferOps.GlSetWposZ(gfx, z, numFaces);
+        glBufferOps.Gl_set_wpos_Z(gfx, z, numFaces);
     }
     MoveXYZ(pos, gfx, num_faces) {
         /**DEBUG ERROR*/ if (pos.length !== 3) console.error('Wrong array dimention for position xyz. @ class Geometry2D, Geometry.js')
         this.pos[0] += pos[0];
         this.pos[1] += pos[1];
         this.pos[2] += pos[2];
-        glBufferOps.GlMoveXYZ(gfx, pos, num_faces);
+        glBufferOps.Gl_add_wpos_XYZ(gfx, pos, num_faces);
     }
     MoveXY(x, y, gfx) {
         // if(x===0 && y===0) return;
         this.pos[0] += x;
         this.pos[1] += y;
-        glBufferOps.GlMoveXY(gfx, [x, y], this.num_faces);
+        glBufferOps.Gl_add_wpos_XY(gfx, [x, y], this.num_faces);
     }
     MoveX(x, gfx) {
         if(x===0) return;
         this.pos[0] += x;
-        glBufferOps.GlMoveXY(gfx, [x, 0]);
+        glBufferOps.Gl_add_wpos_X(gfx, x,);
     }
     MoveY(y, gfx) {
         if(y===0) return;
         this.pos[1] += y;
-        glBufferOps.GlMoveXY(gfx, [0, y]);
+        glBufferOps.Gl_add_wpos_Y(gfx, y);
     }
     //////////////////////////////////////////////////////////////
     SetDim(dim, gfx) {
@@ -127,10 +122,10 @@ export class Geometry2D {
         else dimentions[1] = this.dim[1];
         
         math.CopyArr2(this.dim, dimentions);
-        glBufferOps.GlSetDim(gfx, dimentions);
+        glBufferOps.Gl_set_dim_XY(gfx, dimentions);
     }
     UpdateDim(gfx) {
-        glBufferOps.GlSetDim(gfx, this.dim);
+        glBufferOps.Gl_set_dim_XY(gfx, this.dim);
     }
     UpdateScale() {
         glBufferOps.GlSetScale(gfx, this.scale);
@@ -209,26 +204,26 @@ export class Geometry3D {
     //////////////////////////////////////////////////////////////
     SetPos(pos, gfx) {
         math.CopyArr3(this.pos, pos);
-        glBufferOps.GlSetWposXY(gfx, pos);
+        glBufferOps.Gl_set_wpos_XY(gfx, pos);
     }
     SetPosXY(pos, gfx) {
         math.CopyArr2(this.pos, pos);
-        glBufferOps.GlSetWposXY(gfx, pos);
+        glBufferOps.Gl_set_wpos_XY(gfx, pos);
     }
     SetPosX(x, gfx) {
         this.pos[0] = x;
-        glBufferOps.GlSetWposX(gfx, x);
+        glBufferOps.Gl_set_wpos_X(gfx, x);
     }
     SetPosY(y) {
         this.pos[1] = y;
-        glBufferOps.GlSetWposY(gfx, y);
+        glBufferOps.Gl_set_wpos_Y(gfx, y);
     }
     UpdatePosXY() {
-        glBufferOps.GlSetWposXY(gfx, this.pos);
+        glBufferOps.Gl_set_wpos_XY(gfx, this.pos);
     }
     UpdatePosZ(z) {
         this.pos[2] = z;
-        glBufferOps.GlSetWposZ(gfx, z);
+        glBufferOps.Gl_set_wpos_Z(gfx, z);
     }
     //////////////////////////////////////////////////////////////
     StoreDefPos(pos) {

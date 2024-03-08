@@ -5,7 +5,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Find_gfx_match_widget_root_impl, Find_textgfx_from_parent_descending } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/GL/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Mesh_buffer_get_mesh_byidx, Movey_from_widget_root_buffer, Widget_group_add, Widget_group_create, Widget_group_find_but_not_insert, Widget_group_update_decrement, Widget_group_update_increment, Widget_group_update_start, Widget_root_buffer_get_byidx, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";

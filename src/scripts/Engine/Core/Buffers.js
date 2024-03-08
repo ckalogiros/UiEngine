@@ -229,6 +229,7 @@ export class M_Buffer extends Buffer_Interface {
 
 
 
+// TODO: Instead use Uint8 and set the NULL value with uin8_max: 255-0xff
 export class Int8Buffer extends Buffer_Interface {
 
    constructor(size = 0) {
@@ -590,254 +591,100 @@ export class Int16Buffer extends Buffer_Interface {
 
 
 
-// Does not 'null' the elements on 'Remove()', instead it sets them to INT_NULL
-export class Int8Buffer2 extends Buffer_Interface {
 
-   constructor() {
+// export class Int8_2DBuffer {
 
-      super();
-   }
+//    buffer;
+//    boundary; // CAUTION! Do not rely on the boundary variable. Its use is only for counting how many alements are in use(1 boundary for both rows and columns).
+//    size;
+//    numcols;
 
-   
-   Init(size, val) {
+//    constructor(numrows = 0, numcols = 0) {
 
-      if (size < 1) alert('Invalid size for Int8Buffer2 buffer.')
-      this.size = size;
-      if (!this.buffer) this.buffer = new Int8Array(this.size)
-      for (let i = 0; i < this.size; i++)
-         this.buffer[i] = val;
-   }
+//       this.size = numcols * numrows;
+//       this.numcols = numcols;
+//       if (ERROR_NULL(this.size)) alert('Must initialize Int8_2dBuffer with a size > 1');
 
+//       this.buffer = new Int8Array(this.size);
+//       this.boundary = 0;
 
-   AddAtIndex(idx, elem) {
-      if (idx < 0 || idx >= this.size) console.error('WRONG Index. Adding item at: ', idx, ' with size:', this.size)
+//       this.Init(INT_NULL);
+//    }
 
-      this.buffer[idx] = elem;
-      this.active_count++;
 
-      if (this.active_count <= idx) {
-         this.boundary = idx + 1;
-      }
-      else if (this.boundary + 1 <= this.size) {
-         // Case inserting the click event (idx=1) first. Then if we insert 
-         // the hover event (idx=0), the boundary shall not be icremented;
-         this.boundary++;
-      }
+//    Init(val) {
+//       for (let i = 0; i < this.size; i++) {
+//          this.buffer[i] = val;
+//       }
+//    }
 
-      return idx;
-   }
 
+//    Add(rowidx, val) {
 
-   RemoveByIdx(idx) {
+//       const idx = this.GetNextFree(rowidx);
+//       if (idx !== INT_NULL) {
+//          this.buffer[idx] = val;
+//          this.boundary++;
+//       }
+//    }
 
-      this.buffer[idx] = INT_NULL;
-      this.active_count--;
 
-      if (this.boundary === 1) {
-         this.boundary = 0;
-         return;
-      }
+//    GetElem(rowidx, colidx) {
+//       return this.buffer[this.numcols * rowidx + colidx];
+//    }
 
-      else {
-         const boundary = this.boundary;
-         for (let i = boundary; i > 0; i--) {
 
-            if (this.buffer[this.boundary - 1] !== INT_NULL || this.boundary === 0) break;
-            this.boundary--;
-         }
-      }
+//    GetRow(rowidx) {
+//       const row = [];
+//       for (let i = 0; i < this.numcols; i++) {
 
-      if (this.boundary === INT_NULL)
-         alert('M_Buffer boundary = -1')
-      ERROR_NULL(this.active_count);
-   }
+//          const idx = this.numcols * rowidx + i;
 
+//          if (this.buffer[idx] !== INT_NULL)
+//             row[i] = this.buffer[idx];
+//       }
+//       return row;
+//    }
 
-   Realloc() {
 
-      if (this.size <= 0) {
-         this.size = 1;
-      }
-      else this.size *= 2;
+//    GetNextFree(rowidx) {
 
-      const oldData = this.buffer;
-      this.buffer = new Int8Array(this.size);
+//       for (let i = 0; i <= this.size; i++) {
 
-      if (oldData) this.CopyBufferElements(oldData)
-      // console.warn('Resizing Int8Buffer!')
-   }
+//          const idx = this.numcols * rowidx + i;
+//          if (this.buffer[idx] === INT_NULL) {
+//             return idx;
+//          }
+//       }
+//       return INT_NULL;
+//    }
 
-}
 
+//    RemoveByIdx(rowidx, i) {
 
+//       const idx = this.numcols * rowidx + i;
 
-export class Int8_2DBuffer {
+//       if (idx > INT_NULL && idx < this.size) {
+//          this.buffer[idx] = INT_NULL;
+//          this.boundary--;
+//       }
+//    }
 
-   buffer;
-   boundary; // CAUTION! Do not rely on the boundary variable. Its use is only for counting how many alements are in use(1 boundary for both rows and columns).
-   size;
-   numcols;
 
-   constructor(numrows = 0, numcols = 0) {
+//    RemoveAll() {
 
-      this.size = numcols * numrows;
-      this.numcols = numcols;
-      if (ERROR_NULL(this.size)) alert('Must initialize Int8_2dBuffer with a size > 1');
+//       for (let i = 0; i <= this.size; i++)
+//          this.buffer[i] = INT_NULL
+//       this.boundary = 0;
+//    }
 
-      this.buffer = new Int8Array(this.size);
-      this.boundary = 0;
 
-      this.Init(INT_NULL);
-   }
+//    /** Debug */
+//    Print() {
+//       console.log('Count: ', this.boundary)
+//       console.log(this.buffer)
+//    }
 
+// }
 
-   Init(val) {
-      for (let i = 0; i < this.size; i++) {
-         this.buffer[i] = val;
-      }
-   }
 
-
-   Add(rowidx, val) {
-
-      const idx = this.GetNextFree(rowidx);
-      if (idx !== INT_NULL) {
-         this.buffer[idx] = val;
-         this.boundary++;
-      }
-   }
-
-
-   GetElem(rowidx, colidx) {
-      return this.buffer[this.numcols * rowidx + colidx];
-   }
-
-
-   GetRow(rowidx) {
-      const row = [];
-      for (let i = 0; i < this.numcols; i++) {
-
-         const idx = this.numcols * rowidx + i;
-
-         if (this.buffer[idx] !== INT_NULL)
-            row[i] = this.buffer[idx];
-      }
-      return row;
-   }
-
-
-   GetNextFree(rowidx) {
-
-      for (let i = 0; i <= this.size; i++) {
-
-         const idx = this.numcols * rowidx + i;
-         if (this.buffer[idx] === INT_NULL) {
-            return idx;
-         }
-      }
-      return INT_NULL;
-   }
-
-
-   RemoveByIdx(rowidx, i) {
-
-      const idx = this.numcols * rowidx + i;
-
-      if (idx > INT_NULL && idx < this.size) {
-         this.buffer[idx] = INT_NULL;
-         this.boundary--;
-      }
-   }
-
-
-   RemoveAll() {
-
-      for (let i = 0; i <= this.size; i++)
-         this.buffer[i] = INT_NULL
-      this.boundary = 0;
-   }
-
-
-   /** Debug */
-   Print() {
-      console.log('Count: ', this.boundary)
-      console.log(this.buffer)
-   }
-
-}
-
-
-
-export class Float32Buffer extends Buffer_Interface {
-
-   constructor(size = 0) {
-
-      super();
-      this.size = size;
-   }
-
-
-   Init(val) {
-
-      if (!this.buffer) this.buffer = new Float32Array(this.size)
-      for (let i = 0; i < this.size; i++)
-         this.buffer[i] = val;
-   }
-
-
-   Add(int) {
-
-      const idx = this.GetNextFree();
-      this.buffer[idx] = int;
-      this.active_count++;
-      return idx;
-   }
-
-
-   GetNextFree() {
-
-      if (this.boundary >= this.size) {
-
-         this.Realloc(); // buffer is full.
-         const freeIdx = this.boundary++;
-         return freeIdx;
-      }
-
-      // We run until boundary and not size (the whole buffer) 
-      // since boundary does not decrement (on remove) below the last element's index.
-      // Sample buffer: [null, null, null, elem, 'empty', empty], count=1, boundary=4, size=6
-      for (let i = 0; i <= this.boundary; i++) {
-         if (this.buffer[i] === INT_NULL) {
-            // Increment boundary only if the free element is after the last stored element in the buffer.
-            if (i >= this.boundary) this.boundary++;
-            return i;
-         }
-      }
-   }
-
-
-   // TODO: Maybe implement growing algorithm to be NOT doubling but just big enough
-   Realloc() {
-
-      const old_size = this.size;
-
-      if (this.size <= 0) {
-         this.size = 1;
-      }
-      else this.size *= 2;
-
-      const oldData = this.buffer;
-      this.buffer = new Float32Array(this.size);
-
-      if (oldData) { // Copy any old data
-         this.CopyBufferElements(oldData);
-      }
-
-      // Initialize the rest of buffer.
-      for (let i = old_size; i < this.size; i++) {
-         this.buffer[i] = INT_NULL;
-      }
-      // console.warn('Resizing Int8Buffer!')
-   }
-
-}

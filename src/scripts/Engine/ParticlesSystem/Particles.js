@@ -1,7 +1,7 @@
 "use strict";
 
 import * as math from '../../Helpers/Math/MathOperations.js'
-import { GlSetAttrTime, GlSetWposXY, GlSetColor, GlSetColorAlpha, GlSetAttrParams1 } from "../../Graphics/Buffers/GlBufferOps.js";
+import { Gl_set_wpos_time, Gl_set_wpos_XY, Gl_set_RGBA, Gl_set_alpha, GlSetAttrParams1 } from "../../VertexBuffersOps.js";
 import { Mesh } from "../Drawables/Meshes/Base/Mesh.js";
 import { TimersCreateTimer } from "../Timers/Timers.js";
 
@@ -36,24 +36,24 @@ class Particle {
 
     SetColor(col) {
         math.CopyArr4(this.mesh.col, col);
-        GlSetColor(this.gfxInfo, col);
+        Gl_set_RGBA(this.gfxInfo, col);
     }
 
 
     SetColorAlpha(a) {
         this.mesh.col[3] = a;
-        GlSetColorAlpha(this.gfxInfo, a);
+        Gl_set_alpha(this.gfxInfo, a);
     }
 
 
     SetPos(pos) {
         math.CopyArr2(this.mesh.pos, pos);
-        GlSetWposXY(this.gfxInfo, pos);
+        Gl_set_wpos_XY(this.gfxInfo, pos);
     }
 
 
     UpdatePos() {
-        GlSetWposXY(this.gfxInfo, this.mesh.pos);
+        Gl_set_wpos_XY(this.gfxInfo, this.mesh.pos);
     }
 
 };
@@ -91,8 +91,8 @@ export class Particles{
     Update(){
         for(let i=0; i< this.count; i++){
             if( this.buffer[i].isAlive){
-                GlSetWposXY(this.buffer[i].gfxInfo,   this.buffer[i].mesh.pos);
-                GlSetAttrTime(this.buffer[i].gfxInfo, this.buffer[i].timer.t);
+                Gl_set_wpos_XY(this.buffer[i].gfxInfo,   this.buffer[i].mesh.pos);
+                Gl_set_wpos_time(this.buffer[i].gfxInfo, this.buffer[i].timer.t);
             }
         }
     }
@@ -110,7 +110,7 @@ export class Particles{
     Destroy(idx){ // The index comes from the callers site destruction function
         this. buffer[idx].isAlive = false;
         // Set the wpos far from screen view, so the destroyed particle does not show.
-        GlSetWposXY(this.buffer[idx].gfxInfo, [OUT_OF_VIEW, OUT_OF_VIEW]);
+        Gl_set_wpos_XY(this.buffer[idx].gfxInfo, [OUT_OF_VIEW, OUT_OF_VIEW]);
     }
 
 
@@ -140,7 +140,7 @@ export class Particles{
     SetColor(col) {
         for(let i=0; i< this.count; i++){
             math.CopyArr4(this.buffer[i].mesh.col, col);
-            GlSetColor(this.buffer[i].gfxInfo, col);
+            Gl_set_RGBA(this.buffer[i].gfxInfo, col);
         }
     }
 

@@ -212,9 +212,3 @@ export function Create_widget_minimize_btn(ROOT_WIDGET_FLAGS=0x0, root, pos, fon
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
 
-
-
-/********************************************************************************************************************************/
-// Widget creation functions ONLY FOR TESTING PURPOSES
-
-

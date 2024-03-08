@@ -1,6 +1,6 @@
 "use strict";
 
-import { GlSetWposXY, GlSetWposY } from "../../../Graphics/Buffers/GlBufferOps.js";
+import { Gl_set_wpos_XY, Gl_set_wpos_Y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js";
@@ -51,7 +51,7 @@ export class Geometry2D_Text extends Geometry2D {
 
    SetPosY(y, gfx) {
       this.pos[1] = y;
-      GlSetWposY(gfx, y, this.num_faces);
+      Gl_set_wpos_Y(gfx, y, this.num_faces);
    }
 
    UpdatePosXY(gfx) {
@@ -65,7 +65,7 @@ export class Geometry2D_Text extends Geometry2D {
       let gfxCopy = new GfxInfoMesh(gfx);
       for (let i = 0; i < this.num_faces; i++) {
 
-         GlSetWposXY(gfxCopy, charPos);
+         Gl_set_wpos_XY(gfxCopy, charPos);
          gfxCopy.vb.start += gfxCopy.vb.count;
          charPos[0] += this.dim[0];
          console.error('MADE A CHANGE FOR DIMENTION CALCULATION. SEE UpdatePosXY(gfx) @ Geometry2DText TO RESOLVE ANY ISSUES OF THE CHANGE')

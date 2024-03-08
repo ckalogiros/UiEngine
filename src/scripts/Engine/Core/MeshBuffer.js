@@ -1,7 +1,7 @@
 "use strict";
 
-import { Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/GL/VertexBuffers.js";
-import { Gl_remove_geometry_params } from "../../Graphics/Buffers/GlBufferOps.js";
+import { Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Gl_remove_geometry_params } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Index_buffer_reset_to_index } from "../../Graphics/Buffers/IndexBuffers.js";
 import { Program_get_shader_attribute_attribs_per_vertex } from "../../Graphics/ShaderPrograms.js";
 import { MouseGetPosDif } from "../Controls/Input/Mouse.js";

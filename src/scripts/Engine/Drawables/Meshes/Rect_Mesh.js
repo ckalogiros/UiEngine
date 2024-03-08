@@ -8,7 +8,7 @@ import { Mesh } from "./Base/Mesh.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Widget_group_add, Widget_root_add_mesh, Widget_root_batch_update_increment_accumulator } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/GL/VertexBuffers.js";
+import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
 
 

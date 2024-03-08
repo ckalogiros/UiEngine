@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_get } from "../Buffers/GL/VertexBuffers.js";
+import { Vertex_buffer_get } from "../Buffers/VertexBuffers.js";
 
 
 /**

@@ -1,5 +1,5 @@
 "use strict";
-import { GlSetAttrTime } from "../../../../Graphics/Buffers/GlBufferOps.js";
+import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Int16Buffer, Int8Buffer, M_Buffer } from "../../../Core/Buffers.js";
 import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { Listener_create_child_event, Listener_create_event, Listener_remove_children_event_by_idx, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
@@ -471,7 +471,7 @@ export class Mesh {
     SetAttrTime() {
         if (this.sid.attr & SID.ATTR.TIME) {
             this.geom.timer = TimerGetGlobalTimer();
-            GlSetAttrTime(this.gfx, this.geom.timer);
+            Gl_set_wpos_time(this.gfx, this.geom.timer);
         }
     }
 

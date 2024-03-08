@@ -1,13 +1,12 @@
 "use strict";
 
 
-import { M_Buffer } from "../../../Engine/Core/Buffers";
-import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../ShaderAttributes";
-import { Progarm_get_program, Program_get_shader_attributes_index } from "../../ShaderPrograms";
-import { Index_buffer_state_enable } from "../IndexBuffers";
-import { Create_buffer_from_type } from "../TypedArrayBuffers";
-import { Gl_operation_add } from "../VertexBuffersOps";
-import { Gl_vertex_array_object_create, Gl_vertex_array_object_find_compatible, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays";
+import { M_Buffer } from "../../Engine/Core/Buffers";
+import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../ShaderAttributes";
+import { Progarm_get_program, Program_get_shader_attributes_index } from "../ShaderPrograms";
+import { Create_buffer_from_type } from "./TypedArrayBuffers";
+import { Gl_operation_add } from "./VertexBuffersOps";
+import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays";
 
 
 
@@ -32,6 +31,13 @@ export function Vertex_buffer_get() { return _vertex_buffers; }
 export function Vertex_buffer_get_by_vbidx(vbidx) {
     if(!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers, vbidx, new Error().lineNumber);
     return _vertex_buffers.buffer[vbidx];
+}
+
+
+
+export function Vertex_buffer_get_attrib_value_from_vb_byidx(vbidx, attr_idx) {
+    if(!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers, vbidx, new Error().lineNumber);
+    return _vertex_buffers.buffer[vbidx][attr_idx];
 }
 
 
@@ -90,8 +96,6 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
     /***********************************************************************************************/
     // Create VAO
 
-    // Check for compatible VAO
-    // let vaoidx = Gl_vertex_array_object_find_compatible(sid);
     let vaoidx = INT_NULL;
 
     let new_vao_created = false;
@@ -115,44 +119,8 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
     const type = BUFFER_TYPE.FLOAT32
     const ret = Vertex_buffer_create(type, size, sid);
     const vb_info = new Vertex_Buffer_Info(size, sid, ret.vbidx, ret.vbo, vaoidx, vao.vao, vao.type);
-    // const vb_info = new Vertex_Buffer_Info(size, sid, ret.vbidx, ret.vbo, _, _, type);
 
     _vertex_buffers_info.Add(vb_info);
-
-    /** VAO SAVE */
-    // if (new_vao_created) { // BIND SHADER ATTRIBUTES TO VAO, ONLY ONCE, ON VAO CREATION, BUT AFTER VERTEX BUFFER CREATION
-
-    //     // VAO must be bound before enabling attribute locations for the created VAO
-    //     // gfxCtx.gl.bindVertexArray(vao.vao);
-    //     gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
-    //     const vb = _vertex_buffers.buffer[ret.vbidx];
-    //     gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb, gfxCtx.gl.STATIC_DRAW, 0);
-        
-    //     const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
-    //     Shader_attributes_enable(attribsidx)
-    //     console.warn('Create Shader Attributes:')
-    // }
-    // else{
-    //     // gfxCtx.gl.bindVertexArray(vao.vao);
-    //     gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
-    //     // const vb = _vertex_buffers.buffer[ret.vbidx];
-    //     // gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb, gfxCtx.gl.STATIC_DRAW, 0);
-
-    //     gfxCtx.gl.enableVertexAttribArray(0);
-    //     gfxCtx.gl.enableVertexAttribArray(1);
-    //     gfxCtx.gl.enableVertexAttribArray(2);
-    //     gfxCtx.gl.enableVertexAttribArray(3);
-    //     const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
-    //     Shader_attributes_enable(attribsidx)
-    // }
-    // gfxCtx.gl.bindVertexArray(vao.vao);
-    // gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
-    // const vb = _vertex_buffers.buffer[ret.vbidx];
-    // gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb, gfxCtx.gl.STATIC_DRAW, 0);
-    // const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
-    // Shader_attributes_enable(attribsidx)
-
-    // gfxCtx.gl.bindVertexArray(vao.vao);
    
     const vb = _vertex_buffers.buffer[ret.vbidx];
     gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
@@ -161,41 +129,10 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
     const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
     Shader_attributes_enable(attribsidx)
     console.warn('Create Shader Attributes:')
-
    
-    // GL_GET_ERROR(new Error().lineNumber)
-
-
     return vb_info;
 }
 
-/**
-. Create program
-. Use program
-
-. Create VAO
-. Bind VAO
-. Create Vertexbuffer1
-. Bind VBO1
-. Set vertexAttribPointer and enableVertexAttribArray
-No bufferData is set at this point for Vertexbuffer1.
-
-. Bind VAO
-. Create Vertexbuffer2
-. Bind VBO2
-No bufferData is set at this point for Vertexbuffer2.
-
-In Draw function:
-. Use program
-. Bind VAO
-. Bind VBO1
-. Set bufferData for Vertexbuffer1
-. GlDraw. 
-
-. Bind VBO2
-. Set bufferData for Vertexbuffer2
-. GlDraw
- */
 
 
 
