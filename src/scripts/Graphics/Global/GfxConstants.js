@@ -95,6 +95,7 @@ const SID = {
         SDF: BIT2 <<= 1,
         MSDF: BIT2 <<= 1,
         PARAMS1: BIT2 <<= 1,
+        STYLE: BIT2 <<= 1,
         BORDER: BIT2 <<= 1,
         R_CORNERS: BIT2 <<= 1,
         FEATHER: BIT2 <<= 1,
@@ -106,12 +107,49 @@ const SID = {
     },
 
     UNIF: {
-        U_BUFFER: BIT5 <<= 0x1,
-        BUFFER_RES: BIT5 <<= 0x1,
 
-        SHARED_BLOCK: BIT5 <<= 0x1,
-        PROJECTION_MATRIX: BIT5 <<= 0x1,
+        PROJECTION_MATRIX: BIT5,
         SCREEN_RESOLUTION: BIT5 <<= 0x1,
+        TIME: BIT5 <<= 0x1,
+
+        ANY_SHARED: BIT5 <<= 0x1,
+
+        // Extension:
+        // IS_PROJECTION_MATRIX_BUFFERED: BIT5 <<= 0x1,
+        // IS_SCREEN_RESOLUTION_BUFFERED: BIT5 <<= 0x1,
+    },
+
+    UNIF_EXTRA:{
+
+        
+        PROJECTION_MATRIX: {
+            IS_SHARED: 0x1,
+            IN_VS: 0x2,
+            IN_FS: 0x4,
+        },
+        SCREEN_RESOLUTION: {
+            IS_SHARED: 0x1,
+            IN_VS: 0x2,
+            IN_FS: 0x4,
+        },
+        TIME: {
+            IS_SHARED: 0x1,
+            IN_VS: 0x2,
+            IN_FS: 0x4,
+        },
+    },
+    
+    PASS: {
+        COL4: BIT4,
+        POS2: BIT4 <<= 1,
+        DIM2: BIT4 <<= 1,
+        TEX2: BIT4 <<= 1,
+        WPOS2: BIT4 <<= 1,
+        TIME1: BIT4 <<= 1,
+        RES2: BIT4 <<= 1,
+        STYLE3: BIT4 <<= 1,
+        SDF2: BIT4 <<= 1,
+        PARAMS1: BIT4 <<= 1,
     },
 
     // FX
@@ -133,18 +171,6 @@ const SID = {
         FS_SHADOW: BIT3 <<= 1,
     },
 
-    PASS: {
-        COL4: BIT4,
-        POS2: BIT4 <<= 1,
-        DIM2: BIT4 <<= 1,
-        TEX2: BIT4 <<= 1,
-        WPOS2: BIT4 <<= 1,
-        TIME1: BIT4 <<= 1,
-        RES2: BIT4 <<= 1,
-        STYLE3: BIT4 <<= 1,
-        SDF2: BIT4 <<= 1,
-        PARAMS1: BIT4 <<= 1,
-    },
 
     DEBUG: false,
 
@@ -166,7 +192,9 @@ const SID = {
 
 };
 
-
+if(SID.ATTR > MAX_BIT_MASK) console.error('SID ATTR exceeding javascript\'s max number value');
+if(SID.UNIF > MAX_BIT_MASK) console.error('SID UNIF exceeding javascript\'s max number value');
+if(SID.PASS > MAX_BIT_MASK) console.error('SID PASS exceeding javascript\'s max number value');
 
 
 
@@ -404,15 +432,15 @@ const TRIG = {
 
 /*************************************************************************************************/
 // Framebuffer
-cnt1 = 0x1;
+_CNT = 0x1;
 const FB = {
-    NEW: cnt1 <<= 0x1, // represents the creation of new farmebuffer
+    NEW: _CNT <<= 0x1, // represents the creation of new farmebuffer
     STATIC: {
-        ID: cnt1 <<= 0x1,
+        ID: _CNT <<= 0x1,
         idx: INT_NULL, // The index of the static frambuffer in the "_fb_buffer" at GlFramebuffer.js file. Should be set manualy.
     },
     DYNAMIC: {
-        ID: cnt1 <<= 0x1,
+        ID: _CNT <<= 0x1,
         idx: INT_NULL, // The index of the dynamic frambuffer in the "_fb_buffer" at GlFramebuffer.js file. Should be set manualy.
     },
 }

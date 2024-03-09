@@ -21,6 +21,8 @@ const MAX_UINT16 = 65535;
 const MAX_UINT32 = 0xFFFFFFFF; // 4294967295;
 // const MAX_UINT64 = 0xFFFFFFFFFFFFFFFF; // 18446744073709551615 ;
 
+const MAX_BIT_MASK =  0xFFFFFFFFFFFFF; 
+const MAX_BIT_MASK_COMBINATIONS =  52; 
 
 const MILISEC = 0.001;
 const NANOSEC = 0.000001;
@@ -113,10 +115,11 @@ const MAT4X4_BYTE_SIZE = 4 * VEC4_BYTE_SIZE; // 64 Bytes
 
 
 
-// In order to update the correct uniform of the shared block, we store the index to the block'a uniform location.
+// In order to update the correct uniform of a uniform block, we store the index to the block'a uniform location.
 const UBS = {
 	PROJECTION_LOC: INT_NULL,
 	RESOLUTION_LOC: INT_NULL,
+	TIME_LOC: INT_NULL,
 };
 
 

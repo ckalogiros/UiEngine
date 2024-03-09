@@ -168,9 +168,9 @@ export function Program_create_program(sid) {
 	// }
 
 	// Enable Uniform Shared Block
-	if(sid.unif & SID.UNIF.SHARED_BLOCK){
-		UBO_create(prog.shader_program, sid.unif)
-	}
+	// if(sid.unif & SID.UNIF.UNIFORM_BLOCK){
+	// 	UBO_create(prog.shader_program, sid.unif);
+	// }
 
 	// Enable global timer uniform (float)
 	// if (sid.unif & SID.UNIF.BUFFER_RES) {
@@ -195,29 +195,39 @@ class Gl_Program {
 
 		this.shader_program = Shaders_load(gfxCtx.gl, sid);
 
-		this.vb = new Int8Buffer(1);
-		this.vb.Init(-1)
+		this.vb = new Int8Buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffers_info' buffer. 
+		this.vb.Init(-1);
 
-		this.ib = new Int8Buffer(1);
-		this.ib.Init(-1)
+		this.ib = new Int8Buffer(1); // Array of indexes to all index buffers in '_index_buffers_info' buffer. 
+		this.ib.Init(-1);
+
+		this.ub = new Int8Buffer(1); // Array of indexes to all vertex buffers in '_uniform_blocks' buffer. 
+		this.ub.Init(-1);
 
 		this.vao = null;
 		this.vaoidx = INT_NULL;
 
+
+
 		this.attribsidx = Shader_attributes_create(sid, this.shader_program);
 		this.attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(this.attribsidx);
+
 
 		// Store the function's index that is responsible of been used to add mesh data to apropriately to a vertex buffer
 		this.add_to_vb_fnidx = Select_fnidx_to_fill_vertex_buffer(this.attribsidx);
 
 
+		// if any of the uniforms in SID.UNIF are _SHARED, must call UBO_create()
+		// For each uniform that is active but NOT _SHARED, we must add either to uniform buffer OR create a separate uniform
+		if(sid.unif & SID.UNIF.ANY_SHARED ){
+			const ub_idx = UBO_create(sid.unif, this.shader_program, this.ub);
+			this.ub.Add(ub_idx);
+		}
+
+
 		this.shaderinfo = {
 			uniforms: {
-
 				sampler: gl.getUniformLocation(this.shader_program, 'u_sampler0'),	// Sampler for texture units 	
-
-				// Uniforms buffer. Stores any uniform as an array of values.
-				// buffer: new UniformsBuffer(gfxCtx.gl, this, SHADER_CONSTANTS.UNIFORM_BUFFER_COUNT),
 			},
 
 		};

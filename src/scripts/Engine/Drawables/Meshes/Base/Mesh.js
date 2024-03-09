@@ -30,6 +30,11 @@ import { Str_buffer_get_by_idx, Str_buffer_store } from "../../../Core/StringBuf
 }
 */
 
+class MeshOptionFlags {
+
+
+};
+
 
 
 
@@ -100,10 +105,26 @@ export class Mesh {
         this.geom = geom;
         this.mat = mat;
 
+
+        // TODO: Move conditional shader building options to some place else
+        let UNIFORM_FLAGS = (SID.UNIF.PROJECTION_MATRIX ); // Assuming a projection camera and screen resolution uniforms for all meshes. 
+        
+        const UNIF_EXTRA_PROJ = SID.UNIF_EXTRA.PROJECTION_MATRIX.IS_SHARED | SID.UNIF_EXTRA.PROJECTION_MATRIX.IN_VS;     
+        
+        if(SID.ATTR.STYLE){
+            UNIFORM_FLAGS |= SID.UNIF.SCREEN_RESOLUTION;
+            var UNIFORM_EXTRA_RES = SID.UNIF_EXTRA.SCREEN_RESOLUTION.IN_FS;
+        }
+
         this.sid = {
             shad: SID.SHAD.INDEXED | (this.geom.sid.shad | this.mat.sid.shad),
             attr: (this.geom.sid.attr | this.mat.sid.attr),
-            unif: (this.mat.sid.unif) | (SID.UNIF.PROJECTION_MATRIX | SID.UNIF.SHARED_BLOCK | SID.UNIF.SCREEN_RESOLUTION), // Assuming we always have  a projection camera and a uniforms buffer. 
+            unif: (this.mat.sid.unif) | UNIFORM_FLAGS | SID.UNIF.ANY_SHARED, 
+            unif_extra: {
+                proj: UNIF_EXTRA_PROJ,
+                res: UNIFORM_EXTRA_RES,
+                time: 0x0,
+            },
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
             progs_group: PROGRAMS_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
         };
@@ -543,21 +564,21 @@ export class Mesh {
 
         switch (which) {
 
-            case MESH_ENABLE.GFX.UNIF_RESOLUTION: {
+            // case MESH_ENABLE.GFX.UNIF_RESOLUTION: {
 
-                this.sid.unif |= SID.UNIF.BUFFER_RES | SID.UNIF.U_BUFFER; // Enable the screen resolution to be contructed as a uniform in the vertex shader, to be used in the fragment shader.
-                break;
-            }
+            //     this.sid.unif |= SID.UNIF.BUFFER_RES; // Enable the screen resolution to be contructed as a uniform in the vertex shader, to be used in the fragment shader.
+            //     break;
+            // }
             case MESH_ENABLE.GFX.ATTR_STYLE: {
 
-                this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.PARAMS1 | SID.ATTR.EMPTY;
-                this.sid.unif |= SID.UNIF.U_BUFFER;
+                this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.PARAMS1 | SID.ATTR.EMPTY;
+                // this.sid.unif |= SID.UNIF.U_BUFFER;
                 this.sid.pass |= SID.PASS.WPOS2 | SID.PASS.DIM2;
                 if (!(params === null || params === undefined)) {
                     this.mat.style = params.style;
                 }
 
-                this.sid.unif |= SID.UNIF.BUFFER_RES | SID.UNIF.U_BUFFER;
+                // this.sid.unif |= SID.UNIF.BUFFER_RES | SID.UNIF.U_BUFFER;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_TIME: {

@@ -87,7 +87,8 @@ vec4 Stylize()                                                    \n\
   float rCorners = v_rCorners * .008;                             \n\
   float feather = v_border_feather;                               \n\
   \n\
-  vec2 res = v_screen_res;    \n\
+//   vec2 res = v_screen_res;    \n\
+  vec2 res = u_screen_res;    \n\
   vec2 uv = gl_FragCoord.xy/res;                                  \n\
   uv -= vec2(v_wpos.x/res.x, 1.-(v_wpos.y/res.y));                \n\
   pos.xy = uv;                                                    \n\

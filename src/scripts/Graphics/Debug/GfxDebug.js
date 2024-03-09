@@ -39,8 +39,6 @@ export function GetShaderTypeId(sid) {
 
     if (sid.unif) str += 'Uniforms:'
     if (sid.unif & SID.UNIF.PROJECTION) str += 'Projection Matrix, '
-    if (sid.unif & SID.UNIF.U_BUFFER) str += 'Uniform Buffer, '
-    if (sid.unif & SID.UNIF.BUFFER_RES) str += 'Send Screen Resolution, '
     if (sid.unif) str += '\n'
 
     if (sid.pass) str += 'Passes:'

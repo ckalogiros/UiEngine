@@ -312,7 +312,7 @@ function SdfLine(col, pos, dim) {
     // line.AddItem(line1)
     
     // line.sid.unif |= SID.UNIF.SCREEN_RESOLUTION;
-    // line.sid.unif |=  SID.UNIF.SHARED_BLOCK | SID.UNIF.PROJECTION_MATRIX;
+    // line.sid.unif |=  SID.UNIF.UNIFORM_BLOCK | SID.UNIF.PROJECTION_MATRIX;
     
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     line.Activate();
