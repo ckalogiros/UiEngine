@@ -31,7 +31,7 @@ export class Geometry2D_Text extends Geometry2D {
       // this.char_ratio = char_ratio;
       this.text = text;
       this.num_faces = text.length;
-      this.type |= MESH_TYPES_DBG.TEXT_GEOMETRY2D;
+      this.type |= MESH_TYPE.TEXT_GEOMETRY2D;
    }
 
    /*******************************************************************************************************************************************************/

@@ -1,6 +1,7 @@
 "use strict";
 
 import { Create_widget_label, Create_widget_section, Create_widget_switch } from "../../Core/CreateWidget";
+import { WHITE } from "../Material/Base/Colors";
 
 
 export function Dbg_ui_create(name, parent, fontsize, switch_fn, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex){

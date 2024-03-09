@@ -83,29 +83,18 @@ vec2 RoundedRectangle(vec2 dim, float r, float bw) {              \n\
 }                                                                 \n\
 vec4 Stylize()                                                    \n\
 {                                                                 \n\
-  float t = v_uniforms_buffer[2];                                 \n\
   // Radius(From 0.01 to 0.35 good values) for rounding corners   \n\
   float rCorners = v_rCorners * .008;                             \n\
   float feather = v_border_feather;                               \n\
   \n\
-#ifdef UB_HAS_RESOLUTION\n\
-  vec2 res = vec2(v_uniforms_buffer[UB_IDX0], v_uniforms_buffer[UB_IDX1]);    \n\
-  res.x /= res.x/res.y;                                           \n\
-#else                                                             \n\
-vec2 res = vec2(824., 893.);                                      \n\
-  res.x /= res.x/res.y;                                           \n\
-  return vec4(1.);                                                \n\
-#endif                                                            \n\
+  vec2 res = v_screen_res;    \n\
   vec2 uv = gl_FragCoord.xy/res;                                  \n\
   uv -= vec2(v_wpos.x/res.x, 1.-(v_wpos.y/res.y));                \n\
   pos.xy = uv;                                                    \n\
   vec2 dim = vec2(v_dim.x/res.x, v_dim.y/res.y);                  \n\
-  // dim -= vec2(v_wpos.x/res.x, 1.-(v_wpos.y/res.y));            \n\
-  // vec2 dim = vec2(v_dim.x, v_dim.y);                           \n\
   \n\
   // From 0.3 to 1.2 good values                                  \n\
   float clarity = 10.4;                                           \n\
-  // float clarity = 1.; // From 0.3 to 1.2 good values           \n\
   ScreenH = min(res.x, res.y)*clarity;                            \n\
   AA = ScreenH*.5;                                                \n\
   \n\
@@ -118,40 +107,109 @@ vec2 res = vec2(824., 893.);                                      \n\
   \n\
   // Calculate alpha (for rounding corners)                       \n\
   float dd = d.x - blur.x;                                        \n\
-  // float dd = min(d.x - blur.x, d.x-rCorners);                  \n\
-  // float wa = clamp(-dd * AA, 0.0, 1.);                         \n\
   float wa = 1.;                                                  \n\
   float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);               \n\
   float alpha = src.a * (wa * wb);                                \n\
   color += color * (1.0 - alpha) + src.rgb * alpha;               \n\
   \n\
-  // BORDER                                                       \n\
   // Border Width. It is 0.001 for every pixel                    \n\
   float borderWidth = v_border_width * 0.001;                     \n\
   float bd = (abs(d.x)-borderWidth) - blur.x;                     \n\
   wa = clamp(-bd * AA, 0.0, 1.0);                                 \n\
   wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);                    \n\
   color += color * vec3(abs(wa * wb));                            \n\
-  // color += vec3(.1,.4,.8) * vec3(abs(wa * wb));                \n\
-  // color *= 2.*vec3(abs(wa * wb));                              \n\
   \n\
-  // Bevel. // TODO: Control @colorIntensity for the pow() and @darkness for the mult of the pow() \n\
-  // float r = min(rCorners*.17, min(dim.x, dim.y));              \n\
-  // // float r = min(.023, min(dim.x, dim.y));                   \n\
-  // float f = smoothstep(r, .0, abs(d.x)-borderWidth);           \n\
-  // color = mix(color, pow(color, vec3(1.5))*.85, f);            \n\
-  \n\
-  // if(v_uniforms_buffer[2] > 10.) return vec4(1.);              \n\
   return vec4(color, alpha);                                      \n\
-  \
-  // // Calculate Gradient                                        \n\
-  // float dist = length(vec2(d.x, 0.1));                         \n\
-  // vec2 p0 = vec2(-dist, 0.0);                                  \n\
-  // vec2 p1 = vec2(dist, 0.0);                                   \n\
-  // vec2 pa = pos.xy - p0;                                       \n\
-  // vec2 ba = p1 - p0;                                           \n\
 } \n\
 ';
+
+
+
+/**SAVE 2. Removed all commented code*/
+// export const frag_round_corners = '\
+// vec4 pos = vec4(.0, .0, .0, .0);                                  \n\
+// float ScreenH;                                                    \n\
+// float AA;                                                         \n\
+// vec2 length2(vec4 a) {                                            \n\
+//   return vec2(length(a.xy), length(a.zw));                        \n\
+// }  \n\
+// vec2 RoundedRectangle(vec2 dim, float r, float bw) {              \n\
+//   dim -= bw +.0002; // Subtract the border                        \n\
+//   r = min(r, min(dim.x, dim.y));                                  \n\
+//   dim -= r; // Subtract the border-radius                         \n\
+//   vec4 d = abs(pos) - dim.xyxy;                                   \n\
+//   vec4 dmin = min(d, 0.0);                                        \n\
+//   vec4 dmax = max(d, 0.0);                                        \n\
+//   vec2 df = max(dmin.xz, dmin.yw) + length2(dmax);                \n\
+//   return (df - r);                                                \n\
+// }                                                                 \n\
+// vec4 Stylize()                                                    \n\
+// {                                                                 \n\
+//   // float t = v_uniforms_buffer[2];                                 \n\
+//   // Radius(From 0.01 to 0.35 good values) for rounding corners   \n\
+//   float rCorners = v_rCorners * .008;                             \n\
+//   float feather = v_border_feather;                               \n\
+//   \n\
+//   vec2 res = v_screen_res;    \n\
+//   vec2 uv = gl_FragCoord.xy/res;                                  \n\
+//   uv -= vec2(v_wpos.x/res.x, 1.-(v_wpos.y/res.y));                \n\
+//   pos.xy = uv;                                                    \n\
+//   vec2 dim = vec2(v_dim.x/res.x, v_dim.y/res.y);                  \n\
+//   // dim -= vec2(v_wpos.x/res.x, 1.-(v_wpos.y/res.y));            \n\
+//   // vec2 dim = vec2(v_dim.x, v_dim.y);                           \n\
+//   \n\
+//   // From 0.3 to 1.2 good values                                  \n\
+//   float clarity = 10.4;                                           \n\
+//   // float clarity = 1.; // From 0.3 to 1.2 good values           \n\
+//   ScreenH = min(res.x, res.y)*clarity;                            \n\
+//   AA = ScreenH*.5;                                                \n\
+//   \n\
+//   vec2 blur = vec2(0.0, feather * .001);                          \n\
+//   \n\
+//   vec2 d = RoundedRectangle(dim, mix(0.0, .2, rCorners), 0.);     \n\
+//   \n\
+//   vec4 src = v_col;                                               \n\
+//   vec3 color = vec3(0.0);                                         \n\
+//   \n\
+//   // Calculate alpha (for rounding corners)                       \n\
+//   float dd = d.x - blur.x;                                        \n\
+//   // float dd = min(d.x - blur.x, d.x-rCorners);                  \n\
+//   // float wa = clamp(-dd * AA, 0.0, 1.);                         \n\
+//   float wa = 1.;                                                  \n\
+//   float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);               \n\
+//   float alpha = src.a * (wa * wb);                                \n\
+//   color += color * (1.0 - alpha) + src.rgb * alpha;               \n\
+//   \n\
+//   // BORDER                                                       \n\
+//   // Border Width. It is 0.001 for every pixel                    \n\
+//   float borderWidth = v_border_width * 0.001;                     \n\
+//   float bd = (abs(d.x)-borderWidth) - blur.x;                     \n\
+//   wa = clamp(-bd * AA, 0.0, 1.0);                                 \n\
+//   wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);                    \n\
+//   color += color * vec3(abs(wa * wb));                            \n\
+//   // color += vec3(.1,.4,.8) * vec3(abs(wa * wb));                \n\
+//   // color *= 2.*vec3(abs(wa * wb));                              \n\
+//   \n\
+//   // Bevel. // TODO: Control @colorIntensity for the pow() and @darkness for the mult of the pow() \n\
+//   // float r = min(rCorners*.17, min(dim.x, dim.y));              \n\
+//   // // float r = min(.023, min(dim.x, dim.y));                   \n\
+//   // float f = smoothstep(r, .0, abs(d.x)-borderWidth);           \n\
+//   // color = mix(color, pow(color, vec3(1.5))*.85, f);            \n\
+//   \n\
+//   // if(v_uniforms_buffer[2] > 10.) return vec4(1.);              \n\
+//   return vec4(color, alpha);                                      \n\
+//   \
+//   // // Calculate Gradient                                        \n\
+//   // float dist = length(vec2(d.x, 0.1));                         \n\
+//   // vec2 p0 = vec2(-dist, 0.0);                                  \n\
+//   // vec2 p1 = vec2(dist, 0.0);                                   \n\
+//   // vec2 pa = pos.xy - p0;                                       \n\
+//   // vec2 ba = p1 - p0;                                           \n\
+// } \n\
+// ';
+
+
+
 
 
 

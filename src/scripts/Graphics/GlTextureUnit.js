@@ -26,7 +26,16 @@ export class Gl_Texture {
 
 
 export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=0) {
-
+/**                gl.RGBA8
+                gl.SRGB8_ALPHA8 (also available as an extension for WebGL 1, see below)
+                gl.RGB10_A2
+                gl.RGBA8UI
+                gl.RGBA8I
+                gl.RGB10_A2UI
+                gl.RGBA16UI
+                gl.RGBA16I
+                gl.RGBA32I
+                gl.RGBA32UI */
     const texture = new Gl_Texture();
     texture.tex_unit_id = gl.TEXTURE0 + idx; // Advance the texture ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
     texture.texidx = idx; // Advance the texture ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.

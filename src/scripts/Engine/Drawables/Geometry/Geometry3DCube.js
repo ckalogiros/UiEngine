@@ -51,7 +51,7 @@
 //              .5, -.5, -.5, // v4
 //         ];
 
-//         this.type |= MESH_TYPES_DBG.CUBE_GEOMETRY;
+//         this.type |= MESH_TYPE.CUBE_GEOMETRY;
 //     }
 
 //     AddToGraphicsBuffer(sid, gfx, meshName) {

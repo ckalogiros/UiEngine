@@ -103,12 +103,12 @@ export class Mesh {
         this.sid = {
             shad: SID.SHAD.INDEXED | (this.geom.sid.shad | this.mat.sid.shad),
             attr: (this.geom.sid.attr | this.mat.sid.attr),
-            unif: (this.mat.sid.unif) | (SID.UNIF.PROJECTION_MATRIX | SID.UNIF.SHARED_BLOCK), // Assuming we always have  a projection camera and a uniforms buffer. 
+            unif: (this.mat.sid.unif) | (SID.UNIF.PROJECTION_MATRIX | SID.UNIF.SHARED_BLOCK | SID.UNIF.SCREEN_RESOLUTION), // Assuming we always have  a projection camera and a uniforms buffer. 
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
             progs_group: PROGRAMS_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
         };
 
-        this.type = MESH_TYPES_DBG.MESH;
+        this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
         // this.state = { mask: 0x0 }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
         this.alignment = 0x0;

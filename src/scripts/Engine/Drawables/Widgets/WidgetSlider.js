@@ -10,6 +10,7 @@ import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js
 import { Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { Index_buffer_add_indices } from '../../../Graphics/Buffers/IndexBuffers.js';
+import { BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
 
 
 
@@ -20,7 +21,7 @@ export class Widget_Slider extends Rect {
 
    text_mesh;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = TRANSPARENCY(GREY1, .6), hover_margin = [0, 0]) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = TRANSPARENCY(GREY[1], .6), hover_margin = [0, 0]) {
 
       // Calculate the bar's and handle's horizontal pading.
       const ratio = dim[0] / dim[1];
@@ -43,7 +44,7 @@ export class Widget_Slider extends Rect {
       super(pos, dim, col);
 
       this.mesh_bufferidx = mesh_bufferidx;
-      this.type |= MESH_TYPES_DBG.WIDGET_SLIDER;
+      this.type |= MESH_TYPE.WIDGET_SLIDER;
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle([0, 6, 2]);
       this.SetName('Widget_Slider');
@@ -62,7 +63,7 @@ export class Widget_Slider extends Rect {
 
       const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, GREY3);
 
-      bar.type |= MESH_TYPES_DBG.WIDGET_SLIDER_BAR | bar.geom | bar.mat;
+      bar.type |= MESH_TYPE.WIDGET_SLIDER_BAR | bar.geom | bar.mat;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       bar.SetStyle([0, 3, 2]);
       // bar.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
@@ -76,7 +77,7 @@ export class Widget_Slider extends Rect {
 
       const handle = Create_rect_mesh(handleMetrics.pos, handleMetrics.dim, BLUE_10_120_220);
 
-      handle.type |= MESH_TYPES_DBG.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
+      handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([5, 35, 3]);
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
@@ -441,7 +442,7 @@ export class Widget_Slider extends Rect {
          STATE.mesh.SetClicked(bar);
          // STATE.mesh.SetFocused(mesh);
 
-         if ((bar.type & MESH_TYPES_DBG.WIDGET_SLIDER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
+         if ((bar.type & MESH_TYPE.WIDGET_SLIDER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
             const idx = TimeIntervalsCreate(10, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_on_update_handle, bar);
             bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
@@ -459,7 +460,7 @@ export class Widget_Slider extends Rect {
          // STATE.mesh.SetFocused(mesh);
 
          // Move Slider 
-         if ((mesh.type & MESH_TYPES_DBG.WIDGET_SLIDER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+         if ((mesh.type & MESH_TYPE.WIDGET_SLIDER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
             // const idx = TimeIntervalsCreate(10, 'Move Slider', TIME_INTERVAL_REPEAT_ALWAYS, Slider_move_event, mesh);
             const idx = TimeIntervalsCreate(10, 'Move Slider', TIME_INTERVAL_REPEAT_ALWAYS, mesh.OnMove, mesh);
@@ -529,29 +530,18 @@ export class Widget_Slider extends Rect {
       if (x === 0 && y === 0) return;
 
       this.geom.MoveXY(x, y, this.gfx);
-      // this.MoveXY(x, y); 
-      // Batch_store(this, BATCH_TYPE.MOVE, [x, y]);
 
       const bar = this.children.buffer[SLIDER_BAR_IDX];
       bar.geom.MoveXY(x, y, bar.gfx);
-      // Batch_store(bar, BATCH_TYPE.MOVE, [x, y]);
-      // bar.geom.MoveXY(x, y, bar.gfx);
+
       const name_text = this.text_mesh;
       name_text.geom.MoveXY(x, y, name_text.gfx);
-      // name_text.MoveXY(x, y); 
-      // Batch_store(name_text, BATCH_TYPE.MOVE, [x, y]);
-      // name_text.geom.MoveXY(x, y, name_text.gfx);
+
       const handle = bar.children.buffer[0];
       handle.geom.MoveXY(x, y, handle.gfx);
-      // handle.MoveXY(x, y); 
-      // Batch_store(handle, BATCH_TYPE.MOVE, [x, y]);
-      // handle.geom.MoveXY(x, y, handle.gfx);
 
       const value_text = bar.children.buffer[1];
       value_text.geom.MoveXY(x, y, value_text.gfx);
-      // value_text.MoveXY(x, y); 
-      // Batch_store(value_text, BATCH_TYPE.MOVE, [x, y]);
-      // value_text.geom.MoveXY(x, y, value_text.gfx);
 
    }
 
@@ -1005,7 +995,7 @@ export function Slider_connect(_params) {
          if (newTargetId === existingTargetId) {
 
             console.log('Disconnecting target:', sliderBar.eventCallbacks.buffer[i].target.GetName(), ' clicked:', STATE.mesh.clickedId);
-            /*FOR DEBUG*/clicked_mesh.SetColor(RED)
+            /*FOR DEBUG*/clicked_mesh.SetColor(REDL[7])
 
             // Disconnect
             sliderBar.eventCallbacks.RemoveByIdx(i);

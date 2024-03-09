@@ -405,7 +405,7 @@ function Check_for_textgfx_in_mesh_combinatory(mesh, child) {
    }
 
    // Else check combinations
-   if ((child.type & MESH_TYPES_DBG.TEXT_MESH) && ((mesh.type & MESH_TYPES_DBG.TEXT_MESH) || (mesh.type & MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC))) {
+   if ((child.type & MESH_TYPE.TEXT_MESH) && ((mesh.type & MESH_TYPE.TEXT_MESH) || (mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC))) {
 
       if (SID.CheckSidMatch(mesh.sid, child.sid)) {
          igfx.idxs[0] = child.gfx.prog.idx;
@@ -417,7 +417,7 @@ function Check_for_textgfx_in_mesh_combinatory(mesh, child) {
          if (DBG) console.log('1. ----------- | mesh:child', mesh.GetName(), child.GetName())
       }
    }
-   else if (mesh.text_mesh && (child.type & MESH_TYPES_DBG.TEXT_MESH) && (!(mesh.type & MESH_TYPES_DBG.TEXT_MESH) && !(mesh.type & MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC))) {
+   else if (mesh.text_mesh && (child.type & MESH_TYPE.TEXT_MESH) && (!(mesh.type & MESH_TYPE.TEXT_MESH) && !(mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC))) {
 
       if (SID.CheckSidMatch(mesh.text_mesh.sid, child.sid)) {
          igfx.idxs[0] = child.gfx.prog.idx;
@@ -427,7 +427,7 @@ function Check_for_textgfx_in_mesh_combinatory(mesh, child) {
          if (DBG) console.log('2. ----------- | mesh:child', mesh.GetName(), child.GetName())
       }
    }
-   else if (child.text_mesh && !(child.type & MESH_TYPES_DBG.TEXT_MESH) && ((mesh.type & MESH_TYPES_DBG.TEXT_MESH) || (mesh.type & MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC))) {
+   else if (child.text_mesh && !(child.type & MESH_TYPE.TEXT_MESH) && ((mesh.type & MESH_TYPE.TEXT_MESH) || (mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC))) {
 
       if (SID.CheckSidMatch(mesh.sid, child.text_mesh.sid)) {
          igfx.idxs[0] = child.text_mesh.gfx.prog.idx;
@@ -439,7 +439,7 @@ function Check_for_textgfx_in_mesh_combinatory(mesh, child) {
          if (DBG) console.log('3. ----------- | mesh:child', mesh.GetName(), child.GetName())
       }
    }
-   else if (!(child.type & MESH_TYPES_DBG.TEXT_MESH) && (!(mesh.type & MESH_TYPES_DBG.TEXT_MESH) && !(mesh.type & MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC))) {
+   else if (!(child.type & MESH_TYPE.TEXT_MESH) && (!(mesh.type & MESH_TYPE.TEXT_MESH) && !(mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC))) {
 
       if (mesh.text_mesh && child.text_mesh) { // Make sure both meshes have text_mesh variable(may be just a rect mesh like 'section' mesh)
 
@@ -468,7 +468,7 @@ export function Find_textgfx_from_parent_descending(parent) {
       const child = mesh.children.buffer[i];
       if (child && child.gfx) {
 
-         if (child.type & MESH_TYPES_DBG.WIDGET_TEXT) {
+         if (child.type & MESH_TYPE.WIDGET_TEXT) {
             return child.gfx;
          }
          else if (child.text_mesh) {

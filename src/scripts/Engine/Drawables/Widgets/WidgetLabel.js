@@ -15,6 +15,7 @@ import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
+import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
 
@@ -46,7 +47,7 @@ export class Widget_Label extends Rect {
     idx; // Stores the index of the scene's root_mesh buffer, that keeps all scene's root meshes. 
     pad = [0, 0];
 
-    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY1, text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 0, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
+    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 0, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -73,7 +74,7 @@ export class Widget_Label extends Rect {
         this.mesh_bufferidx = mesh_bufferidx;
         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
         this.SetStyle(style);
-        this.type |= MESH_TYPES_DBG.WIDGET_TEXT_LABEL | this.geom.type | this.mat.type;
+        this.type |= MESH_TYPE.WIDGET_TEXT_LABEL | this.geom.type | this.mat.type;
         this.SetName(`Lebel-text [${text}]`);
         this.pad = pad;
 
@@ -634,7 +635,7 @@ export class Widget_Label_Text_Mesh_Menu_Options extends Widget_Label {
     constructor(text, Align, pos, fontSize, col, textCol, scale, pad, bold, font, style) {
 
         super(text, Align, pos, fontSize, col, textCol, scale, pad, bold, font, style)
-        this.type |= MESH_TYPES_DBG.WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS;
+        this.type |= MESH_TYPE.WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS;
     }
 
 

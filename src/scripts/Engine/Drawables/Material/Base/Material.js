@@ -36,7 +36,7 @@ export class Material {
       math.CopyArr4(this.col, col);
       this.defCol = [0,0,0,0];
       math.CopyArr4(this.defCol, col);
-      this.type = MESH_TYPES_DBG.MATERIAL;
+      this.type = MESH_TYPE.MATERIAL;
       this.style = [0, 0, 0]; // Initialize style: []
       this.uv = [0,1,0,1];
       this.uvIdx  = INT_NULL;
@@ -146,7 +146,7 @@ export class FontMaterial extends Material {
       this.sid.shad |= SID.SHAD.PRE_MULTIPLIED_ALPHA; // E
       this.sid.attr |= SID.ATTR.TEX2; // 
       this.sid.attr |= SID.ATTR.MSDF; // 
-      this.type |= MESH_TYPES_DBG.FONT_MATERIAL;
+      this.type |= MESH_TYPE.FONT_MATERIAL;
       
       // Load texture and uv map, via indexes to the actual buffers
       const tex_idxs = Texture_load_texture_byid(this.texidx, TEXTURE_TYPE.TYPE_FONT);
@@ -175,7 +175,7 @@ export class Texture_Material extends Material {
       super(col);
       
       this.sid.attr |= SID.ATTR.TEX2; // Enable texture coordinates for the vertex shader
-      this.type |= MESH_TYPES_DBG.TEXTURE_MATERIAL;
+      this.type |= MESH_TYPE.TEXTURE_MATERIAL;
       
       const tex_idxs = Texture_load_texture_byid(textureid, TEXTURE_TYPE.TYPE_TEXTURE);  
       this.texidx = tex_idxs.texidx;

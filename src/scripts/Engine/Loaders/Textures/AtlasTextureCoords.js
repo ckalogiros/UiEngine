@@ -23,25 +23,25 @@ const ATLAS_TEX_HEIGHT = 1024;
  * 	that means the index of the texture name buuffer must match the index of the coordinates buffer
  */
 
-let _cnt = 0;
+_CNT = 0;
 const ATLAS_TEX_NAMES = {
-	COIN: _cnt++,			// Coin
-	PWU_BLL: _cnt++,			// PowUp Balls
-	PWU_ENL: _cnt++,			// PowUp Player Enlargment
-	PWU_BULLET: _cnt++,			// PowUp Bullet
-	PWU_POW_BALL: _cnt++,	// PowUp PowerBall
+	COIN: _CNT++,			// Coin
+	PWU_BLL: _CNT++,			// PowUp Balls
+	PWU_ENL: _CNT++,			// PowUp Player Enlargment
+	PWU_BULLET: _CNT++,			// PowUp Bullet
+	PWU_POW_BALL: _CNT++,	// PowUp PowerBall
 
-	GUN: _cnt++,	// Gun
-	BULLET: _cnt++,	// Gun
+	GUN: _CNT++,	// Gun
+	BULLET: _CNT++,	// Gun
 
 	STAGE_COMPLETE: {
-		TEXT:{GOOD: _cnt++,},
-		OUTER: _cnt++,	// Stage completed logo - outer ring
-		MIDDLE: _cnt++,	// Stage completed logo - middle ring
-		INNER: _cnt++,	// Stage completed logo - inner ring
+		TEXT:{GOOD: _CNT++,},
+		OUTER: _CNT++,	// Stage completed logo - outer ring
+		MIDDLE: _CNT++,	// Stage completed logo - middle ring
+		INNER: _CNT++,	// Stage completed logo - inner ring
 	},
 
-	SIZE: _cnt,
+	SIZE: _CNT,
 };
 
 

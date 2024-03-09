@@ -1,4 +1,5 @@
 "use strict";
+import { COLOR_ARRAY, COLOR_ARRAY2 } from "../Engine/Drawables/Material/Base/Colors.js";
 import { MapLinear } from "./Math/MathOperations.js";
 
 
@@ -45,8 +46,8 @@ export function GetRandomColor(){
 
 let nextidx = 0;
 export function GetSequencedColor(){
-    if(nextidx >= COLORS1.length) nextidx = 0;
-    return COLORS1[nextidx++];
+    if(nextidx >= COLOR_ARRAY2.length) nextidx = 0;
+    return COLOR_ARRAY2[nextidx++];
 }
 
 

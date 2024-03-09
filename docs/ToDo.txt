@@ -10,6 +10,7 @@
 -Implement shaders with INT attributes: Color, wposition
 -3D
 -Android Phone
+-Pass font texture via Uniform Shared Block
 --------------------------------------------------- Milestones!
 
 --------------------------------------------------- Ideas!

@@ -6,6 +6,7 @@ import { Section } from "../Meshes/Section.js";
 import { Widget_Switch } from "../Widgets/WidgetButton.js";
 import { Widget_Label_Text_Mesh_Menu_Options } from "../Widgets/WidgetLabel.js";
 import { Slider_connect } from "../Widgets/WidgetSlider.js";
+import { BLUE_10_120_220, GREY, WHITE } from "../Material/Base/Colors.js";
 
 
 const _menu_options = [];
@@ -76,7 +77,7 @@ export function Menu_options_create(clicked_mesh, pos) {
    }
 
    // ELSE it does not exist, so create options menu
-   if (clicked_mesh.type & MESH_TYPES_DBG.WIDGET_SLIDER) {
+   if (clicked_mesh.type & MESH_TYPE.WIDGET_SLIDER) {
 
       const options_menu = Menu_options_create_slider_popup_menu_options(clicked_mesh, pos);
       
@@ -98,7 +99,7 @@ function Menu_options_create_slider_popup_menu_options(clicked_mesh, _pos) {
    return;
    const meshes = Scenes_get_root_meshes(STATE.scene.active_idx);
 
-   const section_menu = new Section(SECTION.VERTICAL, [2, 2], pos, [20, 40], TRANSPARENCY(GREY7, .8));
+   const section_menu = new Section(SECTION.VERTICAL, [2, 2], pos, [20, 40], TRANSPARENCY(GREY[7], .8));
    section_menu.SetName('section_menu' + clicked_mesh.menu_options_idx)
    section_menu.SetSceneIdx(STATE.scene.active_idx);
    section_menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);

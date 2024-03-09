@@ -8,6 +8,7 @@ import { Create_widget_text } from "../../Core/CreateWidget.js";
 import { Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx, TimeIntervalsGetByIdx } from "../../Timers/TimeIntervals.js";
+import { WHITE } from "../Material/Base/Colors.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
 import { Align_between, Align_self } from "../Operations/Alignment.js";
 
@@ -30,7 +31,7 @@ export class Widget_Text extends Text_Mesh {
 		// if (sdfouter + bold > 1) bold = 1 - sdfouter;
 
 		super(text, pos, fontSize, col)
-		this.type |= MESH_TYPES_DBG.WIDGET_TEXT | this.type;
+		this.type |= MESH_TYPE.WIDGET_TEXT | this.type;
 
 		this.SetName('Widget_Text:' + text);
 		this.pad = [0, 0];
@@ -195,7 +196,7 @@ export class Widget_Text extends Text_Mesh {
 		// this.geom.MoveXY(x, y, this.gfx);
 		this.geom.pos[0] += x;
 		this.geom.pos[1] += y;
-		Batch_store(this, BATCH_TYPE.MOVE, { pos: [x, y] });
+		Batch_store(this, _, { pos: [x, y] });
 
 	}
 
@@ -272,7 +273,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	constructor(text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad) {
 
 		super(text, pos, fontSize, text_col, bold, pad);
-		this.type |= MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC;
+		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
 		// Translate the dynamic text by the width of the constant text's width
 		// pos[0] += this.geom.CalcTextWidth();
@@ -580,11 +581,11 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		CopyArr3(pos, this.geom.pos); // Copy the dynamic's text mesh pos
 		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad);
-		new_text.type = MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC;
+		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 		// Add the new new_text as a child of 'this'.
 		const idx = this.AddChild(new_text);
 		// new_text.SetName('MultiText '+ idx + '-' + new_text.mat.text.slice(0, 7));
-		this.type |= MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC | new_text.geom.type | new_text.mat.type;
+		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC | new_text.geom.type | new_text.mat.type;
 
 
 		// new_text.pad = prev_text_mesh.pad;
@@ -743,7 +744,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		// Move 'this' text
 		mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, mesh.gfx);
-		// Batch_store(mesh, BATCH_TYPE.MOVE, [mouse_pos.x, -mouse_pos.y,]);
+
 		// Move children text
 		for (let i = 0; i < mesh.children.boundary; i++) {
 			const child = mesh.children.buffer[i];
@@ -763,7 +764,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		// this.geom.MoveXY(x, y, this.gfx);
 		this.geom.pos[0] += x;
 		this.geom.pos[1] += y;
-		Batch_store(this, BATCH_TYPE.MOVE, [x, y]);
+		Batch_store(this, _, [x, y]);
 
 		// Move children text
 		for (let i = 0; i < this.children.boundary; i++) {
@@ -773,7 +774,7 @@ export class Widget_Multi_Text extends Widget_Text {
 				// child.geom.MoveXY(x, y, child.gfx);
 				child.geom.pos[0] += x;
 				child.geom.pos[1] += y;
-				Batch_store(child, BATCH_TYPE.MOVE, [x, y]);
+				Batch_store(child, _, [x, y]);
 			}
 		}
 	}

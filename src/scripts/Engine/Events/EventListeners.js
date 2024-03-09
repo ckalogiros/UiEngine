@@ -6,6 +6,7 @@ import { M_Buffer } from "../Core/Buffers.js";
 import { _pt_event_listener, _pt_hover_listener } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
 import { Info_listener_create_event, Info_listener_dispatch_event } from "../Drawables/DebugInfo/InfoListeners.js";
+import { GREY } from "../Drawables/Material/Base/Colors.js";
 
 
 
@@ -600,7 +601,7 @@ export function Listeners_debug_info_create(scene) {
    const dp_btn_pad = [10, 2];
 
    // Create the dropdown that will hold all listen events to display for debuging purposes.
-   const dropdown = new Widget_Dropdown('Info Ui Listeners Root-DP', [VIEWPORT.RIGHT - 140, 20, 0], GREY1, TRANSPARENCY(GREY5, .8), WHITE, dp_btn_pad);
+   const dropdown = new Widget_Dropdown('Info Ui Listeners Root-DP', [VIEWPORT.RIGHT - 140, 20, 0], GREY1, TRANSPARENCY(GREY[5], .8), WHITE, dp_btn_pad);
    dropdown.CreateClickEvent();
    dropdown.CreateMoveEvent();
    Dropdown_roots_set_root(dropdown, dropdown);

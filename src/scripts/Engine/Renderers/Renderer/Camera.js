@@ -18,14 +18,14 @@ import { Matrix4 } from '../../../Helpers/Math/Matrix4.js';
 
 const DEG2RAD = Math.PI / 180;
 
-let _cnt = 1;
+_CNT = 1;
 export const CAMERA_CONTROLS = {
-	PAN: _cnt++,
-	ROTATE: _cnt++,
-	ZOOM: _cnt++,
+	PAN: _CNT++,
+	ROTATE: _CNT++,
+	ZOOM: _CNT++,
 
 	NONE: 0,
-	COUNT: _cnt,
+	COUNT: _CNT,
 };
 
 

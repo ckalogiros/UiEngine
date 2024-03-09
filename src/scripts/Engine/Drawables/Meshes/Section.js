@@ -49,10 +49,10 @@ export class Section extends Rect {
          chunk_size: INT_NULL,
       }
 
-      this.type |= MESH_TYPES_DBG.SECTION_MESH;
+      this.type |= MESH_TYPE.SECTION_MESH;
       // In order to provide more info about the current section mesh. The 'SECTION_MESH_ONLY' could be disabled by another widget that 
       // extends section class, in order to call it's classes methods instead of the mother class(the Section)
-      this.type |= MESH_TYPES_DBG.SECTION_MESH_ONLY;
+      this.type |= MESH_TYPE.SECTION_MESH_ONLY;
 
       this.SetName(name)
 
@@ -95,7 +95,7 @@ export class Section extends Rect {
       mesh.StateEnable(this.state.mask & MESH_STATE.ACTIVE);
 
       // UNNECESSARY: I the calc rearanges all items
-      if (mesh.type & MESH_TYPES_DBG.SECTION_MESH) { // Handle other sections
+      if (mesh.type & MESH_TYPE.SECTION_MESH) { // Handle other sections
 
          if (options & SECTION.FIT) {
 
@@ -207,7 +207,7 @@ export class Section extends Rect {
       Calculate_sizes_recursive(section, top, left, options, total_margin, total_size);
 
 
-      if (section.type & MESH_TYPES_DBG.WIDGET_SCROLLER) {
+      if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
          section.geom.dim[0] = section.max_size[0]; // For scroller widgets, do not set the height
       }
       else {
@@ -265,7 +265,7 @@ export class Section extends Rect {
       Calculate_sizes_recursive(section, top, left, options, total_margin, total_size);
 
 
-      if (section.type & MESH_TYPES_DBG.WIDGET_SCROLLER) {
+      if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
          section.geom.dim[0] = section.max_size[0]; // For scroller widgets, do not set the height
       }
       else {
@@ -320,7 +320,7 @@ export class Section extends Rect {
       for (let i = 0; i < section.children.boundary; i++) {
 
          const mesh = section.children.buffer[i];
-         if (mesh.children.active_count && mesh.type & MESH_TYPES_DBG.SECTION_MESH) {
+         if (mesh.children.active_count && mesh.type & MESH_TYPE.SECTION_MESH) {
             this.Reset(mesh);
          }
       }
@@ -808,7 +808,7 @@ function Section_rotatez_children_recursive(mesh, angle) {
    for (let i = 0; i < mesh.children.boundary; i++) {
 
       const child = mesh.children.buffer[i];
-      if (child.type & MESH_TYPES_DBG.SECTION_MESH) { // Case anothe section, run recursively
+      if (child.type & MESH_TYPE.SECTION_MESH) { // Case anothe section, run recursively
          Section_rotatez_children_recursive(child, angle);
       }
    }
@@ -824,7 +824,7 @@ function Section_set_posxy_children_recursive(pos, mesh) {
 
       const child = mesh.children.buffer[i];
 
-      if (child.type & MESH_TYPES_DBG.SECTION_MESH) { // Case another section, run recursively
+      if (child.type & MESH_TYPE.SECTION_MESH) { // Case another section, run recursively
          Section_set_posxy_children_recursive(pos, child);
       }
       else { // NOTE: To avoid moving section twice (as a child and as a section from recursion)
@@ -870,11 +870,11 @@ function Expand(section, options, width, accum_margins) {
 
       const child = section.children.buffer[i];
 
-      if (child.type & MESH_TYPES_DBG.WIDGET_TEXT_LABEL && child.type & MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC) {
+      if (child.type & MESH_TYPE.WIDGET_TEXT_LABEL && child.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
          child.Resize();
          child.geom.dim[0] = width - (section.margin[0] + accum_margins);
       }
-      else if (child.type & MESH_TYPES_DBG.SECTION_MESH) {
+      else if (child.type & MESH_TYPE.SECTION_MESH) {
 
          child.Resize();
          if (options & SECTION.VERTICAL) {
@@ -912,7 +912,7 @@ function Calculate_sizes_recursive(section, top, left, options, total_margin = [
 
       const mesh = section.children.buffer[i];
 
-      if (mesh.children.active_count && ((mesh.type & MESH_TYPES_DBG.SECTION_MESH) && !((mesh.type & MESH_TYPES_DBG.WIDGET_SCROLLER)))) {
+      if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) && !((mesh.type & MESH_TYPE.WIDGET_SCROLLER)))) {
 
          const size = Calculate_sizes_recursive(mesh, top, left, SECTION.INHERIT, margin, total_size); // Recurse if child mesh is of type of Section
 
@@ -934,7 +934,7 @@ function Calculate_sizes_recursive(section, top, left, options, total_margin = [
             if (section.max_size[1] < mesh.geom.dim[1]) section.max_size[1] = mesh.geom.dim[1]
          }
       }
-      else if ((mesh.type & MESH_TYPES_DBG.TEXT_MESH) || (mesh.type & MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC)) { // Case the current item is of type text.
+      else if ((mesh.type & MESH_TYPE.TEXT_MESH) || (mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC)) { // Case the current item is of type text.
 
          if (opt & SECTION.VERTICAL) {
 
@@ -1003,7 +1003,7 @@ export function Calculate_positions_recursive(parent, options = SECTION.INHERIT,
       if (options & SECTION.INHERIT) opt = parent.options
 
       const mesh_max_width = mesh.GetMaxWidth();
-      if (parent.type & MESH_TYPES_DBG.SECTION_MESH) { // For meshes with a parent of type Section
+      if (parent.type & MESH_TYPE.SECTION_MESH) { // For meshes with a parent of type Section
 
          const c_x = cur_pos[0], c_y = cur_pos[1]; // curent position
          const parent_dimx = parent.GetMaxWidth(), parent_dimy = parent.GetTotalHeight(); // parent mesh dimention
@@ -1014,7 +1014,7 @@ export function Calculate_positions_recursive(parent, options = SECTION.INHERIT,
 
          if (pos_dif[0] !== 0 || pos_dif[1] !== 0) {
 
-            if ((mesh.type & MESH_TYPES_DBG.SECTION_MESH) === 0) { // Case mesh not of type section, have it update it's new pos-dim on a later when it's gfx exists.
+            if ((mesh.type & MESH_TYPE.SECTION_MESH) === 0) { // Case mesh not of type section, have it update it's new pos-dim on a later when it's gfx exists.
 
                mesh.Reposition_pre(pos_dif);
                continue_recur = false; // Stop recursion for mesh's children. Let the mesh deal with it's children positioning.
@@ -1073,7 +1073,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options = SE
       if (options & SECTION.INHERIT) opt = parent.options
 
       const mesh_max_width = mesh.GetMaxWidth();
-      if (parent.type & MESH_TYPES_DBG.SECTION_MESH) { // For meshes with a parent of type Section
+      if (parent.type & MESH_TYPE.SECTION_MESH) { // For meshes with a parent of type Section
 
          const c_x = cur_pos[0], c_y = cur_pos[1]; // curent position
          const parent_dimx = parent.GetMaxWidth(), parent_dimy = parent.GetTotalHeight(); // parent mesh dimention
@@ -1082,7 +1082,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options = SE
          const new_pos = [(c_x - parent_dimx) + mesh_max_width + parent_margx, (c_y - parent_dimy) + mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
          const pos_dif = [new_pos[0] - (mesh.GetCenterPosX()), new_pos[1] - mesh.GetCenterPosY(), new_pos[2] + 1];
 
-         if ((mesh.type & MESH_TYPES_DBG.SECTION_MESH) === 0) { // Case mesh not of type section, have it update it's new pos-dim on a later when it's gfx exists.
+         if ((mesh.type & MESH_TYPE.SECTION_MESH) === 0) { // Case mesh not of type section, have it update it's new pos-dim on a later when it's gfx exists.
 
             // IMPORTANT: CANNOT RUN BATCH HERE BECAUSE ANY NEW MESHES HAVEN'T BEEN INITIALIZED AND THEIR START IS 0
             if (!mesh.MoveNoGfxUpdate) console.error('Mesh does not have function .MoveNoGfxUpdate()', mesh.constructor.name, mesh.GetName())
@@ -1091,7 +1091,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options = SE
 
 
             // HACK: Because scrollers bar is a Rect_mesh, it does not handle any children, like the scrollers handle
-            if (mesh.type & MESH_TYPES_DBG.WIDGET_SCROLLER_BAR) {
+            if (mesh.type & MESH_TYPE.WIDGET_SCROLLER_BAR) {
                mesh.children.buffer[0].geom.pos[0] += pos_dif[0];
                mesh.children.buffer[0].geom.pos[1] += pos_dif[1];
             }

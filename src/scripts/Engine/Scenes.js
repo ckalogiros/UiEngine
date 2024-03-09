@@ -15,7 +15,7 @@ export class Scene {
 
         this.sceneidx = idx;
         this.camera = null;
-        this.type |= MESH_TYPES_DBG.SCENE;
+        this.type |= MESH_TYPE.SCENE;
         this.name = 'scene, idx:' + this.idx;
 
     }

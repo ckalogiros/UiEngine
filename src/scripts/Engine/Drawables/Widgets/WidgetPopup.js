@@ -6,6 +6,7 @@ import { CopyArr2 } from '../../../Helpers/Math/MathOperations.js';
 import { Menu_options_create } from '../Operations/MenuOptionsBuilder.js';
 import { Section } from '../Meshes/Section.js';
 import { Gfx_activate } from '../../Interfaces/Gfx/MeshGfxContext.js';
+import { TRANSPARENT } from '../Material/Base/Colors.js';
 
 
 class Widget_PopUp extends Section {
@@ -23,7 +24,7 @@ class Widget_PopUp extends Section {
       pos[1] -= this.geom.dim[1] - fontSize * 2 - 8;
       pos[2] += 1;
 
-      this.type |= MESH_TYPES_DBG.WIDGET_POP_UP | this.geom.type | this.mat.type;
+      this.type |= MESH_TYPE.WIDGET_POP_UP | this.geom.type | this.mat.type;
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle([6, 4, 3]);
@@ -91,7 +92,7 @@ class Widget_PopUp extends Section {
          if(mesh){
             
             // Deactivate all meshes of type 'WIDGET_POP_UP' with all its options(recursively), from the curent popup level.
-            if (mesh.type & MESH_TYPES_DBG.WIDGET_POP_UP) {
+            if (mesh.type & MESH_TYPE.WIDGET_POP_UP) {
    
                // Recursive_deactivate_secondary_popups(mesh);
                mesh.RemoveChildren(); // TODO: Do we need to strip down all meshes??? Only if they are shared pointers to some mesh of the appliction
@@ -170,12 +171,12 @@ export function Widget_popup_handler_onclick_event(clicked_mesh, clickedButtonId
 
       if (clicked_mesh) { // Case clicked mesh does not belong to popup or its options
 
-         if(!popup.isActive || clicked_mesh.type & MESH_TYPES_DBG.WIDGET_POP_UP) return; // Do nothing onclick on a popup menu area
+         if(!popup.isActive || clicked_mesh.type & MESH_TYPE.WIDGET_POP_UP) return; // Do nothing onclick on a popup menu area
 
          const parent = clicked_mesh.parent;
          if (parent && // Not null
-            (clicked_mesh.type & MESH_TYPES_DBG.WIDGET_POP_UP || // Is popup menu area
-            (clicked_mesh.type & MESH_TYPES_DBG.WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS && // Or a popup options button
+            (clicked_mesh.type & MESH_TYPE.WIDGET_POP_UP || // Is popup menu area
+            (clicked_mesh.type & MESH_TYPE.WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS && // Or a popup options button
                parent.FindIdInChildren(clicked_mesh.id)))) {
                   parent.DeactivateSecondaryPopups(); // If options have been clicked, then deactivate and re-construct the secondary options
          }

@@ -12,6 +12,7 @@ import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_get_rootidx,
 import { Clipy_from_widget_root } from "../Operations/Clip.js";
 import { Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Section } from "../Meshes/Section.js";
+import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
 
 /**
  * SEE: ### Widget_Dropdown
@@ -70,7 +71,7 @@ export class Widget_Dropdown extends Section {
    // depth_level; // The tree depth level that the dropdown exists (root dp = 0 depth).
 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY3, col2 = PINK_240_60_160, text_col = WHITE, btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, style = [2, 5, 2], margin = [10, 10]) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col2 = PURPLER[7], text_col = WHITE, btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, style = [2, 5, 2], margin = [10, 10]) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, margin, pos, [10, 10], col1, null, style);
 
@@ -79,13 +80,13 @@ export class Widget_Dropdown extends Section {
       AddArr2(this.total_margin, margin);
       this.isOn = DP_MENU_STATE.OFF;
       this.SetName(`DP-${text} id${this.id}`);
-      this.type |= MESH_TYPES_DBG.WIDGET_DROP_DOWN;
-      this.type &= ~MESH_TYPES_DBG.SECTION_MESH_ONLY;
+      this.type |= MESH_TYPE.WIDGET_DROP_DOWN;
+      this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
       this.rootidx = INT_NULL;
 
       pos[2] += 1;
       this.menu = Create_widget_section(_, SECTION.VERTICAL, margin, [OUT_OF_VIEW, OUT_OF_VIEW, pos[2]], [1, 1], TRANSPARENCY(col2, tr));
-      this.menu.type |= MESH_TYPES_DBG.DROP_DOWN_MENU;
+      this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.parent = this;
       AddArr2(this.menu.total_margin, this.menu.margin);
       AddArr2(this.menu.total_margin, this.margin);
@@ -126,7 +127,7 @@ export class Widget_Dropdown extends Section {
       }
 
 
-      if (mesh.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN) {
+      if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {
 
          // mesh.SetGfxProgramGroup(this.sid.progs_group); // Should belong to the same programs group.
          // mesh.depth_level = this.depth_level + 1; // Set the depth of the new dp.
@@ -316,7 +317,7 @@ export class Widget_Dropdown extends Section {
 
             const item = menu.children.buffer[i];
 
-            if (item.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN) { // Case item is another dropdown
+            if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
 
                item.SetGfxProgramGroup(menu.sid.progs_group);
                // We know that dropdown derives from Section, so we can pass the igfx_rect
@@ -370,7 +371,7 @@ export class Widget_Dropdown extends Section {
 
             const item = menu.children.buffer[i];
 
-            if (item.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN) { // Case item is another dropdown
+            if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
 
                item.SetGfxProgramGroup(menu.sid.progs_group);
                // We know that dropdown derives from Section, so we can pass the igfx_rect
@@ -413,19 +414,19 @@ export class Widget_Dropdown extends Section {
       for (let i = 0; i < mesh.children.boundary; i++) {
 
          const child = mesh.children.buffer[i];
-         // The "child.type & MESH_TYPES_DBG.SECTION_MESH_ONLY" is avoiding for example: any Scroller widget to be treated as a Section_Mesh and not as a Widget_Scroller first. That way we call  "mesh.Destroy()" on Widget_Scroller rather than  calling recursive for the scroller as if it was a Section_Mesh
-         if (child && child.children.active_count && (child.type & MESH_TYPES_DBG.SECTION_MESH_ONLY))
+         // The "child.type & MESH_TYPE.SECTION_MESH_ONLY" is avoiding for example: any Scroller widget to be treated as a Section_Mesh and not as a Widget_Scroller first. That way we call  "mesh.Destroy()" on Widget_Scroller rather than  calling recursive for the scroller as if it was a Section_Mesh
+         if (child && child.children.active_count && (child.type & MESH_TYPE.SECTION_MESH_ONLY))
             this.DestroyRecursive(child)
       }
 
       // If the mesh is dp and it's menu is closed but still in the vertex buffers(Fake removed), then we need to remove the menu with all of its meshes.
-      if ((mesh.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN)) {
+      if ((mesh.type & MESH_TYPE.WIDGET_DROP_DOWN)) {
          if ((mesh.isOn & DP_MENU_STATE.OFF)) {
             this.DestroyRecursive(mesh.menu)
          }
       }
 
-      if ((mesh.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN) && (mesh.isOn & DP_MENU_STATE.OFF_FAKE)) {
+      if ((mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) && (mesh.isOn & DP_MENU_STATE.OFF_FAKE)) {
          console.warn('{{DESTROY}}, child:', mesh, mesh.GetName(), mesh.gfx.prog.idx, mesh.gfx.vb.idx, mesh.gfx.vb.start)
       }
 
@@ -538,7 +539,7 @@ export class Widget_Dropdown extends Section {
 
       const dp = (_dp) ? _dp : this;
 
-      /**DEBUG ERROR*/ if (!dp || !(dp.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN)) {
+      /**DEBUG ERROR*/ if (!dp || !(dp.type & MESH_TYPE.WIDGET_DROP_DOWN)) {
          console.error('ERROR: in RemoveAllListenersFromDP(). dp is null or not a Dropdown type. dp:', dp);
          return;
       }
@@ -590,7 +591,7 @@ export class Widget_Dropdown extends Section {
 
             const child = menu.children.buffer[i];
 
-            if ((child.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN) && child.children.active_count) // If child is of type Dropdown...
+            if ((child.type & MESH_TYPE.WIDGET_DROP_DOWN) && child.children.active_count) // If child is of type Dropdown...
                child.RemoveAllListenersFromDP(child, root.menu.listeners.buffer); // ...remove it's button click listener.
 
             if (child.listeners.buffer[clickidx] && child.listeners.buffer[clickidx].is_child_event) // In any other case, if the child has a listener, remove it.
@@ -620,7 +621,7 @@ export class Widget_Dropdown extends Section {
             const item = menu.children.buffer[i];
 
             if (item.state.mask & MESH_STATE.ACTIVE) {
-               if (item.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN) { // Case item is another dropdown
+               if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
 
                   item.FakeAddFromGfxPosy(item.geom.defPos[1]);
 
@@ -674,7 +675,7 @@ export class Widget_Dropdown extends Section {
          if (item.state.mask & MESH_STATE.ACTIVE) {
 
             // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
-            if (item.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN) {
+            if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) {
 
                if (dp.isOn & DP_MENU_STATE.ON) {
 
@@ -737,7 +738,7 @@ export class Widget_Dropdown extends Section {
 
 
             // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
-            if (item.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
+            if (item.type & MESH_TYPE.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
 
                item.Deactivate();
                // Deactivate gfx for menu's children meshes.
@@ -829,7 +830,7 @@ export class Widget_Dropdown extends Section {
          }
          else item.UpdateWidgetGroupIncrementNumFaces();
 
-         if (item.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN) { // Case item is another dropdown
+         if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
 
             // Create Click events for any meshes of type Dropdown
             item.CreateClickEvent();
@@ -1249,7 +1250,7 @@ function Clamp_x_recursive(mesh, clampx, margx) {
 
 function Get_all_margins_recursive_bottom_up(dp, margin = [0, 0]) {
 
-   if ((dp.type & MESH_TYPES_DBG.WIDGET_DROP_DOWN)) {
+   if ((dp.type & MESH_TYPE.WIDGET_DROP_DOWN)) {
 
       AddArr2(margin, dp.margin);
       AddArr2(margin, dp.menu.margin);

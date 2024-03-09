@@ -51,7 +51,7 @@ function Animations_run_scale_up_start(mesh) {
 
    if (mesh.children.boundary) {
 
-      if(mesh.children.buffer[0].type & MESH_TYPES_DBG.TEXT_MESH){
+      if(mesh.children.buffer[0].type & MESH_TYPE.TEXT_MESH){
          
          Helper_scale_text(mesh, scaleFactor, 0);
       }
@@ -99,7 +99,7 @@ function Animations_run_scale_down_start(mesh) {
 
    if (mesh.children.boundary) {
       
-      if(mesh.children.buffer[0].type & MESH_TYPES_DBG.TEXT_MESH){
+      if(mesh.children.buffer[0].type & MESH_TYPE.TEXT_MESH){
          
          Helper_scale_text(mesh, scaleFactor, 1);
       }
@@ -154,8 +154,8 @@ function Animations_run_scale_down_stop(mesh) {
 
       const scaleFactor = 1; // Must pass param scaleFactor
 
-      // console.log('MESH TYPE: ', GetMeshNameFromType(mesh.children.buffer[0].type))
-      if(mesh.children.buffer[0].type & MESH_TYPES_DBG.TEXT_MESH){
+      // console.log('MESH TYPE: ', Get_name_from_mesh_type(mesh.children.buffer[0].type))
+      if(mesh.children.buffer[0].type & MESH_TYPE.TEXT_MESH){
 
          Helper_scale_text(mesh, scaleFactor, 2);
       }

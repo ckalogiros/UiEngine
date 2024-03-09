@@ -1,36 +1,42 @@
 "use strict";
 
-let _cnt = 0x1;
+
+
+let _CNT = 0x1;
+
 
 const INT_NULL = -1; // For case like 0 index arrays, where the number 0 index cannot be used as null element for a buffer
-// const FLOAT_NULL = 0xFFFFFFFF; // Same for float 32 buffer indexing.
 
-// const MAX_INT = 0x1000000000000000
-// const MAX_INT = 10000
 
-const MAX_INT8 =   127;
-const MIN_INT8 =  -128;
-const MAX_INT16 =  32767;
+const MAX_INT8 = 127;
+const MIN_INT8 = -128;
+const MAX_INT16 = 32767;
 const MIN_INT16 = -32768;
-const MAX_INT32 =  0x7FFFFFFF; // 2147483647;
+const MAX_INT32 = 0x7FFFFFFF; // 2147483647;
 const MIN_INT32 = -2147483648;
 // const MAX_INT64 =  0x7FFFFFFFFFFFFFFF; // 9223372036854775807
 // const MINX_INT64 = -9223372036854775808;
-const MAX_UINT8  = 0xff; // 255
+const MAX_UINT8 = 0xff; // 255
 const MAX_UINT16 = 65535;
 const MAX_UINT32 = 0xFFFFFFFF; // 4294967295;
 // const MAX_UINT64 = 0xFFFFFFFFFFFFFFFF; // 18446744073709551615 ;
 
+
 const MILISEC = 0.001;
 const NANOSEC = 0.000001;
 
+
 const ALL = 0xffff;
+
 
 const UNCHANGED = 0xffff; // Just a flag, used for checking if a value should change or remain the same.
 
+
 const _ = undefined;
 
+
 const WIDGET_TEXT_MESH = 0x1; // Just a flag, as a way to check if the parent of a mesh is not null but is not part of the parent's children buffer either.
+
 
 // For renderqueue
 const FIRST = 1;
@@ -46,50 +52,59 @@ const TYPES = {
 
 	ID: 'TYPES',
 
-	BOOL: 	_cnt <<= 0x1,
-	INT8: 	_cnt <<= 0x1,
-	INT16: 	_cnt <<= 0x1,
-	INT32: 	_cnt <<= 0x1,
-	UINT8: 	_cnt <<= 0x1,
-	UINT16: 	_cnt <<= 0x1,
-	UINT32: 	_cnt <<= 0x1,
-	FLOAT32: _cnt <<= 0x1,
-	VEC2: 	_cnt <<= 0x1,
-	VEC3: 	_cnt <<= 0x1,
-	VEC4: 	_cnt <<= 0x1,
-	MAT2X2: 	_cnt <<= 0x1,
-	MAT4X4: 	_cnt <<= 0x1,
+	BOOL: _CNT,
+	INT8: _CNT <<= 0x1,
+	INT16: _CNT <<= 0x1,
+	INT32: _CNT <<= 0x1,
+	UINT8: _CNT <<= 0x1,
+	UINT16: _CNT <<= 0x1,
+	UINT32: _CNT <<= 0x1,
+	FLOAT32: _CNT <<= 0x1,
+	VEC2: _CNT <<= 0x1,
+	VEC3: _CNT <<= 0x1,
+	VEC4: _CNT <<= 0x1,
+	MAT2X2: _CNT <<= 0x1,
+	MAT4X4: _CNT <<= 0x1,
 
-	GetSizeInBytes(type, id){
+	GetSizeInBytes(type, id) {
 
-		if(id === undefined || id !== this.ID) alert('type not match');
+		if (id === undefined || id !== this.ID) alert('type not match');
 
 		let size = 0;
 		if (type & this.FLOAT32) size += FLOAT32_BYTE_SIZE;
-      else if (type & this.INT8 || type & this.UINT8) size += INT8_BYTE_SIZE;
-      else if (type & this.INT16 || type & this.UINT16) size += INT16_BYTE_SIZE;
-      else if (type & this.INT32 || type & this.UINT32) size += INT32_BYTE_SIZE;
-      else if (type & this.MAT2X2) size += MAT2X2_BYTE_SIZE;
-      else if (type & this.MAT4X4) size += MAT4X4_BYTE_SIZE;
+		else if (type & this.INT8 || type & this.UINT8) size += INT8_BYTE_SIZE;
+		else if (type & this.INT16 || type & this.UINT16) size += INT16_BYTE_SIZE;
+		else if (type & this.INT32 || type & this.UINT32) size += INT32_BYTE_SIZE;
+		else if (type & this.VEC2) size += VEC2_BYTE_SIZE;
+		else if (type & this.VEC3) size += VEC3_BYTE_SIZE;
+		else if (type & this.VEC4) size += VEC4_BYTE_SIZE;
+		else if (type & this.MAT2X2) size += MAT2X2_BYTE_SIZE;
+		else if (type & this.MAT4X4) size += MAT4X4_BYTE_SIZE;
 
 		return size;
 	}
 }
 
 
+
+
+
+
+
+
 // Type Sizes in bytes
-const INT8_BYTE_SIZE    = 1; // 1 Bytes
-const INT16_BYTE_SIZE   = 2; // 2 Bytes
-const INT32_BYTE_SIZE   = 4; // 4 Bytes
-const UINT8_BYTE_SIZE   = 1; // 1 Bytes
-const UINT16_BYTE_SIZE  = 2; // 2 Bytes
-const UINT32_BYTE_SIZE  = 4; // 4 Bytes
+const INT8_BYTE_SIZE = 1; // 1 Bytes
+const INT16_BYTE_SIZE = 2; // 2 Bytes
+const INT32_BYTE_SIZE = 4; // 4 Bytes
+const UINT8_BYTE_SIZE = 1; // 1 Bytes
+const UINT16_BYTE_SIZE = 2; // 2 Bytes
+const UINT32_BYTE_SIZE = 4; // 4 Bytes
 const FLOAT32_BYTE_SIZE = 4; // 4 Bytes
-const VEC2_BYTE_SIZE    = 2 * FLOAT32_BYTE_SIZE; // 8 Bytes
-const VEC3_BYTE_SIZE    = 3 * FLOAT32_BYTE_SIZE; // 12 Bytes
-const VEC4_BYTE_SIZE    = 4 * FLOAT32_BYTE_SIZE; // 16 Bytes
-const MAT2X2_BYTE_SIZE  = 2 * VEC2_BYTE_SIZE; // 16 Bytes
-const MAT4X4_BYTE_SIZE  = 4 * VEC4_BYTE_SIZE; // 64 Bytes
+const VEC2_BYTE_SIZE = 2 * FLOAT32_BYTE_SIZE; // 8 Bytes
+const VEC3_BYTE_SIZE = 3 * FLOAT32_BYTE_SIZE; // 12 Bytes
+const VEC4_BYTE_SIZE = 4 * FLOAT32_BYTE_SIZE; // 16 Bytes
+const MAT2X2_BYTE_SIZE = 2 * VEC2_BYTE_SIZE; // 16 Bytes
+const MAT4X4_BYTE_SIZE = 4 * VEC4_BYTE_SIZE; // 64 Bytes
 
 
 
@@ -100,8 +115,8 @@ const MAT4X4_BYTE_SIZE  = 4 * VEC4_BYTE_SIZE; // 64 Bytes
 
 // In order to update the correct uniform of the shared block, we store the index to the block'a uniform location.
 const UBS = {
-   PROJECTION_LOC:INT_NULL,
-   RESOLUTION_LOC:INT_NULL,
+	PROJECTION_LOC: INT_NULL,
+	RESOLUTION_LOC: INT_NULL,
 };
 
 
@@ -111,18 +126,7 @@ const UBS = {
 
 
 
-
-
-
-
-
-
-
-
-
-
 let _idx = 0;
-
 /*************************************************************************************************/
 // Application Constants 
 const PLATFORM = {
@@ -135,6 +139,11 @@ const PLATFORM = {
 
 
 
+
+
+
+
+
 /*************************************************************************************************/
 // Engine Constants
 const Device = {
@@ -144,6 +153,13 @@ const Device = {
 	height: 0,
 	ratio: 1, // Create same proportions throughout any device. It measures the ratio of the game's build device width and the current device width
 }
+
+
+
+
+
+
+
 
 const VIEWPORT = {
 	WIDTH: 0,
@@ -160,6 +176,13 @@ const VIEWPORT = {
 		BOTTOM: 0,
 	},
 };
+
+
+
+
+
+
+
 
 const STATE = {
 
@@ -241,52 +264,62 @@ const STATE = {
 	},
 };
 
-_cnt = 0x1;
+
+
+
+
+
+
+
+_CNT = 0x1;
 const SECTION = {
 
-	VERTICAL: _cnt,
-	HORIZONTAL: _cnt <<= 0x1,
-	INHERIT: _cnt <<= 0x1,
-	EXPAND: _cnt <<= 0x1,
-	FIT: _cnt <<= 0x1,
-	FOLLOW: _cnt <<= 0x1,
+	VERTICAL: _CNT,
+	HORIZONTAL: _CNT <<= 0x1,
+	INHERIT: _CNT <<= 0x1,
+	EXPAND: _CNT <<= 0x1,
+	FIT: _CNT <<= 0x1,
+	FOLLOW: _CNT <<= 0x1,
 
-	ITEM_FIT: _cnt <<= 0x1,
-	ITEM_RESTRICT: _cnt <<= 0x1,
+	ITEM_FIT: _CNT <<= 0x1,
+	ITEM_RESTRICT: _CNT <<= 0x1,
 
-	NO_ITEMS_CALC: _cnt <<= 0x1,
-	TOP_DOWN: _cnt <<= 0x1,
+	NO_ITEMS_CALC: _CNT <<= 0x1,
+	TOP_DOWN: _CNT <<= 0x1,
 
 };
 
-_cnt = 0x1;
+
+
+
+
+
+
+
+_CNT = 0x1;
 const MESH_STATE = {
 
-	ACTIVE: _cnt,
-	CLIPED_Y: _cnt <<= 1,
-	
-	IN_FOCUS: _cnt <<= 1,
-	IN_HOVER: _cnt <<= 1,
-	IN_SCALE: _cnt <<= 1,
-	IN_MOVE: _cnt <<= 1,
-	IN_GRAB: _cnt <<= 1,
-	IN_HOVER_COLOR: _cnt <<= 1,
+	ACTIVE: _CNT,
+	CLIPED_Y: _CNT <<= 1,
 
-	IS_HOVERABLE: _cnt <<= 1,
-	IS_CLICKABLE: _cnt <<= 1,
-	IS_MOVABLE: _cnt <<= 1,
-	IS_GRABABLE: _cnt <<= 1,
-	IS_FAKE_EVENT: _cnt <<= 1,
-	IS_FAKE_HOVERABLE: _cnt <<= 1,
-	IS_FAKE_CLICKABLE: _cnt <<= 1,
-	IS_HOVER_COLORABLE: _cnt <<= 1,
+	IN_FOCUS: _CNT <<= 1,
+	IN_HOVER: _CNT <<= 1,
+	IN_SCALE: _CNT <<= 1,
+	IN_MOVE: _CNT <<= 1,
+	IN_GRAB: _CNT <<= 1,
+	IN_HOVER_COLOR: _CNT <<= 1,
 
-	HAS_POPUP: _cnt <<= 1,
-	HAS_CLIP: _cnt <<= 1,
+	IS_HOVERABLE: _CNT <<= 1,
+	IS_CLICKABLE: _CNT <<= 1,
+	IS_MOVABLE: _CNT <<= 1,
+	IS_GRABABLE: _CNT <<= 1,
+	IS_FAKE_EVENT: _CNT <<= 1,
+	IS_FAKE_HOVERABLE: _CNT <<= 1,
+	IS_FAKE_CLICKABLE: _CNT <<= 1,
+	IS_HOVER_COLORABLE: _CNT <<= 1,
 
-	// CHILDREN_HAVE_CLICK_EVENT: _cnt <<= 1,
-	// CHILDREN_HAVE_HOVER_EVENT: _cnt <<= 1,
-
+	HAS_POPUP: _CNT <<= 1,
+	HAS_CLIP: _CNT <<= 1,
 
 	Print(mask) {
 
@@ -310,7 +343,15 @@ const MESH_STATE = {
 		if (mask & this.IS_HOVER_COLORABLE) str += 'IS_HOVER_COLORABLE,'
 		// console.info(str)
 	}
+
 };
+
+
+
+
+
+
+
 
 const MOUSE = {
 
@@ -322,36 +363,42 @@ const MOUSE = {
 	},
 };
 
-_cnt = 0x1;
+
+
+
+
+
+
+
+_CNT = 0x1;
 const ALIGN = {
 
-	LEFT: _cnt,
-	RIGHT: _cnt <<= 0x1,
-	TOP: _cnt <<= 0x1,
-	BOTTOM: _cnt <<= 0x1,
-	VERT_CENTER: _cnt <<= 0x1,
-	HOR_CENTER: _cnt <<= 0x1,
+	LEFT: _CNT,
+	RIGHT: _CNT <<= 0x1,
+	TOP: _CNT <<= 0x1,
+	BOTTOM: _CNT <<= 0x1,
+	VERT_CENTER: _CNT <<= 0x1,
+	HOR_CENTER: _CNT <<= 0x1,
 
-	VERTICAL: _cnt <<= 0x1,
-	HORIZONTAL: _cnt <<= 0x1,
+	VERTICAL: _CNT <<= 0x1,
+	HORIZONTAL: _CNT <<= 0x1,
 }
+
+
+
+
+
+
+
 
 const POSITION_CENTER = [0, 0, 0]
 
-_cnt = 0x1;
-const FLAGS = {
 
-	FALSE: 0,
-	TRUE: 1,
-	DESTROY: _cnt <<= 0x1,
-}
 
-_cnt = 0x1;
-const BATCH = {
-	POS: 1,
-	DIM: _cnt <<= 0x1,
-	COL: _cnt <<= 0x1,
-};
+
+
+
+
 
 // SEE ## THRESHOLD
 const DEFAULT_CLAMP_THRESHOLD = 200; // in pixels. Suppose to be added/sutracted to the clamp value to form an upper/lower limit
@@ -367,6 +414,12 @@ const CLAMP = {
 }
 
 
+
+
+
+
+
+
 /*************************************************************************************************/
 // Widgets's Constants 
 const DP_MENU_STATE = {
@@ -374,6 +427,8 @@ const DP_MENU_STATE = {
 	OFF: 0x2,  // Not in the gfx buffer.
 	OFF_FAKE: 0x4,   // Exists in the gfx but is not displayed on screen(fake removed).
 };
+
+
 
 
 
@@ -388,6 +443,10 @@ const CHAR_ARRAY_LETTERS_START_OFFSET = 'A'.charCodeAt(0);
 
 
 
+
+
+
+
 /*************************************************************************************************/
 // Timer's Constants 
 const TIME_INTERVAL_REPEAT_ALWAYS = 9999999999; // Repeat always a time interval clbk function.
@@ -395,18 +454,27 @@ const TIME_INTERVAL_REPEAT_ALWAYS = 9999999999; // Repeat always a time interval
 
 
 
+
+
+
+
 /*************************************************************************************************/
-// Mesh's Constants 
-_cnt = 0x1;
+// 
+_CNT = 0x1;
 const ROOT_WIDGETS = {
-	CREATE_ROOT: _cnt,
-	CREATE_BATCH: _cnt <<= 0x1,
+	CREATE_ROOT: _CNT,
+	CREATE_BATCH: _CNT <<= 0x1,
 }
 
 
 
+
+
+
+
+
 /*************************************************************************************************/
-// Mesh's Constants 
+//  
 const GFX = {
 	GROUP_IDX: 0, // Indexing array of [group, program, vertexbuffer]
 	PROG_IDX: 1, // Indexing array of [group, program, vertexbuffer]
@@ -416,213 +484,57 @@ const GFX = {
 
 
 
+
+
+
+
 /*************************************************************************************************/
-// Mesh's Constants 
+// 
 const OUT_OF_VIEW = 100000; // Out of screen view in pixels
 
 
 
 
+
+
+
+
 /*************************************************************************************************/
-// Events Constants 
+// 
 
 const MAT_ENABLE = {
-	ATTR_VERTEX_COLOR: _cnt++,
-	ATTR_VERTEX_GRADIENT_HORIZONTAL: _cnt++,
-	ATTR_VERTEX_GRADIENT_VERTICAL: _cnt++,
+	ATTR_VERTEX_COLOR: _CNT++,
+	ATTR_VERTEX_GRADIENT_HORIZONTAL: _CNT++,
+	ATTR_VERTEX_GRADIENT_VERTICAL: _CNT++,
 
 	NONE: 0,
-	LEN: _cnt,
+	LEN: _CNT,
 }
+
+
+
+
+
+
 
 
 /*************************************************************************************************/
-// Style Constants  
+//  
 
-const STYLE = {
 
-	BORDER: 0,
-	R_CORNERS: 1,
-	FEATHER: 2,
-}
+
+
+
+
+
 
 function TRANSPARENCY(col, transparency) {
 	return [col[0], col[1], col[2], transparency]
 }
-const TRANSPARENT = [0.0, 0.0, 0.0, 0.0];
-const WHITE = [1.0, 1.0, 1.0, 1.0];
-const BLACK_TRANS = [0.0, 0.0, 0.0, .3];
-const BLACK = [0.04, 0.04, 0.04, 1.0];
-const GREY0 = [0.05, 0.05, 0.05, 1.0];
-const GREY1 = [0.13, 0.13, 0.13, 1.0];
-const GREY2 = [0.2, 0.2, 0.2, 1.0];
-const GREY3 = [0.3, 0.3, 0.3, 1.0];
-const GREY4 = [0.43, 0.43, 0.43, 1.0];
-const GREY5 = [0.5, 0.5, 0.5, 1.0];
-const GREY6 = [0.6, 0.6, 0.6, 1.0];
-const GREY7 = [0.7, 0.7, 0.7, 1.0];
-const GREY8 = [0.8, 0.8, 0.8, 1.0];
-const GREY9 = [0.9, 0.9, 0.9, 1.0];
-const GREEN = [0.0, 1.0, 0.0, 1.0];
-const GREENL1 = [0.07, 0.9, 0.0, 1.0];
-const GREENL2 = [0.1, 0.8, 0.0, 1.0];
-const GREENL3 = [0.1, 0.6, 0.0, 1.0];
-const GREENL4 = [0.08, 0.2, 0.0, 1.0];
-const BLUE = [0.0, 0.0, 1.0, 1.0];
-const BLUE_TRANS = [0.0, 0.0, 1.0, .3];
-const BLUER1 = [0.0, 0.2, 88.0, 1.0];
-const BLUER2 = [0.0, 0.2, 75.0, 1.0];
-const BLUER3 = [0.0, 0.2, 6.0, 1.0];
-const RED = [1.0, 0.0, 0.0, 1.0];
-const RED_TRANS = [1.0, 0.0, 0.0, .3];
-const PURPLE = [0.5, 0.0, 1.0, 1.0];
-const YELLOW = [1.0, 1.0, 0.0, 1.0];
-const MAGENTA_BLUE = [0.5, 0.0, 1.0, 1.0];
-const MAGENTA_RED = [1.0, 0.0, 0.6, 1.0];
-const ORANGE = [1.0, 0.5, 0.0, 1.0];
-const LIGHT_BLUE = [0.0, 1.0, 1.0, 1.0];
-const MAGENTA_BLUE_DARK1 = [0.3, 0.0, 0.7, 1.0];
-const MAGENTA_BLUE_DARK2 = [0.2, 0.1, 0.52, 1.0];
-const MAGENTA_BLUE_DARK3 = [0.1, 0.1, 0.26, 1.0];
 
 
-const RED0 = [0.1, 0.0, 0.0, 1.0];
-const RED1 = [0.2, 0.0, 0.0, 1.0];
-const RED2 = [0.3, 0.0, 0.0, 1.0];
-const RED3 = [0.4, 0.0, 0.0, 1.0];
-const RED4 = [0.5, 0.0, 0.0, 1.0];
-const RED5 = [0.6, 0.0, 0.0, 1.0];
-const RED6 = [0.7, 0.0, 0.0, 1.0];
-const RED7 = [0.8, 0.0, 0.0, 1.0];
-const RED8 = [0.9, 0.0, 0.0, 1.0];
-const RED9 = [1.0, 0.0, 0.0, 1.0];
-
-const BLUE0 = [0.0, 0.0, 0.1, 1.0];
-const BLUE1 = [0.0, 0.0, 0.2, 1.0];
-const BLUE2 = [0.0, 0.0, 0.3, 1.0];
-const BLUE3 = [0.0, 0.0, 0.4, 1.0];
-const BLUE4 = [0.0, 0.0, 0.5, 1.0];
-const BLUE5 = [0.0, 0.0, 0.6, 1.0];
-const BLUE6 = [0.0, 0.0, 0.7, 1.0];
-const BLUE7 = [0.0, 0.0, 0.8, 1.0];
-const BLUE8 = [0.0, 0.0, 0.9, 1.0];
-const BLUE9 = [0.0, 0.0, 1.0, 1.0];
-
-const GREEN0 = [0.0, 0.1, 0.0, 1.0];
-const GREEN1 = [0.0, 0.2, 0.0, 1.0];
-const GREEN2 = [0.0, 0.3, 0.0, 1.0];
-const GREEN3 = [0.0, 0.4, 0.0, 1.0];
-const GREEN4 = [0.0, 0.5, 0.0, 1.0];
-const GREEN5 = [0.0, 0.6, 0.0, 1.0];
-const GREEN6 = [0.0, 0.7, 0.0, 1.0];
-const GREEN7 = [0.0, 0.8, 0.0, 1.0];
-const GREEN8 = [0.0, 0.9, 0.0, 1.0];
-const GREEN9 = [0.0, 1.0, 0.0, 1.0];
-
-const citf = 1 / 255;
-function InterpolateRgb(red, green, blue) {
-	return [citf * red, citf * green, citf * blue, 1.0];
-}
-
-const PINK_240_60_160 = InterpolateRgb(240, 60, 160);
-const PINK_240_60_200 = InterpolateRgb(240, 60, 200);
-const RED_200_10_10 = InterpolateRgb(200, 10, 10);
-const GREEN_33_208_40 = InterpolateRgb(33, 208, 40);
-const GREEN_60_240_100 = InterpolateRgb(60, 240, 100);
-const GREEN_60_240_60 = InterpolateRgb(60, 240, 60);
-const GREEN_140_240_10 = InterpolateRgb(140, 240, 10);
-const BLUE_10_160_220 = InterpolateRgb(10, 160, 220);
-const BLUE_10_120_220 = InterpolateRgb(10, 120, 220);
-const BLUE_15_130_255 = InterpolateRgb(15, 130, 255);
-const CYAN_10_200_240 = InterpolateRgb(10, 200, 240);
-const CYAN_10_230_240 = InterpolateRgb(10, 230, 240);
-const CYAN_10_230_180 = InterpolateRgb(10, 230, 180);
-const YELLOW_240_240_10 = InterpolateRgb(240, 240, 10);
-const YELLOW_240_220_10 = InterpolateRgb(240, 200, 10);
-const ORANGE_240_160_10 = InterpolateRgb(240, 160, 10);
-const ORANGE_240_200_10 = InterpolateRgb(240, 200, 10);
-const ORANGE_240_130_10 = InterpolateRgb(240, 130, 10);
-const ORANGE_240_75_10 = InterpolateRgb(255, 75, 10);
-
-const BLUE_A1 = InterpolateRgb(0, 46, 71);
-const BLUE_A2 = InterpolateRgb(0, 77, 119);
-const BLUE_A3 = InterpolateRgb(0, 112, 173);
-const BLUE_A4 = InterpolateRgb(0, 140, 220);
-const BLUE_B1 = InterpolateRgb(0, 29, 73);
-const BLUE_B2 = InterpolateRgb(0, 48, 122);
-const BLUE_B3 = InterpolateRgb(0, 71, 178);
-const BLUE_B4 = InterpolateRgb(0, 100, 220);
-const GREEN_B1 = InterpolateRgb(0, 58, 0);
-const GREEN_B2 = InterpolateRgb(0, 94, 0);
-const GREEN_B3 = InterpolateRgb(0, 150, 0);
-const GREEN_B4 = InterpolateRgb(0, 210, 0);
-const ORANGE_B1 = InterpolateRgb(63, 36, 0);
-const ORANGE_B2 = InterpolateRgb(114, 65, 0);
-const ORANGE_B3 = InterpolateRgb(158, 89, 0);
-const ORANGE_B4 = InterpolateRgb(210, 118, 0);
-const ORANGE_C1 = InterpolateRgb(63, 48, 0);
-const ORANGE_C2 = InterpolateRgb(114, 86, 0);
-const ORANGE_C3 = InterpolateRgb(158, 118, 0);
-const ORANGE_C4 = InterpolateRgb(210, 158, 0);
-const PURPLE_COOL1 = InterpolateRgb(33, 0, 71);
-const PURPLE_COOL2 = InterpolateRgb(60, 0, 130);
-const PURPLE_COOL3 = InterpolateRgb(88, 0, 188);
-const PURPLE_COOL4 = InterpolateRgb(160, 30, 280);
-const PURPLE_HOT1 = InterpolateRgb(71, 0, 71);
-const PURPLE_HOT2 = InterpolateRgb(130, 0, 130);
-const PURPLE_HOT3 = InterpolateRgb(188, 0, 188);
-const PURPLE_HOT4 = InterpolateRgb(226, 0, 226);
-const PINK1 = InterpolateRgb(71, 0, 33);
-const PINK2 = InterpolateRgb(130, 0, 60);
-const PINK3 = InterpolateRgb(188, 0, 88);
-const PINK4 = InterpolateRgb(226, 0, 108);
-const RED_A1 = InterpolateRgb(66, 0, 12);
-const RED_A2 = InterpolateRgb(114, 0, 21);
-const RED_A3 = InterpolateRgb(163, 0, 31);
-const RED_A4 = InterpolateRgb(220, 0, 40);
-
-const BLUE_LIGHT = InterpolateRgb(76, 171, 254);
-const blue = InterpolateRgb(0.345 * 255, 0.780 * 255, 0.988 * 255)
-const bluePurple = InterpolateRgb(0.361 * 255, 0.020 * 255, 0.839 * 255)
 
 
-const COLOR_ARRAY = new Array(
-	PINK_240_60_160,
-	PINK_240_60_200,
-	RED_200_10_10,
-	GREEN_33_208_40,
-	GREEN_60_240_100,
-	GREEN_60_240_60,
-	GREEN_60_240_60,
-	GREEN_140_240_10,
-	BLUE_10_160_220,
-	BLUE_10_120_220,
-	CYAN_10_200_240,
-	CYAN_10_230_240,
-	CYAN_10_230_180,
-	YELLOW_240_220_10,
-	YELLOW_240_240_10,
-	ORANGE_240_75_10,
-	ORANGE_240_130_10,
-	ORANGE_240_160_10,
-);
-
-const COLORS1 = new Array(
-	ORANGE_240_130_10,
-	PINK_240_60_160,
-	GREEN_33_208_40,
-	YELLOW_240_220_10,
-	BLUE_10_160_220,
-	CYAN_10_200_240,
-	CYAN_10_230_240,
-	YELLOW_240_240_10,
-	GREEN_140_240_10,
-	BLUE_10_120_220,
-	ORANGE_240_160_10,
-	CYAN_10_230_180,
-	ORANGE_240_75_10,
-	RED_200_10_10,
-);
 
 
 
@@ -635,6 +547,13 @@ const TEXTURE_TYPE = {
 	TYPE_TEXTURE: 0x2,
 };
 
+
+
+
+
+
+
+
 // Textures
 // Font textures
 const FONT_CONSOLAS_SDF_LARGE = 'consolas_sdf_11115w';
@@ -642,12 +561,14 @@ const FONT_CONSOLAS_SDF_SMALL = 'consolas_sdf_2048w';
 const COMIC_FONT_METRICS_PATH = '../../../../resources/fonts/consolas_sdf/metrics/consolas_sdf35.txt'
 const TEST_MSDF_FONT_1 = 'msdf_a_char';
 const TEST_MTSDF_FONT_TEST_1024DIM = 'consola_mtsdf_test_1024';
-// const TEST_MSDF_FONT_TEST_256DIM = 'consola_msdf_test_256dim';
-// const TEST_MSDF_FONT_TEST_512DIM = 'consola_msdf_test_512dim';
-// const TEST_MSDF_FONT_TEST_1024DIM = 'consola_msdf_test_1024';
-// const TEST_SDF_FONT_TEST_256DIM = 'consola_sdf_test_256dim';
-// const TEST_SDF_FONT_TEST_512DIM = 'consola_sdf_test_512dim';
-// const TEST_SDF_FONT_TEST_1024DIM = 'consola_sdf_test_1024dim';
+
+
+
+
+
+
+
+
 // IMPORTANT: Every texture image file above, must be stored to the FONT_PATHS below as shown.
 const TEXTURE_PATHS = [
 	{
@@ -656,6 +577,14 @@ const TEXTURE_PATHS = [
 		imgType: 'png',
 	},
 ];
+
+
+
+
+
+
+
+
 g_cnt = 0;
 const TEXTURES = {
 	// POTENTIAL_BUG: 
@@ -666,14 +595,27 @@ const TEXTURES = {
 	COUNT: g_cnt,
 }
 
+
+
+
+
+
+
+
 const MENU_FONT_IDX = TEXTURES.MSDF_CONSOLAS_1024; // Set the font for the options menu
 const MENU_FONT_SIZE = 4; // Set the font size for the options menu
+
+
+
+
+
+
 
 
 /*************************************************************************************************/
 // Framebuffers
 
-_cnt = 0x0;
+_CNT = 0x0;
 const FRAMEBUFFER_TYPE = {
 	SCREEN_DIMENTION: 0x1, // Framebuffer's dimentions at canvas dimentions
 	PORTION_DIMENTION: 0x2, // Framebuffer's dimentions are specific 
@@ -681,191 +623,154 @@ const FRAMEBUFFER_TYPE = {
 
 
 
+
+
+
+
+
 /*************************************************************************************************/
 // Meshes  
 
-// MESH_TYPES_DBG: A bitmask to check if a mesh is of a specific type
-_cnt = 0x1;
+// MESH_TYPE: A bitmask to check if a mesh is of a specific type
+_CNT = 0x1;
 // MAX cnt is 31 times shifted and the 32nd is valid but a negative number
 // IDEA: Maybe we implement a negative bitfield for another 31 values ???
-const MESH_TYPES_DBG = {
+const MESH_TYPE = {
 
-	GEOMETRY2D: _cnt,
-	TEXT_GEOMETRY2D: _cnt <<= 1,
-	GEOMETRY3D: _cnt <<= 1,
-	CUBE_GEOMETRY: _cnt <<= 1,
+	GEOMETRY2D: _CNT,
+	TEXT_GEOMETRY2D: _CNT <<= 1,
+	GEOMETRY3D: _CNT <<= 1,
+	CUBE_GEOMETRY: _CNT <<= 1,
 
-	MATERIAL: _cnt <<= 1,
-	FONT_MATERIAL: _cnt <<= 1,
-	TEXTURE_MATERIAL: _cnt <<= 1,
+	MATERIAL: _CNT <<= 1,
+	FONT_MATERIAL: _CNT <<= 1,
+	TEXTURE_MATERIAL: _CNT <<= 1,
 
-	MESH: _cnt <<= 1,
-	TEXT_MESH: _cnt <<= 1,
-	RECT_MESH: _cnt <<= 1,
-	SECTION_MESH: _cnt <<= 1,
-	SECTION_MESH_ONLY: _cnt <<= 1,
+	MESH: _CNT <<= 1,
+	TEXT_MESH: _CNT <<= 1,
+	RECT_MESH: _CNT <<= 1,
+	SECTION_MESH: _CNT <<= 1,
+	SECTION_MESH_ONLY: _CNT <<= 1,
 
-	WIDGET_GENERIC: _cnt <<= 1,
-	WIDGET_TEXT_LABEL: _cnt <<= 1,
-	WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _cnt <<= 1,
-	WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _cnt <<= 1,
-	WIDGET_BUTTON: _cnt <<= 1,
-	WIDGET_SWITCH: _cnt <<= 1,
-	WIDGET_TEXT: _cnt <<= 1,
-	WIDGET_TEXT_DYNAMIC: _cnt <<= 1,
-
-	WIDGET_SLIDER: _cnt <<= 1,
-	WIDGET_SLIDER_BAR: _cnt <<= 1,
-	WIDGET_SLIDER_HANDLE: _cnt <<= 1,
-
-	WIDGET_SCROLLER: _cnt <<= 1,
-	WIDGET_SCROLLER_BAR: _cnt <<= 1,
-	WIDGET_SCROLLER_HANDLE: _cnt <<= 1,
-
-	WIDGET_POP_UP: _cnt <<= 1,
-	WIDGET_MENU_BAR: _cnt <<= 1,
-
-	WIDGET_DROP_DOWN: _cnt <<= 1,
-	DROP_DOWN_MENU: _cnt <<= 1,
-
-	// UI_INFO_GFX: _cnt <<= 1,
-	// UI_INFO_MESH: _cnt <<= 1,
-	SCENE: _cnt <<= 1,
+	WIDGET_TEXT_LABEL: _CNT <<= 1,
+	WIDGET_BUTTON: _CNT <<= 1,
+	WIDGET_SWITCH: _CNT <<= 1,
+	WIDGET_TEXT: _CNT <<= 1,
+	WIDGET_TEXT_DYNAMIC: _CNT <<= 1,
+	
+	WIDGET_SLIDER: _CNT <<= 1,
+	WIDGET_SLIDER_BAR: _CNT <<= 1,
+	WIDGET_SLIDER_HANDLE: _CNT <<= 1,
+	
+	WIDGET_SCROLLER: _CNT <<= 1,
+	WIDGET_SCROLLER_BAR: _CNT <<= 1,
+	WIDGET_SCROLLER_HANDLE: _CNT <<= 1,
+	
+	WIDGET_POP_UP: _CNT <<= 1,
+	WIDGET_MENU_BAR: _CNT <<= 1,
+	
+	WIDGET_DROP_DOWN: _CNT <<= 1,
+	DROP_DOWN_MENU: _CNT <<= 1,
+	
+	SCENE: _CNT <<= 1,
+	
+	WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
+	WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
 };
 
-function GetMeshNameFromType(type) {
-
-	let meshType = []
-
-	if (type & MESH_TYPES_DBG.GEOMETRY2D) { meshType.push('Geometry2D'); }
-	if (type & MESH_TYPES_DBG.TEXT_GEOMETRY2D) { meshType.push('Geometry2D_Text'); }
-	if (type & MESH_TYPES_DBG.GEOMETRY3D) { meshType.push('Geometry3D'); }
-	if (type & MESH_TYPES_DBG.CUBE_GEOMETRY) { meshType.push('CubeGeometry'); }
-
-	if (type & MESH_TYPES_DBG.MATERIAL) { meshType.push('Material'); }
-	if (type & MESH_TYPES_DBG.FONT_MATERIAL) { meshType.push('FontMaterial'); }
-
-	if (type & MESH_TYPES_DBG.MESH) { meshType.push('Mesh'); }
-	if (type & MESH_TYPES_DBG.TEXT_MESH) { meshType.push('Text_Mesh'); }
-	if (type & MESH_TYPES_DBG.RECT_MESH) { meshType.push('RECT_MESH'); }
-
-	if (type & MESH_TYPES_DBG.SECTION_MESH) { meshType.push('SECTION_MESH'); }
-
-	if (type & MESH_TYPES_DBG.WIDGET_GENERIC) { meshType.push('WIDGET_GENERIC'); }
-	if (type & MESH_TYPES_DBG.WIDGET_TEXT_LABEL) { meshType.push('Widget_Label'); }
-	if (type & MESH_TYPES_DBG.Widget_Label_Text_Mesh_Menu_Options) { meshType = 'Widget_Label_Text_Mesh_Menu_Options'; }
-	if (type & MESH_TYPES_DBG.WIDGET_BUTTON) { meshType.push('Widget_Button'); }
-	if (type & MESH_TYPES_DBG.WIDGET_SWITCH) { meshType.push('Widget_Switch'); }
-	if (type & MESH_TYPES_DBG.WIDGET_TEXT) { meshType.push('Widget_Text'); }
-	if (type & MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC) { meshType.push('Widget_Dynamic_Text_Mesh'); }
-	if (type & MESH_TYPES_DBG.WIDGET_SLIDER) { meshType.push('WIDGET_SLIDER'); }
-	if (type & MESH_TYPES_DBG.WIDGET_SLIDER_BAR) { meshType.push('WIDGET_SLIDER_BAR'); }
-	if (type & MESH_TYPES_DBG.WIDGET_SLIDER_HANDLE) { meshType.push('WIDGET_SLIDER_HANDLE'); }
-	if (type & MESH_TYPES_DBG.WIDGET_POP_UP) { meshType.push('WIDGET_POP_UP'); }
-
-	return meshType;
-}
-
-function GetMeshHighOrderNameFromType(type) {
-
-	let meshType = ''
-
-	if (type & MESH_TYPES_DBG.GEOMETRY2D) { meshType = 'GEOMETRY2D'; }
-	if (type & MESH_TYPES_DBG.TEXT_GEOMETRY2D) { meshType = 'TEXT_GEOMETRY2D'; }
-	if (type & MESH_TYPES_DBG.GEOMETRY3D) { meshType = 'GEOMETRY3D'; }
-	if (type & MESH_TYPES_DBG.CUBE_GEOMETRY) { meshType = 'CUBE_GEOMETRY'; }
-
-	if (type & MESH_TYPES_DBG.MATERIAL) { meshType = 'MATERIAL'; }
-	if (type & MESH_TYPES_DBG.FONT_MATERIAL) { meshType = 'FONT_MATERIAL'; }
-
-	if (type & MESH_TYPES_DBG.MESH) { meshType = 'MESH'; }
-	if (type & MESH_TYPES_DBG.TEXT_MESH) { meshType = 'TEXT_MESH'; }
-	if (type & MESH_TYPES_DBG.RECT_MESH) { meshType = 'RECT_MESH'; }
-
-	if (type & MESH_TYPES_DBG.SECTION_MESH) { meshType = 'SECTION_MESH'; }
-
-	if (type & MESH_TYPES_DBG.WIDGET_GENERIC) { meshType = 'WIDGET_GENERIC'; }
-	if (type & MESH_TYPES_DBG.WIDGET_TEXT_LABEL) { meshType = 'WIDGET_TEXT_LABEL'; }
-	if (type & MESH_TYPES_DBG.WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS) { meshType = 'WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS'; }
-	if (type & MESH_TYPES_DBG.WIDGET_BUTTON) { meshType = 'WIDGET_BUTTON'; }
-	if (type & MESH_TYPES_DBG.WIDGET_TEXT) { meshType = 'WIDGET_TEXT'; }
-	if (type & MESH_TYPES_DBG.WIDGET_TEXT_DYNAMIC) { meshType = 'WIDGET_TEXT_DYNAMIC'; }
-	if (type & MESH_TYPES_DBG.WIDGET_SLIDER) { meshType = 'WIDGET_SLIDER'; }
-	if (type & MESH_TYPES_DBG.WIDGET_SLIDER_BAR) { meshType = 'WIDGET_SLIDER_BAR'; }
-	if (type & MESH_TYPES_DBG.WIDGET_SLIDER_HANDLE) { meshType = 'WIDGET_SLIDER_HANDLE'; }
-	if (type & MESH_TYPES_DBG.WIDGET_POP_UP) { meshType = 'WIDGET_POP_UP'; }
-	// console.log(MESH_TYPES_DBG.WIDGET_SLIDER);
-	return meshType;
-}
 
 
-const BATCH_TYPE = {
-	MOVE: 0x1,
-	COLOR: 0x2,
-};
 
-const BATCH_FN_TABLE = {
-	RECT: { // Type of shader program: Rect => 4 vertices
 
-		POS: 1, // Function call for updating the mesh position to the vertexbuffer attributes.  
-	},
-}
 
-_cnt = 0;
+
+
+
+_CNT = 0;
 const BATCH_FN_IDX = {
-	SET_WPOS4: _cnt++, 
-   ADD_WPOS4: _cnt++, 
-   SET_POS2: _cnt++, 
-   SET_WPOS4_POS2: _cnt++, 
+	SET_WPOS4: _CNT++,
+	ADD_WPOS4: _CNT++,
+	SET_POS2: _CNT++,
+	SET_WPOS4_POS2: _CNT++,
 }
 
 
 
-_cnt = 0x1;
+
+
+
+
+
+_CNT = 0x1;
 const SHADER_ATTRIBUTES = {
-   COL4:_cnt, 
-   WPOS4: _cnt<<=0x1, 
-   POS2: _cnt<<=0x1,
-   PARAMS1: _cnt<<=0x1,
-   TEX2: _cnt<<=0x1,
+	COL4: _CNT,
+	WPOS4: _CNT <<= 0x1,
+	POS2: _CNT <<= 0x1,
+	PARAMS1: _CNT <<= 0x1,
+	TEX2: _CNT <<= 0x1,
 };
+
+
+
+
 
 
 
 
 /*************************************************************************************************/
 //  Events  
-_cnt = 0x1;
+_CNT = 0x1;
 const LISTENERS_FLAGS = {
-	ANY_HOVER: _cnt <<= 0x1,
-	ANY_CLICK: _cnt <<= 0x1,
-	ANY: _cnt <<= 0x1,
+	ANY_HOVER: _CNT <<= 0x1,
+	ANY_CLICK: _CNT <<= 0x1,
+	ANY: _CNT <<= 0x1,
 
-	HOVER: _cnt <<= 0x1,
-	CLICK: _cnt <<= 0x1,
-	ALL: _cnt <<= 0x1,
+	HOVER: _CNT <<= 0x1,
+	CLICK: _CNT <<= 0x1,
+	ALL: _CNT <<= 0x1,
 
 
 	mask: 0x0, // the variable to sto
 };
 
-_cnt = 0x1;
-const LISTEN_EVENT_TYPES = {
-	HOVER: _cnt <<= 1,
-	CLICK_UP: _cnt <<= 1,
-	MOVE: _cnt <<= 1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
 
-	NULL: _cnt <<= 1,
+
+
+
+
+
+
+_CNT = 0x1;
+const LISTEN_EVENT_TYPES = {
+	HOVER: _CNT <<= 1,
+	CLICK_UP: _CNT <<= 1,
+	MOVE: _CNT <<= 1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
+
+	NULL: _CNT <<= 1,
 };
 
-_cnt = 0;
+
+
+
+
+
+
+
+_CNT = 0;
 /** CAUTION: This is an enum for indexing the Listen_Events class buffer NOT the  Listener_Hover class buffer which is a separate class*/
 const LISTEN_EVENT_TYPES_INDEX = {
-	HOVER: _cnt++, // HOVER event belongs to another class, that is the Listener_Hover class.
-	CLICK: _cnt++,
+	HOVER: _CNT++, // HOVER event belongs to another class, that is the Listener_Hover class.
+	CLICK: _CNT++,
 	// MOVE event registers with the CLICK event, no need to create new event in the ListeEvents buffer.
-	SIZE: _cnt,
+	SIZE: _CNT,
 };
+
+
+
+
+
+
+
 
 function Listeners_get_event_type_string(event_type_idx) {
 	switch (event_type_idx) {
@@ -874,35 +779,97 @@ function Listeners_get_event_type_string(event_type_idx) {
 	}
 }
 
-_cnt = 0x1;
+
+
+
+
+
+
+
+_CNT = 0x1;
 const INFO_LISTEN_EVENT_TYPE = {
 
-	// GFX: {
-	// 	UPDATE: _cnt <<= 0x1,
-	// 	CREATE_PROG: _cnt <<= 0x1,
-	// 	CREATE_VB: _cnt <<= 0x1,
-	// 	UPDATE_VB: _cnt <<= 0x1,
-	// },
+	UI_INFO_MESH: _CNT <<= 0x1,
+	UI_INFO_GFX: _CNT <<= 0x1,
 
-	UI_INFO_MESH: _cnt <<= 0x1,
-	UI_INFO_GFX: _cnt <<= 0x1,
-
-	LISTENERS: _cnt <<= 0x1,
-	MOUSE: _cnt <<= 0x1,
-	MOUSE: _cnt <<= 0x1,
-	// ALL_MESHES: _cnt <<= 0x1,
-	// MESH: _cnt <<= 0x1,
+	LISTENERS: _CNT <<= 0x1,
+	MOUSE: _CNT <<= 0x1,
+	MOUSE: _CNT <<= 0x1,
 
 }
 
-_idx = 0;
+
+
+
+
+
+
+
+_CNT = 0;
 const INTERVALS = {
 
-	MOVE: _idx++,
-	UPDATE: _idx++,
+	MOVE: _CNT++,
+	UPDATE: _CNT++,
 
-	SIZE: _idx,
+	SIZE: _CNT,
 };
+
+
+
+
+
+
+
+
+
+/*************************************************************************************************/
+// Debugging. Switching On/Off console.log() in the code.
+
+const DEBUG = {
+
+	CORE: false,
+	MATERIAL: false,
+	GEOMETRY: false,
+	MESH: true,
+	MESH_ALL_UVS: false,
+	RECT: false,
+	CAMERA: true,
+
+	TEXTURE: false,
+	UVS: false,
+
+	// Graphics
+	WEB_GL: false,
+	SHADER_INFO: false,
+	SHADERS: true,
+
+	BINDING_FUNCTIONS: false,
+
+	LISTENERS: false,
+
+	SET_HOVER_TO_ALL_MESHES: false,
+	REMOVE_MESH: false,
+
+	GFX: {
+		BUFFERS: false,
+		ADD_MESH: false,
+		REMOVE_MESH: false,
+		CONTEXT_CREATE: false,
+		CONTEXT_FIND: false,
+	},
+
+	EVENTS_LISTENERS: {
+		WIDGET_DROP_DOWN: false,
+	},
+
+	WIGET_DROPDOWN: false,
+
+	INFO_UI: false,
+};
+
+
+
+
 
 
 
@@ -951,76 +918,20 @@ const DEBUG_INFO = {
 
 
 
-/*************************************************************************************************/
-// Debugging. Switching On/Off console.log() in the code.
-const DEBUG = {
-	CORE: false,
-	MATERIAL: false,
-	GEOMETRY: false,
-	MESH: true,
-	MESH_ALL_UVS: false,
-	RECT: false,
-	CAMERA: true,
-
-	TEXTURE: false,
-	UVS: false,
-
-	// Graphics
-	WEB_GL: false,
-	SHADER_INFO: false,
-	SHADERS: true,
-
-	BINDING_FUNCTIONS: false,
-
-	LISTENERS: false,
-
-	SET_HOVER_TO_ALL_MESHES: false,
-	REMOVE_MESH: false,
-
-	GFX: {
-		BUFFERS: false,
-		ADD_MESH: false,
-		REMOVE_MESH: false,
-		CONTEXT_CREATE: false,
-		CONTEXT_FIND: false,
-	},
-
-	EVENTS_LISTENERS: {
-		WIDGET_DROP_DOWN: false,
-	},
-
-	WIGET_DROPDOWN: false,
-
-	INFO_UI: false,
-};
-
-
-// const DEBUG_PRINT = {
-
-// 	GFX: {
-// 		BUFFERS: ()=>{console.log('[[[[[[[[[[[[[[[d]]]]]]]]]]]]]]]]]'); },
-// 		ADD_MESH: false,
-// 		REMOVE_MESH: false,
-// 		CONTEXT_CREATE: false,
-// 		CONTEXT_FIND: false,
-// 	},
-// }
 
 
 
 function ERROR_NULL(obj) {
 	if (obj === null || obj === undefined || obj === INT_NULL) {
-		// console.error('Null ERROR. object:', obj, msg)
 		return true;
 	}
 }
 
-function ERROR_TYPE(obj, type, msg) {
-	if ((obj.type & type) === 0) {
-		console.error(`Type ERROR. type: ${GetMeshNameFromType(type)}, objectType: ${GetMeshNameFromType(obj.type)}`, msg)
-		return true;
-	}
-}
+
+
+
+
+
 
 
 /***********************************************************************************************************************************************/
@@ -1037,11 +948,3 @@ const TEMP_TEST_PERFORMANE_COUNTERS = {
 	MISC: null,
 	MISC_IDX: INT_NULL,
 };
-
-// function CheckClampY(clampy, pos, dim, name) {
-// 	const up = pos[1] + dim[1];
-// 	const bottom = pos[1] - dim[1];
-// 	const ret = (clampy[0] >= up || clampy[1] <= bottom) ? false : true;
-// 	// console.log('00:', ret, name, clampy, up, bottom);
-// 	return ret;
-// }

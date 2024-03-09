@@ -161,23 +161,22 @@ export function Program_create_program(sid) {
 	GL.BOUND_PROG = prog.shader_program;
 
 	// Enable screen resolution uniform (vec2)  
-	if (sid.unif & SID.UNIF.BUFFER_RES) {
-		const unifBufferResIdx = prog.UniformsBufferCreateScreenRes();
-		prog.UniformsSetBufferUniform(VIEWPORT.WIDTH, unifBufferResIdx.resXidx);
-		prog.UniformsSetBufferUniform(VIEWPORT.HEIGHT, unifBufferResIdx.resYidx);
-	}
+	// if (sid.unif & SID.UNIF.BUFFER_RES) {
+	// 	const unifBufferResIdx = prog.UniformsBufferCreateScreenRes();
+	// 	prog.UniformsSetBufferUniform(VIEWPORT.WIDTH, unifBufferResIdx.resXidx);
+	// 	prog.UniformsSetBufferUniform(VIEWPORT.HEIGHT, unifBufferResIdx.resYidx);
+	// }
 
 	// Enable Uniform Shared Block
 	if(sid.unif & SID.UNIF.SHARED_BLOCK){
-		UBO_create(prog.shader_program, sid.unif, progidx)
-		// UBO_update()
+		UBO_create(prog.shader_program, sid.unif)
 	}
 
 	// Enable global timer uniform (float)
-	if (sid.unif & SID.UNIF.BUFFER_RES) {
-		const step = 0.1;
-		prog.UniformsCreateTimer(step);
-	}
+	// if (sid.unif & SID.UNIF.BUFFER_RES) {
+	// 	const step = 0.1;
+	// 	prog.UniformsCreateTimer(step);
+	// }
 
 	return indexes;
 }
@@ -214,16 +213,11 @@ class Gl_Program {
 
 		this.shaderinfo = {
 			uniforms: {
-				// // Static uniforms
-				// projection: new Uniform(
-				// 	/* value */ 	0,
-				// 	/* Location */ gl.getUniformLocation(this.shader_program, 'u_projection'),
-				// 	/* type */		UNIF_TYPE.MAT4,
-				// ),
+
 				sampler: gl.getUniformLocation(this.shader_program, 'u_sampler0'),	// Sampler for texture units 	
 
 				// Uniforms buffer. Stores any uniform as an array of values.
-				buffer: new UniformsBuffer(gfxCtx.gl, this, SHADER_CONSTANTS.UNIFORM_BUFFER_COUNT),
+				// buffer: new UniformsBuffer(gfxCtx.gl, this, SHADER_CONSTANTS.UNIFORM_BUFFER_COUNT),
 			},
 
 		};
@@ -248,115 +242,74 @@ class Gl_Program {
 	/**
 	 * Uniforms Buffer
 	 */
-	UniformsCreateBufferUniform(name) {
-		this.shaderinfo.uniforms.buffer.CreateUniform(name);
-	}
+	// UniformsCreateBufferUniform(name) {
+	// 	this.shaderinfo.uniforms.buffer.CreateUniform(name);
+	// }
 
 
-	UniformsSetBufferUniform(val, index) {
-		this.shaderinfo.uniforms.buffer.Set(val, index);
+	// UniformsSetBufferUniform(val, index) {
+	// 	this.shaderinfo.uniforms.buffer.Set(val, index);
 		
-		console.warn('Program :: Uniforms :: Set :: generic buffer')
-		this.UniformsUpdateBufferUniforms(gfxCtx.gl); // HACK: Leave it for the re-implentation of the UniformBuffer system
-	}
+	// 	console.warn('Program :: Uniforms :: Set :: generic buffer')
+	// 	this.UniformsUpdateBufferUniforms(gfxCtx.gl); // HACK: Leave it for the re-implentation of the UniformBuffer system
+	// }
 
 
-	UniformsCreateSetBufferUniform(name, val) {
-		const idx = this.shaderinfo.uniforms.buffer.CreateUniform(name);
-		this.shaderinfo.uniforms.buffer.Set(val, idx);
-		console.warn('Program :: Uniforms :: Create&Set :: generic buffer')
-	}
+	// UniformsCreateSetBufferUniform(name, val) {
+	// 	const idx = this.shaderinfo.uniforms.buffer.CreateUniform(name);
+	// 	this.shaderinfo.uniforms.buffer.Set(val, idx);
+	// 	console.warn('Program :: Uniforms :: Create&Set :: generic buffer')
+	// }
 
 
-	UniformsUpdateBufferUniforms(gl) {
-		this.shaderinfo.uniforms.buffer.Update(gl);
-		console.warn('Program :: Uniforms :: Update :: generic buffer')
-	}
+	// UniformsUpdateBufferUniforms(gl) {
+	// 	this.shaderinfo.uniforms.buffer.Update(gl);
+	// 	console.warn('Program :: Uniforms :: Update :: generic buffer')
+	// }
 
 
-	UniformsSetUpdateBufferUniform(gl, val, index) {
-		this.shaderinfo.uniforms.buffer.Set(val, index);
-		this.shaderinfo.uniforms.buffer.Update(gl);
-		console.warn('Program :: Uniforms :: Set&Update :: generic buffer')
-	}
+	// UniformsSetUpdateBufferUniform(gl, val, index) {
+	// 	this.shaderinfo.uniforms.buffer.Set(val, index);
+	// 	this.shaderinfo.uniforms.buffer.Update(gl);
+	// 	console.warn('Program :: Uniforms :: Set&Update :: generic buffer')
+	// }
 
 
 	/**
 	 * Unique Uniforms.
 	 * New uniforms that are set by the client and are created as a seperate uniforms in the shaders.
 	 */
-	UniformsCreateTimer(step) {
+	// UniformsCreateTimer(step) {
 
-		// 'Activates' 1 array element of the uniforms buffer array.
-		this.timer.isActive = true;
-		this.timer.step = step;
-		this.timer.index = this.shaderinfo.uniforms.buffer.CreateUniform('Timer');
-	}
-
-
-	UniformsUpdateTimer() {
-
-		this.shaderinfo.uniforms.buffer.Set(this.timer.val, this.timer.index);
-		this.state.mask |= PROGRAM_STATE.UNIFORMS_NEED_UPDATE;
-		this.timer.val += this.timer.step;
-		console.warn('Program :: Uniforms :: Update :: timer')
-	}
+	// 	// 'Activates' 1 array element of the uniforms buffer array.
+	// 	this.timer.isActive = true;
+	// 	this.timer.step = step;
+	// 	this.timer.index = this.shaderinfo.uniforms.buffer.CreateUniform('Timer');
+	// }
 
 
-	UniformsBufferCreateScreenRes() {
-		/**
-		 * 'Activates' 2 array elements of the uniforms buffer array, and returns the 2 indexes
-		 *  so the caller can 'Set' the uniforms value at it's site.
-		 */
-		const resXidx = this.shaderinfo.uniforms.buffer.CreateUniform('ScreenResX');
-		const resYidx = this.shaderinfo.uniforms.buffer.CreateUniform('ScreenResY');
+	// UniformsUpdateTimer() {
 
-		return {
-			resXidx: resXidx,
-			resYidx: resYidx,
-		};
-	}
+	// 	this.shaderinfo.uniforms.buffer.Set(this.timer.val, this.timer.index);
+	// 	this.state.mask |= PROGRAM_STATE.UNIFORMS_NEED_UPDATE;
+	// 	this.timer.val += this.timer.step;
+	// 	console.warn('Program :: Uniforms :: Update :: timer')
+	// }
 
 
-	/**
-	 * Static Uniforms
-	 * Uniforms that are used in every new program.
-	 */
-	UniformsSetProjectionMatrix(val) {
-		this.shaderinfo.uniforms.projection.Set(val);
-		console.warn('Program :: Uniforms :: Set :: projection matrix. vaoidx:', this.vaoidx)
-	}
+	// UniformsBufferCreateScreenRes() {
+	// 	/**
+	// 	 * 'Activates' 2 array elements of the uniforms buffer array, and returns the 2 indexes
+	// 	 *  so the caller can 'Set' the uniforms value at it's site.
+	// 	 */
+	// 	const resXidx = this.shaderinfo.uniforms.buffer.CreateUniform('ScreenResX');
+	// 	const resYidx = this.shaderinfo.uniforms.buffer.CreateUniform('ScreenResY');
 
-
-	UniformsUpdateProjectionMatrix(gl) {
-		this.shaderinfo.uniforms.projection.Update(gl);
-		console.warn('Program :: Uniforms :: Update :: projection matrix. vaoidx:', this.vaoidx);
-	}
-
-
-	UniformsSetUpdateProjectionMatrix(gl, val) {
-		this.shaderinfo.uniforms.projection.Set(val);
-		this.shaderinfo.uniforms.projection.Update(gl);
-		console.warn('Program :: Uniforms :: Set&Update :: projection matrix. vaoidx:', this.vaoidx);
-	}
-	
-	
-	/**
-	 * Update all uniforms of glProgram.
-	 * Not neccesary cause it needs a lot of conditional statements
-	*/
-	UniformsUpdate(gl) {
-		if (this.shaderinfo.uniforms.buffer.needsUpdate) {
-			this.shaderinfo.uniforms.buffer.Update(gl);
-			console.warn('Program :: Uniforms :: UpdateAll :: generic buffer')
-		}
-		if (this.shaderinfo.uniforms.projection.needsUpdate) {
-			this.shaderinfo.uniforms.projection.Update(gl);
-			console.warn('Program :: Uniforms :: UpdateAll :: projection matrix')
-		}
-
-		this.state.mask &= ~PROGRAM_STATE.UNIFORMS_NEED_UPDATE;
-	}
+	// 	return {
+	// 		resXidx: resXidx,
+	// 		resYidx: resYidx,
+	// 	};
+	// }
 
 };
 
@@ -389,13 +342,6 @@ export function Program_use_program(shader_program, progidx) {
 
 
 
-
-
-
-
-export function Program_get_shaderinfo_uniforms(groupidx = INT_NULL, progidx) {
-	return _program_groups.buffer[groupidx].buffer[progidx].shaderinfo.uniforms;
-}
 
 
 

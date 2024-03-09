@@ -22,7 +22,7 @@ export class Rect extends Mesh {
 
       super(geom, mat);
 
-      this.type |= MESH_TYPES_DBG.RECT_MESH;
+      this.type |= MESH_TYPE.RECT_MESH;
 
    }
 
@@ -132,15 +132,15 @@ export class Rect extends Mesh {
       }
       // Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_MESH, params);
 
-      const params2 = {
-         groupidx: this.gfx.prog.groupidx,
-         progidx: this.gfx.prog.idx,
-         vbidx: this.gfx.vb.idx,
-         sceneidx: this.sceneidx,
-         isActive: true,
-         isPrivate: (FLAGS & GFX_CTX_FLAGS.PRIVATE) ? true : false,
-         type: INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX,
-      }
+      // const params2 = {
+      //    groupidx: this.gfx.prog.groupidx,
+      //    progidx: this.gfx.prog.idx,
+      //    vbidx: this.gfx.vb.idx,
+      //    sceneidx: this.sceneidx,
+      //    isActive: true,
+      //    isPrivate: (FLAGS & GFX_CTX_FLAGS.PRIVATE) ? true : false,
+      //    type: INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX,
+      // }
       // Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX, params2);
 
       return this.gfx.vb.start;

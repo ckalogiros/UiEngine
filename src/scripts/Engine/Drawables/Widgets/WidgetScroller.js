@@ -11,6 +11,7 @@ import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clipy_from_widget_root } from "../Operations/Clip.js";
 import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { BLUE_10_120_220, GREY, PURPLER } from "../Material/Base/Colors.js";
 
 
 /** ### Scroller Widget
@@ -61,7 +62,7 @@ export class Widget_Scroller extends Section {
    scroll_bar;
    renderables; // Store the first/upper and last/lower meshes that is rendered by the gfx buffers
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, scrolled_mesh, dim = [100, 50], col = TRANSPARENCY(GREY5, .5)) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, scrolled_mesh, dim = [100, 50], col = TRANSPARENCY(GREY[5], .5)) {
 
       const pos = [200, 400, 0];
 
@@ -71,12 +72,12 @@ export class Widget_Scroller extends Section {
       this.SetStyle([0, 6, 2]);
       this.SetName('Widget_Scroller');
       // this.StateEnable(MESH_STATE.HAS_POPUP);
-      this.type |= MESH_TYPES_DBG.WIDGET_SCROLLER;
-      // Disable the 'MESH_TYPES_DBG.SECTION_MESH_ONLY'
-      this.type &= ~MESH_TYPES_DBG.SECTION_MESH_ONLY;
+      this.type |= MESH_TYPE.WIDGET_SCROLLER;
+      // Disable the 'MESH_TYPE.SECTION_MESH_ONLY'
+      this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
 
       // If there is a group (section) passed by the user, use that section as scrolled section.
-      if (scrolled_mesh && (scrolled_mesh.type & MESH_TYPES_DBG.SECTION_MESH)) {
+      if (scrolled_mesh && (scrolled_mesh.type & MESH_TYPE.SECTION_MESH)) {
 
          this.scrolled_section = scrolled_mesh;
          // this.scrolled_section.root_bufferidx = this.root_bufferidx;
@@ -109,9 +110,9 @@ export class Widget_Scroller extends Section {
       const barMetrics = this.#CalculateBarArea(barpos, [10, dim[1]], pad)
 
 
-      const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, PINK_240_60_160);
+      const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, PURPLER[7]);
 
-      bar.type |= MESH_TYPES_DBG.WIDGET_SCROLLER_BAR | bar.geom | bar.mat;
+      bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR | bar.geom | bar.mat;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       bar.SetStyle([0, 3, 2]);
       bar.SetName('Scroll bar');
@@ -123,7 +124,7 @@ export class Widget_Scroller extends Section {
 
       const handleMetrics = this.#CalculateHandleArea(bar.geom.pos, bar.geom.dim, pad)
       const handle = Create_rect_mesh(handleMetrics.pos, handleMetrics.dim, BLUE_10_120_220);
-      handle.type |= MESH_TYPES_DBG.WIDGET_SCROLLER_HANDLE | handle.geom | handle.mat;
+      handle.type |= MESH_TYPE.WIDGET_SCROLLER_HANDLE | handle.geom | handle.mat;
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([4, 5, 1.9]);
       handle.SetName('Scroll handle');
@@ -433,7 +434,7 @@ export class Widget_Scroller extends Section {
 
          STATE.mesh.SetClicked(bar);
 
-         if ((bar.type & MESH_TYPES_DBG.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
+         if ((bar.type & MESH_TYPE.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
             const idx = TimeIntervalsCreate(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_on_update_handle, bar);
             // bar.timeIntervalsIdxBuffer.Add(idx);
@@ -451,7 +452,7 @@ export class Widget_Scroller extends Section {
          // STATE.mesh.SetFocused(mesh);
 
          // Move Scroller // HERE!!!
-         if ((mesh.type & MESH_TYPES_DBG.WIDGET_SCROLLER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+         if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
             const idx = TimeIntervalsCreate(10, 'Move Scroller', TIME_INTERVAL_REPEAT_ALWAYS, mesh.OnMove, mesh);
             // mesh.timeIntervalsIdxBuffer.Add(idx);

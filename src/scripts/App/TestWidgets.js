@@ -26,6 +26,7 @@ import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Crea
 import { Mesh_buffer_get_mesh_byidx, Widget_group_create, Widget_group_get, Widget_group_update_start, Widget_root_buffer_get_byidx, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3 } from '../Engine/Core/MeshBuffer.js';
 import { Clamp_y_remove_children_FIRST_TIME_CLAMP } from '../Engine/Drawables/Operations/Clip.js';
 import { Calculate_positions_recursive } from '../Engine/Drawables/Meshes/Section.js';
+import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE_240_160_10, PURPLE, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 
 
 /**
@@ -67,7 +68,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    // const uidbg = Debug_info_ui_performance(scene);
+    const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -77,8 +78,8 @@ export function TestWidgetsGeneric(scene) {
 
     /** Lines */
     SdfLine(BLUE_10_120_220, [500, 200, 5], [800, 10]);
-    // SdfLine(GREEN_140_240_10, [500, 600, 5], [800, 10]);
-    // SdfLine(PINK_240_60_160, [500, 400, 5], [800, 10]);
+    // SdfLine(GREEN[7], [500, 600, 5], [800, 10]);
+    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
 
     // const fb = Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, line);
     { // Draw multiple lines to multiple framebuffers
@@ -95,7 +96,7 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    const label = CreateLabel('LABEL');
+    // const label = CreateLabel('LABEL');
     // CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
@@ -218,13 +219,13 @@ function CreateLabel(name = 'Label ') {
 
     const pos = [20, 310 + (labelCount * 35), 2];
     // const pos = [80, 600, 2];
-    // const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, 10, GREY1, WHITE, [6, 4], .5);
-    const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY2, WHITE, [5, 5], .5);
+    // const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, 10, GREY[1], WHITE, [6, 4], .5);
+    const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY[2], WHITE, [5, 5], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.ConstructListeners();
 
-    // label.sid.unif |= SID.UNIF.BLOCK | SID.UNIF.GENERIC1;
+    label.sid.unif |= SID.UNIF.SCREEN_RESOLUTION;
     // label.text_mesh.sid.unif |= SID.UNIF.BLOCK | SID.UNIF.GENERIC;
     // label.text_mesh.sid.unif |= SID.UNIF.BLOCK | SID.UNIF.GENERIC2;
 
@@ -237,8 +238,8 @@ function CreateLabel(name = 'Label ') {
     label.Render()
 
     // label.ClampX(30);
-    // label.text_mesh.SetColorRGB(RED);
-    // label.text_mesh.UpdateText('RED');
+    // label.text_mesh.SetColorRGB(REDL);
+    // label.text_mesh.UpdateText('REDL');
 
     // label.Align(ALIGN.BOTTOM | ALIGN.LEFT, [0, 0]);
     // label.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
@@ -253,7 +254,7 @@ function CreateLabel(name = 'Label ') {
 function CreateButton() {
 
     let ypos = 400
-    const btn = Create_widget_button(_, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [20, ypos, 0], fontsize, GREY1, WHITE, [5, 5], .5);
+    const btn = Create_widget_button(_, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [20, ypos, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     btn.ConstructListeners();
@@ -271,7 +272,7 @@ function CreateButton() {
 function CreateSwitch() {
 
     let ypos = 450
-    const switch1 = Create_widget_switch(_, 'switch on', 'switch off', [20, ypos, 0], fontsize, GREY1, BLUE_10_120_220, [5, 5], .5);
+    const switch1 = Create_widget_switch(_, 'switch on', 'switch off', [20, ypos, 0], fontsize, GREY[1], BLUE_10_120_220, [5, 5], .5);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
@@ -280,7 +281,7 @@ function CreateSwitch() {
 
     switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     switch1.Render();
-    switch1.text_mesh.SetColorRGB(PINK_240_60_200, 4);
+    switch1.text_mesh.SetColorRGB(PURPLER[7], 4);
     ypos += switch1.geom.dim[1] * 2 + 5;
 
 
@@ -306,10 +307,11 @@ function SdfLine(col, pos, dim) {
     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(col, 1));
     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     
-    // const line1 = Create_widget_section(_, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(GREEN_140_240_10, 1.5));
+    // const line1 = Create_widget_section(_, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(GREEN[7], 1.5));
     // line1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     // line.AddItem(line1)
     
+    // line.sid.unif |= SID.UNIF.SCREEN_RESOLUTION;
     // line.sid.unif |=  SID.UNIF.SHARED_BLOCK | SID.UNIF.PROJECTION_MATRIX;
     
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
@@ -348,36 +350,36 @@ function CreateDropdown(scene, pos, id) {
     const col = GetSequencedColor()
     for (let i = 0; i < sub_dp1_count; i++) {
 
-        const dpsub1 = Create_widget_dropdown(_, `${id}-${i}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col, WHITE, pad, _, _, _, margin);
+        const dpsub1 = Create_widget_dropdown(_, `${id}-${i}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
         dpsub1.CreateHoverEvent();
         dpsub1.CreateClickEvent();
         dp.AddToMenu(dpsub1);
 
-        // const label = Create_widget_label(_, 'l1', ALIGN.LEFT, [0,0,2], 10, RED)
+        // const label = Create_widget_label(_, 'l1', ALIGN.LEFT, [0,0,2], 10, REDL)
         // dp.AddToMenu(label);
 
         const col1 = GetSequencedColor()
         for (let j = 0; j < sub_dp2_count; j++) {
 
-            const dpsub2 = Create_widget_dropdown(_, `${id}-${i}-${j}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col1, WHITE, pad, _, _, _, margin);
+            const dpsub2 = Create_widget_dropdown(_, `${id}-${i}-${j}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
             dpsub1.AddToMenu(dpsub2);
 
             const col2 = GetSequencedColor()
             for (let k = 0; k < sub_dp2_count; k++) {
 
-                const dpsub3 = Create_widget_dropdown(_, `DP${id}-${i}${j}${k}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                const dpsub3 = Create_widget_dropdown(_, `DP${id}-${i}${j}${k}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                 dpsub2.AddToMenu(dpsub3);
             }
         }
         for (let j = 0; j < sub_dp2_count; j++) {
 
-            const dpsub2 = Create_widget_dropdown(_, `${id}-${i}-${j}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col1, WHITE, pad, _, _, _, margin);
+            const dpsub2 = Create_widget_dropdown(_, `${id}-${i}-${j}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
             dpsub1.AddToMenu(dpsub2);
 
             const col2 = GetSequencedColor()
             for (let k = 0; k < sub_dp2_count; k++) {
 
-                const dpsub3 = Create_widget_dropdown(_, `DP${id}-${i}${j}${k}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                const dpsub3 = Create_widget_dropdown(_, `DP${id}-${i}${j}${k}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                 dpsub2.AddToMenu(dpsub3);
             }
         }
@@ -410,17 +412,17 @@ function CreateDropdown3(scene, pos, dim) {
     const col = GetSequencedColor()
     for (let i = 0; i < sub_dp1_count; i++) {
 
-        const dpsub1 = Create_widget_dropdown(_, `0${i}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col, WHITE, pad, _, _, _, margin);
+        const dpsub1 = Create_widget_dropdown(_, `0${i}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
         dpsub1.CreateHoverEvent();
         dpsub1.CreateClickEvent();
         dp.AddToMenu(dpsub1);
 
         for (let j = 0; j < sub_dp2_count; j++) {
-            const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN_140_240_10, 1.5), `0${i}${j}`)
+            const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[7], 1.5), `0${i}${j}`)
             dpsub1.AddToMenu(s);
         }
         for (let j = 0; j < sub_dp2_count; j++) {
-            const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN_140_240_10, 1.5), `0${i}${j}`)
+            const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[7], 1.5), `0${i}${j}`)
             dpsub1.AddToMenu(s);
         }
     }
@@ -455,62 +457,62 @@ function CreateDropdown2(scene, pos, id) {
     for (let i = 0; i < sub_dp1_count; i++) {
 
         const col1 = GetSequencedColor()
-        const dpsub2 = Create_widget_dropdown(_, `${i}0`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col1, WHITE, pad, _, _, _, margin);
+        const dpsub2 = Create_widget_dropdown(_, `${i}0`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
         dp.AddToMenu(dpsub2);
 
         const col2 = GetSequencedColor()
         {
-            const dpsub3 = Create_widget_dropdown(_, `${i}00`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+            const dpsub3 = Create_widget_dropdown(_, `${i}00`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
             dpsub2.AddToMenu(dpsub3);
             {
-                const dpsub5 = Create_widget_dropdown(_, `${i}000`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                const dpsub5 = Create_widget_dropdown(_, `${i}000`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                 dpsub3.AddToMenu(dpsub5);
                 {
-                    const dpsub4 = Create_widget_dropdown(_, `${i}0000`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                    const dpsub4 = Create_widget_dropdown(_, `${i}0000`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                     dpsub5.AddToMenu(dpsub4);
                 }
                 {
-                    const dpsub4 = Create_widget_dropdown(_, `${i}0001`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                    const dpsub4 = Create_widget_dropdown(_, `${i}0001`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                     dpsub5.AddToMenu(dpsub4);
                 }
             }
             {
-                const dpsub5 = Create_widget_dropdown(_, `${i}001`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                const dpsub5 = Create_widget_dropdown(_, `${i}001`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                 dpsub3.AddToMenu(dpsub5);
                 {
-                    const dpsub4 = Create_widget_dropdown(_, `${i}0010`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                    const dpsub4 = Create_widget_dropdown(_, `${i}0010`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                     dpsub5.AddToMenu(dpsub4);
                 }
                 {
-                    const dpsub4 = Create_widget_dropdown(_, `${i}0011`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                    const dpsub4 = Create_widget_dropdown(_, `${i}0011`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                     dpsub5.AddToMenu(dpsub4);
                 }
             }
         }
         {
-            const dpsub3 = Create_widget_dropdown(_, `${i}01`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+            const dpsub3 = Create_widget_dropdown(_, `${i}01`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
             dpsub2.AddToMenu(dpsub3);
             {
-                const dpsub5 = Create_widget_dropdown(_, `${i}010`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                const dpsub5 = Create_widget_dropdown(_, `${i}010`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                 dpsub3.AddToMenu(dpsub5);
                 {
-                    const dpsub4 = Create_widget_dropdown(_, `${i}0100`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                    const dpsub4 = Create_widget_dropdown(_, `${i}0100`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                     dpsub5.AddToMenu(dpsub4);
                 }
                 {
-                    const dpsub4 = Create_widget_dropdown(_, `${i}0101`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                    const dpsub4 = Create_widget_dropdown(_, `${i}0101`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                     dpsub5.AddToMenu(dpsub4);
                 }
             }
             {
-                const dpsub5 = Create_widget_dropdown(_, `${i}011`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                const dpsub5 = Create_widget_dropdown(_, `${i}011`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                 dpsub3.AddToMenu(dpsub5);
                 {
-                    const dpsub4 = Create_widget_dropdown(_, `${i}0110`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                    const dpsub4 = Create_widget_dropdown(_, `${i}0110`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                     dpsub5.AddToMenu(dpsub4);
                 }
                 {
-                    const dpsub4 = Create_widget_dropdown(_, `${i}0111`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, col2, WHITE, pad, _, _, _, margin);
+                    const dpsub4 = Create_widget_dropdown(_, `${i}0111`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                     dpsub5.AddToMenu(dpsub4);
                 }
             }
@@ -532,7 +534,7 @@ function CreateDropdown2(scene, pos, id) {
     // const root = Widget_root_buffer_get_byidx(dp.root_bufferidx);
     // for (let i = 0; i < root.boundary; i++) {
     //     const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
-    //     if (mesh.type & MESH_TYPES_DBG.WIDGET_BUTTON)
+    //     if (mesh.type & MESH_TYPE.WIDGET_BUTTON)
     //         console.log(mesh.text_mesh.mat.text)
     // }
 
@@ -543,7 +545,7 @@ function CreateDropdown2(scene, pos, id) {
 function CreateSectioned_LabelSliderButtonSwitchDynemicText() {
 
     const fontsize = 14;
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [193, 212, 0], [0, 0], TRANSPARENCY(GREY1, 1.5))
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [193, 212, 0], [0, 0], TRANSPARENCY(GREY[1], 1.5))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
@@ -551,13 +553,13 @@ function CreateSectioned_LabelSliderButtonSwitchDynemicText() {
     const pos = [0, 0, 0];
     let id = 1;
     {
-        const label = Create_widget_label(_, `sssdsdsdsdsLabel ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY1, WHITE, [14, 4], .5);
+        const label = Create_widget_label(_, `sssdsdsdsdsLabel ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY[1], WHITE, [14, 4], .5);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         section.AddItem(label);
     }
     {
-        const label = Create_widget_label(_, `Label ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY1, WHITE, [14, 4], .5);
+        const label = Create_widget_label(_, `Label ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY[1], WHITE, [14, 4], .5);
         // label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE); 
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         section.AddItem(label);
@@ -579,13 +581,13 @@ function CreateSectioned_LabelSliderButtonSwitchDynemicText() {
 
     // With buttons
     {
-        const btn = Create_widget_button(_, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5);
+        const btn = Create_widget_button(_, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5);
         section.AddItem(btn);
     }
 
     // With switch
     {
-        const switch1 = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5);
+        const switch1 = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5);
         switch1.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
         switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [6, 6, 3] })
         switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
@@ -595,34 +597,34 @@ function CreateSectioned_LabelSliderButtonSwitchDynemicText() {
     // With dynamic text
     {
         const dt = Create_widget_multi_text(_, 'HORIZONTAL Alignment', ALIGN.HORIZONTAL, [0, 500, 0], 8, BLACK, _, [0, 0]);
-        dt.CreateNewText('Pad 0', 8, ORANGE_B4, [0, 0]);
-        dt.CreateNewText('Pad 10', 8, YELLOW_240_220_10, [10, 0]);
-        dt.CreateNewText('Pad 20', 8, GREEN6, [20, 0]);
-        dt.CreateNewText('Pad 5', 8, BLUE_10_160_220, [5, 0]);
+        dt.CreateNewText('Pad 0', 8, ORANGE_240_160_10, [0, 0]);
+        dt.CreateNewText('Pad 10', 8, YELLOWR[7], [10, 0]);
+        dt.CreateNewText('Pad 20', 8, ORANGE_240_160_10, [20, 0]);
+        dt.CreateNewText('Pad 5', 8, BLUEL[7], [5, 0]);
         section.AddItem(dt);
     }
     {
         const dt = Create_widget_multi_text(_, 'VERTICAL: Align LEFT', ALIGN.VERTICAL | ALIGN.LEFT, [0, 500, 0], fontsize, BLACK, _, [0, 0]);
-        dt.CreateNewText('OOOO', fontsize, ORANGE_B4, [20, 0]);
-        dt.CreateNewText('OOO', fontsize, YELLOW_240_220_10, [0, 0]);
-        dt.CreateNewText('OO', fontsize, GREEN6, [20, 0]);
-        dt.CreateNewText('O', fontsize, BLUE_10_160_220, [20, 0]);
+        dt.CreateNewText('OOOO', fontsize, ORANGE_240_160_10, [20, 0]);
+        dt.CreateNewText('OOO', fontsize, YELLOWR[7], [0, 0]);
+        dt.CreateNewText('OO', fontsize, ORANGE_240_160_10, [20, 0]);
+        dt.CreateNewText('O', fontsize, BLUEL[7], [20, 0]);
         section.AddItem(dt);
     }
     {
         const dt = Create_widget_multi_text(_, 'VERTICAL: Align RIGHT', ALIGN.VERTICAL | ALIGN.RIGHT, [0, 500, 0], fontsize, BLACK, _, [0, 0]);
-        dt.CreateNewText('OOOO', fontsize, ORANGE_B4, [20, 0]);
-        dt.CreateNewText('OOO', fontsize, YELLOW_240_220_10, [0, 0]);
-        dt.CreateNewText('OO', fontsize, GREEN6, [20, 0]);
-        dt.CreateNewText('O', fontsize, BLUE_10_160_220, [20, 0]);
+        dt.CreateNewText('OOOO', fontsize, ORANGE_240_160_10, [20, 0]);
+        dt.CreateNewText('OOO', fontsize, YELLOWR[7], [0, 0]);
+        dt.CreateNewText('OO', fontsize, ORANGE_240_160_10, [20, 0]);
+        dt.CreateNewText('O', fontsize, BLUEL[7], [20, 0]);
         section.AddItem(dt);
     }
     {
         const dt = Create_widget_multi_text(_, 'Dynamic text', ALIGN.VERTICAL | ALIGN.RIGHT, [0, 0, 0], fontsize, BLACK, [0, 0]);
-        dt.CreateNewText('Text 2', fontsize, PURPLE_HOT2, [2, 2]);
-        dt.CreateNewText('Text 3', fontsize, PURPLE_HOT3, [2, 2]);
+        dt.CreateNewText('Text 2', fontsize, PURPLER[7], [2, 2]);
+        dt.CreateNewText('Text 3', fontsize, PURPLER[7], [2, 2]);
         dt.CreateNewText('Text', fontsize, PURPLE_HOT4, [2, 2]);
-        dt.CreateNewText('Text 5', fontsize, YELLOW_240_220_10, [2, 2]);
+        dt.CreateNewText('Text 5', fontsize, YELLOWR[7], [2, 2]);
 
         section.AddItem(dt);
     }
@@ -638,31 +640,31 @@ function CreateSectioned_LabelSliderButtonSwitchDynemicText() {
 function CreateDropDownWithDropdownsInside(scene) {
 
     const pad = [10, 2.5]
-    const drop_down = Create_widget_dropdown(_, 'DP1', [260, 200, 0], [60, 20], RED, BLUE_10_120_220, WHITE, pad);
+    const drop_down = Create_widget_dropdown(_, 'DP1', [260, 200, 0], [60, 20], REDL, BLUE_10_120_220, WHITE, pad);
     drop_down.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     drop_down.CreateClickEvent();
     drop_down.CreateMoveEvent();
     drop_down.SetClamp(200, 0)
 
     { // Add another dropdown in dropdown
-        const drop_down3 = Create_widget_dropdown(_, 'DP2', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY1, YELLOW_240_220_10, WHITE, pad);
+        const drop_down3 = Create_widget_dropdown(_, 'DP2', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY[1], YELLOWR[7], WHITE, pad);
         drop_down3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         drop_down3.CreateClickEvent();
         drop_down.AddToMenu(drop_down3);
         {
-            const drop_down4 = Create_widget_dropdown(_, 'DP3', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY1, GREEN_140_240_10, WHITE, pad);
+            const drop_down4 = Create_widget_dropdown(_, 'DP3', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY[1], GREEN[7], WHITE, pad);
             drop_down4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             drop_down4.CreateClickEvent();
             drop_down3.AddToMenu(drop_down4);
 
             {
-                const drop_down5 = Create_widget_dropdown(_, 'DP4', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY1, PINK_240_60_200, WHITE, pad);
+                const drop_down5 = Create_widget_dropdown(_, 'DP4', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY[1], PURPLER[7], WHITE, pad);
                 drop_down5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 drop_down5.CreateClickEvent();
                 drop_down4.AddToMenu(drop_down5);
 
                 {
-                    const drop_down6 = Create_widget_dropdown(_, 'DP5', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY1, RED_200_10_10, WHITE, pad);
+                    const drop_down6 = Create_widget_dropdown(_, 'DP5', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY[1], REDL[7], WHITE, pad);
                     drop_down6.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     drop_down6.CreateClickEvent();
                     drop_down5.AddToMenu(drop_down6);
@@ -688,7 +690,7 @@ function CreateDropDownWithDropdownsInside(scene) {
 
 function CreateLargeDropdown() {
 
-    const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [593, 262, 0], [0, 0], TRANSPARENCY(GREY3, 1.5));
+    const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [593, 262, 0], [0, 0], TRANSPARENCY(GREY[3], 1.5));
 
     const pad = [2, 1];
     const margin = [8, 8];
@@ -701,12 +703,12 @@ function CreateLargeDropdown() {
         s.AddItem(dp)
         Dropdown_roots_set_root(dp, dp);
 
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
     }
     {
         const dp = Create_widget_dropdown(_, 'DP1', [260, 200, 0], GREY2, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
@@ -717,12 +719,12 @@ function CreateLargeDropdown() {
         s.AddItem(dp)
         Dropdown_roots_set_root(dp, dp);
 
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
     }
     {
         const dp = Create_widget_dropdown(_, 'DP1', [260, 200, 0], GREY2, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
@@ -733,12 +735,12 @@ function CreateLargeDropdown() {
         s.AddItem(dp)
         Dropdown_roots_set_root(dp, dp);
 
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
     }
     {
         const dp = Create_widget_dropdown(_, 'DP1', [260, 200, 0], GREY2, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
@@ -749,12 +751,12 @@ function CreateLargeDropdown() {
         s.AddItem(dp)
         Dropdown_roots_set_root(dp, dp);
 
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
     }
     {
         const dp = Create_widget_dropdown(_, 'DP1', [260, 200, 0], GREY2, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
@@ -765,12 +767,12 @@ function CreateLargeDropdown() {
         s.AddItem(dp)
         Dropdown_roots_set_root(dp, dp);
 
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
     }
     {
         const dp = Create_widget_dropdown(_, 'DP1', [260, 200, 0], GREY2, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
@@ -781,12 +783,12 @@ function CreateLargeDropdown() {
         s.AddItem(dp)
         Dropdown_roots_set_root(dp, dp);
 
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
     }
     {
         const dp = Create_widget_dropdown(_, 'DP1', [260, 200, 0], GREY2, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
@@ -797,12 +799,12 @@ function CreateLargeDropdown() {
         s.AddItem(dp)
         Dropdown_roots_set_root(dp, dp);
 
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
-        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY1, WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
+        { const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 6, GREY[1], WHITE, [5, 5], .5); dp.AddToMenu(l); }
     }
 
     // {
@@ -815,12 +817,12 @@ function CreateLargeDropdown() {
     //     s.AddItem(dp)
 
     //     { // Add another dropdown in dropdown
-    //         const dp3 = Create_widget_dropdown(_, 'DP2', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY1, YELLOW_240_220_10, WHITE, pad);
+    //         const dp3 = Create_widget_dropdown(_, 'DP2', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY[1], YELLOWR[7], WHITE, pad);
     //         dp3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     //         dp3.CreateClickEvent();
     //         dp.AddToMenu(dp3);
     //         {
-    //             const dp4 = Create_widget_dropdown(_, 'DP3', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY1, GREEN_140_240_10, WHITE, pad);
+    //             const dp4 = Create_widget_dropdown(_, 'DP3', [OUT_OF_VIEW, OUT_OF_VIEW, 0], [60, 20], GREY[1], GREEN[7], WHITE, pad);
     //             dp4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     //             dp4.CreateClickEvent();
     //             dp3.AddToMenu(dp4);
@@ -840,7 +842,7 @@ function CreateLargeDropdown() {
 
 function CreateManyTextInSection() {
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [350, 400, 0], [0, 0], GREY0);
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [350, 400, 0], [0, 0], GREY[0]);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
@@ -868,7 +870,7 @@ function DestroyMeshTest(scene, widget) {
         }
         else console.log('Widget does not exist')
     }
-    const btn1 = Create_widget_button(_, 'Destroy', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [160, 240, 0], 5, GREY1, WHITE, [4, 4], .5);
+    const btn1 = Create_widget_button(_, 'Destroy', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [160, 240, 0], 5, GREY[1], WHITE, [4, 4], .5);
     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
     btn1.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, customCallback)
     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -877,13 +879,13 @@ function DestroyMeshTest(scene, widget) {
     btn1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [6, 6, 3] })
     btn1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, gfx_idxs);
     btn1.Render();
-    btn1.text_mesh.SetColorRGB(YELLOW_240_220_10);
+    btn1.text_mesh.SetColorRGB(YELLOWR[7]);
 }
 
 
 function CreateMenu(scene) {
 
-    const menu = Create_widget_menubar(ROOT_WIDGETS.CREATE_ROOT, 'Widget Menu bar', ALIGN.LEFT, [200, 500, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+    const menu = Create_widget_menubar(ROOT_WIDGETS.CREATE_ROOT, 'Widget Menu bar', ALIGN.LEFT, [200, 500, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
     menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     menu.AddCloseButton(_, menu, 'x');
@@ -898,12 +900,12 @@ function CreateMenu(scene) {
 function CreateDropDownWidgetWithWidgetsInside(scene) {
 
     const pad = [10, 2.5]
-    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'DP1', [260, 300, 0], GREY1, ORANGE_240_130_10, WHITE, pad);
+    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'DP1', [260, 300, 0], GREY[1], ORANGE_240_160_10, WHITE, pad);
     dp.CreateClickEvent();
     dp.CreateMoveEvent();
 
     { // Add another dropdown in dropdown
-        const drop_down2 = Create_widget_dropdown(_, 'DP2', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, BLUE_10_120_220, WHITE, pad);
+        const drop_down2 = Create_widget_dropdown(_, 'DP2', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], BLUE_10_120_220, WHITE, pad);
         drop_down2.CreateClickEvent();
         dp.AddToMenu(drop_down2);
 
@@ -923,7 +925,7 @@ function CreateDropDownWidgetWithWidgetsInside(scene) {
             for (let i = 0; i < 10; i++) {
 
                 // const label = Create_widget_label(_, `Label ${i}`, _, [OUT_OF_VIEW, OUT_OF_VIEW, 0], [10, 10], 10, WHITE, BLACK);
-                // const label = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0,0,0], 6, GREY1, WHITE, [5, 5], .5);
+                // const label = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0,0,0], 6, GREY[1], WHITE, [5, 5], .5);
                 const label = Create_widget_text(_, 'DP2 TEXT ->', [0, 0, 4], 10, WHITE);
                 s.AddItem(label)
             }
@@ -949,24 +951,24 @@ function CreateDropDownWidgetWithWidgetsInside(scene) {
 
 
         // {
-        //     const drop_down3 = Create_widget_dropdown(_, 'DP3 DP1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, YELLOW_240_220_10, WHITE, pad);
+        //     const drop_down3 = Create_widget_dropdown(_, 'DP3 DP1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], YELLOWR[7], WHITE, pad);
         //     drop_down3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
         //     drop_down3.CreateClickEvent();
         //     drop_down2.AddToMenu(drop_down3);
         //     {
-        //         const drop_down4 = Create_widget_dropdown(_, 'DP4 DP1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, GREEN_140_240_10, WHITE, pad);
+        //         const drop_down4 = Create_widget_dropdown(_, 'DP4 DP1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], GREEN[7], WHITE, pad);
         //         drop_down4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //         drop_down4.CreateClickEvent();
         //         drop_down3.AddToMenu(drop_down4);
 
         //         {
-        //             const drop_down5 = Create_widget_dropdown(_, 'DP5 DP1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, PINK_240_60_200, WHITE, pad);
+        //             const drop_down5 = Create_widget_dropdown(_, 'DP5 DP1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], PURPLER[7], WHITE, pad);
         //             drop_down5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //             drop_down5.CreateClickEvent();
         //             drop_down4.AddToMenu(drop_down5);
 
         //             {
-        //                 const drop_down6 = Create_widget_dropdown(_, 'DP6 DP1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, RED_200_10_10, WHITE, pad);
+        //                 const drop_down6 = Create_widget_dropdown(_, 'DP6 DP1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], REDL[7], WHITE, pad);
         //                 drop_down6.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
         //                 drop_down6.CreateClickEvent();
         //                 drop_down5.AddToMenu(drop_down6);
@@ -998,12 +1000,12 @@ function CreateDropDownWidgetWithWidgetsInside(scene) {
 // TODO: Is a widget dropdown implementable with a menu bar? If yes, we need to recalc windows section on dp's expansion-contraction
 function CreateDropDownWidgetWithWidgetsInsideWithMenu(scene) {
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [250, 400, 0], [0, 0], TRANSPARENCY(GREY3, .5))
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [250, 400, 0], [0, 0], TRANSPARENCY(GREY[3], .5))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     // {
-    //     const menu = Create_widget_menubar(_, 'Widget Menu bar', (ALIGN.HOR_CENTER|ALIGN.VERT_CENTER), [60, 200, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+    //     const menu = Create_widget_menubar(_, 'Widget Menu bar', (ALIGN.HOR_CENTER|ALIGN.VERT_CENTER), [60, 200, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
     //     menu.AddCloseButton(_, section, 'x');
     //     menu.AddMinimizeButton(section);
     //     menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
@@ -1011,7 +1013,7 @@ function CreateDropDownWidgetWithWidgetsInsideWithMenu(scene) {
     // }
 
     const pad = [10, 2.5]
-    const drop_down = Create_widget_dropdown(_, 'DP1', [260, 300, 0], GREY1, ORANGE_240_130_10, WHITE, pad);
+    const drop_down = Create_widget_dropdown(_, 'DP1', [260, 300, 0], GREY[1], ORANGE_240_160_10, WHITE, pad);
     // drop_down.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // drop_down.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     drop_down.CreateHoverEvent();
@@ -1019,7 +1021,7 @@ function CreateDropDownWidgetWithWidgetsInsideWithMenu(scene) {
     // drop_down.CreateMoveEvent();
 
     { // Add another dropdown in dropdown
-        const drop_down2 = Create_widget_dropdown(_, 'DP2', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, BLUE_10_120_220, WHITE, pad);
+        const drop_down2 = Create_widget_dropdown(_, 'DP2', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], BLUE_10_120_220, WHITE, pad);
         drop_down2.CreateHoverEvent();
         drop_down2.CreateClickEvent();
         // drop_down2.CreateMoveEvent();
@@ -1051,27 +1053,27 @@ function CreateDropDownWidgetWithWidgetsInsideWithMenu(scene) {
 
 
         {
-            const drop_down3 = Create_widget_dropdown(_, 'DP3', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, YELLOW_240_220_10, WHITE, pad);
+            const drop_down3 = Create_widget_dropdown(_, 'DP3', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], YELLOWR[7], WHITE, pad);
             // drop_down3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
             // drop_down3.CreateHoverEvent();
             // drop_down3.CreateClickEvent();
             drop_down2.AddToMenu(drop_down3);
             {
-                const drop_down4 = Create_widget_dropdown(_, 'DP4', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, GREEN_140_240_10, WHITE, pad);
+                const drop_down4 = Create_widget_dropdown(_, 'DP4', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], GREEN[7], WHITE, pad);
                 // drop_down4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 // drop_down4.CreateHoverEvent();
                 // drop_down4.CreateClickEvent();
                 drop_down3.AddToMenu(drop_down4);
 
                 {
-                    const drop_down5 = Create_widget_dropdown(_, 'DP5', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, PINK_240_60_200, WHITE, pad);
+                    const drop_down5 = Create_widget_dropdown(_, 'DP5', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], PURPLER[7], WHITE, pad);
                     // drop_down5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     // drop_down5.CreateHoverEvent();
                     // drop_down5.CreateClickEvent();
                     drop_down4.AddToMenu(drop_down5);
 
                     {
-                        const drop_down6 = Create_widget_dropdown(_, 'DP6', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, RED_200_10_10, WHITE, pad);
+                        const drop_down6 = Create_widget_dropdown(_, 'DP6', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], REDL[7], WHITE, pad);
                         // drop_down6.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
                         // drop_down6.CreateHoverEvent();
                         // drop_down6.CreateClickEvent();
@@ -1104,12 +1106,12 @@ function CreateDropDownWidgetWithWidgetsInsideWithMenu(scene) {
 
 function CreateMenuSectioned(scene) {
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, ALIGN.LEFT, [10, 10], [250, 500, 0], [0, 0], TRANSPARENCY(GREY1, .5))
+    const section = Create_widget_section(_, SECTION.VERTICAL, ALIGN.LEFT, [10, 10], [250, 500, 0], [0, 0], TRANSPARENCY(GREY[1], .5))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     {
-        const menu = Create_widget_menubar('Widget Menu bar', [60, 200, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+        const menu = Create_widget_menubar('Widget Menu bar', [60, 200, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
         section.AddItem(menu)
         menu.AddCloseButton(_, section, 'x');
         menu.AddMinimizeButton(section);
@@ -1123,13 +1125,13 @@ function CreateMenuSectioned(scene) {
     //     section.AddItem(lb);
     // }
     // {
-    //     const dt = Create_widget_multi_text(_, '0000000', ALIGN.VERTICAL, [0, 0, 0], 10, BLUE_10_120_220, PINK_240_60_160);
+    //     const dt = Create_widget_multi_text(_, '0000000', ALIGN.VERTICAL, [0, 0, 0], 10, BLUE_10_120_220, PURPLER[7]);
     //     dt.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     //     dt.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
     //     section.AddItem(dt);
     // }
     // {
-    //     const slider = Create_widget_slider(_, [0, 0, 0], [160, 10], PINK_240_60_160, [2, 4]);
+    //     const slider = Create_widget_slider(_, [0, 0, 0], [160, 10], PURPLER[7], [2, 4]);
     //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     //     slider.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
     //     section.AddItem(slider);
@@ -1147,12 +1149,12 @@ function CreateMenuSectioned(scene) {
 
 function CreateSectionedMixWidgetsWithMenu(scene) {
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 400, 0], [0, 0], TRANSPARENCY(GREY1, .5))
+    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 400, 0], [0, 0], TRANSPARENCY(GREY[1], .5))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
     {
         // Add Menu bar
-        // const menu = Create_widget_menubar (_, 'Widget Menu bar', ALIGN.LEFT, [60, 200, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+        // const menu = Create_widget_menubar (_, 'Widget Menu bar', ALIGN.LEFT, [60, 200, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
         // menu.AddCloseButton(section, 'x');
         // menu.AddMinimizeButton(section);
         // menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
@@ -1175,35 +1177,35 @@ function CreateSectionedMixWidgetsWithMenu(scene) {
         section.AddItem(lb);
     }
     {
-        const dt = Create_widget_multi_text(_, 'Dynamic text', '0000000', ALIGN.VERTICAL, [0, 0, 0], 10, BLUE_10_120_220, PINK_240_60_160);
+        const dt = Create_widget_multi_text(_, 'Dynamic text', '0000000', ALIGN.VERTICAL, [0, 0, 0], 10, BLUE_10_120_220, PURPLER[7]);
         section.AddItem(dt);
     }
     {
-        const slider = Create_widget_slider(_, [0, 0, 0], [60, 10], PINK_240_60_160, [2, 4]);
+        const slider = Create_widget_slider(_, [0, 0, 0], [60, 10], PURPLER[7], [2, 4]);
         section.AddItem(slider);
     }
     {
-        const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(ORANGE_240_200_10, .5))
+        const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5))
         s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-        const menu = Create_widget_menubar(_, 'Widget Menu bar', ALIGN.LEFT, [0, 0, 0], TRANSPARENCY(ORANGE_240_200_10, .5), WHITE, [10, 6]);
+        const menu = Create_widget_menubar(_, 'Widget Menu bar', ALIGN.LEFT, [0, 0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), WHITE, [10, 6]);
         menu.AddCloseButton(_, s2, 'x');
         menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
         s2.AddItem(menu);
 
-        const slider = Create_widget_slider(_, [0, 0, 0], [80, 10], BLUE_10_160_220);
+        const slider = Create_widget_slider(_, [0, 0, 0], [80, 10], BLUEL[7]);
         s2.AddItem(slider);
 
         {
-            const s3 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREEN_140_240_10, .5))
+            const s3 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREEN[7], .5))
             s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-            const menu = Create_widget_menubar(_, 'Widget Menu bar', ALIGN.LEFT, [0, 0, 0], TRANSPARENCY(GREEN_140_240_10, .5), WHITE, [10, 6]);
+            const menu = Create_widget_menubar(_, 'Widget Menu bar', ALIGN.LEFT, [0, 0, 0], TRANSPARENCY(GREEN[7], .5), WHITE, [10, 6]);
             menu.AddCloseButton(_, s3, 'x');
             menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
             s3.AddItem(menu);
 
-            const slider = Create_widget_slider(_, [0, 0, 0], [80, 10], GREEN_33_208_40);
+            const slider = Create_widget_slider(_, [0, 0, 0], [80, 10], GREEN[7]);
             s3.AddItem(slider);
             s2.AddItem(s3);
         }
@@ -1220,12 +1222,12 @@ function CreateSectionedMixWidgetsWithMenu(scene) {
 function CreateManySectionsWithMenu(scene) {
 
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [250, 400, 0], [0, 0], TRANSPARENCY(GREY1, .5))
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [250, 400, 0], [0, 0], TRANSPARENCY(GREY[1], .5))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     { // Create menu bar
-        const menu = Create_widget_menubar(_, 'Widget Menu bar', ALIGN.LEFT, [60, 200, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+        const menu = Create_widget_menubar(_, 'Widget Menu bar', ALIGN.LEFT, [60, 200, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
         menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         menu.AddCloseButton(_, section, 'x');
@@ -1238,40 +1240,40 @@ function CreateManySectionsWithMenu(scene) {
         const tr = 1.;
         const flags = (SECTION.ITEM_FIT | SECTION.EXPAND);
 
-        const blu = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [350, 500, 0], [10, 0], TRANSPARENCY(BLUE_A2, tr));
+        const blu = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [350, 500, 0], [10, 0], TRANSPARENCY(BLUEL[7], tr));
         blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
-        const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_HOT3, tr));
-        const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B2, tr));
-        const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_B3, tr));
-        // const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(PINK2, tr));
-        // const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(RED1, tr));
-        // const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+        const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+        const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        // const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+        // const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+        // const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
 
 
         { // Construct sub-sections
-            var bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-            var pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PINK_240_60_160, tr));
-            var blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUE_10_160_220, tr));
+            var bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+            var pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+            var blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[7], tr));
             var pur_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE, tr));
-            var red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(RED4, tr));
-            var yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_HOT2, tr));
-            var yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOW_240_220_10, tr));
-            var red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(RED2, tr));
-            var yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_B2, tr));
-            var gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B3, tr));
-            var red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PINK3, tr));
-            var yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_COOL2, tr));
-            var gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B2, tr));
-            var ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_C3, tr));
-            var gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B3, tr));
-            var gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY5, tr));
-            var gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY7, tr));
-            var gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-            var gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-            var gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-            var gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-            var vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+            var red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+            var yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+            var yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
+            var red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+            var yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+            var gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+            var red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
+            var yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
+            var gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+            var ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+            var gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+            var gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[5], tr));
+            var gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[7], tr));
+            var gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+            var gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+            var gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+            var gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+            var vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
 
         }
 
@@ -1382,10 +1384,10 @@ function CreateManySectionsWithMenu(scene) {
 
 function CreateSectionedMenuBarsWithNestedSliders(scene) {
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY1, .6))
+    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[1], .6))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
 
-    const menu = Create_widget_menubar(_, 'Widget Menu bar 0', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .6), WHITE, [10, 6]);
+    const menu = Create_widget_menubar(_, 'Widget Menu bar 0', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .6), WHITE, [10, 6]);
     menu.AddCloseButton(_, section, 'x');
     section.AddItem(menu);
 
@@ -1394,9 +1396,9 @@ function CreateSectionedMenuBarsWithNestedSliders(scene) {
 
     {
 
-        const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREEN_140_240_10, .9))
+        const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREEN[7], .9))
 
-        const m = Create_widget_menubar(_, 'Widget Menu bar 1', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+        const m = Create_widget_menubar(_, 'Widget Menu bar 1', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
         m.AddCloseButton(_, s, 'x');
         s.AddItem(m);
 
@@ -1405,9 +1407,9 @@ function CreateSectionedMenuBarsWithNestedSliders(scene) {
         section.AddItem(s);
 
         {
-            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(YELLOW_240_220_10, .9))
+            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(YELLOWR[7], .9))
 
-            const m2 = Create_widget_menubar(_, 'Widget Menu bar 2', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+            const m2 = Create_widget_menubar(_, 'Widget Menu bar 2', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
             m2.AddCloseButton(_, s2, 'x');
             s2.AddItem(m2);
 
@@ -1430,11 +1432,11 @@ function CreateSectionedMenuBarsWithNestedSliders(scene) {
 
 function CreateSectionedMenuBarsWithNestedSliders2(scene) {
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY1, .9))
+    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[1], .9))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-    const menu = Create_widget_menubar(_, 'Widget Menu bar 0', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+    const menu = Create_widget_menubar(_, 'Widget Menu bar 0', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
     menu.AddCloseButton(_, section, 'x');
     section.AddItem(menu);
 
@@ -1443,9 +1445,9 @@ function CreateSectionedMenuBarsWithNestedSliders2(scene) {
 
     {
 
-        const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREEN_140_240_10, .9))
+        const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREEN[7], .9))
 
-        const m = Create_widget_menubar(_, 'Widget Menu bar 1', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+        const m = Create_widget_menubar(_, 'Widget Menu bar 1', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
         m.AddCloseButton(_, s, 'x');
         s.AddItem(m);
 
@@ -1455,9 +1457,9 @@ function CreateSectionedMenuBarsWithNestedSliders2(scene) {
         section.AddItem(s);
 
         {
-            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(YELLOW_240_220_10, .9))
+            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(YELLOWR[7], .9))
 
-            const m2 = Create_widget_menubar(_, 'Widget Menu bar 2', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+            const m2 = Create_widget_menubar(_, 'Widget Menu bar 2', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
             m2.AddCloseButton(_, s2, 'x');
             s2.AddItem(m2);
 
@@ -1466,9 +1468,9 @@ function CreateSectionedMenuBarsWithNestedSliders2(scene) {
 
             s.AddItem(s2);
             {
-                const s3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(YELLOW_240_220_10, .9))
+                const s3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(YELLOWR[7], .9))
 
-                const m3 = Create_widget_menubar(_, 'Widget Menu bar 3', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+                const m3 = Create_widget_menubar(_, 'Widget Menu bar 3', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
                 m3.AddCloseButton(_, s3, 'x');
                 s3.AddItem(m3);
 
@@ -1492,10 +1494,10 @@ function CreateSectionedMenuBarsWithNestedWidgets(scene) {
 
     let cnt = 1;
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY1, .5))
+    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[1], .5))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
 
-    const menu = Create_widget_menubar(_, 'Widget Menu bar 0', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .5), WHITE, [10, 6]);
+    const menu = Create_widget_menubar(_, 'Widget Menu bar 0', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .5), WHITE, [10, 6]);
     menu.AddCloseButton(_, section, 'x');
     menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -1505,9 +1507,9 @@ function CreateSectionedMenuBarsWithNestedWidgets(scene) {
     section.AddItem(slider);
 
     {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY6, .5))
+        const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[6], .5))
 
-        const m = Create_widget_menubar(_, 'Widget Menu bar 1', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .9), WHITE, [10, 6]);
+        const m = Create_widget_menubar(_, 'Widget Menu bar 1', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
         m.AddCloseButton(_, s, 'x');
         m.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         s.AddItem(m);
@@ -1519,9 +1521,9 @@ function CreateSectionedMenuBarsWithNestedWidgets(scene) {
         section.AddItem(s);
 
         {
-            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY6, .5))
+            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[6], .5))
 
-            const m2 = Create_widget_menubar(_, 'Widget Menu bar 2', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .5), WHITE, [10, 6]);
+            const m2 = Create_widget_menubar(_, 'Widget Menu bar 2', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .5), WHITE, [10, 6]);
             m2.AddCloseButton(_, s2, 'x');
             s2.AddItem(m2);
 
@@ -1530,9 +1532,9 @@ function CreateSectionedMenuBarsWithNestedWidgets(scene) {
 
             s.AddItem(s2);
             {
-                const s3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY6, .5))
+                const s3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[6], .5))
 
-                const m3 = Create_widget_menubar(_, 'Widget Menu bar 3', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY1, .5), WHITE, [10, 6]);
+                const m3 = Create_widget_menubar(_, 'Widget Menu bar 3', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .5), WHITE, [10, 6]);
                 m3.AddCloseButton(_, s3, 'x');
                 s3.AddItem(m3);
 
@@ -1540,20 +1542,20 @@ function CreateSectionedMenuBarsWithNestedWidgets(scene) {
                 s3.AddItem(sl3);
 
                 // With buttons
-                const btn = Create_widget_button(_, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _fontsize, GREY1, WHITE, [4, 4], .5);
+                const btn = Create_widget_button(_, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _fontsize, GREY[1], WHITE, [4, 4], .5);
                 s3.AddItem(btn);
 
                 // With switch
-                const switch1 = new Widget_Switch('switch on', 'switch off', [0, 0, 0], _fontsize, GREY1, WHITE, [4, 4], .5);
+                const switch1 = new Widget_Switch('switch on', 'switch off', [0, 0, 0], _fontsize, GREY[1], WHITE, [4, 4], .5);
                 switch1.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
                 switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [6, 6, 3] })
                 switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
                 s3.AddItem(switch1);
 
                 // With dynamic text
-                const dt = Create_widget_multi_text(_, 'Dynamic text', 'value', ALIGN.VERTICAL, [100, 300, 0], _fontsize, BLUE_10_120_220, PINK_240_60_160);
+                const dt = Create_widget_multi_text(_, 'Dynamic text', 'value', ALIGN.VERTICAL, [100, 300, 0], _fontsize, BLUE_10_120_220, PURPLER[7]);
                 dt.CreateNewText('Text 2', _fontsize, PURPLE, [2, 2]);
-                dt.CreateNewText('Text 3', _fontsize, GREEN_60_240_100, [2, 2]);
+                dt.CreateNewText('Text 3', _fontsize, GREEN[7], [2, 2]);
                 dt.CreateNewText('Text 4 very long text', _fontsize, WHITE, [2, 2]);
                 dt.Align_pre(dt, ALIGN.VERTICAL);
                 s3.AddItem(dt);
@@ -1581,7 +1583,7 @@ function CreateMenuBarSectioned(count) {
         const menu_bar = Create_widget_menubar(_, `Menu ${cnt}`, ALIGN.LEFT, [120, posy, 0], [60, 20], BLUE_10_120_220, WHITE, [2, 2], .3);
         menu_bar.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
         menu_bar.SetName(`Menu ${cnt}`)
-        menu_bar.AddCloseButton(_, menu_bar, 'x', [120, posy, 0], 6, GREY1, WHITE, [6, 4], .8, _, [1, 4, 2]);
+        menu_bar.AddCloseButton(_, menu_bar, 'x', [120, posy, 0], 6, GREY[1], WHITE, [6, 4], .8, _, [1, 4, 2]);
         section.AddItem(menu_bar)
         posy -= h; cnt++;
     }
@@ -1593,7 +1595,7 @@ function CreateSectionsSimple(scene) {
 
     const tr = 1.;
 
-    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [200, 200, 0], [10, 100], TRANSPARENCY(BLUE_A2, tr));
+    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [200, 200, 0], [10, 100], TRANSPARENCY(BLUEL[7], tr));
     blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(RED3, tr));
@@ -1620,65 +1622,65 @@ function CreateManySections(scene) {
     const tr = 1.;
     const flags = (SECTION.ITEM_FIT | SECTION.EXPAND);
 
-    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUE_A2, tr));
+    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
     blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     // blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     
-    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(RED1, tr));
+    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
     blu.AddItem(red);
-    const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_B3, tr));
+    const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
     red.AddItem(yel); 
-    const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B2, tr));
+    const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
     yel.AddItem(gre);
-    const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_130_10, tr));
+    const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
     red.AddItem(ora); 
-    const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(BLUE_10_160_220, tr));
+    const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[7], tr));
     red.AddItem(cie);
-    const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+    const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
     cie.AddItem(bla);
-    const bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+    const bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
     red.AddItem(bla_1); 
-    const pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PINK_240_60_160, tr));
+    const pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
     bla_1.AddItem(pin_1); 
-    const blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUE_10_160_220, tr));
+    const blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[7], tr));
     bla_1.AddItem(blu_1);
-    const pur_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE, tr));
+    const pur_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
     yel.AddItem(pur_1); 
-    const red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(RED4, tr));
+    const red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
     gre.AddItem(red_1);
-    const yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOW_240_240_10, tr));
+    const yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
     gre.AddItem(yel_1); 
-    const yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOW_240_220_10, tr));
+    const yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
     ora.AddItem(yel_2); 
-    const red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(RED2, tr));
+    const red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
     yel.AddItem(red_3);
-    const yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_B2, tr));
+    const yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
     cie.AddItem(yel_3); 
-    const gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B3, tr));
+    const gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
     cie.AddItem(gre_3); 
-    const red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PINK3, tr));
+    const red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
     ora.AddItem(red_4); 
-    const yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_COOL2, tr));
+    const yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
     ora.AddItem(yel_4); 
-    const gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B2, tr));
+    const gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
     yel.AddItem(gre_4); 
-    const ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_C3, tr));
+    const ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
     ora.AddItem(ora_4);
-    const gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B3, tr));
+    const gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
     bla.AddItem(gry1_1); 
-    const gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY5, tr));
+    const gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[5], tr));
     bla.AddItem(gry1_2); 
-    const gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY7, tr));
+    const gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[7], tr));
     bla.AddItem(gry1_3);
-    const gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+    const gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
     pin_1.AddItem(gry2_1); 
-    const gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+    const gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
     pin_1.AddItem(gry2_2);
-    const gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+    const gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
     blu_1.AddItem(gry2_3); 
-    const gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+    const gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
     blu_1.AddItem(gry2_4);
-    const vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+    const vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
     gry1_1.AddItem(vert_0);
 
 
@@ -1797,39 +1799,39 @@ function CreateManySectionsWithLabelsAndMinimizer(scene) {
     const tr = 1.;
     const flags = (SECTION.ITEM_FIT | SECTION.EXPAND);
 
-    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [865, 600, 0], [100, 100], TRANSPARENCY(BLUE_A2, tr));
+    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [865, 600, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
 
-    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_HOT3, tr));
-    const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B2, tr));
-    const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_B3, tr));
-    const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(PINK2, tr));
-    const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(RED1, tr));
-    const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+    const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+    const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+    const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+    const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+    const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
 
 
     { // Construct sub-sections
-        var bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PINK_240_60_160, tr));
-        var blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUE_10_160_220, tr));
+        var bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+        var blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[7], tr));
         var pur_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE, tr));
-        var red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(RED4, tr));
-        var yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_HOT2, tr));
-        var yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOW_240_220_10, tr));
-        var red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(RED2, tr));
-        var yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_B2, tr));
-        var gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B3, tr));
-        var red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PINK3, tr));
-        var yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_COOL2, tr));
-        var gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B2, tr));
-        var ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_C3, tr));
-        var gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B3, tr));
-        var gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY5, tr));
-        var gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY7, tr));
-        var gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+        var red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+        var yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+        var yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
+        var red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+        var yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
+        var yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
+        var gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[5], tr));
+        var gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[7], tr));
+        var gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
 
     }
 
@@ -1944,39 +1946,39 @@ function CreateManySectionsWithScroller(scene) {
     const tr = 1.;
     const flags = (SECTION.ITEM_FIT | SECTION.EXPAND);
 
-    const blu = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [350, 500, 0], [10, 0], TRANSPARENCY(BLUE_A2, tr));
+    const blu = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [350, 500, 0], [10, 0], TRANSPARENCY(BLUEL[7], tr));
 
-    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_HOT3, tr));
-    const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B2, tr));
-    const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_B3, tr));
-    const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(PINK2, tr));
-    const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(RED1, tr));
-    const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+    const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+    const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+    const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+    const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+    const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
 
 
     { // Construct sub-sections
-        var bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PINK_240_60_160, tr));
-        var blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUE_10_160_220, tr));
+        var bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+        var blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[7], tr));
         var pur_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE, tr));
-        var red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(RED4, tr));
-        var yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_HOT2, tr));
-        var yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOW_240_220_10, tr));
-        var red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(RED2, tr));
-        var yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_B2, tr));
-        var gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B3, tr));
-        var red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PINK3, tr));
-        var yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE_COOL2, tr));
-        var gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B2, tr));
-        var ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_C3, tr));
-        var gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN_B3, tr));
-        var gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY5, tr));
-        var gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY7, tr));
-        var gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
-        var vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY1, tr));
+        var red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+        var yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+        var yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
+        var red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+        var yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
+        var yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
+        var gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
+        var gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[5], tr));
+        var gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[7], tr));
+        var gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+        var vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
 
     }
 
@@ -2100,8 +2102,8 @@ function CreateScroller(scene) {
     const fontsize = 8;
     const tr = .3;
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [260, 350, 0], [20, 20], TRANSPARENCY(GREY1, 1.));
-    const colors = [RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,];
+    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [260, 350, 0], [20, 20], TRANSPARENCY(GREY[1], 1.));
+    const colors = [RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,];
     const count = colors.length;
 
     for (let i = 0; i < 50; i++) {
@@ -2114,7 +2116,7 @@ function CreateScroller(scene) {
         for (let j = 0; j < 4; j++) {
 
             let rowobj = 0;
-            const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GREY1, .9), `chunk:${chunk} row:${j}`);
+            const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GREY[1], .9), `chunk:${chunk} row:${j}`);
             s.AddItem(s1);
 
             for (let k = 0; k < 7; k++) {
@@ -2179,7 +2181,7 @@ function CreateScroller(scene) {
                 }
                 { // Large text
                     // {
-                    // const dt = Create_widget_multi_text(_, 'Dynamic text', 'value', ALIGN.VERTICAL, [100, 300, 0], 6, BLUE_10_120_220, PINK_240_60_160);
+                    // const dt = Create_widget_multi_text(_, 'Dynamic text', 'value', ALIGN.VERTICAL, [100, 300, 0], 6, BLUE_10_120_220, PURPLER[7]);
                     // dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
                     // dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
                     // dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
@@ -2239,27 +2241,27 @@ function CreateScroller(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, section);
 
     // { // Add more items to the scroller's scrolled section, to debug the correct behavior of the scroller's re-size and reposition.
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [], []);
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
@@ -2271,8 +2273,8 @@ function CreateScrollerManyMeshes(scene) {
 
     const fontsize = 8;
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 450, 0], [20, 20], TRANSPARENCY(GREY1, .6));
-    const colors = [RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,];
+    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 450, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
+    const colors = [RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,];
     const count = colors.length;
 
     for (let i = 0; i < 30; i++) {
@@ -2440,27 +2442,27 @@ function CreateScrollerManyMeshes(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, section);
 
     // { // Add more items to the scroller's scrolled section, to debug the correct behavior of the scroller's re-size and reposition.
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [], []);
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
@@ -2471,27 +2473,27 @@ function CreateScrollerManyMeshes(scene) {
 function CreateScrollerClampAlphaTest(scene) {
 
     const colors = [
-        RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,
+        RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,
         BLUE0, BLUE1, BLUE2, BLUE3, BLUE4, BLUE5, BLUE6, BLUE7, BLUE8, BLUE9,
-        RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,
+        RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,
         BLUE0, BLUE1, BLUE2, BLUE3, BLUE4, BLUE5, BLUE6, BLUE7, BLUE8, BLUE9,
-        RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,
+        RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,
         BLUE0, BLUE1, BLUE2, BLUE3, BLUE4, BLUE5, BLUE6, BLUE7, BLUE8, BLUE9,
-        RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,
+        RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,
         BLUE0, BLUE1, BLUE2, BLUE3, BLUE4, BLUE5, BLUE6, BLUE7, BLUE8, BLUE9,
-        RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,
+        RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,
         BLUE0, BLUE1, BLUE2, BLUE3, BLUE4, BLUE5, BLUE6, BLUE7, BLUE8, BLUE9,
-        RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,
+        RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,
         BLUE0, BLUE1, BLUE2, BLUE3, BLUE4, BLUE5, BLUE6, BLUE7, BLUE8, BLUE9,
-        RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,
+        RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,
         BLUE0, BLUE1, BLUE2, BLUE3, BLUE4, BLUE5, BLUE6, BLUE7, BLUE8, BLUE9,
-        RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,
+        RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,
         BLUE0, BLUE1, BLUE2, BLUE3, BLUE4, BLUE5, BLUE6, BLUE7, BLUE8, BLUE9,
     ];
     const count = colors.length;
     const fontsize = 14;
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY1, .6));
+    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
 
     // const count = 100;
     for (let i = 0; i < count; i++) {
@@ -2543,27 +2545,27 @@ function CreateScrollerClampAlphaTest(scene) {
 
 
     // { // Add more items to the scroller's scrolled section, to debug the correct behavior of the scroller's re-size and reposition.
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [], []);
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_130_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
@@ -2576,15 +2578,15 @@ function CreateClampWidgets(scene) {
 
     const fontsize = 10;
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY1, .6));
+    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
 
     {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY1, .6));
+        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
         section.AddItem(s);
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2592,7 +2594,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2600,7 +2602,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2608,7 +2610,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2616,7 +2618,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2624,12 +2626,12 @@ function CreateClampWidgets(scene) {
     }
 
     {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY1, .6));
+        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
         section.AddItem(s);
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2637,7 +2639,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2645,7 +2647,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2653,7 +2655,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2661,7 +2663,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2669,12 +2671,12 @@ function CreateClampWidgets(scene) {
     }
 
     {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY1, .6));
+        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
         section.AddItem(s);
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2682,7 +2684,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2690,7 +2692,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2698,7 +2700,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2706,7 +2708,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2714,12 +2716,12 @@ function CreateClampWidgets(scene) {
     }
 
     {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY1, .6));
+        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
         section.AddItem(s);
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2727,7 +2729,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2735,7 +2737,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2743,7 +2745,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2751,7 +2753,7 @@ function CreateClampWidgets(scene) {
         {
             const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
             s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY1, WHITE, [4, 4], .5)
+            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
             s.AddItem(text);
             const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
             s.AddItem(label);
@@ -2793,8 +2795,8 @@ function CreateScrollerWithWidgets(scene) {
 
     const fontsize = 8;
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [120, 450, 0], [20, 20], TRANSPARENCY(GREY1, .6));
-    const colors = [RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9,];
+    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [120, 450, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
+    const colors = [RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,];
     let cnt = 0;
 
     // {
@@ -2814,7 +2816,7 @@ function CreateScrollerWithWidgets(scene) {
     //     section.AddItem(s);
     // }
     {
-        const s = Create_widget_dropdown(_, 'DropDown 1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, RED_200_10_10, WHITE);
+        const s = Create_widget_dropdown(_, 'DropDown 1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], REDL[7], WHITE);
         // // s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
         s.CreateClickEvent();
         // Dropdown_roots_set_root(s, s); // If dropdown does not  
@@ -2824,7 +2826,7 @@ function CreateScrollerWithWidgets(scene) {
             s.AddToMenu(s1);
         }
         {
-            const s1 = Create_widget_dropdown(_, 'DropDown 1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY1, RED_200_10_10, WHITE);
+            const s1 = Create_widget_dropdown(_, 'DropDown 1', [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], REDL[7], WHITE);
             s.AddToMenu(s1);
             {
                 const s2 = Create_widget_slider(_, [200, 100, 0], [150, 10])
@@ -2861,12 +2863,12 @@ function Help(scene) {
     const flags = (SECTION.ITEM_FIT);
 
     //options, margin, pos, dim, col, name
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [VIEWPORT.RIGHT - 230, VIEWPORT.BOTTOM - 340, 0], [100, 100], TRANSPARENCY(GREY1, .8));
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [VIEWPORT.RIGHT - 230, VIEWPORT.BOTTOM - 340, 0], [100, 100], TRANSPARENCY(GREY[1], .8));
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.SetName('Help section')
 
     // scene.StoreMesh(section)
-    const s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 10], [220, 400, 0], [0, 0], TRANSPARENCY(GREY3, .6));
+    const s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 10], [220, 400, 0], [0, 0], TRANSPARENCY(GREY[3], .6));
     s1.SetName('Help section 2')
 
     let msgs = [];
@@ -2874,7 +2876,7 @@ function Help(scene) {
 
         msgs[i] = '\"' + DEBUG_PRINT_KEYS[i].key + '\": ' + DEBUG_PRINT_KEYS[i].discr
 
-        const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 10, TRANSPARENCY(GREY1, .4), WHITE, [7, 3], .5, [0, 4, 3])
+        const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 10, TRANSPARENCY(GREY[1], .4), WHITE, [7, 3], .5, [0, 4, 3])
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         s1.AddItem(label)
@@ -2909,12 +2911,12 @@ function Help2(scene) {
     const flags = (SECTION.ITEM_FIT);
 
     //options, margin, pos, dim, col, name
-    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [VIEWPORT.RIGHT - 230, VIEWPORT.BOTTOM - 340, 0], [100, 100], TRANSPARENCY(RED, .2));
+    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [VIEWPORT.RIGHT - 230, VIEWPORT.BOTTOM - 340, 0], [100, 100], TRANSPARENCY(REDL, .2));
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.SetName('Help section')
 
     // scene.StoreMesh(section)
-    const s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 10], [220, 400, 0], [0, 0], TRANSPARENCY(GREY1, .2));
+    const s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 10], [220, 400, 0], [0, 0], TRANSPARENCY(GREY[1], .2));
     s1.SetName('Help section 2')
 
     let msgs = [];
@@ -2922,7 +2924,7 @@ function Help2(scene) {
 
         msgs[i] = '\"' + DEBUG_PRINT_KEYS[i].key + '\": ' + DEBUG_PRINT_KEYS[i].discr
 
-        const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 10, TRANSPARENCY(ORANGE_240_130_10, 1.0), WHITE, [7, 3], .5, [0, 4, 3])
+        const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 10, TRANSPARENCY(ORANGE_240_160_10, 1.0), WHITE, [7, 3], .5, [0, 4, 3])
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         s1.AddItem(label)
@@ -2956,19 +2958,19 @@ function MeshInfo(scene) {
     const fontsize = 9;
     const pad = [4, 0];
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], [880, 130, 100], [0, 0], TRANSPARENCY(GREY1, .9), 'MeshInfoUiTip');
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], [880, 130, 100], [0, 0], TRANSPARENCY(GREY[1], .9), 'MeshInfoUiTip');
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.ConstructListeners();
 
     // section.root_bufferidx = Widget_root_create_root(section.mesh_bufferidx);
 
-    const infomesh = Create_widget_multi_text(_, 'Mesh name 000000000000', ALIGN.VERTICAL, [420, 15, 100], fontsize, GREEN_140_240_10, YELLOW_240_220_10, pad, .4);
+    const infomesh = Create_widget_multi_text(_, 'Mesh name 000000000000', ALIGN.VERTICAL, [420, 15, 100], fontsize, GREEN[7], YELLOWR[7], pad, .4);
     section.AddItem(infomesh);
     infomesh.CreateNewText('id:000', fontsize, BLUE_10_120_220, pad, .9);
     infomesh.CreateNewText('pos: 0000,0000,0', fontsize, BLUE_10_120_220, pad, .9);
     infomesh.CreateNewText('dim: 0000,0000', fontsize, BLUE_10_120_220, pad, .9);
-    infomesh.CreateNewText('idx: 0000, alpha: 0.00', fontsize, ORANGE_240_130_10, pad, .9);
+    infomesh.CreateNewText('idx: 0000, alpha: 0.00', fontsize, ORANGE_240_160_10, pad, .9);
     infomesh.CreateNewText('gfx: group: 0, prog:0, vb:0, start:00000', fontsize, BLUE_10_120_220, pad, .9);
     infomesh.CreateNewText('HOVERED: name: 123456789, id:12', fontsize, BLUE_10_120_220, pad, .9);
     infomesh.CreateNewText('FOCUSED: name: 123456789, id:12', fontsize, BLUE_10_120_220, pad, .9);
@@ -3049,7 +3051,7 @@ function MeshInfoUpdate(params) {
         // Create info for any text gfx, if exists
         const child = (infoMesh.children.boundary && infoMesh.children.buffer[0]) ? infoMesh.children.buffer[0] : null;
         if (child) {
-            if (child.type & MESH_TYPES_DBG.FONT_MATERIAL) { // Plain text
+            if (child.type & MESH_TYPE.FONT_MATERIAL) { // Plain text
 
                 const text_num_faces = (child.text_mesh) ? child.text_mesh.geom.num_faces : child.geom.num_faces; // If child is of type label and has 'text_mesh' else is plain text.
 
@@ -3091,19 +3093,18 @@ function Menu_labels_switches(scene) {
 
     const flags = (SECTION.ITEM_FIT);
 
-    const section = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [120, 300, 0], [0, 0], TRANSPARENCY(GREY1, .2));
-    const s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 2], [220, 400, 0], [0, 0], TRANSPARENCY(GREY1, .2));
-    const s2 = Create_widget_section(_, SECTION.VERTICAL, [7, 2], [220, 400, 0], [0, 0], TRANSPARENCY(GREY1, .3));
+    const section = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [120, 300, 0], [0, 0], TRANSPARENCY(GREY[1], .2));
+    const s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 2], [220, 400, 0], [0, 0], TRANSPARENCY(GREY[1], .2));
+    const s2 = Create_widget_section(_, SECTION.VERTICAL, [7, 2], [220, 400, 0], [0, 0], TRANSPARENCY(GREY[1], .3));
 
-    // const label1 = Create_widget_label(_, 'options 1', [400, 700, 0], 4, TRANSPARENT, WHITE, [1,1], [7,6], .5, undefined, [0,4,1])
-    const label1 = Create_widget_label(_, 'options 1', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(GREY1, .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
-    const label2 = Create_widget_label(_, 'options 2', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 700, 0], 4, TRANSPARENCY(GREY1, .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
-    const label3 = Create_widget_label(_, 'options 3', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 700, 0], 4, TRANSPARENCY(GREY1, .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
-    const label4 = Create_widget_label(_, 'options 4', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 700, 0], 4, TRANSPARENCY(GREY1, .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
+    const label1 = Create_widget_label(_, 'options 1', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
+    const label2 = Create_widget_label(_, 'options 2', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
+    const label3 = Create_widget_label(_, 'options 3', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
+    const label4 = Create_widget_label(_, 'options 4', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
 
-    const switch1 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(GREY1, .0), WHITE, [4, 6], .5, undefined, [2, 8, 1]);
-    const switch2 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(GREY1, .0), WHITE, [4, 6], .5, undefined, [2, 8, 1]);
-    const switch3 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(GREY1, .0), WHITE, [4, 6], .5, undefined, [2, 8, 1]);
+    const switch1 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [4, 6], .5, undefined, [2, 8, 1]);
+    const switch2 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [4, 6], .5, undefined, [2, 8, 1]);
+    const switch3 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [4, 6], .5, undefined, [2, 8, 1]);
     const switch4 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(BLUE_10_120_220, .2), WHITE, [4, 6], .5, undefined, [2, 4, 1]);
 
     s1.AddItem(label1, flags)
@@ -3142,7 +3143,7 @@ function CreateStyledRects(scene) {
 
     {
         const geom = new Geometry2D([100, 420, 0], [50, 50]);
-        const mat = new Material(ORANGE_240_130_10);
+        const mat = new Material(ORANGE_240_160_10);
 
         const mesh = new Mesh(geom, mat);
         mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -3153,8 +3154,8 @@ function CreateStyledRects(scene) {
     }
     {
         const geom = new Geometry2D([204, 420, 0], [50, 50]);
-        const mat = new Material(PINK_240_60_160);
-        mat.col = PINK_240_60_160;
+        const mat = new Material(PURPLER[7]);
+        mat.col = PURPLER[7];
         const mesh = new Mesh(geom, mat);
         mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
         mesh.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
@@ -3164,7 +3165,7 @@ function CreateStyledRects(scene) {
     }
     {
         const geom = new Geometry2D([308, 420, 0], [50, 50]);
-        const mat = new Material(GREEN_60_240_100);
+        const mat = new Material(GREEN[7]);
         const mesh = new Mesh(geom, mat);
         mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
         mesh.SetStyle([10, 15, 3]);
@@ -3183,7 +3184,7 @@ function CreateStyledRects(scene) {
         mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         mesh.SetStyle([25, 15, 3]);
         scene.AddMesh(mesh);
-        mesh.SetColor(ORANGE_240_130_10);
+        mesh.SetColor(ORANGE_240_160_10);
     }
 }
 

@@ -38,7 +38,7 @@ export class Geometry2D {
         this.zIndex = this.pos[2];  // Store default z index value. 
 
         this.num_faces = 1;
-        this.type |= MESH_TYPES_DBG.GEOMETRY2D;
+        this.type |= MESH_TYPE.GEOMETRY2D;
 
 
         /** Debug properties */
@@ -193,7 +193,7 @@ export class Geometry3D {
         math.CopyArr3(this.scale, scale);
         this.zIndex = this.pos[2]; // Store default z index value. 
 
-        this.type |= MESH_TYPES_DBG.GEOMETRY3D;
+        this.type |= MESH_TYPE.GEOMETRY3D;
 
         /** Debug properties */
         if (DEBUG.GEOMETRY) {

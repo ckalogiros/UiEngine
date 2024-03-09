@@ -1,13 +1,14 @@
 import { M_Buffer } from "../scripts/Engine/Core/Buffers";
 import { Create_widget_multi_text, Create_widget_section } from "../scripts/Engine/Core/CreateWidget";
 import { Mesh_buffer_get } from "../scripts/Engine/Core/MeshBuffer";
+import { GREY, ORANGE_240_160_10 } from "../scripts/Engine/Drawables/Material/Base/Colors";
 import { PerformanceTimersGetBestFps, PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, _pt_test_misc_1, _pt_test_misc_2, _pt_test_misc_3, _pt_test_misc_4 } from "../scripts/Engine/Timers/PerformanceTimers";
 
 
 
 export function Create_read_write_test() {
 
-   const section = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [400, 500, 0], [0, 0], TRANSPARENCY(GREY1, .8), 'ui performance timers panel');
+   const section = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [400, 500, 0], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui performance timers panel');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('InfoUi-PerformanceTimers section');
 
@@ -21,21 +22,21 @@ export function Create_read_write_test() {
       const fontsize = 8;
       const pad = 0;
 
-      const ui = Create_widget_multi_text(_, 'Test:read-write: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY7, .5);
+      const ui = Create_widget_multi_text(_, 'Test:read-write: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY[7], .5);
       section.AddItem(ui);
 
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [pad * 3, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write avg`, ms, PerformanceTimersGetFps, timer1); // idx is for use in creating separate time intervals for each dynamic text.
 
-      ui.CreateNewText('| avg_1sec:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| avg_1sec:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_test_misc_1)
 
-      ui.CreateNewText('| best:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| best:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write best`, ms, PerformanceTimersGetBestFps, timer1)
 
-      ui.CreateNewText('| worst:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| worst:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write worst`, ms, PerformanceTimersGetWorstFps, timer1)
 
@@ -45,21 +46,21 @@ export function Create_read_write_test() {
       const fontsize = 8;
       const pad = 0;
 
-      const ui = Create_widget_multi_text(_, 'Test:readwrite2: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY7, .5);
+      const ui = Create_widget_multi_text(_, 'Test:readwrite2: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY[7], .5);
       section.AddItem(ui);
 
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [pad * 3, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 avg`, ms, PerformanceTimersGetFps, timer2); // idx is for use in creating separate time intervals for each dynamic text.
 
-      ui.CreateNewText('| avg_1sec:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| avg_1sec:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_test_misc_2)
 
-      ui.CreateNewText('| best:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| best:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 best`, ms, PerformanceTimersGetBestFps, timer2)
 
-      ui.CreateNewText('| worst:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| worst:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 worst`, ms, PerformanceTimersGetWorstFps, timer2)
 
@@ -69,21 +70,21 @@ export function Create_read_write_test() {
    //    const fontsize = 8;
    //    const pad = 0;
 
-   //    const ui = Create_widget_multi_text(_, 'Test:readwrite4: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY7, .5);
+   //    const ui = Create_widget_multi_text(_, 'Test:readwrite4: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY[7], .5);
    //    section.AddItem(ui);
 
    //    ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [pad * 3, 0], .9);
    //    ui.SetDynamicText(`ms${ms} Test:read-write2 avg`, ms, PerformanceTimersGetFps, timer4); // idx is for use in creating separate time intervals for each dynamic text.
 
-   //    ui.CreateNewText('| avg_1sec:', fontsize, GREY7, [pad * 3, 0], .9);
+   //    ui.CreateNewText('| avg_1sec:', fontsize, GREY[7], [pad * 3, 0], .9);
    //    ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
    //    ui.SetDynamicText(`ms${ms} Test:read-write2 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_test_misc_4)
 
-   //    ui.CreateNewText('| best:', fontsize, GREY7, [pad * 3, 0], .9);
+   //    ui.CreateNewText('| best:', fontsize, GREY[7], [pad * 3, 0], .9);
    //    ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
    //    ui.SetDynamicText(`ms${ms} Test:read-write2 best`, ms, PerformanceTimersGetBestFps, timer4)
 
-   //    ui.CreateNewText('| worst:', fontsize, GREY7, [pad * 3, 0], .9);
+   //    ui.CreateNewText('| worst:', fontsize, GREY[7], [pad * 3, 0], .9);
    //    ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
    //    ui.SetDynamicText(`ms${ms} Test:read-write2 worst`, ms, PerformanceTimersGetWorstFps, timer4)
 
@@ -93,21 +94,21 @@ export function Create_read_write_test() {
       const fontsize = 8;
       const pad = 0;
 
-      const ui = Create_widget_multi_text(_, 'Test:readwrite3: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY7, .5);
+      const ui = Create_widget_multi_text(_, 'Test:readwrite3: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY[7], .5);
       section.AddItem(ui);
 
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [pad * 3, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 avg`, ms, PerformanceTimersGetFps, timer3); // idx is for use in creating separate time intervals for each dynamic text.
 
-      ui.CreateNewText('| avg_1sec:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| avg_1sec:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_test_misc_3)
 
-      ui.CreateNewText('| best:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| best:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 best`, ms, PerformanceTimersGetBestFps, timer3)
 
-      ui.CreateNewText('| worst:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| worst:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 worst`, ms, PerformanceTimersGetWorstFps, timer3)
 
@@ -117,21 +118,21 @@ export function Create_read_write_test() {
       const fontsize = 8;
       const pad = 0;
 
-      const ui = Create_widget_multi_text(_, 'Test:readwrite4: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY7, .5);
+      const ui = Create_widget_multi_text(_, 'Test:readwrite4: | avg:', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, GREY[7], .5);
       section.AddItem(ui);
 
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [pad * 3, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 avg`, ms, PerformanceTimersGetFps, timer4); // idx is for use in creating separate time intervals for each dynamic text.
 
-      ui.CreateNewText('| avg_1sec:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| avg_1sec:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_test_misc_4)
 
-      ui.CreateNewText('| best:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| best:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 best`, ms, PerformanceTimersGetBestFps, timer4)
 
-      ui.CreateNewText('| worst:', fontsize, GREY7, [pad * 3, 0], .9);
+      ui.CreateNewText('| worst:', fontsize, GREY[7], [pad * 3, 0], .9);
       ui.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       ui.SetDynamicText(`ms${ms} Test:read-write2 worst`, ms, PerformanceTimersGetWorstFps, timer4)
 

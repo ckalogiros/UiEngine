@@ -11,6 +11,7 @@ import { TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Create_widget_close_btn, Create_widget_minimize_btn } from "../../Core/CreateWidget.js";
 import { Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
+import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
 
@@ -21,7 +22,7 @@ export class Widget_Menu_Bar extends Widget_Label {
    minimize_btn_idx;
 
    // UNUSED: The align param is unused from the Widget_Label class
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, align, pos, col = GREY3, text_col = WHITE, pad = [14, 6], bold = .4, style = [2, 5, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, align, pos, col = GREY[3], text_col = WHITE, pad = [14, 6], bold = .4, style = [2, 5, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, align, pos, _fontsize, col, text_col, pad, bold, font, style);
       
@@ -32,7 +33,7 @@ export class Widget_Menu_Bar extends Widget_Label {
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle(style);
       this.SetName('Widget_Menu_Bar');
-      this.type |= MESH_TYPES_DBG.WIDGET_MENU_BAR;
+      this.type |= MESH_TYPE.WIDGET_MENU_BAR;
 
       this.close_btn_idx = INT_NULL;
       this.minimize_btn_idx = INT_NULL;
@@ -40,7 +41,7 @@ export class Widget_Menu_Bar extends Widget_Label {
    }
 
 
-   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize=0, col=GREY3, text_col=WHITE, pad=[4, 2], bold=.4, style=[6, 5, 3], font=TEXTURES.MSDF_CONSOLAS_1024) {
+   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize=0, col=GREY[3], text_col=WHITE, pad=[4, 2], bold=.4, style=[6, 5, 3], font=TEXTURES.MSDF_CONSOLAS_1024) {
 
       if (!fontsize) fontsize = this.text_mesh.geom.dim[0];
 
@@ -65,7 +66,7 @@ export class Widget_Menu_Bar extends Widget_Label {
    }
 
 
-   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize=0, col = GREY3, text_col = WHITE, pad = [4, 2], bold = .4, font = TEXTURES.MSDF_CONSOLAS_1024, style = [6, 5, 3]) {
+   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize=0, col = GREY[3], text_col = WHITE, pad = [4, 2], bold = .4, font = TEXTURES.MSDF_CONSOLAS_1024, style = [6, 5, 3]) {
 
       if (!fontsize) fontsize = this.text_mesh.geom.dim[0];
       let pos = [100,200,0]
@@ -190,8 +191,6 @@ export class Widget_Menu_Bar extends Widget_Label {
       // Move menu widget
       const mouse_pos = MouseGetPosDif();
       menu.geom.MoveXY(mouse_pos.x, -mouse_pos.y, menu.gfx);
-		// Batch_store(menu, BATCH_TYPE.MOVE, [x,y]);
-		// Batch_store(text_mesh, BATCH_TYPE.MOVE, [x,y]);
 
 
       // Move menu children widgets(close/minimize buttons)
@@ -200,8 +199,6 @@ export class Widget_Menu_Bar extends Widget_Label {
          const widget_child = menu.children.buffer[i];
          widget_child.geom.MoveXY(mouse_pos.x, -mouse_pos.y, widget_child.gfx)
          widget_child.text_mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, widget_child.text_mesh.gfx)
-         // Batch_store(widget_child, BATCH_TYPE.MOVE, [x,y]);
-         // Batch_store(widget_child.text_mesh, BATCH_TYPE.MOVE, [x,y]);
       }
 
    }
@@ -304,8 +301,6 @@ export class Widget_Menu_Bar extends Widget_Label {
       // Move 'this' text
       this.geom.MoveXY(x, y, this.gfx);
       this.text_mesh.geom.MoveXY(x, y, this.text_mesh.gfx);
-		// Batch_store(this, BATCH_TYPE.MOVE, [x,y]);
-		// Batch_store(this.text_mesh, BATCH_TYPE.MOVE, [x,y]);
       
       // Move menu children widgets(close/minimize buttons)
       for (let i = 0; i < this.children.boundary; i++) {
@@ -313,10 +308,6 @@ export class Widget_Menu_Bar extends Widget_Label {
          const child = this.children.buffer[i];
          child.geom.MoveXY(x, y, child.gfx);
          child.text_mesh.geom.MoveXY(x, y, child.text_mesh.gfx);
-         // widget_child.MoveXY(x, y, widget_child.gfx);
-         // widget_child.text_mesh.MoveXY(x, y, widget_child.gfx);
-         // Batch_store(widget_child, BATCH_TYPE.MOVE, [x,y]);
-         // Batch_store(widget_child.text_mesh, BATCH_TYPE.MOVE, [x,y]);
       }
    }
 
@@ -325,7 +316,7 @@ export class Widget_Menu_Bar extends Widget_Label {
 
 export class Close_Button extends Widget_Button {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY3, text_col = WHITE, pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE, pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, pad, bold, style, font);
 
@@ -378,7 +369,7 @@ export class Widget_Minimize extends Widget_Button {
    stored_children_meshes; // Store all children meshes of the root, to maximize the widget back to normal. 
    stored_children_events; // Store the 'children' buffer of the roots EventListeners (class).
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY3, text_col, pad = [6, 2], bold = .5, style = [0, 4, 1.8], font) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = [0, 4, 1.8], font) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, '- minimize', ALIGN.RIGHT, pos, fontsize, col, text_col, pad, bold, style, font);
 

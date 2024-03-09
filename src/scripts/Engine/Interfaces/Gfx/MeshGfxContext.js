@@ -10,6 +10,7 @@ import { M_Buffer } from "../../Core/Buffers.js";
 import { Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
+import { UBO_SetUniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 
 
 
@@ -364,6 +365,8 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
          Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx);
 
          Scene_set_projection_matrix(sceneidx)
+
+         UBO_SetUniform(UBS.RESOLUTION_LOC, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
 
          
       }

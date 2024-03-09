@@ -9,6 +9,7 @@ import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Texture_Material } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { WHITE } from "../Material/Base/Colors.js";
 
 
 
@@ -21,7 +22,7 @@ export class Textured_Mesh extends Mesh {
 
       super(geom, mat);
       this.SetName(name);
-      this.type |= MESH_TYPES_DBG.TEXT_MESH;
+      this.type |= MESH_TYPE.TEXT_MESH;
 
    }
 
@@ -161,14 +162,7 @@ export class Textured_Mesh extends Mesh {
       const mouse_pos = MouseGetPosDif();
 
       mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, mesh.gfx);
-      // Batch_store(mesh, BATCH_TYPE.MOVE, [mouse_pos.x, -mouse_pos.y]);
 
-      // HACK: temporarely use the move to change the uv coordinates
-      // mesh.mat.uv[0] += -mouse_pos.x *.001;
-      // mesh.mat.uv[1] += -mouse_pos.x *.001;
-      // mesh.mat.uv[2] += mouse_pos.y  *.001;
-      // mesh.mat.uv[3] += mouse_pos.y  *.001;
-      // Gl_set_uv(mesh.gfx, mesh.mat.uv);
    }
 
 

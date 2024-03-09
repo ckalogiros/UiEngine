@@ -9,6 +9,13 @@ const gfxCtx = {
     ext: null,
 };
 
+
+
+
+
+
+
+
 const GL = {
     BOUND_PROG_IDX: INT_NULL, // The current bound gl program index
     BOUND_PROG: INT_NULL, // The current bound gl program 
@@ -23,18 +30,23 @@ const GL = {
 
 
 
-_cnt = 0x1;
+
+
+
+
+
+_CNT = 0x1;
 /** Grouping shader programs. Example: group for debug user interface meshes, default group meshes */
 const PROGRAMS_GROUPS = {
 
     DEBUG: {
         IDX: INT_NULL, // The index of the group of programs dedicated for displaing debug info. 
-        MASK: _cnt,
+        MASK: _CNT,
     },
 
     DEFAULT: {
         IDX: INT_NULL, // The default group stores shader programs for 
-        MASK: _cnt <<= 0x1,
+        MASK: _CNT <<= 0x1,
     },
 
     // SIZE: 2,
@@ -50,6 +62,12 @@ const PROGRAMS_GROUPS = {
         else return `UNKOWN progs group index. index:${idx}`
     },
 }
+
+
+
+
+
+
 
 
 /**
@@ -146,15 +164,13 @@ const SID = {
         return false;
     },
 
-    // Copy(sid) {
-    //     this.shad = sid.shad;
-    //     this.attr = sid.attr;
-    //     this.unif = sid.unif;
-    //     this.pass = sid.pass;
-    //     this.pass = sid.pass;
-    //     this.progs_group = this.progs_group
-    // },
 };
+
+
+
+
+
+
 
 
 const GRAPHICS_LAYOUT = {
@@ -176,6 +192,12 @@ const GRAPHICS_LAYOUT = {
         WPOS4_TIME: 3, // The second attribute in a WPOS-X
     },
 };
+
+
+
+
+
+
 
 
 // TODO: Create a smaller buffer that ca resize its self
@@ -203,22 +225,28 @@ const V_BORDER_WIDTH_STRIDE = 1;
 const V_BORDER_FEATHER_STRIDE = 2;
 
 
-_cnt = 0x1;
+
+
+
+
+
+
+_CNT = 0x1;
 const MESH_ENABLE = {
 
     GFX: {
 
         UNIF_RESOLUTION: 1,
-        UNIF_TIMER: _cnt <<= 1,
-        ATTR_TIME: _cnt <<= 1,
-        ATTR_STYLE: _cnt <<= 1,
+        UNIF_TIMER: _CNT <<= 1,
+        ATTR_TIME: _CNT <<= 1,
+        ATTR_STYLE: _CNT <<= 1,
 
         // Pass from vertex to fragment shader
-        PASS_COL4: _cnt <<= 1,
-        PASS_WPOS2: _cnt <<= 1,
-        PASS_DIM2: _cnt <<= 1,
-        PASS_TIME1: _cnt <<= 1,
-        PASS_RES2: _cnt <<= 1,
+        PASS_COL4: _CNT <<= 1,
+        PASS_WPOS2: _CNT <<= 1,
+        PASS_DIM2: _CNT <<= 1,
+        PASS_TIME1: _CNT <<= 1,
+        PASS_RES2: _CNT <<= 1,
 
 
         NONE: 0,
@@ -226,23 +254,29 @@ const MESH_ENABLE = {
 }
 
 
-_cnt = 0x1;
+
+
+
+
+
+
+_CNT = 0x1;
 const GFX_CTX_FLAGS = {
 
     // Let the application decide a vertex buffer with the same shader id(sid)
-    ANY: _cnt <<= 0x1, // SID exists, it will use it, else it will create a new one.
-    NEW: _cnt <<= 0x1, // Create a new vertexBuffer.
-    SPECIFIC: _cnt <<= 0x1, // Use specific index of a vertex buffer.
+    ANY: _CNT <<= 0x1, // SID exists, it will use it, else it will create a new one.
+    NEW: _CNT <<= 0x1, // Create a new vertexBuffer.
+    SPECIFIC: _CNT <<= 0x1, // Use specific index of a vertex buffer.
     // Use private vertex buffer. If a private and inactive buffer exists it will use that, ...
-    PRIVATE: _cnt <<= 0x1, // ... else it will create a new buffer and render it as private
+    PRIVATE: _CNT <<= 0x1, // ... else it will create a new buffer and render it as private
 
-    CHILDEN: _cnt <<= 0x1, // Choose the first match (sid match) from mesh'a children.
-    SIBLINGS: _cnt <<= 0x1, // Choose the first match (sid match) from mesh's siblings.
-    PARENT: _cnt <<= 0x1, // Choose the first match (sid match) from mesh's parent.
-    PARENT_ASC: _cnt <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
+    CHILDEN: _CNT <<= 0x1, // Choose the first match (sid match) from mesh'a children.
+    SIBLINGS: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's siblings.
+    PARENT: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent.
+    PARENT_ASC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
 
-    STATIC: _cnt <<= 0x1, // Choose a buffer that is going to be updated rarely
-    DYNAMIC: _cnt <<= 0x1, // Choose a buffer that is going to be updated every frame
+    STATIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated rarely
+    DYNAMIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated every frame
 };
 
 
@@ -250,11 +284,13 @@ const GFX_CTX_FLAGS = {
 
 
 
-_cnt = 0x1;
+
+
+_CNT = 0x1;
 const BUFFER_STATE = {
-    SHOW: _cnt,
-    NEEDS_UPDATE: _cnt <<= 0x1,
-    IS_PRIVATE: _cnt <<= 0x1,
+    SHOW: _CNT,
+    NEEDS_UPDATE: _CNT <<= 0x1,
+    IS_PRIVATE: _CNT <<= 0x1,
     // show = false;
     // needsUpdate = false;
     // hasChanged = false;
@@ -265,32 +301,36 @@ const BUFFER_STATE = {
 
 
 
-_cnt = 0x1;
+
+
+
+
+_CNT = 0x1;
 const BUFFER_TYPE = {
 
-    FLOAT32: _cnt,
-    UINT16: _cnt <<= 0x1,
+    FLOAT32: _CNT,
+    UINT16: _CNT <<= 0x1,
 
 }
 
 
 
-_cnt = 0x1;
+
+
+
+
+
+_CNT = 0x1;
 const PROGRAM_STATE = {
-    ACTIVE: _cnt, // UNNECESSARY: Possibly has no usefuleness
-    UNIFORMS_NEED_UPDATE: _cnt <<= 0x1,
-    // NEEDS_UPDATE: _cnt <<= 0x1,
+    ACTIVE: _CNT, // UNNECESSARY: Possibly has no usefuleness
+    UNIFORMS_NEED_UPDATE: _CNT <<= 0x1,
+    // NEEDS_UPDATE: _CNT <<= 0x1,
 };
 
 
 
 
-// Temporary counters to automaticaly calculate indexes
-let cnt1 = 0;
-let cnt2 = 0;
-let cnt3 = 0;
-let cnt4 = 0;
-let cntPart = 0;
+
 
 
 
@@ -311,6 +351,12 @@ const Texture = {
     // to which texture is bound.
     boundTexture: -1,
 };
+
+
+
+
+
+
 
 
 const UNIF_TYPE = {
@@ -336,6 +382,10 @@ const UNIF_TYPE = {
 
 
 
+
+
+
+
 /*************************************************************************************************/
 // Graphics Constants
 
@@ -344,6 +394,13 @@ const TRIG = {
     SIN: 0,
 
 };
+
+
+
+
+
+
+
 
 /*************************************************************************************************/
 // Framebuffer
@@ -359,6 +416,12 @@ const FB = {
         idx: INT_NULL, // The index of the dynamic frambuffer in the "_fb_buffer" at GlFramebuffer.js file. Should be set manualy.
     },
 }
+
+
+
+
+
+
 
 
 /** Rotation Matrices */
@@ -417,6 +480,13 @@ class ROTATION3D {
     }
 }
 
+
+
+
+
+
+
+
 const ROT3D = new ROTATION3D();
 
 const RX3D = [
@@ -424,11 +494,26 @@ const RX3D = [
     0, TRIG.COS, -TRIG.SIN,
     0, TRIG.SIN, TRIG.COS,
 ];
+
+
+
+
+
+
+
 const RY3D = [
     TRIG.COS, 0, TRIG.SIN,
     0, 1, 0,
     -TRIG.SIN, 0, TRIG.COS,
 ];
+
+
+
+
+
+
+
+
 const RZ3D = [
     TRIG.COS, -TRIG.SIN, 0,
     TRIG.SIN, TRIG.COS, 0,

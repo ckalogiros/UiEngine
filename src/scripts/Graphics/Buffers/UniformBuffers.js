@@ -144,12 +144,19 @@ export class UniformsBuffer {
 }
 
 
+const ERROR_UBS = `
+1. Is the SID.UNIF.XXX enabled in meshes sid.unif?
+2. Is the UBS.XXX_LOC index set?
+3. Check the ShaderBuilder.
+4. Check all parameters an offsets passed to .AddLayout().`
+
 
 export class BufferLayout {
 
    constructor() {
 
       this.buffer = null;
+      this.buffer_size = 0;
       this.layout = {
          locs: [],
          sizes: [],
@@ -161,14 +168,28 @@ export class BufferLayout {
 
       const size = TYPES.GetSizeInBytes(type, typeid) / FLOAT32_BYTE_SIZE;
 
+      // Every time
+
       // Initialize
       if (!this.buffer) {
          this.buffer = new Float32Array(size);
+         this.buffer_size += size;
+      }
+      else { // Resize buffer to the new size
+         this.buffer_size += size;
+         const old_buffer = this.buffer;
+         this.buffer = new Float32Array(this.buffer_size);
+
+         const old_len = old_buffer.length;
+         for (let i = 0; i < old_len; i++) {
+            this.buffer[i] = old_buffer[i];
+         }
       }
 
       this.layout.sizes.push(size);
       this.layout.names.push(name);
 
+      // Create and return the index of the location of the new layout.
       const len = this.layout.locs.length;
       if (len === 0) {
          const locidx = this.layout.locs.push(0) - 1;
@@ -191,7 +212,7 @@ export class BufferLayout {
       const size = this.layout.sizes[locidx];
 
       const len = val.length;
-      if (len !== size) { console.error('Size mismatch'); alert('SEE console error. Size mismatch'); }
+      if (len !== size) { console.error('Uniform Shared Block. location idx:', locidx, '\nERROR MSG:', ERROR_UBS); alert('SEE console error. Size mismatch'); }
 
       let cnt = start;
       for (let i = 0; i < len; i++) {
@@ -204,29 +225,26 @@ export class BufferLayout {
 
 
 
-const _uniform_shared_block = {
-   block: null,
-   gl_layout: null,
-   needsUpdate: false,
-};
+let _uniform_shared_block = null;
+
+
 
 export function UBO_SetUniform(uniform_locidx, val) {
-   _uniform_shared_block.block.SetVal(uniform_locidx, val);
+   _uniform_shared_block.SetVal(uniform_locidx, val);
    _uniform_shared_block.needsUpdate = true;
 }
 
 
 
+
+
 let ubs_counter = 0;
-
-
 export class UniformsSharedBlock {
 
-   constructor(gl, program, uniform_block_name, progidx) {
+   constructor(gl, program, uniform_block_name) {
 
       this.binding_index = ubs_counter++;
       this.name = uniform_block_name;
-      this.progidx = progidx;
 
       this.loc = gl.getUniformBlockIndex(program, uniform_block_name);
       gl.uniformBlockBinding(program, this.loc, this.binding_index);
@@ -234,37 +252,103 @@ export class UniformsSharedBlock {
       this.glbuffer = gl.createBuffer();
       gl.bindBufferBase(gl.UNIFORM_BUFFER, this.binding_index, this.glbuffer);
 
+      this.buffer = null;
+      this.buffer_size = 0;
+      this.layout = {
+         locs: [],
+         sizes: [],
+         names: [],
+      }
+
+      this.needsUpdate = false;
+
+   }
+
+
+   AddLayout(gl, type, typeid, name) {
+
+      const size = TYPES.GetSizeInBytes(type, typeid) / FLOAT32_BYTE_SIZE;
+
+      // Every uniform starts at the end of the prevoius unoform end
+      const locidx = this.layout.locs.push(this.buffer_size) - 1;
+
+      // Initialize
+      if (!this.buffer) {
+         this.buffer = new Float32Array(size);
+         this.buffer_size += size;
+      }
+      else { // Resize buffer to the new size
+         this.buffer_size += size;
+         const old_buffer = this.buffer;
+         this.buffer = new Float32Array(this.buffer_size);
+
+         const old_len = old_buffer.length;
+         for (let i = 0; i < old_len; i++) {
+            this.buffer[i] = old_buffer[i];
+         }
+      }
+
+      this.layout.sizes[locidx] = size;
+      this.layout.names[locidx] = name;
+
+      gl.bindBufferBase(gl.UNIFORM_BUFFER, this.binding_index, this.glbuffer);
+      gl.bufferData(gl.UNIFORM_BUFFER, this.buffer, gl.DYNAMIC_DRAW);
+
+      return locidx;
+   }
+
+
+   SetVal(locidx, val) {
+
+      // IMPORTANT: We must check if val is array 
+
+      const start = this.layout.locs[locidx];
+      const size = this.layout.sizes[locidx];
+
+      const len = val.length;
+      if (len !== size) { console.error('Uniform Shared Block. location idx:', locidx, '\nERROR MSG:', ERROR_UBS); alert('SEE console error. Size mismatch'); }
+
+      let cnt = start;
+      for (let i = 0; i < len; i++) {
+         this.buffer[cnt++] = val[i];
+      }
    }
 
 }
 
+/**
+ * I have to create  the block once, 
+ * and then on every new program just
+ * check the UBS.XXXXX_LOC index if it is INT_NULL
+ * If it isn't, then the uniform hasn't been set up
+ * and we must ONLY resize the Float32Array buffer and create the layout 
+ * for the new uniform, No binding, not something else
+ */
 
-
-export function UBO_create(program, sid, progidx) {
+export function UBO_create(program, sid) {
 
    const gl = gfxCtx.gl;
 
+
+   // Create the shared block, if it is not yet created
+   if (!_uniform_shared_block) {
+      _uniform_shared_block = new UniformsSharedBlock(gl, program, UNIFORM_BLOCK_SHARED_NAME);
+   }
    
-   // Create the shared block buffer if it is not yet created
-   if (!_uniform_shared_block.block) {
-      
-      _uniform_shared_block.gl_layout = new UniformsSharedBlock(gl, program, UNIFORM_BLOCK_SHARED_NAME, progidx);
-      const shared_buffer = new BufferLayout(FLOAT32_BYTE_SIZE)
-      _uniform_shared_block.block = shared_buffer;
-   }
-
-   if (sid & SID.UNIF.PROJECTION_MATRIX) {
-      UBS.PROJECTION_LOC = _uniform_shared_block.block.AddLayout(TYPES.MAT4X4, TYPES.ID, 'UBS Projection');
+   if (sid & SID.UNIF.PROJECTION_MATRIX && UBS.PROJECTION_LOC === INT_NULL) {
+      UBS.PROJECTION_LOC = _uniform_shared_block.AddLayout(gl, TYPES.MAT4X4, TYPES.ID, 'UBS Projection');
    };
-   if (sid & SID.UNIF.SCREEN_RESOLUTION) {
-      UBS.RESOLUTION_LOC = _uniform_shared_block.block.AddLayout(TYPES.VEC2, TYPES.ID, 'UBS screen Resolution');
+   if (sid & SID.UNIF.SCREEN_RESOLUTION && UBS.RESOLUTION_LOC === INT_NULL) {
+      UBS.RESOLUTION_LOC = _uniform_shared_block.AddLayout(gl, TYPES.VEC2, TYPES.ID, 'UBS screen Resolution');
    }
 
-   // 
-   gl.bindBufferBase(gl.UNIFORM_BUFFER, _uniform_shared_block.gl_layout.binding_index, _uniform_shared_block.gl_layout.glbuffer);
-   gl.bufferData(gl.UNIFORM_BUFFER, _uniform_shared_block.block.buffer, gl.DYNAMIC_DRAW);
+   console.log('---- Uniform Shared Block ----\n', _uniform_shared_block)
 
-   console.log('---- Uniform Shared Block', _uniform_shared_block)
+   /**
+    * // NOTE
+    * Combine 2 Uniform Blocks in to one buffer
+    * gl.bindBufferRange( BINDING_INDEX, glbuffer, offset, size, )
+    */
 }
 
 
@@ -272,92 +356,18 @@ export function UBO_create(program, sid, progidx) {
 
 export function UBO_update() { // HOT-PATH
 
-   if (!_uniform_shared_block.needsUpdate) {
-      return;
-   }
+   if (!_uniform_shared_block.needsUpdate) return; 
 
 
    const gl = gfxCtx.gl;
 
-   gl.bindBufferBase(gl.UNIFORM_BUFFER, _uniform_shared_block.gl_layout.binding_index, _uniform_shared_block.gl_layout.glbuffer);
-   // // gl.bufferData(gl.UNIFORM_BUFFER, Block, gl.DYNAMIC_DRAW);
-
-   // // bufferSubData(target, dstByteOffset, srcData, srcOffset, length)
-   gl.bufferSubData(gl.UNIFORM_BUFFER, 0, _uniform_shared_block.block.buffer, 0, 0);
+   gl.bindBufferBase(gl.UNIFORM_BUFFER, _uniform_shared_block.binding_index, _uniform_shared_block.glbuffer);
+   
+   const offset = 0; // The offset of the starting index from which to replace the data
+   gl.bufferSubData(gl.UNIFORM_BUFFER, 0, _uniform_shared_block.buffer, offset, 0);
+   // gl.bufferData(gl.UNIFORM_BUFFER, Block, gl.DYNAMIC_DRAW);
 
    _uniform_shared_block.needsUpdate = false;
 
 }
 
-
-
-// export function UBO_change_val(){
-
-//    const col = GetRandomColor();
-//    Block[0] = col[0];
-//    Block[1] = col[1];
-//    Block[2] = col[2];
-//    Block[3] = col[3];
-//    const col2 = GetRandomColor();
-//    Block[4] = col2[0];
-//    Block[5] = col2[1];
-//    Block[6] = col2[2];
-//    Block[7] = col2[3];
-// }
-
-
-/** SAVE initial UB Block Test */
-// export const UNIFORM_BLOCK_BINDING_POINT = 0;
-// // export const Block = new Float32Array(RED);
-// export const Block = new Float32Array([
-//    1.0, 0.0, 0.0, 1.0,
-//    1.0, 0.0, 1.0, 1.0,
-// ]);
-
-// const buffers = []
-
-// export function UBO_create(program){
-
-//    const gl = gfxCtx.gl;
-
-//    const loc = gl.getUniformBlockIndex(program, 'Block');
-
-//    gl.uniformBlockBinding(program, loc, UNIFORM_BLOCK_BINDING_POINT);
-
-//    const buffer = gl.createBuffer();
-//    buffers[0] = buffer;
-
-//    gl.bindBufferBase(gl.UNIFORM_BUFFER, UNIFORM_BLOCK_BINDING_POINT, buffer);
-
-//    gl.bufferData(gl.UNIFORM_BUFFER, Block, gl.DYNAMIC_DRAW);
-
-// }
-
-// export function UBO_change_val(){
-
-//    const col = GetRandomColor();
-//    Block[0] = col[0];
-//    Block[1] = col[1];
-//    Block[2] = col[2];
-//    Block[3] = col[3];
-//    const col2 = GetRandomColor();
-//    Block[4] = col2[0];
-//    Block[5] = col2[1];
-//    Block[6] = col2[2];
-//    Block[7] = col2[3];
-// }
-
-// let srcOffset = 0;
-// const stride = 4;
-
-// export function UBO_update(){
-
-//    const gl = gfxCtx.gl;
-
-//    gl.bindBufferBase(gl.UNIFORM_BUFFER, UNIFORM_BLOCK_BINDING_POINT, buffers[0]);
-//    // gl.bufferData(gl.UNIFORM_BUFFER, Block, gl.DYNAMIC_DRAW);
-
-//    // bufferSubData(target, dstByteOffset, srcData, srcOffset, length)
-//    gl.bufferSubData(gl.UNIFORM_BUFFER, 0, Block, 4, 0);
-
-// }

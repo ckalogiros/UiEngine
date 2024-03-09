@@ -1,15 +1,16 @@
 "use strict";
 
+import { GREY, WHITE } from '../Material/Base/Colors.js';
 import { Widget_Label } from './WidgetLabel.js';
 
 
 
 export class Widget_Button extends Widget_Label {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontsize = 10, col = GREY1, text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 6, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontsize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 6, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad, bold, style, font)
-      this.type |= MESH_TYPES_DBG.WIDGET_BUTTON;
+      this.type |= MESH_TYPE.WIDGET_BUTTON;
       this.SetName('Button');
    }
 
@@ -23,7 +24,7 @@ export class Widget_Switch extends Widget_Button {
    state_text;
    evt_params;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize = 5, col = GREY1, text_col = WHITE, pad = [fontsize, fontsize], bold, style = [3, 6, 2], font) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize = 5, col = GREY[1], text_col = WHITE, pad = [fontsize, fontsize], bold, style = [3, 6, 2], font) {
 
       // super(text_off, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos, fontsize, col, text_col, pad, bold, style, font)
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_off, (ALIGN.LEFT | ALIGN.BOTTOM), pos, fontsize, col, text_col, pad, bold, style, font)
@@ -37,7 +38,7 @@ export class Widget_Switch extends Widget_Button {
          params: null,
       };
 
-      this.type |= MESH_TYPES_DBG.WIDGET_BUTTON;
+      this.type |= MESH_TYPE.WIDGET_BUTTON;
       this.SetName('Switch');
 
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)

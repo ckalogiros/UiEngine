@@ -13,6 +13,7 @@ import { Widget_group_update_increment, Widget_root_batch_update_increment_accum
 import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { Index_buffer_add_indices, Index_buffer_add_indices_from_non_existant_mesh } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
+import { WHITE } from "../Material/Base/Colors.js";
 
 
 
@@ -35,7 +36,7 @@ export class Text_Mesh extends Mesh {
       this.last_charidx = text.length;
 
       this.SetName(text);
-      this.type |= MESH_TYPES_DBG.TEXT_MESH;
+      this.type |= MESH_TYPE.TEXT_MESH;
       this.fontsize = fontsize;
       this.advancex = Font_get_font_advancex(font);
       // this.width = Font_calculate_string_width(text, font, fontsize);
