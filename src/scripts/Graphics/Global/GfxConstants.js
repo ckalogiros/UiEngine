@@ -265,6 +265,7 @@ const MESH_ENABLE = {
     GFX: {
 
         UNIF_RESOLUTION: 1,
+        UNIFORM: _CNT <<= 1,
         UNIF_TIMER: _CNT <<= 1,
         ATTR_TIME: _CNT <<= 1,
         ATTR_STYLE: _CNT <<= 1,
@@ -405,8 +406,46 @@ const UNIF_TYPE = {
     UIVEC2: 0x8dc6, // _VEC2
     UIVEC3: 0x8dc7, // _VEC3
     UIVEC4: 0x8dc8, // _VEC4
+
+    GetStr(type){
+        switch(type){
+            case this.FLOAT:  return 'float';
+            case this.FVEC2:  return 'vec2';
+            case this.FVEC3:  return 'vec3';
+            case this.FVEC4:  return 'vec4';
+            case this.MAT2:  return 'mat2';
+            case this.MAT3:  return 'mat3';
+            case this.MAT4:  return 'mat4';
+            case this.INT:  return 'int';
+            case this.BOOL:  return 'int';
+            case this.IVEC2:  return 'vec2';
+            case this.IVEC3:  return 'vec3';
+            case this.UIVEC4: return 'vec4'; 
+            case this.UINT:  return 'int';
+            case this.UIVEC2: return 'vec2'; 
+            case this.UIVEC3: return 'vec3'; 
+            case this.UIVEC4: return 'vec4';
+            default: alert('Wrong type. See UNIF_TYPE .GetStr()') 
+        }
+    }
 };
 
+
+
+
+
+
+
+/** Temporary storage of uniforms info. Used by ShaderBuilder to store info for all created uniforms. This buffer must be reseted (by the user:Program class in this case) to be ready for next use.  */
+const UNIFORMS_TEMP_INFO = {
+    vs: null,
+    fs: null,
+
+    Reset(){
+        this.vs = null;
+        this.fs = null;
+    }
+};
 
 
 

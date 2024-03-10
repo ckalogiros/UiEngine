@@ -3,7 +3,7 @@
 import { Gl_draw } from "../../Graphics/GlDraw.js";
 import { MouseResetDif, MouseResetWheel } from "../Controls/Input/Mouse.js";
 import { TimeSample, TimeUpdate } from "../Timers/Time.js";
-import { TimersUpdateGlobalTimer } from "../Timers/Timers.js";
+import { TimersUpdateGlobalTimer, TimersUpdateTimers } from "../Timers/Timers.js";
 import { TimeIntervalsUpdateAll } from "../Timers/TimeIntervals.js";
 import { PerformanceTimersTick, _pt_loop, _pt_gl_draw, _pt_all_timers, _pt_batch_update, _pt_scene_update } from '../Timers/PerformanceTimers.js'
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
@@ -91,7 +91,7 @@ export class WebGlRenderer {
          TimeIntervalsUpdateAll(); // Update and run callbacks for each interval timer that has been set.
          _pt_all_timers.timer.Stop();
          TimersUpdateGlobalTimer(); // This is a globbal timer, going only forward
-         // TimersUpdateTimers();
+         TimersUpdateTimers();
          // TimersUpdateStepTimers();
 
          Framebuffer_update_draw();

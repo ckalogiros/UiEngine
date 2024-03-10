@@ -1,41 +1,43 @@
 "use strict";
 
 import { M_Buffer } from "../../Engine/Core/Buffers";
-import { Str_buffer_store } from "../../Engine/Core/StringBuffer";
-import { GetRandomColor } from "../../Helpers/Helpers";
 import { Program_use_program } from "../ShaderPrograms";
 import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilder";
 
 
-// Array of scalars
-function SetValueV1f(gl, loc, val) { gl.uniform1fv(loc, val); }
 
+const DISABLE_DEBUG = true;
+
+
+
+/*************************************************************************************************************************************/
+// 
+/*************************************************************************************************************************************/
+
+// Array of scalars
+// function SetValueV1f(gl, loc, val) { gl.uniform1fv(loc, val); }
+function SetValueV1f(gl, loc, val) { gl.uniform1f(loc, val); }
 
 // Array of vectors (from flat array or array of THREE.VectorN)
 function SetValueV2f(gl, loc, val) { gl.uniform2fv(loc, val); }
 function SetValueV3f(gl, loc, val) { gl.uniform3fv(loc, val); }
 function SetValueV4f(gl, loc, val) { gl.uniform4fv(loc, val); }
 
-
 // Array of matrices (from flat array or array of THREE.MatrixN)
 function SetValueM2(gl, loc, val) { gl.uniformMatrix2fv(loc, false, val); }
 function SetValueM3(gl, loc, val) { gl.uniformMatrix3fv(loc, false, val); }
 function SetValueM4(gl, loc, val) { gl.uniformMatrix4fv(loc, false, val); }
 
-
 // Array of integer / boolean
 function SetValueV1i(gl, loc, val) { gl.uniform1iv(loc, val); }
-
 
 // Array of integer / boolean vectors (from flat array)
 function SetValueV2i(gl, loc, val) { gl.uniform2iv(loc, val); }
 function SetValueV3i(gl, loc, val) { gl.uniform3iv(loc, val); }
 function SetValueV4i(gl, loc, val) { gl.uniform4iv(loc, val); }
 
-
 // Array of unsigned integer
 function SetValueV1ui(gl, loc, val) { gl.uniform1uiv(loc, val); }
-
 
 // Array of unsigned integer vectors (from flat array)
 function SetValueV2ui(gl, loc, val) { gl.uniform2uiv(loc, val); }
@@ -43,17 +45,59 @@ function SetValueV3ui(gl, loc, val) { gl.uniform3uiv(loc, val); }
 function SetValueV4ui(gl, loc, val) { gl.uniform4uiv(loc, val); }
 
 
+// const numUniforms = gl.getProgramParameter(this.shader_program, gl.ACTIVE_UNIFORMS);
+// const indices = [...Array(numUniforms).keys()];
+// const blockIndices = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_BLOCK_INDEX);
+// const offsets = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_OFFSET);
+
+// const uniforms = [];
+// for (let ii = 0; ii < numUniforms; ++ii) {
+//   const uniformInfo = gl.getActiveUniform(this.shader_program, ii);
+// //   if (isBuiltIn(uniformInfo)) {
+// // 		continue;
+// //   }
+//   uniforms.push(uniformInfo);
+//   const {name, type, size} = uniformInfo;
+//   const blockIndex = blockIndices[ii];
+//   const offset = offsets[ii];
+// //   console.log(
+// // 	  name, size, glEnumToString(gl, type),
+// // 	  blockIndex, offset);
+// console.log(uniformInfo, blockIndex, offset)
+// }
 
 
-export class Uniform {
+// gl.getActiveUniform(this.shader_program, idx)
+// gl.getActiveUniforms(this.shader_program, indices, TYPE_TO_RETRACT);
+// TYPE_TO_RETRACT TYPES
+// gl.UNIFORM_TYPE            Returns an Array of GLenum indicating the types of the uniforms.
+// gl.UNIFORM_SIZE            Returns an Array of GLuint indicating the sizes of the uniforms.
+// gl.UNIFORM_BLOCK_INDEX     Returns an Array of GLint indicating the block indices of the uniforms.
+// gl.UNIFORM_OFFSET          Returns an Array of GLint indicating the uniform buffer offsets.
+// gl.UNIFORM_ARRAY_STRIDE    Returns an Array of GLint indicating the strides between the elements.
+// gl.UNIFORM_MATRIX_STRIDE   Returns an Array of GLint indicating the strides between columns of a column-major matrix or a row-major matrix.
+// gl.UNIFORM_IS_ROW_MAJOR    Returns an Array of GLboolean indicating whether each of the uniforms is a row-major matrix or not.
+
+class Uniform {
 
 
-   constructor(val = null, loc = null, type = null) {
+   constructor(gl=null, shader_program=null, type=INT_NULL, name='') {
 
-      this.val = val;// Uniform value
-      this.loc = loc; // Uniform Location
+      // const uniformInfo = gfxCtx.gl.getActiveUniform(this.shader_program, idx);
+      const loc = gl.getUniformLocation(shader_program, name);
+      /**DEBUG */if (loc > 0xffff) alert('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.');
+      // const type = gl.getActiveUniform(shader_program, 0)
+
+      
+      this.val = 0;// Uniform value
+      this.loc = loc; // Uniform location
+      this.name = name; // Uniform name
       this.needsUpdate = false;
-      this.UpdateUniform = null; // Function
+      this.UpdateUniform = null; // Gl specific type function for updating the uniform.
+
+      this.is_set_bound = false;
+      this.is_update_bound = false;
+
 
       switch (type) {
          // From THREE.js
@@ -77,9 +121,10 @@ export class Uniform {
          case UNIF_TYPE.UIVEC3: { this.UpdateUniform = SetValueV3ui; break; } // UI_VEC3
          case UNIF_TYPE.UIVEC4: { this.UpdateUniform = SetValueV4ui; break; } // UI_VEC4
 
-         default: { console.error('The type of the uniform\'s value is unknown'); break; }
+         default: { console.error('The type of the uniform\'s value is unknown.\nType:', type); alert('SEE console error.\nUniform Type Not Found.'); break; }
 
       }
+
    }
 
 
@@ -89,13 +134,93 @@ export class Uniform {
    }
 
 
-   Update(gl) {
-      this.UpdateUniform(gl, this.loc, this.val);
+   Update() {
+      this.UpdateUniform(gfxCtx.gl, this.loc, this.val);
       this.needsUpdate = false;
    }
 }
 
 
+const _uniforms_buffer = new M_Buffer(); 
+
+
+
+export function Uniforms_buffer_create_uniform(gl, shader_program, type, name){
+
+   const uniform = new Uniform(gl, shader_program, type, name);
+   const idx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
+   console.log('1111111 Uniform Created at index:', idx, _uniforms_buffer )
+   // return uniform
+}
+
+
+
+export function Uniforms_buffer_get_uniform_byidx(ubidx){
+   if(!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
+   return _uniforms_buffer[ubidx];
+}
+
+
+
+export function Uniforms_buffer_set_uniform(ubidx, val){
+   if(!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
+   _uniforms_buffer[ubidx].Set(val);
+}
+
+
+
+export function Uniforms_buffer_update_uniform(ubidx){
+   if(!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
+   _uniforms_buffer[ubidx].Update();
+}
+
+
+
+/** 'fn_set' and 'fn_update' MUST BE type of 'function' in order to bind them. */
+export function Uniforms_buffer_bind_uniform_functions(obj, i, unif_name=''){
+
+   // Find uniform by name
+   for(let i=0; i<_uniforms_buffer.boundary; i++){
+
+      const unif = _uniforms_buffer.buffer[i];
+      /**DEBUG*/if(unif.is_set_bound)     alert('Uniform function \'Set\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
+      /**DEBUG*/if(unif.is_update_bound)  alert('Uniform function \'Update\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
+
+      if(unif.name === unif_name){
+
+         // Set the 'Set' and 'Update' 
+         // if(typeof fn_set === 'function' && !unif.is_set_bound) {
+         if(!unif.is_set_bound) {
+            // fn_set = unif.Set;
+            obj.Set = unif.Set.bind(unif);
+            unif.is_set_bound = true;
+         } 
+         // if(typeof fn_update === 'function' && !unif.is_update_bound) {
+         if(!unif.is_update_bound) {
+            // fn_update = _uniforms_buffer.buffer[i].Update;
+            obj.Update = unif.Update.bind(unif);
+            unif.is_update_bound = true;
+         }
+      }
+   }
+
+
+   // TODO: 
+   // Create an 'export function Uniforms_invalidate_uniform_bind()', for the caller to voluntarily unbind from the uniform
+   // What happens if the uniform gets invalidated by deleting the program????
+   // Solutions: 
+   //    1. Pass a third function callback, to call uppon invalidation and unbind the 'Set' and 'Update' function at caller site 
+   //       That means to have a buffer of invalidation callback functions.
+
+}
+
+
+
+
+
+/*************************************************************************************************************************************/
+// 
+/*************************************************************************************************************************************/
 
 export class UniformsBuffer {
 
@@ -148,7 +273,9 @@ export class UniformsBuffer {
 
 
 
-
+/*************************************************************************************************************************************/
+// 
+/*************************************************************************************************************************************/
 
 const ERROR_UBS = `
 1. Is the SID.UNIF.XXX enabled in meshes sid.unif?
@@ -159,14 +286,7 @@ const ERROR_UBS = `
 
 
 
-
-
-
 let _uniform_blocks = new M_Buffer();
-
-
-
-
 
 
 // const CreatedUniforms = [];
@@ -268,7 +388,7 @@ class UniformsBlock {
 
 
 
-export function UBO_create(sid, program, progrm_ub_ixs) {
+export function Uniforms_block_buffer_create(sid, program, progrm_ub_ixs) {
 
    const gl = gfxCtx.gl;
 
@@ -326,3 +446,22 @@ export function UBO_update() { // HOT-PATH
 
 }
 
+
+
+
+
+
+/****************************************************************************************************************************************************/
+// DEBUG
+/****************************************************************************************************************************************************/
+
+function DEBUG_PRINT (buffer, index, line) {
+	if (index < 0 || index > buffer.boundary) {
+		 console.error('Index is out of bounds. @GlProgram.js.\nLine:', line, 'index:', index, buffer);
+		  alert('Index is out of bounds. @GlProgram.js');
+	}
+	if (buffer.buffer[index] === null) {
+		 console.error('Buffer at index is NULL. @GlProgram.js\nLine:', line, 'index:', index, buffer);
+		 alert('Buffer at index is NULL. @GlProgram.js.');
+	}
+}

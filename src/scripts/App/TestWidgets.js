@@ -27,6 +27,9 @@ import { Mesh_buffer_get_mesh_byidx, Widget_group_create, Widget_group_get, Widg
 import { Clamp_y_remove_children_FIRST_TIME_CLAMP } from '../Engine/Drawables/Operations/Clip.js';
 import { Calculate_positions_recursive } from '../Engine/Drawables/Meshes/Section.js';
 import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE_240_160_10, PURPLE, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
+import { TimersCreateTimer } from '../Engine/Timers/Timers.js';
+import { Program_uniform_bind } from '../Graphics/ShaderPrograms.js';
+import { Shader_builder_store_uniform_name } from '../Graphics/Shaders/ShaderBuilder/ShaderBuilder.js';
 
 
 /**
@@ -68,7 +71,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    const uidbg = Debug_info_ui_performance(scene);
+    // const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -77,9 +80,18 @@ export function TestWidgetsGeneric(scene) {
 
 
     /** Lines */
-    SdfLine(BLUE_10_120_220, [500, 200, 5], [800, 10]);
-    // SdfLine(GREEN[7], [500, 600, 5], [800, 10]);
-    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
+    const line = SdfLine(BLUE_10_120_220, [500, 200, 5], [800, 10]);
+    // Get the uniform by the program
+    const obj = {
+        Set: null,
+        Update:null,
+    };
+    Program_uniform_bind(line.gfx.prog.groupidx, line.gfx.prog.idx, obj, null, 'u_time');
+    obj.Set(4.2);
+    obj.Update();
+
+    SdfLine(GREEN[7], [500, 600, 5], [800, 10]);
+    SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
 
     // const fb = Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, line);
     { // Draw multiple lines to multiple framebuffers
@@ -311,7 +323,16 @@ function SdfLine(col, pos, dim) {
     // line1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     // line.AddItem(line1)
     
-    // line.sid.unif |= SID.UNIF.SCREEN_RESOLUTION;
+    line.sid.unif |= SID.UNIF.TIME;
+
+    Shader_builder_store_uniform_name({
+        name: 'u_time',
+        type: UNIF_TYPE.FLOAT,
+        shader: 'FS',
+    });
+
+    const params = null;
+    const timer = TimersCreateTimer(0.01, 10, .1, 'T1', TEMP_TIMER_CLBK, params);
     // line.sid.unif |=  SID.UNIF.UNIFORM_BLOCK | SID.UNIF.PROJECTION_MATRIX;
     
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
@@ -319,6 +340,7 @@ function SdfLine(col, pos, dim) {
     line.Render();
     // line.Calc();
     line.ConstructListeners();
+
 
     // setInterval(()=>{GlRotateZ2D(mesh.gfx, mesh.geom.dim, TimerGetGlobalTimer()*.55)}, 16)
     // GlRotateZ2D(mesh.gfx, mesh.geom.dim, 1.23)
@@ -329,6 +351,11 @@ function SdfLine(col, pos, dim) {
     // mesh.RotateZ(5.5);
 
     return line;
+}
+
+function TEMP_TIMER_CLBK(){
+    console.log('===========================================')
+    // SetUniform
 }
 
 

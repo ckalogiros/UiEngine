@@ -113,7 +113,7 @@ export class Mesh {
         
         if(SID.ATTR.STYLE){
             UNIFORM_FLAGS |= SID.UNIF.SCREEN_RESOLUTION;
-            var UNIFORM_EXTRA_RES = SID.UNIF_EXTRA.SCREEN_RESOLUTION.IN_FS;
+            var UNIFORM_EXTRA_RES = SID.UNIF_EXTRA.SCREEN_RESOLUTION.IS_SHARED | SID.UNIF_EXTRA.SCREEN_RESOLUTION.IN_FS;
         }
 
         this.sid = {
@@ -123,7 +123,7 @@ export class Mesh {
             unif_extra: {
                 proj: UNIF_EXTRA_PROJ,
                 res: UNIFORM_EXTRA_RES,
-                time: 0x0,
+                time: SID.UNIF_EXTRA.TIME.IN_FS,
             },
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
             progs_group: PROGRAMS_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
@@ -564,15 +564,9 @@ export class Mesh {
 
         switch (which) {
 
-            // case MESH_ENABLE.GFX.UNIF_RESOLUTION: {
-
-            //     this.sid.unif |= SID.UNIF.BUFFER_RES; // Enable the screen resolution to be contructed as a uniform in the vertex shader, to be used in the fragment shader.
-            //     break;
-            // }
             case MESH_ENABLE.GFX.ATTR_STYLE: {
 
                 this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.PARAMS1 | SID.ATTR.EMPTY;
-                // this.sid.unif |= SID.UNIF.U_BUFFER;
                 this.sid.pass |= SID.PASS.WPOS2 | SID.PASS.DIM2;
                 if (!(params === null || params === undefined)) {
                     this.mat.style = params.style;
@@ -584,6 +578,12 @@ export class Mesh {
             case MESH_ENABLE.GFX.ATTR_TIME: {
 
                 this.sid.attr |= SID.ATTR.TIME;
+                break;
+            }
+            case MESH_ENABLE.GFX.UNIFORM: {
+
+                // Store the uniforms name globaly so the shader builder can use the name to create the uniform
+                // this.sid.attr |= SID.ATTR.TIME;
                 break;
             }
 
