@@ -71,21 +71,11 @@ export const SHADER_CONSTANTS = {
 
 
 export const UNIFORM_BLOCK_SHARED_NAME = 'Uniform_block_generic';
-// export const UNIFORM_BLOCK_BINDING_POINT = ubs_counter++;
-
-let SHADER_BUILDER_UNIFORM_NAMES = [];
-export function Shader_builder_get_uniform_name_array(){
-   return SHADER_BUILDER_UNIFORM_NAMES;
-}
-export function Shader_builder_store_uniform_name(uniform){
-   SHADER_BUILDER_UNIFORM_NAMES.push(uniform);
-}
-export function Shader_builder_reset_uniform_names_array(){
-   SHADER_BUILDER_UNIFORM_NAMES = [];
-}
 
 
-function Resolve_uniforms_from_sid_vs(sid){
+
+
+function Resolve_uniforms_from_sid_vs(sid, _uniforms_info){
 
    let uniforms_code = '';
    const uniforms_info = [];
@@ -160,24 +150,16 @@ function Resolve_uniforms_from_sid_vs(sid){
          });
       }
 
-   // if(sid.unif & SID.UNIF.TIME && sid.unif_extra.time & SID.UNIF_EXTRA.TIME.IN_VS && 
-   //    (sid.unif_extra.time & SID.UNIF_EXTRA.TIME.IS_SHARED) === 0
-   //    ) {
-   //       uniforms_code += 'uniform float u_time;\n'; 
-   //       uniforms_info.push({
-   //          name:'u_time',
-   //          is_block:false,
-   //          type:UNIF_TYPE.FLOAT,
-   //       });
-   //    }
-
-   for(let i=0; i< SHADER_BUILDER_UNIFORM_NAMES.length; i++){
-      if(SHADER_BUILDER_UNIFORM_NAMES.shader === 'VS')
-         uniforms_code += `uniform ${SHADER_BUILDER_UNIFORM_NAMES[i].type} ${SHADER_BUILDER_UNIFORM_NAMES[i].name};\n`; 
-   }
 
    
-   UNIFORMS_TEMP_INFO.vs = uniforms_info;
+   const len = _uniforms_info.length;
+   for(let i=0; i< len; i++){
+      if(_uniforms_info[i].shader & UNIFORM.IN_VS){
+
+         const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
+         uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
+      }
+   }
 
    return uniforms_code;
 
@@ -185,7 +167,7 @@ function Resolve_uniforms_from_sid_vs(sid){
 }
 
 
-function Resolve_uniforms_from_sid_fs(sid){
+function Resolve_uniforms_from_sid_fs(sid, _uniforms_info){
 
    let uniforms_code = '';
    const uniforms_info = [];
@@ -237,27 +219,17 @@ function Resolve_uniforms_from_sid_fs(sid){
          });
       }
 
-   // if(sid.unif & SID.UNIF.TIME && sid.unif_extra.time & SID.UNIF_EXTRA.TIME.IN_FS && 
-   //    (sid.unif_extra.time & SID.UNIF_EXTRA.TIME.IS_SHARED) === 0
-   //    ) {
-   //       uniforms_code += 'uniform float u_time;\n'; 
-   //       uniforms_info.push({
-   //          name:'u_time',
-   //          is_block:false,
-   //          type:UNIF_TYPE.FLOAT,
-   //       });
-   //    }
 
-   
-   for(let i=0; i< SHADER_BUILDER_UNIFORM_NAMES.length; i++){
-      if(SHADER_BUILDER_UNIFORM_NAMES[i].shader === 'FS'){
+   const len = _uniforms_info.length;
+   for(let i=0; i< len; i++){
+      if(_uniforms_info[i].shader & UNIFORM.IN_FS){
 
-         const type = UNIF_TYPE.GetStr(SHADER_BUILDER_UNIFORM_NAMES[i].type);
-         uniforms_code += `uniform ${type} ${SHADER_BUILDER_UNIFORM_NAMES[i].name};\n`; 
+         const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
+         uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
       }
    }
       
-   UNIFORMS_TEMP_INFO.fs = uniforms_info;
+   // UNIFORMS_TEMP_INFO.fs = uniforms_info;
    
    return uniforms_code;
 
@@ -289,7 +261,7 @@ function Resolve_uniforms_from_sid_fs(sid){
  */
 
 
-export function Shaders_build_vertex_shader(sid){
+export function Shaders_build_vertex_shader(sid, uniforms_info){
 
    const vs_chunks = [
 
@@ -315,7 +287,7 @@ export function Shaders_build_vertex_shader(sid){
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // UNIFORMS
-      Resolve_uniforms_from_sid_vs(sid),
+      Resolve_uniforms_from_sid_vs(sid, uniforms_info),
       '\n',
       
 
@@ -368,7 +340,7 @@ export function Shaders_build_vertex_shader(sid){
 }
 
 
-export function Shaders_build_fragment_shader(sid){
+export function Shaders_build_fragment_shader(sid, uniforms_info){
 
    const fs_chunks = [
 
@@ -399,7 +371,7 @@ export function Shaders_build_fragment_shader(sid){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // UNIFORMS
       '\n',
-      Resolve_uniforms_from_sid_fs(sid),
+      Resolve_uniforms_from_sid_fs(sid, uniforms_info),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
       
       

@@ -10,6 +10,7 @@ import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Info_listener_dispatch_event } from "../../DebugInfo/InfoListeners.js";
 import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../../../Core/StringBuffer.js";
+import { Program_enable_uniforms_for_creation } from "../../../../Graphics/ShaderPrograms.js";
 
 
 
@@ -546,21 +547,9 @@ export class Mesh {
 
         if (this.alreadyAdded === true) {
             console.error(`You are trying to enable ${which} but the shaders have been already created. Try Enable() before inserting the mesh to a Scene().`);
+            alert('SEE console error');
         }
 
-        if (Array.isArray(which)) {
-            const count = which.length;
-            for (let i = 0; i < count; i++) {
-                this.CheckCase(which[i], params);
-            }
-        }
-        else {
-            this.CheckCase(which, params);
-        }
-    }
-
-
-    CheckCase(which, params) {
 
         switch (which) {
 
@@ -571,8 +560,6 @@ export class Mesh {
                 if (!(params === null || params === undefined)) {
                     this.mat.style = params.style;
                 }
-
-                // this.sid.unif |= SID.UNIF.BUFFER_RES | SID.UNIF.U_BUFFER;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_TIME: {
@@ -581,9 +568,8 @@ export class Mesh {
                 break;
             }
             case MESH_ENABLE.GFX.UNIFORM: {
-
-                // Store the uniforms name globaly so the shader builder can use the name to create the uniform
-                // this.sid.attr |= SID.ATTR.TIME;
+                
+                Program_enable_uniforms_for_creation(params)
                 break;
             }
 

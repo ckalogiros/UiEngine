@@ -366,6 +366,12 @@ const PROGRAM_STATE = {
 /*************************************************************************************************/
 // UNIFORMS
 
+_CNT = 0x1;
+const UNIFORM = {
+    IN_VS: _CNT,
+    IN_FS: _CNT<<=0x1,
+}
+
 
 
 // Store key-value pairs of texture name - texture index(for the global texture array. See GlTextures.js)
@@ -436,16 +442,16 @@ const UNIF_TYPE = {
 
 
 
-/** Temporary storage of uniforms info. Used by ShaderBuilder to store info for all created uniforms. This buffer must be reseted (by the user:Program class in this case) to be ready for next use.  */
-const UNIFORMS_TEMP_INFO = {
-    vs: null,
-    fs: null,
+// /** Temporary storage of uniforms info. Used by ShaderBuilder to store info for all created uniforms. This buffer must be reseted (by the user:Program class in this case) to be ready for next use.  */
+// const UNIFORMS_TEMP_INFO = {
+//     vs: null,
+//     fs: null,
 
-    Reset(){
-        this.vs = null;
-        this.fs = null;
-    }
-};
+//     Reset(){
+//         this.vs = null;
+//         this.fs = null;
+//     }
+// };
 
 
 

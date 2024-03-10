@@ -19,11 +19,11 @@ import { Shaders_build_vertex_shader, Shaders_build_fragment_shader } from './Sh
  * 
  */
 
-export function Shaders_load(gl, sid) {
+export function Shaders_load(gl, sid, uniforms_info) {
 
 	const shader = {
-		vShader: Shaders_build_vertex_shader(sid),
-		fShader: Shaders_build_fragment_shader(sid),
+		vShader: Shaders_build_vertex_shader(sid, uniforms_info),
+		fShader: Shaders_build_fragment_shader(sid, uniforms_info),
 	};
 	const shader_program = Load_shaders(gl, shader);
 	if (shader_program) {

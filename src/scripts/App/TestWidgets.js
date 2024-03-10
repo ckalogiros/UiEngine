@@ -29,7 +29,6 @@ import { Calculate_positions_recursive } from '../Engine/Drawables/Meshes/Sectio
 import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE_240_160_10, PURPLE, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { TimersCreateTimer } from '../Engine/Timers/Timers.js';
 import { Program_uniform_bind } from '../Graphics/ShaderPrograms.js';
-import { Shader_builder_store_uniform_name } from '../Graphics/Shaders/ShaderBuilder/ShaderBuilder.js';
 
 
 /**
@@ -325,10 +324,13 @@ function SdfLine(col, pos, dim) {
     
     line.sid.unif |= SID.UNIF.TIME;
 
-    Shader_builder_store_uniform_name({
-        name: 'u_time',
-        type: UNIF_TYPE.FLOAT,
-        shader: 'FS',
+    
+    line.EnableGfxAttributes(
+        MESH_ENABLE.GFX.UNIFORM, {
+        name:'u_time', 
+        type:UNIF_TYPE.FLOAT, 
+        shader:(UNIFORM.IN_FS), 
+        sid:line.sid
     });
 
     const params = null;

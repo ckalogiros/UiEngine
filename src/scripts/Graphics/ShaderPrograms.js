@@ -5,7 +5,7 @@ import { Gfx_create_group_buffer } from '../Engine/Interfaces/Gfx/MeshGfxContext
 import { Int8Buffer, M_Buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_create, Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
 import { Select_fnidx_to_fill_vertex_buffer } from './Buffers/VertexBuffersOps.js';
-import { Shader_builder_get_uniform_name_array, Shader_builder_reset_uniform_names_array } from './Shaders/ShaderBuilder/ShaderBuilder.js';
+
 
 
 
@@ -184,6 +184,73 @@ export function Program_create_program(sid) {
 
 
 
+
+
+
+const TEMP_UNIFORMS_STORAGE_BUFFER = [];
+
+
+export function Program_enable_uniforms_for_creation(params){
+
+	const ub = TEMP_UNIFORMS_STORAGE_BUFFER; // Cash
+
+	let program_idx = INT_NULL;
+	const len = ub.length;
+	// If program (same sid) exists, store the uniform info to the same buffer, else create new array buffer (different sid/program)
+	for (let i=0; i<len; i++){
+		
+		// If TEMP_UNIFORMS_STORAGE_BUFFER[i] exists, it means that at least on uniform has been stored for that i (program_idx).
+		// Because all uniforms of every [i] have the same sid, checking [i][0] is enough.
+		if(ub[i][0]){
+
+			// In order to store a uniform for creation, 
+			// 1. we must match the same sid, that means that the all uniforms of the same program will be created in the same shader,
+			if(SID.CheckSidMatch(ub[i][0].sid, params.sid)){
+				
+				program_idx = i;
+				break;
+			}
+		}
+	}
+
+	// Create buffer for new program uniforms
+	if(program_idx === INT_NULL)
+		program_idx = TEMP_UNIFORMS_STORAGE_BUFFER.push(new Array) -1;
+
+	let abort = false;
+	// 2. and we do not want duplicate uniforms. Checked by name.
+	const len2 = ub[program_idx].length;
+	for (let j=0; j<len2; j++){
+		if(ub[program_idx][j].name === params.name){
+			abort = true;
+			break;
+		}
+	}
+		
+
+		// Store the uniform info and the mesh sid
+		if(!abort) TEMP_UNIFORMS_STORAGE_BUFFER[program_idx].push(params);
+}
+
+
+
+function Get_uniforms_for_program(sid){
+
+	for (let i=0; i<TEMP_UNIFORMS_STORAGE_BUFFER.length; i++){
+		
+		if(SID.CheckSidMatch(TEMP_UNIFORMS_STORAGE_BUFFER[i][0].sid, sid)){
+			
+			return TEMP_UNIFORMS_STORAGE_BUFFER[i];
+		}
+	}
+
+	if(!TEMP_UNIFORMS_STORAGE_BUFFER.length) return 1;
+	return null;
+}
+
+
+
+
 class Gl_Program {
 
 	constructor(gl, sid) {
@@ -193,7 +260,12 @@ class Gl_Program {
 
 		this.idx = INT_NULL; // Self index to the Programs buffer
 
-		this.shader_program = Shaders_load(gfxCtx.gl, sid);
+		const uniforms = Get_uniforms_for_program(sid);
+		if(!uniforms){
+			console.error('Uniform by sid not found. U Buffer:', TEMP_UNIFORMS_STORAGE_BUFFER);
+			alert('SEE console error.');
+		} 
+		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
 
 		this.vb = new Int8Buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffers_info' buffer. 
 		this.vb.Init(-1);
@@ -237,35 +309,16 @@ class Gl_Program {
 		/****************************************************************************************************/
 		// Individual uniforms
 		
-		// Consume the individual uniforms from u_projection
-		// console.log('UNIFORMS_TEMP_INFO', UNIFORMS_TEMP_INFO)
-
-		// const vs_u_info = UNIFORMS_TEMP_INFO.vs
-		// const vs_u_len = vs_u_info.length;
-		// for (let i = 0; i < vs_u_len; i++) {
-		// 	if (!vs_u_info[i].is_block) {
-		// 		Uniforms_buffer_create_uniform(gl, this.shader_program, vs_u_info[i].type, vs_u_info[i].name);
-		// 	}
-		// }
-
-		// const fs_u_info = UNIFORMS_TEMP_INFO.fs
-		// const fs_u_len = fs_u_info.length;
-		// for (let i = 0; i < fs_u_len; i++) {
-		// 	if (!fs_u_info[i].is_block) {
-		// 		Uniforms_buffer_create_uniform(gl, this.shader_program, fs_u_info[i].type, fs_u_info[i].name);
-		// 	}
-		// }
-
-		const u_info = Shader_builder_get_uniform_name_array();
+		const u_info = TEMP_UNIFORMS_STORAGE_BUFFER[0];
 		const len = u_info.length;
 		for (let i = 0; i < len; i++) {
 			Uniforms_buffer_create_uniform(gl, this.shader_program, u_info[i].type, u_info[i].name);
 		}
-		// UNIFORMS_TEMP_INFO.Reset(); 
-		Shader_builder_reset_uniform_names_array(); // IMPORTANT! Must call reset in order to delete all uniform names from the array for the next fill of a shader program creation.
 
 
-
+		
+		/****************************************************************************************************/
+		// Sampler uniforms
 		this.shaderinfo = {
 			uniforms: {
 				sampler: gl.getUniformLocation(this.shader_program, 'u_sampler0'),	// Sampler for texture units 	
@@ -412,7 +465,6 @@ export function Program_uniforms_update(groupidx, progidx, ubidx) {
 	const uniform_idx = _program_groups.buffer[groupidx].buffer[progidx].ub[ubidx];
 	Uniforms_buffer_update_uniform(uniform_idx);
 }
-
 
 
 
