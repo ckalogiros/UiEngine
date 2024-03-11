@@ -1,5 +1,5 @@
 "use strict";
-import { UBO_SetUniform } from '../Graphics/Buffers/UniformBuffers.js';
+import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from '../Graphics/Buffers/UniformBuffers.js';
 import { M_Buffer } from './Core/Buffers.js';
 import { HandleEvents } from './Events/Events.js';
 
@@ -78,7 +78,8 @@ export function Scenes_get_count() { return _scenes.active_count; }
 
 export function Scene_set_projection_matrix(sceneidx) { 
 
-    UBO_SetUniform(UBS.PROJECTION_LOC, _scenes.buffer[sceneidx].camera.matrix);
+    const unifidx = Uniforms_block_bind_uniform_layout('u_projection');
+    Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
 }
 
 

@@ -22,7 +22,7 @@ export function Gl_draw(gl) {
     if(temp_change){
 
         // UBO_change_val();
-        // UBO_update();
+        // Uniforms_block_update_uniform();
         temp_change = false;
     }
 

@@ -103,7 +103,7 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
         // Create VAO
         vaoidx = Gl_vertex_array_object_create(sid);
         new_vao_created = true;
-        console.warn('################ New VAO created. vaoidx:', vaoidx)
+        // console.warn('################ New VAO created. vaoidx:', vaoidx)
     }
     
     const vao = Gl_vertex_array_object_get_by_vaoidx(vaoidx); // Get VAO
@@ -128,7 +128,7 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
     
     const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
     Shader_attributes_enable(attribsidx)
-    console.warn('Create Shader Attributes:')
+    // console.warn('Create Shader Attributes:')
    
     return vb_info;
 }

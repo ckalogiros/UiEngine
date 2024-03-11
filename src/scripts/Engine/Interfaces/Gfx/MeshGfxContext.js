@@ -10,7 +10,7 @@ import { M_Buffer } from "../../Core/Buffers.js";
 import { Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
-import { UBO_SetUniform } from "../../../Graphics/Buffers/UniformBuffers.js";
+import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from "../../../Graphics/Buffers/UniformBuffers.js";
 
 
 
@@ -295,7 +295,7 @@ export function Gfx_activate(mesh) {
 
 
 
-export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_gfx_idxs, root_bufferidx = INT_NULL, mesh_bufferidx = INT_NULL) {
+export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_gfx_idxs, root_bufferidx = INT_NULL, mesh_bufferidx = INT_NULL, uniforms) {
 
 
 
@@ -366,7 +366,9 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 
          Scene_set_projection_matrix(sceneidx)
 
-         UBO_SetUniform(UBS.RESOLUTION_LOC, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
+         const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
+         Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
+         // Uniforms_block_set_uniform(UBS.RESOLUTION_LOC, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
 
          
       }

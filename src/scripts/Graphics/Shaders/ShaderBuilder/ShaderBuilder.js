@@ -75,86 +75,40 @@ export const UNIFORM_BLOCK_SHARED_NAME = 'Uniform_block_generic';
 
 
 
-function Resolve_uniforms_from_sid_vs(sid, _uniforms_info){
+function Resolve_uniforms_from_sid(unif_shader_type, _uniforms_info){
 
    let uniforms_code = '';
-   const uniforms_info = [];
-   let is_block = false;
-
-
-   if(sid.unif & SID.UNIF.ANY_SHARED) { // Create uniforms block.
-
-         uniforms_code += `layout(std140) uniform Uniform_block_generic {\n`;
-      is_block = true;
-   }
-
-   if(sid.unif & SID.UNIF.PROJECTION_MATRIX) { // Create projection in block if it is shared else as a separate uniform input
-      if(sid.unif_extra.proj & SID.UNIF_EXTRA.PROJECTION_MATRIX.IS_SHARED) {
-
-         uniforms_code += ' mat4 u_projection;\n'; 
-         uniforms_info.push({
-            name:'u_projection',
-            is_block:true,
-            type:UNIF_TYPE.MAT4, // UNNECESSARY: The Uniforms class can retrieve this info.
-         });
-      }
-   }
-   
-   if(sid.unif & SID.UNIF.SCREEN_RESOLUTION) {
-      if(sid.unif_extra.res & SID.UNIF_EXTRA.SCREEN_RESOLUTION.IS_SHARED) {
-
-         uniforms_code += ' vec2 u_screen_res;\n'; // If uniform is in block(shared), does not matter if the shader uses it, it must be declared.
-         uniforms_info.push({
-            name:'u_screen_res',
-            is_block:true,
-            type:UNIF_TYPE.FVEC2,
-         });
-      }
-   }
-   
-   if(sid.unif & SID.UNIF.TIME) {
-      if(sid.unif_extra.time & SID.UNIF_EXTRA.TIME.IS_SHARED) {
-         
-         uniforms_code += ' float u_time;\n'; 
-         uniforms_info.push({
-            name:'u_time',
-            type:UNIF_TYPE.FLOAT,
-         });
-      }
-   }
-   
-   if(is_block) uniforms_code += '};\n\n'
-   
-   
-   if(sid.unif & SID.UNIF.PROJECTION_MATRIX && 
-      sid.unif_extra.proj & SID.UNIF_EXTRA.PROJECTION_MATRIX.IN_VS && 
-      (sid.unif_extra.proj & SID.UNIF_EXTRA.PROJECTION_MATRIX.IS_SHARED) === 0
-      ) {
-         uniforms_code += 'uniform mat4 u_projection;\n'; 
-         uniforms_info.push({
-            name:'u_projection',
-            is_block:true,
-            type:UNIF_TYPE.MAT4,
-         });
-
-      }
-
-   if(sid.unif & SID.UNIF.SCREEN_RESOLUTION && sid.unif_extra.res & SID.UNIF_EXTRA.SCREEN_RESOLUTION.IN_VS && 
-      (sid.unif_extra.res & SID.UNIF_EXTRA.SCREEN_RESOLUTION.IS_SHARED) === 0
-      ) {
-         uniforms_code += 'uniform vec2 u_screen_res;\n'; 
-         uniforms_info.push({
-            name:'u_screen_res',
-            is_block:false,
-            type:UNIF_TYPE.FVEC2,
-         });
-      }
-
-
+   let block_created = false;
    
    const len = _uniforms_info.length;
+
    for(let i=0; i< len; i++){
-      if(_uniforms_info[i].shader & UNIFORM.IN_VS){
+      if(_uniforms_info[i].shader & UNIFORM.IS_SHARED){
+
+         // Create Uniforms Block
+         if(!block_created) {
+            uniforms_code += `layout(std140) uniform Uniform_block_generic {\n`;
+            block_created = true;
+         }
+         
+         const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
+         uniforms_code += ` ${type} ${_uniforms_info[i].name};\n`; 
+      }
+
+   }
+
+   // End uniforms block
+   if(block_created) uniforms_code += '};\n';
+   
+
+
+   for(let i=0; i< len; i++){
+      if((_uniforms_info[i].shader & UNIFORM.IN_VS) && UNIFORM.IN_VS === unif_shader_type){
+
+         const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
+         uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
+      }
+      else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && UNIFORM.IN_FS === unif_shader_type){
 
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
@@ -166,61 +120,32 @@ function Resolve_uniforms_from_sid_vs(sid, _uniforms_info){
    // Extension: For lights
 }
 
-
 function Resolve_uniforms_from_sid_fs(sid, _uniforms_info){
 
    let uniforms_code = '';
-   const uniforms_info = [];
-   let is_block = false;
-
-   // TODO: If block was created for the vertex buffer, must check if at least one of the block uniforms is used by fs, and recreate the whole block in fs too. Otherwise skip declaring the block.
-
-   if(sid.unif & SID.UNIF.ANY_SHARED) { // Create uniforms block.
-
-         uniforms_code += `layout(std140) uniform Uniform_block_generic {\n`;
-      is_block = true;
-   }
-
-   if(sid.unif & SID.UNIF.PROJECTION_MATRIX) { // Create projection in block if it is shared else as a separate uniform input
-      if(sid.unif_extra.proj & SID.UNIF_EXTRA.PROJECTION_MATRIX.IS_SHARED) uniforms_code += ' mat4 u_projection;\n'; 
-   }
+   let block_created = false;
    
-   if(sid.unif & SID.UNIF.SCREEN_RESOLUTION) {
-      if(sid.unif_extra.res & SID.UNIF_EXTRA.SCREEN_RESOLUTION.IS_SHARED) uniforms_code += ' vec2 u_screen_res;\n'; // If uniform is in block(shared), does not matter if the shader uses it, it must be declared.
-   }
-   
-   if(sid.unif & SID.UNIF.TIME) {
-      if(sid.unif_extra.time & SID.UNIF_EXTRA.TIME.IS_SHARED) uniforms_code += ' float u_time;\n'; 
-   }
-   
-   if(is_block) uniforms_code += '};\n\n'
-   
-   
-   if(sid.unif & SID.UNIF.PROJECTION_MATRIX && sid.unif_extra.proj & SID.UNIF_EXTRA.PROJECTION_MATRIX.IN_FS && 
-      (sid.unif_extra.proj & SID.UNIF_EXTRA.PROJECTION_MATRIX.IS_SHARED) === 0
-      ) {
-         uniforms_code += 'uniform mat4 u_projection;\n'; 
-         uniforms_info.push({
-            name:'u_projection',
-            is_block:true,
-            type:UNIF_TYPE.MAT4,
-         });
-
-      }
-
-   if(sid.unif & SID.UNIF.SCREEN_RESOLUTION && sid.unif_extra.res & SID.UNIF_EXTRA.SCREEN_RESOLUTION.IN_FS && 
-      (sid.unif_extra.res & SID.UNIF_EXTRA.SCREEN_RESOLUTION.IS_SHARED) === 0
-      ) {
-         uniforms_code += 'uniform vec2 u_screen_res;\n'; 
-         uniforms_info.push({
-            name:'u_screen_res',
-            is_block:false,
-            type:UNIF_TYPE.FVEC2,
-         });
-      }
-
-
    const len = _uniforms_info.length;
+
+   for(let i=0; i< len; i++){
+      if(_uniforms_info[i].shader & UNIFORM.IS_SHARED){
+
+         // Create Uniforms Block
+         if(!block_created) {
+            uniforms_code += `layout(std140) uniform Uniform_block_generic {\n`;
+            block_created = true;
+         }
+         
+         const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
+         uniforms_code += ` ${type} ${_uniforms_info[i].name};\n`; 
+      }
+
+   }
+
+   // End uniforms block
+   if(block_created) uniforms_code += '};\n';
+
+
    for(let i=0; i< len; i++){
       if(_uniforms_info[i].shader & UNIFORM.IN_FS){
 
@@ -229,7 +154,6 @@ function Resolve_uniforms_from_sid_fs(sid, _uniforms_info){
       }
    }
       
-   // UNIFORMS_TEMP_INFO.fs = uniforms_info;
    
    return uniforms_code;
 
@@ -287,7 +211,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // UNIFORMS
-      Resolve_uniforms_from_sid_vs(sid, uniforms_info),
+      Resolve_uniforms_from_sid(UNIFORM.IN_VS, uniforms_info),
       '\n',
       
 
@@ -310,7 +234,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       'void main(void) ',
       '{',
-      (sid.unif & SID.UNIF.PROJECTION_MATRIX) 
+      (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
          ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);' 
          : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
 
@@ -364,14 +288,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.R_CORNERS) ? '#include <in_frag_rCorners>' : '',
       (sid.attr & SID.ATTR.FEATHER) ? '#include <in_frag_border_feather>' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <in_frag_sdf2>' : '',
-      // (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? 'in vec2 v_screen_res;' : '',
-      // (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? 'uniform  vec2 u_screen_res;' : '',
-      // (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? 'vec2 v_screen_res = u_screen_res;' : '',
+
       
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // UNIFORMS
       '\n',
-      Resolve_uniforms_from_sid_fs(sid, uniforms_info),
+      Resolve_uniforms_from_sid(UNIFORM.IN_FS, uniforms_info),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
       
       
@@ -406,7 +328,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // TESTS
-      true ? '  frag_color.xyz *= u_time;' : '',
+      (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
       
       true ? '}' : '',
       

@@ -75,22 +75,136 @@ export function TestWidgetsGeneric(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
 
+    { // TESTING u_time
+        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 200, 5], [800, 10], PURPLER[7]);
+        {
+            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            const params = {
+                name: 'u_projection',
+                type: UNIF_TYPE.MAT4,
+                shader:(UNIFORM.IS_SHARED),
+                sid: line.sid,
+            };
+            line.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
+            
+            params.name =  'u_screen_res';
+            params.type =  UNIF_TYPE.FVEC2;
+            params.shader = (UNIFORM.IS_SHARED);
+            line.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
+            
+            params.name =  'u_time';
+            params.type =  UNIF_TYPE.FLOAT;
+            params.shader = (UNIFORM.IN_FS);
+            line.EnableGfxUniforms(params, SID.UNIF.TIME);
+    
+            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+            line.Activate();
+            line.Render();
+            line.ConstructListeners();
+        }
+    }
+    { // TESTING u_time
+        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 300, 5], [800, 10], PURPLER[7]);
+        {
+            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            const params = {
+                name: 'u_projection',
+                type: UNIF_TYPE.MAT4,
+                shader:(UNIFORM.IS_SHARED),
+                sid: line.sid,
+            };
+            line.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
+            
+            params.name =  'u_screen_res';
+            params.type =  UNIF_TYPE.FVEC2;
+            params.shader = (UNIFORM.IS_SHARED);
+            line.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
+            
+            params.name =  'u_time';
+            params.type =  UNIF_TYPE.FLOAT;
+            params.shader = (UNIFORM.IN_FS);
+            line.EnableGfxUniforms(params, SID.UNIF.TIME);
+    
+            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+            line.Activate();
+            line.Render();
+            line.ConstructListeners();
+        }
+    }
+    { // TESTING u_time
+        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 400, 5], [800, 10], PURPLER[7]);
+        {
+            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            const params = {
+                name: 'u_projection',
+                type: UNIF_TYPE.MAT4,
+                shader:(UNIFORM.IS_SHARED),
+                sid: line.sid,
+            };
+            line.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
+            
+            params.name =  'u_screen_res';
+            params.type =  UNIF_TYPE.FVEC2;
+            params.shader = (UNIFORM.IS_SHARED);
+            line.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
+            
+            params.name =  'u_time';
+            params.type =  UNIF_TYPE.FLOAT;
+            params.shader = (UNIFORM.IN_FS);
+            line.EnableGfxUniforms(params, SID.UNIF.TIME);
+    
+            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+            line.Activate();
+            line.Render();
+            line.ConstructListeners();
+        }
+    }
+    { // TESTING u_time
+        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 500, 5], [800, 10], PURPLER[7]);
+        {
+            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            const params = {
+                name: 'u_projection',
+                type: UNIF_TYPE.MAT4,
+                shader:(UNIFORM.IS_SHARED),
+                sid: line.sid,
+            };
+            line.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
+            
+            params.name =  'u_screen_res';
+            params.type =  UNIF_TYPE.FVEC2;
+            params.shader = (UNIFORM.IS_SHARED);
+            line.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
+            
+            params.name =  'u_time';
+            params.type =  UNIF_TYPE.FLOAT;
+            params.shader = (UNIFORM.IN_FS);
+            line.EnableGfxUniforms(params, SID.UNIF.TIME);
+    
+            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+            line.Activate();
+            line.Render();
+            line.ConstructListeners();
+        }
+    }
 
 
 
     /** Lines */
-    const line = SdfLine(BLUE_10_120_220, [500, 200, 5], [800, 10]);
-    // Get the uniform by the program
-    const obj = {
-        Set: null,
-        Update:null,
-    };
-    Program_uniform_bind(line.gfx.prog.groupidx, line.gfx.prog.idx, obj, null, 'u_time');
-    obj.Set(4.2);
-    obj.Update();
+    // // Get the uniform by the program
+    // const obj = {
+    //     Set: null,
+    //     Update:null,
+    // };
+    // Program_uniform_bind(line.gfx.prog.groupidx, line.gfx.prog.idx, obj, 'u_time');
+    // obj.Set(4.2);
+    // obj.Update();
 
-    SdfLine(GREEN[7], [500, 600, 5], [800, 10]);
-    SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
+    // SdfLine(GREEN[7], [500, 600, 5], [800, 10]);
+    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
+    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
+    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
+    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
 
     // const fb = Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, line);
     { // Draw multiple lines to multiple framebuffers
@@ -231,16 +345,12 @@ function CreateLabel(name = 'Label ') {
     const pos = [20, 310 + (labelCount * 35), 2];
     // const pos = [80, 600, 2];
     // const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, 10, GREY[1], WHITE, [6, 4], .5);
-    const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY[2], WHITE, [5, 5], .5);
+    const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.ConstructListeners();
 
-    label.sid.unif |= SID.UNIF.SCREEN_RESOLUTION;
-    // label.text_mesh.sid.unif |= SID.UNIF.BLOCK | SID.UNIF.GENERIC;
-    // label.text_mesh.sid.unif |= SID.UNIF.BLOCK | SID.UNIF.GENERIC2;
 
-    // const pos = [halfw, VIEWPORT.HEIGHT-halfh, 0];
 
     label.Activate();
     // label.GenGfxCtx(GFX_CTX_FLAGS.NEW);
@@ -322,20 +432,12 @@ function SdfLine(col, pos, dim) {
     // line1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     // line.AddItem(line1)
     
-    line.sid.unif |= SID.UNIF.TIME;
+    // line.sid.unif |= SID.UNIF.TIME;
 
-    
-    line.EnableGfxAttributes(
-        MESH_ENABLE.GFX.UNIFORM, {
-        name:'u_time', 
-        type:UNIF_TYPE.FLOAT, 
-        shader:(UNIFORM.IN_FS), 
-        sid:line.sid
-    });
 
-    const params = null;
-    const timer = TimersCreateTimer(0.01, 10, .1, 'T1', TEMP_TIMER_CLBK, params);
-    // line.sid.unif |=  SID.UNIF.UNIFORM_BLOCK | SID.UNIF.PROJECTION_MATRIX;
+
+    // const params = null;
+    // const timer = TimersCreateTimer(0.01, 10, .1, 'T1', TEMP_TIMER_CLBK, params);
     
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     line.Activate();

@@ -1,6 +1,6 @@
 "use strict";
 import { Shaders_load } from './GlShaders.js';
-import { Uniforms_block_buffer_create, Uniforms_buffer_create_uniform, Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform, Uniforms_buffer_bind_uniform_functions } from './Buffers/UniformBuffers.js';
+import { Uniforms_block_buffer_create, Uniforms_buffer_create_uniform, Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform, Uniforms_buffer_bind_uniform_functions, Uniforms_block_bind_uniform_layout } from './Buffers/UniformBuffers.js';
 import { Gfx_create_group_buffer } from '../Engine/Interfaces/Gfx/MeshGfxContext.js';
 import { Int8Buffer, M_Buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_create, Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
@@ -138,6 +138,25 @@ function Create_program(sid) {
 	const progidx = _program_groups.buffer[groupidx].Add(prog);
 	prog.idx = progidx; // Store the programs index to self
 
+		
+	const u_info = TEMP_UNIFORMS_STORAGE_BUFFER[progidx];
+	/****************************************************************************************************/
+	// Shared-Block uniforms
+	
+	const ub_idx = Uniforms_block_buffer_create(sid.unif, prog.shader_program, u_info);
+	// prog.ubb.Add(ub_idx);
+
+	/****************************************************************************************************/
+	// Individual uniforms
+	
+	const len = u_info.length;
+	for (let i = 0; i < len; i++) {
+		if((u_info[i].shader & UNIFORM.IS_SHARED) === 0)
+		Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, u_info[i].type, u_info[i].name);
+	}
+
+
+
 	return { groupidx: groupidx, progidx: progidx };
 
 }
@@ -160,24 +179,6 @@ export function Program_create_program(sid) {
 	GL.BOUND_PROG_IDX = progidx;
 	GL.BOUND_PROG = prog.shader_program;
 
-	// Enable screen resolution uniform (vec2)  
-	// if (sid.unif & SID.UNIF.BUFFER_RES) {
-	// 	const unifBufferResIdx = prog.UniformsBufferCreateScreenRes();
-	// 	prog.UniformsSetBufferUniform(VIEWPORT.WIDTH, unifBufferResIdx.resXidx);
-	// 	prog.UniformsSetBufferUniform(VIEWPORT.HEIGHT, unifBufferResIdx.resYidx);
-	// }
-
-	// Enable Uniform Shared Block
-	// if(sid.unif & SID.UNIF.UNIFORM_BLOCK){
-	// 	Uniforms_block_buffer_create(prog.shader_program, sid.unif);
-	// }
-
-	// Enable global timer uniform (float)
-	// if (sid.unif & SID.UNIF.BUFFER_RES) {
-	// 	const step = 0.1;
-	// 	prog.UniformsCreateTimer(step);
-	// }
-
 	return indexes;
 }
 
@@ -194,42 +195,66 @@ export function Program_enable_uniforms_for_creation(params){
 
 	const ub = TEMP_UNIFORMS_STORAGE_BUFFER; // Cash
 
-	let program_idx = INT_NULL;
+	let same_progidx = INT_NULL;
 	const len = ub.length;
 	// If program (same sid) exists, store the uniform info to the same buffer, else create new array buffer (different sid/program)
 	for (let i=0; i<len; i++){
 		
-		// If TEMP_UNIFORMS_STORAGE_BUFFER[i] exists, it means that at least on uniform has been stored for that i (program_idx).
+		// If TEMP_UNIFORMS_STORAGE_BUFFER[i] exists, it means that at least on uniform has been stored for that i (same_progidx).
 		// Because all uniforms of every [i] have the same sid, checking [i][0] is enough.
 		if(ub[i][0]){
 
 			// In order to store a uniform for creation, 
 			// 1. we must match the same sid, that means that the all uniforms of the same program will be created in the same shader,
-			if(SID.CheckSidMatch(ub[i][0].sid, params.sid)){
+			// if(SID.CheckSidMatch(ub[i][0].sid, params.sid)){
+			if(ub[i][0].sid.shad === params.sid.shad &&
+            ub[i][0].sid.attr === params.sid.attr &&
+            ub[i][0].sid.unif === params.sid.unif &&
+            ub[i][0].sid.pass === params.sid.pass &&
+            ub[i][0].sid.progs_group === params.sid.progs_group){
 				
-				program_idx = i;
+				same_progidx = i;
+				// console.log( params.sid)
+				// console.log('YES', ub[i][0].sid)
+				break;
+			}
+			// else console.log('NO', ub[i][0].sid)
+		}
+	}
+	
+	let abort = false;
+
+	// Create buffer for new program uniforms
+	if(same_progidx === INT_NULL){
+		same_progidx = TEMP_UNIFORMS_STORAGE_BUFFER.push(new Array) -1;
+	}
+	else{
+
+		// 2. and we do not want duplicate uniforms. Checked by name.
+		const len2 = ub[same_progidx].length;
+		for (let j=0; j<len2; j++){
+			if(ub[same_progidx][j].name === params.name){
+				abort = true;
 				break;
 			}
 		}
 	}
-
-	// Create buffer for new program uniforms
-	if(program_idx === INT_NULL)
-		program_idx = TEMP_UNIFORMS_STORAGE_BUFFER.push(new Array) -1;
-
-	let abort = false;
-	// 2. and we do not want duplicate uniforms. Checked by name.
-	const len2 = ub[program_idx].length;
-	for (let j=0; j<len2; j++){
-		if(ub[program_idx][j].name === params.name){
-			abort = true;
-			break;
-		}
-	}
 		
 
-		// Store the uniform info and the mesh sid
-		if(!abort) TEMP_UNIFORMS_STORAGE_BUFFER[program_idx].push(params);
+	// Store the uniform info and the mesh sid
+	if(!abort) {
+		
+		const sid_copy = {};
+		SID.Copy(sid_copy, params.sid)
+		console.log(sid_copy)
+		
+		TEMP_UNIFORMS_STORAGE_BUFFER[same_progidx].push({
+		name:params.name,
+		type:params.type,
+		shader:params.shader,
+		sid:params.sid, // NOTE: The sid probably is tored by refference and not copied
+	});
+	}
 }
 
 
@@ -260,6 +285,7 @@ class Gl_Program {
 
 		this.idx = INT_NULL; // Self index to the Programs buffer
 
+		console.log('------------------------------------------------\nTEMP_UNIFORMS_STORAGE_BUFFER:\n', TEMP_UNIFORMS_STORAGE_BUFFER, '\n\n')
 		const uniforms = Get_uniforms_for_program(sid);
 		if(!uniforms){
 			console.error('Uniform by sid not found. U Buffer:', TEMP_UNIFORMS_STORAGE_BUFFER);
@@ -273,8 +299,8 @@ class Gl_Program {
 		this.ib = new Int8Buffer(1); // Array of indexes to all index buffers in '_index_buffers_info' buffer. 
 		this.ib.Init(-1);
 
-		this.ubb = new Int8Buffer(1); // Array of indexes to all uniforms in '_uniform_blocks' buffer. 
-		this.ubb.Init(-1);
+		// this.ubb = new Int8Buffer(1); // Array of indexes to all uniforms in '_uniform_blocks' buffer. 
+		// this.ubb.Init(-1);
 
 		// this.ub = new Int8Buffer(1); // Array of indexes to all uniforms in '_uniforms_buffer' buffer. 
 		// this.ub.Init(-1);
@@ -291,29 +317,6 @@ class Gl_Program {
 		// Store the function's index that is responsible of been used to add mesh data to apropriately to a vertex buffer
 		this.add_to_vb_fnidx = Select_fnidx_to_fill_vertex_buffer(this.attribsidx);
 
-
-		
-		
-		/****************************************************************************************************/
-		// Shared-Block uniforms
-		
-		// if any of the uniforms in SID.UNIF are _SHARED, must call Uniforms_block_buffer_create()
-		// For each uniform that is active but NOT _SHARED, we must add either to uniform buffer OR create a separate uniform
-		if (sid.unif & SID.UNIF.ANY_SHARED) {
-			const ub_idx = Uniforms_block_buffer_create(sid.unif, this.shader_program, this.ubb);
-			this.ubb.Add(ub_idx);
-		}
-
-
-		
-		/****************************************************************************************************/
-		// Individual uniforms
-		
-		const u_info = TEMP_UNIFORMS_STORAGE_BUFFER[0];
-		const len = u_info.length;
-		for (let i = 0; i < len; i++) {
-			Uniforms_buffer_create_uniform(gl, this.shader_program, u_info[i].type, u_info[i].name);
-		}
 
 
 		
@@ -437,34 +440,48 @@ export function Program_use_program(shader_program, progidx) {
 
 
 
-/** Call this to bind the 'Set' and 'Update' uniform function. Can call twice, for each binding seperately, but the 'fn_set, fn_update' must be null or undefined */
-export function Program_uniform_bind(groupidx, progidx, fn_set, fn_update, unif_name) {
+// /** 'functions' MUST HAVE .Set and .Update fields, so they can be bound to the uniforms Set() and Update(). */
+// export function Program_block_bind_uniform_layout(unif_name){
+// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
+// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
+
+// 	Uniforms_block_bind_uniform_layout(unif_name);
+
+// }
+
+
+
+// IMPORTANT:
+// Update individual uniforms via the Program function, so that there is no confusion as to under what program a uniform is boumd. 
+// Because the uniform update uses only a 'loc', this might lead to unwilingly updating same loc of another progrm'a uniform. 
+/** 'functions' MUST HAVE .Set and .Update fields, so they can be bound to the uniforms Set() and Update(). */
+export function Program_uniform_bind(groupidx, progidx, functions_obj, unif_name) {
 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
 
-	Uniforms_buffer_bind_uniform_functions(fn_set, fn_update, unif_name);
+	Uniforms_buffer_bind_uniform_functions(functions_obj, unif_name);
 
 }
 
 
 
-export function Program_uniforms_set(groupidx, progidx, ubidx, val) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
+// export function Program_uniforms_set(groupidx, progidx, ubidx, val) {
+// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
+// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
 
-	const uniform_idx = _program_groups.buffer[groupidx].buffer[progidx].ub[ubidx];
-	Uniforms_buffer_set_uniform(uniform_idx, val);
-}
+// 	const uniform_idx = _program_groups.buffer[groupidx].buffer[progidx].ub[ubidx];
+// 	Uniforms_buffer_set_uniform(uniform_idx, val);
+// }
 
 
 
-export function Program_uniforms_update(groupidx, progidx, ubidx) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
+// export function Program_uniforms_update(groupidx, progidx, ubidx) {
+// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
+// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
 
-	const uniform_idx = _program_groups.buffer[groupidx].buffer[progidx].ub[ubidx];
-	Uniforms_buffer_update_uniform(uniform_idx);
-}
+// 	const uniform_idx = _program_groups.buffer[groupidx].buffer[progidx].ub[ubidx];
+// 	Uniforms_buffer_update_uniform(uniform_idx);
+// }
 
 
 

@@ -1,5 +1,5 @@
 --------------------------------------------------- Milestones!
--Convert all mesh attribs to indexes in a vertex buffer
+-Convert all mesh attribs to indexes in a vertex buffer ???
 -Resizing
 -Horizontal scrolling
 -Dynamic Creation and Connection of sliders to utilities
@@ -13,71 +13,37 @@
 -Pass font texture via Uniform Shared Block
 --------------------------------------------------- Milestones!
 
---------------------------------------------------- Ideas!
-- What if we have a buffer per mesh with all its TREE children via indexes to the scenes gfxbuffer indexes?
-  That way we do not need to run recursively.
-- What if we have a buffer at every top root with all its TREE children?
-  And every time we want to run recursion on the root,we use that buffer of indexes/ponters(?).
 
+
+--------------------------------------------------- Ideas!
 - Implement Draw Commands, so that we can later implement UNDO command.
   Batch is allready a kind of command gathering(keeps the move values)
 
-- For Animatiions, have a MAX size buffer and a queue.
+- For Animations, have a MAX size buffer and a queue.
   If the animations buffer is full, store to queue 
   and when buffer element is free, run animations from queue 
 --------------------------------------------------- Ideas!
 
 
 
---------------------------------------------------- TESTING!
-. Implement a smooth fps timer, by addding
-  on each frame the new delta time but
-  subtracting the 'oldest' one, with a constant counter.
-  The 'oldest' value is up to dicision. For example
-  we could set 1000 samples, so the oldest will be the -100 delta. 
---------------------------------------------------- TESTING!
+--------------------------------------------------- CHECK!
+. Implement set render queue priority for meshes inside a vb.
+. Renderqueue
+. Listeners. When section has hover, children are not set as child events
+. Minimizer. Does not move children when minimized.
+. On collapsing an inner dropdown, the listeners are still there.
+--------------------------------------------------- CHECK!
+
+
 
 --------------------------------------------------- IMIDIATE!
-
-. Any new mesh or existing mesh update to the gfx buffers should be an One Time Event().
-  ??
-    DispatchEvent(update gfx pipeline), which runs for every update separately
-    Or 
-    gather all updates {
-      IF: scene's progidx needsUpdate = true 
-      IF: scene's vbidx needsUpdate = true
-      IF: scene's mesh needsUpdate = true
-    }
-    which  runs all updates at once
-    but we have to check for updates on each frame
-  ??
-
-  with the Scene being responsible to run for the 'gfx.prog[i].vb[j].mesh.Render() ' functionality. 
-
-. Implement set render queue priority for meshes inside a vb.
-
 . Implement destruction of gfx buffers and gl program.
   (Also make sure all suposed private buffers are set private).
 --------------------------------------------------- IMIDIATE!
 
 --------------------------------------------------- 
 
-// MEDDLE with
--// root.UpdateGfxPosDimRecursive(root);
 
-Set UpdatePosXYZ() in Mesh to update with the Batch.
-
-{ now
-  1. Implement the minimizer with a label
-  2. create the Help tip to display all the shortcuts for printing
-  3. Establish a good print debug for any concepts - like printing the root meshes of a scene
-}
-
-
-
-BUG:
-I think on collapsing an inner dropdown (fake removing by alpha), the listeners are still there. 
-Proven by when PRE_MULTIPLY is off and the actual collapsed menu is still hovered
 
 
 

@@ -112,33 +112,11 @@ const SID = {
         SCREEN_RESOLUTION: BIT5 <<= 0x1,
         TIME: BIT5 <<= 0x1,
 
-        ANY_SHARED: BIT5 <<= 0x1,
-
         // Extension:
         // IS_PROJECTION_MATRIX_BUFFERED: BIT5 <<= 0x1,
         // IS_SCREEN_RESOLUTION_BUFFERED: BIT5 <<= 0x1,
     },
 
-    UNIF_EXTRA:{
-
-        
-        PROJECTION_MATRIX: {
-            IS_SHARED: 0x1,
-            IN_VS: 0x2,
-            IN_FS: 0x4,
-        },
-        SCREEN_RESOLUTION: {
-            IS_SHARED: 0x1,
-            IN_VS: 0x2,
-            IN_FS: 0x4,
-        },
-        TIME: {
-            IS_SHARED: 0x1,
-            IN_VS: 0x2,
-            IN_FS: 0x4,
-        },
-    },
-    
     PASS: {
         COL4: BIT4,
         POS2: BIT4 <<= 1,
@@ -153,23 +131,23 @@ const SID = {
     },
 
     // FX
-    FX: {
-        FS_PARTICLES: BIT3,
-        FS_FIRE: BIT3 <<= 1,
-        FS_EXPLOSION_CIRCLE: BIT3 <<= 1,
-        FS_EXPLOSION_SIMPLE: BIT3 <<= 1,
-        FS_VORONOI_EXPLOSION: BIT3 <<= 1,
-        FS_GRADIENT: BIT3 <<= 1,
-        FS_HIGH_TECH: BIT3 <<= 1,
-        FS_CRAMBLE: BIT3 <<= 1,
-        FS_NOISE: BIT3 <<= 1,
-        FS_V2DGFX: BIT3 <<= 1,
-        FS_GLOW: BIT3 <<= 1,
-        FS_TWIST: BIT3 <<= 1,
-        FS_VORTEX: BIT3 <<= 1,
-        FS_VOLUMETRIC_EXPLOSION: BIT3 <<= 1,
-        FS_SHADOW: BIT3 <<= 1,
-    },
+    // FX: {
+    //     FS_PARTICLES: BIT3,
+    //     FS_FIRE: BIT3 <<= 1,
+    //     FS_EXPLOSION_CIRCLE: BIT3 <<= 1,
+    //     FS_EXPLOSION_SIMPLE: BIT3 <<= 1,
+    //     FS_VORONOI_EXPLOSION: BIT3 <<= 1,
+    //     FS_GRADIENT: BIT3 <<= 1,
+    //     FS_HIGH_TECH: BIT3 <<= 1,
+    //     FS_CRAMBLE: BIT3 <<= 1,
+    //     FS_NOISE: BIT3 <<= 1,
+    //     FS_V2DGFX: BIT3 <<= 1,
+    //     FS_GLOW: BIT3 <<= 1,
+    //     FS_TWIST: BIT3 <<= 1,
+    //     FS_VORTEX: BIT3 <<= 1,
+    //     FS_VOLUMETRIC_EXPLOSION: BIT3 <<= 1,
+    //     FS_SHADOW: BIT3 <<= 1,
+    // },
 
 
     DEBUG: false,
@@ -189,6 +167,15 @@ const SID = {
 
         return false;
     },
+
+    Copy(dst, src){
+        dst.shad = 0;        dst.shad |= src.shad;
+        dst.attr = 0;        dst.attr |= src.attr;
+        dst.attr = 0;        dst.attr |= src.attr;
+        dst.unif = 0;        dst.unif |= src.unif;
+        dst.pass = 0;        dst.pass |= src.pass;
+        dst.progs_group = 0;
+    }
 
 };
 
@@ -306,6 +293,7 @@ const GFX_CTX_FLAGS = {
 
     STATIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated rarely
     DYNAMIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated every frame
+    
 };
 
 
@@ -370,6 +358,7 @@ _CNT = 0x1;
 const UNIFORM = {
     IN_VS: _CNT,
     IN_FS: _CNT<<=0x1,
+    IS_SHARED: _CNT<<=0x1,
 }
 
 
@@ -395,6 +384,9 @@ const Texture = {
 
 
 const UNIF_TYPE = {
+
+    ID:'UNIF_TYPE',
+
     FLOAT: 0x1406, // FLOAT
     FVEC2: 0x8b50, // _VEC2
     FVEC3: 0x8b51, // _VEC3
@@ -412,6 +404,26 @@ const UNIF_TYPE = {
     UIVEC2: 0x8dc6, // _VEC2
     UIVEC3: 0x8dc7, // _VEC3
     UIVEC4: 0x8dc8, // _VEC4
+
+
+	GetSizeInBytes(type, id) {
+
+		if (id === undefined || id !== this.ID) alert('type not match');
+
+		let size = 0;
+		if (type === this.FLOAT) size += FLOAT32_BYTE_SIZE;
+		// else if (type & this.INT8 || type & this.UINT8) size += INT8_BYTE_SIZE;
+		// else if (type & this.INT16 || type & this.UINT16) size += INT16_BYTE_SIZE;
+		else if (type === this.INT || type === this.UINT) size += INT32_BYTE_SIZE;
+		else if (type === this.FVEC2) size += VEC2_BYTE_SIZE;
+		else if (type === this.FVEC3) size += VEC3_BYTE_SIZE;
+		else if (type === this.FVEC4) size += VEC4_BYTE_SIZE;
+		else if (type === this.MAT2) size += MAT2X2_BYTE_SIZE;
+		else if (type === this.MAT4) size += MAT4X4_BYTE_SIZE;
+
+		return size;
+	},
+
 
     GetStr(type){
         switch(type){
@@ -437,21 +449,6 @@ const UNIF_TYPE = {
 };
 
 
-
-
-
-
-
-// /** Temporary storage of uniforms info. Used by ShaderBuilder to store info for all created uniforms. This buffer must be reseted (by the user:Program class in this case) to be ready for next use.  */
-// const UNIFORMS_TEMP_INFO = {
-//     vs: null,
-//     fs: null,
-
-//     Reset(){
-//         this.vs = null;
-//         this.fs = null;
-//     }
-// };
 
 
 

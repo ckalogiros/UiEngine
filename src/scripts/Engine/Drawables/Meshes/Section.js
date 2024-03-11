@@ -94,7 +94,7 @@ export class Section extends Rect {
 
       mesh.StateEnable(this.state.mask & MESH_STATE.ACTIVE);
 
-      // UNNECESSARY: I the calc rearanges all items
+      // UNNECESSARY: the calc rearanges all items
       if (mesh.type & MESH_TYPE.SECTION_MESH) { // Handle other sections
 
          if (options & SECTION.FIT) {

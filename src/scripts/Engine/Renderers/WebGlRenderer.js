@@ -9,7 +9,7 @@ import { PerformanceTimersTick, _pt_loop, _pt_gl_draw, _pt_all_timers, _pt_batch
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
 import { Update_read_write_test } from "../../../Tests/ReadWrite.js";
 import { Batch_update } from "../Batch/Batch.js";
-import { UBO_update } from "../../Graphics/Buffers/UniformBuffers.js";
+import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 
 
 
@@ -99,7 +99,7 @@ export class WebGlRenderer {
 
          Batch_update()
 
-         UBO_update();
+         Uniforms_block_update_uniform();
          
          _pt_gl_draw.timer.Start(); Gl_draw(this.gl); _pt_gl_draw.timer.Stop();
 

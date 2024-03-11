@@ -47,7 +47,7 @@ export class Widget_Label extends Rect {
     idx; // Stores the index of the scene's root_mesh buffer, that keeps all scene's root meshes. 
     pad = [0, 0];
 
-    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 0, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
+    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;

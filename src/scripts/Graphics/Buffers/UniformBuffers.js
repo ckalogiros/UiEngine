@@ -45,26 +45,6 @@ function SetValueV3ui(gl, loc, val) { gl.uniform3uiv(loc, val); }
 function SetValueV4ui(gl, loc, val) { gl.uniform4uiv(loc, val); }
 
 
-// const numUniforms = gl.getProgramParameter(this.shader_program, gl.ACTIVE_UNIFORMS);
-// const indices = [...Array(numUniforms).keys()];
-// const blockIndices = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_BLOCK_INDEX);
-// const offsets = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_OFFSET);
-
-// const uniforms = [];
-// for (let ii = 0; ii < numUniforms; ++ii) {
-//   const uniformInfo = gl.getActiveUniform(this.shader_program, ii);
-// //   if (isBuiltIn(uniformInfo)) {
-// // 		continue;
-// //   }
-//   uniforms.push(uniformInfo);
-//   const {name, type, size} = uniformInfo;
-//   const blockIndex = blockIndices[ii];
-//   const offset = offsets[ii];
-// //   console.log(
-// // 	  name, size, glEnumToString(gl, type),
-// // 	  blockIndex, offset);
-// console.log(uniformInfo, blockIndex, offset)
-// }
 
 
 // gl.getActiveUniform(this.shader_program, idx)
@@ -149,7 +129,7 @@ export function Uniforms_buffer_create_uniform(gl, shader_program, type, name){
 
    const uniform = new Uniform(gl, shader_program, type, name);
    const idx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
-   console.log('1111111 Uniform Created at index:', idx, _uniforms_buffer )
+   console.warn('1111111 Uniform Created at index:', idx, _uniforms_buffer )
    // return uniform
 }
 
@@ -176,8 +156,8 @@ export function Uniforms_buffer_update_uniform(ubidx){
 
 
 
-/** 'fn_set' and 'fn_update' MUST BE type of 'function' in order to bind them. */
-export function Uniforms_buffer_bind_uniform_functions(obj, i, unif_name=''){
+/** 'functions' MUST HAVE .Set and .Update fields, so they can be bound to the uniforms Set() and Update(). */
+export function Uniforms_buffer_bind_uniform_functions(functions, unif_name=''){
 
    // Find uniform by name
    for(let i=0; i<_uniforms_buffer.boundary; i++){
@@ -189,16 +169,14 @@ export function Uniforms_buffer_bind_uniform_functions(obj, i, unif_name=''){
       if(unif.name === unif_name){
 
          // Set the 'Set' and 'Update' 
-         // if(typeof fn_set === 'function' && !unif.is_set_bound) {
          if(!unif.is_set_bound) {
-            // fn_set = unif.Set;
-            obj.Set = unif.Set.bind(unif);
+
+            functions.Set = unif.Set.bind(unif);
             unif.is_set_bound = true;
          } 
-         // if(typeof fn_update === 'function' && !unif.is_update_bound) {
          if(!unif.is_update_bound) {
-            // fn_update = _uniforms_buffer.buffer[i].Update;
-            obj.Update = unif.Update.bind(unif);
+
+            functions.Update = unif.Update.bind(unif);
             unif.is_update_bound = true;
          }
       }
@@ -290,7 +268,7 @@ let _uniform_blocks = new M_Buffer();
 
 
 // const CreatedUniforms = [];
-function CheckUniformBlockExists(sid){
+function Uniform_block_exists(sid){
 
    for( let i=0; i<_uniform_blocks.boundary; i++){
 
@@ -337,9 +315,9 @@ class UniformsBlock {
 
    AddLayout(gl, type, typeid, name) {
 
-      const size = TYPES.GetSizeInBytes(type, typeid) / FLOAT32_BYTE_SIZE;
+      const size = UNIF_TYPE.GetSizeInBytes(type, typeid) / FLOAT32_BYTE_SIZE;
 
-      // Every uniform starts at the end of the prevoius unoform end
+      // Every uniform starts at the end of the prevoius uniform end
       const locidx = this.layout.locs.push(this.buffer_size) - 1;
 
       // Initialize
@@ -388,26 +366,39 @@ class UniformsBlock {
 
 
 
-export function Uniforms_block_buffer_create(sid, program, progrm_ub_ixs) {
+export function Uniforms_block_buffer_create(sid, program, uniforms) {
 
    const gl = gfxCtx.gl;
 
    let ub_idx = INT_NULL;
 
    // Create the shared block, if it is not yet created
-   // if (!_uniform_blocks.boundary) {
-   if (!CheckUniformBlockExists(sid)) {
+   if (!Uniform_block_exists(sid)) {
 
       const ub = new UniformsBlock(gl, program, UNIFORM_BLOCK_SHARED_NAME, sid);
       ub_idx = _uniform_blocks.Add(ub);
 
    }
    
-   if (sid & SID.UNIF.PROJECTION_MATRIX && UBS.PROJECTION_LOC === INT_NULL) {
-      UBS.PROJECTION_LOC = _uniform_blocks.buffer[0].AddLayout(gl, TYPES.MAT4X4, TYPES.ID, 'UBS Projection');
-   };
-   if (sid & SID.UNIF.SCREEN_RESOLUTION && UBS.RESOLUTION_LOC === INT_NULL) {
-      UBS.RESOLUTION_LOC = _uniform_blocks.buffer[0].AddLayout(gl, TYPES.VEC2, TYPES.ID, 'UBS screen Resolution');
+   let found = false;
+   const len = uniforms.length;
+   for (let i = 0; i < len; i++) {
+      
+      // Avoid duplicates, by checking for matched names
+      for (let j = 0; j < _uniform_blocks.boundary; j++) {
+
+         const layout = _uniform_blocks.buffer[j].layout;
+         for (let k = 0; k < len; k++) {
+
+            if(layout.names[k] === uniforms[i].name){
+               found = true;
+            }
+         }
+      }
+
+
+      if(!found && uniforms[i].shader & UNIFORM.IS_SHARED)
+         _uniform_blocks.buffer[0].AddLayout(gl, uniforms[i].type, UNIF_TYPE.ID, uniforms[i].name);
    }
 
    console.log('---- Uniform Shared Block ----\n', _uniform_blocks)
@@ -421,17 +412,37 @@ export function Uniforms_block_buffer_create(sid, program, progrm_ub_ixs) {
 
 
 
+/** The binding happens with an index to the uniform's layout of the '_uniform_blocks' buffer */
+export function Uniforms_block_bind_uniform_layout(unif_name=''){
 
-export function UBO_SetUniform(uniform_locidx, val) {
+   // Find matching uniform layout by uniform name
+   for(let i=0; i<_uniform_blocks.boundary; i++){
+      
+      const ubb = _uniform_blocks.buffer[i];
+      const len = ubb.layout.names.length;
+      for(let j=0; j<len; j++){
+         if(ubb.layout.names[j] === unif_name){
+            return j;
+         }
+      }
+   }
+
+   console.error('No Block uniform with name:', unif_name, 'found to be bound. Blocks:', _uniform_blocks);
+   alert('No Block uniform found to be bound.\n SEE console error');
+}
+
+
+
+export function Uniforms_block_set_uniform(uniform_locidx, val) {
    _uniform_blocks.buffer[0].SetVal(uniform_locidx, val);
    _uniform_blocks.buffer[0].needsUpdate = true;
 }
 
 
 
-export function UBO_update() { // HOT-PATH
+export function Uniforms_block_update_uniform() { // HOT-PATH
 
-   if (!_uniform_blocks.buffer[0].needsUpdate) return; 
+   if (!_uniform_blocks.buffer || !_uniform_blocks.buffer[0].needsUpdate) return; 
 
 
    const gl = gfxCtx.gl;
@@ -439,8 +450,8 @@ export function UBO_update() { // HOT-PATH
    gl.bindBufferBase(gl.UNIFORM_BUFFER, _uniform_blocks.buffer[0].binding_index, _uniform_blocks.buffer[0].glbuffer);
    
    const offset = 0; // The offset of the starting index from which to replace the data
-   gl.bufferSubData(gl.UNIFORM_BUFFER, 0, _uniform_blocks.buffer[0].buffer, offset, 0);
-   // gl.bufferData(gl.UNIFORM_BUFFER, Block, gl.DYNAMIC_DRAW);
+   // gl.bufferSubData(gl.UNIFORM_BUFFER, 0, _uniform_blocks.buffer[0].buffer, offset, 0);
+   gl.bufferData(gl.UNIFORM_BUFFER, _uniform_blocks.buffer[0].buffer, gl.DYNAMIC_DRAW);
 
    _uniform_blocks.buffer[0].needsUpdate = false;
 
@@ -465,3 +476,36 @@ function DEBUG_PRINT (buffer, index, line) {
 		 alert('Buffer at index is NULL. @GlProgram.js.');
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/* Extract all uniforms and uniform data (size, type, name) directly from shader */
+// const numUniforms = gl.getProgramParameter(this.shader_program, gl.ACTIVE_UNIFORMS);
+// const indices = [...Array(numUniforms).keys()];
+// const blockIndices = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_BLOCK_INDEX);
+// const offsets = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_OFFSET);
+
+// const uniforms = [];
+// for (let ii = 0; ii < numUniforms; ++ii) {
+//   const uniformInfo = gl.getActiveUniform(this.shader_program, ii);
+// //   if (isBuiltIn(uniformInfo)) {
+// // 		continue;
+// //   }
+//   uniforms.push(uniformInfo);
+//   const {name, type, size} = uniformInfo;
+//   const blockIndex = blockIndices[ii];
+//   const offset = offsets[ii];
+// //   console.log(
+// // 	  name, size, glEnumToString(gl, type),
+// // 	  blockIndex, offset);
+// console.log(uniformInfo, blockIndex, offset)
+// }

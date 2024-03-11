@@ -107,28 +107,27 @@ export class Mesh {
         this.mat = mat;
 
 
-        // TODO: Move conditional shader building options to some place else
-        let UNIFORM_FLAGS = (SID.UNIF.PROJECTION_MATRIX ); // Assuming a projection camera and screen resolution uniforms for all meshes. 
-        
-        const UNIF_EXTRA_PROJ = SID.UNIF_EXTRA.PROJECTION_MATRIX.IS_SHARED | SID.UNIF_EXTRA.PROJECTION_MATRIX.IN_VS;     
-        
-        if(SID.ATTR.STYLE){
-            UNIFORM_FLAGS |= SID.UNIF.SCREEN_RESOLUTION;
-            var UNIFORM_EXTRA_RES = SID.UNIF_EXTRA.SCREEN_RESOLUTION.IS_SHARED | SID.UNIF_EXTRA.SCREEN_RESOLUTION.IN_FS;
-        }
-
         this.sid = {
             shad: SID.SHAD.INDEXED | (this.geom.sid.shad | this.mat.sid.shad),
             attr: (this.geom.sid.attr | this.mat.sid.attr),
-            unif: (this.mat.sid.unif) | UNIFORM_FLAGS | SID.UNIF.ANY_SHARED, 
-            unif_extra: {
-                proj: UNIF_EXTRA_PROJ,
-                res: UNIFORM_EXTRA_RES,
-                time: SID.UNIF_EXTRA.TIME.IN_FS,
-            },
+            unif: this.mat.sid.unif, 
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
             progs_group: PROGRAMS_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
         };
+
+        const params = {
+            name: 'u_projection',
+            type: UNIF_TYPE.MAT4,
+            shader:(UNIFORM.IS_SHARED),
+            sid: this.sid,
+        };
+        this.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
+        
+        params.name =  'u_screen_res';
+        params.type =  UNIF_TYPE.FVEC2;
+        params.shader = (UNIFORM.IS_SHARED);
+        this.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
+
 
         this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
@@ -567,11 +566,6 @@ export class Mesh {
                 this.sid.attr |= SID.ATTR.TIME;
                 break;
             }
-            case MESH_ENABLE.GFX.UNIFORM: {
-                
-                Program_enable_uniforms_for_creation(params)
-                break;
-            }
 
             case MESH_ENABLE.GFX.PASS_COL4: { this.sid.pass |= SID.PASS.COL4; break; }
             case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS2; break; }
@@ -581,6 +575,32 @@ export class Mesh {
 
             default: console.error('Enable material\'s shader param failed. @ Material.js');
         }
+    }
+    EnableGfxUniforms(params, flags) {
+
+        if (this.alreadyAdded === true) {
+            console.error(`You are trying to enable ${which} but the shaders have been already created. Try Enable() before inserting the mesh to a Scene().`);
+            alert('SEE console error');
+        }
+
+        /**
+         * How to set up a uniform:
+         * 1. Call this, with uniform name and a glg:SID.UNIF. the type of uniform to enable.
+         *      This means that the user is responsiblee to add any new uniform type in SID global object.
+         *      That is so we can check and enable code in the shader builder. 
+         * 2. We need to bind the 'Set' and 'Update' functions for the uniforms to be usefull.
+         *      . For the block uniforms, we only need to 'Set' the value via 
+         *      'Uniforms_block_set_uniform()' function, the Update happens by gl.bindBuffer.
+         *      . For individual uniforms, both 'Set' and 'Update' must be bound via 'Program_uniform_bind()' function.
+         *          Use the 'Program_uniform_bind' and not 'Uniforms_bind...' Because the uniform update uses only a 'loc', 
+         *          this might lead to unwilingly updating same loc of another progrm'a uniform. 
+         */
+
+        // this.sid.unif |= SID.UNIF.PROJECTION_MATRIX;
+        this.sid.unif |= flags;
+        this.uniforms = params;
+        // Program_enable_uniforms_for_creation(params)
+
     }
 
 
