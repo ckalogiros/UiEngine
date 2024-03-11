@@ -10,7 +10,7 @@ import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Info_listener_dispatch_event } from "../../DebugInfo/InfoListeners.js";
 import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../../../Core/StringBuffer.js";
-import { Program_enable_uniforms_for_creation } from "../../../../Graphics/ShaderPrograms.js";
+// import { Program_enable_uniforms_for_creation } from "../../../../Graphics/ShaderPrograms.js";
 
 
 
@@ -110,24 +110,18 @@ export class Mesh {
         this.sid = {
             shad: SID.SHAD.INDEXED | (this.geom.sid.shad | this.mat.sid.shad),
             attr: (this.geom.sid.attr | this.mat.sid.attr),
+            // unif: this.mat.sid.unif | SID.UNIF.PROJECTION_MATRIX | SID.UNIF.SCREEN_RESOLUTION, 
             unif: this.mat.sid.unif, 
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
             progs_group: PROGRAMS_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
         };
 
-        const params = {
-            name: 'u_projection',
-            type: UNIF_TYPE.MAT4,
-            shader:(UNIFORM.IS_SHARED),
-            sid: this.sid,
-        };
-        this.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
-        
-        params.name =  'u_screen_res';
-        params.type =  UNIF_TYPE.FVEC2;
-        params.shader = (UNIFORM.IS_SHARED);
-        this.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
 
+        
+        this.uniforms = [];
+        if(APP.ENABLE_SHADER_PROJECTION_MATRIX)
+            this.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+        
 
         this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
@@ -154,12 +148,12 @@ export class Mesh {
         this.attrParams1 = [0, 0, 0, 0];
         if (attrParams1) CopyArr4(this.attrParams1, attrParams1);
 
-        this.uniforms = {
-            time: {
-                val: 0,
-                idx: INT_NULL,
-            }
-        }
+        // this.uniforms = {
+        //     time: {
+        //         val: 0,
+        //         idx: INT_NULL,
+        //     }
+        // }
 
         // Guard against enable a param for the shaders after the gl program has been created
         this.is_batched_temp = false;
@@ -576,7 +570,7 @@ export class Mesh {
             default: console.error('Enable material\'s shader param failed. @ Material.js');
         }
     }
-    EnableGfxUniforms(params, flags) {
+    EnableGfxUniforms(flags, name, type, shader_flags) {
 
         if (this.alreadyAdded === true) {
             console.error(`You are trying to enable ${which} but the shaders have been already created. Try Enable() before inserting the mesh to a Scene().`);
@@ -596,10 +590,22 @@ export class Mesh {
          *          this might lead to unwilingly updating same loc of another progrm'a uniform. 
          */
 
-        // this.sid.unif |= SID.UNIF.PROJECTION_MATRIX;
         this.sid.unif |= flags;
-        this.uniforms = params;
-        // Program_enable_uniforms_for_creation(params)
+
+        // Avoid duplicates
+        const len = this.uniforms.length;
+        let skip = false;
+        for(let i=0; i<len; i++){
+            if(this.uniforms[i].name === name)
+                skip = true;
+        }
+
+        if(!skip)
+            this.uniforms.push({
+                name: name,
+                type: type,
+                shader: shader_flags,
+            });
 
     }
 

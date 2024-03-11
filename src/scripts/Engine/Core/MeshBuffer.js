@@ -212,7 +212,11 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
 
       if (gfxidxs[i].groupidx === groupidx && gfxidxs[i].progidx === progidx && gfxidxs[i].vbidx === vbidx) {
          _root_batch_buffer[root_bufferidx].vb[i].num_faces += num_faces;
+
          const mesh = _mesh_buffer.buffer[mesh_bufferidx];
+
+         if(!mesh)
+         console.log()
          mesh.batch_bufferidx = i;
 
          stored = true;

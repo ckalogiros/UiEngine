@@ -155,7 +155,7 @@ export class Widget_Dropdown extends Section {
          Widget_root_add_mesh(this.menu.root_bufferidx, this.menu.mesh_bufferidx);
       }
 
-      this.menu.AddItem(mesh);
+      this.menu.AddItem(mesh); 
 
       this.SetMenuItemsZindex(); // EFFICIENCY: It runs for all children al over again every time a new item is added
 
@@ -244,10 +244,10 @@ export class Widget_Dropdown extends Section {
          const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
          FLAGS |= igfx.FLAGS;
 
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
+         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
       }
       else {
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, null, this.root_bufferidx, this.mesh_bufferidx);
+         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, null, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
       }
 
       this.menu.SetGfxProgramGroup(this.sid.progs_group);

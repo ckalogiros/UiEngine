@@ -45,8 +45,13 @@ export class Widget_Slider extends Rect {
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
+
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle([0, 6, 2]);
+      // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
+      this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      
+      
       this.SetName('Widget_Slider');
       // this.StateEnable(MESH_STATE.HAS_POPUP);
 
@@ -61,7 +66,7 @@ export class Widget_Slider extends Rect {
       const barpos = [pos[0], pos[1] + this.geom.dim[1], pos[2]]
       const barMetrics = this.#CalculateBarArea(barpos, dim, pad)
 
-      const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, GREY3);
+      const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, GREY[3]);
 
       bar.type |= MESH_TYPE.WIDGET_SLIDER_BAR | bar.geom | bar.mat;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -276,11 +281,11 @@ export class Widget_Slider extends Rect {
          {
             const igfx_rect = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
             FLAGS |= igfx_rect.FLAGS;
-            this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx_rect.FLAGS, igfx_rect.idxs, this.root_bufferidx, this.mesh_bufferidx);
+            this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx_rect.FLAGS, igfx_rect.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
    
             const igfx_text = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
             FLAGS |= igfx_text.FLAGS;
-            this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, igfx_text.FLAGS, igfx_text.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+            this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, igfx_text.FLAGS, igfx_text.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
          }
 
          // We already have a vertex buffer for rect and text rendering

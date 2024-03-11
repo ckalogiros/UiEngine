@@ -70,6 +70,11 @@ export class Widget_Scroller extends Section {
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle([0, 6, 2]);
+      // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
+      this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+
+
+
       this.SetName('Widget_Scroller');
       // this.StateEnable(MESH_STATE.HAS_POPUP);
       this.type |= MESH_TYPE.WIDGET_SCROLLER;
@@ -247,7 +252,7 @@ export class Widget_Scroller extends Section {
          const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
          FLAGS |= igfx.FLAGS;
 
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
+         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
 
          // Use the same gfx buffer for bar mesh
          const igfx_rect = [this.gfx.prog.idx, this.gfx.vb.idx];

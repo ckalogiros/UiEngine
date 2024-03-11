@@ -49,6 +49,14 @@ const TEST_CLIP_TOP = -110;
 const TEST_CLIP_BOTTOM = 700;
 
 
+
+const APP = {
+	ENABLE_SHADER_PROJECTION_MATRIX: true, // The block uniform 'u_projection_matrix' must be enabled for all app's shader programs.
+}
+
+
+
+
 //
 const TYPES = {
 

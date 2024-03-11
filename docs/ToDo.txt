@@ -40,7 +40,7 @@
 . Implement destruction of gfx buffers and gl program.
   (Also make sure all suposed private buffers are set private).
 --------------------------------------------------- IMIDIATE!
-
+. slider as child of a section, does not move to the correct position, only the gfx, the mesh moves
 --------------------------------------------------- 
 
 

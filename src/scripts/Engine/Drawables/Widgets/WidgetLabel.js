@@ -72,8 +72,12 @@ export class Widget_Label extends Rect {
         text_mesh.sid.progs_group = this.sid.progs_group; // If the label is a debug ui, so must be the text. 
 
         this.mesh_bufferidx = mesh_bufferidx;
+
         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
         this.SetStyle(style);
+        // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
+        this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+        
         this.type |= MESH_TYPE.WIDGET_TEXT_LABEL | this.geom.type | this.mat.type;
         this.SetName(`Lebel-text [${text}]`);
         this.pad = pad;
@@ -154,25 +158,25 @@ export class Widget_Label extends Rect {
             const rect_igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
             FLAGS |= rect_igfx.FLAGS;
    
-            this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, rect_igfx.FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
+            this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, rect_igfx.FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
 
             const text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
             FLAGS |= text_igfx.FLAGS;
    
-            this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, text_igfx.FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+            this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, text_igfx.FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
         }
         else {
 
-            this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, area_gfx_specific, this.root_bufferidx, this.mesh_bufferidx);
+            this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, area_gfx_specific, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
             if (!text_gfx_specific) {
 
                 const rect_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.sid);
                 FLAGS |= rect_igfx.FLAGS;
        
-                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.uniforms);
             }
             else {
-                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, text_gfx_specific, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, text_gfx_specific, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
             }
         }
 

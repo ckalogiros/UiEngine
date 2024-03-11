@@ -30,7 +30,11 @@ export class Section extends Rect {
       this.total_margin = [0, 0];
 
       this.mesh_bufferidx = mesh_bufferidx;
+
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
+      this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+
 
       this.options = options;
       this.margin = margin;
@@ -82,6 +86,8 @@ export class Section extends Rect {
    AddItem(mesh, options) {
 
       this.options |= options;
+
+      // SID.InheritUniform(mesh.sid.unif, this.sid.unif); // Inherits the parent's uniform flags
 
       const idx = this.AddChild(mesh);
       this.children_all.Add(mesh.mesh_bufferidx);

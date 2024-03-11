@@ -73,54 +73,13 @@ export const SHADER_CONSTANTS = {
 export const UNIFORM_BLOCK_SHARED_NAME = 'Uniform_block_generic';
 
 
+/**
+ * ERRORS:
+ * 
+ * . The 'Gfx_generate_context()' call, does not pass a 'uniform' param. 
+ */
 
-
-function Resolve_uniforms_from_sid(unif_shader_type, _uniforms_info){
-
-   let uniforms_code = '';
-   let block_created = false;
-   
-   const len = _uniforms_info.length;
-
-   for(let i=0; i< len; i++){
-      if(_uniforms_info[i].shader & UNIFORM.IS_SHARED){
-
-         // Create Uniforms Block
-         if(!block_created) {
-            uniforms_code += `layout(std140) uniform Uniform_block_generic {\n`;
-            block_created = true;
-         }
-         
-         const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
-         uniforms_code += ` ${type} ${_uniforms_info[i].name};\n`; 
-      }
-
-   }
-
-   // End uniforms block
-   if(block_created) uniforms_code += '};\n';
-   
-
-
-   for(let i=0; i< len; i++){
-      if((_uniforms_info[i].shader & UNIFORM.IN_VS) && UNIFORM.IN_VS === unif_shader_type){
-
-         const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
-         uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
-      }
-      else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && UNIFORM.IN_FS === unif_shader_type){
-
-         const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
-         uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
-      }
-   }
-
-   return uniforms_code;
-
-   // Extension: For lights
-}
-
-function Resolve_uniforms_from_sid_fs(sid, _uniforms_info){
+function Resolve_uniforms_from_sid(_uniforms_info){
 
    let uniforms_code = '';
    let block_created = false;
@@ -144,21 +103,29 @@ function Resolve_uniforms_from_sid_fs(sid, _uniforms_info){
 
    // End uniforms block
    if(block_created) uniforms_code += '};\n';
+   
 
 
    for(let i=0; i< len; i++){
-      if(_uniforms_info[i].shader & UNIFORM.IN_FS){
+      // if((_uniforms_info[i].shader & UNIFORM.IN_VS) && UNIFORM.IN_VS === unif_shader_type){
+      if((_uniforms_info[i].shader & UNIFORM.IN_VS) ){
+
+         const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
+         uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
+      }
+      // else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && UNIFORM.IN_FS === unif_shader_type){
+      else if((_uniforms_info[i].shader & UNIFORM.IN_FS)){
 
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
       }
    }
-      
-   
+
    return uniforms_code;
 
    // Extension: For lights
 }
+
 
 /**
  * // TODO:
@@ -211,7 +178,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // UNIFORMS
-      Resolve_uniforms_from_sid(UNIFORM.IN_VS, uniforms_info),
+      Resolve_uniforms_from_sid(uniforms_info),
       '\n',
       
 
@@ -293,7 +260,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // UNIFORMS
       '\n',
-      Resolve_uniforms_from_sid(UNIFORM.IN_FS, uniforms_info),
+      Resolve_uniforms_from_sid(uniforms_info),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
       
       

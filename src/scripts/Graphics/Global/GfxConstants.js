@@ -108,13 +108,17 @@ const SID = {
 
     UNIF: {
 
+        // Block Uniforms
         PROJECTION_MATRIX: BIT5,
         SCREEN_RESOLUTION: BIT5 <<= 0x1,
+
+        // Individual Uniforms
         TIME: BIT5 <<= 0x1,
 
         // Extension:
         // IS_PROJECTION_MATRIX_BUFFERED: BIT5 <<= 0x1,
         // IS_SCREEN_RESOLUTION_BUFFERED: BIT5 <<= 0x1,
+
     },
 
     PASS: {
@@ -153,12 +157,23 @@ const SID = {
     DEBUG: false,
 
 
+    // This function is used only to be able to reason of which mesh inherits from which mesh
+    InheritUniform(target, src){
+        target.unif |= src.unif;
+    },
+
+
     CheckSidMatch(sid1, sid2) {
 
+        // Remove all Block Uniforms flags. Better to reuse a program than to create a duplicate only because some meshes dont use Blocked Uniforms. 
+        const  unif1 = sid1 & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
+        const  unif2 = sid2 & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
+        
         if (
             sid1.shad === sid2.shad &&
             sid1.attr === sid2.attr &&
-            sid1.unif === sid2.unif &&
+            // sid1.unif === sid2.unif &&
+            unif1 === unif2 &&
             sid1.pass === sid2.pass &&
             sid1.progs_group === sid2.progs_group
         ) {

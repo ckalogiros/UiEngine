@@ -26,7 +26,7 @@ import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Crea
 import { Mesh_buffer_get_mesh_byidx, Widget_group_create, Widget_group_get, Widget_group_update_start, Widget_root_buffer_get_byidx, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3 } from '../Engine/Core/MeshBuffer.js';
 import { Clamp_y_remove_children_FIRST_TIME_CLAMP } from '../Engine/Drawables/Operations/Clip.js';
 import { Calculate_positions_recursive } from '../Engine/Drawables/Meshes/Section.js';
-import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE_240_160_10, PURPLE, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
+import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { TimersCreateTimer } from '../Engine/Timers/Timers.js';
 import { Program_uniform_bind } from '../Graphics/ShaderPrograms.js';
 
@@ -76,117 +76,59 @@ export function TestWidgetsGeneric(scene) {
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
 
     { // TESTING u_time
-        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 200, 5], [800, 10], PURPLER[7]);
+        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [500, 200, 5], [800, 10], PURPLER[7]);
         {
             line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            const params = {
-                name: 'u_projection',
-                type: UNIF_TYPE.MAT4,
-                shader:(UNIFORM.IS_SHARED),
-                sid: line.sid,
-            };
-            line.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
             
-            params.name =  'u_screen_res';
-            params.type =  UNIF_TYPE.FVEC2;
-            params.shader = (UNIFORM.IS_SHARED);
-            line.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
+            // line.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+            // line.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+            line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS|UNIFORM.IN_FS);
             
-            params.name =  'u_time';
-            params.type =  UNIF_TYPE.FLOAT;
-            params.shader = (UNIFORM.IN_FS);
-            line.EnableGfxUniforms(params, SID.UNIF.TIME);
-    
+            // {
+            //     const line2 = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [1000, 200, 5], [100, 10], PURPLEB[7]);
+            //     line2.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            //     line.AddItem(line2);
+            //     {
+            //         const line3 = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [1000, 200, 5], [100, 10], REDL[7]);
+            //         line3.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            //         line2.AddItem(line3);
+            //     }
+            // }
+            // {
+            //     const line2 = Create_widget_section(_, SECTION.VERTICAL, [0, 0], [1000, 200, 5], [100, 10], PURPLEB[7]);
+            //     line2.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            //     line.AddItem(line2);
+            // }
+            // {
+            //     const slider = Create_widget_slider(_, [200, 300, 0], [150, 10]);
+            //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+            //     // slider.ConstructListeners();
+            //     line.AddItem(slider);
+            // }
+            
             line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
             line.Activate();
             line.Render();
+            // line.Calc();
             line.ConstructListeners();
         }
     }
-    { // TESTING u_time
-        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 300, 5], [800, 10], PURPLER[7]);
-        {
-            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            const params = {
-                name: 'u_projection',
-                type: UNIF_TYPE.MAT4,
-                shader:(UNIFORM.IS_SHARED),
-                sid: line.sid,
-            };
-            line.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
+    // { // TESTING u_time
+    //     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 200, 5], [800, 10], PURPLER[7]);
+    //     {
+    //         line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
             
-            params.name =  'u_screen_res';
-            params.type =  UNIF_TYPE.FVEC2;
-            params.shader = (UNIFORM.IS_SHARED);
-            line.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
-            
-            params.name =  'u_time';
-            params.type =  UNIF_TYPE.FLOAT;
-            params.shader = (UNIFORM.IN_FS);
-            line.EnableGfxUniforms(params, SID.UNIF.TIME);
+    //         line.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+    //         line.EnableGfxUniforms(SID.UNIF.TIME, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+    //         // line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
     
-            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-            line.Activate();
-            line.Render();
-            line.ConstructListeners();
-        }
-    }
-    { // TESTING u_time
-        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 400, 5], [800, 10], PURPLER[7]);
-        {
-            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            const params = {
-                name: 'u_projection',
-                type: UNIF_TYPE.MAT4,
-                shader:(UNIFORM.IS_SHARED),
-                sid: line.sid,
-            };
-            line.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
-            
-            params.name =  'u_screen_res';
-            params.type =  UNIF_TYPE.FVEC2;
-            params.shader = (UNIFORM.IS_SHARED);
-            line.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
-            
-            params.name =  'u_time';
-            params.type =  UNIF_TYPE.FLOAT;
-            params.shader = (UNIFORM.IN_FS);
-            line.EnableGfxUniforms(params, SID.UNIF.TIME);
-    
-            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-            line.Activate();
-            line.Render();
-            line.ConstructListeners();
-        }
-    }
-    { // TESTING u_time
-        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 500, 5], [800, 10], PURPLER[7]);
-        {
-            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            const params = {
-                name: 'u_projection',
-                type: UNIF_TYPE.MAT4,
-                shader:(UNIFORM.IS_SHARED),
-                sid: line.sid,
-            };
-            line.EnableGfxUniforms(params, SID.UNIF.PROJECTION_MATRIX);
-            
-            params.name =  'u_screen_res';
-            params.type =  UNIF_TYPE.FVEC2;
-            params.shader = (UNIFORM.IS_SHARED);
-            line.EnableGfxUniforms(params, SID.UNIF.SCREEN_RESOLUTION);
-            
-            params.name =  'u_time';
-            params.type =  UNIF_TYPE.FLOAT;
-            params.shader = (UNIFORM.IN_FS);
-            line.EnableGfxUniforms(params, SID.UNIF.TIME);
-    
-            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-            line.Activate();
-            line.Render();
-            line.ConstructListeners();
-        }
-    }
+    //         line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+    //         line.Activate();
+    //         line.Render();
+    //         line.ConstructListeners();
+    //     }
+    // }
+   
 
 
 
@@ -349,6 +291,10 @@ function CreateLabel(name = 'Label ') {
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.ConstructListeners();
+
+    // label.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+    // label.text_mesh.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+    // label.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
 
 
@@ -2234,7 +2180,7 @@ function CreateScroller(scene) {
     const tr = .3;
 
     const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [260, 350, 0], [20, 20], TRANSPARENCY(GREY[1], 1.));
-    const colors = [RED0, REDL[7], REDL[7], RED3, REDL[7], RED5, RED6, RED7, RED8, RED9,];
+    const colors = REDL;
     const count = colors.length;
 
     for (let i = 0; i < 50; i++) {

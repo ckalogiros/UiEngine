@@ -38,10 +38,10 @@ export class Textured_Mesh extends Mesh {
          const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
          FLAGS |= igfx.FLAGS;
 
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
+         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
       }
       else {
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, gfxidx, this.root_bufferidx, this.mesh_bufferidx);
+         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, gfxidx, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
       }
 
       return this.gfx;

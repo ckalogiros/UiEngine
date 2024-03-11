@@ -318,12 +318,18 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 
       if (progidx === INT_NULL) { // If shader program does not exist, create new program.
 
-         const gfx_idxs = Program_create_program(sid);
+         const gfx_idxs = Program_create_program(sid, uniforms);
          groupidx = gfx_idxs.groupidx;
          progidx = gfx_idxs.progidx;
 
          Gfx_create_program_buffer(groupidx, progidx);
 
+         
+         Scene_set_projection_matrix(sceneidx)
+
+         const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
+         Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
+         
       }
       else groupidx = PROGRAMS_GROUPS.GetIdxByMask(sid.progs_group); // Get groupidx via SID
 
@@ -363,13 +369,6 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 
          // Create new entry for the new vertex buffer in widget root gfx buffer
          Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx);
-
-         Scene_set_projection_matrix(sceneidx)
-
-         const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
-         Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
-         // Uniforms_block_set_uniform(UBS.RESOLUTION_LOC, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
-
          
       }
       

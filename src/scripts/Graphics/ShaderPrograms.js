@@ -116,7 +116,7 @@ function Create_group() {
 
 
 
-function Create_program(sid) {
+function Create_program(sid, uniforms) {
 
 	/***************************************************************************************************/
 	// Create Program Group if it doesn't exist
@@ -134,25 +134,25 @@ function Create_program(sid) {
 
 	/***************************************************************************************************/
 	// Create Shader Program
-	const prog = new Gl_Program(gfxCtx.gl, sid);
+	const prog = new Gl_Program(gfxCtx.gl, sid, uniforms);
 	const progidx = _program_groups.buffer[groupidx].Add(prog);
 	prog.idx = progidx; // Store the programs index to self
 
 		
-	const u_info = TEMP_UNIFORMS_STORAGE_BUFFER[progidx];
+	// const u_info = TEMP_UNIFORMS_STORAGE_BUFFER[progidx];
 	/****************************************************************************************************/
 	// Shared-Block uniforms
 	
-	const ub_idx = Uniforms_block_buffer_create(sid.unif, prog.shader_program, u_info);
+	const ub_idx = Uniforms_block_buffer_create(sid.unif, prog.shader_program, uniforms);
 	// prog.ubb.Add(ub_idx);
 
 	/****************************************************************************************************/
 	// Individual uniforms
 	
-	const len = u_info.length;
+	const len = uniforms.length;
 	for (let i = 0; i < len; i++) {
-		if((u_info[i].shader & UNIFORM.IS_SHARED) === 0)
-		Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, u_info[i].type, u_info[i].name);
+		if((uniforms[i].shader & UNIFORM.IS_SHARED) === 0)
+		Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name);
 	}
 
 
@@ -163,9 +163,9 @@ function Create_program(sid) {
 
 
 
-export function Program_create_program(sid) {
+export function Program_create_program(sid, uniforms) {
 
-	const indexes = Create_program(sid);
+	const indexes = Create_program(sid, uniforms);
 	const groupidx = indexes.groupidx;
 	const progidx = indexes.progidx;
 
@@ -188,109 +188,104 @@ export function Program_create_program(sid) {
 
 
 
-const TEMP_UNIFORMS_STORAGE_BUFFER = [];
+// const TEMP_UNIFORMS_STORAGE_BUFFER = [];
 
 
-export function Program_enable_uniforms_for_creation(params){
+// export function Program_enable_uniforms_for_creation(params){
 
-	const ub = TEMP_UNIFORMS_STORAGE_BUFFER; // Cash
+// 	const ub = TEMP_UNIFORMS_STORAGE_BUFFER; // Cash
 
-	let same_progidx = INT_NULL;
-	const len = ub.length;
-	// If program (same sid) exists, store the uniform info to the same buffer, else create new array buffer (different sid/program)
-	for (let i=0; i<len; i++){
+// 	let same_progidx = INT_NULL;
+// 	const len = ub.length;
+// 	// If program (same sid) exists, store the uniform info to the same buffer, else create new array buffer (different sid/program)
+// 	for (let i=0; i<len; i++){
 		
-		// If TEMP_UNIFORMS_STORAGE_BUFFER[i] exists, it means that at least on uniform has been stored for that i (same_progidx).
-		// Because all uniforms of every [i] have the same sid, checking [i][0] is enough.
-		if(ub[i][0]){
+// 		// If TEMP_UNIFORMS_STORAGE_BUFFER[i] exists, it means that at least on uniform has been stored for that i (same_progidx).
+// 		// Because all uniforms of every [i] have the same sid, checking [i][0] is enough.
+// 		if(ub[i][0]){
 
-			// In order to store a uniform for creation, 
-			// 1. we must match the same sid, that means that the all uniforms of the same program will be created in the same shader,
-			// if(SID.CheckSidMatch(ub[i][0].sid, params.sid)){
-			if(ub[i][0].sid.shad === params.sid.shad &&
-            ub[i][0].sid.attr === params.sid.attr &&
-            ub[i][0].sid.unif === params.sid.unif &&
-            ub[i][0].sid.pass === params.sid.pass &&
-            ub[i][0].sid.progs_group === params.sid.progs_group){
+// 			// In order to store a uniform for creation, 
+// 			// 1. we must match the same sid, that means that the all uniforms of the same program will be created in the same shader,
+// 			// if(SID.CheckSidMatch(ub[i][0].sid, params.sid)){
+// 			if(ub[i][0].sid.shad === params.sid.shad &&
+//             ub[i][0].sid.attr === params.sid.attr &&
+//             ub[i][0].sid.unif === params.sid.unif &&
+//             ub[i][0].sid.pass === params.sid.pass &&
+//             ub[i][0].sid.progs_group === params.sid.progs_group){
 				
-				same_progidx = i;
-				// console.log( params.sid)
-				// console.log('YES', ub[i][0].sid)
-				break;
-			}
-			// else console.log('NO', ub[i][0].sid)
-		}
-	}
+// 				same_progidx = i;
+// 				// console.log( params.sid)
+// 				// console.log('YES', ub[i][0].sid)
+// 				break;
+// 			}
+// 			// else console.log('NO', ub[i][0].sid)
+// 		}
+// 	}
 	
-	let abort = false;
+// 	let abort = false;
 
-	// Create buffer for new program uniforms
-	if(same_progidx === INT_NULL){
-		same_progidx = TEMP_UNIFORMS_STORAGE_BUFFER.push(new Array) -1;
-	}
-	else{
+// 	// Create buffer for new program uniforms
+// 	if(same_progidx === INT_NULL){
+// 		same_progidx = TEMP_UNIFORMS_STORAGE_BUFFER.push(new Array) -1;
+// 	}
+// 	else{
 
-		// 2. and we do not want duplicate uniforms. Checked by name.
-		const len2 = ub[same_progidx].length;
-		for (let j=0; j<len2; j++){
-			if(ub[same_progidx][j].name === params.name){
-				abort = true;
-				break;
-			}
-		}
-	}
+// 		// 2. and we do not want duplicate uniforms. Checked by name.
+// 		const len2 = ub[same_progidx].length;
+// 		for (let j=0; j<len2; j++){
+// 			if(ub[same_progidx][j].name === params.name){
+// 				abort = true;
+// 				break;
+// 			}
+// 		}
+// 	}
 		
 
-	// Store the uniform info and the mesh sid
-	if(!abort) {
+// 	// Store the uniform info and the mesh sid
+// 	if(!abort) {
 		
-		const sid_copy = {};
-		SID.Copy(sid_copy, params.sid)
-		console.log(sid_copy)
+// 		const sid_copy = {};
+// 		SID.Copy(sid_copy, params.sid)
+// 		console.log(sid_copy)
 		
-		TEMP_UNIFORMS_STORAGE_BUFFER[same_progidx].push({
-		name:params.name,
-		type:params.type,
-		shader:params.shader,
-		sid:params.sid, // NOTE: The sid probably is tored by refference and not copied
-	});
-	}
-}
+// 		TEMP_UNIFORMS_STORAGE_BUFFER[same_progidx].push({
+// 		name:params.name,
+// 		type:params.type,
+// 		shader:params.shader,
+// 		sid:params.sid, // NOTE: The sid probably is tored by refference and not copied
+// 	});
+// 	}
+// }
 
 
 
-function Get_uniforms_for_program(sid){
+// function Get_uniforms_for_program(sid){
 
-	for (let i=0; i<TEMP_UNIFORMS_STORAGE_BUFFER.length; i++){
+// 	for (let i=0; i<TEMP_UNIFORMS_STORAGE_BUFFER.length; i++){
 		
-		if(SID.CheckSidMatch(TEMP_UNIFORMS_STORAGE_BUFFER[i][0].sid, sid)){
+// 		if(SID.CheckSidMatch(TEMP_UNIFORMS_STORAGE_BUFFER[i][0].sid, sid)){
 			
-			return TEMP_UNIFORMS_STORAGE_BUFFER[i];
-		}
-	}
+// 			return TEMP_UNIFORMS_STORAGE_BUFFER[i];
+// 		}
+// 	}
 
-	if(!TEMP_UNIFORMS_STORAGE_BUFFER.length) return 1;
-	return null;
-}
+// 	if(!TEMP_UNIFORMS_STORAGE_BUFFER.length) return 1;
+// 	return null;
+// }
 
 
 
 
 class Gl_Program {
 
-	constructor(gl, sid) {
+	constructor(gl, sid, uniforms) {
 
 		this.sid = sid; // Shader Type ID (E.g. ATTR_COL4 | ATTR_POS2 | INDEXED)
 		this.state = { mask: 0x0 };
 
 		this.idx = INT_NULL; // Self index to the Programs buffer
 
-		console.log('------------------------------------------------\nTEMP_UNIFORMS_STORAGE_BUFFER:\n', TEMP_UNIFORMS_STORAGE_BUFFER, '\n\n')
-		const uniforms = Get_uniforms_for_program(sid);
-		if(!uniforms){
-			console.error('Uniform by sid not found. U Buffer:', TEMP_UNIFORMS_STORAGE_BUFFER);
-			alert('SEE console error.');
-		} 
+
 		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
 
 		this.vb = new Int8Buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffers_info' buffer. 
