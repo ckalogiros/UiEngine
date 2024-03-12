@@ -14,7 +14,7 @@ import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keys.js';
 import { GetShaderTypeId } from '../Graphics/Debug/GfxDebug.js';
 
 import { Dropdown_roots_set_root, Widget_Dropdown } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Debug_info_ui_performance } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Debug_info_create_all_generic_info, Debug_info_ui_performance } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Scroller_clampy_and_render, Widget_Scroller } from '../Engine/Drawables/Widgets/WidgetScroller.js';
 import { GetRandomColor, GetSequencedColor } from '../Helpers/Helpers.js';
 import { Gl_framebuffer_render, Gl_framebuffer_render_mesh } from '../Graphics/Buffers/FrameBuffers.js';
@@ -75,44 +75,8 @@ export function TestWidgetsGeneric(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
 
-    { // TESTING u_time
-        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [500, 200, 5], [800, 10], PURPLER[7]);
-        {
-            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            
-            // line.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
-            // line.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-            line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS|UNIFORM.IN_FS);
-            
-            // {
-            //     const line2 = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [1000, 200, 5], [100, 10], PURPLEB[7]);
-            //     line2.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            //     line.AddItem(line2);
-            //     {
-            //         const line3 = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [1000, 200, 5], [100, 10], REDL[7]);
-            //         line3.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            //         line2.AddItem(line3);
-            //     }
-            // }
-            // {
-            //     const line2 = Create_widget_section(_, SECTION.VERTICAL, [0, 0], [1000, 200, 5], [100, 10], PURPLEB[7]);
-            //     line2.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            //     line.AddItem(line2);
-            // }
-            // {
-            //     const slider = Create_widget_slider(_, [200, 300, 0], [150, 10]);
-            //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-            //     // slider.ConstructListeners();
-            //     line.AddItem(slider);
-            // }
-            
-            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-            line.Activate();
-            line.Render();
-            // line.Calc();
-            line.ConstructListeners();
-        }
-    }
+
+
     // { // TESTING u_time
     //     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [500, 200, 5], [800, 10], PURPLER[7]);
     //     {
@@ -163,8 +127,8 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    // const label = CreateLabel('LABEL');
-    // CreateLabel('Label2');
+    const label = CreateLabel('LABEL');
+    CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, label);
@@ -249,10 +213,9 @@ export function TestWidgetsGeneric(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh.children.buffer[0]);
 
-    // Meshbuffer_print()
 
-    // const gfxinfo = GfxInfo(scene)
-    // TimeIntervalsCreate(100, 'Gfx info tip', TIME_INTERVAL_REPEAT_ALWAYS, GfxInfoUpdate, { gfxinfo: gfxinfo });
+    Debug_info_create_all_generic_info();
+
 
     // Scenes_debug_info_create(scene);
 
@@ -278,6 +241,24 @@ export function TestWidgetsGeneric(scene) {
 // Widget Creation Functions
 
 const fontsize = 12;
+
+
+function Test_uniforms_uTime(){
+    { // TESTING u_time
+        const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [500, 200, 5], [800, 10], PURPLER[7]);
+        {
+            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            
+            // line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS|UNIFORM.IN_FS);
+            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+            line.Activate();
+            line.Render();
+            // line.Calc();
+            line.ConstructListeners();
+        }
+    }
+}
+
 
 
 
@@ -522,7 +503,7 @@ function CreateDropdown2(scene, pos, id) {
     const pad = [2, 1]
     const margin = [7, 7]
     // const dp = Create_widget_dropdown(`DP${id}`, pos, GREY2, BLUE_10_120_220, WHITE, pad);
-    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `${id}`, pos, GREY2, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
+    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
     dp.CreateMoveEvent();
     dp.CreateClickEvent();
 
@@ -3067,7 +3048,7 @@ function MeshInfo(scene) {
     infomesh.Align_pre(infomesh, ALIGN.VERTICAL)
 
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.NEW);
+    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     section.ActivateAndChildrenRecursive()
     section.Render();
     section.Calc(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);

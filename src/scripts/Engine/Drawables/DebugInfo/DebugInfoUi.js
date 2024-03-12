@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_create_text_info, Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown";
 import { PerformanceTimersGetBestFps, PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, Performance_timers_get_ms_1sec_reset, _pt_all_timers, _pt_batch2_update, _pt_batch_update, _pt_event_listener, _pt_framebuffer_rendering, _pt_gl_draw, _pt_hover_listener, _pt_loop, _pt_mesh_info_tip, _pt_scene_update } from "../../Timers/PerformanceTimers";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners";
@@ -9,7 +9,7 @@ import { Mesh_buffer_get_mesh_byidx, Widget_group_create, Widget_root_buffer_get
 import { Scroller_clampy_and_render } from "../Widgets/WidgetScroller";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals";
 import { Dbg_ui_create } from "./DebugInfoUiFactory";
-import { Program_get_group } from "../../../Graphics/ShaderPrograms.js";
+import { Program_create_text_info, Program_get_group } from "../../../Graphics/ShaderPrograms.js";
 import { BLUEL, GREEN, GREY, ORANGE_240_160_10, PURPLEB, PURPLER, REDL, WHITE, YELLOWL } from "../Material/Base/Colors.js";
 
 
@@ -1088,7 +1088,41 @@ function Debug_info_create_vertexbuffer_2D(params) {
    // section.Calc();
    // section.ConstructListeners();
 
-   // DEBUG_INFO.UI_VB_2D.IDX = section.scene_rootidx;
+   // DEBUG_INFO.UI_VB_2D.IDX =;
    // DEBUG_INFO.UI_VB_2D.IS_ON = true;
+
+}
+
+
+
+
+
+/************************************************************************************************************************************************/
+// All Generic Info
+/************************************************************************************************************************************************/
+
+export function Debug_info_create_all_generic_info() {
+
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [5, 5], [400,200,0], [100, 100], GREY[1], 'All Generic Info');
+   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+
+   const program_info = Program_create_text_info();
+   section.AddItem(program_info);
+   
+   const vb_info = Vertex_buffer_create_text_info();
+   section.AddItem(vb_info);
+
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   section.Render();
+   section.ConstructListeners();
+   section.Recalc();
+
+   section.group_bufferidxs = Widget_group_create(section.mesh_bufferidx, section.gfx)
+   section.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
+   
+   // program_info.group_bufferidxs = Widget_group_create(program_info.mesh_bufferidx, program_info.gfx)
+   // program_info.AddToWidgetGroupBuffer(program_info.group_bufferidxs[0]);
 
 }

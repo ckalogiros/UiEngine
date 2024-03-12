@@ -129,7 +129,7 @@ export class Text_Mesh extends Mesh {
       
       // Scenes_store_mesh_in_gfx(this.sceneidx, this); // For storing meshes by its gfx
       
-      if(this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
+      // if(this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
       
       this.is_gfx_inserted = true;
 

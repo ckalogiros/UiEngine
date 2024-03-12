@@ -63,7 +63,7 @@ class Buffer_Interface {
 
       /**DEBUG ERROR*/ if (idx < 0 || idx > this.size - 1) {
 
-         console.error('Index Out of bounds. @ M_Buffer.RemoveByIdx().')
+         console.error('Index Out of bounds. @ M_Buffer.RemoveByIdx().\n idx:', idx, 'size', this.size)
          // alert('Index Out of bounds. @ M_Buffer.RemoveByIdx().')
          return;
       }
@@ -181,6 +181,9 @@ class Buffer_Interface {
 
 
 
+
+
+
 // IMPORTANT: DO NOT USE M_BUFFER CLASS AS AN ARRAY OF INTEGERS, UNTIL CORRECT IMPLEMENTATION. SEE BUG AT 'Buffer_Interface, GetNextFree()'.
 export class M_Buffer extends Buffer_Interface {
 
@@ -229,8 +232,127 @@ export class M_Buffer extends Buffer_Interface {
 
 
 
+
+
+
+
+export class ArrayBufferInterface {
+
+   buffer;
+   boundary; // Counts how many elements from start until last element. (Some elements in between could be null)
+   active_count; // Counts how many elements are not null
+   size;
+   reserveidx; // An int value to store a reserved element for later use.
+
+   constructor(size=0) {
+
+      this.buffer = null;
+      this.boundary = 0;
+      this.active_count = 0;
+      this.size = size;
+      this.reserveidx = INT_NULL;
+
+   }
+
+
+   Add(int) {
+
+      const idx = this.GetNextFree();
+      this.buffer[idx] = int;
+      this.active_count++;
+      return idx;
+   }
+
+
+   GetNextFree() {
+
+      if (this.boundary >= this.size) {
+
+         this.Realloc(); // buffer is full.
+         const freeIdx = this.boundary++;
+         return freeIdx;
+      }
+
+      // We run until boundary and not size (the whole buffer) 
+      // since boundary does not decrement (on remove) below the last element's index.
+      // Sample buffer: [null, null, null, elem, 'empty', empty], count=1, boundary=4, size=6
+      for (let i = 0; i <= this.boundary; i++) {
+         if (this.buffer[i] === INT_NULL) {
+            // Increment boundary only if the free element is after the last stored element in the buffer.
+            if (i >= this.boundary) this.boundary++;
+            return i;
+         }
+      }
+   }
+
+
+   Reset() {
+
+      this.size = INT_NULL;
+      this.boundary = 0;
+      this.active_count = 0;
+      this.buffer = null;
+   }
+
+
+   RemoveByIdx(idx) {
+
+      if (this.buffer[idx] !== INT_NULL) {
+
+         this.buffer[idx] = INT_NULL;
+         this.active_count--;
+         this.ShortReplaceWithLast(idx)
+
+         if (this.boundary <= INT_NULL) alert('M_Buffer boundary <= -1');
+         if (this.active_count <= INT_NULL) alert('M_Buffer active_count <= -1');
+
+      }
+   }
+
+
+   ShortReplaceWithLast(removed_idx){
+      
+      let cur = removed_idx;
+      let last = this.boundary-1;
+      // REPLACE
+      this.buffer[cur] = this.buffer[last];
+      // REMOVE LAST
+      this.buffer[last] = INT_NULL;
+      this.boundary--;
+   }
+
+   
+   ShortShiftOne(removed_idx){
+
+      // SHIFT
+      let cur = removed_idx;
+      let next = cur+1;
+      for (next = removed_idx+1; next<this.boundary; next++, cur++) {
+
+         this.buffer[cur] = this.buffer[next];
+      }
+      // this.active_count--;
+      this.boundary--;
+      console.log('Short:', this.boundary, this.active_count)
+
+      // REMOVE LAST
+      this.buffer[next-1] = INT_NULL;
+   }
+
+   CopyBufferElements(oldData) {
+
+      const size = oldData.length;
+      for (let i = 0; i < size; i++) {
+         this.buffer[i] = oldData[i];
+      }
+   }
+
+}
+
+
+
 // TODO: Instead use Uint8 and set the NULL value with uin8_max: 255-0xff
-export class Int8Buffer extends Buffer_Interface {
+export class Int8Buffer extends ArrayBufferInterface {
 
    constructor(size = 0) {
 
@@ -476,11 +598,12 @@ export class Uint8Buffer extends Buffer_Interface {
       }
    }
 
+
 }
 
 
 
-export class Int16Buffer extends Buffer_Interface {
+export class Int16Buffer extends ArrayBufferInterface {
 
    constructor(size = 0) {
 
@@ -497,35 +620,35 @@ export class Int16Buffer extends Buffer_Interface {
    }
 
 
-   Add(int) {
+   // Add(int) {
 
-      const idx = this.GetNextFree();
-      this.buffer[idx] = int;
-      this.active_count++;
-      return idx;
-   }
+   //    const idx = this.GetNextFree();
+   //    this.buffer[idx] = int;
+   //    this.active_count++;
+   //    return idx;
+   // }
 
 
-   GetNextFree() {
+   // GetNextFree() {
 
-      if (this.boundary >= this.size) {
+   //    if (this.boundary >= this.size) {
 
-         this.Realloc(); // buffer is full.
-         const freeIdx = this.boundary++;
-         return freeIdx;
-      }
+   //       this.Realloc(); // buffer is full.
+   //       const freeIdx = this.boundary++;
+   //       return freeIdx;
+   //    }
 
-      // We run until boundary and not size (the whole buffer) 
-      // since boundary does not decrement (on remove) below the last element's index.
-      // Sample buffer: [null, null, null, elem, 'empty', empty], count=1, boundary=4, size=6
-      for (let i = 0; i <= this.boundary; i++) {
-         if (this.buffer[i] === INT_NULL) {
-            // Increment boundary only if the free element is after the last stored element in the buffer.
-            if (i >= this.boundary) this.boundary++;
-            return i;
-         }
-      }
-   }
+   //    // We run until boundary and not size (the whole buffer) 
+   //    // since boundary does not decrement (on remove) below the last element's index.
+   //    // Sample buffer: [null, null, null, elem, 'empty', empty], count=1, boundary=4, size=6
+   //    for (let i = 0; i <= this.boundary; i++) {
+   //       if (this.buffer[i] === INT_NULL) {
+   //          // Increment boundary only if the free element is after the last stored element in the buffer.
+   //          if (i >= this.boundary) this.boundary++;
+   //          return i;
+   //       }
+   //    }
+   // }
 
 
    // TODO: Maybe implement growing algorithm to be NOT doubling but just big enough
@@ -553,39 +676,70 @@ export class Int16Buffer extends Buffer_Interface {
    }
 
 
-   Reset() {
+   // Reset() {
 
-      this.size = INT_NULL;
-      this.boundary = 0;
-      this.active_count = 0;
-      this.buffer = null;
-   }
+   //    this.size = INT_NULL;
+   //    this.boundary = 0;
+   //    this.active_count = 0;
+   //    this.buffer = null;
+   // }
 
 
-   RemoveByIdx(idx) {
+   // RemoveByIdx(idx) {
 
-      if (this.buffer[idx] !== INT_NULL) {
+   //    if (this.buffer[idx] !== INT_NULL) {
 
-         this.buffer[idx] = INT_NULL;
-         this.active_count--;
+   //       this.buffer[idx] = INT_NULL;
+   //       this.active_count--;
+   //       this.ShortReplaceWithLast(idx)
 
-         if (this.boundary === 1) {
-            this.boundary = 0;
-            return;
-         }
-         else {
-            const boundary = this.boundary + 1;
-            for (let i = boundary; i > 0; i--) {
+   //       // if (this.boundary === 1) {
+   //       //    this.boundary = 0;
+   //       //    return;
+   //       // }
+   //       // else {
+   //       //    const boundary = this.boundary;
+   //       //    for (let i = boundary; i > 0; i--) {
 
-               if (this.buffer[this.boundary - 1] || this.boundary === 0) break;
-               this.boundary--;
-            }
-         }
+   //       //       if (this.buffer[this.boundary - 1] !== INT_NULL || this.boundary === 0) break;
+   //       //       this.boundary--;
+   //       //    }
+   //       // }
 
-         if (this.boundary === INT_NULL) alert('M_Buffer boundary = -1')
-         ERROR_NULL(this.active_count);
-      }
-   }
+   //       // console.log('Remove:', this.boundary, this.active_count)
+
+   //       if (this.boundary === INT_NULL) alert('M_Buffer boundary = -1')
+   //       ERROR_NULL(this.active_count);
+   //    }
+   // }
+
+   // ShortReplaceWithLast(removed_idx){
+      
+   //    let cur = removed_idx;
+   //    let last = this.boundary-1;
+   //    // REPLACE
+   //    this.buffer[cur] = this.buffer[last];
+   //    // REMOVE LAST
+   //    this.buffer[last] = INT_NULL;
+   //    this.boundary--;
+   // }
+
+   // ShortShiftOne(removed_idx){
+
+   //    // SHIFT
+   //    let cur = removed_idx;
+   //    let next = cur+1;
+   //    for (next = removed_idx+1; next<this.boundary; next++, cur++) {
+
+   //       this.buffer[cur] = this.buffer[next];
+   //    }
+   //    // this.active_count--;
+   //    this.boundary--;
+   //    console.log('Short:', this.boundary, this.active_count)
+
+   //    // REMOVE LAST
+   //    this.buffer[next-1] = INT_NULL;
+   // }
 
 }
 

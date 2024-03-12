@@ -45,8 +45,8 @@ const FIRST = 1;
 const LAST = 2;
 
 
-const TEST_CLIP_TOP = -110;
-const TEST_CLIP_BOTTOM = 700;
+const TEST_CLIP_TOP = -210;
+const TEST_CLIP_BOTTOM = 1500;
 
 
 
@@ -332,7 +332,7 @@ const MESH_STATE = {
 	HAS_POPUP: _CNT <<= 1,
 	HAS_CLIP: _CNT <<= 1,
 
-	Print(mask) {
+	ToString(mask) {
 
 		let str = '';
 		if (mask & this.IN_FOCUS) str += 'IN_FOCUS,'
@@ -352,7 +352,14 @@ const MESH_STATE = {
 		if (mask & this.IS_HOVERABLE) str += 'IS_HOVERABLE,'
 		if (mask & this.HAS_POPUP) str += 'HAS_POPUP,'
 		if (mask & this.IS_HOVER_COLORABLE) str += 'IS_HOVER_COLORABLE,'
+
+		return str;
 		// console.info(str)
+	},
+
+
+	Print(mask) {
+		console.info(this.ToString(mask))
 	}
 
 };

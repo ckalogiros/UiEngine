@@ -60,7 +60,7 @@ export class Mesh {
     // IMPORTANT: If the mesh is a root mesh: direct child of the scene, then the idx is a refference to the scene's mesh buffer. Else if mesh has parent another mesh, then the idx is the index of the parent's children buffer
     idx;        // Value: This is the index of the mesh in the parents's children buffer.
     sceneidx;   // Value: An index to the scene that the mesh belongs to(index only).
-    scene_rootidx; // Value: An index that stores the mesh's location in a scene root_meshes[] buffer.
+    // scene_rootidx; // Value: An index that stores the mesh's location in a scene root_meshes[] buffer.
     fbidx;      // Value: The framebuffer index that this mesh is reb=ndered to. If INT_NULL the mesh is rendered to the default gl output buffer. 
     batch_fnidx; // Value: An index to the batch buffer of function pointers
     mesh_bufferidx; // Value: This is the index of the mesh in the Mesh_Buffer storage.
@@ -71,19 +71,19 @@ export class Mesh {
 
     parent;     // Pointer: to the parent mesh.
     children;   // Buffer: of pointers to children mesh.
-    children_all; // Indexes of mesh's all children (active and inactive).. Indexes to MeshBuffer storage buffer. // TODO: Try not to use. If succeded, remove variable
-    children_removed; // Indexes of mesh's removed children. Indexes to MeshBuffer storage buffer. // TODO: Try not to use. If succeded, remove the variable
+    // children_all; // Indexes of mesh's all children (active and inactive).. Indexes to MeshBuffer storage buffer. // TODO: Try not to use. If succeded, remove variable
+    // children_removed; // Indexes of mesh's removed children. Indexes to MeshBuffer storage buffer. // TODO: Try not to use. If succeded, remove the variable
 
     geom;   // Class: Geometry: position, dimentions, ...
     mat;    // Class: Material: color, texture coordinates, ...
     gfx;    // Class: Graphics: start index, attributes count, vertexbuffer, shader program, ...
 
-    is_batched_temp; // Bool: A way to tell if the mesh has been set to update in the batch buffer.
+    // is_batched_temp; // Bool: A way to tell if the mesh has been set to update in the batch buffer.
     is_gfx_inserted; // Bool: A way to tell if the mesh has been inserted to the graphics buffers.
     isFramebufferRendered; // Value: Stores the index of the framebuffer the mesh is rendered to. Else INT_NULL for no framebuffer rendering for this mesh.
 
-    attrParams1; // Array: A vec4 array which a mesh can pass any values the the shaders.
-    uniforms;   // Struct: Some uniform values that need to be stored mesh-side
+    // attrParams1; // Array: A vec4 array which a mesh can pass any values to the shaders.
+    uniforms;   // Array: Uniform info: {name, type, flags}. It is set only for mesh that is the first mesh for a Program to be created
 
     listeners;      // Buffer: Indexes to the EventListeners class.
     eventCallbacks; // Buffer: A buffer to store all callbacks, for any event enabled for the mesh.
@@ -95,13 +95,12 @@ export class Mesh {
     menu_options;       // Struct: A callback and an index. Constructs the options popup menu for the mesh
     menu_options_idx;   // Value: An index to the menu options handler's buffer
 
-    total_move_for_inactive_children; // Array: [x,y]. Accumulates any move event (in the root widget)
-
 
     name; // String:
     nameidx; // Index to Str buffer:
 
-    constructor(geom = null, mat = null, time = 0, attrParams1 = [0, 0, 0, 0], name = '???') {
+
+    constructor(geom = null, mat = null) {
 
         this.geom = geom;
         this.mat = mat;
@@ -110,7 +109,6 @@ export class Mesh {
         this.sid = {
             shad: SID.SHAD.INDEXED | (this.geom.sid.shad | this.mat.sid.shad),
             attr: (this.geom.sid.attr | this.mat.sid.attr),
-            // unif: this.mat.sid.unif | SID.UNIF.PROJECTION_MATRIX | SID.UNIF.SCREEN_RESOLUTION, 
             unif: this.mat.sid.unif, 
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
             progs_group: PROGRAMS_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
@@ -136,27 +134,13 @@ export class Mesh {
         this.idx = INT_NULL;
         this.sceneidx = STATE.scene.active_idx;
         this.fbidx = INT_NULL; // This should render the current mesh to the default gl framebuffer. 
-        this.scene_rootidx = INT_NULL;
+        // this.scene_rootidx = INT_NULL;
         this.batch_fnidx = INT_NULL;
         this.mesh_bufferidx = INT_NULL;
         this.root_bufferidx = INT_NULL;
         this.batch_buffer_vbidx = INT_NULL;
         this.batchidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL];
-
-
-        this.attrParams1 = [0, 0, 0, 0];
-        if (attrParams1) CopyArr4(this.attrParams1, attrParams1);
-
-        // this.uniforms = {
-        //     time: {
-        //         val: 0,
-        //         idx: INT_NULL,
-        //     }
-        // }
-
-        // Guard against enable a param for the shaders after the gl program has been created
-        this.is_batched_temp = false;
 
 
         this.listeners = new M_Buffer();
@@ -167,15 +151,15 @@ export class Mesh {
         this.eventCallbacks = new M_Buffer();
         this.timedEvents = new M_Buffer();
         this.children = new M_Buffer();
-        this.children_all = new Int16Buffer(16);
-        this.children_all.Init(INT_NULL);
+        // this.children_all = new Int16Buffer(16);
+        // this.children_all.Init(INT_NULL);
         this.timeIntervalsIdxBuffer = new Int8Buffer(INTERVALS.SIZE);
         this.timeIntervalsIdxBuffer.Init(INT_NULL);
 
 
         this.hover_margin = [0, 0];
         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]]; // TODO: do the same for the clamx too
-        // this.total_margin = [0, 0];
+
 
         this.menu_options_idx = INT_NULL;
         this.menu_options = {
@@ -226,14 +210,17 @@ export class Mesh {
 
     Destroy() {
 
+        /*************************************************************************************/
         // Remove event listeners
         this.RemoveAllListenEvents();
+        
 
+        /*************************************************************************************/
         // Remove time intervals
         if (this.timeIntervalsIdxBuffer.active_count) {
-
+            
             for (let i = 0; i < this.timeIntervalsIdxBuffer.boundary; i++) {
-
+                
                 const intervalIdx = this.timeIntervalsIdxBuffer.buffer[i];
                 if(intervalIdx !== INT_NULL){
                     TimeIntervalsDestroyByIdx(intervalIdx);
@@ -242,35 +229,38 @@ export class Mesh {
                 // else console.error('WRONG INDEX. @Mesh.js, Destroy().')
             }
         }
-
+        
+        
+        /*************************************************************************************/
         // Remove from gfx buffers.
         const ret = Gfx_remove_geometry(this.gfx, this.geom.num_faces);
         
+
+        /*************************************************************************************/
+        // Remove from widget root buffer.
+        Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
+
+
         
-        // Remove from scene
-        // Scenes_update_all_gfx_starts(this.sceneidx, this.gfx.prog.groupidx, this.gfx.prog.idx, this.gfx.vb.idx, ret); // Update the gfx.start of all meshes that are inserted in the same vertex buffer.
-        // Scenes_remove_root_mesh(this, this.sceneidx);
-        // const error = Scenes_remove_mesh_from_gfx(this.sceneidx, this.gfx.prog.groupidx, this.gfx.prog.idx, this.gfx.vb.idx, this.gfx.scene_mesh_in_gfx_idx); // Remove mesh from the scene's gfx buffer
-        if (error) { console.error('ERROR REMOVING MESH: ', this.GetName()); }
 
         // Remove from parent's children buffer
         if (this.parent && this.parent !== WIDGET_TEXT_MESH) this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
 
         
-        // Set Debug listen event
-        const params = {
-            groupidx: this.gfx.prog.groupidx,
-            progidx: this.gfx.prog.idx,
-            vbidx: this.gfx.vb.idx,
-            sceneidx: this.sceneidx,
-            isActive: true,
-            isPrivate: (FLAGS & GFX_CTX_FLAGS.PRIVATE) ? true : false,
-            type: INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX,
-        }
-        Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX, params);
+        // // Set Debug listen event
+        // const params = {
+        //     groupidx: this.gfx.prog.groupidx,
+        //     progidx: this.gfx.prog.idx,
+        //     vbidx: this.gfx.vb.idx,
+        //     sceneidx: this.sceneidx,
+        //     isActive: true,
+        //     isPrivate: (FLAGS & GFX_CTX_FLAGS.PRIVATE) ? true : false,
+        //     type: INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX,
+        // }
+        // Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX, params);
         
-        // Remove from mesh buffer, the true storage of the mesh
-        Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
+        // // Remove from mesh buffer, the true storage of the mesh
+        // Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
     }
 
     ActivateAndChildren(){

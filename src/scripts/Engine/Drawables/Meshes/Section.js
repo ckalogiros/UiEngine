@@ -90,7 +90,7 @@ export class Section extends Rect {
       // SID.InheritUniform(mesh.sid.unif, this.sid.unif); // Inherits the parent's uniform flags
 
       const idx = this.AddChild(mesh);
-      this.children_all.Add(mesh.mesh_bufferidx);
+      // this.children_all.Add(mesh.mesh_bufferidx);
 
       if (this.root_bufferidx !== INT_NULL && mesh.root_bufferidx === INT_NULL) {
          mesh.AddToWidgetRootBuffer(this.root_bufferidx)
@@ -189,12 +189,10 @@ export class Section extends Rect {
 
    StateDisable(MASK=0x0) {
 
-      // if(this.mesh_bufferidx === 365)
-      // console.log('FROM AddToWidgetGroup()','mask', MASK, this.GetName(), this.state.mask)
-      this.state.mask &= ~MASK;
-      for (let i = 0; i < this.children.boundary; i++) {
-         this.children.buffer[i].StateDisable(MASK);
-      }
+      this.state.mask &= ~MASK; // HERE
+      // for (let i = 0; i < this.children.boundary; i++) {
+      //    this.children.buffer[i].StateDisable(MASK);
+      // }
    }
 
 
@@ -580,15 +578,22 @@ export class Section extends Rect {
 
       if (x === 0 && y === 0) return;
 
-      if (this.root_bufferidx > INT_NULL) {
+      if(this.root_bufferidx === INT_NULL) return;
 
-         const widget_root_buffer = Widget_root_buffer_get_byidx(this.root_bufferidx);
+      const widget_root_buffer = Widget_root_buffer_get_byidx(this.root_bufferidx);
+      
+      // if (this.root_bufferidx > INT_NULL) {
+
          for (let i = 0; i < widget_root_buffer.boundary; i++) {
 
+            // if(widget_root_buffer.buffer[i] == INT_NULL)
+            
             // EFFICIENCY: Maybe its better to access the _mesh_buffer directly from the MeshBuffer.js file. Also later we use 'Widget_root_batch_get'
             const mesh = Mesh_buffer_get_mesh_byidx(widget_root_buffer.buffer[i]);
-            mesh.geom.pos[0] += x;
-            mesh.geom.pos[1] += y;
+            if(mesh === _) console.log(widget_root_buffer.buffer[i], i)
+               mesh.geom.pos[0] += x;
+               mesh.geom.pos[1] += y;
+            // }
          }
 
          const root_batch_buffer = Widget_root_batch_get(this.root_bufferidx);
@@ -596,33 +601,37 @@ export class Section extends Rect {
          const len = root_batch_buffer.vb.length
          for (let i = 0; i < len; i++) {
 
-            const meshidx = root_batch_buffer.vb[i].batch_mesh_bufferidx;
+            const meshidx = root_batch_buffer.vb[i].meshidx;
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
 
-            mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-            const update_data = {
-                sizes:[2],
-                data:[x, y],
-            };
-            Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, root_batch_buffer.vb[i].num_faces); // The batch_store needs the number of meshes to update as well as the move value
-         }
+            if(mesh){
 
-      }
-      else {
-
-         this.geom.pos[0] += x;
-         this.geom.pos[1] += y;
-         
-         // Batch_store(this, _, { pos: [x, y] });
-         
-         for (let i = 0; i < this.children.boundary; i++) {
-            // EFFICIENCY: Unfortunately if the chldren are all Widget_text, we are gonna batch_store all seperately, instead of batch store all of the texts together with total num_faces
-            const child = this.children.buffer[i];
-            if (child.is_gfx_inserted) {
-               child.Move(x, y)
+               mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
+               const update_data = {
+                   sizes:[2],
+                   data:[x, y],
+               };
+               Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, root_batch_buffer.vb[i].num_faces); // The batch_store needs the number of meshes to update as well as the move value
             }
+
          }
-      }
+
+      // }
+      // else {
+
+      //    this.geom.pos[0] += x;
+      //    this.geom.pos[1] += y;
+         
+      //    // Batch_store(this, _, { pos: [x, y] });
+         
+      //    for (let i = 0; i < this.children.boundary; i++) {
+      //       // EFFICIENCY: Unfortunately if the chldren are all Widget_text, we are gonna batch_store all seperately, instead of batch store all of the texts together with total num_faces
+      //       const child = this.children.buffer[i];
+      //       if (child.is_gfx_inserted) {
+      //          child.Move(x, y)
+      //       }
+      //    }
+      // }
    }
 
 

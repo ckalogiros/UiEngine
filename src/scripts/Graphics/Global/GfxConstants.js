@@ -190,7 +190,11 @@ const SID = {
         dst.unif = 0;        dst.unif |= src.unif;
         dst.pass = 0;        dst.pass |= src.pass;
         dst.progs_group = 0;
-    }
+    },
+
+    ToString(sid){
+        return `shad:${sid.shad} attr:${sid.attr} unif:${sid.unif} pass:${sid.pass} group:${sid.progs_group}`
+    },
 
 };
 
@@ -343,6 +347,14 @@ const BUFFER_TYPE = {
     FLOAT32: _CNT,
     UINT16: _CNT <<= 0x1,
 
+    ToString(mask) {
+
+        let str = '';
+        if (mask & this.FLOAT32) str += '{FLOAT32}'
+        if (mask & this.UINT16) str += '{UINT16}'
+
+        return str;
+    },
 }
 
 
@@ -357,6 +369,15 @@ const PROGRAM_STATE = {
     ACTIVE: _CNT, // UNNECESSARY: Possibly has no usefuleness
     UNIFORMS_NEED_UPDATE: _CNT <<= 0x1,
     // NEEDS_UPDATE: _CNT <<= 0x1,
+
+    ToString(mask) {
+
+        let str = '';
+        if (mask & this.ACTIVE) str += '{ACTIVE}'
+        if (mask & this.UNIFORMS_NEED_UPDATE) str += '{UNIFORMS_NEED_UPDATE}'
+
+        return str;
+    },
 };
 
 

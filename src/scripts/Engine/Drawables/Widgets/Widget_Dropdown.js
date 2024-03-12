@@ -8,7 +8,7 @@ import { Listener_remove_children_event_by_idx } from "../../Events/EventListene
 import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_get_rootidx, Widget_group_rerender, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Widget_group_add, Widget_group_get_rootidx, Widget_group_rerender, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
 import { Clipy_from_widget_root } from "../Operations/Clip.js";
 import { Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Section } from "../Meshes/Section.js";
@@ -71,7 +71,7 @@ export class Widget_Dropdown extends Section {
    // depth_level; // The tree depth level that the dropdown exists (root dp = 0 depth).
 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col2 = PURPLER[7], text_col = WHITE, btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, style = [2, 5, 2], margin = [10, 10]) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col_menu = PURPLER[7], text_col = WHITE, btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, style = [2, 5, 2], margin = [10, 10]) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, margin, pos, [10, 10], col1, null, style);
 
@@ -85,7 +85,7 @@ export class Widget_Dropdown extends Section {
       this.rootidx = INT_NULL;
 
       pos[2] += 1;
-      this.menu = Create_widget_section(_, SECTION.VERTICAL, margin, [OUT_OF_VIEW, OUT_OF_VIEW, pos[2]], [1, 1], TRANSPARENCY(col2, tr));
+      this.menu = Create_widget_section(_, SECTION.VERTICAL, margin, [OUT_OF_VIEW, OUT_OF_VIEW, pos[2]], [1, 1], TRANSPARENCY(col_menu, tr));
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.parent = this;
       AddArr2(this.menu.total_margin, this.menu.margin);
@@ -100,10 +100,10 @@ export class Widget_Dropdown extends Section {
          // this.menu.mat.col[1][11] = .5;
          // this.menu.mat.col[1][15] = .6;
       }
-      this.menu.state.mask &= ~ MESH_STATE.ACTIVE;
+      this.menu.state.mask &= ~MESH_STATE.ACTIVE;
 
       this.dp_symbols = ['+', '-'];
-      const btn = new Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, ALIGN.LEFT, [pos[0], pos[1], this.menu.geom.pos[2] + 1], _font_size, col2, text_col, btn_pad, bold, style, font);
+      const btn = new Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, ALIGN.LEFT, [pos[0], pos[1], this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font);
       btn.SetName(`BTN-${this.GetName()}`);
       // AddArr2(btn.total_margin, this.menu.total_margin);
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
@@ -121,7 +121,7 @@ export class Widget_Dropdown extends Section {
       // NOTE: The dp's button is inserted to the widget root buffer by the constructor:  'this.AddItem(btn)'
 
       // if(this.isOn & DP_MENU_STATE.OFF){
-      if((this.isOn & DP_MENU_STATE.ON) === 0){
+      if ((this.isOn & DP_MENU_STATE.ON) === 0) {
          // this.StateDisable(MESH_STATE.ACTIVE)
          mesh.StateDisable(MESH_STATE.ACTIVE)
       }
@@ -155,7 +155,7 @@ export class Widget_Dropdown extends Section {
          Widget_root_add_mesh(this.menu.root_bufferidx, this.menu.mesh_bufferidx);
       }
 
-      this.menu.AddItem(mesh); 
+      this.menu.AddItem(mesh);
 
       this.SetMenuItemsZindex(); // EFFICIENCY: It runs for all children al over again every time a new item is added
 
@@ -201,21 +201,21 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   StateEnable(MASK=0x0) {
+   StateEnable(MASK = 0x0) {
 
       this.state.mask |= MASK;
       this.children.buffer[0].StateEnable(MASK); // Button
-      if(this.isOn & DP_MENU_STATE.ON){
+      if (this.isOn & DP_MENU_STATE.ON) {
          this.menu.StateEnable(MASK); // Active Menu
       }
    }
 
 
-   StateDisable(MASK=0x0) {
+   StateDisable(MASK = 0x0) {
 
       this.state.mask &= ~MASK;
       this.children.buffer[0].StateDisable(MASK); // Button
-      if(this.isOn & DP_MENU_STATE.ON){
+      if (this.isOn & DP_MENU_STATE.ON) {
          this.menu.StateDisable(MASK); // Active Menu
       }
    }
@@ -435,20 +435,112 @@ export class Widget_Dropdown extends Section {
    }
 
 
+   // Destroy() {
+
+   //    for (let i = 0; i < this.children.boundary; i++) {
+
+   //       const child = this.children.buffer[i];
+   //       // if (child && child.children.active_count)
+   //       if (child)
+   //          this.DestroyRecursive(child)
+   //    }
+
+   //    Dropdown_roots_destroy_byidx(this.rootidx);
+
+   //    // console.warn('{{DESTROY}}, mesh:', this.GetName(), this)
+   //    // this.RemoveAllListenEvents();
+   //    super.Destroy();
+
+   // }
+
+
    Destroy() {
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      const btn = this.children.buffer[0];
+      btn.Destroy();
 
-         const child = this.children.buffer[i];
-         if (child && child.children.active_count)
-            this.DestroyRecursive(child)
+      if (this.isOn & DP_MENU_STATE.ON) {
+         this.menu.Destroy();
+      }
+      else if(this.isOn & DP_MENU_STATE.OFF){
+         this.DestroyDeactivetedMenu(this.menu);
       }
 
       Dropdown_roots_destroy_byidx(this.rootidx);
 
       // console.warn('{{DESTROY}}, mesh:', this.GetName(), this)
-      this.RemoveAllListenEvents();
+      // this.RemoveAllListenEvents();
       super.Destroy();
+
+   }
+
+
+   DestroyDeactivetedMenu(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy doe not call for vertex buffer remove mesh attributes
+
+      for (let i = 0; i < mesh.children.boundary; i++) {
+
+         const child = mesh.children.buffer[i];
+
+            if (child.children)
+               this.DestroyDeactivetedMenu(child);
+      }
+
+      // console.log('[[[[[[[[[[[[[[[[[[[[[[', mesh.GetName())
+
+      if(mesh.type & MESH_TYPE.WIDGET_DROP_DOWN){
+         this.DestroyDeactivetedMenu(mesh.menu)
+      }
+
+      if(mesh.text_mesh) this.DestroyNoGfxRemove(mesh.text_mesh);
+
+      this.DestroyNoGfxRemove(mesh);
+   }
+
+
+   // DestroyDeactivetedMenuItemsRecursive(children) { // The deactivated meshes are not inside the vertex buffers, so this Destroy doe not call for vertex buffer remove mesh attributes
+
+   //    for (let i = 0; i < children.boundary; i++) {
+
+   //       const child = children.buffer[i];
+   //       if (child)
+   //          this.DestroyNoGfxRemove(child);
+   //    }
+   // }
+
+
+   DestroyNoGfxRemove(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy doe not call for vertex buffer remove mesh attributes
+
+      /*************************************************************************************/
+      // Remove event listeners
+      mesh.RemoveAllListenEvents(); // BUG: The deactivated meshes SHOULD NOT HAVE any listen events, so removing them is buggy.
+      // The above is true if the listeners removal for all deactivated meshes IS IMPLEMENTED. CHECK IT!!!
+      // Another thing is what we do when we implement a FAKE listeners remove by -DEACTIVATING- the listeners?????
+
+
+      /*************************************************************************************/
+      // Remove time intervals
+      if (mesh.timeIntervalsIdxBuffer.active_count) {
+
+         for (let i = 0; i < mesh.timeIntervalsIdxBuffer.boundary; i++) {
+
+            const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[i];
+            if (intervalIdx !== INT_NULL) {
+               TimeIntervalsDestroyByIdx(intervalIdx);
+               mesh.timeIntervalsIdxBuffer.RemoveByIdx(i);
+            }
+         }
+      }
+
+
+
+      /*************************************************************************************/
+      // Remove from widget root buffer.
+      Mesh_buffer_remove_mesh_byidx(mesh.mesh_bufferidx);
+
+
+      // Remove from parent's children buffer
+      // if (mesh.parent && mesh.parent !== WIDGET_TEXT_MESH) mesh.parent.RemoveChildByIdx(mesh.idx); // Remove the current mesh from the parent
+
 
    }
 
@@ -775,7 +867,6 @@ export class Widget_Dropdown extends Section {
    }
 
 
-
    DpDeactivateMenu() {
 
       const menu = this.menu;
@@ -886,11 +977,14 @@ export class Widget_Dropdown extends Section {
       // Re-calculate dimensions and positions
       if (root.group_bufferidxs[0] !== INT_NULL) {
          const group_root = Mesh_buffer_get_mesh_byidx(Widget_group_get_rootidx(root.group_bufferidxs[0]))
-         group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
+         // group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
+         group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN);
       }
       else {
-         root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
+         // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
+         root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN);
       }
+      // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
 
       Clipy_from_widget_root(root.root_bufferidx);
       Widget_group_rerender(root.group_bufferidxs[0]);
@@ -898,7 +992,6 @@ export class Widget_Dropdown extends Section {
 
       // TEMP_PRINT_IS_GFX_INSERTED(root, 'END')
    }
-
 
 
    // Is Called from a source that has added a new dropdown to an existing one and must activate it 

@@ -25,7 +25,7 @@ export class Widget_Text extends Text_Mesh {
 
 	pad;
 
-	constructor(text, pos, fontSize = 5, col = WHITE, bold = 4, pad = [0, 0]) {
+	constructor(text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0]) {
 
 		// const sdfouter = CalculateSdfOuterFromDim(fontSize);
 		// if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -312,7 +312,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			Widget_root_add_mesh(text_mesh.root_bufferidx, text_mesh.mesh_bufferidx);
 		}
 
-		this.children_all.Add(text_mesh.mesh_bufferidx);
+		// this.children_all.Add(text_mesh.mesh_bufferidx);
 
 		// this.Align_pre(text_mesh, this.alignment)
 		// this.Align_pre(this, this.alignment)

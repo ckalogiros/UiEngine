@@ -2,7 +2,8 @@
 
 import { Str_buffer_get_by_idx } from "../../Engine/Core/StringBuffer";
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size } from "../ShaderAttributes";
-import { Vertex_buffer_get_by_vbidx, Vertex_buffer_state_enable } from "./VertexBuffers";
+import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from "./IndexBuffers";
+import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_state_enable } from "./VertexBuffers";
 
 
 
@@ -242,8 +243,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
 
 export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
 
-   const vb = Vertex_buffer_info_get_by_vbidx(gfx.prog.groupidx, gfx.prog.idx, gfx.vb.idx);
-   const ib = Gl_progs_get_ib_byidx(gfx.prog.groupidx, gfx.prog.idx, gfx.ib.idx);
+   const vb = Vertex_buffer_info_get_by_vbidx(gfx.vb.idx);
+   const ib = Index_buffer_info_get_by_ibidx(gfx.ib.idx);
 
    const start = (start_index) ? start_index : gfx.vb.start;
 
@@ -260,9 +261,9 @@ export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
    ret.counts[0] = vb.Remove_geometry(gfx, num_faces, start);
    ret.counts[1] = ib.Remove_geometry(num_faces); // It doe not matter from where we remove indexes, as long as the vertices per face are same. 
 
-   if (vb.count <= 0) ret.empty = true;
+   // if (vb.count <= 0) ret.empty = true;
 
-   if (ret.empty) vb.Reset();
+   // if (ret.empty) vb.Reset();
 
 
    return ret;
@@ -273,7 +274,7 @@ export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
 export function Gl_remove_geometry_params(groupidx, progidx, vbidx, num_faces = 1, start_index = 0, attribsPerVertex, verticesPerRect) {
 
    const vb = Vertex_buffer_info_get_by_vbidx(vbidx);
-   const ib = Gl_progs_get_ib_byidx(groupidx, progidx, vbidx);
+   const ib = Index_buffer_get_by_ibidx(groupidx, progidx, vbidx);
 
    const start = start_index;
 

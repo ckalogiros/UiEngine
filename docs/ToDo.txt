@@ -39,9 +39,18 @@
 --------------------------------------------------- IMIDIATE!
 . Implement destruction of gfx buffers and gl program.
   (Also make sure all suposed private buffers are set private).
---------------------------------------------------- IMIDIATE!
 . slider as child of a section, does not move to the correct position, only the gfx, the mesh moves
---------------------------------------------------- 
+. IMPLEMENT: Destroy from widget root
+--------------------------------------------------- IMIDIATE!
+
+
+--------------------------------------------------- TODO!
+. The name of uniforms in mesh.uniforms[], should be index to the String buffer.
+. Is multi_text same as text? If yes, maybe implement multi_text as a faster widget than the simple text.
+. The vertex buffer pooling must be based on size, always choose tha smaller fitting one.
+  Also insted of reallocating the buffer, check if an avaliable buffer exists in pool and switch.
+  More over, regular checks may take place to check if any vertex buffer is too large for the attribs count it store and switch with a smaller from the pool 
+--------------------------------------------------- TODO!
 
 
 

@@ -5,6 +5,10 @@ import { Gfx_create_group_buffer } from '../Engine/Interfaces/Gfx/MeshGfxContext
 import { Int8Buffer, M_Buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_create, Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
 import { Select_fnidx_to_fill_vertex_buffer } from './Buffers/VertexBuffersOps.js';
+import { Create_widget_button, Create_widget_dropdown, Create_widget_multi_text, Create_widget_section, Create_widget_text } from '../Engine/Core/CreateWidget.js';
+import { BLUEL, GREEN, GREY } from '../Engine/Drawables/Material/Base/Colors.js';
+import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
+import { Widget_group_create } from '../Engine/Core/MeshBuffer.js';
 
 
 
@@ -139,16 +143,14 @@ function Create_program(sid, uniforms) {
 	prog.idx = progidx; // Store the programs index to self
 
 		
-	// const u_info = TEMP_UNIFORMS_STORAGE_BUFFER[progidx];
 	/****************************************************************************************************/
 	// Shared-Block uniforms
-	
 	const ub_idx = Uniforms_block_buffer_create(sid.unif, prog.shader_program, uniforms);
 	// prog.ubb.Add(ub_idx);
 
+
 	/****************************************************************************************************/
 	// Individual uniforms
-	
 	const len = uniforms.length;
 	for (let i = 0; i < len; i++) {
 		if((uniforms[i].shader & UNIFORM.IS_SHARED) === 0)
@@ -183,95 +185,6 @@ export function Program_create_program(sid, uniforms) {
 }
 
 
-
-
-
-
-
-// const TEMP_UNIFORMS_STORAGE_BUFFER = [];
-
-
-// export function Program_enable_uniforms_for_creation(params){
-
-// 	const ub = TEMP_UNIFORMS_STORAGE_BUFFER; // Cash
-
-// 	let same_progidx = INT_NULL;
-// 	const len = ub.length;
-// 	// If program (same sid) exists, store the uniform info to the same buffer, else create new array buffer (different sid/program)
-// 	for (let i=0; i<len; i++){
-		
-// 		// If TEMP_UNIFORMS_STORAGE_BUFFER[i] exists, it means that at least on uniform has been stored for that i (same_progidx).
-// 		// Because all uniforms of every [i] have the same sid, checking [i][0] is enough.
-// 		if(ub[i][0]){
-
-// 			// In order to store a uniform for creation, 
-// 			// 1. we must match the same sid, that means that the all uniforms of the same program will be created in the same shader,
-// 			// if(SID.CheckSidMatch(ub[i][0].sid, params.sid)){
-// 			if(ub[i][0].sid.shad === params.sid.shad &&
-//             ub[i][0].sid.attr === params.sid.attr &&
-//             ub[i][0].sid.unif === params.sid.unif &&
-//             ub[i][0].sid.pass === params.sid.pass &&
-//             ub[i][0].sid.progs_group === params.sid.progs_group){
-				
-// 				same_progidx = i;
-// 				// console.log( params.sid)
-// 				// console.log('YES', ub[i][0].sid)
-// 				break;
-// 			}
-// 			// else console.log('NO', ub[i][0].sid)
-// 		}
-// 	}
-	
-// 	let abort = false;
-
-// 	// Create buffer for new program uniforms
-// 	if(same_progidx === INT_NULL){
-// 		same_progidx = TEMP_UNIFORMS_STORAGE_BUFFER.push(new Array) -1;
-// 	}
-// 	else{
-
-// 		// 2. and we do not want duplicate uniforms. Checked by name.
-// 		const len2 = ub[same_progidx].length;
-// 		for (let j=0; j<len2; j++){
-// 			if(ub[same_progidx][j].name === params.name){
-// 				abort = true;
-// 				break;
-// 			}
-// 		}
-// 	}
-		
-
-// 	// Store the uniform info and the mesh sid
-// 	if(!abort) {
-		
-// 		const sid_copy = {};
-// 		SID.Copy(sid_copy, params.sid)
-// 		console.log(sid_copy)
-		
-// 		TEMP_UNIFORMS_STORAGE_BUFFER[same_progidx].push({
-// 		name:params.name,
-// 		type:params.type,
-// 		shader:params.shader,
-// 		sid:params.sid, // NOTE: The sid probably is tored by refference and not copied
-// 	});
-// 	}
-// }
-
-
-
-// function Get_uniforms_for_program(sid){
-
-// 	for (let i=0; i<TEMP_UNIFORMS_STORAGE_BUFFER.length; i++){
-		
-// 		if(SID.CheckSidMatch(TEMP_UNIFORMS_STORAGE_BUFFER[i][0].sid, sid)){
-			
-// 			return TEMP_UNIFORMS_STORAGE_BUFFER[i];
-// 		}
-// 	}
-
-// 	if(!TEMP_UNIFORMS_STORAGE_BUFFER.length) return 1;
-// 	return null;
-// }
 
 
 
@@ -333,78 +246,6 @@ class Gl_Program {
 	}
 
 
-	/**
-	 * Uniforms Buffer
-	 */
-	// UniformsCreateBufferUniform(name) {
-	// 	this.shaderinfo.uniforms.buffer.CreateUniform(name);
-	// }
-
-
-	// UniformsSetBufferUniform(val, index) {
-	// 	this.shaderinfo.uniforms.buffer.Set(val, index);
-
-	// 	console.warn('Program :: Uniforms :: Set :: generic buffer')
-	// 	this.UniformsUpdateBufferUniforms(gfxCtx.gl); // HACK: Leave it for the re-implentation of the UniformBuffer system
-	// }
-
-
-	// UniformsCreateSetBufferUniform(name, val) {
-	// 	const idx = this.shaderinfo.uniforms.buffer.CreateUniform(name);
-	// 	this.shaderinfo.uniforms.buffer.Set(val, idx);
-	// 	console.warn('Program :: Uniforms :: Create&Set :: generic buffer')
-	// }
-
-
-	// UniformsUpdateBufferUniforms(gl) {
-	// 	this.shaderinfo.uniforms.buffer.Update(gl);
-	// 	console.warn('Program :: Uniforms :: Update :: generic buffer')
-	// }
-
-
-	// UniformsSetUpdateBufferUniform(gl, val, index) {
-	// 	this.shaderinfo.uniforms.buffer.Set(val, index);
-	// 	this.shaderinfo.uniforms.buffer.Update(gl);
-	// 	console.warn('Program :: Uniforms :: Set&Update :: generic buffer')
-	// }
-
-
-	/**
-	 * Unique Uniforms.
-	 * New uniforms that are set by the client and are created as a seperate uniforms in the shaders.
-	 */
-	// UniformsCreateTimer(step) {
-
-	// 	// 'Activates' 1 array element of the uniforms buffer array.
-	// 	this.timer.isActive = true;
-	// 	this.timer.step = step;
-	// 	this.timer.index = this.shaderinfo.uniforms.buffer.CreateUniform('Timer');
-	// }
-
-
-	// UniformsUpdateTimer() {
-
-	// 	this.shaderinfo.uniforms.buffer.Set(this.timer.val, this.timer.index);
-	// 	this.state.mask |= PROGRAM_STATE.UNIFORMS_NEED_UPDATE;
-	// 	this.timer.val += this.timer.step;
-	// 	console.warn('Program :: Uniforms :: Update :: timer')
-	// }
-
-
-	// UniformsBufferCreateScreenRes() {
-	// 	/**
-	// 	 * 'Activates' 2 array elements of the uniforms buffer array, and returns the 2 indexes
-	// 	 *  so the caller can 'Set' the uniforms value at it's site.
-	// 	 */
-	// 	const resXidx = this.shaderinfo.uniforms.buffer.CreateUniform('ScreenResX');
-	// 	const resYidx = this.shaderinfo.uniforms.buffer.CreateUniform('ScreenResY');
-
-	// 	return {
-	// 		resXidx: resXidx,
-	// 		resYidx: resYidx,
-	// 	};
-	// }
-
 };
 
 
@@ -435,16 +276,6 @@ export function Program_use_program(shader_program, progidx) {
 
 
 
-// /** 'functions' MUST HAVE .Set and .Update fields, so they can be bound to the uniforms Set() and Update(). */
-// export function Program_block_bind_uniform_layout(unif_name){
-// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
-
-// 	Uniforms_block_bind_uniform_layout(unif_name);
-
-// }
-
-
 
 // IMPORTANT:
 // Update individual uniforms via the Program function, so that there is no confusion as to under what program a uniform is boumd. 
@@ -460,26 +291,113 @@ export function Program_uniform_bind(groupidx, progidx, functions_obj, unif_name
 
 
 
-// export function Program_uniforms_set(groupidx, progidx, ubidx, val) {
-// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
-
-// 	const uniform_idx = _program_groups.buffer[groupidx].buffer[progidx].ub[ubidx];
-// 	Uniforms_buffer_set_uniform(uniform_idx, val);
-// }
 
 
 
-// export function Program_uniforms_update(groupidx, progidx, ubidx) {
-// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
-
-// 	const uniform_idx = _program_groups.buffer[groupidx].buffer[progidx].ub[ubidx];
-// 	Uniforms_buffer_update_uniform(uniform_idx);
-// }
 
 
 
+
+
+/****************************************************************************************************************************************************/
+// DEBUG Info - Create text for render
+/****************************************************************************************************************************************************/
+
+function TEMP(params){
+	const destroy_btn = params.target_mesh;
+	console.log('TEMP FUNCTION', destroy_btn.GetName());
+	
+	const section = params.params;
+	console.log('section', section.GetName());
+	section.Destroy();
+
+}
+
+export function Program_create_text_info(){
+
+	const col_menu = GREY[3], col_dp = GREY[1];
+
+	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400,400,0], [0, 0], TRANSPARENCY(BLUEL[9], .3), 'Program Group Info');
+
+	const destroy = Create_widget_button(_, 'Destroy', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
+	destroy.Bind(TEMP, _, s);
+	s.AddItem(destroy);
+
+	s.Calc()
+
+	const margin = [4,4];
+	const style = [0, 3, 1];;
+	const gr = _program_groups;
+
+	for(let i=0; i<gr.boundary; i++){
+
+		const grw = Create_widget_dropdown(_, 'groups', [100, 100, 0], col_dp, col_menu, _, _, _, _, _, margin);
+		grw.CreateClickEvent();
+		Dropdown_roots_set_root(grw, grw)
+		s.AddItem(grw)
+
+		const group_info = Create_widget_text(_, `count:${gr.active_count} size:${gr.size}`);
+		grw.AddToMenu(group_info);
+
+			
+		{ // Programs
+
+			const progs = gr.buffer[i];
+
+			const progsw = Create_widget_dropdown(_, 'programs', [100, 100, 0], col_dp, col_menu, _, [2,2], _, _, style, margin);
+			progsw.CreateClickEvent();
+			grw.AddToMenu(progsw)
+
+			const progs_info = Create_widget_text(_, `count:${progs.active_count} size:${progs.size}`);
+			progsw.AddToMenu(progs_info);
+
+
+			for(let i2=0; i2<progs.boundary; i2++){
+
+				const prog = progs.buffer[i2];
+
+				const progw = Create_widget_dropdown(_, 'programs', [100, 100, 0], col_dp, col_menu, _, [2,2], _, _, style, margin);
+				progw.CreateClickEvent();
+				progsw.AddToMenu(progw)
+
+
+				{ const prog_info = Create_widget_text(_, `state:${prog.state.mask}`); progw.AddToMenu(prog_info); }
+				{ const prog_info = Create_widget_text(_, `vaoidx:${prog.vaoidx}`); progw.AddToMenu(prog_info); }
+				{ const prog_info = Create_widget_text(_, `self idx:${prog.idx}`); progw.AddToMenu(prog_info); }
+				{ const prog_info = Create_widget_text(_, `attribsidx:${prog.attribsidx}`); progw.AddToMenu(prog_info); }
+				{ const prog_info = Create_widget_text(_, `attribs_per_vertex:${prog.attribs_per_vertex}`); progw.AddToMenu(prog_info); }
+				{ const prog_info = Create_widget_text(_, `add_to_vb_fnidx:${prog.add_to_vb_fnidx}`); progw.AddToMenu(prog_info); }
+				
+				/****************************************************************************************************************************/
+				// vb and ib
+				const vbw = Create_widget_dropdown(_, 'vertex buffer', [100, 100, 0], col_dp, col_menu, _, [2,2], _, _, style, margin);
+				vbw.CreateClickEvent();
+				progw.AddToMenu(vbw)
+				let vb_info = 'vb:'
+				for(let i3=0; i3<prog.vb.boundary; i3++){
+
+					vb_info += `[${prog.vb.buffer[i3]}]`;
+				}
+				console.log(vb_info)
+				{ const info = Create_widget_text(_, vb_info); vbw.AddToMenu(info); }
+
+				const ibw = Create_widget_dropdown(_, 'index buffer', [100, 100, 0], col_dp, col_menu, _, [2,2], _, _, style, margin);
+				ibw.CreateClickEvent();
+				progw.AddToMenu(ibw)
+				let ib_info = 'ib:'
+				for(let i3=0; i3<prog.ib.boundary; i3++){
+
+					ib_info += `[${prog.ib.buffer[i3]}]`;
+				}
+				{ const info = Create_widget_text(_, ib_info); ibw.AddToMenu(info); }
+			}
+		}
+		
+	}
+
+
+	return s;
+}
 
 
 

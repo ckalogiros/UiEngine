@@ -2,11 +2,15 @@
 
 
 import { M_Buffer } from "../../Engine/Core/Buffers";
-import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../ShaderAttributes";
-import { Progarm_get_program, Program_get_shader_attributes_index } from "../ShaderPrograms";
+import { Shader_attributes_enable, Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex } from "../ShaderAttributes";
+import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index } from "../ShaderPrograms";
 import { Create_buffer_from_type } from "./TypedArrayBuffers";
 import { Gl_operation_add } from "./VertexBuffersOps";
 import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays";
+import { BLUEL, GREEN, GREY, REDL, YELLOWL, YELLOWR } from "../../Engine/Drawables/Material/Base/Colors";
+import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "../../Engine/Core/CreateWidget";
+import { Dropdown_roots_set_root } from "../../Engine/Drawables/Widgets/Widget_Dropdown";
+import { Floor } from "../../Helpers/Math/MathOperations";
 
 
 
@@ -118,7 +122,7 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
     // const type = vao.type
     const type = BUFFER_TYPE.FLOAT32
     const ret = Vertex_buffer_create(type, size, sid);
-    const vb_info = new Vertex_Buffer_Info(size, sid, ret.vbidx, ret.vbo, vaoidx, vao.vao, vao.type);
+    const vb_info = new Vertex_Buffer_Info(size, sid, ret.vbidx, ret.vbo, vaoidx, vao.vao, vao.type, groupidx, progidx);
 
     _vertex_buffers_info.Add(vb_info);
    
@@ -138,12 +142,14 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
 
 class Vertex_Buffer_Info {
 
-    constructor(size, sid, vbidx, vbo, vaoidx, vao, type) {
+    constructor(size, sid, vbidx, vbo, vaoidx, vao, type, groupidx, progidx) {
 
         this.size = size;   // Total size of the typed array buffer (in elements).
         this.count = 0;	    // Current size oof the typed array buffer (in elements)
         this.vCount = 0;    // Number of vertices
 
+        this.progidx = progidx;   // Just for debuging.
+        this.groupidx = groupidx; // Just for debuging.
         this.vbo = vbo;         // WebGl vertex buffer object.
         this.vbidx = vbidx;     // index to the array of stored vertex buffers.
         this.vao = vao;         // WebGl vertex array object.
@@ -175,6 +181,42 @@ class Vertex_Buffer_Info {
 
         if (DEBUG.GFX.BUFFERS) console.warn('Resizing vertex buffer!')
         if (this.size > 35000) { console.error(this.size, '-------------------------'); }
+    }
+
+
+
+    Remove_geometry(gfx, num_faces, start_index) {
+
+
+        const vb_data = _vertex_buffers.buffer[gfx.vb.idx];
+
+        const removed_attribs = gfx.attribsPerVertex * gfx.vertsPerRect * num_faces;
+        
+        const start = start_index;
+        const end = start + removed_attribs;
+        
+        
+        const remaining_attribs = this.count - end; // This is the length of the attributes to be shifted
+        // const copied_end = this.count - end; // This is the length of the attributes to be shifted
+        let k = end;
+
+
+        // Shift all attributes left to fil the gap of the removed attributes. 
+        for (let i = start; i < start + remaining_attribs; i++) {
+            vb_data[i] = vb_data[k++]
+        }
+
+        this.count -= removed_attribs;
+        const vCount = removed_attribs / gfx.attribsPerVertex;
+        this.vCount -= vCount;
+
+        if (this.count < 0)
+            console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb:', this.idx)
+
+        this.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+
+        return removed_attribs;
+
     }
 
 
@@ -445,4 +487,153 @@ function DEBUG_PRINT(buffer, index, line) {
 export function Gl_vertex_buffer_print(){
     console.log('VertexBuffer:', _vertex_buffers)
     console.log('VertexBufferInfo', _vertex_buffers_info)
+}
+
+
+
+
+
+
+
+
+
+_CNT = 0x1;
+const VB_TO_STRING_FLAGS = {
+    COLOR: _CNT,
+    WPOS: _CNT<<=0x1,
+    DIM: _CNT<<=0x1,
+    TEX: _CNT<<=0x1,
+}
+
+function Vertex_to_string(flags, groupidx, progidx, vbidx, count){
+
+    const is_wpos = flags & VB_TO_STRING_FLAGS.WPOS;
+    
+    const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
+    const stride = Program_get_shader_attribute_attribs_per_vertex(groupidx, progidx);
+    const wpos_attr = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.WPOS4);
+    
+    const arr = [];
+    const faces = count/(stride*4);
+    
+    for(let i2=0; i2<faces; i2++){
+        
+        let i = wpos_attr.offset;
+        let wpos = '';
+        while(i<stride*4){
+                
+            if(is_wpos){
+    
+                wpos += `${Floor(_vertex_buffers.buffer[vbidx][i++])}, `;
+                wpos += `${Floor(_vertex_buffers.buffer[vbidx][i++])}, `;
+            }
+    
+            i += stride - 2;
+        }
+        arr.push(wpos);
+    }
+
+    console.log(arr)
+    return arr;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************************************************************************************************************************************/
+// DEBUG Info - Create text for render
+/****************************************************************************************************************************************************/
+
+function TEMP(params){
+	const destroy_btn = params.target_mesh;
+	console.log('TEMP FUNCTION', destroy_btn.GetName());
+	
+	const section = params.params;
+	console.log('section', section.GetName());
+	section.Destroy();
+
+}
+
+export function Vertex_buffer_create_text_info(){
+
+	const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(YELLOWR[7], .4);
+
+	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400,400,0], [0, 0], TRANSPARENCY(BLUEL[3], .3), 'Vertex Buffer Info');
+
+	const destroy = Create_widget_button(_, 'Destroy', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
+	destroy.Bind(TEMP, _, s);
+	s.AddItem(destroy);
+
+
+    const margin = [4,4];
+    const style = [0, 3, 1];
+
+    const vbiw = Create_widget_dropdown(_, 'Vertex Buffers', [100, 100, 0], col_dp, col_menu, _, _, _, _, style, margin);
+    vbiw.CreateClickEvent();
+    Dropdown_roots_set_root(vbiw, vbiw)
+    s.AddItem(vbiw)
+    
+	const vbi = _vertex_buffers_info;
+    const vb_buffer_info = Create_widget_text(_, `count:${vbi.active_count} size:${vbi.size}`);
+    vbiw.AddToMenu(vb_buffer_info);
+
+	for(let i=0; i<vbi.boundary; i++){
+        
+        const vb = vbi.buffer[i];
+
+        const vbw = Create_widget_dropdown(_, `Vb [${i}]`, [100, 100, 0], col_dp, col_menu, _, [2,1], _, _, style, margin);
+        vbw.CreateClickEvent();
+        vbiw.AddToMenu(vbw)
+
+        {
+            const type = BUFFER_TYPE.ToString(vb.type);
+            const info = Create_widget_text(_, `count:${vb.count} size:${vb.size}  vCount:${vb.vCount}  type:${type}`);
+            vbw.AddToMenu(info);
+        }
+        // {
+        //     const info = Create_widget_text(_, `vaoidx:${vb.vaoidx} vbidx:${vb.vbidx} ibidx:${vb.ibidx} texidx:${vb.texidx} progidx:${vb.progidx}`);
+        //     vbw.AddToMenu(info);
+        // }
+        // {
+        //     const sid = SID.ToString(vb.sid);
+        //     const info = Create_widget_text(_, `sid:${sid}`);
+        //     vbw.AddToMenu(info);
+        // }
+        // {
+        //     const state = PROGRAM_STATE.ToString(vb.state.mask);
+        //     const info = Create_widget_text(_, `state:${state}`);
+        //     vbw.AddToMenu(info);
+        // }
+
+        
+		// { // Vertex buffer array
+        //     const vba = Create_widget_dropdown(_, `buffer`, [100, 100, 0], col_dp, col_menu, _, [2,1], _, _, style, margin);
+        //     vba.CreateClickEvent();
+        //     vbw.AddToMenu(vba)
+
+        //     const wpos = Vertex_to_string(VB_TO_STRING_FLAGS.WPOS, vb.groupidx, vb.progidx, vb.vbidx, vb.count);
+
+        //     const len = wpos.length;
+        //     for(let i2=0; i2<len; i2++){
+
+        //         const info = Create_widget_text(_, `wpos:${wpos[i]}`);
+        //         vba.AddToMenu(info);
+        //     }
+
+		// }
+		
+	}
+
+	// s.Calc(SECTION.EXPAND)
+	s.Calc()
+
+	return s;
 }

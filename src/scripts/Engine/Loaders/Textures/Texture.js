@@ -56,7 +56,7 @@ export function Texture_get_texture_byidx(idx) {
 
 
 
-// HERE!
+
 function Texture_is_loaded(textureid, TEX_TYPE) {
 
 	for(let i=0; i<_textureBufferCount; i++){

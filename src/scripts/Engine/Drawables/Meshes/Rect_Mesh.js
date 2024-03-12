@@ -14,7 +14,6 @@ import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers
 
 export class Rect extends Mesh {
 
-   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos = POSITION_CENTER, dim = [10, 10], col = BLUER3) {
    constructor(pos = POSITION_CENTER, dim = [10, 10], col = BLUER3) {
 
       const geom = new Geometry2D(pos, dim);
@@ -124,7 +123,7 @@ export class Rect extends Mesh {
       this.is_gfx_inserted = true;
 
 
-      if (this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
+      // if (this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
 
       const params = {
          groupidx: this.gfx.prog.groupidx,

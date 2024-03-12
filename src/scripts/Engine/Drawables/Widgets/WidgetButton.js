@@ -11,9 +11,66 @@ export class Widget_Button extends Widget_Label {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad, bold, style, font)
       this.type |= MESH_TYPE.WIDGET_BUTTON;
-      this.SetName('Button');
+      // this.SetName('Button');
+
+      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    }
 
+      /*******************************************************************************************************************************************************/
+   // Events Handling
+
+   OnClick(params) {
+
+      const mesh = params.target_params.target_mesh;
+
+      /**
+       * For popup menu options and slider connections.
+       * If the option is clicked, then we must call the slider connect function
+       */
+
+      if (params.target_params.EventClbk) {
+
+         const EventClbk = params.target_params.EventClbk;
+         EventClbk(params.target_params);
+      }
+      else { // Fallback to label OnClick()
+         super.OnClick(params);
+      }
+      
+      // console.log('CLICKED')
+      return true;
+   }
+
+
+   /*******************************************************************************************************************************************************/
+   // Misc
+   Bind(EventClbk, targetBindingFunctions=_, params) {
+
+      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      this.evt_params = { // Create the parameters to pass for the switch's click event. 
+         EventClbk: EventClbk,
+         targetBindingFunctions: targetBindingFunctions,
+         target_mesh: this,
+         params: params,
+      };
+   }
+
+
+   // SEE ### Construct Listeners
+   ConstructListeners(_root = null) {
+
+      const mesh = this; // If in recursion, use as the current mesh the passed param. 
+      const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
+      const root_evt = root.listeners.buffer;
+
+      for (let etypeidx = 0; etypeidx < mesh.listeners.boundary; etypeidx++) {
+
+         const evt = mesh.listeners.buffer[etypeidx];
+         if (evt) { 
+            mesh.AddListenEvent(etypeidx, mesh.OnClick, this.evt_params, root_evt);
+         }
+      }
+   }
 }
 
 
@@ -71,13 +128,14 @@ export class Widget_Switch extends Widget_Button {
          EventClbk(params.target_params);
       }
 
+      console.log('CLICKED')
       return true;
    }
 
 
    /*******************************************************************************************************************************************************/
    // Misc
-   Bind(EventClbk, targetBindingFunctions, params) {
+   Bind(EventClbk, targetBindingFunctions=_, params) {
 
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.evt_params = { // Create the parameters to pass for the switch's click event. 
@@ -107,6 +165,10 @@ export class Widget_Switch extends Widget_Button {
 
 }
 
+
+function Button_click_default_callback(){
+   console.log('Button Clicked!');
+}
 
 
 
