@@ -1154,12 +1154,13 @@ export function Meshbuffer_print_loop() {
 
       if (_mesh_buffer.buffer[i]) {
 
-         console.log('i:', i,
-            'id:', _mesh_buffer.buffer[i].id,
-            'idx:', _mesh_buffer.buffer[i].idx,
+         console.log(i,
+            // 'id:', _mesh_buffer.buffer[i].id,
+            // 'idx:', _mesh_buffer.buffer[i].idx,
             'mbidx:', _mesh_buffer.buffer[i].mesh_bufferidx,
             'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
             'batchidx:', _mesh_buffer.buffer[i].batch_buffer_vbidx,
+            'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1],
             'name:', _mesh_buffer.buffer[i].GetName(),
          );
       }

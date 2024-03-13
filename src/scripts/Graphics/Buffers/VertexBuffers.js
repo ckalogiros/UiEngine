@@ -19,7 +19,7 @@ const DISABLE_DEBUG = true;
 
 
 /****************************************************************************************************************************************************/
-// Vertex Buffer Data 
+// Vertex Buffer Data Array
 /****************************************************************************************************************************************************/
 
 
@@ -68,7 +68,7 @@ export function Vertex_buffer_create(type, size) {
 
 
 /****************************************************************************************************************************************************/
-// Vertex Buffer Info 
+// Vertex Buffer Info Array
 /****************************************************************************************************************************************************/
 
 
@@ -93,6 +93,7 @@ export function Gl_vertex_buffer_get_vao(vbidx) {
         vaoidx: _vertex_buffers_info.buffer[vbidx].vaoidx,
     };
 }
+
 
 
 export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, groupidx, progidx) {
@@ -265,6 +266,8 @@ export function Vertex_buffer_set_ibidx(vbidx, ibidx) {
     _vertex_buffers_info.buffer[vbidx].ibidx = ibidx;
 }
 
+
+
 export function Vertex_buffer_info_get_sid(vbidx) {
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_info, vbidx, new Error().lineNumber);
     return _vertex_buffers_info.buffer[vbidx].sid;
@@ -330,6 +333,8 @@ export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset
     buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
 }
 
+
+
 /** Returns true/false */
 export function Vertex_buffer_exists(vbidx) {
 
@@ -359,15 +364,12 @@ export function Vertexbuffer_reset_to_index(groupidx, progidx, vbidx, start) {
 
 
 
-
 export function Vertex_buffer_reset(gfx) {
     console.error('IMPLEMENT ME');
     const vb = Vertex_buffer_info_get_by_vbidx(gfx.prog.groupidx, gfx.prog.idx, gfx.vb.idx);
     if (vb.count > 0) // If the vertex buffer has data(mainly for recursive functions that call reset even if the vb is already been reseted).
         vb.Reset();
 }
-
-
 
 
 

@@ -12,6 +12,7 @@ import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Rendere
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Debug_ui_set_notification, NOTIFICATION_TYPE_IDX } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
+import { Gfx_groups_create_group } from "./GfxGroups.js";
 
 
 
@@ -297,7 +298,11 @@ export function Gfx_activate(mesh) {
 }
 
 
-
+/**
+ * Change for program groups:
+ * I the group in sid is set, then create a new group for the vertex buffers
+ * Else default to the default group
+ */
 export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_gfx_idxs, root_bufferidx = INT_NULL, mesh_bufferidx = INT_NULL, uniforms) {
 
 
@@ -308,6 +313,11 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
    let ibidx = INT_NULL;
 
    let vbfound = null;
+
+   // Decision: Choose default or create new group
+   if((sid.progs_group & PROGRAMS_GROUPS.DEFAULT.MASK) === 0){
+      groupidx = Gfx_groups_create_group();
+   }
 
    if (progidx !== INT_NULL && vbidx !== INT_NULL) { // We have all we need to add to a specific vertex buffer
 
@@ -396,6 +406,20 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+/****************************************************************************************************************************************************/
+// DEBUG Info - Create text for render
+/****************************************************************************************************************************************************/
 
 
 

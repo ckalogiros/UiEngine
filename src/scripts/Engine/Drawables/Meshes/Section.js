@@ -134,7 +134,7 @@ export class Section extends Rect {
    }
 
 
-   AddToWidgetGroupBuffer(group_bufferidx, temp_max_size = 0) {
+   AddToWidgetGroupBuffer(group_bufferidx) {
 
 
       if (this.state.mask & MESH_STATE.ACTIVE) {
@@ -142,15 +142,10 @@ export class Section extends Rect {
          this.group_bufferidxs[0] = group_bufferidx;
          this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
 
-         const count = (temp_max_size) ? temp_max_size : this.children.boundary
-         for (let i = 0; i < count; i++) {
+         for (let i = 0; i <= this.children.boundary; i++) {
 
             const child = this.children.buffer[i];
-            /**DEBUG */ if (!child.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR SECTION CHILD:', child.mesh_bufferidx, child.GetName());
-            /**DEBUG */ if (!child.AddToWidgetGroupBuffer) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO AddToWidgetGroupBuffer() FOR SECTION CHILD:', child.mesh_bufferidx, child.GetName());
-               
-
-            if (child.state.mask & MESH_STATE.ACTIVE) child.AddToWidgetGroupBuffer(group_bufferidx);
+            if (child && child.state.mask & MESH_STATE.ACTIVE) child.AddToWidgetGroupBuffer(group_bufferidx);
          }
       }
    }
