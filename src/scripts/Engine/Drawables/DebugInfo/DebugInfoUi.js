@@ -5,12 +5,13 @@ import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown";
 import { PerformanceTimersGetBestFps, PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, Performance_timers_get_ms_1sec_reset, _pt_all_timers, _pt_batch2_update, _pt_batch_update, _pt_event_listener, _pt_framebuffer_rendering, _pt_gl_draw, _pt_hover_listener, _pt_loop, _pt_mesh_info_tip, _pt_scene_update } from "../../Timers/PerformanceTimers";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners";
 import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget";
-import { Mesh_buffer_get_mesh_byidx, Widget_group_create, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
+import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_create, Widget_root_batch_assign_and_accum_to_vb, Widget_root_batch_print_w4, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_create_text_info } from "../../Core/MeshBuffer";
 import { Scroller_clampy_and_render } from "../Widgets/WidgetScroller";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals";
 import { Dbg_ui_create } from "./DebugInfoUiFactory";
 import { Program_create_text_info, Program_get_group } from "../../../Graphics/ShaderPrograms.js";
 import { BLUEL, GREEN, GREY, ORANGE_240_160_10, PURPLEB, PURPLER, REDL, WHITE, YELLOWL } from "../Material/Base/Colors.js";
+import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "./DebugInfoUiNotifications.js";
 
 
 const _font_size = 10;
@@ -85,7 +86,7 @@ export function Debug_info_ui_performance(scene) {
 
 
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-   dp.StateEnable(MESH_STATE.ACTIVE)
+   // dp.StateEnable(MESH_STATE.ACTIVE)
    dp.Render();
    dp.Calc(SECTION.EXPAND | SECTION.INHERIT);
    dp.ConstructListeners();
@@ -534,7 +535,7 @@ function Debug_info_gfx_update(params) {
    // 1. We want to search in the dropdown all the programs info dropdowns if there is any prog dp for the progidx that was inserted. 
    let foundprogidx = INT_NULL;
    // Find if program dropdown exists
-   for (let i = 0; i < root.menu.children.boundary; i++) {
+   for (let i = 0; i <= root.menu.children.boundary; i++) {
       const pr = root.menu.children.buffer[i];
       if (pr._gfxidx === undefined) console.error('Missing prog-gfxidx property for dropdown')
       if (pr._gfxidx === progidx) {
@@ -549,7 +550,7 @@ function Debug_info_gfx_update(params) {
    if (foundprogidx !== INT_NULL) {
 
       dp_prog = root.menu.children.buffer[foundprogidx];
-      for (let i = 0; i < dp_prog.menu.children.boundary; i++) {
+      for (let i = 0; i <= dp_prog.menu.children.boundary; i++) {
 
          const vb = dp_prog.menu.children.buffer[i];
          /**DEBUG*/if (vb._gfxidx === undefined)
@@ -712,7 +713,7 @@ function Debug_info_create_mesh_info(params) {
 
    // Create the dropdown structure representing all the applications's meshes
    const root_meshes_idxs = Widget_root_buffer_get();
-   for (let i = 0; i < root_meshes_idxs.boundary; i++) {
+   for (let i = 0; i <= root_meshes_idxs.boundary; i++) {
    
       const root = Mesh_buffer_get_mesh_byidx(root_meshes_idxs.buffer[i].buffer[0]);
 
@@ -721,7 +722,7 @@ function Debug_info_create_mesh_info(params) {
    }
    // // Create the dropdown structure representing all the applications's meshes
    // const root_meshes = Scenes_get_root_meshes(STATE.scene.active_idx);
-   // for (let i = 0; i < root_meshes.boundary; i++) {
+   // for (let i = 0; i <=root_meshes.boundary; i++) {
 
    //    if (root_meshes.buffer[i])
    //       Debug_info_mesh_add_meshes_as_tree_struct(root_meshes.buffer[i], dp);
@@ -774,7 +775,7 @@ function Debug_info_mesh_add_meshes_as_tree_struct(mesh, parent) {
    // }
 
    // Run recursively for any mesh's children
-   for (let i = 0; i < mesh.children.boundary; i++) {
+   for (let i = 0; i <= mesh.children.boundary; i++) {
       const child = mesh.children.buffer[i];
       if (child)
          Debug_info_mesh_add_meshes_as_tree_struct(child, dp_mesh);
@@ -1103,7 +1104,7 @@ function Debug_info_create_vertexbuffer_2D(params) {
 
 export function Debug_info_create_all_generic_info() {
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [5, 5], [400,200,0], [100, 100], GREY[1], 'All Generic Info');
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [5, 5], [400,200,0], [100, 100], PURPLEB[1], 'All Generic Info');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
@@ -1111,8 +1112,11 @@ export function Debug_info_create_all_generic_info() {
    const program_info = Program_create_text_info();
    section.AddItem(program_info);
    
+   
    const vb_info = Vertex_buffer_create_text_info();
    section.AddItem(vb_info);
+   
+   Debug_ui_create_notification(NOTIFICATION_TYPE_IDX.GFX_PROGRAM, Debug_info_update_progarm_clbk, section);
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    section.Render();
@@ -1125,4 +1129,49 @@ export function Debug_info_create_all_generic_info() {
    // program_info.group_bufferidxs = Widget_group_create(program_info.mesh_bufferidx, program_info.gfx)
    // program_info.AddToWidgetGroupBuffer(program_info.group_bufferidxs[0]);
 
+
+
+   // const s2 = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [5, 5], [400,200,0], [100, 100], GREY[1], 'All Generic Info');
+   // s2.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+   // const widget_groups = Widget_root_create_text_info();
+   // s2.AddItem(widget_groups)
+
+   // s2.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   // s2.Render();
+   // s2.ConstructListeners();
+   // s2.Recalc();
+
+   // s2.group_bufferidxs = Widget_group_create(s2.mesh_bufferidx, s2.gfx)
+   // s2.AddToWidgetGroupBuffer(s2.group_bufferidxs[0]);
+}
+
+
+
+function Debug_info_update_progarm_clbk(idx, params){
+
+   console.warn('--- NOTIFICATION {', NOTIFICATION_TYPE_IDX.ToSting(idx), '} ---');
+
+   // Widget_root_batch_print_w4()
+   // const section = params;
+   
+   // const program_info = section.children.buffer[0];
+   // program_info.Destroy();
+   // const updated_program_info = Program_create_text_info();
+   // // const updated_program_info = Vertex_buffer_create_text_info();
+   // section.AddItem(updated_program_info);
+   
+   // const vb_info = section.children.buffer[1];
+   // vb_info.Destroy();
+   // const updated_vb_info = Program_create_text_info();
+   // section.AddItem(updated_vb_info);
+   
+   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   // section.Render();
+   // section.ConstructListeners();
+   // section.Recalc();
+   // Widget_root_batch_print_w4()
+
+   // section.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
 }

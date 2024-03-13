@@ -42,7 +42,7 @@ export class Rect extends Mesh {
       this.root_bufferidx = root_bufferidx;
       Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
          child.root_bufferidx = root_bufferidx;
@@ -164,7 +164,7 @@ export class Rect extends Mesh {
 
       this.MoveXYZ(pos_dif);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          this.children.buffer[i].MoveXYZ(pos_dif);
       }
    }
@@ -175,7 +175,7 @@ export class Rect extends Mesh {
       this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
       Batch_store(this, _, { pos: pos_dif }, _);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          AddArr2(this.children.buffer[i].geom.pos, pos_dif);
          this.children.buffer[i].batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
          Batch_store(this.children.buffer[i], _, { pos: pos_dif }, _);
@@ -283,7 +283,7 @@ export class Rect extends Mesh {
       const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
       const root_evt = root.listeners.buffer;
 
-      for (let etypeidx = 0; etypeidx < mesh.listeners.boundary; etypeidx++) {
+      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
          const evt = mesh.listeners.buffer[etypeidx];
          if (evt) { // If event is not null

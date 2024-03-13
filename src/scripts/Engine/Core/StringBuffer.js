@@ -6,6 +6,9 @@ import { M_Buffer } from "./Buffers";
 const _str_Buffer = new M_Buffer();
 _str_Buffer.Add(''); // Empty string
 
+export function Str_buffer_get_DEBUG() {
+   return _str_Buffer;
+}
 
 export function Str_buffer_store(str) {
    const idx = _str_Buffer.Add(str);

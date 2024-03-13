@@ -106,7 +106,7 @@ export class Widget_Text extends Text_Mesh {
 	Reposition_post(pos_dif) {
 
 		this.MoveXYZ(pos_dif)
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 
 			const child = this.children.buffer[i];
 			child.MoveXYZ(pos_dif)
@@ -122,19 +122,19 @@ export class Widget_Text extends Text_Mesh {
 			this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
 
 		const update_data = {
-				sizes:[2],
-				data:[pos_dif[0], pos_dif[1]],
+			sizes: [2],
+			data: [pos_dif[0], pos_dif[1]],
 		};
 		Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data, _);
-		
-		for (let i = 0; i < this.children.boundary; i++) {
-			
+
+		for (let i = 0; i <= this.children.boundary; i++) {
+
 			const child = this.children.buffer[i];
 			AddArr2(child.geom.pos, pos_dif);
-			
+
 			if (child.batch_fnidx === INT_NULL)
 				child.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-		
+
 			Batch_store(child, SHADER_ATTRIBUTES.WPOS4, update_data, _);
 			// Batch_store(child, _, { pos: pos_dif }, _);
 		}
@@ -252,7 +252,7 @@ export class Widget_Text extends Text_Mesh {
 
 	UpdateWidgetGroupIncrementNumFaces() {
 
-		Widget_group_update_increment(this.group_bufferidxs, this.geom.num_face);
+		Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
 	}
 
 
@@ -288,7 +288,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	Destroy() {
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 
 			if (this.children.buffer[i]) {
 				this.children.buffer[i].Destroy();
@@ -307,7 +307,6 @@ export class Widget_Multi_Text extends Widget_Text {
 		text_mesh.parent = this;
 
 		if (this.root_bufferidx !== INT_NULL && text_mesh.root_bufferidx === INT_NULL) {
-			// text_mesh.AddToWidgetRootBuffer(this.root_bufferidx);
 			text_mesh.root_bufferidx = this.root_bufferidx;
 			Widget_root_add_mesh(text_mesh.root_bufferidx, text_mesh.mesh_bufferidx);
 		}
@@ -325,7 +324,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.root_bufferidx = root_bufferidx;
 		Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
 			child.root_bufferidx = root_bufferidx;
 			Widget_root_add_mesh(child.root_bufferidx, child.mesh_bufferidx);
@@ -336,7 +335,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	Activate() {
 
 		this.state.mask |= MESH_STATE.ACTIVE;
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].state.mask |= MESH_STATE.ACTIVE;
 		}
 	}
@@ -345,7 +344,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	Deactivate() {
 
 		this.state.mask &= ~MESH_STATE.ACTIVE;
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].state.mask &= ~MESH_STATE.ACTIVE;
 		}
 	}
@@ -354,7 +353,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	StateEnable(MASK = 0x0) {
 
 		this.state.mask |= MASK;
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].state.mask |= MASK;
 		}
 	}
@@ -363,7 +362,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	StateDisable(MASK = 0x0) {
 
 		this.state.mask &= ~MASK;
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].state.mask &= ~MASK;
 		}
 	}
@@ -374,7 +373,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		if (this.ClipyCheck_A(clip_top, clip_bottom))
 			this.state.mask &= ~MESH_STATE.ACTIVE;
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			if (this.children.buffer[i].ClipyCheck_A(clip_top, clip_bottom))
 				this.children.buffer[i].state.mask &= ~MESH_STATE.ACTIVE;
 		}
@@ -392,7 +391,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		FLAGS |= GFX_CTX_FLAGS.SPECIFIC;
 		const igfx = [this.gfx.prog.idx, this.gfx.vb.idx];
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 
 			const child = this.children.buffer[i];
 			// if (child) child.gfx = child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx); // Pass the already exixting gfx buffers for use
@@ -409,7 +408,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		super.Render();
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 
 			const child = this.children.buffer[i];
 			if (child) child.Render();
@@ -420,7 +419,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	Rerender() {
 
 		super.Rerender();
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 
 			const child = this.children.buffer[i];
 			if (child) child.Rerender();
@@ -437,7 +436,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		const all_meshes = parent_meshes_buf ? parent_meshes_buf : [];
 		all_meshes.push(this);
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 
 			const child = this.children.buffer[i];
 			if (child) all_meshes.push(child);
@@ -451,13 +450,13 @@ export class Widget_Multi_Text extends Widget_Text {
 		let max_width = super.GetMaxWidth();
 
 		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
-			for (let i = 0; i < this.children.boundary; i++) {
+			for (let i = 0; i <= this.children.boundary; i++) {
 				max_width += this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].pad[0];
 			}
 			return max_width;
 		}
 		else {
-			for (let i = 0; i < this.children.boundary; i++) {
+			for (let i = 0; i <= this.children.boundary; i++) {
 				const w = this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].pad[0];
 				if (max_width < w)
 					max_width = w;
@@ -477,7 +476,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			return max_height;
 		}
 		else { // Else calculate all the lines of the text meshes
-			for (let i = 0; i < this.children.boundary; i++) {
+			for (let i = 0; i <= this.children.boundary; i++) {
 				max_height += this.children.buffer[i].geom.dim[1] + this.children.buffer[i].pad[1];
 			}
 			return max_height;
@@ -489,7 +488,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	SetColorAlpha(alpha) {
 
 		super.SetColorAlpha(alpha);
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].SetColorAlpha(alpha);
 		}
 	}
@@ -498,7 +497,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	SetIsGfxInserted(flag) {
 		if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			if (this.children.buffer[i].is_gfx_inserted !== flag) this.children.buffer[i].is_gfx_inserted = flag;
 		}
 	}
@@ -509,7 +508,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.geom.defPos[1] = this.geom.pos[1]; // Copy the current position to the mesh's default pos, so it can be retrieved.
 		super.SetPosY(posy);
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].geom.defPos[1] = this.children.buffer[i].geom.pos[1];
 			this.children.buffer[i].SetPosY(posy);
 		}
@@ -521,7 +520,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.geom.pos[1] = this.geom.defPos[1]; // Copy the current position to the mesh's default pos, so it can be retrieved.
 		super.SetPosY(posy);
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].geom.pos[1] = this.children.buffer[i].geom.defPos[1];
 			this.children.buffer[i].SetPosY(posy);
 		}
@@ -533,7 +532,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.mat.defCol[3] = this.mat.col[3];
 		this.mat.SetColorAlpha(alpha, this.gfx);
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].mat.defCol[3] = this.children.buffer[i].mat.col[3];
 			this.children.buffer[i].mat.SetColorAlpha(alpha, this.gfx);
 		}
@@ -545,7 +544,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.mat.col[3] = this.mat.defCol[3];
 		this.mat.SetColorAlpha(alpha, this.gfx);
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].mat.col[3] = this.children.buffer[i].mat.defCol[3];
 			this.children.buffer[i].mat.SetColorAlpha(alpha, this.gfx);
 		}
@@ -554,7 +553,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	SetZPos(val) {
 		this.geom.pos[2] = val;
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].geom.pos[2] = val;
 		}
 	}
@@ -574,7 +573,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		let prev_text_mesh = null;
 		if (this.children.active_count) {
 
-			prev_text_mesh = this.children.buffer[this.children.boundary - 1];
+			prev_text_mesh = this.children.buffer[this.children.boundary];
 			ERROR_NULL(prev_text_mesh, ' @ Widget_Dynamic_Text_Mesh.CreateNewText(). WidgetText.js');
 		}
 		else prev_text_mesh = this;
@@ -686,7 +685,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 			params.func[i] = func;
 			params.func_params[i] = func_params;
-			params.meshes[i] = this.children.buffer[this.children.boundary - 1];
+			params.meshes[i] = this.children.buffer[this.children.boundary];
 
 			/**
 			 * Substitute interval_time_value or leave the same??
@@ -746,7 +745,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, mesh.gfx);
 
 		// Move children text
-		for (let i = 0; i < mesh.children.boundary; i++) {
+		for (let i = 0; i <= mesh.children.boundary; i++) {
 			const child = mesh.children.buffer[i];
 			if (child) child.MoveXY(mouse_pos.x, -mouse_pos.y, child.gfx);
 		}
@@ -767,7 +766,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		Batch_store(this, _, [x, y]);
 
 		// Move children text
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 
 			const child = this.children.buffer[i];
 			if (child) {
@@ -784,7 +783,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		this.geom.pos[0] += x;
 		this.geom.pos[1] += y;
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
 			if (child) child.MoveNoGfxUpdate(x, y);
 		}
@@ -795,7 +794,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	MoveYNoGfxUpdate(y) {
 
 		this.geom.pos[1] += y;
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
 			if (child) child.MoveYNoGfxUpdate(y);
 		}
@@ -806,7 +805,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	MoveXNoGfxUpdate(x) {
 
 		this.geom.pos[0] += x;
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
 			if (child) child.MoveXNoGfxUpdate(x);
 		}
@@ -822,7 +821,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		let ypos = pos[1] + dim[1] * 2;
 		if (flags & ALIGN.VERTICAL) {
 
-			for (let i = 0; i < this.children.boundary; i++) {
+			for (let i = 0; i <= this.children.boundary; i++) {
 
 				const child = this.children.buffer[i];
 				pos[1] = ypos;
@@ -865,7 +864,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
 		}
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 
 			const child = this.children.buffer[i];
 			if (child) {
@@ -892,7 +891,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	SetGfxProgramGroup(group_mask) {
 		this.sid.progs_group = group_mask;
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
 			child.sid.progs_group = group_mask;
 		}
@@ -905,7 +904,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			this.group_bufferidxs[0] = group_bufferidx;
 			this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces);
 
-			for (let i = 0; i < this.children.boundary; i++) {
+			for (let i = 0; i <= this.children.boundary; i++) {
 				const child = this.children.buffer[i];
 				if (child) {
 					child.group_bufferidxs[0] = group_bufferidx;
@@ -920,7 +919,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
 			if (child) {
 				child.UpdateWidgetGroupIncrementNumFaces();
@@ -933,7 +932,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
 
-		for (let i = 0; i < this.children.boundary; i++) {
+		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
 			if (child) {
 				child.UpdateWidgetGroupDecrementNumFaces();

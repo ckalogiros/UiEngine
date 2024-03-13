@@ -108,7 +108,7 @@ class Framebuffer {
    }
 
 
-   #SetName(str_name) {
+   #SetName(str_name='FramebufferUNAMED') {
       return Str_buffer_store(str_name);
    }
 

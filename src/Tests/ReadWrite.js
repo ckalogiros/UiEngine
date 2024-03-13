@@ -167,7 +167,7 @@ function Test_write_all_meshes() {
 
    timer.Start();
 
-   for (let i = 0; i < mesh_buffer.boundary; i++) {
+   for (let i = 0; i <= mesh_buffer.boundary; i++) {
 
       const mesh = mesh_buffer.buffer[i];
       if (mesh.gfx) {
@@ -194,7 +194,7 @@ function Test_write_all_meshes2() {
    timer.Start();
 
 
-   for (let i = 0; i < mesh_buffer.boundary; i++) {
+   for (let i = 0; i <= mesh_buffer.boundary; i++) {
 
       const mesh = mesh_buffer.buffer[i];
       if (mesh.gfx) {
@@ -244,7 +244,7 @@ function Test_write_all_meshes2_1() {
    timer.Start();
 
 
-   for (let i = 0; i < mesh_buffer.boundary; i++) {
+   for (let i = 0; i <= mesh_buffer.boundary; i++) {
 
       const mesh = mesh_buffer.buffer[i];
 

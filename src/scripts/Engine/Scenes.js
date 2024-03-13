@@ -48,7 +48,9 @@ class Scenes extends M_Buffer {
 
     Create() {
 
-        const scene = new Scene(this.boundary);
+        // this.boundary++;
+        // this.active_count++;
+        const scene = new Scene(this.boundary+1);
         this.Add(scene);
         return scene;
     }
@@ -96,7 +98,7 @@ export function Scene_set_projection_matrix(sceneidx) {
 
 //     const scene = _scenes.buffer[sceneidx];
 //     const meshes = scene.gfx.buffer[groupidx].buffer[progidx].buffer[vbidx].buffer;
-//     for (let k = 0; k < meshes.boundary; k++) { 
+//     for (let k = 0; k <= meshes.boundary; k++) { 
         
 //         if(meshes.buffer[k]){ // Make sure for any removed meshes
 

@@ -11,6 +11,7 @@ import { Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from ".
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from "../../../Graphics/Buffers/UniformBuffers.js";
+import { Debug_ui_set_notification, NOTIFICATION_TYPE_IDX } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 
 
 
@@ -204,22 +205,24 @@ export function Gfx_create_program_buffer(groupidx, progidx) {
 
 
 
-function Gfx_pool_create_vb_buffer(groupidx, progidx, vbidx) {
+function Gfx_pool_create_vb_buffer(groupidx, progidx) {
    _gfx_pool.buffer[groupidx].buffer[progidx].Add(new M_Buffer());
 }
 
 
 
-function Gfx_create_gfx_data_buffer(groupidx, progidx, vbidx, sceneidx, inUse = true, isPrivate) {
+function Gfx_create_gfx_data_buffer(groupidx, progidx, vbidx, progvbidx, sceneidx, inUse = true, isPrivate) {
+
    const data = {
       groupidx: groupidx,
       progidx: progidx,
+      progvbidx: progvbidx,
       vbidx: vbidx,
       sceneidx: sceneidx,
       inUse: inUse,
       isPrivate: (isPrivate) ? true : false,
    }
-   _gfx_pool.buffer[groupidx].buffer[progidx].buffer[vbidx] = data;
+   _gfx_pool.buffer[groupidx].buffer[progidx].buffer[progvbidx] = data;
 }
 
 
@@ -275,7 +278,7 @@ export function Gfx_remove_geometry(gfx, num_faces, start) {
 
 export function Gfx_activate(mesh) {
 
-   for (let i = 0; i < mesh.children.boundary; i++) {
+   for (let i = 0; i <= mesh.children.boundary; i++) {
 
       const child = mesh.children.buffer[i];
       if (child) Gfx_activate(child)
@@ -298,9 +301,9 @@ export function Gfx_activate(mesh) {
 export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_gfx_idxs, root_bufferidx = INT_NULL, mesh_bufferidx = INT_NULL, uniforms) {
 
 
-
    let groupidx = INT_NULL;
    let progidx = spesific_gfx_idxs[0];
+   let progvbidx = INT_NULL; // The index of: the refference of the vertex buffer, inside the programs buffer vb array!
    let vbidx = spesific_gfx_idxs[1];
    let ibidx = INT_NULL;
 
@@ -324,12 +327,15 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 
          Gfx_create_program_buffer(groupidx, progidx);
 
-         
+
          Scene_set_projection_matrix(sceneidx)
 
          const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
          Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
-         
+
+         /** DEBUG INFO UI */
+         Debug_ui_set_notification(NOTIFICATION_TYPE_IDX.GFX_PROGRAM)
+
       }
       else groupidx = PROGRAMS_GROUPS.GetIdxByMask(sid.progs_group); // Get groupidx via SID
 
@@ -360,8 +366,8 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
          }
 
 
-         const progvbidx = Program_store_vertex_buffer_idx(groupidx, progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
-         Gfx_pool_create_vb_buffer(groupidx, progidx, progvbidx);
+         progvbidx = Program_store_vertex_buffer_idx(groupidx, progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
+         Gfx_pool_create_vb_buffer(groupidx, progidx);
 
          // Add the new vertexBuffer to the render queue
          Renderqueue_Add(groupidx, progidx, vbidx, true);
@@ -369,16 +375,19 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 
          // Create new entry for the new vertex buffer in widget root gfx buffer
          Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx);
-         
+
       }
-      
+
+      Gfx_create_gfx_data_buffer(groupidx, progidx, vbidx, sceneidx, true, FLAGS & GFX_CTX_FLAGS.PRIVATE);
+      console.warn(vbidx)
+
    }
-   
+
    /**DEBUG*/if (ibidx === INT_NULL) console.error('ibidx is NULL');
-   
+
    const gfx = Generate_mesh_gfx_info(sid, sceneidx, groupidx, progidx, vbidx, ibidx, mesh_count);
-   Gfx_create_gfx_data_buffer(groupidx, progidx, vbidx, sceneidx, true, FLAGS & GFX_CTX_FLAGS.PRIVATE);
    
+
    // Add mesh to the root batch buffer for batch update
    Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx, mesh_count);
 
@@ -401,16 +410,23 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 export function Gfx_pool_print() {
 
    console.log('Gfx Pool: ');
-   for (let i = 0; i < _gfx_pool.boundary; i++) {
-      for (let j = 0; j < _gfx_pool.buffer[i].boundary; j++) {
-         for (let k = 0; k < _gfx_pool.buffer[i].buffer[j].boundary; k++) {
-            console.log(
-               'group:', _gfx_pool.buffer[i].buffer[j].buffer[k].groupidx,
-               ' prog:', _gfx_pool.buffer[i].buffer[j].buffer[k].progidx,
-               ' vb:', _gfx_pool.buffer[i].buffer[j].buffer[k].vbidx,
-               ' inUse:', _gfx_pool.buffer[i].buffer[j].buffer[k].inUse,
-               ' private:', _gfx_pool.buffer[i].buffer[j].buffer[k].isPrivate,
-            );
+   console.log(_gfx_pool);
+   for (let i = 0; i <= _gfx_pool.boundary; i++) {
+      for (let j = 0; j <= _gfx_pool.buffer[i].boundary; j++) {
+         for (let k = 0; k <= _gfx_pool.buffer[i].buffer[j].boundary; k++) {
+
+            // if(_gfx_pool.buffer[i].buffer[j].buffer[k].active_count){
+               console.log(
+                  'group:', _gfx_pool.buffer[i].buffer[j].buffer[k].groupidx,
+                  ' prog:', _gfx_pool.buffer[i].buffer[j].buffer[k].progidx,
+                  ' vb:', _gfx_pool.buffer[i].buffer[j].buffer[k].vbidx,
+                  ' inUse:', _gfx_pool.buffer[i].buffer[j].buffer[k].inUse,
+                  ' private:', _gfx_pool.buffer[i].buffer[j].buffer[k].isPrivate,
+               );
+            // }
+            // else{
+            //    console.log('EMPTY VB. NO DATA');
+            // }
          }
       }
    }

@@ -101,7 +101,7 @@ export function Program_program_exists(sid) {
 	const progs = Program_group_exists(groupidx);
 
 	if (ERROR_NULL(progs) || ERROR_NULL(progs.buffer)) return INT_NULL
-	for (let i = 0; i < progs.boundary; i++)
+	for (let i = 0; i <= progs.boundary; i++)
 		if (SID.CheckSidMatch(sid, progs.buffer[i].sid)) return i;
 
 	return INT_NULL;
@@ -142,7 +142,7 @@ function Create_program(sid, uniforms) {
 	const progidx = _program_groups.buffer[groupidx].Add(prog);
 	prog.idx = progidx; // Store the programs index to self
 
-		
+
 	/****************************************************************************************************/
 	// Shared-Block uniforms
 	const ub_idx = Uniforms_block_buffer_create(sid.unif, prog.shader_program, uniforms);
@@ -153,8 +153,8 @@ function Create_program(sid, uniforms) {
 	// Individual uniforms
 	const len = uniforms.length;
 	for (let i = 0; i < len; i++) {
-		if((uniforms[i].shader & UNIFORM.IS_SHARED) === 0)
-		Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name);
+		if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0)
+			Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name);
 	}
 
 
@@ -202,10 +202,10 @@ class Gl_Program {
 		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
 
 		this.vb = new Int8Buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffers_info' buffer. 
-		this.vb.Init(-1);
+		// this.vb.Init(-1);
 
 		this.ib = new Int8Buffer(1); // Array of indexes to all index buffers in '_index_buffers_info' buffer. 
-		this.ib.Init(-1);
+		// this.ib.Init(-1);
 
 		// this.ubb = new Int8Buffer(1); // Array of indexes to all uniforms in '_uniform_blocks' buffer. 
 		// this.ubb.Init(-1);
@@ -227,7 +227,7 @@ class Gl_Program {
 
 
 
-		
+
 		/****************************************************************************************************/
 		// Sampler uniforms
 		this.shaderinfo = {
@@ -303,21 +303,21 @@ export function Program_uniform_bind(groupidx, progidx, functions_obj, unif_name
 // DEBUG Info - Create text for render
 /****************************************************************************************************************************************************/
 
-function TEMP(params){
+function TEMP(params) {
 	const destroy_btn = params.target_mesh;
 	console.log('TEMP FUNCTION', destroy_btn.GetName());
-	
+
 	const section = params.params;
 	console.log('section', section.GetName());
 	section.Destroy();
 
 }
 
-export function Program_create_text_info(){
+export function Program_create_text_info() {
 
 	const col_menu = GREY[3], col_dp = GREY[1];
 
-	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400,400,0], [0, 0], TRANSPARENCY(BLUEL[9], .3), 'Program Group Info');
+	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .3), 'Program Group Info');
 
 	const destroy = Create_widget_button(_, 'Destroy', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
 	destroy.Bind(TEMP, _, s);
@@ -325,11 +325,11 @@ export function Program_create_text_info(){
 
 	s.Calc()
 
-	const margin = [4,4];
+	const margin = [4, 4];
 	const style = [0, 3, 1];;
 	const gr = _program_groups;
 
-	for(let i=0; i<gr.boundary; i++){
+	for (let i = 0; i <= gr.boundary; i++) {
 
 		const grw = Create_widget_dropdown(_, 'groups', [100, 100, 0], col_dp, col_menu, _, _, _, _, _, margin);
 		grw.CreateClickEvent();
@@ -339,12 +339,12 @@ export function Program_create_text_info(){
 		const group_info = Create_widget_text(_, `count:${gr.active_count} size:${gr.size}`);
 		grw.AddToMenu(group_info);
 
-			
+
 		{ // Programs
 
 			const progs = gr.buffer[i];
 
-			const progsw = Create_widget_dropdown(_, 'programs', [100, 100, 0], col_dp, col_menu, _, [2,2], _, _, style, margin);
+			const progsw = Create_widget_dropdown(_, 'programs', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
 			progsw.CreateClickEvent();
 			grw.AddToMenu(progsw)
 
@@ -352,11 +352,11 @@ export function Program_create_text_info(){
 			progsw.AddToMenu(progs_info);
 
 
-			for(let i2=0; i2<progs.boundary; i2++){
+			for (let i2 = 0; i2 <= progs.boundary; i2++) {
 
 				const prog = progs.buffer[i2];
 
-				const progw = Create_widget_dropdown(_, 'programs', [100, 100, 0], col_dp, col_menu, _, [2,2], _, _, style, margin);
+				const progw = Create_widget_dropdown(_, 'programs', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
 				progw.CreateClickEvent();
 				progsw.AddToMenu(progw)
 
@@ -367,32 +367,32 @@ export function Program_create_text_info(){
 				{ const prog_info = Create_widget_text(_, `attribsidx:${prog.attribsidx}`); progw.AddToMenu(prog_info); }
 				{ const prog_info = Create_widget_text(_, `attribs_per_vertex:${prog.attribs_per_vertex}`); progw.AddToMenu(prog_info); }
 				{ const prog_info = Create_widget_text(_, `add_to_vb_fnidx:${prog.add_to_vb_fnidx}`); progw.AddToMenu(prog_info); }
-				
+
 				/****************************************************************************************************************************/
 				// vb and ib
-				const vbw = Create_widget_dropdown(_, 'vertex buffer', [100, 100, 0], col_dp, col_menu, _, [2,2], _, _, style, margin);
+				const vbw = Create_widget_dropdown(_, 'vertex buffer', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
 				vbw.CreateClickEvent();
 				progw.AddToMenu(vbw)
 				let vb_info = 'vb:'
-				for(let i3=0; i3<prog.vb.boundary; i3++){
+				for (let i3 = 0; i3 <= prog.vb.boundary; i3++) {
 
 					vb_info += `[${prog.vb.buffer[i3]}]`;
 				}
-				console.log(vb_info)
+
 				{ const info = Create_widget_text(_, vb_info); vbw.AddToMenu(info); }
 
-				const ibw = Create_widget_dropdown(_, 'index buffer', [100, 100, 0], col_dp, col_menu, _, [2,2], _, _, style, margin);
+				const ibw = Create_widget_dropdown(_, 'index buffer', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
 				ibw.CreateClickEvent();
 				progw.AddToMenu(ibw)
 				let ib_info = 'ib:'
-				for(let i3=0; i3<prog.ib.boundary; i3++){
+				for (let i3 = 0; i3 <= prog.ib.boundary; i3++) {
 
 					ib_info += `[${prog.ib.buffer[i3]}]`;
 				}
 				{ const info = Create_widget_text(_, ib_info); ibw.AddToMenu(info); }
 			}
 		}
-		
+
 	}
 
 

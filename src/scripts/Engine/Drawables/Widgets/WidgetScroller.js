@@ -100,7 +100,7 @@ export class Widget_Scroller extends Section {
 
       this.renderables = {
          first: 0,
-         last: this.scrolled_section.children.boundary - 1,
+         last: this.scrolled_section.children.boundary,
       }
 
       // Calculate the bar's and handle's horizontal pading.
@@ -200,24 +200,24 @@ export class Widget_Scroller extends Section {
       scrolled_mesh.root_bufferidx = root_bufferidx;
    }
 
-   
+
    AddToWidgetGroupBuffer(group_bufferidx) {
 
-      if(this.state.mask & MESH_STATE.ACTIVE){
+      if (this.state.mask & MESH_STATE.ACTIVE) {
          /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR MESH:', this.mesh_bufferidx, this.GetName());
          /**DEBUG */ if (this.group_bufferidxs[1] !== INT_NULL) console.error('ADDING TO WIDGET GROUP BUFFER WARNING: MESH ALREADY IS IN A WIDGET GROUP:', this.mesh_bufferidx, this.GetName(), 'group:', this.group_bufferidxs, 'start', this.gfx.vb.start);
 
          this.group_bufferidxs[0] = group_bufferidx;
          this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
-         
+
          const bar = this.children.buffer[SCROLL_BAR_IDX];
          bar.group_bufferidxs[0] = group_bufferidx;
          bar.group_bufferidxs[1] = Widget_group_add(group_bufferidx, bar.gfx, bar.geom.num_faces, bar.mesh_bufferidx);
-         
+
          const handle = bar.children.buffer[0];
          handle.group_bufferidxs[0] = group_bufferidx;
          handle.group_bufferidxs[1] = Widget_group_add(group_bufferidx, handle.gfx, handle.geom.num_faces, handle.mesh_bufferidx);
-         
+
          const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
          scrolled_mesh.group_bufferidxs[0] = group_bufferidx;
          scrolled_mesh.group_bufferidxs[1] = Widget_group_add(group_bufferidx, scrolled_mesh.gfx, scrolled_mesh.geom.num_faces, scrolled_mesh.mesh_bufferidx);
@@ -271,7 +271,7 @@ export class Widget_Scroller extends Section {
          }
 
          const scrolled_section_igfx = [this.scrolled_section.gfx.prog.idx, this.scrolled_section.gfx.vb.idx];
-         for (let i = 0; i < this.scrolled_section.children.boundary; i++) {
+         for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
             const child = this.scrolled_section.children.buffer[i];
             if (child) {
                child.GenGfxCtx(FLAGS, scrolled_section_igfx);
@@ -300,7 +300,7 @@ export class Widget_Scroller extends Section {
          handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, igfx, this.root_bufferidx, this.mesh_bufferidx);
 
          this.scrolled_section.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx);
-         for (let i = 0; i < this.scrolled_section.children.boundary; i++) {
+         for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
             const child = this.scrolled_section.children.buffer[i];
             if (child) {
                child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx);
@@ -336,24 +336,24 @@ export class Widget_Scroller extends Section {
 
       // Reset gfx start for the mesh
       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
-      if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
+      if (this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.StateEnable(MESH_STATE.ACTIVE);
 
       const bar = this.scroll_bar;
       Vertex_buffer_add_vertices(bar.gfx, bar.geom, bar.mat, bar.GetName());
-      if(bar.sid.shad & SID.SHAD.INDEXED) bar.gfx.ib.start = Index_buffer_add_indices(bar.gfx.ib, bar.GetName());
+      if (bar.sid.shad & SID.SHAD.INDEXED) bar.gfx.ib.start = Index_buffer_add_indices(bar.gfx.ib, bar.GetName());
       bar.StateEnable(MESH_STATE.ACTIVE);
 
       const handle = bar.children.buffer[0];
       Vertex_buffer_add_vertices(handle.gfx, handle.geom, handle.mat, handle.GetName());
-      if(handle.sid.shad & SID.SHAD.INDEXED) handle.gfx.ib.start = Index_buffer_add_indices(handle.gfx.ib, handle.GetName());
+      if (handle.sid.shad & SID.SHAD.INDEXED) handle.gfx.ib.start = Index_buffer_add_indices(handle.gfx.ib, handle.GetName());
       handle.StateEnable(MESH_STATE.ACTIVE);
 
       Vertex_buffer_add_vertices(this.scrolled_section.gfx, this.scrolled_section.geom, this.scrolled_section.mat, this.scrolled_section.GetName());
-      if(this.scrolled_section.sid.shad & SID.SHAD.INDEXED) this.scrolled_section.gfx.ib.start = Index_buffer_add_indices(this.scrolled_section.gfx.ib, this.scrolled_section.GetName());
+      if (this.scrolled_section.sid.shad & SID.SHAD.INDEXED) this.scrolled_section.gfx.ib.start = Index_buffer_add_indices(this.scrolled_section.gfx.ib, this.scrolled_section.GetName());
       this.scrolled_section.StateEnable(MESH_STATE.ACTIVE);
 
-      for (let i = 0; i < this.scrolled_section.children.boundary; i++) {
+      for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
 
          const child = this.scrolled_section.children.buffer[i];
          /**DEBUG*/if (child === _) console.error('TEMP_RERENDER', this.scrolled_section.children.buffer, i)
@@ -961,7 +961,7 @@ export function Scroller_clampy_and_render(scroller, upper_threshold = 0, lower_
    scroller.scrolled_section.AddToWidgetGroupBuffer(scroller.scrolled_section.group_bufferidxs[0]);
 
    // Render the clamped scroller
-   scroller.Render();   
+   scroller.Render();
    // scroller.Recalc();
    // This way we do not resize the scrolled section to the clamped height(keeps it at original height for all items)
    scroller.ConstructListeners();
@@ -982,7 +982,7 @@ export function Scroller_clampy_and_render(scroller, upper_threshold = 0, lower_
    // TEMPORARY: Design how and where to implement.
    const widget_root = Widget_root_buffer_get_byidx(scroller.root_bufferidx);
    const group_bufferidx = scroller.scrolled_section.group_bufferidxs[0]; // The roots group idx
-   for (let i = 0; i < widget_root.boundary; i++) {
+   for (let i = 0; i <= widget_root.boundary; i++) {
 
       const mesh = Mesh_buffer_get_mesh_byidx(widget_root.buffer[i])
       if (mesh.gfx && mesh.group_bufferidxs[1] === INT_NULL) {

@@ -65,14 +65,8 @@ export function Create_text_mesh(text, pos, fontsize, col, bold, font) {
 
 export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, margin, pos, dim, col, name, style) {
 
-   // Create a new mesh_buffer element and add a new section mesh
-   // const freeidx = _mesh_buffer.Add(new Section(options, margin, pos, dim, col, name, style));
-   
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, margin, pos, dim, col, name, style));
-   // ROOT_WIDGETS.CREATE_ROOT, 
-
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_section(). ${mesh_bufferidx}, ${testidx}` )
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, margin, pos, dim, col, name, style));
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
@@ -108,9 +102,7 @@ export function Create_widget_multi_text(ROOT_WIDGET_FLAGS=0x0, text, ALIGNMENT,
 export function Create_widget_label(ROOT_WIDGET_FLAGS=0x0, text, Align, pos, fontSize, col, text_col, pad, bold, style, font) {
 
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontSize, col, text_col, pad, bold, style, font));
-
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_section(). ${mesh_bufferidx}, ${testidx}` )
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontSize, col, text_col, pad, bold, style, font));
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
@@ -120,9 +112,7 @@ export function Create_widget_label(ROOT_WIDGET_FLAGS=0x0, text, Align, pos, fon
 export function Create_widget_button(ROOT_WIDGET_FLAGS=0x0, text, Align, pos, fontSize, col, text_col, pad, bold, style, font) {
 
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontSize, col, text_col, pad, bold, style, font));
-
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_section(). ${mesh_bufferidx}, ${testidx}` )
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontSize, col, text_col, pad, bold, style, font));
    
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
@@ -132,9 +122,7 @@ export function Create_widget_button(ROOT_WIDGET_FLAGS=0x0, text, Align, pos, fo
 export function Create_widget_switch(ROOT_WIDGET_FLAGS=0x0, text_on, text_off, pos, fontsize, col, text_col, pad, bold, style, font) {
 
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Switch(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize, col, text_col, pad, bold, style, font));
-
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_section(). ${mesh_bufferidx}, ${testidx}` )
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Switch(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize, col, text_col, pad, bold, style, font));
    
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
@@ -144,9 +132,7 @@ export function Create_widget_switch(ROOT_WIDGET_FLAGS=0x0, text_on, text_off, p
 export function Create_widget_slider(ROOT_WIDGET_FLAGS=0x0, pos, dim, col, hover_margin) {
 
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, hover_margin));
-
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_section(). ${mesh_bufferidx}, ${testidx}` )
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, hover_margin));
    
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
@@ -156,9 +142,7 @@ export function Create_widget_slider(ROOT_WIDGET_FLAGS=0x0, pos, dim, col, hover
 export function Create_widget_scroller(ROOT_WIDGET_FLAGS=0x0, scrolled_mesh, dim, col) {
 
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Scroller(mesh_bufferidx, ROOT_WIDGET_FLAGS, scrolled_mesh, dim, col));
-
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_scroller(). ${mesh_bufferidx}, ${testidx}` )
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Scroller(mesh_bufferidx, ROOT_WIDGET_FLAGS, scrolled_mesh, dim, col));
    
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
@@ -168,10 +152,8 @@ export function Create_widget_scroller(ROOT_WIDGET_FLAGS=0x0, scrolled_mesh, dim
 export function Create_widget_dropdown(ROOT_WIDGET_FLAGS=0x0, text, pos, col1, col_menu, text_col, btn_pad, bold, font, style, margin) {
 
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Dropdown(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1, col_menu, text_col, btn_pad, bold, font, style, margin));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Dropdown(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1, col_menu, text_col, btn_pad, bold, font, style, margin));
 
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_scroller(). ${mesh_bufferidx}, ${testidx}` )
-   
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
 
@@ -180,9 +162,7 @@ export function Create_widget_dropdown(ROOT_WIDGET_FLAGS=0x0, text, pos, col1, c
 export function Create_widget_menubar(ROOT_WIDGET_FLAGS=0x0, text, align, pos, col, text_col, btn_pad, bold, font, style, margin) {
 
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Menu_Bar(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, align, pos, col, text_col, btn_pad, bold, font, style, margin));
-
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_scroller(). ${mesh_bufferidx}, ${testidx}` )
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Menu_Bar(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, align, pos, col, text_col, btn_pad, bold, font, style, margin));
    
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
@@ -193,10 +173,8 @@ export function Create_widget_close_btn(ROOT_WIDGET_FLAGS=0x0, root, text, pos, 
 
          
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Close_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col, text_col, pad, bold, style, font));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Close_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col, text_col, pad, bold, style, font));
 
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_section(). ${mesh_bufferidx}, ${testidx}` )
-   
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
 
@@ -205,9 +183,7 @@ export function Create_widget_close_btn(ROOT_WIDGET_FLAGS=0x0, root, text, pos, 
 export function Create_widget_minimize_btn(ROOT_WIDGET_FLAGS=0x0, root, pos, fontsize, col, text_col, pad, bold, style, font) {
 
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   const testidx = _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Minimize(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos, fontsize, col, text_col, pad, bold, style, font));
-
-   /**DEBUG*/if(mesh_bufferidx !== testidx) alert(`mesh_bufferidx IS NOT THE SAME WITH THE INDEX AT _mesh_buffer[] BUFFER. @ Create_widget_section(). ${mesh_bufferidx}, ${testidx}` )
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Minimize(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos, fontsize, col, text_col, pad, bold, style, font));
    
    return _mesh_buffer.buffer[mesh_bufferidx];
 }

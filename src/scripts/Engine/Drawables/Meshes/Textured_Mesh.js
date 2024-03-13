@@ -86,7 +86,7 @@ export class Textured_Mesh extends Mesh {
 
       const root_evt = root.listeners.buffer;
 
-      for (let etypeidx = 0; etypeidx < mesh.listeners.boundary; etypeidx++) {
+      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
          const evt = mesh.listeners.buffer[etypeidx];
          if (evt) { // If event is not null

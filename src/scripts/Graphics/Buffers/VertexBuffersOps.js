@@ -1,6 +1,6 @@
 "use strict";
 
-import { Str_buffer_get_by_idx } from "../../Engine/Core/StringBuffer";
+import { Str_buffer_get_DEBUG, Str_buffer_get_by_idx } from "../../Engine/Core/StringBuffer";
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size } from "../ShaderAttributes";
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from "./IndexBuffers";
 import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_state_enable } from "./VertexBuffers";
@@ -16,6 +16,7 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx) {
 
    const shader_attribs = Shader_attributes_get_attribs(attribsidx);
    const names = shader_attribs.names;
+   const str_buffer = Str_buffer_get_DEBUG();
    if (Str_buffer_get_by_idx(names[0]) === 'a_col' && Str_buffer_get_by_idx(names[1]) === 'a_wpos_time' &&
        Str_buffer_get_by_idx(names[2]) === 'a_params1' && Str_buffer_get_by_idx(names[3]) === 'a_pos') {
       return 0;

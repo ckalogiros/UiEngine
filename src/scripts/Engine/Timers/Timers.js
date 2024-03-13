@@ -100,7 +100,7 @@ class Timer {
     }
 
 
-    SetTimer(start, duration, step, idx, name, clbk, params){
+    SetTimer(start, duration, step, idx, name='Timers UNAMED', clbk, params){
 
         this.t = start;
         this.duration = duration;

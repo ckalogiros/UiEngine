@@ -43,16 +43,16 @@ export class Text_Mesh extends Mesh {
    }
 
 
-	StateEnable(MASK = 0x0) {
+   StateEnable(MASK = 0x0) {
 
-		this.state.mask |= MASK;
-	}
+      this.state.mask |= MASK;
+   }
 
 
-	StateDisable(MASK = 0x0) {
+   StateDisable(MASK = 0x0) {
 
-		this.state.mask &= ~MASK;
-	}
+      this.state.mask &= ~MASK;
+   }
 
 
 
@@ -62,8 +62,8 @@ export class Text_Mesh extends Mesh {
    /*******************************************************************************************************************************************************/
 
 
-   GenGfxCtx(FLAGS=GFX_CTX_FLAGS.ANY, gfxidx=null) {
-      
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null) {
+
       if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
 
          const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
@@ -108,16 +108,16 @@ export class Text_Mesh extends Mesh {
 
          if (i === 0) {
             Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            if(this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
-         else{
+         else {
             Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            if(this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
 
-         
+
          geom_copy.pos[0] += (this.fontsize * 2 * advancex);
-         
+
          // Reset geometry copy
          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
 
@@ -126,11 +126,11 @@ export class Text_Mesh extends Mesh {
       // BUG: If one text has by mistake a different 'this.mat.uvIdx', then the vb will store that uv-map index. Cause a vertex buffer may use only one texture.
       Vertex_buffer_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
 
-      
+
       // Scenes_store_mesh_in_gfx(this.sceneidx, this); // For storing meshes by its gfx
-      
+
       // if(this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
-      
+
       this.is_gfx_inserted = true;
 
    }
@@ -166,16 +166,16 @@ export class Text_Mesh extends Mesh {
 
          if (i === 0) {
             Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            if(this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
-         else{
+         else {
             Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            if(this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
 
-         
+
          geom_copy.pos[0] += (this.fontsize * 2 * advancex);
-         
+
          // Reset geometry copy
          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
 
@@ -194,7 +194,7 @@ export class Text_Mesh extends Mesh {
 
       this.geom.pos[0] += x;
       this.geom.pos[1] += y;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.MoveNoGfxUpdate(x, y);
       }
@@ -205,7 +205,7 @@ export class Text_Mesh extends Mesh {
    MoveYNoGfxUpdate(y) {
 
       this.geom.pos[1] += y;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.MoveYNoGfxUpdate(y);
       }
@@ -216,7 +216,7 @@ export class Text_Mesh extends Mesh {
    MoveXNoGfxUpdate(x) {
 
       this.geom.pos[0] += x;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.MoveXNoGfxUpdate(x);
       }
@@ -280,10 +280,10 @@ export class Text_Mesh extends Mesh {
 
       // const gfx_copy = new GfxInfoMesh(this.gfx);
       const gfx_copy = {
-         vb:{idx:this.gfx.vb.idx, start:this.gfx.vb.start, count:this.gfx.vb.count},
-         prog:{attribsidx:this.gfx.prog.attribsidx},
-         vertsPerRect:this.gfx.vertsPerRect,
-         attribsPerVertex:this.gfx.attribsPerVertex,
+         vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
+         prog: { attribsidx: this.gfx.prog.attribsidx },
+         vertsPerRect: this.gfx.vertsPerRect,
+         attribsPerVertex: this.gfx.attribsPerVertex,
       }
 
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
@@ -298,10 +298,10 @@ export class Text_Mesh extends Mesh {
       // NOTE: We want to run for max chars to reset any extra from the current text
       // const len = (this.geom.num_faces > numchars) ? this.geom.num_faces :
       //    (numchars > this.geom.num_faces ? this.geom.num_faces : numchars);
-      
+
       let len = 0;
-      if(numchars > this.last_charidx){
-         len = numchars<this.geom.num_faces ? numchars : this.geom.num_faces;
+      if (numchars > this.last_charidx) {
+         len = numchars < this.geom.num_faces ? numchars : this.geom.num_faces;
          this.last_charidx = len
       }
       else {//if(numchars <= this.last_charidx){
@@ -367,14 +367,14 @@ export class Text_Mesh extends Mesh {
       // Make a copy to not change the default .start value of the first char(face).
       // let gfx_copy = new GfxInfoMesh(this.gfx);
       const gfx_copy = {
-         vb:{idx:this.gfx.vb.idx, start:this.gfx.vb.start, count:this.gfx.vb.count},
-         prog:{attribsidx:this.gfx.prog.attribsidx},
-         vertsPerRect:this.gfx.vertsPerRect,
-         attribsPerVertex:this.gfx.attribsPerVertex,
+         vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
+         prog: { attribsidx: this.gfx.prog.attribsidx },
+         vertsPerRect: this.gfx.vertsPerRect,
+         attribsPerVertex: this.gfx.attribsPerVertex,
       }
       gfx_copy.vb.start = this.gfx.vb.start + (gfx_copy.vb.count * idx); // Calc the characters position inside the char array.
 
-      
+
       // Make a copy to not change the default face.
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
          pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
@@ -402,7 +402,7 @@ export class Text_Mesh extends Mesh {
 
    }
 
-   
+
 
    /*******************************************************************************************************************************************************/
    // Setters-Getters
@@ -417,7 +417,7 @@ export class Text_Mesh extends Mesh {
 
    GetCenterPosX() { return this.geom.pos[0] + this.GetMaxWidth() - this.geom.dim[0]; }
 
-   
+
    GetCenterPosY() { return this.geom.pos[1]; }
 
 
@@ -429,25 +429,25 @@ export class Text_Mesh extends Mesh {
 
    GetTop_A() { return this.geom.pos[1] - this.geom.pos[1]; }
 
-   
+
    GetBottom_A() { return this.geom.pos[1] + this.geom.pos[1]; }
 
 
-   GetTextLeft_A() { return this.GetCenterPosX() - this. GetMaxWidth(); }
+   GetTextLeft_A() { return this.GetCenterPosX() - this.GetMaxWidth(); }
 
 
-   GetTextRight_A() { return this.GetCenterPosX() + this. GetMaxWidth(); }
+   GetTextRight_A() { return this.GetCenterPosX() + this.GetMaxWidth(); }
 
 
    GetTextTop_A() { return this.GetTop_A(); } // UNNECESSARY
 
-   
+
    GetTextBottom_A() { return this.GetBottom_A(); } // UNNECESSARY
 
 
 
    SetColorRGB(col, char_len = 0) {
-      const num_face = (char_len) ? char_len : this.geom.num_faces; 
+      const num_face = (char_len) ? char_len : this.geom.num_faces;
       this.mat.SetColorRGB(col, this.gfx, num_face)
    }
 
@@ -473,7 +473,7 @@ export class Text_Mesh extends Mesh {
    }
 
 
-   UpdateWidgetGroupIncrementNumFaces(){
+   UpdateWidgetGroupIncrementNumFaces() {
       Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces); // Increment the number of faces of the vb_data of the group for the rect mesh.
    }
 
@@ -486,24 +486,24 @@ export class Text_Mesh extends Mesh {
       AddArr3(this.geom.pos, pos_dif);
    }
 
-   
+
    SetGfxProgramGroup(group_mask) {
       this.sid.progs_group = group_mask;
    }
 
 
-   ClipyCheck_A(clip_top, clip_bottom){
-      
-      if(this.GetTop_A() > clip_bottom || this.GetBottom_A() < clip_top)
+   ClipyCheck_A(clip_top, clip_bottom) {
+
+      if (this.GetTop_A() > clip_bottom || this.GetBottom_A() < clip_top)
          return true;
       return false
    }
-   	
-	
+
+
    ClipY(clip_top, clip_bottom) {
 
-		if(this.ClipyCheck_A(clip_top, clip_bottom))
-			this.state.mask &= ~MESH_STATE.ACTIVE;
+      if (this.ClipyCheck_A(clip_top, clip_bottom))
+         this.state.mask &= ~MESH_STATE.ACTIVE;
    }
 
 }

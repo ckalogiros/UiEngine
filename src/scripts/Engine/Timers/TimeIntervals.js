@@ -38,7 +38,7 @@ class Interval {
    // Debug
    nameidx;
 
-   constructor(interval, clbk, idx, name, repeat) {
+   constructor(interval, clbk, idx, name='Time intervalsUNAMED', repeat) {
 
       this.t = 0;
       this.interval = interval;
@@ -147,7 +147,7 @@ class TimeIntervals {
 
       this.size = MAX_TIME_INTERVALS_COUNT;
       for (let i = 0; i < this.size; i++) {
-         this.ti[i] = new Interval(INT_NULL, null, i, '', 0);
+         this.ti[i] = new Interval(INT_NULL, null, i, `TimeInterval:${i}`, 0);
       }
    }
 

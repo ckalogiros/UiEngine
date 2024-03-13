@@ -10,6 +10,7 @@ import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js"
 import { Update_read_write_test } from "../../../Tests/ReadWrite.js";
 import { Batch_update } from "../Batch/Batch.js";
 import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
+import { Debug_ui_update_notifications } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 
 
 
@@ -100,6 +101,8 @@ export class WebGlRenderer {
          Batch_update()
 
          Uniforms_block_update_uniform();
+
+         // Debug_ui_update_notifications();
          
          _pt_gl_draw.timer.Start(); Gl_draw(this.gl); _pt_gl_draw.timer.Stop();
 

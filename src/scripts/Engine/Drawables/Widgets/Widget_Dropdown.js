@@ -51,7 +51,7 @@ function Dropdown_roots_destroy_byidx(rootidx) {
 
 /**Debug-Print */
 export function Dropdown_roots_print_root_buffer() {
-   for (let i = 0; i < _root_dropdown.boundary; i++) {
+   for (let i = 0; i <= _root_dropdown.boundary; i++) {
       console.log('id:', _root_dropdown.buffer[i].id, ' name:', _root_dropdown.buffer[i].GetName(), ' pos:', _root_dropdown.buffer[i].geom.pos);
    }
 }
@@ -271,7 +271,7 @@ export class Widget_Dropdown extends Section {
       btn.Render();
 
       if (this.isOn & DP_MENU_STATE.ON) {
-         for (let i = 0; i < this.children.boundary; i++) {
+         for (let i = 0; i <= this.children.boundary; i++) {
             this.children.buffer[i].Render();
          }
       }
@@ -313,7 +313,7 @@ export class Widget_Dropdown extends Section {
          menu.SetGfxProgramGroup(root.sid.progs_group);
          menu.gfx = Gfx_generate_context(menu.sid, menu.sceneidx, menu.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, menu.root_bufferidx, menu.mesh_bufferidx);
 
-         for (let i = 0; i < menu.children.boundary; i++) {
+         for (let i = 0; i <= menu.children.boundary; i++) {
 
             const item = menu.children.buffer[i];
 
@@ -367,7 +367,7 @@ export class Widget_Dropdown extends Section {
          menu.SetGfxProgramGroup(root.sid.progs_group);
          menu.gfx = Gfx_generate_context(menu.sid, menu.sceneidx, menu.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, menu.root_bufferidx, menu.mesh_bufferidx);
 
-         for (let i = 0; i < menu.children.boundary; i++) {
+         for (let i = 0; i <= menu.children.boundary; i++) {
 
             const item = menu.children.buffer[i];
 
@@ -411,7 +411,7 @@ export class Widget_Dropdown extends Section {
 
    DestroyRecursive(mesh) {
 
-      for (let i = 0; i < mesh.children.boundary; i++) {
+      for (let i = 0; i <= mesh.children.boundary; i++) {
 
          const child = mesh.children.buffer[i];
          // The "child.type & MESH_TYPE.SECTION_MESH_ONLY" is avoiding for example: any Scroller widget to be treated as a Section_Mesh and not as a Widget_Scroller first. That way we call  "mesh.Destroy()" on Widget_Scroller rather than  calling recursive for the scroller as if it was a Section_Mesh
@@ -437,7 +437,7 @@ export class Widget_Dropdown extends Section {
 
    // Destroy() {
 
-   //    for (let i = 0; i < this.children.boundary; i++) {
+   //    for (let i = 0; i <= this.children.boundary; i++) {
 
    //       const child = this.children.buffer[i];
    //       // if (child && child.children.active_count)
@@ -462,7 +462,7 @@ export class Widget_Dropdown extends Section {
       if (this.isOn & DP_MENU_STATE.ON) {
          this.menu.Destroy();
       }
-      else if(this.isOn & DP_MENU_STATE.OFF){
+      else if (this.isOn & DP_MENU_STATE.OFF) {
          this.DestroyDeactivetedMenu(this.menu);
       }
 
@@ -477,35 +477,24 @@ export class Widget_Dropdown extends Section {
 
    DestroyDeactivetedMenu(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy doe not call for vertex buffer remove mesh attributes
 
-      for (let i = 0; i < mesh.children.boundary; i++) {
+      for (let i = 0; i <= mesh.children.boundary; i++) {
 
          const child = mesh.children.buffer[i];
 
-            if (child.children)
-               this.DestroyDeactivetedMenu(child);
+         if (child.children)
+            this.DestroyDeactivetedMenu(child);
       }
 
       // console.log('[[[[[[[[[[[[[[[[[[[[[[', mesh.GetName())
 
-      if(mesh.type & MESH_TYPE.WIDGET_DROP_DOWN){
+      if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {
          this.DestroyDeactivetedMenu(mesh.menu)
       }
 
-      if(mesh.text_mesh) this.DestroyNoGfxRemove(mesh.text_mesh);
+      if (mesh.text_mesh) this.DestroyNoGfxRemove(mesh.text_mesh);
 
       this.DestroyNoGfxRemove(mesh);
    }
-
-
-   // DestroyDeactivetedMenuItemsRecursive(children) { // The deactivated meshes are not inside the vertex buffers, so this Destroy doe not call for vertex buffer remove mesh attributes
-
-   //    for (let i = 0; i < children.boundary; i++) {
-
-   //       const child = children.buffer[i];
-   //       if (child)
-   //          this.DestroyNoGfxRemove(child);
-   //    }
-   // }
 
 
    DestroyNoGfxRemove(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy doe not call for vertex buffer remove mesh attributes
@@ -521,7 +510,7 @@ export class Widget_Dropdown extends Section {
       // Remove time intervals
       if (mesh.timeIntervalsIdxBuffer.active_count) {
 
-         for (let i = 0; i < mesh.timeIntervalsIdxBuffer.boundary; i++) {
+         for (let i = 0; i <= mesh.timeIntervalsIdxBuffer.boundary; i++) {
 
             const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[i];
             if (intervalIdx !== INT_NULL) {
@@ -610,7 +599,7 @@ export class Widget_Dropdown extends Section {
 
       const menu = dp_menu;
 
-      for (let j = 0; j < menu.children.boundary; j++) {
+      for (let j = 0; j <= menu.children.boundary; j++) {
 
          const child = menu.children.buffer[j];
 
@@ -679,7 +668,7 @@ export class Widget_Dropdown extends Section {
           *  NOTE: For widgets, let their class handle all the listen events removal,
           *  for structures that may have arbitary meshes(children buffer), we must check and remove.
           */
-         for (let i = 0; i < menu.children.boundary; i++) {
+         for (let i = 0; i <= menu.children.boundary; i++) {
 
             const child = menu.children.buffer[i];
 
@@ -708,7 +697,7 @@ export class Widget_Dropdown extends Section {
 
          menu.FakeAddFromGfxPosy(menu.geom.defPos[1]);
 
-         for (let i = 0; i < menu.children.boundary; i++) {
+         for (let i = 0; i <= menu.children.boundary; i++) {
 
             const item = menu.children.buffer[i];
 
@@ -756,7 +745,7 @@ export class Widget_Dropdown extends Section {
       if (!dp) dp = this;
       const menu = dp.menu;
 
-      for (let j = 0; j < menu.children.boundary; j++) {
+      for (let j = 0; j <= menu.children.boundary; j++) {
 
          const item = menu.children.buffer[j];
 
@@ -824,7 +813,7 @@ export class Widget_Dropdown extends Section {
       const menu = dp.menu;
 
       if (dp.isOn & DP_MENU_STATE.ON) {
-         for (let j = 0; j < menu.children.boundary; j++) {
+         for (let j = 0; j <= menu.children.boundary; j++) {
 
             const item = menu.children.buffer[j];
 
@@ -910,7 +899,7 @@ export class Widget_Dropdown extends Section {
       }
 
       // Activate menu's items, recursively
-      for (let i = 0; i < menu.children.boundary; i++) {
+      for (let i = 0; i <= menu.children.boundary; i++) {
 
          const item = menu.children.buffer[i];
 
@@ -1164,7 +1153,7 @@ export class Widget_Dropdown extends Section {
 
       let pad = [this.pad[0], this.pad[1]];
 
-      for (let i = 1; i < this.children.boundary; i++) {
+      for (let i = 1; i <= this.children.boundary; i++) {
 
          const btn = this.children.buffer[i];
          btn.Align_pre(this, ALIGN.RIGHT | ALIGN.VERT_CENTER, pad);
@@ -1256,7 +1245,7 @@ export class Widget_Dropdown extends Section {
          this.menu.geom.pos[2] = this.geom.pos[2] + 1;
       }
       // DICISION: What about any children recursive???
-      for (let i = 0; i < this.menu.children.boundary; i++) {
+      for (let i = 0; i <= this.menu.children.boundary; i++) {
          const child = this.menu.children.buffer[i];
          if (child)
             child.SetZPos(this.menu.geom.pos[2] + 1);
@@ -1305,12 +1294,12 @@ export class Widget_Dropdown extends Section {
 export function TEMP_PRINT_IS_GFX_INSERTED(_mesh, msg) {
 
    const root = Widget_root_buffer_get_byidx(_mesh.root_bufferidx)
-   for (let i = 0; i < root.boundary; i++) {
+   for (let i = 0; i <= root.boundary; i++) {
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i])
       if (mesh.is_gfx_inserted)
          console.log(i, `[[GFX_INSERTED]] ${msg}`, mesh.mesh_bufferidx, mesh.geom.pos[1], mesh.GetName())
    }
-   for (let i = 0; i < root.boundary; i++) {
+   for (let i = 0; i <= root.boundary; i++) {
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i])
       if (mesh.state.mask & MESH_STATE.ACTIVE)
          console.log(i, `[ACTIVE] ${msg}`, mesh.mesh_bufferidx, mesh.geom.pos[1], mesh.GetName())
@@ -1324,7 +1313,7 @@ export function TEMP_PRINT_IS_GFX_INSERTED(_mesh, msg) {
 
 function Clamp_x_recursive(mesh, clampx, margx) {
 
-   for (let i = 0; i < mesh.children.boundary; i++) {
+   for (let i = 0; i <= mesh.children.boundary; i++) {
 
       const child = mesh.children.buffer[i];
       if (child) {

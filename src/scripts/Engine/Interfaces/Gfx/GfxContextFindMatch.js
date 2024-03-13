@@ -12,14 +12,14 @@ const DBG = false;
 /****************************************************************************************************************************************************/
 
 
-export function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid){
+export function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid) {
 
    const igfx = {
       idxs: [INT_NULL, INT_NULL],
       FLAGS: GFX_CTX_FLAGS.NEW, // If no matching vertex buffer found, mark so that new buffer will be created
    };
 
-   if(root_bufferidx === INT_NULL){
+   if (root_bufferidx === INT_NULL) {
       console.warn('FAILED TO Find_gfx_match, widget_root is NULL.');
       return igfx;
    }
@@ -28,12 +28,12 @@ export function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid){
    const gfx_idxs = Widget_root_gfx_get_structured(root_bufferidx);
    const len = gfx_idxs.length;
 
-   for( let i=0; i<len; i++){
+   for (let i = 0; i < len; i++) {
 
       const gfx_sid = Vertex_buffer_info_get_sid(gfx_idxs[i].vbidx); // Get the sid of the current gfx from the vertex buffer.
 
       if (SID.CheckSidMatch(target_sid, gfx_sid)) {
-         
+
          igfx.idxs[0] = gfx_idxs[i].progidx;
          igfx.idxs[1] = gfx_idxs[i].vbidx;
          igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC; // If no matching vertex buffer found, new buffer must be created
@@ -67,7 +67,7 @@ export function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid){
  *    Find any vertex matching vertex buffer that is inUse, and check if any of the meshes
  *    belonging to the vertex buffer, have common ancestor with the mesh we want to generate the gfx context for.
  */
-function Find_match_from_children(mesh, parent){
+function Find_match_from_children(mesh, parent) {
 
    let igfx = {
       idxs: [INT_NULL, INT_NULL],
@@ -77,7 +77,7 @@ function Find_match_from_children(mesh, parent){
    let done = false;
    // console.log('2')
 
-   for (let i = 0; i < parent.children.boundary; i++) {
+   for (let i = 0; i <= parent.children.boundary; i++) {
 
       const child = parent.children.buffer[i];
 
@@ -89,14 +89,14 @@ function Find_match_from_children(mesh, parent){
             igfx.idxs[1] = child.gfx.vb.idx;
             igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
             done = true;
-            return {igfx:igfx, done:done};
+            return { igfx: igfx, done: done };
          }
-         else if(child.text_mesh && child.text_mesh.gfx && SID.CheckSidMatch(mesh.sid, child.text_mesh.sid)){
+         else if (child.text_mesh && child.text_mesh.gfx && SID.CheckSidMatch(mesh.sid, child.text_mesh.sid)) {
             igfx.idxs[0] = child.text_mesh.gfx.prog.idx;
             igfx.idxs[1] = child.text_mesh.gfx.vb.idx;
             igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
             done = true;
-            return {igfx:igfx, done:done};
+            return { igfx: igfx, done: done };
          }
 
          // Search recursively down the children tree
@@ -104,12 +104,12 @@ function Find_match_from_children(mesh, parent){
             // igfx = Find_match_from_children(mesh, child);
             const res = Find_match_from_children(mesh, child);
             // IMPORTANT: Must return since gfx index is found, else is going to search furthemore and probably will populate the igfx with INT_NULL again.
-            if(res.done) return {igfx:res.igfx, done:res.done}; 
+            if (res.done) return { igfx: res.igfx, done: res.done };
          }
       }
    }
 
-   return {igfx:igfx, done:done};
+   return { igfx: igfx, done: done };
 }
 
 
@@ -122,7 +122,7 @@ export function Find_match_gfx_from_parent(mesh, parent) {
    }
    let done = false;
 
-   if (!parent) return {igfx:igfx, done:true}
+   if (!parent) return { igfx: igfx, done: true }
 
    if (SID.CheckSidMatch(mesh.sid, parent.sid)) {
       igfx.idxs[0] = parent.gfx.prog.idx;
@@ -131,24 +131,24 @@ export function Find_match_gfx_from_parent(mesh, parent) {
       done = true;
    }
    // Check if the parent has a text_mesh
-   else if(parent.text_mesh && SID.CheckSidMatch(mesh.sid, parent.text_mesh.sid)){
+   else if (parent.text_mesh && SID.CheckSidMatch(mesh.sid, parent.text_mesh.sid)) {
       igfx.idxs[0] = parent.text_mesh.gfx.prog.idx;
       igfx.idxs[1] = parent.text_mesh.gfx.vb.idx;
       igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC; // If no matching vertex buffer found, new buffer must be created
       done = true;
    }
-   
-   return {igfx:igfx, done:done};
+
+   return { igfx: igfx, done: done };
 }
 
 
 
 export function Find_match_gfx_from_parent_ascending(mesh, parent) {
-   
+
    const res = Find_match_gfx_from_parent(mesh, parent)
    // console.log('1')
 
-   if(!res.done && parent.parent) // Run recursively up the parent tree
+   if (!res.done && parent.parent) // Run recursively up the parent tree
       Find_match_gfx_from_parent_ascending(mesh, parent.parent)
 
    return res.igfx;
@@ -160,12 +160,12 @@ export function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 
    // console.log(mesh.id)
    let res = Find_match_gfx_from_parent(mesh, parent)
-   
-   if(!res.done) {
-      
+
+   if (!res.done) {
+
       res = Find_match_from_children(mesh, parent)
 
-      if(!res.done && parent.parent) { // Run recursively 
+      if (!res.done && parent.parent) { // Run recursively 
          res.igfx = Find_match_gfx_from_parent_ascending_search_all(mesh, parent.parent)
       }
    }
@@ -211,7 +211,7 @@ export function Find_text_gfx_from_parent_ascending(FLAGS, mesh, parent) {
    else {
       if (parent.children.boundary) {
 
-         for (let i = 0; i < parent.children.boundary; i++) {
+         for (let i = 0; i <= parent.children.boundary; i++) {
 
             const child = parent.children.buffer[i];
             if (DEBUG.CONTEXT_FIND) console.log('$$ Searching in children:', child.GetName())
@@ -290,7 +290,7 @@ export function Find_gfx_from_parent_ascend_descend(mesh, parent, _igfx = null, 
       }
 
       // Search all parent's children for matching gfx
-      for (let i = 0; i < parent.children.boundary; i++) {
+      for (let i = 0; i <= parent.children.boundary; i++) {
 
          const child = parent.children.buffer[i];
 
@@ -351,7 +351,7 @@ export function Find_gfx_from_parent_ascend_descend(mesh, parent, _igfx = null, 
 
 function Find_gfx_from_children_descending(mesh, parent, igfx, done) {
 
-   for (let i = 0; i < parent.children.boundary; i++) {
+   for (let i = 0; i <= parent.children.boundary; i++) {
 
       const child = parent.children.buffer[i];
 
@@ -463,7 +463,7 @@ function Check_for_textgfx_in_mesh_combinatory(mesh, child) {
 export function Find_textgfx_from_parent_descending(parent) {
 
    const mesh = parent;
-   for (let i = 0; i < mesh.children.boundary; i++) {
+   for (let i = 0; i <= mesh.children.boundary; i++) {
 
       const child = mesh.children.buffer[i];
       if (child && child.gfx) {

@@ -156,7 +156,7 @@ export class Event_Listener {
 
       let intersects = false;
 
-      for (let i = 0; i < this.event_type[TYPE_IDX].boundary; i++) {
+      for (let i = 0; i <= this.event_type[TYPE_IDX].boundary; i++) {
 
          const evt = this.event_type[TYPE_IDX].buffer[i];
 
@@ -234,7 +234,7 @@ export class Event_Listener {
       let intersected = false;
 
       // console.log('----- CHECK HOVER EVENTS -----')
-      for (let i = 0; i < this.event_type[TYPE_IDX].boundary; i++) {
+      for (let i = 0; i <= this.event_type[TYPE_IDX].boundary; i++) {
          const event = this.event_type[TYPE_IDX].buffer[i];
          if (this.event_type[TYPE_IDX].buffer[i]) { // Some buffer elements maybe null(removed)
             
@@ -277,7 +277,7 @@ export class Event_Listener {
       const children_events = this.event_type[TYPE_IDX].buffer[event_idx].children;
       const temp = new M_Buffer;
 
-      for (let i = 0; i < children_events.boundary; i++) {
+      for (let i = 0; i <= children_events.boundary; i++) {
 
          const evt = children_events.buffer[i];
 
@@ -308,7 +308,7 @@ export class Event_Listener {
 
 function Check_hover_recursive(events, point) {
 
-   for (let i = 0; i < events.children.boundary; i++) {
+   for (let i = 0; i <= events.children.boundary; i++) {
 
       if (events.children.buffer[i]) {
 
@@ -345,7 +345,7 @@ function Check_hover_recursive(events, point) {
  */
 function Check_child_events_recursive(evt, point) {
 
-   for (let i = 0; i < evt.children.boundary; i++) {
+   for (let i = 0; i <= evt.children.boundary; i++) {
 
       const child_evt = evt.children.buffer[i];
       if (child_evt) {
@@ -563,7 +563,7 @@ function Listener_debug_print_info_recursive(children, count) {
 
    let total_count = 0;
 
-   for (let i = 0; i < children.boundary; i++) {
+   for (let i = 0; i <= children.boundary; i++) {
 
       const e = children.buffer[i];
 

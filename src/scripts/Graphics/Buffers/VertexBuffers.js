@@ -33,14 +33,14 @@ export function Vertex_buffer_get() { return _vertex_buffers; }
 
 
 export function Vertex_buffer_get_by_vbidx(vbidx) {
-    if(!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers, vbidx, new Error().lineNumber);
+    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers, vbidx, new Error().lineNumber);
     return _vertex_buffers.buffer[vbidx];
 }
 
 
 
 export function Vertex_buffer_get_attrib_value_from_vb_byidx(vbidx, attr_idx) {
-    if(!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers, vbidx, new Error().lineNumber);
+    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers, vbidx, new Error().lineNumber);
     return _vertex_buffers.buffer[vbidx][attr_idx];
 }
 
@@ -81,7 +81,7 @@ export function Vertex_buffer_info_get() { return _vertex_buffers_info; }
 
 
 export function Vertex_buffer_info_get_by_vbidx(vbidx) {
-    if(!DISABLE_DEBUG) (_vertex_buffers_info, vbidx, new Error().lineNumber);
+    if (!DISABLE_DEBUG) (_vertex_buffers_info, vbidx, new Error().lineNumber);
     return _vertex_buffers_info.buffer[vbidx];
 }
 
@@ -89,8 +89,8 @@ export function Vertex_buffer_info_get_by_vbidx(vbidx) {
 
 export function Gl_vertex_buffer_get_vao(vbidx) {
     return {
-        vao:_vertex_buffers_info.buffer[vbidx].vao, 
-        vaoidx:_vertex_buffers_info.buffer[vbidx].vaoidx,
+        vao: _vertex_buffers_info.buffer[vbidx].vao,
+        vaoidx: _vertex_buffers_info.buffer[vbidx].vaoidx,
     };
 }
 
@@ -109,12 +109,12 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
         new_vao_created = true;
         // console.warn('################ New VAO created. vaoidx:', vaoidx)
     }
-    
+
     const vao = Gl_vertex_array_object_get_by_vaoidx(vaoidx); // Get VAO
     gfxCtx.gl.bindVertexArray(vao.vao);
-    console.log('BIND VAO:', vao)
+    // console.log('BIND VAO:', vao)
 
-    
+
 
     /***********************************************************************************************/
     // Create vertex buffer
@@ -125,15 +125,15 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
     const vb_info = new Vertex_Buffer_Info(size, sid, ret.vbidx, ret.vbo, vaoidx, vao.vao, vao.type, groupidx, progidx);
 
     _vertex_buffers_info.Add(vb_info);
-   
+
     const vb = _vertex_buffers.buffer[ret.vbidx];
     gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
     gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb, gfxCtx.gl.STATIC_DRAW, 0);
-    
+
     const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
     Shader_attributes_enable(attribsidx)
     // console.warn('Create Shader Attributes:')
-   
+
     return vb_info;
 }
 
@@ -191,11 +191,11 @@ class Vertex_Buffer_Info {
         const vb_data = _vertex_buffers.buffer[gfx.vb.idx];
 
         const removed_attribs = gfx.attribsPerVertex * gfx.vertsPerRect * num_faces;
-        
+
         const start = start_index;
         const end = start + removed_attribs;
-        
-        
+
+
         const remaining_attribs = this.count - end; // This is the length of the attributes to be shifted
         // const copied_end = this.count - end; // This is the length of the attributes to be shifted
         let k = end;
@@ -237,7 +237,7 @@ class Vertex_Buffer_Info {
         while (new_size < target_size) {
             new_size += stride;
         }
-        
+
         if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
 
         new_size += stride; // Make it greater than the target_size
@@ -265,8 +265,8 @@ export function Vertex_buffer_set_ibidx(vbidx, ibidx) {
     _vertex_buffers_info.buffer[vbidx].ibidx = ibidx;
 }
 
-export function Vertex_buffer_info_get_sid(vbidx){
-    if(!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_info, vbidx, new Error().lineNumber);
+export function Vertex_buffer_info_get_sid(vbidx) {
+    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_info, vbidx, new Error().lineNumber);
     return _vertex_buffers_info.buffer[vbidx].sid;
 }
 
@@ -291,7 +291,7 @@ export function Vertex_buffer_state_disable(vbidx, STATE_FLAG) {
 //     gl.bufferData(gl.ARRAY_BUFFER, vb, gl.STATIC_DRAW, 0);
 //     // gl.bufferData(gl.ARRAY_BUFFER, Vertex_buffer_get_by_vbidx(buffer.vbidx), gl.STATIC_DRAW, 0);
 //     Shader_attributes_enable(attribsidx);
-    
+
 //     buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
 
 //     GL.BOUND_VBO = buffer.vbo;
@@ -326,23 +326,23 @@ export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vbo);
     // bufferSubData(target, dstByteOffset, srcData, srcOffset, length)
     gl.bufferSubData(gl.ARRAY_BUFFER, dst_offset, buffer.data, src_offset, byte_length)
-    
+
     buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
 }
 
 /** Returns true/false */
 export function Vertex_buffer_exists(vbidx) {
 
-    if(_vertex_buffers.buffer[vbidx] === undefined || _vertex_buffers.buffer[vbidx] === null)
+    if (_vertex_buffers.buffer[vbidx] === undefined || _vertex_buffers.buffer[vbidx] === null)
         return false
 
-	return true;
+    return true;
 }
 
 
 
 export function Vertexbuffer_reset_to_index(groupidx, progidx, vbidx, start) {
-    if(!DISABLE_DEBUG) (_vertex_buffers_info, progidx, new Error().lineNumber);
+    if (!DISABLE_DEBUG) (_vertex_buffers_info, progidx, new Error().lineNumber);
 
     const vb_info = _vertex_buffers_info.buffer[vbidx];
     if (start < 0 || start > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js, ');
@@ -350,7 +350,7 @@ export function Vertexbuffer_reset_to_index(groupidx, progidx, vbidx, start) {
     const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
     const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
 
-    const vCount = (vb_info.count-start) / (vertices_per_rect * attribs_per_vertex);
+    const vCount = (vb_info.count - start) / (vertices_per_rect * attribs_per_vertex);
     vb_info.count = start;
     vb_info.vCount = vCount;
     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
@@ -381,7 +381,7 @@ function temp_check_nan_rename_me(arr) {
     if (arr.length === 3) {
         if (arr[0] === NaN || arr[1] === NaN || arr[2] === NaN || arr[3] === NaN) alert('NaN value to gfx buffers')
     }
- }
+}
 
 
 
@@ -408,14 +408,14 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     const count = gfx.vb.count;
     gfx.vb.end = (start + count) * num_faces;
     vb_info.vCount += VERTS_PER_RECT_INDEXED * num_faces;
-    if((vb_info.vCount % 1) !== 0)
-    console.error('index buffer count mismatch')
+    if ((vb_info.vCount % 1) !== 0)
+        console.error('index buffer count mismatch')
 
 
     // Reallocate vertex buffer if it has no more space
     const meshSize = gfx.attribsPerVertex * gfx.vertsPerRect * num_faces;
     if (vb_info.count + meshSize >= vb_info.size) vb_info.Realloc(meshSize);
-    
+
     const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
     vb_info.count += Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
@@ -448,7 +448,7 @@ export function Vertex_buffer_add_vertices_from_non_existant_mesh(gfx, geom, mat
     // Reallocate vertex buffer if it has no more space
     const meshSize = gfx.attribsPerVertex * gfx.vertsPerRect * num_faces;
     if (vb_info.count + meshSize >= vb_info.size) vb_info.Realloc(meshSize);
-    
+
     const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
     vb_info.count += Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
@@ -484,7 +484,7 @@ function DEBUG_PRINT(buffer, index, line) {
 
 
 
-export function Gl_vertex_buffer_print(){
+export function Gl_vertex_buffer_print() {
     console.log('VertexBuffer:', _vertex_buffers)
     console.log('VertexBufferInfo', _vertex_buffers_info)
 }
@@ -500,34 +500,34 @@ export function Gl_vertex_buffer_print(){
 _CNT = 0x1;
 const VB_TO_STRING_FLAGS = {
     COLOR: _CNT,
-    WPOS: _CNT<<=0x1,
-    DIM: _CNT<<=0x1,
-    TEX: _CNT<<=0x1,
+    WPOS: _CNT <<= 0x1,
+    DIM: _CNT <<= 0x1,
+    TEX: _CNT <<= 0x1,
 }
 
-function Vertex_to_string(flags, groupidx, progidx, vbidx, count){
+function Vertex_to_string(flags, groupidx, progidx, vbidx, count) {
 
     const is_wpos = flags & VB_TO_STRING_FLAGS.WPOS;
-    
+
     const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
     const stride = Program_get_shader_attribute_attribs_per_vertex(groupidx, progidx);
     const wpos_attr = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.WPOS4);
-    
+
     const arr = [];
-    const faces = count/(stride*4);
-    
-    for(let i2=0; i2<faces; i2++){
-        
+    const faces = count / (stride * 4);
+
+    for (let i2 = 0; i2 < faces; i2++) {
+
         let i = wpos_attr.offset;
         let wpos = '';
-        while(i<stride*4){
-                
-            if(is_wpos){
-    
+        while (i < stride * 4) {
+
+            if (is_wpos) {
+
                 wpos += `${Floor(_vertex_buffers.buffer[vbidx][i++])}, `;
                 wpos += `${Floor(_vertex_buffers.buffer[vbidx][i++])}, `;
             }
-    
+
             i += stride - 2;
         }
         arr.push(wpos);
@@ -552,44 +552,44 @@ function Vertex_to_string(flags, groupidx, progidx, vbidx, count){
 // DEBUG Info - Create text for render
 /****************************************************************************************************************************************************/
 
-function TEMP(params){
-	const destroy_btn = params.target_mesh;
-	console.log('TEMP FUNCTION', destroy_btn.GetName());
-	
-	const section = params.params;
-	console.log('section', section.GetName());
-	section.Destroy();
+function TEMP(params) {
+    const destroy_btn = params.target_mesh;
+    console.log('TEMP FUNCTION', destroy_btn.GetName());
+
+    const section = params.params;
+    console.log('section', section.GetName());
+    section.Destroy();
 
 }
 
-export function Vertex_buffer_create_text_info(){
+export function Vertex_buffer_create_text_info() {
 
-	const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(YELLOWR[7], .4);
+    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(YELLOWR[7], .4);
 
-	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400,400,0], [0, 0], TRANSPARENCY(BLUEL[3], .3), 'Vertex Buffer Info');
+    const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[3], .3), 'Vertex Buffer Info');
 
-	const destroy = Create_widget_button(_, 'Destroy', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
-	destroy.Bind(TEMP, _, s);
-	s.AddItem(destroy);
+    const destroy = Create_widget_button(_, 'Destroy', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
+    destroy.Bind(TEMP, _, s);
+    s.AddItem(destroy);
 
 
-    const margin = [4,4];
+    const margin = [4, 4];
     const style = [0, 3, 1];
 
     const vbiw = Create_widget_dropdown(_, 'Vertex Buffers', [100, 100, 0], col_dp, col_menu, _, _, _, _, style, margin);
     vbiw.CreateClickEvent();
     Dropdown_roots_set_root(vbiw, vbiw)
     s.AddItem(vbiw)
-    
-	const vbi = _vertex_buffers_info;
+
+    const vbi = _vertex_buffers_info;
     const vb_buffer_info = Create_widget_text(_, `count:${vbi.active_count} size:${vbi.size}`);
     vbiw.AddToMenu(vb_buffer_info);
 
-	for(let i=0; i<vbi.boundary; i++){
-        
+    for (let i = 0; i <= vbi.boundary; i++) {
+
         const vb = vbi.buffer[i];
 
-        const vbw = Create_widget_dropdown(_, `Vb [${i}]`, [100, 100, 0], col_dp, col_menu, _, [2,1], _, _, style, margin);
+        const vbw = Create_widget_dropdown(_, `Vb [${i}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
         vbw.CreateClickEvent();
         vbiw.AddToMenu(vbw)
 
@@ -613,8 +613,8 @@ export function Vertex_buffer_create_text_info(){
         //     vbw.AddToMenu(info);
         // }
 
-        
-		// { // Vertex buffer array
+
+        // { // Vertex buffer array
         //     const vba = Create_widget_dropdown(_, `buffer`, [100, 100, 0], col_dp, col_menu, _, [2,1], _, _, style, margin);
         //     vba.CreateClickEvent();
         //     vbw.AddToMenu(vba)
@@ -628,12 +628,12 @@ export function Vertex_buffer_create_text_info(){
         //         vba.AddToMenu(info);
         //     }
 
-		// }
-		
-	}
+        // }
 
-	// s.Calc(SECTION.EXPAND)
-	s.Calc()
+    }
 
-	return s;
+    // s.Calc(SECTION.EXPAND)
+    s.Calc()
+
+    return s;
 }

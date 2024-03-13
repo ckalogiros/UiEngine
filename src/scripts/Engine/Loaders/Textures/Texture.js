@@ -27,7 +27,7 @@ function Get_next_free_index() {
 
 
 
-function Texture_create_texture(gl, textureid, img, name) {
+function Texture_create_texture(gl, textureid, img, name='Texture UNAMED') {
 
 	const idx = Get_next_free_index();
 	_textureBuffer[idx] = Gl_texture_unit_create(gl, textureid, idx, img);
@@ -108,7 +108,7 @@ export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 
 
 
-export function Texture_create_renderbuffer_texture(gl, textureid, width, height, name) {
+export function Texture_create_renderbuffer_texture(gl, textureid, width, height, name='Renderbuffer UNAMED') {
 	
 	const idx = Get_next_free_index();
 	_textureBuffer[idx] = Gl_texture_unit_create(gl, textureid, idx, null, width, height);
@@ -120,7 +120,7 @@ export function Texture_create_renderbuffer_texture(gl, textureid, width, height
 
 
 
-export function Texture_set_texture_name(texidx, name) {
+export function Texture_set_texture_name(texidx, name='UNAMED') {
 	
 	_textureBuffer[texidx].nameidx = Str_buffer_store(name);
 }

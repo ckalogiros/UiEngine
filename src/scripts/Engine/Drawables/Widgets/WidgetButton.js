@@ -44,8 +44,10 @@ export class Widget_Button extends Widget_Label {
 
    /*******************************************************************************************************************************************************/
    // Misc
-   Bind(EventClbk, targetBindingFunctions=_, params) {
+   Bind(EventClbk=null, targetBindingFunctions=_, params) {
 
+      if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
+      
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.evt_params = { // Create the parameters to pass for the switch's click event. 
          EventClbk: EventClbk,
@@ -63,7 +65,7 @@ export class Widget_Button extends Widget_Label {
       const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
       const root_evt = root.listeners.buffer;
 
-      for (let etypeidx = 0; etypeidx < mesh.listeners.boundary; etypeidx++) {
+      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
          const evt = mesh.listeners.buffer[etypeidx];
          if (evt) { 
@@ -135,8 +137,10 @@ export class Widget_Switch extends Widget_Button {
 
    /*******************************************************************************************************************************************************/
    // Misc
-   Bind(EventClbk, targetBindingFunctions=_, params) {
+   Bind(EventClbk=null, targetBindingFunctions=_, params) {
 
+      if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Switch'; }
+      
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.evt_params = { // Create the parameters to pass for the switch's click event. 
          EventClbk: EventClbk,
@@ -154,7 +158,7 @@ export class Widget_Switch extends Widget_Button {
       const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
       const root_evt = root.listeners.buffer;
 
-      for (let etypeidx = 0; etypeidx < mesh.listeners.boundary; etypeidx++) {
+      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
          const evt = mesh.listeners.buffer[etypeidx];
          if (evt) { 
@@ -166,8 +170,8 @@ export class Widget_Switch extends Widget_Button {
 }
 
 
-function Button_click_default_callback(){
-   console.log('Button Clicked!');
+function Button_click_default_callback(params){
+   console.log(params, ' Clicked!');
 }
 
 

@@ -70,7 +70,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    // const uidbg = Debug_info_ui_performance(scene);
+    const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -106,7 +106,7 @@ export function TestWidgetsGeneric(scene) {
     // obj.Set(4.2);
     // obj.Update();
 
-    // SdfLine(GREEN[7], [500, 600, 5], [800, 10]);
+    // SdfLine(GREEN[7],w1 [500, 600, 5], [800, 10]);
     // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
     // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
     // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
@@ -127,8 +127,8 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    const label = CreateLabel('LABEL');
-    CreateLabel('Label2');
+    // const label = CreateLabel('LABEL');
+    // CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, label);
@@ -214,7 +214,7 @@ export function TestWidgetsGeneric(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh.children.buffer[0]);
 
 
-    Debug_info_create_all_generic_info();
+    // Debug_info_create_all_generic_info();
 
 
     // Scenes_debug_info_create(scene);
@@ -396,7 +396,7 @@ function CreateDropdown(scene, pos, id) {
     const pad = [4, 2]
     const margin = [8, 8]
     // const dp = Create_widget_dropdown(`DP${id}`, pos, GREY2, BLUE_10_120_220, WHITE, pad);
-    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `${id}`, pos, GREY2, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
+    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
     // dp.CreateHoverEvent();
     dp.CreateMoveEvent();
     dp.CreateClickEvent();
@@ -590,7 +590,7 @@ function CreateDropdown2(scene, pos, id) {
 
     // const group = Widget_group_get(dp.group_bufferidxs[0]);
     // const root = Widget_root_buffer_get_byidx(dp.root_bufferidx);
-    // for (let i = 0; i < root.boundary; i++) {
+    // for (let i = 0; i <= root.boundary; i++) {
     //     const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
     //     if (mesh.type & MESH_TYPE.WIDGET_BUTTON)
     //         console.log(mesh.text_mesh.mat.text)
@@ -3133,7 +3133,7 @@ function MeshInfoUpdate(params) {
         msgs[TEMP_TEST_PERFORMANE_COUNTERS.MISC_IDX] = `MISC:${TEMP_TEST_PERFORMANE_COUNTERS.MISC}`;
 
         // Update info text
-        for (let i = 0; i < textMesh.children.boundary; i++) {
+        for (let i = 0; i <= textMesh.children.boundary; i++) {
 
             const childText = textMesh.children.buffer[i];
 

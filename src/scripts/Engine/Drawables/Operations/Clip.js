@@ -34,7 +34,7 @@ export function Clipy_from_widget_root(root_bufferidx) {
    const limit = { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
    const root = Widget_root_buffer_get_byidx(root_bufferidx);
-   for(let i=0; i<root.boundary; i++){
+   for(let i=0; i<=root.boundary; i++){
 
       const mesh     = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
       const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
@@ -98,7 +98,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
          
          // console.log(threshold, limit, first_top)
          // Deactivate any mesh between the upper limit and clampy
-         for (let i = first.idx; i < mesh.children.boundary; i++) {
+         for (let i = first.idx; i <= mesh.children.boundary; i++) {
             
             const child = mesh.children.buffer[i];
             const c_top = child.geom.pos[1] + child.geom.dim[1];
@@ -205,8 +205,8 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
       const lower_bottom = lower_deactivated.geom.pos[1] + lower_deactivated.geom.dim[1]; 
 
       // If mesh's bottom side is above the clamp y down, activate all childrem from last to limit.down
-      if (lower_bottom < clampY[CLAMP.Y_DOWN]) {
-         for (let i = lower_deactivated.idx; i < mesh.children.boundary; i++) {
+      if (lower_bottom <= clampY[CLAMP.Y_DOWN]) {
+         for (let i = lower_deactivated.idx; i <= mesh.children.boundary; i++) {
 
             const child = mesh.children.buffer[i];
             const c_bottom = child.geom.pos[1] + child.geom.dim[1];
@@ -238,7 +238,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
 
 function Recurse_mesh_set_active(mesh, flag_activate) {
 
-   for (let i = 0; i < mesh.children.boundary; i++) {
+   for (let i = 0; i <= mesh.children.boundary; i++) {
 
       const child = mesh.children.buffer[i];
       if (child) {
@@ -285,7 +285,7 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, upper_limit, l
    let firstupper = 0, lastupper = INT_NULL, firstlower = INT_NULL, lastlower = INT_NULL;
 
    let cnt = 0;
-   for (let i = 0; i < section.children.boundary; i++) {
+   for (let i = 0; i <= section.children.boundary; i++) {
 
       const child = section.children.buffer[i];
       const top = child.geom.pos[1] - child.geom.dim[1];
@@ -349,7 +349,7 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, upper_limit, l
 
 
 //    let cnt = 0;
-//    for (let i = 0; i < section.children.boundary; i++) {
+//    for (let i = 0; i <= section.children.boundary; i++) {
 
 //       const child = section.children.buffer[i];
 //       const top = child.geom.pos[1] - child.geom.dim[1];

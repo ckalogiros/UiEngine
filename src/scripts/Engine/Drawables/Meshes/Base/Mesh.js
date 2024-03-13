@@ -56,7 +56,7 @@ export class Mesh {
 
 
     hover_margin; // Value: A margin to be set for hovering. // TODO: Abstract to a struct.
-    
+
     // IMPORTANT: If the mesh is a root mesh: direct child of the scene, then the idx is a refference to the scene's mesh buffer. Else if mesh has parent another mesh, then the idx is the index of the parent's children buffer
     idx;        // Value: This is the index of the mesh in the parents's children buffer.
     sceneidx;   // Value: An index to the scene that the mesh belongs to(index only).
@@ -109,17 +109,17 @@ export class Mesh {
         this.sid = {
             shad: SID.SHAD.INDEXED | (this.geom.sid.shad | this.mat.sid.shad),
             attr: (this.geom.sid.attr | this.mat.sid.attr),
-            unif: this.mat.sid.unif, 
+            unif: this.mat.sid.unif,
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
             progs_group: PROGRAMS_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
         };
 
 
-        
+
         this.uniforms = [];
-        if(APP.ENABLE_SHADER_PROJECTION_MATRIX)
+        if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
             this.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
-        
+
 
         this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
@@ -154,7 +154,7 @@ export class Mesh {
         // this.children_all = new Int16Buffer(16);
         // this.children_all.Init(INT_NULL);
         this.timeIntervalsIdxBuffer = new Int8Buffer(INTERVALS.SIZE);
-        this.timeIntervalsIdxBuffer.Init(INT_NULL);
+        // this.timeIntervalsIdxBuffer.Init(INT_NULL);
 
 
         this.hover_margin = [0, 0];
@@ -213,40 +213,40 @@ export class Mesh {
         /*************************************************************************************/
         // Remove event listeners
         this.RemoveAllListenEvents();
-        
+
 
         /*************************************************************************************/
         // Remove time intervals
         if (this.timeIntervalsIdxBuffer.active_count) {
-            
-            for (let i = 0; i < this.timeIntervalsIdxBuffer.boundary; i++) {
-                
+
+            for (let i = 0; i <= this.timeIntervalsIdxBuffer.boundary; i++) {
+
                 const intervalIdx = this.timeIntervalsIdxBuffer.buffer[i];
-                if(intervalIdx !== INT_NULL){
+                if (intervalIdx !== INT_NULL) {
                     TimeIntervalsDestroyByIdx(intervalIdx);
                     this.timeIntervalsIdxBuffer.RemoveByIdx(i);
                 }
                 // else console.error('WRONG INDEX. @Mesh.js, Destroy().')
             }
         }
-        
-        
+
+
         /*************************************************************************************/
         // Remove from gfx buffers.
         const ret = Gfx_remove_geometry(this.gfx, this.geom.num_faces);
-        
+
 
         /*************************************************************************************/
         // Remove from widget root buffer.
         Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
 
 
-        
+
 
         // Remove from parent's children buffer
         if (this.parent && this.parent !== WIDGET_TEXT_MESH) this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
 
-        
+
         // // Set Debug listen event
         // const params = {
         //     groupidx: this.gfx.prog.groupidx,
@@ -258,30 +258,30 @@ export class Mesh {
         //     type: INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX,
         // }
         // Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX, params);
-        
+
         // // Remove from mesh buffer, the true storage of the mesh
         // Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
     }
 
-    ActivateAndChildren(){
+    ActivateAndChildren() {
         this.state.mask |= MESH_STATE.ACTIVE;
-        for(let i=0; i<this.children.boundary; i++){
+        for (let i = 0; i <= this.children.boundary; i++) {
             const child = this.children.buffer[i];
             child.state.mask |= MESH_STATE.ACTIVE;
         }
     }
 
-    ActivateAndChildrenRecursive(){
+    ActivateAndChildrenRecursive() {
         this.state.mask |= MESH_STATE.ACTIVE;
-        for(let i=0; i<this.children.boundary; i++){
+        for (let i = 0; i <= this.children.boundary; i++) {
 
             const child = this.children.buffer[i];
             child.StateEnable(MESH_STATE.ACTIVE);
             // child.state.mask |= MESH_STATE.ACTIVE;
-            
-            if(child.children.boundary){
+
+            if (child.children.boundary) {
                 child.ActivateAndChildrenRecursive()
-                if(child.text_mesh)
+                if (child.text_mesh)
                     child.text_mesh.state.mask |= MESH_STATE.ACTIVE;
             }
         }
@@ -296,7 +296,7 @@ export class Mesh {
     // Set_graphics_vertex_buffer_render(flag) {
 
     //     // Gl_vertex_buffer_set_show(this.gfx.prog.groupidx, this.gfx.prog.idx, this.gfx.vb.idx, flag);
-            // TODO: DONT FORGET TO UPDATE THE RENDERQUE OR SET AN UPDATE IF RENDERQUEUE CHNGED TO AVOID THE OVERHEAD
+    // TODO: DONT FORGET TO UPDATE THE RENDERQUE OR SET AN UPDATE IF RENDERQUEUE CHNGED TO AVOID THE OVERHEAD
     //     if (flag) this.StateEnable(MESH_STATE.IS_HOVERABLE);
     //     else this.StateDisable(MESH_STATE.IS_HOVERABLE);
     // }
@@ -327,11 +327,11 @@ export class Mesh {
     /*******************************************************************************************************************************************************/
     // Listeners
     /*******************************************************************************************************************************************************/
-    
+
     CreateListenEvent(etype, is_fake_event = false) {
 
-        if (is_fake_event) 
-        this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
+        if (is_fake_event)
+            this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
         if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
             this.listeners.AddAtIndex(LISTEN_EVENT_TYPES_INDEX.HOVER, {
@@ -381,11 +381,11 @@ export class Mesh {
     RemoveAllListenEvents() {
         // TODO The if's maybe better implemented in EventListeners class RemoveEvent()???
 
-        for (let etype = 0; etype < this.listeners.boundary; etype++) {
+        for (let etype = 0; etype <= this.listeners.boundary; etype++) {
 
             if (this.listeners.buffer[etype] && this.listeners.buffer[etype].evt) {
 
-                if (!this.listeners.buffer[etype].is_child_event) 
+                if (!this.listeners.buffer[etype].is_child_event)
                     Listener_remove_event_by_idx(etype, this.listeners.buffer[etype].evt);
                 else
                     Listener_remove_children_event_by_idx(etype, this.listeners.buffer[etype].evt);
@@ -407,68 +407,68 @@ export class Mesh {
     // Transformations   
     /*******************************************************************************************************************************************************/
 
-    SetHoverColor()         { this.SetUpdateFrameBuffer(); this.mat.SetHoverColor(this.gfx); } 
+    SetHoverColor() { this.SetUpdateFrameBuffer(); this.mat.SetHoverColor(this.gfx); }
 
 
-    SetColor(col)           { this.SetUpdateFrameBuffer(); this.mat.SetColor(col, this.gfx); } 
+    SetColor(col) { this.SetUpdateFrameBuffer(); this.mat.SetColor(col, this.gfx); }
 
 
-    SeHoverColortDefault()  { this.SetUpdateFrameBuffer(); this.mat.SeHoverColortDefault(this.gfx); } 
+    SeHoverColortDefault() { this.SetUpdateFrameBuffer(); this.mat.SeHoverColortDefault(this.gfx); }
 
 
-    SetColorRGB(col)        { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
+    SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
 
 
-    SetColorAlpha(alpha)    { this.SetUpdateFrameBuffer(); this.mat.SetColorAlpha(alpha, this.gfx, this.geom.num_faces); }
+    SetColorAlpha(alpha) { this.SetUpdateFrameBuffer(); this.mat.SetColorAlpha(alpha, this.gfx, this.geom.num_faces); }
 
 
-    SetDefaultColor()       { this.SetUpdateFrameBuffer(); this.mat.SetDefaultColor(this.gfx, this.geom.num_faces); }
+    SetDefaultColor() { this.SetUpdateFrameBuffer(); this.mat.SetDefaultColor(this.gfx, this.geom.num_faces); }
 
 
-    SetStyle(style)         { this.SetUpdateFrameBuffer(); this.mat.SetStyle(style); }
+    SetStyle(style) { this.SetUpdateFrameBuffer(); this.mat.SetStyle(style); }
 
 
-    SetDefaultPosXY()       { this.SetUpdateFrameBuffer(); this.geom.SetDefaultPosXY(this.gfx); }
+    SetDefaultPosXY() { this.SetUpdateFrameBuffer(); this.geom.SetDefaultPosXY(this.gfx); }
 
 
-    SetPosXYZ(pos)          { this.SetUpdateFrameBuffer(); this.geom.SetPosXYZ(pos, this.gfx); }
+    SetPosXYZ(pos) { this.SetUpdateFrameBuffer(); this.geom.SetPosXYZ(pos, this.gfx); }
 
 
-    SetPosXY(pos)           { this.SetUpdateFrameBuffer(); this.geom.SetPosXY(pos, this.gfx); }
+    SetPosXY(pos) { this.SetUpdateFrameBuffer(); this.geom.SetPosXY(pos, this.gfx); }
 
 
-    SetPosX(x)              { this.SetUpdateFrameBuffer(); this.geom.SetPosX(x, this.gfx, this.geom.num_faces); }
+    SetPosX(x) { this.SetUpdateFrameBuffer(); this.geom.SetPosX(x, this.gfx, this.geom.num_faces); }
 
 
-    SetPosY(y)              { this.SetUpdateFrameBuffer(); this.geom.SetPosY(y, this.gfx); }
+    SetPosY(y) { this.SetUpdateFrameBuffer(); this.geom.SetPosY(y, this.gfx); }
 
 
-    SetDim(dim)             { this.SetUpdateFrameBuffer(); this.geom.SetDim(dim, this.gfx); }
+    SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDim(dim, this.gfx); }
 
 
-    GetName()               { return Str_buffer_get_by_idx(this.nameidx); }
+    GetName() { return Str_buffer_get_by_idx(this.nameidx); }
 
 
-    UpdatePosXY()           { this.SetUpdateFrameBuffer(); this.geom.UpdatePosXY(this.gfx); }
+    UpdatePosXY() { this.SetUpdateFrameBuffer(); this.geom.UpdatePosXY(this.gfx); }
 
 
-    UpdatePosXYZ()          { this.SetUpdateFrameBuffer(); this.geom.UpdatePosXYZ(this.gfx); }
+    UpdatePosXYZ() { this.SetUpdateFrameBuffer(); this.geom.UpdatePosXYZ(this.gfx); }
 
 
-    UpdateDim()             { this.SetUpdateFrameBuffer(); this.geom.UpdateDim(this.gfx); }
+    UpdateDim() { this.SetUpdateFrameBuffer(); this.geom.UpdateDim(this.gfx); }
 
 
-    UpdateZindex(z)         { this.SetUpdateFrameBuffer(); this.geom.UpdatePosZ(z, this.gfx); }
+    UpdateZindex(z) { this.SetUpdateFrameBuffer(); this.geom.UpdatePosZ(z, this.gfx); }
 
 
-    MoveXY(x, y)            { 
-        this.SetUpdateFrameBuffer(); 
+    MoveXY(x, y) {
+        this.SetUpdateFrameBuffer();
         this.geom.MoveXY(x, y, this.gfx, _, this.state.mask & MESH_STATE.ACTIVE); // console.log('Mesh MoveXY')
     }
 
 
-    MoveXYZ(pos)            { 
-        this.SetUpdateFrameBuffer(); 
+    MoveXYZ(pos) {
+        this.SetUpdateFrameBuffer();
         this.geom.MoveXYZ(pos, this.gfx, _, this.state.mask & MESH_STATE.ACTIVE); // console.log('Mesh MoveXYZ')
     }
 
@@ -481,18 +481,18 @@ export class Mesh {
     }
 
 
-    RotateZ(angle){
+    RotateZ(angle) {
         GlRotateZ2D(this.gfx, this.geom.dim, angle);
     }
-    
+
 
 
     /*******************************************************************************************************************************************************/
     // Setters-Getters    
     /*******************************************************************************************************************************************************/
 
-    SetUpdateFrameBuffer(){
-        if(this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
+    SetUpdateFrameBuffer() {
+        if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
     }
 
 
@@ -501,7 +501,7 @@ export class Mesh {
     }
 
 
-    SetClampY(ypos, ydim, threshold=DEFAULT_CLAMP_THRESHOLD){
+    SetClampY(ypos, ydim, threshold = DEFAULT_CLAMP_THRESHOLD) {
         this.clamp[CLAMP.Y][CLAMP.Y_UP] = ypos - ydim;
         this.clamp[CLAMP.Y][CLAMP.Y_DOWN] = ypos + ydim;
         this.clamp[CLAMP.Y][CLAMP.THRESHOLD] = threshold;
@@ -511,7 +511,7 @@ export class Mesh {
 
     FindIdInChildren(id) {
 
-        for (let i = 0; i < this.children.boundary; i++) {
+        for (let i = 0; i <= this.children.boundary; i++) {
             const child = this.children.buffer[i];
             if (child && id === child.id && child.StateCheck(MESH_STATE.IS_HOVERABLE)) {
                 return true;
@@ -585,12 +585,12 @@ export class Mesh {
         // Avoid duplicates
         const len = this.uniforms.length;
         let skip = false;
-        for(let i=0; i<len; i++){
-            if(this.uniforms[i].name === name)
+        for (let i = 0; i < len; i++) {
+            if (this.uniforms[i].name === name)
                 skip = true;
         }
 
-        if(!skip)
+        if (!skip)
             this.uniforms.push({
                 name: name,
                 type: type,
@@ -607,7 +607,7 @@ export class Mesh {
 export function Recursive_gfx_operations(_mesh, Clbk, params) {
 
     const children = _mesh.children;
-    for (let i = 0; i < children.boundary; i++) {
+    for (let i = 0; i <= children.boundary; i++) {
 
         const mesh = children.buffer[i];
         if (mesh.children.active_count)
@@ -620,21 +620,21 @@ export function Recursive_gfx_operations(_mesh, Clbk, params) {
 
 
 // Run recursively from a root mesh down to all children and gather all unique gfx indexes into a buffer
-export function Temp_Create_child_gfx_rename_me(mesh){
-    
+export function Temp_Create_child_gfx_rename_me(mesh) {
+
     const gfx_buffer_rename_me = [];
     gfx_buffer_rename_me.push({
-        groupidx:   mesh.gfx.prog.groupidx,
-        progidx:    mesh.gfx.prog.idx,
-        vbidx:      mesh.gfx.vb.idx,
+        groupidx: mesh.gfx.prog.groupidx,
+        progidx: mesh.gfx.prog.idx,
+        vbidx: mesh.gfx.vb.idx,
     });
 
     // Case the mesh is label and has a text mesh
-    if(mesh.text_mesh){
+    if (mesh.text_mesh) {
         gfx_buffer_rename_me.push({
-            groupidx:   mesh.text_mesh.gfx.prog.groupidx,
-            progidx:    mesh.text_mesh.gfx.prog.idx,
-            vbidx:      mesh.text_mesh.gfx.vb.idx,
+            groupidx: mesh.text_mesh.gfx.prog.groupidx,
+            progidx: mesh.text_mesh.gfx.prog.idx,
+            vbidx: mesh.text_mesh.gfx.vb.idx,
         });
     }
 
@@ -644,36 +644,36 @@ export function Temp_Create_child_gfx_rename_me(mesh){
 
 
 
-export function Temp_Create_child_gfx_recursive_rename_me(mesh, gfx_buffer_rename_me){
+export function Temp_Create_child_gfx_recursive_rename_me(mesh, gfx_buffer_rename_me) {
 
     const count = mesh.children.boundary;
-    for(let i=0; i<count; i++){
+    for (let i = 0; i < count; i++) {
 
         const child = mesh.children.buffer[i];
 
-        if(child){
+        if (child) {
 
-            if(child.children.boundary){ // Run recursively
+            if (child.children.boundary) { // Run recursively
                 Temp_Create_child_gfx_recursive_rename_me(child, gfx_buffer_rename_me);
             }
 
             const gfx_indexes = {
-                groupidx:   child.gfx.prog.groupidx,
-                progidx:    child.gfx.prog.idx,
-                vbidx:      child.gfx.vb.idx,
+                groupidx: child.gfx.prog.groupidx,
+                progidx: child.gfx.prog.idx,
+                vbidx: child.gfx.vb.idx,
             };
-            if( !GfxExists_rename_me(gfx_buffer_rename_me, gfx_indexes) ){ // If gfx is not already stored, store it
+            if (!GfxExists_rename_me(gfx_buffer_rename_me, gfx_indexes)) { // If gfx is not already stored, store it
                 gfx_buffer_rename_me.push(gfx_indexes);
             }
             // Case the mesh is label and has a text mesh
-            if(child.text_mesh){
+            if (child.text_mesh) {
 
                 const text_gfx_indexes = {
-                    groupidx:   child.text_mesh.gfx.prog.groupidx,
-                    progidx:    child.text_mesh.gfx.prog.idx,
-                    vbidx:      child.text_mesh.gfx.vb.idx,
+                    groupidx: child.text_mesh.gfx.prog.groupidx,
+                    progidx: child.text_mesh.gfx.prog.idx,
+                    vbidx: child.text_mesh.gfx.vb.idx,
                 };
-                if( !GfxExists_rename_me(gfx_buffer_rename_me, text_gfx_indexes) ){ // If gfx is not already stored, store it
+                if (!GfxExists_rename_me(gfx_buffer_rename_me, text_gfx_indexes)) { // If gfx is not already stored, store it
                     gfx_buffer_rename_me.push(text_gfx_indexes);
                 }
             }
@@ -684,17 +684,16 @@ export function Temp_Create_child_gfx_recursive_rename_me(mesh, gfx_buffer_renam
 
 
 
-export function GfxExists_rename_me(gfx_buffer, gfx_indexes){
+export function GfxExists_rename_me(gfx_buffer, gfx_indexes) {
 
     const count = gfx_buffer.length;
-    for(let i=0; i<count; i++){
-        if( gfx_buffer[i].groupidx === gfx_indexes.groupidx &&
+    for (let i = 0; i < count; i++) {
+        if (gfx_buffer[i].groupidx === gfx_indexes.groupidx &&
             gfx_buffer[i].progidx === gfx_indexes.progidx &&
-            gfx_buffer[i].vbidx === gfx_indexes.vbidx )
-            {
-                return true;
-            }
+            gfx_buffer[i].vbidx === gfx_indexes.vbidx) {
+            return true;
         }
+    }
 
     return false;
 }
@@ -715,7 +714,7 @@ export function Mesh_print_all_mesh_listeners() {
 
 function Mesh_print_all_mesh_listeners_recursive(meshes) {
 
-    for (let i = 0; i < meshes.boundary; i++) {
+    for (let i = 0; i <= meshes.boundary; i++) {
 
         const mesh = meshes.buffer[i];
         if (mesh) {

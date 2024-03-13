@@ -72,7 +72,7 @@ export class Section extends Rect {
    Destroy() {
 
       // Any children destruction
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
          if (child) child.Destroy(child);
@@ -124,7 +124,7 @@ export class Section extends Rect {
       this.root_bufferidx = root_bufferidx;
       Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
          /**DEBUG */ if (!child.AddToWidgetRootBuffer)
@@ -136,8 +136,6 @@ export class Section extends Rect {
 
    AddToWidgetGroupBuffer(group_bufferidx, temp_max_size = 0) {
 
-      if(this.mesh_bufferidx === 365)
-      console.log()
 
       if (this.state.mask & MESH_STATE.ACTIVE) {
          /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR SECTION:', this.mesh_bufferidx, this.GetName());
@@ -149,11 +147,9 @@ export class Section extends Rect {
 
             const child = this.children.buffer[i];
             /**DEBUG */ if (!child.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR SECTION CHILD:', child.mesh_bufferidx, child.GetName());
-            /**DEBUG */ if (!child.AddToWidgetGroupBuffer)
-               console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO AddToWidgetGroupBuffer() FOR SECTION CHILD:', child.mesh_bufferidx, child.GetName());
+            /**DEBUG */ if (!child.AddToWidgetGroupBuffer) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO AddToWidgetGroupBuffer() FOR SECTION CHILD:', child.mesh_bufferidx, child.GetName());
                
-      if(child.mesh_bufferidx === 365)
-      console.log('FROM AddToWidgetGroup()', child.state.mask)
+
             if (child.state.mask & MESH_STATE.ACTIVE) child.AddToWidgetGroupBuffer(group_bufferidx);
          }
       }
@@ -163,7 +159,7 @@ export class Section extends Rect {
    Activate() {
 
       this.state.mask |= MESH_STATE.ACTIVE;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          this.children.buffer[i].Activate();
       }
    }
@@ -172,7 +168,7 @@ export class Section extends Rect {
    Deactivate() {
 
       this.state.mask &= ~MESH_STATE.ACTIVE;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          this.children.buffer[i].Deactivate();
       }
    }
@@ -181,7 +177,7 @@ export class Section extends Rect {
    StateEnable(MASK=0x0) {
 
       this.state.mask |= MASK;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          this.children.buffer[i].StateEnable(MASK);
       }
    }
@@ -190,9 +186,9 @@ export class Section extends Rect {
    StateDisable(MASK=0x0) {
 
       this.state.mask &= ~MASK; // HERE
-      // for (let i = 0; i < this.children.boundary; i++) {
-      //    this.children.buffer[i].StateDisable(MASK);
-      // }
+      for (let i = 0; i <= this.children.boundary; i++) {
+         this.children.buffer[i].StateDisable(MASK);
+      }
    }
 
 
@@ -321,7 +317,7 @@ export class Section extends Rect {
 
    Reset(section) {
 
-      for (let i = 0; i < section.children.boundary; i++) {
+      for (let i = 0; i <= section.children.boundary; i++) {
 
          const mesh = section.children.buffer[i];
          if (mesh.children.active_count && mesh.type & MESH_TYPE.SECTION_MESH) {
@@ -343,7 +339,7 @@ export class Section extends Rect {
 
       const gfx = super.GenGfxCtx(FLAGS, gfxidx);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
          if (child) child.GenGfxCtx(FLAGS, gfxidx);
@@ -357,7 +353,7 @@ export class Section extends Rect {
    Render() {
       
       if (this.state.mask & MESH_STATE.ACTIVE) super.AddToGfx();
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          child.Render();
       }
@@ -369,7 +365,7 @@ export class Section extends Rect {
 
       super.AddToGfxFromReset();
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child && (child.state.mask & MESH_STATE.ACTIVE)) {
             child.Rerender();
@@ -382,7 +378,7 @@ export class Section extends Rect {
 
       super.DeactivateGfx();
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
          if (child) child.DeactivateGfx();
@@ -401,7 +397,7 @@ export class Section extends Rect {
       let all_meshes = parent_meshes_buf ? parent_meshes_buf : [];
       all_meshes.push(this)
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
          if (child) all_meshes = child.GetAllMeshes(all_meshes);
@@ -425,7 +421,7 @@ export class Section extends Rect {
 
    SetFrameBufferIdx(fbidx) {
       this.isFramebufferRendered = fbidx;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) {
             child.SetFrameBufferIdx(fbidx)
@@ -437,7 +433,7 @@ export class Section extends Rect {
    SetPosY(y) {
 
       super.SetPosY(y);
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.SetPosY(y);
       }
@@ -446,7 +442,7 @@ export class Section extends Rect {
 
    SetPosXNoGfxUpdate(x) {
       this.geom.pos[0] = x;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.SetPosXNoGfxUpdate(x);
       }
@@ -455,7 +451,7 @@ export class Section extends Rect {
 
    SetPosYNoGfxUpdate(y) {
       this.geom.pos[1] = y;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.SetPosYNoGfxUpdate(y);
       }
@@ -465,7 +461,7 @@ export class Section extends Rect {
    SetPosXYNoGfxUpdate(x, y) {
       this.geom.pos[0] = x;
       this.geom.pos[1] = y;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.SetPosXYNoGfxUpdate(x, y);
       }
@@ -521,7 +517,7 @@ export class Section extends Rect {
 
       // Create listen events for the section
       const root_evt = root.listeners.buffer;
-      for (let etypeidx = 0; etypeidx < mesh.listeners.boundary; etypeidx++) {
+      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
          const evt = mesh.listeners.buffer[etypeidx];
 
@@ -538,7 +534,7 @@ export class Section extends Rect {
       }
 
       // Construct listen events for each section's item.
-      for (let i = 0; i < mesh.children.boundary; i++) {
+      for (let i = 0; i <= mesh.children.boundary; i++) {
 
          const child = mesh.children.buffer[i];
          if (child) {
@@ -584,13 +580,14 @@ export class Section extends Rect {
       
       // if (this.root_bufferidx > INT_NULL) {
 
-         for (let i = 0; i < widget_root_buffer.boundary; i++) {
+         for (let i = 0; i <= widget_root_buffer.boundary; i++) {
 
             // if(widget_root_buffer.buffer[i] == INT_NULL)
             
             // EFFICIENCY: Maybe its better to access the _mesh_buffer directly from the MeshBuffer.js file. Also later we use 'Widget_root_batch_get'
             const mesh = Mesh_buffer_get_mesh_byidx(widget_root_buffer.buffer[i]);
-            if(mesh === _) console.log(widget_root_buffer.buffer[i], i)
+            if(mesh === _) 
+            console.log(widget_root_buffer.buffer[i], i)
                mesh.geom.pos[0] += x;
                mesh.geom.pos[1] += y;
             // }
@@ -624,7 +621,7 @@ export class Section extends Rect {
          
       //    // Batch_store(this, _, { pos: [x, y] });
          
-      //    for (let i = 0; i < this.children.boundary; i++) {
+      //    for (let i = 0; i <= this.children.boundary; i++) {
       //       // EFFICIENCY: Unfortunately if the chldren are all Widget_text, we are gonna batch_store all seperately, instead of batch store all of the texts together with total num_faces
       //       const child = this.children.buffer[i];
       //       if (child.is_gfx_inserted) {
@@ -639,7 +636,7 @@ export class Section extends Rect {
 
       this.geom.pos[0] += x;
       this.geom.pos[1] += y;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.MoveNoGfxUpdate(x, y);
       }
@@ -650,7 +647,7 @@ export class Section extends Rect {
    MoveYNoGfxUpdate(y) {
 
       this.geom.pos[1] += y;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.MoveYNoGfxUpdate(y);
       }
@@ -661,7 +658,7 @@ export class Section extends Rect {
    MoveXNoGfxUpdate(x) {
 
       this.geom.pos[0] += x;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.MoveXNoGfxUpdate(x);
       }
@@ -678,7 +675,7 @@ export class Section extends Rect {
 
       super.SetColorAlpha(alpha);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          child.SetColorAlpha(alpha, alpha)
       }
@@ -688,7 +685,7 @@ export class Section extends Rect {
    SetIsGfxInserted(flag) {
       if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          child.SetIsGfxInserted(flag)
       }
@@ -700,7 +697,7 @@ export class Section extends Rect {
       this.geom.defPos[1] = this.geom.pos[1];
       this.geom.SetPosY(posy, this.gfx);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
 
@@ -715,7 +712,7 @@ export class Section extends Rect {
       this.geom.pos[1] = this.geom.defPos[1];
       this.geom.SetPosY(posy, this.gfx);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
          if (child.state.mask & MESH_STATE.ACTIVE)
@@ -729,7 +726,7 @@ export class Section extends Rect {
       this.mat.defCol[3] = this.mat.col[3];  // Copy the current alpha to the mesh's default col, so it can be retrieved.
       this.mat.SetColorAlpha(alpha, this.gfx);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (!child.FakeRemoveFromGfxAlpha) {
             console.log(child.GetName(), child.constructor.name)
@@ -744,7 +741,7 @@ export class Section extends Rect {
       this.mat.col[3] = this.mat.defCol[3];  // Copy the current alpha to the mesh's default col, so it can be retrieved.
       this.mat.SetColorAlpha(alpha, this.gfx);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (!child.FakeAddFromGfxAlpha) {
             console.log(child.GetName(), child.constructor.name)
@@ -765,7 +762,7 @@ export class Section extends Rect {
    RotateZ(angle) {
 
       super.RotateZ(angle);
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) {
 
@@ -777,7 +774,7 @@ export class Section extends Rect {
 
    SetGfxProgramGroup(group_mask) {
       this.sid.progs_group = group_mask;
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) {
             child.SetGfxProgramGroup(group_mask);
@@ -794,7 +791,7 @@ export class Section extends Rect {
 
       Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) {
             child.UpdateWidgetGroupIncrementNumFaces();
@@ -807,7 +804,7 @@ export class Section extends Rect {
 
       Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
 
-      for (let i = 0; i < this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) {
             child.UpdateWidgetGroupDecrementNumFaces();
@@ -820,7 +817,7 @@ export class Section extends Rect {
 
 function Section_rotatez_children_recursive(mesh, angle) {
 
-   for (let i = 0; i < mesh.children.boundary; i++) {
+   for (let i = 0; i <= mesh.children.boundary; i++) {
 
       const child = mesh.children.buffer[i];
       if (child.type & MESH_TYPE.SECTION_MESH) { // Case anothe section, run recursively
@@ -835,7 +832,7 @@ function Section_rotatez_children_recursive(mesh, angle) {
 
 function Section_set_posxy_children_recursive(pos, mesh) {
 
-   for (let i = 0; i < mesh.children.boundary; i++) {
+   for (let i = 0; i <= mesh.children.boundary; i++) {
 
       const child = mesh.children.buffer[i];
 
@@ -881,7 +878,7 @@ function Section_on_move_section(params) {
 function Expand(section, options, width, accum_margins) {
 
 
-   for (let i = 0; i < section.children.boundary; i++) {
+   for (let i = 0; i <= section.children.boundary; i++) {
 
       const child = section.children.buffer[i];
 
@@ -918,7 +915,7 @@ function Calculate_sizes_recursive(section, top, left, options, total_margin = [
    const margin = total_margin;
    const accum_size_per_section = [0, 0];
 
-   for (let i = 0; i < section.children.boundary; i++) {
+   for (let i = 0; i <= section.children.boundary; i++) {
 
 
       let opt = options
@@ -1009,7 +1006,7 @@ export function Calculate_positions_recursive(parent, options = SECTION.INHERIT,
    const cur_pos = [parent.geom.pos[0], parent.geom.pos[1]];
    const accum_pos = _accum_pos;
 
-   for (let i = 0; i < parent.children.boundary; i++) {
+   for (let i = 0; i <= parent.children.boundary; i++) {
 
       const mesh = parent.children.buffer[i];
       let continue_recur = true;
@@ -1042,9 +1039,7 @@ export function Calculate_positions_recursive(parent, options = SECTION.INHERIT,
                   data: [new_pos[0], new_pos[1], mesh.geom.dim[0],mesh.geom.dim[1],]
                   // data: [new_pos[0], new_pos[1]]
                };
-               // mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4; // HACK
-               // Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, _);
-               console.log(mesh.geom.dim, mesh.GetName());
+
                mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
                Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, _);
             }
@@ -1079,7 +1074,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options = SE
    const accum_pos = _accum_pos;
 
 
-   for (let i = 0; i < parent.children.boundary; i++) {
+   for (let i = 0; i <= parent.children.boundary; i++) {
 
       const mesh = parent.children.buffer[i];
       let continue_recur = true;

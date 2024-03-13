@@ -1,26 +1,48 @@
 "use strict";
 
-class Buffer_Interface {
+
+
+// TODO: Implement all Realloc() functions growing algorithm. NOT doubling but just big enough
+
+// TODO: Correct the Init logic of 'Buffer_Interface' and 'M_Buffer'. Currently if object is passed and elements are initialized, the boundary remains 0. 
+
+
+/**********************************************************************************************************************************************/
+// Generic Array
+/**********************************************************************************************************************************************/
+// IMPORTANT: DO NOT USE M_BUFFER CLASS AS AN ARRAY OF INTEGERS, UNTIL CORRECT IMPLEMENTATION. SEE BUG AT 'Buffer_Interface, GetNextFree()'.
+export class M_Buffer {
 
    buffer;
-   boundary; // Counts how many elements from start until last element. (Some elements in between could be null)
-   active_count; // Counts how many elements are not null
-   size;
-   reserveidx; // An int value to store a reserved element for later use.
+   boundary;      // Points to the last active element.. (Some elements in between could be null)
+   active_count;  // The total active elements.
+   size;          // Buffer size.
+   freeidx; 
+   reserveidx;    // An int value to store a reserved element for later use.
 
    constructor(m_buffer = null) {
 
-      this.buffer = null;
-      this.boundary = 0;
-      this.active_count = 0;
-      this.size = INT_NULL;
+      this.buffer = [];
+      this.buffer[0] = null;
+      this.boundary = -1;     
+      this.active_count = 0;  
+      this.size = 1;          
+      this.freeidx = 0;       
       this.reserveidx = INT_NULL;
 
       if (m_buffer)
          return this.Copy(m_buffer);
    }
 
+   Init(size, struct = null) {
 
+      this.size = size;
+      this.buffer = new Array(size);
+
+      for (let i = 0; i < size; i++) {
+         this.buffer[i] = struct;
+      }
+   }
    Add(elem) {
 
       const idx = this.#GetNextFree();
@@ -29,13 +51,67 @@ class Buffer_Interface {
       return idx;
    }
 
+   #GetNextFree() {
+      
+      // if(this.freeidx !== INT_NULL){
+      if(this.buffer[this.freeidx] === null){
+
+         if(this.freeidx > this.boundary) this.boundary = this.freeidx; // UNNECESSARY: Can freeidx be greater thn boundary???
+         
+         // const idx = this.freeidx; 
+         // this.freeidx = INT_NULL;
+         return this.freeidx;
+      }
+
+      if(this.active_count >= this.size){
+        
+         const idx = this.Realloc(); // buffer is full.
+         if (idx > this.boundary) this.boundary = idx;
+         return idx;
+      }
+      // We run until boundary and not size (the whole buffer) 
+      // since boundary does not decrement (on remove) below the last element's index.
+      for (let i = 0; i < this.size; i++) {
+
+         if (this.buffer[i] === null) { 
+
+            // Increment boundary only if the free element is after the last stored element in the buffer.
+            if (i > this.boundary) this.boundary = i; 
+               
+            return i;
+         }
+      }
+
+      alert('Buffers.js, GetNextFree(). New element not found')
+
+      // console.error('Free idx not found in Buffers GetNextFree()');
+   }
+
+   Realloc() {
+
+      const idx = this.size;
+      this.size *= 2;
+
+      const oldData = this.buffer;
+      this.buffer = new Array(this.size);
+
+      if (oldData) this.CopyFromBufferToStart(oldData);
+
+      if(idx<1) alert('Buffers.js, Realloc()');
+      return idx;
+
+   }
+
 
    Reset() {
 
-      this.size = INT_NULL;
-      this.boundary = 0;
+      this.size = 1;
+      this.boundary = -1;
       this.active_count = 0;
       this.buffer = [];
+      this.buffer[0] = null;
+      this.freeidx = 0;
+      this.reserveidx = INT_NULL;
    }
 
 
@@ -44,9 +120,9 @@ class Buffer_Interface {
       this.size = m_buffer.size;
       this.buffer = new Array(this.size);
 
-      if (m_buffer instanceof Buffer_Interface) {
+      if (m_buffer instanceof M_Buffer) {
 
-         for (let i = 0; i < m_buffer.boundary; i++) {
+         for (let i = 0; i <= m_buffer.boundary; i++) {
 
             this.buffer[i] = m_buffer.buffer[i];
             this.boundary++;
@@ -62,114 +138,110 @@ class Buffer_Interface {
    RemoveByIdx(idx) {
 
       /**DEBUG ERROR*/ if (idx < 0 || idx > this.size - 1) {
-
          console.error('Index Out of bounds. @ M_Buffer.RemoveByIdx().\n idx:', idx, 'size', this.size)
-         // alert('Index Out of bounds. @ M_Buffer.RemoveByIdx().')
          return;
       }
 
       if (this.buffer[idx] !== null) {
 
-         /**
-          * In this implementation of buffer, we run 
-          * the loops until boundary and not until size. 
-          * For this to work, we can only decrement boundary
-          * if all next elements are not used.
-          * All we are doing is 
-          * to have the boundary at the last used element of the buffer.
-          */
-
          this.buffer[idx] = null;
          this.active_count--;
+         if(idx === this.boundary) this.boundary--; // Case the we removed the last element in existance
 
-         if (this.boundary === 1) {
-            this.boundary = 0;
-            return;
+
+         // Check if previous elements are empty, and reduce boundary to the last active.
+         const boundary = this.boundary;
+         for (let i = boundary; i > 0; i--) {
+
+            if (this.buffer[this.boundary] !== null) break;
+            this.boundary--;
          }
 
-         else {
-            const boundary = this.boundary + 1;
-            for (let i = boundary; i > 0; i--) {
-
-               if (this.buffer[this.boundary - 1] || this.boundary === 0) break;
-               this.boundary--;
-            }
-         }
-
-         if (this.boundary === INT_NULL) alert('M_Buffer boundary = -1')
+         if (this.boundary < INT_NULL) alert('M_Buffer boundary = -1')
          ERROR_NULL(this.active_count);
-      }
-   }
-
-
-   #GetNextFree() {
-
-      if (this.boundary >= this.size) {
-
-         this.Realloc(); // buffer is full.
-         const freeIdx = this.boundary++;
-         return freeIdx;
-      }
-
-      // We run until boundary and not size (the whole buffer) 
-      // since boundary does not decrement (on remove) below the last element's index.
-      // Sample buffer: [null, null, null, elem, 'empty', empty], count=1, boundary=4, size=6
-      for (let i = 0; i <= this.boundary; i++) {
-
-         if (!this.buffer[i]) { // BUG: What if the buffer[i] is an index with value 0 ????????????
-
-            // Increment boundary only if the free element is after the last stored element in the buffer.
-            if (i >= this.boundary) this.boundary++; {
-               return i;
-            }
-         }
       }
    }
 
 
    Reserve() {
 
-      if (this.boundary >= this.size) {
-
-         this.Realloc(); // buffer is full.
-         const freeIdx = this.boundary++;
-         this.reserveidx = freeIdx;
-      }
-      else{
-         for (let i = 0; i <= this.boundary; i++) {
-   
-            if (!this.buffer[i]) { // BUG: What if the buffer[i] is an index with value 0 ????????????
-               // Increment boundary only if the free element is after the last stored element in the buffer.
-               if (i >= this.boundary) this.boundary++; {
-                  this.reserveidx = i;
-                  break;
-               }
-            }
-         }
-      }
-
-
-      this.buffer[this.reserveidx] = true;
+      const idx = this.#GetNextFree();
+      this.reserveidx = idx;
+      this.buffer[idx] = true;
       this.active_count++;
-
       return this.reserveidx;
+
+      // if(this.freeidx !== INT_NULL) {
+
+      //    this.reserveidx = this.freeidx;
+      //    this.active_count++;
+      //    if(this.freeidx > this.boundary) this.boundary = this.freeidx;
+      //    this.freeidx = INT_NULL;
+      //    this.buffer[this.reserveidx] = true;
+   
+      //    return this.reserveidx;
+      // }
+
+      // if (this.active_count >= this.size) {
+         
+      //    const idx = this.Realloc(); // buffer is full.
+      //    this.reserveidx = idx;
+      //    this.boundary++;
+      //    this.buffer[this.reserveidx] = true;
+      //    this.active_count++;
+      //    return this.reserveidx;
+      // }
+
+      // for (let i = 0; i <= this.size; i++) {
+
+      //    if (this.buffer[i] === null) { 
+
+      //       // Increment boundary only if the free element is after the last stored element in the buffer.
+      //       if (i > this.boundary)  this.boundary = i;
+            
+      //       this.reserveidx = i;
+      //       this.buffer[this.reserveidx] = true;
+      //       this.active_count++;
+      
+      //       return this.reserveidx;
+      //    }
+      // }
+
+      // alert('Buffers.js, Reserve()')
+
    }
 
 
    AddAtReservedIndex(idx, elem) {
 
       this.buffer[idx] = elem;
+      this.reserveidx = INT_NULL;
       return idx;
    }
 
+   
 
-   CopyBufferElements(oldData) {
+   AddAtIndex(idx, elem) {
+      if (idx < 0 || idx >= this.size) console.error('WRONG Index. Adding item at: ', idx, ' with size:', this.size)
+
+      this.buffer[idx] = elem;
+      this.active_count++;
+      if (idx > this.boundary) this.boundary = idx;
+
+      return idx;
+   }
+
+   CopyFromBufferToStart(oldData) {
 
       const size = oldData.length;
       for (let i = 0; i < size; i++) {
          this.buffer[i] = oldData[i];
       }
+      for (let i = size; i < this.size; i++) {
+         this.buffer[i] = null;
+      }
    }
+
 
 
    /** Debug */
@@ -181,117 +253,113 @@ class Buffer_Interface {
 
 
 
+// 
+// export class M_Buffer extends Buffer_Interface {
 
+//    constructor(m_buffer) {
 
-
-// IMPORTANT: DO NOT USE M_BUFFER CLASS AS AN ARRAY OF INTEGERS, UNTIL CORRECT IMPLEMENTATION. SEE BUG AT 'Buffer_Interface, GetNextFree()'.
-export class M_Buffer extends Buffer_Interface {
-
-   constructor(m_buffer) {
-
-      super(m_buffer);
-   }
-
-   Init(size, struct = null) {
-
-      this.size = size;
-      this.buffer = new Array(size);
-
-      for (let i = 0; i < size; i++) {
-         this.buffer[i] = struct;
-      }
-   }
-
-
-   Realloc() {
-
-      if (this.size <= 0) {
-         this.size = 1;
-      }
-      else this.size *= 2;
-
-      const oldData = this.buffer;
-      this.buffer = new Array(this.size);
-
-      if (oldData) this.CopyBufferElements(oldData)
-      // console.warn('Resizing M_Buffer!', this.size)
-   }
-
-
-   AddAtIndex(idx, elem) {
-      if (idx < 0 || idx >= this.size) console.error('WRONG Index. Adding item at: ', idx, ' with size:', this.size)
-
-      this.buffer[idx] = elem;
-      this.active_count++;
-      if (idx >= this.boundary) this.boundary = idx + 1;
-
-      return idx;
-   }
-
-}
+//       super(m_buffer);
+//    }
 
 
 
 
 
+// }
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************************************/
+// Array Buffers
+/**********************************************************************************************************************************************/
 
 
 export class ArrayBufferInterface {
 
-   buffer;
-   boundary; // Counts how many elements from start until last element. (Some elements in between could be null)
-   active_count; // Counts how many elements are not null
-   size;
-   reserveidx; // An int value to store a reserved element for later use.
 
-   constructor(size=0) {
+   constructor() {
 
       this.buffer = null;
-      this.boundary = 0;
+      this.boundary = INT_NULL;
       this.active_count = 0;
-      this.size = size;
+      this.size = INT_NULL;
+      this.freeidx = this.freeidx;
       this.reserveidx = INT_NULL;
 
    }
 
+   Add(elem) {
 
-   Add(int) {
+      if(elem === _)
+      console.log()
+      if(this.freeidx !== INT_NULL){
+
+         this.buffer[this.freeidx] = elem;
+         this.active_count++;
+         if(this.freeidx > this.boundary) this.boundary = this.freeidx;
+         const idx = this.freeidx; 
+         this.freeidx = INT_NULL;
+         return idx;
+      }
 
       const idx = this.GetNextFree();
-      this.buffer[idx] = int;
+      this.buffer[idx] = elem;
       this.active_count++;
+      return idx;
+   }
+
+
+   AddAtIndex(idx, elem) {
+
+      if (idx < 0 || idx >= this.size)
+         console.error('WRONG Index. Adding item at: ', idx, ' with size:', this.size)
+
+      this.buffer[idx] = elem;
+      this.active_count++;
+      if (idx > this.boundary) this.boundary = idx;
+
       return idx;
    }
 
 
    GetNextFree() {
-
-      if (this.boundary >= this.size) {
-
-         this.Realloc(); // buffer is full.
-         const freeIdx = this.boundary++;
-         return freeIdx;
+      
+      if(this.active_count >= this.size){
+         const idx = this.Realloc(); // buffer is full.
+         this.boundary = idx;
+         return idx;
       }
 
-      // We run until boundary and not size (the whole buffer) 
-      // since boundary does not decrement (on remove) below the last element's index.
-      // Sample buffer: [null, null, null, elem, 'empty', empty], count=1, boundary=4, size=6
-      for (let i = 0; i <= this.boundary; i++) {
-         if (this.buffer[i] === INT_NULL) {
+      for (let i = 0; i < this.size; i++) {
+
+         if (this.buffer[i] === INT_NULL) { 
+
             // Increment boundary only if the free element is after the last stored element in the buffer.
-            if (i >= this.boundary) this.boundary++;
+            if (i > this.boundary) this.boundary = i; 
+
             return i;
          }
       }
+
+
+
    }
 
 
    Reset() {
-
-      this.size = INT_NULL;
-      this.boundary = 0;
+      
+      this.size = 1;
+      this.boundary = -1;
       this.active_count = 0;
-      this.buffer = null;
+      // this.buffer = [];
+      this.buffer[0] = INT_NULL;
+      this.freeidx = 0;
+      this.reserveidx = INT_NULL;
    }
 
 
@@ -303,433 +371,32 @@ export class ArrayBufferInterface {
          this.active_count--;
          this.ShortReplaceWithLast(idx)
 
-         if (this.boundary <= INT_NULL) alert('M_Buffer boundary <= -1');
          if (this.active_count <= INT_NULL) alert('M_Buffer active_count <= -1');
 
       }
    }
 
 
-   ShortReplaceWithLast(removed_idx){
-      
-      let cur = removed_idx;
-      let last = this.boundary-1;
-      // REPLACE
-      this.buffer[cur] = this.buffer[last];
-      // REMOVE LAST
-      this.buffer[last] = INT_NULL;
+   ShortReplaceWithLast(removed_idx) {
+
+      if(removed_idx !== this.boundary){
+
+         let last = this.boundary;
+         // REPLACE
+         this.buffer[removed_idx] = this.buffer[last];
+         // REMOVE LAST
+         this.buffer[last] = INT_NULL;
+      }
       this.boundary--;
    }
 
-   
-   ShortShiftOne(removed_idx){
 
-      // SHIFT
-      let cur = removed_idx;
-      let next = cur+1;
-      for (next = removed_idx+1; next<this.boundary; next++, cur++) {
-
-         this.buffer[cur] = this.buffer[next];
-      }
-      // this.active_count--;
-      this.boundary--;
-      console.log('Short:', this.boundary, this.active_count)
-
-      // REMOVE LAST
-      this.buffer[next-1] = INT_NULL;
-   }
-
-   CopyBufferElements(oldData) {
-
-      const size = oldData.length;
-      for (let i = 0; i < size; i++) {
-         this.buffer[i] = oldData[i];
-      }
-   }
-
-}
-
-
-
-// TODO: Instead use Uint8 and set the NULL value with uin8_max: 255-0xff
-export class Int8Buffer extends ArrayBufferInterface {
-
-   constructor(size = 0) {
-
-      super();
-      this.size = size;
-   }
-
-
-   Init(val) {
-
-      if (!this.buffer) this.buffer = new Int8Array(this.size)
-      for (let i = 0; i < this.size; i++) {
-         this.buffer[i] = val;
-
-      }
-   }
-
-
-   Add(int) {
-
-      const idx = this.GetNextFree();
-      this.buffer[idx] = int;
-      this.active_count++;
-      return idx;
-   }
-
-
-   GetNextFree() {
-
-      if (this.boundary >= this.size) {
-
-         this.Realloc(); // buffer is full.
-         const freeIdx = this.boundary++;
-         return freeIdx;
-      }
-
-      // We run until boundary and not size (the whole buffer) 
-      // since boundary does not decrement (on remove) below the last element's index.
-      // Sample buffer: [null, null, null, elem, 'empty', empty], count=1, boundary=4, size=6
-      for (let i = 0; i <= this.boundary; i++) {
-         if (this.buffer[i] === INT_NULL) {
-            // Increment boundary only if the free element is after the last stored element in the buffer.
-            if (i >= this.boundary) this.boundary++;
-            return i;
-         }
-      }
-
-      console.error('GetNextFree() DID NOT FIND A FREE ELEMENT TO INSERT TO. @ class Int8Buffer')
-   }
-
-
-   // TODO: Maybe implement growing algorithm to be NOT doubling but just big enough
-   Realloc() {
-
-      const old_size = this.size;
-
-      if (this.size <= 0) {
-         this.size = 1;
-      }
-      else this.size *= 2;
-
-      const oldData = this.buffer;
-      this.buffer = new Int8Array(this.size);
-
-      if (oldData) this.CopyBufferElements(oldData)
-
-      // Initialize the rest of buffer.
-      for (let i = old_size; i < this.size; i++) {
-         this.buffer[i] = INT_NULL;
-      }
-      // console.warn('Resizing Int8Buffer!')
-   }
-
-
-   Reset() {
-
-      this.size = INT_NULL;
-      this.boundary = 0;
-      this.active_count = 0;
-      this.buffer = null;
-   }
-
-   
-   AddAtIndex(idx, elem) {
-      if (idx < 0 || idx >= this.size) 
-      console.error('WRONG Index. Adding item at: ', idx, ' with size:', this.size)
-
-      this.buffer[idx] = elem;
-      this.active_count++;
-      if (idx >= this.boundary) this.boundary = idx + 1;
-
-      return idx;
-   }
-
-
-   RemoveByIdx(idx) {
-
-      if (this.buffer[idx] !== INT_NULL) {
-
-         this.buffer[idx] = INT_NULL;
-         this.active_count--;
-
-         if (this.boundary === 1) {
-            this.boundary = 0;
-            return;
-         }
-         else {
-            const boundary = this.boundary + 1;
-            for (let i = boundary; i > 0; i--) {
-
-               if (this.buffer[this.boundary - 1] !== INT_NULL || this.boundary === 0) break;
-               this.boundary--;
-            }
-         }
-
-         if (this.boundary === INT_NULL) alert('M_Buffer boundary = -1')
-         ERROR_NULL(this.active_count);
-      }
-   }
-
-}
-
-
-
-export class Uint8Buffer extends Buffer_Interface {
-
-   constructor(size = 0) {
-
-      super();
-      this.size = size;
-   }
-
-
-   Init(val) {
-
-      if (!this.buffer) this.buffer = new Uint8Array(this.size)
-      for (let i = 0; i < this.size; i++) {
-         this.buffer[i] = val;
-
-      }
-   }
-
-
-   Add(int) {
-
-      const idx = this.GetNextFree();
-      this.buffer[idx] = int;
-      this.active_count++;
-      return idx;
-   }
-
-
-   GetNextFree() {
-
-      if (this.boundary >= this.size) {
-
-         this.Realloc(); // buffer is full.
-         const freeIdx = this.boundary++;
-         return freeIdx;
-      }
-
-      // We run until boundary and not size (the whole buffer) 
-      // since boundary does not decrement (on remove) below the last element's index.
-      // Sample buffer: [null, null, null, elem, 'empty', empty], count=1, boundary=4, size=6
-      for (let i = 0; i <= this.boundary; i++) {
-         if (this.buffer[i] === INT_NULL) {
-            // Increment boundary only if the free element is after the last stored element in the buffer.
-            if (i >= this.boundary) this.boundary++;
-            return i;
-         }
-      }
-
-      console.error('GetNextFree() DID NOT FIND A FREE ELEMENT TO INSERT TO. @ class Int8Buffer')
-   }
-
-
-   // TODO: Maybe implement growing algorithm to be NOT doubling but just big enough
-   Realloc() {
-
-      const old_size = this.size;
-
-      if (this.size <= 0) {
-         this.size = 1;
-      }
-      else this.size *= 2;
-
-      const oldData = this.buffer;
-      this.buffer = new Uint8Array(this.size);
-
-      if (oldData) this.CopyBufferElements(oldData)
-
-      // Initialize the rest of buffer.
-      for (let i = old_size; i < this.size; i++) {
-         this.buffer[i] = INT_NULL;
-      }
-      // console.warn('Resizing Int8Buffer!')
-   }
-
-
-   Reset() {
-
-      this.size = INT_NULL;
-      this.boundary = 0;
-      this.active_count = 0;
-      this.buffer = null;
-   }
-
-   
-   AddAtIndex(idx, elem) {
-      if (idx < 0 || idx >= this.size) 
-      console.error('WRONG Index. Adding item at: ', idx, ' with size:', this.size)
-
-      this.buffer[idx] = elem;
-      this.active_count++;
-      if (idx >= this.boundary) this.boundary = idx + 1;
-
-      return idx;
-   }
-
-
-   RemoveByIdx(idx) {
-
-      if (this.buffer[idx] !== INT_NULL) {
-
-         this.buffer[idx] = INT_NULL;
-         this.active_count--;
-
-         if (this.boundary === 1) {
-            this.boundary = 0;
-            return;
-         }
-         else {
-            const boundary = this.boundary + 1;
-            for (let i = boundary; i > 0; i--) {
-
-               if (this.buffer[this.boundary - 1] !== INT_NULL || this.boundary === 0) break;
-               this.boundary--;
-            }
-         }
-
-         if (this.boundary === INT_NULL) alert('M_Buffer boundary = -1')
-         ERROR_NULL(this.active_count);
-      }
-   }
-
-
-}
-
-
-
-export class Int16Buffer extends ArrayBufferInterface {
-
-   constructor(size = 0) {
-
-      super();
-      this.size = size;
-   }
-
-
-   Init(val) {
-
-      if (!this.buffer) this.buffer = new Int16Array(this.size)
-      for (let i = 0; i < this.size; i++)
-         this.buffer[i] = val;
-   }
-
-
-   // Add(int) {
-
-   //    const idx = this.GetNextFree();
-   //    this.buffer[idx] = int;
-   //    this.active_count++;
-   //    return idx;
-   // }
-
-
-   // GetNextFree() {
-
-   //    if (this.boundary >= this.size) {
-
-   //       this.Realloc(); // buffer is full.
-   //       const freeIdx = this.boundary++;
-   //       return freeIdx;
-   //    }
-
-   //    // We run until boundary and not size (the whole buffer) 
-   //    // since boundary does not decrement (on remove) below the last element's index.
-   //    // Sample buffer: [null, null, null, elem, 'empty', empty], count=1, boundary=4, size=6
-   //    for (let i = 0; i <= this.boundary; i++) {
-   //       if (this.buffer[i] === INT_NULL) {
-   //          // Increment boundary only if the free element is after the last stored element in the buffer.
-   //          if (i >= this.boundary) this.boundary++;
-   //          return i;
-   //       }
-   //    }
-   // }
-
-
-   // TODO: Maybe implement growing algorithm to be NOT doubling but just big enough
-   Realloc() {
-
-      const old_size = this.size;
-
-      if (this.size <= 0) {
-         this.size = 1;
-      }
-      else this.size *= 2;
-
-      const oldData = this.buffer;
-      this.buffer = new Int16Array(this.size);
-
-      if (oldData) { // Copy any old data
-         this.CopyBufferElements(oldData);
-      }
-
-      // Initialize the rest of buffer.
-      for (let i = old_size; i < this.size; i++) {
-         this.buffer[i] = INT_NULL;
-      }
-      // console.warn('Resizing Int8Buffer!')
-   }
-
-
-   // Reset() {
-
-   //    this.size = INT_NULL;
-   //    this.boundary = 0;
-   //    this.active_count = 0;
-   //    this.buffer = null;
-   // }
-
-
-   // RemoveByIdx(idx) {
-
-   //    if (this.buffer[idx] !== INT_NULL) {
-
-   //       this.buffer[idx] = INT_NULL;
-   //       this.active_count--;
-   //       this.ShortReplaceWithLast(idx)
-
-   //       // if (this.boundary === 1) {
-   //       //    this.boundary = 0;
-   //       //    return;
-   //       // }
-   //       // else {
-   //       //    const boundary = this.boundary;
-   //       //    for (let i = boundary; i > 0; i--) {
-
-   //       //       if (this.buffer[this.boundary - 1] !== INT_NULL || this.boundary === 0) break;
-   //       //       this.boundary--;
-   //       //    }
-   //       // }
-
-   //       // console.log('Remove:', this.boundary, this.active_count)
-
-   //       if (this.boundary === INT_NULL) alert('M_Buffer boundary = -1')
-   //       ERROR_NULL(this.active_count);
-   //    }
-   // }
-
-   // ShortReplaceWithLast(removed_idx){
-      
-   //    let cur = removed_idx;
-   //    let last = this.boundary-1;
-   //    // REPLACE
-   //    this.buffer[cur] = this.buffer[last];
-   //    // REMOVE LAST
-   //    this.buffer[last] = INT_NULL;
-   //    this.boundary--;
-   // }
-
-   // ShortShiftOne(removed_idx){
+   // ShortShiftOne(removed_idx) {
 
    //    // SHIFT
    //    let cur = removed_idx;
-   //    let next = cur+1;
-   //    for (next = removed_idx+1; next<this.boundary; next++, cur++) {
+   //    let next = cur + 1;
+   //    for (next = removed_idx + 1; next <= this.boundary; next++, cur++) {
 
    //       this.buffer[cur] = this.buffer[next];
    //    }
@@ -738,13 +405,164 @@ export class Int16Buffer extends ArrayBufferInterface {
    //    console.log('Short:', this.boundary, this.active_count)
 
    //    // REMOVE LAST
-   //    this.buffer[next-1] = INT_NULL;
+   //    this.buffer[next - 1] = INT_NULL;
    // }
+
+
+   CopyFromBufferToStart(oldData) {
+
+      const size = oldData.length;
+      for (let i = 0; i < size; i++) {
+         this.buffer[i] = oldData[i];
+      }
+
+   }
 
 }
 
 
 
+
+
+/**********************************************************************************************************************************************/
+// Int8
+/**********************************************************************************************************************************************/
+// TODO: Instead use Uint8 and set the NULL value with uin8_max: 255-0xff
+export class Int8Buffer extends ArrayBufferInterface {
+
+
+   constructor(size = 1) {
+
+      super();
+      this.size = size;
+      this.buffer = new Int8Array(this.size);
+      this.boundary = INT_NULL;
+      this.freeidx = 0;
+      for (let i = 0; i < this.size; i++)
+      this.buffer[i] = INT_NULL;
+   }
+
+   Realloc() {
+
+      const old_size = this.size;
+
+      this.size *= 2;
+
+      const oldData = this.buffer;
+      this.buffer = new Int8Array(this.size);
+
+      if (oldData) this.CopyFromBufferToStart(oldData)
+
+      // Initialize the rest of buffer.
+      for (let i = old_size; i < this.size; i++) {
+         this.buffer[i] = INT_NULL;
+      }
+
+      return old_size; // The new empty index.
+   }
+
+}
+
+
+
+
+
+/**********************************************************************************************************************************************/
+// Int16
+/**********************************************************************************************************************************************/
+export class Int16Buffer extends ArrayBufferInterface {
+
+
+   constructor(size = 1) {
+
+      super();
+      this.size = size;
+      this.buffer = new Int16Array(this.size);
+      this.boundary = INT_NULL;
+      this.freeidx = 0;
+      for (let i = 0; i < this.size; i++)
+      this.buffer[i] = INT_NULL;
+   }
+
+
+   Realloc() {
+
+      const old_size = this.size;
+      this.size *= 2;
+
+      const oldData = this.buffer;
+      this.buffer = new Int16Array(this.size);
+
+      this.CopyFromBufferToStart(oldData);
+
+      // Initialize the rest of buffer.
+      for (let i = old_size; i < this.size; i++) {
+         this.buffer[i] = INT_NULL;
+      }
+
+      return old_size; // The new empty index. 
+   }
+
+
+}
+
+
+
+/**********************************************************************************************************************************************/
+// Uint8
+/**********************************************************************************************************************************************/
+// export class Uint8Buffer extends ArrayBufferInterface {
+
+
+//    constructor(size = 0) {
+
+//       super();
+//       this.size = size;
+//    }
+
+
+//    Init(val) {
+
+//       if (!this.buffer) this.buffer = new Uint8Array(this.size)
+//       for (let i = 0; i < this.size; i++) {
+//          this.buffer[i] = val;
+
+//       }
+//    }
+
+
+//    Realloc() {
+
+//       const old_size = this.size;
+
+//       if (this.size <= 0) {
+//          this.size = 1;
+//       }
+//       else this.size *= 2;
+
+//       const oldData = this.buffer;
+//       this.buffer = new Uint8Array(this.size);
+
+//       if (oldData) this.CopyFromBufferToStart(oldData)
+
+//       // Initialize the rest of buffer.
+//       for (let i = old_size; i < this.size; i++) {
+//          this.buffer[i] = INT_NULL;
+//       }
+//       // console.warn('Resizing Int8Buffer!')
+//    }
+
+// }
+
+
+
+
+
+
+
+/**********************************************************************************************************************************************/
+// Int8 2D
+/**********************************************************************************************************************************************/
 // export class Int8_2DBuffer {
 
 //    buffer;

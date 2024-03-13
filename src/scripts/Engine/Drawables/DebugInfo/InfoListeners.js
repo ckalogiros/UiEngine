@@ -4,14 +4,18 @@ import { M_Buffer } from "../../Core/Buffers";
 
 
 
+
 export class Info_Listeners {
+
 
    events;
 
-   constructor(){
+
+   constructor() {
 
       this.events = new M_Buffer();
    }
+
 
    AddEvent(EVENT_TYPE, Clbk = null, source_params = null, target_params = null) {
 
@@ -26,29 +30,32 @@ export class Info_Listeners {
       return this.events.Add(event_params);
    }
 
-   DestroyEvent(idx){
+
+   DestroyEvent(idx) {
 
       this.events.RemoveByIdx(idx);
    }
 
-   GetEvent(TYPE_IDX){
 
-      for(let i=0; i<this.events.boundary; i++){
+   GetEvent(TYPE_IDX) {
 
-         if(this.events.buffer[i].event_type === TYPE_IDX){
+      for (let i = 0; i <= this.events.boundary; i++) {
+
+         if (this.events.buffer[i].event_type === TYPE_IDX) {
             return this.events.buffer[i];
          }
       }
       return null;
    }
 
+
    DispatchEvents(EVENT_TYPE, trigger_params) {
 
-      for (let i = 0; i < this.events.boundary; i++) {
-            
-         const evt = this.events.buffer[i]; 
+      for (let i = 0; i <= this.events.boundary; i++) {
 
-         if(evt && (evt.event_type & EVENT_TYPE)){
+         const evt = this.events.buffer[i];
+
+         if (evt && (evt.event_type & EVENT_TYPE)) {
 
             // Handle event via callback
             const dispatch_params = {
@@ -60,10 +67,12 @@ export class Info_Listeners {
             }
             evt.Clbk(dispatch_params)
          }
-    
-      } 
+      }
    }
 }
+
+
+
 
 const _info_listeners = new Info_Listeners();
 
@@ -72,23 +81,35 @@ export function Info_listener_create_event(TYPE_IDX, Clbk, source_params, target
    return _info_listeners.AddEvent(TYPE_IDX, Clbk, source_params, target_params);
 }
 
+
+
+
 export function Info_listener_dispatch_event(TYPE_IDX, trigger_params) {
 
    _info_listeners.DispatchEvents(TYPE_IDX, trigger_params);
 }
 
+
+
+
 export function Info_listener_destroy_event(event_idx) {
-   if(event_idx === INT_NULL){
+   if (event_idx === INT_NULL) {
       console.error('Info_listener_destroy_event is NULL. event_idx:', event_idx);
       return;
    }
-      _info_listeners.DestroyEvent(event_idx);
+   _info_listeners.DestroyEvent(event_idx);
 }
+
+
+
 
 export function Info_listener_get_event(TYPE_IDX) {
 
    return _info_listeners.GetEvent(TYPE_IDX);
 }
+
+
+
 
 /**Debug-Print */
 export function Info_listener_print_buffer() {

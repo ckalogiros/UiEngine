@@ -44,7 +44,6 @@ function CalculateArea(text, _dim, pos, pad = [0, 0]) {
 export class Widget_Label extends Rect {
 
     text_mesh;
-    idx; // Stores the index of the scene's root_mesh buffer, that keeps all scene's root meshes. 
     pad = [0, 0];
 
     constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
@@ -525,7 +524,7 @@ export class Widget_Label extends Rect {
 
         const root_evt = root.listeners.buffer;
 
-        for (let etypeidx = 0; etypeidx < mesh.listeners.boundary; etypeidx++) {
+        for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
             const evt = mesh.listeners.buffer[etypeidx];
             if (evt) { // If event is not null

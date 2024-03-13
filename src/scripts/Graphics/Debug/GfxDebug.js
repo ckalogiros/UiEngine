@@ -189,7 +189,7 @@ export function PrintVertexDataAll() {
     // }
 
     const vbs = Vertex_buffer_get();
-    for (let i = 0; i < vbs.boundary; i++) {
+    for (let i = 0; i <= vbs.boundary; i++) {
         console.log(' progidx:', i)
         console.log('vb:', vbs.buffer[i]);
     }
