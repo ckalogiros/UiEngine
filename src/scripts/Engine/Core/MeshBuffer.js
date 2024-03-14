@@ -342,7 +342,7 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
    let stored = false;
    for (let i = 0; i < len; i++) {
 
-      if (gfxidxs[i].groupidx === groupidx && gfxidxs[i].progidx === progidx && gfxidxs[i].vbidx === vbidx) {
+      if (gfxidxs[i].progidx === progidx && gfxidxs[i].vbidx === vbidx) {
 
          if(_root_batch_buffer[root_bufferidx].vb[i].meshidx === mesh_bufferidx && _root_batch_buffer[root_bufferidx].vb[i].num_faces > 0){
 
@@ -362,6 +362,7 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
          }
 
          stored = true;
+         break;
       }
 
    }
@@ -503,7 +504,7 @@ export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, groupidx, pr
 
    if (root_bufferidx === INT_NULL) return; // Case there is no widget root creation.
 
-   _widget_root_gfx.buffer[root_bufferidx].Add(groupidx);
+   _widget_root_gfx.buffer[root_bufferidx].Add(-3);
    _widget_root_gfx.buffer[root_bufferidx].Add(progidx);
    _widget_root_gfx.buffer[root_bufferidx].Add(vbidx);
 
@@ -785,12 +786,14 @@ export function Widget_group_reset_partially_gfx_buffers(root_dp) {
    const len = group.group_data.length;
    for (let i = 0; i < len; i++) {
 
-      const groupidx = group.group_data[i].gfx_idxs[GFX.GROUP_IDX];
+      // const groupidx = group.group_data[i].gfx_idxs[GFX.GROUP_IDX];
       const progidx = group.group_data[i].gfx_idxs[GFX.PROG_IDX];
       const vbidx = group.group_data[i].gfx_idxs[GFX.VB_IDX];
 
-      if (groupidx === INT_NULL || progidx === INT_NULL || vbidx === INT_NULL)
+      if (progidx === INT_NULL || vbidx === INT_NULL){
+         console.error('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes', 'progidx', progidx, 'vbidx', vbidx)
          alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
+      }
 
       // const start = root_dp.gfx.vb.start;
       const start = group.group_data[i].start;
@@ -814,16 +817,17 @@ export function Widget_group_reset_from_group_to_vb_end(root_dp) {
    const len = group.group_data.length;
    for (let i = 0; i < len; i++) {
 
-      const groupidx = group.group_data[i].gfx_idxs[GFX.GROUP_IDX];
+      // const groupidx = group.group_data[i].gfx_idxs[GFX.GROUP_IDX];
       const progidx = group.group_data[i].gfx_idxs[GFX.PROG_IDX];
       const vbidx = group.group_data[i].gfx_idxs[GFX.VB_IDX];
 
-      if (groupidx === INT_NULL || progidx === INT_NULL || vbidx === INT_NULL)
+      if (progidx === INT_NULL || vbidx === INT_NULL){
+         console.error('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes', 'progidx', progidx, 'vbidx', vbidx)
          alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
-
+      }
 
       const vb_start = group.group_data[i].start; // We want the start of the root mesh of the group, not the start of the root widget
-      Vertexbuffer_reset_to_index(groupidx, progidx, vbidx, vb_start);
+      Vertexbuffer_reset_to_index(progidx, vbidx, vb_start);
 
       const ib_start = group.group_data[i].ib_start; // We want the start of the root mesh of the group, not the start of the root widget
       Index_buffer_reset_to_index(vbidx, ib_start);
@@ -1024,7 +1028,7 @@ export function Widget_root_reset_gfx(root_bufferidx) {
          alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
 
       // Add to vertexbuffer
-      Vertexbuffer_reset_to_index(rootgfx.buffer[i + GFX.GROUP_IDX], rootgfx.buffer[i + GFX.PROG_IDX], rootgfx.buffer[i + GFX.VB_IDX], 0);
+      Vertexbuffer_reset_to_index(rootgfx.buffer[i + GFX.PROG_IDX], rootgfx.buffer[i + GFX.VB_IDX], 0);
       Index_buffer_reset_to_index(rootgfx.buffer[i + GFX.VB_IDX], 0);
    }
 }

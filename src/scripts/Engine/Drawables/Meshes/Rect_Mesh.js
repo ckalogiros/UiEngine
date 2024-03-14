@@ -221,7 +221,7 @@ export class Rect extends Mesh {
 
 
    SetGfxProgramGroup(group_mask) {
-      this.sid.progs_group = group_mask;
+      this.sid.gfx_group = group_mask;
    }
 
 

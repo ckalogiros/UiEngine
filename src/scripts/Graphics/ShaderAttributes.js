@@ -48,7 +48,7 @@ export function Shader_attributes_get_attribs_offset_size(attribsidx, nameid) {
 
 
 
-export function Shader_attributes_get_attrib_by_nameid(attribsidx, nameid) {
+function Shader_attributes_get_attrib_by_nameid(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
    const shader_attribs = _shader_attribs_buffer.buffer[attribsidx];
@@ -176,7 +176,7 @@ export function Shader_attributes_create(sid, shader_program) {
 
    const idx = _shader_attribs_buffer.Add(shader_attribs_typed_arrays);
 
-   // console.log('Shader Attributes', _shader_attribs_buffer.buffer[idx])
+   console.log('--- Shader Attributes ---', _shader_attribs_buffer.buffer[idx])
    // Shader_attributes_print();
 
    return idx;

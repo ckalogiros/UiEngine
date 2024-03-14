@@ -57,9 +57,9 @@ export function TestWidgetsGeneric(scene) {
     // }, 500)
 
     // setInterval(()=>{
-    //     console.log(Performance_timers_get_avg_1sec_reset(_pt_loop), PerformanceTimersGetFps(_pt_loop.timer), 'worst', PerformanceTimersGetWorstFps(_pt_loop.timer));
-    //     // console.log(Performance_timers_get_avg_1sec_reset(_pt_test_misc_1), PerformanceTimersGetFps(_pt_test_misc_1.timer), 'worst', PerformanceTimersGetWorstFps(_pt_test_misc_1.timer));
-    //     console.log(Performance_timers_get_avg_1sec_reset(_pt_test_misc_2), PerformanceTimersGetFps(_pt_test_misc_2.timer), 'worst', PerformanceTimersGetWorstFps(_pt_test_misc_2.timer));
+    //     // console.log(Performance_timers_get_avg_1sec_reset(_pt_loop), PerformanceTimersGetFps(_pt_loop.timer), 'worst', PerformanceTimersGetWorstFps(_pt_loop.timer));
+    //     console.log(Performance_timers_get_avg_1sec_reset(_pt_test_misc_1), PerformanceTimersGetFps(_pt_test_misc_1.timer), 'worst', PerformanceTimersGetWorstFps(_pt_test_misc_1.timer));
+    //     // console.log(Performance_timers_get_avg_1sec_reset(_pt_test_misc_2), PerformanceTimersGetFps(_pt_test_misc_2.timer), 'worst', PerformanceTimersGetWorstFps(_pt_test_misc_2.timer));
     //     console.log('--------------');
     // }, 1000)
 
@@ -70,7 +70,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    const uidbg = Debug_info_ui_performance(scene);
+    // const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -106,7 +106,7 @@ export function TestWidgetsGeneric(scene) {
     // obj.Set(4.2);
     // obj.Update();
 
-    // SdfLine(GREEN[7],w1 [500, 600, 5], [800, 10]);
+    // SdfLine(GREEN[7], [500, 600, 5], [800, 10]);
     // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
     // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
     // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
@@ -127,8 +127,8 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    // const label = CreateLabel('LABEL');
-    // CreateLabel('Label2');
+    const label = CreateLabel('LABEL');
+    CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, label);

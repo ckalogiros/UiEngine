@@ -1,15 +1,13 @@
 "use strict";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Int16Buffer, Int8Buffer, M_Buffer } from "../../../Core/Buffers.js";
+import { Int8Buffer, M_Buffer } from "../../../Core/Buffers.js";
 import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { Listener_create_child_event, Listener_create_event, Listener_remove_children_event_by_idx, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
-import { CopyArr4 } from "../../../../Helpers/Math/MathOperations.js";
 import { Scenes_get_count } from "../../../Scenes.js";
-import { Gfx_remove_geometry } from "../../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
-import { Info_listener_dispatch_event } from "../../DebugInfo/InfoListeners.js";
 import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../../../Core/StringBuffer.js";
+import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 // import { Program_enable_uniforms_for_creation } from "../../../../Graphics/ShaderPrograms.js";
 
 
@@ -111,7 +109,7 @@ export class Mesh {
             attr: (this.geom.sid.attr | this.mat.sid.attr),
             unif: this.mat.sid.unif,
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
-            progs_group: PROGRAMS_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
+            gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
         };
 
 
@@ -233,7 +231,7 @@ export class Mesh {
 
         /*************************************************************************************/
         // Remove from gfx buffers.
-        const ret = Gfx_remove_geometry(this.gfx, this.geom.num_faces);
+        Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces);
 
 
         /*************************************************************************************/

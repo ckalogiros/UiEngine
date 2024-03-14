@@ -4,9 +4,7 @@ import { PrintAttributes, PrintIndexBuffer, PrintVertexBufferDataAndNames } from
 import { Listener_debug_print_all, Listener_debug_print_info } from "../../Events/EventListeners.js";
 import { Renderqueue_get } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scenes_get_scene_by_idx } from "../../Scenes.js";
-// import { FpsGet } from "../../Timers/Time.js";
 import { TimeIntervalsPrintAll } from "../../Timers/TimeIntervals.js";
-import { Gfx_pool_print } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Mesh_print_all_mesh_listeners } from "../../Drawables/Meshes/Base/Mesh.js";
 import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
@@ -18,6 +16,7 @@ import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js
 import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/VertexArrays.js";
 import { Gl_program_print } from "../../../Graphics/ShaderPrograms.js";
 import { Shader_attributes_print } from "../../../Graphics/ShaderAttributes.js";
+import { Gfx_pool_print } from "../../Interfaces/Gfx/GfxPool.js";
 
 _CNT = 0;
 const em = _CNT++;

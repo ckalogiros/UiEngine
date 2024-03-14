@@ -131,7 +131,7 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
     gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
     gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb, gfxCtx.gl.STATIC_DRAW, 0);
 
-    const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
+    const attribsidx = Program_get_shader_attributes_index(progidx);
     Shader_attributes_enable(attribsidx)
     // console.warn('Create Shader Attributes:')
 
@@ -346,13 +346,13 @@ export function Vertex_buffer_exists(vbidx) {
 
 
 
-export function Vertexbuffer_reset_to_index(groupidx, progidx, vbidx, start) {
+export function Vertexbuffer_reset_to_index(progidx, vbidx, start) {
     if (!DISABLE_DEBUG) (_vertex_buffers_info, progidx, new Error().lineNumber);
 
     const vb_info = _vertex_buffers_info.buffer[vbidx];
     if (start < 0 || start > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js, ');
     const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Make responsibility for 'VERTS_PER_RECT_INDEXED' OR the program should store the a 'VERTS_PER_RECT_INDEXED'
-    const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
+    const attribsidx = Program_get_shader_attributes_index(progidx);
     const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
 
     const vCount = (vb_info.count - start) / (vertices_per_rect * attribs_per_vertex);
@@ -366,7 +366,7 @@ export function Vertexbuffer_reset_to_index(groupidx, progidx, vbidx, start) {
 
 export function Vertex_buffer_reset(gfx) {
     console.error('IMPLEMENT ME');
-    const vb = Vertex_buffer_info_get_by_vbidx(gfx.prog.groupidx, gfx.prog.idx, gfx.vb.idx);
+    const vb = Vertex_buffer_info_get_by_vbidx(gfx.vb.idx);
     if (vb.count > 0) // If the vertex buffer has data(mainly for recursive functions that call reset even if the vb is already been reseted).
         vb.Reset();
 }
@@ -398,10 +398,10 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     /**DEBUG ERROR*/ temp_check_nan_rename_me(geom.pos); temp_check_nan_rename_me(geom.dim); temp_check_nan_rename_me(mat.col); temp_check_nan_rename_me(mat.style);
     // /**DEBUG ERROR*/ if(meshidx === undefined){ console.error('Mesh index is not passed as a param. mesh:', dbg_mesh_name)}
 
-    const groupidx = gfx.prog.groupidx;
+    // const groupidx = gfx.prog.groupidx;
     const progidx = gfx.prog.idx;
     const vbidx = gfx.vb.idx;
-    const prog = Progarm_get_program(groupidx, progidx);
+    const prog = Progarm_get_program(progidx);
     const vb_info = Vertex_buffer_info_get_by_vbidx(vbidx);
 
     const num_faces = 1;
@@ -436,10 +436,10 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
 
 export function Vertex_buffer_add_vertices_from_non_existant_mesh(gfx, geom, mat, dbg_mesh_name) {
 
-    const groupidx = gfx.prog.groupidx;
+    // const groupidx = gfx.prog.groupidx;
     const progidx = gfx.prog.idx;
     const vbidx = gfx.vb.idx;
-    const prog = Progarm_get_program(groupidx, progidx);
+    const prog = Progarm_get_program(progidx);
     const vb_info = Vertex_buffer_info_get_by_vbidx(vbidx);
 
     const num_faces = 1;
@@ -511,8 +511,8 @@ function Vertex_to_string(flags, groupidx, progidx, vbidx, count) {
 
     const is_wpos = flags & VB_TO_STRING_FLAGS.WPOS;
 
-    const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
-    const stride = Program_get_shader_attribute_attribs_per_vertex(groupidx, progidx);
+    const attribsidx = Program_get_shader_attributes_index(progidx);
+    const stride = Program_get_shader_attribute_attribs_per_vertex(progidx);
     const wpos_attr = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.WPOS4);
 
     const arr = [];

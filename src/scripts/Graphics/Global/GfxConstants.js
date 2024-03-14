@@ -37,7 +37,7 @@ const GL = {
 
 _CNT = 0x1;
 /** Grouping shader programs. Example: group for debug user interface meshes, default group meshes */
-const PROGRAMS_GROUPS = {
+const GFX_GROUPS = {
 
     DEBUG: {
         IDX: INT_NULL, // The index of the group of programs dedicated for displaing debug info. 
@@ -175,7 +175,7 @@ const SID = {
             // sid1.unif === sid2.unif &&
             unif1 === unif2 &&
             sid1.pass === sid2.pass &&
-            sid1.progs_group === sid2.progs_group
+            sid1.gfx_group === sid2.gfx_group
         ) {
             return true;
         }
@@ -189,11 +189,11 @@ const SID = {
         dst.attr = 0;        dst.attr |= src.attr;
         dst.unif = 0;        dst.unif |= src.unif;
         dst.pass = 0;        dst.pass |= src.pass;
-        dst.progs_group = 0;
+        dst.gfx_group = 0;
     },
 
     ToString(sid){
-        return `shad:${sid.shad} attr:${sid.attr} unif:${sid.unif} pass:${sid.pass} group:${sid.progs_group}`
+        return `shad:${sid.shad} attr:${sid.attr} unif:${sid.unif} pass:${sid.pass} group:${sid.gfx_group}`
     },
 
 };

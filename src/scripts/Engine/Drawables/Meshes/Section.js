@@ -187,10 +187,14 @@ export class Section extends Rect {
    }
 
 
-   Calc(options = SECTION.INHERIT) {
+   // Calc(options = SECTION.INHERIT) {
+   Calc(options=_) {
 
       // TEMP_PRINT_IS_GFX_INSERTED(this, 'CALC START')
       const section = this;
+      if(options === _) options = section.options
+
+
       let left = section.geom.pos[0]; // Left starting position
       let top = section.geom.pos[1]; // Top starting position
 
@@ -245,9 +249,12 @@ export class Section extends Rect {
    }
 
 
-   Calc_no_gfx_update(options = SECTION.INHERIT) {
+   // Calc_no_gfx_update(options = SECTION.INHERIT) {
+   Calc_no_gfx_update(options) {
 
+      
       const section = this;
+      if(options === _) options = section.options
 
       let left = section.geom.pos[0]; // Left starting position
       let top = section.geom.pos[1]; // Top starting position
@@ -768,7 +775,7 @@ export class Section extends Rect {
 
 
    SetGfxProgramGroup(group_mask) {
-      this.sid.progs_group = group_mask;
+      this.sid.gfx_group = group_mask;
       for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) {
@@ -870,16 +877,16 @@ function Section_on_move_section(params) {
 
 
 
-function Expand(section, options, width, accum_margins) {
+function Expand(parent, options, width, accum_margins) {
 
 
-   for (let i = 0; i <= section.children.boundary; i++) {
+   for (let i = 0; i <= parent.children.boundary; i++) {
 
-      const child = section.children.buffer[i];
+      const child = parent.children.buffer[i];
 
       if (child.type & MESH_TYPE.WIDGET_TEXT_LABEL && child.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
          child.Resize();
-         child.geom.dim[0] = width - (section.margin[0] + accum_margins);
+         child.geom.dim[0] = width - (parent.margin[0] + accum_margins);
       }
       else if (child.type & MESH_TYPE.SECTION_MESH) {
 
@@ -892,7 +899,7 @@ function Expand(section, options, width, accum_margins) {
          }
 
          accum_margins += child.margin[0];
-         // HACK: Pass the parent's options so that if parent section is vertical align for children, the children will expand. The option of the child counts for it's children expansion. 
+         // HACK: Pass the parent's options so that if parent parent is vertical align for children, the children will expand. The option of the child counts for it's children expansion. 
          Expand(child, child.parent.options, width, accum_margins);
          accum_margins -= child.margin[0];
       }
@@ -904,20 +911,19 @@ function Expand(section, options, width, accum_margins) {
 
 
 // TODO: For calculating multi-word text, if we need separate flags (HORIZONTAL | VERTICAL), we need to store the flags in the mesh. 
-function Calculate_sizes_recursive(section, top, left, options, total_margin = [0, 0], total_size = [0, 0]) {
+function Calculate_sizes_recursive(parent, top, left, options, total_margin = [0, 0], total_size = [0, 0]) {
 
    const padding = [0, 0]; // TODO: Implement
    const margin = total_margin;
    const accum_size_per_section = [0, 0];
 
-   for (let i = 0; i <= section.children.boundary; i++) {
+   for (let i = 0; i <= parent.children.boundary; i++) {
 
 
       let opt = options
-      if (options & SECTION.INHERIT)
-         opt = section.options
+      if (options & SECTION.INHERIT) opt = parent.options
 
-      const mesh = section.children.buffer[i];
+      const mesh = parent.children.buffer[i];
 
       if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) && !((mesh.type & MESH_TYPE.WIDGET_SCROLLER)))) {
 
@@ -932,13 +938,13 @@ function Calculate_sizes_recursive(section, top, left, options, total_margin = [
          mesh.SetMargin();
 
          if (opt & SECTION.VERTICAL) {
-            if (section.max_size[0] < mesh.geom.dim[0])
-               section.max_size[0] = mesh.geom.dim[0]
-            section.max_size[1] += mesh.geom.dim[1]
+            if (parent.max_size[0] < mesh.geom.dim[0])
+               parent.max_size[0] = mesh.geom.dim[0]
+            parent.max_size[1] += mesh.geom.dim[1]
          }
          else if (opt & SECTION.HORIZONTAL) {
-            section.max_size[0] += mesh.geom.dim[0]
-            if (section.max_size[1] < mesh.geom.dim[1]) section.max_size[1] = mesh.geom.dim[1]
+            parent.max_size[0] += mesh.geom.dim[0]
+            if (parent.max_size[1] < mesh.geom.dim[1]) parent.max_size[1] = mesh.geom.dim[1]
          }
       }
       else if ((mesh.type & MESH_TYPE.TEXT_MESH) || (mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC)) { // Case the current item is of type text.
@@ -947,27 +953,27 @@ function Calculate_sizes_recursive(section, top, left, options, total_margin = [
 
             if (mesh.children.boundary) { // Case text mesh has separate text as children, calculate size of all of them.
                accum_size_per_section[1] += mesh.GetTotalHeight();
-               section.max_size[1] += mesh.GetTotalHeight();
+               parent.max_size[1] += mesh.GetTotalHeight();
             }
             else {
                accum_size_per_section[1] += mesh.geom.dim[1];
-               section.max_size[1] += mesh.geom.dim[1];
+               parent.max_size[1] += mesh.geom.dim[1];
             }
             if(mesh.mesh_bufferidx === 97)
             console.log
             accum_size_per_section[0] = mesh.GetMaxWidth();
-            if (section.max_size[0] < accum_size_per_section[0])
-               section.max_size[0] = accum_size_per_section[0];  // Keep the max width of all meshes in Vertical mode.
+            if (parent.max_size[0] < accum_size_per_section[0])
+               parent.max_size[0] = accum_size_per_section[0];  // Keep the max width of all meshes in Vertical mode.
 
          }
          else if (opt & SECTION.HORIZONTAL) {
 
             accum_size_per_section[0] += mesh.GetMaxWidth();
-            section.max_size[0] += mesh.GetMaxWidth();
+            parent.max_size[0] += mesh.GetMaxWidth();
 
             accum_size_per_section[1] = mesh.geom.dim[1];
-            if (section.max_size[1] < accum_size_per_section[1])
-               section.max_size[1] = mesh.geom.dim[1];  // Keep the max height of all meshes in Horizontal mode.
+            if (parent.max_size[1] < accum_size_per_section[1])
+               parent.max_size[1] = mesh.geom.dim[1];  // Keep the max height of all meshes in Horizontal mode.
          }
       }
       else { // Case the current item does not have children.
@@ -975,16 +981,16 @@ function Calculate_sizes_recursive(section, top, left, options, total_margin = [
          if (opt & SECTION.VERTICAL) {
             accum_size_per_section[1] += mesh.geom.dim[1];
             accum_size_per_section[0] = mesh.geom.dim[0];
-            section.max_size[1] += mesh.geom.dim[1];
-            if (section.max_size[0] < accum_size_per_section[0])
-               section.max_size[0] = mesh.geom.dim[0]; // For horizontal, grow to the max width of all meshes
+            parent.max_size[1] += mesh.geom.dim[1];
+            if (parent.max_size[0] < accum_size_per_section[0])
+               parent.max_size[0] = mesh.geom.dim[0]; // For horizontal, grow to the max width of all meshes
          }
          else if (opt & SECTION.HORIZONTAL) {
             accum_size_per_section[0] += mesh.geom.dim[0];
             accum_size_per_section[1] = mesh.geom.dim[1];
-            section.max_size[0] += mesh.geom.dim[0];
-            if (section.max_size[1] < accum_size_per_section[1])
-               section.max_size[1] = mesh.geom.dim[1];  // For horizontal, grow to the max height of all meshes
+            parent.max_size[0] += mesh.geom.dim[0];
+            if (parent.max_size[1] < accum_size_per_section[1])
+               parent.max_size[1] = mesh.geom.dim[1];  // For horizontal, grow to the max height of all meshes
          }
       }
    }

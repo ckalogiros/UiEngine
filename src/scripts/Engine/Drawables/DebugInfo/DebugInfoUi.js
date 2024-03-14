@@ -9,7 +9,7 @@ import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_create, Widg
 import { Scroller_clampy_and_render } from "../Widgets/WidgetScroller";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals";
 import { Dbg_ui_create } from "./DebugInfoUiFactory";
-import { Program_create_text_info, Program_get_group } from "../../../Graphics/ShaderPrograms.js";
+import { Program_create_text_info, Program_get_programs } from "../../../Graphics/ShaderPrograms.js";
 import { BLUEL, GREEN, GREY, ORANGE_240_160_10, PURPLEB, PURPLER, REDL, WHITE, YELLOWL } from "../Material/Base/Colors.js";
 import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "./DebugInfoUiNotifications.js";
 
@@ -41,6 +41,8 @@ export function Debug_info_ui_performance(scene) {
    dp.CreateClickEvent();
    dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
+
+   dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL;
 
 
 
@@ -88,7 +90,8 @@ export function Debug_info_ui_performance(scene) {
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    // dp.StateEnable(MESH_STATE.ACTIVE)
    dp.Render();
-   dp.Calc(SECTION.EXPAND | SECTION.INHERIT);
+   // dp.Calc(SECTION.EXPAND | SECTION.INHERIT);
+   dp.Calc();
    dp.ConstructListeners();
 
 
@@ -460,7 +463,8 @@ function Debug_info_create_gfx_info(params) {
    Dropdown_roots_set_root(dp, dp);
 
    // Get the gfx programs buffer of which we want to create the info to.
-   const progs = Program_get_group(PROGRAMS_GROUPS.GetIdxByMask(PROGRAMS_GROUPS.DEFAULT.MASK));
+   // const progs = Program_get_group(GFX_GROUPS.GetIdxByMask(GFX_GROUPS.DEFAULT.MASK));
+   const progs = Program_get_programs();
    const count = progs.boundary;
    let j = 0;
 
@@ -486,7 +490,7 @@ function Debug_info_create_gfx_info(params) {
 
    }
 
-   dp.sid.progs_group = PROGRAMS_GROUPS.DEBUG.MASK;
+   dp.sid.gfx_group = GFX_GROUPS.DEBUG.MASK;
 
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    dp.Render();
@@ -709,7 +713,7 @@ function Debug_info_create_mesh_info(params) {
    scroller.StateEnable(MESH_STATE.ACTIVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   scroller.SetGfxProgramGroup(PROGRAMS_GROUPS.DEBUG.MASK); // IMPORTANT: Must set the scroller to be rendered in the Debug gfx buffers
+   scroller.SetGfxProgramGroup(GFX_GROUPS.DEBUG.MASK); // IMPORTANT: Must set the scroller to be rendered in the Debug gfx buffers
 
    // Create the dropdown structure representing all the applications's meshes
    const root_meshes_idxs = Widget_root_buffer_get();

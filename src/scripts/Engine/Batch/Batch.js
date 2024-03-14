@@ -25,7 +25,7 @@ import { _pt_batch_update } from "../Timers/PerformanceTimers";
 /**************************************************************** */
 /**
  * Batch buffer is stuctured as such:
- * _batch[i][j][k][l]
+ * _batch[j][k][l]
  * [i]: An array of GFX program groups, fixed count for now.
  * [j]: An array of GFX shader programs, pre-alocated.
  * [k]: An array of GFX vertex buffers, created uppon batch buffer construction
@@ -35,9 +35,7 @@ import { _pt_batch_update } from "../Timers/PerformanceTimers";
  * That way we can optimize mesh data in the graphics buffers.
  */
 const _batch = [];
-// IMPORTANT: Upoon adding groups to the application, we must add the program here to as a new array
-_batch[0] = []; // FIXED PROGRAM GROUPS
-_batch[1] = []; // FIXED PROGRAM GROUPS
+
 
 
 
@@ -69,14 +67,12 @@ let progs_index = [INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL];
 // TODO: Initialize any programs from the gl program creation function.
 {
    // PRE-INITIALIZATION for efficiency
-   _batch[0][0] = []; _batch[0][1] = []; _batch[0][2] = []; _batch[0][3] = []; _batch[0][4] = []; 
-   // PRE-INITIALIZATION for efficiency
-   _batch[1][0] = []; _batch[1][1] = []; _batch[1][2] = []; _batch[1][3] = []; _batch[1][4] = []; 
+   _batch[0] = []; _batch[1] = []; _batch[2] = []; _batch[3] = []; _batch[4] = []; 
+
 }
 
 let progs_cnt = 0;
-let prog_cnt = new Int8Array(3);
-prog_cnt[0] = 0; prog_cnt[1] = 0;
+let prog_cnt = 0;
 
 let vb_index = new Int8Array(32);
 for(let i=0; i<vb_index.length; i++){
@@ -96,34 +92,30 @@ export function Batch_store(mesh, first_attrib_offset, update_data=null, num_fac
 
    if (mesh.gfx) {
 
-      const i = mesh.gfx.prog.groupidx;
+      // const i = mesh.gfx.prog.groupidx;
       const j = mesh.gfx.prog.idx;
       // const k = mesh.gfx.vb.idx;
       
 
       if (progs_index[j] === INT_NULL) {
-         progs_index[j] = prog_cnt[i];
-         prog_cnt[i]++;
+         progs_index[j] = prog_cnt;
+         prog_cnt++;
       }
-      if (_batch[i][progs_index[j]][vb_index[prog_cnt[i]-1+j]] === _) {
-         if (vb_index[prog_cnt[i]-1+j] === INT_NULL) {
-            vb_index[prog_cnt[i]-1+j] = vb_cnt[prog_cnt[i]-1];
-            vb_cnt[prog_cnt[i]-1]++;
+      if (_batch[progs_index[j]][vb_index[prog_cnt-1+j]] === _) {
+         if (vb_index[prog_cnt-1+j] === INT_NULL) {
+            vb_index[prog_cnt-1+j] = vb_cnt[prog_cnt-1];
+            vb_cnt[prog_cnt-1]++;
          }
-         _batch[i][progs_index[j]][vb_index[prog_cnt[i]-1+j]] = [];
+         _batch[progs_index[j]][vb_index[prog_cnt-1+j]] = [];
       }
 
       const data = {
-         // fnidx : (mesh.batch_fnidx === INT_NULL) ? mesh.gfx.update_fn_idx : mesh.batch_fnidx,
          fnidx : mesh.batch_fnidx,
-         groupidx : mesh.gfx.prog.groupidx, 
          progidx : mesh.gfx.prog.idx, 
          vbidx : mesh.gfx.vb.idx,
          start : (start!==INT_NULL) ? start : mesh.gfx.vb.start, 
          vertsPerRect : mesh.gfx.vertsPerRect, 
          num_faces : (num_faces) ? num_faces : mesh.geom.num_faces, 
-         mat : mesh.mat, 
-         geom : mesh.geom,
          update_data:update_data,
          first_attrib_offset:first_attrib_offset,
          /**DEBUG*/name: mesh.GetName(),
@@ -132,7 +124,7 @@ export function Batch_store(mesh, first_attrib_offset, update_data=null, num_fac
       // TODO: If same mesh, use the mesh.batchidx to store changes
 
       // The 'batchidx' will tell, if the mesh has already been registered for update.
-      mesh.batchidx = _batch[i][progs_index[j]][vb_index[prog_cnt[i]-1+j]].push(data);
+      mesh.batchidx = _batch[progs_index[j]][vb_index[prog_cnt-1+j]].push(data);
       any_update = true;
       mesh.batch_fnidx = INT_NULL;
    }
@@ -150,51 +142,42 @@ export function Batch_update() {
    // console.log('------------------------------------------------')
    // console.log(_batch);
 
-   const i1len = _batch.length;
-   for (let i1 = 0; i1 < i1len; i1++) { // Program Group
+   const i2len = _batch.length;
+   for (let i2 = 0; i2 < i2len; i2++) { // Program
 
-      const i2len = _batch[i1].length;
-      for (let i2 = 0; i2 < i2len; i2++) { // Program
-
+      
+      const i3len = _batch[i2].length;
+      for (let i3 = 0; i3 < i3len; i3++) { // Vertex Buffer
          
-         const i3len = _batch[i1][i2].length;
-         for (let i3 = 0; i3 < i3len; i3++) { // Vertex Buffer
+         const i4len = _batch[i2][i3].length;
+         for (let i4 = 0; i4 < i4len; i4++) {
             
-            const i4len = _batch[i1][i2][i3].length;
-            for (let i4 = 0; i4 < i4len; i4++) {
-               
-               const data = _batch[i1][i2][i3][i4];
-               
-               // EFFICIENCY: We can get the attribsidx only every program, yet we get it for each vertex buffer and for each mesh
-               const attribsidx = Program_get_shader_attributes_index(data.groupidx, data.progidx);
-               const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
-               
-               const attrib_offset = Shader_attributes_get_attrib_offset_by_nameid(attribsidx, data.first_attrib_offset);
-               //                        fnidx,     vbidx,     start,      attrib_offset,    verts_per_rect, attribs_per_vertex, num_faces = 1,    mat,      geom,   update_data
-               Gl_batch_update_fn_byidx(data.fnidx, data.vbidx, data.start, attrib_offset, data.vertsPerRect, attribs_per_vertex, data.num_faces, data.update_data);
+            const data = _batch[i2][i3][i4];
+            
+            // EFFICIENCY: We can get the attribsidx only every program, yet we get it for each vertex buffer and for each mesh
+            // const attribsidx = Program_get_shader_attributes_index(data.groupidx, data.progidx);
+            const attribsidx = Program_get_shader_attributes_index(data.progidx);
+            const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
+            
+            const attrib_offset = Shader_attributes_get_attrib_offset_by_nameid(attribsidx, data.first_attrib_offset);
+            //                        fnidx,     vbidx,     start,      attrib_offset,    verts_per_rect, attribs_per_vertex, num_faces = 1,    mat,      geom,   update_data
+            Gl_batch_update_fn_byidx(data.fnidx, data.vbidx, data.start, attrib_offset, data.vertsPerRect, attribs_per_vertex, data.num_faces, data.update_data);
 
-               // console.log(data.name, data);
-            }
+            // console.log(data.name, data);
          }
       }
    }
 
    // TODO: What if we reset in the for loop???
    {// Clear buffers for next use
-      _batch[0][0] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
-      _batch[0][1] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
-      _batch[0][2] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
-      _batch[0][3] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
-      _batch[0][4] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
-      _batch[1][0] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
-      _batch[1][1] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
-      _batch[1][2] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
-      _batch[1][3] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
-      _batch[1][4] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
+      _batch[0] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
+      _batch[1] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
+      _batch[2] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
+      _batch[3] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
+      _batch[4] = []; // Reset the programs buffer, for which we have pre-alocated and initialized
 
       // progs_cnt = 0; // Reset the batch programs counter for the next batch costruction.
-      prog_cnt[0] = 0; 
-      prog_cnt[1] = 0;
+      prog_cnt = 0; 
 
       // We must reset the progs_index, because we check for INT_NULL on every call.
       progs_index = [INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL];

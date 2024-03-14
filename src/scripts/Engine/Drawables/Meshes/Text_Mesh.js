@@ -369,6 +369,7 @@ export class Text_Mesh extends Mesh {
       const gfx_copy = {
          vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
          prog: { attribsidx: this.gfx.prog.attribsidx },
+         group: { group_progidx: this.gfx.group.group_progidx, group_vbidx: this.gfx.group.group_vbidx,},
          vertsPerRect: this.gfx.vertsPerRect,
          attribsPerVertex: this.gfx.attribsPerVertex,
       }
@@ -488,7 +489,7 @@ export class Text_Mesh extends Mesh {
 
 
    SetGfxProgramGroup(group_mask) {
-      this.sid.progs_group = group_mask;
+      this.sid.gfx_group = group_mask;
    }
 
 

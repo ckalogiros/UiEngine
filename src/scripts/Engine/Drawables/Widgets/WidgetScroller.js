@@ -366,7 +366,7 @@ export class Widget_Scroller extends Section {
    SetScissorBox() {
 
       // Enable scissoring
-      const vb = Vertex_buffer_info_get_by_vbidx(this.gfx.prog.groupidx, this.gfx.prog.idx, this.gfx.vb.idx);
+      const vb = Vertex_buffer_info_get_by_vbidx(this.gfx.vb.idx);
       /**DEBUG */ if (!vb) alert('SetScissorBox() in Scroller cannot resolve vertex buffer');
       const scissorbox = [
          this.geom.pos[0] - this.geom.dim[0],
@@ -379,7 +379,7 @@ export class Widget_Scroller extends Section {
 
       const textgfx = Find_textgfx_from_parent_descending(this);
       if (textgfx) {
-         const vb_text = Vertex_buffer_info_get_by_vbidx(textgfx.prog.groupidx, textgfx.prog.idx, textgfx.vb.idx);
+         const vb_text = Vertex_buffer_info_get_by_vbidx(textgfx.vb.idx);
          /**DEBUG */ if (!vb_text) alert('SetScissorBox() in Scroller cannot resolve vertex buffer for text');
          vb_text.EnableScissorBox();
          vb_text.SetScissorBox(scissorbox);
@@ -389,11 +389,11 @@ export class Widget_Scroller extends Section {
 
 
    SetGfxProgramGroup(group_mask) {
-      this.sid.progs_group = group_mask;
+      this.sid.gfx_group = group_mask;
 
-      this.scroll_bar.sid.progs_group = group_mask;
+      this.scroll_bar.sid.gfx_group = group_mask;
       const handle = this.scroll_bar.children.buffer[0];
-      handle.sid.progs_group = group_mask;
+      handle.sid.gfx_group = group_mask;
       this.scrolled_section.SetGfxProgramGroup(group_mask);
    }
 

@@ -1,13 +1,13 @@
 "use strict";
 import { Shaders_load } from './GlShaders.js';
 import { Uniforms_block_buffer_create, Uniforms_buffer_create_uniform, Uniforms_buffer_bind_uniform_functions } from './Buffers/UniformBuffers.js';
-import { Gfx_create_group_buffer } from '../Engine/Interfaces/Gfx/MeshGfxContext.js';
 import { Int8Buffer, M_Buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_create, Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
 import { Select_fnidx_to_fill_vertex_buffer } from './Buffers/VertexBuffersOps.js';
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { BLUEL, GREEN, GREY } from '../Engine/Drawables/Material/Base/Colors.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
+// import { Gfx_groups_create_group, Gfx_groups_store_program } from '../Engine/Interfaces/Gfx/GfxGroups.js';
 
 
 
@@ -18,23 +18,40 @@ const DISABLE_DEBUG = true;
 
 
 
-const _program_groups = new M_Buffer();
+const _programs = new M_Buffer();
 
 
 /***************************************************************************************************************************************************/
 // Groups
 /***************************************************************************************************************************************************/
 
-export function Program_get_groups() { return _program_groups; }
+// export function Program_get_groups() { return _programs; }
 
 
 
-export function Program_get_group(groupidx) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber)
-	return _program_groups.buffer[groupidx];
-}
+// export function Program_get_group(groupidx) {
+// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, groupidx, new Error().lineNumber)
+// 	return _programs.buffer[groupidx];
+// }
 
 
+
+// export function Program_group_exists(groupidx) {
+// 	if (groupidx < 0 || groupidx > _programs.boundary || _programs.buffer[groupidx] == undefined)
+// 		return INT_NULL;
+// 	return _programs.buffer[groupidx];
+// }
+
+
+
+// function Create_group() {
+
+// 	const groupidx = _programs.Add(new M_Buffer());
+
+// 	Gfx_create_group_buffer(groupidx);
+
+// 	return groupidx; // Return the index of the newly created group buffer.
+// }
 
 
 
@@ -48,44 +65,61 @@ export function Program_get_group(groupidx) {
 
 
 
-export function Progarm_get_program(groupidx, progidx) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber)
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber)
-	return _program_groups.buffer[groupidx].buffer[progidx];
+export function Program_get_programs() { return _programs; }
+
+
+
+export function Progarm_get_program(progidx) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber)
+	return _programs.buffer[progidx];
 }
 
 
 
-export function Program_get_shader_attributes_index(groupidx, progidx) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
-	return _program_groups.buffer[groupidx].buffer[progidx].attribsidx;
+/** Find the programs group index by the group's index */
+export function Progarm_get_prog_groupidx(progidx, groupidx) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber)
+
+	const groupidxs = _programs.buffer[progidx].prog_groupidxs;
+	for (let i = 0; i <= groupidxs.boundary; i++) {
+
+		if (groupidxs.buffer[i] === groupidx)
+			return i;
+
+	}
+
+	alert('NO apropriate prog_groupidx was found in program')
+	return INT_NULL;
 }
 
 
 
-export function Program_get_shader_attributes(groupidx, progidx) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
-	const attribsidx = _program_groups.buffer[groupidx].buffer[progidx].attribsidx;
+export function Program_get_shader_attributes_index(progidx) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
+	return _programs.buffer[progidx].attribsidx;
+}
+
+
+
+export function Program_get_shader_attributes(progidx) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
+	const attribsidx = _programs.buffer[progidx].attribsidx;
 	return Shader_attributes_get_attribs(attribsidx);
 }
 
 
 
-export function Program_get_shader_attribute_offset_by_nameid(groupidx, progidx, attrib_nameid) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
-	const attribsidx = _program_groups.buffer[groupidx].buffer[progidx].attribsidx;
+export function Program_get_shader_attribute_offset_by_nameid(progidx, attrib_nameid) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
+	const attribsidx = _programs.buffer[progidx].attribsidx;
 	return Shader_attributes_get_attrib_offset_by_nameid(attribsidx, attrib_nameid);
 }
 
 
 
-export function Program_get_shader_attribute_attribs_per_vertex(groupidx, progidx) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
-	return _program_groups.buffer[groupidx].buffer[progidx].attribs_per_vertex;
+export function Program_get_shader_attribute_attribs_per_vertex(progidx) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
+	return _programs.buffer[progidx].attribs_per_vertex;
 }
 
 
@@ -96,38 +130,31 @@ export function Program_get_shader_attribute_attribs_per_vertex(groupidx, progid
 //
 /***************************************************************************************************************************************************/
 
-export function Program_group_exists(groupidx) {
-	if (groupidx < 0 || groupidx > _program_groups.boundary || _program_groups.buffer[groupidx] == undefined)
-		return INT_NULL;
-	return _program_groups.buffer[groupidx];
-}
-
 
 
 /** Returns 'INT_NULL': if program does NOT exist AND 'progidx':if program exists. */
+// export function Program_program_exists(sid) {
+
+// 	const groupidx = GFX_GROUPS.GetIdxByMask(sid.gfx_group)
+
+// 	const progs = Program_group_exists(groupidx);
+
+// 	if (ERROR_NULL(progs) || ERROR_NULL(progs.buffer)) return INT_NULL
+// 	for (let i = 0; i <= progs.boundary; i++)
+// 		if (SID.CheckSidMatch(sid, progs.buffer[i].sid)) return i;
+
+// 	return INT_NULL;
+// }
+/** Returns 'INT_NULL': if program does NOT exist AND 'progidx':if program exists. */
 export function Program_program_exists(sid) {
 
-	const groupidx = PROGRAMS_GROUPS.GetIdxByMask(sid.progs_group)
-
-	const progs = Program_group_exists(groupidx);
-
-	if (ERROR_NULL(progs) || ERROR_NULL(progs.buffer)) return INT_NULL
-	for (let i = 0; i <= progs.boundary; i++)
-		if (SID.CheckSidMatch(sid, progs.buffer[i].sid)) return i;
+	if (ERROR_NULL(_programs) || ERROR_NULL(_programs.buffer)) return INT_NULL
+	for (let i = 0; i <= _programs.boundary; i++)
+		if (SID.CheckSidMatch(sid, _programs.buffer[i].sid)) return i;
 
 	return INT_NULL;
 }
 
-
-
-function Create_group() {
-
-	const groupidx = _program_groups.Add(new M_Buffer());
-
-	Gfx_create_group_buffer(groupidx);
-
-	return groupidx; // Return the index of the newly created group buffer.
-}
 
 
 
@@ -135,23 +162,27 @@ function Create_program(sid, uniforms) {
 
 	/***************************************************************************************************/
 	// Create Program Group if it doesn't exist
-	let groupidx = PROGRAMS_GROUPS.GetIdxByMask(sid.progs_group);
-	if (groupidx === INT_NULL || _program_groups[groupidx] === null) {
+	let groupidx = GFX_GROUPS.GetIdxByMask(sid.gfx_group);
+	// if (groupidx === INT_NULL || _programs[groupidx] === null) {
 
-		groupidx = Create_group();
+	// 	groupidx = Gfx_groups_create_group();
 
-		// IMPORTANT! Here we set globaly the index of the program group.
-		if (sid.progs_group & PROGRAMS_GROUPS.DEBUG.MASK) PROGRAMS_GROUPS.DEBUG.IDX = groupidx;
-		else if (sid.progs_group & PROGRAMS_GROUPS.DEFAULT.MASK) PROGRAMS_GROUPS.DEFAULT.IDX = groupidx;
+	// 	// IMPORTANT! Here we set globaly the index of the program group.
+	// 	if (sid.gfx_group & GFX_GROUPS.DEBUG.MASK) GFX_GROUPS.DEBUG.IDX = groupidx;
+	// 	else if (sid.gfx_group & GFX_GROUPS.DEFAULT.MASK) GFX_GROUPS.DEFAULT.IDX = groupidx;
 
-	}
+	// }
 
 
 	/***************************************************************************************************/
 	// Create Shader Program
 	const prog = new Gl_Program(gfxCtx.gl, sid, uniforms);
-	const progidx = _program_groups.buffer[groupidx].Add(prog);
+	const progidx = _programs.Add(prog);
 	prog.idx = progidx; // Store the programs index to self
+
+	// Add to Gfx Groups
+	// const prog_groupidx = Gfx_groups_store_program(groupidx, progidx);
+	// prog.prog_groupidxs.Add(prog_groupidx);
 
 
 	/****************************************************************************************************/
@@ -183,7 +214,7 @@ export function Program_create_program(sid, uniforms) {
 	const progidx = indexes.progidx;
 
 
-	const prog = _program_groups.buffer[groupidx].buffer[progidx];
+	const prog = _programs.buffer[progidx];
 
 
 	/**********************************************************************/
@@ -211,6 +242,8 @@ class Gl_Program {
 
 
 		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
+
+		this.prog_groupidxs = new Int8Buffer(1); // Array of all indexes of the groups this program belongs to. 
 
 		this.vb = new Int8Buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffers_info' buffer. 
 		// this.vb.Init(-1);
@@ -261,19 +294,18 @@ class Gl_Program {
 
 
 
-export function Program_store_vertex_buffer_idx(groupidx, progidx, vbidx, vao, vaoidx) {
-	const progvbidx = _program_groups.buffer[groupidx].buffer[progidx].vb.Add(vbidx);
-	_program_groups.buffer[groupidx].buffer[progidx].vao = vao;
-	_program_groups.buffer[groupidx].buffer[progidx].vaoidx = vaoidx;
+export function Program_store_vertex_buffer_idx(progidx, vbidx, vao, vaoidx) {
+	const progvbidx = _programs.buffer[progidx].vb.Add(vbidx);
+	_programs.buffer[progidx].vao = vao;
+	_programs.buffer[progidx].vaoidx = vaoidx;
 	return progvbidx;
 }
 
 
 
-export function Program_store_index_buffer_idx(groupidx, progidx, ibidx) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
-	const progibidx = _program_groups.buffer[groupidx].buffer[progidx].ib.Add(ibidx);
+export function Program_store_index_buffer_idx(progidx, ibidx) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
+	const progibidx = _programs.buffer[progidx].ib.Add(ibidx);
 	return progibidx;
 }
 
@@ -292,9 +324,8 @@ export function Program_use_program(shader_program, progidx) {
 // Update individual uniforms via the Program function, so that there is no confusion as to under what program a uniform is boumd. 
 // Because the uniform update uses only a 'loc', this might lead to unwilingly updating same loc of another progrm'a uniform. 
 /** 'functions' MUST HAVE .Set and .Update fields, so they can be bound to the uniforms Set() and Update(). */
-export function Program_uniform_bind(groupidx, progidx, functions_obj, unif_name) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups, groupidx, new Error().lineNumber);
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_program_groups.buffer[groupidx], progidx, new Error().lineNumber);
+export function Program_uniform_bind(progidx, functions_obj, unif_name) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
 
 	Uniforms_buffer_bind_uniform_functions(functions_obj, unif_name);
 
@@ -338,7 +369,7 @@ export function Program_create_text_info() {
 
 	const margin = [4, 4];
 	const style = [0, 3, 1];;
-	const gr = _program_groups;
+	const gr = _programs;
 
 	for (let i = 0; i <= gr.boundary; i++) {
 
@@ -436,7 +467,7 @@ function DEBUG_PRINT(buffer, index, line) {
 
 
 export function Gl_program_print() {
-	console.log('Program Groups', _program_groups)
+	console.log('Program Groups', _programs)
 }
 
 

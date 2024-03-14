@@ -3,7 +3,7 @@ import { Renderqueue_get_active, Renderqueue_active_get_count } from '../Engine/
 import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx } from './Buffers/VertexBuffers.js';
-import { Program_get_groups } from './ShaderPrograms.js';
+import { Program_get_programs } from './ShaderPrograms.js';
 import { _pt_test_misc_1 } from '../Engine/Timers/PerformanceTimers.js';
 
 
@@ -12,7 +12,7 @@ let temp_change = false;
 
 export function Gl_draw(gl) {
 
-    const progs_group = Program_get_groups();
+    // const gfx_group = Program_get_groups();
     const drawQueue = Renderqueue_get_active();
     const drawQueueCount = Renderqueue_active_get_count();
     
@@ -29,11 +29,13 @@ export function Gl_draw(gl) {
 
     for (let i = 0; i < drawQueueCount; i++) {
         
+        _pt_test_misc_1.timer.Start();
         const groupidx = drawQueue[i].groupidx;
         const progidx = drawQueue[i].progidx;
         const vbidx = drawQueue[i].vbidx;
         
-        const progs = progs_group.buffer[groupidx];
+        // const progs = gfx_group.buffer[groupidx];
+        const progs = Program_get_programs();
         
         if (GL.BOUND_PROG_IDX !== progidx){
             gfxCtx.gl.useProgram(progs.buffer[progidx].shader_program);
@@ -56,40 +58,29 @@ export function Gl_draw(gl) {
             Gl_texture_unit_bind(gl, texture);
             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
         }
+        _pt_test_misc_1.timer.Stop();
         
         
         if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
-            _pt_test_misc_1.timer.Start();
             
             const vb = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
             gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
             gl.bufferData(gl.ARRAY_BUFFER, vb, gl.STATIC_DRAW, 0);
             vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-            GL.BOUND_IBO = ib_info.ibo;
-            GL.BOUND_IBIDX = ib_info.ibidx;
-            
-            // Vertex_buffer_set_vb_data(gl, vb_info, progs.buffer[progidx].attribsidx);
-            // const attribsidx = Program_get_shader_attributes_index(groupidx, progidx);
-            // Shader_attributes_enable(attribsidx);
-            _pt_test_misc_1.timer.Stop();
-
-            temp_change = true;
-
+            GL.BOUND_VBO = vb_info.ibo;
+            GL.BOUND_VBIDX = vb_info.ibidx;
         }
 
         
         
         if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE){
             
-            _pt_test_misc_1.timer.Start();
             const ib = Index_buffer_get_by_ibidx(ib_info.ibidx);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_info.ibo);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib, gl.STATIC_DRAW, 0);
             ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
             GL.BOUND_IBO = ib_info.ibo;
             GL.BOUND_IBIDX = ib_info.ibidx;
-            _pt_test_misc_1.timer.Stop();
-            // Index_buffer_set_ib_data(gl, ib_info)
         }
         
         
@@ -165,7 +156,7 @@ export function Gl_draw(gl) {
 // Pass an array[] as 'gfx_queue' from which to draw gfx buffers. 'gfx_queue' must be of struct: [{groupidx, progidx, vbidx}, ...]
 export function Gl_draw_specific(gl, gfx_queue, w, h) {
 
-    // const progs_group = Progarm_get_program();
+    // const gfx_group = Progarm_get_program();
     // const count = gfx_queue.length;
 
     // gl.viewport(0, 0, VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
@@ -182,7 +173,7 @@ export function Gl_draw_specific(gl, gfx_queue, w, h) {
     //     const progidx = gfx_queue[i].progidx;
     //     const vbidx = gfx_queue[i].vbidx;
 
-    //     const progs = progs_group.buffer[groupidx];
+    //     const progs = gfx_group.buffer[groupidx];
 
     //     if (GL.BOUND_PROG_IDX !== progidx)
     //         Program_use_program(progs.buffer[progidx].shader_program, progidx)

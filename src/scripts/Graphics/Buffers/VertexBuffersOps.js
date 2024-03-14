@@ -262,6 +262,7 @@ export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
    ret.counts[0] = vb.Remove_geometry(gfx, num_faces, start);
    ret.counts[1] = ib.Remove_geometry(num_faces); // It doe not matter from where we remove indexes, as long as the vertices per face are same. 
 
+   vb.in
    // if (vb.count <= 0) ret.empty = true;
 
    // if (ret.empty) vb.Reset();
@@ -303,7 +304,7 @@ export function Gl_remove_geometry_params(groupidx, progidx, vbidx, num_faces = 
 
 export function Gl_set_vb_mesh_priority(groupidx, progidx, vbIdx, meshIdx, meshCount) {
 
-   const vb = Vertex_buffer_info_get_by_vbidx(groupidx, progidx, vbIdx);
+   const vb = Vertex_buffer_info_get_by_vbidx(progidx, vbIdx);
 
    const meshStart = vb.meshes[meshIdx].vb.start;
    const meshSize = vb.meshes[meshIdx].vb.count;

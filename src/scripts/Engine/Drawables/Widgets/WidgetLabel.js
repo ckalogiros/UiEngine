@@ -68,7 +68,7 @@ export class Widget_Label extends Rect {
         // Must call super() before using the 'this', that is why we write the code here.
         text_mesh.SetSceneIdx(this.sceneidx);
         text_mesh.SetName(`Text-mesh [${text}]`);
-        text_mesh.sid.progs_group = this.sid.progs_group; // If the label is a debug ui, so must be the text. 
+        text_mesh.sid.gfx_group = this.sid.gfx_group; // If the label is a debug ui, so must be the text. 
 
         this.mesh_bufferidx = mesh_bufferidx;
 
@@ -622,8 +622,8 @@ export class Widget_Label extends Rect {
 
 
     SetGfxProgramGroup(group_mask) {
-        this.sid.progs_group = group_mask;
-        this.text_mesh.sid.progs_group = group_mask;
+        this.sid.gfx_group = group_mask;
+        this.text_mesh.sid.gfx_group = group_mask;
     }
 
 }

@@ -890,10 +890,10 @@ export class Widget_Multi_Text extends Widget_Text {
 
 
 	SetGfxProgramGroup(group_mask) {
-		this.sid.progs_group = group_mask;
+		this.sid.gfx_group = group_mask;
 		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
-			child.sid.progs_group = group_mask;
+			child.sid.gfx_group = group_mask;
 		}
 	}
 

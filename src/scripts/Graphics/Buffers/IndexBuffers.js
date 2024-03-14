@@ -2,8 +2,6 @@
 
 
 import { M_Buffer } from '../../Engine/Core/Buffers.js';
-import { Shader_attributes_get_attribs_per_vertex } from '../ShaderAttributes.js';
-import { Program_get_shader_attribute_attribs_per_vertex } from '../ShaderPrograms.js';
 import { Create_buffer_from_type } from './TypedArrayBuffers.js';
 
 
