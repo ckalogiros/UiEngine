@@ -7,7 +7,6 @@ _CNT = 0;
 export const NOTIFICATION_TYPE_IDX = {
    GFX_PROGRAM: _CNT++,
    GFX_VERTEX_BUFFER: _CNT++,
-   // GFX_VERTEX_BUFFER: _CNT <<= 0x1,
 
    SIZE: _CNT,
 
@@ -37,20 +36,20 @@ export class Notification {
 
 
 const _debug_ui_buffer = new M_Buffer();
-_debug_ui_buffer.Init(NOTIFICATION_TYPE_IDX.SIZE, new Notification());
-_debug_ui_buffer.boundary = NOTIFICATION_TYPE_IDX.SIZE; // HACK
-// _debug_ui_buffer.Init(NOTIFICATION_TYPE_IDX.SIZE);
+// _debug_ui_buffer.Init(NOTIFICATION_TYPE_IDX.SIZE, new Notification());
 
 
 
-export function Debug_ui_create_notification(idx, Clbk, params) {
+export function Debug_ui_create_notification(Clbk, params) {
 
-   // if(!_debug_ui_buffer.buffer || !_debug_ui_buffer.buffer[idx])
-   //    _debug_ui_buffer.Add(new Notification())
-
-   const notification = _debug_ui_buffer.buffer[idx];
-   notification.Clbk = Clbk;
-   notification.params = params;
+   _debug_ui_buffer.Add({
+      is_active: true,
+      Clbk: Clbk,
+      params: params,
+   });
+   // const notification = _debug_ui_buffer.buffer[idx];
+   // notification.Clbk = Clbk;
+   // notification.params = params;
 }
 
 
@@ -59,9 +58,13 @@ export function Debug_ui_create_notification(idx, Clbk, params) {
 export function Debug_ui_set_notification(idx) {
 
    const notification = _debug_ui_buffer.buffer[idx];
-   notification.isActive = true;
+   notification.is_active = true;
 
-   // console.warn('--- NOTIFICATION {', NOTIFICATION_TYPE_IDX.ToSting(idx), '} ---')
+   // _debug_ui_buffer.Add({
+   //    is_active: true,
+   //    Clbk: Clbk,
+   //    params: params,
+   // });
 }
 
 
@@ -69,14 +72,16 @@ export function Debug_ui_set_notification(idx) {
 
 export function Debug_ui_update_notifications() {
 
-
-   for (let i = 0; i <= _debug_ui_buffer.boundary; i++) {
+   
+   const len = _debug_ui_buffer.boundary;
+   for (let i = 0; i <= len; i++) {
 
       const notification = _debug_ui_buffer.buffer[i];
-      if (notification.isActive) {
+      if (notification.is_active) {
 
-         notification.Clbk(i, notification.params);
-         notification.isActive = false;
+         notification.Clbk(notification.params);
+         notification.is_active = false;
+         // Debug_ui_destroy_notification(i);
       }
    }
 }

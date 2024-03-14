@@ -58,7 +58,7 @@ export class Textured_Mesh extends Mesh {
       // If texture exists, store texture index, else if font texture exists, store font texture index, else store null
       // BUG: Make sure the below statement makes sense for Texture_Material(it is copied from the Font_Material)
       this.gfx.tb.idx = (this.mat.texidx !== INT_NULL) ? this.mat.texidx : ((this.mat.uvIdx !== INT_NULL) ? this.mat.uvIdx : INT_NULL);
-      Vertex_buffer_set_texidx(this.gfx.prog.groupidx, this.gfx.prog.idx, this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
+      Vertex_buffer_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
 
       return this.gfx;
    }

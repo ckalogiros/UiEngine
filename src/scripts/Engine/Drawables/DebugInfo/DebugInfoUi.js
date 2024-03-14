@@ -5,7 +5,7 @@ import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown";
 import { PerformanceTimersGetBestFps, PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, Performance_timers_get_ms_1sec_reset, _pt_all_timers, _pt_batch2_update, _pt_batch_update, _pt_event_listener, _pt_framebuffer_rendering, _pt_gl_draw, _pt_hover_listener, _pt_loop, _pt_mesh_info_tip, _pt_scene_update } from "../../Timers/PerformanceTimers";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners";
 import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget";
-import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_create, Widget_root_batch_assign_and_accum_to_vb, Widget_root_batch_print_w4, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_create_text_info } from "../../Core/MeshBuffer";
+import { Mesh_buffer_get_mesh_byidx, Widget_group_create, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
 import { Scroller_clampy_and_render } from "../Widgets/WidgetScroller";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals";
 import { Dbg_ui_create } from "./DebugInfoUiFactory";
@@ -42,7 +42,7 @@ export function Debug_info_ui_performance(scene) {
    dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
 
-   dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL;
+   
 
 
 
@@ -88,9 +88,10 @@ export function Debug_info_ui_performance(scene) {
 
 
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-   // dp.StateEnable(MESH_STATE.ACTIVE)
    dp.Render();
+   // dp.StateEnable(MESH_STATE.ACTIVE)
    // dp.Calc(SECTION.EXPAND | SECTION.INHERIT);
+   dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
    dp.Calc();
    dp.ConstructListeners();
 
@@ -519,18 +520,20 @@ function Debug_info_gfx_update(params) {
    const tr = .7;
 
    // Trigger params is the mesh that have been inserted and to which we want to create info for.
-   const groupidx = params.trigger_params.groupidx;
    const progidx = params.trigger_params.progidx;
    const vbidx = params.trigger_params.vbidx;
 
    // Target params is the root mesh that will display the info of the newly added mesh. 
    const root = params.target_params;
 
-   // 0. If the groupidx of the inserted mesh is the same with the groupidx of the UiGfxInfo dropdown, we want to skip(avoid infinite loop) 
-   if (root.gfx.prog.groupidx === groupidx) {
-      if (DEBUG.INFO_UI) console.error('UiGfxInfo: Cannot add new entry that belongs to the same group as the UiGfxInfo dropdown.')
-      return;
-   }
+   console.error('See file and line');
+   alert('IMPLEMET ME. SEE console error')
+   // Implement: How to avoid infinite loop by avoiding meshes of type DEBUG INFO
+   // // 0. If the groupidx of the inserted mesh is the same with the groupidx of the UiGfxInfo dropdown, we want to skip(avoid infinite loop) 
+   // if (root.gfx.prog.groupidx === groupidx) {
+   //    if (DEBUG.INFO_UI) console.error('UiGfxInfo: Cannot add new entry that belongs to the same group as the UiGfxInfo dropdown.')
+   //    return;
+   // }
 
    let dp_prog = null;
    let dp_vb = null;
@@ -805,12 +808,6 @@ function Debug_info_mesh_update(params) {
     * 4. Add the mesh dp to the menu of the found parent dp
     * DONE
     */
-
-   // Is the check for infinite loop needed, since we use different program group for debug uis???
-   /**DEBUG*/if (added_mesh_gfx.groupidx === root_info_dp.gfx.prog.groupidx) { // NOTE: Avoid Infinite loop
-      // console.error('INFINITE LOOP. added_mesh group:', added_mesh_gfx.groupidx, 'self group:', root_info_dp.gfx.prog.groupidx)
-      return;
-   }
 
    if (!parent) {
 
@@ -1117,21 +1114,23 @@ export function Debug_info_create_all_generic_info() {
    section.AddItem(program_info);
    
    
-   const vb_info = Vertex_buffer_create_text_info();
-   section.AddItem(vb_info);
+   // const vb_info = Vertex_buffer_create_text_info();
+   // section.AddItem(vb_info);
+
    
-   Debug_ui_create_notification(NOTIFICATION_TYPE_IDX.GFX_PROGRAM, Debug_info_update_progarm_clbk, section);
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    section.Render();
-   section.ConstructListeners();
+   section.options |= SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT;
+   // section.options |= SECTION.TOP_DOWN | SECTION.HORIZONTAL;
    section.Recalc();
+   section.ConstructListeners();
 
+   // program_info.group_bufferidxs = Widget_group_create(program_info.mesh_bufferidx, program_info.gfx)
+   // program_info.AddToWidgetGroupBuffer(program_info.group_bufferidxs[0]);
    section.group_bufferidxs = Widget_group_create(section.mesh_bufferidx, section.gfx)
    section.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
    
-   // program_info.group_bufferidxs = Widget_group_create(program_info.mesh_bufferidx, program_info.gfx)
-   // program_info.AddToWidgetGroupBuffer(program_info.group_bufferidxs[0]);
 
 
 
@@ -1153,29 +1152,38 @@ export function Debug_info_create_all_generic_info() {
 
 
 
-function Debug_info_update_progarm_clbk(idx, params){
+export function Debug_info_update_progarm_clbk(params){
 
-   console.warn('--- NOTIFICATION {', NOTIFICATION_TYPE_IDX.ToSting(idx), '} ---');
+   
+   const notification_type =  params.notification_type;
+   console.warn('--- NOTIFICATION {', NOTIFICATION_TYPE_IDX.ToSting(notification_type), '} ---');
+   const section = params.parent_section;
+   console.log('--- Create info {', section.GetName(), '} ---\nparams:', params);
 
-   // Widget_root_batch_print_w4()
-   // const section = params;
+   if(notification_type === NOTIFICATION_TYPE_IDX.GFX_PROGRAM){ // Program Info Ui
+      
+      const updated_info = Program_create_text_info();
+      section.AddItem(updated_info);
    
-   // const program_info = section.children.buffer[0];
-   // program_info.Destroy();
-   // const updated_program_info = Program_create_text_info();
-   // // const updated_program_info = Vertex_buffer_create_text_info();
-   // section.AddItem(updated_program_info);
-   
-   // const vb_info = section.children.buffer[1];
-   // vb_info.Destroy();
-   // const updated_vb_info = Program_create_text_info();
-   // section.AddItem(updated_vb_info);
-   
-   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-   // section.Render();
-   // section.ConstructListeners();
-   // section.Recalc();
-   // Widget_root_batch_print_w4()
+      updated_info.ConstructListeners();
+      updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+      updated_info.Render();
+      updated_info.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
+   }
 
-   // section.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
+   if(notification_type === NOTIFICATION_TYPE_IDX.GFX_VERTEX_BUFFER){ // Vertex buffer Info Ui
+      
+      const updated_info = Vertex_buffer_create_text_info();
+      section.AddItem(updated_info);
+   
+      updated_info.ConstructListeners();
+      updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+      updated_info.Render();
+      updated_info.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
+   }
+   
+      
+   
+   section.options |= SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT;
+   section.Recalc();
 }

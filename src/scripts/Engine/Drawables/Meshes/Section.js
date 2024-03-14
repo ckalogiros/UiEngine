@@ -6,7 +6,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh, Widget_root_batch_get, Widget_root_create_root, Widget_root_buffer_get_byidx, Widget_group_get, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3 } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh, Widget_root_batch_get, Widget_root_create_root, Widget_root_buffer_get_byidx, Widget_group_get, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widget_root_batch_move_from_batch_buffer } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
 
 
@@ -72,7 +72,8 @@ export class Section extends Rect {
    Destroy() {
 
       // Any children destruction
-      for (let i = 0; i <= this.children.boundary; i++) {
+      const len = this.children.boundary; // Cash the boundary cause it is going to be decremented on mesh destroy
+      for (let i = 0; i <= len; i++) {
 
          const child = this.children.buffer[i];
          if (child) child.Destroy(child);
@@ -254,7 +255,7 @@ export class Section extends Rect {
 
       
       const section = this;
-      if(options === _) options = section.options
+      if(options === _) options = section.options; // Here set as options: the passed options(de-activates any mesh self-set-options), or the mesh self-options
 
       let left = section.geom.pos[0]; // Left starting position
       let top = section.geom.pos[1]; // Top starting position
@@ -578,59 +579,44 @@ export class Section extends Rect {
 
       if(this.root_bufferidx === INT_NULL) return;
 
-      const widget_root_buffer = Widget_root_buffer_get_byidx(this.root_bufferidx);
+      Widget_root_batch_move_from_batch_buffer(this.root_bufferidx, x, y)
+
+      // const widget_root_buffer = Widget_root_buffer_get_byidx(this.root_bufferidx);
       
-      // if (this.root_bufferidx > INT_NULL) {
 
-         for (let i = 0; i <= widget_root_buffer.boundary; i++) {
+      // for (let i = 0; i <= widget_root_buffer.boundary; i++) {
 
-            // if(widget_root_buffer.buffer[i] == INT_NULL)
-            
-            // EFFICIENCY: Maybe its better to access the _mesh_buffer directly from the MeshBuffer.js file. Also later we use 'Widget_root_batch_get'
-            const mesh = Mesh_buffer_get_mesh_byidx(widget_root_buffer.buffer[i]);
-            if(mesh === _) 
-            console.log(widget_root_buffer.buffer[i], i)
-               mesh.geom.pos[0] += x;
-               mesh.geom.pos[1] += y;
-            // }
-         }
-
-         const root_batch_buffer = Widget_root_batch_get(this.root_bufferidx);
-
-         const len = root_batch_buffer.vb.length
-         for (let i = 0; i < len; i++) {
-
-            const meshidx = root_batch_buffer.vb[i].meshidx;
-            const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-
-            if(mesh){
-
-               mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-               const update_data = {
-                   sizes:[2],
-                   data:[x, y],
-               };
-               Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, root_batch_buffer.vb[i].num_faces); // The batch_store needs the number of meshes to update as well as the move value
-            }
-
-         }
-
+      //    // if(widget_root_buffer.buffer[i] == INT_NULL)
+         
+      //    // EFFICIENCY: Maybe its better to access the _mesh_buffer directly from the MeshBuffer.js file. Also later we use 'Widget_root_batch_get'
+      //    const mesh = Mesh_buffer_get_mesh_byidx(widget_root_buffer.buffer[i]);
+      //    if(mesh === _) 
+      //    console.log(widget_root_buffer.buffer[i], i)
+      //       mesh.geom.pos[0] += x;
+      //       mesh.geom.pos[1] += y;
+      //    // }
       // }
-      // else {
 
-      //    this.geom.pos[0] += x;
-      //    this.geom.pos[1] += y;
-         
-      //    // Batch_store(this, _, { pos: [x, y] });
-         
-      //    for (let i = 0; i <= this.children.boundary; i++) {
-      //       // EFFICIENCY: Unfortunately if the chldren are all Widget_text, we are gonna batch_store all seperately, instead of batch store all of the texts together with total num_faces
-      //       const child = this.children.buffer[i];
-      //       if (child.is_gfx_inserted) {
-      //          child.Move(x, y)
-      //       }
+      // const root_batch_buffer = Widget_root_batch_get(this.root_bufferidx);
+
+      // const len = root_batch_buffer.vb.length
+      // for (let i = 0; i < len; i++) {
+
+      //    const meshidx = root_batch_buffer.vb[i].meshidx;
+      //    const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
+
+      //    if(mesh){
+
+      //       mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
+      //       const update_data = {
+      //             sizes:[2],
+      //             data:[x, y],
+      //       };
+      //       Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, root_batch_buffer.vb[i].num_faces); // The batch_store needs the number of meshes to update as well as the move value
       //    }
+
       // }
+
    }
 
 
@@ -1001,7 +987,7 @@ function Calculate_sizes_recursive(parent, top, left, options, total_margin = [0
 
 
 
-export function Calculate_positions_recursive(parent, options = SECTION.INHERIT, _accum_pos = [parent.geom.pos[1], 0]) {
+export function Calculate_positions_recursive(parent, options, _accum_pos = [parent.geom.pos[1], 0]) {
 
    const padding = [0, 0]
    const cur_pos = [parent.geom.pos[0], parent.geom.pos[1]];
@@ -1023,6 +1009,7 @@ export function Calculate_positions_recursive(parent, options = SECTION.INHERIT,
          const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
 
          const new_pos = [(c_x - parent_dimx) + mesh_max_width + parent_margx, (c_y - parent_dimy) + mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
+         // const new_pos = [(c_x - parent_dimx) + parent_margx, (c_y - parent_dimy) + parent_margy, parent.geom.pos[2] + 1,];
          const pos_dif = [new_pos[0] - mesh.GetCenterPosX(), new_pos[1] - mesh.GetCenterPosY(), new_pos[2] + 1];
 
          if (pos_dif[0] !== 0 || pos_dif[1] !== 0) {
@@ -1068,7 +1055,7 @@ export function Calculate_positions_recursive(parent, options = SECTION.INHERIT,
 
 
 
-export function Calculate_positions_no_gfx_update_recursive(parent, options = SECTION.INHERIT, _accum_pos = [parent.geom.pos[1], 0]) {
+export function Calculate_positions_no_gfx_update_recursive(parent, options, _accum_pos = [parent.geom.pos[1], 0]) {
 
    const padding = [0, 0]
    const cur_pos = [parent.geom.pos[0], parent.geom.pos[1]];

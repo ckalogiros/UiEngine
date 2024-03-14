@@ -11,6 +11,8 @@ import { BLUEL, GREEN, GREY, REDL, YELLOWL, YELLOWR } from "../../Engine/Drawabl
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "../../Engine/Core/CreateWidget";
 import { Dropdown_roots_set_root } from "../../Engine/Drawables/Widgets/Widget_Dropdown";
 import { Floor } from "../../Helpers/Math/MathOperations";
+import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications";
+import { Debug_info_update_progarm_clbk } from "../../Engine/Drawables/DebugInfo/DebugInfoUi";
 
 
 
@@ -96,7 +98,7 @@ export function Gl_vertex_buffer_get_vao(vbidx) {
 
 
 
-export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, groupidx, progidx) {
+export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx) {
 
     /***********************************************************************************************/
     // Create VAO
@@ -123,7 +125,7 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
     // const type = vao.type
     const type = BUFFER_TYPE.FLOAT32
     const ret = Vertex_buffer_create(type, size, sid);
-    const vb_info = new Vertex_Buffer_Info(size, sid, ret.vbidx, ret.vbo, vaoidx, vao.vao, vao.type, groupidx, progidx);
+    const vb_info = new Vertex_Buffer_Info(size, sid, ret.vbidx, ret.vbo, vaoidx, vao.vao, vao.type, progidx);
 
     _vertex_buffers_info.Add(vb_info);
 
@@ -143,14 +145,13 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, gr
 
 class Vertex_Buffer_Info {
 
-    constructor(size, sid, vbidx, vbo, vaoidx, vao, type, groupidx, progidx) {
+    constructor(size, sid, vbidx, vbo, vaoidx, vao, type, progidx) {
 
         this.size = size;   // Total size of the typed array buffer (in elements).
         this.count = 0;	    // Current size oof the typed array buffer (in elements)
         this.vCount = 0;    // Number of vertices
 
         this.progidx = progidx;   // Just for debuging.
-        this.groupidx = groupidx; // Just for debuging.
         this.vbo = vbo;         // WebGl vertex buffer object.
         this.vbidx = vbidx;     // index to the array of stored vertex buffers.
         this.vao = vao;         // WebGl vertex array object.
@@ -398,7 +399,6 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     /**DEBUG ERROR*/ temp_check_nan_rename_me(geom.pos); temp_check_nan_rename_me(geom.dim); temp_check_nan_rename_me(mat.col); temp_check_nan_rename_me(mat.style);
     // /**DEBUG ERROR*/ if(meshidx === undefined){ console.error('Mesh index is not passed as a param. mesh:', dbg_mesh_name)}
 
-    // const groupidx = gfx.prog.groupidx;
     const progidx = gfx.prog.idx;
     const vbidx = gfx.vb.idx;
     const prog = Progarm_get_program(progidx);
@@ -436,7 +436,7 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
 
 export function Vertex_buffer_add_vertices_from_non_existant_mesh(gfx, geom, mat, dbg_mesh_name) {
 
-    // const groupidx = gfx.prog.groupidx;
+
     const progidx = gfx.prog.idx;
     const vbidx = gfx.vb.idx;
     const prog = Progarm_get_program(progidx);
@@ -507,7 +507,7 @@ const VB_TO_STRING_FLAGS = {
     TEX: _CNT <<= 0x1,
 }
 
-function Vertex_to_string(flags, groupidx, progidx, vbidx, count) {
+function Vertex_to_string(flags, progidx, vbidx, count) {
 
     const is_wpos = flags & VB_TO_STRING_FLAGS.WPOS;
 
@@ -558,10 +558,17 @@ function TEMP(params) {
     const destroy_btn = params.target_mesh;
     console.log('TEMP FUNCTION', destroy_btn.GetName());
 
-    const section = params.params;
-    console.log('section', section.GetName());
-    section.Destroy();
+    const s = params.params;
+    console.log('section', s.GetName());
+    s.Destroy();
 
+    const _params = {
+        notification_type: NOTIFICATION_TYPE_IDX.GFX_VERTEX_BUFFER,
+        parent_section: s.parent,
+    }
+
+    
+	Debug_ui_create_notification(Debug_info_update_progarm_clbk, _params);
 }
 
 export function Vertex_buffer_create_text_info() {

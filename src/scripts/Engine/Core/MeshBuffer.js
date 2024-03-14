@@ -10,6 +10,7 @@ import { Int16Buffer, Int8Buffer, M_Buffer } from "./Buffers.js";
 import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
+import { Batch_store } from "../Batch/Batch.js";
 
 
 /**
@@ -44,7 +45,13 @@ export function Mesh_buffer_get_mesh_byidx(mesh_bufferidx) { return _mesh_buffer
 export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
 
    const mesh = _mesh_buffer.buffer[mesh_bufferidx];
-   if (!mesh || mesh === _) alert('Mesh is NULL.\n@ Mesh_buffer_remove_mesh_byidx().');
+   if (!mesh || mesh === _) {
+      console.error('Mesh is NULL.\n@ Mesh_buffer_remove_mesh_byidx(). mesh_bufferidx:',
+      mesh_bufferidx,_mesh_buffer,
+      '_widget_root_buffer', _widget_root_buffer,
+      );
+      alert('Mesh is NULL.\n@ Mesh_buffer_remove_mesh_byidx()\nSEE console error');
+   }
 
    if (Widget_root_is_widget_root(mesh.root_bufferidx, mesh_bufferidx)) {
 
@@ -332,7 +339,7 @@ export function Widget_root_batch_create_vb(root_bufferidx, mesh_bufferidx) {
 
 
 
-export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx, num_faces) {
+export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vbidx, num_faces) {
 
    if (root_bufferidx === INT_NULL) return;
 
@@ -371,7 +378,7 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
    // Case the GFX buffers(WebGL) are already created, and in the 'Gfx_generate_context()' 
    // there is no call to this 'Widget_root_gfx_add()', // we must create the vb data.
    if (!stored)
-      Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx);
+      Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbidx);
 
 }
 
@@ -455,7 +462,7 @@ _widget_root_gfx.Init(1);
 
 
 
-// Returns an array [groupidx:INT, progidx:INT, vbidx:INT, ...]
+// Returns an array [progidx:INT, vbidx:INT, ...]
 export function Widget_root_gfx_get(root_bufferidx) {
    return _widget_root_gfx.buffer[root_bufferidx];
 }
@@ -475,10 +482,9 @@ export function Widget_root_gfx_get_structured(root_bufferidx) {
    const gfx_idxs = _widget_root_gfx.buffer[root_bufferidx];
    let structured = [];
 
-   for (let i = 0; i <= gfx_idxs.boundary; i += 3) {
+   for (let i = 0; i <= gfx_idxs.boundary; i += GFX.SIZE) {
 
       const s = {
-         groupidx: gfx_idxs.buffer[i + GFX.GROUP_IDX],
          progidx: gfx_idxs.buffer[i + GFX.PROG_IDX],
          vbidx: gfx_idxs.buffer[i + GFX.VB_IDX],
       };
@@ -491,20 +497,17 @@ export function Widget_root_gfx_get_structured(root_bufferidx) {
 
 function Widget_root_gfx_create(root_bufferidx) {
 
-   const idx = _widget_root_gfx.Add(new Int8Buffer(6)); // 3 elements is enough for 1 gfx indexes (0:groupidx, 1:progidx, 2:vbidx) 
+   const idx = _widget_root_gfx.Add(new Int8Buffer(2)); // 2 elements is enough for 1 gfx indexes (0:progidx, 1:vbidx) 
 
    if (root_bufferidx !== idx) alert('Widget root gfx buffer not the same with the Widget root buffer');
-
-   // _widget_root_gfx.buffer[idx].Init(INT_NULL);
 }
 
 
 
-export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx) {
+export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbidx) {
 
    if (root_bufferidx === INT_NULL) return; // Case there is no widget root creation.
 
-   _widget_root_gfx.buffer[root_bufferidx].Add(-3);
    _widget_root_gfx.buffer[root_bufferidx].Add(progidx);
    _widget_root_gfx.buffer[root_bufferidx].Add(vbidx);
 
@@ -554,7 +557,7 @@ export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, groupidx, pr
  *       meshidx: mesh_bufferidx,
  *       start: start, // The start of the first element of the group in this specific vertex buffer
  *       num_faces: 0, // The number of total faces of all meshes of the vertex buffer belonging to the group. 
- *       gfx_idxs: [groupidx, progidx, vbidx],
+ *       gfx_idxs: [progidx, vbidx],
  *   }
  */
 
@@ -584,10 +587,9 @@ export function Widget_group_remove_byidx(group_bufferidx) {
 // Group meshes together. Store the start and num_faces of a bunch of meshes belonging to the same vertex buffer. 
 // Makes it easy to remove meshes from a vertex buffer by using the start and the num_faces index, so the elements to the right of the removed chunk can be shifted to replace the chunks gap.
 // Create a new group. Params: pass the root mesh mesh_bufferidx and the start of the mesh in the vertex buffer as well as the number of faces of the mesh
-// export function Widget_group_create(mesh_bufferidx, groupidx, progidx, vbidx, start, num_faces) {
 export function Widget_group_create(mesh_bufferidx, gfx) {
 
-   const groupidx = gfx.prog.groupidx, progidx = gfx.prog.idx, vbidx = gfx.vb.idx, vb_start = gfx.vb.start, ib_start = gfx.ib.start;
+   const progidx = gfx.prog.idx, vbidx = gfx.vb.idx, vb_start = gfx.vb.start, ib_start = gfx.ib.start;
 
    // Uppon creation, initialize with the root mesh of the new group. 
    const group = {
@@ -602,7 +604,7 @@ export function Widget_group_create(mesh_bufferidx, gfx) {
       start: vb_start, // The start vertex buffer index, of the first element of this group
       ib_start: ib_start,  // The start index buffer index, of the first element of this group
       num_faces: 0, // The number of total faces of all meshes of the vertex buffer belonging to the group. 
-      gfx_idxs: [groupidx, progidx, vbidx],
+      gfx_idxs: [progidx, vbidx],
    }
 
    const vb_data_idx = _widget_groups_buffer.buffer[group_bufferidx].group_data.push(data);
@@ -621,15 +623,13 @@ export function Widget_group_add(group_bufferidx, gfx, num_faces = _, mesh_buffe
    /**DEBUG */ if (num_faces === _) console.error('Forget to pass param: num_faces. @ Widget_group_add()');
 
 
-   const groupidx = gfx.prog.groupidx, progidx = gfx.prog.idx, vbidx = gfx.vb.idx, start = gfx.vb.start, ib_start = gfx.ib.start;
+   const progidx = gfx.prog.idx, vbidx = gfx.vb.idx, start = gfx.vb.start, ib_start = gfx.ib.start;
    const group = _widget_groups_buffer.buffer[group_bufferidx];
-   // console.log('ADDING MESH TO GROUP:', group_bufferidx, 'gfx',groupidx, progidx, vbidx, 'faces', num_faces)
-   // console.log('ADDING MESH TO GROUP: mesh_bufferidx', id)
 
    const len = group.group_data.length;
    for (let i = 0; i < len; i++) {
 
-      if (group.group_data[i].gfx_idxs[GFX.GROUP_IDX] === groupidx && group.group_data[i].gfx_idxs[GFX.PROG_IDX] === progidx && group.group_data[i].gfx_idxs[GFX.VB_IDX] === vbidx) {
+      if (group.group_data[i].gfx_idxs[GFX.PROG_IDX] === progidx && group.group_data[i].gfx_idxs[GFX.VB_IDX] === vbidx) {
 
          group.group_data[i].num_faces += num_faces;
 
@@ -653,7 +653,7 @@ export function Widget_group_add(group_bufferidx, gfx, num_faces = _, mesh_buffe
       start: start, // The start of the first element of the group in this specific vertex buffer
       ib_start: ib_start, // The start of the first element of the group in this specific vertex buffer
       num_faces: num_faces, // The number of total faces of all meshes of the vertex buffer belonging to the group. 
-      gfx_idxs: [groupidx, progidx, vbidx],
+      gfx_idxs: [progidx, vbidx],
    });
 
 
@@ -666,15 +666,13 @@ export function Widget_group_add(group_bufferidx, gfx, num_faces = _, mesh_buffe
 // Case mesh is added on run time, create or use group_data
 export function Widget_group_find_but_not_insert(group_bufferidx, gfx) {
 
-   const groupidx = gfx.prog.groupidx, progidx = gfx.prog.idx, vbidx = gfx.vb.idx, start = gfx.vb.start;
+   const progidx = gfx.prog.idx, vbidx = gfx.vb.idx;
    const group = _widget_groups_buffer.buffer[group_bufferidx];
 
    const len = group.group_data.length;
    for (let i = 0; i < len; i++) {
 
-      if (group.group_data[i].gfx_idxs[GFX.GROUP_IDX] === groupidx && group.group_data[i].gfx_idxs[GFX.PROG_IDX] === progidx && group.group_data[i].gfx_idxs[GFX.VB_IDX] === vbidx) {
-
-         // console.log('ADDING MESH TO GROUP:', group_bufferidx, i,  'gfx',groupidx, progidx, vbidx)
+      if (group.group_data[i].gfx_idxs[GFX.PROG_IDX] === progidx && group.group_data[i].gfx_idxs[GFX.VB_IDX] === vbidx) {
          return [group_bufferidx, i];
       }
 
@@ -723,29 +721,10 @@ export function Widget_group_update_decrement(group_bufferidxs, num_faces, debug
 
 
 
-function Widget_group_destroy_group(group_bufferidxs) {
+export function Widget_group_destroy_group(group_bufferidxs) {
 
-   _widget_groups_buffer.buffer[group_bufferidxs[0]].group_data[group_bufferidxs[1]].meshidx = INT_NULL;
-   // TODO: Do we need to destroy all fields??? {start, ib_start, num_faces, gfx_idxs:[int,int,int]}
-   // _widget_groups_buffer.buffer[group_bufferidxs[0]].group_data[group_bufferidxs[1]].start = INT_NULL;
+   _widget_groups_buffer.RemoveByIdx(group_bufferidxs[0]);
 
-
-   // Check all group_data vbs, if all have num_faces=0, remove the whole group from the  _widget_groups_buffer, else destroy index refferences to meshes
-
-   // const group = _widget_groups_buffer.buffer[group_bufferidxs[0]].group_data;
-   // let empty_group = true;
-   // const len = group.length;
-   // for (let i = 0; i < len; i++) {
-
-   //    if (group[i].num_faces !== 0) {
-   //       empty_group = false;
-   //       break;
-   //    }
-   // }
-
-   // if (empty_group) {
-   //    Widget_group_remove_byidx(group_bufferidxs[0])
-   // }
 }
 
 
@@ -786,7 +765,6 @@ export function Widget_group_reset_partially_gfx_buffers(root_dp) {
    const len = group.group_data.length;
    for (let i = 0; i < len; i++) {
 
-      // const groupidx = group.group_data[i].gfx_idxs[GFX.GROUP_IDX];
       const progidx = group.group_data[i].gfx_idxs[GFX.PROG_IDX];
       const vbidx = group.group_data[i].gfx_idxs[GFX.VB_IDX];
 
@@ -795,29 +773,27 @@ export function Widget_group_reset_partially_gfx_buffers(root_dp) {
          alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
       }
 
-      // const start = root_dp.gfx.vb.start;
       const start = group.group_data[i].start;
       const num_faces = group.group_data[i].num_faces;
-      // console.log('RESET:' , groupidx, progidx, vbidx, 'num faces', 'start', group.group_data[i].start, 'num_faces', group.group_data[i].num_faces)
 
       const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK
-      const attribs_per_vertex = Program_get_shader_attribute_attribs_per_vertex(groupidx, progidx);
+      const attribs_per_vertex = Program_get_shader_attribute_attribs_per_vertex(progidx);
 
-      Gl_remove_geometry_params(groupidx, progidx, vbidx, num_faces, start, attribs_per_vertex, vertices_per_rect);
-
-      // console.log('RESET GFX:', rootgfx.buffer[i+GFX.GROUP_IDX], rootgfx.buffer[i+GFX.PROG_IDX], rootgfx.buffer[i+GFX.VB_IDX])
+      //TODO: Pass ibidx for good implementation
+      Gl_remove_geometry_params(vbidx, num_faces, start, attribs_per_vertex, vertices_per_rect);
    }
 }
 
 
-/** Reset the vgfx buffers from an index till the end. Fast, it does not remove from gfx buffers. Works only if there is no other group for that gfx buffers. */
-export function Widget_group_reset_from_group_to_vb_end(root_dp) {
 
-   const group = Widget_group_get(root_dp.group_bufferidxs[0]);
+/** Reset the vgfx buffers from an index till the end. Fast, it does not remove from gfx buffers. Works only if there is no other group for that gfx buffers. */
+export function Widget_group_reset_from_group_to_vb_end(group_bufferidxs) {
+
+   // const group = Widget_group_get(root_dp.group_bufferidxs[0]);
+   const group = Widget_group_get(group_bufferidxs[0]);
    const len = group.group_data.length;
    for (let i = 0; i < len; i++) {
 
-      // const groupidx = group.group_data[i].gfx_idxs[GFX.GROUP_IDX];
       const progidx = group.group_data[i].gfx_idxs[GFX.PROG_IDX];
       const vbidx = group.group_data[i].gfx_idxs[GFX.VB_IDX];
 
@@ -837,12 +813,57 @@ export function Widget_group_reset_from_group_to_vb_end(root_dp) {
 
 
 
-/** Run ".Rerender()" on the root mesh of this widget_root_buffer */
-export function Widget_group_rerender(group_bufferidx) {
+/** Reset the vgfx buffers from an index till the end. Fast, it does not remove from gfx buffers. Works only if there is no other group for that gfx buffers. */
+export function Widget_group_reset_from_group_to_vb_end_specific_vbidx(group_bufferidx, vb_bufferidx) {
+
+   // const group = Widget_group_get(root_dp.group_bufferidxs[0]);
+   const group = Widget_group_get(group_bufferidx);
+
+   const progidx = group.group_data[vb_bufferidx].gfx_idxs[GFX.PROG_IDX];
+   const vbidx = group.group_data[vb_bufferidx].gfx_idxs[GFX.VB_IDX];
+
+   if (progidx === INT_NULL || vbidx === INT_NULL){
+      console.error('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes', 'progidx', progidx, 'vbidx', vbidx)
+      alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
+   }
+
+   const vb_start = group.group_data[vb_bufferidx].start; // We want the start of the root mesh of the group, not the start of the root widget
+   Vertexbuffer_reset_to_index(progidx, vbidx, vb_start);
+
+   const ib_start = group.group_data[vb_bufferidx].ib_start; // We want the start of the root mesh of the group, not the start of the root widget
+   Index_buffer_reset_to_index(vbidx, ib_start);
+}
+
+
+
+/** Rerenders from root through mesh tree calls to Rerender(Slow)  */
+export function Widget_group_rerender_tree_mesh_recursive(group_bufferidx) {
 
    const rootidx = _widget_groups_buffer.buffer[group_bufferidx].meshidx;
    const mesh = _mesh_buffer.buffer[rootidx];
    mesh.Rerender();
+}
+
+
+
+/** Rerenders from root through loop calls to Rerender(Fast) */
+export function Widget_group_rerender_from_group(group_bufferidx) {
+
+   /**
+    * IMPLEMENT:
+    * Unfortunately the widget_group does not have all of its meshes indexes 
+    */
+   alert('IMPLEMENT ME. Widget_group_rerender_from_group');
+
+   const rootidx = _widget_groups_buffer.buffer[group_bufferidx].meshidx;
+   
+   // for (let i=0; i<; i++){
+      
+   //    const meshidx = 
+   //    const mesh = _mesh_buffer.buffer[rootidx];
+
+   //    mesh.Rerender();
+   // }
 }
 
 
@@ -909,6 +930,42 @@ export function Widget_movexy(params) {
       }
 
    }
+}
+
+
+
+export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
+
+   for (let i = 0; i <= _widget_root_buffer.buffer[root_bufferidx].boundary; i++) {
+      // Increment each mesh, that is part of this widget_root
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[0] += x;
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1] += y;
+   }
+
+   const len = _root_batch_buffer[root_bufferidx].vb.length
+   for (let i = 0; i < len; i++) {
+
+      // Get the batch's root mesh for each vb gfx buffers
+      const mesh = _mesh_buffer.buffer[_root_batch_buffer[root_bufferidx].vb[i].meshidx];
+
+      if(mesh){
+
+         mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
+
+         const update_data = {
+               sizes:[2],
+               data:[x, y],
+         };
+
+         // The batch_store needs the number of meshes to update as well as the move value
+         Batch_store(mesh, 
+            SHADER_ATTRIBUTES.WPOS4, 
+            update_data, 
+            _root_batch_buffer[root_bufferidx].vb[i].num_faces); 
+      }
+
+   }
+
 }
 
 
@@ -1018,13 +1075,14 @@ export function Movey_from_widget_root_buffer_and_batch_update(mesh, ydif) {
 }
 
 
+
 /** Reset all gfx buffers, from start index 0, for the widget_root buffer, via it's widget_root_gfx buffer */
 export function Widget_root_reset_gfx(root_bufferidx) {
 
    const rootgfx = _widget_root_gfx.buffer[root_bufferidx];
-   for (let i = 0; i <= rootgfx.boundary; i += 3) {
+   for (let i = 0; i <= rootgfx.boundary; i += GFX.SIZE) {
 
-      if (rootgfx.buffer[i + GFX.GROUP_IDX] === INT_NULL || rootgfx.buffer[i + GFX.PROG_IDX] === INT_NULL || rootgfx.buffer[i + GFX.VB_IDX] === INT_NULL)
+      if (rootgfx.buffer[i + GFX.PROG_IDX] === INT_NULL || rootgfx.buffer[i + GFX.VB_IDX] === INT_NULL)
          alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
 
       // Add to vertexbuffer
@@ -1032,6 +1090,23 @@ export function Widget_root_reset_gfx(root_bufferidx) {
       Index_buffer_reset_to_index(rootgfx.buffer[i + GFX.VB_IDX], 0);
    }
 }
+
+
+
+// /** Reset all gfx buffers, from start index 0, for the widget_root buffer, via it's widget_root_gfx buffer */
+// export function Widget_root_reset_gfx_only_text(root_bufferidx) {
+
+//    const rootgfx = _widget_root_gfx.buffer[root_bufferidx];
+//    for (let i = 0; i <= rootgfx.boundary; i += GFX.SIZE) {
+
+//       if (rootgfx.buffer[i + GFX.PROG_IDX] === INT_NULL || rootgfx.buffer[i + GFX.VB_IDX] === INT_NULL)
+//          alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
+
+//       // Add to vertexbuffer
+//       Vertexbuffer_reset_to_index(rootgfx.buffer[i + GFX.PROG_IDX], rootgfx.buffer[i + GFX.VB_IDX], 0);
+//       Index_buffer_reset_to_index(rootgfx.buffer[i + GFX.VB_IDX], 0);
+//    }
+// }
 
 
 
@@ -1233,13 +1308,11 @@ export function Widgetroot_gfx_print_loop_w2() {
 
    for (let i = 0; i <= _widget_root_buffer.boundary; i++) {
 
-      const mesh = Mesh_buffer_get_mesh_byidx(_widget_root_buffer.buffer[i].buffer[0]); // 0-th element in each widget root buffer is the root mesh
       console.log('root idx:', _widget_root_buffer.buffer[i].buffer[0]);
 
       const widget = _widget_root_gfx.buffer[i];
-      for (let j = 0; j <= widget.boundary; j += 3) {
+      for (let j = 0; j <= widget.boundary; j += GFX.SIZE) {
          console.log(
-            ' groupidx:', widget.buffer[j + GFX.GROUP_IDX],
             ' progidx:', widget.buffer[j + GFX.PROG_IDX],
             ' vbidx:', widget.buffer[j + GFX.VB_IDX],
          );
@@ -1280,6 +1353,7 @@ export function Widget_root_batch_print_w4() {
 // Print the widget groups buffer
 export function Widget_group_buffer_print_w5() {
 
+   console.log('Wole Group Buffer:', _widget_groups_buffer)
    for (let i = 0; i <= _widget_groups_buffer.boundary; i++) {
 
       const mesh = Mesh_buffer_get_mesh_byidx(_widget_groups_buffer.buffer[i].meshidx)

@@ -21,14 +21,14 @@ export class Widget_Button extends Widget_Label {
 
    OnClick(params) {
 
-      const mesh = params.target_params.target_mesh;
+      // const mesh = params.target_params.target_mesh;
 
       /**
        * For popup menu options and slider connections.
        * If the option is clicked, then we must call the slider connect function
        */
 
-      if (params.target_params.EventClbk) {
+      if (params.target_params && params.target_params.EventClbk) {
 
          const EventClbk = params.target_params.EventClbk;
          EventClbk(params.target_params);

@@ -67,7 +67,7 @@ class Framebuffer {
    texture;
    render_area; // A rectangle to draw the framebuffer to. Like any geometry, needs a vertex buffer etc. 
    render_widget; // The mesh (with children) to be rendered to the renderbuffer.
-   gfx_queue; // A buffer to store all gfx indexes of struct: [{groupidx,progidx,vbidx},{...},...].
+   gfx_queue; // A buffer to store all gfx indexes of struct: [{progidx,vbidx},{...},...].
    needs_update; // A bool to denote if the framebuffer needs to redraw all of the meshes.
    nameidx; // Index to an array of names. Instead of storing the string name, we have a separate array to store all framebuffers names.
 
@@ -177,7 +177,7 @@ export function Gl_framebuffer_render_mesh(FBID = FB.NEW, FB_TYPE = FRAMEBUFFER_
 
    // setInterval(() => {
    //    for (let i = 0; i < gfx_queue.length; i++) {
-   //       Renderqueue_set_active(gfx_queue[i].groupidx, gfx_queue[i].progidx, gfx_queue[i].vbidx, false)
+   //       Renderqueue_set_active(gfx_queue[i].progidx, gfx_queue[i].vbidx, false)
    //    }
    // }, 100)
 

@@ -4,7 +4,6 @@ const MAX_DRAWQUEUE_COUNT = 64; // Number of Gl programs for the queue
 
 class Queue {
 
-   groupidx;
    progidx;
    vbidx;
    queueIdx;
@@ -16,7 +15,6 @@ class Queue {
 
 
    Set(elem){
-      this.groupidx  = elem.groupidx;
       this.progidx  = elem.progidx;
       this.vbidx    = elem.vbidx;
       this.queueIdx = elem.queueIdx;
@@ -25,7 +23,6 @@ class Queue {
 
    
    Reset(){
-      this.groupidx  = INT_NULL;
       this.progidx  = INT_NULL;
       this.vbidx    = INT_NULL;
       this.queueIdx = INT_NULL;
@@ -58,9 +55,9 @@ class RenderQueue {
    }
 
 
-   Deactivate(groupidx, progidx, vbidx){
+   Deactivate(progidx, vbidx){
 
-      const foundIdx = this.Find(groupidx, progidx, vbidx);
+      const foundIdx = this.Find(progidx, vbidx);
       if (foundIdx !== INT_NULL && foundIdx < this.count-1) {
          this.buffer[foundIdx].isActive = false;
          this.RebuildActiveQueue()
@@ -85,12 +82,11 @@ class RenderQueue {
    }
 
 
-   Add(groupidx, progidx, vbidx, isActive) {
+   Add(progidx, vbidx, isActive) {
 
       // index = (i * (columns * depth)) + (j * depth) + k
       // index = (groupidx * (max_progs * max_vbs)) + (progidx * max_vbs) + vbidx
       const obj = {
-         groupidx: groupidx,
          progidx: progidx,
          vbidx: vbidx,
          queueIdx: this.count,
@@ -104,13 +100,12 @@ class RenderQueue {
    }
 
 
-   Find(groupidx, progidx, vbidx) {
+   Find(progidx, vbidx) {
 
       if(!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
       for (let i = 0; i < this.size; i++) {
          if (this.buffer[i].vbidx === vbidx &&
-            this.buffer[i].progidx === progidx && 
-            this.buffer[i].groupidx === groupidx) {
+            this.buffer[i].progidx === progidx ) {
             return i;
          }
       }
@@ -118,12 +113,12 @@ class RenderQueue {
    }
    
 
-   FindAllBuffersFromProgram(groupidx, progidx) {
+   FindAllBuffersFromProgram(progidx) {
 
       if(!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
       let idxs = [];
       for (let i = 0; i < this.size; i++) {
-         if (this.buffer[i].progidx === progidx && this.buffer[i].groupidx === groupidx) {
+         if (this.buffer[i].progidx === progidx) {
             idxs.push(i);
          }
       }
@@ -141,11 +136,11 @@ class RenderQueue {
 
 
    // IMIDIATELY: SLOW 
-   SetPriority(flag, groupidx, progidx, vbidx = ALL){
+   SetPriority(flag, progidx, vbidx = ALL){
 
       if(vbidx === ALL){
 
-         const idxs = this.FindAllBuffersFromProgram(groupidx, progidx);
+         const idxs = this.FindAllBuffersFromProgram(progidx);
 
          for(let k=0; k<idxs.length; k++){
 
@@ -172,7 +167,7 @@ class RenderQueue {
 
       /**************************************************************************/
 
-      const idx = this.Find(groupidx, progidx, vbidx);
+      const idx = this.Find(progidx, vbidx);
       if(idx !== INT_NULL){
 
          const temp = new Queue;
@@ -203,14 +198,14 @@ class RenderQueue {
     * But we do not care for now.
     * // TODO: Implement correctly: using bubble sort? 
     */
-   SetPriorityProgram(flag, groupidx, progidx){
+   SetPriorityProgram(flag, progidx){
 
       if(!this.count) return; // Case RenderQueue hasn't been initialized
 
       for (let i = 0; i < this.count; i++) {
          
-         if (this.buffer[i].progidx === progidx && this.buffer[i].groupidx === groupidx) {
-            this.SetPriority(flag, groupidx, progidx, this.buffer[i].vbidx)
+         if (this.buffer[i].progidx === progidx) {
+            this.SetPriority(flag, progidx, this.buffer[i].vbidx)
          }
       }
    }
@@ -264,21 +259,15 @@ export function Renderqueue_active_get_count() { return renderQueue.activeCount;
 
 
 
-// Set priority to the render queue buffer, but need to update the active render queue buffer.
-export function Renderqueue_set_priority(flag, groupidx, progidx, vbidx) { 
-   renderQueue.SetPriority(flag, groupidx, progidx, vbidx); 
-}
 
-
-
-export function Renderqueue_set_priority_by_program(flag, groupidx, progidx) { 
-   renderQueue.SetPriorityProgram(flag, groupidx, progidx); 
+export function Renderqueue_set_priority_by_program(flag, progidx) { 
+   renderQueue.SetPriorityProgram(flag, progidx); 
 }
 
 
 
 // Set priority to the active render queue buffer, no need to update.
-export function Renderqueue_set_priority_to_active_queue(flag, groupidx, progidx, vbidx) { /*// TODO: IMPLEMENT*/ }
+export function Renderqueue_set_priority_to_active_queue(flag, progidx, vbidx) { /*// TODO: IMPLEMENT*/ }
 
 
 
@@ -293,9 +282,9 @@ export function Renderqueue_update_active_queue() { renderQueue.RebuildActiveQue
  * changed(enabled or disabled for drawing), we must add or remove
  * these programs-vertex buffers from the draw queue.
  */
-export function Renderqueue_set_active(groupidx, progidx, vbidx, flag){ 
+export function Renderqueue_set_active(progidx, vbidx, flag){ 
 
-   const idx = renderQueue.Find(groupidx, progidx, vbidx);
+   const idx = renderQueue.Find(progidx, vbidx);
    if(idx !== INT_NULL){
 
       renderQueue.buffer[idx].isActive = flag;
@@ -307,8 +296,8 @@ export function Renderqueue_set_active(groupidx, progidx, vbidx, flag){
 
 
 
-export function Renderqueue_Add(groupidx, progidx, vbidx, isActive) {
-   renderQueue.Add(groupidx, progidx, vbidx, isActive);
+export function Renderqueue_Add(progidx, vbidx, isActive) {
+   renderQueue.Add(progidx, vbidx, isActive);
 }
 
 

@@ -7,7 +7,9 @@ import { Select_fnidx_to_fill_vertex_buffer } from './Buffers/VertexBuffersOps.j
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { BLUEL, GREEN, GREY } from '../Engine/Drawables/Material/Base/Colors.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-// import { Gfx_groups_create_group, Gfx_groups_store_program } from '../Engine/Interfaces/Gfx/GfxGroups.js';
+import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from '../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js';
+import { Debug_info_update_progarm_clbk } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Widget_root_gfx_get_structured, Widget_root_reset_gfx } from '../Engine/Core/MeshBuffer.js';
 
 
 
@@ -162,7 +164,7 @@ function Create_program(sid, uniforms) {
 
 	/***************************************************************************************************/
 	// Create Program Group if it doesn't exist
-	let groupidx = GFX_GROUPS.GetIdxByMask(sid.gfx_group);
+	// let groupidx = GFX_GROUPS.GetIdxByMask(sid.gfx_group);
 	// if (groupidx === INT_NULL || _programs[groupidx] === null) {
 
 	// 	groupidx = Gfx_groups_create_group();
@@ -201,7 +203,7 @@ function Create_program(sid, uniforms) {
 
 
 
-	return { groupidx: groupidx, progidx: progidx };
+	return progidx;
 
 }
 
@@ -209,11 +211,7 @@ function Create_program(sid, uniforms) {
 
 export function Program_create_program(sid, uniforms) {
 
-	const indexes = Create_program(sid, uniforms);
-	const groupidx = indexes.groupidx;
-	const progidx = indexes.progidx;
-
-
+	const progidx = Create_program(sid, uniforms);
 	const prog = _programs.buffer[progidx];
 
 
@@ -223,7 +221,7 @@ export function Program_create_program(sid, uniforms) {
 	GL.BOUND_PROG_IDX = progidx;
 	GL.BOUND_PROG = prog.shader_program;
 
-	return indexes;
+	return progidx;
 }
 
 
@@ -243,7 +241,7 @@ class Gl_Program {
 
 		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
 
-		this.prog_groupidxs = new Int8Buffer(1); // Array of all indexes of the groups this program belongs to. 
+		// this.prog_groupidxs = new Int8Buffer(1); // Array of all indexes of the groups this program belongs to. 
 
 		this.vb = new Int8Buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffers_info' buffer. 
 		// this.vb.Init(-1);
@@ -349,9 +347,19 @@ function TEMP(params) {
 	const destroy_btn = params.target_mesh;
 	console.log('TEMP FUNCTION', destroy_btn.GetName());
 
-	const section = params.params;
-	console.log('section', section.GetName());
-	section.Destroy();
+	const s = params.params;
+	// console.log('section:', s.GetName());
+	// s.Destroy();
+
+
+	const _params = {
+		notification_type: NOTIFICATION_TYPE_IDX.GFX_PROGRAM,
+		parent_section: s.parent,
+	}
+
+	// Debug_ui_create_notification(Debug_info_update_progarm_clbk, _params);
+	Debug_ui_create_notification(Program_update_text_info, _params);
+
 
 }
 
@@ -359,86 +367,140 @@ export function Program_create_text_info() {
 
 	const col_menu = GREY[3], col_dp = GREY[1];
 
-	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .3), 'Program Group Info');
+	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .3), 'Program Info COLOR BLUE');
 
 	const destroy = Create_widget_button(_, 'Destroy', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
 	destroy.Bind(TEMP, _, s);
 	s.AddItem(destroy);
-
-	s.Calc()
+	// s.options |= SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+	s.options |= SECTION.TOP_DOWN | SECTION.VERTICAL;
+	// s.Calc()
 
 	const margin = [4, 4];
 	const style = [0, 3, 1];;
-	const gr = _programs;
+	const progs = _programs;
 
-	for (let i = 0; i <= gr.boundary; i++) {
+	const progs_widget = Create_widget_dropdown(_, 'programs', [100, 100, 0], col_dp, col_menu, _, _, _, _, _, margin);
+	progs_widget.CreateClickEvent();
+	Dropdown_roots_set_root(progs_widget, progs_widget)
+	s.AddItem(progs_widget)
 
-		const grw = Create_widget_dropdown(_, 'groups', [100, 100, 0], col_dp, col_menu, _, _, _, _, _, margin);
-		grw.CreateClickEvent();
-		Dropdown_roots_set_root(grw, grw)
-		s.AddItem(grw)
-
-		const group_info = Create_widget_text(_, `count:${gr.active_count} size:${gr.size}`);
-		grw.AddToMenu(group_info);
-
-
-		{ // Programs
-
-			const progs = gr.buffer[i];
-
-			const progsw = Create_widget_dropdown(_, 'programs', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
-			progsw.CreateClickEvent();
-			grw.AddToMenu(progsw)
-
-			const progs_info = Create_widget_text(_, `count:${progs.active_count} size:${progs.size}`);
-			progsw.AddToMenu(progs_info);
+	const group_info = Create_widget_text(_, `count:${progs.active_count} size:${progs.size}`);
+	progs_widget.AddToMenu(group_info);
+	// progs_widget.options |= SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+	progs_widget.options = SECTION.TOP_DOWN | SECTION.VERTICAL;
 
 
-			for (let i2 = 0; i2 <= progs.boundary; i2++) {
-
-				const prog = progs.buffer[i2];
-
-				const progw = Create_widget_dropdown(_, 'programs', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
-				progw.CreateClickEvent();
-				progsw.AddToMenu(progw)
+	for (let i = 0; i <= progs.boundary; i++) {
 
 
-				{ const prog_info = Create_widget_text(_, `state:${prog.state.mask}`); progw.AddToMenu(prog_info); }
-				{ const prog_info = Create_widget_text(_, `vaoidx:${prog.vaoidx}`); progw.AddToMenu(prog_info); }
-				{ const prog_info = Create_widget_text(_, `self idx:${prog.idx}`); progw.AddToMenu(prog_info); }
-				{ const prog_info = Create_widget_text(_, `attribsidx:${prog.attribsidx}`); progw.AddToMenu(prog_info); }
-				{ const prog_info = Create_widget_text(_, `attribs_per_vertex:${prog.attribs_per_vertex}`); progw.AddToMenu(prog_info); }
-				{ const prog_info = Create_widget_text(_, `add_to_vb_fnidx:${prog.add_to_vb_fnidx}`); progw.AddToMenu(prog_info); }
 
-				/****************************************************************************************************************************/
-				// vb and ib
-				const vbw = Create_widget_dropdown(_, 'vertex buffer', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
-				vbw.CreateClickEvent();
-				progw.AddToMenu(vbw)
-				let vb_info = 'vb:'
-				for (let i3 = 0; i3 <= prog.vb.boundary; i3++) {
+		const prog = progs.buffer[i];
 
-					vb_info += `[${prog.vb.buffer[i3]}]`;
-				}
+		const prog_widget = Create_widget_dropdown(_, 'program', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
+		prog_widget.CreateClickEvent();
+		progs_widget.AddToMenu(prog_widget);
+		prog_widget.options = SECTION.VERTICAL;
+		// prog_widget.options = 0x0;
 
-				{ const info = Create_widget_text(_, vb_info); vbw.AddToMenu(info); }
+		const progs_info = Create_widget_text(_, `count:${progs.active_count} size:${progs.size}`);
+		prog_widget.AddToMenu(progs_info);
 
-				const ibw = Create_widget_dropdown(_, 'index buffer', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
-				ibw.CreateClickEvent();
-				progw.AddToMenu(ibw)
-				let ib_info = 'ib:'
-				for (let i3 = 0; i3 <= prog.ib.boundary; i3++) {
 
-					ib_info += `[${prog.ib.buffer[i3]}]`;
-				}
-				{ const info = Create_widget_text(_, ib_info); ibw.AddToMenu(info); }
-			}
+		{ const prog_info = Create_widget_text(_, `state:${prog.state.mask}`); prog_widget.AddToMenu(prog_info); }
+		{ const prog_info = Create_widget_text(_, `vaoidx:${prog.vaoidx}`); prog_widget.AddToMenu(prog_info); }
+		{ const prog_info = Create_widget_text(_, `self idx:${prog.idx}`); prog_widget.AddToMenu(prog_info); }
+		{ const prog_info = Create_widget_text(_, `attribsidx:${prog.attribsidx}`); prog_widget.AddToMenu(prog_info); }
+		{ const prog_info = Create_widget_text(_, `attribs_per_vertex:${prog.attribs_per_vertex}`); prog_widget.AddToMenu(prog_info); }
+		{ const prog_info = Create_widget_text(_, `add_to_vb_fnidx:${prog.add_to_vb_fnidx}`); prog_widget.AddToMenu(prog_info); }
+
+		/****************************************************************************************************************************/
+		// vb and ib
+		const vb_widget = Create_widget_dropdown(_, 'vertex buffer', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
+		vb_widget.CreateClickEvent();
+		vb_widget.options = SECTION.VERTICAL;
+		prog_widget.AddToMenu(vb_widget);
+
+		let vb_info = 'vb:'
+		for (let i3 = 0; i3 <= prog.vb.boundary; i3++) {
+
+			vb_info += `[${prog.vb.buffer[i3]}]`;
 		}
+
+		{ const info = Create_widget_text(_, vb_info); vb_widget.AddToMenu(info); }
+
+		const ibw = Create_widget_dropdown(_, 'index buffer', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
+		ibw.CreateClickEvent();
+		prog_widget.AddToMenu(ibw)
+		let ib_info = 'ib:'
+		for (let i3 = 0; i3 <= prog.ib.boundary; i3++) {
+
+			ib_info += `[${prog.ib.buffer[i3]}]`;
+		}
+		{ const info = Create_widget_text(_, ib_info); ibw.AddToMenu(info); }
 
 	}
 
-
+	// s.Calc()
 	return s;
+}
+
+export function Program_update_text_info(params) {
+
+	const s = params.parent_section;
+	Program_update_text_info_TEMP(s);
+	// s.DpActivateMenu();
+
+	// for (let i=0; i<s.children.boundary; i++){
+
+	// 	const child = s.children.buffer[i];
+	// 	console.log(child.mesh_bufferidx, child.GetName())
+	// }
+
+	// const vb_start = group.group_data[i].start; // We want the start of the root mesh of the group, not the start of the root widget
+	// const root_gfxs = Widget_root_gfx_get_structured()
+	// // Widget_root_reset_gfx()
+	// Vertexbuffer_reset_to_index(progidx, vbidx, 0);
+
+	// Widget_group_reset_from_group_to_vb_end_specific_vbidx(s.group_bufferidxs[0], group_bufferidx, 1)
+
+
+
+	// const ib_start = group.group_data[i].ib_start; // We want the start of the root mesh of the group, not the start of the root widget
+	// Index_buffer_reset_to_index(vbidx, ib_start);
+	
+	// AddToGfxFromReset()
+
+}
+
+export function Program_update_text_info_TEMP(mesh) {
+
+	for (let i=0; i<=mesh.children.boundary; i++){
+
+		const child = mesh.children.buffer[i];
+		if(child) Program_update_text_info_TEMP(child)
+
+		// if(child.type & MESH_TYPE.WIDGET_DROP_DOWN){
+		// 	if(child.isOn & DP_MENU_STATE.ON){
+		// 		// child.DeactivateMenu();
+		// 		child.DpActivateMenu();
+		// 		console.log(child.mesh_bufferidx, child.GetName())
+		// 	}
+		// }
+		if(child.type & MESH_TYPE.WIDGET_TEXT){
+			console.log(child.mesh_bufferidx, child.GetName())
+			// child.UpdateText('NEW TEXT')
+			child.ResetText('NEW TEXT jhsdkskjd sjdkjsjsm sjdkjskdjksj');
+
+		}
+		
+
+
+		// console.log(child.mesh_bufferidx, child.GetName())
+	}
+	
+	// console.log(mesh.mesh_bufferidx, mesh.GetName())
+
 }
 
 

@@ -42,7 +42,7 @@ export function Gfx_pool_remove_geometry(gfx, num_faces, start_index) {
    const ret = Gl_remove_geometry(gfx, num_faces, start_index);
    if (ret.empty) { // If the vertex buffer is empty, then set it as not active, so it can be used by other gfx demands.
 alert('IMPLEMENT ME. GfxPool.js\nGfx_pool_remove_geometry()')
-      _gfx_pool.buffer[gfx.prog.groupidx].buffer[gfx.prog.idx].buffer[gfx.vb.idx].inUse = false;
+      // _gfx_pool.buffer[gfx.prog.groupidx].buffer[gfx.prog.idx].buffer[gfx.vb.idx].inUse = false;
 
 
 

@@ -25,11 +25,10 @@ import { _pt_batch_update } from "../Timers/PerformanceTimers";
 /**************************************************************** */
 /**
  * Batch buffer is stuctured as such:
- * _batch[j][k][l]
- * [i]: An array of GFX program groups, fixed count for now.
- * [j]: An array of GFX shader programs, pre-alocated.
- * [k]: An array of GFX vertex buffers, created uppon batch buffer construction
- * [l]: An array of mesh data
+ * _batch[i1][i2][i3]
+ * [i1]: An array of GFX shader programs, pre-alocated.
+ * [i2]: An array of GFX vertex buffers, created uppon batch buffer construction
+ * [i3]: An array of mesh data
  * The first three buffers are storing indexes to the equivalent gfx buffers.
  * It's purpose is to store mesh data by the mesh's gfx vertex buffer.
  * That way we can optimize mesh data in the graphics buffers.
@@ -50,7 +49,7 @@ const _batch = [];
  * So the 'progs_index' would look like: 'progs_index = [2, INT_NULL, INT_NULL, INT_NULL, INT_NULL]'.
  * Now when we access the batch's programs buffer, we do it via the 'progs_index', using the mesh's
  * gfx.prog.idx as an index to the buffer.
- * E.x. _batch[groupidx][ *progs_index[mesh.gfx.prog.idx]* ].
+ * E.x. _batch[ *progs_index[mesh.gfx.prog.idx]* ].
  * That way we can store arbitrarily any index value in order without wasting batch programs buffers.
  * E.x. Assuming the batch is gonna update meshes from only one program, lets say program index 2.
  * With the implementation we can store all of the meshes data (of program index 2) to the 0th batch programs buffer,
@@ -92,10 +91,7 @@ export function Batch_store(mesh, first_attrib_offset, update_data=null, num_fac
 
    if (mesh.gfx) {
 
-      // const i = mesh.gfx.prog.groupidx;
       const j = mesh.gfx.prog.idx;
-      // const k = mesh.gfx.vb.idx;
-      
 
       if (progs_index[j] === INT_NULL) {
          progs_index[j] = prog_cnt;
@@ -155,7 +151,6 @@ export function Batch_update() {
             const data = _batch[i2][i3][i4];
             
             // EFFICIENCY: We can get the attribsidx only every program, yet we get it for each vertex buffer and for each mesh
-            // const attribsidx = Program_get_shader_attributes_index(data.groupidx, data.progidx);
             const attribsidx = Program_get_shader_attributes_index(data.progidx);
             const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
             

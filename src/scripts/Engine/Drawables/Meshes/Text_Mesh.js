@@ -184,6 +184,12 @@ export class Text_Mesh extends Mesh {
       this.is_gfx_inserted = true;
    }
 
+   
+   ResetText(new_text){
+      this.mat.text = new_text;
+      this.geom.text = new_text;
+      this.geom.num_faces = new_text.length;
+   }
 
 
    /*******************************************************************************************************************************************************/
@@ -296,19 +302,18 @@ export class Text_Mesh extends Mesh {
 
       const numchars = text.length;
       // NOTE: We want to run for max chars to reset any extra from the current text
-      // const len = (this.geom.num_faces > numchars) ? this.geom.num_faces :
-      //    (numchars > this.geom.num_faces ? this.geom.num_faces : numchars);
+      const len = (this.geom.num_faces > numchars) ? this.geom.num_faces :
+         (numchars > this.geom.num_faces ? this.geom.num_faces : numchars);
 
-      let len = 0;
-      if (numchars > this.last_charidx) {
-         len = numchars < this.geom.num_faces ? numchars : this.geom.num_faces;
-         this.last_charidx = len
-      }
-      else {//if(numchars <= this.last_charidx){
-         len = this.last_charidx;
-         this.last_charidx = numchars
-      }
-      // console.log(len, text)
+      // let len = 0;
+      // if (numchars > this.last_charidx) {
+      //    len = numchars < this.geom.num_faces ? numchars : this.geom.num_faces;
+      //    this.last_charidx = len
+      // }
+      // else {
+      //    len = this.last_charidx;
+      //    this.last_charidx = numchars
+      // }
 
 
       const attr = Shader_attributes_get_attribs_offset_size(gfx_copy.prog.attribsidx, SHADER_ATTRIBUTES.TEX2);
@@ -338,7 +343,7 @@ export class Text_Mesh extends Mesh {
          }
 
          Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex)
-         // Gl_set_uv(gfx_copy, uvs);
+
          gfx_copy.vb.start += gfx_copy.vb.count
       }
 
@@ -356,6 +361,61 @@ export class Text_Mesh extends Mesh {
    }
 
 
+   // UpdateTextAndReset(_text) {
+
+   //    if (!this.gfx) return; // Case replace text before insert to gfx buffers;
+
+   //    let text = (typeof (_text) === 'number') ? `${_text}` : _text; // Takes arithmetic values or just a char.
+
+   //    const gfx_copy = {
+   //       vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
+   //       prog: { attribsidx: this.gfx.prog.attribsidx },
+   //       vertsPerRect: this.gfx.vertsPerRect,
+   //       attribsPerVertex: this.gfx.attribsPerVertex,
+   //    }
+
+   //    const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
+   //       pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
+   //       dim: [this.geom.dim[0], this.geom.dim[1]],
+   //    }
+
+
+   //    const advancex = Font_get_font_advancex(this.mat.texidx);
+   //    const numchars = text.length;
+
+
+   //    // Update text faces
+   //    for (let i = 0; i < numchars; i++) {
+
+   //       let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
+
+   //       if (text[i] !== undefined) // If char=' ' space, just render [0,0] uv coordinates.
+   //       {
+   //          // Set character dimentions.
+   //          const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, text[i]);
+   //          geom_copy.dim[0] *= plane_bounds.width;
+   //          geom_copy.dim[1] *= plane_bounds.height;
+   //          Gl_set_dim_XY(gfx_copy, geom_copy.dim);
+
+   //          // // Set character y position and advance.
+   //          geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
+   //          Gl_set_wpos_XY(gfx_copy, geom_copy.pos);
+   //          geom_copy.pos[0] += Floor(this.fontsize * 2 * advancex);
+
+   //          // Get the correct uv coordinates.
+   //          uvs = Font_get_char_uv_coords(this.mat.uvIdx, text[i]);
+
+   //          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
+   //       }
+
+   //       gfx_copy.vb.start += gfx_copy.vb.count
+   //    }
+
+   //    Vertex_buffer_state_enable(gfx_copy.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
+
+   // }
+
+
    /** Update a specific character in text char array */
    UpdateTextCharacter(_text, idx) {
 
@@ -369,7 +429,6 @@ export class Text_Mesh extends Mesh {
       const gfx_copy = {
          vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
          prog: { attribsidx: this.gfx.prog.attribsidx },
-         group: { group_progidx: this.gfx.group.group_progidx, group_vbidx: this.gfx.group.group_vbidx,},
          vertsPerRect: this.gfx.vertsPerRect,
          attribsPerVertex: this.gfx.attribsPerVertex,
       }
@@ -395,7 +454,6 @@ export class Text_Mesh extends Mesh {
       geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
       geom_copy.pos[0] += this.geom.dim[0];
       geom_copy.pos[0] += Floor(this.fontsize * advancex);
-      // Gl_set_wpos_XY(gfx_copy, geom_copy.pos);
 
       // Set the correct uv coordinates.
       const uvs = Font_get_char_uv_coords(this.mat.uvIdx, _text);

@@ -128,7 +128,7 @@ export function TestWidgetsGeneric(scene) {
     /** Misc widgets */
 
     const label = CreateLabel('LABEL');
-    CreateLabel('Label2');
+    // CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, label);
@@ -214,7 +214,7 @@ export function TestWidgetsGeneric(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh.children.buffer[0]);
 
 
-    // Debug_info_create_all_generic_info();
+    Debug_info_create_all_generic_info();
 
 
     // Scenes_debug_info_create(scene);
@@ -309,10 +309,10 @@ function CreateButton() {
     btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     btn.Render();
-    btn.text_mesh.SetColorRGB(BLUE_10_120_220);
+    // btn.text_mesh.SetColorRGB(BLUE_10_120_220);
 
     // btn.Align(ALIGN.LEFT | ALIGN.TOP, [0, 0]);
-    btn.Align(ALIGN.RIGHT | ALIGN.BOTTOM, [15, 5]);
+    // btn.Align(ALIGN.RIGHT | ALIGN.BOTTOM, [15, 5]);
 
     return btn;
 }
@@ -3090,7 +3090,7 @@ function MeshInfoUpdate(params) {
 
         textMesh.UpdateText(infoMesh.GetName());
 
-        const gfx = (infoMesh.gfx !== null) ? `gfx: group:${infoMesh.gfx.prog.groupidx}, prog:${infoMesh.gfx.prog.idx}, vb:${infoMesh.gfx.vb.idx}, start:${infoMesh.gfx.vb.start}` : 'null'
+        const gfx = (infoMesh.gfx !== null) ? `gfx: prog:${infoMesh.gfx.prog.idx}, vb:${infoMesh.gfx.vb.idx}, start:${infoMesh.gfx.vb.start}` : 'null'
 
         let msgs = [
             `id:${infoMesh.id}`,
@@ -3115,18 +3115,18 @@ function MeshInfoUpdate(params) {
 
                 msgs.push(`Plain Text:${child.GetName()}, dim: ${child.id}`);
                 msgs.push(`pos:[${FloorArr3(child.geom.pos)}], dim:[${child.geom.dim}], alpha:${child.mat.col[3]}`);
-                msgs.push(`gfx: group:${child.gfx.prog.groupidx}, prog:${child.gfx.prog.idx}, vb:${child.gfx.vb.idx}, start:${child.gfx.vb.start}, faces:${text_num_faces}`);
+                msgs.push(`gfx: prog:${child.gfx.prog.idx}, vb:${child.gfx.vb.idx}, start:${child.gfx.vb.start}, faces:${text_num_faces}`);
             }
             else if (child.text_mesh) { // Text in label or any other mesh that has text_mesh
                 msgs.push(`Text_mesh: id:${child.text_mesh.id}, name:${child.text_mesh.GetName()},`);
                 msgs.push(`pos:[${FloorArr3(child.text_mesh.geom.pos)}], dim: [${child.text_mesh.geom.dim}], alpha:${child.text_mesh.mat.col[3]}`);
-                msgs.push(`gfx: group:${child.text_mesh.gfx.prog.groupidx}, prog:${child.text_mesh.gfx.prog.idx}, vb:${child.text_mesh.gfx.vb.idx}, start:${child.text_mesh.gfx.vb.start}, faces:${child.text_mesh.geom.num_faces}`);
+                msgs.push(`gfx: prog:${child.text_mesh.gfx.prog.idx}, vb:${child.text_mesh.gfx.vb.idx}, start:${child.text_mesh.gfx.vb.start}, faces:${child.text_mesh.geom.num_faces}`);
             }
         }
         else if (infoMesh.text_mesh) {
             msgs.push(`Text_mesh: id:${infoMesh.text_mesh.id}, name:${infoMesh.text_mesh.GetName()},`);
             msgs.push(`pos:[${FloorArr3(infoMesh.text_mesh.geom.pos)}], dim: [${FloorArr2(infoMesh.text_mesh.geom.dim)}], alpha:${infoMesh.text_mesh.mat.col[3]}`);
-            msgs.push(`gfx: group:${infoMesh.text_mesh.gfx.prog.groupidx}, prog:${infoMesh.text_mesh.gfx.prog.idx}, vb:${infoMesh.text_mesh.gfx.vb.idx}, start:${infoMesh.text_mesh.gfx.vb.start}, faces:${infoMesh.text_mesh.geom.num_faces}`);
+            msgs.push(`gfx: prog:${infoMesh.text_mesh.gfx.prog.idx}, vb:${infoMesh.text_mesh.gfx.vb.idx}, start:${infoMesh.text_mesh.gfx.vb.start}, faces:${infoMesh.text_mesh.geom.num_faces}`);
         }
 
         // msgs.push(`Framebuffer counter:${TEMP_TEST_PERFORMANE_COUNTERS.FRAMEBUFFER}`);

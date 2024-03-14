@@ -242,7 +242,19 @@ export class Mesh {
 
 
         // Remove from parent's children buffer
-        if (this.parent && this.parent !== WIDGET_TEXT_MESH) this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
+        if (this.parent && this.parent !== WIDGET_TEXT_MESH) {
+
+            this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
+            // Shift all children to the left
+            // for(let i=this.idx; i<=this.parent.children.boundary; i++){
+            //     if(i+1 <= this.parent.children.boundary)
+            //         this.parent.children.buffer[i] = this.parent.children.buffer[i+1];
+            // }
+            // this.parent.children.buffer[this.parent.children.boundary] = null;
+            // this.parent.children.boundary--;
+        }
+
+
 
 
         // // Set Debug listen event
@@ -622,7 +634,6 @@ export function Temp_Create_child_gfx_rename_me(mesh) {
 
     const gfx_buffer_rename_me = [];
     gfx_buffer_rename_me.push({
-        groupidx: mesh.gfx.prog.groupidx,
         progidx: mesh.gfx.prog.idx,
         vbidx: mesh.gfx.vb.idx,
     });
@@ -630,7 +641,6 @@ export function Temp_Create_child_gfx_rename_me(mesh) {
     // Case the mesh is label and has a text mesh
     if (mesh.text_mesh) {
         gfx_buffer_rename_me.push({
-            groupidx: mesh.text_mesh.gfx.prog.groupidx,
             progidx: mesh.text_mesh.gfx.prog.idx,
             vbidx: mesh.text_mesh.gfx.vb.idx,
         });
@@ -656,7 +666,6 @@ export function Temp_Create_child_gfx_recursive_rename_me(mesh, gfx_buffer_renam
             }
 
             const gfx_indexes = {
-                groupidx: child.gfx.prog.groupidx,
                 progidx: child.gfx.prog.idx,
                 vbidx: child.gfx.vb.idx,
             };
@@ -667,7 +676,6 @@ export function Temp_Create_child_gfx_recursive_rename_me(mesh, gfx_buffer_renam
             if (child.text_mesh) {
 
                 const text_gfx_indexes = {
-                    groupidx: child.text_mesh.gfx.prog.groupidx,
                     progidx: child.text_mesh.gfx.prog.idx,
                     vbidx: child.text_mesh.gfx.vb.idx,
                 };
@@ -686,8 +694,7 @@ export function GfxExists_rename_me(gfx_buffer, gfx_indexes) {
 
     const count = gfx_buffer.length;
     for (let i = 0; i < count; i++) {
-        if (gfx_buffer[i].groupidx === gfx_indexes.groupidx &&
-            gfx_buffer[i].progidx === gfx_indexes.progidx &&
+        if (gfx_buffer[i].progidx === gfx_indexes.progidx &&
             gfx_buffer[i].vbidx === gfx_indexes.vbidx) {
             return true;
         }

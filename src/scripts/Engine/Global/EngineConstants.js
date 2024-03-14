@@ -494,9 +494,10 @@ const ROOT_WIDGETS = {
 /*************************************************************************************************/
 //  
 const GFX = {
-	GROUP_IDX: 0, // Indexing array of [group, program, vertexbuffer]
-	PROG_IDX: 1, // Indexing array of [group, program, vertexbuffer]
-	VB_IDX: 2, // Indexing array of [group, program, vertexbuffer]
+	PROG_IDX: 0, // Indexing array of [group, program, vertexbuffer]
+	VB_IDX: 1, // Indexing array of [group, program, vertexbuffer]
+
+	SIZE: 2,
 };
 
 

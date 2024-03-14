@@ -10,7 +10,6 @@ import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Rendere
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Debug_ui_set_notification, NOTIFICATION_TYPE_IDX } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Gfx_pool_find_notActive_and_notPrivate_vb } from "./GfxPool.js";
 
 
 
@@ -26,14 +25,8 @@ export class GfxInfoMesh {
    attribsPerVertex = 0;
    meshIdx = INT_NULL; // The index of the current mesh from scene's mesh buffer.
    vao = null;
-   // groupidx = INT_NULL; // TODO: Decide if this var should be a bool or a bi-field.
-
-   // group = {
-   //    group_progidx: INT_NULL,
-   // };
 
    prog = {
-      // groupidx: INT_NULL,
       idx: INT_NULL,
       progvbidx: INT_NULL,
       progibidx: INT_NULL,
@@ -71,7 +64,6 @@ export class GfxInfoMesh {
          this.meshIdx = gfx.meshIdx;
          this.vao = gfx.vao;
 
-         this.prog.groupidx = gfx.prog.groupidx;
          this.prog.idx = gfx.prog.idx;
          this.prog.progvbidx = gfx.prog.progvbidx;
          this.prog.progibidx = gfx.prog.progibidx;
@@ -104,7 +96,6 @@ export class GfxInfoMesh {
          this.meshIdx = gfx.meshIdx;
          this.vao = gfx.vao;
 
-         this.prog.groupidx = gfx.prog.groupidx;
          this.prog.idx = gfx.prog.idx;
          this.prog.progvbidx = gfx.prog.progvbidx;
          this.prog.progibidx = gfx.prog.progibidx;
@@ -128,7 +119,7 @@ export class GfxInfoMesh {
 
 
 
-function Generate_mesh_gfx_info(sid, sceneidx, groupidx, progidx, vbidx, group_progidx, group_vbidx, ibidx, num_faces = 1) {
+function Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx, num_faces = 1) {
 
    const prog = Progarm_get_program(progidx);
    const vb = Vertex_buffer_info_get_by_vbidx(vbidx);
@@ -149,14 +140,11 @@ function Generate_mesh_gfx_info(sid, sceneidx, groupidx, progidx, vbidx, group_p
    gfx_ctx.attribsPerVertex = attribsPerVertex;
    gfx_ctx.vao = vb.vao;
 
-   gfx_ctx.prog.groupidx = groupidx;
    gfx_ctx.prog.idx = progidx;
    gfx_ctx.prog.progvbidx = prog.vb.buffer[vbidx];
    gfx_ctx.prog.progibidx = prog.ib.buffer[ibidx];
    gfx_ctx.prog.attribsidx = prog.attribsidx;
    
-   // gfx_ctx.group.group_progidx = group_progidx;
-   // gfx_ctx.group.group_vbidx = group_vbidx;
 
    gfx_ctx.vb.idx = vbidx;
    gfx_ctx.vb.start = 0; // NOTE: The start of the mesh in the vertex buffer is calculated when the mesh is added to the vertex buffer.
@@ -283,22 +271,21 @@ function Generate_mesh_gfx_info(sid, sceneidx, groupidx, progidx, vbidx, group_p
 
 
 export function Gfx_activate(mesh) {
+console.wrror('IMPLEMENT ME.\nGfx_activate()')
+   // for (let i = 0; i <= mesh.children.boundary; i++) {
 
-   for (let i = 0; i <= mesh.children.boundary; i++) {
+   //    const child = mesh.children.buffer[i];
+   //    if (child) Gfx_activate(child)
+   // }
 
-      const child = mesh.children.buffer[i];
-      if (child) Gfx_activate(child)
-   }
+   // if (!mesh.gfx) console.log('DEACTIVATING MESH - GFX NOT FOUND:', mesh.GetName(), mesh)
+   // else {
+   //    const progidx = mesh.gfx.prog.idx;
+   //    const vbidx = mesh.gfx.vb.idx;
 
-   if (!mesh.gfx) console.log('DEACTIVATING MESH - GFX NOT FOUND:', mesh.GetName(), mesh)
-   else {
-      const groupidx = mesh.gfx.prog.groupidx;
-      const progidx = mesh.gfx.prog.idx;
-      const vbidx = mesh.gfx.vb.idx;
-
-      // console.log('SetActive ', progidx, vbidx)
-      _gfx_pool.buffer[groupidx].buffer[progidx].buffer[vbidx].inUse = true;
-   }
+   //    // console.log('SetActive ', progidx, vbidx)
+   //    _gfx_pool.buffer[groupidx].buffer[progidx].buffer[vbidx].inUse = true;
+   // }
 
 }
 
@@ -311,9 +298,7 @@ export function Gfx_activate(mesh) {
 export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_gfx_idxs, root_bufferidx = INT_NULL, mesh_bufferidx = INT_NULL, uniforms) {
 
 
-   let groupidx = INT_NULL;
    let progidx = spesific_gfx_idxs[0];
-   let progvbidx = INT_NULL; // The index of: the refference of the vertex buffer, inside the programs buffer vb array!
    
    let vbidx = spesific_gfx_idxs[1];
    let ibidx = INT_NULL;
@@ -323,14 +308,7 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 
    let vbfound = null;
 
-   // Decision: Choose default or create new group
-   // if((sid.gfx_group & GFX_GROUPS.DEFAULT.MASK) === 0){
-   //    groupidx = Gfx_groups_create_group();
-   // }
-
-   if (progidx !== INT_NULL && vbidx !== INT_NULL) { // We have all we need to add to a specific vertex buffer
-
-      groupidx = GFX_GROUPS.GetIdxByMask(sid.gfx_group); // Get groupidx via SID
+   if (vbidx !== INT_NULL) { // We have all we need to add to a specific vertex buffer
       ibidx = Index_buffer_get_by_vertex_buffer_index(vbidx); // Get ibidx from vbidx (WORKS only in case index/vertex buffers are 1to1)
    }
    else {
@@ -340,12 +318,7 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 
       if (progidx === INT_NULL) { // If shader program does not exist, create new program.
 
-         const gfx_idxs = Program_create_program(sid, uniforms);
-         groupidx = gfx_idxs.groupidx;
-         progidx = gfx_idxs.progidx;
-         
-         // Gfx_create_program_buffer(groupidx, progidx);
-         
+         progidx = Program_create_program(sid, uniforms);
          
          Scene_set_projection_matrix(sceneidx)
          
@@ -353,33 +326,33 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
          Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
          
          /** DEBUG INFO UI */
-         Debug_ui_set_notification(NOTIFICATION_TYPE_IDX.GFX_PROGRAM)
+         // Debug_ui_set_notification(NOTIFICATION_TYPE_IDX.GFX_PROGRAM)
          
       }
-      else groupidx = GFX_GROUPS.GetIdxByMask(sid.gfx_group); // Get groupidx via SID
       
       /*******************************************************************************************************************/
       // Create vertex buffer
       
       // If the flag is set to ANY, find any apropriate vertex buffer
       if (FLAGS & GFX_CTX_FLAGS.ANY) {
-         
-         // vbfound = Gfx_find_notActive_and_notPrivate_vb(groupidx, progidx);
-         // const group_progidx = Gfx_groups_get_progidx(groupidx);
-         // group_progidx = Progarm_get_prog_groupidx(groupidx);
-         vbfound = Gfx_pool_find_notActive_and_notPrivate_vb(progidx);
-         if (vbfound)
-         if (DEBUG.GFX.CONTEXT_CREATE) console.log('ANY ############', vbfound.groupidx, vbfound.progidx, vbfound.vbidx)
-         else if (DEBUG.GFX.CONTEXT_CREATE) console.log('ANY ############', groupidx, progidx, vbfound)
+         alert('IMPLEMENT ME.\nGfx_generate_context()')
+         // vbfound = Gfx_pool_find_notActive_and_notPrivate_vb(progidx);
+         // if (vbfound)
+         // if (DEBUG.GFX.CONTEXT_CREATE) console.log('ANY ############', vbfound.progidx, vbfound.vbidx)
+         // else if (DEBUG.GFX.CONTEXT_CREATE) console.log('ANY ############', progidx, vbfound)
       }
       else { // else create new vertex buffer
 
          
-         const vb_info = Vertex_buffer_info_create(sid, _, groupidx, progidx);
+         const vb_info = Vertex_buffer_info_create(sid, _, progidx);
          vbidx = vb_info.vbidx;
          Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE | BUFFER_STATE.SHOW);
-         if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', groupidx, progidx, vbidx)
+         if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidx)
+       
          
+         Program_store_vertex_buffer_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
+
+                  
          
          if (sid.shad & SID.SHAD.INDEXED) {
             var ib_info = Index_buffer_info_create(sid, vb_info.vao, vb_info.vaoidx, _);
@@ -387,33 +360,27 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
             Program_store_index_buffer_idx(progidx, ibidx); // Store the indexbuffer index to the programs ib array
             Vertex_buffer_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
          }
-         
-         
-         // group_progidx = Progarm_get_prog_groupidx(progidx, groupidx);
-         progvbidx = Program_store_vertex_buffer_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
-         // Gfx_pool_create_vb_buffer(groupidx, progidx);
 
          // Add the new vertexBuffer to the render queue
-         Renderqueue_Add(groupidx, progidx, vbidx, true);
-         Renderqueue_set_active(groupidx, progidx, vbidx, true); // Update the draw buffer
+         Renderqueue_Add(progidx, vbidx, true);
+         Renderqueue_set_active(progidx, vbidx, true); // Update the draw buffer
 
          // Create new entry for the new vertex buffer in widget root gfx buffer
-         Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx);
+         Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbidx);
 
       }
 
-      // Gfx_create_gfx_data_buffer(groupidx, progidx, vbidx, sceneidx, true, FLAGS & GFX_CTX_FLAGS.PRIVATE);
       console.warn(vbidx)
 
    }
 
    /**DEBUG*/if (ibidx === INT_NULL) console.error('ibidx is NULL');
 
-   const gfx = Generate_mesh_gfx_info(sid, sceneidx, groupidx, progidx, vbidx, group_progidx, group_vbidx, ibidx, mesh_count);
+   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx, mesh_count);
    
 
    // Add mesh to the root batch buffer for batch update
-   Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, groupidx, progidx, vbidx, mesh_count);
+   Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vbidx, mesh_count);
 
    return gfx;
 

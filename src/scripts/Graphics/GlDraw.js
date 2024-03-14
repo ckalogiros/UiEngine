@@ -30,11 +30,9 @@ export function Gl_draw(gl) {
     for (let i = 0; i < drawQueueCount; i++) {
         
         _pt_test_misc_1.timer.Start();
-        const groupidx = drawQueue[i].groupidx;
         const progidx = drawQueue[i].progidx;
         const vbidx = drawQueue[i].vbidx;
         
-        // const progs = gfx_group.buffer[groupidx];
         const progs = Program_get_programs();
         
         if (GL.BOUND_PROG_IDX !== progidx){

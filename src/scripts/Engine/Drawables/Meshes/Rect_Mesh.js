@@ -126,7 +126,6 @@ export class Rect extends Mesh {
       // if (this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
 
       const params = {
-         groupidx: this.gfx.prog.groupidx,
          progidx: this.gfx.prog.idx,
          vbidx: this.gfx.vb.idx,
          mesh: this,
@@ -134,7 +133,6 @@ export class Rect extends Mesh {
       // Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_MESH, params);
 
       // const params2 = {
-      //    groupidx: this.gfx.prog.groupidx,
       //    progidx: this.gfx.prog.idx,
       //    vbidx: this.gfx.vb.idx,
       //    sceneidx: this.sceneidx,

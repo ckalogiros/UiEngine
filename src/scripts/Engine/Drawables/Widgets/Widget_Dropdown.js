@@ -8,9 +8,8 @@ import { Listener_remove_children_event_by_idx } from "../../Events/EventListene
 import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Widget_group_add, Widget_group_get_rootidx, Widget_group_rerender, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Widget_group_add, Widget_group_get_rootidx, Widget_group_rerender_tree_mesh_recursive, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
 import { Clipy_from_widget_root } from "../Operations/Clip.js";
-import { Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Section } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
 
@@ -59,8 +58,7 @@ export function Dropdown_roots_print_root_buffer() {
 
 const tr = .5;
 const _font_size = 9;
-const temp_dp_margin = [10, 10];
-let once = true;
+
 export class Widget_Dropdown extends Section {
 
    isOn; // Bool for checking a dropdown's menu expanded/contructed.
@@ -844,7 +842,7 @@ export class Widget_Dropdown extends Section {
 
       // Widget_group_reset_partially_gfx_buffers(root)
       // Widget_root_reset_gfx(root.root_bufferidx);
-      Widget_group_reset_from_group_to_vb_end(root);
+      Widget_group_reset_from_group_to_vb_end(root.group_bufferidxs);
       // Widget_group_update_decrement(root.group_bufferidxs, 1)
 
       this.DpDestroyListeners(menu, root);
@@ -855,7 +853,7 @@ export class Widget_Dropdown extends Section {
       root.Recalc_no_batch_render();
 
       Clipy_from_widget_root(root.root_bufferidx);
-      Widget_group_rerender(root.group_bufferidxs[0]);
+      Widget_group_rerender_tree_mesh_recursive(root.group_bufferidxs[0]);
 
    }
 
@@ -932,11 +930,9 @@ export class Widget_Dropdown extends Section {
          this.GenMenuGfxCtx_recursive(root, GFX_CTX_FLAGS.PRIVATE); // Create PRIVATE context to the root's gfx buffers.
       }
 
-      const ib_info = Index_buffer_info_get_by_ibidx(this.gfx.ib.idx)
       // Widget_group_reset_partially_gfx_buffers(root)
       // Widget_root_reset_gfx(root.root_bufferidx);
-      Widget_group_reset_from_group_to_vb_end(root);
-      // Widget_group_update_increment(root.group_bufferidxs, 1)
+      Widget_group_reset_from_group_to_vb_end(root.group_bufferidxs);
 
 
       this.ActivateMenu(root); // Add dropdown to gfx buffers.
@@ -948,19 +944,19 @@ export class Widget_Dropdown extends Section {
       // Re-calculate dimensions and positions
       if (root.group_bufferidxs[0] !== INT_NULL) {
          const group_root = Mesh_buffer_get_mesh_byidx(Widget_group_get_rootidx(root.group_bufferidxs[0]))
-         // group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
+         group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
          // group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN);
-         group_root.Recalc_no_batch_render();
+         // group_root.Recalc_no_batch_render();
       }
       else {
-         // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
+         root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
          // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN);
-         root.Recalc_no_batch_render();
+         // root.Recalc_no_batch_render();
       }
       // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
 
       Clipy_from_widget_root(root.root_bufferidx);
-      Widget_group_rerender(root.group_bufferidxs[0]);
+      Widget_group_rerender_tree_mesh_recursive(root.group_bufferidxs[0]);
 
 
       // TEMP_PRINT_IS_GFX_INSERTED(root, 'END')

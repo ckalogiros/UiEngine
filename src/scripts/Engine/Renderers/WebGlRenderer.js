@@ -102,7 +102,7 @@ export class WebGlRenderer {
 
          Uniforms_block_update_uniform();
 
-         // Debug_ui_update_notifications();
+         Debug_ui_update_notifications();
          
          _pt_gl_draw.timer.Start(); Gl_draw(this.gl); _pt_gl_draw.timer.Stop();
 
