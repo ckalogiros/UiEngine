@@ -45,8 +45,8 @@ const FIRST = 1;
 const LAST = 2;
 
 
-const TEST_CLIP_TOP = -210;
-const TEST_CLIP_BOTTOM = 1500;
+const TEST_CLIP_TOP = -10000;
+const TEST_CLIP_BOTTOM = 10000;
 
 
 

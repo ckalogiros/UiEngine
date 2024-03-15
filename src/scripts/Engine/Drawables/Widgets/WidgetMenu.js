@@ -276,7 +276,7 @@ export class Widget_Menu_Bar extends Widget_Label {
 
 
    Reposition_pre(pos_dif) {
-
+      console.error('NO BATCH CREATED')
       AddArr2(this.geom.pos, pos_dif);
       this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
       // Batch_store(this, _, { pos: pos_dif }, _);

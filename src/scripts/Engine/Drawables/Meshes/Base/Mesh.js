@@ -121,7 +121,6 @@ export class Mesh {
 
         this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
-        // this.state = { mask: 0x0 }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
         this.alignment = 0x0;
 
 
@@ -132,7 +131,6 @@ export class Mesh {
         this.idx = INT_NULL;
         this.sceneidx = STATE.scene.active_idx;
         this.fbidx = INT_NULL; // This should render the current mesh to the default gl framebuffer. 
-        // this.scene_rootidx = INT_NULL;
         this.batch_fnidx = INT_NULL;
         this.mesh_bufferidx = INT_NULL;
         this.root_bufferidx = INT_NULL;
@@ -140,19 +138,15 @@ export class Mesh {
         this.batchidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL];
 
+        this.parent = null;
 
         this.listeners = new M_Buffer();
         this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
 
-        this.parent = null;
-
         this.eventCallbacks = new M_Buffer();
         this.timedEvents = new M_Buffer();
         this.children = new M_Buffer();
-        // this.children_all = new Int16Buffer(16);
-        // this.children_all.Init(INT_NULL);
         this.timeIntervalsIdxBuffer = new Int8Buffer(INTERVALS.SIZE);
-        // this.timeIntervalsIdxBuffer.Init(INT_NULL);
 
 
         this.hover_margin = [0, 0];
@@ -172,9 +166,6 @@ export class Mesh {
             data: null, // Some storage for any kind of data
             evtidx: INT_NULL, // Stores the index of the events in the Info_Listeners buffer.
         };
-
-        this.all_children_gfx_rename_me = null; // This is a buffer for storing all childrens unique gfx info(group, prog, vb indexes)
-
 
         /** Debug  properties */
         if (DEBUG.MESH) {
@@ -508,6 +499,7 @@ export class Mesh {
 
     SetName(name = null) {
         if (name !== '' && name) this.nameidx = Str_buffer_store(name);
+        /**DEBUG*/this.name = name
     }
 
 

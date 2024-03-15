@@ -29,6 +29,7 @@ import { Calculate_positions_recursive } from '../Engine/Drawables/Meshes/Sectio
 import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { TimersCreateTimer } from '../Engine/Timers/Timers.js';
 import { Program_uniform_bind } from '../Graphics/ShaderPrograms.js';
+import { View_create_per_gfx_view, View_reset_from_view, View_rerender_from_view, View_get_view_byidx } from '../Engine/Core/MeshBufferViews.js';
 
 
 /**
@@ -70,7 +71,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    // const uidbg = Debug_info_ui_performance(scene);
+    const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -127,7 +128,7 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    const label = CreateLabel('LABEL');
+    // const label = CreateLabel('LABEL');
     // CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
@@ -144,7 +145,13 @@ export function TestWidgetsGeneric(scene) {
 
     // CreateMenu(scene)
 
-    // CreateDropdown(scene, [160, 200, 0], 0);
+    // const dp = CreateDropdown(scene, [160, 200, 0], 0);
+    // const viewidx = View_create_per_gfx_view(dp.root_bufferidx, dp.mesh_bufferidx);
+    // View_reset_from_view(viewidx);
+    // View_rerender_from_view(viewidx);
+    // console.log()
+    
+    
     // CreateDropdown2(scene, [160, 200, 0], 0);
     // CreateDropdown3(scene, [160, 200, 0], 0);
     // CreateLargeDropdown();
@@ -158,6 +165,7 @@ export function TestWidgetsGeneric(scene) {
     {
         // CreateClampWidgets()
     }
+
 
 
     
@@ -204,7 +212,15 @@ export function TestWidgetsGeneric(scene) {
         // CreateManySectionsWithScroller(scene)
     }
 
-    // const helpui = Help(scene);
+    const helpui = Help(scene);
+    
+
+    const viewidx = View_create_per_gfx_view(helpui.root_bufferidx, helpui.mesh_bufferidx);
+
+    const view = View_get_view_byidx(viewidx)
+    const len = view.data.buffer[1].length;
+    View_reset_from_view(viewidx);
+    View_rerender_from_view(viewidx);
     // Help2(scene);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, helpui);
 
@@ -214,7 +230,7 @@ export function TestWidgetsGeneric(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh.children.buffer[0]);
 
 
-    Debug_info_create_all_generic_info();
+    // Debug_info_create_all_generic_info();
 
 
     // Scenes_debug_info_create(scene);
@@ -452,6 +468,7 @@ function CreateDropdown(scene, pos, id) {
     dp.group_bufferidxs = Widget_group_create(dp.mesh_bufferidx, dp.gfx)
     dp.AddToWidgetGroupBuffer(dp.group_bufferidxs[0]);
 
+    return dp;
 }
 
 
@@ -2951,6 +2968,10 @@ function Help(scene) {
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     section.ActivateAndChildrenRecursive()
     section.Render();
+    // section.options = SECTION.VERTICAL;
+    // section.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.INHERIT;
+    // section.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.INHERIT;
+    section.options = SECTION.INHERIT | SECTION.VERTICAL;
     section.Calc()
     //*Gfx_end_session(true);
 

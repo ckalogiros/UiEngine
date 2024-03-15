@@ -944,14 +944,14 @@ export class Widget_Dropdown extends Section {
       // Re-calculate dimensions and positions
       if (root.group_bufferidxs[0] !== INT_NULL) {
          const group_root = Mesh_buffer_get_mesh_byidx(Widget_group_get_rootidx(root.group_bufferidxs[0]))
-         group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
+         // group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
          // group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN);
-         // group_root.Recalc_no_batch_render();
+         group_root.Recalc_no_batch_render();
       }
       else {
-         root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
+         // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
          // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN);
-         // root.Recalc_no_batch_render();
+         root.Recalc_no_batch_render();
       }
       // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
 

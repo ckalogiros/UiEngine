@@ -196,7 +196,13 @@ export class Widget_Text extends Text_Mesh {
 		// this.geom.MoveXY(x, y, this.gfx);
 		this.geom.pos[0] += x;
 		this.geom.pos[1] += y;
-		Batch_store(this, _, { pos: [x, y] });
+		
+		const update_data = {
+         sizes: [2],
+         data: [x,y],
+      }
+      Batch_store(this, _, update_data, _);
+		// Batch_store(this, _, { pos: [x, y] });
 
 	}
 
@@ -760,20 +766,23 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		if (x === 0 && y === 0) return;
 
-		// this.geom.MoveXY(x, y, this.gfx);
 		this.geom.pos[0] += x;
 		this.geom.pos[1] += y;
-		Batch_store(this, _, [x, y]);
 
+		const update_data = {
+         sizes: [2],
+         data: [x,y],
+      }
+      Batch_store(this, _, update_data, _);
+		
 		// Move children text
 		for (let i = 0; i <= this.children.boundary; i++) {
-
+			
 			const child = this.children.buffer[i];
 			if (child) {
-				// child.geom.MoveXY(x, y, child.gfx);
 				child.geom.pos[0] += x;
 				child.geom.pos[1] += y;
-				Batch_store(child, _, [x, y]);
+				Batch_store(child, _, update_data, _);
 			}
 		}
 	}

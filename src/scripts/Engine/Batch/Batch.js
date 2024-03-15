@@ -129,6 +129,11 @@ export function Batch_store(mesh, first_attrib_offset, update_data=null, num_fac
 }
 
 
+export function Batch_cancel_batch_byidx(batchidx){
+
+}
+
+
 
 export function Batch_update() {
    

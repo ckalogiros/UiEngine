@@ -878,7 +878,7 @@ export class Widget_Slider extends Rect {
 
 
    Reposition_pre(pos_dif) {
-      // console.error('NO BATCH CREATED')
+      console.error('NO BATCH CREATED')
 
       AddArr2(this.geom.pos, pos_dif);
       this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;

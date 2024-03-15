@@ -14,6 +14,7 @@ import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContext
 import { Index_buffer_add_indices, Index_buffer_add_indices_from_non_existant_mesh } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
 import { WHITE } from "../Material/Base/Colors.js";
+import { Batch_store } from "../../Batch/Batch.js";
 
 
 
@@ -110,7 +111,7 @@ export class Text_Mesh extends Mesh {
             Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
             if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
-         else {
+         else { // The first face exista as an entity, the rest are constructed here and store only to the vertex buffer
             Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
             if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
@@ -126,10 +127,6 @@ export class Text_Mesh extends Mesh {
       // BUG: If one text has by mistake a different 'this.mat.uvIdx', then the vb will store that uv-map index. Cause a vertex buffer may use only one texture.
       Vertex_buffer_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
 
-
-      // Scenes_store_mesh_in_gfx(this.sceneidx, this); // For storing meshes by its gfx
-
-      // if(this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
 
       this.is_gfx_inserted = true;
 
@@ -543,6 +540,16 @@ export class Text_Mesh extends Mesh {
    Reposition_pre(pos_dif) {
       console.error('NO BATCH CREATED')
       AddArr3(this.geom.pos, pos_dif);
+
+      // this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
+      // Batch_store(this, _, { pos: pos_dif }, _);
+
+      // mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
+      // const update_data = {
+      //     sizes:[2],
+      //     data:[mouse_pos.x, -mouse_pos.y],
+      // };
+      // Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
    }
 
 

@@ -352,11 +352,11 @@ export function Vertexbuffer_reset_to_index(progidx, vbidx, start) {
 
     const vb_info = _vertex_buffers_info.buffer[vbidx];
     if (start < 0 || start > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js, ');
-    const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Make responsibility for 'VERTS_PER_RECT_INDEXED' OR the program should store the a 'VERTS_PER_RECT_INDEXED'
+
     const attribsidx = Program_get_shader_attributes_index(progidx);
     const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
 
-    const vCount = (vb_info.count - start) / (vertices_per_rect * attribs_per_vertex);
+    const vCount = start ? start/attribs_per_vertex :  0;
     vb_info.count = start;
     vb_info.vCount = vCount;
     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;

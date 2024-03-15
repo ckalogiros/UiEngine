@@ -359,8 +359,9 @@ export class Widget_Label extends Rect {
         AddArr2(this.text_mesh.geom.pos, pos_dif);
         // AddArr2(this.text_mesh.geom.pos_dif, pos_dif);
         
-        if (this.text_mesh.batch_fnidx === INT_NULL)
+        // if (this.text_mesh.batch_fnidx === INT_NULL)
             this.text_mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
+
         Batch_store(this.text_mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
 
         // Batch_store(this.text_mesh, _, { pos: this.text_mesh.geom.pos_dif }, _);

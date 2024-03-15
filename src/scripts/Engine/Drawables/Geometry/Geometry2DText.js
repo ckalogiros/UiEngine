@@ -80,15 +80,16 @@ export class Geometry2D_Text extends Geometry2D {
    }
 
    Reposition_pre(pos) {
-      // console.error('NO BATCH CREATED')
+
       CopyArr2(this.pos, pos)
-      CopyArr2(this.defPos, pos)
+      // CopyArr2(this.defPos, pos)
+
       this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
       const update_data = {
          sizes: [pos.length],
-         dtat: pos,
+         data: [pos[0], pos[1]],
       }
-      Batch_store(this, _, update_data, _);
+      Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data, _);
    }
 
    static Copy(geom = {}) {

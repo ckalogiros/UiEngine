@@ -169,14 +169,23 @@ export class Rect extends Mesh {
 
 
    Reposition_pre(pos_dif) {
+
       AddArr2(this.geom.pos, pos_dif);
       this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      Batch_store(this, _, { pos: pos_dif }, _);
 
+      const update_data = {
+         sizes: [pos_dif.length],
+         data: [pos_dif[0], pos_dif[1]],
+      }
+      Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data, _);
+      
       for (let i = 0; i <= this.children.boundary; i++) {
+
          AddArr2(this.children.buffer[i].geom.pos, pos_dif);
+         
          this.children.buffer[i].batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-         Batch_store(this.children.buffer[i], _, { pos: pos_dif }, _);
+         Batch_store(this.children.buffer[i], SHADER_ATTRIBUTES.WPOS4, update_data, _);
+         // Batch_store(this.children.buffer[i], _, { pos: pos_dif }, _);
       }
    }
 

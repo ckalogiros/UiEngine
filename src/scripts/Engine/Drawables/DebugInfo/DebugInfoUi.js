@@ -89,9 +89,9 @@ export function Debug_info_ui_performance(scene) {
 
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    dp.Render();
-   // dp.StateEnable(MESH_STATE.ACTIVE)
-   // dp.Calc(SECTION.EXPAND | SECTION.INHERIT);
-   dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   // dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN  | SECTION.INHERIT;
+   // dp.options = SECTION.VERTICAL | SECTION.INHERIT;
    dp.Calc();
    dp.ConstructListeners();
 
@@ -350,6 +350,7 @@ function Debug_info_create_ui_performance_timers() {
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    section.ActivateAndChildren()
    section.Render()
+   section.options = SECTION.VERTICAL;
    section.Calc();
    section.ConstructListeners();
 
@@ -397,7 +398,8 @@ function Debug_info_create_ui_mouse() {
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    section.ActivateAndChildren();
    section.Render()
-   section.Calc(SECTION.INHERIT | SECTION.VERTICAL);
+   section.options |= SECTION.EXPAND | SECTION.INHERIT;
+   section.Calc();
    section.ConstructListeners();
 
    DEBUG_INFO.UI_MOUSE.MESH_BUFFER_IDX = section.mesh_bufferidx;
@@ -891,7 +893,8 @@ function Debug_info_create_batch_info(params) {
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    section.ActivateAndChildren();
    section.Render()
-   section.Calc(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL);
+   section.options = SECTION.HORIZONTAL;
+   section.Calc();
    section.ConstructListeners();
 
 

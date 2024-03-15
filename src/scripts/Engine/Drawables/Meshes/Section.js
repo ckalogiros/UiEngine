@@ -188,7 +188,6 @@ export class Section extends Rect {
    }
 
 
-   // Calc(options = SECTION.INHERIT) {
    Calc(options=_) {
 
       // TEMP_PRINT_IS_GFX_INSERTED(this, 'CALC START')
@@ -196,15 +195,12 @@ export class Section extends Rect {
       if(options === _) options = section.options
 
 
-      let left = section.geom.pos[0]; // Left starting position
-      let top = section.geom.pos[1]; // Top starting position
-
       const total_size = [0, 0], total_margin = [0, 0]
       const old_sizex = section.geom.dim[0];
       const old_sizey = section.geom.dim[1];
 
 
-      Calculate_sizes_recursive(section, top, left, options, total_margin, total_size);
+      Calculate_sizes_recursive(section, options, total_margin, total_size);
 
 
       if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
@@ -215,12 +211,12 @@ export class Section extends Rect {
       }
 
       /** OPTIONS:EXPAND 
-       * Happens on a second pass of all items of current section, since each section may have different options for expand.
        * Expand width of items to match the max width of section, minus the margin.
+       * Happens on a second pass of all items of current section, since each section may have different options for expand.
        * Only if the section has VERTICAL align for its items. 
        */
       if (options & SECTION.EXPAND) {
-         Expand(section, section.options, section.max_size[0], 0);
+         Expand(section, options, section.max_size[0], 0);
       }
 
 
@@ -243,29 +239,25 @@ export class Section extends Rect {
           data:[section.geom.dim[0], section.geom.dim[1]],
       };
       Batch_store(section, SHADER_ATTRIBUTES.POS2, update_data, _);
-      // Batch_store(section, SHADER_ATTRIBUTES.WPOS4, _, _);
 
       return section.max_size;
 
    }
 
 
-   // Calc_no_gfx_update(options = SECTION.INHERIT) {
    Calc_no_gfx_update(options) {
 
       
       const section = this;
       if(options === _) options = section.options; // Here set as options: the passed options(de-activates any mesh self-set-options), or the mesh self-options
 
-      let left = section.geom.pos[0]; // Left starting position
-      let top = section.geom.pos[1]; // Top starting position
 
       const total_size = [0, 0], total_margin = [0, 0]
       const old_sizex = section.geom.dim[0];
       const old_sizey = section.geom.dim[1];
 
 
-      Calculate_sizes_recursive(section, top, left, options, total_margin, total_size);
+      Calculate_sizes_recursive(section, options, total_margin, total_size);
 
 
       if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
@@ -281,7 +273,7 @@ export class Section extends Rect {
        * Only if the section has VERTICAL align for its items. 
        */
       if (options & SECTION.EXPAND) {
-         Expand(section, section.options, section.max_size[0], 0);
+         Expand(section, options, section.max_size[0], 0);
       }
 
 
@@ -581,42 +573,6 @@ export class Section extends Rect {
 
       Widget_root_batch_move_from_batch_buffer(this.root_bufferidx, x, y)
 
-      // const widget_root_buffer = Widget_root_buffer_get_byidx(this.root_bufferidx);
-      
-
-      // for (let i = 0; i <= widget_root_buffer.boundary; i++) {
-
-      //    // if(widget_root_buffer.buffer[i] == INT_NULL)
-         
-      //    // EFFICIENCY: Maybe its better to access the _mesh_buffer directly from the MeshBuffer.js file. Also later we use 'Widget_root_batch_get'
-      //    const mesh = Mesh_buffer_get_mesh_byidx(widget_root_buffer.buffer[i]);
-      //    if(mesh === _) 
-      //    console.log(widget_root_buffer.buffer[i], i)
-      //       mesh.geom.pos[0] += x;
-      //       mesh.geom.pos[1] += y;
-      //    // }
-      // }
-
-      // const root_batch_buffer = Widget_root_batch_get(this.root_bufferidx);
-
-      // const len = root_batch_buffer.vb.length
-      // for (let i = 0; i < len; i++) {
-
-      //    const meshidx = root_batch_buffer.vb[i].meshidx;
-      //    const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-
-      //    if(mesh){
-
-      //       mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-      //       const update_data = {
-      //             sizes:[2],
-      //             data:[x, y],
-      //       };
-      //       Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, root_batch_buffer.vb[i].num_faces); // The batch_store needs the number of meshes to update as well as the move value
-      //    }
-
-      // }
-
    }
 
 
@@ -865,28 +821,30 @@ function Section_on_move_section(params) {
 
 function Expand(parent, options, width, accum_margins) {
 
-
+   let opt = options
    for (let i = 0; i <= parent.children.boundary; i++) {
 
       const child = parent.children.buffer[i];
+      if (options & SECTION.INHERIT) opt = parent.options
 
       if (child.type & MESH_TYPE.WIDGET_TEXT_LABEL && child.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
-         child.Resize();
+         child.Resize(); // TODO: Implement
          child.geom.dim[0] = width - (parent.margin[0] + accum_margins);
       }
       else if (child.type & MESH_TYPE.SECTION_MESH) {
 
          child.Resize();
-         if (options & SECTION.VERTICAL) {
+         if (opt & SECTION.VERTICAL) {
             child.geom.dim[0] = width - accum_margins;
          }
-         else if (options & SECTION.HORIZONTAL) {
+         else if (opt & SECTION.HORIZONTAL) {
 
          }
 
          accum_margins += child.margin[0];
          // HACK: Pass the parent's options so that if parent parent is vertical align for children, the children will expand. The option of the child counts for it's children expansion. 
-         Expand(child, child.parent.options, width, accum_margins);
+         // Expand(child, child.parent.options, width, accum_margins);
+         Expand(child, opt, width, accum_margins);
          accum_margins -= child.margin[0];
       }
    }
@@ -897,23 +855,23 @@ function Expand(parent, options, width, accum_margins) {
 
 
 // TODO: For calculating multi-word text, if we need separate flags (HORIZONTAL | VERTICAL), we need to store the flags in the mesh. 
-function Calculate_sizes_recursive(parent, top, left, options, total_margin = [0, 0], total_size = [0, 0]) {
+function Calculate_sizes_recursive(parent, options, total_margin = [0, 0], total_size = [0, 0]) {
 
    const padding = [0, 0]; // TODO: Implement
    const margin = total_margin;
    const accum_size_per_section = [0, 0];
 
+   let opt = options
    for (let i = 0; i <= parent.children.boundary; i++) {
 
 
-      let opt = options
       if (options & SECTION.INHERIT) opt = parent.options
 
       const mesh = parent.children.buffer[i];
 
       if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) && !((mesh.type & MESH_TYPE.WIDGET_SCROLLER)))) {
 
-         const size = Calculate_sizes_recursive(mesh, top, left, SECTION.INHERIT, margin, total_size); // Recurse if child mesh is of type of Section
+         const size = Calculate_sizes_recursive(mesh, options, margin, total_size); // Recurse if child mesh is of type of Section
 
          total_size[0] += size[0];
          total_size[1] += size[1];
