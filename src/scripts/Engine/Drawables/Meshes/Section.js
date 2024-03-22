@@ -58,7 +58,7 @@ export class Section extends Rect {
       // extends section class, in order to call it's classes methods instead of the mother class(the Section)
       this.type |= MESH_TYPE.SECTION_MESH_ONLY;
 
-      this.SetName(name)
+      this.SetName(`[${this.mesh_bufferidx}]{${name}}-SECTION`);
 
       this.SetStyle(style);
 
@@ -73,14 +73,17 @@ export class Section extends Rect {
 
       // Any children destruction
       const len = this.children.boundary; // Cash the boundary cause it is going to be decremented on mesh destroy
-      for (let i = 0; i <= len; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
-         if (child) child.Destroy(child);
+         if (child) {
+            const shift_children = child.Destroy(child);
+            if(shift_children) i--;
+         }
       }
 
       // section's destruction
-      super.Destroy();
+      return super.Destroy();
    }
 
 
@@ -115,6 +118,8 @@ export class Section extends Rect {
       else { // Handle Items 
          // TODO: implement
       }
+
+      mesh.idx = idx;
 
       return idx;
    }
@@ -152,6 +157,16 @@ export class Section extends Rect {
    }
 
 
+   // AddToGfxBuffer() { 
+   //    this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+   // }
+
+
+   // RemoveFromGfxBuffer() { 
+   //    Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
+   // }
+
+
    Activate() {
 
       this.state.mask |= MESH_STATE.ACTIVE;
@@ -181,8 +196,10 @@ export class Section extends Rect {
 
    StateDisable(MASK=0x0) {
 
+      
       this.state.mask &= ~MASK; // HERE
       for (let i = 0; i <= this.children.boundary; i++) {
+         if(!this.children.buffer[i]) console.error('child missisng. this:', this.GetName(), 'children', this.children)
          this.children.buffer[i].StateDisable(MASK);
       }
    }
@@ -226,6 +243,7 @@ export class Section extends Rect {
          section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.margin[0];
          section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.margin[1];
       }
+
 
       section.SetMargin();
 

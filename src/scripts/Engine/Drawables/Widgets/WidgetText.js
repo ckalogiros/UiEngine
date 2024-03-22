@@ -33,7 +33,7 @@ export class Widget_Text extends Text_Mesh {
 		super(text, pos, fontSize, col)
 		this.type |= MESH_TYPE.WIDGET_TEXT | this.type;
 
-		this.SetName('Widget_Text:' + text);
+		// this.SetName(`[${this.mesh_bufferidx}]{${text}}-Widget-Text`);
 		this.pad = [0, 0];
 		AddArr2(this.pad, pad);
 	}
@@ -237,6 +237,9 @@ export class Widget_Text extends Text_Mesh {
 
 	AddToWidgetGroupBuffer(group_bufferidx) {
 
+		if(group_bufferidx === INT_NULL)
+         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
+
 		if (this.state.mask & MESH_STATE.ACTIVE) {
 			this.group_bufferidxs[0] = group_bufferidx;
 			this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
@@ -301,7 +304,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			}
 		}
 
-		super.Destroy();
+		return super.Destroy();
 	}
 
 
@@ -908,6 +911,9 @@ export class Widget_Multi_Text extends Widget_Text {
 
 
 	AddToWidgetGroupBuffer(group_bufferidx) {
+
+      if(group_bufferidx === INT_NULL)
+         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
 
 		if (this.state.mask & MESH_STATE.ACTIVE) {
 			this.group_bufferidxs[0] = group_bufferidx;

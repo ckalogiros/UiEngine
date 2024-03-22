@@ -5,7 +5,7 @@ import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { Listener_create_child_event, Listener_create_event, Listener_remove_children_event_by_idx, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
-import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
+import { Gfx_buffer_update_start, Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 // import { Program_enable_uniforms_for_creation } from "../../../../Graphics/ShaderPrograms.js";
@@ -60,9 +60,10 @@ export class Mesh {
     sceneidx;   // Value: An index to the scene that the mesh belongs to(index only).
     // scene_rootidx; // Value: An index that stores the mesh's location in a scene root_meshes[] buffer.
     fbidx;      // Value: The framebuffer index that this mesh is reb=ndered to. If INT_NULL the mesh is rendered to the default gl output buffer. 
+    root_bufferidx; // Value: This is the index of the mesh in the Widget_root_buffer storage.
+    gfx_bufferidx;  // Value. Index of the msh inside the Gfx Buffer.
     batch_fnidx; // Value: An index to the batch buffer of function pointers
     mesh_bufferidx; // Value: This is the index of the mesh in the Mesh_Buffer storage.
-    root_bufferidx; // Value: This is the index of the mesh in the Widget_root_buffer storage.
     batch_buffer_vbidx; // Value: This is the index of the mesh in the Widget_root_batch_buffer storage.
     batchidx;   // Value: An index to the mesh refference in the batch buffer. 
     group_bufferidxs; // Array[2]: The first element is the index of the group in the group buffer. The second element is the index to the elem of the array representing the vertex buffer of this mesh 
@@ -134,6 +135,7 @@ export class Mesh {
         this.batch_fnidx = INT_NULL;
         this.mesh_bufferidx = INT_NULL;
         this.root_bufferidx = INT_NULL;
+        this.gfx_bufferidx = INT_NULL;
         this.batch_buffer_vbidx = INT_NULL;
         this.batchidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL];
@@ -194,6 +196,7 @@ export class Mesh {
     RemoveChildByIdx(idx) {
 
         this.children.RemoveByIdx(idx);
+        return this.children.ShiftElementOnDestroy(idx);
     }
 
 
@@ -222,30 +225,23 @@ export class Mesh {
 
         /*************************************************************************************/
         // Remove from gfx buffers.
-        Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces);
+        const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces);
 
-
+    
         /*************************************************************************************/
         // Remove from widget root buffer.
         Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
+        Gfx_buffer_update_start(this.root_bufferidx);
 
 
-
-
+        let shift_children = false;
         // Remove from parent's children buffer
-        if (this.parent && this.parent !== WIDGET_TEXT_MESH) {
-
-            this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
-            // Shift all children to the left
-            // for(let i=this.idx; i<=this.parent.children.boundary; i++){
-            //     if(i+1 <= this.parent.children.boundary)
-            //         this.parent.children.buffer[i] = this.parent.children.buffer[i+1];
-            // }
-            // this.parent.children.buffer[this.parent.children.boundary] = null;
-            // this.parent.children.boundary--;
-        }
-
-
+        if (this.parent && this.parent !== NO_MESH_PARENT) {
+            
+            shift_children = this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
+            if(this.gfx.vb.idx === 3)console.log('-{1} Removing:', this.GetName(), 'idx:', this.idx, 'parent name', 'start', ret.start, this.parent.GetName())
+        }      
+        else if(this.gfx.vb.idx === 3 )console.log('-{1-NO-PARENT} Removing:', 'start', ret.start, this.GetName(), 'idx:', this.idx)
 
 
         // // Set Debug listen event
@@ -262,6 +258,8 @@ export class Mesh {
 
         // // Remove from mesh buffer, the true storage of the mesh
         // Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
+
+        return shift_children;
     }
 
     ActivateAndChildren() {

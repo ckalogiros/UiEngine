@@ -80,7 +80,6 @@ export function View_create_per_gfx_view(root_bufferidx, mesh_bufferidx) {
 
    // Run a precalculation for Int16Buffer size
    // Build the buffers and then create the vie buffers out of them
-   const LOC = 2;
    const VB = 2;
    const pre_data = [];
    const gfxidxs = [];
@@ -99,6 +98,7 @@ export function View_create_per_gfx_view(root_bufferidx, mesh_bufferidx) {
    for (let i = 0; i < len; i++) { num_faces[i] = 0; } // Init to 0
 
    
+   // Build the view buffer by storing all view's mesh's indexes in a regular array first
    for (let i = 0; i <= root_buffer.boundary; i++) {
       
       const mesh = Mesh_buffer_get_mesh_byidx(root_buffer.buffer[i]);
@@ -106,8 +106,7 @@ export function View_create_per_gfx_view(root_bufferidx, mesh_bufferidx) {
       for (let j = 0; j < len; j++) {
 
          if(mesh.gfx.vb.idx === gfxidxs[j][VB]){
-            // pre_data[gfxidxs[LOC]].push(mesh.mesh_bufferidx);
-            // num_faces[LOC] += mesh.geom.num_faces;
+
             pre_data[j].push(mesh.mesh_bufferidx);
             num_faces[j] += mesh.geom.num_faces;
             break;
@@ -118,13 +117,14 @@ export function View_create_per_gfx_view(root_bufferidx, mesh_bufferidx) {
    console.warn('pre_data', pre_data, 'num_faces', num_faces);
 
 
-   // Store the num_faes as the last elem of pre_data
+   // Store the num_faces as the last array element of pre_data
    for (let i = 0; i < len; i++) {
-
-      // const last_elem = pre_data[i].length 
       pre_data[i].push(num_faces[i]);
    }
+
+
    
+   // Finally build the typed array view
    const view = new View(mesh_bufferidx);
    for (let i = 0; i < len; i++) {
       
@@ -133,11 +133,13 @@ export function View_create_per_gfx_view(root_bufferidx, mesh_bufferidx) {
    }
 
    const viewidx = _view_buffer.Add(view);
-
    console.warn('view', view);
 
    return viewidx;
 }
+
+
+
 
 /******************************************************************************************************************************/
 // Functionality
@@ -162,14 +164,11 @@ export function View_reset_from_view(view_bufferidx) {
 }
 
 
+
 export function View_rerender_from_view(view_bufferidx) {
 
    const view = _view_buffer.buffer[view_bufferidx];
 
-   // const mesh = Mesh_buffer_get_mesh_byidx(view.data.buffer[1][0])
-   // console.log(mesh.GetName())
-   // mesh.AddToGfxFromReset();
-   
    const len = view.data.buffer[1].length;
    for (let i = 0; i < len-1; i++) {
       
@@ -181,15 +180,43 @@ export function View_rerender_from_view(view_bufferidx) {
    
    const mesh = Mesh_buffer_get_mesh_byidx(view.data.buffer[1][0])
    Vertex_buffer_state_enable(mesh.gfx.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
-   // mesh.Recalc();
 
-   // const progidx = mesh.gfx.prog.idx;
-   // const vbidx = mesh.gfx.vb.idx;
+}
 
-   // const vb_start = mesh.gfx.vb.start; // We want the start of the root mesh of the group, not the start of the root widget
-   // Vertexbuffer_reset_to_index(progidx, vbidx, vb_start);
 
-   // const ib_start = mesh.gfx.ib.start; // We want the start of the root mesh of the group, not the start of the root widget
-   // Index_buffer_reset_to_index(vbidx, ib_start);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/
+// DEBUG-PRINT
+/*******************************************************************************************************************************************************************************/
+
+
+// Buffer of all meshes of the application.
+export function View_buffer_print() {
+   console.log('_view_buffer:', _view_buffer);
 }

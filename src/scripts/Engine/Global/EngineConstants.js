@@ -37,7 +37,7 @@ const UNCHANGED = 0xffff; // Just a flag, used for checking if a value should ch
 const _ = undefined;
 
 
-const WIDGET_TEXT_MESH = 0x1; // Just a flag, as a way to check if the parent of a mesh is not null but is not part of the parent's children buffer either.
+const NO_MESH_PARENT = INT_NULL; // Just a flag, as a way to check if the parent of a mesh is not null but is not part of the parent's children buffer either.
 
 
 // For renderqueue
@@ -297,6 +297,7 @@ const SECTION = {
 
 	NO_ITEMS_CALC: _CNT <<= 0x1,
 	TOP_DOWN: _CNT <<= 0x1,
+	LEFT_RIGHT: _CNT <<= 0x1,
 
 };
 

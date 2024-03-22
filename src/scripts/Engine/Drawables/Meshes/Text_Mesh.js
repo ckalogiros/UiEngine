@@ -9,7 +9,7 @@ import { FontMaterial } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Font_get_char_plane_bounds, Font_get_char_uv_coords, Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { Gl_set_dim_XY, Gl_set_uv, Gl_set_uv2, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Widget_group_update_increment, Widget_root_batch_update_increment_accumulator } from "../../Core/MeshBuffer.js";
+import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_group_update_increment, Widget_root_batch_update_increment_accumulator } from "../../Core/MeshBuffer.js";
 import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { Index_buffer_add_indices, Index_buffer_add_indices_from_non_existant_mesh } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
@@ -36,7 +36,7 @@ export class Text_Mesh extends Mesh {
 
       this.last_charidx = text.length;
 
-      this.SetName(text);
+      // this.SetName(text);
       this.type |= MESH_TYPE.TEXT_MESH;
       this.fontsize = fontsize;
       this.advancex = Font_get_font_advancex(font);
@@ -55,7 +55,14 @@ export class Text_Mesh extends Mesh {
       this.state.mask &= ~MASK;
    }
 
+   AddToGfxBuffer() { 
+      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+   }
 
+
+   RemoveFromGfxBuffer() { 
+      Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
+   }
 
 
    /*******************************************************************************************************************************************************/
@@ -128,6 +135,11 @@ export class Text_Mesh extends Mesh {
       Vertex_buffer_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
 
 
+
+      // Add entry to Gfx Buffer
+      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+
+
       this.is_gfx_inserted = true;
 
    }
@@ -179,6 +191,10 @@ export class Text_Mesh extends Mesh {
       }
 
       this.is_gfx_inserted = true;
+
+      
+      // Add entry to Gfx Buffer
+      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
    }
 
    

@@ -5,11 +5,10 @@ import { Int8Buffer, M_Buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_create, Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
 import { Select_fnidx_to_fill_vertex_buffer } from './Buffers/VertexBuffersOps.js';
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from '../Engine/Core/CreateWidget.js';
-import { BLUEL, GREEN, GREY } from '../Engine/Drawables/Material/Base/Colors.js';
-import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
+import { BLUEL, GREY, WHITE } from '../Engine/Drawables/Material/Base/Colors.js';
 import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from '../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js';
 import { Debug_info_update_progarm_clbk } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
-import { Widget_root_gfx_get_structured, Widget_root_reset_gfx } from '../Engine/Core/MeshBuffer.js';
+import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 
 
 
@@ -345,11 +344,10 @@ export function Program_uniform_bind(progidx, functions_obj, unif_name) {
 
 function TEMP(params) {
 	const destroy_btn = params.target_mesh;
-	console.log('TEMP FUNCTION', destroy_btn.GetName());
+	// console.log('TEMP FUNCTION', destroy_btn.GetName());
 
 	const s = params.params;
-	// console.log('section:', s.GetName());
-	// s.Destroy();
+	s.Destroy();
 
 
 	const _params = {
@@ -357,24 +355,112 @@ function TEMP(params) {
 		parent_section: s.parent,
 	}
 
-	// Debug_ui_create_notification(Debug_info_update_progarm_clbk, _params);
-	Debug_ui_create_notification(Program_update_text_info, _params);
-
+	Debug_ui_create_notification(Debug_info_update_progarm_clbk, _params);
 
 }
+
+/** Simple Sections */
+// export function Program_create_text_info() {
+
+// 	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), 'BLUE');
+
+// 	const destroy = Create_widget_button(_, 'BLUE DESTROY', _, _, _, TRANSPARENCY(WHITE, .3), _, _, _, _, _);
+// 	destroy.Bind(TEMP, _, s);
+// 	s.AddItem(destroy);
+
+// 	const margin = [4, 4];
+// 	const style = [0, 3, 1];;
+// 	const progs = _programs;
+
+// 	const _0 = Create_widget_section(_, SECTION.HORIZONTAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), '0BLUE');
+// 	s.AddItem(_0)
+
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE1'); _0.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE2'); _0.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE3'); _0.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE4'); _0.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE5'); _0.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE6'); _0.AddItem(vb_buffer_info); }
+
+// 	const _1 = Create_widget_section(_, SECTION.HORIZONTAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), '0BLUE');
+// 	s.AddItem(_1)
+
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE1'); _1.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE2'); _1.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE3'); _1.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE4'); _1.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE5'); _1.AddItem(vb_buffer_info); }
+// 	{ const vb_buffer_info = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [5, 5], TRANSPARENCY(BLUEL[9], .9), 'BLUE6'); _1.AddItem(vb_buffer_info); }
+
+
+// 	return s;
+// }
+
+/** Buttons */
+// export function Program_create_text_info() {
+
+// 	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), 'BLUE');
+
+// 	const destroy = Create_widget_button(_, 'BLUE DESTROY', _, _, _, TRANSPARENCY(WHITE, .3), _, _, _, _, _);
+// 	destroy.Bind(TEMP, _, s);
+// 	s.AddItem(destroy);
+
+// 	const _0 = Create_widget_section(_, SECTION.HORIZONTAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), '0BLUE');
+// 	s.AddItem(_0)
+
+// 	for(let i=0; i<4; i++){
+
+// 		{ const vb_buffer_info = Create_widget_button(_, 'BLUE DESTROY', _, _, _, TRANSPARENCY(WHITE, .3), _, _, _, _, _); _0.AddItem(vb_buffer_info); }
+// 	}
+
+
+// 	const _1 = Create_widget_section(_, SECTION.HORIZONTAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), '1BLUE');
+// 	s.AddItem(_1)
+
+// 	for(let i=0; i<4; i++){
+
+// 		{ const vb_buffer_info = Create_widget_button(_, 'BLUE DESTROY', _, _, _, TRANSPARENCY(WHITE, .3), _, _, _, _, _); _1.AddItem(vb_buffer_info); }
+// 	}
+
+// 	return s;
+// }
+
+
+/** Dropdown */
+// export function Program_create_text_info() {
+
+// 	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), 'BLUE');
+
+// 	const destroy = Create_widget_button(_, 'BD', _, _, _, TRANSPARENCY(WHITE, .3), _, _, _, _, _);
+// 	destroy.Bind(TEMP, _, s);
+// 	s.AddItem(destroy);
+
+
+// 	const col_menu = GREY[3], col_dp = GREY[1];
+// 	const margin = [4, 4], style = [0, 3, 1];
+
+// 	const _0 = Create_widget_dropdown(_, '0', [100, 100, 0], col_dp, col_menu, _, _, _, _, _, margin);
+// 	Dropdown_roots_set_root(_0, _0);
+// 	s.AddItem(_0)
+
+// 	for(let i=0; i<4; i++){
+
+// 		{ const vb_buffer_info = Create_widget_button(_, `${i}B`, _, _, _, TRANSPARENCY(WHITE, .3), _, _, _, _, _); _0.AddToMenu(vb_buffer_info); }
+// 	}
+
+
+// 	return s;
+// }
 
 export function Program_create_text_info() {
 
 	const col_menu = GREY[3], col_dp = GREY[1];
 
-	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .3), 'Program Info COLOR BLUE');
+	const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), 'Program Info COLOR BLUE');
 
-	const destroy = Create_widget_button(_, 'Destroy', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
+	const destroy = Create_widget_button(_, 'Recalc', _, _, _, TRANSPARENCY(WHITE, .3), _, _, _, _, _);
 	destroy.Bind(TEMP, _, s);
 	s.AddItem(destroy);
-	// s.options |= SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-	s.options |= SECTION.TOP_DOWN | SECTION.VERTICAL;
-	// s.Calc()
 
 	const margin = [4, 4];
 	const style = [0, 3, 1];;
@@ -392,8 +478,6 @@ export function Program_create_text_info() {
 
 
 	for (let i = 0; i <= progs.boundary; i++) {
-
-
 
 		const prog = progs.buffer[i];
 
@@ -442,6 +526,7 @@ export function Program_create_text_info() {
 	}
 
 	// s.Calc()
+	s.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT
 	return s;
 }
 
@@ -468,37 +553,31 @@ export function Program_update_text_info(params) {
 
 	// const ib_start = group.group_data[i].ib_start; // We want the start of the root mesh of the group, not the start of the root widget
 	// Index_buffer_reset_to_index(vbidx, ib_start);
-	
+
 	// AddToGfxFromReset()
 
 }
 
 export function Program_update_text_info_TEMP(mesh) {
 
-	for (let i=0; i<=mesh.children.boundary; i++){
+	for (let i = 0; i <= mesh.children.boundary; i++) {
 
 		const child = mesh.children.buffer[i];
-		if(child) Program_update_text_info_TEMP(child)
+		if (child) Program_update_text_info_TEMP(child)
 
-		// if(child.type & MESH_TYPE.WIDGET_DROP_DOWN){
-		// 	if(child.isOn & DP_MENU_STATE.ON){
-		// 		// child.DeactivateMenu();
-		// 		child.DpActivateMenu();
-		// 		console.log(child.mesh_bufferidx, child.GetName())
-		// 	}
-		// }
-		if(child.type & MESH_TYPE.WIDGET_TEXT){
+
+		if (child.type & MESH_TYPE.WIDGET_TEXT) {
 			console.log(child.mesh_bufferidx, child.GetName())
 			// child.UpdateText('NEW TEXT')
 			child.ResetText('NEW TEXT jhsdkskjd sjdkjsjsm sjdkjskdjksj');
 
 		}
-		
+
 
 
 		// console.log(child.mesh_bufferidx, child.GetName())
 	}
-	
+
 	// console.log(mesh.mesh_bufferidx, mesh.GetName())
 
 }

@@ -9,7 +9,7 @@ import { Mesh_print_all_mesh_listeners } from "../../Drawables/Meshes/Base/Mesh.
 import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
 import { Info_listener_print_buffer } from "../../Drawables/DebugInfo/InfoListeners.js";
-import { Meshbuffer_print, Meshbuffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widget_group_buffer_print_w5, Widgetroot_buffer_print_w6 } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_print, Mesh_buffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widget_group_buffer_print_w5, Widgetroot_buffer_print_w6, Gfx_buffer_print, Gfx_buffer_print_loop } from "../../Core/MeshBuffer.js";
 import { Str_buffer_print } from "../../Core/StringBuffer.js";
 import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js";
@@ -57,6 +57,8 @@ const vi = _CNT++;
 const vs = _CNT++;
 const gs = _CNT++;
 const gw = _CNT++;
+const g1 = _CNT++;
+const g2 = _CNT++;
 const p1 = _CNT++;
 
 export const DEBUG_PRINT_KEYS = [
@@ -258,18 +260,18 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'm1',
-      discr: 'Meshbuffer_print',
+      discr: 'Mesh_buffer_print',
       func: (e)=>{
-         console.log('------------------ Meshbuffer_print() ------------------');
-         Meshbuffer_print();
+         console.log('------------------ Mesh_buffer_print() ------------------');
+         Mesh_buffer_print();
       },
    },
    {
       key: 'm2',
-      discr: 'Meshbuffer_print_loop',
+      discr: 'Mesh_buffer_print_loop',
       func: (e)=>{
-         console.log('------------------ Meshbuffer_print_loop() ------------------');
-         Meshbuffer_print_loop();
+         console.log('------------------ Mesh_buffer_print_loop() ------------------');
+         Mesh_buffer_print_loop();
       },
    },
    {
@@ -369,6 +371,22 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
+      key: 'g1',
+      discr: 'Gfx_buffer_print',
+      func: (e)=>{
+         console.log('------------------ Gfx_buffer_print ------------------');
+         Gfx_buffer_print()
+      },
+   },
+   {
+      key: 'g2',
+      discr: 'Gfx_buffer_print_loop',
+      func: (e)=>{
+         console.log('------------------ Gfx_buffer_print_loop ------------------');
+         Gfx_buffer_print_loop()
+      },
+   },
+   {
       key: 'p1',
       discr: 'Gl_program_print',
       func: (e)=>{
@@ -464,13 +482,15 @@ export function OnKeyUp(e){
       }
       else if  (_keys_buffer[0].key === 'v') { 
          if       (_keys_buffer[len].key === 'a') DEBUG_PRINT_KEYS[va].func(e);  
-         if       (_keys_buffer[len].key === 'b') DEBUG_PRINT_KEYS[vb].func(e);  
-         if       (_keys_buffer[len].key === 'i') DEBUG_PRINT_KEYS[vi].func(e);  
-         if       (_keys_buffer[len].key === 's') DEBUG_PRINT_KEYS[vs].func(e);  
+         else if       (_keys_buffer[len].key === 'b') DEBUG_PRINT_KEYS[vb].func(e);  
+         else if       (_keys_buffer[len].key === 'i') DEBUG_PRINT_KEYS[vi].func(e);  
+         else if       (_keys_buffer[len].key === 's') DEBUG_PRINT_KEYS[vs].func(e);  
       }
       else if  (_keys_buffer[0].key === 'g') { 
          if       (_keys_buffer[len].key === 's') DEBUG_PRINT_KEYS[gs].func(e);  
-         if       (_keys_buffer[len].key === 'w') DEBUG_PRINT_KEYS[gw].func(e);  
+         else if       (_keys_buffer[len].key === 'w') DEBUG_PRINT_KEYS[gw].func(e);  
+         else if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[g1].func(e);  
+         else if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[g2].func(e);  
       }
       else if  (_keys_buffer[0].key === 'p') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[p1].func(e);  

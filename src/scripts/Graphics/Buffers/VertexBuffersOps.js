@@ -3,7 +3,7 @@
 import { Str_buffer_get_DEBUG, Str_buffer_get_by_idx } from "../../Engine/Core/StringBuffer";
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size } from "../ShaderAttributes";
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from "./IndexBuffers";
-import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_state_enable } from "./VertexBuffers";
+import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_remove_geometry, Vertex_buffer_state_enable } from "./VertexBuffers";
 
 
 
@@ -258,7 +258,8 @@ export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
    };
 
    // if(DEBUG.GFX.REMOVE_MESH) console.log('idx:', gfx.prog.idx, gfx.vb.idx, 'vb count:', vb.count, ' attributes from start:', gfx.vb.start, ' to:', gfx.vb.start+gfx.vb.count*num_faces)
-   ret.counts[0] = vb.Remove_geometry(gfx, num_faces, start);
+   // ret.counts[0] = vb.Remove_geometry(gfx, num_faces, start);
+   ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start);
    ret.counts[1] = ib.Remove_geometry(num_faces); // It doe not matter from where we remove indexes, as long as the vertices per face are same. 
 
    // vb.in

@@ -203,6 +203,11 @@ export class Widget_Scroller extends Section {
 
    AddToWidgetGroupBuffer(group_bufferidx) {
 
+      
+      if(group_bufferidx === INT_NULL)
+         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
+
+
       if (this.state.mask & MESH_STATE.ACTIVE) {
          /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR MESH:', this.mesh_bufferidx, this.GetName());
          /**DEBUG */ if (this.group_bufferidxs[1] !== INT_NULL) console.error('ADDING TO WIDGET GROUP BUFFER WARNING: MESH ALREADY IS IN A WIDGET GROUP:', this.mesh_bufferidx, this.GetName(), 'group:', this.group_bufferidxs, 'start', this.gfx.vb.start);
@@ -238,7 +243,7 @@ export class Widget_Scroller extends Section {
       this.scrolled_section = null;
       this.scroll_bar = null;
       // Scrollers's rect_mesh destruction
-      super.Destroy();
+      return super.Destroy();
    }
 
 
@@ -959,7 +964,7 @@ export function Scroller_clampy_and_render(scroller, upper_threshold = 0, lower_
    // Build the group out of the clamped scrolled section
    scroller.scrolled_section.group_bufferidxs = Widget_group_create(scroller.scrolled_section.mesh_bufferidx, scroller.scrolled_section.gfx)
    scroller.scrolled_section.AddToWidgetGroupBuffer(scroller.scrolled_section.group_bufferidxs[0]);
-
+   // scroller.options = SECTION.VERTICAL | SECTION.TOP_DOWN;
    // Render the clamped scroller
    scroller.Render();
    // scroller.Recalc();

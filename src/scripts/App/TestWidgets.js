@@ -29,7 +29,7 @@ import { Calculate_positions_recursive } from '../Engine/Drawables/Meshes/Sectio
 import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { TimersCreateTimer } from '../Engine/Timers/Timers.js';
 import { Program_uniform_bind } from '../Graphics/ShaderPrograms.js';
-import { View_create_per_gfx_view, View_reset_from_view, View_rerender_from_view, View_get_view_byidx } from '../Engine/Core/MeshBufferViews.js';
+import { View_create_per_gfx_view, View_reset_from_view, View_rerender_from_view, View_get_view_byidx, View_buffer_print } from '../Engine/Core/MeshBufferViews.js';
 
 
 /**
@@ -212,15 +212,15 @@ export function TestWidgetsGeneric(scene) {
         // CreateManySectionsWithScroller(scene)
     }
 
-    const helpui = Help(scene);
-    
+    // const helpui = Help(scene);
 
-    const viewidx = View_create_per_gfx_view(helpui.root_bufferidx, helpui.mesh_bufferidx);
+    // const viewidx = View_create_per_gfx_view(helpui.root_bufferidx, helpui.mesh_bufferidx);
+    // const view = View_get_view_byidx(viewidx)
+    // const len = view.data.buffer[1].length;
+    // View_reset_from_view(viewidx);
+    // View_rerender_from_view(viewidx);
+    // View_buffer_print();
 
-    const view = View_get_view_byidx(viewidx)
-    const len = view.data.buffer[1].length;
-    View_reset_from_view(viewidx);
-    View_rerender_from_view(viewidx);
     // Help2(scene);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, helpui);
 
@@ -230,7 +230,7 @@ export function TestWidgetsGeneric(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh.children.buffer[0]);
 
 
-    // Debug_info_create_all_generic_info();
+    Debug_info_create_all_generic_info();
 
 
     // Scenes_debug_info_create(scene);

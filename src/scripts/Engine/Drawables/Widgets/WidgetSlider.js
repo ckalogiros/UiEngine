@@ -140,7 +140,7 @@ export class Widget_Slider extends Rect {
       bar.Destroy();
 
       // Sliders's rect_mesh destruction
-      super.Destroy();
+      return super.Destroy();
    }
 
 
@@ -169,6 +169,9 @@ export class Widget_Slider extends Rect {
 
 
    AddToWidgetGroupBuffer(group_bufferidx) {
+
+      if(group_bufferidx === INT_NULL)
+         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
 
       if (this.state.mask & MESH_STATE.ACTIVE) {
          /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR MESH:', this.mesh_bufferidx, this.GetName());

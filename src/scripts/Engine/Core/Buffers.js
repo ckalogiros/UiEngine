@@ -20,6 +20,7 @@ export class M_Buffer {
    freeidx; 
    reserveidx;    // An int value to store a reserved element for later use.
 
+
    constructor(m_buffer = null) {
 
       this.buffer = [];
@@ -34,6 +35,7 @@ export class M_Buffer {
          return this.Copy(m_buffer);
    }
 
+
    Init(size, struct = null) {
 
       this.size = size;
@@ -43,6 +45,8 @@ export class M_Buffer {
          this.buffer[i] = struct;
       }
    }
+
+
    Add(elem) {
 
       const idx = this.#GetNextFree();
@@ -50,6 +54,7 @@ export class M_Buffer {
       this.active_count++;
       return idx;
    }
+
 
    #GetNextFree() {
       
@@ -86,6 +91,7 @@ export class M_Buffer {
 
       // console.error('Free idx not found in Buffers GetNextFree()');
    }
+
 
    Realloc() {
 
@@ -219,7 +225,6 @@ export class M_Buffer {
       return idx;
    }
 
-   
 
    AddAtIndex(idx, elem) {
       if (idx < 0 || idx >= this.size) console.error('WRONG Index. Adding item at: ', idx, ' with size:', this.size)
@@ -231,6 +236,7 @@ export class M_Buffer {
       return idx;
    }
 
+
    CopyFromBufferToStart(oldData) {
 
       const size = oldData.length;
@@ -240,6 +246,36 @@ export class M_Buffer {
       for (let i = size; i < this.size; i++) {
          this.buffer[i] = null;
       }
+   }
+
+
+   // TODO: Call this on every Destroy, to have all M_Buffer elements not sparsed
+   ShiftElementOnDestroy(destroyed_idx){
+
+      /**DEBUG*/ if(destroyed_idx > this.boundary && this.boundary >= 0){
+
+         // console.error('destroyed_idx is out of bounds. @ ShiftElementOnDestroy(), Buffers.js.\destroyed_idx:', destroyed_idx, 'boundary:', this.boundary, '\nbuffer:');
+         // for(let i=0; i<this.buffer.length; i++){
+         //    const name = this.buffer[i] ? this.buffer[i].GetName() : 'NULL'
+         //    console.log(i, name)
+         // }
+      }
+
+      if(destroyed_idx < this.boundary){
+         // console.warn('ShiftElementOnDestroy:Before', 'index', destroyed_idx, 'buffer', this.buffer)
+         
+         this.buffer[destroyed_idx] = this.buffer[this.boundary];
+         this.buffer[this.boundary] = null;
+         this.boundary--;
+
+         this.buffer[destroyed_idx].idx = destroyed_idx; // IMPORTANT: Must update the mesh's idx to point to the new element index 
+
+         // console.warn('ShiftElementOnDestroy:After', 'buffer', this.buffer)
+
+         return true;
+      }
+
+      return false;
    }
 
 
@@ -369,9 +405,12 @@ export class ArrayBufferInterface {
 
          this.buffer[idx] = INT_NULL;
          this.active_count--;
-         this.ShortReplaceWithLast(idx)
+         const replaced = this.ShortReplaceWithLast(idx)
 
-         if (this.active_count <= INT_NULL) alert('M_Buffer active_count <= -1');
+         if (this.active_count <= INT_NULL) 
+            alert('M_Buffer active_count <= -1');
+
+         return replaced;
 
       }
    }
@@ -387,7 +426,11 @@ export class ArrayBufferInterface {
          // REMOVE LAST
          this.buffer[last] = INT_NULL;
       }
+
+      const replaced = this.boundary;
       this.boundary--;
+      return replaced;
+
    }
 
 

@@ -100,7 +100,7 @@ export class Widget_Menu_Bar extends Widget_Label {
       }
 
       // Menus's destruction
-      super.Destroy();
+      return super.Destroy();
    }
 
 

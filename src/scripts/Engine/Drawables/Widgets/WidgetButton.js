@@ -13,6 +13,9 @@ export class Widget_Button extends Widget_Label {
       this.type |= MESH_TYPE.WIDGET_BUTTON;
       // this.SetName('Button');
 
+      // Bind a default function for OnClick() event
+      this.Bind(Button_click_default_callback, _, 'Default Button Binding Function')
+
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    }
 

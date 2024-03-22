@@ -8,7 +8,7 @@ import { Listener_remove_children_event_by_idx } from "../../Events/EventListene
 import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Widget_group_add, Widget_group_get_rootidx, Widget_group_rerender_tree_mesh_recursive, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
+import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Gfx_buffer_update_start, Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Widget_group_add, Widget_group_get_rootidx, Widget_group_rerender_tree_mesh_recursive, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
 import { Clipy_from_widget_root } from "../Operations/Clip.js";
 import { Section } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
@@ -77,7 +77,7 @@ export class Widget_Dropdown extends Section {
 
       AddArr2(this.total_margin, margin);
       this.isOn = DP_MENU_STATE.OFF;
-      this.SetName(`DP-${text} id${this.id}`);
+      this.SetName(`[${this.mesh_bufferidx}]{${text}}-DP`);
       this.type |= MESH_TYPE.WIDGET_DROP_DOWN;
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
       this.rootidx = INT_NULL;
@@ -88,7 +88,7 @@ export class Widget_Dropdown extends Section {
       this.menu.parent = this;
       AddArr2(this.menu.total_margin, this.menu.margin);
       AddArr2(this.menu.total_margin, this.margin);
-      this.menu.SetName(`MENU-${this.GetName()} id${this.menu.id}`);
+      this.menu.SetName(`[${this.menu.mesh_bufferidx}]{${text}}-MENU_DP`);
       { // Multi color vertex
          //    this.menu.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
          //    this.menu.mat.col = [WHITE, RED, GREEN, BLUE];
@@ -102,7 +102,7 @@ export class Widget_Dropdown extends Section {
 
       this.dp_symbols = ['+', '-'];
       const btn = new Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, ALIGN.LEFT, [pos[0], pos[1], this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font);
-      btn.SetName(`BTN-${this.GetName()}`);
+      btn.SetName(`[${btn.mesh_bufferidx}]{${text}}-BTN_DP`);
       // AddArr2(btn.total_margin, this.menu.total_margin);
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
 
@@ -153,7 +153,7 @@ export class Widget_Dropdown extends Section {
          Widget_root_add_mesh(this.menu.root_bufferidx, this.menu.mesh_bufferidx);
       }
 
-      this.menu.AddItem(mesh);
+      mesh.idx = this.menu.AddItem(mesh);
 
       this.SetMenuItemsZindex(); // EFFICIENCY: It runs for all children al over again every time a new item is added
 
@@ -171,6 +171,12 @@ export class Widget_Dropdown extends Section {
 
 
    AddToWidgetGroupBuffer(group_bufferidx) {
+
+      if (group_bufferidx === INT_NULL)
+         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
+
+      if (group_bufferidx === INT_NULL)
+         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
 
       if (this.state.mask & MESH_STATE.ACTIVE) {
          /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR MESH:', this.mesh_bufferidx, this.GetName());
@@ -407,32 +413,6 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   DestroyRecursive(mesh) {
-
-      for (let i = 0; i <= mesh.children.boundary; i++) {
-
-         const child = mesh.children.buffer[i];
-         // The "child.type & MESH_TYPE.SECTION_MESH_ONLY" is avoiding for example: any Scroller widget to be treated as a Section_Mesh and not as a Widget_Scroller first. That way we call  "mesh.Destroy()" on Widget_Scroller rather than  calling recursive for the scroller as if it was a Section_Mesh
-         if (child && child.children.active_count && (child.type & MESH_TYPE.SECTION_MESH_ONLY))
-            this.DestroyRecursive(child)
-      }
-
-      // If the mesh is dp and it's menu is closed but still in the vertex buffers(Fake removed), then we need to remove the menu with all of its meshes.
-      if ((mesh.type & MESH_TYPE.WIDGET_DROP_DOWN)) {
-         if ((mesh.isOn & DP_MENU_STATE.OFF)) {
-            this.DestroyRecursive(mesh.menu)
-         }
-      }
-
-      if ((mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) && (mesh.isOn & DP_MENU_STATE.OFF_FAKE)) {
-         console.warn('{{DESTROY}}, child:', mesh, mesh.GetName(), mesh.gfx.prog.idx, mesh.gfx.vb.idx, mesh.gfx.vb.start)
-      }
-
-      // Unfortunately we need an extra if statement, because when we have to remove OFF_FAKE menu's items, they may not have been opened ever.
-      if (mesh.gfx) mesh.Destroy();
-   }
-
-
    Destroy() {
 
       const btn = this.children.buffer[0];
@@ -449,30 +429,39 @@ export class Widget_Dropdown extends Section {
 
       // console.warn('{{DESTROY}}, mesh:', this.GetName(), this)
       // this.RemoveAllListenEvents();
-      super.Destroy();
+      return super.Destroy();
 
    }
 
 
-   DestroyDeactivetedMenu(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy doe not call for vertex buffer remove mesh attributes
+   DestroyDeactivetedMenu(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy does not call for vertex buffer remove mesh attributes
 
       for (let i = 0; i <= mesh.children.boundary; i++) {
 
          const child = mesh.children.buffer[i];
 
-         if (child.children)
-            this.DestroyDeactivetedMenu(child);
+         if (child.children) {
+            const shift_children = this.DestroyDeactivetedMenu(child);
+            if (shift_children) i--;
+         }
+
       }
 
-      // console.log('[[[[[[[[[[[[[[[[[[[[[[', mesh.GetName())
 
       if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {
          this.DestroyDeactivetedMenu(mesh.menu)
       }
 
-      if (mesh.text_mesh) this.DestroyNoGfxRemove(mesh.text_mesh);
+      if (mesh.text_mesh) {
 
-      this.DestroyNoGfxRemove(mesh);
+         // this.DestroyNoGfxRemove(mesh.text_mesh);
+         const shift_children = this.DestroyNoGfxRemove(mesh.text_mesh);
+         if (shift_children) i--;
+      }
+
+      return this.DestroyNoGfxRemove(mesh);
+      // const shift_children = this.DestroyNoGfxRemove(mesh);
+      // if(shift_children) i--;
    }
 
 
@@ -504,11 +493,22 @@ export class Widget_Dropdown extends Section {
       /*************************************************************************************/
       // Remove from widget root buffer.
       Mesh_buffer_remove_mesh_byidx(mesh.mesh_bufferidx);
+      // Gfx_buffer_update_start(this.root_bufferidx);
 
 
+      /*************************************************************************************/
+      // Remove from mesh from parent's children buffer.
+      let shift_children = false;
       // Remove from parent's children buffer
-      // if (mesh.parent && mesh.parent !== WIDGET_TEXT_MESH) mesh.parent.RemoveChildByIdx(mesh.idx); // Remove the current mesh from the parent
+      if (mesh.idx > NO_MESH_PARENT && mesh.parent !== NO_MESH_PARENT) {
 
+         shift_children = mesh.parent.RemoveChildByIdx(mesh.idx); // Remove the current mesh from the parent
+         console.log('-{NO-GFX} Removing:', mesh.GetName(), 'idx:', mesh.idx, 'parent name', mesh.parent.GetName())
+      }
+      else console.log('-{NO-GFX-NO-PARENT} Removing:', mesh.GetName(), 'idx:', mesh.idx)
+
+
+      return shift_children;
 
    }
 
@@ -800,6 +800,7 @@ export class Widget_Dropdown extends Section {
             // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
             if (item.type & MESH_TYPE.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
 
+               item.RemoveFromGfxBuffer();
                item.Deactivate();
                // Deactivate gfx for menu's children meshes.
                item.UpdateWidgetGroupDecrementNumFaces();
@@ -813,6 +814,7 @@ export class Widget_Dropdown extends Section {
             else {
                if (item.gfx && item.is_gfx_inserted) {
 
+                  item.RemoveFromGfxBuffer();
                   item.Deactivate();
                   item.UpdateWidgetGroupDecrementNumFaces();
                   item.SetIsGfxInserted(false);
@@ -821,7 +823,11 @@ export class Widget_Dropdown extends Section {
          }
 
          if (menu.gfx && menu.is_gfx_inserted) {
+
             menu.state.mask &= ~MESH_STATE.ACTIVE;
+
+            Gfx_buffer_remove_mesh_by_vbidx(menu.gfx.vb.idx, menu.gfx_bufferidx);
+
             Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
             menu.is_gfx_inserted = false;
             // Remove menu's Fake listen events
@@ -850,7 +856,16 @@ export class Widget_Dropdown extends Section {
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 
       // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
-      root.Recalc_no_batch_render();
+      // root.Recalc_no_batch_render();
+
+      // Re-calculate dimensions and positions
+      if (root.group_bufferidxs[0] !== INT_NULL) {
+         const group_root = Mesh_buffer_get_mesh_byidx(Widget_group_get_rootidx(root.group_bufferidxs[0]))
+         group_root.Recalc_no_batch_render();
+      }
+      else {
+         root.Recalc_no_batch_render();
+      }
 
       Clipy_from_widget_root(root.root_bufferidx);
       Widget_group_rerender_tree_mesh_recursive(root.group_bufferidxs[0]);
@@ -868,6 +883,8 @@ export class Widget_Dropdown extends Section {
 
       menu.state.mask |= MESH_STATE.ACTIVE;
 
+      menu.gfx_bufferidx = Gfx_buffer_store(menu.gfx.vb.idx, menu.mesh_bufferidx);
+
       // Handle widget group. If the dp belongs to a group and the menu isn't, add the menu to the root's dp group 
       if (menu.group_bufferidxs[1] === INT_NULL && root.group_bufferidxs[1] !== INT_NULL) {
          // NOTE: Updates the group and the batch buffers
@@ -883,7 +900,11 @@ export class Widget_Dropdown extends Section {
 
          const item = menu.children.buffer[i];
 
+         // console.warn(item.GetName())
+
          item.Activate();
+
+         item.AddToGfxBuffer();
 
          if (item.group_bufferidxs[1] === INT_NULL && root.group_bufferidxs[1] !== INT_NULL) {
             item.AddToWidgetGroupBuffer(root.group_bufferidxs[0]);
@@ -941,19 +962,15 @@ export class Widget_Dropdown extends Section {
 
       menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
 
+      // root.Recalc_no_batch_render();
       // Re-calculate dimensions and positions
       if (root.group_bufferidxs[0] !== INT_NULL) {
          const group_root = Mesh_buffer_get_mesh_byidx(Widget_group_get_rootidx(root.group_bufferidxs[0]))
-         // group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
-         // group_root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN);
          group_root.Recalc_no_batch_render();
       }
       else {
-         // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
-         // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN);
          root.Recalc_no_batch_render();
       }
-      // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
 
       Clipy_from_widget_root(root.root_bufferidx);
       Widget_group_rerender_tree_mesh_recursive(root.group_bufferidxs[0]);

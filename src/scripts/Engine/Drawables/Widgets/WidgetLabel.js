@@ -13,7 +13,7 @@ import { Gl_set_alpha_from_offset, Gl_set_dim_X, Gl_set_wpos_X } from "../../../
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
@@ -67,7 +67,7 @@ export class Widget_Label extends Rect {
 
         // Must call super() before using the 'this', that is why we write the code here.
         text_mesh.SetSceneIdx(this.sceneidx);
-        text_mesh.SetName(`Text-mesh [${text}]`);
+        // text_mesh.SetName(`[${this.mesh_bufferidx}]{${text}}-Text-mesh `);
         text_mesh.sid.gfx_group = this.sid.gfx_group; // If the label is a debug ui, so must be the text. 
 
         this.mesh_bufferidx = mesh_bufferidx;
@@ -78,11 +78,11 @@ export class Widget_Label extends Rect {
         this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
         
         this.type |= MESH_TYPE.WIDGET_TEXT_LABEL | this.geom.type | this.mat.type;
-        this.SetName(`Lebel-text [${text}]`);
+        this.SetName(`[${this.mesh_bufferidx}]{${text}}-LABEL`);
         this.pad = pad;
 
         this.text_mesh = text_mesh;
-        this.text_mesh.parent = WIDGET_TEXT_MESH; // Use a special case for text meshes that are part of a widget without being in children's buffer.
+        this.text_mesh.parent = NO_MESH_PARENT; // Use a special case for text meshes that are part of a widget without being in children's buffer.
 
     }
 
@@ -94,7 +94,7 @@ export class Widget_Label extends Rect {
         this.text_mesh = null;
 
         // Label's rect_area destruction
-        super.Destroy();
+        return super.Destroy();
     }
 
 
@@ -486,6 +486,10 @@ export class Widget_Label extends Rect {
     /*******************************************************************************************************************************************************/
 
     AddToWidgetGroupBuffer(group_bufferidx) {
+        
+        if(group_bufferidx === INT_NULL)
+        console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
+
         if (this.state.mask & MESH_STATE.ACTIVE) {
             /**DEBUG */ if (!this.gfx) console.error('ADDING TO GROUP BUFFER FAILED: NO GFX FOR LABEL:', this.mesh_bufferidx, this.GetName());
             /**DEBUG */ if (!this.text_mesh.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR LABEL TEXT:', this.text_mesh.mesh_bufferidx, this.text_mesh.GetName());
@@ -509,6 +513,18 @@ export class Widget_Label extends Rect {
 
         Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
         Widget_group_update_decrement(this.text_mesh.group_bufferidxs, this.text_mesh.geom.num_faces, this.text_mesh);
+    }
+
+
+    AddToGfxBuffer() { 
+       this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+       this.text_mesh.gfx_bufferidx = Gfx_buffer_store(this.text_mesh.gfx.vb.idx, this.text_mesh.mesh_bufferidx);
+    }
+ 
+ 
+    RemoveFromGfxBuffer() { 
+       Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
+       Gfx_buffer_remove_mesh_by_vbidx(this.text_mesh.gfx.vb.idx, this.text_mesh.gfx_bufferidx);
     }
 
 

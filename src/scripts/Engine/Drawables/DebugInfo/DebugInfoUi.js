@@ -5,13 +5,13 @@ import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown";
 import { PerformanceTimersGetBestFps, PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, Performance_timers_get_ms_1sec_reset, _pt_all_timers, _pt_batch2_update, _pt_batch_update, _pt_event_listener, _pt_framebuffer_rendering, _pt_gl_draw, _pt_hover_listener, _pt_loop, _pt_mesh_info_tip, _pt_scene_update } from "../../Timers/PerformanceTimers";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners";
 import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget";
-import { Mesh_buffer_get_mesh_byidx, Widget_group_create, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
+import { Mesh_buffer_get_mesh_byidx, TEMP_PRINT_ACCUM, TEMP_PRINT_START, Widget_group_create, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
 import { Scroller_clampy_and_render } from "../Widgets/WidgetScroller";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals";
 import { Dbg_ui_create } from "./DebugInfoUiFactory";
 import { Program_create_text_info, Program_get_programs } from "../../../Graphics/ShaderPrograms.js";
 import { BLUEL, GREEN, GREY, ORANGE_240_160_10, PURPLEB, PURPLER, REDL, WHITE, YELLOWL } from "../Material/Base/Colors.js";
-import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "./DebugInfoUiNotifications.js";
+import { NOTIFICATION_TYPE_IDX } from "./DebugInfoUiNotifications.js";
 
 
 const _font_size = 10;
@@ -41,6 +41,7 @@ export function Debug_info_ui_performance(scene) {
    dp.CreateClickEvent();
    dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
+
 
    
 
@@ -89,8 +90,8 @@ export function Debug_info_ui_performance(scene) {
 
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    dp.Render();
-   // dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-   dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN  | SECTION.INHERIT;
+   dp.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   // dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN  | SECTION.INHERIT | SECTION.TOP_DOWN;
    // dp.options = SECTION.VERTICAL | SECTION.INHERIT;
    dp.Calc();
    dp.ConstructListeners();
@@ -708,17 +709,20 @@ function Debug_info_create_mesh_info(params) {
    dp.CreateClickEvent();
    dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
+   dp.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL;
 
    section.AddItem(dp);
    const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [0, 300]);
 
-
+   
+   
    // Create scroller for the ui-mesh info widget
    // const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, dp, [0, 300]);
    scroller.StateEnable(MESH_STATE.ACTIVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    scroller.SetGfxProgramGroup(GFX_GROUPS.DEBUG.MASK); // IMPORTANT: Must set the scroller to be rendered in the Debug gfx buffers
+   scroller.scrolled_section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL ;
 
    // Create the dropdown structure representing all the applications's meshes
    const root_meshes_idxs = Widget_root_buffer_get();
@@ -739,6 +743,7 @@ function Debug_info_create_mesh_info(params) {
 
    // Render the 
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+
    scroller.ActivateAndChildrenRecursive();
    Scroller_clampy_and_render(scroller, 100, 800);
 
@@ -1112,30 +1117,24 @@ export function Debug_info_create_all_generic_info() {
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
+   
+   const vb_info = Vertex_buffer_create_text_info();
+   section.AddItem(vb_info);
 
-   const program_info = Program_create_text_info();
-   section.AddItem(program_info);
-   
-   
-   // const vb_info = Vertex_buffer_create_text_info();
-   // section.AddItem(vb_info);
+   // const program_info = Program_create_text_info();
+   // section.AddItem(program_info);
 
-   
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    section.Render();
-   section.options |= SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT;
-   // section.options |= SECTION.TOP_DOWN | SECTION.HORIZONTAL;
+   // section.options = SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
+   section.options = SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT;
    section.Recalc();
    section.ConstructListeners();
 
-   // program_info.group_bufferidxs = Widget_group_create(program_info.mesh_bufferidx, program_info.gfx)
-   // program_info.AddToWidgetGroupBuffer(program_info.group_bufferidxs[0]);
    section.group_bufferidxs = Widget_group_create(section.mesh_bufferidx, section.gfx)
    section.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
    
-
-
 
    // const s2 = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [5, 5], [400,200,0], [100, 100], GREY[1], 'All Generic Info');
    // s2.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -1159,34 +1158,33 @@ export function Debug_info_update_progarm_clbk(params){
 
    
    const notification_type =  params.notification_type;
-   console.warn('--- NOTIFICATION {', NOTIFICATION_TYPE_IDX.ToSting(notification_type), '} ---');
    const section = params.parent_section;
-   console.log('--- Create info {', section.GetName(), '} ---\nparams:', params);
 
+   TEMP_PRINT_ACCUM();
+   TEMP_PRINT_START();
+   
+   
    if(notification_type === NOTIFICATION_TYPE_IDX.GFX_PROGRAM){ // Program Info Ui
       
       const updated_info = Program_create_text_info();
       section.AddItem(updated_info);
-   
+      
       updated_info.ConstructListeners();
       updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
       updated_info.Render();
       updated_info.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
    }
-
+   
    if(notification_type === NOTIFICATION_TYPE_IDX.GFX_VERTEX_BUFFER){ // Vertex buffer Info Ui
       
       const updated_info = Vertex_buffer_create_text_info();
       section.AddItem(updated_info);
-   
+      
       updated_info.ConstructListeners();
       updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
       updated_info.Render();
       updated_info.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
    }
    
-      
-   
-   section.options |= SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT;
    section.Recalc();
 }

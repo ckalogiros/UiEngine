@@ -7,7 +7,7 @@ import { Material } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Widget_group_add, Widget_root_add_mesh, Widget_root_batch_update_increment_accumulator } from "../../Core/MeshBuffer.js";
+import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_group_add, Widget_root_add_mesh, Widget_root_batch_update_increment_accumulator } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
 
@@ -55,11 +55,24 @@ export class Rect extends Mesh {
 
    AddToWidgetGroupBuffer(group_bufferidx) {
 
+      if(group_bufferidx === INT_NULL)
+         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
+
       if (this.state.mask & MESH_STATE.ACTIVE) {
          /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR SECTION:', this.mesh_bufferidx, this.GetName());
          this.group_bufferidxs[0] = group_bufferidx;
          this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
       }
+   }
+
+
+   AddToGfxBuffer() { 
+      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+   }
+
+
+   RemoveFromGfxBuffer() { 
+      Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
    }
 
 
@@ -122,6 +135,9 @@ export class Rect extends Mesh {
       if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.is_gfx_inserted = true;
 
+      // Add entry to Gfx Buffer
+      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+
 
       // if (this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
 
@@ -151,6 +167,10 @@ export class Rect extends Mesh {
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
       if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.is_gfx_inserted = true;
+
+      
+      // Add entry to Gfx Buffer
+      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }

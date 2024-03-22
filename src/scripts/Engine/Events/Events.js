@@ -52,13 +52,13 @@ export function HandleEvents() {
             // Disable mesh's hover state
             if (STATE.mesh.hovered) {
                 if (mesh.StateCheck(MESH_STATE.IN_MOVE)) {
-                    mesh.StateDisable(MESH_STATE.IN_MOVE);
+                    mesh.state.mask &= ~MESH_STATE.IN_MOVE; // Set false
                 }
             }
             // Disable mesh's grab state
             if (STATE.mesh.grabed) {
                 if (STATE.mesh.grabed.StateCheck(MESH_STATE.IN_GRAB)) {
-                    STATE.mesh.grabed.StateDisable(MESH_STATE.IN_GRAB);
+                    STATE.mesh.grabed.state.mask &= ~MESH_STATE.IN_GRAB; // Set false
                     STATE.mesh.SetGrabed(null)
                 }
             }
@@ -120,11 +120,11 @@ export function Events_handle_immidiate(e) {
             // Unhover any hovered mesh. // TODO: Decide who unhovers an already hovered mesh: here OR EventListeners.js. The diff is that if we unhover here, is faster since there is no separate call to 'Events_handle_immidiate()' for the 'else if (e.type === 'unhover')'
             if (STATE.mesh.hovered) {
                 STATE.mesh.hovered.SeHoverColortDefault();
-                STATE.mesh.hovered.StateDisable(MESH_STATE.IN_HOVER_COLOR);
+                e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER_COLOR; // Set false
             }
 
             e.params.mesh.SetHoverColor();
-            e.params.mesh.StateEnable(MESH_STATE.IN_HOVER_COLOR | MESH_STATE.IN_HOVER);
+            e.params.mesh.state.mask |= (MESH_STATE.IN_HOVER_COLOR | MESH_STATE.IN_HOVER); 
             STATE.mesh.SetHovered(e.params.mesh);
             TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.COUNT++;
 
@@ -136,10 +136,10 @@ export function Events_handle_immidiate(e) {
 
         if (e.params.mesh.StateCheck(MESH_STATE.IN_HOVER_COLOR)) {
             e.params.mesh.SeHoverColortDefault();
-            e.params.mesh.StateDisable(MESH_STATE.IN_HOVER_COLOR);
+            e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER_COLOR; // Set false
         }
-
-        e.params.mesh.StateDisable(MESH_STATE.IN_HOVER); // Set false
+        
+        e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER; // Set false
         STATE.mesh.SetHovered(null);
     }
 

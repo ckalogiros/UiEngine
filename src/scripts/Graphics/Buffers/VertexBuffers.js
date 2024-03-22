@@ -7,7 +7,7 @@ import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, P
 import { Create_buffer_from_type } from "./TypedArrayBuffers";
 import { Gl_operation_add } from "./VertexBuffersOps";
 import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays";
-import { BLUEL, GREEN, GREY, REDL, YELLOWL, YELLOWR } from "../../Engine/Drawables/Material/Base/Colors";
+import { BLACK, BLUEL, GREEN, GREY, PURPLER, REDL, YELLOWL, YELLOWR } from "../../Engine/Drawables/Material/Base/Colors";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "../../Engine/Core/CreateWidget";
 import { Dropdown_roots_set_root } from "../../Engine/Drawables/Widgets/Widget_Dropdown";
 import { Floor } from "../../Helpers/Math/MathOperations";
@@ -65,6 +65,24 @@ export function Vertex_buffer_create(type, size) {
 
     return ret;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -288,42 +306,6 @@ export function Vertex_buffer_state_disable(vbidx, STATE_FLAG) {
 
 
 
-// export function Vertex_buffer_set_vb_data(gl, buffer, attribsidx) {
-
-//     const vb = Vertex_buffer_get_by_vbidx(buffer.vbidx);
-//     gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vbo)
-//     gl.bufferData(gl.ARRAY_BUFFER, vb, gl.STATIC_DRAW, 0);
-//     // gl.bufferData(gl.ARRAY_BUFFER, Vertex_buffer_get_by_vbidx(buffer.vbidx), gl.STATIC_DRAW, 0);
-//     Shader_attributes_enable(attribsidx);
-
-//     buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-
-//     GL.BOUND_VBO = buffer.vbo;
-//     GL.BOUND_VBIDX = buffer.vbidx;
-
-//     // GL_GET_ERROR(new Error().lineNumber)
-// }
-
-
-
-// export function Vertex_buffer_set_vb_data(gl, buffer) {
-
-//     const vb = Vertex_buffer_get_by_vbidx(buffer.vbidx);
-
-//     // gl.bindVertexArray(buffer.vao);
-//     // gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vbo);
-//     // gl.bufferData(gl.ARRAY_BUFFER, vb, gl.STATIC_DRAW, 0);
-
-//     buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-
-//     GL.BOUND_VBO = buffer.vbo;
-//     GL.BOUND_VBIDX = buffer.vbidx;
-
-//     // GL_GET_ERROR(new Error().lineNumber)
-// }
-
-
-
 export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset, byte_length) {
 
     // gl.bindVertexArray(buffer.vao);
@@ -467,6 +449,64 @@ export function Vertex_buffer_add_vertices_from_non_existant_mesh(gfx, geom, mat
 
 
 
+export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index) {
+
+
+    const vb_info = _vertex_buffers_info.buffer[gfx.vb.idx];
+    const vb_data = _vertex_buffers.buffer[gfx.vb.idx];
+
+    const removed_attribs = gfx.attribsPerVertex * gfx.vertsPerRect * num_faces;
+
+    let start = start_index;
+    const end = start + removed_attribs;
+
+
+    const remaining_attribs = vb_info.count - end; // This is the length of the attributes to be shifted
+    // const copied_end = this.count - end; // This is the length of the attributes to be shifted
+    let k = end;
+
+
+    // // Shift all attributes left to fil the gap of the removed attributes. 
+    // for (let i = start; i < start + remaining_attribs; i++) {
+    //     vb_data[i] = vb_data[k++]
+    // }
+    // Shift all attributes left to fil the gap of the removed attributes. 
+    for (let i = end; i < vb_info.count; i++) {
+        vb_data[start++] = vb_data[i]
+    }
+
+    vb_info.count -= removed_attribs;
+    const vCount = removed_attribs / gfx.attribsPerVertex;
+    vb_info.vCount -= vCount;
+
+    if (vb_info.count < 0)
+        console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb:', vb_info.idx)
+
+    vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+
+    return removed_attribs;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /****************************************************************************************************************************************************/
@@ -490,6 +530,19 @@ export function Gl_vertex_buffer_print() {
     console.log('VertexBuffer:', _vertex_buffers)
     console.log('VertexBufferInfo', _vertex_buffers_info)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -532,12 +585,26 @@ function Vertex_to_string(flags, progidx, vbidx, count) {
 
             i += stride - 2;
         }
-        arr.push(wpos);
-    }
 
-    console.log(arr)
+        // const copy = Object.assign({}, wpos);
+        const copy = JSON.parse( JSON.stringify(wpos) );
+        arr.push(copy);
+        console.log(copy)
+    }
+    
+    // console.log(arr)
     return arr;
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -555,11 +622,9 @@ function Vertex_to_string(flags, progidx, vbidx, count) {
 /****************************************************************************************************************************************************/
 
 function TEMP(params) {
-    const destroy_btn = params.target_mesh;
-    console.log('TEMP FUNCTION', destroy_btn.GetName());
 
+    const destroy_btn = params.target_mesh;
     const s = params.params;
-    console.log('section', s.GetName());
     s.Destroy();
 
     const _params = {
@@ -571,13 +636,15 @@ function TEMP(params) {
 	Debug_ui_create_notification(Debug_info_update_progarm_clbk, _params);
 }
 
+
+
 export function Vertex_buffer_create_text_info() {
 
-    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(YELLOWR[7], .4);
+    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
 
-    const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[3], .3), 'Vertex Buffer Info');
+    const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), 'Vertex Buffer Info BLUE');
 
-    const destroy = Create_widget_button(_, 'Destroy', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
+    const destroy = Create_widget_button(_, 'Recalc', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
     destroy.Bind(TEMP, _, s);
     s.AddItem(destroy);
 
@@ -589,16 +656,18 @@ export function Vertex_buffer_create_text_info() {
     vbiw.CreateClickEvent();
     Dropdown_roots_set_root(vbiw, vbiw)
     s.AddItem(vbiw)
-
+    vbiw.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+    
     const vbi = _vertex_buffers_info;
     const vb_buffer_info = Create_widget_text(_, `count:${vbi.active_count} size:${vbi.size}`);
     vbiw.AddToMenu(vb_buffer_info);
-
+    
     for (let i = 0; i <= vbi.boundary; i++) {
-
+        
         const vb = vbi.buffer[i];
-
+        
         const vbw = Create_widget_dropdown(_, `Vb [${i}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+        vbw.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
         vbw.CreateClickEvent();
         vbiw.AddToMenu(vbw)
 
@@ -607,41 +676,41 @@ export function Vertex_buffer_create_text_info() {
             const info = Create_widget_text(_, `count:${vb.count} size:${vb.size}  vCount:${vb.vCount}  type:${type}`);
             vbw.AddToMenu(info);
         }
-        // {
-        //     const info = Create_widget_text(_, `vaoidx:${vb.vaoidx} vbidx:${vb.vbidx} ibidx:${vb.ibidx} texidx:${vb.texidx} progidx:${vb.progidx}`);
-        //     vbw.AddToMenu(info);
-        // }
-        // {
-        //     const sid = SID.ToString(vb.sid);
-        //     const info = Create_widget_text(_, `sid:${sid}`);
-        //     vbw.AddToMenu(info);
-        // }
-        // {
-        //     const state = PROGRAM_STATE.ToString(vb.state.mask);
-        //     const info = Create_widget_text(_, `state:${state}`);
-        //     vbw.AddToMenu(info);
-        // }
+        {
+            const info = Create_widget_text(_, `vaoidx:${vb.vaoidx} vbidx:${vb.vbidx} ibidx:${vb.ibidx} texidx:${vb.texidx} progidx:${vb.progidx}`);
+            vbw.AddToMenu(info);
+        }
+        {
+            const sid = SID.ToString(vb.sid);
+            const info = Create_widget_text(_, `sid:${sid}`);
+            vbw.AddToMenu(info);
+        }
+        {
+            const state = PROGRAM_STATE.ToString(vb.state.mask);
+            const info = Create_widget_text(_, `state:${state}`);
+            vbw.AddToMenu(info);
+        }
 
 
-        // { // Vertex buffer array
-        //     const vba = Create_widget_dropdown(_, `buffer`, [100, 100, 0], col_dp, col_menu, _, [2,1], _, _, style, margin);
-        //     vba.CreateClickEvent();
-        //     vbw.AddToMenu(vba)
+        { // Vertex buffer array
+            const vba = Create_widget_dropdown(_, `buffer`, [100, 100, 0], col_dp, col_menu, _, [2,1], _, _, style, margin);
+            vba.CreateClickEvent();
+            vbw.AddToMenu(vba)
 
-        //     const wpos = Vertex_to_string(VB_TO_STRING_FLAGS.WPOS, vb.groupidx, vb.progidx, vb.vbidx, vb.count);
+            // const wpos = Vertex_to_string(VB_TO_STRING_FLAGS.WPOS, vb.progidx, vb.vbidx, vb.count);
 
-        //     const len = wpos.length;
-        //     for(let i2=0; i2<len; i2++){
+            // const len = wpos.length;
+            // for(let i2=0; i2<len; i2++){
 
-        //         const info = Create_widget_text(_, `wpos:${wpos[i]}`);
-        //         vba.AddToMenu(info);
-        //     }
+            //     const info = Create_widget_text(_, `wpos:${wpos[i]}`);
+            //     vba.AddToMenu(info);
+            // }
 
-        // }
+        }
 
     }
 
-    // s.Calc(SECTION.EXPAND)
+    s.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT
     s.Calc()
 
     return s;

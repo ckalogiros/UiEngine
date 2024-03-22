@@ -57,6 +57,7 @@ export function Create_text_mesh(text, pos, fontsize, col, bold, font) {
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[freeidx].mesh_bufferidx = freeidx;
+   _mesh_buffer.buffer[freeidx].SetName(`[${freeidx}]{${text}}-TEXT_MESH`);
 
    return _mesh_buffer.buffer[freeidx];
 }
@@ -77,9 +78,11 @@ export function Create_widget_text(ROOT_WIDGET_FLAGS=0x0, text, pos, fontSize, c
 
    // Create a new mesh_buffer element and add a new section mesh
    const freeidx = _mesh_buffer.Add(new Widget_Text(text, pos, fontSize, col, bold, pad));
+
    
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[freeidx].mesh_bufferidx = freeidx;
+   _mesh_buffer.buffer[freeidx].SetName(`[${freeidx}]{${text}}-WIDGET_TEXT`);
 
    return _mesh_buffer.buffer[freeidx];
 }
@@ -93,6 +96,7 @@ export function Create_widget_multi_text(ROOT_WIDGET_FLAGS=0x0, text, ALIGNMENT,
    
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[freeidx].mesh_bufferidx = freeidx;
+   _mesh_buffer.buffer[freeidx].SetName(`[${freeidx}]{${text}}-MULTI_TEXT`);
    
    return _mesh_buffer.buffer[freeidx];
 }

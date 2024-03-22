@@ -5,7 +5,7 @@ import { Vertex_buffer_info_create, Vertex_buffer_info_get_by_vbidx, Vertex_buff
 import { Index_buffer_get_by_vertex_buffer_index, Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_store_vertex_buffer_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists } from "../../../Graphics/ShaderPrograms.js";
-import { Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
+import { Gfx_buffer_create_vb, Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from "../../../Graphics/Buffers/UniformBuffers.js";
@@ -347,7 +347,11 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
          const vb_info = Vertex_buffer_info_create(sid, _, progidx);
          vbidx = vb_info.vbidx;
          Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE | BUFFER_STATE.SHOW);
-         if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidx)
+         if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidx);
+
+
+         // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
+         Gfx_buffer_create_vb(vbidx);
        
          
          Program_store_vertex_buffer_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
@@ -369,8 +373,6 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
          Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbidx);
 
       }
-
-      console.warn(vbidx)
 
    }
 
