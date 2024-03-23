@@ -7,6 +7,7 @@ _CNT = 0;
 export const NOTIFICATION_TYPE_IDX = {
    GFX_PROGRAM: _CNT++,
    GFX_VERTEX_BUFFER: _CNT++,
+   MESH_BUFFER: _CNT++,
 
    SIZE: _CNT,
 
@@ -14,6 +15,7 @@ export const NOTIFICATION_TYPE_IDX = {
 
       if (idx === this.GFX_PROGRAM) return 'GFX_PROGRAM';
       if (idx === this.GFX_VERTEX_BUFFER) return 'GFX_VERTEX_BUFFER';
+      if (idx === this.MESH_BUFFER) return 'MESH_BUFFER';
    }
 }
 

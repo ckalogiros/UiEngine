@@ -1,6 +1,6 @@
 "use strict";
 
-import { Mesh_buffer_get_mesh_byidx, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
+import { Mesh_buffer_get_mesh_byidx, Widget_group_get, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
 
 
 
@@ -27,14 +27,21 @@ import { Mesh_buffer_get_mesh_byidx, Widget_group_update_decrement, Widget_group
  * 
  */
 
-
-export function Clipy_from_widget_root(root_bufferidx) {
+/**
+ * // TODO
+ * // IMIDIATELY
+ * We must implement the View groups.
+ * We need all mesh indexes for each group, i order to
+ * clip all meshes of that group
+ */
+export function Clipy_from_widget_root(root_bufferidx, group_bufferidxs=null, clip_top=null, clip_bottom=null) {
 
    let changes_hapened = false;
-   const limit = { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
+   const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
-   const root = Widget_root_buffer_get_byidx(root_bufferidx);
-   for(let i=0; i<=root.boundary; i++){
+   // const root = Widget_root_buffer_get_byidx(root_bufferidx);
+   const group = Widget_group_get(group_bufferidxs[0]);
+   for(let i=0; i<=group.boundary; i++){
 
       const mesh     = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
       const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
@@ -64,6 +71,42 @@ export function Clipy_from_widget_root(root_bufferidx) {
 
    return changes_hapened;
 }
+// export function Clipy_from_widget_root(root_bufferidx, group_bufferidxs=null, clip_top=null, clip_bottom=null) {
+
+//    let changes_hapened = false;
+//    const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
+
+//    const root = Widget_root_buffer_get_byidx(root_bufferidx);
+//    for(let i=0; i<=root.boundary; i++){
+
+//       const mesh     = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
+//       const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
+//       const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
+
+//       if(bottom < limit.up || top > limit.down){
+//          // if(mesh.state.mask & (MESH_STATE.ACTIVE | (~MESH_STATE.CLIPED_Y))){
+//          if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
+//             mesh.state.mask &= ~MESH_STATE.ACTIVE;
+//             mesh.state.mask |= MESH_STATE.CLIPED_Y;
+//             Widget_group_update_decrement(mesh.group_bufferidxs, mesh.geom.num_faces, mesh);
+//             // mesh.is_gfx_inserted = false
+//             changes_hapened = true;
+//             // console.log('Deactivate', mesh.GetName())
+//          }
+//       }
+//       else{
+//          if(mesh.state.mask & MESH_STATE.CLIPED_Y){
+//             // console.log('Activate', mesh.GetName())
+//             mesh.state.mask |= MESH_STATE.ACTIVE;
+//             mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
+//             Widget_group_update_increment(mesh.group_bufferidxs, mesh.geom.num_faces, mesh);
+//             changes_hapened = true;
+//          }
+//       }
+//    }
+
+//    return changes_hapened;
+// }
 
 
 

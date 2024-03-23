@@ -14,7 +14,7 @@ import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js"
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
-import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
+import { Find_gfx_match_widget_group_impl, Find_gfx_match_widget_root_impl, Find_match_gfx_from_parent_ascending } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
@@ -164,19 +164,43 @@ export class Widget_Label extends Rect {
    
             this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, text_igfx.FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
         }
-        else {
+        else if(FLAGS & GFX_CTX_FLAGS.SPECIFIC){
 
             this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, area_gfx_specific, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
+
+            
             if (!text_gfx_specific) {
 
-                const rect_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.sid);
-                FLAGS |= rect_igfx.FLAGS;
+                
+                let text_igfx = null;
+         
+                if(FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET){
+
+                    text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
+                }
+                else if(FLAGS & GFX_CTX_FLAGS.FROM_GROUP){
+                    
+                    text_igfx = Find_gfx_match_widget_group_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
+                }
+                else if(FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC){
+                    text_igfx = Find_match_gfx_from_parent_ascending(this.text_mesh, this.parent);
+                }
+                else{
+                    console.error('NO CORRECT GenGfxCtx FLAG found, searching for vb index to store');
+                    alert('SEE console.error');
+                }
+                // const text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.sid);
+                FLAGS |= text_igfx.FLAGS;
        
-                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.uniforms);
+                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.uniforms);
             }
             else {
                 this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, text_gfx_specific, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
             }
+        }
+        else{
+            console.error('NO CORRECT FLAGS passed in GenGfxCtx');
+            alert('NO CORRECT FLAGS passed in GenGfxCtx.\nSEEE console.error');
         }
 
         return this.gfx;

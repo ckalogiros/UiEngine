@@ -5,7 +5,7 @@ import { M_Buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Listener_remove_children_event_by_idx } from "../../Events/EventListeners.js";
-import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
+import { Find_gfx_match_widget_group_impl, Find_gfx_match_widget_root_impl, Find_match_gfx_from_parent_ascending } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
 import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Gfx_buffer_update_start, Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Widget_group_add, Widget_group_get_rootidx, Widget_group_rerender_tree_mesh_recursive, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
@@ -245,7 +245,25 @@ export class Widget_Dropdown extends Section {
 
       if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
 
-         const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
+         let igfx = null;
+
+         
+         if(FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET){
+
+            igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
+         }
+         else if(FLAGS & GFX_CTX_FLAGS.FROM_GROUP){
+            
+            igfx = Find_gfx_match_widget_group_impl(this.root_bufferidx, this.sid);
+         }
+         else if(FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC){
+            igfx = Find_match_gfx_from_parent_ascending(this, this.parent);
+         }
+         else{
+            console.error('NO CORRECT GenGfxCtx FLAG found, searching for vb index to store');
+            alert('SEE console.error');
+         }
+
          FLAGS |= igfx.FLAGS;
 
          this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
@@ -259,7 +277,7 @@ export class Widget_Dropdown extends Section {
       const btn = this.children.buffer[0];
 
       btn.SetGfxProgramGroup(this.sid.gfx_group);
-      btn.GenGfxCtx(FLAGS, [this.gfx.prog.idx, this.gfx.vb.idx]); // Set button's area gfx same with dropDown mesh 
+      btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC | GFX_CTX_FLAGS.FROM_PARENT_ASC, [this.gfx.prog.idx, this.gfx.vb.idx], _); // Set button's area gfx same with dropDown mesh 
 
       this.GenGfxCtxForAllClosedMenus(this, GFX_CTX_FLAGS.PRIVATE);
 
@@ -886,7 +904,7 @@ export class Widget_Dropdown extends Section {
       menu.gfx_bufferidx = Gfx_buffer_store(menu.gfx.vb.idx, menu.mesh_bufferidx);
 
       // Handle widget group. If the dp belongs to a group and the menu isn't, add the menu to the root's dp group 
-      if (menu.group_bufferidxs[1] === INT_NULL && root.group_bufferidxs[1] !== INT_NULL) {
+      if (menu.is_gfx_inserted && menu.group_bufferidxs[1] === INT_NULL && root.group_bufferidxs[1] !== INT_NULL) {
          // NOTE: Updates the group and the batch buffers
          menu.group_bufferidxs[0] = root.group_bufferidxs[0];
          menu.group_bufferidxs[1] = Widget_group_add(root.group_bufferidxs[0], menu.gfx, menu.geom.num_faces, menu.mesh_bufferidx);

@@ -4,13 +4,13 @@ import { Section } from "../Meshes/Section.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { Find_gfx_match_widget_root_impl, Find_textgfx_from_parent_descending } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Mesh_buffer_get_mesh_byidx, Movey_from_widget_root_buffer, Widget_group_add, Widget_group_create, Widget_group_find_but_not_insert, Widget_group_update_decrement, Widget_group_update_increment, Widget_group_update_start, Widget_root_buffer_get_byidx, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
+import { Find_gfx_match_widget_root_impl, Find_match_gfx_from_parent, Find_textgfx_from_parent_descending } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_info_get_by_vbidx, Vertexbuffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Mesh_buffer_get_mesh_byidx, Movey_from_widget_root_buffer, Widget_group_add, Widget_group_create, Widget_group_find_but_not_insert, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_group_update_start, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clipy_from_widget_root } from "../Operations/Clip.js";
-import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { Index_buffer_add_indices, Index_buffer_reset_to_index } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { BLUE_10_120_220, GREY, PURPLER } from "../Material/Base/Colors.js";
 
 
@@ -76,16 +76,13 @@ export class Widget_Scroller extends Section {
 
 
       this.SetName('Widget_Scroller');
-      // this.StateEnable(MESH_STATE.HAS_POPUP);
       this.type |= MESH_TYPE.WIDGET_SCROLLER;
-      // Disable the 'MESH_TYPE.SECTION_MESH_ONLY'
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
 
       // If there is a group (section) passed by the user, use that section as scrolled section.
       if (scrolled_mesh && (scrolled_mesh.type & MESH_TYPE.SECTION_MESH)) {
 
          this.scrolled_section = scrolled_mesh;
-         // this.scrolled_section.root_bufferidx = this.root_bufferidx;
          this.scrolled_section.SetName('Scrolled_section')
 
          // Calculate the scroller's initial position
@@ -95,7 +92,7 @@ export class Widget_Scroller extends Section {
       else { // else create a new scrolled section.
          // We need to calculate the sizes correctly.
          // E.x. we need to create a new scrolled_section section, add the items, calculate with .Calc() and get the size to use for aligning the scroller and the scroll bar...
-         console.error('IMPLEMENT this.')
+         console.error('IMPLEMENT Scroller create new scrolled section.')
       }
 
       this.renderables = {
@@ -134,7 +131,6 @@ export class Widget_Scroller extends Section {
       handle.SetStyle([4, 5, 1.9]);
       handle.SetName('Scroll handle');
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      // handle.StateEnable(MESH_STATE.IS_MOVABLE); // No event is created, cause the handle move event is handled by the OnClick() class method
 
       // Make the vertical area of the bar larger for hover and handle grabing.
       bar.hover_margin = [0, handle.geom.dim[1] + 4];
@@ -157,7 +153,6 @@ export class Widget_Scroller extends Section {
 
       // Add the scrolled mesh
       SCROLL_BAR_IDX = this.AddItem(bar);
-      // SCROLL_BAR_IDX = this.AddChild(bar);
       SCROLL_MESH_IDX = this.AddItem(this.scrolled_section);
 
    }
@@ -189,15 +184,21 @@ export class Widget_Scroller extends Section {
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
+      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
       const bar = this.children.buffer[SCROLL_BAR_IDX];
       bar.root_bufferidx = root_bufferidx;
+      Widget_root_add_mesh(bar.root_bufferidx, bar.mesh_bufferidx);
 
       const handle = bar.children.buffer[0];
       handle.root_bufferidx = root_bufferidx;
+      Widget_root_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
 
       const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
-      scrolled_mesh.root_bufferidx = root_bufferidx;
+      // scrolled_mesh.root_bufferidx = root_bufferidx;
+      // Widget_root_add_mesh(scrolled_mesh.root_bufferidx, scrolled_mesh.mesh_bufferidx);
+      
+      scrolled_mesh.AddToWidgetRootBuffer(root_bufferidx)
    }
 
 
@@ -250,14 +251,21 @@ export class Widget_Scroller extends Section {
 
    /*******************************************************************************************************************************************************/
    // Graphics
+
+   // For scrollers we always create a separate vertex buffer, so it will be easier to handle the clipping of the scrolled section
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null, is_scrolled_section_private = false) {
 
       if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
 
-         const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-         FLAGS |= igfx.FLAGS;
+         // const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
+         
+         // const igfx = Find_match_gfx_from_parent(this, this.sid);
+         // FLAGS |= igfx.FLAGS;
+         
+         const igfx = [INT_NULL, INT_NULL];
+         FLAGS |= GFX_CTX_FLAGS.NEW;
 
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
+         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
 
          // Use the same gfx buffer for bar mesh
          const igfx_rect = [this.gfx.prog.idx, this.gfx.vb.idx];
@@ -279,7 +287,7 @@ export class Widget_Scroller extends Section {
          for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
             const child = this.scrolled_section.children.buffer[i];
             if (child) {
-               child.GenGfxCtx(FLAGS, scrolled_section_igfx);
+               child.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section_igfx);
             }
          }
 
@@ -314,6 +322,70 @@ export class Widget_Scroller extends Section {
       }
 
       return this.gfx;
+   // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null, is_scrolled_section_private = false) {
+
+   //    if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
+
+   //       const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
+   //       FLAGS |= igfx.FLAGS;
+
+   //       this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
+
+   //       // Use the same gfx buffer for bar mesh
+   //       const igfx_rect = [this.gfx.prog.idx, this.gfx.vb.idx];
+   //       this.scroll_bar.gfx = Gfx_generate_context(this.scroll_bar.sid, this.scroll_bar.sceneidx, this.scroll_bar.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
+
+   //       // Use the same gfx buffer for handle mesh
+   //       const handle = this.scroll_bar.children.buffer[0];
+   //       handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, handle.root_bufferidx, handle.mesh_bufferidx);
+
+   //       // Render the scrolled section and all it's meshes to it's own separate gfx buffer
+   //       if (is_scrolled_section_private) {
+   //          this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, GFX_CTX_FLAGS.PRIVATE, igfx_rect, this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
+   //       }
+   //       else {
+   //          this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
+   //       }
+
+   //       const scrolled_section_igfx = [this.scrolled_section.gfx.prog.idx, this.scrolled_section.gfx.vb.idx];
+   //       for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
+   //          const child = this.scrolled_section.children.buffer[i];
+   //          if (child) {
+   //             child.GenGfxCtx(FLAGS, scrolled_section_igfx);
+   //          }
+   //       }
+
+
+   //    }
+   //    else {
+
+   //       /**
+   //        * ELSE:
+   //        *    if FLAGS = SPECIFIC AND gfxidx !== null
+   //        *    the whole scroller will be rendered at the specific gfx buffer.
+   //        *    The meshes in the scrolled mesh are handled by the Section's GenGfxCtx,
+   //        *    and the dicision (Up until this IMPLEMENTATION) is "Find_gfx_match_widget_root_impl",
+   //        *    for all 3 base classes: Rect_Mesh, Text_Mesh, Textured_Mesh
+   //        */
+
+   //       this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, gfxidx, this.root_bufferidx, this.mesh_bufferidx);
+   //       const igfx = [this.gfx.prog.idx, this.gfx.vb.idx]
+
+   //       this.scroll_bar.gfx = Gfx_generate_context(this.scroll_bar.sid, this.scroll_bar.sceneidx, this.scroll_bar.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, igfx, this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
+
+   //       const handle = this.scroll_bar.children.buffer[0];
+   //       handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, igfx, this.root_bufferidx, this.mesh_bufferidx);
+
+   //       this.scrolled_section.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx);
+   //       for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
+   //          const child = this.scrolled_section.children.buffer[i];
+   //          if (child) {
+   //             child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx);
+   //          }
+   //       }
+   //    }
+
+   //    return this.gfx;
    }
 
 
@@ -337,23 +409,29 @@ export class Widget_Scroller extends Section {
    Rerender() {
 
       // Reset any gfx buffers from mesh tree recursively
-      Widget_root_reset_gfx(this.root_bufferidx);
+      // Widget_root_reset_gfx(this.root_bufferidx);
 
-      // Reset gfx start for the mesh
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
-      if (this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
-      this.StateEnable(MESH_STATE.ACTIVE);
+      // Vertexbuffer_reset_to_index(this.gfx.prog.idx, this.gfx.vb.idx, this.gfx.vb.start);
+      // Index_buffer_reset_to_index(this.gfx.vb.idx, this.gfx.ib.start);
 
-      const bar = this.scroll_bar;
-      Vertex_buffer_add_vertices(bar.gfx, bar.geom, bar.mat, bar.GetName());
-      if (bar.sid.shad & SID.SHAD.INDEXED) bar.gfx.ib.start = Index_buffer_add_indices(bar.gfx.ib, bar.GetName());
-      bar.StateEnable(MESH_STATE.ACTIVE);
-
-      const handle = bar.children.buffer[0];
-      Vertex_buffer_add_vertices(handle.gfx, handle.geom, handle.mat, handle.GetName());
-      if (handle.sid.shad & SID.SHAD.INDEXED) handle.gfx.ib.start = Index_buffer_add_indices(handle.gfx.ib, handle.GetName());
-      handle.StateEnable(MESH_STATE.ACTIVE);
-
+      
+      // // Reset gfx start for the mesh
+      // Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
+      // if (this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
+      // this.StateEnable(MESH_STATE.ACTIVE);
+      
+      // const bar = this.scroll_bar;
+      // Vertex_buffer_add_vertices(bar.gfx, bar.geom, bar.mat, bar.GetName());
+      // if (bar.sid.shad & SID.SHAD.INDEXED) bar.gfx.ib.start = Index_buffer_add_indices(bar.gfx.ib, bar.GetName());
+      // bar.StateEnable(MESH_STATE.ACTIVE);
+      
+      // const handle = bar.children.buffer[0];
+      // Vertex_buffer_add_vertices(handle.gfx, handle.geom, handle.mat, handle.GetName());
+      // if (handle.sid.shad & SID.SHAD.INDEXED) handle.gfx.ib.start = Index_buffer_add_indices(handle.gfx.ib, handle.GetName());
+      // handle.StateEnable(MESH_STATE.ACTIVE);
+      
+      Widget_group_reset_from_group_to_vb_end(this.scrolled_section.group_bufferidxs);
+      
       Vertex_buffer_add_vertices(this.scrolled_section.gfx, this.scrolled_section.geom, this.scrolled_section.mat, this.scrolled_section.GetName());
       if (this.scrolled_section.sid.shad & SID.SHAD.INDEXED) this.scrolled_section.gfx.ib.start = Index_buffer_add_indices(this.scrolled_section.gfx.ib, this.scrolled_section.GetName());
       this.scrolled_section.StateEnable(MESH_STATE.ACTIVE);
@@ -915,11 +993,14 @@ export function Scroller_on_update_handle(_params) {
     * reset the accumulator
     */
 
-   Movey_from_widget_root_buffer(scrolled_section, ydif);
+   // Movey_from_widget_root_buffer(scrolled_section, ydif);
+   scrolled_section.MoveYNoGfxUpdate(ydif)
+
 
    // scroller.scrolled_section.SetClampY(scroller.geom.pos[1], scroller.geom.dim[1], 300);
    // const changes_hapened = Clipy_chunks_impl(scroller.scrolled_section, scroller.scrolled_section.clamp[CLAMP.Y], scroller.renderables);
-   const changes_hapened = Clipy_from_widget_root(scroller.root_bufferidx);
+   const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
+   const changes_hapened = Clipy_from_widget_root(scroller.root_bufferidx, scrolled_section.group_bufferidxs, clip_top, clip_bottom);
 
    // scroller.Rerender2()
    scroller.Rerender()

@@ -12,7 +12,7 @@ import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Cr
 import { Dropdown_roots_set_root } from "../../Engine/Drawables/Widgets/Widget_Dropdown";
 import { Floor } from "../../Helpers/Math/MathOperations";
 import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications";
-import { Debug_info_update_progarm_clbk } from "../../Engine/Drawables/DebugInfo/DebugInfoUi";
+import { Debug_info_update_clbk } from "../../Engine/Drawables/DebugInfo/DebugInfoUi";
 
 
 
@@ -633,7 +633,7 @@ function TEMP(params) {
     }
 
     
-	Debug_ui_create_notification(Debug_info_update_progarm_clbk, _params);
+	Debug_ui_create_notification(Debug_info_update_clbk, _params);
 }
 
 

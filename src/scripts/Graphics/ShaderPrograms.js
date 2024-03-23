@@ -7,7 +7,7 @@ import { Select_fnidx_to_fill_vertex_buffer } from './Buffers/VertexBuffersOps.j
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { BLUEL, GREY, WHITE } from '../Engine/Drawables/Material/Base/Colors.js';
 import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from '../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js';
-import { Debug_info_update_progarm_clbk } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Debug_info_update_clbk } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 
 
@@ -355,7 +355,7 @@ function TEMP(params) {
 		parent_section: s.parent,
 	}
 
-	Debug_ui_create_notification(Debug_info_update_progarm_clbk, _params);
+	Debug_ui_create_notification(Debug_info_update_clbk, _params);
 
 }
 

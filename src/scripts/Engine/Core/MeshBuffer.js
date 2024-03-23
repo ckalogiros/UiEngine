@@ -7,10 +7,13 @@ import { Program_get_shader_attribute_attribs_per_vertex } from "../../Graphics/
 import { MouseGetPosDif } from "../Controls/Input/Mouse.js";
 import { TimeIntervalsDestroyByIdx } from "../Timers/TimeIntervals.js";
 import { Int16Buffer, Int8Buffer, M_Buffer } from "./Buffers.js";
-import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
-import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
+import { BLUEL, GREEN, GREY, ORANGE_240_160_10 } from "../Drawables/Material/Base/Colors.js";
+import { Create_widget_button, Create_widget_dropdown, Create_widget_scroller, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Batch_store } from "../Batch/Batch.js";
+import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
+import { Debug_info_update_clbk } from "../Drawables/DebugInfo/DebugInfoUi.js";
+import { Scroller_clampy_and_render } from "../Drawables/Widgets/WidgetScroller.js";
 
 
 /**
@@ -845,17 +848,18 @@ export function Widget_group_add(group_bufferidx, gfx, num_faces = _, mesh_buffe
    const len = group.group_data.length;
    for (let i = 0; i < len; i++) {
 
-      if (group.group_data[i].gfx_idxs[GFX.PROG_IDX] === progidx && group.group_data[i].gfx_idxs[GFX.VB_IDX] === vbidx) {
+      // if (group.group_data[i].gfx_idxs[GFX.PROG_IDX] === progidx && group.group_data[i].gfx_idxs[GFX.VB_IDX] === vbidx) {
+      if (group.group_data[i].gfx_idxs[GFX.VB_IDX] === vbidx) { // vbidx is enough
 
          group.group_data[i].num_faces += num_faces;
 
          // Case the mesh inserted to the group is rendered first in the vertex buffer. 
-         if (group.group_data[i].start > start) {
-            group.group_data[i].start = start;
-         }
-         if (group.group_data[i].ib_start > ib_start) {
-            group.group_data[i].ib_start = ib_start;
-         }
+         // if (group.group_data[i].start > start) {
+         //    group.group_data[i].start = start;
+         // }
+         // if (group.group_data[i].ib_start > ib_start) {
+         //    group.group_data[i].ib_start = ib_start;
+         // }
 
          // for (let j = 0; j < group.group_data.length; j++) console.log('group_data:', group.group_data[j].num_faces, )
          return i; // vb found, no need to create. Return the index to the mesh for refference.
@@ -1031,23 +1035,23 @@ export function Widget_group_reset_from_group_to_vb_end(group_bufferidxs) {
 
 
 /** Reset the vgfx buffers from an index till the end. Fast, it does not remove from gfx buffers. Works only if there is no other group for that gfx buffers. */
-export function Widget_group_reset_from_group_to_vb_end_specific_vbidx(group_bufferidx, vb_bufferidx) {
+export function Widget_group_reset_from_group_to_vb_end_specific_vbidx(group_bufferidx, group_dataidx) {
 
    // const group = Widget_group_get(root_dp.group_bufferidxs[0]);
    const group = Widget_group_get(group_bufferidx);
 
-   const progidx = group.group_data[vb_bufferidx].gfx_idxs[GFX.PROG_IDX];
-   const vbidx = group.group_data[vb_bufferidx].gfx_idxs[GFX.VB_IDX];
+   const progidx = group.group_data[group_dataidx].gfx_idxs[GFX.PROG_IDX];
+   const vbidx = group.group_data[group_dataidx].gfx_idxs[GFX.VB_IDX];
 
    if (progidx === INT_NULL || vbidx === INT_NULL) {
       console.error('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes', 'progidx', progidx, 'vbidx', vbidx)
       alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
    }
 
-   const vb_start = group.group_data[vb_bufferidx].start; // We want the start of the root mesh of the group, not the start of the root widget
+   const vb_start = group.group_data[group_dataidx].start; // We want the start of the root mesh of the group, not the start of the root widget
    Vertexbuffer_reset_to_index(progidx, vbidx, vb_start);
 
-   const ib_start = group.group_data[vb_bufferidx].ib_start; // We want the start of the root mesh of the group, not the start of the root widget
+   const ib_start = group.group_data[group_dataidx].ib_start; // We want the start of the root mesh of the group, not the start of the root widget
    Index_buffer_reset_to_index(vbidx, ib_start);
 }
 
@@ -1617,4 +1621,164 @@ export function Widget_group_buffer_print_w5() {
          );
       }
    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************************************************************************************************************************************/
+// DEBUG Info - Create text for render
+/****************************************************************************************************************************************************/
+
+function TEMP(params) {
+
+   const destroy_btn = params.target_mesh;
+   const s = params.params;
+   s.Destroy();
+
+   const _params = {
+       notification_type: NOTIFICATION_TYPE_IDX.MESH_BUFFER,
+       parent_section: s.parent,
+   }
+
+   
+  Debug_ui_create_notification(Debug_info_update_clbk, _params);
+}
+
+
+
+export function Mesh_buffer_create_text_info() {
+
+   const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
+
+   const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), 'Mesh Buffer Info ORANGE');
+
+   const destroy = Create_widget_button(_, 'Recalc', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
+   destroy.Bind(TEMP, _, s);
+   s.AddItem(destroy);
+
+
+   const margin = [4, 4];
+   const style = [0, 3, 1];
+
+   const _0 = Create_widget_dropdown(_, 'Mesh Buffer', [100, 100, 0], col_dp, col_menu, _, _, _, _, style, margin);
+   _0.CreateClickEvent();
+   Dropdown_roots_set_root(_0, _0)
+   s.AddItem(_0)
+   _0.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   
+   const mb = _mesh_buffer;
+   const mesh_buffer_info = Create_widget_text(_, `count:${mb.active_count} size:${mb.size}`);
+   _0.AddToMenu(mesh_buffer_info);
+   
+   const len = mb.boundary; // Avoid infinite loop
+   for (let i = 0; i <= len; i++) {
+       
+      const m = mb.buffer[i];
+
+      const _1 = Create_widget_dropdown(_, `[${m.mesh_bufferidx}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+      _1.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+      _1.CreateClickEvent();
+      _0.AddToMenu(_1)
+
+      { // Name info
+         const info = Create_widget_text(_, `name:{${m.GetName()}}`);
+         _1.AddToMenu(info);
+      }
+
+      { // Views indexes info
+         const view = Create_widget_dropdown(_, `view`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+         view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+         view.CreateClickEvent();
+         _1.AddToMenu(view)
+         { const info = Create_widget_text(_, `gfx:${m.gfx_bufferidx}`); view.AddToMenu(info); }
+         { const info = Create_widget_text(_, `root:${m.root_bufferidx}`); view.AddToMenu(info); }
+         { const info = Create_widget_text(_, `batch:${m.batch_buffer_vbidx}`); view.AddToMenu(info); }
+         { const info = Create_widget_text(_, `group:${m.group_bufferidxs}`); view.AddToMenu(info); }
+         { const info = Create_widget_text(_, `fbidx:${m.fbidx}`); view.AddToMenu(info); }
+         { const info = Create_widget_text(_, `batch_fnidx:${m.batch_fnidx}`); view.AddToMenu(info); }
+      }
+
+      { // Geometry info
+         const view = Create_widget_dropdown(_, `geometry`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+         view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+         view.CreateClickEvent();
+         _1.AddToMenu(view)
+         { const info = Create_widget_text(_, `pos:${m.geom.pos[0]}, ${m.geom.pos[1]}, ${m.geom.pos[2]}`); view.AddToMenu(info); }
+         { const info = Create_widget_text(_, `dim:${m.geom.dim[0]}, ${m.geom.dim[1]}`); view.AddToMenu(info); }
+      }
+
+
+      // Gfx info
+      const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+      gfx.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+      gfx.CreateClickEvent();
+      _1.AddToMenu(gfx)
+      if(m.gfx) {
+         { // Program
+            const info = Create_widget_text(_, `prog: {idx:${m.gfx.prog.idx} attribsidx:${m.gfx.prog.attribsidx} }`);
+            gfx.AddToMenu(info);
+         }
+         { // Vertex buffer
+            const info = Create_widget_text(_, `vb: { idx:${m.gfx.vb.idx} start:${m.gfx.vb.start} count:${m.gfx.vb.count} }`);
+            gfx.AddToMenu(info);
+         }
+         { // Index buffer
+            const info = Create_widget_text(_, `ib: { idx:${m.gfx.ib.idx} start:${m.gfx.ib.start} count:${m.gfx.ib.count} }`);
+            gfx.AddToMenu(info);
+         }
+         { // Texture
+            const info = Create_widget_text(_, `tb: { idx:${m.gfx.tb.idx} }`);
+            gfx.AddToMenu(info);
+         }
+      }
+      else{
+         { // Vertex buffer
+            const info = Create_widget_text(_, `NULL`);
+            gfx.AddToMenu(info);
+         }
+      }
+       
+   }
+
+      
+   // Create scroller for the ui-mesh info widget
+   // const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, _0, [0, 300]);
+   // scroller.StateEnable(MESH_STATE.ACTIVE);
+   // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   // // scroller.SetGfxProgramGroup(GFX_GROUPS.DEBUG.MASK); // IMPORTANT: Must set the scroller to be rendered in the Debug gfx buffers
+   // // scroller.scrolled_section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL ;
+   // s.AddItem(scroller);
+
+   // Render the 
+   // scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+
+   // scroller.ActivateAndChildrenRecursive();
+   // Scroller_clampy_and_render(scroller, 100, 800);
+
+   // return scroller;
+
+   // s.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT
+   s.Calc()
+   return s;
+
 }

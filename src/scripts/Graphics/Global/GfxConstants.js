@@ -166,16 +166,20 @@ const SID = {
     CheckSidMatch(sid1, sid2) {
 
         // Remove all Block Uniforms flags. Better to reuse a program than to create a duplicate only because some meshes dont use Blocked Uniforms. 
-        const  unif1 = sid1 & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
-        const  unif2 = sid2 & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
-        
+        const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
+        const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
+        /**
+         * // TODO:
+         * I have deactivated the 'gfx_group' check.
+         * Also for the uniforms i exclude the projection matrix and resolution uniforms
+         */
         if (
             sid1.shad === sid2.shad &&
             sid1.attr === sid2.attr &&
             // sid1.unif === sid2.unif &&
             unif1 === unif2 &&
-            sid1.pass === sid2.pass &&
-            sid1.gfx_group === sid2.gfx_group
+            sid1.pass === sid2.pass
+            // sid1.gfx_group === sid2.gfx_group
         ) {
             return true;
         }
@@ -302,14 +306,19 @@ const GFX_CTX_FLAGS = {
     ANY: _CNT <<= 0x1, // SID exists, it will use it, else it will create a new one.
     NEW: _CNT <<= 0x1, // Create a new vertexBuffer.
     SPECIFIC: _CNT <<= 0x1, // Use specific index of a vertex buffer.
-    // Use private vertex buffer. If a private and inactive buffer exists it will use that, ...
-    PRIVATE: _CNT <<= 0x1, // ... else it will create a new buffer and render it as private
+    PRIVATE: _CNT <<= 0x1, // Private will search for any matching vb from: {widget_root_buffer, widget_group, parent, ...}
 
     CHILDEN: _CNT <<= 0x1, // Choose the first match (sid match) from mesh'a children.
     SIBLINGS: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's siblings.
-    PARENT: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent.
-    PARENT_ASC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
+    // PARENT: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent.
+    
+    
+    FROM_ROOT_WIDGET: _CNT <<= 0x1, // 
+    FROM_GROUP: _CNT <<= 0x1, // 
+    FROM_PARENT_ASC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
+    // FROM_PARENT: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
 
+    // UNUSED
     STATIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated rarely
     DYNAMIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated every frame
     

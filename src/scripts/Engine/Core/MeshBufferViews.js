@@ -65,7 +65,16 @@ class View {
    constructor(rootidx) {
 
       this.rootidx = rootidx;
-      this.data = new M_Buffer();
+      this.data = new M_Buffer(); // Array of arrays of per vertex buffer mesh indexes
+
+
+      /**
+       * The info is part of the data
+       * Also data have a buffer for mesh indexes
+       * OR store the info at the end of the buffer
+       */
+      // this.data = [INT_NULL, INT_NULL, INT_NULL]; // VIEW_INFO:{ VBIDX, START, NUM_FACES }
+      // this.info[VIEW_INFO.NUM_FACES] = 0;
 
    }
 
@@ -141,6 +150,7 @@ export function View_create_per_gfx_view(root_bufferidx, mesh_bufferidx) {
 
 
 
+
 /******************************************************************************************************************************/
 // Functionality
 /*****************************************************************************************************************************/
@@ -185,6 +195,124 @@ export function View_rerender_from_view(view_bufferidx) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/
+// NEW IMPLEMENTATION
+/*******************************************************************************************************************************************************************************/
+
+
+const VIEW_INFO = {
+   VBIDX: 0,
+   START: 1,
+   NUM_FACES: 2,
+};
+
+
+function View_vb_exists(groupidx, vbidx){
+
+   const view = _view_buffer.buffer[groupidx];
+
+   for(let i=0; view.vb.boundary; i++){
+
+      if(view.vb.buffer[i].info[VIEW_INFO.VBIDX] === vbidx)
+         return i;
+   }
+
+   return INT_NULL;
+}
+
+
+/** group.buffer[group_bufferidx].vb.buffer[group_vbidx].data.buffer[group_meshidx] */
+/** group.buffer[group_bufferidx].vb.buffer[group_vbidx].info.buffer[3] */
+function View_add_mesh(groupidx, mesh_bufferidx, num_faces, start, vbidx){
+
+
+   const view = _view_buffer.buffer[groupidx];
+   // TODO: Check for errors
+
+   // Find data for vertex buffer exists
+   const view_vbidx = View_vb_exists(groupidx, vbidx);
+   if(view_vbidx !== INT_NULL){ // Vb buffer found
+
+      const view_vb_buffer = view.vb.buffer[view_vbidx];  
+
+      view_vb_buffer.data.Add(mesh_bufferidx);
+            
+      // update num_faces
+      view_vb_buffer.info[VIEW_INFO.NUM_FACES] += num_faces;
+
+      // Update start if it is less than the stored
+      const group_start = view_vb_buffer.info.buffer[VIEW_INFO.START]
+      if(start < group_start && start !== INT_NULL)
+         view_vb_buffer.info.buffer[VIEW_INFO.START] = start;
+
+      return view_vb_buffer.info.buffer; // return the info
+      
+   }
+   else{ // Not found, create new
+
+      const view_vb_buffer = view.vb.buffer[view_vbidx];  
+
+      const mesh_groupidx =  view_vb_buffer.data.Add(mesh_bufferidx);
+      
+      view_vb_buffer.info.buffer[VIEW_INFO.VBIDX] = vbidx;
+      view_vb_buffer.info.buffer[VIEW_INFO.START] = start;
+      view_vb_buffer.info.buffer[VIEW_INFO.NUM_FACES] = num_faces;
+
+      return [groupidx, view_vbidx, mesh_groupidx]; // return the indexes
+   }
+
+}
+
+
+
+
+function Build_per_gfx_view_group_from_root_mesh(mesh, groupidx) {
+
+   // 
+   const info = View_add_mesh(groupidx, mesh.mesh_bufferidx, mesh.geom.num_faces, mesh.gfx.vb.start, mesh.gfx.vb.idx);
+   mesh.group_bufferidxs[0] = info[0]; // Groups buffer index.
+   mesh.group_bufferidxs[1] = info[1]; // VB buffers index, which vb buffer the mesh belongs.
+   mesh.group_bufferidxs[2] = info[2]; // Mesh's index in the group buffer  .
+
+   for(let i=0; i<=mesh.children.boundary; i++){
+
+      const child = mesh.children.buffer[i];
+      if(child){
+         Build_per_gfx_view_group_from_root_mesh(child)
+      }
+   }
+}
+
+
+
+export function View_build_group_from_root_mesh(mesh){
+
+   if(mesh.group_bufferidxs[0] !== INT_NULL) alert('@ View_build_group_from_root_mesh(). mesh is alredy in a group')
+
+   const view = new View(mesh.mesh_bufferidx);
+   const groupidx = _view_buffer.Add(view);
+
+   Build_per_gfx_view_group_from_root_mesh(mesh, groupidx);
+}
 
 
 

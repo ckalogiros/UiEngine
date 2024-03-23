@@ -71,7 +71,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    const uidbg = Debug_info_ui_performance(scene);
+    // const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -230,8 +230,10 @@ export function TestWidgetsGeneric(scene) {
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh.children.buffer[0]);
 
 
-    Debug_info_create_all_generic_info();
-
+    
+    Test_scroller_in_between();
+    
+    // Debug_info_create_all_generic_info();
 
     // Scenes_debug_info_create(scene);
 
@@ -247,6 +249,130 @@ export function TestWidgetsGeneric(scene) {
 }
 
 
+
+
+function Test_scroller_in_between() {
+
+    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
+ 
+    const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], [400, 400, 0], [100, 100], TRANSPARENCY(REDL[7], 1.5), 'Test_scroller_in_between');
+    s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+
+    const margin = [4, 4]; const style = [0, 3, 1];
+ 
+    let scroller1 = null; 
+    {
+        const _0 = Create_widget_dropdown(_, 'Dp', [100, 100, 0], col_dp, col_menu, _, _, _, _, style, margin);
+        _0.CreateClickEvent();
+        _0.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+        // _0.options = SECTION.TOP_DOWN | SECTION.VERTICAL;
+        Dropdown_roots_set_root(_0, _0)
+        // s.AddItem(_0)
+        
+    
+        const len = 10; // Avoid infinite loop
+        for (let i = 0; i <= len; i++) {
+            
+           const _1 = Create_widget_dropdown(_, `Dp${i}`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+           _1.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+           _1.CreateClickEvent();
+           _0.AddToMenu(_1)
+     
+           {
+              const info = Create_widget_text(_, `name:TEXT`);
+              _1.AddToMenu(info);
+           }
+    
+            
+        }
+     
+        const scrolled_section = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), 'scrolled_section');
+        // const info = Create_widget_text(_, `name:TEXT`);
+        // scrolled_section.AddItem(info);
+        scrolled_section.AddItem(_0);
+    
+        // Create scroller for the ui-mesh info widget
+        const scroller = Create_widget_scroller(_, scrolled_section, [0, 60]);
+        scroller.StateEnable(MESH_STATE.ACTIVE);
+        scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        scroller.SetGfxProgramGroup(GFX_GROUPS.DEBUG.MASK); // IMPORTANT: Must set the scroller to be rendered in the Debug gfx buffers
+        scroller.scrolled_section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL ;
+        s.AddItem(scroller);
+     
+        scroller.Calc_no_gfx_update();
+
+        scroller1 = scroller;
+
+    }
+    let scroller2 = null; 
+    {
+        const _0 = Create_widget_dropdown(_, 'Dp', [100, 100, 0], col_dp, col_menu, _, _, _, _, style, margin);
+        _0.CreateClickEvent();
+        _0.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+        // _0.options = SECTION.TOP_DOWN | SECTION.VERTICAL;
+        Dropdown_roots_set_root(_0, _0)
+        // s.AddItem(_0)
+        
+    
+        const len = 10; // Avoid infinite loop
+        for (let i = 0; i <= len; i++) {
+            
+           const _1 = Create_widget_dropdown(_, `Dp${i}`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+           _1.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+           _1.CreateClickEvent();
+           _0.AddToMenu(_1)
+     
+           {
+              const info = Create_widget_text(_, `name:TEXT`);
+              _1.AddToMenu(info);
+           }
+    
+            
+        }
+     
+        const scrolled_section = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), 'scrolled_section');
+        // const info = Create_widget_text(_, `name:TEXT`);
+        // scrolled_section.AddItem(info);
+        scrolled_section.AddItem(_0);
+    
+        // Create scroller for the ui-mesh info widget
+        const scroller = Create_widget_scroller(_, scrolled_section, [0, 60]);
+        scroller.StateEnable(MESH_STATE.ACTIVE);
+        scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        scroller.SetGfxProgramGroup(GFX_GROUPS.DEBUG.MASK); // IMPORTANT: Must set the scroller to be rendered in the Debug gfx buffers
+        scroller.scrolled_section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL ;
+        s.AddItem(scroller);
+     
+        scroller.Calc_no_gfx_update();
+
+        
+        scroller2 = scroller;
+    }
+
+
+
+
+    // return scroller;
+ 
+    s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+    s.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+    // s.Recalc();
+    s.Calc_no_gfx_update();
+    s.Render();
+    s.ConstructListeners();
+ 
+    // s.group_bufferidxs = Widget_group_create(s.mesh_bufferidx, s.gfx)
+    // s.AddToWidgetGroupBuffer(s.group_bufferidxs[0]);
+
+
+    scroller1.scrolled_section.group_bufferidxs = Widget_group_create(scroller1.scrolled_section.mesh_bufferidx, scroller1.scrolled_section.gfx)
+    scroller1.scrolled_section.AddToWidgetGroupBuffer(scroller1.scrolled_section.group_bufferidxs[0]);
+    scroller2.scrolled_section.group_bufferidxs = Widget_group_create(scroller2.scrolled_section.mesh_bufferidx, scroller2.scrolled_section.gfx)
+    scroller2.scrolled_section.AddToWidgetGroupBuffer(scroller2.scrolled_section.group_bufferidxs[0]);
+ 
+ }
 
 
 
