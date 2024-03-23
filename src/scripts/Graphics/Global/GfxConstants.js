@@ -302,23 +302,21 @@ const MESH_ENABLE = {
 _CNT = 0x1;
 const GFX_CTX_FLAGS = {
 
-    // Let the application decide a vertex buffer with the same shader id(sid)
-    ANY: _CNT <<= 0x1, // SID exists, it will use it, else it will create a new one.
-    NEW: _CNT <<= 0x1, // Create a new vertexBuffer.
-    SPECIFIC: _CNT <<= 0x1, // Use specific index of a vertex buffer.
-    PRIVATE: _CNT <<= 0x1, // Private will search for any matching vb from: {widget_root_buffer, widget_group, parent, ...}
-
-    CHILDEN: _CNT <<= 0x1, // Choose the first match (sid match) from mesh'a children.
-    SIBLINGS: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's siblings.
-    // PARENT: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent.
     
+    /** If any of the options fail to find match, then new vertex buffer is created */
     
-    FROM_ROOT_WIDGET: _CNT <<= 0x1, // 
-    FROM_GROUP: _CNT <<= 0x1, // 
+    ANY: _CNT <<= 0x1, // Match any vertex buffer.
+    NEW: _CNT <<= 0x1, // Create a new vertex buffer.
+    SPECIFIC: _CNT <<= 0x1, // Use specific indexes for vertex buffer and program. // TODO: program maybe no longer required, vb has a sid
+    
+    PRIVATE: _CNT <<= 0x1, // Private will initiate the 'find buffer from...' functionality 
+    // So 'Private' is used along with one of the bellow: 
+    FROM_ROOT_WIDGET: _CNT <<= 0x1, // Check from root descending
     FROM_PARENT_ASC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
-    // FROM_PARENT: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
+    FROM_PARENT_CHLDREN_DESC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent children
 
     // UNUSED
+    // These are prioritized over all other above options.
     STATIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated rarely
     DYNAMIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated every frame
     

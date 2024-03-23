@@ -142,7 +142,7 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, pr
 
     // const type = vao.type
     const type = BUFFER_TYPE.FLOAT32
-    const ret = Vertex_buffer_create(type, size, sid);
+    const ret = Vertex_buffer_create(type, size);
     const vb_info = new Vertex_Buffer_Info(size, sid, ret.vbidx, ret.vbo, vaoidx, vao.vao, vao.type, progidx);
 
     _vertex_buffers_info.Add(vb_info);
@@ -300,6 +300,7 @@ export function Vertex_buffer_state_enable(vbidx, STATE_FLAG) {
 
 
 
+
 export function Vertex_buffer_state_disable(vbidx, STATE_FLAG) {
     _vertex_buffers_info.buffer[vbidx].state.mask &= ~STATE_FLAG;
 }
@@ -319,7 +320,7 @@ export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset
 
 
 /** Returns true/false */
-export function Vertex_buffer_exists(vbidx) {
+export function Vertex_buffer_exists_from_index(vbidx) {
 
     if (_vertex_buffers.buffer[vbidx] === undefined || _vertex_buffers.buffer[vbidx] === null)
         return false

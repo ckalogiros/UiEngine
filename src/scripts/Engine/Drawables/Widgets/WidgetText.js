@@ -5,7 +5,7 @@ import { AddArr2, CopyArr2, CopyArr3, Floor } from "../../../Helpers/Math/MathOp
 import { Batch_store } from "../../Batch/Batch.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
-import { Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx, TimeIntervalsGetByIdx } from "../../Timers/TimeIntervals.js";
 import { WHITE } from "../Material/Base/Colors.js";
@@ -193,7 +193,6 @@ export class Widget_Text extends Text_Mesh {
 
 		if (x === 0 && y === 0) return;
 
-		// this.geom.MoveXY(x, y, this.gfx);
 		this.geom.pos[0] += x;
 		this.geom.pos[1] += y;
 		
@@ -202,7 +201,6 @@ export class Widget_Text extends Text_Mesh {
          data: [x,y],
       }
       Batch_store(this, _, update_data, _);
-		// Batch_store(this, _, { pos: [x, y] });
 
 	}
 
@@ -232,18 +230,6 @@ export class Widget_Text extends Text_Mesh {
 
 		this.mat.col[3] = this.mat.defCol[3];
 		this.mat.SetColorAlpha(alpha, this.gfx);
-	}
-
-
-	AddToWidgetGroupBuffer(group_bufferidx) {
-
-		if(group_bufferidx === INT_NULL)
-         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
-
-		if (this.state.mask & MESH_STATE.ACTIVE) {
-			this.group_bufferidxs[0] = group_bufferidx;
-			this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
-		}
 	}
 
 
@@ -283,9 +269,6 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		super(text, pos, fontSize, text_col, bold, pad);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC;
-
-		// Translate the dynamic text by the width of the constant text's width
-		// pos[0] += this.geom.CalcTextWidth();
 
 		// Default alignment for all children text meshes
 		// this.alignment = ALIGN.VERTICAL;
@@ -376,17 +359,6 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 	}
 
-
-	ClipY(clip_top, clip_bottom) {
-
-		if (this.ClipyCheck_A(clip_top, clip_bottom))
-			this.state.mask &= ~MESH_STATE.ACTIVE;
-
-		for (let i = 0; i <= this.children.boundary; i++) {
-			if (this.children.buffer[i].ClipyCheck_A(clip_top, clip_bottom))
-				this.children.buffer[i].state.mask &= ~MESH_STATE.ACTIVE;
-		}
-	}
 
 
 	/*******************************************************************************************************************************************************/
@@ -590,21 +562,14 @@ export class Widget_Multi_Text extends Widget_Text {
 		CopyArr3(pos, this.geom.pos); // Copy the dynamic's text mesh pos
 		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad);
 		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
+
 		// Add the new new_text as a child of 'this'.
 		const idx = this.AddChild(new_text);
-		// new_text.SetName('MultiText '+ idx + '-' + new_text.mat.text.slice(0, 7));
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC | new_text.geom.type | new_text.mat.type;
 
 
-		// new_text.pad = prev_text_mesh.pad;
-
-
-		// Align_self(ALIGN.LEFT, this.geom, new_text.geom, new_text.geom.num_faces, pad);
-		// Align_between(ALIGN.VERTICAL, prev_text_mesh.geom, new_text.geom, pad, new_text.pad, prev_text_mesh.advancex)
-		// Align_between(ALIGN.HORIZONTAL, prev_text_mesh.geom, new_text.geom, prev_text_mesh.pad, new_text.pad, prev_text_mesh.advancex)
 		Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.pad, prev_text_mesh.advancex)
 		const pos_dif = Align_self(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
-		// const pos_dif = Align_self(ALIGN.LEFT, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
 		AddArr2(new_text.geom.pos, pos_dif);
 
 
@@ -734,7 +699,6 @@ export class Widget_Multi_Text extends Widget_Text {
 
 			const text = `${val}`;
 			meshes[i].UpdateText(text);
-			// console.log(meshes[i].GetName())
 		}
 
 	}
@@ -855,7 +819,6 @@ export class Widget_Multi_Text extends Widget_Text {
 	ClampX(x, margin = 0) {
 
 		const clamp = x - margin * 2;
-		// const clamp = x - margin;
 		const char_width = Floor(this.fontsize * Font_get_font_advancex(this.mat.texidx));
 		let text_width = char_width * 2;
 
@@ -865,7 +828,6 @@ export class Widget_Multi_Text extends Widget_Text {
 			text_width += char_width * 2;
 			k++;
 		}
-		// this.text_mesh.geom.num_faces -= k;
 		this.geom.num_faces = k - 1;
 
 		// Update the gfx buffers, if the mesh is already inserted.
@@ -880,13 +842,13 @@ export class Widget_Multi_Text extends Widget_Text {
 
 			const child = this.children.buffer[i];
 			if (child) {
+
 				k = 0; // Will store the number of characters need to be clamped.
 				// Calculate how many characters we must ommit.
 				while (text_width < clamp && k < child.geom.num_faces) {
 					text_width += char_width;
 					k++;
 				}
-				// this.text_mesh.geom.num_faces -= k;
 				child.geom.num_faces = k - 1;
 
 				// Update the gfx buffers, if the mesh is already inserted.
@@ -900,34 +862,6 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 	}
 
-
-	SetGfxProgramGroup(group_mask) {
-		this.sid.gfx_group = group_mask;
-		for (let i = 0; i <= this.children.boundary; i++) {
-			const child = this.children.buffer[i];
-			child.sid.gfx_group = group_mask;
-		}
-	}
-
-
-	AddToWidgetGroupBuffer(group_bufferidx) {
-
-      if(group_bufferidx === INT_NULL)
-         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
-
-		if (this.state.mask & MESH_STATE.ACTIVE) {
-			this.group_bufferidxs[0] = group_bufferidx;
-			this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces);
-
-			for (let i = 0; i <= this.children.boundary; i++) {
-				const child = this.children.buffer[i];
-				if (child) {
-					child.group_bufferidxs[0] = group_bufferidx;
-					child.group_bufferidxs[1] = Widget_group_add(group_bufferidx, child.gfx, child.geom.num_faces);
-				}
-			}
-		}
-	}
 
 
 	UpdateWidgetGroupIncrementNumFaces() {

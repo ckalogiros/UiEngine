@@ -413,7 +413,6 @@ export class Widget_Minimize extends Widget_Button {
       if (Check_intersection_point_rect(m.pos, m.dim, point, [0, 0])) {
 
          STATE.mesh.SetClicked(minim_mesh);
-         // STATE.mesh.SetFocused(root);
 
 
          if (root) {
@@ -425,9 +424,6 @@ export class Widget_Minimize extends Widget_Button {
 
 
                Reset_gfx_from_parent_recursive(root);
-               // Vertex_buffer_reset(root.gfx);
-               // Index_buffer_reset(root.gfx);
-
 
                { // Create new minimized widget and add to the root
 

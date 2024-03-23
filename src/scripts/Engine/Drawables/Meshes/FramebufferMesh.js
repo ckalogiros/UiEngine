@@ -28,7 +28,7 @@ export function Create_mesh_for_framebuffer(mesh, fb, pos, dim) {
    // rect.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    rect.ConstructListeners();
 
-   rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    rect.Render();
 
    // Draw the framebuffer texture mesh first, and every other mesh on top.

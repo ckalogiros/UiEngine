@@ -1,6 +1,7 @@
 "use strict";
 
-import { Mesh_buffer_get_mesh_byidx, Widget_group_get, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer";
+import { View_get_view_byidx } from "../../Core/MeshBufferViews";
 
 
 
@@ -27,57 +28,59 @@ import { Mesh_buffer_get_mesh_byidx, Widget_group_get, Widget_group_update_decre
  * 
  */
 
-/**
- * // TODO
- * // IMIDIATELY
- * We must implement the View groups.
- * We need all mesh indexes for each group, i order to
- * clip all meshes of that group
- */
-export function Clipy_from_widget_root(root_bufferidx, group_bufferidxs=null, clip_top=null, clip_bottom=null) {
+
+export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
 
    let changes_hapened = false;
    const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
-   // const root = Widget_root_buffer_get_byidx(root_bufferidx);
-   const group = Widget_group_get(group_bufferidxs[0]);
-   for(let i=0; i<=group.boundary; i++){
+   const group = View_get_view_byidx(group_bufferidx);
 
-      const mesh     = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
-      const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
-      const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
+   for(let i=0; i<=group.vb.boundary; i++){
+   
+      const meshshes_idx = group.vb.buffer[i].data;
+      for(let j=0; j<=meshshes_idx.boundary; j++){
+         
+         const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+         const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
+         const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
+   
+         if(bottom < limit.up || top > limit.down){
 
-      if(bottom < limit.up || top > limit.down){
-         // if(mesh.state.mask & (MESH_STATE.ACTIVE | (~MESH_STATE.CLIPED_Y))){
-         if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
-            mesh.state.mask &= ~MESH_STATE.ACTIVE;
-            mesh.state.mask |= MESH_STATE.CLIPED_Y;
-            Widget_group_update_decrement(mesh.group_bufferidxs, mesh.geom.num_faces, mesh);
-            // mesh.is_gfx_inserted = false
-            changes_hapened = true;
-            // console.log('Deactivate', mesh.GetName())
+            if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
+
+               mesh.state.mask &= ~MESH_STATE.ACTIVE;
+               mesh.state.mask |= MESH_STATE.CLIPED_Y;
+               // Widget_group_update_decrement(mesh.group_bufferidxs, mesh.geom.num_faces, mesh);
+               changes_hapened = true;
+            }
+         }
+         else{
+            
+            if(mesh.state.mask & MESH_STATE.CLIPED_Y){
+            
+               mesh.state.mask |= MESH_STATE.ACTIVE;
+               mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
+               // Widget_group_update_increment(mesh.group_bufferidxs, mesh.geom.num_faces, mesh);
+               changes_hapened = true;
+            }
          }
       }
-      else{
-         if(mesh.state.mask & MESH_STATE.CLIPED_Y){
-            // console.log('Activate', mesh.GetName())
-            mesh.state.mask |= MESH_STATE.ACTIVE;
-            mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
-            Widget_group_update_increment(mesh.group_bufferidxs, mesh.geom.num_faces, mesh);
-            changes_hapened = true;
-         }
       }
-   }
+
 
    return changes_hapened;
 }
-// export function Clipy_from_widget_root(root_bufferidx, group_bufferidxs=null, clip_top=null, clip_bottom=null) {
+
+/**SAVE-Old implementation */
+// export function Clipy_from_group(root_bufferidx, group_bufferidxs=null, clip_top=null, clip_bottom=null) {
 
 //    let changes_hapened = false;
 //    const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
-//    const root = Widget_root_buffer_get_byidx(root_bufferidx);
-//    for(let i=0; i<=root.boundary; i++){
+//    // const root = Widget_root_buffer_get_byidx(root_bufferidx);
+//    const group = Widget_group_get(group_bufferidxs[0]);
+//    for(let i=0; i<=group.boundary; i++){
 
 //       const mesh     = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
 //       const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
@@ -107,6 +110,8 @@ export function Clipy_from_widget_root(root_bufferidx, group_bufferidxs=null, cl
 
 //    return changes_hapened;
 // }
+
+
 
 
 
@@ -322,7 +327,14 @@ function Recurse_mesh_set_active(mesh, flag_activate) {
  * Returns the removed meshes buffer and the first-last
  *  mesh indexes for both the upper and lower chunks.
  */
-export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, upper_limit, lower_limit) {
+// export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top, clip_bottom) {
+//    , clip_top=null, clip_bottom=null) {
+export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top=null, clip_bottom=null) {
+
+   if(!clip_top)
+      clip_top =  TEST_CLIP_TOP; 
+   if(!clip_bottom)
+      clip_bottom = TEST_CLIP_BOTTOM;
 
    // The first and last meshes of scrolled section after been clamped.
    let firstupper = 0, lastupper = INT_NULL, firstlower = INT_NULL, lastlower = INT_NULL;
@@ -337,7 +349,7 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, upper_limit, l
       if(child.mesh_bufferidx === 365)
       console.log()
 
-      if (bottom <= upper_limit) {
+      if (bottom <= clip_top) {
 
          // child.Deactivate();
          // child.state.mask |= MESH_STATE.CLIPED_Y
@@ -347,7 +359,7 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, upper_limit, l
          
          if (firstupper === INT_NULL) firstupper = i;
       }
-      else if (top >= lower_limit) {
+      else if (top >= clip_bottom) {
          
          // child.Deactivate();
          // child.state.mask |= MESH_STATE.CLIPED_Y
@@ -398,7 +410,7 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, upper_limit, l
 //       const top = child.geom.pos[1] - child.geom.dim[1];
 //       const bottom = child.geom.pos[1] + child.geom.dim[1];
 
-//       if (bottom <= clampy.upper_limit) {
+//       if (bottom <= clampy.clip_top) {
 
 //          clamped_buffer[cnt++] = child; // Store children to a temp buffer, in order to restore them back after .Render().
 //          // section.children.RemoveByIdx(i);
@@ -406,7 +418,7 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, upper_limit, l
          
 //          if (firstupper === INT_NULL) firstupper = i;
 //       }
-//       else if (top >= clampy.lower_limit) {
+//       else if (top >= clampy.clip_bottom) {
          
 //          clamped_buffer[cnt++] = child; // Store children to a temp buffer, in order to restore them back after .Render().
 //          // section.children.RemoveByIdx(i);

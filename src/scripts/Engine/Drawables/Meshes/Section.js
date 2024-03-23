@@ -6,7 +6,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh, Widget_root_batch_get, Widget_root_create_root, Widget_root_buffer_get_byidx, Widget_group_get, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widget_root_batch_move_from_batch_buffer } from "../../Core/MeshBuffer.js";
+import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_batch_move_from_batch_buffer } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
 
 
@@ -28,6 +28,7 @@ export class Section extends Rect {
       super(pos, dim, col);
 
       this.total_margin = [0, 0];
+      this.options = options;
 
       this.mesh_bufferidx = mesh_bufferidx;
 
@@ -72,7 +73,6 @@ export class Section extends Rect {
    Destroy() {
 
       // Any children destruction
-      const len = this.children.boundary; // Cash the boundary cause it is going to be decremented on mesh destroy
       for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
@@ -94,7 +94,6 @@ export class Section extends Rect {
       // SID.InheritUniform(mesh.sid.unif, this.sid.unif); // Inherits the parent's uniform flags
 
       const idx = this.AddChild(mesh);
-      // this.children_all.Add(mesh.mesh_bufferidx);
 
       if (this.root_bufferidx !== INT_NULL && mesh.root_bufferidx === INT_NULL) {
          mesh.AddToWidgetRootBuffer(this.root_bufferidx)
@@ -123,48 +122,6 @@ export class Section extends Rect {
 
       return idx;
    }
-
-
-   AddToWidgetRootBuffer(root_bufferidx) {
-
-      this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
-
-      for (let i = 0; i <= this.children.boundary; i++) {
-
-         const child = this.children.buffer[i];
-         /**DEBUG */ if (!child.AddToWidgetRootBuffer)
-            console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO AddToWidgetGroupBuffer() FOR SECTION CHILD:', child.mesh_bufferidx, child.GetName());
-         if (child) child.AddToWidgetRootBuffer(root_bufferidx);
-      }
-   }
-
-
-   AddToWidgetGroupBuffer(group_bufferidx) {
-
-
-      if (this.state.mask & MESH_STATE.ACTIVE) {
-         /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR SECTION:', this.mesh_bufferidx, this.GetName());
-         this.group_bufferidxs[0] = group_bufferidx;
-         this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
-
-         for (let i = 0; i <= this.children.boundary; i++) {
-
-            const child = this.children.buffer[i];
-            if (child && child.state.mask & MESH_STATE.ACTIVE) child.AddToWidgetGroupBuffer(group_bufferidx);
-         }
-      }
-   }
-
-
-   // AddToGfxBuffer() { 
-   //    this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
-   // }
-
-
-   // RemoveFromGfxBuffer() { 
-   //    Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
-   // }
 
 
    Activate() {
@@ -207,7 +164,6 @@ export class Section extends Rect {
 
    Calc(options=_) {
 
-      // TEMP_PRINT_IS_GFX_INSERTED(this, 'CALC START')
       const section = this;
       if(options === _) options = section.options
 
@@ -226,6 +182,7 @@ export class Section extends Rect {
       else {
          CopyArr2(section.geom.dim, section.max_size); // Set size for the root.
       }
+      
 
       /** OPTIONS:EXPAND 
        * Expand width of items to match the max width of section, minus the margin.
@@ -348,14 +305,14 @@ export class Section extends Rect {
    // Graphics
    /*******************************************************************************************************************************************************/
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null, params) {
 
-      const gfx = super.GenGfxCtx(FLAGS, gfxidx);
+      const gfx = super.GenGfxCtx(FLAGS, gfxidx, params);
 
       for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
-         if (child) child.GenGfxCtx(FLAGS, gfxidx);
+         if (child) child.GenGfxCtx(FLAGS, gfxidx, params);
       }
 
 
@@ -734,15 +691,8 @@ export class Section extends Rect {
    }
 
 
-   SetGfxProgramGroup(group_mask) {
-      this.sid.gfx_group = group_mask;
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) {
-            child.SetGfxProgramGroup(group_mask);
-         }
-      }
-   }
+
+
 
 
    /*******************************************************************************************************************************************************/
@@ -751,7 +701,7 @@ export class Section extends Rect {
 
    UpdateWidgetGroupIncrementNumFaces() {
 
-      Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
+      // Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
 
       for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
@@ -764,7 +714,7 @@ export class Section extends Rect {
 
    UpdateWidgetGroupDecrementNumFaces() {
 
-      Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
+      // Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
 
       for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
@@ -802,7 +752,6 @@ function Section_set_posxy_children_recursive(pos, mesh) {
          Section_set_posxy_children_recursive(pos, child);
       }
       else { // NOTE: To avoid moving section twice (as a child and as a section from recursion)
-         // child.MoveXY(pos);
          child.SetPosXY(pos);
       }
    }
@@ -887,15 +836,20 @@ function Calculate_sizes_recursive(parent, options, total_margin = [0, 0], total
 
       const mesh = parent.children.buffer[i];
 
-      if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) && !((mesh.type & MESH_TYPE.WIDGET_SCROLLER)))) {
+      // if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) && !(mesh.type & MESH_TYPE.WIDGET_SCROLLER))) {
+      if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) )) {
 
          const size = Calculate_sizes_recursive(mesh, options, margin, total_size); // Recurse if child mesh is of type of Section
+
+
+         if((mesh.type & MESH_TYPE.WIDGET_SCROLLER)===0){
+            mesh.geom.dim[0] = mesh.max_size[0]
+            mesh.geom.dim[1] = mesh.max_size[1]
+         }
 
          total_size[0] += size[0];
          total_size[1] += size[1];
 
-         mesh.geom.dim[0] = mesh.max_size[0]
-         mesh.geom.dim[1] = mesh.max_size[1]
 
          mesh.SetMargin();
 

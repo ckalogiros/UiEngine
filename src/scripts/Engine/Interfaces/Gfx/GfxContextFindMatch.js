@@ -1,9 +1,103 @@
 "use strict";
 
-import { Vertex_buffer_info_get_sid } from "../../../Graphics/Buffers/VertexBuffers";
+import { Vertex_buffer_exists_from_index, Vertex_buffer_info_get_sid } from "../../../Graphics/Buffers/VertexBuffers";
+import { Program_program_exists_from_index, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms";
 import { Widget_root_gfx_get_structured } from "../../Core/MeshBuffer";
+import { View_get_view_byidx } from "../../Core/MeshBufferViews";
 
 const DBG = false;
+
+
+
+
+/****************************************************************************************************************************************************/
+// Graphicks Generation Function
+/****************************************************************************************************************************************************/
+
+/**
+ * Returns indexes to a Graphics Program and a Vertex buffer.
+ * If NO apropriate gfx is found, returns [INT_NULL, INT_NULL], from which there after 
+ */
+export function Generate_graphics_context(FLAGS, mesh, gfxidxs = null) {
+
+
+   let igfx = {
+      idxs: [INT_NULL, INT_NULL],
+      FLAGS: GFX_CTX_FLAGS.NEW, // If no matching vertex buffer found, mark so that new buffer will be created
+   };
+
+   // If 'PRIVATE' then one of the folowing FLAGS shouuld be also present
+   if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
+
+      if (FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET) {
+         igfx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid);
+         FLAGS |= igfx.FLAGS; // Store any changes. Example, maybe the match failed and NEW vertex buffer is to be created.
+      }
+      else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC) {
+
+         // Case the mesh is a text mesh, and there is a gfx buuffer to be found, then becauuse we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
+         if(mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH){
+            igfx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid);
+            FLAGS |= igfx.FLAGS; // Store any changes. Example, maybe the match failed and NEW vertex buffer is to be created.
+         }
+         else{
+
+            if(mesh.parent === INT_NULL){
+               console.error('NO parent exists for mesh to generate gfx. mesh:', mesh.GetName(), mesh);
+               // alert('SEE console.error');
+            }
+            else{
+   
+               igfx = Find_match_gfx_from_parent_ascending(mesh, mesh.parent);
+               FLAGS |= igfx.FLAGS; // Store any changes. Example, maybe the match failed and NEW vertex buffer is to be created.
+            }
+         }
+
+
+      }
+      else {
+         console.error('NO CORRECT GenGfxCtx FLAG found for generating gfx.\nProbably forgot to pass one of the flags \'FROM_ROOT_WIDGET, FROM_PARENT_ASC, FROM_PARENT_CHLDREN_DESC, ...\'');
+         alert('SEE console.error');
+      }
+   }
+   else if (FLAGS & GFX_CTX_FLAGS.SPECIFIC) {
+
+      /**
+       * Case SPECIFIC is passed for 1 kind of mesh and not for all meshes of the widget.
+       * Example: Widget_Label may have spesific gfxidxs for the rect area but not for the text.
+       * We distinguish this case by having the gfxidxs param as being null,
+       * and we re-call this fuunction so that we search for any text gfx.
+       */
+      // Check the passed gfxidxs params if they are valid gfx indexes
+      if (gfxidxs!==null) {
+         if (gfxidxs[0] === INT_NULL || gfxidxs[1] === INT_NULL) {
+            console.error('NO CORRECT gfxidxs passed for generating SPECIFIC gfx.\n_gfxidxs:', gfxidxs);
+            // alert('SEE console.error');
+         }
+         else {
+            if (Program_program_exists_from_index(gfxidxs[0]) && Vertex_buffer_exists_from_index(gfxidxs[1])) {
+   
+               igfx.idxs[0] = gfxidxs[0];
+               igfx.idxs[1] = gfxidxs[1];
+            }
+         }
+      }
+      else{ // Re-Call this to generate gfx from existing buuffers
+         FLAGS &= ~GFX_CTX_FLAGS.SPECIFIC;
+         FLAGS |= GFX_CTX_FLAGS.FROM_PARENT_ASC;
+         Generate_graphics_context(FLAGS, mesh, gfxidxs)
+      }
+   }
+
+
+
+
+   return igfx;
+}
+
+
+
+
 
 
 
@@ -47,9 +141,42 @@ export function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid) {
 }
 
 
-export function Find_gfx_match_widget_group_impl(group_bufferidxs, target_sid) {
+export function Find_gfx_match_widget_group_impl(group_bufferidx, target_sid) {
 
-   console.error('IMPLEMENT ME')
+   const igfx = {
+      idxs: [INT_NULL, INT_NULL],
+      FLAGS: GFX_CTX_FLAGS.NEW, // If no matching vertex buffer found, mark so that new buffer will be created
+   };
+
+   // If group has not been created yet, return NOT FOUND
+   if (group_bufferidx === INT_NULL) {
+      console.warn('FAILED TO Find_gfx_match, widget_root is NULL.\nSet for creating new vertex buuffer');
+      return igfx;
+   }
+
+   const group = View_get_view_byidx(group_bufferidx);
+
+
+
+   for (let i = 0; i <= group.boundary; i++) {
+
+      for (let i = 0; i <= group.vb.buffer[i].boundary; i++) {
+
+         const vb_info = group.vb.buffer[i].info.buffer[j];
+
+         const prog_sid = Vertex_buffer_info_get_sid(vb_info[VIEW_INFO.VBIDX])
+
+         if (SID.CheckSidMatch(target_sid, prog_sid)) {
+
+            igfx.idxs[0] = vb_info[VIEW_INFO.PROGIDX];
+            igfx.idxs[1] = vb_info[VIEW_INFO.VBIDX];
+            igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC; // If no matching vertex buffer found, new buffer must be created
+            break;
+         }
+      }
+   }
+
+   return igfx;
 
 }
 

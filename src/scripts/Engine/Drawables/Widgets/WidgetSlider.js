@@ -4,13 +4,13 @@ import { Rect } from '../Meshes/Rect_Mesh.js';
 import { MouseGetPos, MouseGetPosDif } from '../../Controls/Input/Mouse.js';
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/TimeIntervals.js';
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
-import { Find_gfx_match_widget_root_impl } from '../../Interfaces/Gfx/GfxContextFindMatch.js';
 import { AddArr2, RoundFloat1Decimal } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js';
-import { Widget_group_add, Widget_group_update_decrement, Widget_group_update_increment, Widget_root_add_mesh } from '../../Core/MeshBuffer.js';
+import { Widget_root_add_mesh } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { Index_buffer_add_indices } from '../../../Graphics/Buffers/IndexBuffers.js';
 import { BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
+import { Generate_graphics_context } from '../../Interfaces/Gfx/GfxContextFindMatch.js';
 
 
 
@@ -168,36 +168,6 @@ export class Widget_Slider extends Rect {
    }
 
 
-   AddToWidgetGroupBuffer(group_bufferidx) {
-
-      if(group_bufferidx === INT_NULL)
-         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
-
-      if (this.state.mask & MESH_STATE.ACTIVE) {
-         /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR MESH:', this.mesh_bufferidx, this.GetName());
-         /**DEBUG */ if (this.group_bufferidxs[1] !== INT_NULL) console.error('ADDING TO WIDGET GROUP BUFFER WARNING: MESH ALREADY IS IN A WIDGET GROUP:', this.mesh_bufferidx, this.GetName(), 'group:', this.group_bufferidxs, 'start', this.gfx.vb.start);
-
-         this.group_bufferidxs[0] = group_bufferidx;
-         this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
-
-         const bar = this.children.buffer[SLIDER_BAR_IDX];
-         bar.group_bufferidxs[0] = group_bufferidx;
-         bar.group_bufferidxs[1] = Widget_group_add(group_bufferidx, bar.gfx, bar.geom.num_faces, bar.mesh_bufferidx);
-
-         const name_text = this.text_mesh;
-         name_text.group_bufferidxs[0] = group_bufferidx;
-         name_text.group_bufferidxs[1] = Widget_group_add(group_bufferidx, name_text.gfx, name_text.geom.num_faces, name_text.mesh_bufferidx);
-
-         const handle = bar.children.buffer[0];
-         handle.group_bufferidxs[0] = group_bufferidx;
-         handle.group_bufferidxs[1] = Widget_group_add(group_bufferidx, handle.gfx, handle.geom.num_faces, handle.mesh_bufferidx);
-
-         const value_text = bar.children.buffer[1];
-         value_text.group_bufferidxs[0] = group_bufferidx;
-         value_text.group_bufferidxs[1] = Widget_group_add(group_bufferidx, value_text.gfx, value_text.geom.num_faces, value_text.mesh_bufferidx);
-      }
-   }
-
 
    Activate() {
 
@@ -277,55 +247,33 @@ export class Widget_Slider extends Rect {
    /*******************************************************************************************************************************************************/
    // Graphics
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY) {
 
-      if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
 
-         {
-            const igfx_rect = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-            FLAGS |= igfx_rect.FLAGS;
-            this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx_rect.FLAGS, igfx_rect.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
+      let rect_igfx = null;
+      rect_igfx = Generate_graphics_context(FLAGS, this);
+      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
+      rect_igfx.idxs = [this.gfx.prog.idx, this.gfx.vb.idx]; // Copy the gfx from the scroller area.
+      
+      
+      let text_igfx = null;
+      text_igfx = Generate_graphics_context(FLAGS, this.text_mesh);
+      this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+      text_igfx.idxs = [this.text_mesh.gfx.prog.idx, this.text_mesh.gfx.vb.idx];
+
+
+      const name_text = this.text_mesh;
+      name_text.gfx = Gfx_generate_context(name_text.sid, name_text.sceneidx, name_text.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, text_igfx.idxs, name_text.root_bufferidx, name_text.mesh_bufferidx);
+
+      const bar = this.children.buffer[SLIDER_BAR_IDX];
+      bar.gfx = Gfx_generate_context(bar.sid, bar.sceneidx, bar.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, bar.root_bufferidx, bar.mesh_bufferidx);
+
+      const handle = bar.children.buffer[0];
+      handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, handle.root_bufferidx, handle.mesh_bufferidx);
+
+      const value_text = bar.children.buffer[1];
+      value_text.gfx = Gfx_generate_context(value_text.sid, value_text.sceneidx, value_text.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, text_igfx.idxs, value_text.root_bufferidx, value_text.mesh_bufferidx);
    
-            const igfx_text = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
-            FLAGS |= igfx_text.FLAGS;
-            this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, igfx_text.FLAGS, igfx_text.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
-         }
-
-         // We already have a vertex buffer for rect and text rendering
-         const igfx_rect = [this.gfx.prog.idx, this.gfx.vb.idx];
-         const igfx_text = [this.text_mesh.gfx.prog.idx, this.text_mesh.gfx.vb.idx];
-
-
-         const name_text = this.text_mesh;
-         name_text.gfx = Gfx_generate_context(name_text.sid, name_text.sceneidx, name_text.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_text, name_text.root_bufferidx, name_text.mesh_bufferidx);
-
-         const bar = this.children.buffer[SLIDER_BAR_IDX];
-         bar.gfx = Gfx_generate_context(bar.sid, bar.sceneidx, bar.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, bar.root_bufferidx, bar.mesh_bufferidx);
-
-         const handle = bar.children.buffer[0];
-         handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, handle.root_bufferidx, handle.mesh_bufferidx);
-
-         const value_text = bar.children.buffer[1];
-         value_text.gfx = Gfx_generate_context(value_text.sid, value_text.sceneidx, value_text.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_text, value_text.root_bufferidx, value_text.mesh_bufferidx);
-      }
-      else {
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, gfxidx, this.root_bufferidx, this.mesh_bufferidx);
-         this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, gfxidx, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
-
-         const name_text = this.text_mesh;
-         name_text.gfx = Gfx_generate_context(name_text.sid, name_text.sceneidx, name_text.geom.num_faces, FLAGS, gfxidx, name_text.root_bufferidx, name_text.mesh_bufferidx);
-
-         const bar = this.children.buffer[SLIDER_BAR_IDX];
-         bar.gfx = Gfx_generate_context(bar.sid, bar.sceneidx, bar.geom.num_faces, FLAGS, gfxidx, bar.root_bufferidx, bar.mesh_bufferidx);
-
-         const handle = bar.children.buffer[0];
-         handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, FLAGS, gfxidx, handle.root_bufferidx, handle.mesh_bufferidx);
-
-         const value_text = bar.children.buffer[1];
-         value_text.gfx = Gfx_generate_context(value_text.sid, value_text.sceneidx, value_text.geom.num_faces, FLAGS, gfxidx, value_text.root_bufferidx, value_text.mesh_bufferidx);
-      }
-
-
       return this.gfx;
    }
 

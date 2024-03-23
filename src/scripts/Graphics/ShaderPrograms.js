@@ -133,27 +133,25 @@ export function Program_get_shader_attribute_attribs_per_vertex(progidx) {
 
 
 
+
 /** Returns 'INT_NULL': if program does NOT exist AND 'progidx':if program exists. */
-// export function Program_program_exists(sid) {
-
-// 	const groupidx = GFX_GROUPS.GetIdxByMask(sid.gfx_group)
-
-// 	const progs = Program_group_exists(groupidx);
-
-// 	if (ERROR_NULL(progs) || ERROR_NULL(progs.buffer)) return INT_NULL
-// 	for (let i = 0; i <= progs.boundary; i++)
-// 		if (SID.CheckSidMatch(sid, progs.buffer[i].sid)) return i;
-
-// 	return INT_NULL;
-// }
-/** Returns 'INT_NULL': if program does NOT exist AND 'progidx':if program exists. */
-export function Program_program_exists(sid) {
+export function Program_program_exists_from_sid(sid) {
 
 	if (ERROR_NULL(_programs) || ERROR_NULL(_programs.buffer)) return INT_NULL
 	for (let i = 0; i <= _programs.boundary; i++)
 		if (SID.CheckSidMatch(sid, _programs.buffer[i].sid)) return i;
 
 	return INT_NULL;
+}
+
+
+
+export function Program_program_exists_from_index(progidx) {
+
+	if (_programs.buffer[progidx] === null || _programs.buffer[progidx] === undefined) 
+		return false;
+	
+	return true;
 }
 
 

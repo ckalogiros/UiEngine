@@ -10,6 +10,7 @@ import { Texture_Material } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { WHITE } from "../Material/Base/Colors.js";
+import { Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 
 
 
@@ -31,18 +32,11 @@ export class Textured_Mesh extends Mesh {
    /*******************************************************************************************************************************************************/
    // Graphics
 
+
    GenGfxCtx(FLAGS=GFX_CTX_FLAGS.ANY, gfxidx=null) {
 
-      if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
-         
-         const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-         FLAGS |= igfx.FLAGS;
-
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-      }
-      else {
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, gfxidx, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-      }
+      const igfx = Generate_graphics_context(FLAGS, this, gfxidx);
+      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
 
       return this.gfx;
    }
@@ -77,9 +71,6 @@ export class Textured_Mesh extends Mesh {
       this.StateEnable(MESH_STATE.ACTIVE);
       this.is_gfx_inserted = true;
 
-      
-      // Add entry to Gfx Buffer
-      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
    }
 
 
@@ -207,17 +198,11 @@ export class Textured_Mesh extends Mesh {
    }
 
 
-   // UpdateUvCoordinates(val) {
-   //    TODO: Implement
-   // }
-
 
    
    /*******************************************************************************************************************************************************/
    // Alignment
-   // Reposition_pre(pos_dif) {
-   //    // TODO: If needed: implemnt. Else Delete
-   // }
+
 }
 
 

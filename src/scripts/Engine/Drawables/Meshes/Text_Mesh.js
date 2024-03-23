@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_get_attrib_value_from_vb_byidx, Vertex_buffer_set_texidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_set_texidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { AddArr3, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Gfx_generate_context, GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js"; ``
@@ -9,12 +9,11 @@ import { FontMaterial } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Font_get_char_plane_bounds, Font_get_char_uv_coords, Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { Gl_set_dim_XY, Gl_set_uv, Gl_set_uv2, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_group_update_increment, Widget_root_batch_update_increment_accumulator } from "../../Core/MeshBuffer.js";
-import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
+import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store } from "../../Core/MeshBuffer.js";
+import { Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { Index_buffer_add_indices, Index_buffer_add_indices_from_non_existant_mesh } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
 import { WHITE } from "../Material/Base/Colors.js";
-import { Batch_store } from "../../Batch/Batch.js";
 
 
 
@@ -24,7 +23,6 @@ export class Text_Mesh extends Mesh {
    advancex; // The advancex is a ratio with which we calculate the correct width of any text
    last_charidx; // An index to the last char of each state of the current text.(dynamic text changes, so it is good to always have the last char).
 
-   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.MSDF_CONSOLAS_1024, scale = [1, 1]) {
    constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.MSDF_CONSOLAS_1024, scale = [1, 1]) {
 
       const sdfouter = CalculateSdfOuterFromDim(fontsize);
@@ -36,11 +34,9 @@ export class Text_Mesh extends Mesh {
 
       this.last_charidx = text.length;
 
-      // this.SetName(text);
       this.type |= MESH_TYPE.TEXT_MESH;
       this.fontsize = fontsize;
       this.advancex = Font_get_font_advancex(font);
-      // this.width = Font_calculate_string_width(text, font, fontsize);
    }
 
 
@@ -72,16 +68,8 @@ export class Text_Mesh extends Mesh {
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null) {
 
-      if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
-
-         const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-         FLAGS |= igfx.FLAGS;
-
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-      }
-      else {
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, gfxidx, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-      }
+      const igfx = Generate_graphics_context(FLAGS, this, gfxidx);
+      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
 
       return this.gfx;
    }
@@ -192,9 +180,6 @@ export class Text_Mesh extends Mesh {
 
       this.is_gfx_inserted = true;
 
-      
-      // Add entry to Gfx Buffer
-      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
    }
 
    
@@ -293,11 +278,8 @@ export class Text_Mesh extends Mesh {
 
       if (!this.gfx) return; // Case replace text before insert to gfx buffers;
 
-      // this.SetUpdateFrameBuffer();
-
       let text = (typeof (_text) === 'number') ? `${_text}` : _text; // Takes arithmetic values or just a char.
 
-      // const gfx_copy = new GfxInfoMesh(this.gfx);
       const gfx_copy = {
          vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
          prog: { attribsidx: this.gfx.prog.attribsidx },
@@ -360,73 +342,8 @@ export class Text_Mesh extends Mesh {
          gfx_copy.vb.start += gfx_copy.vb.count
       }
 
-      // this.last_charidx = len;
-
       Vertex_buffer_state_enable(gfx_copy.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
-
-      // HERE !!!!
-      /**
-       * We must set a gfx that starts at the first chars start and ends at the last character's end
-       * But the Batch_store takes a mesh.
-       * So either we change the Batch_store to take gfx or we construct a fake mesh to pass
-       */
-
    }
-
-
-   // UpdateTextAndReset(_text) {
-
-   //    if (!this.gfx) return; // Case replace text before insert to gfx buffers;
-
-   //    let text = (typeof (_text) === 'number') ? `${_text}` : _text; // Takes arithmetic values or just a char.
-
-   //    const gfx_copy = {
-   //       vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
-   //       prog: { attribsidx: this.gfx.prog.attribsidx },
-   //       vertsPerRect: this.gfx.vertsPerRect,
-   //       attribsPerVertex: this.gfx.attribsPerVertex,
-   //    }
-
-   //    const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-   //       pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
-   //       dim: [this.geom.dim[0], this.geom.dim[1]],
-   //    }
-
-
-   //    const advancex = Font_get_font_advancex(this.mat.texidx);
-   //    const numchars = text.length;
-
-
-   //    // Update text faces
-   //    for (let i = 0; i < numchars; i++) {
-
-   //       let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
-
-   //       if (text[i] !== undefined) // If char=' ' space, just render [0,0] uv coordinates.
-   //       {
-   //          // Set character dimentions.
-   //          const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, text[i]);
-   //          geom_copy.dim[0] *= plane_bounds.width;
-   //          geom_copy.dim[1] *= plane_bounds.height;
-   //          Gl_set_dim_XY(gfx_copy, geom_copy.dim);
-
-   //          // // Set character y position and advance.
-   //          geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
-   //          Gl_set_wpos_XY(gfx_copy, geom_copy.pos);
-   //          geom_copy.pos[0] += Floor(this.fontsize * 2 * advancex);
-
-   //          // Get the correct uv coordinates.
-   //          uvs = Font_get_char_uv_coords(this.mat.uvIdx, text[i]);
-
-   //          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
-   //       }
-
-   //       gfx_copy.vb.start += gfx_copy.vb.count
-   //    }
-
-   //    Vertex_buffer_state_enable(gfx_copy.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
-
-   // }
 
 
    /** Update a specific character in text char array */
@@ -438,7 +355,6 @@ export class Text_Mesh extends Mesh {
       const text = (typeof (_text) === 'number') ? `${_text}` : _text; // Takes arithmetic values or just a char.
 
       // Make a copy to not change the default .start value of the first char(face).
-      // let gfx_copy = new GfxInfoMesh(this.gfx);
       const gfx_copy = {
          vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
          prog: { attribsidx: this.gfx.prog.attribsidx },
@@ -555,22 +471,8 @@ export class Text_Mesh extends Mesh {
 
    Reposition_pre(pos_dif) {
       console.error('NO BATCH CREATED')
+
       AddArr3(this.geom.pos, pos_dif);
-
-      // this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      // Batch_store(this, _, { pos: pos_dif }, _);
-
-      // mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-      // const update_data = {
-      //     sizes:[2],
-      //     data:[mouse_pos.x, -mouse_pos.y],
-      // };
-      // Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
-   }
-
-
-   SetGfxProgramGroup(group_mask) {
-      this.sid.gfx_group = group_mask;
    }
 
 
@@ -581,12 +483,6 @@ export class Text_Mesh extends Mesh {
       return false
    }
 
-
-   ClipY(clip_top, clip_bottom) {
-
-      if (this.ClipyCheck_A(clip_top, clip_bottom))
-         this.state.mask &= ~MESH_STATE.ACTIVE;
-   }
 
 }
 

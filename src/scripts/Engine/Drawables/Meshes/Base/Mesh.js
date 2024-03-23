@@ -8,7 +8,6 @@ import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Gfx_buffer_update_start, Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
-// import { Program_enable_uniforms_for_creation } from "../../../../Graphics/ShaderPrograms.js";
 
 
 
@@ -28,11 +27,6 @@ import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
     isEnabled(channel) { return (this.mask & (1 << channel | 0)) !== 0; }
 }
 */
-
-class MeshOptionFlags {
-
-
-};
 
 
 
@@ -66,7 +60,7 @@ export class Mesh {
     mesh_bufferidx; // Value: This is the index of the mesh in the Mesh_Buffer storage.
     batch_buffer_vbidx; // Value: This is the index of the mesh in the Widget_root_batch_buffer storage.
     batchidx;   // Value: An index to the mesh refference in the batch buffer. 
-    group_bufferidxs; // Array[2]: The first element is the index of the group in the group buffer. The second element is the index to the elem of the array representing the vertex buffer of this mesh 
+    group_bufferidxs; // Array[3]: The [0] is the index of the group in the group buffer. The [1] is the index to the elem of the array representing the vertex buffer of this mesh, and [2] is the index of the buffer this mesh's index is stored to. 
 
     parent;     // Pointer: to the parent mesh.
     children;   // Buffer: of pointers to children mesh.
@@ -138,7 +132,7 @@ export class Mesh {
         this.gfx_bufferidx = INT_NULL;
         this.batch_buffer_vbidx = INT_NULL;
         this.batchidx = INT_NULL;
-        this.group_bufferidxs = [INT_NULL, INT_NULL];
+        this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL];
 
         this.parent = null;
 
@@ -243,22 +237,6 @@ export class Mesh {
         }      
         else if(this.gfx.vb.idx === 3 )console.log('-{1-NO-PARENT} Removing:', 'start', ret.start, this.GetName(), 'idx:', this.idx)
 
-
-        // // Set Debug listen event
-        // const params = {
-        //     groupidx: this.gfx.prog.groupidx,
-        //     progidx: this.gfx.prog.idx,
-        //     vbidx: this.gfx.vb.idx,
-        //     sceneidx: this.sceneidx,
-        //     isActive: true,
-        //     isPrivate: (FLAGS & GFX_CTX_FLAGS.PRIVATE) ? true : false,
-        //     type: INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX,
-        // }
-        // Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX, params);
-
-        // // Remove from mesh buffer, the true storage of the mesh
-        // Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
-
         return shift_children;
     }
 
@@ -292,28 +270,12 @@ export class Mesh {
     // Graphics
     /*******************************************************************************************************************************************************/
 
-    // Set_graphics_vertex_buffer_render(flag) {
-
-    //     // Gl_vertex_buffer_set_show(this.gfx.prog.groupidx, this.gfx.prog.idx, this.gfx.vb.idx, flag);
-    // TODO: DONT FORGET TO UPDATE THE RENDERQUE OR SET AN UPDATE IF RENDERQUEUE CHNGED TO AVOID THE OVERHEAD
-    //     if (flag) this.StateEnable(MESH_STATE.IS_HOVERABLE);
-    //     else this.StateDisable(MESH_STATE.IS_HOVERABLE);
-    // }
 
 
 
     /*******************************************************************************************************************************************************/
     /* Mesh State.
     /*******************************************************************************************************************************************************/
-    // Enable, disable, etc, mesh states.
-    // E.x. enable mesh to be movable or to have a popup menu when right clicked...
-
-
-    // StateEnable(bit) { this.state.mask |= bit; }
-
-
-    // StateDisable(bit) { this.state.mask &= ~bit; }
-
 
     StateToggle(bit) { this.state.mask ^= bit; }
 
@@ -331,15 +293,18 @@ export class Mesh {
 
         if (is_fake_event)
             this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
+
         if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
             this.listeners.AddAtIndex(LISTEN_EVENT_TYPES_INDEX.HOVER, {
                 evt: null,
                 is_child_event: false,
             });
+
             this.state.mask |= (MESH_STATE.IS_HOVERABLE | MESH_STATE.IS_HOVER_COLORABLE);
-            // if (is_fake_event) this.StateEnable(MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
+            
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
+
         }
         else if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
 
@@ -347,8 +312,11 @@ export class Mesh {
                 evt: null,
                 is_child_event: false,
             });
+
             this.state.mask |= (MESH_STATE.IS_CLICKABLE);
+
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_CLICKABLE);
+
         }
         else if (etype & LISTEN_EVENT_TYPES.MOVE) {
 
@@ -356,8 +324,11 @@ export class Mesh {
                 evt: null,
                 is_child_event: false,
             });
+
             this.state.mask |= (MESH_STATE.IS_GRABABLE | MESH_STATE.IS_MOVABLE | MESH_STATE.IS_CLICKABLE);
+
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_CLICKABLE);
+
         }
 
     }
@@ -498,14 +469,6 @@ export class Mesh {
     SetName(name = null) {
         if (name !== '' && name) this.nameidx = Str_buffer_store(name);
         /**DEBUG*/this.name = name
-    }
-
-
-    SetClampY(ypos, ydim, threshold = DEFAULT_CLAMP_THRESHOLD) {
-        this.clamp[CLAMP.Y][CLAMP.Y_UP] = ypos - ydim;
-        this.clamp[CLAMP.Y][CLAMP.Y_DOWN] = ypos + ydim;
-        this.clamp[CLAMP.Y][CLAMP.THRESHOLD] = threshold;
-        this.StateEnable(MESH_STATE.HAS_CLIP)
     }
 
 

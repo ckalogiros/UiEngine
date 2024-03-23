@@ -4,14 +4,15 @@ import { Section } from "../Meshes/Section.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { Find_gfx_match_widget_root_impl, Find_match_gfx_from_parent, Find_textgfx_from_parent_descending } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_info_get_by_vbidx, Vertexbuffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Mesh_buffer_get_mesh_byidx, Movey_from_widget_root_buffer, Widget_group_add, Widget_group_create, Widget_group_find_but_not_insert, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_group_update_start, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
+import { Find_textgfx_from_parent_descending, Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Mesh_buffer_get_mesh_byidx,  Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
-import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clipy_from_widget_root } from "../Operations/Clip.js";
-import { Index_buffer_add_indices, Index_buffer_reset_to_index } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clipy_from_group } from "../Operations/Clip.js";
+import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { BLUE_10_120_220, GREY, PURPLER } from "../Material/Base/Colors.js";
+import { View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 
 
 /** ### Scroller Widget
@@ -94,6 +95,8 @@ export class Widget_Scroller extends Section {
          // E.x. we need to create a new scrolled_section section, add the items, calculate with .Calc() and get the size to use for aligning the scroller and the scroll bar...
          console.error('IMPLEMENT Scroller create new scrolled section.')
       }
+
+      this.scrolled_section.type |= MESH_TYPE.SCROLLED_SECTION;
 
       this.renderables = {
          first: 0,
@@ -195,45 +198,13 @@ export class Widget_Scroller extends Section {
       Widget_root_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
 
       const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
-      // scrolled_mesh.root_bufferidx = root_bufferidx;
-      // Widget_root_add_mesh(scrolled_mesh.root_bufferidx, scrolled_mesh.mesh_bufferidx);
-      
-      scrolled_mesh.AddToWidgetRootBuffer(root_bufferidx)
-   }
+      scrolled_mesh.AddToWidgetRootBuffer(root_bufferidx);
 
-
-   AddToWidgetGroupBuffer(group_bufferidx) {
-
-      
-      if(group_bufferidx === INT_NULL)
-         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
-
-
-      if (this.state.mask & MESH_STATE.ACTIVE) {
-         /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR MESH:', this.mesh_bufferidx, this.GetName());
-         /**DEBUG */ if (this.group_bufferidxs[1] !== INT_NULL) console.error('ADDING TO WIDGET GROUP BUFFER WARNING: MESH ALREADY IS IN A WIDGET GROUP:', this.mesh_bufferidx, this.GetName(), 'group:', this.group_bufferidxs, 'start', this.gfx.vb.start);
-
-         this.group_bufferidxs[0] = group_bufferidx;
-         this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
-
-         const bar = this.children.buffer[SCROLL_BAR_IDX];
-         bar.group_bufferidxs[0] = group_bufferidx;
-         bar.group_bufferidxs[1] = Widget_group_add(group_bufferidx, bar.gfx, bar.geom.num_faces, bar.mesh_bufferidx);
-
-         const handle = bar.children.buffer[0];
-         handle.group_bufferidxs[0] = group_bufferidx;
-         handle.group_bufferidxs[1] = Widget_group_add(group_bufferidx, handle.gfx, handle.geom.num_faces, handle.mesh_bufferidx);
-
-         const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
-         scrolled_mesh.group_bufferidxs[0] = group_bufferidx;
-         scrolled_mesh.group_bufferidxs[1] = Widget_group_add(group_bufferidx, scrolled_mesh.gfx, scrolled_mesh.geom.num_faces, scrolled_mesh.mesh_bufferidx);
-      }
    }
 
 
    Destroy() {
 
-      // const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
       const bar = this.children.buffer[SCROLL_BAR_IDX];
       const handle = bar.children.buffer[0];
 
@@ -243,6 +214,7 @@ export class Widget_Scroller extends Section {
 
       this.scrolled_section = null;
       this.scroll_bar = null;
+
       // Scrollers's rect_mesh destruction
       return super.Destroy();
    }
@@ -253,139 +225,42 @@ export class Widget_Scroller extends Section {
    // Graphics
 
    // For scrollers we always create a separate vertex buffer, so it will be easier to handle the clipping of the scrolled section
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null, is_scrolled_section_private = false) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = [INT_NULL, INT_NULL], is_scrolled_section_private = false) {
 
-      if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
+      let rect_igfx = null;
+      rect_igfx = Generate_graphics_context(FLAGS, this);
+      
+      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
 
-         // const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-         
-         // const igfx = Find_match_gfx_from_parent(this, this.sid);
-         // FLAGS |= igfx.FLAGS;
-         
-         const igfx = [INT_NULL, INT_NULL];
-         FLAGS |= GFX_CTX_FLAGS.NEW;
+      rect_igfx.idxs = [this.gfx.prog.idx, this.gfx.vb.idx]; // Copy the gfx from the scroller area.
 
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
+      // Use the same gfx buffer for bar mesh
+      this.scroll_bar.gfx = Gfx_generate_context(this.scroll_bar.sid, this.scroll_bar.sceneidx, this.scroll_bar.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
 
-         // Use the same gfx buffer for bar mesh
-         const igfx_rect = [this.gfx.prog.idx, this.gfx.vb.idx];
-         this.scroll_bar.gfx = Gfx_generate_context(this.scroll_bar.sid, this.scroll_bar.sceneidx, this.scroll_bar.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
+      // Use the same gfx buffer for handle mesh
+      const handle = this.scroll_bar.children.buffer[0];
+      handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, handle.root_bufferidx, handle.mesh_bufferidx);
 
-         // Use the same gfx buffer for handle mesh
-         const handle = this.scroll_bar.children.buffer[0];
-         handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, handle.root_bufferidx, handle.mesh_bufferidx);
-
-         // Render the scrolled section and all it's meshes to it's own separate gfx buffer
-         if (is_scrolled_section_private) {
-            this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, GFX_CTX_FLAGS.PRIVATE, igfx_rect, this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
-         }
-         else {
-            this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
-         }
-
-         const scrolled_section_igfx = [this.scrolled_section.gfx.prog.idx, this.scrolled_section.gfx.vb.idx];
-         for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
-            const child = this.scrolled_section.children.buffer[i];
-            if (child) {
-               child.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section_igfx);
-            }
-         }
-
-
+      // Render the scrolled section and all it's meshes to it's own separate gfx buffer
+      if (is_scrolled_section_private) {
+         this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, FLAGS, [INT_NULL, INT_NULL], this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
       }
       else {
+         this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
+      }
 
-         /**
-          * ELSE:
-          *    if FLAGS = SPECIFIC AND gfxidx !== null
-          *    the whole scroller will be rendered at the specific gfx buffer.
-          *    The meshes in the scrolled mesh are handled by the Section's GenGfxCtx,
-          *    and the dicision (Up until this IMPLEMENTATION) is "Find_gfx_match_widget_root_impl",
-          *    for all 3 base classes: Rect_Mesh, Text_Mesh, Textured_Mesh
-          */
-
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, gfxidx, this.root_bufferidx, this.mesh_bufferidx);
-         const igfx = [this.gfx.prog.idx, this.gfx.vb.idx]
-
-         this.scroll_bar.gfx = Gfx_generate_context(this.scroll_bar.sid, this.scroll_bar.sceneidx, this.scroll_bar.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, igfx, this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
-
-         const handle = this.scroll_bar.children.buffer[0];
-         handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, igfx, this.root_bufferidx, this.mesh_bufferidx);
-
-         this.scrolled_section.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx);
-         for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
-            const child = this.scrolled_section.children.buffer[i];
-            if (child) {
-               child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx);
-            }
+      const scrolled_section_igfx = [this.scrolled_section.gfx.prog.idx, this.scrolled_section.gfx.vb.idx];
+      for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
+         const child = this.scrolled_section.children.buffer[i];
+         if (child) {
+            child.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section_igfx);
          }
       }
 
+
+
       return this.gfx;
-   // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null, is_scrolled_section_private = false) {
 
-   //    if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
-
-   //       const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-   //       FLAGS |= igfx.FLAGS;
-
-   //       this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-
-   //       // Use the same gfx buffer for bar mesh
-   //       const igfx_rect = [this.gfx.prog.idx, this.gfx.vb.idx];
-   //       this.scroll_bar.gfx = Gfx_generate_context(this.scroll_bar.sid, this.scroll_bar.sceneidx, this.scroll_bar.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
-
-   //       // Use the same gfx buffer for handle mesh
-   //       const handle = this.scroll_bar.children.buffer[0];
-   //       handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, handle.root_bufferidx, handle.mesh_bufferidx);
-
-   //       // Render the scrolled section and all it's meshes to it's own separate gfx buffer
-   //       if (is_scrolled_section_private) {
-   //          this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, GFX_CTX_FLAGS.PRIVATE, igfx_rect, this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
-   //       }
-   //       else {
-   //          this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
-   //       }
-
-   //       const scrolled_section_igfx = [this.scrolled_section.gfx.prog.idx, this.scrolled_section.gfx.vb.idx];
-   //       for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
-   //          const child = this.scrolled_section.children.buffer[i];
-   //          if (child) {
-   //             child.GenGfxCtx(FLAGS, scrolled_section_igfx);
-   //          }
-   //       }
-
-
-   //    }
-   //    else {
-
-   //       /**
-   //        * ELSE:
-   //        *    if FLAGS = SPECIFIC AND gfxidx !== null
-   //        *    the whole scroller will be rendered at the specific gfx buffer.
-   //        *    The meshes in the scrolled mesh are handled by the Section's GenGfxCtx,
-   //        *    and the dicision (Up until this IMPLEMENTATION) is "Find_gfx_match_widget_root_impl",
-   //        *    for all 3 base classes: Rect_Mesh, Text_Mesh, Textured_Mesh
-   //        */
-
-   //       this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, gfxidx, this.root_bufferidx, this.mesh_bufferidx);
-   //       const igfx = [this.gfx.prog.idx, this.gfx.vb.idx]
-
-   //       this.scroll_bar.gfx = Gfx_generate_context(this.scroll_bar.sid, this.scroll_bar.sceneidx, this.scroll_bar.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, igfx, this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
-
-   //       const handle = this.scroll_bar.children.buffer[0];
-   //       handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, igfx, this.root_bufferidx, this.mesh_bufferidx);
-
-   //       this.scrolled_section.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx);
-   //       for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
-   //          const child = this.scrolled_section.children.buffer[i];
-   //          if (child) {
-   //             child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx);
-   //          }
-   //       }
-   //    }
-
-   //    return this.gfx;
    }
 
 
@@ -408,29 +283,7 @@ export class Widget_Scroller extends Section {
    // IMIDIATELY: Create a separate function like in Dropdown widget
    Rerender() {
 
-      // Reset any gfx buffers from mesh tree recursively
-      // Widget_root_reset_gfx(this.root_bufferidx);
-
-      // Vertexbuffer_reset_to_index(this.gfx.prog.idx, this.gfx.vb.idx, this.gfx.vb.start);
-      // Index_buffer_reset_to_index(this.gfx.vb.idx, this.gfx.ib.start);
-
-      
-      // // Reset gfx start for the mesh
-      // Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
-      // if (this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
-      // this.StateEnable(MESH_STATE.ACTIVE);
-      
-      // const bar = this.scroll_bar;
-      // Vertex_buffer_add_vertices(bar.gfx, bar.geom, bar.mat, bar.GetName());
-      // if (bar.sid.shad & SID.SHAD.INDEXED) bar.gfx.ib.start = Index_buffer_add_indices(bar.gfx.ib, bar.GetName());
-      // bar.StateEnable(MESH_STATE.ACTIVE);
-      
-      // const handle = bar.children.buffer[0];
-      // Vertex_buffer_add_vertices(handle.gfx, handle.geom, handle.mat, handle.GetName());
-      // if (handle.sid.shad & SID.SHAD.INDEXED) handle.gfx.ib.start = Index_buffer_add_indices(handle.gfx.ib, handle.GetName());
-      // handle.StateEnable(MESH_STATE.ACTIVE);
-      
-      Widget_group_reset_from_group_to_vb_end(this.scrolled_section.group_bufferidxs);
+      View_reset_from_view_all_buffers(this.scrolled_section.group_bufferidxs[0]);
       
       Vertex_buffer_add_vertices(this.scrolled_section.gfx, this.scrolled_section.geom, this.scrolled_section.mat, this.scrolled_section.GetName());
       if (this.scrolled_section.sid.shad & SID.SHAD.INDEXED) this.scrolled_section.gfx.ib.start = Index_buffer_add_indices(this.scrolled_section.gfx.ib, this.scrolled_section.GetName());
@@ -470,15 +323,6 @@ export class Widget_Scroller extends Section {
       else console.log('{}{}{}{}}}{}{}} TEXT BUFFER NNOT FOUND')
    }
 
-
-   SetGfxProgramGroup(group_mask) {
-      this.sid.gfx_group = group_mask;
-
-      this.scroll_bar.sid.gfx_group = group_mask;
-      const handle = this.scroll_bar.children.buffer[0];
-      handle.sid.gfx_group = group_mask;
-      this.scrolled_section.SetGfxProgramGroup(group_mask);
-   }
 
 
    /*******************************************************************************************************************************************************/
@@ -525,7 +369,6 @@ export class Widget_Scroller extends Section {
          if ((bar.type & MESH_TYPE.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
             const idx = TimeIntervalsCreate(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_on_update_handle, bar);
-            // bar.timeIntervalsIdxBuffer.Add(idx);
             bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
             STATE.mesh.SetGrabed(bar);
@@ -537,13 +380,11 @@ export class Widget_Scroller extends Section {
       else {
 
          STATE.mesh.SetClicked(bar);
-         // STATE.mesh.SetFocused(mesh);
 
-         // Move Scroller // HERE!!!
+         // Move Scroller
          if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
             const idx = TimeIntervalsCreate(10, 'Move Scroller', TIME_INTERVAL_REPEAT_ALWAYS, mesh.OnMove, mesh);
-            // mesh.timeIntervalsIdxBuffer.Add(idx);
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
             STATE.mesh.SetGrabed(mesh);
@@ -569,35 +410,17 @@ export class Widget_Scroller extends Section {
          TimeIntervalsDestroyByIdx(intervalIdx);
          scroller.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.MOVE);
 
-         // Set the position of any disabled meshes
-         /**
-          *  Upon moving the scroller, for efficiency we move only the renderables meshes,
-          *  and not the clamped ones. So by calling Calculate_positions_recursive() 
-          *  on mouse 'click-up', we reposition all meshes, including the clamped ones. 
-          */
-         // Calculate_positions_recursive(scroller.scrolled_section, SECTION.INHERIT); 
-
          return;
       }
 
       const mouse_pos = MouseGetPosDif();
       scroller.Move(mouse_pos.x, -mouse_pos.y);
 
-      // scroller.SetScissorBox();
    }
 
 
    // IMPORTANT: This Move Calls Section's Move which runs on the meshbuffer for all widget_root_buffer meshes (LINEAR ACCESS)
    Move(x, y) { // Called from any widget. Example: If the scroller is child of a section, the section's Move() will call this Move for the scroller widget
-
-      // Move 'this' text
-      // this.geom.MoveXY(x, y, this.gfx);
-
-      // const bar = this.children.buffer[SCROLL_BAR_IDX];
-      // bar.geom.MoveXY(x, y, bar.gfx);
-
-      // const handle = bar.children.buffer[0];
-      // handle.geom.MoveXY(x, y, handle.gfx);
 
       const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
       if (scrolled_mesh) {
@@ -784,9 +607,7 @@ export class Widget_Scroller extends Section {
 
       // Create hover events
       // BUG: It seems that hovering does not work for scroller and bar
-      // if (scroller.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.HOVER]) scroller.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER);
       if (handle.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.HOVER]) handle.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER);
-      // if (bar.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.HOVER]) bar.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER);
 
       const target_params = {
          EventClbk: null,
@@ -984,11 +805,11 @@ export function Scroller_on_update_handle(_params) {
     * 
     * Create a position accumulator.
     * 
-    * The position of the meshes should change in 'Clipy_from_widget_root'
+    * The position of the meshes should change in 'Clipy_from_group'
     * 
     * Acumulate the positions
     * 
-    * If change in the 'Clipy_from_widget_root' happened, update the pos of all meshes
+    * If change in the 'Clipy_from_group' happened, update the pos of all meshes
     * 
     * reset the accumulator
     */
@@ -997,23 +818,10 @@ export function Scroller_on_update_handle(_params) {
    scrolled_section.MoveYNoGfxUpdate(ydif)
 
 
-   // scroller.scrolled_section.SetClampY(scroller.geom.pos[1], scroller.geom.dim[1], 300);
-   // const changes_hapened = Clipy_chunks_impl(scroller.scrolled_section, scroller.scrolled_section.clamp[CLAMP.Y], scroller.renderables);
    const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
-   const changes_hapened = Clipy_from_widget_root(scroller.root_bufferidx, scrolled_section.group_bufferidxs, clip_top, clip_bottom);
+   const changes_hapened = Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
 
-   // scroller.Rerender2()
    scroller.Rerender()
-   // if(changes_hapened) scroller.Rerender2(); 
-   // else{
-   //    const group_batch_buffer = Widget_group_get(scrolled_section.group_bufferidxs[0]);
-   //    const len = group_batch_buffer.vb_data.length
-   //    for (let i = 0; i < len; i++) {
-   //       const mesh = Mesh_buffer_get_mesh_byidx(group_batch_buffer.vb_data[i].meshidx);
-   //       Batch_store(mesh, _, { pos: [0, ydif] }, group_batch_buffer.vb_data[i].num_faces, group_batch_buffer.vb_data[i].start); // The batch_store needs the number of meshes to update as well as the move value
-   //    }
-   // }
-
 
    /**FOR FRAMEBUFFER. DO NOT DELETE */
    // if(scrolled_section.isFramebufferRendered !== INT_NULL){
@@ -1028,73 +836,6 @@ export function Scroller_on_update_handle(_params) {
 
 
 
-export function Scroller_clampy_and_render(scroller, upper_threshold = 0, lower_thresold = 0) {
-
-   // First run a calc to update the dimensions and positions of all meshes, so that we can clamp correctly
-   scroller.Calc_no_gfx_update();
-
-   // Remove all children that are not inside limits
-   const ret = Clamp_y_remove_children_FIRST_TIME_CLAMP(scroller.scrolled_section, upper_threshold, lower_thresold);
-   scroller.renderables.first = ret.firstupper;
-   scroller.renderables.first_all = ret.firstupper;
-   scroller.renderables.last = ret.firstlower - 1;
-   scroller.renderables.last_all = ret.firstlower;
-   console.log('scroller.renderables', scroller.renderables, 'ret', ret);
-
-
-   // Build the group out of the clamped scrolled section
-   scroller.scrolled_section.group_bufferidxs = Widget_group_create(scroller.scrolled_section.mesh_bufferidx, scroller.scrolled_section.gfx)
-   scroller.scrolled_section.AddToWidgetGroupBuffer(scroller.scrolled_section.group_bufferidxs[0]);
-   // scroller.options = SECTION.VERTICAL | SECTION.TOP_DOWN;
-   // Render the clamped scroller
-   scroller.Render();
-   // scroller.Recalc();
-   // This way we do not resize the scrolled section to the clamped height(keeps it at original height for all items)
-   scroller.ConstructListeners();
-
-   // NOTE: We have to update the "starts" of all group.vb[] arrays after the render, because the group was created before the render, the start indexes to the vertex buffers are set wrong.
-   Widget_group_update_start(scroller.scrolled_section.group_bufferidxs[0]);
-
-   // IMPORTANT: Do not trust a mesh that has a valid .group_bufferidxs, that it is actively in the group at any time.
-   /**
-    * In order for all scrolled meshes to be able to be rendered correctly, we need them to 
-    * have a reference to the group buffer via their .group_bufferidxs variable.
-    * That is because at any given time, a Batch update will update X number of faces in the vertex buffers,
-    * but the number of scrolled items may change depending on the clamp of the scroller.
-    * So we need to dynamicaly update the number of faces of the group when changes happen on the clamp procedure.
-    * The only way to acomplish this is to store the group in to all items regardless if they are actively in the group or not.  
-    */
-   // Assign to all scrolled items the scroller's group
-   // TEMPORARY: Design how and where to implement.
-   const widget_root = Widget_root_buffer_get_byidx(scroller.root_bufferidx);
-   const group_bufferidx = scroller.scrolled_section.group_bufferidxs[0]; // The roots group idx
-   for (let i = 0; i <= widget_root.boundary; i++) {
-
-      const mesh = Mesh_buffer_get_mesh_byidx(widget_root.buffer[i])
-      if (mesh.gfx && mesh.group_bufferidxs[1] === INT_NULL) {
-         mesh.group_bufferidxs = Widget_group_find_but_not_insert(group_bufferidx, mesh.gfx);
-      }
-   }
-
-
-
-   /** DO NOT DELETE YET. This is the code to restore the removed children back to scrolled section */
-   // let cnt = 0;
-   // // Restore the upper chunk removed meshes back as children of the scrolled mesh
-   // for(let i=firstupper; i<lastupper; i++){
-
-   //     const child = clamped_buffer[cnt++];
-   //     scroller.scrolled_section.children.buffer[i] = child; // Store children to a temp buffer, in order to restore them back after .Render().
-   // }
-   // // Restore the lower chunk removed meshes
-   // if(firstlower !== INT_NULL)
-   // for(let i=firstlower; i<lastlower; i++){
-
-   //     const child = clamped_buffer[cnt++];
-   //     scroller.scrolled_section.children.buffer[i] = child; // Store children to a temp buffer, in order to restore them back after .Render().
-   // }
-
-}
 
 
 

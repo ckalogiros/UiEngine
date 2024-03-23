@@ -609,7 +609,7 @@ export function Listeners_debug_info_create(scene) {
    dropdown.menu.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS; // NOTE: Must set the specific type for the dp's menu to avoid infinite looping
 
 
-   dropdown.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   dropdown.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    dropdown.Calc();
    dropdown.Render();
    dropdown.ConstructListeners();

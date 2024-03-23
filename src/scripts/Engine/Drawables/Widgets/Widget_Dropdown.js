@@ -5,13 +5,14 @@ import { M_Buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Listener_remove_children_event_by_idx } from "../../Events/EventListeners.js";
-import { Find_gfx_match_widget_group_impl, Find_gfx_match_widget_root_impl, Find_match_gfx_from_parent_ascending } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
+import { Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Gfx_buffer_update_start, Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Widget_group_add, Widget_group_get_rootidx, Widget_group_rerender_tree_mesh_recursive, Widget_group_reset_from_group_to_vb_end, Widget_group_update_decrement, Widget_group_update_increment, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
-import { Clipy_from_widget_root } from "../Operations/Clip.js";
+import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
+import { Clipy_from_group } from "../Operations/Clip.js";
 import { Section } from "../Meshes/Section.js";
-import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
+import { BLUEL, GREEN, GREY, PURPLER, REDL, WHITE } from "../Material/Base/Colors.js";
+import { View_add_to_group_from_root_mesh, View_get_view_vb_root_meshidx, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 
 /**
  * SEE: ### Widget_Dropdown
@@ -90,9 +91,9 @@ export class Widget_Dropdown extends Section {
       AddArr2(this.menu.total_margin, this.margin);
       this.menu.SetName(`[${this.menu.mesh_bufferidx}]{${text}}-MENU_DP`);
       { // Multi color vertex
-         //    this.menu.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-         //    this.menu.mat.col = [WHITE, RED, GREEN, BLUE];
-         //    this.menu.mat.defCol = [WHITE, RED, GREEN, BLUE];
+         // this.menu.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
+         // this.menu.mat.col = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
+         // this.menu.mat.defCol = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
          // this.menu.mat.col[1][3] = .5;
          // this.menu.mat.col[1][7] = .5;
          // this.menu.mat.col[1][11] = .5;
@@ -127,7 +128,6 @@ export class Widget_Dropdown extends Section {
 
       if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {
 
-         // mesh.SetGfxProgramGroup(this.sid.gfx_group); // Should belong to the same programs group.
          // mesh.depth_level = this.depth_level + 1; // Set the depth of the new dp.
 
          if (this.rootidx === INT_NULL) {
@@ -170,27 +170,6 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   AddToWidgetGroupBuffer(group_bufferidx) {
-
-      if (group_bufferidx === INT_NULL)
-         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
-
-      if (group_bufferidx === INT_NULL)
-         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
-
-      if (this.state.mask & MESH_STATE.ACTIVE) {
-         /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR MESH:', this.mesh_bufferidx, this.GetName());
-         /**DEBUG */ if (this.group_bufferidxs[1] !== INT_NULL) console.error('ADDING TO WIDGET GROUP BUFFER WARNING: MESH ALREADY IS IN A WIDGET GROUP:', this.mesh_bufferidx, this.GetName(), 'group:', this.group_bufferidxs, 'start', this.gfx.vb.start);
-
-         this.group_bufferidxs[0] = group_bufferidx;
-         this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
-
-         const btn = this.children.buffer[0];
-         btn.AddToWidgetGroupBuffer(group_bufferidx);
-      }
-   }
-
-
    Activate() {
 
       this.state.mask |= MESH_STATE.ACTIVE;
@@ -225,15 +204,6 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   ClipY(clip_top, clip_bottom) {
-
-      if (this.ClipyCheck_A(clip_top, clip_bottom))
-         this.state.mask &= ~MESH_STATE.ACTIVE;
-
-      if (this.children.buffer[0].ClipyCheck_A(clip_top, clip_bottom))
-         this.children.buffer[0].Deactivate();
-   }
-
 
 
    /*******************************************************************************************************************************************************/
@@ -243,43 +213,11 @@ export class Widget_Dropdown extends Section {
    /** If FLAG===PRIVATE, then we get the gfx of the parent. If no parent exists, then the Gfx_generate_context creates new gfx. */
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY) {
 
-      if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
-
-         let igfx = null;
-
-         
-         if(FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET){
-
-            igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-         }
-         else if(FLAGS & GFX_CTX_FLAGS.FROM_GROUP){
-            
-            igfx = Find_gfx_match_widget_group_impl(this.root_bufferidx, this.sid);
-         }
-         else if(FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC){
-            igfx = Find_match_gfx_from_parent_ascending(this, this.parent);
-         }
-         else{
-            console.error('NO CORRECT GenGfxCtx FLAG found, searching for vb index to store');
-            alert('SEE console.error');
-         }
-
-         FLAGS |= igfx.FLAGS;
-
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-      }
-      else {
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, null, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-      }
-
-      this.menu.SetGfxProgramGroup(this.sid.gfx_group);
+      const igfx = Generate_graphics_context(FLAGS, this);
+      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
 
       const btn = this.children.buffer[0];
-
-      btn.SetGfxProgramGroup(this.sid.gfx_group);
-      btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC | GFX_CTX_FLAGS.FROM_PARENT_ASC, [this.gfx.prog.idx, this.gfx.vb.idx], _); // Set button's area gfx same with dropDown mesh 
-
-      this.GenGfxCtxForAllClosedMenus(this, GFX_CTX_FLAGS.PRIVATE);
+      btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [this.gfx.prog.idx, this.gfx.vb.idx], _); // Set button's area gfx same with dropDown mesh 
 
       return this.gfx;
    }
@@ -314,62 +252,6 @@ export class Widget_Dropdown extends Section {
 
    }
 
-   // Initializes the gfx and stores to widget root buffer all created but deactivated menus and items recursively.
-   GenGfxCtxForAllClosedMenus(root, FLAGS) {
-      // SEE ## Widget Dropdown generate gfx Context
-
-      const menu = this.menu;
-
-      if (!menu.gfx) { // Generate gfx context only if the menu does not alredy have gfx context.
-
-         const igfx_rect = [this.gfx.prog.idx, this.gfx.vb.idx];
-         const btn = this.children.buffer[0];
-         const igfx_text = [btn.text_mesh.gfx.prog.idx, btn.text_mesh.gfx.vb.idx];
-
-         if (this.root_bufferidx !== INT_NULL && menu.root_bufferidx === INT_NULL) {
-            menu.AddToWidgetRootBuffer(this.root_bufferidx);
-         }
-
-
-         // FLAGS |= GFX_CTX_FLAGS.SPECIFIC;
-         menu.SetGfxProgramGroup(root.sid.gfx_group);
-         menu.gfx = Gfx_generate_context(menu.sid, menu.sceneidx, menu.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, menu.root_bufferidx, menu.mesh_bufferidx);
-
-         for (let i = 0; i <= menu.children.boundary; i++) {
-
-            const item = menu.children.buffer[i];
-
-            if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
-
-               item.SetGfxProgramGroup(menu.sid.gfx_group);
-               // We know that dropdown derives from Section, so we can pass the igfx_rect
-               item.gfx = Gfx_generate_context(item.sid, item.sceneidx, item.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, igfx_rect, item.root_bufferidx, item.mesh_bufferidx);
-               AddArr2(item.total_margin, menu.total_margin);
-
-               const btn = item.children.buffer[0];
-               btn.SetGfxProgramGroup(menu.sid.gfx_group);
-               btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx_rect, igfx_text);
-               btn.SetZPos(item.geom.pos[2] + 1);
-
-               // Create Click events for any meshes of type Dropdown
-               item.CreateClickEvent();
-               item.CreateHoverEvent();
-
-               // If the menu was deactivated while open, then on activation keep its '-' symbol
-               btn.text_mesh.mat.text = `${this.dp_symbols[1]} ${btn.text_mesh.mat.text.slice(2)}`;
-               item.GenGfxCtxForAllClosedMenus(root, FLAGS);
-
-            }
-            else { // Case: Generate gfx for any other children meshes (non dropdown meshes).
-
-               item.SetGfxProgramGroup(menu.sid.gfx_group);
-               // TODO. Do we genarate gfx for any other widget in the same gfx????  
-               item.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-            }
-
-         }
-      }
-   }
 
 
    // NOTE: Call comes from DpActivateMenu()
@@ -386,7 +268,6 @@ export class Widget_Dropdown extends Section {
          const igfx_text = [btn.text_mesh.gfx.prog.idx, btn.text_mesh.gfx.vb.idx];
 
 
-         menu.SetGfxProgramGroup(root.sid.gfx_group);
          menu.gfx = Gfx_generate_context(menu.sid, menu.sceneidx, menu.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, igfx_rect, menu.root_bufferidx, menu.mesh_bufferidx);
 
          for (let i = 0; i <= menu.children.boundary; i++) {
@@ -395,15 +276,13 @@ export class Widget_Dropdown extends Section {
 
             if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
 
-               item.SetGfxProgramGroup(menu.sid.gfx_group);
                // We know that dropdown derives from Section, so we can pass the igfx_rect
                item.gfx = Gfx_generate_context(item.sid, item.sceneidx, item.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, igfx_rect, item.root_bufferidx, item.mesh_bufferidx);
                AddArr2(item.total_margin, menu.total_margin);
 
-               const btn = item.children.buffer[0];
-               btn.SetGfxProgramGroup(menu.sid.gfx_group);
-               btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx_rect, igfx_text);
-               btn.SetZPos(item.geom.pos[2] + 1);
+               const btn1 = item.children.buffer[0];
+               btn1.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx_rect, igfx_text);
+               btn1.SetZPos(item.geom.pos[2] + 1);
 
                // Create Click events for any meshes of type Dropdown
                item.CreateClickEvent();
@@ -412,16 +291,15 @@ export class Widget_Dropdown extends Section {
                if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's dp menu (runs recursive for any opened sub dp menus). 
 
                   // If the menu was deactivated while open, then on activation keep its '-' symbol
-                  btn.text_mesh.mat.text = `${this.dp_symbols[1]} ${btn.text_mesh.mat.text.slice(2)}`;
+                  btn1.text_mesh.mat.text = `${this.dp_symbols[1]} ${btn1.text_mesh.mat.text.slice(2)}`;
                   item.GenMenuGfxCtx_recursive(root, FLAGS);
                }
 
             }
             else { // Case: Generate gfx for any other children meshes (non dropdown meshes).
 
-               item.SetGfxProgramGroup(menu.sid.gfx_group);
                // TODO. Do we genarate gfx for any other widget in the same gfx????  
-               item.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+               item.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
                console.error('TEMP ERROR PATH')
 
             }
@@ -627,6 +505,8 @@ export class Widget_Dropdown extends Section {
       // Remove dropdown button's listen events.
       for (let etype = 0; etype < LISTEN_EVENT_TYPES_INDEX.SIZE; etype++) {
          if (btn.listeners.buffer[etype]) {
+            if (parent_event[etype] === null)
+               console.log()
             Listener_remove_children_event_by_idx(etype, parent_event[etype].idx, btn.listeners.buffer[etype].idx);
             btn.listeners.RemoveByIdx(etype);
          }
@@ -799,14 +679,10 @@ export class Widget_Dropdown extends Section {
 
    // Reset and rebuild vertex buffers x
    DeactivateMenu(dp = null) {
-      // SEE ### Fake Remove
-      // Must remove listeners
-      // Must remove menu (and consequently the items as part of the menu) from the dropdown's children buffer.
 
       if (!dp) dp = this;
       this.menu_active = false; // Set state to active.
 
-      const root = Dropdown_roots_get_root_by_idx(dp.rootidx);
       const menu = dp.menu;
 
       if (dp.isOn & DP_MENU_STATE.ON) {
@@ -820,8 +696,7 @@ export class Widget_Dropdown extends Section {
 
                item.RemoveFromGfxBuffer();
                item.Deactivate();
-               // Deactivate gfx for menu's children meshes.
-               item.UpdateWidgetGroupDecrementNumFaces();
+               // item.UpdateWidgetGroupDecrementNumFaces();
                item.SetIsGfxInserted(false);
 
                item.RemoveAllListenEvents();
@@ -834,7 +709,7 @@ export class Widget_Dropdown extends Section {
 
                   item.RemoveFromGfxBuffer();
                   item.Deactivate();
-                  item.UpdateWidgetGroupDecrementNumFaces();
+                  // item.UpdateWidgetGroupDecrementNumFaces();
                   item.SetIsGfxInserted(false);
                }
             }
@@ -846,7 +721,7 @@ export class Widget_Dropdown extends Section {
 
             Gfx_buffer_remove_mesh_by_vbidx(menu.gfx.vb.idx, menu.gfx_bufferidx);
 
-            Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
+            // Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
             menu.is_gfx_inserted = false;
             // Remove menu's Fake listen events
             menu.RemoveAllListenEvents();
@@ -864,29 +739,40 @@ export class Widget_Dropdown extends Section {
       const menu = this.menu;
       const root = Dropdown_roots_get_root_by_idx(this.rootidx);
 
-      // Widget_group_reset_partially_gfx_buffers(root)
-      // Widget_root_reset_gfx(root.root_bufferidx);
-      Widget_group_reset_from_group_to_vb_end(root.group_bufferidxs);
-      // Widget_group_update_decrement(root.group_bufferidxs, 1)
+      // Reset vertex buffers from group
+      View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
 
       this.DpDestroyListeners(menu, root);
       this.DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 
-      // root.Recalc_no_batch_render(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
-      // root.Recalc_no_batch_render();
 
+      /**
+       * // TODO: If group root mesh does not have a Recalc function, we MUST search for the first 'Section' fro the group root 
+       */
       // Re-calculate dimensions and positions
+      let clip_top = null, clip_bottom = null;
       if (root.group_bufferidxs[0] !== INT_NULL) {
-         const group_root = Mesh_buffer_get_mesh_byidx(Widget_group_get_rootidx(root.group_bufferidxs[0]))
-         group_root.Recalc_no_batch_render();
+
+         // Get the group root mesh to Recalc position/dimentions 
+         const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+         const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx);
+         group_root_mesh.Recalc_no_batch_render();
+
+         // TODO: If the group root is a scrolled_section, maybe the responsibility for Clip is at scroller ?????????
+         if (group_root_mesh.parent) {
+
+            clip_top = group_root_mesh.parent.geom.pos[1] - group_root_mesh.parent.geom.dim[1];
+            clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1];
+         }
       }
       else {
          root.Recalc_no_batch_render();
       }
 
-      Clipy_from_widget_root(root.root_bufferidx);
-      Widget_group_rerender_tree_mesh_recursive(root.group_bufferidxs[0]);
+
+      Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      View_rerender_from_view_all_buffers(root.group_bufferidxs[0]);
 
    }
 
@@ -903,14 +789,9 @@ export class Widget_Dropdown extends Section {
 
       menu.gfx_bufferidx = Gfx_buffer_store(menu.gfx.vb.idx, menu.mesh_bufferidx);
 
-      // Handle widget group. If the dp belongs to a group and the menu isn't, add the menu to the root's dp group 
-      if (menu.is_gfx_inserted && menu.group_bufferidxs[1] === INT_NULL && root.group_bufferidxs[1] !== INT_NULL) {
-         // NOTE: Updates the group and the batch buffers
-         menu.group_bufferidxs[0] = root.group_bufferidxs[0];
-         menu.group_bufferidxs[1] = Widget_group_add(root.group_bufferidxs[0], menu.gfx, menu.geom.num_faces, menu.mesh_bufferidx);
-      }
-      else {
-         Widget_group_update_increment(root.group_bufferidxs, menu.geom.num_faces);
+      // Case its the first time this menu will be rendered
+      if (menu.group_bufferidxs[0] === INT_NULL) {
+         View_add_to_group_from_root_mesh(menu, this.group_bufferidxs[0])
       }
 
       // Activate menu's items, recursively
@@ -918,16 +799,9 @@ export class Widget_Dropdown extends Section {
 
          const item = menu.children.buffer[i];
 
-         // console.warn(item.GetName())
-
          item.Activate();
 
          item.AddToGfxBuffer();
-
-         if (item.group_bufferidxs[1] === INT_NULL && root.group_bufferidxs[1] !== INT_NULL) {
-            item.AddToWidgetGroupBuffer(root.group_bufferidxs[0]);
-         }
-         else item.UpdateWidgetGroupIncrementNumFaces();
 
          if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
 
@@ -965,13 +839,11 @@ export class Widget_Dropdown extends Section {
 
       this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
       if (!menu.gfx) {
-         // Case the menu is added  at runtime, must genetrate gfx context for the menu and its items
+         // Case the menu is added  at runtime, must generate gfx context for the menu and its items
          this.GenMenuGfxCtx_recursive(root, GFX_CTX_FLAGS.PRIVATE); // Create PRIVATE context to the root's gfx buffers.
       }
 
-      // Widget_group_reset_partially_gfx_buffers(root)
-      // Widget_root_reset_gfx(root.root_bufferidx);
-      Widget_group_reset_from_group_to_vb_end(root.group_bufferidxs);
+      View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
 
 
       this.ActivateMenu(root); // Add dropdown to gfx buffers.
@@ -980,21 +852,33 @@ export class Widget_Dropdown extends Section {
 
       menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
 
-      // root.Recalc_no_batch_render();
+      /**
+       * // TODO: If group root mesh does not have a Recalc function, we MUST search for the first 'Section' fro the group root 
+       */
       // Re-calculate dimensions and positions
+      let clip_top = null, clip_bottom = null;
       if (root.group_bufferidxs[0] !== INT_NULL) {
-         const group_root = Mesh_buffer_get_mesh_byidx(Widget_group_get_rootidx(root.group_bufferidxs[0]))
-         group_root.Recalc_no_batch_render();
+
+         // Get the group root mesh to Recalc position/dimentions 
+         const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+         const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
+         group_root_mesh.Recalc_no_batch_render();
+
+         // TODO: If the group root is a scrolled_section, maybe the responsibility for Clip is at scroller ?????????
+         if (group_root_mesh.parent) {
+
+            clip_top = group_root_mesh.parent.geom.pos[1] - group_root_mesh.parent.geom.dim[1];
+            clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1];
+         }
+
       }
       else {
          root.Recalc_no_batch_render();
       }
 
-      Clipy_from_widget_root(root.root_bufferidx);
-      Widget_group_rerender_tree_mesh_recursive(root.group_bufferidxs[0]);
+      Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      View_rerender_from_view_all_buffers(root.group_bufferidxs[0]);
 
-
-      // TEMP_PRINT_IS_GFX_INSERTED(root, 'END')
    }
 
 
@@ -1011,11 +895,7 @@ export class Widget_Dropdown extends Section {
       this.Render(); // Add dropdown to gfx buffers.
       this.ConstructListeners(this.parent); // Create listeners, as children of menu listeners.                         // POTENTIAL_BUG: We create the listen events as children to the parent dropdown. So any change to the way we construct listeners for dropdowns must be apllied here too. 
 
-      // root.Recalc(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
       root.Recalc();
-
-      // Add to widget group buffer
-      this.AddToWidgetGroupBuffer(root.group_bufferidxs[0]);
 
    }
 

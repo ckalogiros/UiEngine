@@ -9,7 +9,6 @@ export function Dbg_ui_create(name, parent, fontsize, switch_fn, section_col, la
    const section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zindex + 1], [0, 0], section_col, `DBG_UI ${name}`);
    section.SetName(`DBG_UI ${name}`);
    section.options = SECTION.HORIZONTAL | SECTION.EXPAND | SECTION.TOP_DOWN;
-   // parent.AddToMenu(section);
    
    const label = Create_widget_label(_, `DBG_UI ${name} label`, (ALIGN.BOTTOM | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, label_col, label_text_col, label_pad, _, label_style);
    section.AddItem(label);

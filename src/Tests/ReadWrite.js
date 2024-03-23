@@ -138,7 +138,7 @@ export function Create_read_write_test() {
 
    }
 
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    section.Calc(SECTION.VERTICAL);
    section.Render();
    section.ConstructListeners();

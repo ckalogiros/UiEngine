@@ -7,8 +7,47 @@ export const TRANSPARENT = [0.0, 0.0, 0.0, 0.0];
 export const WHITE = [1.0, 1.0, 1.0, 1.0];
 export const BLACK = [0.04, 0.04, 0.04, 1.0];
 
-const ORANGE = [1.0, 0.5, 0.0, 1.0];
+// const ORANGE = [1.0, 0.5, 0.0, 1.0];
 
+
+
+const ORANGE0 = [0.1, 0.050, 0.0, 1.0];
+const ORANGE1 = [0.2, 0.100, 0.0, 1.0];
+const ORANGE2 = [0.3, 0.150, 0.0, 1.0];
+const ORANGE3 = [0.4, 0.200, 0.0, 1.0];
+const ORANGE4 = [0.5, 0.250, 0.0, 1.0];
+const ORANGE5 = [0.6, 0.300, 0.0, 1.0];
+const ORANGE6 = [0.7, 0.350, 0.0, 1.0];
+const ORANGE7 = [0.8, 0.400, 0.0, 1.0];
+const ORANGE8 = [0.9, 0.450, 0.0, 1.0];
+const ORANGE9 = [1.0, 0.500, 0.0, 1.0];
+export const ORANGE = [ ORANGE0, ORANGE1, ORANGE2, ORANGE3, ORANGE4, ORANGE5, ORANGE6, ORANGE7, ORANGE8, ORANGE9, ];
+
+const ORANGEL0 = [0.1, 0.025, 0.0, 1.0];
+const ORANGEL1 = [0.2, 0.050, 0.0, 1.0];
+const ORANGEL2 = [0.3, 0.075, 0.0, 1.0];
+const ORANGEL3 = [0.4, 0.100, 0.0, 1.0];
+const ORANGEL4 = [0.5, 0.125, 0.0, 1.0];
+const ORANGEL5 = [0.6, 0.150, 0.0, 1.0];
+const ORANGEL6 = [0.7, 0.175, 0.0, 1.0];
+const ORANGEL7 = [0.8, 0.200, 0.0, 1.0];
+const ORANGEL8 = [0.9, 0.225, 0.0, 1.0];
+const ORANGEL9 = [1.0, 0.250, 0.0, 1.0];
+export const ORANGEL = [ ORANGEL0, ORANGEL1, ORANGEL2, ORANGEL3, ORANGEL4, ORANGEL5, ORANGEL6, ORANGEL7, ORANGEL8, ORANGEL9, ];
+
+
+
+const ORANGER0 = [0.1, 0.075, 0.0, 1.0];
+const ORANGER1 = [0.2, 0.150, 0.0, 1.0];
+const ORANGER2 = [0.3, 0.150, 0.0, 1.0];
+const ORANGER3 = [0.4, 0.225, 0.0, 1.0];
+const ORANGER4 = [0.5, 0.300, 0.0, 1.0];
+const ORANGER5 = [0.6, 0.374, 0.0, 1.0];
+const ORANGER6 = [0.7, 0.450, 0.0, 1.0];
+const ORANGER7 = [0.8, 0.525, 0.0, 1.0];
+const ORANGER8 = [0.9, 0.600, 0.0, 1.0];
+const ORANGER9 = [1.0, 0.675, 0.0, 1.0];
+export const ORANGER = [ ORANGER0, ORANGER1, ORANGER2, ORANGER3, ORANGER4, ORANGER5, ORANGER6, ORANGER7, ORANGER8, ORANGER9, ];
 
 
 const RED0 = [0.1, 0.0, 0.0, 1.0];
@@ -23,16 +62,16 @@ const RED8 = [0.9, 0.0, 0.0, 1.0];
 const RED9 = [1.0, 0.0, 0.0, 1.0];
 export const RED = [ RED0, RED1, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9, ];
 
-const REDL0 = [0.1, 0.025, 0.0, 1.0];
-const REDL1 = [0.2, 0.05 , 0.0, 1.0];
-const REDL2 = [0.3, 0.75 , 0.0, 1.0];
-const REDL3 = [0.4, 0.1  , 0.0, 1.0];
-const REDL4 = [0.5, 0.125, 0.0, 1.0];
-const REDL5 = [0.6, 0.15 , 0.0, 1.0];
-const REDL6 = [0.7, 0.175, 0.0, 1.0];
-const REDL7 = [0.8, 0.2  , 0.0, 1.0];
-const REDL8 = [0.9, 0.225, 0.0, 1.0];
-const REDL9 = [1.0, 0.25 , 0.0, 1.0];
+const REDL0 = [0.1, 0.01, 0.0, 1.0];
+const REDL1 = [0.2, 0.02, 0.0, 1.0];
+const REDL2 = [0.3, 0.03, 0.0, 1.0];
+const REDL3 = [0.4, 0.04, 0.0, 1.0];
+const REDL4 = [0.5, 0.05, 0.0, 1.0];
+const REDL5 = [0.6, 0.06, 0.0, 1.0];
+const REDL6 = [0.7, 0.07, 0.0, 1.0];
+const REDL7 = [0.8, 0.08, 0.0, 1.0];
+const REDL8 = [0.9, 0.09, 0.0, 1.0];
+const REDL9 = [1.0, 0.10, 0.0, 1.0];
 export const REDL = [ REDL0, REDL1, REDL2, REDL3, REDL4, REDL5, REDL6, REDL7, REDL8, REDL9, ];
 
 const BLUE0 = [0.0, 0.0, 0.1, 1.0];
@@ -47,17 +86,29 @@ const BLUE8 = [0.0, 0.0, 0.9, 1.0];
 const BLUE9 = [0.0, 0.0, 1.0, 1.0];
 export const BLUE = [ BLUE0, BLUE1, BLUE2, BLUE3, BLUE4, BLUE5, BLUE6, BLUE7, BLUE8, BLUE9, ];
 
-const BLUEL0 = [0.0, 0.5 , 0.1, 1.0];
-const BLUEL1 = [0.0, 0.1 , 0.2, 1.0];
+const BLUEL0 = [0.0, 0.05 , 0.1, 1.0];
+const BLUEL1 = [0.0, 0.10, 0.2, 1.0];
 const BLUEL2 = [0.0, 0.15, 0.3, 1.0];
-const BLUEL3 = [0.0, 0.2 , 0.4, 1.0];
+const BLUEL3 = [0.0, 0.20, 0.4, 1.0];
 const BLUEL4 = [0.0, 0.25, 0.5, 1.0];
-const BLUEL5 = [0.0, 0.3 , 0.6, 1.0];
+const BLUEL5 = [0.0, 0.30, 0.6, 1.0];
 const BLUEL6 = [0.0, 0.35, 0.7, 1.0];
-const BLUEL7 = [0.0, 0.4 , 0.8, 1.0];
+const BLUEL7 = [0.0, 0.40, 0.8, 1.0];
 const BLUEL8 = [0.0, 0.45, 0.9, 1.0];
-const BLUEL9 = [0.0, 0.5 , 1.0, 1.0];
+const BLUEL9 = [0.0, 0.50, 1.0, 1.0];
 export const BLUEL = [ BLUEL0, BLUEL1, BLUEL2, BLUEL3, BLUEL4, BLUEL5, BLUEL6, BLUEL7, BLUEL8, BLUEL9, ];
+
+const BLUER0 = [0.015, 0.05 , 0.1, 1.0];
+const BLUER1 = [0.030, 0.10, 0.2, 1.0];
+const BLUER2 = [0.045, 0.15, 0.3, 1.0];
+const BLUER3 = [0.060, 0.20, 0.4, 1.0];
+const BLUER4 = [0.075, 0.25, 0.5, 1.0];
+const BLUER5 = [0.090, 0.30, 0.6, 1.0];
+const BLUER6 = [0.105, 0.35, 0.7, 1.0];
+const BLUER7 = [0.120, 0.40, 0.8, 1.0];
+const BLUER8 = [0.135, 0.45, 0.9, 1.0];
+const BLUER9 = [0.150, 0.50, 1.0, 1.0];
+export const BLUER = [ BLUER0, BLUER1, BLUER2, BLUER3, BLUER4, BLUER5, BLUER6, BLUER7, BLUER8, BLUER9, ];
 
 
 const GREEN0 = [0.0, 0.1, 0.0, 1.0];

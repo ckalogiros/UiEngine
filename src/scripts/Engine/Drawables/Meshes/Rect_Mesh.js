@@ -1,13 +1,13 @@
 "use strict";
 
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { Find_gfx_match_widget_root_impl } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
+import { Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_group_add, Widget_root_add_mesh, Widget_root_batch_update_increment_accumulator } from "../../Core/MeshBuffer.js";
+import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
 
@@ -30,8 +30,6 @@ export class Rect extends Mesh {
 
       mesh.idx = this.children.Add(mesh);
 
-      // SID.InheritUniform(mesh.sid.unif, this.sid.unif);  // Inherits the parent's uniform flags
-
       mesh.parent = this;
       return mesh.idx;
    }
@@ -43,26 +41,16 @@ export class Rect extends Mesh {
       Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
       for (let i = 0; i <= this.children.boundary; i++) {
-
+         
          const child = this.children.buffer[i];
-         child.root_bufferidx = root_bufferidx;
-         Widget_root_add_mesh(child.root_bufferidx, child.mesh_bufferidx);
-         console.warn('RECT_MESH has children. Please check the type of children because we add them directly to the widget_root.', '\nchild:', child.constructor.name, 'name:', child.GetName());
+
+         /**CATCH ERROR - INFINITE LOOP */
+         if(child.type & MESH_TYPE.RECT_MESH){
+            console.warn('RECT_MESH. Recursive call on AddToWidgetRootBuffer().\nSee for infinite loop', '\nchild:', child.constructor.name, 'name:', child.GetName());
+         }
+         child.AddToWidgetRootBuffer(root_bufferidx);
       }
 
-   }
-
-
-   AddToWidgetGroupBuffer(group_bufferidx) {
-
-      if(group_bufferidx === INT_NULL)
-         console.error('Catch group_bufferidx === -1. this:', this.GetName(), this)
-
-      if (this.state.mask & MESH_STATE.ACTIVE) {
-         /**DEBUG */ if (!this.gfx) console.error('ADDING TO WIDGET GROUP BUFFER FAILED: NO GFX FOR SECTION:', this.mesh_bufferidx, this.GetName());
-         this.group_bufferidxs[0] = group_bufferidx;
-         this.group_bufferidxs[1] = Widget_group_add(group_bufferidx, this.gfx, this.geom.num_faces, this.mesh_bufferidx);
-      }
    }
 
 
@@ -100,12 +88,6 @@ export class Rect extends Mesh {
    }
 
 
-   ClipY(clip_top, clip_bottom) {
-
-      if(this.ClipyCheck_A(clip_top, clip_bottom))
-         this.state.mask &= ~MESH_STATE.ACTIVE;
-   }
-
 
 
    /*******************************************************************************************************************************************************/
@@ -113,17 +95,8 @@ export class Rect extends Mesh {
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null) {
 
-      if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
-
-         const igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-         FLAGS |= igfx.FLAGS;
-
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-      }
-      else {
-         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, gfxidx, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-      }
-
+      const igfx = Generate_graphics_context(FLAGS, this, gfxidx);
+      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
 
       return this.gfx;
    }
@@ -141,11 +114,11 @@ export class Rect extends Mesh {
 
       // if (this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
 
-      const params = {
-         progidx: this.gfx.prog.idx,
-         vbidx: this.gfx.vb.idx,
-         mesh: this,
-      }
+      // const params = {
+      //    progidx: this.gfx.prog.idx,
+      //    vbidx: this.gfx.vb.idx,
+      //    mesh: this,
+      // }
       // Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_MESH, params);
 
       // const params2 = {
@@ -167,10 +140,6 @@ export class Rect extends Mesh {
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
       if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.is_gfx_inserted = true;
-
-      
-      // Add entry to Gfx Buffer
-      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }
@@ -205,7 +174,6 @@ export class Rect extends Mesh {
          
          this.children.buffer[i].batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
          Batch_store(this.children.buffer[i], SHADER_ATTRIBUTES.WPOS4, update_data, _);
-         // Batch_store(this.children.buffer[i], _, { pos: pos_dif }, _);
       }
    }
 
@@ -244,11 +212,6 @@ export class Rect extends Mesh {
 
    SetZPos(val) {
       this.geom.pos[2] = val;
-   }
-
-
-   SetGfxProgramGroup(group_mask) {
-      this.sid.gfx_group = group_mask;
    }
 
 

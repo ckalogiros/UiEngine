@@ -5,13 +5,13 @@ import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown";
 import { PerformanceTimersGetBestFps, PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, Performance_timers_get_ms_1sec_reset, _pt_all_timers, _pt_batch2_update, _pt_batch_update, _pt_event_listener, _pt_framebuffer_rendering, _pt_gl_draw, _pt_hover_listener, _pt_loop, _pt_mesh_info_tip, _pt_scene_update } from "../../Timers/PerformanceTimers";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners";
 import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget";
-import { Mesh_buffer_create_text_info, Mesh_buffer_get_mesh_byidx, TEMP_PRINT_ACCUM, TEMP_PRINT_START, Widget_group_create, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
-import { Scroller_clampy_and_render } from "../Widgets/WidgetScroller";
+import { Mesh_buffer_create_text_info, Mesh_buffer_get_mesh_byidx, TEMP_PRINT_ACCUM, TEMP_PRINT_START, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals";
 import { Dbg_ui_create } from "./DebugInfoUiFactory";
 import { Program_create_text_info, Program_get_programs } from "../../../Graphics/ShaderPrograms.js";
 import { BLUEL, GREEN, GREY, ORANGE_240_160_10, PURPLEB, PURPLER, REDL, WHITE, YELLOWL } from "../Material/Base/Colors.js";
 import { NOTIFICATION_TYPE_IDX } from "./DebugInfoUiNotifications.js";
+import { View_build_group_from_root_mesh } from "../../Core/MeshBufferViews.js";
 
 
 const _font_size = 10;
@@ -41,8 +41,6 @@ export function Debug_info_ui_performance(scene) {
    dp.CreateClickEvent();
    dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
-
-
    
 
 
@@ -88,18 +86,15 @@ export function Debug_info_ui_performance(scene) {
 
 
 
-   dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    dp.Render();
    dp.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-   // dp.options |= SECTION.EXPAND | SECTION.TOP_DOWN  | SECTION.INHERIT | SECTION.TOP_DOWN;
-   // dp.options = SECTION.VERTICAL | SECTION.INHERIT;
    dp.Calc();
    dp.ConstructListeners();
 
 
    // Create Group for this dropdown, to easily remove meshes from their vertex buffers and rebuild the vertex buffer
-   dp.group_bufferidxs = Widget_group_create(dp.mesh_bufferidx, dp.gfx);
-   dp.AddToWidgetGroupBuffer(dp.group_bufferidxs[0]);
+   View_build_group_from_root_mesh(dp);
 
    return dp;
 }
@@ -348,7 +343,7 @@ function Debug_info_create_ui_performance_timers() {
    }
 
 
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    section.ActivateAndChildren()
    section.Render()
    section.options = SECTION.VERTICAL;
@@ -396,7 +391,7 @@ function Debug_info_create_ui_mouse() {
    infomesh.CreateNewText('pos: x:0000, y:0000', fontsize, GREEN[7], [0, 0], .9);
    infomesh.CreateNewText('| area: x:0000, y:0000', fontsize, GREEN[7], [0, 0], .9);
 
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    section.ActivateAndChildren();
    section.Render()
    section.options |= SECTION.EXPAND | SECTION.INHERIT;
@@ -496,15 +491,14 @@ function Debug_info_create_gfx_info(params) {
 
    dp.sid.gfx_group = GFX_GROUPS.DEBUG.MASK;
 
-   dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    dp.Render();
    dp.Calc();
    dp.ConstructListeners();
 
 
    // Create Group for this dropdown, to easily remove meshes from their vertex buffers and rebuild the vertex buffer(Mainly for activate/deactivate dropdowns)
-   dp.group_bufferidxs = Widget_group_create(dp.mesh_bufferidx, dp.gfx)
-   dp.AddToWidgetGroupBuffer(dp.group_bufferidxs[0]);
+   View_build_group_from_root_mesh(dp);
 
 
    DEBUG_INFO.UI_GFX.MESH_BUFFER_IDX = dp.mesh_bufferidx;
@@ -596,7 +590,7 @@ function Debug_info_gfx_update(params) {
 
       Debug_info_gfx_create_more_info(new_dp_vb, vb)
 
-      new_dp_vb.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE)
+      new_dp_vb.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC)
       new_dp_vb.DpActivate();
 
       // TODO: Must add new meshes to widget root buffer
@@ -641,7 +635,6 @@ function Debug_info_gfx_create_more_info(dp_vb, vb) {
 
 
    { // Adding all vertex buffer's mesh names
-      // const mesh_names_count = vb.meshesNames.length;
       const mesh_names_count = str_buffer.length;
       const dp_names = Create_widget_dropdown(_, `Meshes:${mesh_names_count}`, [0, 0, 0], TRANSPARENCY(GREY[3], .5), TRANSPARENCY(GREY[4], .5), WHITE);
       dp_vb.AddToMenu(dp_names);
@@ -661,8 +654,6 @@ function Debug_info_gfx_create_more_info(dp_vb, vb) {
 
       section.Calc(SECTION.INHERIT | SECTION.TOP_DOWN);
 
-      // scroller.scrolled_section.SetClampY(scroller.geom.pos[1], scroller.geom.dim[1], 40);
-      // Widget_set_clampY_mesh_recursive(scroller.scrolled_section, scroller.scrolled_section.clamp[CLAMP.Y], scroller.renderables);
    }
 }
 
@@ -712,14 +703,15 @@ function Debug_info_create_mesh_info(params) {
    dp.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL;
 
    section.AddItem(dp);
-   
+
+
    // Create scroller for the ui-mesh info widget
    const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [0, 300]);
    scroller.StateEnable(MESH_STATE.ACTIVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   scroller.SetGfxProgramGroup(GFX_GROUPS.DEBUG.MASK); // IMPORTANT: Must set the scroller to be rendered in the Debug gfx buffers
-   scroller.scrolled_section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL ;
+   scroller.scrolled_section.options =  SECTION.VERTICAL ;
+    
 
    // Create the dropdown structure representing all the applications's meshes
    const root_meshes_idxs = Widget_root_buffer_get();
@@ -731,11 +723,15 @@ function Debug_info_create_mesh_info(params) {
 
    }
 
-   // Render the 
-   scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   scroller.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
+   scroller.Calc_no_gfx_update();
+   scroller.Render();
+   scroller.ConstructListeners();
 
-   scroller.ActivateAndChildrenRecursive();
-   Scroller_clampy_and_render(scroller, 100, 800);
+
+   View_build_group_from_root_mesh(scroller.scrolled_section)
+
 
 
    DEBUG_INFO.UI_MESH.ROOT_IDX = scroller.root_bufferidx;
@@ -818,7 +814,7 @@ function Debug_info_mesh_update(params) {
       root_info_dp.AddToMenu(dp_mesh);
 
       const gfx_idxs = [root_info_dp.menu.gfx.prog.idx, root_info_dp.menu.gfx.vb.idx];
-      dp_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, gfx_idxs);
+      dp_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, gfx_idxs);
       dp_mesh.Render();
       root_info_dp.Calc();
 
@@ -885,7 +881,7 @@ function Debug_info_create_batch_info(params) {
    section.AddItem(info2);
 
 
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    section.ActivateAndChildren();
    section.Render()
    section.options = SECTION.HORIZONTAL;
@@ -1103,13 +1099,13 @@ function Debug_info_create_vertexbuffer_2D(params) {
 
 export function Debug_info_create_all_generic_info() {
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [5, 5], [400,200,0], [100, 100], PURPLEB[1], 'All Generic Info');
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [5, 5], [400,200,0], [100, 100], PURPLEB[1], 'All Generic Info');
+   // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
    
    const mb_info = Mesh_buffer_create_text_info();
-   section.AddItem(mb_info);
+   // section.AddItem(mb_info);
    
    // const vb_info = Vertex_buffer_create_text_info();
    // section.AddItem(vb_info);
@@ -1118,16 +1114,28 @@ export function Debug_info_create_all_generic_info() {
    // section.AddItem(program_info);
 
 
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-   section.Render();
-   // section.options = SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
-   section.options = SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT;
-   section.Recalc();
-   section.ConstructListeners();
+   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   // section.Render();
+   // // section.options = SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
+   // section.options = SECTION.TOP_DOWN | SECTION.HORIZONTAL | SECTION.INHERIT;
+   // section.Recalc();
+   // section.ConstructListeners();
 
-   section.group_bufferidxs = Widget_group_create(section.mesh_bufferidx, section.gfx)
-   section.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
-   
+   // View_build_group_from_root_mesh(section);
+
+   // Create scroller for the ui-mesh info widget
+   const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, mb_info, [100, 300]);
+   scroller.StateEnable(MESH_STATE.ACTIVE);
+   scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   scroller.scrolled_section.options =  SECTION.VERTICAL ;
+   scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   scroller.options = SECTION.VERTICAL | SECTION.INHERIT;
+   scroller.Calc_no_gfx_update();
+   scroller.Render();
+   scroller.ConstructListeners();
+
+   View_build_group_from_root_mesh(scroller.scrolled_section);
 
    // const s2 = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [5, 5], [400,200,0], [100, 100], GREY[1], 'All Generic Info');
    // s2.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -1163,7 +1171,7 @@ export function Debug_info_update_clbk(params){
       section.AddItem(updated_info);
       
       updated_info.ConstructListeners();
-      updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+      updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
       updated_info.Render();
       updated_info.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
    }
@@ -1174,7 +1182,7 @@ export function Debug_info_update_clbk(params){
       section.AddItem(updated_info);
       
       updated_info.ConstructListeners();
-      updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+      updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
       updated_info.Render();
       updated_info.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
    }
@@ -1185,7 +1193,7 @@ export function Debug_info_update_clbk(params){
       section.AddItem(updated_info);
       
       updated_info.ConstructListeners();
-      updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+      updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
       updated_info.Render();
       updated_info.AddToWidgetGroupBuffer(section.group_bufferidxs[0]);
    }

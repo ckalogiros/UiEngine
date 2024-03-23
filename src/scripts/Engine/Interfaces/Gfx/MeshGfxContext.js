@@ -4,7 +4,7 @@
 import { Vertex_buffer_info_create, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_set_ibidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_get_by_vertex_buffer_index, Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
-import { Program_store_vertex_buffer_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists } from "../../../Graphics/ShaderPrograms.js";
+import { Program_store_vertex_buffer_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
 import { Gfx_buffer_create_vb, Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
@@ -35,7 +35,7 @@ export class GfxInfoMesh {
 
    vb = { // The vertex buffer info the mesh belongs to
       idx: INT_NULL,	// The vertex buffer (float*) idx that this Mesh is stored to.
-      start: 0,		// The current meshe's starting index in vertex buffer. 
+      start: INT_NULL,		// The current meshe's starting index in vertex buffer. 
       end: 0,			// The meshe's end index in the vertex buffer. // UNNECESSARY
       count: 0,		// Current size of the float buffer (in floats)
       /*DO NOT DELETE*///ib_count: 0,    // Case that the index buffer is shared between vertex buffers, each vb nedds to know how many indices the Draw function should access
@@ -314,7 +314,7 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
    else {
 
       // Check if program already exists
-      progidx = Program_program_exists(sid);
+      progidx = Program_program_exists_from_sid(sid);
 
       if (progidx === INT_NULL) { // If shader program does not exist, create new program.
 
@@ -325,9 +325,6 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
          const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
          Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
          
-         /** DEBUG INFO UI */
-         // Debug_ui_set_notification(NOTIFICATION_TYPE_IDX.GFX_PROGRAM)
-         
       }
       
       /*******************************************************************************************************************/
@@ -336,10 +333,6 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
       // If the flag is set to ANY, find any apropriate vertex buffer
       if (FLAGS & GFX_CTX_FLAGS.ANY) {
          alert('IMPLEMENT ME.\nGfx_generate_context()')
-         // vbfound = Gfx_pool_find_notActive_and_notPrivate_vb(progidx);
-         // if (vbfound)
-         // if (DEBUG.GFX.CONTEXT_CREATE) console.log('ANY ############', vbfound.progidx, vbfound.vbidx)
-         // else if (DEBUG.GFX.CONTEXT_CREATE) console.log('ANY ############', progidx, vbfound)
       }
       else { // else create new vertex buffer
 
