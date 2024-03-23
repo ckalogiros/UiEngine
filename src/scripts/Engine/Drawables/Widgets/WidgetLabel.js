@@ -540,21 +540,6 @@ export class Widget_Label extends Rect {
     /*******************************************************************************************************************************************************/
 
 
-
-    UpdateWidgetGroupIncrementNumFaces() {
-
-        Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
-        Widget_group_update_increment(this.text_mesh.group_bufferidxs, this.text_mesh.geom.num_faces);
-    }
-
-
-    UpdateWidgetGroupDecrementNumFaces() {
-
-        Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
-        Widget_group_update_decrement(this.text_mesh.group_bufferidxs, this.text_mesh.geom.num_faces, this.text_mesh);
-    }
-
-
     AddToGfxBuffer() { 
        this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
        this.text_mesh.gfx_bufferidx = Gfx_buffer_store(this.text_mesh.gfx.vb.idx, this.text_mesh.mesh_bufferidx);

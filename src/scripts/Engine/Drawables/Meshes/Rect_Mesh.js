@@ -260,12 +260,6 @@ export class Rect extends Mesh {
    }
 
 
-
-   // UpdateWidgetGroupIncrementNumFaces(){
-   //    Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces); // Increment the number of faces of the vb_data of the group for the rect mesh.
-   // }
-
-
    // SEE ### Construct Listeners
    ConstructListeners(_root = null) {
 

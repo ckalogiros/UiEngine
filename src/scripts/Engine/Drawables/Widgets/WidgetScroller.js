@@ -673,35 +673,6 @@ export class Widget_Scroller extends Section {
    // Misc
    /*******************************************************************************************************************************************************/
 
-   UpdateWidgetGroupIncrementNumFaces() {
-
-      Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
-
-      const bar = this.children.buffer[SCROLL_BAR_IDX];
-      Widget_group_update_increment(bar.group_bufferidxs, bar.geom.num_faces);
-
-      const handle = bar.children.buffer[0];
-      Widget_group_update_increment(handle.group_bufferidxs, handle.geom.num_faces);
-
-      const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
-      Widget_group_update_increment(scrolled_mesh.group_bufferidxs, scrolled_mesh.geom.num_faces);
-   }
-
-
-   UpdateWidgetGroupDecrementNumFaces() {
-
-      Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
-
-      const bar = this.children.buffer[SCROLL_BAR_IDX];
-      Widget_group_update_decrement(bar.group_bufferidxs, bar.geom.num_faces);
-
-      const handle = bar.children.buffer[0];
-      Widget_group_update_decrement(handle.group_bufferidxs, handle.geom.num_faces);
-
-      const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
-      Widget_group_update_decrement(scrolled_mesh.group_bufferidxs, scrolled_mesh.geom.num_faces);
-   }
-
 
 
    /*******************************************************************************************************************************************************/

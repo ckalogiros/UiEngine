@@ -134,8 +134,6 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
    const limit = {
       up: clampY[CLAMP.Y_UP] - threshold,
       down: clampY[CLAMP.Y_DOWN] + threshold,
-      // up: TEST_CLIP_TOP - threshold,
-      // down: TEST_CLIP_BOTTOM + threshold,
    }
    
    // DEACTIVATE: Handles the upper clamp value. ### Clamp 
@@ -144,7 +142,6 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
       // Check only the first/upper mesh. If it's upper side is greater than the upper limit(clampy+threshold), deactivate all meshes between upper limit and clampy 
       if (first.state.mask & MESH_STATE.ACTIVE) {
          
-         // console.log(threshold, limit, first_top)
          // Deactivate any mesh between the upper limit and clampy
          for (let i = first.idx; i <= mesh.children.boundary; i++) {
             
@@ -152,10 +149,9 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
             const c_top = child.geom.pos[1] + child.geom.dim[1];
             
             if (c_top < clampY[CLAMP.Y_UP]) {  // Enable all meshes that are lower than the upper limit 
-               // console.log('000000000000000000000000000000000')
+
                child.state.mask &= ~MESH_STATE.ACTIVE;
                // Widget_group_update_decrement(child.group_bufferidxs, child.geom.num_faces);
-               if((child.state.mask & MESH_STATE.ACTIVE)) child.UpdateWidgetGroupDecrementNumFaces();
                if(DBG) console.log('REMOVE', child.mesh_bufferidx, child.GetName())
                child.gfx.vb.start = INT_NULL;
                changes_hapened = true;
@@ -185,8 +181,8 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
             const child = mesh.children.buffer[i];
             const c_top = child.geom.pos[1] - child.geom.dim[1];
             if (c_top > limit.up) {  // Enable all meshes that are below the upper limit 
+
                child.state.mask |= MESH_STATE.ACTIVE;
-               if((child.state.mask & MESH_STATE.ACTIVE)===0) child.UpdateWidgetGroupIncrementNumFaces();
                if(DBG)console.log('ADD', child.mesh_bufferidx, child.GetName())
                changes_hapened = true;
 
@@ -227,8 +223,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
             // const c_bottom = child.geom.pos[1] + child.geom.dim[1];
             if (c_top > clampY[CLAMP.Y_DOWN]) {  // Disable all meshes that are higher than the lower limit 
                child.state.mask &= ~MESH_STATE.ACTIVE;
-               // Widget_group_update_decrement(child.group_bufferidxs, child.geom.num_faces)
-               if((child.state.mask & MESH_STATE.ACTIVE)) child.UpdateWidgetGroupDecrementNumFaces();
+
                if(DBG)console.log('REMOVE', child.mesh_bufferidx, child.GetName())
                child.gfx.vb.start = INT_NULL;
                changes_hapened = true;
@@ -261,7 +256,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
 
                if (c_bottom < limit.down){ // Enable all meshes that are higher than the lower limit 
                child.state.mask |= MESH_STATE.ACTIVE;
-               if((child.state.mask & MESH_STATE.ACTIVE)===0) child.UpdateWidgetGroupIncrementNumFaces();
+
                if(DBG)console.log('ADD', child.mesh_bufferidx, child.GetName())
                changes_hapened = true;
 
@@ -293,14 +288,9 @@ function Recurse_mesh_set_active(mesh, flag_activate) {
 
          if (flag_activate) {
             child.state.mask |= MESH_STATE.ACTIVE;
-            // child.StateEnable(MESH_STATE.ACTIVE);
-            // child.UpdateWidgetGroupIncrementNumFaces();
          }
          else {
-            // child.StateDisable(MESH_STATE.ACTIVE);
             child.state.mask &= ~MESH_STATE.ACTIVE;
-            // child.StateDisable(MESH_STATE.ACTIVE);
-            // child.UpdateWidgetGroupDecrementNumFaces();
          }
       }
 

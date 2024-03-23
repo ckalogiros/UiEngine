@@ -862,40 +862,6 @@ export class Widget_Slider extends Rect {
    /*******************************************************************************************************************************************************/
    // Misc
 
-   UpdateWidgetGroupIncrementNumFaces() {
-
-      Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
-
-      const name_mesh = this.text_mesh;
-      Widget_group_update_increment(name_mesh.group_bufferidxs, name_mesh.geom.num_faces);
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      Widget_group_update_increment(bar.group_bufferidxs, bar.geom.num_faces);
-
-      const handle = bar.children.buffer[0];
-      Widget_group_update_increment(handle.group_bufferidxs, handle.geom.num_faces);
-
-      const value = bar.children.buffer[1];
-      Widget_group_update_increment(value.group_bufferidxs, value.geom.num_faces);
-   }
-
-
-   UpdateWidgetGroupDecrementNumFaces() {
-
-      Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces);
-
-      const name_mesh = this.text_mesh;
-      Widget_group_update_decrement(name_mesh.group_bufferidxs, name_mesh.geom.num_faces);
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      Widget_group_update_decrement(bar.group_bufferidxs, bar.geom.num_faces);
-
-      const handle = bar.children.buffer[0];
-      Widget_group_update_decrement(handle.group_bufferidxs, handle.geom.num_faces);
-
-      const value = bar.children.buffer[1];
-      Widget_group_update_decrement(value.group_bufferidxs, value.geom.num_faces);
-   }
 
 
 

@@ -696,7 +696,6 @@ export class Widget_Dropdown extends Section {
 
                item.RemoveFromGfxBuffer();
                item.Deactivate();
-               // item.UpdateWidgetGroupDecrementNumFaces();
                item.SetIsGfxInserted(false);
 
                item.RemoveAllListenEvents();
@@ -709,7 +708,6 @@ export class Widget_Dropdown extends Section {
 
                   item.RemoveFromGfxBuffer();
                   item.Deactivate();
-                  // item.UpdateWidgetGroupDecrementNumFaces();
                   item.SetIsGfxInserted(false);
                }
             }
@@ -1154,20 +1152,6 @@ export class Widget_Dropdown extends Section {
    // Misc
    /*******************************************************************************************************************************************************/
 
-   UpdateWidgetGroupIncrementNumFaces() {
-
-      Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
-      const btn = this.children.buffer[0];
-      btn.UpdateWidgetGroupIncrementNumFaces();
-   }
-
-
-   UpdateWidgetGroupDecrementNumFaces() {
-
-      Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
-      const btn = this.children.buffer[0];
-      btn.UpdateWidgetGroupDecrementNumFaces();
-   }
 
 
    // BUG: The function fails in the occation that the menu is above the upper clip limit and needs NOT to be clipped.

@@ -245,17 +245,6 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
-	UpdateWidgetGroupIncrementNumFaces() {
-
-		Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
-	}
-
-
-	UpdateWidgetGroupDecrementNumFaces() {
-
-		Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
-	}
-
 }
 
 
@@ -861,34 +850,5 @@ export class Widget_Multi_Text extends Widget_Text {
 			}
 		}
 	}
-
-
-
-	UpdateWidgetGroupIncrementNumFaces() {
-
-		Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
-
-		for (let i = 0; i <= this.children.boundary; i++) {
-			const child = this.children.buffer[i];
-			if (child) {
-				child.UpdateWidgetGroupIncrementNumFaces();
-			}
-		}
-	}
-
-
-	UpdateWidgetGroupDecrementNumFaces() {
-
-		Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
-
-		for (let i = 0; i <= this.children.boundary; i++) {
-			const child = this.children.buffer[i];
-			if (child) {
-				child.UpdateWidgetGroupDecrementNumFaces();
-			}
-		}
-	}
-
-
 }
 

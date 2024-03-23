@@ -699,30 +699,7 @@ export class Section extends Rect {
    // Misc
    /*******************************************************************************************************************************************************/
 
-   UpdateWidgetGroupIncrementNumFaces() {
 
-      // Widget_group_update_increment(this.group_bufferidxs, this.geom.num_faces);
-
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) {
-            child.UpdateWidgetGroupIncrementNumFaces();
-         }
-      }
-   }
-
-
-   UpdateWidgetGroupDecrementNumFaces() {
-
-      // Widget_group_update_decrement(this.group_bufferidxs, this.geom.num_faces, this);
-
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) {
-            child.UpdateWidgetGroupDecrementNumFaces();
-         }
-      }
-   }
 }
 
 
