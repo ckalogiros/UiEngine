@@ -168,12 +168,11 @@ export class Section extends Rect {
       if(options === _) options = section.options
 
 
-      const total_size = [0, 0], total_margin = [0, 0]
       const old_sizex = section.geom.dim[0];
       const old_sizey = section.geom.dim[1];
 
 
-      Calculate_sizes_recursive(section, options, total_margin, total_size);
+      Calculate_sizes_recursive(section, options);
 
 
       if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
@@ -227,12 +226,11 @@ export class Section extends Rect {
       if(options === _) options = section.options; // Here set as options: the passed options(de-activates any mesh self-set-options), or the mesh self-options
 
 
-      const total_size = [0, 0], total_margin = [0, 0]
       const old_sizex = section.geom.dim[0];
       const old_sizey = section.geom.dim[1];
 
 
-      Calculate_sizes_recursive(section, options, total_margin, total_size);
+      Calculate_sizes_recursive(section, options);
 
 
       if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
@@ -305,7 +303,7 @@ export class Section extends Rect {
    // Graphics
    /*******************************************************************************************************************************************************/
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null, params) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null, params=null) {
 
       const gfx = super.GenGfxCtx(FLAGS, gfxidx, params);
 
@@ -799,10 +797,9 @@ function Expand(parent, options, width, accum_margins) {
 
 
 // TODO: For calculating multi-word text, if we need separate flags (HORIZONTAL | VERTICAL), we need to store the flags in the mesh. 
-function Calculate_sizes_recursive(parent, options, total_margin = [0, 0], total_size = [0, 0]) {
+function Calculate_sizes_recursive(parent, options) {
 
    const padding = [0, 0]; // TODO: Implement
-   const margin = total_margin;
    const accum_size_per_section = [0, 0];
 
    let opt = options
@@ -816,16 +813,13 @@ function Calculate_sizes_recursive(parent, options, total_margin = [0, 0], total
       // if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) && !(mesh.type & MESH_TYPE.WIDGET_SCROLLER))) {
       if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) )) {
 
-         const size = Calculate_sizes_recursive(mesh, options, margin, total_size); // Recurse if child mesh is of type of Section
+         const size = Calculate_sizes_recursive(mesh, options); // Recurse if child mesh is of type of Section
 
 
          if((mesh.type & MESH_TYPE.WIDGET_SCROLLER)===0){
             mesh.geom.dim[0] = mesh.max_size[0]
             mesh.geom.dim[1] = mesh.max_size[1]
          }
-
-         total_size[0] += size[0];
-         total_size[1] += size[1];
 
 
          mesh.SetMargin();
@@ -888,17 +882,14 @@ function Calculate_sizes_recursive(parent, options, total_margin = [0, 0], total
       }
    }
 
-   AddArr2(total_size, accum_size_per_section);
-   return total_size;
 }
 
 
 
-export function Calculate_positions_recursive(parent, options, _accum_pos = [parent.geom.pos[1], 0]) {
+export function Calculate_positions_recursive(parent, options) {
 
    const padding = [0, 0]
    const cur_pos = [parent.geom.pos[0], parent.geom.pos[1]];
-   const accum_pos = _accum_pos;
 
    for (let i = 0; i <= parent.children.boundary; i++) {
 
@@ -916,7 +907,6 @@ export function Calculate_positions_recursive(parent, options, _accum_pos = [par
          const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
 
          const new_pos = [(c_x - parent_dimx) + mesh_max_width + parent_margx, (c_y - parent_dimy) + mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
-         // const new_pos = [(c_x - parent_dimx) + parent_margx, (c_y - parent_dimy) + parent_margy, parent.geom.pos[2] + 1,];
          const pos_dif = [new_pos[0] - mesh.GetCenterPosX(), new_pos[1] - mesh.GetCenterPosY(), new_pos[2] + 1];
 
          if (pos_dif[0] !== 0 || pos_dif[1] !== 0) {
@@ -932,7 +922,6 @@ export function Calculate_positions_recursive(parent, options, _accum_pos = [par
                const update_data = { 
                   sizes:[2],
                   data: [new_pos[0], new_pos[1], mesh.geom.dim[0],mesh.geom.dim[1],]
-                  // data: [new_pos[0], new_pos[1]]
                };
 
                mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
@@ -944,7 +933,7 @@ export function Calculate_positions_recursive(parent, options, _accum_pos = [par
 
       // if ((mesh.state.mask & MESH_STATE.ACTIVE) && continue_recur)
       if (continue_recur)
-         Calculate_positions_recursive(mesh, options, accum_pos)
+         Calculate_positions_recursive(mesh, options)
 
       const mesh_width = mesh_max_width;
       const mesh_height = mesh.GetTotalHeight();
@@ -957,17 +946,14 @@ export function Calculate_positions_recursive(parent, options, _accum_pos = [par
       }
    }
 
-   return accum_pos;
 }
 
 
 
-export function Calculate_positions_no_gfx_update_recursive(parent, options, _accum_pos = [parent.geom.pos[1], 0]) {
+export function Calculate_positions_no_gfx_update_recursive(parent, options) {
 
    const padding = [0, 0]
    const cur_pos = [parent.geom.pos[0], parent.geom.pos[1]];
-   const accum_pos = _accum_pos;
-
 
    for (let i = 0; i <= parent.children.boundary; i++) {
 
@@ -1004,7 +990,6 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, _ac
             continue_recur = false; // Stop recursion for mesh's children. Let the mesh deal with it's children positioning.
          }
          else { // Case  mesh is of type section  
-
             CopyArr2(mesh.geom.pos, new_pos);
          }
 
@@ -1012,7 +997,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, _ac
 
 
       if (continue_recur)
-         Calculate_positions_no_gfx_update_recursive(mesh, options, accum_pos)
+         Calculate_positions_no_gfx_update_recursive(mesh, options)
 
       const mesh_width = mesh_max_width;
       const mesh_height = mesh.GetTotalHeight();
@@ -1025,6 +1010,5 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, _ac
       }
    }
 
-   return accum_pos;
 }
 

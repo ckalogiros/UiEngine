@@ -35,22 +35,24 @@ export function Generate_graphics_context(FLAGS, mesh, gfxidxs = null) {
       }
       else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC) {
 
-         // Case the mesh is a text mesh, and there is a gfx buuffer to be found, then becauuse we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
-         if(mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH){
-            igfx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid);
-            FLAGS |= igfx.FLAGS; // Store any changes. Example, maybe the match failed and NEW vertex buffer is to be created.
-         }
-         else{
+         if (mesh.parent === INT_NULL) {
+            console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', mesh.GetName(), mesh);
 
-            if(mesh.parent === INT_NULL){
-               console.error('NO parent exists for mesh to generate gfx. mesh:', mesh.GetName(), mesh);
-               // alert('SEE console.error');
-            }
-            else{
-   
-               igfx = Find_match_gfx_from_parent_ascending(mesh, mesh.parent);
+            // Case the mesh is a text mesh, and there is a gfx buffer to be found, then because we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
+            if (mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH) {
+               igfx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid);
                FLAGS |= igfx.FLAGS; // Store any changes. Example, maybe the match failed and NEW vertex buffer is to be created.
             }
+         }
+         else {
+
+            igfx = Find_match_gfx_from_parent_ascending(mesh, mesh.parent);
+
+            if (igfx.idxs[0] === INT_NULL) { // Fallback to search all ascending-descending until root is reached.
+               igfx = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
+            }
+
+            FLAGS |= igfx.FLAGS; // Store any changes. Example, maybe the match failed and NEW vertex buffer is to be created.
          }
 
 
@@ -69,23 +71,24 @@ export function Generate_graphics_context(FLAGS, mesh, gfxidxs = null) {
        * and we re-call this fuunction so that we search for any text gfx.
        */
       // Check the passed gfxidxs params if they are valid gfx indexes
-      if (gfxidxs!==null) {
+      if (gfxidxs !== null) {
          if (gfxidxs[0] === INT_NULL || gfxidxs[1] === INT_NULL) {
             console.error('NO CORRECT gfxidxs passed for generating SPECIFIC gfx.\n_gfxidxs:', gfxidxs);
             // alert('SEE console.error');
          }
          else {
             if (Program_program_exists_from_index(gfxidxs[0]) && Vertex_buffer_exists_from_index(gfxidxs[1])) {
-   
+
                igfx.idxs[0] = gfxidxs[0];
                igfx.idxs[1] = gfxidxs[1];
             }
          }
       }
-      else{ // Re-Call this to generate gfx from existing buuffers
+      else { // Re-Call this to generate gfx from existing buuffers
          FLAGS &= ~GFX_CTX_FLAGS.SPECIFIC;
          FLAGS |= GFX_CTX_FLAGS.FROM_PARENT_ASC;
-         Generate_graphics_context(FLAGS, mesh, gfxidxs)
+         FLAGS |= GFX_CTX_FLAGS.PRIVATE;
+         igfx = Generate_graphics_context(FLAGS, mesh, gfxidxs);
       }
    }
 
@@ -290,7 +293,7 @@ export function Find_match_gfx_from_parent_ascending(mesh, parent) {
 
 
 
-export function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
+function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 
    // console.log(mesh.id)
    let res = Find_match_gfx_from_parent(mesh, parent)

@@ -70,6 +70,9 @@ export class Textured_Mesh extends Mesh {
       if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.StateEnable(MESH_STATE.ACTIVE);
       this.is_gfx_inserted = true;
+      
+      // Add entry to Gfx Buffer
+      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
    }
 
@@ -196,7 +199,11 @@ export class Textured_Mesh extends Mesh {
       this.geom.pos[0] = x;
       this.geom.pos[1] = y;
    }
+   
 
+   SetTypeDebug(){
+      this.type |= MESH_TYPE.DEBUG_MESH;
+   }
 
 
    

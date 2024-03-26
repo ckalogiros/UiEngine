@@ -30,8 +30,9 @@ export function Index_buffer_get_by_ibidx(ibidx) {
 }
 
 
+
 /** Check if the analogous index buffer exists, in the case of one to one vertex and index buffers */
-export function Index_buffer_get_by_vertex_buffer_index(ibidx) {
+function Index_buffer_get_by_vertex_buffer_index(ibidx) {
    if(!DISABLE_DEBUG) DEBUG_PRINT(_index_buffers, ibidx, new Error().lineNumber);
 
    if((ibidx < 0 || ibidx > _index_buffers.boundary) || (_index_buffers.buffer[ibidx] === null)){
@@ -43,7 +44,7 @@ export function Index_buffer_get_by_vertex_buffer_index(ibidx) {
 
 
 
-export function Index_buffer_set_ib_data(gl, buffer) {
+function Index_buffer_set_ib_data(gl, buffer) {
 
    const ib = Index_buffer_get_by_ibidx(buffer.ibidx);
 
@@ -65,7 +66,7 @@ export function Index_buffer_set_ib_data(gl, buffer) {
 
 
 /** Returns struct: { ibidx:INT, ibo:OBJ } */
-export function Index_buffer_create(type, size) {
+function Index_buffer_create(type, size) {
 
    const ret = {
       ibidx: INT_NULL,
@@ -81,52 +82,6 @@ export function Index_buffer_create(type, size) {
    return ret;
 }
 
-/****************************************************************************************************************************************************/
-
-// export function Gl_ib_create_indexbuffer(sid, gl, vao, indices_per_rect) {
-//    _index_buffers[_count] = new IndexBuffer(sid, gl, indices_per_rect, vao, _count);
-//    _count++;
-//    return _count - 1;
-// }
-
-
-
-// export function Gl_ib_get_byidx(idx) {
-//    if (idx < 0 || idx >= _count) alert('Index for getting indexbuffer is out of bounds. @ IndexBuffer.js.');
-//    return _index_buffers[idx];
-// }
-
-
-
-// export function Gl_ib_get_byidx_in_prog(idx) {
-//    if (_index_buffers[idx])
-//       return _index_buffers[idx];
-//    else
-//       alert('ERROR: NO INDEX BUFFER EXISTS.  @ IndexBuffer.js.')
-// }
-
-
-
-// export function Gl_ib_set_idx_in_prog(ibidx, idx_in_prog) {
-//    _index_buffers[ibidx].idx_in_prog = idx_in_prog;
-// }
-
-
-
-// export function Gl_ib_set_show(ibidx, flag){
-//    _index_buffers[ibidx].show = flag;
-// }
-
-
-
-// export function Gl_ib_exists(ibIdx) {
-
-//    if (_index_buffers[ibIdx])
-//       return _index_buffers[ibIdx];
-
-//    return -1;
-// }
-
 
 
 
@@ -138,6 +93,7 @@ export function Index_buffer_create(type, size) {
 
 
 const _index_buffers_info = new M_Buffer();
+
 
 
 export function Index_buffer_info_get() { return _index_buffers_info; }
@@ -162,33 +118,6 @@ export function Index_buffer_state_disable(ibidx, STATE_FLAG) {
 }
 
 
-
-
-// export function Index_buffer_info_create(sid, size = MAX_INDEX_BUFFER_SIZE) {
-export function Index_buffer_info_create(sid, vao, vaoidx, size = 6) {
-
-   /***********************************************************************************************/
-   // Create index buffer
-
-   // gfxCtx.gl.bindVertexArray(vao);
-
-   const type = BUFFER_TYPE.UINT16; // TODO: Who decides the type???
-
-   const ret = Index_buffer_create(type, size, sid);
-
-   const ib_info = new Index_Buffer_Info(size, sid, ret.ibidx, ret.ibo, type, vao, vaoidx);
-
-   _index_buffers_info.Add(ib_info);
-
-   // VAO must be bound before enabling attribute locations for the created VAO
-   // Bind VAO in case the VAO exists, otherwise if VAO was created it is already bound.  
-   //  gfxCtx.gl.bindVertexArray(vao.vao);
-   gfxCtx.gl.bindBuffer(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, ret.ibo);
-   const ib = _index_buffers.buffer[ret.ibidx];
-   gfxCtx.gl.bufferData(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, ib, gfxCtx.gl.STATIC_DRAW, 0);
-
-   return ib_info;
-}
 
 
 class Index_Buffer_Info {
@@ -285,7 +214,12 @@ class Index_Buffer_Info {
       this.count -= attr_count;
       const vCount = (attr_count / INDICES_PER_RECT) * VERTS_PER_RECT_INDEXED;
       this.vCount -= vCount;
-      this.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+
+      if(this.count === 0) this.state.mask &= ~BUFFER_STATE.IS_ACTIVE;
+      else this.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+
+      // POTENTIAL_BUG: If the buffer is empty MUST be updated!!!
+      // TODO: If The buffer is not used, then we need to update the render queue
 
       return attr_count;
    }
@@ -320,6 +254,32 @@ class Index_Buffer_Info {
 
 
 
+export function Index_buffer_info_create(sid, vao, vaoidx, size = 6) {
+
+   /***********************************************************************************************/
+   // Create index buffer
+
+   const type = BUFFER_TYPE.UINT16; // TODO: Who decides the type???
+
+   const ret = Index_buffer_create(type, size, sid);
+
+   const ib_info = new Index_Buffer_Info(size, sid, ret.ibidx, ret.ibo, type, vao, vaoidx);
+
+   _index_buffers_info.Add(ib_info);
+
+   // VAO must be bound before enabling attribute locations for the created VAO
+   // Bind VAO in case the VAO exists, otherwise if VAO was created it is already bound.  
+   //  gfxCtx.gl.bindVertexArray(vao.vao);
+   gfxCtx.gl.bindBuffer(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, ret.ibo);
+   const ib = _index_buffers.buffer[ret.ibidx];
+   gfxCtx.gl.bufferData(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, ib, gfxCtx.gl.STATIC_DRAW, 0);
+
+   ib_info.state.mask |= BUFFER_STATE.IS_ACTIVE;
+
+   return ib_info;
+}
+
+
 
 export function Index_buffer_reset(ibidx) {
    _index_buffers_info.buffer[ibidx].count = 0;
@@ -345,7 +305,7 @@ export function Index_buffer_reset_to_index(ibidx, start) {
 
 
 
-export function Index_buffer_add_indices(ib_gfx, dbg_mesh_name) {
+export function Index_buffer_add_indices(ib_gfx) {
 
    const ibidx = ib_gfx.idx;
    const ib_info = Index_buffer_info_get_by_ibidx(ibidx);
@@ -369,7 +329,7 @@ export function Index_buffer_add_indices(ib_gfx, dbg_mesh_name) {
 
 
 
-export function Index_buffer_add_indices_from_non_existant_mesh(ib_gfx, dbg_mesh_name) {
+export function Index_buffer_add_indices_from_non_existant_mesh(ib_gfx) {
 
    const ibidx = ib_gfx.idx;
    const ib_info = Index_buffer_info_get_by_ibidx(ibidx);

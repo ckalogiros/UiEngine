@@ -11,6 +11,7 @@ import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js
 import { Batch_store } from "../Batch/Batch.js";
 import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Debug_info_update_clbk } from "../Drawables/DebugInfo/DebugInfoUi.js";
+import { View_destroy_view, View_remove_from_group } from "./MeshBufferViews.js";
 
 
 /**
@@ -25,7 +26,7 @@ temp_accum[0] = 0;
 temp_accum[1] = 0;
 temp_accum[2] = 0;
 temp_accum[3] = 0;
-export function TEMP_PRINT_ACCUM(){console.error(temp_accum);}
+export function TEMP_PRINT_ACCUM() { console.error(temp_accum); }
 
 
 // TODO: Temporary for vb starts of meshidxs in per vb buffer 
@@ -34,7 +35,7 @@ temp_start[0] = 0xffff;
 temp_start[1] = 0xffff;
 temp_start[2] = 0xffff;
 temp_start[3] = 0xffff;
-export function TEMP_PRINT_START(){console.error(temp_start);}
+export function TEMP_PRINT_START() { console.error(temp_start); }
 
 
 const _mesh_buffer = new M_Buffer();
@@ -42,7 +43,7 @@ const _gfx_buffer = new M_Buffer();
 
 
 const _widget_root_buffer = new M_Buffer();
-const _root_batch_buffer = [];
+const _root_batch_buffer = new M_Buffer();
 const _widget_root_gfx = new M_Buffer();
 
 // const _widget_groups_buffer = new M_Buffer();
@@ -83,18 +84,26 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
       alert('Mesh is NULL.\n@ Mesh_buffer_remove_mesh_byidx()\nSEE console error');
    }
 
-   if(mesh.state.mask & MESH_STATE.ACTIVE){
+   if (mesh.gfx) {
 
-      temp_accum[mesh.gfx.vb.idx] += mesh.geom.num_faces;
-      if(temp_start[mesh.gfx.vb.idx] > mesh.gfx.vb.start)  
-         temp_start[mesh.gfx.vb.idx] = mesh.gfx.vb.start;
+      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+
+         temp_accum[mesh.gfx.vb.idx] += mesh.geom.num_faces;
+         if (temp_start[mesh.gfx.vb.idx] > mesh.gfx.vb.start)
+            temp_start[mesh.gfx.vb.idx] = mesh.gfx.vb.start;
+      }
+
+      if (mesh.gfx_bufferidx === INT_NULL) {
+         console.error('NO gfx_bufferidx for the mesh.\nMesh is not removed from the _gfx_buffer\nmesh:', mesh.GetName(), 'mesh:', mesh);
+         // alert('SEE console.error')
+      }
+      else {
+         Gfx_buffer_remove_mesh_by_vbidx(mesh.gfx.vb.idx, mesh.gfx_bufferidx);
+      }
    }
 
-   
-   Gfx_buffer_remove_mesh_by_vbidx(mesh.gfx.vb.idx, mesh.gfx_bufferidx);
-
    // TODO: Remove the whole root is WRONG, we have to destroy all meshes, which we do not do
-   // If the mesh is the root, destroy the whole root buffer, gfx_buffer, batch buffer and if any group buffer.
+   // If the mesh is the root, destroy the whole root buffer, gfx_buffer, batch buffer.
    if (Widget_root_is_widget_root(mesh.root_bufferidx, mesh_bufferidx)) {
 
       Widget_root_remove_root_byidx(mesh.root_bufferidx);
@@ -102,65 +111,9 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
    }
    else { // ...remove element, BUT the removed mesh may be root of a batch-vb or group-groupdata-vb
 
-      Widget_root_remove_element_byidx(mesh.root_bufferidx, mesh.batch_buffer_vbidx, mesh_bufferidx, mesh.geom.num_faces);
+      if (mesh.batch_buffer_vbidx !== INT_NULL)
+         Widget_root_remove_element_byidx(mesh.root_bufferidx, mesh.batch_buffer_vbidx, mesh_bufferidx, mesh.geom.num_faces);
 
-
-      /*********************************************************************************************************************************/
-      // Group Remove num_faces
-
-      const group_idx = mesh.group_bufferidxs[0];
-      const group_data_idx = mesh.group_bufferidxs[1];
-
-      if (group_idx !== INT_NULL && group_data_idx !== INT_NULL) { // TODO: I think checking only the [1] is enough
-
-         if (mesh.state.mask & MESH_STATE.ACTIVE) { // Decrement num_faces only if ACTIVE, else the num_faces for the mesh aren't added.
-
-            const is_group_data_empty = Widget_group_update_decrement(mesh.group_bufferidxs, mesh.geom.num_faces);
-
-            const group_data = _widget_groups_buffer.buffer[group_idx].group_data[group_data_idx];
-
-            // If group has 0 num_faces, disconnect the destroyed mesh's idx from the batch.
-            if (is_group_data_empty) {
-
-               Widget_group_destroy_group_data(mesh.group_bufferidxs)
-               console.warn('EMPTY root_group:', _widget_groups_buffer.buffer[group_idx]);
-            }
-
-
-            /**
-             * Replace the meshidx of the group-data(which is the root mesh for this spesific group-data[]),
-             * if it is the mesh to be removed, with any other available meshidx from the same group-data
-             * and the same  gfx_idxs: [progidx, vbidx].
-             */
-            
-            // If the removed mesh is root to the group and the group is not empty, MUST replace it with the next apropriate mesh's idx
-            // Apropriate meshes must have the same gfx_idxs with the removed mesh
-            else if (group_data.meshidx === mesh_bufferidx) {
-
-               // Unfortunately we have no other option but to search the meshes through widget_root_buffer
-
-               const len = _widget_root_buffer.buffer[mesh.root_bufferidx].boundary;
-               for (let i = 0; i < len; i++) {
-
-                  const m = _mesh_buffer.buffer[_widget_root_buffer.buffer[mesh.root_bufferidx].buffer[i]]; // Get meshes through wigdet_root_buffer
-                  // console.log(m.GetName())
-
-                  // Make sure: The fetched mesh in the loop is not the removed mesh, and the fetched mesh belongs to removed mesh's batch-vb.
-                  if (m.mesh_bufferidx !== mesh_bufferidx && // If is not the same mesh
-                     m.group_bufferidxs[0] === group_idx && // If belongs to same group
-                     m.group_bufferidxs[1] === group_data_idx  // If belongs to same gfx 
-                  ) {
-
-                     // ... replace
-                     _widget_groups_buffer.buffer[group_idx].group_data[group_data_idx].meshidx = m.mesh_bufferidx
-                     _widget_groups_buffer.buffer[group_idx].group_data[group_data_idx].start = m.gfx.vb.start;
-                     _widget_groups_buffer.buffer[group_idx].group_data[group_data_idx].ib_start = m.gfx.ib.start;
-                     break;
-                  }
-               }
-            }
-         }
-      }
    }
 
    _mesh_buffer.RemoveByIdx(mesh_bufferidx);
@@ -215,19 +168,19 @@ export function Gfx_buffer_create_vb(vbidx) { _gfx_buffer.AddAtIndex(vbidx, new 
 
 
 
-export function Gfx_buffer_remove_mesh_by_vbidx(vbidx, gfx_bufferidx) { 
+export function Gfx_buffer_remove_mesh_by_vbidx(vbidx, gfx_bufferidx) {
 
-   if(gfx_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
+   if (gfx_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
 
 
-   _gfx_buffer.buffer[vbidx].RemoveByIdx(gfx_bufferidx); 
+   _gfx_buffer.buffer[vbidx].RemoveByIdx(gfx_bufferidx);
 
    // Update the gfx_bufferidx of the mesh that repalaced the removed mesh
    const mesh = _mesh_buffer.buffer[_gfx_buffer.buffer[vbidx].buffer[gfx_bufferidx]];
 
 
-   
-   if(mesh && (mesh.state.mask & MESH_STATE.ACTIVE)) { // Case the removed mesh is last in the _gfx_buffer, then there is no replacement and no need for setting the 'mesh.gfx_bufferidx'
+
+   if (mesh && (mesh.state.mask & MESH_STATE.ACTIVE)) { // Case the removed mesh is last in the _gfx_buffer, then there is no replacement and no need for setting the 'mesh.gfx_bufferidx'
 
       mesh.gfx_bufferidx = gfx_bufferidx;
    }
@@ -246,21 +199,21 @@ export function Gfx_buffer_update_start(root_bufferidx) {
 
    const len = gfx.length;
    for (let i = 0; i < len; i++) {
-      
+
       const vbidx = gfx[i].vbidx;
-      if(temp_accum[vbidx] === 0) {
-         
+      if (temp_accum[vbidx] === 0) {
+
          // EFFICIENCY: We should loop through all mesh idxs in gfx_buffer only if there is an accumulated value to be updated to
          for (let j = 0; j <= _gfx_buffer.buffer[vbidx].boundary; j++) {
 
             const mesh = _mesh_buffer.buffer[_gfx_buffer.buffer[vbidx].buffer[j]];
-            if(mesh && mesh.gfx.vb.start >= temp_start[vbidx]){
+            if (mesh && mesh.gfx.vb.start >= temp_start[vbidx]) {
 
                mesh.gfx.vb.start -= temp_accum[vbidx] * mesh.gfx.attribsPerVertex * mesh.gfx.vertsPerRect;
             }
          }
       }
-      
+
    }
 
    // TODO: Integrate these to the ??_gfx_buffers?? Because each element represents a vertex buffer.
@@ -360,8 +313,8 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
          // If batch-vb has 0 num_faces, set the batch-vb-meshidx to null.
          if (is_batch_vb_empty) {
 
-            _root_batch_buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = INT_NULL;
-            console.log('EMPTY root_batch:', _root_batch_buffer[root_bufferidx])
+            _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = INT_NULL;
+            console.log('EMPTY root_batch:', _root_batch_buffer.buffer[root_bufferidx])
          }
 
 
@@ -369,9 +322,9 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
           * Replace the meshidx of the batch-vb(which is the root mesh for the spesific batch-vb[]),
           * if it is the mesh to be removed, with any other available meshidx from the same batch-vb 
           */
-         
+
          // If the removed mesh happens to be root of any of the batch-vbs, we MUST replace it with the FIRST, same SID, mesh_bufferidx.
-         else if (_root_batch_buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx === mesh_bufferidx) {
+         else if (_root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx === mesh_bufferidx) {
 
             // Unfortunately we have no other option but to search the meshes through widget_root_buffer
 
@@ -379,17 +332,17 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
             let new_root_meshidx = INT_NULL;
             let min_start = 0xffff;
             for (let i = 0; i < len; i++) {
-               
+
                // for (let j = 0; j < _mesh_buffer.boundary; j++) {
                // }
-               
-               const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]]; // Get meshes through wigdet_root_buffer
-               if (mesh.mesh_bufferidx !== mesh_bufferidx && 
-                  mesh.batch_buffer_vbidx === batch_buffer_vbidx && 
-                  mesh.gfx.vb.start < min_start ) {
 
-                     min_start = mesh.gfx.vb.start;
-                     new_root_meshidx = mesh.mesh_bufferidx;
+               const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]]; // Get meshes through wigdet_root_buffer
+               if (mesh.mesh_bufferidx !== mesh_bufferidx &&
+                  mesh.batch_buffer_vbidx === batch_buffer_vbidx &&
+                  mesh.gfx.vb.start < min_start) {
+
+                  min_start = mesh.gfx.vb.start;
+                  new_root_meshidx = mesh.mesh_bufferidx;
                }
 
                // const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]]; // Get meshes through wigdet_root_buffer
@@ -402,12 +355,12 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
                //       min_start = mesh.gfx.vb.start;
                //       new_root_meshidx = mesh.mesh_bufferidx;
                //    // Set the first found mesh as the root of this batch-vb
-               //    // _root_batch_buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = mesh.mesh_bufferidx;
+               //    // _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = mesh.mesh_bufferidx;
                //    // break;
                // }
             }
 
-            _root_batch_buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = new_root_meshidx;
+            _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = new_root_meshidx;
          }
 
 
@@ -515,14 +468,25 @@ function Widget_root_is_widget_root(root_bufferidx, mesh_bufferidx) {
 
 
 export function Widget_root_batch_get(root_bufferidx) {
-   return _root_batch_buffer[root_bufferidx];
+   return _root_batch_buffer.buffer[root_bufferidx];
+}
+
+
+
+export function Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx) {
+
+   let roots = [];
+   for (let i = 0; i <= _root_batch_buffer.buffer[root_bufferidx].boundary; i++) {
+      roots[i] = _root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx;
+   }
+   return roots;
 }
 
 
 
 export function Widget_root_batch_remove_byidx(root_bufferidx) {
-   console.warn('widget root batch removing root batch by splice. IMPLEMENT correct: removing by .Removeidx()', _root_batch_buffer[root_bufferidx]);
-   _root_batch_buffer.splice(root_bufferidx, 1)
+   console.warn('widget root batch removing root batch by splice. IMPLEMENT correct: removing by .Removeidx()', _root_batch_buffer.buffer[root_bufferidx]);
+   _root_batch_buffer.RemoveByIdx(root_bufferidx);
 }
 
 
@@ -535,9 +499,10 @@ function Widget_root_batch_create_root(root_bufferidx, mesh_bufferidx) {
       vb: [], // To store the mesh_bufferidx of the first mesh of the batch, as well as the number of faces of all the meshes in one batch(1 face = 4 vertices)
    };
 
-   const idx = _root_batch_buffer.push(root_batch_vb);
+   // const idx = _root_batch_buffer.push(root_batch_vb);
+   const idx = _root_batch_buffer.Add(root_batch_vb);
 
-   if (root_bufferidx !== idx - 1) alert('Widget root batch buffer not the same with the Widget root buffer');
+   if (root_bufferidx !== idx) alert('Widget root batch buffer not the same with the Widget root buffer');
 }
 
 
@@ -546,7 +511,7 @@ export function Widget_root_batch_create_vb(root_bufferidx, mesh_bufferidx) {
 
    if (root_bufferidx === INT_NULL) return; // Case there is no widget root creation.
 
-   const root_batch = _root_batch_buffer[root_bufferidx];
+   const root_batch = _root_batch_buffer.buffer[root_bufferidx];
    const vb_dataidx = root_batch.vb.push({
       num_faces: 0,
       meshidx: mesh_bufferidx,
@@ -569,19 +534,19 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
 
       if (gfxidxs[i].progidx === progidx && gfxidxs[i].vbidx === vbidx) {
 
-         if (_root_batch_buffer[root_bufferidx].vb[i].meshidx === mesh_bufferidx && _root_batch_buffer[root_bufferidx].vb[i].num_faces > 0) {
+         if (_root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx === mesh_bufferidx && _root_batch_buffer.buffer[root_bufferidx].vb[i].num_faces > 0) {
 
          }
          else {
 
-            if (_root_batch_buffer[root_bufferidx].vb[i].meshidx === INT_NULL) {
-               _root_batch_buffer[root_bufferidx].vb[i].meshidx = mesh_bufferidx;
+            if (_root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx === INT_NULL) {
+               _root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx = mesh_bufferidx;
             }
 
-            _root_batch_buffer[root_bufferidx].vb[i].num_faces += num_faces;
+            _root_batch_buffer.buffer[root_bufferidx].vb[i].num_faces += num_faces;
             const mesh = _mesh_buffer.buffer[mesh_bufferidx];
 
-            // if(_root_batch_buffer[root_bufferidx].vb[i].meshidx === mesh.mesh_bufferidx)
+            // if(_root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx === mesh.mesh_bufferidx)
 
             mesh.batch_buffer_vbidx = i;
          }
@@ -609,7 +574,7 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
  */
 export function Widget_root_batch_reset_accumulator(root_bufferidx) {
 
-   const root_batch = _root_batch_buffer[root_bufferidx];
+   const root_batch = _root_batch_buffer.buffer[root_bufferidx];
 
    const len = root_batch.vb.length;
    for (let i = 0; i < len; i++) {
@@ -625,15 +590,16 @@ export function Widget_root_batch_reset_accumulator(root_bufferidx) {
 
 export function Widget_root_batch_update_increment_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces) {
 
-   _root_batch_buffer[root_bufferidx].vb[batch_buffer_vbidx].num_faces += num_faces;
+   _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].num_faces += num_faces;
 }
 
 
 
 export function Widget_root_batch_update_decrement_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces) {
 
-   const batch_vb = _root_batch_buffer[root_bufferidx].vb[batch_buffer_vbidx];
-
+   if (root_bufferidx === INT_NULL)
+      alert()
+   const batch_vb = _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx];
    if (batch_vb === _ || !batch_vb)
       console.error('batch_vb NULL', 'root_bufferidx', root_bufferidx, 'batch_buffer_vbidx', batch_buffer_vbidx, '_root_batch_buffer', _root_batch_buffer)
 
@@ -820,11 +786,11 @@ export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
       _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1] += y;
    }
 
-   const len = _root_batch_buffer[root_bufferidx].vb.length
+   const len = _root_batch_buffer.buffer[root_bufferidx].vb.length
    for (let i = 0; i < len; i++) {
 
       // Get the batch's root mesh for each vb gfx buffers
-      const mesh = _mesh_buffer.buffer[_root_batch_buffer[root_bufferidx].vb[i].meshidx];
+      const mesh = _mesh_buffer.buffer[_root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx];
 
       if (mesh) {
 
@@ -839,7 +805,7 @@ export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
          Batch_store(mesh,
             SHADER_ATTRIBUTES.WPOS4,
             update_data,
-            _root_batch_buffer[root_bufferidx].vb[i].num_faces);
+            _root_batch_buffer.buffer[root_bufferidx].vb[i].num_faces);
       }
 
    }
@@ -1119,12 +1085,12 @@ export function Gfx_buffer_print() {
 
    console.log('size:', _gfx_buffer.size, 'boundary:', _gfx_buffer.boundary, 'count:', _gfx_buffer.active_count,);
    for (let i = 0; i <= _gfx_buffer.boundary; i++) {
-      
+
       if (_gfx_buffer.buffer[i]) {
-         
-         console.log('vb', i, 
-         '\n size:', _gfx_buffer.buffer[i].size, 'boundary:', _gfx_buffer.buffer[i].boundary, 'count:', _gfx_buffer.buffer[i].active_count,
-         '\n ', _gfx_buffer.buffer[i].buffer);
+
+         console.log('vb', i,
+            '\n size:', _gfx_buffer.buffer[i].size, 'boundary:', _gfx_buffer.buffer[i].boundary, 'count:', _gfx_buffer.buffer[i].active_count,
+            '\n ', _gfx_buffer.buffer[i].buffer);
       }
       else console.log(i, 'NULL')
    }
@@ -1136,12 +1102,12 @@ export function Gfx_buffer_print_loop() {
 
    console.log('size:', _gfx_buffer.size, 'boundary:', _gfx_buffer.boundary, 'count:', _gfx_buffer.active_count,);
    for (let i = 0; i <= _gfx_buffer.boundary; i++) {
-      
+
       if (_gfx_buffer.buffer[i]) {
 
-         console.log('vb', i, );
+         console.log('vb', i,);
          for (let j = 0; j <= _gfx_buffer.buffer[i].boundary; j++) {
-            
+
             const mesh = _mesh_buffer.buffer[_gfx_buffer.buffer[i].buffer[j]];
             console.log(j,
                ' mbidx:', mesh.mesh_bufferidx,
@@ -1176,6 +1142,7 @@ export function Widgetroot_buffer_print_w1() {
             if (!mesh.gfx) {
                console.warn('   ', j,
                   'ridx:', _widget_root_buffer.buffer[i].buffer[j],
+                  'batchidx', mesh.batch_buffer_vbidx,
                   'gfxidx', mesh.gfx_bufferidx,
                   'msbidx', mesh.mesh_bufferidx,
                   'state', mesh.state.mask,
@@ -1184,6 +1151,7 @@ export function Widgetroot_buffer_print_w1() {
             else {
                console.log('   ', j,
                   'ridx:', _widget_root_buffer.buffer[i].buffer[j],
+                  'batchidx', mesh.batch_buffer_vbidx,
                   'gfxidx', mesh.gfx_bufferidx,
                   'msbidx', mesh.mesh_bufferidx,
                   'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.idx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
@@ -1242,17 +1210,16 @@ export function Widgetroot_gfx_print_w3() {
 // Print the widget batch buffer
 export function Widget_root_batch_print_w4() {
 
-   const len = _root_batch_buffer.length;
-   for (let i = 0; i < len; i++) {
+   for (let i = 0; i <= _root_batch_buffer.boundary; i++) {
 
-      if (!_root_batch_buffer[i]) { console.log('EMPTY'); return };
+      if (!_root_batch_buffer.buffer[i]) { console.log('EMPTY'); return };
 
-      const mesh = Mesh_buffer_get_mesh_byidx(_root_batch_buffer[i].meshidx)
-      console.log('mesh_bufferidx:', _root_batch_buffer[i].meshidx, 'root_bufferidx:', _root_batch_buffer[i].rootidx, 'mesh name', mesh.GetName())
-      for (let j = 0; j < _root_batch_buffer[i].vb.length; j++) {
+      const mesh = Mesh_buffer_get_mesh_byidx(_root_batch_buffer.buffer[i].meshidx)
+      console.log('mesh_bufferidx:', _root_batch_buffer.buffer[i].meshidx, 'root_bufferidx:', _root_batch_buffer.buffer[i].rootidx, 'mesh name', mesh.GetName())
+      for (let j = 0; j < _root_batch_buffer.buffer[i].vb.length; j++) {
          console.log('  vb:', j,
-            'num_faces:', _root_batch_buffer[i].vb[j].num_faces,
-            'meshidx:', _root_batch_buffer[i].vb[j].meshidx,
+            'num_faces:', _root_batch_buffer.buffer[i].vb[j].num_faces,
+            'meshidx:', _root_batch_buffer.buffer[i].vb[j].meshidx,
          );
       }
    }
@@ -1308,16 +1275,18 @@ export function Widget_group_buffer_print_w5() {
 function TEMP(params) {
 
    const destroy_btn = params.target_mesh;
-   const s = params.params;
-   s.Destroy();
+   const scroller_section = params.params;
+
+   View_destroy_view(scroller_section.group_bufferidxs);
+   scroller_section.Destroy();
 
    const _params = {
-       notification_type: NOTIFICATION_TYPE_IDX.MESH_BUFFER,
-       parent_section: s.parent,
+      notification_type: NOTIFICATION_TYPE_IDX.MESH_BUFFER,
+      parent_section: scroller_section.parent,
    }
 
-   
-  Debug_ui_create_notification(Debug_info_update_clbk, _params);
+
+   Debug_ui_create_notification(Debug_info_update_clbk, _params);
 }
 
 
@@ -1327,10 +1296,14 @@ export function Mesh_buffer_create_text_info() {
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
 
    const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), 'Mesh Buffer Info ORANGE');
+   // s.type |= MESH_TYPE.DEBUG_MESH;
+   s.SetTypeDebug();
 
    const destroy = Create_widget_button(_, 'Recalc', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
    destroy.Bind(TEMP, _, s);
+   destroy.SetTypeDebug();
    s.AddItem(destroy);
+   // s.sid.gfx_group |= GFX_GROUPS.DEBUG.MASK;
 
 
    const margin = [4, 4];
@@ -1338,107 +1311,103 @@ export function Mesh_buffer_create_text_info() {
 
    const _0 = Create_widget_dropdown(_, 'Mesh Buffer', [100, 100, 0], col_dp, col_menu, _, _, _, _, style, margin);
    _0.CreateClickEvent();
-   Dropdown_roots_set_root(_0, _0)
+   Dropdown_roots_set_root(_0, _0);
+   _0.SetTypeDebug();
    s.AddItem(_0)
    _0.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-   
+
    const mb = _mesh_buffer;
    const mesh_buffer_info = Create_widget_text(_, `count:${mb.active_count} size:${mb.size}`);
+   mesh_buffer_info.SetTypeDebug();
    _0.AddToMenu(mesh_buffer_info);
-   
+
    const len = mb.boundary; // Avoid infinite loop
    for (let i = 0; i <= len; i++) {
-       
+
       const m = mb.buffer[i];
+      if(!m)
+      console.log()
 
-      const _1 = Create_widget_dropdown(_, `[${m.mesh_bufferidx}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-      _1.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-      _1.CreateClickEvent();
-      _0.AddToMenu(_1)
+      if(m && (m.type & MESH_TYPE.DEBUG_MESH)===0){ // Insert meshes that are only belong to DEFAULT grouping
+         console.log(m.GetName(), m.mesh_bufferidx)
+         const _1 = Create_widget_dropdown(_, `[${m.mesh_bufferidx}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
 
-      { // Name info
-         const info = Create_widget_text(_, `name:{${m.GetName()}}`);
-         _1.AddToMenu(info);
+         _1.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+         _1.CreateClickEvent();
+         _1.SetTypeDebug();
+         _0.AddToMenu(_1);
+   
+         { // Name info
+            const info = Create_widget_text(_, `name:{${m.GetName()}}`);
+            info.SetTypeDebug();
+            _1.AddToMenu(info);
+         }
+   
+         { // Views indexes info
+            const view = Create_widget_dropdown(_, `view`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+            view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+            view.CreateClickEvent();
+            view.SetTypeDebug();
+            _1.AddToMenu(view)
+            { const info = Create_widget_text(_, `gfx:${m.gfx_bufferidx}`);         info.SetTypeDebug(); view.AddToMenu(info); }
+            { const info = Create_widget_text(_, `root:${m.root_bufferidx}`);       info.SetTypeDebug(); view.AddToMenu(info); }
+            { const info = Create_widget_text(_, `batch:${m.batch_buffer_vbidx}`);  info.SetTypeDebug(); view.AddToMenu(info); }
+            { const info = Create_widget_text(_, `group:${m.group_bufferidxs}`);    info.SetTypeDebug(); view.AddToMenu(info); }
+            { const info = Create_widget_text(_, `fbidx:${m.fbidx}`);               info.SetTypeDebug(); view.AddToMenu(info); }
+            { const info = Create_widget_text(_, `batch_fnidx:${m.batch_fnidx}`);   info.SetTypeDebug(); view.AddToMenu(info); }
+         }
+   
+         { // Geometry info
+            const view = Create_widget_dropdown(_, `geometry`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+            view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+            view.CreateClickEvent();
+            view.SetTypeDebug();
+            _1.AddToMenu(view)
+            { const info = Create_widget_text(_, `pos:${m.geom.pos[0]}, ${m.geom.pos[1]}, ${m.geom.pos[2]}`); info.SetTypeDebug(); view.AddToMenu(info); }
+            { const info = Create_widget_text(_, `dim:${m.geom.dim[0]}, ${m.geom.dim[1]}`); info.SetTypeDebug(); view.AddToMenu(info); }
+         }
+   
+   
+         // Gfx info
+         const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+         gfx.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+         gfx.CreateClickEvent();
+         gfx.SetTypeDebug(); 
+         _1.AddToMenu(gfx)
+         if (m.gfx) {
+            { // Program
+               const info = Create_widget_text(_, `prog: {idx:${m.gfx.prog.idx} attribsidx:${m.gfx.prog.attribsidx} }`);
+               info.SetTypeDebug();
+               gfx.AddToMenu(info);
+            }
+            { // Vertex buffer
+               const info = Create_widget_text(_, `vb: { idx:${m.gfx.vb.idx} start:${m.gfx.vb.start} count:${m.gfx.vb.count} }`);
+               info.SetTypeDebug();
+               gfx.AddToMenu(info);
+            }
+            { // Index buffer
+               const info = Create_widget_text(_, `ib: { idx:${m.gfx.ib.idx} start:${m.gfx.ib.start} count:${m.gfx.ib.count} }`);
+               info.SetTypeDebug();
+               gfx.AddToMenu(info);
+            }
+            { // Texture
+               const info = Create_widget_text(_, `tb: { idx:${m.gfx.tb.idx} }`);
+               info.SetTypeDebug();
+               gfx.AddToMenu(info);
+            }
+         }
+         else {
+            { // Vertex buffer
+               const info = Create_widget_text(_, `NULL`); 
+               info.SetTypeDebug();
+               gfx.AddToMenu(info);
+            }
+         }
       }
 
-      { // Views indexes info
-         const view = Create_widget_dropdown(_, `view`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-         view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         view.CreateClickEvent();
-         _1.AddToMenu(view)
-         { const info = Create_widget_text(_, `gfx:${m.gfx_bufferidx}`); view.AddToMenu(info); }
-         { const info = Create_widget_text(_, `root:${m.root_bufferidx}`); view.AddToMenu(info); }
-         { const info = Create_widget_text(_, `batch:${m.batch_buffer_vbidx}`); view.AddToMenu(info); }
-         { const info = Create_widget_text(_, `group:${m.group_bufferidxs}`); view.AddToMenu(info); }
-         { const info = Create_widget_text(_, `fbidx:${m.fbidx}`); view.AddToMenu(info); }
-         { const info = Create_widget_text(_, `batch_fnidx:${m.batch_fnidx}`); view.AddToMenu(info); }
-      }
 
-      { // Geometry info
-         const view = Create_widget_dropdown(_, `geometry`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-         view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         view.CreateClickEvent();
-         _1.AddToMenu(view)
-         { const info = Create_widget_text(_, `pos:${m.geom.pos[0]}, ${m.geom.pos[1]}, ${m.geom.pos[2]}`); view.AddToMenu(info); }
-         { const info = Create_widget_text(_, `dim:${m.geom.dim[0]}, ${m.geom.dim[1]}`); view.AddToMenu(info); }
-      }
-
-
-      // Gfx info
-      const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-      gfx.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-      gfx.CreateClickEvent();
-      _1.AddToMenu(gfx)
-      if(m.gfx) {
-         { // Program
-            const info = Create_widget_text(_, `prog: {idx:${m.gfx.prog.idx} attribsidx:${m.gfx.prog.attribsidx} }`);
-            gfx.AddToMenu(info);
-         }
-         { // Vertex buffer
-            const info = Create_widget_text(_, `vb: { idx:${m.gfx.vb.idx} start:${m.gfx.vb.start} count:${m.gfx.vb.count} }`);
-            gfx.AddToMenu(info);
-         }
-         { // Index buffer
-            const info = Create_widget_text(_, `ib: { idx:${m.gfx.ib.idx} start:${m.gfx.ib.start} count:${m.gfx.ib.count} }`);
-            gfx.AddToMenu(info);
-         }
-         { // Texture
-            const info = Create_widget_text(_, `tb: { idx:${m.gfx.tb.idx} }`);
-            gfx.AddToMenu(info);
-         }
-      }
-      else{
-         { // Vertex buffer
-            const info = Create_widget_text(_, `NULL`);
-            gfx.AddToMenu(info);
-         }
-      }
-       
    }
 
-      
-   //  // Create scroller for the ui-mesh info widget
-   //  const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [0, 60]);
-   //  scroller.StateEnable(MESH_STATE.ACTIVE);
-   //  scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   //  scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //  // scroller.scrolled_section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL ;
-   //  scroller.scrolled_section.options =  SECTION.VERTICAL ;
- 
-   //  scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-   //  scroller.options = SECTION.VERTICAL | SECTION.INHERIT;
-   //  // s.Recalc();
-   //  scroller.Calc_no_gfx_update();
-   //  scroller.Render();
-   //  scroller.ConstructListeners();
- 
-
-   //  View_build_group_from_root_mesh(scroller.scrolled_section)
-
-   // return scroller;
-
-   // s.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT
-   s.Calc()
    return s;
 
 }

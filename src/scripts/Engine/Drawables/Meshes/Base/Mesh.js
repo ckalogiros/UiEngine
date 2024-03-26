@@ -45,6 +45,7 @@ export class Mesh {
     type;       // BitField: All different class types of this mesh. 
     state;      // BitField: Mesh state. 
     alignment;  // BitField: Control this mesh's children alignment.
+    UNAMED;     // BitField: 
 
 
     hover_margin; // Value: A margin to be set for hovering. // TODO: Abstract to a struct.
@@ -104,7 +105,7 @@ export class Mesh {
             attr: (this.geom.sid.attr | this.mat.sid.attr),
             unif: this.mat.sid.unif,
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
-            gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for dubug, so it uses specific gfx buffers for debug ui rendering.
+            gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
         };
 
 
@@ -117,6 +118,7 @@ export class Mesh {
         this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
         this.alignment = 0x0;
+        this.UNAMED = GFX_POOL_REQUESTS.ANY;
 
 
         this.gfx = null;
@@ -212,30 +214,30 @@ export class Mesh {
                     TimeIntervalsDestroyByIdx(intervalIdx);
                     this.timeIntervalsIdxBuffer.RemoveByIdx(i);
                 }
-                // else console.error('WRONG INDEX. @Mesh.js, Destroy().')
             }
         }
 
 
         /*************************************************************************************/
         // Remove from gfx buffers.
-        const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces);
-
-    
+        // Bacause of clipping we must check if current mesh exists in vertex buffer(rendered and not clipped)
+        if (this.state.mask & MESH_STATE.ACTIVE) {
+            Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces);
+            this.gfx.vb.start = INT_NULL;
+        }
+        
+        let shift_children = false; // A way to store and return if this was removed from paren's children so that the caller will reduce the i from the loop by 1.
+        // Remove from parent's children buffer
+        if (this.parent && this.parent !== NO_MESH_PARENT && this.idx !== INT_NULL) {
+            
+            shift_children = this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
+            if (this.state.mask & MESH_STATE.ACTIVE) console.log('-{1} Removing:', this.GetName(), 'idx:', this.idx, 'parent name', 'start', this.gfx.vb.start, this.parent.GetName())
+        }
+        else if (this.state.mask & MESH_STATE.ACTIVE) console.log('-{1-NO-PARENT} Removing:', 'start', this.gfx.vb.start, this.GetName(), 'idx:', this.idx)
+        
         /*************************************************************************************/
         // Remove from widget root buffer.
         Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
-        Gfx_buffer_update_start(this.root_bufferidx);
-
-
-        let shift_children = false;
-        // Remove from parent's children buffer
-        if (this.parent && this.parent !== NO_MESH_PARENT) {
-            
-            shift_children = this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
-            if(this.gfx.vb.idx === 3)console.log('-{1} Removing:', this.GetName(), 'idx:', this.idx, 'parent name', 'start', ret.start, this.parent.GetName())
-        }      
-        else if(this.gfx.vb.idx === 3 )console.log('-{1-NO-PARENT} Removing:', 'start', ret.start, this.GetName(), 'idx:', this.idx)
 
         return shift_children;
     }
@@ -302,7 +304,7 @@ export class Mesh {
             });
 
             this.state.mask |= (MESH_STATE.IS_HOVERABLE | MESH_STATE.IS_HOVER_COLORABLE);
-            
+
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
 
         }

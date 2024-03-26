@@ -405,7 +405,7 @@ export class ArrayBufferInterface {
 
          this.buffer[idx] = INT_NULL;
          this.active_count--;
-         const replaced = this.ShortReplaceWithLast(idx)
+         const replaced = this.ShortReplaceWithLast(idx);
 
          if (this.active_count <= INT_NULL) 
             alert('M_Buffer active_count <= -1');
@@ -416,6 +416,7 @@ export class ArrayBufferInterface {
    }
 
 
+   /**Returns -1 if there was no replacment(the removed element happens to be last) */
    ShortReplaceWithLast(removed_idx) {
 
       if(removed_idx !== this.boundary){
@@ -425,11 +426,15 @@ export class ArrayBufferInterface {
          this.buffer[removed_idx] = this.buffer[last];
          // REMOVE LAST
          this.buffer[last] = INT_NULL;
-      }
 
-      const replaced = this.boundary;
-      this.boundary--;
-      return replaced;
+         const replacer = this.boundary;
+         this.boundary--;
+         return replacer;
+      }
+      else{
+         this.boundary--;
+         return INT_NULL; // Shows that there was no element move
+      }
 
    }
 

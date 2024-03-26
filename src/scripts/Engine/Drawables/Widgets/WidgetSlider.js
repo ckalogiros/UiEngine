@@ -38,7 +38,7 @@ export class Widget_Slider extends Rect {
 
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
       const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, 'Slider', pos, fontSize, WHITE, .4);
-
+      name_text.sid.gfx_group = this.sid.gfx_group;
 
       /** Label area mesh */
       super(pos, dim, col);
@@ -67,6 +67,7 @@ export class Widget_Slider extends Rect {
       const barMetrics = this.#CalculateBarArea(barpos, dim, pad)
 
       const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, GREY[3]);
+      bar.sid.gfx_group = this.sid.gfx_group;
 
       bar.type |= MESH_TYPE.WIDGET_SLIDER_BAR | bar.geom | bar.mat;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -80,8 +81,9 @@ export class Widget_Slider extends Rect {
       pad[1] = dim[1] / 10;
       const handleMetrics = this.#CalculateHandleArea(bar.geom.pos, dim, pad)
 
-      const handle = Create_rect_mesh(handleMetrics.pos, handleMetrics.dim, BLUE_10_120_220);
 
+      const handle = Create_rect_mesh(handleMetrics.pos, handleMetrics.dim, BLUE_10_120_220);
+      handle.sid.gfx_group = this.sid.gfx_group;
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([5, 35, 3]);
@@ -91,6 +93,7 @@ export class Widget_Slider extends Rect {
 
       // Create value_text
       const value_text = Create_widget_text(ROOT_WIDGET_FLAGS, '0000', pos, fontSize, WHITE, .4);
+      value_text.sid.gfx_group = this.sid.gfx_group;
       value_text.SetName(this.GetName() + ' - value_text');
 
 

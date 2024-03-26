@@ -42,10 +42,6 @@ export class Material {
       this.uvIdx  = INT_NULL;
       this.texidx = INT_NULL;
 
-      // this.col_id = INT_NULL;  
-      // this.uv_id = INT_NULL;   
-      // this.style_id = INT_NULL;
-      
 
       { // Debug
          /**Unique id*/if (DEBUG.MATERIAL) Object.defineProperty(this, 'id', { value: _materialId++ });

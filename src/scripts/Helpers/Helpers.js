@@ -1,5 +1,5 @@
 "use strict";
-import { COLOR_ARRAY, COLOR_ARRAY2 } from "../Engine/Drawables/Material/Base/Colors.js";
+import { COLOR_ARRAY, COLOR_ARRAY2, COLOR_ARRAY3 } from "../Engine/Drawables/Material/Base/Colors.js";
 import { MapLinear } from "./Math/MathOperations.js";
 
 
@@ -39,7 +39,9 @@ export function DimColor(col, dimAmt){
 
 
 export function GetRandomColor(){
-    return COLOR_ARRAY[GetRandomInt(0, COLOR_ARRAY.length)];
+    const i = GetRandomInt(1, COLOR_ARRAY3.length-3);
+    const j = GetRandomInt(1, COLOR_ARRAY3[i].length-3);
+    return COLOR_ARRAY3[i][j];
 }
 
 

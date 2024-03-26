@@ -319,7 +319,8 @@ const GFX_CTX_FLAGS = {
     // These are prioritized over all other above options.
     STATIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated rarely
     DYNAMIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated every frame
-    
+
+   
 };
 
 
@@ -331,14 +332,28 @@ const GFX_CTX_FLAGS = {
 
 _CNT = 0x1;
 const BUFFER_STATE = {
+
     SHOW: _CNT,
     NEEDS_UPDATE: _CNT <<= 0x1,
     IS_PRIVATE: _CNT <<= 0x1,
-    // show = false;
-    // needsUpdate = false;
-    // hasChanged = false;
-    // hasScissorBox = false;
-    // isPrivate = false; // SEE ## PRIVATE_BUFFERS
+    IS_ACTIVE: _CNT <<= 0x1,
+};
+
+
+
+
+
+
+
+
+_CNT = 0x1;
+const GFX_POOL_REQUESTS = {
+
+    ANY: _CNT,
+    // FIRST_SMALL: _CNT <<= 0x1,
+    // FIRST_LARGE: _CNT <<= 0x1,
+    SMALLEST: _CNT <<= 0x1,
+    LARGEST: _CNT <<= 0x1,
 };
 
 

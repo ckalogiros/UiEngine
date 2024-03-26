@@ -50,6 +50,12 @@ export class Text_Mesh extends Mesh {
 
       this.state.mask &= ~MASK;
    }
+      
+
+   SetTypeDebug(){
+      this.type |= MESH_TYPE.DEBUG_MESH;
+   }
+   
 
    AddToGfxBuffer() { 
       this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
@@ -179,6 +185,9 @@ export class Text_Mesh extends Mesh {
       }
 
       this.is_gfx_inserted = true;
+      
+      // Add entry to Gfx Buffer
+      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
    }
 
@@ -345,6 +354,14 @@ export class Text_Mesh extends Mesh {
       Vertex_buffer_state_enable(gfx_copy.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
    }
 
+   // ClipText(clip_val) {
+
+   //    let text = this.text; // Takes arithmetic values or just a char.
+
+
+
+   // }
+
 
    /** Update a specific character in text char array */
    UpdateTextCharacter(_text, idx) {
@@ -472,12 +489,6 @@ export class Text_Mesh extends Mesh {
    }
 
 
-   ClipyCheck_A(clip_top, clip_bottom) {
-
-      if (this.GetTop_A() > clip_bottom || this.GetBottom_A() < clip_top)
-         return true;
-      return false
-   }
 
 
 }

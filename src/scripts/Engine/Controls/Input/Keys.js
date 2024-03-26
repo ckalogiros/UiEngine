@@ -17,7 +17,7 @@ import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/VertexAr
 import { Gl_program_print } from "../../../Graphics/ShaderPrograms.js";
 import { Shader_attributes_print } from "../../../Graphics/ShaderAttributes.js";
 import { Gfx_pool_print } from "../../Interfaces/Gfx/GfxPool.js";
-import { View_buffer_print } from "../../Core/MeshBufferViews.js";
+import { View_buffer_print, View_buffer_print_loop } from "../../Core/MeshBufferViews.js";
 
 _CNT = 0;
 const em = _CNT++;
@@ -61,6 +61,7 @@ const gw = _CNT++;
 const g1 = _CNT++;
 const g2 = _CNT++;
 const g5 = _CNT++;
+const g6 = _CNT++;
 const p1 = _CNT++;
 
 export const DEBUG_PRINT_KEYS = [
@@ -397,6 +398,14 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
+      key: 'g6',
+      discr: 'View_buffer_print_loop',
+      func: (e)=>{
+         console.log('------------------ View_buffer_print_loop ------------------');
+         View_buffer_print_loop()
+      },
+   },
+   {
       key: 'p1',
       discr: 'Gl_program_print',
       func: (e)=>{
@@ -502,6 +511,7 @@ export function OnKeyUp(e){
          else if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[g1].func(e);  
          else if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[g2].func(e);  
          else if       (_keys_buffer[len].key === '5') DEBUG_PRINT_KEYS[g5].func(e);  
+         else if       (_keys_buffer[len].key === '6') DEBUG_PRINT_KEYS[g6].func(e);  
       }
       else if  (_keys_buffer[0].key === 'p') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[p1].func(e);  

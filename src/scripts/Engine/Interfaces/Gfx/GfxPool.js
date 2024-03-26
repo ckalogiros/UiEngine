@@ -1,6 +1,7 @@
 "use strict";
 
-import { Vertex_buffer_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Index_buffer_info_get } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_remove_geometry } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Progarm_get_program } from "../../../Graphics/ShaderPrograms.js";
 
@@ -41,10 +42,8 @@ export function Gfx_pool_remove_geometry(gfx, num_faces, start_index) {
 
    const ret = Gl_remove_geometry(gfx, num_faces, start_index);
    if (ret.empty) { // If the vertex buffer is empty, then set it as not active, so it can be used by other gfx demands.
-alert('IMPLEMENT ME. GfxPool.js\nGfx_pool_remove_geometry()')
+      alert('IMPLEMENT ME. GfxPool.js\nGfx_pool_remove_geometry()')
       // _gfx_pool.buffer[gfx.prog.groupidx].buffer[gfx.prog.idx].buffer[gfx.vb.idx].inUse = false;
-
-
 
       // TODO: DONT FORGET TO UPDATE THE RENDERQUE OR SET AN UPDATE IF RENDERQUEUE CHNGED TO AVOID THE OVERHEAD    }
    }
@@ -52,6 +51,86 @@ alert('IMPLEMENT ME. GfxPool.js\nGfx_pool_remove_geometry()')
 }
 
 
+
+export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags) {
+
+   const vb_buffer = Vertex_buffer_info_get();
+
+   // Return first buffer match
+   if(pool_request_flags & GFX_POOL_REQUESTS.ANY){ 
+
+      for (let i = 0; i <= vb_buffer.boundary; i++) {
+   
+         if((vb_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
+            
+            const vb_sid = vb_buffer.buffer[i].sid;
+            if(SID.CheckSidMatch(sid, vb_sid)){
+   
+               vb_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
+               return i;
+            }
+         }
+      }
+   }
+
+   else{ // Else search from conditions. Searches through all buffers
+
+      let found = INT_NULL;
+      let size = INT_NULL;
+
+      for (let i = 0; i <= vb_buffer.boundary; i++) {
+   
+         if((vb_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
+            
+            const vb_sid = vb_buffer.buffer[i].sid;
+            if(SID.CheckSidMatch(sid, vb_sid)){
+   
+               
+               if(size === INT_NULL){ // Case first match
+                  size = vb_buffer.buffer[i].size;
+                  found = i;
+               }
+               else if(pool_request_flags & GFX_POOL_REQUESTS.SMALLEST){ // Case: If smaller buffer match found, use that
+                  if(size > vb_buffer.buffer[i].size){
+                     found = i;
+                     console.log('GFX POOL found SMALLEST. vbidx:', found)
+                  }
+               }
+               else if(pool_request_flags & GFX_POOL_REQUESTS.LARGEST){  // Case: If larger buffer match found, use that
+                  if(size < vb_buffer.buffer[i].size){
+                     found = i;
+                     console.log('GFX POOL found LARGEST. vbidx:', found)
+                  }
+               }
+            }
+         }
+      }
+
+      if(found !== INT_NULL){
+         vb_buffer.buffer[found].state.mask |= BUFFER_STATE.IS_ACTIVE;
+         return found;
+      }
+   }
+
+
+   return INT_NULL;
+}
+
+
+
+export function Gfx_pool_find_ib_notActive() {
+
+   const ib_buffer = Index_buffer_info_get();
+   for (let i = 0; i <= ib_buffer.boundary; i++) {
+
+      if((ib_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
+
+         ib_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
+         return i;
+      }
+   }
+   return INT_NULL;
+}
 
 
 

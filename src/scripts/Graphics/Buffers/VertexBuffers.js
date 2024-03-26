@@ -155,6 +155,8 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, pr
     Shader_attributes_enable(attribsidx)
     // console.warn('Create Shader Attributes:')
 
+    vb_info.state.mask |= BUFFER_STATE.IS_ACTIVE;
+
     return vb_info;
 }
 
@@ -180,7 +182,7 @@ class Vertex_Buffer_Info {
 
         this.type = type; // The type of the typed array buffer
 
-        this.state = { mask: 0x0 }; // Gather the state of the vertex buffer info into a bit field
+        this.state = { mask: 0x0 }; // SEE: 'BUFFER_STATE'. Gather the state of the vertex buffer info into a bit field
         this.sid = sid;             // Bit field: Shader ID
     }
 
@@ -201,42 +203,6 @@ class Vertex_Buffer_Info {
 
         if (DEBUG.GFX.BUFFERS) console.warn('Resizing vertex buffer!')
         if (this.size > 35000) { console.error(this.size, '-------------------------'); }
-    }
-
-
-
-    Remove_geometry(gfx, num_faces, start_index) {
-
-
-        const vb_data = _vertex_buffers.buffer[gfx.vb.idx];
-
-        const removed_attribs = gfx.attribsPerVertex * gfx.vertsPerRect * num_faces;
-
-        const start = start_index;
-        const end = start + removed_attribs;
-
-
-        const remaining_attribs = this.count - end; // This is the length of the attributes to be shifted
-        // const copied_end = this.count - end; // This is the length of the attributes to be shifted
-        let k = end;
-
-
-        // Shift all attributes left to fil the gap of the removed attributes. 
-        for (let i = start; i < start + remaining_attribs; i++) {
-            vb_data[i] = vb_data[k++]
-        }
-
-        this.count -= removed_attribs;
-        const vCount = removed_attribs / gfx.attribsPerVertex;
-        this.vCount -= vCount;
-
-        if (this.count < 0)
-            console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb:', this.idx)
-
-        this.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-
-        return removed_attribs;
-
     }
 
 
@@ -462,15 +428,6 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index) {
     const end = start + removed_attribs;
 
 
-    const remaining_attribs = vb_info.count - end; // This is the length of the attributes to be shifted
-    // const copied_end = this.count - end; // This is the length of the attributes to be shifted
-    let k = end;
-
-
-    // // Shift all attributes left to fil the gap of the removed attributes. 
-    // for (let i = start; i < start + remaining_attribs; i++) {
-    //     vb_data[i] = vb_data[k++]
-    // }
     // Shift all attributes left to fil the gap of the removed attributes. 
     for (let i = end; i < vb_info.count; i++) {
         vb_data[start++] = vb_data[i]
@@ -483,7 +440,16 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index) {
     if (vb_info.count < 0)
         console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb:', vb_info.idx)
 
-    vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+    
+        
+    // POTENTIAL_BUG: If the buffer is empty MUST be updated!!!
+    // TODO: If The buffer is not used, by deactivating it below, then we need to update the render queue
+    // Set inactive 
+    if(vb_info.count === 0) 
+        vb_info.state.mask &= ~BUFFER_STATE.IS_ACTIVE
+    else vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+
+
 
     return removed_attribs;
 

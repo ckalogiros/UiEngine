@@ -8,25 +8,66 @@ import { View_get_view_byidx } from "../../Core/MeshBufferViews";
 
 
 
-/**
- * //TODOS
- * 
- * DONE! Implement correctly the clamp value as well as the threshold value
- * 
- * DONE! Where to store the first and last renderable meshes????
- * 
- * DONE! Who sets the clamp values for the scroller???
- * 
- * DONE! Fix the move of the scroller
- * 
- * DONE! Implement for more complex widgets. Needs recursion for children
- * DONE! Implement for more text 
- * 
- * Implement the move of the deactivated meshes once when they are active again 
- * 
- * What about none sroller meshes??? Do they need a different aproach???
- * 
- */
+
+
+
+export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_right=null) {
+
+   let changes_hapened = false;
+   // const limit = (clip_left && clip_right) ? { left: clip_left, dorightwn: clip_right, } : { left: TEST_CLIP_LEFT, right: TEST_CLIP_RIGHT, }
+   const limit = (clip_right) ? { left: clip_left, right: clip_right, } : { left: TEST_CLIP_LEFT, right: TEST_CLIP_RIGHT, }
+
+   const group = View_get_view_byidx(group_bufferidx);
+
+   for(let i=0; i<=group.vb.boundary; i++){
+   
+      const meshshes_idx = group.vb.buffer[i].data;
+      for(let j=0; j <= meshshes_idx.boundary; j++){
+         
+         const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+         const right   = mesh.geom.pos[0] + mesh.geom.dim[0];
+   
+         // We run for all meshes of the group so that on scoll every mesh is clipped
+         // Case for text meshes
+         if(mesh.type & MESH_TYPE.TEXT_MESH){
+
+            const r = mesh.geom.pos[0] + (mesh.geom.dim[0] * 2 * mesh.geom.num_faces) ;
+            if(r > limit.right){
+
+               // TEMPORARY: Clip text. Should use def_text for default text storage.
+               let pos = mesh.geom.pos[0];
+               let new_text = '';
+               for(let i=0; i<mesh.mat.text.length; i++){
+
+                  pos += mesh.geom.dim[0];
+                  if(pos >= limit.right - mesh.geom.dim[0]) break
+                  new_text += mesh.mat.text[i];
+               }
+
+               mesh.geom.num_faces = new_text.length;
+               mesh.mat.text = new_text;
+               
+               mesh.state.mask |= MESH_STATE.CLIPED_X;
+               changes_hapened = true;
+            }
+         }
+         else if(right > limit.right){
+   
+            const reduce = right - limit.right;
+            mesh.geom.dim[0] -= reduce/2;
+            mesh.geom.pos[0] -= reduce/2;
+            
+            mesh.state.mask |= MESH_STATE.CLIPED_X;
+            changes_hapened = true;
+         }
+      }
+   }
+
+
+   return changes_hapened;
+}
+
+
 
 
 export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
@@ -36,7 +77,7 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
 
    const group = View_get_view_byidx(group_bufferidx);
 
-   for(let i=0; i<=group.vb.boundary; i++){
+   for(let i=0; i <= group.vb.boundary; i++){
    
       const meshshes_idx = group.vb.buffer[i].data;
       for(let j=0; j<=meshshes_idx.boundary; j++){
@@ -48,6 +89,7 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
          if(bottom < limit.up || top > limit.down){
 
             if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
+            // if(mesh.state.mask & MESH_STATE.ACTIVE){
 
                mesh.state.mask &= ~MESH_STATE.ACTIVE;
                mesh.state.mask |= MESH_STATE.CLIPED_Y;
@@ -66,7 +108,7 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
             }
          }
       }
-      }
+   }
 
 
    return changes_hapened;
@@ -317,8 +359,6 @@ function Recurse_mesh_set_active(mesh, flag_activate) {
  * Returns the removed meshes buffer and the first-last
  *  mesh indexes for both the upper and lower chunks.
  */
-// export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top, clip_bottom) {
-//    , clip_top=null, clip_bottom=null) {
 export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top=null, clip_bottom=null) {
 
    if(!clip_top)

@@ -31,6 +31,7 @@ export class Rect extends Mesh {
       mesh.idx = this.children.Add(mesh);
 
       mesh.parent = this;
+
       return mesh.idx;
    }
 
@@ -88,6 +89,11 @@ export class Rect extends Mesh {
    }
 
 
+   SetTypeDebug(){
+      this.type |= MESH_TYPE.DEBUG_MESH;
+   }
+
+
 
 
    /*******************************************************************************************************************************************************/
@@ -140,6 +146,9 @@ export class Rect extends Mesh {
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
       if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.is_gfx_inserted = true;
+
+      // Add entry to Gfx Buffer
+      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }
@@ -282,11 +291,4 @@ export class Rect extends Mesh {
       }
    }
 
-
-   ClipyCheck_A(clip_top, clip_bottom){
-      
-      if(this.GetTop_A() > clip_bottom || this.GetBottom_A() < clip_top)
-         return true;
-      return false
-   }
 }

@@ -9,10 +9,10 @@ import { Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMa
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
 import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
-import { Clipy_from_group } from "../Operations/Clip.js";
+import { Clipx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { Section } from "../Meshes/Section.js";
 import { BLUEL, GREEN, GREY, PURPLER, REDL, WHITE } from "../Material/Base/Colors.js";
-import { View_add_to_group_from_root_mesh, View_get_view_vb_root_meshidx, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
+import { View_add_to_group, View_get_view_vb_root_meshidx, View_remove_from_group, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 
 /**
  * SEE: ### Widget_Dropdown
@@ -204,6 +204,15 @@ export class Widget_Dropdown extends Section {
    }
 
 
+   SetTypeDebug() {
+
+      this.type |= MESH_TYPE.DEBUG_MESH;
+      
+      this.children.buffer[0].SetTypeDebug();
+
+      this.menu.type |= MESH_TYPE.DEBUG_MESH;
+   }
+
 
 
    /*******************************************************************************************************************************************************/
@@ -300,7 +309,7 @@ export class Widget_Dropdown extends Section {
 
                // TODO. Do we genarate gfx for any other widget in the same gfx????  
                item.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-               console.error('TEMP ERROR PATH')
+               console.error('TEMP ERROR PATH:', item.GetName())
 
             }
 
@@ -314,12 +323,13 @@ export class Widget_Dropdown extends Section {
       const btn = this.children.buffer[0];
       btn.Destroy();
 
-      if (this.isOn & DP_MENU_STATE.ON) {
-         this.menu.Destroy();
-      }
-      else if (this.isOn & DP_MENU_STATE.OFF) {
-         this.DestroyDeactivetedMenu(this.menu);
-      }
+      this.menu.Destroy();
+      // if (this.isOn & DP_MENU_STATE.ON) {
+      //    this.menu.Destroy();
+      // }
+      // else if (this.isOn & DP_MENU_STATE.OFF) {
+      //    this.DestroyDeactivetedMenu(this.menu);
+      // }
 
       Dropdown_roots_destroy_byidx(this.rootidx);
 
@@ -330,83 +340,81 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   DestroyDeactivetedMenu(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy does not call for vertex buffer remove mesh attributes
+   // NOTE: The only reason we keep this function is because the menu items may not have a generated gfx, and the default Destroy uses .gfx
+   // DestroyDeactivetedMenu(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy does not call for vertex buffer remove mesh attributes
 
-      for (let i = 0; i <= mesh.children.boundary; i++) {
+   //    for (let i = 0; i <= mesh.children.boundary; i++) {
 
-         const child = mesh.children.buffer[i];
+   //       const child = mesh.children.buffer[i];
 
-         if (child.children) {
-            const shift_children = this.DestroyDeactivetedMenu(child);
-            if (shift_children) i--;
-         }
+   //       if (child.children) {
+   //          const shift_children = this.DestroyDeactivetedMenu(child);
+   //          if (shift_children) i--;
+   //       }
 
-      }
-
-
-      if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-         this.DestroyDeactivetedMenu(mesh.menu)
-      }
-
-      if (mesh.text_mesh) {
-
-         // this.DestroyNoGfxRemove(mesh.text_mesh);
-         const shift_children = this.DestroyNoGfxRemove(mesh.text_mesh);
-         if (shift_children) i--;
-      }
-
-      return this.DestroyNoGfxRemove(mesh);
-      // const shift_children = this.DestroyNoGfxRemove(mesh);
-      // if(shift_children) i--;
-   }
+   //    }
 
 
-   DestroyNoGfxRemove(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy doe not call for vertex buffer remove mesh attributes
+   //    if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+   //       this.DestroyDeactivetedMenu(mesh.menu)
+   //    }
 
-      /*************************************************************************************/
-      // Remove event listeners
-      mesh.RemoveAllListenEvents(); // BUG: The deactivated meshes SHOULD NOT HAVE any listen events, so removing them is buggy.
-      // The above is true if the listeners removal for all deactivated meshes IS IMPLEMENTED. CHECK IT!!!
-      // Another thing is what we do when we implement a FAKE listeners remove by -DEACTIVATING- the listeners?????
+   //    if (mesh.text_mesh) {
+
+   //       const shift_children = this.DestroyNoGfxRemove(mesh.text_mesh);
+   //       if (shift_children) i--;
+   //    }
+
+   //    return this.DestroyNoGfxRemove(mesh);
+   // }
 
 
-      /*************************************************************************************/
-      // Remove time intervals
-      if (mesh.timeIntervalsIdxBuffer.active_count) {
+   // DestroyNoGfxRemove(mesh) { // The deactivated meshes are not inside the vertex buffers, so this Destroy doe not call for vertex buffer remove mesh attributes
 
-         for (let i = 0; i <= mesh.timeIntervalsIdxBuffer.boundary; i++) {
+   //    /*************************************************************************************/
+   //    // Remove event listeners
+   //    mesh.RemoveAllListenEvents(); // BUG: The deactivated meshes SHOULD NOT HAVE any listen events, so removing them is buggy.
+   //    // The above is true if the listeners removal for all deactivated meshes IS IMPLEMENTED. CHECK IT!!!
+   //    // Another thing is what we do when we implement a FAKE listeners remove by -DEACTIVATING- the listeners?????
 
-            const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[i];
-            if (intervalIdx !== INT_NULL) {
-               TimeIntervalsDestroyByIdx(intervalIdx);
-               mesh.timeIntervalsIdxBuffer.RemoveByIdx(i);
-            }
-         }
-      }
+
+   //    /*************************************************************************************/
+   //    // Remove time intervals
+   //    if (mesh.timeIntervalsIdxBuffer.active_count) {
+
+   //       for (let i = 0; i <= mesh.timeIntervalsIdxBuffer.boundary; i++) {
+
+   //          const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[i];
+   //          if (intervalIdx !== INT_NULL) {
+   //             TimeIntervalsDestroyByIdx(intervalIdx);
+   //             mesh.timeIntervalsIdxBuffer.RemoveByIdx(i);
+   //          }
+   //       }
+   //    }
 
 
 
-      /*************************************************************************************/
-      // Remove from widget root buffer.
-      Mesh_buffer_remove_mesh_byidx(mesh.mesh_bufferidx);
-      // Gfx_buffer_update_start(this.root_bufferidx);
+   //    /*************************************************************************************/
+   //    // Remove from widget root buffer.
+   //    Mesh_buffer_remove_mesh_byidx(mesh.mesh_bufferidx);
+   //    // Gfx_buffer_update_start(this.root_bufferidx);
 
 
-      /*************************************************************************************/
-      // Remove from mesh from parent's children buffer.
-      let shift_children = false;
-      // Remove from parent's children buffer
-      if (mesh.idx > NO_MESH_PARENT && mesh.parent !== NO_MESH_PARENT) {
+   //    /*************************************************************************************/
+   //    // Remove from mesh from parent's children buffer.
+   //    let shift_children = false;
+   //    // Remove from parent's children buffer
+   //    if (mesh.idx > NO_MESH_PARENT && mesh.parent !== NO_MESH_PARENT) {
 
-         shift_children = mesh.parent.RemoveChildByIdx(mesh.idx); // Remove the current mesh from the parent
-         console.log('-{NO-GFX} Removing:', mesh.GetName(), 'idx:', mesh.idx, 'parent name', mesh.parent.GetName())
-      }
-      else console.log('-{NO-GFX-NO-PARENT} Removing:', mesh.GetName(), 'idx:', mesh.idx)
+   //       shift_children = mesh.parent.RemoveChildByIdx(mesh.idx); // Remove the current mesh from the parent
+   //       console.log('-{NO-GFX} Removing:', mesh.GetName(), 'idx:', mesh.idx, 'parent name', mesh.parent.GetName())
+   //    }
+   //    else console.log('-{NO-GFX-NO-PARENT} Removing:', mesh.GetName(), 'idx:', mesh.idx)
 
 
-      return shift_children;
+   //    return shift_children;
 
-   }
+   // }
 
 
    /*******************************************************************************************************************************************************/
@@ -712,12 +720,13 @@ export class Widget_Dropdown extends Section {
                }
             }
          }
-
+         
          if (menu.gfx && menu.is_gfx_inserted) {
-
+            
             menu.state.mask &= ~MESH_STATE.ACTIVE;
-
-            Gfx_buffer_remove_mesh_by_vbidx(menu.gfx.vb.idx, menu.gfx_bufferidx);
+            
+            // Gfx_buffer_remove_mesh_by_vbidx(menu.gfx.vb.idx, menu.gfx_bufferidx);
+            menu.RemoveFromGfxBuffer();
 
             // Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
             menu.is_gfx_inserted = false;
@@ -740,6 +749,11 @@ export class Widget_Dropdown extends Section {
       // Reset vertex buffers from group
       View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
 
+      // Remove menu and all its items from the group view
+      if (menu.group_bufferidxs[0] !== INT_NULL) {
+         View_remove_from_group(menu);
+      }
+
       this.DpDestroyListeners(menu, root);
       this.DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
@@ -750,6 +764,7 @@ export class Widget_Dropdown extends Section {
        */
       // Re-calculate dimensions and positions
       let clip_top = null, clip_bottom = null;
+      let clip_right = null;
       if (root.group_bufferidxs[0] !== INT_NULL) {
 
          // Get the group root mesh to Recalc position/dimentions 
@@ -762,6 +777,7 @@ export class Widget_Dropdown extends Section {
 
             clip_top = group_root_mesh.parent.geom.pos[1] - group_root_mesh.parent.geom.dim[1];
             clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1];
+            clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0];
          }
       }
       else {
@@ -770,6 +786,7 @@ export class Widget_Dropdown extends Section {
 
 
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0]);
 
    }
@@ -789,7 +806,7 @@ export class Widget_Dropdown extends Section {
 
       // Case its the first time this menu will be rendered
       if (menu.group_bufferidxs[0] === INT_NULL) {
-         View_add_to_group_from_root_mesh(menu, this.group_bufferidxs[0])
+         View_add_to_group(menu, this.group_bufferidxs[0])
       }
 
       // Activate menu's items, recursively
@@ -838,7 +855,7 @@ export class Widget_Dropdown extends Section {
       this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
       if (!menu.gfx) {
          // Case the menu is added  at runtime, must generate gfx context for the menu and its items
-         this.GenMenuGfxCtx_recursive(root, GFX_CTX_FLAGS.PRIVATE); // Create PRIVATE context to the root's gfx buffers.
+         this.GenMenuGfxCtx_recursive(root, GFX_CTX_FLAGS.PRIVATE | SECTION.FROM_PARENT_ASC); // Create PRIVATE context to the root's gfx buffers.
       }
 
       View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
@@ -855,6 +872,7 @@ export class Widget_Dropdown extends Section {
        */
       // Re-calculate dimensions and positions
       let clip_top = null, clip_bottom = null;
+      let clip_right = null;
       if (root.group_bufferidxs[0] !== INT_NULL) {
 
          // Get the group root mesh to Recalc position/dimentions 
@@ -867,14 +885,17 @@ export class Widget_Dropdown extends Section {
 
             clip_top = group_root_mesh.parent.geom.pos[1] - group_root_mesh.parent.geom.dim[1];
             clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1];
+            clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0];
          }
-
+         
       }
       else {
          root.Recalc_no_batch_render();
       }
-
+      
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
+
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0]);
 
    }

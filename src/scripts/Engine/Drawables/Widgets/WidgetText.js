@@ -272,7 +272,9 @@ export class Widget_Multi_Text extends Widget_Text {
 		for (let i = 0; i <= this.children.boundary; i++) {
 
 			if (this.children.buffer[i]) {
-				this.children.buffer[i].Destroy();
+				
+				const shift_children = this.children.buffer[i].Destroy();
+            if(shift_children) i--;
 			}
 		}
 

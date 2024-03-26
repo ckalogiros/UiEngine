@@ -67,8 +67,7 @@ export class Widget_Label extends Rect {
 
         // Must call super() before using the 'this', that is why we write the code here.
         text_mesh.SetSceneIdx(this.sceneidx);
-        // text_mesh.SetName(`[${this.mesh_bufferidx}]{${text}}-Text-mesh `);
-        text_mesh.sid.gfx_group = this.sid.gfx_group; // If the label is a debug ui, so must be the text. 
+
 
         this.mesh_bufferidx = mesh_bufferidx;
 
@@ -76,7 +75,7 @@ export class Widget_Label extends Rect {
         this.SetStyle(style);
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
         this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-        
+
         this.type |= MESH_TYPE.WIDGET_TEXT_LABEL | this.geom.type | this.mat.type;
         this.SetName(`[${this.mesh_bufferidx}]{${text}}-LABEL`);
         this.pad = pad;
@@ -119,21 +118,26 @@ export class Widget_Label extends Rect {
         this.state.mask &= ~MESH_STATE.ACTIVE;
         this.text_mesh.state.mask &= ~MESH_STATE.ACTIVE;
     }
-    
-    
+
+
     StateEnable(MASK = 0x0) {
-        
+
         this.state.mask |= MASK;
         this.text_mesh.state.mask |= MASK;
     }
-    
-    
+
+
     StateDisable(MASK = 0x0) {
-        
+
         this.state.mask &= ~MASK;
         this.text_mesh.state.mask &= ~MASK;
     }
 
+
+    SetTypeDebug() {
+        this.type |= MESH_TYPE.DEBUG_MESH;
+        this.text_mesh.type |= MESH_TYPE.DEBUG_MESH;
+    }
 
 
     /*******************************************************************************************************************************************************/
@@ -141,10 +145,10 @@ export class Widget_Label extends Rect {
     /*******************************************************************************************************************************************************/
 
     GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = null, text_gfx_specific = null) {
-        
+
         const rect_igfx = Generate_graphics_context(FLAGS, this, area_gfx_specific);
         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, rect_igfx.FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-        
+
         const text_igfx = Generate_graphics_context(FLAGS, this.text_mesh, text_gfx_specific);
         this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, text_igfx.FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
 
@@ -159,23 +163,23 @@ export class Widget_Label extends Rect {
 
     //         // const rect_igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
     //         // FLAGS |= rect_igfx.FLAGS;
-   
+
     //         // this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, rect_igfx.FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-            
+
     //         // const text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
     //         // FLAGS |= text_igfx.FLAGS;
-            
-            
+
+
     //         let rect_igfx = null;
     //         let text_igfx = null;
-            
+
     //         if(FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET){
-                
+
     //             rect_igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
     //             text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.sid);
     //         }
     //         // else if(FLAGS & GFX_CTX_FLAGS.FROM_GROUP){
-                
+
     //         //     rect_igfx = Find_gfx_match_widget_group_impl(this.root_bufferidx, this.sid);
     //         //     text_igfx = Find_gfx_match_widget_group_impl(this.text_mesh.root_bufferidx, this.sid);
     //         // }
@@ -187,10 +191,10 @@ export class Widget_Label extends Rect {
     //             console.error('NO CORRECT GenGfxCtx FLAG found, searching for vb index to store');
     //             alert('SEE console.error');
     //         }
-            
+
     //         FLAGS |= rect_igfx.FLAGS;
     //         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, rect_igfx.FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-            
+
     //         FLAGS |= text_igfx.FLAGS;
     //         this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, text_igfx.FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
     //     }
@@ -198,18 +202,18 @@ export class Widget_Label extends Rect {
 
     //         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, area_gfx_specific, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
 
-            
+
     //         if (!text_gfx_specific) {
 
-                
+
     //             let text_igfx = null;
-         
+
     //             if(FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET){
 
     //                 text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
     //             }
     //             // else if(FLAGS & GFX_CTX_FLAGS.FROM_GROUP){
-                    
+
     //             //     text_igfx = Find_gfx_match_widget_group_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
     //             // }
     //             else if(FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC){
@@ -221,7 +225,7 @@ export class Widget_Label extends Rect {
     //             }
     //             // const text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.sid);
     //             FLAGS |= text_igfx.FLAGS;
-       
+
     //             this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.uniforms);
     //         }
     //         else {
@@ -405,16 +409,16 @@ export class Widget_Label extends Rect {
             this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
 
         const update_data = {
-            sizes:[2],
-            data:[pos_dif[0], pos_dif[1]],
+            sizes: [2],
+            data: [pos_dif[0], pos_dif[1]],
         };
         Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data);
-        
+
         AddArr2(this.text_mesh.geom.pos, pos_dif);
         // AddArr2(this.text_mesh.geom.pos_dif, pos_dif);
-        
+
         // if (this.text_mesh.batch_fnidx === INT_NULL)
-            this.text_mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
+        this.text_mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
 
         Batch_store(this.text_mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
 
@@ -540,15 +544,15 @@ export class Widget_Label extends Rect {
     /*******************************************************************************************************************************************************/
 
 
-    AddToGfxBuffer() { 
-       this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
-       this.text_mesh.gfx_bufferidx = Gfx_buffer_store(this.text_mesh.gfx.vb.idx, this.text_mesh.mesh_bufferidx);
+    AddToGfxBuffer() {
+        this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+        this.text_mesh.gfx_bufferidx = Gfx_buffer_store(this.text_mesh.gfx.vb.idx, this.text_mesh.mesh_bufferidx);
     }
- 
- 
-    RemoveFromGfxBuffer() { 
-       Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
-       Gfx_buffer_remove_mesh_by_vbidx(this.text_mesh.gfx.vb.idx, this.text_mesh.gfx_bufferidx);
+
+
+    RemoveFromGfxBuffer() {
+        Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
+        Gfx_buffer_remove_mesh_by_vbidx(this.text_mesh.gfx.vb.idx, this.text_mesh.gfx_bufferidx);
     }
 
 
@@ -646,11 +650,11 @@ export class Widget_Label extends Rect {
             mesh.geom.pos[1] += -mouse_pos.y;
             mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
             const update_data = {
-                sizes:[2],
-                data:[mouse_pos.x, -mouse_pos.y],
+                sizes: [2],
+                data: [mouse_pos.x, -mouse_pos.y],
             };
             Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
-            
+
             text_mesh.geom.pos[0] += mouse_pos.x;
             text_mesh.geom.pos[1] += -mouse_pos.y;
             text_mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;

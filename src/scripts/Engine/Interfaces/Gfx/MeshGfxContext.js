@@ -1,15 +1,15 @@
 "use strict";
 
 
-import { Vertex_buffer_info_create, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_set_ibidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Index_buffer_get_by_vertex_buffer_index, Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { Gl_vertex_buffer_get_vao, Vertex_buffer_exists_from_index, Vertex_buffer_info_create, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_set_ibidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_store_vertex_buffer_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
-import { Gfx_buffer_create_vb, Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
+import { Gfx_buffer_create_vb, Mesh_buffer_get_mesh_byidx, Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from "../../../Graphics/Buffers/UniformBuffers.js";
-import { Debug_ui_set_notification, NOTIFICATION_TYPE_IDX } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
+import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private } from "./GfxPool.js";
 
 
 
@@ -303,13 +303,43 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
    let vbidx = spesific_gfx_idxs[1];
    let ibidx = INT_NULL;
 
-   let group_progidx = INT_NULL;
-   let group_vbidx = INT_NULL;
+   let vao = null;
+   let vaoidx = INT_NULL;
 
-   let vbfound = null;
 
-   if (vbidx !== INT_NULL) { // We have all we need to add to a specific vertex buffer
-      ibidx = Index_buffer_get_by_vertex_buffer_index(vbidx); // Get ibidx from vbidx (WORKS only in case index/vertex buffers are 1to1)
+   /**
+    * 1. if specific: check vb existance
+    *    If INDEXED, find ib
+    *       If NOT found, create ib
+    *    
+    * 2. ELSE if NOT specific
+    *    Check if program exists
+    *    Based on CONDITIONS 
+    *       a) find/create vertex buffer * if (INDEXED) find/create index buffer
+    * 
+    */
+
+   // If specific vertex buffer exists, we do not need to check if program exists. 
+   
+   if(Vertex_buffer_exists_from_index(vbidx)){
+
+      const VAO = Gl_vertex_buffer_get_vao(vbidx);
+      vao = VAO.vao;
+      vaoidx = VAO.vaoidx;
+
+      // ibidx = Index_buffer_get_by_vertex_buffer_index(vbidx); // Get ibidx from vbidx (WORKS only in case index/vertex buffers are 1to1)
+      if (sid.shad & SID.SHAD.INDEXED){
+
+         ibidx = Gfx_pool_find_ib_notActive(); // Get ibidx from vbidx (WORKS only in case index/vertex buffers are 1to1)
+
+         if(ibidx === INT_NULL){
+
+            const ib_info = Index_buffer_info_create(sid, vao, vaoidx, _);
+            ibidx = ib_info.ibidx;
+            Program_store_index_buffer_idx(progidx, ibidx); // Store the indexbuffer index to the programs ib array
+            Vertex_buffer_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
+         }
+      }
    }
    else {
 
@@ -333,30 +363,56 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
       // If the flag is set to ANY, find any apropriate vertex buffer
       if (FLAGS & GFX_CTX_FLAGS.ANY) {
          alert('IMPLEMENT ME.\nGfx_generate_context()')
+         // Gfx_pool_find_vb_active_and_notPrivate(sid);
       }
       else { // else create new vertex buffer
 
+         // HACK: Instead of passing another param to this function, we instead get the mesh by mesh_bufferidx to address the pool reqquest flags for the mesh.
+         const mesh = Mesh_buffer_get_mesh_byidx(mesh_bufferidx);
+         const pool_request_flags = mesh.UNAMED;
+
+         // First look a the gfx pool for any matching vertex buffer
+         vbidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags);
+
+
+         if(vbidx === INT_NULL){
+            
+            const vb_info = Vertex_buffer_info_create(sid, _, progidx);
+            vbidx = vb_info.vbidx;
+            vao = vb_info.vao;
+            vaoidx = vb_info.vaoidx;
+
+
+            Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE | BUFFER_STATE.SHOW);
+            if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidx);
+            
+            Program_store_vertex_buffer_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
+            
+            // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
+            Gfx_buffer_create_vb(vbidx);
+         }
+         else{
+            const VAO = Gl_vertex_buffer_get_vao(vbidx);
+            vao = VAO.vao;
+            vaoidx = VAO.vaoidx;
+         }
          
-         const vb_info = Vertex_buffer_info_create(sid, _, progidx);
-         vbidx = vb_info.vbidx;
-         Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE | BUFFER_STATE.SHOW);
-         if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidx);
-
-
-         // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
-         Gfx_buffer_create_vb(vbidx);
-       
          
-         Program_store_vertex_buffer_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
-
-                  
          
          if (sid.shad & SID.SHAD.INDEXED) {
-            var ib_info = Index_buffer_info_create(sid, vb_info.vao, vb_info.vaoidx, _);
-            ibidx = ib_info.ibidx;
-            Program_store_index_buffer_idx(progidx, ibidx); // Store the indexbuffer index to the programs ib array
-            Vertex_buffer_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
+            
+            ibidx = Gfx_pool_find_ib_notActive();
+   
+            if(ibidx === INT_NULL){
+
+               const ib_info = Index_buffer_info_create(sid, vao, vaoidx, _);
+               ibidx = ib_info.ibidx;
+               Program_store_index_buffer_idx(progidx, ibidx); // Store the indexbuffer index to the programs ib array
+               Vertex_buffer_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
+            }
+            
          }
+
 
          // Add the new vertexBuffer to the render queue
          Renderqueue_Add(progidx, vbidx, true);
@@ -373,6 +429,7 @@ export function Gfx_generate_context(sid, sceneidx, mesh_count, FLAGS, spesific_
 
    const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx, mesh_count);
    
+   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_ACTIVE); // For the case the 
 
    // Add mesh to the root batch buffer for batch update
    Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vbidx, mesh_count);
