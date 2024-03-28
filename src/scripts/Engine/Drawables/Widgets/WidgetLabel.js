@@ -14,7 +14,6 @@ import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js"
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
-import { Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
@@ -144,101 +143,13 @@ export class Widget_Label extends Rect {
     // Graphics
     /*******************************************************************************************************************************************************/
 
-    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = null, text_gfx_specific = null) {
+    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific=[INT_NULL, INT_NULL], text_gfx_specific=[INT_NULL, INT_NULL]) {
 
-        const rect_igfx = Generate_graphics_context(FLAGS, this, area_gfx_specific);
-        this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, rect_igfx.FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-
-        const text_igfx = Generate_graphics_context(FLAGS, this.text_mesh, text_gfx_specific);
-        this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, text_igfx.FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
-
+        this.gfx = Gfx_generate_context(FLAGS, this, area_gfx_specific);
+        this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_gfx_specific);
 
         return this.gfx;
     }
-    /**SAVE */
-    // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = null, text_gfx_specific = null) {
-
-
-    //     if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
-
-    //         // const rect_igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-    //         // FLAGS |= rect_igfx.FLAGS;
-
-    //         // this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, rect_igfx.FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-
-    //         // const text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
-    //         // FLAGS |= text_igfx.FLAGS;
-
-
-    //         let rect_igfx = null;
-    //         let text_igfx = null;
-
-    //         if(FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET){
-
-    //             rect_igfx = Find_gfx_match_widget_root_impl(this.root_bufferidx, this.sid);
-    //             text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.sid);
-    //         }
-    //         // else if(FLAGS & GFX_CTX_FLAGS.FROM_GROUP){
-
-    //         //     rect_igfx = Find_gfx_match_widget_group_impl(this.root_bufferidx, this.sid);
-    //         //     text_igfx = Find_gfx_match_widget_group_impl(this.text_mesh.root_bufferidx, this.sid);
-    //         // }
-    //         else if(FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC){
-    //             rect_igfx = Find_match_gfx_from_parent_ascending(this, this.parent);
-    //             text_igfx = Find_match_gfx_from_parent_ascending_search_all(this.text_mesh, this.parent);
-    //         }
-    //         else{
-    //             console.error('NO CORRECT GenGfxCtx FLAG found, searching for vb index to store');
-    //             alert('SEE console.error');
-    //         }
-
-    //         FLAGS |= rect_igfx.FLAGS;
-    //         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, rect_igfx.FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-
-    //         FLAGS |= text_igfx.FLAGS;
-    //         this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, text_igfx.FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
-    //     }
-    //     else if(FLAGS & GFX_CTX_FLAGS.SPECIFIC){
-
-    //         this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, area_gfx_specific, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-
-
-    //         if (!text_gfx_specific) {
-
-
-    //             let text_igfx = null;
-
-    //             if(FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET){
-
-    //                 text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
-    //             }
-    //             // else if(FLAGS & GFX_CTX_FLAGS.FROM_GROUP){
-
-    //             //     text_igfx = Find_gfx_match_widget_group_impl(this.text_mesh.root_bufferidx, this.text_mesh.sid);
-    //             // }
-    //             else if(FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC){
-    //                 text_igfx = Find_match_gfx_from_parent_ascending(this.text_mesh, this.parent);
-    //             }
-    //             else{
-    //                 console.error('NO CORRECT GenGfxCtx FLAG found, searching for vb index to store');
-    //                 alert('SEE console.error');
-    //             }
-    //             // const text_igfx = Find_gfx_match_widget_root_impl(this.text_mesh.root_bufferidx, this.sid);
-    //             FLAGS |= text_igfx.FLAGS;
-
-    //             this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.uniforms);
-    //         }
-    //         else {
-    //             this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS, text_gfx_specific, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx, this.text_mesh.uniforms);
-    //         }
-    //     }
-    //     else{
-    //         console.error('NO CORRECT FLAGS passed in GenGfxCtx');
-    //         alert('NO CORRECT FLAGS passed in GenGfxCtx.\nSEEE console.error');
-    //     }
-
-    //     return this.gfx;
-    // }
 
 
     Render() {
@@ -636,7 +547,7 @@ export class Widget_Label extends Rect {
 
             const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
             TimeIntervalsDestroyByIdx(intervalIdx);
-            mesh.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.MOVE);
+            mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
             return;
         }

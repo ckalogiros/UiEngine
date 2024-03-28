@@ -45,7 +45,7 @@ export function Gfx_pool_remove_geometry(gfx, num_faces, start_index) {
       alert('IMPLEMENT ME. GfxPool.js\nGfx_pool_remove_geometry()')
       // _gfx_pool.buffer[gfx.prog.groupidx].buffer[gfx.prog.idx].buffer[gfx.vb.idx].inUse = false;
 
-      // TODO: DONT FORGET TO UPDATE THE RENDERQUE OR SET AN UPDATE IF RENDERQUEUE CHNGED TO AVOID THE OVERHEAD    }
+      // TODO: DONT FORGET TO UPDATE THE RENDERQUE OR SET AN UPDATE IF RENDERQUEUE CHANGED TO AVOID THE OVERHEAD    }
    }
    return ret;
 }
@@ -118,12 +118,12 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags) 
 
 
 
-export function Gfx_pool_find_ib_notActive() {
+export function Gfx_pool_find_ib_notActive(PATTERN) {
 
    const ib_buffer = Index_buffer_info_get();
    for (let i = 0; i <= ib_buffer.boundary; i++) {
 
-      if((ib_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
+      if(ib_buffer.buffer[i].temp_pattern & PATTERN){
 
          ib_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
          return i;

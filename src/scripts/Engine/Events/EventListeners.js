@@ -68,6 +68,8 @@ import { GREY } from "../Drawables/Material/Base/Colors.js";
       // }
  */
 
+
+// TODO: Maybe the source_params and target params are just mesh_bufferidxs
 export class Event_Listener {
 
    event_type;
@@ -87,6 +89,7 @@ export class Event_Listener {
       }
 
       const event_params = {
+         /**DEBUG */name: (source_params) ? source_params.GetName() : 'NO SOURCE PARAMS',
          type: TYPE_IDX,
          Clbk: Clbk,
          evt_idx: INT_NULL,
@@ -116,6 +119,7 @@ export class Event_Listener {
       }
 
       const event_params = {
+         /**DEBUG */name: (source_params) ? source_params.GetName() : 'NO SOURCE PARAMS',
          type: TYPE_IDX,
          Clbk: Clbk,
          evt_idx: INT_NULL,
@@ -403,12 +407,14 @@ export function Listener_create_child_event(TYPE_IDX, parent_event, Clbk = null,
 
 
 
+// CAUTION!: If the event is a child event, then its index is an invalid index, because its the index to the parents children buffer and not to the '_listener.event_type[TYPE_IDX].buffer[evt_idx]'
 export function Listener_remove_event_by_idx(TYPE_IDX, evt) {
 
    // Handle the InfoUi for the eventListeners 
    Listeners_debug_info_remove(_listener.event_type[TYPE_IDX].buffer[evt.evt_idx], evt)
 
    _listener.event_type[TYPE_IDX].RemoveByIdx(evt.evt_idx);
+
    if (_listener.event_type[TYPE_IDX].active_count === 0)
       LISTENERS_FLAGS[TYPE_IDX] = false;
 
@@ -416,20 +422,30 @@ export function Listener_remove_event_by_idx(TYPE_IDX, evt) {
 
 
 
-export function Listener_remove_children_event_by_idx(TYPE_IDX, evt) {
+export function Listener_remove_child_event_from_parent(TYPE_IDX, evt) {
 
    // Handle the InfoUi for the eventListeners 
    Listeners_debug_info_remove(_listener.event_type[TYPE_IDX].buffer[evt.evt_idx], evt)
 
-   /**
-    * Remove child events requires the parent to remove the child event from 
-    */
+   // Remove child events requires the parent to remove the child event from 
    evt.parent_evt.children.RemoveByIdx(evt.evt_idx);
 
    if (_listener.event_type[TYPE_IDX].active_count === 0)
       LISTENERS_FLAGS[TYPE_IDX] = false;
 }
 
+
+
+export function Listener_destroy_children_buffer(TYPE_IDX, event_idx) {
+   _listener.event_type[TYPE_IDX].buffer[event_idx].children = null;
+}
+
+
+
+export function Listener_recover_children_buffer(TYPE_IDX, event_idx, children_buffer) {
+   _listener.event_type[TYPE_IDX].buffer[event_idx].children = children_buffer;
+   _listener.event_type[TYPE_IDX].buffer[event_idx].has_child_events = true;
+}
 
 
 export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
@@ -468,19 +484,6 @@ export function Listener_events_set_mesh_events_active(FLAGS, mesh_listeners, bo
          _listener.event_type[click_type_idx].buffer[mesh_listeners.buffer[click_type_idx].idx].isActive = bool_activate;
       }
    }
-}
-
-
-
-export function Listener_reset_children_buffer(TYPE_IDX, event_idx) {
-   _listener.event_type[TYPE_IDX].buffer[event_idx].children = null;
-}
-
-
-
-export function Listener_recover_children_buffer(TYPE_IDX, event_idx, children_buffer) {
-   _listener.event_type[TYPE_IDX].buffer[event_idx].children = children_buffer;
-   _listener.event_type[TYPE_IDX].buffer[event_idx].has_child_events = true;
 }
 
 
@@ -569,15 +572,13 @@ function Listener_debug_print_info_recursive(children, count) {
 
       if (e) {
 
-         let r = ' ';
+         let r = '  ';
 
-         for (let j = 0; j < count; j++) r += '->';
+         for (let j = 0; j < count; j++) { r += '->';}
 
          const is_child_event = (e.source_params.listeners.buffer[1]) ? e.source_params.listeners.buffer[1].is_child_event : false;
          const parentEvent = e.parent_event ? e.parent_event.GetName() : 'NULL'
-         const msg = `  ${r} ${i} name:${e.source_params.GetName()}|haschildren:${e.has_child_events}|is_child_event:${is_child_event}|evt_idx:${e.evt_idx}|parentEvent:${parentEvent}`;
-
-         console.log(msg);
+         console.log(`${r} :(${e.source_params.GetName()})-(has children:${e.has_child_events})-(is child:${is_child_event})-(evtidx:${e.evt_idx})-(parent:${parentEvent})`);
          total_count++;
 
          if (e.children) {

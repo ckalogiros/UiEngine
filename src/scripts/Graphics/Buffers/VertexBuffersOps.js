@@ -8,7 +8,7 @@ import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx, Vertex_buf
 
 
 /**************************************************************************************************************************************/
-// Apropriate Function Selector
+// Function Selector
 /**************************************************************************************************************************************/
 
 
@@ -245,7 +245,6 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
 export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
 
    const vb = Vertex_buffer_info_get_by_vbidx(gfx.vb.idx);
-   const ib = Index_buffer_info_get_by_ibidx(gfx.ib.idx);
 
    const start = (start_index) ? start_index : gfx.vb.start;
 
@@ -257,15 +256,7 @@ export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
        empty: false, // Is the buffer is empty?
    };
 
-   // if(DEBUG.GFX.REMOVE_MESH) console.log('idx:', gfx.prog.idx, gfx.vb.idx, 'vb count:', vb.count, ' attributes from start:', gfx.vb.start, ' to:', gfx.vb.start+gfx.vb.count*num_faces)
-   // ret.counts[0] = vb.Remove_geometry(gfx, num_faces, start);
    ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start);
-   ret.counts[1] = ib.Remove_geometry(num_faces); // It doe not matter from where we remove indexes, as long as the vertices per face are same. 
-
-   // vb.in
-   // if (vb.count <= 0) ret.empty = true;
-
-   // if (ret.empty) vb.Reset();
 
 
    return ret;
@@ -288,9 +279,8 @@ export function Gl_remove_geometry_params(vbidx, num_faces = 1, start_index = 0,
        empty: false, // Is the buffer is empty?
    };
 
-   // if(DEBUG.GFX.REMOVE_MESH) console.log('idx:', gfx.prog.idx, gfx.vb.idx, 'vb count:', vb.count, ' attributes from start:', gfx.vb.start, ' to:', gfx.vb.start+gfx.vb.count*num_faces)
    ret.counts[0] = vb.Remove_geometry_params(num_faces, start, attribsPerVertex, verticesPerRect);
-   ret.counts[1] = ib.Remove_geometry(num_faces); // It doe not matter from where we remove indexes, as long as the vertices per face are same. 
+   // ret.counts[1] = ib.Remove_geometry(num_faces); // It doe not matter from where we remove indexes, as long as the vertices per face are same. 
 
    if (vb.count <= 0) ret.empty = true;
 

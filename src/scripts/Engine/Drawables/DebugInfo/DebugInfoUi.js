@@ -11,8 +11,9 @@ import { Dbg_ui_create } from "./DebugInfoUiFactory";
 import { Program_create_text_info, Program_get_programs } from "../../../Graphics/ShaderPrograms.js";
 import { BLUEL, GREEN, GREY, ORANGE_240_160_10, PURPLEB, PURPLER, REDL, WHITE, YELLOWL } from "../Material/Base/Colors.js";
 import { NOTIFICATION_TYPE_IDX } from "./DebugInfoUiNotifications.js";
-import { View_build_group_from_root_mesh, View_destroy_view } from "../../Core/MeshBufferViews.js";
+import { View_build_group_from_root_mesh, View_destroy_view, View_set_view_start_vb_index } from "../../Core/MeshBufferViews.js";
 import { SCROLLER_TEMP_GET_POS, SCROLLER_TEMP_SET_SCROLLED_SECTION_XPOS } from "../Widgets/WidgetScroller.js";
+import { Clipy_from_group } from "../Operations/Clip.js";
 
 
 const _font_size = 10;
@@ -87,10 +88,13 @@ export function Debug_info_ui_performance(scene) {
 
 
 
-   dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    dp.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   
    dp.Calc_no_gfx_update();
+   
    dp.Render();
+
    dp.ConstructListeners();
 
 
@@ -1156,10 +1160,19 @@ export function TEMP_111111111111111111111111111() {
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
    scroller.Calc_no_gfx_update();
+   
+   View_build_group_from_root_mesh(scroller.scrolled_section);
+   
+   const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1];
+   const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
+   Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+
    scroller.Render();
+
+   View_set_view_start_vb_index(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
+
    scroller.ConstructListeners();
 
-   View_build_group_from_root_mesh(scroller.scrolled_section);
 }
 export function TEMP_222222222222222222222222222() {
    

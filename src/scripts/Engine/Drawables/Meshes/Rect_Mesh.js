@@ -1,7 +1,6 @@
 "use strict";
 
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
@@ -9,7 +8,6 @@ import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
 
 
 export class Rect extends Mesh {
@@ -99,10 +97,9 @@ export class Rect extends Mesh {
    /*******************************************************************************************************************************************************/
    // Graphics
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs=[INT_NULL, INT_NULL]) {
 
-      const igfx = Generate_graphics_context(FLAGS, this, gfxidx);
-      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
+      this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
 
       return this.gfx;
    }
@@ -111,11 +108,10 @@ export class Rect extends Mesh {
    AddToGfx() {
 
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
-      if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
 
       // if (this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
@@ -144,11 +140,10 @@ export class Rect extends Mesh {
    AddToGfxFromReset() {
 
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
-      if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }

@@ -2,7 +2,7 @@
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Int8Buffer, M_Buffer } from "../../../Core/Buffers.js";
 import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
-import { Listener_create_child_event, Listener_create_event, Listener_remove_children_event_by_idx, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
+import { Listener_create_child_event, Listener_create_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Gfx_buffer_update_start, Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
@@ -212,7 +212,7 @@ export class Mesh {
                 const intervalIdx = this.timeIntervalsIdxBuffer.buffer[i];
                 if (intervalIdx !== INT_NULL) {
                     TimeIntervalsDestroyByIdx(intervalIdx);
-                    this.timeIntervalsIdxBuffer.RemoveByIdx(i);
+                    this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(i);
                 }
             }
         }
@@ -340,12 +340,16 @@ export class Mesh {
 
         if (!this.listeners.buffer[etypeidx])
             console.error('NO LISTENER IN this.listeners.buffer[etypeidx]')
-        if (parent_event && parent_event[etypeidx] && parent_event[etypeidx].evt) {
-            this.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, parent_event[etypeidx].evt, Clbk, this, params);
-            this.listeners.buffer[etypeidx].is_child_event = true;
-        }
-        else {
-            this.listeners.buffer[etypeidx].evt = Listener_create_event(etypeidx, Clbk, this, params);
+
+        if(this.state.mask & MESH_STATE.ACTIVE){
+
+            if (parent_event && parent_event[etypeidx] && parent_event[etypeidx].evt) {
+                this.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, parent_event[etypeidx].evt, Clbk, this, params);
+                this.listeners.buffer[etypeidx].is_child_event = true;
+            }
+            else {
+                this.listeners.buffer[etypeidx].evt = Listener_create_event(etypeidx, Clbk, this, params);
+            }
         }
     }
 
@@ -360,7 +364,7 @@ export class Mesh {
                 if (!this.listeners.buffer[etype].is_child_event)
                     Listener_remove_event_by_idx(etype, this.listeners.buffer[etype].evt);
                 else
-                    Listener_remove_children_event_by_idx(etype, this.listeners.buffer[etype].evt);
+                    Listener_remove_child_event_from_parent(etype, this.listeners.buffer[etype].evt);
             }
         }
     }

@@ -4,7 +4,7 @@
 import { M_Buffer } from "../../Engine/Core/Buffers";
 import { Shader_attributes_enable, Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex } from "../ShaderAttributes";
 import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index } from "../ShaderPrograms";
-import { Create_buffer_from_type } from "./TypedArrayBuffers";
+import { Typed_array_create_from_type } from "./TypedArrayBuffers";
 import { Gl_operation_add } from "./VertexBuffersOps";
 import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays";
 import { BLACK, BLUEL, GREEN, GREY, PURPLER, REDL, YELLOWL, YELLOWR } from "../../Engine/Drawables/Material/Base/Colors";
@@ -13,6 +13,10 @@ import { Dropdown_roots_set_root } from "../../Engine/Drawables/Widgets/Widget_D
 import { Floor } from "../../Helpers/Math/MathOperations";
 import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications";
 import { Debug_info_update_clbk } from "../../Engine/Drawables/DebugInfo/DebugInfoUi";
+import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers";
+
+
+
 
 
 
@@ -56,7 +60,7 @@ export function Vertex_buffer_create(type, size) {
         vbo: INT_NULL, // VBO is stored directly to the vertex buffer class object.
     };
 
-    const vb = Create_buffer_from_type(type, size);
+    const vb = Typed_array_create_from_type(type, size);
     ret.vbidx = _vertex_buffers.Add(vb);
     ret.vbo = gfxCtx.gl.createBuffer();
     gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
@@ -95,6 +99,9 @@ export function Vertex_buffer_create(type, size) {
 const _vertex_buffers_info = new M_Buffer();
 
 
+/****************************************************************************************************************************************************/
+// GETTERS-SETTERS 
+/****************************************************************************************************************************************************/
 
 export function Vertex_buffer_info_get() { return _vertex_buffers_info; }
 
@@ -112,6 +119,127 @@ export function Gl_vertex_buffer_get_vao(vbidx) {
         vao: _vertex_buffers_info.buffer[vbidx].vao,
         vaoidx: _vertex_buffers_info.buffer[vbidx].vaoidx,
     };
+}
+
+
+
+export function Vertex_buffer_set_texidx(vbidx, texidx) {
+    _vertex_buffers_info.buffer[vbidx].texidx = texidx;
+}
+
+
+
+export function Vertex_buffer_set_ibidx(vbidx, ibidx) {
+    _vertex_buffers_info.buffer[vbidx].ibidx = ibidx;
+}
+
+
+
+export function Vertex_buffer_info_get_sid(vbidx) {
+    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_info, vbidx, new Error().lineNumber);
+    return _vertex_buffers_info.buffer[vbidx].sid;
+}
+
+
+
+class Vertex_Buffer_Info {
+
+    constructor(size, sid, vbidx, vbo, vaoidx, vao, type, progidx) {
+
+        this.size = size;   // Total size of the typed array buffer (in elements).
+        this.count = 0;	    // Current size oof the typed array buffer (in elements)
+        this.vCount = 0;    // Number of vertices
+
+        this.progidx = progidx;   // Just for debuging.
+        this.vbo = vbo;         // WebGl vertex buffer object.
+        this.vbidx = vbidx;     // index to the array of stored vertex buffers.
+        this.vao = vao;         // WebGl vertex array object.
+        this.vaoidx = vaoidx;   // Index to the array of stored VAO's
+        this.texidx = INT_NULL; // index to the array all textures are stored.
+        this.ibidx = INT_NULL; // index ref to index buffer this vb uses.
+        /*DO NOT DELETE*///this.ib_count = 0;      // Case that the index buffer is shared between vertex buffers, each vb needs to know how many indices the Draw function should access
+
+        this.type = type; // The type of the typed array buffer
+
+        this.state = { mask: 0x0 }; // SEE: 'BUFFER_STATE'. Gather the state of the vertex buffer info into a bit field
+        this.sid = sid;             // Bit field: Shader ID
+
+        this.draw_count = 0;
+        this.vertices_per_face = 4; // HACK: How vertex buffer should conclude the vertices per face ????????????????
+    }
+
+
+
+    // EFFICIENCY: Can pass an aproximation of all the meshes count (extra_size) from the root caller where the widget is constructed
+    Realloc(extra_size = 0) {
+
+        this.size = this.#CalculateMemoryPaddedSize(this.size, extra_size);
+        const new_data = Typed_array_create_from_type(this.type, this.size)
+
+        const old_data = _vertex_buffers.buffer[this.vbidx];
+        const size = old_data.length;
+        for (let i = 0; i < size; i++) {
+            new_data[i] = old_data[i];
+        }
+        _vertex_buffers.buffer[this.vbidx] = new_data;
+
+        if (DEBUG.GFX.BUFFERS) console.warn('Resizing vertex buffer!')
+        if (this.size > 35000) { console.error(this.size, '-------------------------'); }
+    }
+
+
+    #CalculateMemoryPaddedSize(cur_size, extra_size) {
+
+        let stride = 64;
+
+        if (cur_size + extra_size < 64) { return 64; }
+        if (cur_size + extra_size < 128) { return 128; }
+        if (cur_size + extra_size < 256) { return 256; }
+        if (cur_size + extra_size < 512) { return 512; }
+        else if (cur_size > 32768) { stride = 2048; }
+        else if (cur_size > 16384) { stride = 1024; }
+        else if (cur_size > 4096) { stride = 128; }
+
+        let new_size = cur_size;
+        const target_size = cur_size + extra_size;
+        while (new_size < target_size) {
+            new_size += stride;
+        }
+
+        if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
+
+        new_size += stride; // Make it greater than the target_size
+        return new_size;
+    }
+
+};
+
+
+
+
+
+
+export function Vertex_buffer_state_enable(vbidx, STATE_FLAG) {
+    _vertex_buffers_info.buffer[vbidx].state.mask |= STATE_FLAG;
+}
+
+
+
+
+export function Vertex_buffer_state_disable(vbidx, STATE_FLAG) {
+    _vertex_buffers_info.buffer[vbidx].state.mask &= ~STATE_FLAG;
+}
+
+
+
+export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset, byte_length) {
+
+    // gl.bindVertexArray(buffer.vao);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vbo);
+    // bufferSubData(target, dstByteOffset, srcData, srcOffset, length)
+    gl.bufferSubData(gl.ARRAY_BUFFER, dst_offset, buffer.data, src_offset, byte_length)
+
+    buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
 }
 
 
@@ -162,129 +290,6 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, pr
 
 
 
-
-class Vertex_Buffer_Info {
-
-    constructor(size, sid, vbidx, vbo, vaoidx, vao, type, progidx) {
-
-        this.size = size;   // Total size of the typed array buffer (in elements).
-        this.count = 0;	    // Current size oof the typed array buffer (in elements)
-        this.vCount = 0;    // Number of vertices
-
-        this.progidx = progidx;   // Just for debuging.
-        this.vbo = vbo;         // WebGl vertex buffer object.
-        this.vbidx = vbidx;     // index to the array of stored vertex buffers.
-        this.vao = vao;         // WebGl vertex array object.
-        this.vaoidx = vaoidx;   // Index to the array of stored VAO's
-        this.texidx = INT_NULL; // index to the array all textures are stored.
-        this.ibidx = INT_NULL; // index ref to index buffer this vb uses.
-        /*DO NOT DELETE*///this.ib_count = 0;      // Case that the index buffer is shared between vertex buffers, each vb needs to know how many indices the Draw function should access
-
-        this.type = type; // The type of the typed array buffer
-
-        this.state = { mask: 0x0 }; // SEE: 'BUFFER_STATE'. Gather the state of the vertex buffer info into a bit field
-        this.sid = sid;             // Bit field: Shader ID
-    }
-
-
-
-    // EFFICIENCY: Can pass an aproximation of all the meshes count (extra_size) from the root caller where the widget is constructed
-    Realloc(extra_size = 0) {
-
-        this.size = this.#CalculateMemoryPaddedSize(this.size, extra_size);
-        const new_data = Create_buffer_from_type(this.type, this.size)
-
-        const old_data = _vertex_buffers.buffer[this.vbidx];
-        const size = old_data.length;
-        for (let i = 0; i < size; i++) {
-            new_data[i] = old_data[i];
-        }
-        _vertex_buffers.buffer[this.vbidx] = new_data;
-
-        if (DEBUG.GFX.BUFFERS) console.warn('Resizing vertex buffer!')
-        if (this.size > 35000) { console.error(this.size, '-------------------------'); }
-    }
-
-
-    #CalculateMemoryPaddedSize(cur_size, extra_size) {
-
-        let stride = 64;
-
-        if (cur_size + extra_size < 64) { return 64; }
-        if (cur_size + extra_size < 128) { return 128; }
-        if (cur_size + extra_size < 256) { return 256; }
-        if (cur_size + extra_size < 512) { return 512; }
-        else if (cur_size > 32768) { stride = 2048; }
-        else if (cur_size > 16384) { stride = 1024; }
-        else if (cur_size > 4096) { stride = 128; }
-
-        let new_size = cur_size;
-        const target_size = cur_size + extra_size;
-        while (new_size < target_size) {
-            new_size += stride;
-        }
-
-        if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
-
-        new_size += stride; // Make it greater than the target_size
-        return new_size;
-    }
-
-};
-
-
-
-
-
-/****************************************************************************************************************************************************/
-// GETTERS-SETTERS 
-/****************************************************************************************************************************************************/
-
-
-export function Vertex_buffer_set_texidx(vbidx, texidx) {
-    _vertex_buffers_info.buffer[vbidx].texidx = texidx;
-}
-
-
-
-export function Vertex_buffer_set_ibidx(vbidx, ibidx) {
-    _vertex_buffers_info.buffer[vbidx].ibidx = ibidx;
-}
-
-
-
-export function Vertex_buffer_info_get_sid(vbidx) {
-    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_info, vbidx, new Error().lineNumber);
-    return _vertex_buffers_info.buffer[vbidx].sid;
-}
-
-
-
-export function Vertex_buffer_state_enable(vbidx, STATE_FLAG) {
-    _vertex_buffers_info.buffer[vbidx].state.mask |= STATE_FLAG;
-}
-
-
-
-
-export function Vertex_buffer_state_disable(vbidx, STATE_FLAG) {
-    _vertex_buffers_info.buffer[vbidx].state.mask &= ~STATE_FLAG;
-}
-
-
-
-export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset, byte_length) {
-
-    // gl.bindVertexArray(buffer.vao);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vbo);
-    // bufferSubData(target, dstByteOffset, srcData, srcOffset, length)
-    gl.bufferSubData(gl.ARRAY_BUFFER, dst_offset, buffer.data, src_offset, byte_length)
-
-    buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-}
-
-
-
 /** Returns true/false */
 export function Vertex_buffer_exists_from_index(vbidx) {
 
@@ -296,7 +301,7 @@ export function Vertex_buffer_exists_from_index(vbidx) {
 
 
 
-export function Vertexbuffer_reset_to_index(progidx, vbidx, start) {
+export function Vertexbuffer_reset_to_index(progidx, vbidx, ibidx, start) {
     if (!DISABLE_DEBUG) (_vertex_buffers_info, progidx, new Error().lineNumber);
 
     const vb_info = _vertex_buffers_info.buffer[vbidx];
@@ -305,21 +310,18 @@ export function Vertexbuffer_reset_to_index(progidx, vbidx, start) {
     const attribsidx = Program_get_shader_attributes_index(progidx);
     const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
 
-    const vCount = start ? start/attribs_per_vertex :  0;
+    const vCount = start ? start / attribs_per_vertex : 0;
     vb_info.count = start;
     vb_info.vCount = vCount;
     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
 
+    const indices_per_face = Index_buffer_info_get_indices_per_face(ibidx);
+    const num_faces = vb_info.count / (vb_info.vertices_per_face * attribs_per_vertex);
+    vb_info.draw_count = num_faces * indices_per_face;
+
 }
 
 
-
-export function Vertex_buffer_reset(gfx) {
-    console.error('IMPLEMENT ME');
-    const vb = Vertex_buffer_info_get_by_vbidx(gfx.vb.idx);
-    if (vb.count > 0) // If the vertex buffer has data(mainly for recursive functions that call reset even if the vb is already been reseted).
-        vb.Reset();
-}
 
 
 
@@ -337,6 +339,13 @@ function temp_check_nan_rename_me(arr) {
 
 
 
+/**
+ * // TODO:
+ * The index buffer pattern ({123, 234} or fan{12,13,14,15})
+ * probably will be dectating the vertex buffer build function,
+ * as to how the attributes of a mesh(pos, dim, ...)
+ * are gonna be stored inside the veertex buffer.
+ */
 export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
 
 
@@ -378,6 +387,20 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     // Store the texture index in the vertex
     vb_info.texidx = mat.texidx;
 
+    // Update the draw count
+    let draw_count = vb_info.vCount; // This is seting draw_count without 'INDEXED' vertex shader 
+    if (vb_info.sid.shad & SID.SHAD.INDEXED) { // If vertex shader is 'INDEXED', then re-assign the draw_count
+
+        draw_count = num_faces * INDICES_PER_RECT; // HACK: Later the 'INDICES_PER_RECT' must be abstracted in the vertex buffer OR the program.
+
+        // Check if index buffer has enough indices to cover the max of any vertex buffer that it represents.
+        Index_buffer_info_check_has_enough_indices(gfx.ib.idx, vb_info.draw_count, num_faces);
+    }
+
+    vb_info.draw_count += draw_count;
+    // console.log('draw_count', vb_info.draw_count)
+
+
     return start;
 }
 
@@ -411,6 +434,18 @@ export function Vertex_buffer_add_vertices_from_non_existant_mesh(gfx, geom, mat
     // Store the texture index in the vertex
     vb_info.texidx = mat.texidx;
 
+    // Update the draw count
+    let draw_count = vb_info.vCount; // This is seting draw_count without 'INDEXED' vertex shader 
+    if (vb_info.sid.shad & SID.SHAD.INDEXED) { // If vertex shader is 'INDEXED', then re-assign the draw_count
+
+        draw_count = num_faces * INDICES_PER_RECT; // HACK: Later the 'INDICES_PER_RECT' must be abstracted in the vertex buffer OR the program.
+
+        // Check if index buffer has enough indices to cover the max of any vertex buffer that it represents.
+        Index_buffer_info_check_has_enough_indices(gfx.ib.idx, vb_info.draw_count, num_faces);
+    }
+
+    vb_info.draw_count += draw_count;
+
     return start;
 }
 
@@ -440,14 +475,21 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index) {
     if (vb_info.count < 0)
         console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb:', vb_info.idx)
 
-    
-        
+
+    const indices_per_face = Index_buffer_info_get_indices_per_face(vb_info.ibidx);
+    vb_info.draw_count -= num_faces * indices_per_face; 
+    console.log('++++++++\ndraw_count', vb_info.draw_count)
+    console.log()
+
     // POTENTIAL_BUG: If the buffer is empty MUST be updated!!!
     // TODO: If The buffer is not used, by deactivating it below, then we need to update the render queue
     // Set inactive 
-    if(vb_info.count === 0) 
+    if (vb_info.count === 0){
+
         vb_info.state.mask &= ~BUFFER_STATE.IS_ACTIVE
+    }
     else vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+
 
 
 
@@ -554,11 +596,11 @@ function Vertex_to_string(flags, progidx, vbidx, count) {
         }
 
         // const copy = Object.assign({}, wpos);
-        const copy = JSON.parse( JSON.stringify(wpos) );
+        const copy = JSON.parse(JSON.stringify(wpos));
         arr.push(copy);
         console.log(copy)
     }
-    
+
     // console.log(arr)
     return arr;
 }
@@ -599,8 +641,8 @@ function TEMP(params) {
         parent_section: s.parent,
     }
 
-    
-	Debug_ui_create_notification(Debug_info_update_clbk, _params);
+
+    Debug_ui_create_notification(Debug_info_update_clbk, _params);
 }
 
 
@@ -624,15 +666,15 @@ export function Vertex_buffer_create_text_info() {
     Dropdown_roots_set_root(vbiw, vbiw)
     s.AddItem(vbiw)
     vbiw.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-    
+
     const vbi = _vertex_buffers_info;
     const vb_buffer_info = Create_widget_text(_, `count:${vbi.active_count} size:${vbi.size}`);
     vbiw.AddToMenu(vb_buffer_info);
-    
+
     for (let i = 0; i <= vbi.boundary; i++) {
-        
+
         const vb = vbi.buffer[i];
-        
+
         const vbw = Create_widget_dropdown(_, `Vb [${i}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
         vbw.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
         vbw.CreateClickEvent();
@@ -660,7 +702,7 @@ export function Vertex_buffer_create_text_info() {
 
 
         { // Vertex buffer array
-            const vba = Create_widget_dropdown(_, `buffer`, [100, 100, 0], col_dp, col_menu, _, [2,1], _, _, style, margin);
+            const vba = Create_widget_dropdown(_, `buffer`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
             vba.CreateClickEvent();
             vbw.AddToMenu(vba)
 

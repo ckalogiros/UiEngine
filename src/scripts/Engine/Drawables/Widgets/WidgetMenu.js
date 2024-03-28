@@ -187,7 +187,7 @@ export class Widget_Menu_Bar extends Widget_Label {
 
          const intervalIdx = menu.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          TimeIntervalsDestroyByIdx(intervalIdx);
-         menu.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.MOVE);
+         menu.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
          return;
       }
@@ -456,8 +456,6 @@ export class Widget_Minimize extends Widget_Button {
 
                // Gfx_deactivate_no_listeners_touch(root);
                Reset_gfx_from_parent_recursive(root);
-               // Vertex_buffer_reset(root.gfx);
-               // Index_buffer_reset(root.gfx);
 
                root.children.Reset();
                root.children = minim_mesh.stored_children_meshes;

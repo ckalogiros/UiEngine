@@ -1,7 +1,6 @@
 "use strict";
 
 import { Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Index_buffer_reset_to_index } from "../../Graphics/Buffers/IndexBuffers.js";
 import { MouseGetPosDif } from "../Controls/Input/Mouse.js";
 import { TimeIntervalsDestroyByIdx } from "../Timers/TimeIntervals.js";
 import { Int16Buffer, Int8Buffer, M_Buffer } from "./Buffers.js";
@@ -173,7 +172,7 @@ export function Gfx_buffer_remove_mesh_by_vbidx(vbidx, gfx_bufferidx) {
    if (gfx_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
 
 
-   _gfx_buffer.buffer[vbidx].RemoveByIdx(gfx_bufferidx);
+   _gfx_buffer.buffer[vbidx].RemoveByIdxSortedVersion(gfx_bufferidx);
 
    // Update the gfx_bufferidx of the mesh that repalaced the removed mesh
    const mesh = _mesh_buffer.buffer[_gfx_buffer.buffer[vbidx].buffer[gfx_bufferidx]];
@@ -188,7 +187,7 @@ export function Gfx_buffer_remove_mesh_by_vbidx(vbidx, gfx_bufferidx) {
 }
 
 
-
+// HERE
 export function Gfx_buffer_store(vbidx, mesh_bufferidx) { return _gfx_buffer.buffer[vbidx].Add(mesh_bufferidx); }
 
 
@@ -366,7 +365,7 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
 
          /*********************************************************************************************************************************/
          // Batch Remove
-         _widget_root_buffer.buffer[root_bufferidx].RemoveByIdx(elem_found);
+         _widget_root_buffer.buffer[root_bufferidx].RemoveByIdxSortedVersion(elem_found);
 
       }
       else console.error('Widget root FAILED to remove element. root idx:', root_bufferidx, 'mesh_bufferidx', mesh_bufferidx, ' element idx:', elem_found,);
@@ -752,7 +751,7 @@ export function Widget_movexy(params) {
 
       const intervalIdx = root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       TimeIntervalsDestroyByIdx(intervalIdx);
-      root.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.MOVE);
+      root.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
       return;
    }
 
@@ -930,8 +929,8 @@ export function Widget_root_reset_gfx(root_bufferidx) {
          alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
 
       // Add to vertexbuffer
+      alert('IMPLEMENT: Pass ibidx to Vertexbuffer_reset_to_index()')
       Vertexbuffer_reset_to_index(rootgfx.buffer[i + GFX.PROG_IDX], rootgfx.buffer[i + GFX.VB_IDX], 0);
-      Index_buffer_reset_to_index(rootgfx.buffer[i + GFX.VB_IDX], 0);
    }
 }
 
@@ -1329,7 +1328,7 @@ export function Mesh_buffer_create_text_info() {
       console.log()
 
       if(m && (m.type & MESH_TYPE.DEBUG_MESH)===0){ // Insert meshes that are only belong to DEFAULT grouping
-         console.log(m.GetName(), m.mesh_bufferidx)
+         // console.log(m.GetName(), m.mesh_bufferidx)
          const _1 = Create_widget_dropdown(_, `[${m.mesh_bufferidx}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
 
          _1.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
@@ -1386,7 +1385,7 @@ export function Mesh_buffer_create_text_info() {
                gfx.AddToMenu(info);
             }
             { // Index buffer
-               const info = Create_widget_text(_, `ib: { idx:${m.gfx.ib.idx} start:${m.gfx.ib.start} count:${m.gfx.ib.count} }`);
+               const info = Create_widget_text(_, `ib: { idx:${m.gfx.ib.idx} count:${m.gfx.ib.count} }`);
                info.SetTypeDebug();
                gfx.AddToMenu(info);
             }

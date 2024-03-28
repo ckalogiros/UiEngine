@@ -8,6 +8,7 @@ import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js"
 import { Rect } from "./Rect_Mesh.js";
 import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_batch_move_from_batch_buffer } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
+import { Listener_create_child_event } from "../../Events/EventListeners.js";
 
 
 
@@ -480,8 +481,30 @@ export class Section extends Rect {
    // SEE ### Construct Listeners
    ConstructListeners(_root = null, _Clbk = null) {
 
+      /**
+       * Concept of creating tree like event structure:
+       * 
+       * First we 'AddListenEvent' any listen events that the user alredy have instructed on widget creation.
+       * 
+       * Then we must create all listen events for all children recursively,
+       * calling on each widgets '.ConstructListeners()' function.
+       * 
+       * In the loop, before calling 'ConstructListeners', we 
+       * check if the current 'root', which may be the root or the 'this' mesh,
+       * has events in its 'listeners' buffer. If it has not, then we
+       * create a fake event, with no callback or target_params, so as to have an 
+       * event in the ListenersBuffer to store any possible children events.
+       * In the ListenersBuffer, we create a 'children's' buffer, and in that buffer
+       * any child event will go.
+       * 
+       * // IMPORTANT ISSUES: 
+       * The fake event in the parent is created 
+       * despite the fact that no child may not have any events to register.
+       * 
+       */
+
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-      const root = (_root) ? _root : this; // If in recursion, use as root the passed param. 
+      let root = (_root) ? _root : this; // If in recursion, use as root the passed param. 
 
       // Create listen events for the section
       const root_evt = root.listeners.buffer;
@@ -490,14 +513,24 @@ export class Section extends Rect {
          const evt = mesh.listeners.buffer[etypeidx];
 
          if (evt) { // If mesh has events to add...
+            
             const target_params = {
                EventClbk: null,
                targetBindingFunctions: null,
                target_mesh: mesh,
                params: null,
             }
+            
             const Clbk = (_Clbk) ? _Clbk : mesh.OnClick;
-            mesh.AddListenEvent(etypeidx, Clbk, target_params, root_evt);
+            if(evt.is_child_event){
+               // mesh.AddListenEvent(etypeidx, Clbk, target_params, evt.evt.parent_evt);
+               mesh.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, evt.evt.parent_evt, Clbk, mesh, target_params);
+               root = evt.evt.parent_evt.source_params;
+            }
+            else{
+               mesh.AddListenEvent(etypeidx, Clbk, target_params, root_evt);
+            }
+            // mesh.AddListenEvent(etypeidx, Clbk, target_params, root_evt);
          }
       }
 
@@ -505,7 +538,7 @@ export class Section extends Rect {
       for (let i = 0; i <= mesh.children.boundary; i++) {
 
          const child = mesh.children.buffer[i];
-         if (child) {
+         if (child && (child.state.mask & MESH_STATE.ACTIVE)) {
          /**
           * Create a Fake listen event as a parent event, if the section has no listen events,
           * so that the actual listen events of the section's children meshes have a parent event to be grouped.
@@ -515,18 +548,23 @@ export class Section extends Rect {
           * 2. We create Fake event despite the fact that there may not be any children events.
           */
 
-            const parent_root = root.parent ? root.parent : root
+            const parent_root = root ? root : root.parent;
 
             // Case item is of type section, run recursively.
             // If the root mesh does not have an event, create a fake event to store the children events to. 
-            if (root.listeners.buffer[1] === null) {
+            if (mesh.listeners.buffer[0] === null) {
 
-               root.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
-               root.AddListenEvent(1, null, null, parent_root.listeners.buffer);
+               mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, true);
+               mesh.AddListenEvent(0, null, null, parent_root.listeners.buffer);
+            }
+            if (mesh.listeners.buffer[1] === null) {
+
+               mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
+               mesh.AddListenEvent(1, null, null, parent_root.listeners.buffer);
             }
 
             if (child.ConstructListeners) // Call the widget's specific .ConstructListeners() to handle the widget's listen events creation
-               child.ConstructListeners(root);
+               child.ConstructListeners(this);
 
          }
       }
@@ -747,7 +785,7 @@ function Section_on_move_section(params) {
 
       const intervalIdx = section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       TimeIntervalsDestroyByIdx(intervalIdx);
-      section.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.MOVE);
+      section.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
       return;
    }

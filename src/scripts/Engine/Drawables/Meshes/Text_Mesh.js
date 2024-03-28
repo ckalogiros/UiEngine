@@ -10,8 +10,6 @@ import { Mesh } from "./Base/Mesh.js";
 import { Font_get_char_plane_bounds, Font_get_char_uv_coords, Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { Gl_set_dim_XY, Gl_set_uv, Gl_set_uv2, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store } from "../../Core/MeshBuffer.js";
-import { Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
-import { Index_buffer_add_indices, Index_buffer_add_indices_from_non_existant_mesh } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
 import { WHITE } from "../Material/Base/Colors.js";
 
@@ -72,10 +70,9 @@ export class Text_Mesh extends Mesh {
    /*******************************************************************************************************************************************************/
 
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs=[INT_NULL, INT_NULL]) {
 
-      const igfx = Generate_graphics_context(FLAGS, this, gfxidx);
-      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
+      this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
 
       return this.gfx;
    }
@@ -110,11 +107,11 @@ export class Text_Mesh extends Mesh {
 
          if (i === 0) {
             Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
          else { // The first face exista as an entity, the rest are constructed here and store only to the vertex buffer
             Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
 
 
@@ -131,7 +128,7 @@ export class Text_Mesh extends Mesh {
 
 
       // Add entry to Gfx Buffer
-      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
 
       this.is_gfx_inserted = true;
@@ -169,11 +166,11 @@ export class Text_Mesh extends Mesh {
 
          if (i === 0) {
             Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
          else {
             Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
          }
 
 
@@ -187,7 +184,7 @@ export class Text_Mesh extends Mesh {
       this.is_gfx_inserted = true;
       
       // Add entry to Gfx Buffer
-      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
    }
 
@@ -269,9 +266,7 @@ export class Text_Mesh extends Mesh {
       for (let i = 0; i < len; i++) {
 
          this.geom.UpdateFromPosXYZ(gfxcopy, charPos); // For text we need to give a 'next' position for every characters
-         // console.log(this.geom.pos[0])
          gfxcopy.vb.start += gfxcopy.vb.boundary;
-         gfxcopy.ib.start += gfxcopy.ib.boundary;
          charPos[0] += this.geom.dim[0] * 2;
       }
    }

@@ -4,15 +4,14 @@ import { Section } from "../Meshes/Section.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { Find_textgfx_from_parent_descending, Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
+import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
-import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clipy_from_group } from "../Operations/Clip.js";
-import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { Clipy_from_group } from "../Operations/Clip.js";
 import { BLUE_10_120_220, GREY, PURPLER } from "../Material/Base/Colors.js";
-import { View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
+import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
+import { Listener_destroy_children_buffer, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 
 
 /** ### Scroller Widget
@@ -62,6 +61,7 @@ export class Widget_Scroller extends Section {
    scrolled_section;
    scroll_bar;
    renderables; // Store the first/upper and last/lower meshes that is rendered by the gfx buffers
+   is_scrolled_section_private; // A way to set a scroller to use separate vertex buffer for the scrolled mesh and all its items  
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, scrolled_mesh, dim = [100, 50], col = TRANSPARENCY(GREY[5], .5)) {
 
@@ -69,12 +69,14 @@ export class Widget_Scroller extends Section {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.HORIZONTAL, [10, 10], pos, dim, col);
 
+      this.is_scrolled_section_private = false;
+
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle([0, 6, 2]);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-
-      this.SetName('Widget_Scroller');
+      
+      this.SetName(`[${this.mesh_bufferidx}]-Scroller`);
       this.type |= MESH_TYPE.WIDGET_SCROLLER;
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
 
@@ -82,7 +84,7 @@ export class Widget_Scroller extends Section {
       if (scrolled_mesh && (scrolled_mesh.type & MESH_TYPE.SECTION_MESH)) {
 
          this.scrolled_section = scrolled_mesh;
-         this.scrolled_section.SetName('Scrolled_section')
+         this.scrolled_section.SetName(`[${this.mesh_bufferidx}]-Scrolled section`)
 
          // Calculate the scroller's initial position
          this.geom.pos[0] = (this.scrolled_section.geom.pos[0] - this.scrolled_section.geom.dim[0]) - this.margin[0]; // Include the margin in the calculation
@@ -118,7 +120,7 @@ export class Widget_Scroller extends Section {
       bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR | bar.geom | bar.mat;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       bar.SetStyle([0, 3, 1]);
-      bar.SetName('Scroll bar');
+      bar.SetName(`[${this.mesh_bufferidx}]-Scroll bar`);
 
 
 
@@ -224,28 +226,27 @@ export class Widget_Scroller extends Section {
    // Graphics
 
    // For scrollers we always create a separate vertex buffer, so it will be easier to handle the clipping of the scrolled section
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = [INT_NULL, INT_NULL], is_scrolled_section_private = false) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, INT_NULL]) {
 
-      let rect_igfx = null;
-      rect_igfx = Generate_graphics_context(FLAGS, this);
-
-      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, FLAGS, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
-
-      rect_igfx.idxs = [this.gfx.prog.idx, this.gfx.vb.idx]; // Copy the gfx from the scroller area.
+      
+      this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
+      
+      
+      const rect_igfx = [this.gfx.prog.idx, this.gfx.vb.idx]; // Copy the gfx from the scroller area.
 
       // Use the same gfx buffer for bar mesh
-      this.scroll_bar.gfx = Gfx_generate_context(this.scroll_bar.sid, this.scroll_bar.sceneidx, this.scroll_bar.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
+      this.scroll_bar.gfx = Gfx_generate_context(GFX_CTX_FLAGS.SPECIFIC, this.scroll_bar, rect_igfx);
 
       // Use the same gfx buffer for handle mesh
       const handle = this.scroll_bar.children.buffer[0];
-      handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, handle.root_bufferidx, handle.mesh_bufferidx);
+      handle.gfx = Gfx_generate_context(GFX_CTX_FLAGS.SPECIFIC, handle, rect_igfx);
 
       // Render the scrolled section and all it's meshes to it's own separate gfx buffer
-      if (is_scrolled_section_private) {
-         this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, FLAGS, [INT_NULL, INT_NULL], this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
+      if (this.is_scrolled_section_private) {
+         this.scrolled_section.gfx = Gfx_generate_context(FLAGS, this.scrolled_section, [INT_NULL, INT_NULL]);
       }
       else {
-         this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.sid, this.scrolled_section.sceneidx, this.scrolled_section.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.scrolled_section.root_bufferidx, this.scrolled_section.mesh_bufferidx);
+         this.scrolled_section.gfx = Gfx_generate_context(GFX_CTX_FLAGS.SPECIFIC, this.scrolled_section, rect_igfx);
       }
 
       const scrolled_section_igfx = [this.scrolled_section.gfx.prog.idx, this.scrolled_section.gfx.vb.idx];
@@ -263,6 +264,7 @@ export class Widget_Scroller extends Section {
    }
 
 
+
    Render() {
 
       if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
@@ -276,23 +278,30 @@ export class Widget_Scroller extends Section {
 
       if (!this.scrolled_section.is_gfx_inserted && (this.scrolled_section.state.mask & MESH_STATE.ACTIVE)) { this.scrolled_section.Render(); }
 
-      // this.SetScissorBox();
    }
 
-   // IMIDIATELY: Create a separate function like in Dropdown widget
    Rerender() {
 
       View_reset_from_view_all_buffers(this.scrolled_section.group_bufferidxs[0]);
 
-      Vertex_buffer_add_vertices(this.scrolled_section.gfx, this.scrolled_section.geom, this.scrolled_section.mat, this.scrolled_section.GetName());
-      if (this.scrolled_section.sid.shad & SID.SHAD.INDEXED) this.scrolled_section.gfx.ib.start = Index_buffer_add_indices(this.scrolled_section.gfx.ib, this.scrolled_section.GetName());
-      this.scrolled_section.StateEnable(MESH_STATE.ACTIVE);
+      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) { this.AddToGfxFromReset(); }
+
+      const bar = this.scroll_bar;
+      if (!bar.is_gfx_inserted && (bar.state.mask & MESH_STATE.ACTIVE)) { bar.AddToGfxFromReset(); }
+
+      const handle = bar.children.buffer[0];
+      if (!handle.is_gfx_inserted && (handle.state.mask & MESH_STATE.ACTIVE)) { handle.AddToGfxFromReset(); }
+
+      if (!this.scrolled_section.is_gfx_inserted && (this.scrolled_section.state.mask & MESH_STATE.ACTIVE)) { this.scrolled_section.Render(); }
 
       for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
 
          const child = this.scrolled_section.children.buffer[i];
-         /**DEBUG*/if (child === _) console.error('TEMP_RERENDER', this.scrolled_section.children.buffer, i)
-         child.Rerender()
+         if(child.state.mask & MESH_STATE.ACTIVE){
+
+            child.Rerender()
+            // console.log(child.GetName())
+         }
 
       }
    }
@@ -320,6 +329,12 @@ export class Widget_Scroller extends Section {
          vb_text.SetScissorBox(scissorbox);
       }
       else console.log('{}{}{}{}}}{}{}} TEXT BUFFER NNOT FOUND')
+   }
+
+
+   SetScrolledSectionToSeparateGfxBuffers(){
+      if(this.scrolled_section.is_gfx_inserted) alert('Trying to set scrolled section to private buffers though the scrolled section is already added to the gfx buffers');
+      this.is_scrolled_section_private = true;
    }
 
 
@@ -422,7 +437,7 @@ export class Widget_Scroller extends Section {
 
          const intervalIdx = scroller.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          TimeIntervalsDestroyByIdx(intervalIdx);
-         scroller.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.MOVE);
+         scroller.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
          return;
       }
@@ -757,7 +772,7 @@ export function Scroller_on_update_handle(_params) {
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       TimeIntervalsDestroyByIdx(intervalIdx);
-      bar.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.UPDATE);
+      bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
 
       return;
    }
@@ -806,7 +821,62 @@ export function Scroller_on_update_handle(_params) {
    const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
    const changes_hapened = Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
 
-   scroller.Rerender()
+   // scroller.Rerender()
+
+   View_reset_from_view_all_buffers(scrolled_section.group_bufferidxs[0]);
+
+
+   /**
+    * REMOVING SCOLLED SECTION'S EVENTS TO RECONSTRUCT THEM FOR THE NEW EVENTS OF THE ACTIVATED SCROLLED ITEMS 
+    * 
+    * Explanation:
+    * 1. For HOVER the root event is the scrolled section
+    * 2. For CLICK the root event is the scroller
+    * 
+    * So there is different approach as to how to remove HOVER & CLICK events
+    * from scrolled_section as wel as for the children events too.
+    * // NOTE: The children events are 'winked', because the are in
+    * scrolled section's event children buffer, so we just set the buffer to null.
+    *   
+    * The NON loop way to remove children events is 'Listener_remove_child_event_from_parent'.
+    * But this function needs a parent event to remove the children.
+    * In case of HOVER, the top root event is that of scrolled section.
+    * So to remove for hover we must:
+    * HOVER:
+    *    1. Wink the children's event buffer, by setting it to null.
+    *    2. Remove the parent event(scrolled section).
+    *    3. Remove the scrolled section's index of its 'listeners' buffer
+    *       so that on 'Reconstruct()' a new event for scrooled section will be created
+    *       and its index to be stored at the scrolled section's 'listeners' buffer.
+    *    
+    */
+
+   // if((scrolled_section.type & MESH_TYPE.WIDGET_DROP_DOWN)===0){
+
+      // Listener_destroy_children_buffer(LISTEN_EVENT_TYPES_INDEX.HOVER, scrolled_section.listeners.buffer[0].evt.evt_idx);
+      // Listener_remove_event_by_idx(LISTEN_EVENT_TYPES_INDEX.HOVER, scrolled_section.listeners.buffer[0].evt)
+      // scrolled_section.listeners.RemoveByIdx(LISTEN_EVENT_TYPES_INDEX.HOVER)
+      // Listener_remove_child_event_from_parent(LISTEN_EVENT_TYPES_INDEX.CLICK, scrolled_section.listeners.buffer[1].evt)
+      // }
+      
+   for(let i=0; i<2; i++){
+      
+      // Listener_destroy_children_buffer(LISTEN_EVENT_TYPES_INDEX.HOVER, scrolled_section.listeners.buffer[0].evt.evt_idx);
+      // // Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i].evt)
+      // scrolled_section.listeners.RemoveByIdx(i)
+      
+      if(scrolled_section.listeners.buffer[i].is_child_event){
+         Listener_remove_child_event_from_parent(i, scrolled_section.listeners.buffer[i].evt);
+      }
+      // else{
+      //    Listener_destroy_children_buffer(i, scrolled_section.listeners.buffer[i].evt.evt_idx);
+      //    Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i].evt)
+      //    scrolled_section.listeners.RemoveByIdx(i)
+      // }
+   }
+   
+   
+   View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
 
    /**FOR FRAMEBUFFER. DO NOT DELETE */
    // if(scrolled_section.isFramebufferRendered !== INT_NULL){

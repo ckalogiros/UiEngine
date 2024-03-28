@@ -1,6 +1,5 @@
 "use strict";
 
-import { Index_buffer_reset_to_index } from "../../Graphics/Buffers/IndexBuffers";
 import { Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers";
 import { Int16Buffer, M_Buffer } from "./Buffers";
 import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_byidx, Widget_root_gfx_get_structured } from "./MeshBuffer";
@@ -44,8 +43,9 @@ import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_byidx, Widget_root_g
 
 _CNT = 0;
 export const VIEW_INFO = {
-   VBIDX: _CNT++,
    PROGIDX: _CNT++,
+   VBIDX: _CNT++,
+   IBIDX: _CNT++,
    START: _CNT++,
    NUM_FACES: _CNT++,
 
@@ -106,6 +106,13 @@ export function View_destroy_view(group_bufferidxs) {
 
 
 
+export function View_set_view_start_vb_index(group_bufferidxs, start) {
+   // TODO: Buffer Error Check
+   _view_buffer.buffer[group_bufferidxs[0]].vb.buffer[group_bufferidxs[1]].info[VIEW_INFO.START] = start;
+}
+
+
+
 
 
 
@@ -140,6 +147,7 @@ function View_add_mesh(groupidx, mesh) {
    const num_faces = mesh.geom.num_faces;
    const start = mesh.gfx.vb.start;
    const vbidx = mesh.gfx.vb.idx;
+   const ibidx = mesh.gfx.ib.idx;
    const progidx = mesh.gfx.prog.idx;
 
    const view = _view_buffer.buffer[groupidx];
@@ -176,8 +184,9 @@ function View_add_mesh(groupidx, mesh) {
       const vb_bufferidx = view.vb.Add(data);
       const mesh_groupidx = view.vb.buffer[vb_bufferidx].data.Add(mesh_bufferidx);
 
-      view.vb.buffer[vb_bufferidx].info[VIEW_INFO.VBIDX] = vbidx;
       view.vb.buffer[vb_bufferidx].info[VIEW_INFO.PROGIDX] = progidx;
+      view.vb.buffer[vb_bufferidx].info[VIEW_INFO.VBIDX] = vbidx;
+      view.vb.buffer[vb_bufferidx].info[VIEW_INFO.IBIDX] = ibidx;
       view.vb.buffer[vb_bufferidx].info[VIEW_INFO.START] = start;
       view.vb.buffer[vb_bufferidx].info[VIEW_INFO.NUM_FACES] = num_faces;
 
@@ -237,7 +246,7 @@ function Remove_tree_mesh_from_view_recursive(mesh) {
 
 
    // If the last element is removed from .data buffer, the sort_happened is -1, meaning there was no element swap (sorting)
-   const sort_happend = _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data.RemoveByIdx(group_meshidx);
+   const sort_happend = _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data.RemoveByIdxSortedVersion(group_meshidx);
    // console.log(mesh.GetName(), 'meshidx:', mesh.mesh_bufferidx, 'sort_happend', sort_happend, 'mesh.group_bufferidxs', mesh.group_bufferidxs,  'last', _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data.boundary)
    
    // Update group's num_faces.
@@ -318,19 +327,12 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
 
    for (let i = 0; i <= view.vb.boundary; i++) {
 
-      // Get the fist mesh of the vb group buffer
-      const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[0]);
-      // console.log('Reseting vertex buffer from view root mesh:', mesh.GetName())
-
       const progidx = view.vb.buffer[i].info[VIEW_INFO.PROGIDX];
       const vbidx = view.vb.buffer[i].info[VIEW_INFO.VBIDX];
+      const ibidx = view.vb.buffer[i].info[VIEW_INFO.IBIDX];
 
       const vb_start = view.vb.buffer[i].info[VIEW_INFO.START]; // We want the start of the root mesh of the group, not the start of the root widget
-      Vertexbuffer_reset_to_index(progidx, vbidx, vb_start);
-
-      // TODO: What about the index buffer. Does it need to be stored to the groups info as well?????? (so we dont get the messh at all) 
-      const ib_start = mesh.gfx.ib.start; // We want the start of the root mesh of the group, not the start of the root widget
-      Index_buffer_reset_to_index(vbidx, ib_start);
+      Vertexbuffer_reset_to_index(progidx, vbidx, ibidx, vb_start);
 
    }
 
@@ -338,21 +340,29 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
 
 
 
-/**
- * // TODO:
- * We have 2 options:
- *    1. let the tree mesh handle the Render()
- *    2. Do it here for all meshes from group. GetMesh() -> mesh.Render()
- */
 
-export function View_rerender_from_view_all_buffers(view_bufferidx) {
+/** Render all group's meshes from all vertex buffers via AddToGfxFromReset()  */
+export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstruct_listeners=true) {
 
    const view = _view_buffer.buffer[view_bufferidx];
 
+   for (let i = 0; i <= view.vb.boundary; i++){
+
+      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){
+
+         const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[j]);
+         if (mesh.state.mask & MESH_STATE.ACTIVE) { 
+            mesh.AddToGfxFromReset(); 
+         }
+      }
+   }
+   
+   // Get the root mesh
    const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
-   mesh.Rerender();
+   if(do_reconstruct_listeners) mesh.ConstructListeners(); 
 
 }
+
 
 
 

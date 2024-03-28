@@ -142,7 +142,7 @@ export class M_Buffer {
 
 
    RemoveByIdx(idx) {
-
+   
       /**DEBUG ERROR*/ if (idx < 0 || idx > this.size - 1) {
          console.error('Index Out of bounds. @ M_Buffer.RemoveByIdx().\n idx:', idx, 'size', this.size)
          return;
@@ -399,7 +399,8 @@ export class ArrayBufferInterface {
    }
 
 
-   RemoveByIdx(idx) {
+   // RemoveByIdx(idx) {
+      RemoveByIdxSortedVersion(idx) {
 
       if (this.buffer[idx] !== INT_NULL) {
 

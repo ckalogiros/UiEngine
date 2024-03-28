@@ -8,9 +8,7 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/Tim
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Texture_Material } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
-import { Index_buffer_add_indices } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { WHITE } from "../Material/Base/Colors.js";
-import { Generate_graphics_context } from "../../Interfaces/Gfx/GfxContextFindMatch.js";
 
 
 
@@ -33,10 +31,9 @@ export class Textured_Mesh extends Mesh {
    // Graphics
 
 
-   GenGfxCtx(FLAGS=GFX_CTX_FLAGS.ANY, gfxidx=null) {
+   GenGfxCtx(FLAGS=GFX_CTX_FLAGS.ANY, gfxidxs=[INT_NULL, INT_NULL]) {
 
-      const igfx = Generate_graphics_context(FLAGS, this, gfxidx);
-      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, igfx.FLAGS, igfx.idxs, this.root_bufferidx, this.mesh_bufferidx, this.uniforms);
+      this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
 
       return this.gfx;
    }
@@ -46,12 +43,11 @@ export class Textured_Mesh extends Mesh {
 
       // Get the starting index of the text in the vertex buffer.
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
-      if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.is_gfx_inserted = true;
 
       
       // Add entry to Gfx Buffer
-      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
 
 
@@ -67,12 +63,11 @@ export class Textured_Mesh extends Mesh {
    AddToGfxFromReset() {
 
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
-      if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.StateEnable(MESH_STATE.ACTIVE);
       this.is_gfx_inserted = true;
       
       // Add entry to Gfx Buffer
-      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
    }
 
@@ -157,7 +152,7 @@ export class Textured_Mesh extends Mesh {
 
          const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          TimeIntervalsDestroyByIdx(intervalIdx);
-         mesh.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.MOVE);
+         mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
          return;
       }

@@ -36,6 +36,18 @@ const GL = {
 
 
 _CNT = 0x1;
+const TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN = {
+	rect_123_234: _CNT,
+};
+
+
+
+
+
+
+
+
+_CNT = 0x1;
 /** Grouping shader programs. Example: group for debug user interface meshes, default group meshes */
 const GFX_GROUPS = {
 

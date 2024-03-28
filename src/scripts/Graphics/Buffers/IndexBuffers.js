@@ -2,7 +2,7 @@
 
 
 import { M_Buffer } from '../../Engine/Core/Buffers.js';
-import { Create_buffer_from_type } from './TypedArrayBuffers.js';
+import { Typed_array_create_from_type } from './TypedArrayBuffers.js';
 
 
 
@@ -25,7 +25,7 @@ export function Index_buffer_get() { return _index_buffers; }
 
 
 export function Index_buffer_get_by_ibidx(ibidx) {
-   if(!DISABLE_DEBUG) DEBUG_PRINT(_index_buffers, ibidx, new Error().lineNumber)
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_index_buffers, ibidx, new Error().lineNumber)
    return _index_buffers.buffer[ibidx];
 }
 
@@ -33,9 +33,9 @@ export function Index_buffer_get_by_ibidx(ibidx) {
 
 /** Check if the analogous index buffer exists, in the case of one to one vertex and index buffers */
 function Index_buffer_get_by_vertex_buffer_index(ibidx) {
-   if(!DISABLE_DEBUG) DEBUG_PRINT(_index_buffers, ibidx, new Error().lineNumber);
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_index_buffers, ibidx, new Error().lineNumber);
 
-   if((ibidx < 0 || ibidx > _index_buffers.boundary) || (_index_buffers.buffer[ibidx] === null)){
+   if ((ibidx < 0 || ibidx > _index_buffers.boundary) || (_index_buffers.buffer[ibidx] === null)) {
       console.error('NO INDEX BUFFER FOUND THAT CORESPONDS TO THE EWUIVALENT VERTEX BUFFER INDEX.');
       alert('SEE CONOLE ERROR\nIndexBuffers.js');
    }
@@ -51,9 +51,9 @@ function Index_buffer_set_ib_data(gl, buffer) {
    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.ibo);
    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib, gl.STATIC_DRAW, 0);
 
-           
+
    buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-   
+
    GL.BOUND_IBO = buffer.ibo;
    GL.BOUND_IBIDX = buffer.ibidx;
 
@@ -73,7 +73,8 @@ function Index_buffer_create(type, size) {
       ibo: INT_NULL, // VBO is stored directly to the vertex buffer class object.
    };
 
-   const ib = Create_buffer_from_type(type, size);
+   const ib = Typed_array_create_from_type(type, size);
+
    ret.ibidx = _index_buffers.Add(ib);
    ret.ibo = gfxCtx.gl.createBuffer();
    gfxCtx.gl.bindBuffer(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, ret.ibo);
@@ -101,7 +102,7 @@ export function Index_buffer_info_get() { return _index_buffers_info; }
 
 
 export function Index_buffer_info_get_by_ibidx(ibidx) {
-   if(!DISABLE_DEBUG) DEBUG_PRINT(_index_buffers_info, ibidx, new Error().lineNumber)
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_index_buffers_info, ibidx, new Error().lineNumber)
    return _index_buffers_info.buffer[ibidx];
 }
 
@@ -120,9 +121,10 @@ export function Index_buffer_state_disable(ibidx, STATE_FLAG) {
 
 
 
+
 class Index_Buffer_Info {
 
-   constructor(size, sid, ibidx, ibo, type, vao, vaoidx) {
+   constructor(size, sid, ibidx, ibo, type, PATTERN) {
 
       this.size = size;
       this.count = 0;
@@ -130,33 +132,27 @@ class Index_Buffer_Info {
 
       this.ibo = ibo;
       this.ibidx = ibidx;
-      this.vao = vao;
-      this.vaoidx = vaoidx;
 
       this.type = type; // The type of the typed array buffer
 
       this.state = { mask: 0x0 }; // Gather the state of the vertex buffer info into a bit field
       this.sid = sid;             // Bit field: Shader ID
 
+      this.temp_pattern = PATTERN; // Temporary identification of the this index buffer pattern type.
+
+      this.indices_per_face = INDICES_PER_RECT; // HACK: In the future this must be set acording to vertex buffer architecture (???????)
+
    }
 
 
    Add(num_faces) {
 
-      /**
-       * // UNNECESSARY work
-       * On remove or reset, the buffer elements are intact, only the count changes.
-       * But yet on adding we calculate and adding new index elements.
-       * So we could use the length of the Uint16 array buffer to tell
-       * up at which point are the indices calculated, and if it is enough 
-       * we just change the count
-       */
       const offset = VERTS_PER_RECT_INDEXED;
 
       const data = _index_buffers.buffer[this.ibidx];
 
-      if((this.vCount % 1) !== 0)
-      console.error('index buffer count mismatch')
+      if ((this.vCount % 1) !== 0)
+         console.error('index buffer count mismatch')
 
       let k = this.vCount;
       for (let i = 0; i < num_faces; ++i) {
@@ -171,10 +167,11 @@ class Index_Buffer_Info {
          k += offset;
          this.vCount += offset;
       }
-      if((this.vCount % 1) !== 0)
-      console.error('index buffer count mismatch')
+      if ((this.vCount % 1) !== 0)
+         console.error('index buffer count mismatch')
 
       this.state.mask |= BUFFER_STATE.NEEDS_UPDATE; // Make sure that we update GL bufferData 
+
    }
 
 
@@ -182,7 +179,7 @@ class Index_Buffer_Info {
    Realloc(extra_size = 0) {
 
       this.size = this.#CalculateMemoryPaddedSize(this.size, extra_size)
-      const new_data = Create_buffer_from_type(this.type, this.size);
+      const new_data = Typed_array_create_from_type(this.type, this.size);
 
       const old_data = _index_buffers.buffer[this.ibidx];
       const size = old_data.length;
@@ -193,35 +190,6 @@ class Index_Buffer_Info {
 
       if (DEBUG.GFX.BUFFERS) console.warn('Resizing index buffer!')
 
-   }
-
-
-
-   ResetToIndex(index, vertices_per_rect) {
-
-      const new_vCount = ((this.count - index) / INDICES_PER_RECT) * vertices_per_rect;
-      this.vCount -= new_vCount;
-      if((this.vCount % 1) !== 0)
-      console.error('index buffer count mismatch')
-      this.count = index;
-      this.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-   }
-
-
-   Remove_geometry(num_faces) {
-
-      const attr_count = INDICES_PER_RECT * num_faces; // Meshes total attributes count.
-      this.count -= attr_count;
-      const vCount = (attr_count / INDICES_PER_RECT) * VERTS_PER_RECT_INDEXED;
-      this.vCount -= vCount;
-
-      if(this.count === 0) this.state.mask &= ~BUFFER_STATE.IS_ACTIVE;
-      else this.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-
-      // POTENTIAL_BUG: If the buffer is empty MUST be updated!!!
-      // TODO: If The buffer is not used, then we need to update the render queue
-
-      return attr_count;
    }
 
 
@@ -253,8 +221,16 @@ class Index_Buffer_Info {
 };
 
 
+export function Index_buffer_info_get_indices_per_face(ibidx) {
+   //TODO: check buffer error
 
-export function Index_buffer_info_create(sid, vao, vaoidx, size = 6) {
+   return _index_buffers_info.buffer[ibidx].indices_per_face;
+}
+
+
+
+export function Index_buffer_info_create(sid = 0, size = 6, PATTERN=INT_NULL) {
+   /**ERROR */ if(PATTERN===INT_NULL) alert('PATTERN should be passed as param from caller')
 
    /***********************************************************************************************/
    // Create index buffer
@@ -263,13 +239,10 @@ export function Index_buffer_info_create(sid, vao, vaoidx, size = 6) {
 
    const ret = Index_buffer_create(type, size, sid);
 
-   const ib_info = new Index_Buffer_Info(size, sid, ret.ibidx, ret.ibo, type, vao, vaoidx);
+   const ib_info = new Index_Buffer_Info(size, sid, ret.ibidx, ret.ibo, type, PATTERN);
 
    _index_buffers_info.Add(ib_info);
 
-   // VAO must be bound before enabling attribute locations for the created VAO
-   // Bind VAO in case the VAO exists, otherwise if VAO was created it is already bound.  
-   //  gfxCtx.gl.bindVertexArray(vao.vao);
    gfxCtx.gl.bindBuffer(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, ret.ibo);
    const ib = _index_buffers.buffer[ret.ibidx];
    gfxCtx.gl.bufferData(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, ib, gfxCtx.gl.STATIC_DRAW, 0);
@@ -281,77 +254,46 @@ export function Index_buffer_info_create(sid, vao, vaoidx, size = 6) {
 
 
 
-export function Index_buffer_reset(ibidx) {
-   _index_buffers_info.buffer[ibidx].count = 0;
-   _index_buffers_info.buffer[ibidx].vCount = 0;
-   _index_buffers_info.buffer[ibidx].state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-}
 
+function Index_buffer_add_indices(ibidx, num_faces) {
 
-
-export function Index_buffer_reset_to_index(ibidx, start) {
-
-   const ib_info = _index_buffers_info.buffer[ibidx];
-   if (start < 0 || start > ib_info.count) console.error('Start should be less than vertex buffer count. @IndexBuffers.js, ');
-   const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK
-
-   const vCount = start ? (start / INDICES_PER_RECT) * vertices_per_rect  : 0;
-   ib_info.count = start;
-   ib_info.vCount = vCount;
-   ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-
-
-}
-
-
-
-export function Index_buffer_add_indices(ib_gfx) {
-
-   const ibidx = ib_gfx.idx;
-   const ib_info = Index_buffer_info_get_by_ibidx(ibidx);
-   const num_faces = 1;
+   const ib_info = _index_buffers_info.buffer[ibidx];  
 
    // Check for buffer realloc
    if (ib_info.count + num_faces * INDICES_PER_RECT > ib_info.size) {
-       ib_info.Realloc();
+      ib_info.Realloc();
    }
 
-   const start = ib_info.count;
-   ib_gfx.start = start;
+   // const start = ib_info.count;
+   // ib_info.start = start;
    ib_info.Add(num_faces)
-   ib_gfx.count = ib_info.count;
+   ib_info.count = ib_info.count;
 
-   
+
    ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 
-   return start;
+   // return start;
 }
 
 
 
-export function Index_buffer_add_indices_from_non_existant_mesh(ib_gfx) {
+export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, num_faces_to_insert){
 
-   const ibidx = ib_gfx.idx;
-   const ib_info = Index_buffer_info_get_by_ibidx(ibidx);
-   const num_faces = 1;
+   const ib_info = _index_buffers_info.buffer[ibidx];  
 
-   // Check for buffer realloc
-   if (ib_info.count + num_faces * INDICES_PER_RECT > ib_info.size) {
-       ib_info.Realloc();
-   }
-
-   const start = ib_info.count;
-   ib_info.Add(num_faces)
+   const total_draw_count = draw_count + (num_faces_to_insert * ib_info.indices_per_face);
 
    
-   ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+   if(total_draw_count >= ib_info.count){
 
-   return start;
+      // Check for buffer realloc
+      if (total_draw_count > ib_info.size) {
+         ib_info.Realloc();
+      }
+
+      Index_buffer_add_indices(ibidx, (num_faces_to_insert * ib_info.indices_per_face));
+   }
 }
-
-
-
-
 
 
 
@@ -381,7 +323,7 @@ function DEBUG_PRINT(buffer, index, line) {
 
 
 
-export function Gl_index_buffer_print(){
+export function Gl_index_buffer_print() {
    console.log('IndexBuffer:', _index_buffers)
    console.log('IndexBufferInfo', _index_buffers_info)
 }

@@ -2,12 +2,14 @@
 
 const MAX_DRAWQUEUE_COUNT = 64; // Number of Gl programs for the queue  
 
-class Queue {
+class RenderQueueData {
 
    progidx;
    vbidx;
+   ibidx;
    queueIdx;
    isActive;
+   draw_count;
 
    constructor(){
       this.Reset();
@@ -17,8 +19,10 @@ class Queue {
    Set(elem){
       this.progidx  = elem.progidx;
       this.vbidx    = elem.vbidx;
+      this.ibidx    = elem.ibidx;
       this.queueIdx = elem.queueIdx;
       this.isActive = elem.isActive;
+      this.draw_count = elem.draw_count;
    }
 
    
@@ -27,6 +31,7 @@ class Queue {
       this.vbidx    = INT_NULL;
       this.queueIdx = INT_NULL;
       this.isActive = false;
+      this.draw_count = 0;
    }
 
 }
@@ -50,7 +55,7 @@ class RenderQueue {
    Init() {
       
       for (let i = 0; i < this.size; i++) {
-         this.buffer[i] = new Queue;
+         this.buffer[i] = new RenderQueueData;
       }
    }
 
@@ -82,15 +87,17 @@ class RenderQueue {
    }
 
 
-   Add(progidx, vbidx, isActive) {
+   Add(progidx, vbidx, ibidx, isActive) {
 
       // index = (i * (columns * depth)) + (j * depth) + k
       // index = (groupidx * (max_progs * max_vbs)) + (progidx * max_vbs) + vbidx
       const obj = {
          progidx: progidx,
          vbidx: vbidx,
+         ibidx: ibidx,
          queueIdx: this.count,
          isActive: isActive,
+         draw_count: 0,
       }
       this.buffer[this.count].Set(obj);
       this.count++;
@@ -128,7 +135,7 @@ class RenderQueue {
 
    Swap(obj1, obj2){
 
-      const temp = new Queue;
+      const temp = new RenderQueueData;
       temp.Set(obj1);
       obj1.Set(obj2);
       obj2.Set(temp);
@@ -170,7 +177,7 @@ class RenderQueue {
       const idx = this.Find(progidx, vbidx);
       if(idx !== INT_NULL){
 
-         const temp = new Queue;
+         const temp = new RenderQueueData;
          temp.Set(this.buffer[idx]); // Temporary store the prioritized element
 
          if(flag === FIRST && idx > 0){
@@ -216,7 +223,7 @@ class RenderQueue {
       const idx1 = this.Find(progs_groupidx1, progIdx1, vbIdx1);
       const idx2 = this.Find(progs_groupidx2, progIdx2, vbIdx2);
       if(idx1 !== INT_NULL && idx2 !== INT_NULL){
-         const temp = new Queue;
+         const temp = new RenderQueueData;
          temp.Set(this.buffer[idx1]); // Temporary store the prioritized element
          this.buffer[idx1].Set(this.buffer[idx2]);
          this.buffer[idx2].Set(temp);
@@ -245,34 +252,29 @@ class RenderQueue {
 
 
 
-const renderQueue = new RenderQueue;
+const _render_queue = new RenderQueue;
 
-export function Renderqueue_get() { return renderQueue; }
-
-
-
-export function Renderqueue_get_active() { return renderQueue.active; }
+export function Renderqueue_get() { return _render_queue; }
 
 
 
-export function Renderqueue_active_get_count() { return renderQueue.activeCount; }
+export function Renderqueue_get_active() { return _render_queue.active; }
+
+
+
+export function Renderqueue_active_get_count() { return _render_queue.activeCount; }
 
 
 
 
 export function Renderqueue_set_priority_by_program(flag, progidx) { 
-   renderQueue.SetPriorityProgram(flag, progidx); 
+   _render_queue.SetPriorityProgram(flag, progidx); 
 }
 
 
 
-// Set priority to the active render queue buffer, no need to update.
-export function Renderqueue_set_priority_to_active_queue(flag, progidx, vbidx) { /*// TODO: IMPLEMENT*/ }
-
-
-
 // Update the active queue, when new gfx buffers have been created
-export function Renderqueue_update_active_queue() { renderQueue.RebuildActiveQueue(); }
+export function Renderqueue_update_active_queue() { _render_queue.RebuildActiveQueue(); }
 
 
 
@@ -284,27 +286,29 @@ export function Renderqueue_update_active_queue() { renderQueue.RebuildActiveQue
  */
 export function Renderqueue_set_active(progidx, vbidx, flag){ 
 
-   const idx = renderQueue.Find(progidx, vbidx);
+   const idx = _render_queue.Find(progidx, vbidx);
    if(idx !== INT_NULL){
 
-      renderQueue.buffer[idx].isActive = flag;
-      // renderQueue.UpdateActiveQueueByIdx(idx);
+      _render_queue.buffer[idx].isActive = flag;
+      // _render_queue.UpdateActiveQueueByIdx(idx);
       // IMPORTANT: Rebuild the queue once, if this function is called at least once
-      renderQueue.RebuildActiveQueue(); // Create a new active buffer from the updated queue
+      _render_queue.RebuildActiveQueue(); // Create a new active buffer from the updated queue
    }
 }
 
 
 
-export function Renderqueue_Add(progidx, vbidx, isActive) {
-   renderQueue.Add(progidx, vbidx, isActive);
+export function Renderqueue_Add(progidx, vbidx, ibidx, isActive) {
+   _render_queue.Add(progidx, vbidx, ibidx, isActive);
 }
+
 
 
 
 export function Renderqueue_init() {
-   renderQueue.Init(); // One time initialization(creates an empty buffer...)
+   _render_queue.Init(); // One time initialization(creates an empty buffer...)
 }
+
 
 
 

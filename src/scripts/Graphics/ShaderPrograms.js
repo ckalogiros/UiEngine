@@ -238,19 +238,9 @@ class Gl_Program {
 
 		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
 
-		// this.prog_groupidxs = new Int8Buffer(1); // Array of all indexes of the groups this program belongs to. 
-
 		this.vb = new Int8Buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffers_info' buffer. 
-		// this.vb.Init(-1);
 
 		this.ib = new Int8Buffer(1); // Array of indexes to all index buffers in '_index_buffers_info' buffer. 
-		// this.ib.Init(-1);
-
-		// this.ubb = new Int8Buffer(1); // Array of indexes to all uniforms in '_uniform_blocks' buffer. 
-		// this.ubb.Init(-1);
-
-		// this.ub = new Int8Buffer(1); // Array of indexes to all uniforms in '_uniforms_buffer' buffer. 
-		// this.ub.Init(-1);
 
 		this.vao = null;
 		this.vaoidx = INT_NULL;
@@ -550,7 +540,6 @@ export function Program_update_text_info(params) {
 
 
 	// const ib_start = group.group_data[i].ib_start; // We want the start of the root mesh of the group, not the start of the root widget
-	// Index_buffer_reset_to_index(vbidx, ib_start);
 
 	// AddToGfxFromReset()
 

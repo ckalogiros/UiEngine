@@ -7,13 +7,14 @@
  */
 
 
-export function Create_buffer_from_type(type, size){
+export function Typed_array_create_from_type(type, size){
    switch(type){
 
       case BUFFER_TYPE.FLOAT32:{ return Create_buffer_float32(size); }
       case BUFFER_TYPE.UINT16:{ return Create_buffer_uint16(size); }
    }
 }
+
 
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays

@@ -8,7 +8,6 @@ import { AddArr2, RoundFloat1Decimal } from '../../../Helpers/Math/MathOperation
 import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js';
 import { Widget_root_add_mesh } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
-import { Index_buffer_add_indices } from '../../../Graphics/Buffers/IndexBuffers.js';
 import { BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
 import { Generate_graphics_context } from '../../Interfaces/Gfx/GfxContextFindMatch.js';
 
@@ -286,21 +285,16 @@ export class Widget_Slider extends Rect {
       if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
 
       if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) { this.AddToGfx(); this.is_gfx_inserted = true }
-      // if (!this.is_gfx_inserted) { this.AddToGfx(); this.is_gfx_inserted = true }
       if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE.ACTIVE)) { this.text_mesh.AddToGfx(); this.text_mesh.is_gfx_inserted = true }
-      // if (!this.text_mesh.is_gfx_inserted) { this.text_mesh.AddToGfx(); this.text_mesh.is_gfx_inserted = true }
 
       const bar = this.children.buffer[SLIDER_BAR_IDX];
       if (!bar.is_gfx_inserted && (bar.state.mask & MESH_STATE.ACTIVE)) { bar.AddToGfx(); bar.is_gfx_inserted = true }
-      // if (!bar.is_gfx_inserted) { bar.AddToGfx(); bar.is_gfx_inserted = true }
 
       const handle = bar.children.buffer[0];
       if (!handle.is_gfx_inserted && (handle.state.mask & MESH_STATE.ACTIVE)) { handle.AddToGfx(); handle.is_gfx_inserted = true }
-      // if (!handle.is_gfx_inserted) { handle.AddToGfx(); handle.is_gfx_inserted = true }
 
       const value_text = bar.children.buffer[1];
       if (!value_text.is_gfx_inserted && (value_text.state.mask & MESH_STATE.ACTIVE)) { value_text.AddToGfx(); value_text.is_gfx_inserted = true }
-      // if (!value_text.is_gfx_inserted) { value_text.AddToGfx(); value_text.is_gfx_inserted = true }
    }
 
 
@@ -309,7 +303,6 @@ export class Widget_Slider extends Rect {
       // Reset gfx start for the mesh
       // Add to vertexbuffer
       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
-      if(this.sid.shad & SID.SHAD.INDEXED) this.gfx.ib.start = Index_buffer_add_indices(this.gfx.ib, this.GetName());
       this.is_gfx_inserted = true;
       this.StateEnable(MESH_STATE.ACTIVE);
 
@@ -317,13 +310,11 @@ export class Widget_Slider extends Rect {
 
       const bar = this.children.buffer[SLIDER_BAR_IDX];
       Vertex_buffer_add_vertices(bar.gfx, bar.geom, bar.mat, bar.GetName());
-      if(bar.sid.shad & SID.SHAD.INDEXED) bar.gfx.ib.start = Index_buffer_add_indices(bar.gfx.ib, bar.GetName());
       bar.is_gfx_inserted = true;
       bar.StateEnable(MESH_STATE.ACTIVE);
 
       const handle = bar.children.buffer[0];
       Vertex_buffer_add_vertices(handle.gfx, handle.geom, handle.mat, handle.GetName());
-      if(handle.sid.shad & SID.SHAD.INDEXED) handle.gfx.ib.start = Index_buffer_add_indices(handle.gfx.ib, handle.GetName());
       handle.is_gfx_inserted = true;
       handle.StateEnable(MESH_STATE.ACTIVE);
 
@@ -364,7 +355,7 @@ export class Widget_Slider extends Rect {
 
          const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          TimeIntervalsDestroyByIdx(intervalIdx);
-         mesh.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.MOVE);
+         mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
          return;
       }
@@ -974,7 +965,7 @@ export function Slider_on_update_handle(_params) {
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       TimeIntervalsDestroyByIdx(intervalIdx);
-      bar.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.UPDATE);
+      bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
 
       return;
    }
