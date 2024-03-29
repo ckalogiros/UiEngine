@@ -1118,8 +1118,8 @@ function CreateDropdown2InSection(scene, pos, id) {
 
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[2], 1.5), 'S')
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
     const dp = Create_widget_dropdown(_, `${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
     // dp.CreateMoveEvent();
@@ -1208,7 +1208,8 @@ function CreateDropdown2InSection(scene, pos, id) {
     
     View_build_group_from_root_mesh(section)
     
-    section.ConstructListeners();
+    // section.ConstructListeners();
+    dp.ConstructListeners();
 
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes

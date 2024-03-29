@@ -521,16 +521,16 @@ export class Section extends Rect {
                params: null,
             }
             
+            /** // TODO: Pass the mesh event as is to be stored by ListeEvents buffer.
+             * Preriquisites:
+             * 1. Re-implement the ListeEvents to be able to store events directly from meshes via function call 
+             */
             const Clbk = (_Clbk) ? _Clbk : mesh.OnClick;
             if(evt.is_child_event){
-               // mesh.AddListenEvent(etypeidx, Clbk, target_params, evt.evt.parent_evt);
-               mesh.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, evt.evt.parent_evt, Clbk, mesh, target_params);
+               mesh.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, root_evt[etypeidx].evt, Clbk, mesh, target_params);
                root = evt.evt.parent_evt.source_params;
             }
-            else{
-               mesh.AddListenEvent(etypeidx, Clbk, target_params, root_evt);
-            }
-            // mesh.AddListenEvent(etypeidx, Clbk, target_params, root_evt);
+            else{ mesh.AddListenEvent(etypeidx, Clbk, target_params, root_evt); }
          }
       }
 

@@ -25,9 +25,7 @@ import { GREY } from "../Drawables/Material/Base/Colors.js";
  *    the one that is allready hovered.
  * CODE:
  *     
-       * If we already have registered a hovered mesh to STATE.mesh.hovered,
-       * skip checking all click listen events since the only possible ckicked is the one that is curently hovered.
-       * More Efficient.
+
       
       if (STATE.mesh.hovered &&
          STATE.mesh.hovered.listeners.buffer[H] !== INT_NULL &&
@@ -67,6 +65,16 @@ import { GREY } from "../Drawables/Material/Base/Colors.js";
 
       // }
  */
+
+
+// _CNT=0x1;
+// const E = {
+//    H:_CNT,
+//    C:_CNT<<=0x1,
+// }
+
+
+
 
 
 // TODO: Maybe the source_params and target params are just mesh_bufferidxs
@@ -111,6 +119,47 @@ export class Event_Listener {
 
 
    AddChildEvent(TYPE_IDX, parent_event, Clbk = null, source_params = null, target_params = null) {
+
+      if (this.event_type[TYPE_IDX] === undefined) {
+
+         console.log('Creating new event type events buffer')
+         this.event_type[TYPE_IDX] = new M_Buffer();
+      }
+
+      const event_params = {
+         /**DEBUG */name: (source_params) ? source_params.GetName() : 'NO SOURCE PARAMS',
+         type: TYPE_IDX,
+         Clbk: Clbk,
+         evt_idx: INT_NULL,
+         parent_evt: parent_event,
+         source_params: source_params,
+         target_params: target_params,
+         isActive: true,
+         children: null, // current mesh may have children with events. This is the buffer to store them, but only after 'ReconstructEvents' function call.
+         has_child_events: false, // This is to check if the current event has any children events(eficient since we do not have to check every child event if 'isActive')
+      }
+
+      LISTENERS_FLAGS[TYPE_IDX] = true;
+      const event = parent_event;
+      /*DEBUG*/ if (!event) {
+         console.error('Parent event not found. Parent event listeners:', parent_event); return;
+      }
+
+      if (!event.children) {
+         event.children = new M_Buffer();
+      }
+
+      event_params.evt_idx = event.children.Add(event_params);
+      event.has_child_events = true;
+
+      if (source_params.debug_info.type === 0)
+         Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.LISTENERS, event_params);
+
+      return event.children.buffer[event_params.evt_idx];
+   }
+
+
+   AddChildEventFromMesh(TYPE_IDX, parent_event, Clbk = null, source_params = null, target_params = null) {
 
       if (this.event_type[TYPE_IDX] === undefined) {
 

@@ -359,7 +359,7 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
    
    // Get the root mesh
    const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
-   if(do_reconstruct_listeners) mesh.ConstructListeners(); 
+   if(do_reconstruct_listeners) mesh.ConstructListeners(mesh.parent); 
 
 }
 

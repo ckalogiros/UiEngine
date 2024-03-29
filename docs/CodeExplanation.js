@@ -41,7 +41,7 @@
  * A section should be responsible for:
  *    position: all its children
  *    size: resize all its children, if they are sections
- *          resize its self, tha means repositioning its children
+ *          resize its self, that means repositioning its children
  */
 
 /** ### Event Listener
