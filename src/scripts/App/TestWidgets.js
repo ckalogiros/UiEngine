@@ -158,7 +158,7 @@ export function TestWidgetsGeneric(scene) {
 
     // CreateScroller(scene);
     // CreateScrollerClampAlphaTest(scene)
-    // CreateScrollerDp(scene)
+    CreateScrollerDp(scene)
     // CreateScrollerWithWidgets(scene);
 
 
@@ -1198,9 +1198,9 @@ function CreateDropdown2InSection(scene, pos, id) {
 
     }
 
-    section.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
     
+    section.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN
     section.Calc_no_gfx_update();
     
     
@@ -3651,7 +3651,6 @@ function Help(scene) {
         s1.AddItem(label)
     }
 
-    // s1.Calc()
 
     const minimizer = Create_widget_minimize_btn(_, section, section.geom.pos, 12);
     minimizer.SetName('minimi')
@@ -3659,17 +3658,19 @@ function Help(scene) {
     section.AddItem(minimizer);
     section.AddItem(s1)
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    section.ActivateAndChildrenRecursive()
-    section.Render();
-    // section.options = SECTION.VERTICAL;
-    // section.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.INHERIT;
-    // section.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.INHERIT;
-    section.options = SECTION.INHERIT | SECTION.VERTICAL;
-    section.Calc()
-    //*Gfx_end_session(true);
+        
+    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+    
+    section.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN
+    section.Calc_no_gfx_update();
+    
+    
+    section.Render()
+    
+    View_build_group_from_root_mesh(section)
 
     section.ConstructListeners();
+
 
     // Create_root_widget_buffer(section);
     // Create_widget_tree_from_root(section);

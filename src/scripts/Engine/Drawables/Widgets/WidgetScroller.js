@@ -851,28 +851,17 @@ export function Scroller_on_update_handle(_params) {
     *    
     */
 
-   // if((scrolled_section.type & MESH_TYPE.WIDGET_DROP_DOWN)===0){
-
-      // Listener_destroy_children_buffer(LISTEN_EVENT_TYPES_INDEX.HOVER, scrolled_section.listeners.buffer[0].evt.evt_idx);
-      // Listener_remove_event_by_idx(LISTEN_EVENT_TYPES_INDEX.HOVER, scrolled_section.listeners.buffer[0].evt)
-      // scrolled_section.listeners.RemoveByIdx(LISTEN_EVENT_TYPES_INDEX.HOVER)
-      // Listener_remove_child_event_from_parent(LISTEN_EVENT_TYPES_INDEX.CLICK, scrolled_section.listeners.buffer[1].evt)
-      // }
       
    for(let i=0; i<2; i++){
-      
-      // Listener_destroy_children_buffer(LISTEN_EVENT_TYPES_INDEX.HOVER, scrolled_section.listeners.buffer[0].evt.evt_idx);
-      // // Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i].evt)
-      // scrolled_section.listeners.RemoveByIdx(i)
-      
+
       if(scrolled_section.listeners.buffer[i].is_child_event){
          Listener_remove_child_event_from_parent(i, scrolled_section.listeners.buffer[i].evt);
       }
-      // else{
-      //    Listener_destroy_children_buffer(i, scrolled_section.listeners.buffer[i].evt.evt_idx);
-      //    Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i].evt)
-      //    scrolled_section.listeners.RemoveByIdx(i)
-      // }
+      else{
+         Listener_destroy_children_buffer(i, scrolled_section.listeners.buffer[i].evt.evt_idx);
+         Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i].evt)
+         scrolled_section.listeners.RemoveByIdx(i)
+      }
    }
    
    
