@@ -19,6 +19,7 @@ export class Material {
    uvIdx; // Value: The index of the uvmap data for the texture
    texidx; // Value: The index of the texture
 
+   // TODO
    // col_id; // An index to the Str_buffer. As a name, is the name of the shader's color attribute. 
    // uv_id; // An index to the Str_buffer. As a name, is the name of the shader's textureCoord attribute. 
    // style_id; // An index to the Str_buffer. As a name, is the name of the shader's textureCoord attribute. 
@@ -126,15 +127,20 @@ export class Material {
 	}
 }
 
+
+
+
 export class FontMaterial extends Material {
 
    text;
+   defText;
    sdf_params;
 
    constructor(col = [1,1,1,1], texidx=INT_NULL, text='', sdf_params = [.5,.5]) {
 
       super(col, texidx);
       this.text = text;
+      this.defText = text.slice();
       this.sdf_params = [0, 0];
       math.CopyArr2(this.sdf_params, sdf_params);
       this.texidx = texidx;

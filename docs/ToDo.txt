@@ -1,6 +1,6 @@
 --------------------------------------------------- Milestones!
 -Convert all mesh attribs to indexes in a vertex buffer ???
--Resizing
++Resizing
 -Horizontal scrolling
 -Set Focused and enable order drawing
 -Set draw STATIC/DYNAMIC for vertex buffers

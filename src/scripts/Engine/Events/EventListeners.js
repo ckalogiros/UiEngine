@@ -637,7 +637,7 @@ function Listener_debug_print_info_recursive(children, count) {
          for (let j = 0; j < count; j++) { r += '->'; }
 
          const mesh = Mesh_buffer_get_mesh_byidx(e.meshidx);
-         const is_child_event = (mesh.listeners.buffer[E.H]) ? mesh.listeners.buffer[E.C].is_child_event : false;
+         const is_child_event = (mesh.listeners.buffer[1]) ? mesh.listeners.buffer[1].is_child_event : false;
          const parentEvent = e.parent_event ? e.parent_event.GetName() : 'NULL'
          console.log(`${r} :(${mesh.GetName()})-(has children:${e.has_child_events})-(is child:${is_child_event})-(evtidx:${e.evt_idx})-(parent:${parentEvent})`);
          total_count++;

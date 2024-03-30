@@ -28,7 +28,26 @@ import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clipx_from_group, Clipy_from_
 import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { View_build_group_from_root_mesh, View_set_view_start_vb_index } from '../Engine/Core/MeshBufferViews.js';
 import { Index_buffer_info_create } from '../Graphics/Buffers/IndexBuffers.js';
+import { getFile } from '../Engine/Core/FileSystem.js';
 
+// var osu = require('node-os-utils')
+// import {osu} from 'node-os-utils'
+// import {osu} from '../node-os-utils/index.js'
+// import * as os from "../node-os-utils/index.js"
+
+// import { Buffer } from 'buffer';
+
+// import fs from 'fs-extra';
+// import * as fsce from 'fs-extra'
+// const fs = require('fs');
+
+// const data = { name: 'John', age: 30, city: 'New York' };
+// const jsonData = JSON.stringify(data);
+
+// fs.writeFile('data.json', jsonData, (err) => {
+//     if (err) throw err;
+//     console.log('Data has been written to data.json');
+// });
 
 /**
  * // TODO: IMPLEMENT:
@@ -64,7 +83,7 @@ export function TestWidgetsGeneric(scene) {
 
 
 
-
+    // getFile()
 
 
     // GLOBAL_TEST.index_buffer_info = Index_buffer_info_create(_, 100*INDICES_PER_RECT, TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN.rect_123_234);
@@ -131,7 +150,7 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    const label = CreateLabel('LABEL');
+    // const label = CreateLabel('LABEL');
     // CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
@@ -158,7 +177,7 @@ export function TestWidgetsGeneric(scene) {
 
     // CreateScroller(scene);
     // CreateScrollerClampAlphaTest(scene)
-    // CreateScrollerDp(scene)
+    CreateScrollerDp(scene)
     // CreateScrollerWithWidgets(scene);
 
 
@@ -3256,7 +3275,7 @@ function CreateScrollerDp(scene) {
     for (let i = 0; i < count; i++) {
         // const label = Create_widget_section(_, _, _, [400, 300, 0], [20,20], TRANSPARENCY(colors[i], .7), `Section${i + 1}`)
         // const label = Create_widget_text(_, `${i}`, [100, 100, 2], fontsize, TRANSPARENCY(colors[i], .7), WHITE)
-        const label = Create_widget_label(_, `${i}`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE)
+        const label = Create_widget_label(_, `${i} THIS IS A LARGE TEXT FOR TESTING`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE)
 
         label.SetName(`${label.id}`);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
@@ -3281,6 +3300,7 @@ function CreateScrollerDp(scene) {
     const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1];
     const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
     Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+    // Clipx_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
 
     scroller.Render();
 

@@ -15,7 +15,10 @@
         "start": "snowpack dev",
         "build": "snowpack build"
     },
-    "devDependencies": {
+    "dependencies": {
+        "@snowpack/plugin-run-script": "^2.3.0",
+        "fs": "^0.0.1-security",
+        "fs-extra": "^11.2.0",
         "snowpack": "^3.8.8"
     }
 }

@@ -24,41 +24,121 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
       for(let j=0; j <= meshshes_idx.boundary; j++){
          
          const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-         const right   = mesh.geom.pos[0] + mesh.geom.dim[0];
-   
+         
          // We run for all meshes of the group so that on scoll every mesh is clipped
          // Case for text meshes
+         const r = mesh.geom.pos[0] + (mesh.geom.dim[0] * 2 * mesh.geom.num_faces) ;
+         // if((mesh.type & MESH_TYPE.TEXT_MESH)===0) console.log('right', right, 'def_right', def_right)
+         
          if(mesh.type & MESH_TYPE.TEXT_MESH){
-
-            const r = mesh.geom.pos[0] + (mesh.geom.dim[0] * 2 * mesh.geom.num_faces) ;
-            if(r > limit.right){
-
+            
+            const text_right = mesh.GetTextRight_A();
+            // console.log('text_right', text_right, 'len', mesh.mat.text.length, mesh.GetName())
+            if(text_right > limit.right){
+               
                // TEMPORARY: Clip text. Should use def_text for default text storage.
                let pos = mesh.geom.pos[0];
                let new_text = '';
                for(let i=0; i<mesh.mat.text.length; i++){
-
+                  
                   pos += mesh.geom.dim[0];
                   if(pos >= limit.right - mesh.geom.dim[0]) break
-                  new_text += mesh.mat.text[i];
+                  // new_text += mesh.mat.text[i];
+                  mesh.mat.text[i] = mesh.mat.defText[i];
                }
 
+               // mesh.ClampX(x, margin = 0)
+
+               mesh.geom.num_faces = mesh.mat.text.length;
                mesh.geom.num_faces = new_text.length;
                mesh.mat.text = new_text;
+               
+               
+               mesh.state.mask |= MESH_STATE.CLIPED_X;
+               changes_hapened = true;
+            }
+            else{
+
+               let pos = mesh.geom.pos[0];
+               // let new_text = '';
+               for(let i=0; i<mesh.mat.defText.length; i++){
+                  
+                  pos += mesh.geom.dim[0];
+                  if(pos > limit.right + mesh.geom.dim[0]) break
+                  // new_text += mesh.mat.defText[i];
+                  mesh.mat.text[i] = mesh.mat.defText[i];
+               }
+               // mesh.ClampX(x, margin = 0)
+               
+               mesh.geom.num_faces = mesh.mat.text.length;
+               // mesh.geom.num_faces = new_text.length;
+               // mesh.mat.text = new_text;
+               
+               
+               mesh.state.mask &= ~MESH_STATE.CLIPED_X;
+               changes_hapened = true;
+            }
+         }
+         else{
+            
+            const right   = mesh.geom.pos[0] + mesh.geom.dim[0];
+            const def_right   = mesh.geom.defPos[0] + mesh.geom.defDim[0];
+            
+            if(right > limit.right){
+   
+               const reduce = (right) - limit.right;
+               mesh.geom.dim[0] -= reduce/2;
+               mesh.geom.pos[0] -= reduce/2;
+               
+               mesh.state.mask |= MESH_STATE.CLIPED_X;
+               changes_hapened = true;
+   
+            }
+            else if(right < def_right){ // if mesh right < mesh default dim
+   
+               const reduce = (right) - limit.right;
+               mesh.geom.dim[0] -= reduce/2;
+               mesh.geom.pos[0] -= reduce/2;
                
                mesh.state.mask |= MESH_STATE.CLIPED_X;
                changes_hapened = true;
             }
          }
-         else if(right > limit.right){
+
+         
+
+
+         // if(mesh.type & MESH_TYPE.TEXT_MESH){
+
+         //    const r = mesh.geom.pos[0] + (mesh.geom.dim[0] * 2 * mesh.geom.num_faces) ;
+         //    if(r > limit.right){
+
+         //       // TEMPORARY: Clip text. Should use def_text for default text storage.
+         //       let pos = mesh.geom.pos[0];
+         //       let new_text = '';
+         //       for(let i=0; i<mesh.mat.text.length; i++){
+
+         //          pos += mesh.geom.dim[0];
+         //          if(pos >= limit.right - mesh.geom.dim[0]) break
+         //          new_text += mesh.mat.text[i];
+         //       }
+
+         //       mesh.geom.num_faces = new_text.length;
+         //       mesh.mat.text = new_text;
+               
+         //       mesh.state.mask |= MESH_STATE.CLIPED_X;
+         //       changes_hapened = true;
+         //    }
+         // }
+         // else if(right > limit.right){
    
-            const reduce = right - limit.right;
-            mesh.geom.dim[0] -= reduce/2;
-            mesh.geom.pos[0] -= reduce/2;
+         //    const reduce = right - limit.right;
+         //    mesh.geom.dim[0] -= reduce/2;
+         //    mesh.geom.pos[0] -= reduce/2;
             
-            mesh.state.mask |= MESH_STATE.CLIPED_X;
-            changes_hapened = true;
-         }
+         //    mesh.state.mask |= MESH_STATE.CLIPED_X;
+         //    changes_hapened = true;
+         // }
       }
    }
 

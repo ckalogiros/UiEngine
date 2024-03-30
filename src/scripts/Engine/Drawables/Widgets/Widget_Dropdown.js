@@ -308,7 +308,7 @@ export class Widget_Dropdown extends Section {
 
                // TODO. Do we genarate gfx for any other widget in the same gfx????  
                item.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-               console.error('TEMP ERROR PATH:', item.GetName())
+               // console.error('TEMP ERROR PATH:', item.GetName())
 
             }
 
@@ -718,7 +718,7 @@ export class Widget_Dropdown extends Section {
 
 
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-      // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
+      Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 
    }
@@ -826,7 +826,7 @@ export class Widget_Dropdown extends Section {
       }
       
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-      // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
+      Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 

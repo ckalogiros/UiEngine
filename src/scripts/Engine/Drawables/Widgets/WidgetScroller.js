@@ -8,7 +8,7 @@ import { Vertex_buffer_add_vertices, Vertex_buffer_info_get_by_vbidx } from "../
 import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
-import { Clipy_from_group } from "../Operations/Clip.js";
+import { Clipx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { BLUE_10_120_220, GREY, PURPLER } from "../Material/Base/Colors.js";
 import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Listener_destroy_children_buffer, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
@@ -410,17 +410,17 @@ export class Widget_Scroller extends Section {
          // We have Resize
 
          if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
-            console.log('X Y RESIZE');
+            // console.log('X Y RESIZE');
 
             const OnResizeFn = mesh.OnResize;
             const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
          }
          else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
-            console.log('X RESIZE');
+            // console.log('X RESIZE');
          }
          else { // Its a height resize
-            console.log('Y RESIZE');
+            // console.log('Y RESIZE');
          }
 
          mesh.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB;
@@ -505,7 +505,7 @@ export class Widget_Scroller extends Section {
          return;
       }
 
-      console.log('RESIZING ', scroller.GetName());
+      // console.log('RESIZING ', scroller.GetName());
       const mouse_pos = MouseGetPosDif();
 
       // TODO: We can set all positions and simentions and call 'Gl_set_pos_dim' for all meshes of the scroller
@@ -534,7 +534,7 @@ export class Widget_Scroller extends Section {
             // resize bar
             const bar = scroller.children.buffer[SCROLL_BAR_IDX];     
             
-            const bar_old_height = bar.geom.dim[1];
+            // const bar_old_height = bar.geom.dim[1];
 
             bar.geom.dim[1] += y;
             bar.geom.pos[1] += y;
@@ -542,8 +542,8 @@ export class Widget_Scroller extends Section {
             Gl_set_wpos_Y(bar.gfx, bar.geom.pos[1], bar.geom.num_faces)
 
 
-            const dif_percentage = bar.geom.dim[1] / bar_old_height;
-            console.log(dif_percentage)
+            // const dif_percentage = bar.geom.dim[1] / bar_old_height;
+            // console.log(dif_percentage)
             
             // re-position handle
             const dif = y/2;
@@ -556,6 +556,16 @@ export class Widget_Scroller extends Section {
 
          Gl_set_dim_XY(scroller.gfx, scroller.geom.dim, scroller.geom.num_faces)
          Gl_set_wpos_XY(scroller.gfx, scroller.geom.pos, scroller.geom.num_faces)
+
+         View_reset_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0]);
+
+         const clip_top = scroller.scrolled_section.geom.pos[1] - scroller.geom.dim[1];
+         const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
+         const clip_right = scroller.geom.pos[0] + scroller.geom.dim[0];
+         // console.log('clip_right ', clip_right);
+         // Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+         Clipx_from_group(scroller.scrolled_section.group_bufferidxs[0], 0, clip_right);
+         View_rerender_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0], false);
 
 
       }
