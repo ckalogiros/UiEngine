@@ -131,7 +131,7 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    // const label = CreateLabel('LABEL');
+    const label = CreateLabel('LABEL');
     // CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
@@ -158,7 +158,7 @@ export function TestWidgetsGeneric(scene) {
 
     // CreateScroller(scene);
     // CreateScrollerClampAlphaTest(scene)
-    CreateScrollerDp(scene)
+    // CreateScrollerDp(scene)
     // CreateScrollerWithWidgets(scene);
 
 
@@ -790,6 +790,7 @@ function CreateLabel(name = 'Label ') {
     const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
     label.ConstructListeners();
 
     // label.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
@@ -1523,10 +1524,10 @@ function DestroyMeshTest(scene, widget) {
     }
     const btn1 = Create_widget_button(_, 'Destroy', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [160, 240, 0], 5, GREY[1], WHITE, [4, 4], .5);
     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
-    btn1.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, customCallback)
+    btn1.AddListenEvent(E.C, customCallback)
     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    btn1.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER)
-    btn1.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
+    btn1.AddListenEvent(E.H)
+    btn1.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
     btn1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [6, 6, 3] })
     btn1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, gfx_idxs);
     btn1.Render();
@@ -3608,15 +3609,17 @@ function CreateScrollerWithWidgets(scene) {
     scroller.scrolled_section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL;
 
     scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, _, false);
-    scroller.options = SECTION.TOP_DOWN | SECTION.VERTICAL;
     
+    scroller.options = SECTION.TOP_DOWN | SECTION.VERTICAL;
     scroller.Calc_no_gfx_update();
     
     scroller.Render();
+
+    View_build_group_from_root_mesh(scroller.scrolled_section);
+    
     scroller.ConstructListeners();
     
     
-    View_build_group_from_root_mesh(scroller.scrolled_section);
 
 
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, scroller.scrolled_section);

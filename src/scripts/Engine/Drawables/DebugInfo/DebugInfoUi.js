@@ -421,15 +421,15 @@ function Debug_info_create_ui_mouse() {
 
 function Debug_info_update_ui_mouse_pos(params) {
 
-   const target_mesh = params.target_params;
+   const evt_params = params.evt_params;
    const m = params.trigger_params.mouse;
 
    const mp = `pos: x:${m.pos.x}, y:${m.pos.y}`;
    const mpr = `area: x:${m.pos.x - m.click.up.x}, y:${m.pos.y - m.click.up.y}`;
 
-   const mouse_pos_text = target_mesh.children.buffer[0];
+   const mouse_pos_text = evt_params.children.buffer[0];
    mouse_pos_text.UpdateText(mp)
-   const mouse_prev_text = target_mesh.children.buffer[1];
+   const mouse_prev_text = evt_params.children.buffer[1];
    mouse_prev_text.UpdateText(mpr)
 
 }
@@ -915,10 +915,10 @@ function Debug_info_create_batch_info(params) {
 
 function Debug_info_update_batch(params) {
 
-   const target_mesh = params.params.target_params;
+   const evt_params = params.params.target_params;
 
-   const info1 = target_mesh.children.buffer[0];
-   const info2 = target_mesh.children.buffer[1];
+   const info1 = evt_params.children.buffer[0];
+   const info2 = evt_params.children.buffer[1];
 
    info1.UpdateText(`Batch store: ${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_STORE}`)
    info2.UpdateText(`Batch update: ${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_UPDATE}`)

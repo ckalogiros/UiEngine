@@ -24,17 +24,15 @@ export class Widget_Button extends Widget_Label {
 
    OnClick(params) {
 
-      // const mesh = params.target_params.target_mesh;
-
       /**
        * For popup menu options and slider connections.
        * If the option is clicked, then we must call the slider connect function
        */
 
-      if (params.target_params && params.target_params.EventClbk) {
+      if (params.evt_params && params.evt_params.EventClbk) {
 
-         const EventClbk = params.target_params.EventClbk;
-         EventClbk(params.target_params);
+         const EventClbk = params.evt_params.EventClbk;
+         EventClbk(params.evt_params);
       }
       else { // Fallback to label OnClick()
          super.OnClick(params);
@@ -113,7 +111,7 @@ export class Widget_Switch extends Widget_Button {
 
    OnClick(params) {
 
-      const mesh = params.target_params.target_mesh;
+      const mesh = params.evt_params.target_mesh;
       const text_mesh = mesh.text_mesh;
 
       mesh.isOn ^= 0x1;
@@ -127,10 +125,10 @@ export class Widget_Switch extends Widget_Button {
        * If the option is clicked, then we must call the slider connect function
        */
 
-      if (params.target_params.EventClbk) {
+      if (params.evt_params.EventClbk) {
 
-         const EventClbk = params.target_params.EventClbk;
-         EventClbk(params.target_params);
+         const EventClbk = params.evt_params.EventClbk;
+         EventClbk(params.evt_params);
       }
 
       console.log('CLICKED')

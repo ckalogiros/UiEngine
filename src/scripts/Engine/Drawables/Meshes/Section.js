@@ -6,7 +6,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_batch_move_from_batch_buffer } from "../../Core/MeshBuffer.js";
+import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_batch_move_from_batch_buffer, Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Listener_create_child_event } from "../../Events/EventListeners.js";
 
@@ -444,7 +444,7 @@ export class Section extends Rect {
 
    OnClick(params) {
 
-      const section = params.target_params.target_mesh;
+      const section = params.evt_params.target_mesh;
 
       const point = MouseGetPos();
       const g = section.geom;
@@ -492,7 +492,7 @@ export class Section extends Rect {
        * In the loop, before calling 'ConstructListeners', we 
        * check if the current 'root', which may be the root or the 'this' mesh,
        * has events in its 'listeners' buffer. If it has not, then we
-       * create a fake event, with no callback or target_params, so as to have an 
+       * create a fake event, with no callback or evt_params, so as to have an 
        * event in the ListenersBuffer to store any possible children events.
        * In the ListenersBuffer, we create a 'children's' buffer, and in that buffer
        * any child event will go.
@@ -514,7 +514,7 @@ export class Section extends Rect {
 
          if (evt) { // If mesh has events to add...
             
-            const target_params = {
+            const evt_params = {
                EventClbk: null,
                targetBindingFunctions: null,
                target_mesh: mesh,
@@ -527,10 +527,10 @@ export class Section extends Rect {
              */
             const Clbk = (_Clbk) ? _Clbk : mesh.OnClick;
             if(evt.is_child_event){
-               mesh.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, root_evt[etypeidx].evt, Clbk, mesh, target_params);
-               root = evt.evt.parent_evt.source_params;
+               mesh.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, mesh.mesh_bufferidx, Clbk, evt_params, root_evt[etypeidx].evt);
+               root = Mesh_buffer_get_mesh_byidx(evt.evt.parent_evt.meshidx);
             }
-            else{ mesh.AddListenEvent(etypeidx, Clbk, target_params, root_evt); }
+            else{ mesh.AddListenEvent(etypeidx, Clbk, evt_params, root_evt); }
          }
       }
 
@@ -552,15 +552,15 @@ export class Section extends Rect {
 
             // Case item is of type section, run recursively.
             // If the root mesh does not have an event, create a fake event to store the children events to. 
-            if (mesh.listeners.buffer[0] === null) {
+            if (mesh.listeners.buffer[E.H] === null) {
 
                mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, true);
-               mesh.AddListenEvent(0, null, null, parent_root.listeners.buffer);
+               mesh.AddListenEvent(E.H, null, null, parent_root.listeners.buffer);
             }
-            if (mesh.listeners.buffer[1] === null) {
+            if (mesh.listeners.buffer[E.C] === null) {
 
                mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
-               mesh.AddListenEvent(1, null, null, parent_root.listeners.buffer);
+               mesh.AddListenEvent(E.C, null, null, parent_root.listeners.buffer);
             }
 
             if (child.ConstructListeners) // Call the widget's specific .ConstructListeners() to handle the widget's listen events creation

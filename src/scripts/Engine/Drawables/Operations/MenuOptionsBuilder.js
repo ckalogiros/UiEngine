@@ -60,7 +60,7 @@ export function Menu_options_create(clicked_mesh, pos) {
          const option_label = section_option.children.buffer[OPTION_SWITCH_IDX];
          ERROR_NULL(option_switch);
 
-         const target_params = { // Build the parameters for the OnClick callback function.
+         const evt_params = { // Build the parameters for the OnClick callback function.
             EventClbk: Slider_connect,
             targetBindingFunctions: Bind_change_brightness, // TODO: Should be an array of functions.
             clicked_mesh: clicked_mesh,
@@ -68,7 +68,7 @@ export function Menu_options_create(clicked_mesh, pos) {
          }
 
          // Listeners have been removed(on popup deactivate), so we need to re-create them.
-         option_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, option_switch.OnClick, target_params)
+         option_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, option_switch.OnClick, evt_params)
          option_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
       }
@@ -123,7 +123,7 @@ function Menu_options_create_slider_popup_menu_options(clicked_mesh, _pos) {
       option_switch.SetName(`switch:${i}`);
       option_label.SetName(`label:${i}`);
       
-      const target_params = {
+      const evt_params = {
          EventClbk: Slider_connect,
          targetBindingFunctions: Bind_change_brightness,
          clicked_mesh: clicked_mesh,
@@ -131,7 +131,7 @@ function Menu_options_create_slider_popup_menu_options(clicked_mesh, _pos) {
       }
       
       ERROR_NULL(option_switch.OnClick); // Make sure the option mesh has an OnClick method
-      option_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, option_switch.OnClick, target_params)
+      option_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, option_switch.OnClick, evt_params)
       option_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       option_switch.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
 

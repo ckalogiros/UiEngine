@@ -9,11 +9,11 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/Tim
 import { Rect } from "../Meshes/Rect_Mesh.js";
 import { Align_self } from "../Operations/Alignment.js";
 import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
-import { Gl_set_alpha_from_offset, Gl_set_dim_X, Gl_set_wpos_X } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_alpha_from_offset, Gl_set_dim_X, Gl_set_dim_XY, Gl_set_wpos_X, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
@@ -143,7 +143,7 @@ export class Widget_Label extends Rect {
     // Graphics
     /*******************************************************************************************************************************************************/
 
-    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific=[INT_NULL, INT_NULL], text_gfx_specific=[INT_NULL, INT_NULL]) {
+    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific = [INT_NULL, INT_NULL]) {
 
         this.gfx = Gfx_generate_context(FLAGS, this, area_gfx_specific);
         this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_gfx_specific);
@@ -313,27 +313,21 @@ export class Widget_Label extends Rect {
 
     Reposition_pre(pos_dif) { // Update the widget's position, after it is added to the gfx buffers
 
-        AddArr2(this.geom.pos, pos_dif);
-        // AddArr2(this.geom.pos_dif, pos_dif);
-
         if (this.batch_fnidx === INT_NULL)
             this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
+
+        AddArr2(this.geom.pos, pos_dif);
 
         const update_data = {
             sizes: [2],
             data: [pos_dif[0], pos_dif[1]],
         };
+
         Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data);
 
         AddArr2(this.text_mesh.geom.pos, pos_dif);
-        // AddArr2(this.text_mesh.geom.pos_dif, pos_dif);
-
-        // if (this.text_mesh.batch_fnidx === INT_NULL)
         this.text_mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-
         Batch_store(this.text_mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
-
-        // Batch_store(this.text_mesh, _, { pos: this.text_mesh.geom.pos_dif }, _);
     }
 
 
@@ -484,13 +478,13 @@ export class Widget_Label extends Rect {
 
             const evt = mesh.listeners.buffer[etypeidx];
             if (evt) { // If event is not null
-                const target_params = {
+                const evt_params = {
                     EventClbk: null,
                     targetBindingFunctions: null,
                     target_mesh: mesh,
                     params: null,
                 }
-                mesh.AddListenEvent(etypeidx, mesh.OnClick, target_params, root_evt);
+                mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, root_evt);
             }
         }
     }
@@ -498,37 +492,71 @@ export class Widget_Label extends Rect {
 
     OnClick(params) {
 
-        const mesh = params.target_params.target_mesh;
-        const OnMoveFn = mesh.OnMove;
+        const mesh = params.evt_params.target_mesh;
 
-        const point = MouseGetPos();
-        const g = mesh.geom;
-        if (Check_intersection_point_rect(g.pos, g.dim, point, [0, 8])) {
 
-            STATE.mesh.SetClicked(mesh);
-            // STATE.mesh.SetFocused(mesh);
-            console.log('Clicked:', mesh.GetName())
 
-            if (mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+        STATE.mesh.SetClicked(mesh);
+        // STATE.mesh.SetFocused(mesh);
+        console.log('Clicked:', mesh.GetName())
 
-                /**
-                 * Create Move event.
-                 * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
-                 * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
-                */
+        // IMPORTANT: We use the 'INTERVALS.MOVE' index for the 'timeIntervalsIdxBuffer' element, to store the interval for the move OR the resize event, since resize and move (intervals) cannot co-exist.
+        if (mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+
+            /**
+             * Create Move event.
+             * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
+             * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
+            */
+
+            let is_resizesed = false;
+
+            // Check for Resize
+            if (mesh.StateCheck(MESH_STATE.IS_RESIZEABLE)) {
+
+                const point = MouseGetPos();
+
+                const right = mesh.geom.pos[0] + mesh.geom.dim[0];
+                const bottom = mesh.geom.pos[1] + mesh.geom.dim[1];
+                if (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1]) {
+
+                    // We have Resize
+
+                    if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
+                        console.log('X Y RESIZE');
+
+                        const OnResizeFn = mesh.OnResize;
+                        const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
+                        mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+                    }
+                    else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
+                        console.log('X RESIZE');
+                    }
+                    else { // Its a height resize
+                        console.log('Y RESIZE');
+                    }
+
+                    mesh.StateEnable(MESH_STATE.IN_RESIZE);
+                    is_resizesed = true;
+                }
+            }
+
+
+            if (!is_resizesed) { // implement move 
+                const OnMoveFn = mesh.OnMove;
                 const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
                 mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
-
-                if (mesh.StateCheck(MESH_STATE.IS_GRABABLE)) {
-
-                    STATE.mesh.SetGrabed(mesh);
-                    mesh.StateEnable(MESH_STATE.IN_GRAB);
-                }
-
             }
-            return true;
+
+
+            if (mesh.StateCheck(MESH_STATE.IS_GRABABLE)) {
+
+                STATE.mesh.SetGrabed(mesh);
+                mesh.StateEnable(MESH_STATE.IN_GRAB);
+            }
+
         }
-        return false;
+        return true;
     }
 
 
@@ -576,6 +604,53 @@ export class Widget_Label extends Rect {
 
     }
 
+
+    OnResize(params) {
+
+        const mesh = params.params;
+        
+        if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+            
+            const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+            TimeIntervalsDestroyByIdx(intervalIdx);
+            mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+            
+            return;
+        }
+        
+        console.log('RESIZING ', mesh.GetName());
+        const mouse_pos = MouseGetPosDif();
+        
+        if (mouse_pos.x !== 0 || mouse_pos.y !== 0) {
+
+            const x = mouse_pos.x /2;
+            const y = -mouse_pos.y /2;
+            
+            // Check for min dimentions. // TODO: Who decides for the minimum dimentions??????
+            const min_width = 40;
+            const min_height = 20;
+            
+            if(mesh.geom.dim[0] + x > min_width) {
+                mesh.geom.dim[0] += x;
+                mesh.geom.pos[0] += x;
+            }
+            if(mesh.geom.dim[1] + y > min_height) {
+                mesh.geom.dim[1] += y; 
+                mesh.geom.pos[1] += y;
+            }
+            
+            
+            Gl_set_dim_XY(mesh.gfx, mesh.geom.dim, mesh.geom.num_faces)
+            Gl_set_wpos_XY(mesh.gfx, mesh.geom.pos, mesh.geom.num_faces)
+            
+            
+            // TODO: Align text
+            const text_mesh = mesh.text_mesh;
+
+        }
+
+    }
+
 }
 
 
@@ -599,7 +674,7 @@ export class Widget_Label_Text_Mesh_Menu_Options extends Widget_Label {
 
     OnClick(params) {
 
-        const mesh = params.source_params;
+        const mesh = Mesh_buffer_get_mesh_byidx(params.meshidx);
         const point = MouseGetPos();
         const m = mesh.geom;
 
@@ -612,19 +687,19 @@ export class Widget_Label_Text_Mesh_Menu_Options extends Widget_Label {
             /** For popup menu options and slider connections.
              *  If the option is clicked, then we must call the slider connect function
              */
-            if (params.target_params) {
+            if (params.evt_params) {
 
-                const target_params = {
+                const evt_params = {
 
-                    targetBindingFunctions: params.target_params.targetBindingFunctions,
-                    self_mesh: params.target_params.clicked_mesh,
-                    target_mesh: params.target_params.target_mesh,
+                    targetBindingFunctions: params.evt_params.targetBindingFunctions,
+                    self_mesh: params.evt_params.clicked_mesh,
+                    target_mesh: params.evt_params.target_mesh,
                     event_type: params.event_type,
                     /*FOR DEBUG*/clicked_mesh: mesh,
                 }
-                const EventClbk = params.target_params.EventClbk;
+                const EventClbk = params.evt_params.EventClbk;
                 console.log('OnClick callback IN. meshId ', mesh.id)
-                EventClbk(target_params);
+                EventClbk(evt_params);
                 console.log('OnClick callback OUT. meshId ', mesh.id)
             }
 

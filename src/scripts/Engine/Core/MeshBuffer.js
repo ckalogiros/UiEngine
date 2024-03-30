@@ -331,11 +331,9 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
             let new_root_meshidx = INT_NULL;
             let min_start = 0xffff;
             for (let i = 0; i < len; i++) {
-
-               // for (let j = 0; j < _mesh_buffer.boundary; j++) {
-               // }
-
                const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]]; // Get meshes through wigdet_root_buffer
+if(!mesh)
+console.log()
                if (mesh.mesh_bufferidx !== mesh_bufferidx &&
                   mesh.batch_buffer_vbidx === batch_buffer_vbidx &&
                   mesh.gfx.vb.start < min_start) {
@@ -344,19 +342,6 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
                   new_root_meshidx = mesh.mesh_bufferidx;
                }
 
-               // const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]]; // Get meshes through wigdet_root_buffer
-
-               // // Make sure: The fetched mesh in the loop is not the removed mesh, and the fetched mesh belongs to removed mesh's batch-vb.
-               // if (mesh.mesh_bufferidx !== mesh_bufferidx && 
-               //    mesh.batch_buffer_vbidx === batch_buffer_vbidx && 
-               //    mesh.gfx.vb.start < min_start ) {
-
-               //       min_start = mesh.gfx.vb.start;
-               //       new_root_meshidx = mesh.mesh_bufferidx;
-               //    // Set the first found mesh as the root of this batch-vb
-               //    // _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = mesh.mesh_bufferidx;
-               //    // break;
-               // }
             }
 
             _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = new_root_meshidx;
@@ -1273,7 +1258,7 @@ export function Widget_group_buffer_print_w5() {
 
 function TEMP(params) {
 
-   const destroy_btn = params.target_mesh;
+   const destroy_btn = params.evt_params;
    const scroller_section = params.params;
 
    View_destroy_view(scroller_section.group_bufferidxs);

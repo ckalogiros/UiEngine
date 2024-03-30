@@ -5,7 +5,7 @@ import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { Listener_create_child_event, Listener_create_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
-import { Gfx_buffer_update_start, Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
+import { Gfx_buffer_update_start, Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 
@@ -298,7 +298,7 @@ export class Mesh {
 
         if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
-            this.listeners.AddAtIndex(LISTEN_EVENT_TYPES_INDEX.HOVER, {
+            this.listeners.AddAtIndex(E.H, {
                 evt: null,
                 is_child_event: false,
             });
@@ -310,7 +310,7 @@ export class Mesh {
         }
         else if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
 
-            this.listeners.AddAtIndex(LISTEN_EVENT_TYPES_INDEX.CLICK, {
+            this.listeners.AddAtIndex(E.C, {
                 evt: null,
                 is_child_event: false,
             });
@@ -322,7 +322,7 @@ export class Mesh {
         }
         else if (etype & LISTEN_EVENT_TYPES.MOVE) {
 
-            this.listeners.AddAtIndex(LISTEN_EVENT_TYPES_INDEX.CLICK, {
+            this.listeners.AddAtIndex(E.C, {
                 evt: null,
                 is_child_event: false,
             });
@@ -344,11 +344,11 @@ export class Mesh {
         if(this.state.mask & MESH_STATE.ACTIVE){
 
             if (parent_event && parent_event[etypeidx] && parent_event[etypeidx].evt) {
-                this.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, parent_event[etypeidx].evt, Clbk, this, params);
+                this.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, parent_event[etypeidx].evt);
                 this.listeners.buffer[etypeidx].is_child_event = true;
             }
             else {
-                this.listeners.buffer[etypeidx].evt = Listener_create_event(etypeidx, Clbk, this, params);
+                this.listeners.buffer[etypeidx].evt = Listener_create_event(etypeidx, this.mesh_bufferidx, Clbk, params);
             }
         }
     }
@@ -569,7 +569,7 @@ export class Mesh {
     }
 
 
-    OnFakeClick() { console.log('FAKE CLICK! : ', this.source_params.GetName()); }
+    OnFakeClick() { console.log('FAKE CLICK! : ', Mesh_buffer_get_mesh_byidx(this.meshidx.GetName())); }
 }
 
 

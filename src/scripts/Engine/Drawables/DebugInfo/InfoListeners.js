@@ -17,13 +17,13 @@ export class Info_Listeners {
    }
 
 
-   AddEvent(EVENT_TYPE, Clbk = null, source_params = null, target_params = null) {
+   AddEvent(EVENT_TYPE, Clbk = null, source_params = null, evt_params = null) {
 
       const event_params = {
          event_type: EVENT_TYPE,
          Clbk: Clbk,
          source_params: source_params,
-         target_params: target_params,
+         evt_params: evt_params,
          isActive: true,
       }
 
@@ -60,7 +60,7 @@ export class Info_Listeners {
             // Handle event via callback
             const dispatch_params = {
                source_params: evt.source_params,
-               target_params: evt.target_params,
+               evt_params: evt.evt_params,
                trigger_params: trigger_params,
                dispatch_event_type: EVENT_TYPE,
                event_type: evt.event_type,
@@ -76,9 +76,9 @@ export class Info_Listeners {
 
 const _info_listeners = new Info_Listeners();
 
-export function Info_listener_create_event(TYPE_IDX, Clbk, source_params, target_params) {
+export function Info_listener_create_event(TYPE_IDX, Clbk, source_params, evt_params) {
 
-   return _info_listeners.AddEvent(TYPE_IDX, Clbk, source_params, target_params);
+   return _info_listeners.AddEvent(TYPE_IDX, Clbk, source_params, evt_params);
 }
 
 

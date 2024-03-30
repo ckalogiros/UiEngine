@@ -379,10 +379,10 @@ export class Widget_Slider extends Rect {
    }
 
 
-   // TODO!!!: the widget is passed in 'params.target_params.target_mesh', so REMOVE the 'params.source_params' tha has the slider.area_mesh is not needed. 
+   // TODO!!!: the widget is passed in 'params.evt_params.target_mesh', so REMOVE the 'params.source_params' tha has the slider.area_mesh is not needed. 
    OnClick(params) {
 
-      const mesh = params.target_params.target_mesh;
+      const mesh = params.evt_params.target_mesh;
       const point = MouseGetPos();
 
       // Check if the click happened on bar
@@ -444,29 +444,29 @@ export class Widget_Slider extends Rect {
       const root_evt = _root ? _root.listeners.buffer : null;
 
       // Create hover events, NOT as part of the root listen events.
-      if (slider.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.HOVER]) slider.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER);
-      if (handle.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.HOVER]) handle.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER);
-      if (bar.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.HOVER]) bar.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER);
+      if (slider.listeners.buffer[E.H]) slider.AddListenEvent(E.H);
+      if (handle.listeners.buffer[E.H]) handle.AddListenEvent(E.H);
+      if (bar.listeners.buffer[E.H]) bar.AddListenEvent(E.H);
 
-      const target_params = {
+      const evt_params = {
          EventClbk: null,
          targetBindingFunctions: null,
          target_mesh: slider,
          params: null,
       }
-      if (slider.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.CLICK]) { // This is a check mainly if the user has activated the 'Move' event for the scroller.
+      if (slider.listeners.buffer[E.C]) { // This is a check mainly if the user has activated the 'Move' event for the scroller.
 
          slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE, false);
-         slider.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, slider.OnClick, target_params);
+         slider.AddListenEvent(E.C, slider.OnClick, evt_params);
       }
       else {
 
          // Create a Fake click event with no callback and params, but any root events. 
          slider.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
-         slider.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, null, null, root_evt);
+         slider.AddListenEvent(E.C, null, null, root_evt);
       }
       bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      bar.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, slider.OnClick, target_params, slider.listeners.buffer);
+      bar.AddListenEvent(E.C, slider.OnClick, evt_params, slider.listeners.buffer);
 
    }
 

@@ -12,6 +12,7 @@ import { Clipy_from_group } from "../Operations/Clip.js";
 import { BLUE_10_120_220, GREY, PURPLER } from "../Material/Base/Colors.js";
 import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Listener_destroy_children_buffer, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
+import { Gl_add_wpos_Y, Gl_set_dim_XY, Gl_set_dim_Y, Gl_set_wpos_XY, Gl_set_wpos_Y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 
 
 /** ### Scroller Widget
@@ -73,9 +74,11 @@ export class Widget_Scroller extends Section {
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle([0, 6, 2]);
+      this.state.mask |= MESH_STATE.IS_RESIZEABLE;
+
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      
+
       this.SetName(`[${this.mesh_bufferidx}]-Scroller`);
       this.type |= MESH_TYPE.WIDGET_SCROLLER;
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
@@ -228,10 +231,10 @@ export class Widget_Scroller extends Section {
    // For scrollers we always create a separate vertex buffer, so it will be easier to handle the clipping of the scrolled section
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, INT_NULL]) {
 
-      
+
       this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
-      
-      
+
+
       const rect_igfx = [this.gfx.prog.idx, this.gfx.vb.idx]; // Copy the gfx from the scroller area.
 
       // Use the same gfx buffer for bar mesh
@@ -297,7 +300,7 @@ export class Widget_Scroller extends Section {
       for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
 
          const child = this.scrolled_section.children.buffer[i];
-         if(child.state.mask & MESH_STATE.ACTIVE){
+         if (child.state.mask & MESH_STATE.ACTIVE) {
 
             child.Rerender()
             // console.log(child.GetName())
@@ -332,8 +335,8 @@ export class Widget_Scroller extends Section {
    }
 
 
-   SetScrolledSectionToSeparateGfxBuffers(){
-      if(this.scrolled_section.is_gfx_inserted) alert('Trying to set scrolled section to private buffers though the scrolled section is already added to the gfx buffers');
+   SetScrolledSectionToSeparateGfxBuffers() {
+      if (this.scrolled_section.is_gfx_inserted) alert('Trying to set scrolled section to private buffers though the scrolled section is already added to the gfx buffers');
       this.is_scrolled_section_private = true;
    }
 
@@ -362,13 +365,13 @@ export class Widget_Scroller extends Section {
    SetTypeDebug() {
 
       this.type |= MESH_TYPE.DEBUG_MESH;
-      
+
       const bar = this.children.buffer[SCROLL_BAR_IDX];
       bar.type |= MESH_TYPE.DEBUG_MESH;
-      
+
       const handle = bar.children.buffer[0];
       handle.type |= MESH_TYPE.DEBUG_MESH;
-      
+
       const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
       scrolled_mesh.type |= MESH_TYPE.DEBUG_MESH;
    }
@@ -386,49 +389,90 @@ export class Widget_Scroller extends Section {
 
    OnClick(params) {
 
-      const mesh = params.target_params.target_mesh;
+
+      const mesh = params.evt_params.target_mesh;
       const point = MouseGetPos();
 
-      // Check if the click happened on bar
-      const bar = mesh.children.buffer[SCROLL_BAR_IDX];
-      if (point[0] > bar.geom.pos[0] - bar.geom.dim[0] + bar.hover_margin[0]) { // Check only if click is on the right of the left side of the bar mesh
 
-         STATE.mesh.SetClicked(bar);
+      /**
+       * All scollers are resizable.
+       * So we check directly if the pointer is clicked inside the 'resize' area,
+       * and if not, we procceed with bar move or scroller move
+       */
 
-         if ((bar.type & MESH_TYPE.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
+      let is_resizesed = false;
 
-            const idx = TimeIntervalsCreate(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_on_update_handle, bar);
-            bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+      // Check for Resize
+      const right = mesh.geom.pos[0] + mesh.geom.dim[0];
+      const bottom = mesh.geom.pos[1] + mesh.geom.dim[1];
+      if (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1]) {
 
-            STATE.mesh.SetGrabed(bar);
-            bar.StateEnable(MESH_STATE.IN_GRAB);
+         // We have Resize
+
+         if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
+            console.log('X Y RESIZE');
+
+            const OnResizeFn = mesh.OnResize;
+            const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
+            mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+         }
+         else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
+            console.log('X RESIZE');
+         }
+         else { // Its a height resize
+            console.log('Y RESIZE');
          }
 
+         mesh.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB;
+         STATE.mesh.SetGrabed(mesh);
+         
          return true;
       }
       else {
 
-         STATE.mesh.SetClicked(bar);
-
-         // Move Scroller
-         if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
-
-            const idx = TimeIntervalsCreate(10, 'Move Scroller', TIME_INTERVAL_REPEAT_ALWAYS, mesh.OnMove, mesh);
-            mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
-
-            STATE.mesh.SetGrabed(mesh);
-            mesh.StateEnable(MESH_STATE.IN_GRAB);
+         // Check if the click happened on bar
+         const bar = mesh.children.buffer[SCROLL_BAR_IDX];
+         if (point[0] > bar.geom.pos[0] - bar.geom.dim[0] + bar.hover_margin[0]) { // Check only if click is on the right of the left side of the bar mesh
+   
+            STATE.mesh.SetClicked(bar);
+   
+            if ((bar.type & MESH_TYPE.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
+   
+               const idx = TimeIntervalsCreate(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_on_update_handle, bar);
+               bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+   
+               STATE.mesh.SetGrabed(bar);
+               bar.StateEnable(MESH_STATE.IN_GRAB);
+            }
+   
+            return true;
          }
-
-         return true;
+         else {
+   
+            STATE.mesh.SetClicked(bar);
+   
+            // Move Scroller
+            if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+   
+               const idx = TimeIntervalsCreate(10, 'Move Scroller', TIME_INTERVAL_REPEAT_ALWAYS, mesh.OnMove, mesh);
+               mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+   
+               STATE.mesh.SetGrabed(mesh);
+               mesh.StateEnable(MESH_STATE.IN_GRAB);
+            }
+   
+            return true;
+         }
       }
+
+
    }
 
 
    // SEE ### OnMove Events Implementation Logic
    OnMove(params) {// Called by timeInterval as a callback function
 
-      // const scroller = params.target_params;
+      // const scroller = params.evt_params;
       const scroller = params.params;
 
       // Destroy the time interval and the Move operation, if the scroller is not grabed
@@ -444,6 +488,77 @@ export class Widget_Scroller extends Section {
 
       const mouse_pos = MouseGetPosDif();
       scroller.Move(mouse_pos.x, -mouse_pos.y);
+
+   }
+
+
+   OnResize(params) {
+
+      const scroller = params.params;
+
+      if (scroller.StateCheck(MESH_STATE.IN_GRAB) === 0 && scroller.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+
+         const intervalIdx = scroller.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+         TimeIntervalsDestroyByIdx(intervalIdx);
+         scroller.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+
+         return;
+      }
+
+      console.log('RESIZING ', scroller.GetName());
+      const mouse_pos = MouseGetPosDif();
+
+      // TODO: We can set all positions and simentions and call 'Gl_set_pos_dim' for all meshes of the scroller
+      if (mouse_pos.x !== 0 || mouse_pos.y !== 0) {
+
+         const x = mouse_pos.x / 2;
+         const y = -mouse_pos.y / 2;
+
+         // Check for min dimentions. // TODO: Who decides for the minimum dimentions??????
+         const min_width = scroller.scrolled_section.geom.dim[0];
+         const min_height = scroller.geom.defDim[1];
+
+         if (x > POSSITIVE || (x < NEGATIVE && scroller.geom.dim[0] + x > min_width)) {
+            
+            scroller.geom.dim[0] += x;
+            scroller.geom.pos[0] += x;
+
+         }
+         
+         
+         if (y > POSSITIVE || (y < NEGATIVE && scroller.geom.dim[1] + y > min_height)) {
+            
+            scroller.geom.dim[1] += y;
+            scroller.geom.pos[1] += y;
+
+            // resize bar
+            const bar = scroller.children.buffer[SCROLL_BAR_IDX];     
+            
+            const bar_old_height = bar.geom.dim[1];
+
+            bar.geom.dim[1] += y;
+            bar.geom.pos[1] += y;
+            Gl_set_dim_Y(bar.gfx, bar.geom.dim[1], bar.geom.num_faces)
+            Gl_set_wpos_Y(bar.gfx, bar.geom.pos[1], bar.geom.num_faces)
+
+
+            const dif_percentage = bar.geom.dim[1] / bar_old_height;
+            console.log(dif_percentage)
+            
+            // re-position handle
+            const dif = y/2;
+            const handle = bar.children.buffer[0];            
+            handle.geom.pos[1] += dif;
+            Gl_set_wpos_Y(handle.gfx, handle.geom.pos[1], handle.geom.num_faces)
+            
+         }
+
+
+         Gl_set_dim_XY(scroller.gfx, scroller.geom.dim, scroller.geom.num_faces)
+         Gl_set_wpos_XY(scroller.gfx, scroller.geom.pos, scroller.geom.num_faces)
+
+
+      }
 
    }
 
@@ -636,27 +751,27 @@ export class Widget_Scroller extends Section {
 
       // Create hover events
       // BUG: It seems that hovering does not work for scroller and bar
-      if (handle.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.HOVER]) handle.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER);
+      if (handle.listeners.buffer[E.H]) handle.AddListenEvent(E.H);
 
-      const target_params = {
+      const evt_params = {
          EventClbk: null,
          targetBindingFunctions: null,
          target_mesh: scroller,
          params: null,
       }
-      if (scroller.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.CLICK]) { // This is a check mainly if the user has activated the 'Move' event for the scroller.
+      if (scroller.listeners.buffer[E.C]) { // This is a check mainly if the user has activated the 'Move' event for the scroller.
 
          scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE, false);
-         scroller.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, scroller.OnClick, target_params, root_evt);
+         scroller.AddListenEvent(E.C, scroller.OnClick, evt_params, root_evt);
       }
       else {
 
          // Create a Fake click event with no callback and params, but any root events.  
          scroller.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
-         scroller.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, null, null, root_evt);
+         scroller.AddListenEvent(E.C, null, null, root_evt);
       }
       bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      bar.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, scroller.OnClick, target_params, scroller.listeners.buffer);
+      bar.AddListenEvent(E.C, scroller.OnClick, evt_params, scroller.listeners.buffer);
 
       scrolled_section.ConstructListeners(this);
 
@@ -851,20 +966,20 @@ export function Scroller_on_update_handle(_params) {
     *    
     */
 
-      
-   for(let i=0; i<2; i++){
 
-      if(scrolled_section.listeners.buffer[i].is_child_event){
+   for (let i = 0; i < 2; i++) {
+
+      if (scrolled_section.listeners.buffer[i].is_child_event) {
          Listener_remove_child_event_from_parent(i, scrolled_section.listeners.buffer[i].evt);
       }
-      else{
+      else {
          Listener_destroy_children_buffer(i, scrolled_section.listeners.buffer[i].evt.evt_idx);
          Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i].evt)
          scrolled_section.listeners.RemoveByIdx(i)
       }
    }
-   
-   
+
+
    View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
 
    /**FOR FRAMEBUFFER. DO NOT DELETE */
@@ -880,7 +995,7 @@ export function Scroller_on_update_handle(_params) {
 
 
 
-export function SCROLLER_TEMP_GET_POS(scroller, scrolled_section){
+export function SCROLLER_TEMP_GET_POS(scroller, scrolled_section) {
 
    const bar = scroller.children.buffer[0];
    const handle = bar.children.buffer[0];
@@ -899,11 +1014,11 @@ export function SCROLLER_TEMP_GET_POS(scroller, scrolled_section){
 
 
 
-export function SCROLLER_TEMP_SET_SCROLLED_SECTION_XPOS(scroller){
+export function SCROLLER_TEMP_SET_SCROLLED_SECTION_XPOS(scroller) {
 
    const bar = scroller.children.buffer[0];
    // const handle = bar.children.buffer[0];
-   const posx = (scroller.geom.pos[0] - scroller.geom.dim[0] + scroller.margin[0]) + bar.geom.dim[0] *2;
+   const posx = (scroller.geom.pos[0] - scroller.geom.dim[0] + scroller.margin[0]) + bar.geom.dim[0] * 2;
    return posx;
 }
 
@@ -933,6 +1048,7 @@ function Scroller_move_handle(bar, handle) {
 
    return true;
 }
+
 
 
 

@@ -10,8 +10,7 @@ let evtsIdx = 0; // Index for events array
 
 
 export function RegisterEvent(eventType, params) {
-    // if(eventType === 'mouse-click-up')
-    // console.log
+
     events[evtsIdx++] = {
         type: eventType,
         params: params,
@@ -27,11 +26,9 @@ export function HandleEvents() {
 
         const e = events[i];
 
-        // if(e) console.log(e.type)
-
         if (e.type === 'mouse-move') {
 
-            if (LISTENERS_FLAGS[LISTEN_EVENT_TYPES_INDEX.HOVER] === true) // NOTE: Avoid dispatching if there are no listeners in the ListenersBuffer
+            if (LISTENERS_FLAGS[E.H] === true) // NOTE: Avoid dispatching if there are no listeners in the ListenersBuffer
                 Listener_dispatch_check_hover_event();
 
         }
@@ -39,15 +36,14 @@ export function HandleEvents() {
 
             STATE.mouse.activeClickedButtonId = e.params.mouseButton;
 
-            if (LISTENERS_FLAGS[LISTEN_EVENT_TYPES_INDEX.CLICK] === true)  // NOTE: Avoid dispatching if there are no listeners in the ListenersBuffer
-                Listener_dispatch_event(LISTEN_EVENT_TYPES_INDEX.CLICK, e.params.mouseButton);
+            if (LISTENERS_FLAGS[E.C] === true)  // NOTE: Avoid dispatching if there are no listeners in the ListenersBuffer
+                Listener_dispatch_event(E.C, e.params.mouseButton);
                 
         }
         else if (e.type === 'mouse-click-up') {
 
             STATE.mouse.activeClickedButtonId = INT_NULL;
             const mesh = STATE.mesh.hovered;
-            // console.log(('CLICK UP'))
 
             // Disable mesh's hover state
             if (STATE.mesh.hovered) {
@@ -66,34 +62,7 @@ export function HandleEvents() {
             e.type += ' HANDLED'; e.params = {}; evtsIdx--;
 
         }
-        // else if (e.type === 'mouse-click-down-hover') {
-
-        // }
-        // else if (e.type === 'Move') {
-
-        // }
-        // else if (e.type === 'mesh-created') {
-        //     /**
-        //      * Timed Events.
-        //      * One time events triggered by another event.
-        //      * 
-        //      * Example: If we need to set the priority of a mesh. 
-        //      * The mesh must be added to the grapfics pipeline first, in
-        //      * order to obtain its gfx context, that is needed for the RenderQueue.SetPriority().
-        //      * So a timed event is created to do that.
-        //     */
-
-        //     const mesh = e.params;
-        //     const count = mesh.timedEvents.count;
-        //     if (count)
-        //         for (let i = 0; i < count; i++) {
-        //             if (!ERROR_NULL(mesh.timedEvents.buffer))
-        //                 mesh.timedEvents.buffer[i].Clbk(mesh.timedEvents.buffer[i].params)
-        //             mesh.timedEvents.RemoveByIdx(i);
-        //         }
-
-        //     e.type += ' HANDLED'; e.params = {}; evtsIdx--;
-        // }
+    
 
         i++;
     } // End of events for loop

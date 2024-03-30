@@ -319,20 +319,22 @@ const MESH_STATE = {
 
 	IN_FOCUS: _CNT <<= 1,
 	IN_HOVER: _CNT <<= 1,
-	IN_SCALE: _CNT <<= 1,
 	IN_MOVE: _CNT <<= 1,
+	IN_RESIZE: _CNT <<= 1,
 	IN_GRAB: _CNT <<= 1,
 	IN_HOVER_COLOR: _CNT <<= 1,
-
+	
 	IS_HOVERABLE: _CNT <<= 1,
 	IS_CLICKABLE: _CNT <<= 1,
+	IS_RESIZEABLE: _CNT <<= 1,
 	IS_MOVABLE: _CNT <<= 1,
 	IS_GRABABLE: _CNT <<= 1,
 	IS_FAKE_EVENT: _CNT <<= 1,
 	IS_FAKE_HOVERABLE: _CNT <<= 1,
 	IS_FAKE_CLICKABLE: _CNT <<= 1,
 	IS_HOVER_COLORABLE: _CNT <<= 1,
-
+	
+	IN_SCALE: _CNT <<= 1,
 	HAS_POPUP: _CNT <<= 1,
 	HAS_CLIP: _CNT <<= 1,
 
@@ -413,7 +415,10 @@ const ALIGN = {
 
 
 
-const POSITION_CENTER = [0, 0, 0]
+const POSITION_CENTER = [0, 0, 0];
+const TEMP_RESIZE_MARGIN = [10, 10];
+const POSSITIVE = 0;
+const NEGATIVE = 0;
 
 
 
@@ -794,15 +799,18 @@ const LISTEN_EVENT_TYPES_INDEX = {
 
 
 
-
+const E = {
+   H:LISTEN_EVENT_TYPES_INDEX.HOVER,
+   C:LISTEN_EVENT_TYPES_INDEX.CLICK,
+}
 
 
 
 
 function Listeners_get_event_type_string(event_type_idx) {
 	switch (event_type_idx) {
-		case LISTEN_EVENT_TYPES_INDEX.HOVER: return 'Hover';
-		case LISTEN_EVENT_TYPES_INDEX.CLICK: return 'Click';
+		case E.H: return 'Hover';
+		case E.C: return 'Click';
 	}
 }
 

@@ -275,13 +275,13 @@ export class Rect extends Mesh {
 
          const evt = mesh.listeners.buffer[etypeidx];
          if (evt) { // If event is not null
-            const target_params = {
+            const evt_params = {
                EventClbk: null,
                targetBindingFunctions: null,
                target_mesh: mesh,
                params: null,
             }
-            mesh.AddListenEvent(etypeidx, mesh.OnClick, target_params, root_evt);
+            mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, root_evt);
          }
       }
    }

@@ -357,29 +357,29 @@ export class Widget_Dropdown extends Section {
       /***********************************************************************************/
       // Drop down
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, true);
-      this.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER, null, null, root.listeners.buffer);
+      this.AddListenEvent(E.H, null, null, root.listeners.buffer);
       
-      if (this.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.CLICK]) { // If click exists on the dropdown, should be for moving event.
+      if (this.listeners.buffer[E.C]) { // If click exists on the dropdown, should be for moving event.
          
-         this.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, this.SetOnMove, null, root.listeners.buffer);
+         this.AddListenEvent(E.C, this.SetOnMove, null, root.listeners.buffer);
          /**DEBUG */ if (DEBUG.EVENTS_LISTENERS.WIDGET_DROP_DOWN) console.log(' ### Creating Moving event for dropdown:', this.GetName(), ' root', root.GetName())
       }
       else { // Create Fake click event for dropdown
          
          this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
-         this.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, null, null, root.listeners.buffer);
+         this.AddListenEvent(E.C, null, null, root.listeners.buffer);
       }
       
       /***********************************************************************************/
       // Button
       const btn = this.children.buffer[0];
-      /**DEBUG ERROR*/ if (!btn.listeners.buffer[LISTEN_EVENT_TYPES_INDEX.CLICK]) console.error('Dropdown\'s button is missing the click event. Add a CreateClickEvent() to the dropdown');
+      /**DEBUG ERROR*/ if (!btn.listeners.buffer[E.C]) console.error('Dropdown\'s button is missing the click event. Add a CreateClickEvent() to the dropdown');
       
       const params = { // Build the parameters for the OnClick callback function for the dp's button (menu expansion).
          drop_down: this,
          menu: this.menu,
       }
-      btn.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, this.OnClick, params, this.listeners.buffer);
+      btn.AddListenEvent(E.C, this.OnClick, params, this.listeners.buffer);
       /**DEBUG */ if (DEBUG.EVENTS_LISTENERS.WIDGET_DROP_DOWN) console.log(' ### Create btn click for dropdown:', this.GetName(), ' root', root.GetName())
       
       /***********************************************************************************/
@@ -443,13 +443,11 @@ export class Widget_Dropdown extends Section {
 
    DpDestroyListeners(menu, root) {
 
-      const hoveridx = LISTEN_EVENT_TYPES_INDEX.HOVER;
-      const clickidx = LISTEN_EVENT_TYPES_INDEX.CLICK;
       // Case we have stored this menu's items events to the root menu Fake event,
       // Remove all listen events of this menu's items from EventListeners buffer.(one by one, based on the root menu event(parent_event)).
 
-      if(menu.listeners.buffer[hoveridx]) Listener_remove_child_event_from_parent(hoveridx, menu.listeners.buffer[hoveridx].evt);
-      else if(menu.listeners.buffer[clickidx]) Listener_remove_child_event_from_parent(clickidx, menu.listeners.buffer[clickidx].evt);
+      if(menu.listeners.buffer[E.H]) Listener_remove_child_event_from_parent(E.H, menu.listeners.buffer[E.H].evt);
+      else if(menu.listeners.buffer[E.C]) Listener_remove_child_event_from_parent(E.C, menu.listeners.buffer[E.C].evt);
 
       /** Here we remove all listen events(registered as children events of the root menu).
        *  IMPORTANT! The listen events may exist in any nested child widget-mesh, 
@@ -475,7 +473,7 @@ export class Widget_Dropdown extends Section {
    }
    // DpDestroyListeners(menu, root) {
 
-   //    const clickidx = LISTEN_EVENT_TYPES_INDEX.CLICK;
+   //    const clickidx = E.C;
    //    // Case we have stored this menu's items events to the root menu Fake event,
    //    // Remove all listen events of this menu's items from EventListeners buffer.(one by one, based on the root menu event(parent_event)).
    //    // if (menu.listeners.buffer[clickidx] === null) {
@@ -882,18 +880,18 @@ export class Widget_Dropdown extends Section {
 
       const btn = this.children.buffer[0];
       switch (evt_type) {
-         case LISTEN_EVENT_TYPES_INDEX.HOVER: {
+         case E.H: {
             btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-            btn.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.HOVER, null, null, root_evt);
+            btn.AddListenEvent(E.H, null, null, root_evt);
             break;
          }
-         case LISTEN_EVENT_TYPES_INDEX.CLICK: {
+         case E.C: {
             btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
             const params = { // Build the parameters for the OnClick callback function for the dp's button (menu expansion).
                drop_down: this,
                menu: this.menu,
             }
-            btn.AddListenEvent(LISTEN_EVENT_TYPES_INDEX.CLICK, this.OnClick, params, this.listeners.buffer);
+            btn.AddListenEvent(E.C, this.OnClick, params, this.listeners.buffer);
             break;
          }
       }
@@ -903,12 +901,12 @@ export class Widget_Dropdown extends Section {
    // SEE: ## OnClick()
    OnClick(params) {
 
-      const dp = params.target_params.drop_down;
+      const dp = params.evt_params.drop_down;
 
-      /*DEBUG*/if (!params.target_params) { console.error('Target_params.params is null, in a OnClick() event. target_params:', params.target_params); return; }
+      /*DEBUG*/if (!params.evt_params) { console.error('Target_params.params is null, in a OnClick() event. evt_params:', params.evt_params); return; }
       /*DEBUG*/if (dp.rootidx === INT_NULL) { alert('Root for dropdown must be set. ', dp.GetName()); return; }
 
-      const btn = params.source_params;
+      const btn = Mesh_buffer_get_mesh_byidx(params.meshidx);
       Dropdown_roots_get_root_by_idx(dp.rootidx);
 
       if (dp.isOn & DP_MENU_STATE.OFF) { // Case: Activate Menu 
@@ -941,7 +939,7 @@ export class Widget_Dropdown extends Section {
 
    SetOnMove(params) {
 
-      const mesh = params.source_params;
+      const mesh = Mesh_buffer_get_mesh_byidx(params.meshidx);
       STATE.mesh.SetClicked(mesh);
       // STATE.mesh.SetFocused(mesh);
 

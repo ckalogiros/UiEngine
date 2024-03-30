@@ -226,13 +226,13 @@ export class Widget_Menu_Bar extends Widget_Label {
             if (child) {
                const evt = child.listeners.buffer[etypeidx];
                if (evt) { // If event is not null
-                  const target_params = {
+                  const evt_params = {
                      EventClbk: null,
                      targetBindingFunctions: null,
                      target_mesh: child,
                      params: null,
                   }
-                  child.AddListenEvent(etypeidx, child.OnClick, target_params, root_evt);
+                  child.AddListenEvent(etypeidx, child.OnClick, evt_params, root_evt);
                }
             }
          }
@@ -330,7 +330,7 @@ export class Close_Button extends Widget_Button {
       // Set a callback function for the destruction of the menu and its window on clicking the close button.
       const params = {
          source_params: this,
-         target_params: root, // root should be the root widget from which the recursive destruction should start.
+         evt_params: root, // root should be the root widget from which the recursive destruction should start.
          // Clbk: root.OnCloseButtonClick, // The callback that will destroy the root and all of its children(recursive)
       }
       this.eventCallbacks.Add(params); // Pass the root and the callback for destroying the parent widget
@@ -344,7 +344,7 @@ export class Close_Button extends Widget_Button {
 
    OnClick(params) {
 
-      const widget_close_btn = params.target_params.target_mesh;
+      const widget_close_btn = params.evt_params.target_mesh;
       widget_close_btn.OnClose();
       return true; // Needed for the listen event not to propagate further, after widget destruction
    }
@@ -356,10 +356,10 @@ export class Close_Button extends Widget_Button {
 
       /** The Scema of the 'params', constructed for the 'eventCallbacks'
          source_params: this,
-         target_params: root,
+         evt_params: root,
        */
       const params = this.eventCallbacks.buffer[0]; // HACK: We must set up an index clarification for eventCallbacks buffer. 
-      const root = params.target_params
+      const root = params.evt_params
       root.Destroy(root);
 
    }
@@ -386,7 +386,7 @@ export class Widget_Minimize extends Widget_Button {
 
       const params = {
          source_params: this,
-         target_params: root,
+         evt_params: root,
       }
       // The eventCallbacks are going to run from the OnClick() in Widget_Button class.
       this.eventCallbacks.Add(params); // Pass the root and the callback for destroying the parent widget
@@ -396,7 +396,7 @@ export class Widget_Minimize extends Widget_Button {
 
    OnClick(_params) {
 
-      const widget_minimize_btn = _params.target_params.target_mesh;
+      const widget_minimize_btn = _params.evt_params.target_mesh;
       const params = widget_minimize_btn.eventCallbacks.buffer[0]; // HACK: We must set up an index clarification for eventCallbacks buffer. 
       widget_minimize_btn.OnMinimize(params);
       return true; // Needed for the listen event not to propagate further, after widget destruction
@@ -406,7 +406,7 @@ export class Widget_Minimize extends Widget_Button {
    OnMinimize(params) {
 
       const minim_mesh = params.source_params;
-      const root = params.target_params;
+      const root = params.evt_params;
       const point = MouseGetPos();
       const m = minim_mesh.geom;
 
