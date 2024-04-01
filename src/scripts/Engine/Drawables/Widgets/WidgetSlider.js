@@ -974,7 +974,7 @@ export function Slider_on_update_handle(_params) {
 
    const val = Slider_calculate_value(bar, handle); // Calculate slider's value based on the handles position.
 
-   slider_val.UpdateText(val); // Change the text mesh to the current slider's value
+   slider_val.RenderTextFromNumber(val); // Change the text mesh to the current slider's value
 
    /**
     * Dispatch all callbacks for all targets, that is

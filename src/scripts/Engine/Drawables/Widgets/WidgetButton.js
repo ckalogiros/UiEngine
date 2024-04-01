@@ -115,7 +115,7 @@ export class Widget_Switch extends Widget_Button {
       const text_mesh = mesh.text_mesh;
 
       mesh.isOn ^= 0x1;
-      text_mesh.UpdateText(mesh.state_text[mesh.isOn]);
+      text_mesh.RenderTextFromString(mesh.state_text[mesh.isOn]);
       mesh.SetUpdateFrameBuffer();
       STATE.mesh.SetClicked(mesh);
       // STATE.mesh.SetFocused(mesh);

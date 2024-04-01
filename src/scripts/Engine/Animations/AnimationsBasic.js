@@ -110,7 +110,7 @@ function Animations_run_scale_down_start(mesh) {
       // /** Scale button's text meshes */                                          
       // let accumTextWidth = 0;                                                 
       // const textMesh = mesh.children.buffer[0];                                     
-      // const text = textMesh.mat.text;                                      
+      // const text = textMesh.mat.char_buffer;                                      
       // const textLen = text.length;                                      
 
       // textMesh.geom.dim[0] *= scaleFactor; // Update button's text dimentionsx                                                                        
@@ -168,7 +168,7 @@ function Animations_run_scale_down_stop(mesh) {
       // let accumTextWidth = 0;
       // let posx = mesh.geom.pos[0];
       // const textMesh = mesh.children.buffer[0];
-      // const text = textMesh.mat.text;
+      // const text = textMesh.mat.char_buffer;
       // const textLen = text.length;
       // const faceHalfWidth = textMesh.geom.defDim[0];
       // const extraWidth = (mesh.pad * 2) + faceHalfWidth;
@@ -234,8 +234,6 @@ function Helper_scale_text(mesh, scaleFactor, flag) {
    let accumTextWidth = 0;
    let posx = mesh.geom.pos[0];
    const textMesh = mesh.children.buffer[0];
-   const text = textMesh.mat.text;
-   const textLen = text.length;
    let faceHalfWidth = textMesh.geom.dim[0];
 
    if(flag !== 2){ // HACK: For scale down stop mesh gets the default dimentions.
@@ -254,7 +252,7 @@ function Helper_scale_text(mesh, scaleFactor, flag) {
    const advance = textMesh.geom.dim[0] * 2;
 
    _gfx.Copy(textMesh.gfx);
-   for (let i = 0; i < textLen; i++) {
+   for (let i = 0; i < textMesh.mat.char_buffer.boundary; i++) {
 
       posx = (mesh.geom.pos[0] - mesh.geom.dim[0]) + extraWidth + accumTextWidth;
       Gl_set_wpos_X(_gfx, posx);

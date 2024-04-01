@@ -8,7 +8,7 @@ import { Listener_remove_child_event_from_parent, Listener_remove_event_by_idx }
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
 import { Gfx_buffer_store, Mesh_buffer_get_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
-import { Clipx_from_group, Clipy_from_group } from "../Operations/Clip.js";
+import { Clampx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { Section } from "../Meshes/Section.js";
 import { BLUEL, GREEN, GREY, PURPLER, REDL, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_get_view_vb_root_meshidx, View_remove_from_group, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
@@ -299,7 +299,8 @@ export class Widget_Dropdown extends Section {
                if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's dp menu (runs recursive for any opened sub dp menus). 
 
                   // If the menu was deactivated while open, then on activation keep its '-' symbol
-                  btn1.text_mesh.mat.text = `${this.dp_symbols[1]} ${btn1.text_mesh.mat.text.slice(2)}`;
+                  // btn1.text_mesh.mat.char_buffer = `${this.dp_symbols[1]} ${btn1.text_mesh.mat.char_buffer.slice(2)}`;
+                  btn1.text_mesh.SetText(`${this.dp_symbols[1]} ${btn1.text_mesh.SliceText(2)}`);
                   item.GenMenuGfxCtx_recursive(root, FLAGS);
                }
 
@@ -533,7 +534,8 @@ export class Widget_Dropdown extends Section {
                   if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
 
                      // If the menu was deactivated while open, then on activation keep its '-' symbol
-                     btn.text_mesh.mat.text = `${this.dp_symbols[1]} ${btn.text_mesh.mat.text.slice(2)}`;
+                     // btn.text_mesh.mat.char_buffer = `${this.dp_symbols[1]} ${btn.text_mesh.mat.char_buffer.slice(2)}`;
+                     btn.text_mesh.SetText(`${this.dp_symbols[1]} ${btn.text_mesh.SliceText(2)}`);
                      item.ActivateMenuFake(root);
                   }
 
@@ -718,7 +720,7 @@ export class Widget_Dropdown extends Section {
 
 
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-      Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
+      Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 
    }
@@ -761,7 +763,7 @@ export class Widget_Dropdown extends Section {
 
                // If the menu was deactivated while open, then on activation keep its '-' symbol
                const btn = item.children.buffer[0];
-               btn.text_mesh.mat.text = `${this.dp_symbols[1]} ${btn.text_mesh.mat.text.slice(2)}`;
+               btn.text_mesh.SetText(`${this.dp_symbols[1]} ${btn.text_mesh.SliceText(2)}`);
                item.ActivateMenu(root);
             }
 
@@ -795,7 +797,9 @@ export class Widget_Dropdown extends Section {
 
       this.ActivateMenu(root); // Add dropdown to gfx buffers.
       // this.DpCreateListeners(menu, root);
-
+      if(this.mesh_bufferidx === 29 || root.mesh_bufferidx === 29){
+         console.log()
+      }
 
       menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
 
@@ -826,7 +830,7 @@ export class Widget_Dropdown extends Section {
       }
       
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-      Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
+      Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 
@@ -924,7 +928,8 @@ export class Widget_Dropdown extends Section {
          /* Need to update the symbol of the text(not only the gfx buffers), 
             because when the btn will be activated it will be re-inserted in the gfx buffers 
             and it will use the text_mesh's  string (wich is currently the '-' synmbol). */
-         btn.text_mesh.mat.text = `${dp.dp_symbols[0]} ${btn.text_mesh.mat.text.slice(2)}`;
+         // btn.text_mesh.mat.char_buffer = `${dp.dp_symbols[0]} ${btn.text_mesh.mat.char_buffer.slice(2)}`;
+         btn.text_mesh.SetText(`${dp.dp_symbols[0]} ${btn.text_mesh.SliceText(2)}`);
 
          dp.DpDeactivateMenu();
 
@@ -1028,7 +1033,7 @@ export class Widget_Dropdown extends Section {
 
    SetText(text) {
       const btn = this.children.buffer[0];
-      btn.text_mesh.UpdateText(text);
+      btn.text_mesh.RenderTextFromString(text);
    }
 
 

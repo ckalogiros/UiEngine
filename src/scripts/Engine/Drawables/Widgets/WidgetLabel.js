@@ -1,7 +1,7 @@
 "use strict";
 
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
-import { AddArr2, Floor } from "../../../Helpers/Math/MathOperations.js";
+import { AddArr2, CopyArr2, Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
@@ -75,7 +75,7 @@ export class Widget_Label extends Rect {
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
         this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
-        this.type |= MESH_TYPE.WIDGET_TEXT_LABEL | this.geom.type | this.mat.type;
+        this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
         this.SetName(`[${this.mesh_bufferidx}]{${text}}-LABEL`);
         this.pad = pad;
 
@@ -317,6 +317,7 @@ export class Widget_Label extends Rect {
             this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
 
         AddArr2(this.geom.pos, pos_dif);
+        CopyArr2(this.geom.defPos, this.geom.pos);
 
         const update_data = {
             sizes: [2],
@@ -326,6 +327,7 @@ export class Widget_Label extends Rect {
         Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data);
 
         AddArr2(this.text_mesh.geom.pos, pos_dif);
+        CopyArr2(this.text_mesh.geom.defPos, this.text_mesh.geom.pos);
         this.text_mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
         Batch_store(this.text_mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
     }
@@ -407,40 +409,42 @@ export class Widget_Label extends Rect {
     }
 
 
-    ClampX(x, margin = 0) { // UNNECESSARY ???
+    // ClampX(x, margin = 0) { // UNNECESSARY ???
 
-        const clamp = x - margin - this.pad[0];
+    //     const clamp = x - margin - this.pad[0];
 
-        // Do not clamp if mesh already smaller
-        if (this.geom.dim[0] * 2 < clamp) return;
+    //     // Do not clamp if mesh already smaller
+    //     if (this.geom.dim[0] * 2 < clamp) return;
 
-        this.geom.pos[0] -= this.geom.dim[0]; // Center meshe's position at left .
-        this.geom.dim[0] = clamp / 2; // Subtract the clamped value from the labels area dimention.
-        this.geom.pos[0] += clamp / 2; // Move mesh by half the new width.
+    //     this.geom.pos[0] -= this.geom.dim[0]; // Center meshe's position at left .
+    //     this.geom.dim[0] = clamp / 2; // Subtract the clamped value from the labels area dimention.
+    //     this.geom.pos[0] += clamp / 2; // Move mesh by half the new width.
 
-        const label_area_w = this.geom.dim[0] - (this.pad[0] * 2); // Need to include only the left pad
+    //     const label_area_w = this.geom.dim[0] - (this.pad[0] * 2); // Need to include only the left pad
 
-        const char_width = Floor(this.text_mesh.fontsize * Font_get_font_advancex(this.text_mesh.mat.texidx));
-        let text_width = char_width;
-        let k = 0; // Will store the number of characters need to be clamped.
-        // Calculate how many characters we must ommit.
-        while (text_width < label_area_w) {
-            text_width += char_width;
-            k++;
-        }
-        // this.text_mesh.geom.num_faces -= k;
-        if (k + 1 < this.text_mesh.geom.num_faces) // Avoid +1 if k===num_faces
-            this.text_mesh.geom.num_faces = k + 1;
+    //     const char_width = Floor(this.text_mesh.fontsize * Font_get_font_advancex(this.text_mesh.mat.texidx));
+    //     let text_width = char_width;
+    //     let k = 0; // Will store the number of characters need to be clamped.
+    //     // Calculate how many characters we must ommit.
+    //     while (text_width < label_area_w) {
+    //         text_width += char_width;
+    //         k++;
+    //     }
 
-        // Update the gfx buffers, if the mesh is already inserted.
-        if (this.is_gfx_inserted) {
-            // TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
-            Gl_set_dim_X(this.gfx, this.geom.dim[0]); // Update dim in vertex buffer
-            Gl_set_wpos_X(this.gfx, this.geom.pos[0]); // Update pos in vertex buffer
-            const ommited_chars = this.text_mesh.mat.text.length - (k + 1);
-            Gl_set_alpha_from_offset(this.text_mesh.gfx, 0, this.text_mesh.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
-        }
-    }
+    //     if (k + 1 < this.text_mesh.geom.num_faces) // Avoid +1 if k===num_faces
+    //         this.text_mesh.geom.num_faces = k + 1;
+
+    //     // Update the gfx buffers, if the mesh is already inserted.
+    //     if (this.is_gfx_inserted) {
+    //         // TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
+    //         Gl_set_dim_X(this.gfx, this.geom.dim[0]); // Update dim in vertex buffer
+    //         Gl_set_wpos_X(this.gfx, this.geom.pos[0]); // Update pos in vertex buffer
+    //         const ommited_chars = this.text_mesh.mat.char_buffer.active_count - (k + 1);
+    //         Gl_set_alpha_from_offset(this.text_mesh.gfx, 0, this.text_mesh.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
+    //     }
+    // }
+
+
 
 
 
@@ -498,7 +502,7 @@ export class Widget_Label extends Rect {
 
         STATE.mesh.SetClicked(mesh);
         // STATE.mesh.SetFocused(mesh);
-        console.log('Clicked:', mesh.GetName())
+        // console.log('Clicked:', mesh.GetName())
 
         // IMPORTANT: We use the 'INTERVALS.MOVE' index for the 'timeIntervalsIdxBuffer' element, to store the interval for the move OR the resize event, since resize and move (intervals) cannot co-exist.
         if (mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
@@ -523,17 +527,17 @@ export class Widget_Label extends Rect {
                     // We have Resize
 
                     if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
-                        console.log('X Y RESIZE');
+                        // console.log('X Y RESIZE');
 
                         const OnResizeFn = mesh.OnResize;
                         const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
                         mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
                     }
                     else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
-                        console.log('X RESIZE');
+                        // console.log('X RESIZE');
                     }
                     else { // Its a height resize
-                        console.log('Y RESIZE');
+                        // console.log('Y RESIZE');
                     }
 
                     mesh.StateEnable(MESH_STATE.IN_RESIZE);
@@ -618,7 +622,7 @@ export class Widget_Label extends Rect {
             return;
         }
         
-        console.log('RESIZING ', mesh.GetName());
+        // console.log('RESIZING ', mesh.GetName());
         const mouse_pos = MouseGetPosDif();
         
         if (mouse_pos.x !== 0 || mouse_pos.y !== 0) {

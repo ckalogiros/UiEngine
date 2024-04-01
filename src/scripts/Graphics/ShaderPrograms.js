@@ -556,7 +556,7 @@ export function Program_update_text_info_TEMP(mesh) {
 		if (child.type & MESH_TYPE.WIDGET_TEXT) {
 			console.log(child.mesh_bufferidx, child.GetName())
 			// child.UpdateText('NEW TEXT')
-			child.ResetText('NEW TEXT jhsdkskjd sjdkjsjsm sjdkjskdjksj');
+			// child.ResetText('NEW TEXT jhsdkskjd sjdkjsjsm sjdkjskdjksj');
 
 		}
 

@@ -82,6 +82,7 @@ export class Geometry2D_Text extends Geometry2D {
    Reposition_pre(pos) {
 
       CopyArr2(this.pos, pos)
+      CopyArr2(this.defPos, pos)
       // CopyArr2(this.defPos, pos)
 
       this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;

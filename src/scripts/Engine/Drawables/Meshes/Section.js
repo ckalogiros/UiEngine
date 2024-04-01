@@ -178,9 +178,11 @@ export class Section extends Rect {
 
       if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
          section.geom.dim[0] = section.max_size[0]; // For scroller widgets, do not set the height
+         section.geom.defDim[0] = section.max_size[0]; 
       }
       else {
          CopyArr2(section.geom.dim, section.max_size); // Set size for the root.
+         CopyArr2(section.geom.defDim, section.max_size); // Set size for the root.
       }
       
 
@@ -236,9 +238,11 @@ export class Section extends Rect {
 
       if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
          section.geom.dim[0] = section.max_size[0]; // For scroller widgets, do not set the height
+         section.geom.defDim[0] = section.max_size[0]; 
       }
       else {
          CopyArr2(section.geom.dim, section.max_size); // Set size for the root.
+         CopyArr2(section.geom.defDim, section.max_size); // Set size for the root.
       }
 
       /** OPTIONS:EXPAND 
@@ -256,6 +260,9 @@ export class Section extends Rect {
          section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.margin[0];
          section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.margin[1];
       }
+
+      // Update default position
+      CopyArr2(section.geom.defPos, section.geom.pos);
 
       section.SetMargin();
 
@@ -807,15 +814,17 @@ function Expand(parent, options, width, accum_margins) {
       const child = parent.children.buffer[i];
       if (options & SECTION.INHERIT) opt = parent.options
 
-      if (child.type & MESH_TYPE.WIDGET_TEXT_LABEL && child.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
+      if (child.type & MESH_TYPE.WIDGET_LABEL && child.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
          child.Resize(); // TODO: Implement
          child.geom.dim[0] = width - (parent.margin[0] + accum_margins);
+         child.geom.defDim[0] = child.geom.dim[0];
       }
       else if (child.type & MESH_TYPE.SECTION_MESH) {
 
          child.Resize();
          if (opt & SECTION.VERTICAL) {
             child.geom.dim[0] = width - accum_margins;
+            child.geom.defDim[0] = child.geom.dim[0];
          }
          else if (opt & SECTION.HORIZONTAL) {
 
@@ -848,15 +857,23 @@ function Calculate_sizes_recursive(parent, options) {
 
       const mesh = parent.children.buffer[i];
 
+      if(mesh.mesh_bufferidx === 29){
+         console.log()
+      }
       // if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) && !(mesh.type & MESH_TYPE.WIDGET_SCROLLER))) {
       if (mesh.children.active_count && ((mesh.type & MESH_TYPE.SECTION_MESH) )) {
 
-         const size = Calculate_sizes_recursive(mesh, options); // Recurse if child mesh is of type of Section
-
+         Calculate_sizes_recursive(mesh, options); // Recurse if child mesh is of type of Section
 
          if((mesh.type & MESH_TYPE.WIDGET_SCROLLER)===0){
-            mesh.geom.dim[0] = mesh.max_size[0]
-            mesh.geom.dim[1] = mesh.max_size[1]
+            
+            mesh.geom.dim[0] = mesh.max_size[0];
+            mesh.geom.dim[1] = mesh.max_size[1];
+            
+            // Update mesh's default dim
+            mesh.geom.defDim[0] = mesh.max_size[0];
+            mesh.geom.defDim[1] = mesh.max_size[1];
+            
          }
 
 
@@ -934,7 +951,8 @@ export function Calculate_positions_recursive(parent, options) {
       const mesh = parent.children.buffer[i];
       let continue_recur = true;
       let opt = options
-
+if(mesh.mesh_bufferidx === 34)
+console.log
       if (options & SECTION.INHERIT) opt = parent.options
 
       const mesh_max_width = mesh.GetMaxWidth();
@@ -957,6 +975,7 @@ export function Calculate_positions_recursive(parent, options) {
             else { // Case  mesh is of type section  
 
                CopyArr2(mesh.geom.pos, new_pos);
+               CopyArr2(mesh.geom.defPos, mesh.geom.pos);
                const update_data = { 
                   sizes:[2],
                   data: [new_pos[0], new_pos[1], mesh.geom.dim[0],mesh.geom.dim[1],]
@@ -999,6 +1018,9 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
       let continue_recur = true;
       let opt = options
 
+if(mesh.mesh_bufferidx === 34)
+console.log
+
       if (options & SECTION.INHERIT) opt = parent.options
 
       const mesh_max_width = mesh.GetMaxWidth();
@@ -1023,12 +1045,14 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
             if (mesh.type & MESH_TYPE.WIDGET_SCROLLER_BAR) {
                mesh.children.buffer[0].geom.pos[0] += pos_dif[0];
                mesh.children.buffer[0].geom.pos[1] += pos_dif[1];
+               CopyArr2(mesh.children.buffer[0].geom.defPos, mesh.children.buffer[0].geom.pos);
             }
 
             continue_recur = false; // Stop recursion for mesh's children. Let the mesh deal with it's children positioning.
          }
          else { // Case  mesh is of type section  
             CopyArr2(mesh.geom.pos, new_pos);
+            CopyArr2(mesh.geom.defPos, mesh.geom.pos);
          }
 
       }

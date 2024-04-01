@@ -152,7 +152,7 @@ function Menu_options_create_slider_popup_menu_options(clicked_mesh, _pos) {
    const menu = {
 
       section_menu: section_menu, // Has all the menu buttons
-      targets: meshes.buffer.slice(0, count), // Each menu button has a target mesh
+      targets: meshes.buffer.SliceText(0, count), // Each menu button has a target mesh
       event_params: {
          targetBindingFunctions: Bind_change_brightness,
          EventClbk: Slider_connect,

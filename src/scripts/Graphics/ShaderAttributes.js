@@ -39,11 +39,10 @@ export function Shader_attributes_get_attribs_offset_size(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
    const attrib_idx = Shader_attributes_get_attrib_by_nameid(attribsidx, nameid);
-   const ret = {
+   return {
       offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
       size: _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx],
    };
-   return ret;
 }
 
 

@@ -11,7 +11,7 @@ import { View_get_view_byidx } from "../../Core/MeshBufferViews";
 
 
 
-export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_right=null) {
+export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_right=null) {
 
    let changes_hapened = false;
    const limit = (clip_right) ? { left: clip_left, right: clip_right, } : { left: TEST_CLIP_LEFT, right: TEST_CLIP_RIGHT, }
@@ -23,122 +23,90 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
       const meshshes_idx = group.vb.buffer[i].data;
       for(let j=0; j <= meshshes_idx.boundary; j++){
          
-         const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+         const mesh = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
          
          // We run for all meshes of the group so that on scoll every mesh is clipped
+
          // Case for text meshes
-         const r = mesh.geom.pos[0] + (mesh.geom.dim[0] * 2 * mesh.geom.num_faces) ;
-         // if((mesh.type & MESH_TYPE.TEXT_MESH)===0) console.log('right', right, 'def_right', def_right)
-         
          if(mesh.type & MESH_TYPE.TEXT_MESH){
+
+            mesh.ClipX(limit.right)
+         }
+         else{
             
-            const text_right = mesh.GetTextRight_A();
-            // console.log('text_right', text_right, 'len', mesh.mat.text.length, mesh.GetName())
-            if(text_right > limit.right){
-               
-               // TEMPORARY: Clip text. Should use def_text for default text storage.
-               let pos = mesh.geom.pos[0];
-               let new_text = '';
-               for(let i=0; i<mesh.mat.text.length; i++){
-                  
-                  pos += mesh.geom.dim[0];
-                  if(pos >= limit.right - mesh.geom.dim[0]) break
-                  // new_text += mesh.mat.text[i];
-                  mesh.mat.text[i] = mesh.mat.defText[i];
-               }
+            const right  = mesh.geom.pos[0] + mesh.geom.dim[0];
+            const reduce = (right) - limit.right;
+            const def_right   = mesh.geom.pos[0] + mesh.geom.defDim[0];
 
-               // mesh.ClampX(x, margin = 0)
-
-               mesh.geom.num_faces = mesh.mat.text.length;
-               mesh.geom.num_faces = new_text.length;
-               mesh.mat.text = new_text;
+            if(right > limit.right){
                
+               mesh.geom.dim[0] -= reduce/2;
+               mesh.geom.pos[0] -= reduce/2;
                
                mesh.state.mask |= MESH_STATE.CLIPED_X;
+
+               changes_hapened = true;
+   
+            }
+            else if(right < def_right){ // if mesh right < mesh default dim
+
+               mesh.geom.dim[0] -= reduce/2;
+               mesh.geom.pos[0] -= reduce/2;
+               
+               // Case we surpass the default width.
+               if(mesh.geom.dim[0] > mesh.geom.defDim[0]){
+
+                  mesh.geom.pos[0] -= mesh.geom.dim[0] - mesh.geom.defDim[0];
+                  mesh.geom.dim[0] = mesh.geom.defDim[0];
+               }
+
+               mesh.state.mask &= ~MESH_STATE.CLIPED_X;
                changes_hapened = true;
             }
-            else{
+         }
+      }
+   }
 
-               let pos = mesh.geom.pos[0];
-               // let new_text = '';
-               for(let i=0; i<mesh.mat.defText.length; i++){
-                  
-                  pos += mesh.geom.dim[0];
-                  if(pos > limit.right + mesh.geom.dim[0]) break
-                  // new_text += mesh.mat.defText[i];
-                  mesh.mat.text[i] = mesh.mat.defText[i];
-               }
-               // mesh.ClampX(x, margin = 0)
-               
-               mesh.geom.num_faces = mesh.mat.text.length;
-               // mesh.geom.num_faces = new_text.length;
-               // mesh.mat.text = new_text;
-               
-               
-               mesh.state.mask &= ~MESH_STATE.CLIPED_X;
+
+   return changes_hapened;
+}
+
+
+
+export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_right=null) {
+
+   let changes_hapened = false;
+   const limit = (clip_left && clip_right) ? { left: clip_left, right: clip_right, } : { left: TEST_CLIP_TOP, right: TEST_CLIP_BOTTOM, }
+
+   const group = View_get_view_byidx(group_bufferidx);
+
+   for(let i=0; i <= group.vb.boundary; i++){
+   
+      const meshshes_idx = group.vb.buffer[i].data;
+      for(let j=0; j<=meshshes_idx.boundary; j++){
+         
+         const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+         const left    = mesh.geom.pos[0] - mesh.geom.dim[0];
+         const right   = mesh.geom.pos[0] + mesh.geom.dim[0];
+   
+         if(right < limit.left){
+
+            if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_X)===0){
+
+               mesh.state.mask &= ~MESH_STATE.ACTIVE;
+               mesh.state.mask |= MESH_STATE.CLIPED_X;
                changes_hapened = true;
             }
          }
          else{
             
-            const right   = mesh.geom.pos[0] + mesh.geom.dim[0];
-            const def_right   = mesh.geom.defPos[0] + mesh.geom.defDim[0];
+            if(mesh.state.mask & MESH_STATE.CLIPED_X){
             
-            if(right > limit.right){
-   
-               const reduce = (right) - limit.right;
-               mesh.geom.dim[0] -= reduce/2;
-               mesh.geom.pos[0] -= reduce/2;
-               
-               mesh.state.mask |= MESH_STATE.CLIPED_X;
-               changes_hapened = true;
-   
-            }
-            else if(right < def_right){ // if mesh right < mesh default dim
-   
-               const reduce = (right) - limit.right;
-               mesh.geom.dim[0] -= reduce/2;
-               mesh.geom.pos[0] -= reduce/2;
-               
-               mesh.state.mask |= MESH_STATE.CLIPED_X;
+               mesh.state.mask |= MESH_STATE.ACTIVE;
+               mesh.state.mask &= ~MESH_STATE.CLIPED_X;
                changes_hapened = true;
             }
          }
-
-         
-
-
-         // if(mesh.type & MESH_TYPE.TEXT_MESH){
-
-         //    const r = mesh.geom.pos[0] + (mesh.geom.dim[0] * 2 * mesh.geom.num_faces) ;
-         //    if(r > limit.right){
-
-         //       // TEMPORARY: Clip text. Should use def_text for default text storage.
-         //       let pos = mesh.geom.pos[0];
-         //       let new_text = '';
-         //       for(let i=0; i<mesh.mat.text.length; i++){
-
-         //          pos += mesh.geom.dim[0];
-         //          if(pos >= limit.right - mesh.geom.dim[0]) break
-         //          new_text += mesh.mat.text[i];
-         //       }
-
-         //       mesh.geom.num_faces = new_text.length;
-         //       mesh.mat.text = new_text;
-               
-         //       mesh.state.mask |= MESH_STATE.CLIPED_X;
-         //       changes_hapened = true;
-         //    }
-         // }
-         // else if(right > limit.right){
-   
-         //    const reduce = right - limit.right;
-         //    mesh.geom.dim[0] -= reduce/2;
-         //    mesh.geom.pos[0] -= reduce/2;
-            
-         //    mesh.state.mask |= MESH_STATE.CLIPED_X;
-         //    changes_hapened = true;
-         // }
       }
    }
 
@@ -171,7 +139,6 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
                mesh.state.mask &= ~MESH_STATE.ACTIVE;
                mesh.state.mask |= MESH_STATE.CLIPED_Y;
                changes_hapened = true;
-               // console.log(mesh.GetName())
             }
          }
          else{
@@ -182,6 +149,55 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
                mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
                changes_hapened = true;
             }
+         }
+      }
+   }
+
+
+   return changes_hapened;
+}
+
+
+
+export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
+
+
+   let changes_hapened = false;
+   const limit = (clip_bottom) ? { top: clip_top, bottom: clip_bottom, } : { top: TEST_CLIP_LEFT, bottom: TEST_CLIP_RIGHT, }
+
+   const group = View_get_view_byidx(group_bufferidx);
+
+   for(let i=0; i<=group.vb.boundary; i++){
+   
+      const meshshes_idx = group.vb.buffer[i].data;
+      for(let j=0; j <= meshshes_idx.boundary; j++){
+         
+         const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+         
+         // We run for all meshes of the group so that on scoll every mesh is clipped
+            
+         const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
+         const def_bottom   = mesh.geom.pos[1] + mesh.geom.defDim[1];
+
+         if(bottom > limit.bottom){
+            
+            const reduce = (bottom) - limit.bottom;
+            mesh.geom.dim[1] -= reduce/2;
+            mesh.geom.pos[1] -= reduce/2;
+            
+            mesh.state.mask |= MESH_STATE.CLIPED_X;
+
+            changes_hapened = true;
+
+         }
+         else if(bottom < def_bottom){ // if mesh bottom < mesh default dim
+
+            const reduce = (bottom) - limit.bottom;
+            mesh.geom.dim[1] -= reduce/2;
+            mesh.geom.pos[1] -= reduce/2;
+            
+            mesh.state.mask |= MESH_STATE.CLIPED_X;
+            changes_hapened = true;
          }
       }
    }

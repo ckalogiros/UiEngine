@@ -623,6 +623,7 @@ export function Gl_set_wpos_XY(gfxInfo, wpos, num_faces = 1) {
        index += stride; // Go to next vertice's pos. +1 for skipping pos.z
        verts--;
    }
+   
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
 

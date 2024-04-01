@@ -117,6 +117,7 @@ export class Widget_Text extends Text_Mesh {
 	Reposition_pre(pos_dif) {
 
 		AddArr2(this.geom.pos, pos_dif)
+		CopyArr2(this.geom.defPos, this.geom.pos)
 
 		if (this.batch_fnidx === INT_NULL)
 			this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
@@ -131,6 +132,7 @@ export class Widget_Text extends Text_Mesh {
 
 			const child = this.children.buffer[i];
 			AddArr2(child.geom.pos, pos_dif);
+			CopyArr2(child.geom.defPos, child.geom.pos);
 
 			if (child.batch_fnidx === INT_NULL)
 				child.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
@@ -170,7 +172,7 @@ export class Widget_Text extends Text_Mesh {
 		if (this.is_gfx_inserted) {
 			// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
 
-			const ommited_chars = this.mat.text.length - this.geom.num_faces - 1;
+			const ommited_chars = this.mat.char_buffer.boundary - this.geom.num_faces - 1;
 			Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces - 1, ommited_chars); // Update alpha in text vertex buffer
 			// Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, this.geom.num_faces); // Update alpha in text vertex buffer
 		}
@@ -686,8 +688,7 @@ export class Widget_Multi_Text extends Widget_Text {
 				val = params.params.func_params[i].delta_avg; // No callback, just a value
 			}
 
-			const text = `${val}`;
-			meshes[i].UpdateText(text);
+			meshes[i].RenderTextFromNumber(val);
 		}
 
 	}
@@ -805,50 +806,50 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	ClampX(x, margin = 0) {
+	// ClampX(x, margin = 0) {
 
-		const clamp = x - margin * 2;
-		const char_width = Floor(this.fontsize * Font_get_font_advancex(this.mat.texidx));
-		let text_width = char_width * 2;
+	// 	const clamp = x - margin * 2;
+	// 	const char_width = Floor(this.fontsize * Font_get_font_advancex(this.mat.texidx));
+	// 	let text_width = char_width * 2;
 
-		let k = 0; // Will store the number of characters need to be clamped.
-		// Calculate how many characters we must ommit.
-		while (text_width < clamp && k < this.geom.num_faces) {
-			text_width += char_width * 2;
-			k++;
-		}
-		this.geom.num_faces = k - 1;
+	// 	let k = 0; // Will store the number of characters need to be clamped.
+	// 	// Calculate how many characters we must ommit.
+	// 	while (text_width < clamp && k < this.geom.num_faces) {
+	// 		text_width += char_width * 2;
+	// 		k++;
+	// 	}
+	// 	this.geom.num_faces = k - 1;
 
-		// Update the gfx buffers, if the mesh is already inserted.
-		if (this.is_gfx_inserted) {
-			// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
+	// 	// Update the gfx buffers, if the mesh is already inserted.
+	// 	if (this.is_gfx_inserted) {
+	// 		// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
 
-			const ommited_chars = this.mat.text.length - (k + 1);
-			Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
-		}
+	// 		const ommited_chars = this.mat.char_buffer.active_count - (k + 1);
+	// 		Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
+	// 	}
 
-		for (let i = 0; i <= this.children.boundary; i++) {
+	// 	for (let i = 0; i <= this.children.boundary; i++) {
 
-			const child = this.children.buffer[i];
-			if (child) {
+	// 		const child = this.children.buffer[i];
+	// 		if (child) {
 
-				k = 0; // Will store the number of characters need to be clamped.
-				// Calculate how many characters we must ommit.
-				while (text_width < clamp && k < child.geom.num_faces) {
-					text_width += char_width;
-					k++;
-				}
-				child.geom.num_faces = k - 1;
+	// 			k = 0; // Will store the number of characters need to be clamped.
+	// 			// Calculate how many characters we must ommit.
+	// 			while (text_width < clamp && k < child.geom.num_faces) {
+	// 				text_width += char_width;
+	// 				k++;
+	// 			}
+	// 			child.geom.num_faces = k - 1;
 
-				// Update the gfx buffers, if the mesh is already inserted.
-				if (this.is_gfx_inserted) {
-					// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
+	// 			// Update the gfx buffers, if the mesh is already inserted.
+	// 			if (this.is_gfx_inserted) {
+	// 				// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
 
-					const ommited_chars = this.mat.text.length - (k + 1);
-					Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
-				}
-			}
-		}
-	}
+	// 				const ommited_chars = this.mat.char_buffer.active_count - (k + 1);
+	// 				Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 

@@ -768,6 +768,12 @@ export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
       // Increment each mesh, that is part of this widget_root
       _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[0] += x;
       _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1] += y;
+      
+      // Update default position
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[0] = 
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[0];
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[1] = 
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1];
    }
 
    const len = _root_batch_buffer.buffer[root_bufferidx].vb.length

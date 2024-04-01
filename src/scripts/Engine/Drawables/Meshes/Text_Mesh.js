@@ -48,19 +48,19 @@ export class Text_Mesh extends Mesh {
 
       this.state.mask &= ~MASK;
    }
-      
 
-   SetTypeDebug(){
+
+   SetTypeDebug() {
       this.type |= MESH_TYPE.DEBUG_MESH;
    }
-   
 
-   AddToGfxBuffer() { 
+
+   AddToGfxBuffer() {
       this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
    }
 
 
-   RemoveFromGfxBuffer() { 
+   RemoveFromGfxBuffer() {
       Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
    }
 
@@ -70,7 +70,7 @@ export class Text_Mesh extends Mesh {
    /*******************************************************************************************************************************************************/
 
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs=[INT_NULL, INT_NULL]) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, INT_NULL]) {
 
       this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
 
@@ -87,7 +87,7 @@ export class Text_Mesh extends Mesh {
 
       const advancex = Font_get_font_advancex(this.mat.texidx); // Cash the space character
       this.gfx.tb.idx = this.mat.texidx;
-      const face_count = this.mat.text.length; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
+      const face_count = this.mat.char_buffer.active_count; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
       const space_char_uv = Font_get_char_uv_coords(this.mat.uvIdx, ' ');
 
       for (let i = 0; i < face_count; i++) {
@@ -95,10 +95,10 @@ export class Text_Mesh extends Mesh {
          // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
          this.mat.uv = space_char_uv;
 
-         if (this.mat.text[i]) { // If there is a text, get char uv and metrics
+         if (this.mat.char_buffer.buffer[i]) { // If there is a text, get char uv and metrics
 
-            this.mat.uv = Font_get_char_uv_coords(this.mat.uvIdx, this.mat.text[i]);
-            const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, this.mat.text[i]);
+            this.mat.uv = Font_get_char_uv_coords(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
+            const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
             geom_copy.dim[0] *= plane_bounds.width;
             geom_copy.dim[1] *= plane_bounds.height;
             geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
@@ -106,12 +106,12 @@ export class Text_Mesh extends Mesh {
          }
 
          if (i === 0) {
-            Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
+            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
          }
          else { // The first face exista as an entity, the rest are constructed here and store only to the vertex buffer
-            Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
+            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
          }
 
 
@@ -145,7 +145,7 @@ export class Text_Mesh extends Mesh {
 
       const advancex = Font_get_font_advancex(this.mat.texidx);
       this.gfx.tb.idx = this.mat.texidx;
-      const face_count = this.mat.text.length; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
+      const face_count = this.mat.char_buffer.active_count; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
       const space_char_uv = Font_get_char_uv_coords(this.mat.uvIdx, ' ');
 
 
@@ -154,10 +154,10 @@ export class Text_Mesh extends Mesh {
          // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
          this.mat.uv = space_char_uv;
 
-         if (this.mat.text[i]) { // If there is a text, get char uv and metrics
+         if (this.mat.char_buffer.buffer[i]) { // If there is a text, get char uv and metrics
 
-            this.mat.uv = Font_get_char_uv_coords(this.mat.uvIdx, this.mat.text[i]);
-            const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, this.mat.text[i]);
+            this.mat.uv = Font_get_char_uv_coords(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
+            const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
             geom_copy.dim[0] *= plane_bounds.width;
             geom_copy.dim[1] *= plane_bounds.height;
             geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
@@ -165,12 +165,12 @@ export class Text_Mesh extends Mesh {
          }
 
          if (i === 0) {
-            Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
+            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices(this.gfx.ib, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
          }
          else {
-            Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.text[i]} in: ${this.GetName()}`);
-            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.text[i]} in: ${this.GetName()}`);
+            Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
+            // if (this.sid.shad & SID.SHAD.INDEXED) Index_buffer_add_indices_from_non_existant_mesh(this.gfx.ib, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
          }
 
 
@@ -182,15 +182,19 @@ export class Text_Mesh extends Mesh {
       }
 
       this.is_gfx_inserted = true;
-      
+
       // Add entry to Gfx Buffer
       // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
 
    }
 
-   
-   ResetText(new_text){
-      this.mat.text = new_text;
+
+   ResetText(new_text) {
+
+      const len = new_text.length;
+      for (let i = 0; i < len; i++) {
+         this.mat.char_buffer.buffer[i] = new_text[i];
+      }
       this.geom.text = new_text;
       this.geom.num_faces = new_text.length;
    }
@@ -245,17 +249,28 @@ export class Text_Mesh extends Mesh {
 
 
    SetText(str) {
-      this.mat.text = str;
+
+      // const len = (count) ? count+1 : str.length;
+      const len = str.length;
+      this.mat.char_buffer.Reset();
+      for (let i = 0; i < len; i++) {
+         this.mat.char_buffer.Add(str[i]);
+      }
+   }
+
+
+   SliceText(start, count = 0) {
+
+      const len = (start + count) <= this.mat.char_buffer.boundary ? (start + count) : this.mat.char_buffer.boundary
+      for (let i = start; i <= len; i++) {
+         this.mat.char_buffer.RemoveByIdx(i);
+      }
    }
 
 
    UpdatePosXYZ() {
 
-      // alert()
-      const text = this.mat.text;
-
-      const textLen = text.length;
-      const len = this.geom.num_faces > textLen ? this.geom.num_faces : textLen;
+      const len = this.geom.num_faces > this.mat.char_buffer.active_count ? this.geom.num_faces : this.mat.char_buffer.active_count;
 
       const charPos = [0, 0, 0];
       CopyArr3(charPos, this.geom.pos)
@@ -278,11 +293,25 @@ export class Text_Mesh extends Mesh {
     * Probably because of the new GfxInfoMesh and new Geometry2D_Text.
     * Concider building the structs localy.
     */
-   UpdateText(_text) {
+   RenderTextFromNumber(value) {
+      if (value.constructor === Number) {
+         this.SetText(`${value}`)
+         this.RenderText();
+      }
+   }
+
+
+   RenderTextFromString(text) {
+      if (text.constructor === String) {
+         this.SetText(text);
+         this.RenderText();
+      }
+   }
+
+
+   RenderText() {
 
       if (!this.gfx) return; // Case replace text before insert to gfx buffers;
-
-      let text = (typeof (_text) === 'number') ? `${_text}` : _text; // Takes arithmetic values or just a char.
 
       const gfx_copy = {
          vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
@@ -299,33 +328,27 @@ export class Text_Mesh extends Mesh {
 
       const advancex = Font_get_font_advancex(this.mat.texidx);
 
-      const numchars = text.length;
+      const c = this.mat.char_buffer.buffer;
+
+      const numchars = this.mat.char_buffer.active_count;
       // NOTE: We want to run for max chars to reset any extra from the current text
       const len = (this.geom.num_faces > numchars) ? this.geom.num_faces :
          (numchars > this.geom.num_faces ? this.geom.num_faces : numchars);
 
-      // let len = 0;
-      // if (numchars > this.last_charidx) {
-      //    len = numchars < this.geom.num_faces ? numchars : this.geom.num_faces;
-      //    this.last_charidx = len
-      // }
-      // else {
-      //    len = this.last_charidx;
-      //    this.last_charidx = numchars
-      // }
+
 
 
       const attr = Shader_attributes_get_attribs_offset_size(gfx_copy.prog.attribsidx, SHADER_ATTRIBUTES.TEX2);
 
       // Update text faces
-      for (let i = 0; i < len; i++) {
+      for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
 
          let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
 
-         if (text[i] !== undefined) // If char=' ' space, just render [0,0] uv coordinates.
+         if (c[i] !== '') // If char=' ' space, just render [0,0] uv coordinates.
          {
             // Set character dimentions.
-            const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, text[i]);
+            const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, c[i]);
             geom_copy.dim[0] *= plane_bounds.width;
             geom_copy.dim[1] *= plane_bounds.height;
             Gl_set_dim_XY(gfx_copy, geom_copy.dim);
@@ -336,7 +359,7 @@ export class Text_Mesh extends Mesh {
             geom_copy.pos[0] += Floor(this.fontsize * 2 * advancex);
 
             // Get the correct uv coordinates.
-            uvs = Font_get_char_uv_coords(this.mat.uvIdx, text[i]);
+            uvs = Font_get_char_uv_coords(this.mat.uvIdx, c[i]);
 
             geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
          }
@@ -346,16 +369,26 @@ export class Text_Mesh extends Mesh {
          gfx_copy.vb.start += gfx_copy.vb.count
       }
 
+      // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
+      for (let i = this.mat.char_buffer.active_count; i < len; i++) {
+
+         let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
+         if (c[i] !== ''){
+
+            Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex);
+
+            // Take the oportunity to set the characters of char_buffer to '', instead of running a loop.
+            c[i] = '';
+         }
+
+         gfx_copy.vb.start += gfx_copy.vb.count
+      }
+
       Vertex_buffer_state_enable(gfx_copy.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
    }
 
-   // ClipText(clip_val) {
-
-   //    let text = this.text; // Takes arithmetic values or just a char.
 
 
-
-   // }
 
 
    /** Update a specific character in text char array */
@@ -401,6 +434,44 @@ export class Text_Mesh extends Mesh {
       Gl_set_uv(gfx_copy, uvs);
 
    }
+
+
+   ClipX(limit) {
+
+      const text_len = this.mat.text.length;
+      const face_width = this.geom.dim[0] * this.advancex;
+      let right = this.GetTextRight_A();
+
+      let changes_happended = false;
+
+      if (right-face_width > limit) {
+
+         changes_happended = true;
+         for (let i = this.mat.char_buffer.boundary; i >= 0; i--) {
+
+            this.mat.char_buffer.RemoveByIdx(i);
+            this.geom.num_faces--;
+            right -= face_width*2;
+            if (right < limit)
+               break
+         }
+      }
+      else if (right+face_width < limit && this.mat.char_buffer.active_count < text_len) {
+
+         changes_happended = true;
+         for (let i = this.mat.char_buffer.active_count; i < text_len; i++) {
+
+            this.mat.char_buffer.buffer[i] = this.mat.text[i];
+            this.mat.char_buffer.boundary++;
+            this.mat.char_buffer.active_count++;
+            this.geom.num_faces++;
+            right += face_width*2;
+            if (right > limit)
+               break
+         }
+      }
+   }
+
 
 
 
@@ -481,6 +552,7 @@ export class Text_Mesh extends Mesh {
       console.error('NO BATCH CREATED')
 
       AddArr3(this.geom.pos, pos_dif);
+      CopyArr3(this.geom.defPos, this.geom.pos);
    }
 
 

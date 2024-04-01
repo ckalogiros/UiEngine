@@ -1,6 +1,6 @@
 "use strict";
 
-import { AddArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
+import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { M_Buffer } from "../../Core/Buffers.js";
@@ -278,10 +278,12 @@ export class Widget_Menu_Bar extends Widget_Label {
    Reposition_pre(pos_dif) {
       console.error('NO BATCH CREATED')
       AddArr2(this.geom.pos, pos_dif);
+      CopyArr2(this.geom.defPos, this.geom.pos);
       this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
       // Batch_store(this, _, { pos: pos_dif }, _);
 
       AddArr2(this.text_mesh.geom.pos, pos_dif);
+      CopyArr2(this.text_mesh.geom.defPos, this.text_mesh.geom.pos);
       this.text_mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
       // Batch_store(this.text_mesh, _, { pos: pos_dif }, _);
 
@@ -432,8 +434,8 @@ export class Widget_Minimize extends Widget_Button {
                   root.children.Reset();
                   root.AddChild(menu_bar);
 
-                  minim_mesh.text_mesh.SetText('+ maximize');
-                  minim_mesh.text_mesh.UpdateText('+ maximize');
+                  minim_mesh.text_mesh.SetText('+ maximize'); // IMIDIATELY: I think the Set is anneccesary with the new implementation of char buffers
+                  minim_mesh.text_mesh.RenderTextFromString('+ maximize');
                   minim_mesh.toggle = true;
 
                   CopyArr3(root.geom.defPos, root.geom.pos); // Set current pos as the default pos.
@@ -460,8 +462,8 @@ export class Widget_Minimize extends Widget_Button {
                root.children.Reset();
                root.children = minim_mesh.stored_children_meshes;
 
-               minim_mesh.text_mesh.SetText('- minimize');
-               minim_mesh.text_mesh.UpdateText('- minimize');
+               minim_mesh.text_mesh.SetText('- minimize'); // IMIDIATELY: I think the Set is anneccesary with the new implementation of char buffers
+               minim_mesh.text_mesh.RenderTextFromString('- minimize');
 
                { // Set widget pos and render
                   root.geom.pos[1] = root.geom.defPos[1];

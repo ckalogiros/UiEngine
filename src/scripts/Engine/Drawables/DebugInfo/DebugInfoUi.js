@@ -428,9 +428,9 @@ function Debug_info_update_ui_mouse_pos(params) {
    const mpr = `area: x:${m.pos.x - m.click.up.x}, y:${m.pos.y - m.click.up.y}`;
 
    const mouse_pos_text = evt_params.children.buffer[0];
-   mouse_pos_text.UpdateText(mp)
+   mouse_pos_text.RenderTextFromString(mp)
    const mouse_prev_text = evt_params.children.buffer[1];
-   mouse_prev_text.UpdateText(mpr)
+   mouse_prev_text.RenderTextFromString(mpr)
 
 }
 
@@ -585,7 +585,7 @@ function Debug_info_gfx_update(params) {
       if (dp_prog.isOn === DP_MENU_STATE.OFF) return;
       dp_vb = dp_prog.menu.children.buffer[foundvbidx];
 
-      const sumbol = dp_vb.children.buffer[0].text_mesh.mat.text[0];
+      const sumbol = dp_vb.children.buffer[0].text_mesh.mat.char_buffer[0];
       const text = `${sumbol} vb:${vbidx} | count:${vb.count}`;
       dp_vb.SetText(text);
    }
@@ -920,8 +920,8 @@ function Debug_info_update_batch(params) {
    const info1 = evt_params.children.buffer[0];
    const info2 = evt_params.children.buffer[1];
 
-   info1.UpdateText(`Batch store: ${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_STORE}`)
-   info2.UpdateText(`Batch update: ${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_UPDATE}`)
+   info1.RenderTextFromString(`Batch store: ${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_STORE}`)
+   info2.RenderTextFromString(`Batch update: ${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_UPDATE}`)
 
 }
 

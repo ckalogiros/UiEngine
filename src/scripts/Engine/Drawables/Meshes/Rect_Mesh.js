@@ -4,7 +4,7 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
-import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
+import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
@@ -163,6 +163,7 @@ export class Rect extends Mesh {
 
    Reposition_pre(pos_dif) {
 
+      CopyArr2(this.geom.defPos, this.geom.pos);
       AddArr2(this.geom.pos, pos_dif);
       this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
 
@@ -175,6 +176,7 @@ export class Rect extends Mesh {
       for (let i = 0; i <= this.children.boundary; i++) {
 
          AddArr2(this.children.buffer[i].geom.pos, pos_dif);
+         CopyArr2(this.children.buffer[i].geom.defPos, this.children.buffer[i].geom.pos);
          
          this.children.buffer[i].batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
          Batch_store(this.children.buffer[i], SHADER_ATTRIBUTES.WPOS4, update_data, _);

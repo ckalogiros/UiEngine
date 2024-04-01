@@ -7,8 +7,8 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/Tim
 import { Vertex_buffer_add_vertices, Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
-import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
-import { Clipx_from_group, Clipy_from_group } from "../Operations/Clip.js";
+import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
+import { Clampx_from_group, Clampy_from_group, Clipx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { BLUE_10_120_220, GREY, PURPLER } from "../Material/Base/Colors.js";
 import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Listener_destroy_children_buffer, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
@@ -515,7 +515,8 @@ export class Widget_Scroller extends Section {
          const y = -mouse_pos.y / 2;
 
          // Check for min dimentions. // TODO: Who decides for the minimum dimentions??????
-         const min_width = scroller.scrolled_section.geom.dim[0];
+         // const min_width = scroller.scrolled_section.geom.dim[0];
+         const min_width = scroller.geom.defDim[0];
          const min_height = scroller.geom.defDim[1];
 
          if (x > POSSITIVE || (x < NEGATIVE && scroller.geom.dim[0] + x > min_width)) {
@@ -559,12 +560,18 @@ export class Widget_Scroller extends Section {
 
          View_reset_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0]);
 
-         const clip_top = scroller.scrolled_section.geom.pos[1] - scroller.geom.dim[1];
+         const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1];
          const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
+         const clip_left = scroller.geom.pos[0] - scroller.geom.dim[0];
          const clip_right = scroller.geom.pos[0] + scroller.geom.dim[0];
          // console.log('clip_right ', clip_right);
+         
          // Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
-         Clipx_from_group(scroller.scrolled_section.group_bufferidxs[0], 0, clip_right);
+         // Clampy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom)
+         
+         Clampx_from_group(scroller.scrolled_section.group_bufferidxs[0], 0, clip_right);
+         // Clipx_from_group(scroller.scrolled_section.group_bufferidxs[0], 0, clip_right);
+         
          View_rerender_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0], false);
 
 
@@ -811,12 +818,15 @@ export class Widget_Scroller extends Section {
    Reposition_pre(dif_pos) {
 
       AddArr2(this.geom.pos, dif_pos);
+      CopyArr2(this.geom.defPos, this.geom.pos);
 
       const bar = this.children.buffer[SCROLL_BAR_IDX];
       AddArr2(bar.geom.pos, dif_pos);
+      CopyArr2(bar.geom.defPos, bar.geom.pos);
 
       const handle = bar.children.buffer[0];
       AddArr2(handle.geom.pos, dif_pos);
+      CopyArr2(handle.geom.defPos, handle.geom.pos);
 
       const scrolled_mesh = this.children.buffer[SCROLL_MESH_IDX];
       scrolled_mesh.Reposition_pre(dif_pos);

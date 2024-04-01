@@ -46,6 +46,19 @@ export class M_Buffer {
       }
    }
 
+   InitFromText(size, text){
+
+      
+      this.size = size;
+      this.buffer = new Array(size);
+
+      let i=0;
+      for (i = 0; i < size; i++) {
+         this.buffer[i] = text[i];
+      }
+      this.active_count = i;
+      this.boundary = i-1;
+   }
 
    Add(elem) {
 
@@ -109,13 +122,25 @@ export class M_Buffer {
    }
 
 
-   Reset() {
+   ResetRENAMEME() {
 
       this.size = 1;
       this.boundary = -1;
       this.active_count = 0;
       this.buffer = [];
       this.buffer[0] = null;
+      this.freeidx = 0;
+      this.reserveidx = INT_NULL;
+   }
+
+
+   Reset() {
+
+      // this.size = 1;
+      this.boundary = -1;
+      this.active_count = 0;
+      // this.buffer = [];
+      // this.buffer[0] = null;
       this.freeidx = 0;
       this.reserveidx = INT_NULL;
    }
@@ -290,18 +315,146 @@ export class M_Buffer {
 
 
 // 
-// export class M_Buffer extends Buffer_Interface {
+export class CharBuffer extends M_Buffer {
 
-//    constructor(m_buffer) {
+   constructor(char_buffer=null) {
 
-//       super(m_buffer);
-//    }
+      super(char_buffer);
+
+      this.buffer[0] = '';
+   }
+
+
+   Init(size, text){
+      
+      this.size = size;
+      this.buffer = new Array(size);
+
+      let i=0;
+      for (i = 0; i < size; i++) {
+         this.buffer[i] = text[i];
+      }
+      this.active_count = i;
+      this.boundary = i-1;
+   }
+
+   Add(elem) {
+
+      const idx = this.#GetNextFree();
+      this.buffer[idx] = elem;
+      this.active_count++;
+      return idx;
+   }
 
 
 
+   #GetNextFree() {
+      
+      // TODO: 
+      // 1. The freeidx should be set to next availiable free elem, which is not implemented yet
+      // 2. We no longer use '' empty string for char buffers, we just set the boundary and update at boundary
+      // if(this.buffer[this.freeidx] === ''){ 
+
+      //    if(this.freeidx > this.boundary) this.boundary = this.freeidx; // UNNECESSARY: Can freeidx be greater than boundary???
+      //    return this.freeidx;
+      // }
+
+      if(this.active_count >= this.size){
+        
+         const idx = this.Realloc(); // buffer is full.
+         if (idx > this.boundary) this.boundary = idx;
+         return idx;
+      }
+
+      return ++this.boundary;
+      // // We run until boundary and not size (the whole buffer) 
+      // // since boundary does not decrement (on remove) below the last element's index.
+      // for (let i = 0; i < this.size; i++) {
+
+      //    if (this.buffer[i] === '') { 
+
+      //       // Increment boundary only if the free element is after the last stored element in the buffer.
+      //       if (i > this.boundary) this.boundary = i; 
+               
+      //       return i;
+      //    }
+      // }
+
+      // alert('Buffers.js, GetNextFree(). New element not found')
+   }
 
 
-// }
+   Reset() {
+
+      // this.size = 1;
+      this.boundary = -1;
+      this.active_count = 0;
+      // this.buffer = [];
+      this.buffer[0] = '';
+      this.freeidx = 0;
+      this.reserveidx = INT_NULL;
+   }
+
+
+   RemoveByIdx(idx) {
+   
+      /**DEBUG ERROR*/ if (idx < 0 || idx > this.size - 1) {
+         console.error('Index Out of bounds. @ M_Buffer.RemoveByIdx().\n idx:', idx, 'size', this.size)
+         return;
+      }
+
+      if (this.buffer[idx] !== '') {
+
+         this.buffer[idx] = '';
+         this.active_count--;
+         if(idx === this.boundary) this.boundary--; // Case the we removed the last element in existance
+
+
+         // Check if previous elements are empty, and reduce boundary to the last active.
+         const boundary = this.boundary;
+         for (let i = boundary; i > 0; i--) {
+
+            if (this.buffer[this.boundary] !== '') break;
+            this.boundary--;
+         }
+
+         if (this.boundary < INT_NULL) alert('M_Buffer boundary = -1')
+         ERROR_NULL(this.active_count);
+      }
+   }
+
+
+
+   // TODO: Call this on every Destroy, to have all M_Buffer elements not sparsed
+   ShiftElementOnDestroy(destroyed_idx){
+
+      /**DEBUG*/ if(destroyed_idx > this.boundary && this.boundary >= 0){
+
+         // console.error('destroyed_idx is out of bounds. @ ShiftElementOnDestroy(), Buffers.js.\destroyed_idx:', destroyed_idx, 'boundary:', this.boundary, '\nbuffer:');
+         // for(let i=0; i<this.buffer.length; i++){
+         //    const name = this.buffer[i] ? this.buffer[i].GetName() : 'NULL'
+         //    console.log(i, name)
+         // }
+      }
+
+      if(destroyed_idx < this.boundary){
+         // console.warn('ShiftElementOnDestroy:Before', 'index', destroyed_idx, 'buffer', this.buffer)
+         
+         this.buffer[destroyed_idx] = this.buffer[this.boundary];
+         this.buffer[this.boundary] = null;
+         this.boundary--;
+
+         this.buffer[destroyed_idx].idx = destroyed_idx; // IMPORTANT: Must update the mesh's idx to point to the new element index 
+
+         // console.warn('ShiftElementOnDestroy:After', 'buffer', this.buffer)
+
+         return true;
+      }
+
+      return false;
+   }
+
+}
 
 
 

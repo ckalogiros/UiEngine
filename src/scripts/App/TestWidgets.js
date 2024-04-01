@@ -6,7 +6,7 @@ import { TimeIntervalsCreate } from '../Engine/Timers/TimeIntervals.js';
 import { Mesh } from '../Engine/Drawables/Meshes/Base/Mesh.js';
 import { Widget_Menu_Bar, Widget_Minimize } from '../Engine/Drawables/Widgets/WidgetMenu.js';
 import { Geometry2D } from '../Engine/Drawables/Geometry/Base/Geometry.js';
-import { FloorArr2, FloorArr3 } from '../Helpers/Math/MathOperations.js';
+import { Floor, FloorArr2, FloorArr3 } from '../Helpers/Math/MathOperations.js';
 import { Material } from '../Engine/Drawables/Material/Base/Material.js';
 
 
@@ -24,7 +24,7 @@ import { Font_get_char_uv_coords } from '../Engine/Loaders/Font/ChlumskyFontMetr
 import { PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, _pt_loop, _pt_mesh_info_tip, _pt_test_misc_1, _pt_test_misc_2 } from '../Engine/Timers/PerformanceTimers.js';
 import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_byidx, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3 } from '../Engine/Core/MeshBuffer.js';
-import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clipx_from_group, Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
+import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clampx_from_group, Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
 import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { View_build_group_from_root_mesh, View_set_view_start_vb_index } from '../Engine/Core/MeshBufferViews.js';
 import { Index_buffer_info_create } from '../Graphics/Buffers/IndexBuffers.js';
@@ -37,9 +37,8 @@ import { getFile } from '../Engine/Core/FileSystem.js';
 
 // import { Buffer } from 'buffer';
 
-// import fs from 'fs-extra';
-// import * as fsce from 'fs-extra'
-// const fs = require('fs');
+// import fs from 'fs';
+// import * as fs from 'node:fs';
 
 // const data = { name: 'John', age: 30, city: 'New York' };
 // const jsonData = JSON.stringify(data);
@@ -150,7 +149,8 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    // const label = CreateLabel('LABEL');
+    // const label = CreateLabel('ABCDEFGHIJKLM');
+    // setInterval(()=>{label.text_mesh.ClipX(label.geom.pos[0]+label.geom.dim[0]);}, 200)
     // CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
@@ -244,8 +244,8 @@ export function TestWidgetsGeneric(scene) {
     // Help2(scene);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, helpui);
 
-    // const meshinfo_mesh = MeshInfo(scene)
-    // TimeIntervalsCreate(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
+    const meshinfo_mesh = MeshInfo(scene)
+    TimeIntervalsCreate(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh.children.buffer[0]);
 
@@ -826,7 +826,7 @@ function CreateLabel(name = 'Label ') {
 
     // label.ClampX(30);
     // label.text_mesh.SetColorRGB(REDL);
-    // label.text_mesh.UpdateText('REDL');
+    // label.text_mesh.RenderTextFromString('REDL');
 
     // label.Align(ALIGN.BOTTOM | ALIGN.LEFT, [0, 0]);
     // label.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
@@ -3264,7 +3264,7 @@ function CreateScrollerDp(scene) {
     ];
     const count = colors.length;
     const fontsize = 14;
-    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
+    const col_menu = TRANSPARENCY(PURPLEB[1], .9), col_dp = TRANSPARENCY(ORANGER[5], 1.);
     const margin = [4, 4]; const style = [0, 3, 1];
 
     // const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
@@ -3300,7 +3300,7 @@ function CreateScrollerDp(scene) {
     const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1];
     const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
     Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
-    // Clipx_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+    // Clampx_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
 
     scroller.Render();
 
@@ -3764,13 +3764,12 @@ function MeshInfo(scene) {
 
     const infomesh = Create_widget_multi_text(_, 'Mesh name 000000000000', ALIGN.VERTICAL, [420, 15, 100], fontsize, GREEN[7], YELLOWR[7], pad, .4);
     section.AddItem(infomesh);
-    infomesh.CreateNewText('id:000', fontsize, BLUE_10_120_220, pad, .9);
-    infomesh.CreateNewText('pos: 0000,0000,0', fontsize, BLUE_10_120_220, pad, .9);
-    infomesh.CreateNewText('dim: 0000,0000', fontsize, BLUE_10_120_220, pad, .9);
-    infomesh.CreateNewText('idx: 0000, alpha: 0.00', fontsize, ORANGE_240_160_10, pad, .9);
-    infomesh.CreateNewText('gfx: group: 0, prog:0, vb:0, start:00000', fontsize, BLUE_10_120_220, pad, .9);
-    infomesh.CreateNewText('HOVERED: name: 123456789, id:12', fontsize, BLUE_10_120_220, pad, .9);
-    infomesh.CreateNewText('FOCUSED: name: 123456789, id:12', fontsize, BLUE_10_120_220, pad, .9);
+    infomesh.CreateNewText('{meshidx:0000} {rootidx:00} {groupidx:[00] vb:[00]}', fontsize, BLUE_10_120_220, pad, .9);
+    infomesh.CreateNewText('pos: [0000,0000,0] dim:[0000,0000] defpos: [0000,0000,0] defdim:[0000,0000]', fontsize, ORANGE_240_160_10, pad, .9);
+    infomesh.CreateNewText('alpha:0.00, max-size:0000', fontsize, ORANGE_240_160_10, pad, .9);
+    infomesh.CreateNewText('gfx: prog:0, vb:00, start:00000 faces:0000', fontsize, BLUE_10_120_220, pad, .9);
+    // infomesh.CreateNewText('HOVERED: name: 123456789, id:12', fontsize, BLUE_10_120_220, pad, .9);
+    // infomesh.CreateNewText('FOCUSED: name: 123456789, id:12', fontsize, BLUE_10_120_220, pad, .9);
 
     // For text_mesh
     infomesh.CreateNewText('Text: name of the text and id', fontsize, BLUE_10_120_220, pad, .9);
@@ -3787,10 +3786,10 @@ function MeshInfo(scene) {
     infomesh.Align_pre(infomesh, ALIGN.VERTICAL)
 
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    section.ActivateAndChildrenRecursive()
+    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND;
+    section.Calc_no_gfx_update();
     section.Render();
-    section.Calc(SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND);
 
     // DEBUG_INFO.UI_MESH.IDX = section.idx;
 
@@ -3812,22 +3811,20 @@ function MeshInfoUpdate(params) {
 
         prev_infomesh = infoMesh;
 
-        textMesh.UpdateText(infoMesh.GetName());
+        textMesh.RenderTextFromString(infoMesh.GetName());
 
-        const gfx = (infoMesh.gfx !== null) ? `gfx: prog:${infoMesh.gfx.prog.idx}, vb:${infoMesh.gfx.vb.idx}, start:${infoMesh.gfx.vb.start}` : 'null'
+        const gfx = (infoMesh.gfx !== null) ? `gfx: prog:${infoMesh.gfx.prog.idx}, vb:${infoMesh.gfx.vb.idx}, start:${infoMesh.gfx.vb.start} faces:${infoMesh.geom.num_faces}` : 'null'
+
+        const max_size = infoMesh.max_size ? infoMesh.max_size : 'null';
 
         let msgs = [
-            `id:${infoMesh.id}`,
-            `pos:${FloorArr3(infoMesh.geom.pos)}`,
-            `dim: ${FloorArr2(infoMesh.geom.dim)}`,
-            `idx: ${infoMesh.idx} | alpha:${infoMesh.mat.col[3]}`,
+            `{meshidx:${infoMesh.mesh_bufferidx}} {rootidx:${infoMesh.root_bufferidx}} {groupidx:[${infoMesh.group_bufferidxs[0]}] vb:[${infoMesh.group_bufferidxs[0]}]}`,
+            `pos:[${FloorArr3(infoMesh.geom.pos)}] dim:[${FloorArr2(infoMesh.geom.dim)}] defpos:[${FloorArr3(infoMesh.geom.defPos)}] defdim:[${FloorArr2(infoMesh.geom.defDim)}]`,
+            `alpha:${infoMesh.mat.col[3]} max-size:${max_size}`,
             gfx,
-            (STATE.mesh.hovered) ? `HOVERED: name:${STATE.mesh.hovered.GetName()}, id:${STATE.mesh.hoveredId}` : 'HOVERED: NULL',
-            (STATE.mesh.focused) ? `FOCUSED: name:${STATE.mesh.focused.GetName()}, id:${STATE.mesh.focusedId}` : 'FOCUSED: NULL',
-            // `Text:`,
-            // `Batch :${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.MOVE}`,
-            // `Batch:${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_MOVE}`,
-            // `mesh: ${STATE.mesh.hovered.GetName()} counter${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.COUNT}`,
+            // (STATE.mesh.hovered) ? `HOVERED: name:${STATE.mesh.hovered.GetName()}, id:${STATE.mesh.hoveredId}` : 'HOVERED: NULL',
+            // (STATE.mesh.focused) ? `FOCUSED: name:${STATE.mesh.focused.GetName()}, id:${STATE.mesh.focusedId}` : 'FOCUSED: NULL',
+
         ];
 
         // Create info for any text gfx, if exists
@@ -3838,19 +3835,19 @@ function MeshInfoUpdate(params) {
                 const text_num_faces = (child.text_mesh) ? child.text_mesh.geom.num_faces : child.geom.num_faces; // If child is of type label and has 'text_mesh' else is plain text.
 
                 msgs.push(`Plain Text:${child.GetName()}, dim: ${child.id}`);
-                msgs.push(`pos:[${FloorArr3(child.geom.pos)}], dim:[${child.geom.dim}], alpha:${child.mat.col[3]}`);
-                msgs.push(`gfx: prog:${child.gfx.prog.idx}, vb:${child.gfx.vb.idx}, start:${child.gfx.vb.start}, faces:${text_num_faces}`);
+                msgs.push(`{pos:[${FloorArr3(child.geom.pos)}]} {dim:[${child.geom.dim}]}, {alpha:${child.mat.col[3]}}`);
+                msgs.push(`1gfx: prog:${child.gfx.prog.idx}, vb:${child.gfx.vb.idx}, start:${child.gfx.vb.start}, faces:${text_num_faces}`);
             }
             else if (child.text_mesh) { // Text in label or any other mesh that has text_mesh
                 msgs.push(`Text_mesh: id:${child.text_mesh.id}, name:${child.text_mesh.GetName()},`);
-                msgs.push(`pos:[${FloorArr3(child.text_mesh.geom.pos)}], dim: [${child.text_mesh.geom.dim}], alpha:${child.text_mesh.mat.col[3]}`);
-                msgs.push(`gfx: prog:${child.text_mesh.gfx.prog.idx}, vb:${child.text_mesh.gfx.vb.idx}, start:${child.text_mesh.gfx.vb.start}, faces:${child.text_mesh.geom.num_faces}`);
+                msgs.push(`{pos:[${FloorArr3(child.text_mesh.geom.pos)}]}, {dim: [${child.text_mesh.geom.dim}]}, {alpha:${child.text_mesh.mat.col[3]}}`);
+                msgs.push(`2gfx: {prog:${child.text_mesh.gfx.prog.idx}}, {vb:${child.text_mesh.gfx.vb.idx}}, {start:${child.text_mesh.gfx.vb.start}}, {faces:${child.text_mesh.geom.num_faces}}`);
             }
         }
         else if (infoMesh.text_mesh) {
             msgs.push(`Text_mesh: id:${infoMesh.text_mesh.id}, name:${infoMesh.text_mesh.GetName()},`);
             msgs.push(`pos:[${FloorArr3(infoMesh.text_mesh.geom.pos)}], dim: [${FloorArr2(infoMesh.text_mesh.geom.dim)}], alpha:${infoMesh.text_mesh.mat.col[3]}`);
-            msgs.push(`gfx: prog:${infoMesh.text_mesh.gfx.prog.idx}, vb:${infoMesh.text_mesh.gfx.vb.idx}, start:${infoMesh.text_mesh.gfx.vb.start}, faces:${infoMesh.text_mesh.geom.num_faces}`);
+            msgs.push(`3gfx: prog:${infoMesh.text_mesh.gfx.prog.idx}, vb:${infoMesh.text_mesh.gfx.vb.idx}, start:${infoMesh.text_mesh.gfx.vb.start}, faces:${infoMesh.text_mesh.geom.num_faces}`);
         }
 
         // msgs.push(`Framebuffer counter:${TEMP_TEST_PERFORMANE_COUNTERS.FRAMEBUFFER}`);
@@ -3861,8 +3858,8 @@ function MeshInfoUpdate(params) {
 
             const childText = textMesh.children.buffer[i];
 
-            if (msgs[i]) childText.UpdateText(msgs[i]);
-            else childText.UpdateText('NULL')
+            if (msgs[i]) childText.RenderTextFromString(msgs[i]);
+            else childText.RenderTextFromString('NULL')
         }
     }
 
