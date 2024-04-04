@@ -7,7 +7,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Rect } from "../Meshes/Rect_Mesh.js";
-import { Align_self } from "../Operations/Alignment.js";
+import { Align_self_get_dif } from "../Operations/Alignment.js";
 import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { Gl_set_alpha_from_offset, Gl_set_dim_X, Gl_set_dim_XY, Gl_set_wpos_X, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
@@ -18,7 +18,7 @@ import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
 
-function CalculateArea(text, _dim, pos, pad = [0, 0]) {
+export function CalculateArea(text, _dim, pos, pad = [0, 0]) {
 
     const numchars = text.length;
     const dim = [_dim[0] * numchars, _dim[1]];
@@ -45,11 +45,14 @@ export class Widget_Label extends Rect {
     text_mesh;
     pad = [0, 0];
 
-    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
+    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
         pos[2] += 1; // Text in front of the label's area.
+
+        // const text = `[${mesh_bufferidx}]${_text}`;
+        const text = _text;
 
         /** Label tex mesh */
         const text_mesh = Create_text_mesh(text, pos, fontSize, text_col);
@@ -221,7 +224,7 @@ export class Widget_Label extends Rect {
 
     SetPosXNoGfxUpdate(x) {
         this.geom.pos[0] = x;
-        this.text_mesh.geom.pos[0] = x;
+        this.text_mesh.geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0] ) + this.text_mesh.geom.dim[0] + this.pad[0];
     }
 
 
@@ -246,7 +249,7 @@ export class Widget_Label extends Rect {
 
     Align(flags, pad = [0, 0]) { // Align pre-added to the vertexBuffers
 
-        const move_dif = Align_self(flags, this.geom, this.text_mesh.geom, _, this.text_mesh.geom.num_faces, this.pad);
+        const move_dif = Align_self_get_dif(flags, this.geom, this.text_mesh.geom, _, this.text_mesh.geom.num_faces, this.pad);
 
         // Update vertex buffers
         if (this.is_gfx_inserted) {
@@ -254,6 +257,10 @@ export class Widget_Label extends Rect {
              * the vertex buffers, we must update the vertex buffers too.
              */
             this.text_mesh.geom.MoveXY(move_dif[0], move_dif[1], this.text_mesh.gfx);
+        }
+        else{
+            this.text_mesh.geom.pos[0] += move_dif[0];
+            this.text_mesh.geom.pos[1] += move_dif[0];
         }
 
     }
@@ -398,14 +405,6 @@ export class Widget_Label extends Rect {
 
         this.text_mesh.mat.col[3] = this.text_mesh.mat.defCol[3];
         this.text_mesh.mat.SetColorAlpha(alpha, this.text_mesh.gfx);
-    }
-
-
-    Resize() {
-
-        console.log('\n==== Resizing:', this.GetName())
-        console.log()
-        // this.SetColorRGB([1,1,0]);
     }
 
 

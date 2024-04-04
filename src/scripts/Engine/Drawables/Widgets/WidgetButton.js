@@ -78,6 +78,7 @@ export class Widget_Button extends Widget_Label {
 
 
 
+/** DO NOT DELETE - WIDGET SWITCH - With text on/off */
 export class Widget_Switch extends Widget_Button {
 
    isOn;
@@ -91,12 +92,6 @@ export class Widget_Switch extends Widget_Button {
 
       this.isOn = 0x0;
       this.state_text = [text_off, text_on];
-      this.evt_clbk = {
-         EventClbk: null, // Binding function for the switch callback function and some params.
-         targetBindingFunctions: null,
-         target_mesh: this,
-         params: null,
-      };
 
       this.type |= MESH_TYPE.WIDGET_BUTTON;
       this.SetName('Switch');

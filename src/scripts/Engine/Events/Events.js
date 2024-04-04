@@ -77,7 +77,7 @@ export function Events_handle_immidiate(e) {
      * // TODO: Set the hovered mesh to be darwn on top(last in vertexBuffer or in render queue)
      * 0. Check to see if overlap (2)
      * 1. If the hovered mesh is in different vertexBuffer than the previous hovered mesh,
-     *      change the order of the render queue, if it is drawn before. 
+     *      change the order of the render queue, if it is drawn before. 5
      * 2. Else if the hovered mesh is in the same vertexBuffer than the previous hovered mesh, 
      *      change the order inside the vertexBuuffer, if is drawn before. 
      */
@@ -88,12 +88,21 @@ export function Events_handle_immidiate(e) {
 
             // Unhover any hovered mesh. // TODO: Decide who unhovers an already hovered mesh: here OR EventListeners.js. The diff is that if we unhover here, is faster since there is no separate call to 'Events_handle_immidiate()' for the 'else if (e.type === 'unhover')'
             if (STATE.mesh.hovered) {
-                STATE.mesh.hovered.SeHoverColortDefault();
+
+                STATE.mesh.hovered.SeHoverColorDefault();
                 e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER_COLOR; // Set false
             }
 
+            // if(e.params.mesh.OnHover){
+            //     e.params.mesh.OnHover();
+            // }
+            // else{
+            //     e.params.mesh.SetHoverColor();
+            // }
             e.params.mesh.SetHoverColor();
+
             e.params.mesh.state.mask |= (MESH_STATE.IN_HOVER_COLOR | MESH_STATE.IN_HOVER); 
+            
             STATE.mesh.SetHovered(e.params.mesh);
             TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.COUNT++;
 
@@ -104,7 +113,7 @@ export function Events_handle_immidiate(e) {
     else if (e.type === 'unhover') {
 
         if (e.params.mesh.StateCheck(MESH_STATE.IN_HOVER_COLOR)) {
-            e.params.mesh.SeHoverColortDefault();
+            e.params.mesh.SeHoverColorDefault();
             e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER_COLOR; // Set false
         }
         

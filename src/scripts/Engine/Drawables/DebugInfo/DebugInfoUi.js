@@ -28,16 +28,15 @@ export function Debug_info_ui_performance(scene) {
    const dp_margin = [14, 12];
 
    // Style for the label widgets: [BORDER, ROUND_CORNERS, FEATHER]
-   const label_style = [0, 8.5, 5];
+   const label_style = [0, 3.5, 2.];
    const label_pad = [5, 4];
-   const label_col = TRANSPARENCY(GREY[1], .6);
-   const label_text_col = BLUEL[7];
+   const label_col = TRANSPARENCY(GREY[1], .7);
+   const label_text_col = BLUEL[9];
 
    // Style for the switch widgets
-   const switch_fontsize = 8;
-   const switch_pad = [4, 3];
-   const switch_col = TRANSPARENCY(BLUEL[7], .8);
-   const switch_textcol = WHITE;
+   const switch_size = 16;
+   const switch_pad = 3;
+   const switch_col = TRANSPARENCY(BLUEL[7], .6);
 
    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Generic Ui Debug Info', [180, 40, 0], GREY[0], GREY[1], BLUEL[7], [18, 3], _, _, _, dp_margin);
    dp.CreateClickEvent();
@@ -53,42 +52,42 @@ export function Debug_info_ui_performance(scene) {
 
    /************************************************************************************************************************************************/
    // Performance timers
-   const perf_timers_ui = Dbg_ui_create('Performane', dp, fontsize, Debug_info_create_ui_performance_timers, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
+   const perf_timers_ui = Dbg_ui_create('Performane', dp, fontsize,  switch_size, Debug_info_create_ui_performance_timers, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
    dp.AddToMenu(perf_timers_ui);
 
 
    /************************************************************************************************************************************************/
    // Mouse Info
-   const mouse_ui = Dbg_ui_create('Mouse', dp, fontsize, Debug_info_create_ui_mouse, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
+   const mouse_ui = Dbg_ui_create('Mouse', dp, fontsize,  switch_size, Debug_info_create_ui_mouse, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
    dp.AddToMenu(mouse_ui);
 
 
    /************************************************************************************************************************************************/
    // Gfx Info
-   const gfx_ui = Dbg_ui_create('Gfx', dp, fontsize, Debug_info_create_gfx_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
+   const gfx_ui = Dbg_ui_create('Gfx', dp, fontsize,  switch_size, Debug_info_create_gfx_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
    dp.AddToMenu(gfx_ui);
 
 
    /************************************************************************************************************************************************/
    // Mesh Info
-   const mesh_ui = Dbg_ui_create('Mesh', dp, fontsize, Debug_info_create_mesh_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
+   const mesh_ui = Dbg_ui_create('Mesh', dp, fontsize,  switch_size, Debug_info_create_mesh_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
    dp.AddToMenu(mesh_ui);
 
 
    /************************************************************************************************************************************************/
    // Batch Buffer Info
-   const batch_ui = Dbg_ui_create('Batch', dp, fontsize, Debug_info_create_batch_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
+   const batch_ui = Dbg_ui_create('Batch', dp, fontsize,  switch_size, Debug_info_create_batch_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
    dp.AddToMenu(batch_ui);
 
 
    /************************************************************************************************************************************************/
    // Vertexbuffer 2D representation
-   // const vb2D_ui = Dbg_ui_create('Vb2D', dp, fontsize, Debug_info_create_vertexbuffer_2D, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
+   // const vb2D_ui = Dbg_ui_create('Vb2D', dp, fontsize,  switch_size, Debug_info_create_vertexbuffer_2D, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
    // dp.AddToMenu(vb2D_ui);
 
 
 
-   dp.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   dp.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    
    dp.Calc_no_gfx_update();
@@ -350,9 +349,10 @@ function Debug_info_create_ui_performance_timers() {
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    section.ActivateAndChildren()
+   section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+   section.Calc_no_gfx_update();
    section.Render()
-   section.options = SECTION.VERTICAL;
-   section.Calc();
+   // section.options = SECTION.VERTICAL;
    section.ConstructListeners();
 
 
@@ -384,16 +384,16 @@ function Debug_info_create_ui_mouse() {
       return;
    }
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [3, 3], DEBUG_INFO.UI_MOUSE.POS, [0, 0], TRANSPARENCY(GREY[1], .4), 'ui mouse info panel');
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [3, 3], DEBUG_INFO.UI_MOUSE.POS, [0, 0], TRANSPARENCY(GREY[0], .4), 'ui mouse info panel');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('InfoUi-Mouse section');
 
 
    const fontsize = _font_size;
 
-   const infomesh = Create_widget_multi_text(_, 'Mouse |', ALIGN.HORIZONTAL, [0, 0, 0], fontsize, YELLOWL[7], .4);
+   const infomesh = Create_widget_multi_text(_, 'Mouse |', ALIGN.HORIZONTAL, [100, 100, 1], fontsize, YELLOWL[7], .4);
    section.AddItem(infomesh);
-   infomesh.CreateNewText('pos: x:0000, y:0000', fontsize, GREEN[7], [0, 0], .9);
+   infomesh.CreateNewText('pos: x:0000, y:0000', fontsize, GREEN[7], [10, 10], .9);
    infomesh.CreateNewText('| area: x:0000, y:0000', fontsize, GREEN[7], [0, 0], .9);
    
    
@@ -403,10 +403,12 @@ function Debug_info_create_ui_mouse() {
    infomesh.UNAMED &= ~GFX_POOL_REQUESTS.ANY; // Disable the default.
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-   section.ActivateAndChildren();
+  
+   section.options |= SECTION.EXPAND | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+   section.Calc_no_gfx_update();
+   
    section.Render()
-   section.options |= SECTION.EXPAND | SECTION.INHERIT;
-   section.Calc();
+   
    section.ConstructListeners();
 
    DEBUG_INFO.UI_MOUSE.MESH_BUFFER_IDX = section.mesh_bufferidx;
@@ -475,27 +477,25 @@ function Debug_info_create_gfx_info(params) {
    // Get the gfx programs buffer of which we want to create the info to.
    // const progs = Program_get_group(GFX_GROUPS.GetIdxByMask(GFX_GROUPS.DEFAULT.MASK));
    const progs = Program_get_programs();
-   const count = progs.boundary;
-   let j = 0;
 
    // Create all dropdowns for gfx programs
-   for (let i = 0; i < count; i++) {
+   for (let i = 0; i <= progs.boundary; i++) {
 
       const dp_pr = Create_widget_dropdown(_, `prog:${i} | Vb count:${progs.buffer[i].vertexBufferCount}`, [0, 0, 0], TRANSPARENCY(BLUEL[7], tr), TRANSPARENCY(PURPLEB[7], tr), WHITE, btnpad);
       dp_pr._gfxidx = i;
       dp.AddToMenu(dp_pr);
 
       // Create all dropdowns for gfx vertex buffers of current gfx program
-      for (j = 0; j < progs.buffer[i].vertexBufferCount; j++) {
+      for (let j = 0; j < progs.buffer[i].vb.boundary; j++) {
 
-         const vb = progs.buffer[i].vb[j];
+         const vb = progs.buffer[i].vb.buffer[j];
          const dp_vb = Create_widget_dropdown(_, `vb:${j} | count:${vb.count}`, [0, 0, 0], TRANSPARENCY(GREY[3], tr), TRANSPARENCY(GREY[2], tr), WHITE, btnpad);
          dp_vb._gfxidx = j;
          dp_vb.debug_info.data = { progidx: i, vbidx: j, };
          dp_pr.AddToMenu(dp_vb);
 
          // Create more info to display for the current vertex buffer
-         Debug_info_gfx_create_more_info(dp_vb, vb);
+         // Debug_info_gfx_create_more_info(dp_vb, vb);
       }
 
    }
@@ -503,8 +503,12 @@ function Debug_info_create_gfx_info(params) {
    dp.sid.gfx_group = GFX_GROUPS.DEBUG.MASK;
 
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+
+   dp.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+   dp.Calc_no_gfx_update();
+   
    dp.Render();
-   dp.Calc();
+   
    dp.ConstructListeners();
 
 
@@ -658,7 +662,7 @@ function Debug_info_gfx_create_more_info(dp_vb, vb) {
          section.AddItem(name_mesh);
       }
 
-      const scroller = Create_widget_scroller(_, section, [250, 80], TRANSPARENCY(YELLOW, .3));
+      const scroller = Create_widget_scroller(_, section, [250, 80], TRANSPARENCY(YELLOWL[5], .3));
       scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       dp_names.AddToMenu(scroller);
@@ -723,7 +727,7 @@ function Debug_info_create_mesh_info(params) {
    scroller.StateEnable(MESH_STATE.ACTIVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.EXPAND | SECTION.INHERIT | SECTION.TOP_DOWN;
+   scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.EXPAND | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
     
 
    // Create the dropdown structure representing all the applications's meshes
@@ -737,7 +741,7 @@ function Debug_info_create_mesh_info(params) {
    }
 
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-   scroller.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
+   scroller.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
    scroller.Calc_no_gfx_update();
    scroller.Render();
    scroller.ConstructListeners();
@@ -828,8 +832,8 @@ function Debug_info_mesh_update(params) {
 
       const gfx_idxs = [root_info_dp.menu.gfx.prog.idx, root_info_dp.menu.gfx.vb.idx];
       dp_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, gfx_idxs);
+      root_info_dp.Calc_no_gfx_update();
       dp_mesh.Render();
-      root_info_dp.Calc();
 
    }
    else { // Parent must exist. Catch the error if
@@ -895,10 +899,12 @@ function Debug_info_create_batch_info(params) {
 
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-   section.ActivateAndChildren();
+
+   section.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT;
+   section.Calc_no_gfx_update();
+   
    section.Render()
-   section.options = SECTION.HORIZONTAL;
-   section.Calc();
+   
    section.ConstructListeners();
 
 
@@ -1236,7 +1242,7 @@ export function Debug_info_update_clbk(params){
       updated_info.ConstructListeners();
       updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
       scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.TOP_DOWN;
-      scroller.Recalc_no_batch_render();
+      scroller.Recalc_no_gfx_update();
       updated_info.Render();
 
       View_build_group_from_root_mesh(updated_info);
@@ -1252,7 +1258,7 @@ export function Debug_info_update_clbk(params){
       updated_info.ConstructListeners();
       updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
       scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.TOP_DOWN;
-      scroller.Recalc_no_batch_render();
+      scroller.Recalc_no_gfx_update();
       updated_info.Render();
 
       View_build_group_from_root_mesh(updated_info);
@@ -1271,7 +1277,7 @@ export function Debug_info_update_clbk(params){
       scroller.scrolled_section =  updated_info;
       
       updated_info.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-      updated_info.Recalc_no_batch_render();
+      updated_info.Recalc_no_gfx_update();
       
       // Set correct position according to scroller handle position
       const ydif = SCROLLER_TEMP_GET_POS(scroller, updated_info);

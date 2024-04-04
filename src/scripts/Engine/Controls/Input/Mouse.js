@@ -134,6 +134,7 @@ export function MouseGetPos() {
 
 
 export function MouseGetPosDif() {
+   // console.log('Mouse GetDif', mouse.pos.GetDif())
    return mouse.pos.GetDif();
 }
 
@@ -365,7 +366,7 @@ export function OnTouchEnd(e) {
       mouseButton: mouse.click.down,
    };
    
-   RegisterEvent('mouse-click-down', params);
+   RegisterEvent('mouse-click-up', params);
    // console.log(e);
 }
 
@@ -381,11 +382,16 @@ export function OnTouchCancel(e) {
 export function OnTouchMove(e) {
    e.stopPropagation();
    e.preventDefault(); 
-   console.log('OnTouchEnd:',[e.changedTouches[0].clientX, e.changedTouches[0].clientY]);
+   console.log('OnTouchMove:',[e.changedTouches[0].clientX, e.changedTouches[0].clientY]);
    // Update mouse coordinates
    const x = e.changedTouches[0].clientX;
    const y = e.changedTouches[0].clientY;
    MouseSetCoords([x,y]);
+
+   mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
+   mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
+   console.log('updated mouse:',mouse.pos);
+   
 }
 
  

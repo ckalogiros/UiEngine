@@ -301,7 +301,7 @@ export function Vertex_buffer_exists_from_index(vbidx) {
 
 
 
-export function Vertexbuffer_reset_to_index(progidx, vbidx, ibidx, start) {
+export function Vertexbuffer_reset_to_index(progidx, vbidx, start) {
     if (!DISABLE_DEBUG) (_vertex_buffers_info, progidx, new Error().lineNumber);
 
     const vb_info = _vertex_buffers_info.buffer[vbidx];
@@ -315,9 +315,11 @@ export function Vertexbuffer_reset_to_index(progidx, vbidx, ibidx, start) {
     vb_info.vCount = vCount;
     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
 
-    const indices_per_face = Index_buffer_info_get_indices_per_face(ibidx);
+    const indices_per_face = Index_buffer_info_get_indices_per_face(vb_info.ibidx);
     const num_faces = vb_info.count / (vb_info.vertices_per_face * attribs_per_vertex);
     vb_info.draw_count = num_faces * indices_per_face;
+
+    vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 
 }
 

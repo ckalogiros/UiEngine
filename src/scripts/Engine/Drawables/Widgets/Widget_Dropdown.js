@@ -693,9 +693,7 @@ export class Widget_Dropdown extends Section {
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 
 
-      /**
-       * // TODO: If group root mesh does not have a Recalc function, we MUST search for the first 'Section' fro the group root 
-       */
+      // TODO: If group root mesh does not have a Recalc function, we MUST search for the first 'Section' fro the group root 
       // Re-calculate dimensions and positions
       let clip_top = null, clip_bottom = null;
       let clip_right = null;
@@ -704,7 +702,8 @@ export class Widget_Dropdown extends Section {
          // Get the group root mesh to Recalc position/dimentions 
          const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
          const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx);
-         group_root_mesh.Recalc_no_batch_render();
+
+         group_root_mesh.Recalc_no_gfx_update(_, this.idx);
 
          // TODO: If the group root is a scrolled_section, maybe the responsibility for Clip is at scroller ?????????
          if (group_root_mesh.parent) {
@@ -715,7 +714,7 @@ export class Widget_Dropdown extends Section {
          }
       }
       else {
-         root.Recalc_no_batch_render();
+         root.Recalc_no_gfx_update(_, this.idx);
       }
 
 
@@ -733,10 +732,7 @@ export class Widget_Dropdown extends Section {
       const menu = this.menu;
       this.menu_active = true; // Set state to active.
 
-
       menu.state.mask |= MESH_STATE.ACTIVE;
-
-      // menu.gfx_bufferidx = Gfx_buffer_store(menu.gfx.vb.idx, menu.mesh_bufferidx);
 
       // Case its the first time this menu will be rendered
       if (menu.group_bufferidxs[0] === INT_NULL) {
@@ -750,13 +746,8 @@ export class Widget_Dropdown extends Section {
 
          item.Activate();
 
-         // item.AddToGfxBuffer();
 
          if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
-
-            // Create Click events for any meshes of type Dropdown
-            // item.CreateClickEvent();
-            // item.CreateHoverEvent();
 
             // if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
             if (item.menu_active) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
@@ -796,11 +787,6 @@ export class Widget_Dropdown extends Section {
 
 
       this.ActivateMenu(root); // Add dropdown to gfx buffers.
-      // this.DpCreateListeners(menu, root);
-      if(this.mesh_bufferidx === 29 || root.mesh_bufferidx === 29){
-         console.log()
-      }
-
       menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
 
       /**
@@ -814,7 +800,9 @@ export class Widget_Dropdown extends Section {
          // Get the group root mesh to Recalc position/dimentions 
          const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
          const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-         group_root_mesh.Recalc_no_batch_render();
+
+         // group_root_mesh.Recalc_no_gfx_update(_, this.idx);
+         group_root_mesh.Recalc_no_gfx_update(_);
 
          // TODO: If the group root is a scrolled_section, maybe the responsibility for Clip is at scroller ?????????
          if (group_root_mesh.parent) {
@@ -826,7 +814,9 @@ export class Widget_Dropdown extends Section {
          
       }
       else {
-         root.Recalc_no_batch_render();
+         root.Recalc_no_gfx_update(_, this.idx);
+         // const root_dp = Dropdown_roots_get_root_by_idx(this.rootidx);
+         // root_dp.Recalc_no_gfx_update();
       }
       
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);

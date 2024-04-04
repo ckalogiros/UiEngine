@@ -9,6 +9,7 @@ import { Widget_Dropdown } from "../Drawables/Widgets/Widget_Dropdown";
 import { Rect } from "../Drawables/Meshes/Rect_Mesh";
 import { Text_Mesh } from "../Drawables/Meshes/Text_Mesh";
 import { Close_Button, Widget_Menu_Bar, Widget_Minimize } from "../Drawables/Widgets/WidgetMenu";
+import { Widget_Switch_Simple } from "../Drawables/Widgets/WidgetSwitch";
 
 /**
  * All Functions to create widgets.
@@ -133,6 +134,16 @@ export function Create_widget_switch(ROOT_WIDGET_FLAGS=0x0, text_on, text_off, p
 
 
 
+export function Create_widget_switch_simple(ROOT_WIDGET_FLAGS=0x0, pos, size, col, pad, bold, style) {
+
+   const mesh_bufferidx = _mesh_buffer.Reserve();
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Switch_Simple(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size, col, pad, bold, style));
+   
+   return _mesh_buffer.buffer[mesh_bufferidx];
+}
+
+
+
 export function Create_widget_slider(ROOT_WIDGET_FLAGS=0x0, pos, dim, col, hover_margin) {
 
    const mesh_bufferidx = _mesh_buffer.Reserve();
@@ -163,10 +174,10 @@ export function Create_widget_dropdown(ROOT_WIDGET_FLAGS=0x0, text, pos, col1, c
 
 
 
-export function Create_widget_menubar(ROOT_WIDGET_FLAGS=0x0, text, align, pos, col, text_col, btn_pad, bold, font, style, margin) {
+export function Create_widget_menubar(ROOT_WIDGET_FLAGS=0x0, pos, col, text_col, text, btn_pad, bold, style) {
 
-   const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Menu_Bar(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, align, pos, col, text_col, btn_pad, bold, font, style, margin));
+   const mesh_bufferidx = _mesh_buffer.Reserve(); //                                                     pos, col = GREY[3], text_col = WHITE, name, pad = [14, 6], bold = .4, style = [2, 5, 2]
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Menu_Bar(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, col, text_col, text, btn_pad, bold, style));
    
    return _mesh_buffer.buffer[mesh_bufferidx];
 }

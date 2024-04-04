@@ -553,7 +553,7 @@ export class ArrayBufferInterface {
 
 
    // RemoveByIdx(idx) {
-      RemoveByIdxSortedVersion(idx) {
+   RemoveByIdxSortedVersion(idx) {
 
       if (this.buffer[idx] !== INT_NULL) {
 
@@ -567,6 +567,8 @@ export class ArrayBufferInterface {
          return replaced;
 
       }
+
+      return INT_NULL
    }
 
 

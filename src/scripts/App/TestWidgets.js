@@ -22,13 +22,15 @@ import { Textured_Mesh } from '../Engine/Drawables/Meshes/Textured_Mesh.js';
 import { FontGetUvCoords } from '../Engine/Loaders/Font/Font.js';
 import { Font_get_char_uv_coords } from '../Engine/Loaders/Font/ChlumskyFontMetricsLoader.js';
 import { PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, _pt_loop, _pt_mesh_info_tip, _pt_test_misc_1, _pt_test_misc_2 } from '../Engine/Timers/PerformanceTimers.js';
-import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch, Create_widget_text } from '../Engine/Core/CreateWidget.js';
+import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_byidx, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3 } from '../Engine/Core/MeshBuffer.js';
 import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clampx_from_group, Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
 import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { View_build_group_from_root_mesh, View_set_view_start_vb_index } from '../Engine/Core/MeshBufferViews.js';
 import { Index_buffer_info_create } from '../Graphics/Buffers/IndexBuffers.js';
 import { getFile } from '../Engine/Core/FileSystem.js';
+import { Widget_Switch_Simple } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
+import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from '../Engine/Drawables/Operations/RelativePosComponent.js';
 
 // var osu = require('node-os-utils')
 // import {osu} from 'node-os-utils'
@@ -92,10 +94,12 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    const uidbg = Debug_info_ui_performance(scene);
+    // const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
+
+
 
 
 
@@ -177,7 +181,7 @@ export function TestWidgetsGeneric(scene) {
 
     // CreateScroller(scene);
     // CreateScrollerClampAlphaTest(scene)
-    CreateScrollerDp(scene)
+    // CreateScrollerDp(scene)
     // CreateScrollerWithWidgets(scene);
 
 
@@ -367,7 +371,7 @@ function Test_scroller_in_between() {
 
     s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, _, true);
     s.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-    s.Recalc_no_batch_render();
+    s.Recalc_no_gfx_update();
     s.Render();
     s.ConstructListeners();
 
@@ -1556,15 +1560,81 @@ function DestroyMeshTest(scene, widget) {
 
 function CreateMenu(scene) {
 
-    const menu = Create_widget_menubar(ROOT_WIDGETS.CREATE_ROOT, 'Widget Menu bar', ALIGN.LEFT, [200, 500, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
-    menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    const pos = [200, 500, 0]
+
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [100, 200], TRANSPARENCY(YELLOWR[2], .9))
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
+
+
+    const menu = Create_widget_menubar(_, pos, TRANSPARENCY(GREY[1], .6), WHITE, 'Widget', [10, 6]);
+    // menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // menu.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
     menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    menu.AddCloseButton(_, menu, 'x');
+    menu.AddCloseButton(_, section, 'x');
+    menu.AddMinimizeButton(_, section);
+    menu.options = SECTION.HORIZONTAL | SECTION.INHERIT;
+    section.AddItem(menu);
+    
+    // Create items for the section
+    {
+        const label = Create_widget_label(_, 'label', _, [0,0,0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
+    {
+        const label = Create_widget_label(_, 'label', _, [0,0,0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
+    {
+        const label = Create_widget_label(_, 'label', _, [0,0,0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
+
+    {
+        const dp = Create_widget_dropdown(_, 'Dp', [100, 100, 0], GREEN[4], GREY[2], _, _, _, _, _, _);
+        dp.CreateClickEvent();
+        dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+        Dropdown_roots_set_root(dp, dp);
+        section.AddItem(dp);
+
+        {
+            const label = Create_widget_label(_, 'label', _, [0,0,0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0,0,0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+    }
+
+    {
+        const label = Create_widget_label(_, 'label', _, [0,0,0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
+    {
+        const label = Create_widget_label(_, 'label', _, [0,0,0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
 
 
-    menu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    menu.Render();
-    menu.ConstructListeners();
+    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
+    section.Calc_no_gfx_update();
+    section.Render();
+    
+    section.ConstructListeners();
+
+    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
+    View_build_group_from_root_mesh(section);
+    // View_set_view_start_vb_index(section.group_bufferidxs, section.gfx.vb.start);
 }
 
 
@@ -2037,9 +2107,9 @@ function CreateManySectionsWithMenu(scene) {
         // section.AddItem(blu)
     }
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    section.Calc_no_gfx_update();
     section.Render();
-    section.Calc();
 
     section.ConstructListeners();
     return section;
@@ -3749,27 +3819,38 @@ function Help2(scene) {
 }
 
 
-
+let first_text_child_idx = INT_NULL; // If minimizer is anabled, have a ref to the fist text child for the text updates
 function MeshInfo(scene) {
 
     const fontsize = 9;
     const pad = [4, 0];
+    const pos = [880, 130, 100];
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], [880, 130, 100], [0, 0], TRANSPARENCY(GREY[1], .9), 'MeshInfoUiTip');
+    /********************************************************************************************************************************************************/
+    // Info UI
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], pos, [0, 0], TRANSPARENCY(GREY[1], .8), 'MeshInfoUiTip');
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.ConstructListeners();
 
-    // section.root_bufferidx = Widget_root_create_root(section.mesh_bufferidx);
+    /********************************************************************************************************************************************************/
+    // Menu bar and Minimizer
+    const menu = Create_widget_menubar(_, pos, TRANSPARENCY(GREY[4], .7), WHITE, 'Info tip', [10, 6]);
+    menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    menu.AddMinimizeButton(_, section);
+    menu.options = SECTION.HORIZONTAL | SECTION.INHERIT;
+    section.AddItem(menu);
 
+    /********************************************************************************************************************************************************/
+    // All the info text
     const infomesh = Create_widget_multi_text(_, 'Mesh name 000000000000', ALIGN.VERTICAL, [420, 15, 100], fontsize, GREEN[7], YELLOWR[7], pad, .4);
-    section.AddItem(infomesh);
+    first_text_child_idx = section.AddItem(infomesh);
+
+    // For mesh-parent-rect
     infomesh.CreateNewText('{meshidx:0000} {rootidx:00} {groupidx:[00] vb:[00]}', fontsize, BLUE_10_120_220, pad, .9);
     infomesh.CreateNewText('pos: [0000,0000,0] dim:[0000,0000] defpos: [0000,0000,0] defdim:[0000,0000]', fontsize, ORANGE_240_160_10, pad, .9);
     infomesh.CreateNewText('alpha:0.00, max-size:0000', fontsize, ORANGE_240_160_10, pad, .9);
     infomesh.CreateNewText('gfx: prog:0, vb:00, start:00000 faces:0000', fontsize, BLUE_10_120_220, pad, .9);
-    // infomesh.CreateNewText('HOVERED: name: 123456789, id:12', fontsize, BLUE_10_120_220, pad, .9);
-    // infomesh.CreateNewText('FOCUSED: name: 123456789, id:12', fontsize, BLUE_10_120_220, pad, .9);
 
     // For text_mesh
     infomesh.CreateNewText('Text: name of the text and id', fontsize, BLUE_10_120_220, pad, .9);
@@ -3779,7 +3860,6 @@ function MeshInfo(scene) {
 
     // DEBUG COUNTERS 
     TEMP_TEST_PERFORMANE_COUNTERS.MISC_IDX = infomesh.CreateNewText('GENERIC DEBUG: 00000000000000000000', fontsize, BLUE_10_120_220, pad, .9);
-
     section.geom.pos[0] = VIEWPORT.RIGHT - infomesh.GetMaxWidth() * 2 - 30;
     section.geom.pos[1] = VIEWPORT.TOP;
 
@@ -3787,10 +3867,12 @@ function MeshInfo(scene) {
 
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND;
+    section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.RESIZE_PARENT;
     section.Calc_no_gfx_update();
     section.Render();
+    section.ConstructListeners();
 
+    // View_build_group_from_root_mesh(section);
     // DEBUG_INFO.UI_MESH.IDX = section.idx;
 
     return section;
@@ -3799,11 +3881,17 @@ function MeshInfo(scene) {
 // TODO: The text updates the gfx buffers regardless of if any change has happened
 let prev_infomesh = null; // A way to compare with prev update and skip updating if we are hovering the same mesh
 function MeshInfoUpdate(params) {
+
+    
+    const minimize_btn = params.params.mesh.children.buffer[first_text_child_idx-1].children.buffer[0];
+    if(minimize_btn.toggle === true) 
+        return;
+
     _pt_mesh_info_tip.timer.Start();
 
-    // TODO: Skip if nothing changed(from previous hover). The question is how to implement an easy and efficient change
-    // const textMesh = params.params.mesh;
-    const textMesh = params.params.mesh.children.buffer[0];
+    // TODO: IMPLEMENT - Skip if nothing changed(from previous hover). The question is how to implement an easy and efficient change
+
+    const textMesh = params.params.mesh.children.buffer[first_text_child_idx];
     const infoMesh = STATE.mesh.hovered;
 
     // if (infoMesh && infoMesh !== prev_infomesh) { // Avoid update if mesh is same with the mesh of previous update.

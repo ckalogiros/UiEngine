@@ -120,7 +120,7 @@ export class Widget_Scroller extends Section {
 
       const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, PURPLER[7]);
       bar.sid.gfx_group = this.sid.gfx_group;
-      bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR | bar.geom | bar.mat;
+      bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       bar.SetStyle([0, 3, 1]);
       bar.SetName(`[${this.mesh_bufferidx}]-Scroll bar`);
@@ -133,7 +133,7 @@ export class Widget_Scroller extends Section {
       const handleMetrics = this.#CalculateHandleArea(bar.geom.pos, bar.geom.dim, pad)
       const handle = Create_rect_mesh(handleMetrics.pos, handleMetrics.dim, BLUE_10_120_220);
       handle.sid.gfx_group = this.sid.gfx_group;
-      handle.type |= MESH_TYPE.WIDGET_SCROLLER_HANDLE | handle.geom | handle.mat;
+      // handle.type |= MESH_TYPE.WIDGET_SCROLLER_HANDLE | handle.geom | handle.mat;
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([2.5, 5, 1]);
       handle.SetName('Scroll handle');
@@ -400,11 +400,10 @@ export class Widget_Scroller extends Section {
        * and if not, we procceed with bar move or scroller move
        */
 
-      let is_resizesed = false;
-
       // Check for Resize
       const right = mesh.geom.pos[0] + mesh.geom.dim[0];
       const bottom = mesh.geom.pos[1] + mesh.geom.dim[1];
+
       if (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1]) {
 
          // We have Resize
@@ -535,8 +534,6 @@ export class Widget_Scroller extends Section {
             // resize bar
             const bar = scroller.children.buffer[SCROLL_BAR_IDX];     
             
-            // const bar_old_height = bar.geom.dim[1];
-
             bar.geom.dim[1] += y;
             bar.geom.pos[1] += y;
             Gl_set_dim_Y(bar.gfx, bar.geom.dim[1], bar.geom.num_faces)
@@ -544,7 +541,6 @@ export class Widget_Scroller extends Section {
 
 
             // const dif_percentage = bar.geom.dim[1] / bar_old_height;
-            // console.log(dif_percentage)
             
             // re-position handle
             const dif = y/2;

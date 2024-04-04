@@ -74,7 +74,6 @@ export function Gl_draw(gl) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_info.ibo);
         if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) 
         {
-
             const ib = Index_buffer_get_by_ibidx(ib_info.ibidx);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib, gl.STATIC_DRAW, 0);
             ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;

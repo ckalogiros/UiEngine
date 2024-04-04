@@ -10,7 +10,7 @@ import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLo
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx, TimeIntervalsGetByIdx } from "../../Timers/TimeIntervals.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
-import { Align_between, Align_self } from "../Operations/Alignment.js";
+import { Align_between, Align_self_get_dif } from "../Operations/Alignment.js";
 
 
 
@@ -560,7 +560,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 
 		Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.pad, prev_text_mesh.advancex)
-		const pos_dif = Align_self(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
+		const pos_dif = Align_self_get_dif(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
 		AddArr2(new_text.geom.pos, pos_dif);
 
 

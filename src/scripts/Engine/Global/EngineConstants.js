@@ -292,6 +292,11 @@ const SECTION = {
 	INHERIT: _CNT <<= 0x1,
 	EXPAND: _CNT <<= 0x1,
 	FIT: _CNT <<= 0x1,
+
+	RESIZE_PARENT: _CNT <<= 0x1,
+	// RESIZE_PARENTX: _CNT <<= 0x1,
+	// RESIZE_PARENTY: _CNT <<= 0x1,
+
 	FOLLOW: _CNT <<= 0x1,
 
 	ITEM_FIT: _CNT <<= 0x1,

@@ -84,6 +84,8 @@ export class Mesh {
     timedEvents;    // Buffer: A buffer to set a one time event that is triggered by another event. E.x. When we need to set the mesh priority in the renderQueue and the mesh does not have a gfx yet. 
     timeIntervalsIdxBuffer; // Buffer: This buffer stores indexes of the timeIntervals this mesh is using.
 
+    rel_comp; // A component to position this mesh's children relative to the position of one of 'LEFT-CENTER-RIGHT' and relative all other children's position
+
     debug_info;         // Struct: Debug_info_ui.
     minimized;          // Pointer: to a minimized version of the mesh.
     menu_options;       // Struct: A callback and an index. Constructs the options popup menu for the mesh
@@ -145,6 +147,8 @@ export class Mesh {
         this.timedEvents = new M_Buffer();
         this.children = new M_Buffer();
         this.timeIntervalsIdxBuffer = new Int8Buffer(INTERVALS.SIZE);
+        
+        this.rel_comp = null;
 
 
         this.hover_margin = [0, 0];
@@ -386,10 +390,10 @@ export class Mesh {
     SetHoverColor() { this.SetUpdateFrameBuffer(); this.mat.SetHoverColor(this.gfx); }
 
 
+    SeHoverColorDefault() { this.SetUpdateFrameBuffer(); this.mat.SeHoverColorDefault(this.gfx); }
+
+
     SetColor(col) { this.SetUpdateFrameBuffer(); this.mat.SetColor(col, this.gfx); }
-
-
-    SeHoverColortDefault() { this.SetUpdateFrameBuffer(); this.mat.SeHoverColortDefault(this.gfx); }
 
 
     SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }

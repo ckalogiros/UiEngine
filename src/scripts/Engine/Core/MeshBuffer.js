@@ -10,7 +10,7 @@ import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js
 import { Batch_store } from "../Batch/Batch.js";
 import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Debug_info_update_clbk } from "../Drawables/DebugInfo/DebugInfoUi.js";
-import { View_destroy_view, View_remove_from_group } from "./MeshBufferViews.js";
+import { View_destroy_view } from "./MeshBufferViews.js";
 
 
 /**
@@ -332,8 +332,7 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
             let min_start = 0xffff;
             for (let i = 0; i < len; i++) {
                const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]]; // Get meshes through wigdet_root_buffer
-if(!mesh)
-console.log()
+
                if (mesh.mesh_bufferidx !== mesh_bufferidx &&
                   mesh.batch_buffer_vbidx === batch_buffer_vbidx &&
                   mesh.gfx.vb.start < min_start) {
@@ -753,7 +752,10 @@ export function Widget_movexy(params) {
    for (let i = 0; i <= widget_buffer.boundary; i++) {
 
       const mesh = _mesh_buffer.buffer[widget_buffer.buffer[i]];
+      // if (mesh.state.mask & MESH_STATE.ACTIVE && mesh.gfx) {
       if (mesh.state.mask & MESH_STATE.ACTIVE) {
+         if(!mesh.gfx)
+         console.error(mesh.GetName())
          mesh.geom.MoveXY(pos.x, -pos.y, mesh.gfx)
       }
 
@@ -770,10 +772,8 @@ export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
       _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1] += y;
       
       // Update default position
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[0] = 
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[0];
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[1] = 
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1];
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[0] += x; 
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[1] += y; 
    }
 
    const len = _root_batch_buffer.buffer[root_bufferidx].vb.length
@@ -913,15 +913,21 @@ export function Movey_from_widget_root_buffer_and_batch_update(mesh, ydif) {
 /** Reset all gfx buffers, from start index 0, for the widget_root buffer, via it's widget_root_gfx buffer */
 export function Widget_root_reset_gfx(root_bufferidx) {
 
-   const rootgfx = _widget_root_gfx.buffer[root_bufferidx];
-   for (let i = 0; i <= rootgfx.boundary; i += GFX.SIZE) {
+   // const rootgfx = _widget_root_gfx.buffer[root_bufferidx];
+   const rootgfx = Widget_root_gfx_get_structured(root_bufferidx);
+   const len = rootgfx.length;
 
-      if (rootgfx.buffer[i + GFX.PROG_IDX] === INT_NULL || rootgfx.buffer[i + GFX.VB_IDX] === INT_NULL)
-         alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
+   for (let i = 0; i < len; i++) {
+
+      // if (rootgfx.buffer[i] === INT_NULL || rootgfx.buffer[i + GFX.VB_IDX] === INT_NULL)
+      //    alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
+
+      // Get the root mesh from root_batch_buffer, touse the start index of every root for the vertex buffer
+      const root_mesh_per_vb_idx = _root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx; // IMPORTANT: // TODO: Maybe we store the start to the batch buffer: batch_buffer.vb[i].start={meshidx, num_faces, start}
+      const mesh = _mesh_buffer.buffer[root_mesh_per_vb_idx];
 
       // Add to vertexbuffer
-      alert('IMPLEMENT: Pass ibidx to Vertexbuffer_reset_to_index()')
-      Vertexbuffer_reset_to_index(rootgfx.buffer[i + GFX.PROG_IDX], rootgfx.buffer[i + GFX.VB_IDX], 0);
+      Vertexbuffer_reset_to_index(rootgfx[i].progidx, rootgfx[i].vbidx, mesh.gfx.vb.start);
    }
 }
 
@@ -1061,6 +1067,7 @@ export function Mesh_buffer_print_loop() {
             'batchidx:', _mesh_buffer.buffer[i].batch_buffer_vbidx,
             'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1],
             'child idx:', _mesh_buffer.buffer[i].idx,
+            'is active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE.ACTIVE,
             'name:', _mesh_buffer.buffer[i].GetName(),
          );
       }

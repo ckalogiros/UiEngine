@@ -16,9 +16,11 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx) {
 
    const shader_attribs = Shader_attributes_get_attribs(attribsidx);
    const names = shader_attribs.names;
-   const str_buffer = Str_buffer_get_DEBUG();
-   if (Str_buffer_get_by_idx(names[0]) === 'a_col' && Str_buffer_get_by_idx(names[1]) === 'a_wpos_time' &&
-       Str_buffer_get_by_idx(names[2]) === 'a_params1' && Str_buffer_get_by_idx(names[3]) === 'a_pos') {
+
+   if (Str_buffer_get_by_idx(names[0]) === 'a_col' && 
+       Str_buffer_get_by_idx(names[1]) === 'a_wpos_time' &&
+       Str_buffer_get_by_idx(names[2]) === 'a_params1' && 
+       Str_buffer_get_by_idx(names[3]) === 'a_pos') {
       return 0;
    }
    if (Str_buffer_get_by_idx(names[0]) === 'a_col' &&
@@ -28,7 +30,7 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx) {
       return 1;
    }
 
-   console.error('NO add function pointer was set. attrib names:', names);
+   console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names);
    alert('SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:')
 }
 
@@ -662,7 +664,7 @@ export function Gl_add_wpos_X(gfxInfo, x, num_faces = 1) {
 
    while (verts) {
 
-       vb_data[index++] += x; // Move mesh's x pos by amt
+       vb_data[index] += x; // Move mesh's x pos by amt
        index += stride; // Go to next vertice's pos. +1 for skipping pos.z
        verts--;
    }

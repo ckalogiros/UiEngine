@@ -381,6 +381,8 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
 function Check_child_events_recursive(evt, point) {
 
+   let ret = null;
+
    for (let i = 0; i <= evt.children.boundary; i++) {
 
       const child_evt = evt.children.buffer[i];
@@ -401,9 +403,14 @@ function Check_child_events_recursive(evt, point) {
             const ret = Check_child_events_recursive(child_evt, point)
             if (ret) return ret; // Because it a recursive procedure, when the mesh is found we must return it recursively immidiately after the return of the each recursion.
          }
-         if (intersects && (mesh.StateCheck(MESH_STATE.IS_FAKE_EVENT) === 0)) { // 
-            // console.log(mesh.GetName())
-            return child_evt;
+         else{
+
+            if (intersects && (mesh.StateCheck(MESH_STATE.IS_FAKE_EVENT) === 0)) { // 
+               // console.log(mesh.GetName())
+               return child_evt;
+            }
+            if (intersects) 
+               return child_evt;
          }
       }
    }
