@@ -235,13 +235,22 @@ export class Mesh {
         if (this.parent && this.parent !== NO_MESH_PARENT && this.idx !== INT_NULL) {
             
             shift_children = this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
-            if (this.state.mask & MESH_STATE.ACTIVE) console.log('-{1} Removing:', this.GetName(), 'idx:', this.idx, 'parent name', 'start', this.gfx.vb.start, this.parent.GetName())
+            // if (this.state.mask & MESH_STATE.ACTIVE) console.log('-{1} Removing:', this.GetName(), 'idx:', this.idx, 'parent name', 'start', this.gfx.vb.start, this.parent.GetName())
         }
-        else if (this.state.mask & MESH_STATE.ACTIVE) console.log('-{1-NO-PARENT} Removing:', 'start', this.gfx.vb.start, this.GetName(), 'idx:', this.idx)
+        // else if (this.state.mask & MESH_STATE.ACTIVE) console.log('-{1-NO-PARENT} Removing:', 'start', this.gfx.vb.start, this.GetName(), 'idx:', this.idx)
         
         /*************************************************************************************/
         // Remove from widget root buffer.
         Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
+
+        
+
+        /*************************************************************************************/
+        // Remove mesh from STATE.
+        STATE.mesh.CheckAllAndRemove(this)
+
+
+
 
         return shift_children;
     }
@@ -390,7 +399,7 @@ export class Mesh {
     SetHoverColor() { this.SetUpdateFrameBuffer(); this.mat.SetHoverColor(this.gfx); }
 
 
-    SeHoverColorDefault() { this.SetUpdateFrameBuffer(); this.mat.SeHoverColorDefault(this.gfx); }
+    SetHoverColorDefault() { this.SetUpdateFrameBuffer(); this.mat.SetHoverColorDefault(this.gfx); }
 
 
     SetColor(col) { this.SetUpdateFrameBuffer(); this.mat.SetColor(col, this.gfx); }

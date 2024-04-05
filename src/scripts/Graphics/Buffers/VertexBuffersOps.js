@@ -1,6 +1,6 @@
 "use strict";
 
-import { Str_buffer_get_DEBUG, Str_buffer_get_by_idx } from "../../Engine/Core/StringBuffer";
+import { Str_buffer_get_by_idx } from "../../Engine/Core/StringBuffer";
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size } from "../ShaderAttributes";
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from "./IndexBuffers";
 import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_remove_geometry, Vertex_buffer_state_enable } from "./VertexBuffers";
@@ -403,6 +403,9 @@ export function Gl_set_RGBA(gfxInfo, color, num_faces = 1) {
    let index = gfxInfo.vb.start + a.offset;
    let verts = num_faces * gfxInfo.vertsPerRect;
    let stride = gfxInfo.attribsPerVertex - a.size;
+   
+   if(gfxInfo.vb.start < 0)
+   console.log()
 
    while (verts) {
 

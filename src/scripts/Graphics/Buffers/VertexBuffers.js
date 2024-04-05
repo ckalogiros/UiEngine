@@ -370,6 +370,7 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     const count = gfx.vb.count;
     gfx.vb.end = (start + count) * num_faces;
     vb_info.vCount += VERTS_PER_RECT_INDEXED * num_faces;
+
     if ((vb_info.vCount % 1) !== 0)
         console.error('index buffer count mismatch')
 
@@ -380,7 +381,11 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
 
     const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+    
+
     vb_info.count += Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
+
+
 
     prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
     vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
@@ -480,8 +485,6 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index) {
 
     const indices_per_face = Index_buffer_info_get_indices_per_face(vb_info.ibidx);
     vb_info.draw_count -= num_faces * indices_per_face; 
-    console.log('++++++++\ndraw_count', vb_info.draw_count)
-    console.log()
 
     // POTENTIAL_BUG: If the buffer is empty MUST be updated!!!
     // TODO: If The buffer is not used, by deactivating it below, then we need to update the render queue
@@ -654,9 +657,11 @@ export function Vertex_buffer_create_text_info() {
     const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
 
     const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .5), 'Vertex Buffer Info BLUE');
+    s.SetTypeDebug();
 
     const destroy = Create_widget_button(_, 'Recalc', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
     destroy.Bind(TEMP, _, s);
+    destroy.SetTypeDebug();
     s.AddItem(destroy);
 
 
@@ -668,10 +673,12 @@ export function Vertex_buffer_create_text_info() {
     Dropdown_roots_set_root(vbiw, vbiw)
     s.AddItem(vbiw)
     vbiw.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+    vbiw.SetTypeDebug();
 
     const vbi = _vertex_buffers_info;
     const vb_buffer_info = Create_widget_text(_, `count:${vbi.active_count} size:${vbi.size}`);
     vbiw.AddToMenu(vb_buffer_info);
+    vb_buffer_info.SetTypeDebug();
 
     for (let i = 0; i <= vbi.boundary; i++) {
 
@@ -680,26 +687,31 @@ export function Vertex_buffer_create_text_info() {
         const vbw = Create_widget_dropdown(_, `Vb [${i}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
         vbw.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
         vbw.CreateClickEvent();
+        vbw.SetTypeDebug();
         vbiw.AddToMenu(vbw)
 
         {
             const type = BUFFER_TYPE.ToString(vb.type);
             const info = Create_widget_text(_, `count:${vb.count} size:${vb.size}  vCount:${vb.vCount}  type:${type}`);
             vbw.AddToMenu(info);
+            info.SetTypeDebug();
         }
         {
             const info = Create_widget_text(_, `vaoidx:${vb.vaoidx} vbidx:${vb.vbidx} ibidx:${vb.ibidx} texidx:${vb.texidx} progidx:${vb.progidx}`);
             vbw.AddToMenu(info);
+            info.SetTypeDebug();
         }
         {
             const sid = SID.ToString(vb.sid);
             const info = Create_widget_text(_, `sid:${sid}`);
             vbw.AddToMenu(info);
+            info.SetTypeDebug();
         }
         {
             const state = PROGRAM_STATE.ToString(vb.state.mask);
             const info = Create_widget_text(_, `state:${state}`);
             vbw.AddToMenu(info);
+            info.SetTypeDebug();
         }
 
 
@@ -707,6 +719,7 @@ export function Vertex_buffer_create_text_info() {
             const vba = Create_widget_dropdown(_, `buffer`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
             vba.CreateClickEvent();
             vbw.AddToMenu(vba)
+            vba.SetTypeDebug();
 
             // const wpos = Vertex_to_string(VB_TO_STRING_FLAGS.WPOS, vb.progidx, vb.vbidx, vb.count);
 

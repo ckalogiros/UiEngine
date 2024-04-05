@@ -269,6 +269,29 @@ const STATE = {
 				this.focusedIdx = mesh.idx;
 			}
 		},
+		CheckAllAndRemove(mesh){
+			if(mesh === this.hovered){
+				this.hovered = null;
+				this.hoveredId = INT_NULL;
+				this.hoveredIdx = INT_NULL;
+			}
+			if(mesh === this.clicked){
+				this.clicked = null;
+				this.grabedId = INT_NULL;
+				this.grabedIdx = INT_NULL;
+			}
+			if(mesh === this.grabed){
+				this.grabed = null;
+				this.clickedId = INT_NULL;
+				this.clickedIdx = INT_NULL;
+			}
+			if(mesh === this.focused){
+				this.focused = null;
+				this.focusedId = INT_NULL;
+				this.focusedIdx = INT_NULL;
+			}
+		}
+
 	},
 
 	mouse: {

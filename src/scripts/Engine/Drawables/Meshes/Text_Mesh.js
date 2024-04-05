@@ -250,21 +250,60 @@ export class Text_Mesh extends Mesh {
 
    SetText(str) {
 
-      // const len = (count) ? count+1 : str.length;
-      const len = str.length;
       this.mat.char_buffer.Reset();
+
+      const len = str.length;
+      
       for (let i = 0; i < len; i++) {
+
          this.mat.char_buffer.Add(str[i]);
       }
    }
 
 
-   SliceText(start, count = 0) {
+   /** Pass array[] of { strings or arrays } */
+   SetTextConcat(str_array) {
 
-      const len = (start + count) <= this.mat.char_buffer.boundary ? (start + count) : this.mat.char_buffer.boundary
-      for (let i = start; i <= len; i++) {
+      this.mat.char_buffer.Reset();
+
+      const len = str_array.length;
+      
+      for (let i = 0; i < len; i++) {
+
+         const len2 = str_array[i].length;
+         for (let j = 0; j < len2; j++) {
+
+            this.mat.char_buffer.Add(str_array[i][j]);
+         }
+      }
+   }
+
+
+   SetTextAtIndex(str, start) {
+
+      /**DEBUG */ if(start > this.mat.char_buffer.size) console.error('ERROR @SetTextAtIndex().\n start greater than buffer size.\nstart=', start);
+
+      const len = str.length;
+      
+      for (let i = start; i < len; i++) {
+
+         this.mat.char_buffer.AddAtIndex(i, str[i]);
+      }
+   }
+
+
+   SliceText(_start=0, _count=_) {
+      // If no start is passed, all characters are removed/replaced
+      // count=0, the loop does not run for i<0
+
+      const count = (_count===_ || _count > this.mat.char_buffer.size) ? this.mat.char_buffer.active_count : _count;
+      // If start > buffer last char, replace last element
+      const start = (_start > this.mat.char_buffer.boundary) ? this.mat.char_buffer.boundary : _start; 
+
+      for (let i = start; i < count; i++) {
          this.mat.char_buffer.RemoveByIdx(i);
       }
+
    }
 
 

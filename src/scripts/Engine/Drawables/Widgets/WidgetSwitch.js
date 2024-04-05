@@ -174,7 +174,7 @@ export class Widget_Switch_Simple extends Rect {
 
    SetHoverColor() { this.SetUpdateFrameBuffer(); this.children.buffer[0].mat.SetHoverColor(this.children.buffer[0].gfx); }
 
-   SeHoverColorDefault() { this.SetUpdateFrameBuffer(); this.children.buffer[0].mat.SeHoverColorDefault(this.children.buffer[0].gfx); }
+   SetHoverColorDefault() { this.SetUpdateFrameBuffer(); this.children.buffer[0].mat.SetHoverColorDefault(this.children.buffer[0].gfx); }
 
    /*******************************************************************************************************************************************************/
    // Misc

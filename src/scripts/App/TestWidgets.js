@@ -94,7 +94,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    // const uidbg = Debug_info_ui_performance(scene);
+    const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -169,7 +169,7 @@ export function TestWidgetsGeneric(scene) {
 
     // CreateSlider();
 
-    // CreateMenu(scene)
+    // CreateMenu(scene);
 
     // const dp = CreateDropdown(scene, [160, 200, 0], 0);
 
@@ -248,8 +248,8 @@ export function TestWidgetsGeneric(scene) {
     // Help2(scene);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, helpui);
 
-    const meshinfo_mesh = MeshInfo(scene)
-    TimeIntervalsCreate(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
+    // const meshinfo_mesh = MeshInfo(scene)
+    // TimeIntervalsCreate(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, meshinfo_mesh.children.buffer[0]);
 
@@ -258,8 +258,8 @@ export function TestWidgetsGeneric(scene) {
     // Test_scroller_in_between();
 
     // Debug_info_create_all_generic_info();
-    // TEMP_111111111111111111111111111();
-    // TEMP_222222222222222222222222222();
+    TEMP_111111111111111111111111111();
+    TEMP_222222222222222222222222222();
     // TEMP_333333333333333333333333333();
 
     // Scenes_debug_info_create(scene);

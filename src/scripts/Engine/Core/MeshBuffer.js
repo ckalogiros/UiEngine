@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_get_by_vbidx, Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPosDif } from "../Controls/Input/Mouse.js";
 import { TimeIntervalsDestroyByIdx } from "../Timers/TimeIntervals.js";
 import { Int16Buffer, Int8Buffer, M_Buffer } from "./Buffers.js";
@@ -25,6 +25,8 @@ temp_accum[0] = 0;
 temp_accum[1] = 0;
 temp_accum[2] = 0;
 temp_accum[3] = 0;
+temp_accum[4] = 0;
+temp_accum[5] = 0;
 export function TEMP_PRINT_ACCUM() { console.error(temp_accum); }
 
 
@@ -34,6 +36,8 @@ temp_start[0] = 0xffff;
 temp_start[1] = 0xffff;
 temp_start[2] = 0xffff;
 temp_start[3] = 0xffff;
+temp_start[4] = 0xffff;
+temp_start[5] = 0xffff;
 export function TEMP_PRINT_START() { console.error(temp_start); }
 
 
@@ -93,8 +97,7 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
       }
 
       if (mesh.gfx_bufferidx === INT_NULL) {
-         console.error('NO gfx_bufferidx for the mesh.\nMesh is not removed from the _gfx_buffer\nmesh:', mesh.GetName(), 'mesh:', mesh);
-         // alert('SEE console.error')
+         // console.error('NO gfx_bufferidx for the mesh.\nMesh is not removed from the _gfx_buffer\nmesh:', mesh.GetName(), 'mesh:', mesh);
       }
       else {
          Gfx_buffer_remove_mesh_by_vbidx(mesh.gfx.vb.idx, mesh.gfx_bufferidx);
@@ -333,7 +336,14 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
             for (let i = 0; i < len; i++) {
                const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]]; // Get meshes through wigdet_root_buffer
 
-               if (mesh.mesh_bufferidx !== mesh_bufferidx &&
+
+
+if(!mesh || mesh===_)
+console.error('idx:', i, 'buffer', _widget_root_buffer.buffer[root_bufferidx]);
+
+
+
+               if (mesh && mesh.mesh_bufferidx !== mesh_bufferidx &&
                   mesh.batch_buffer_vbidx === batch_buffer_vbidx &&
                   mesh.gfx.vb.start < min_start) {
 
@@ -1282,7 +1292,6 @@ function TEMP(params) {
       parent_section: scroller_section.parent,
    }
 
-
    Debug_ui_create_notification(Debug_info_update_clbk, _params);
 }
 
@@ -1293,7 +1302,6 @@ export function Mesh_buffer_create_text_info() {
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
 
    const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), 'Mesh Buffer Info ORANGE');
-   // s.type |= MESH_TYPE.DEBUG_MESH;
    s.SetTypeDebug();
 
    const destroy = Create_widget_button(_, 'Recalc', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
@@ -1318,18 +1326,17 @@ export function Mesh_buffer_create_text_info() {
    mesh_buffer_info.SetTypeDebug();
    _0.AddToMenu(mesh_buffer_info);
 
-   const len = mb.boundary; // Avoid infinite loop
+   let counter = 0;
+   const len = mb.boundary; // Avoid infinite loop (Avoid creating info for dubug UI's)
    for (let i = 0; i <= len; i++) {
 
       const m = mb.buffer[i];
-      if(!m)
-      console.log()
 
       if(m && (m.type & MESH_TYPE.DEBUG_MESH)===0){ // Insert meshes that are only belong to DEFAULT grouping
          // console.log(m.GetName(), m.mesh_bufferidx)
-         const _1 = Create_widget_dropdown(_, `[${m.mesh_bufferidx}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
+         const _1 = Create_widget_dropdown(_, `${counter++} @[${m.mesh_bufferidx}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
 
-         _1.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+         _1.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
          _1.CreateClickEvent();
          _1.SetTypeDebug();
          _0.AddToMenu(_1);
@@ -1342,7 +1349,7 @@ export function Mesh_buffer_create_text_info() {
    
          { // Views indexes info
             const view = Create_widget_dropdown(_, `view`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-            view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+            view.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
             view.CreateClickEvent();
             view.SetTypeDebug();
             _1.AddToMenu(view)
@@ -1367,7 +1374,7 @@ export function Mesh_buffer_create_text_info() {
    
          // Gfx info
          const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-         gfx.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+         gfx.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
          gfx.CreateClickEvent();
          gfx.SetTypeDebug(); 
          _1.AddToMenu(gfx)

@@ -71,7 +71,7 @@ export class Material {
       }
    }
 
-   SeHoverColorDefault(gfx) {
+   SetHoverColorDefault(gfx) {
       if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
          math.CopyMat4(this.col, this.defCol);
          Gl_set_RGBA_per_vertex(gfx, this.col);

@@ -381,6 +381,9 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
          const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[j]);
          if (mesh.state.mask & MESH_STATE.ACTIVE) { 
             mesh.AddToGfxFromReset(); 
+// if(!mesh.Rerender)
+// console.log()
+//             mesh.Rerender(false); 
             // console.log(mesh.mesh_bufferidx, mesh.GetName())
          }
       }

@@ -235,7 +235,7 @@ export class Section extends Rect {
 
 
    Calc_no_gfx_update(options, target_child_idx) {
-      console.log('\n{=============================}');
+      // console.log('\n{=============================}');
 
       const section = this;
       if (options === _) options = section.options; // Here set as options: the passed options(de-activates any mesh self-set-options), or the mesh self-options
@@ -243,7 +243,6 @@ export class Section extends Rect {
 
       const old_sizex = section.geom.dim[0];
       const old_sizey = section.geom.dim[1];
-
 
       Calculate_sizes_recursive(section, options, target_child_idx);
 
@@ -253,8 +252,8 @@ export class Section extends Rect {
          section.geom.defDim[0] = section.max_size[0];
       }
       if (section.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-         CopyArr2(section.geom.dim, section.max_size); // Set size for the root.
-         CopyArr2(section.geom.defDim, section.max_size); // Set size for the root.
+         CopyArr2(section.geom.dim, section.max_size); // Set size for the root dp.
+         CopyArr2(section.geom.defDim, section.max_size); // Store to default for the root.
       }
       else {
          if(options & SECTION.RESIZE_PARENT) CopyArr2(section.geom.dim, section.max_size); // Set size for the root.
@@ -267,7 +266,7 @@ export class Section extends Rect {
        * Expand width of items to match the max width of section, minus the margin.
        * Only if the section has VERTICAL align for its items. 
        */
-      if (options & SECTION.EXPAND) {
+      if (options & SECTION.EXPAND && (options & SECTION.RESIZE_PARENT)) {
          Expand(section, options, section.max_size[0], 0);
       }
 
@@ -361,14 +360,16 @@ export class Section extends Rect {
    }
 
 
-   Rerender() {
+   Rerender(run_for_children = true) {
 
       super.AddToGfxFromReset();
 
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child && (child.state.mask & MESH_STATE.ACTIVE)) {
-            child.Rerender();
+      if (run_for_children) {
+         for (let i = 0; i <= this.children.boundary; i++) {
+            const child = this.children.buffer[i];
+            if (child && (child.state.mask & MESH_STATE.ACTIVE)) {
+               child.Rerender();
+            }
          }
       }
    }
@@ -1116,6 +1117,156 @@ function Calculate_sizes_recursive(parent, options, target_child_idx) {
    }
 
 }
+/**DO NOT DELETE. IMPLEMENT FAST calc sizes implementation  */
+// function Calculate_sizes_recursive_from_parent_ascending(parent, options, target_child_idx) {
+
+//    const pad = [0, 0]; // TODO: Implement
+//    const accum_size_per_section = [0, 0];
+
+//    let opt = options
+
+//    const target_idx = (target_child_idx!=undefined) ? (target_child_idx>=0) ? target_child_idx : 0 : 0; 
+//    // const target_idx = 0; 
+
+
+//    // TODO: Implement Better. Here we check for any parent's that have text meshes 
+//    if (parent.text_mesh) {
+
+//       if (parent.options & SECTION.VERTICAL) {
+
+//          // accum_size_per_section[1] += parent.text_mesh.geom.dim[1];
+//          accum_size_per_section[0] = parent.text_mesh.GetMaxWidth();
+//          parent.max_size[1] += parent.text_mesh.geom.dim[1];
+
+//          if (parent.max_size[0] < accum_size_per_section[0])
+//             parent.max_size[0] = parent.geom.dim[0]; // For horizontal, grow to the max width of all meshes
+//       }
+//       else if (parent.options & SECTION.HORIZONTAL) {
+
+//          accum_size_per_section[0] += parent.text_mesh.GetMaxWidth();
+//          // accum_size_per_section[1] =  parent.text_mesh.geom.dim[1];
+//          parent.max_size[0] += parent.text_mesh.GetMaxWidth();
+
+//          if (parent.max_size[1] < accum_size_per_section[1])
+//             parent.max_size[1] = parent.geom.dim[1];  // For horizontal, grow to the max height of all meshes
+//       }
+//    }
+
+
+//    for (let i = target_idx; i <= parent.children.boundary; i++) {
+
+
+//       if (options & SECTION.INHERIT) opt = parent.options
+
+//       const mesh = parent.children.buffer[i];
+//       console.log('{===}', target_idx, mesh.mesh_bufferidx, mesh.GetName())
+
+
+
+//       if (mesh.children.active_count && (mesh.type & MESH_TYPE.SECTION_MESH)) {
+
+
+
+//          if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) === 0) {
+
+//             mesh.geom.dim[0] = mesh.max_size[0];
+//             mesh.geom.dim[1] = mesh.max_size[1];
+
+//             // Update mesh's default dim
+//             mesh.geom.defDim[0] = mesh.max_size[0];
+//             mesh.geom.defDim[1] = mesh.max_size[1];
+
+//          }
+
+
+//          mesh.SetMargin();
+
+//          if (opt & SECTION.VERTICAL) {
+//             if (parent.max_size[0] < mesh.geom.dim[0])
+//                parent.max_size[0] = mesh.geom.dim[0]
+//             parent.max_size[1] += mesh.geom.dim[1]
+//          }
+//          else if (opt & SECTION.HORIZONTAL) {
+//             parent.max_size[0] += mesh.geom.dim[0]
+//             if (parent.max_size[1] < mesh.geom.dim[1]) parent.max_size[1] = mesh.geom.dim[1]
+//          }
+//       }
+//       else if ((mesh.type & MESH_TYPE.TEXT_MESH) || (mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC)) { // Case the current item is of type text.
+
+//          if (opt & SECTION.VERTICAL) {
+
+//             if (mesh.children.boundary) { // Case text mesh has separate text as children, calculate size of all of them.
+//                accum_size_per_section[1] += mesh.GetTotalHeight();
+//                parent.max_size[1] += mesh.GetTotalHeight();
+//             }
+//             else {
+//                accum_size_per_section[1] += mesh.geom.dim[1];
+//                parent.max_size[1] += mesh.geom.dim[1];
+//             }
+
+//             accum_size_per_section[0] = mesh.GetMaxWidth();
+//             if (parent.max_size[0] < accum_size_per_section[0])
+//                parent.max_size[0] = accum_size_per_section[0];  // Keep the max width of all meshes in Vertical mode.
+
+//          }
+//          else if (opt & SECTION.HORIZONTAL) {
+
+//             accum_size_per_section[0] += mesh.GetMaxWidth();
+//             parent.max_size[0] += mesh.GetMaxWidth();
+
+//             accum_size_per_section[1] = mesh.geom.dim[1];
+//             if (parent.max_size[1] < accum_size_per_section[1])
+//                parent.max_size[1] = mesh.geom.dim[1];  // Keep the max height of all meshes in Horizontal mode.
+//          }
+//       }
+//       else { // Case the current item does not have children.
+
+//          if (opt & SECTION.VERTICAL) {
+
+//             if (mesh.text_mesh) {
+//                accum_size_per_section[1] += mesh.text_mesh.geom.dim[1];
+//                accum_size_per_section[0] = mesh.text_mesh.GetMaxWidth();
+//                // parent.max_size[1] += mesh.text_mesh.geom.dim[1];
+//             }
+
+//             accum_size_per_section[1] += mesh.geom.dim[1];
+//             accum_size_per_section[0] = mesh.geom.dim[0];
+
+//             parent.max_size[1] += mesh.geom.dim[1];
+
+//             if (parent.max_size[0] < accum_size_per_section[0])
+//                parent.max_size[0] = mesh.geom.dim[0]; // For horizontal, grow to the max width of all meshes
+//          }
+//          else if (opt & SECTION.HORIZONTAL) {
+
+//             if (mesh.text_mesh) {
+//                accum_size_per_section[0] += mesh.text_mesh.GetMaxWidth();
+//                accum_size_per_section[1] = mesh.text_mesh.geom.dim[1];
+//                parent.max_size[0] += mesh.text_mesh.GetMaxWidth();
+//             }
+
+//             accum_size_per_section[0] += mesh.geom.dim[0];
+//             accum_size_per_section[1] = mesh.geom.dim[1];
+
+//             parent.max_size[0] += mesh.geom.dim[0];
+
+//             if (parent.max_size[1] < accum_size_per_section[1])
+//                parent.max_size[1] = mesh.geom.dim[1];  // For horizontal, grow to the max height of all meshes
+//          }
+//       }
+//    }
+
+//    if(parent.parent){
+
+//       let p = parent.parent
+//       while(p !== null && p !== _){
+         
+//          if ((p.type & MESH_TYPE.SECTION_MESH))
+//             p.max_size[0] += parent.max_size[0]; 
+//          p = p.parent;
+//       }
+//    }
+// }
 
 
 

@@ -89,16 +89,10 @@ export function Events_handle_immidiate(e) {
             // Unhover any hovered mesh. // TODO: Decide who unhovers an already hovered mesh: here OR EventListeners.js. The diff is that if we unhover here, is faster since there is no separate call to 'Events_handle_immidiate()' for the 'else if (e.type === 'unhover')'
             if (STATE.mesh.hovered) {
 
-                STATE.mesh.hovered.SeHoverColorDefault();
+                STATE.mesh.hovered.SetHoverColorDefault();
                 e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER_COLOR; // Set false
             }
 
-            // if(e.params.mesh.OnHover){
-            //     e.params.mesh.OnHover();
-            // }
-            // else{
-            //     e.params.mesh.SetHoverColor();
-            // }
             e.params.mesh.SetHoverColor();
 
             e.params.mesh.state.mask |= (MESH_STATE.IN_HOVER_COLOR | MESH_STATE.IN_HOVER); 
@@ -113,7 +107,7 @@ export function Events_handle_immidiate(e) {
     else if (e.type === 'unhover') {
 
         if (e.params.mesh.StateCheck(MESH_STATE.IN_HOVER_COLOR)) {
-            e.params.mesh.SeHoverColorDefault();
+            e.params.mesh.SetHoverColorDefault();
             e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER_COLOR; // Set false
         }
         

@@ -292,15 +292,11 @@ export class Widget_Dropdown extends Section {
                btn1.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx_rect, igfx_text);
                btn1.SetZPos(item.geom.pos[2] + 1);
 
-               // Create Click events for any meshes of type Dropdown
-               // item.CreateClickEvent();
-               // item.CreateHoverEvent();
-
                if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's dp menu (runs recursive for any opened sub dp menus). 
 
                   // If the menu was deactivated while open, then on activation keep its '-' symbol
-                  // btn1.text_mesh.mat.char_buffer = `${this.dp_symbols[1]} ${btn1.text_mesh.mat.char_buffer.slice(2)}`;
-                  btn1.text_mesh.SetText(`${this.dp_symbols[1]} ${btn1.text_mesh.SliceText(2)}`);
+                  btn.text_mesh.SliceText(0, 1);
+                  btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
                   item.GenMenuGfxCtx_recursive(root, FLAGS);
                }
 
@@ -527,15 +523,12 @@ export class Widget_Dropdown extends Section {
                   const btn = item.children.buffer[0];
                   btn.FakeAddFromGfxPosy(btn.geom.defPos[1]);
 
-                  // Create Click events for any meshes of type Dropdown
-                  // item.CreateClickEvent();
-                  // item.CreateHoverEvent();
-
                   if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
 
                      // If the menu was deactivated while open, then on activation keep its '-' symbol
-                     // btn.text_mesh.mat.char_buffer = `${this.dp_symbols[1]} ${btn.text_mesh.mat.char_buffer.slice(2)}`;
-                     btn.text_mesh.SetText(`${this.dp_symbols[1]} ${btn.text_mesh.SliceText(2)}`);
+                     btn.text_mesh.SliceText(0, 1);
+                     btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
+                     
                      item.ActivateMenuFake(root);
                   }
 
@@ -703,7 +696,8 @@ export class Widget_Dropdown extends Section {
          const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
          const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx);
 
-         group_root_mesh.Recalc_no_gfx_update(_, this.idx);
+         // group_root_mesh.Recalc_no_gfx_update(_, this.idx);
+         group_root_mesh.Recalc_no_gfx_update(_);
 
          // TODO: If the group root is a scrolled_section, maybe the responsibility for Clip is at scroller ?????????
          if (group_root_mesh.parent) {
@@ -714,7 +708,8 @@ export class Widget_Dropdown extends Section {
          }
       }
       else {
-         root.Recalc_no_gfx_update(_, this.idx);
+         // root.Recalc_no_gfx_update(_, this.idx);
+         root.Recalc_no_gfx_update(_);
       }
 
 
@@ -754,7 +749,8 @@ export class Widget_Dropdown extends Section {
 
                // If the menu was deactivated while open, then on activation keep its '-' symbol
                const btn = item.children.buffer[0];
-               btn.text_mesh.SetText(`${this.dp_symbols[1]} ${btn.text_mesh.SliceText(2)}`);
+               btn.text_mesh.SliceText(0, 1);
+               btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
                item.ActivateMenu(root);
             }
 
@@ -800,7 +796,7 @@ export class Widget_Dropdown extends Section {
          // Get the group root mesh to Recalc position/dimentions 
          const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
          const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-
+   
          // group_root_mesh.Recalc_no_gfx_update(_, this.idx);
          group_root_mesh.Recalc_no_gfx_update(_);
 
@@ -814,9 +810,8 @@ export class Widget_Dropdown extends Section {
          
       }
       else {
-         root.Recalc_no_gfx_update(_, this.idx);
-         // const root_dp = Dropdown_roots_get_root_by_idx(this.rootidx);
-         // root_dp.Recalc_no_gfx_update();
+         root.Recalc_no_gfx_update(_);
+         console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
       }
       
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
@@ -918,8 +913,8 @@ export class Widget_Dropdown extends Section {
          /* Need to update the symbol of the text(not only the gfx buffers), 
             because when the btn will be activated it will be re-inserted in the gfx buffers 
             and it will use the text_mesh's  string (wich is currently the '-' synmbol). */
-         // btn.text_mesh.mat.char_buffer = `${dp.dp_symbols[0]} ${btn.text_mesh.mat.char_buffer.slice(2)}`;
-         btn.text_mesh.SetText(`${dp.dp_symbols[0]} ${btn.text_mesh.SliceText(2)}`);
+         btn.text_mesh.SliceText(0, 1);
+         btn.text_mesh.SetTextAtIndex(dp.dp_symbols[1], 0);
 
          dp.DpDeactivateMenu();
 

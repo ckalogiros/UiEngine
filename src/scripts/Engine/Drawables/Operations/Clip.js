@@ -21,6 +21,7 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
    for(let i=0; i<=group.vb.boundary; i++){
    
       const meshshes_idx = group.vb.buffer[i].data;
+      const exept_on_resize_meshidx = 1;
       for(let j=0; j <= meshshes_idx.boundary; j++){
          
          const mesh = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
