@@ -3,7 +3,6 @@
 import { Gl_batch_update_fn_byidx } from "../../Graphics/Buffers/VertexBufferOpsBatch";
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs_per_vertex } from "../../Graphics/ShaderAttributes";
 import { Program_get_shader_attributes_index } from "../../Graphics/ShaderPrograms";
-import { _pt_batch_update } from "../Timers/PerformanceTimers";
 
 
 /**
@@ -87,7 +86,7 @@ vb_cnt[0] = 0; vb_cnt[1] = 0; vb_cnt[2] = 0; vb_cnt[3] = 0; vb_cnt[4] = 0; let a
 export function Batch_store(mesh, first_attrib_offset, update_data=null, num_faces=0, start=INT_NULL) {
 
    TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_STORE++;
-   _pt_batch_update.timer.Start();
+   // _pt_batch_update.timer.Start();
 
    if (mesh.gfx) {
 
@@ -125,7 +124,7 @@ export function Batch_store(mesh, first_attrib_offset, update_data=null, num_fac
       mesh.batch_fnidx = INT_NULL;
    }
 
-   _pt_batch_update.timer.Stop();
+   // _pt_batch_update.timer.Stop();
 }
 
 
@@ -139,7 +138,7 @@ export function Batch_update() {
    
    if(!any_update) return;
 
-   _pt_batch_update.timer.Start();
+   // _pt_batch_update.timer.Start();
    // console.log('------------------------------------------------')
    // console.log(_batch);
 
@@ -194,6 +193,6 @@ export function Batch_update() {
       any_update = false;
    }
 
-   _pt_batch_update.timer.Stop();
+   // _pt_batch_update.timer.Stop();
    TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_UPDATE++;
 }

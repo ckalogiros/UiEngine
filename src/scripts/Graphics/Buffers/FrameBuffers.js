@@ -2,9 +2,9 @@
 
 import { GfxExists_rename_me, Temp_Create_child_gfx_rename_me } from "../../Engine/Drawables/Meshes/Base/Mesh";
 import { Texture_create_renderbuffer_texture, Texture_set_texture_name } from "../../Engine/Loaders/Textures/Texture";
-import { _pt_framebuffer_rendering } from "../../Engine/Timers/PerformanceTimers";
 import { Gl_draw_specific } from "../GlDraw";
 import { Create_mesh_for_framebuffer } from "../../Engine/Drawables/Meshes/FramebufferMesh";
+import { Str_buffer_change } from "../../Engine/Core/StringBuffer";
 
 // SEE: ## Framebuffer VS Renderbuffer
 
@@ -242,9 +242,9 @@ export function FramebufferSetUpdate(fbidx) {
       console.error('Not valid Framebuffer index. @ function FramebufferSetUpdate(fbidx)', fbidx);
       return;
    }
-   _pt_framebuffer_rendering.timer.Start();
+   // _pt_framebuffer_rendering.timer.Start();
    _fb_buffer[fbidx].needs_update = true;
-   _pt_framebuffer_rendering.timer.Stop();
+   // _pt_framebuffer_rendering.timer.Stop();
    TEMP_TEST_PERFORMANE_COUNTERS.FRAMEBUFFER++;
 }
 
@@ -252,7 +252,7 @@ export function FramebufferSetUpdate(fbidx) {
 
 // TODO: Remove export.
 export function Gl_framebuffer_render(gl, framebuffer, gfx_queue) { // Renders geometry(from gfx buffers) to a spesific framebuffer target(to texture or to renderbuffer)
-   _pt_framebuffer_rendering.timer.Start();
+   // _pt_framebuffer_rendering.timer.Start();
    // Testing Rotation
    // setInterval(()=>{GlRotateZ2D(mesh.gfx, mesh.geom.dim, TimerGetGlobalTimer()*.55)}, 10)
    // if(framebuffer.name === 0) GlRotateZ2D(framebuffer.render_area.gfx, framebuffer.render_area.geom.dim, TimerGetGlobalTimer()*TimerGetGlobalTimer()*.55)
@@ -286,7 +286,7 @@ export function Gl_framebuffer_render(gl, framebuffer, gfx_queue) { // Renders g
    // }
 
    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-   _pt_framebuffer_rendering.timer.Stop();
+   // _pt_framebuffer_rendering.timer.Stop();
 }
 
 

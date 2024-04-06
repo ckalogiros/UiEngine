@@ -1,7 +1,6 @@
 "use strict";
 
-import { Create_widget_label, Create_widget_section, Create_widget_switch, Create_widget_switch_simple } from "../../Core/CreateWidget";
-import { WHITE } from "../Material/Base/Colors";
+import { Create_widget_label, Create_widget_section, Create_widget_switch_simple } from "../../Core/CreateWidget";
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent";
 
 
@@ -14,10 +13,8 @@ export function Dbg_ui_create(name, parent, fontsize, switch_size, switch_fn, se
 
    
    const label = Create_widget_label(_, `DBG_UI ${name} label`, (ALIGN.BOTTOM | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, TRANSPARENCY(label_col, 0), label_text_col, label_pad, _, label_style);
-   const labelidx = section.AddItem(label);
-   // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, section, labelidx);
+   section.AddItem(label);
    
-   // const ui_switch = Create_widget_switch(_, 'on', 'off', [0, 0, zindex + 2], fontsize, switch_col, WHITE, switch_pad);
    const ui_switch = Create_widget_switch_simple(_, [0, 0, zindex + 2], switch_size, switch_col, switch_pad);
    ui_switch.SetName(`DBG_UI ${name} switch`);
    

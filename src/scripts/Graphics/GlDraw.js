@@ -4,7 +4,6 @@ import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
-import { _pt_test_misc_1 } from '../Engine/Timers/PerformanceTimers.js';
 
 
 
@@ -29,7 +28,7 @@ export function Gl_draw(gl) {
 
     for (let i = 0; i < drawQueueCount; i++) {
         
-        _pt_test_misc_1.timer.Start();
+        // _pt_test_misc_1.timer.Start();
         const progidx = drawQueue[i].progidx;
         const vbidx = drawQueue[i].vbidx;
         const ibidx = drawQueue[i].ibidx;
@@ -57,7 +56,7 @@ export function Gl_draw(gl) {
             Gl_texture_unit_bind(gl, texture);
             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
         }
-        _pt_test_misc_1.timer.Stop();
+        // _pt_test_misc_1.timer.Stop();
         
         
         const vb = Vertex_buffer_get_by_vbidx(vb_info.vbidx);

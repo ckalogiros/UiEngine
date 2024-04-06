@@ -1,13 +1,13 @@
 "use strict";
 
-import { Vertex_buffer_create_text_info, Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown";
-import { PerformanceTimersGetBestFps, PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, Performance_timers_get_ms_1sec_reset, _pt_all_timers, _pt_batch2_update, _pt_batch_update, _pt_event_listener, _pt_framebuffer_rendering, _pt_gl_draw, _pt_hover_listener, _pt_loop, _pt_mesh_info_tip, _pt_scene_update } from "../../Timers/PerformanceTimers";
-import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners";
-import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget";
-import { Mesh_buffer_create_text_info, Mesh_buffer_get_mesh_byidx, TEMP_PRINT_ACCUM, TEMP_PRINT_START, Widget_root_batch_get_all_roots_by_vertex_buffer, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer";
-import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals";
-import { Dbg_ui_create } from "./DebugInfoUiFactory";
+import { Vertex_buffer_create_text_info, Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown.js";
+import { PerformanceTimersGetBestFps, PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset, Performance_timers_get_ms_1sec_reset } from "../../Timers/PerformanceTimers.js";
+import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners.js";
+import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
+import { Mesh_buffer_create_text_info, Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
+import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals.js";
+import { Dbg_ui_create } from "./DebugInfoUiFactory.js";
 import { Program_create_text_info, Program_get_programs } from "../../../Graphics/ShaderPrograms.js";
 import { BLUEL, GREEN, GREY, ORANGE_240_160_10, PURPLEB, PURPLER, REDL, WHITE, YELLOWL } from "../Material/Base/Colors.js";
 import { NOTIFICATION_TYPE_IDX } from "./DebugInfoUiNotifications.js";
@@ -148,141 +148,145 @@ function Debug_info_create_ui_performance_timers() {
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Mainloop avg`, ms, PerformanceTimersGetFps, _pt_loop.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+      timer.SetDynamicText(`ms${ms} Mainloop avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.GameLoop, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-      // timer.SetDynamicText(`ms${ms} Mainloop avg`, ms, PerformanceTimersGetFps, _pt_loop.timer); // idx is for use in creating separate time intervals for each dynamic text.
 
+      let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.GameLoop);
       timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
       timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Mainloop 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_loop, _, generic_time_interval)
-
+      timer.SetDynamicText(`ms${ms} Mainloop 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.GameLoop, timeridx], _, generic_time_interval)
+      
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.GameLoop);
       timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
       timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Mainloop best`, ms, PerformanceTimersGetBestFps, _pt_loop.timer, _, generic_time_interval)
-
+      timer.SetDynamicText(`ms${ms} Mainloop best`, ms, PerformanceTimersGetBestFps, [PERFORMANCE_TIMERS_IDXS.GameLoop, timeridx], _, generic_time_interval)
+      
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.GameLoop);
       timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
       timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Mainloop worst`, ms, PerformanceTimersGetWorstFps, _pt_loop.timer, _, generic_time_interval)
+      timer.SetDynamicText(`ms${ms} Mainloop worst`, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.GameLoop, timeridx], _, generic_time_interval)
 
    }
-   { // All Timers Update timer
-      ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Timers: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
-      section.AddItem(timer);
-      timer.CreateNewText('0000000', fontsize, YELLOWL[7], pad2, .9);
-      timer.SetDynamicText(`ms${ms} Timers avg`, ms, PerformanceTimersGetFps, _pt_all_timers.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+   // { // All Timers Update timer
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'Timers: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
+   //    section.AddItem(timer);
+   //    timer.CreateNewText('0000000', fontsize, YELLOWL[7], pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Timers avg`, ms, PerformanceTimersGetFps, _pt_all_timers.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
 
-      timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOWL[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Timers 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_all_timers, _, generic_time_interval)
+   //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, YELLOWL[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} Timers 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_all_timers, _, generic_time_interval)
 
-      timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOWL[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Timers best`, ms, PerformanceTimersGetBestFps, _pt_all_timers.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, YELLOWL[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} Timers best`, ms, PerformanceTimersGetBestFps, _pt_all_timers.timer, _, generic_time_interval)
 
-      timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOWL[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Timers worst`, ms, PerformanceTimersGetWorstFps, _pt_all_timers.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, YELLOWL[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} Timers worst`, ms, PerformanceTimersGetWorstFps, _pt_all_timers.timer, _, generic_time_interval)
 
-   }
-   { // Scene Update timer
-      ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Scene: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
-      section.AddItem(timer);
-      timer.CreateNewText('0000000', fontsize, BLUEL[7], pad2, .9);
-      timer.SetDynamicText(`ms${ms} Scene avg`, ms, PerformanceTimersGetFps, _pt_scene_update.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+   // }
+   // { // Scene Update timer
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'Scene: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
+   //    section.AddItem(timer);
+   //    timer.CreateNewText('0000000', fontsize, BLUEL[7], pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Scene avg`, ms, PerformanceTimersGetFps, _pt_scene_update.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
 
-      timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, BLUEL[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Scene 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_scene_update, _, generic_time_interval)
+   //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, BLUEL[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} Scene 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_scene_update, _, generic_time_interval)
 
-      timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, BLUEL[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Scene best`, ms, PerformanceTimersGetBestFps, _pt_scene_update.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, BLUEL[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} Scene best`, ms, PerformanceTimersGetBestFps, _pt_scene_update.timer, _, generic_time_interval)
 
-      timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, BLUEL[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Scene worst`, ms, PerformanceTimersGetWorstFps, _pt_scene_update.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, BLUEL[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} Scene worst`, ms, PerformanceTimersGetWorstFps, _pt_scene_update.timer, _, generic_time_interval)
 
-   }
-   { // Gl_draw timer.
-      ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Gl Draw: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
-      section.AddItem(timer);
-      timer.CreateNewText('0000000', fontsize, GREEN[7], pad2, .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_gl_draw.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+   // }
+   // { // Gl_draw timer.
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'Gl Draw: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
+   //    section.AddItem(timer);
+   //    timer.CreateNewText('0000000', fontsize, GREEN[7], pad2, .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_gl_draw.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
 
-      timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, GREEN[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_gl_draw, _, generic_time_interval)
+   //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, GREEN[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_gl_draw, _, generic_time_interval)
 
-      timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, GREEN[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_gl_draw.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, GREEN[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_gl_draw.timer, _, generic_time_interval)
 
-      timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, GREEN[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_gl_draw.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, GREEN[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_gl_draw.timer, _, generic_time_interval)
 
-   }
-   { // Batch Buffer
-      ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Batch: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
-      section.AddItem(timer);
-      timer.CreateNewText('00000000', fontsize, PURPLER[7], pad2, .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_batch_update.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+   // }
+   // { // Batch Buffer
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'Batch: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
+   //    section.AddItem(timer);
+   //    timer.CreateNewText('00000000', fontsize, PURPLER[7], pad2, .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_batch_update.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
 
-      timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_batch_update, _, generic_time_interval)
+   //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_batch_update, _, generic_time_interval)
 
-      timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_batch_update.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_batch_update.timer, _, generic_time_interval)
 
-      timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_batch_update.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_batch_update.timer, _, generic_time_interval)
 
-   }
-   { // Batch2 Buffer
-      ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Batch2: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
-      section.AddItem(timer);
-      timer.CreateNewText('00000000', fontsize, PURPLER[7], pad2, .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_batch2_update.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+   // }
+   // { // Batch2 Buffer
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'Batch2: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
+   //    section.AddItem(timer);
+   //    timer.CreateNewText('00000000', fontsize, PURPLER[7], pad2, .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_batch2_update.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
 
-      timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_batch2_update, _, generic_time_interval)
+   //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_batch2_update, _, generic_time_interval)
 
-      timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_batch2_update.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_batch2_update.timer, _, generic_time_interval)
 
-      timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_batch2_update.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_batch2_update.timer, _, generic_time_interval)
 
-   }
+   // }
    { // Event Listener.
       ms = (g_ms) ? g_ms : 1000;
       const timer = Create_widget_multi_text(_, 'Event Listener: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
       section.AddItem(timer);
       timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_event_listener.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+      timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.EventListener, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
 
-      timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_event_listener, _, generic_time_interval)
+      // const timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.EventListener);
 
-      timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_event_listener.timer, _, generic_time_interval)
+      // timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
+      // timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      // timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, PERFORMANCE_TIMERS_IDXS.EventListener, _, generic_time_interval)
 
-      timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_event_listener.timer, _, generic_time_interval)
+      // timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
+      // timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      // timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, PERFORMANCE_TIMERS_IDXS.EventListener, _, generic_time_interval)
+
+      // timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
+      // timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      // timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, PERFORMANCE_TIMERS_IDXS.EventListener, _, generic_time_interval)
 
    }
    { // Hover Listener.
@@ -290,61 +294,61 @@ function Debug_info_create_ui_performance_timers() {
       const timer = Create_widget_multi_text(_, 'Hover Listener: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
       section.AddItem(timer);
       timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_hover_listener.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+      timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.HoverListener, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
 
-      timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_hover_listener, _, generic_time_interval)
+      // timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
+      // timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      // timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, PERFORMANCE_TIMERS_IDXS.HoverListener, _, generic_time_interval)
 
-      timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_hover_listener.timer, _, generic_time_interval)
+      // timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
+      // timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      // timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, PERFORMANCE_TIMERS_IDXS.HoverListener, _, generic_time_interval)
 
-      timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_hover_listener.timer, _, generic_time_interval)
-
-   }
-   { // Framebuffer Rendering.
-      ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Framebuffer Rendering: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
-      section.AddItem(timer);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_framebuffer_rendering.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
-
-      timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_ms_1sec_reset, _pt_framebuffer_rendering, _, generic_time_interval)
-
-      timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_framebuffer_rendering.timer, _, generic_time_interval)
-
-      timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_framebuffer_rendering.timer, _, generic_time_interval)
+      // timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
+      // timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      // timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, PERFORMANCE_TIMERS_IDXS.HoverListener, _, generic_time_interval)
 
    }
-   { // Mesh info tip.
-      ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'MeshInfo: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
-      section.AddItem(timer);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} MeshInfo avg`, ms, PerformanceTimersGetFps, _pt_mesh_info_tip.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+   // { // Framebuffer Rendering.
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'Framebuffer Rendering: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
+   //    section.AddItem(timer);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_framebuffer_rendering.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
 
-      timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} MeshInfo 1secReset`, ms, Performance_timers_get_ms_1sec_reset, _pt_mesh_info_tip, _, generic_time_interval)
+   //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_ms_1sec_reset, _pt_framebuffer_rendering, _, generic_time_interval)
 
-      timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} MeshInfo best`, ms, PerformanceTimersGetBestFps, _pt_mesh_info_tip.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_framebuffer_rendering.timer, _, generic_time_interval)
 
-      timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} MeshInfo worst`, ms, PerformanceTimersGetWorstFps, _pt_mesh_info_tip.timer, _, generic_time_interval)
+   //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_framebuffer_rendering.timer, _, generic_time_interval)
 
-   }
+   // }
+   // { // Mesh info tip.
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'MeshInfo: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
+   //    section.AddItem(timer);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} MeshInfo avg`, ms, PerformanceTimersGetFps, _pt_mesh_info_tip.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+
+   //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} MeshInfo 1secReset`, ms, Performance_timers_get_ms_1sec_reset, _pt_mesh_info_tip, _, generic_time_interval)
+
+   //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} MeshInfo best`, ms, PerformanceTimersGetBestFps, _pt_mesh_info_tip.timer, _, generic_time_interval)
+
+   //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} MeshInfo worst`, ms, PerformanceTimersGetWorstFps, _pt_mesh_info_tip.timer, _, generic_time_interval)
+
+   // }
 
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);

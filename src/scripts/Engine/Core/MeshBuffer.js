@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_get_by_vbidx, Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPosDif } from "../Controls/Input/Mouse.js";
 import { TimeIntervalsDestroyByIdx } from "../Timers/TimeIntervals.js";
 import { Int16Buffer, Int8Buffer, M_Buffer } from "./Buffers.js";
@@ -9,7 +9,7 @@ import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Cr
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Batch_store } from "../Batch/Batch.js";
 import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Debug_info_update_clbk } from "../Drawables/DebugInfo/DebugInfoUi.js";
+// import { Debug_info_update_clbk } from "../Drawables/DebugInfo/DebugInfoUi.js";
 import { View_destroy_view } from "./MeshBufferViews.js";
 
 
@@ -335,12 +335,6 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
             let min_start = 0xffff;
             for (let i = 0; i < len; i++) {
                const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]]; // Get meshes through wigdet_root_buffer
-
-
-
-if(!mesh || mesh===_)
-console.error('idx:', i, 'buffer', _widget_root_buffer.buffer[root_bufferidx]);
-
 
 
                if (mesh && mesh.mesh_bufferidx !== mesh_bufferidx &&
@@ -1292,7 +1286,7 @@ function TEMP(params) {
       parent_section: scroller_section.parent,
    }
 
-   Debug_ui_create_notification(Debug_info_update_clbk, _params);
+   // Debug_ui_create_notification(Debug_info_update_clbk, _params);
 }
 
 

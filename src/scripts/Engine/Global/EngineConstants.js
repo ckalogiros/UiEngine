@@ -24,7 +24,7 @@ const MAX_UINT32 = 0xFFFFFFFF; // 4294967295;
 const MAX_BIT_MASK =  0xFFFFFFFFFFFFF; 
 const MAX_BIT_MASK_COMBINATIONS =  52; 
 
-const MILISEC = 0.001;
+const MILISEC_TO_SEC = 0.001;
 const NANOSEC = 0.000001;
 
 
@@ -506,6 +506,47 @@ const CHAR_ARRAY_LETTERS_START_OFFSET = 'A'.charCodeAt(0);
 // Timer's Constants 
 const TIME_INTERVAL_REPEAT_ALWAYS = 9999999999; // Repeat always a time interval clbk function.
 
+// Performance Timers indexes. WRITABLE 
+const PERFORMANCE_TIMERS_IDXS = {
+	/**
+		GameLoop
+		GlDraw
+		AllTimersUpdate
+		Batch
+		Batch2
+		SceneUpdate
+		EventListener
+		HoverListener
+		MeshInfoTip
+		FramebufferRendering
+		MiscTest1
+		MiscTest2
+		MiscTest3
+		MiscTest4
+	 */
+	GameLoop: INT_NULL,
+	GlDraw: INT_NULL,
+	AllTimersUpdate: INT_NULL,
+	Batch: INT_NULL,
+	Batch2: INT_NULL,
+	SceneUpdate: INT_NULL,
+	EventListener: INT_NULL,
+	HoverListener: INT_NULL,
+	MeshInfoTip: INT_NULL,
+	FramebufferRendering: INT_NULL,
+	MiscTest1: INT_NULL,
+	MiscTest2: INT_NULL,
+	MiscTest3: INT_NULL,
+	MiscTest4: INT_NULL,
+}
+
+_CNT = 0x1;
+const PERFORMANCE_TIMER = {
+	BASE: _CNT,
+	DETAILED: _CNT <<= 0x1,
+	BASE_FN_IDX: 0,
+	DETAILED_FN_IDX: 1,
+}
 
 
 

@@ -5,12 +5,11 @@ import { MouseResetDif, MouseResetWheel } from "../Controls/Input/Mouse.js";
 import { TimeSample, TimeUpdate } from "../Timers/Time.js";
 import { TimersUpdateGlobalTimer, TimersUpdateTimers } from "../Timers/Timers.js";
 import { TimeIntervalsUpdateAll } from "../Timers/TimeIntervals.js";
-import { PerformanceTimersTick, _pt_loop, _pt_gl_draw, _pt_all_timers, _pt_batch_update, _pt_scene_update } from '../Timers/PerformanceTimers.js'
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
-import { Update_read_write_test } from "../../../Tests/ReadWrite.js";
 import { Batch_update } from "../Batch/Batch.js";
 import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Debug_ui_update_notifications } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
+import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 
 
 
@@ -86,36 +85,41 @@ export class WebGlRenderer {
       if (STATE.loop.paused === false) {
 
          TimeUpdate();
-         _pt_loop.timer.Start();
 
-         _pt_all_timers.timer.Start();
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
+         
+         // _pt_all_timers.timer.Start();
          TimeIntervalsUpdateAll(); // Update and run callbacks for each interval timer that has been set.
-         _pt_all_timers.timer.Stop();
+         // _pt_all_timers.timer.Stop();
          TimersUpdateGlobalTimer(); // This is a globbal timer, going only forward
          TimersUpdateTimers();
          // TimersUpdateStepTimers();
-
+         
          Framebuffer_update_draw();
-         _pt_scene_update.timer.Start(); this.scene.OnUpdate(); _pt_scene_update.timer.Stop();
-
+         // _pt_scene_update.timer.Start(); 
+         this.scene.OnUpdate(); 
+         // _pt_scene_update.timer.Stop();
+         
          Batch_update()
-
+         
          Uniforms_block_update_uniform();
-
+         
          Debug_ui_update_notifications();
          
-         _pt_gl_draw.timer.Start(); Gl_draw(this.gl); _pt_gl_draw.timer.Stop();
-
-
+         // _pt_gl_draw.timer.Start(); 
+         Gl_draw(this.gl); 
+         // _pt_gl_draw.timer.Stop();
+         
+         
          MouseResetDif(.5);
          MouseResetWheel();
-
-         _pt_loop.timer.Stop();
+         
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
 
 
          TimeSample();
 
-         PerformanceTimersTick();
+         // PerformanceTimersTick();
       }
 
       // if(!STATE.loop.paused) STATE.loop.paused = true;

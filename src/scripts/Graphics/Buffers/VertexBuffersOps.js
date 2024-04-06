@@ -2,7 +2,7 @@
 
 import { Str_buffer_get_by_idx } from "../../Engine/Core/StringBuffer";
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size } from "../ShaderAttributes";
-import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from "./IndexBuffers";
+import { Index_buffer_get_by_ibidx } from "./IndexBuffers";
 import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_remove_geometry, Vertex_buffer_state_enable } from "./VertexBuffers";
 
 

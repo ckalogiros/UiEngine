@@ -252,7 +252,7 @@ export class Text_Mesh extends Mesh {
 
       this.mat.char_buffer.Reset();
 
-      const len = str.length;
+      const len = (str.length < this.mat.char_buffer.size) ? str.length : this.mat.char_buffer.size;
       
       for (let i = 0; i < len; i++) {
 

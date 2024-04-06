@@ -2,7 +2,7 @@
 
 import { Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers";
 import { Int16Buffer, M_Buffer } from "./Buffers";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_byidx, Widget_root_gfx_get_structured } from "./MeshBuffer";
+import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer";
 
 
 /**

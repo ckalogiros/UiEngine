@@ -1,6 +1,5 @@
 "use strict";
 
-import { _pt_batch2_update, _pt_test_misc_2 } from "../../Engine/Timers/PerformanceTimers";
 import { Vertex_buffer_get_by_vbidx, Vertex_buffer_state_enable } from "./VertexBuffers";
 
 
@@ -36,9 +35,9 @@ export function Gl_batch_update_get_fn_byidx(idx) {
 
 export function Gl_batch_update_fn_byidx(fnidx, vbidx, start, attrib_offset, verts_per_rect, attribs_per_vertex, num_faces = 1, update_data) {
    
-   _pt_batch2_update.timer.Start();
+   // _pt_batch2_update.timer.Start();
    _batch_gfx_update_fn_table[fnidx](vbidx, start, attrib_offset, verts_per_rect, attribs_per_vertex, num_faces, update_data);
-   _pt_batch2_update.timer.Stop();
+   // _pt_batch2_update.timer.Stop();
 }
 
 

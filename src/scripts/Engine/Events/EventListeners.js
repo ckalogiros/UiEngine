@@ -3,7 +3,7 @@
 import { Intersection_point_rect } from "../Drawables/Operations/Collisions.js";
 import { MouseGetPos } from "../Controls/Input/Mouse.js";
 import { M_Buffer } from "../Core/Buffers.js";
-import { _pt_event_listener, _pt_hover_listener } from "../Timers/PerformanceTimers.js";
+import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
 import { Info_listener_create_event, Info_listener_dispatch_event } from "../Drawables/DebugInfo/InfoListeners.js";
 import { GREY } from "../Drawables/Material/Base/Colors.js";
@@ -205,7 +205,8 @@ export function Listeners_get_event(TYPE_IDX, event_idx) { return _listener.even
 export function Listener_dispatch_check_hover_event() {
 
 
-   _pt_hover_listener.timer.Start();
+   // _pt_hover_listener.timer.Start();
+   Performance_timer_start(PERFORMANCE_TIMERS_IDXS.HoverListener);
 
 
    if (_listener.event_type[E.H] === undefined) return;
@@ -254,7 +255,9 @@ export function Listener_dispatch_check_hover_event() {
    if(!intersected && STATE.mesh.hovered){ // If mouse is not intersecting with any mesh and there still is a hovered mesh, unhover it.
       Events_handle_immidiate({ type: 'unhover', params: { mesh: STATE.mesh.hovered } });
    }
-   _pt_hover_listener.timer.Stop();
+   // _pt_hover_listener.timer.Stop();
+   // Performance_timer_detailed_stop(PERFORMANCE_TIMERS_IDXS.HoverListener);
+   Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.HoverListener);
 }
    
 
@@ -301,10 +304,14 @@ function Check_hover_recursive(events, point) {
 export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
 
-   _pt_event_listener.timer.Start(); /* Performance measure */
+   // _pt_event_listener.timer.Start(); /* Performance measure */
+   Performance_timer_start(PERFORMANCE_TIMERS_IDXS.EventListener);
+   console.log('+START')
+   Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
 
    if (_listener.event_type[TYPE_IDX] === undefined) return;
    /**DEBUG*/if (TYPE_IDX < 0 || TYPE_IDX >= LISTEN_EVENT_TYPES_INDEX.SIZE) alert('Event type index does not exist.');
+
 
    let intersected = false;
 
@@ -342,7 +349,8 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                   if (event_found.Clbk) {
 
                      event_found.Clbk(dispatch_params);
-                     _pt_event_listener.timer.Stop();
+                     // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+                     // console.log('STOP111111')
 
                      const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
                      STATE.mesh.SetFocused(mesh);
@@ -361,7 +369,8 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                }
 
                evt.Clbk(dispatch_params);
-               _pt_event_listener.timer.Stop();
+               // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+               // console.log('STOP22222222222')
 
                const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
                STATE.mesh.SetFocused(mesh);
@@ -373,7 +382,8 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
       }
    }
 
-   _pt_event_listener.timer.Stop();
+   // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+   // console.log('STOP333')
 
 }
 

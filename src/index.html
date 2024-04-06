@@ -8,6 +8,9 @@
 	<link rel="stylesheet" type="text/css" href="style/style.css">
 	<!-- This is to get the device dimentions -->
 	<meta name="viewport" content="height=device-height, initial-scale=1">
+	<!-- Set Cross-Origin-Embedder-Policy -->
+	<meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+	<meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
 </head>
 
 <body>
@@ -15,9 +18,9 @@
 		<canvas id="glCanvas" width="0" height="0" ></canvas>
 	</div>
 </body>
-<script type="text/javascript" src="/scripts/Engine/Global/EngineConstants.js"></script>
-<script type="text/javascript" src="/scripts/Graphics/Global/GfxConstants.js"></script>
-<script type="text/javascript" src="/scripts/Graphics/Global/WebGlConstants.js"></script>
-<script type='module' 			 src="/scripts/Entry.js "></script>
+<script crossorigin="use-credentials" type="text/javascript" src="/scripts/Engine/Global/EngineConstants.js"></script>
+<script crossorigin="use-credentials" type="text/javascript" src="/scripts/Graphics/Global/GfxConstants.js"></script>
+<script crossorigin="use-credentials" type="text/javascript" src="/scripts/Graphics/Global/WebGlConstants.js"></script>
+<script crossorigin="use-credentials" type='module' 			 src="/scripts/Entry.js "></script>
 </html>
 

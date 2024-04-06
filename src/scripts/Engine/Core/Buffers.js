@@ -17,7 +17,7 @@ export class M_Buffer {
    boundary;      // Points to the last active element.. (Some elements in between could be null)
    active_count;  // The total active elements.
    size;          // Buffer size.
-   freeidx; 
+   freeidx;
    reserveidx;    // An int value to store a reserved element for later use.
 
 
@@ -25,10 +25,10 @@ export class M_Buffer {
 
       this.buffer = [];
       this.buffer[0] = null;
-      this.boundary = -1;     
-      this.active_count = 0;  
-      this.size = 1;          
-      this.freeidx = 0;       
+      this.boundary = -1;
+      this.active_count = 0;
+      this.size = 1;
+      this.freeidx = 0;
       this.reserveidx = INT_NULL;
 
       if (m_buffer)
@@ -46,18 +46,18 @@ export class M_Buffer {
       }
    }
 
-   InitFromText(size, text){
+   InitFromText(size, text) {
 
-      
+
       this.size = size;
       this.buffer = new Array(size);
 
-      let i=0;
+      let i = 0;
       for (i = 0; i < size; i++) {
          this.buffer[i] = text[i];
       }
       this.active_count = i;
-      this.boundary = i-1;
+      this.boundary = i - 1;
    }
 
    Add(elem) {
@@ -70,19 +70,19 @@ export class M_Buffer {
 
 
    #GetNextFree() {
-      
-      // if(this.freeidx !== INT_NULL){
-      if(this.buffer[this.freeidx] === null){
 
-         if(this.freeidx > this.boundary) this.boundary = this.freeidx; // UNNECESSARY: Can freeidx be greater thn boundary???
-         
+      // if(this.freeidx !== INT_NULL){
+      if (this.buffer[this.freeidx] === null) {
+
+         if (this.freeidx > this.boundary) this.boundary = this.freeidx; // UNNECESSARY: Can freeidx be greater thn boundary???
+
          // const idx = this.freeidx; 
          // this.freeidx = INT_NULL;
          return this.freeidx;
       }
 
-      if(this.active_count >= this.size){
-        
+      if (this.active_count >= this.size) {
+
          const idx = this.Realloc(); // buffer is full.
          if (idx > this.boundary) this.boundary = idx;
          return idx;
@@ -91,11 +91,11 @@ export class M_Buffer {
       // since boundary does not decrement (on remove) below the last element's index.
       for (let i = 0; i < this.size; i++) {
 
-         if (this.buffer[i] === null) { 
+         if (this.buffer[i] === null) {
 
             // Increment boundary only if the free element is after the last stored element in the buffer.
-            if (i > this.boundary) this.boundary = i; 
-               
+            if (i > this.boundary) this.boundary = i;
+
             return i;
          }
       }
@@ -116,7 +116,7 @@ export class M_Buffer {
 
       if (oldData) this.CopyFromBufferToStart(oldData);
 
-      if(idx<1) alert('Buffers.js, Realloc()');
+      if (idx < 1) alert('Buffers.js, Realloc()');
       return idx;
 
    }
@@ -167,7 +167,7 @@ export class M_Buffer {
 
 
    RemoveByIdx(idx) {
-   
+
       /**DEBUG ERROR*/ if (idx < 0 || idx > this.size - 1) {
          console.error('Index Out of bounds. @ M_Buffer.RemoveByIdx().\n idx:', idx, 'size', this.size)
          return;
@@ -177,7 +177,7 @@ export class M_Buffer {
 
          this.buffer[idx] = null;
          this.active_count--;
-         if(idx === this.boundary) this.boundary--; // Case the we removed the last element in existance
+         if (idx === this.boundary) this.boundary--; // Case the we removed the last element in existance
 
 
          // Check if previous elements are empty, and reduce boundary to the last active.
@@ -209,12 +209,12 @@ export class M_Buffer {
       //    if(this.freeidx > this.boundary) this.boundary = this.freeidx;
       //    this.freeidx = INT_NULL;
       //    this.buffer[this.reserveidx] = true;
-   
+
       //    return this.reserveidx;
       // }
 
       // if (this.active_count >= this.size) {
-         
+
       //    const idx = this.Realloc(); // buffer is full.
       //    this.reserveidx = idx;
       //    this.boundary++;
@@ -229,11 +229,11 @@ export class M_Buffer {
 
       //       // Increment boundary only if the free element is after the last stored element in the buffer.
       //       if (i > this.boundary)  this.boundary = i;
-            
+
       //       this.reserveidx = i;
       //       this.buffer[this.reserveidx] = true;
       //       this.active_count++;
-      
+
       //       return this.reserveidx;
       //    }
       // }
@@ -252,7 +252,19 @@ export class M_Buffer {
 
 
    AddAtIndex(idx, elem) {
-      if (idx < 0 || idx >= this.size) console.error('WRONG Index. Adding item at: ', idx, ' with size:', this.size)
+      if (idx < 0) console.error('SEVERE_ERROR.\nWRONG Index. Adding item at: ', idx);
+
+      // Realloc
+      if (idx >= this.size) {
+
+         console.error('INFORMATIVE_ERROR\nAddAtIndex().\nNot enough size in Buffer.\nAdding item at: ', idx, ' buffer size:', this.size - 1, '\nCalling Realloc()');
+
+         const new_idx = this.Realloc(); // buffer is full.
+         this.buffer[new_idx] = elem;
+         this.boundary = new_idx;
+         this.active_count++;
+         return new_idx;
+      }
 
       this.buffer[idx] = elem;
       this.active_count++;
@@ -275,9 +287,9 @@ export class M_Buffer {
 
 
    // TODO: Call this on every Destroy, to have all M_Buffer elements not sparsed
-   ShiftElementOnDestroy(destroyed_idx){
+   ShiftElementOnDestroy(destroyed_idx) {
 
-      /**DEBUG*/ if(destroyed_idx > this.boundary && this.boundary >= 0){
+      /**DEBUG*/ if (destroyed_idx > this.boundary && this.boundary >= 0) {
 
          // console.error('destroyed_idx is out of bounds. @ ShiftElementOnDestroy(), Buffers.js.\destroyed_idx:', destroyed_idx, 'boundary:', this.boundary, '\nbuffer:');
          // for(let i=0; i<this.buffer.length; i++){
@@ -286,9 +298,9 @@ export class M_Buffer {
          // }
       }
 
-      if(destroyed_idx < this.boundary){
+      if (destroyed_idx < this.boundary) {
          // console.warn('ShiftElementOnDestroy:Before', 'index', destroyed_idx, 'buffer', this.buffer)
-         
+
          this.buffer[destroyed_idx] = this.buffer[this.boundary];
          this.buffer[this.boundary] = null;
          this.boundary--;
@@ -317,7 +329,7 @@ export class M_Buffer {
 // 
 export class CharBuffer extends M_Buffer {
 
-   constructor(char_buffer=null) {
+   constructor(char_buffer = null) {
 
       super(char_buffer);
 
@@ -325,17 +337,17 @@ export class CharBuffer extends M_Buffer {
    }
 
 
-   Init(size, text){
-      
+   Init(size, text) {
+
       this.size = size;
       this.buffer = new Array(size);
 
-      let i=0;
+      let i = 0;
       for (i = 0; i < size; i++) {
          this.buffer[i] = text[i];
       }
       this.active_count = i;
-      this.boundary = i-1;
+      this.boundary = i - 1;
    }
 
    Add(elem) {
@@ -349,7 +361,7 @@ export class CharBuffer extends M_Buffer {
 
 
    #GetNextFree() {
-      
+
       // TODO: 
       // 1. The freeidx should be set to next availiable free elem, which is not implemented yet
       // 2. We no longer use '' empty string for char buffers, we just set the boundary and update at boundary
@@ -359,8 +371,8 @@ export class CharBuffer extends M_Buffer {
       //    return this.freeidx;
       // }
 
-      if(this.active_count >= this.size){
-        
+      if (this.active_count >= this.size) {
+
          const idx = this.Realloc(); // buffer is full.
          if (idx > this.boundary) this.boundary = idx;
          return idx;
@@ -375,7 +387,7 @@ export class CharBuffer extends M_Buffer {
 
       //       // Increment boundary only if the free element is after the last stored element in the buffer.
       //       if (i > this.boundary) this.boundary = i; 
-               
+
       //       return i;
       //    }
       // }
@@ -397,7 +409,7 @@ export class CharBuffer extends M_Buffer {
 
 
    RemoveByIdx(idx) {
-   
+
       /**DEBUG ERROR*/ if (idx < 0 || idx > this.size - 1) {
          console.error('Index Out of bounds. @ M_Buffer.RemoveByIdx().\n idx:', idx, 'size', this.size)
          return;
@@ -407,7 +419,7 @@ export class CharBuffer extends M_Buffer {
 
          this.buffer[idx] = '';
          this.active_count--;
-         if(idx === this.boundary) this.boundary--; // Case the we removed the last element in existance
+         if (idx === this.boundary) this.boundary--; // Case the we removed the last element in existance
 
 
          // Check if previous elements are empty, and reduce boundary to the last active.
@@ -426,9 +438,9 @@ export class CharBuffer extends M_Buffer {
 
 
    // TODO: Call this on every Destroy, to have all M_Buffer elements not sparsed
-   ShiftElementOnDestroy(destroyed_idx){
+   ShiftElementOnDestroy(destroyed_idx) {
 
-      /**DEBUG*/ if(destroyed_idx > this.boundary && this.boundary >= 0){
+      /**DEBUG*/ if (destroyed_idx > this.boundary && this.boundary >= 0) {
 
          // console.error('destroyed_idx is out of bounds. @ ShiftElementOnDestroy(), Buffers.js.\destroyed_idx:', destroyed_idx, 'boundary:', this.boundary, '\nbuffer:');
          // for(let i=0; i<this.buffer.length; i++){
@@ -437,9 +449,9 @@ export class CharBuffer extends M_Buffer {
          // }
       }
 
-      if(destroyed_idx < this.boundary){
+      if (destroyed_idx < this.boundary) {
          // console.warn('ShiftElementOnDestroy:Before', 'index', destroyed_idx, 'buffer', this.buffer)
-         
+
          this.buffer[destroyed_idx] = this.buffer[this.boundary];
          this.buffer[this.boundary] = null;
          this.boundary--;
@@ -484,14 +496,14 @@ export class ArrayBufferInterface {
 
    Add(elem) {
 
-      if(elem === _)
-      console.log()
-      if(this.freeidx !== INT_NULL){
+      if (elem === _)
+         console.log()
+      if (this.freeidx !== INT_NULL) {
 
          this.buffer[this.freeidx] = elem;
          this.active_count++;
-         if(this.freeidx > this.boundary) this.boundary = this.freeidx;
-         const idx = this.freeidx; 
+         if (this.freeidx > this.boundary) this.boundary = this.freeidx;
+         const idx = this.freeidx;
          this.freeidx = INT_NULL;
          return idx;
       }
@@ -505,8 +517,15 @@ export class ArrayBufferInterface {
 
    AddAtIndex(idx, elem) {
 
-      if (idx < 0 || idx >= this.size)
-         console.error('WRONG Index. Adding item at: ', idx, ' with size:', this.size)
+      if (idx < 0) console.error('SEVERE_ERROR.\nWRONG Index. Adding item at: ', idx);
+      if (idx >= this.size) console.error('INFORMATIVE_ERROR\nAddAtIndex().\nNot enough size in Buffer.\nAdding item at: ', idx, ' buffer size:', this.size - 1, '\nCalling Realloc()');
+
+      // Realloc
+      if (idx >= this.size) {
+         const idx = this.Realloc(); // buffer is full.
+         this.boundary = idx;
+         return idx;
+      }
 
       this.buffer[idx] = elem;
       this.active_count++;
@@ -517,8 +536,8 @@ export class ArrayBufferInterface {
 
 
    GetNextFree() {
-      
-      if(this.active_count >= this.size){
+
+      if (this.active_count >= this.size) {
          const idx = this.Realloc(); // buffer is full.
          this.boundary = idx;
          return idx;
@@ -526,10 +545,10 @@ export class ArrayBufferInterface {
 
       for (let i = 0; i < this.size; i++) {
 
-         if (this.buffer[i] === INT_NULL) { 
+         if (this.buffer[i] === INT_NULL) {
 
             // Increment boundary only if the free element is after the last stored element in the buffer.
-            if (i > this.boundary) this.boundary = i; 
+            if (i > this.boundary) this.boundary = i;
 
             return i;
          }
@@ -541,7 +560,7 @@ export class ArrayBufferInterface {
 
 
    Reset() {
-      
+
       this.size = 1;
       this.boundary = -1;
       this.active_count = 0;
@@ -552,19 +571,18 @@ export class ArrayBufferInterface {
    }
 
 
-   // RemoveByIdx(idx) {
    RemoveByIdxSortedVersion(idx) {
 
       if (this.buffer[idx] !== INT_NULL) {
 
          this.buffer[idx] = INT_NULL;
          this.active_count--;
-         const replaced = this.ShortReplaceWithLast(idx);
+         const replacer_idx = this.#ShortReplaceWithLast(idx);
 
-         if (this.active_count <= INT_NULL) 
-            alert('M_Buffer active_count <= -1');
+         if (this.active_count <= INT_NULL)
+            alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nM_Buffer active_count <= -1');
 
-         return replaced;
+         return replacer_idx;
 
       }
 
@@ -573,21 +591,21 @@ export class ArrayBufferInterface {
 
 
    /**Returns -1 if there was no replacment(the removed element happens to be last) */
-   ShortReplaceWithLast(removed_idx) {
+   #ShortReplaceWithLast(removed_idx) {
 
-      if(removed_idx !== this.boundary){
+      if (removed_idx !== this.boundary) { // Handle removing any elements except the last
 
-         let last = this.boundary;
-         // REPLACE
-         this.buffer[removed_idx] = this.buffer[last];
+         // REPLACE WITH LAST ELEM
+         this.buffer[removed_idx] = this.buffer[this.boundary];
          // REMOVE LAST
-         this.buffer[last] = INT_NULL;
+         this.buffer[this.boundary] = INT_NULL;
 
-         const replacer = this.boundary;
+         // RETURN LAST
+         const replacer_idx = this.boundary;
          this.boundary--;
-         return replacer;
+         return replacer_idx;
       }
-      else{
+      else { // Remove last does not need sorting
          this.boundary--;
          return INT_NULL; // Shows that there was no element move
       }
@@ -643,7 +661,7 @@ export class Int8Buffer extends ArrayBufferInterface {
       this.boundary = INT_NULL;
       this.freeidx = 0;
       for (let i = 0; i < this.size; i++)
-      this.buffer[i] = INT_NULL;
+         this.buffer[i] = INT_NULL;
    }
 
    Realloc() {
@@ -685,7 +703,7 @@ export class Int16Buffer extends ArrayBufferInterface {
       this.boundary = INT_NULL;
       this.freeidx = 0;
       for (let i = 0; i < this.size; i++)
-      this.buffer[i] = INT_NULL;
+         this.buffer[i] = INT_NULL;
    }
 
 

@@ -611,7 +611,6 @@ export class Widget_Multi_Text extends Widget_Text {
 			params.meshes = meshes;
 
 			const tIdx = TimeIntervalsCreate(msInterval, name, TIME_INTERVAL_REPEAT_ALWAYS, this.Update, params);
-			// this.timeIntervalsIdxBuffer.Add(tIdx);
 			this.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, tIdx);
 		}
 		else { // Update multiText via one timeIntrval Update().
@@ -676,18 +675,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 
 		for (let i = 0; i < mesheslen; i++) {
-			let val = 0;
-			if (params.params.func[i]) {
-
-				if (params.params.func_params[i])
-					val = params.params.func[i](params.params.func_params[i]); // Callback with parameters
-
-				else val = params.params.func[i](); // Callback with no parameters
-			}
-			else if (params.params.func_params[i]) {
-				val = params.params.func_params[i].delta_avg; // No callback, just a value
-			}
-
+			const val = params.params.func[i](params.params.func_params[i]); // Callback with parameters
 			meshes[i].RenderTextFromNumber(val);
 		}
 
