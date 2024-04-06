@@ -291,23 +291,16 @@ export class M_Buffer {
 
       /**DEBUG*/ if (destroyed_idx > this.boundary && this.boundary >= 0) {
 
-         // console.error('destroyed_idx is out of bounds. @ ShiftElementOnDestroy(), Buffers.js.\destroyed_idx:', destroyed_idx, 'boundary:', this.boundary, '\nbuffer:');
-         // for(let i=0; i<this.buffer.length; i++){
-         //    const name = this.buffer[i] ? this.buffer[i].GetName() : 'NULL'
-         //    console.log(i, name)
-         // }
+         console.error('SEVERE_ERROR\ndestroyed_idx is out of bounds. @ ShiftElementOnDestroy(), Buffers.js.\destroyed_idx:', destroyed_idx, 'boundary:', this.boundary, '\nbuffer:');
       }
 
       if (destroyed_idx < this.boundary) {
-         // console.warn('ShiftElementOnDestroy:Before', 'index', destroyed_idx, 'buffer', this.buffer)
 
          this.buffer[destroyed_idx] = this.buffer[this.boundary];
          this.buffer[this.boundary] = null;
          this.boundary--;
 
          this.buffer[destroyed_idx].idx = destroyed_idx; // IMPORTANT: Must update the mesh's idx to point to the new element index 
-
-         // console.warn('ShiftElementOnDestroy:After', 'buffer', this.buffer)
 
          return true;
       }
@@ -321,6 +314,54 @@ export class M_Buffer {
    Print() {
       console.log('Count: ', this.boundary)
       console.log(this.buffer)
+   }
+
+
+   
+   /*********************************************************************************************************************/
+   // TEMP-TEST
+   /*********************************************************************************************************************/
+   RemoveByIdxSortedVersion(idx) {
+
+      if (this.buffer[idx] !== null) {
+
+         this.buffer[idx] = null;
+         this.active_count--;
+         // const replacer_idx = this.#ShortReplaceWithLast(idx);
+         this.#ShortReplaceWithLast(idx);
+
+         if (this.active_count <= INT_NULL)
+            alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nM_Buffer active_count <= -1');
+
+         // return replacer_idx;
+
+      }
+
+      return null;
+   }
+
+
+   /**Returns -1 if there was no replacment(the removed element happens to be last) */
+   #ShortReplaceWithLast(removed_idx) {
+
+      if (removed_idx !== this.boundary) { // Handle removing any elements except the last
+
+         // const replacer = this.boundary;
+
+         
+         // const replacer = this.buffer[this.boundary];
+         // REPLACE WITH LAST ELEM
+         this.buffer[removed_idx] = this.buffer[this.boundary];
+         // REMOVE LAST
+         this.buffer[this.boundary] = null;
+
+         this.boundary--;
+         // return replacer;
+      }
+      else { // Remove last does not need sorting
+         this.boundary--;
+         // return INT_NULL; // Shows that there was no element move
+      }
    }
 }
 
@@ -577,12 +618,15 @@ export class ArrayBufferInterface {
 
          this.buffer[idx] = INT_NULL;
          this.active_count--;
-         const replacer_idx = this.#ShortReplaceWithLast(idx);
+         
+         const replacer_data = this.#ShortReplaceWithLast(idx);
+         // this.#ShortReplaceWithLast(idx);
 
          if (this.active_count <= INT_NULL)
             alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nM_Buffer active_count <= -1');
 
-         return replacer_idx;
+         return replacer_data;
+         // return idx;
 
       }
 
@@ -595,15 +639,16 @@ export class ArrayBufferInterface {
 
       if (removed_idx !== this.boundary) { // Handle removing any elements except the last
 
+         // const replacer_idx = removed_idx;
+         
          // REPLACE WITH LAST ELEM
          this.buffer[removed_idx] = this.buffer[this.boundary];
          // REMOVE LAST
          this.buffer[this.boundary] = INT_NULL;
-
-         // RETURN LAST
-         const replacer_idx = this.boundary;
+         
          this.boundary--;
-         return replacer_idx;
+         const replacer_data = this.buffer[removed_idx];
+         return replacer_data;
       }
       else { // Remove last does not need sorting
          this.boundary--;

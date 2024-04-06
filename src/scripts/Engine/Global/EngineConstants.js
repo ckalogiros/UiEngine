@@ -50,6 +50,8 @@ const TEST_CLIP_BOTTOM = 10000;
 const TEST_CLIP_LEFT = 0;
 const TEST_CLIP_RIGHT = 10000;
 
+const RESERVED_MESH = true; // Just for check in Str_buffer. The Create_widget.. function reserves a _mesh_buffer element by setting it to 'true'. So instead of checking against blant  true value, we give it a meaning 
+
 
 
 const APP = {

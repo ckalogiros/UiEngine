@@ -2,7 +2,7 @@
 import { Widget_Button, Widget_Switch } from '../Engine/Drawables/Widgets/WidgetButton.js';
 import { Widget_Text } from '../Engine/Drawables/Widgets/WidgetText.js';
 // import { CubeGeometry } from '../Engine/Drawables/Geometry/Geometry3DCube.js';
-import { TimeIntervalsCreate } from '../Engine/Timers/TimeIntervals.js';
+import { TimeIntervalsCreate, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
 import { Mesh } from '../Engine/Drawables/Meshes/Base/Mesh.js';
 import { Widget_Menu_Bar, Widget_Minimize } from '../Engine/Drawables/Widgets/WidgetMenu.js';
 import { Geometry2D } from '../Engine/Drawables/Geometry/Base/Geometry.js';
@@ -83,7 +83,8 @@ export function TestWidgetsGeneric(scene) {
     //     console.log('--------------');
     // }, 1000)
 
-    Performance_timers_init_all()
+    Performance_timers_init_all();
+    Time_intervals_initialize();
 
 
     // getFile()
@@ -260,8 +261,8 @@ export function TestWidgetsGeneric(scene) {
     // Test_scroller_in_between();
 
     // Debug_info_create_all_generic_info();
-    TEMP_111111111111111111111111111();
-    TEMP_222222222222222222222222222();
+    // TEMP_111111111111111111111111111();
+    // TEMP_222222222222222222222222222();
     // TEMP_333333333333333333333333333();
 
     // Scenes_debug_info_create(scene);

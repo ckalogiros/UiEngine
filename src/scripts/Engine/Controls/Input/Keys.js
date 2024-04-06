@@ -10,7 +10,7 @@ import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Grap
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
 import { Info_listener_print_buffer } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { Mesh_buffer_print, Mesh_buffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widget_group_buffer_print_w5, Widgetroot_buffer_print_w6, Gfx_buffer_print, Gfx_buffer_print_loop } from "../../Core/MeshBuffer.js";
-import { Str_buffer_print } from "../../Core/StringBuffer.js";
+import { Str_buffer_print, Str_buffer_mesh_names_print, Str_buffer_mesh_names_print_loop, Str_buffer_print_loop } from "../../Core/StringBuffer.js";
 import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/VertexArrays.js";
@@ -39,7 +39,10 @@ const m = _CNT++;
 const M = _CNT++;
 const s3 = _CNT++;
 const s4 = _CNT++;
+const s6 = _CNT++;
+const s7 = _CNT++;
 const s8 = _CNT++;
+const s9 = _CNT++;
 const L = _CNT++;
 const g = _CNT++;
 const dp = _CNT++;
@@ -222,11 +225,35 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
-      key: 's8',
+      key: 's6',
       discr: 'Str_buffer_print()',
       func: (e)=>{
          console.log('------------------ Str_buffer_print() ------------------');
          Str_buffer_print();
+      },
+   },
+   {
+      key: 's7',
+      discr: 'Str_buffer_print_loop()',
+      func: (e)=>{
+         console.log('------------------ Str_buffer_print_loop() ------------------');
+         Str_buffer_print_loop();
+      },
+   },
+   {
+      key: 's8',
+      discr: 'Str_buffer_mesh_names_print()',
+      func: (e)=>{
+         console.log('------------------ Str_buffer_mesh_names_print() ------------------');
+         Str_buffer_mesh_names_print();
+      },
+   },
+   {
+      key: 's9',
+      discr: 'Str_buffer_mesh_names_print_loop()',
+      func: (e)=>{
+         console.log('------------------ Str_buffer_mesh_names_print_loop() ------------------');
+         Str_buffer_mesh_names_print_loop();
       },
    },
    {
@@ -476,7 +503,10 @@ export function OnKeyUp(e){
 
          if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[s3].func(e);  
          else if  (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[s4].func(e);  
+         else if  (_keys_buffer[len].key === '6') DEBUG_PRINT_KEYS[s6].func(e);  
+         else if  (_keys_buffer[len].key === '7') DEBUG_PRINT_KEYS[s7].func(e);  
          else if  (_keys_buffer[len].key === '8') DEBUG_PRINT_KEYS[s8].func(e);  
+         else if  (_keys_buffer[len].key === '9') DEBUG_PRINT_KEYS[s9].func(e);  
       }
       else if  (_keys_buffer[0].key === 'd' && _keys_buffer[1].key === 'p') { 
          DEBUG_PRINT_KEYS[dp].func(e);  

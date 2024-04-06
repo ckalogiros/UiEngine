@@ -229,7 +229,11 @@ class TimeIntervals {
 
 
 const intervalTimers = new TimeIntervals;
-intervalTimers.Init();
+
+export function Time_intervals_initialize(){
+   // TODO: Make sure its initialized ONCE 
+   intervalTimers.Init();
+}
 
 export function TimeIntervalResetTimer(idx) {
    intervalTimers.ti[idx].ResetTime();

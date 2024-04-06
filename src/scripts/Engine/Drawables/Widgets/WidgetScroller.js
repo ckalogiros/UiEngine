@@ -79,7 +79,7 @@ export class Widget_Scroller extends Section {
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
-      this.SetName(`[${this.mesh_bufferidx}]-Scroller`);
+
       this.type |= MESH_TYPE.WIDGET_SCROLLER;
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
 
@@ -105,6 +105,8 @@ export class Widget_Scroller extends Section {
          first: 0,
          last: this.scrolled_section.children.boundary,
       }
+
+
 
       // Calculate the bar's and handle's horizontal pading.
       const pad = [1.4, 1.4];
@@ -162,6 +164,7 @@ export class Widget_Scroller extends Section {
       SCROLL_BAR_IDX = this.AddItem(bar);
       SCROLL_MESH_IDX = this.AddItem(this.scrolled_section);
 
+      this.SetName(`[${this.mesh_bufferidx}]-Scroller`); // Keep rename scroller last to avoid a bug. Bacause the scroller has not yet been stored to the MeshBuffer, it cannot be renamed before any of its children have been set or renamed.  
    }
 
 

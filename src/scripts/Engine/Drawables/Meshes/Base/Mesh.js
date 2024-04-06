@@ -6,7 +6,7 @@ import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.
 import { Listener_create_child_event, Listener_create_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
-import { Str_buffer_get_by_idx, Str_buffer_store } from "../../../Core/StringBuffer.js";
+import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 
 
@@ -137,6 +137,7 @@ export class Mesh {
         this.batch_buffer_vbidx = INT_NULL;
         this.batchidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL];
+        this.nameidx - INT_NULL;
 
         this.parent = null;
 
@@ -435,7 +436,7 @@ export class Mesh {
     SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDim(dim, this.gfx); }
 
 
-    GetName() { return Str_buffer_get_by_idx(this.nameidx); }
+    GetName() { return Str_buffer_mesh_names_get_by_idx(this.nameidx); }
 
 
     UpdatePosXY() { this.SetUpdateFrameBuffer(); this.geom.UpdatePosXY(this.gfx); }
@@ -486,7 +487,7 @@ export class Mesh {
 
 
     SetName(name = null) {
-        if (name !== '' && name) this.nameidx = Str_buffer_store(name);
+        if (name !== '' && name) this.nameidx = Str_buffer_mesh_names_store(name, this.mesh_bufferidx);
         /**DEBUG*/this.name = name
     }
 

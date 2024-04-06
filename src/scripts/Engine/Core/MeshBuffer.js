@@ -11,6 +11,7 @@ import { Batch_store } from "../Batch/Batch.js";
 import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 // import { Debug_info_update_clbk } from "../Drawables/DebugInfo/DebugInfoUi.js";
 import { View_destroy_view } from "./MeshBufferViews.js";
+import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 
 
 /**
@@ -118,6 +119,7 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
 
    }
 
+   Str_buffer_mesh_names_remove_by_idx(mesh.nameidx);
    _mesh_buffer.RemoveByIdx(mesh_bufferidx);
 }
 
@@ -1072,6 +1074,7 @@ export function Mesh_buffer_print_loop() {
             'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1],
             'child idx:', _mesh_buffer.buffer[i].idx,
             'is active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE.ACTIVE,
+            'nameidx:', _mesh_buffer.buffer[i].nameidx,
             'name:', _mesh_buffer.buffer[i].GetName(),
          );
       }

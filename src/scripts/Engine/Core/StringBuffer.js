@@ -1,24 +1,36 @@
 "use strict";
 
 import { Int16Buffer, M_Buffer } from "./Buffers.js";
-// import { Mesh_buffer_get_mesh_byidx_I } from "./MeshBufferFunctions.js";
-// import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
-// import { _str_buffer_ } from "./StringBufferTest.js";
+import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
 
+
+
+/**
+ * '_str_buffer' is the storage for any Application's strings, except mesh names.
+ * E.x. Could be names for timers, intervals, animations, frambuffers, textures, ... etc.
+ * The reason of the separation is that for the mesh names buffer, we have refferenses to meshes via an int, the mesh_bufferidx.
+ * For the '_str_buffer' we can get only a pointer refference.
+ */
 
 const _str_buffer = new M_Buffer();
 _str_buffer.Add(''); // Empty string
+
+
 
 
 export function Str_buffer_get_DEBUG() {
    return _str_buffer;
 }
 
+
+
+
 export function Str_buffer_store(str, mesh_refference) {
-   
+
    const idx = _str_buffer.Add(str);
    return idx;
 }
+
 
 
 
@@ -28,9 +40,11 @@ export function Str_buffer_get_by_idx(nameidx) {
 
 
 
+
 export function Str_buffer_get_empty_string() {
    return _str_buffer.buffer[0];
 }
+
 
 
 
@@ -42,7 +56,7 @@ export function Str_buffer_change(nameidx, new_name) {
 
 
 
- 
+
 
 
 /****************************************************************************************************************************************************/
@@ -52,9 +66,14 @@ export function Str_buffer_change(nameidx, new_name) {
 
 const _str_buffer_mesh_names = new M_Buffer();
 
+
+
+
 // A buffer to index the string buffer. Stores the mesh's idx (mesh_bufferidx).
 // These 2 buffers must be 1to1. If a mesh name is stored at inde 3, then the '_str_buffer_mesh_names_index_buffer' must have the meshe's 'mesh_bufferidx' at index 3 also.
+// Usage of indices buffer to string names buffer: We need a connection back to the mesh, so we can change any mesh's name on the sorted buffers. 
 const _str_buffer_mesh_names_index_buffer = new Int16Buffer(512);
+
 
 
 
@@ -70,33 +89,84 @@ export function Str_buffer_mesh_names_get_by_idx(nameidx) {
 }
 
 
+function Mesh_name_exists(meshidx) {
+
+   for (let i = 0; i <= _str_buffer_mesh_names_index_buffer.boundary; i++) {
+      const mesh_idx = _str_buffer_mesh_names_index_buffer.buffer[i];
+      if (meshidx === mesh_idx) {
+         return i;
+      }
+   }
+   return INT_NULL;
+}
+
+
+
 
 export function Str_buffer_mesh_names_store(str, mesh_bufferidx) {
-   
-   const idx = _str_buffer_mesh_names.Add(str);
 
-   // Create element in '_str_buffer_mesh_names_index_buffer' at same index.
-   _str_buffer_mesh_names_index_buffer.AddAtIndex(idx, mesh_bufferidx)
+   if (mesh_bufferidx === -1)
+      console.log()
 
-   return idx;
+   const existsidx = Mesh_name_exists(mesh_bufferidx);
+
+   // If string name already exists, replace it with the new. 
+   if (existsidx !== INT_NULL) {
+
+      // console.log('NAME ALREADY REGISTERED TO _str_buffer_mesh_names.\nindex', existsidx)
+      // remove the previous string 
+      Str_buffer_mesh_names_remove_by_idx(existsidx);
+
+
+      // add the new one
+      const idx = _str_buffer_mesh_names.Add(str);
+      _str_buffer_mesh_names_index_buffer.AddAtIndex(idx, mesh_bufferidx);
+
+      return idx;
+   }
+   else { // Else add the new mesh string name
+
+      const idx = _str_buffer_mesh_names.Add(str);
+
+      // Create element in '_str_buffer_mesh_names_index_buffer' at same index.
+      _str_buffer_mesh_names_index_buffer.AddAtIndex(idx, mesh_bufferidx)
+      return idx;
+   }
+
+
 }
 
 
 
 
 export function Str_buffer_mesh_names_remove_by_idx(nameidx) {
+
+
+   { // Debug-Print
+
+      // const mesh = Mesh_buffer_get_mesh_byidx(replacer_meshidx);
+      // console.log('mesh nameidx:', nameidx, 'meshidx:', _str_buffer_mesh_names_index_buffer.buffer[nameidx], 'name', _str_buffer_mesh_names.buffer[nameidx])
+   }
+
+   _str_buffer_mesh_names.RemoveByIdxSortedVersion(nameidx);
+
+   _str_buffer_mesh_names_index_buffer.RemoveByIdxSortedVersion(nameidx);
    
-   _str_buffer_mesh_names.RemoveByIdx(nameidx);
-   
-   const replacer_idx = _str_buffer_mesh_names_index_buffer.RemoveByIdxSortedVersion(nameidx);
-   
-   // Because we moved an element, the last replaced the removed, we need to set the new index for the mesh that pointed at the last(moved) element.
    // Get the mesh index. 
-   const replacer_meshidx = _str_buffer_mesh_names_index_buffer.buffer[replacer_idx];
-   // Get the mesh. 
-   const replacer_mesh = Mesh_buffer_get_mesh_byidx_I(replacer_meshidx);
-   // Update mesh's new nameidx. 
-   replacer_mesh.nameidx = replacer_idx;
+   const replacer_meshidx = _str_buffer_mesh_names_index_buffer.buffer[nameidx];
+
+   // Because we moved an element, and the removed is replaced by the last, we need to set the new index for the mesh that pointed at the last(moved) element.
+   // Else if destroyed already last element, do nothing
+   if (replacer_meshidx !== INT_NULL) {
+
+      const replacer_mesh = Mesh_buffer_get_mesh_byidx(replacer_meshidx);
+
+      if(!(replacer_mesh === RESERVED_MESH)){
+
+         // Update mesh's new nameidx. 
+         replacer_mesh.nameidx = nameidx;
+      }
+   }
 }
 
 
@@ -118,6 +188,22 @@ export function Str_buffer_mesh_names_remove_by_idx(nameidx) {
 
 export function Str_buffer_print() {
    console.log(_str_buffer);
+}
+
+export function Str_buffer_print_loop() {
+   for (let i = 0; i <= _str_buffer.boundary; i++) {
+      console.log('i:', i, _str_buffer.buffer[i]);
+   }
+}
+
+export function Str_buffer_mesh_names_print() {
+   console.log(_str_buffer_mesh_names);
+}
+
+export function Str_buffer_mesh_names_print_loop() {
+   for (let i = 0; i <= _str_buffer_mesh_names.boundary; i++) {
+      console.log('i:', i, 'meshidx', _str_buffer_mesh_names_index_buffer.buffer[i], _str_buffer_mesh_names.buffer[i]);
+   }
 }
 
 
