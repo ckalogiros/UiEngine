@@ -1,6 +1,6 @@
 "use strict";
 
-import { M_Buffer } from "../../Engine/Core/Buffers.js";
+import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
 
 
 
@@ -11,7 +11,7 @@ import { M_Buffer } from "../../Engine/Core/Buffers.js";
 /*****************************************************************************************************************************************************/
 
 
-const _vertex_array_object = new M_Buffer();
+const _vertex_array_object = New_generic_buffer();
 
 
 

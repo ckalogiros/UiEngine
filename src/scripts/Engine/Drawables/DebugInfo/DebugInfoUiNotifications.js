@@ -1,15 +1,23 @@
 "use strict";
 
-import { M_Buffer } from "../../Core/Buffers";
+import { M_Buffer, New_generic_buffer } from "../../Core/Buffers";
 
 
 _CNT = 0;
+let xxx = 0x1;
 export const NOTIFICATION_TYPE_IDX = {
-   GFX_PROGRAM: _CNT++,
-   GFX_VERTEX_BUFFER: _CNT++,
    MESH_BUFFER: _CNT++,
+   GFX_VERTEX_BUFFER: _CNT++,
+   GFX_PROGRAM: _CNT++,
+   STRING_BUFFER: _CNT++,
 
    SIZE: _CNT,
+
+   FLAGS:{
+      CREATE: xxx,
+      DESTROY: xxx<<=0x1,
+      CHANGE: xxx<<=0x1,
+   },
 
    ToSting(idx) {
 
@@ -37,53 +45,52 @@ export class Notification {
 
 
 
-const _debug_ui_buffer = new M_Buffer();
-// _debug_ui_buffer.Init(NOTIFICATION_TYPE_IDX.SIZE, new Notification());
+const _notifications_buffer = New_generic_buffer();
 
 
 
-export function Debug_ui_create_notification(Clbk, params) {
 
-   _debug_ui_buffer.Add({
+export function Notifications_create(Clbk_store, Clbk_update, params) {
+
+   _notifications_buffer.Add({
       is_active: true,
-      Clbk: Clbk,
+      Clbk_store: Clbk_store,
+      Clbk_update: Clbk_update,
       params: params,
    });
-   // const notification = _debug_ui_buffer.buffer[idx];
-   // notification.Clbk = Clbk;
-   // notification.params = params;
+
 }
 
 
 
 
-export function Debug_ui_set_notification(idx) {
+export function Notifications_send(TYPE_IDX, FLAGS, params) {
 
-   const notification = _debug_ui_buffer.buffer[idx];
+   if(_notifications_buffer.buffer[TYPE_IDX] === null) return;
+
+   const notification = _notifications_buffer.buffer[TYPE_IDX];
+
    notification.is_active = true;
+   notification.params.flags = FLAGS;
+   notification.Clbk_store(params, FLAGS);
 
-   // _debug_ui_buffer.Add({
-   //    is_active: true,
-   //    Clbk: Clbk,
-   //    params: params,
-   // });
 }
 
 
 
 
-export function Debug_ui_update_notifications() {
+
+export function Notifications_update() {
 
    
-   const len = _debug_ui_buffer.boundary;
+   const len = _notifications_buffer.boundary;
    for (let i = 0; i <= len; i++) {
 
-      const notification = _debug_ui_buffer.buffer[i];
+      const notification = _notifications_buffer.buffer[i];
       if (notification.is_active) {
 
-         notification.Clbk(notification.params);
+         notification.Clbk_update(notification.params);
          notification.is_active = false;
-         // Debug_ui_destroy_notification(i);
       }
    }
 }
@@ -91,24 +98,24 @@ export function Debug_ui_update_notifications() {
 
 
 
-export function Debug_ui_destroy_notification(idx) {
+export function Notifications_destroy(idx) {
 
-   _debug_ui_buffer.RemoveByIdx(idx);
+   _notifications_buffer.RemoveByIdx(idx);
 }
 
 
 
 
-export function Debug_ui_get_notification(idx) {
+export function Notifications_get_by_idx(idx) {
 
-   return _debug_ui_buffer.buffer[idx];
+   return _notifications_buffer.buffer[idx];
 }
 
 
 
 
 /**Debug-Print */
-export function Debug_ui_print_buffer() {
+export function Notifications_print() {
 
-   console.log(_debug_ui_buffer);
+   console.log(_notifications_buffer);
 }

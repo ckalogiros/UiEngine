@@ -1,16 +1,18 @@
 "use strict";
 import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
-import { Int8Buffer, M_Buffer } from "../../../Core/Buffers.js";
+import { New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_create_child_event, Listener_create_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
+import { Styles_hover_margin_create, Styles_hover_margin_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_create, Styles_margin_destroy, Styles_margin_get, Styles_margin_set, Styles_pad_create, Styles_pad_destroy, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
+import { NOTIFICATION_TYPE_IDX, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 
 
-
+const NOTIFICATIONS_ON = true;
 
 /** SAMPLE
  class BitMask {
@@ -45,10 +47,12 @@ export class Mesh {
     type;       // BitField: All different class types of this mesh. 
     state;      // BitField: Mesh state. 
     alignment;  // BitField: Control this mesh's children alignment.
-    UNAMED;     // BitField: 
+    gfx_pool_request;     // BitField: 
 
 
     hover_margin; // Value: A margin to be set for hovering. // TODO: Abstract to a struct.
+    styles; // Array: Indexes to style_buffer, for margin, pdding, etc
+
 
     // IMPORTANT: If the mesh is a root mesh: direct child of the scene, then the idx is a refference to the scene's mesh buffer. Else if mesh has parent another mesh, then the idx is the index of the parent's children buffer
     idx;        // Value: This is the index of the mesh in the parents's children buffer.
@@ -56,7 +60,7 @@ export class Mesh {
     // scene_rootidx; // Value: An index that stores the mesh's location in a scene root_meshes[] buffer.
     fbidx;      // Value: The framebuffer index that this mesh is reb=ndered to. If INT_NULL the mesh is rendered to the default gl output buffer. 
     root_bufferidx; // Value: This is the index of the mesh in the Widget_root_buffer storage.
-    gfx_bufferidx;  // Value. Index of the msh inside the Gfx Buffer.
+    per_vb_bufferidx;  // Value. Index of the msh inside the Gfx Buffer.
     batch_fnidx; // Value: An index to the batch buffer of function pointers
     mesh_bufferidx; // Value: This is the index of the mesh in the Mesh_Buffer storage.
     batch_buffer_vbidx; // Value: This is the index of the mesh in the Widget_root_batch_buffer storage.
@@ -120,7 +124,7 @@ export class Mesh {
         this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
         this.alignment = 0x0;
-        this.UNAMED = GFX_POOL_REQUESTS.ANY;
+        this.gfx_pool_request = GFX_POOL_REQUESTS.ANY;
 
 
         this.gfx = null;
@@ -133,26 +137,30 @@ export class Mesh {
         this.batch_fnidx = INT_NULL;
         this.mesh_bufferidx = INT_NULL;
         this.root_bufferidx = INT_NULL;
-        this.gfx_bufferidx = INT_NULL;
+        this.per_vb_bufferidx = INT_NULL;
         this.batch_buffer_vbidx = INT_NULL;
         this.batchidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL];
-        this.nameidx - INT_NULL;
+        this.nameidx = INT_NULL;
 
         this.parent = null;
 
-        this.listeners = new M_Buffer();
+        this.listeners = New_generic_buffer();
         this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
 
-        this.eventCallbacks = new M_Buffer();
-        this.timedEvents = new M_Buffer();
-        this.children = new M_Buffer();
-        this.timeIntervalsIdxBuffer = new Int8Buffer(INTERVALS.SIZE);
+        this.eventCallbacks = New_generic_buffer();
+        this.timedEvents = New_generic_buffer();
+        this.children = New_generic_buffer();
+        this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE);
         
         this.rel_comp = null;
 
 
         this.hover_margin = [0, 0];
+        this.styles = [0,0,0];
+        this.styles[STYLES.MARG] = Styles_margin_create([0,0])
+        this.styles[STYLES.HOVER_MARG] = Styles_hover_margin_create([0,0])
+        this.styles[STYLES.PAD] = Styles_pad_create([0,0])
         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]]; // TODO: do the same for the clamx too
 
 
@@ -222,13 +230,26 @@ export class Mesh {
             }
         }
 
+        Styles_margin_destroy(this.styles[STYLES.MARG]);
+        Styles_hover_margin_destroy(this.styles[STYLES.HOVER_MARG]);
+        Styles_pad_destroy(this.styles[STYLES.PAD]);
+
+        if(NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH)===0) 
+            Notifications_send(NOTIFICATION_TYPE_IDX.MESH_BUFFER, NOTIFICATION_TYPE_IDX.FLAGS.DESTROY, this.mesh_bufferidx);
+
 
         /*************************************************************************************/
         // Remove from gfx buffers.
         // Bacause of clipping we must check if current mesh exists in vertex buffer(rendered and not clipped)
         if (this.state.mask & MESH_STATE.ACTIVE) {
-            Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces);
-            this.gfx.vb.start = INT_NULL;
+            
+            const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces);
+            
+            if(!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.geom.num_faces)
+            Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+            
+            console.log('GFX vbidx', this.gfx.vb.idx, 'start', this.gfx.vb.start);
+            // this.gfx.vb.start = INT_NULL;
         }
         
         let shift_children = false; // A way to store and return if this was removed from paren's children so that the caller will reduce the i from the loop by 1.
@@ -471,9 +492,26 @@ export class Mesh {
     }
 
 
-    RotateZ(angle) {
-        GlRotateZ2D(this.gfx, this.geom.dim, angle);
-    }
+    RotateZ(angle) { GlRotateZ2D(this.gfx, this.geom.dim, angle); }
+    
+    StylesGetMargin(axis=STYLES.AXIS.ALL){ return Styles_margin_get(axis, this.styles[STYLES.MARG]); }
+
+
+    StylesGetHoverMargin(axis=STYLES.AXIS.ALL){  return Styles_hover_margin_get(axis, this.styles[STYLES.HOVER_MARG]); } 
+
+
+    StylesGetPad(axis=STYLES.AXIS.ALL){ return Styles_pad_get(axis, this.styles[STYLES.PAD]); }
+
+
+    StylesSetMargin(margin){ Styles_margin_set(this.styles[STYLES.MARG], margin); }
+
+
+    StylesSetHoverMargin(margin){ Styles_hover_margin_set(this.styles[STYLES.MARG], margin); }
+
+
+    StylesSetPad(margin){ Styles_pad_set(this.styles[STYLES.MARG], margin); }
+
+
 
 
 

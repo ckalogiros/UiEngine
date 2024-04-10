@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { M_Buffer } from '../../Engine/Core/Buffers.js';
+import { New_generic_buffer } from '../../Engine/Core/Buffers.js';
 import { Typed_array_create_from_type } from './TypedArrayBuffers.js';
 
 
@@ -16,7 +16,7 @@ const DISABLE_DEBUG = true;
 /****************************************************************************************************************************************************/
 
 
-const _index_buffers = new M_Buffer();
+const _index_buffers = New_generic_buffer();
 
 
 
@@ -93,7 +93,7 @@ function Index_buffer_create(type, size) {
 /****************************************************************************************************************************************************/
 
 
-const _index_buffers_info = new M_Buffer();
+const _index_buffers_info = New_generic_buffer();
 
 
 

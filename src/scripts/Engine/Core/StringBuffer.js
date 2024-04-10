@@ -1,6 +1,6 @@
 "use strict";
 
-import { Int16Buffer, M_Buffer } from "./Buffers.js";
+import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
 
 
@@ -12,7 +12,7 @@ import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
  * For the '_str_buffer' we can get only a pointer refference.
  */
 
-const _str_buffer = new M_Buffer();
+const _str_buffer = New_generic_buffer();
 _str_buffer.Add(''); // Empty string
 
 
@@ -64,7 +64,7 @@ export function Str_buffer_change(nameidx, new_name) {
 /****************************************************************************************************************************************************/
 
 
-const _str_buffer_mesh_names = new M_Buffer();
+const _str_buffer_mesh_names = New_generic_buffer();
 
 
 
@@ -72,7 +72,7 @@ const _str_buffer_mesh_names = new M_Buffer();
 // A buffer to index the string buffer. Stores the mesh's idx (mesh_bufferidx).
 // These 2 buffers must be 1to1. If a mesh name is stored at inde 3, then the '_str_buffer_mesh_names_index_buffer' must have the meshe's 'mesh_bufferidx' at index 3 also.
 // Usage of indices buffer to string names buffer: We need a connection back to the mesh, so we can change any mesh's name on the sorted buffers. 
-const _str_buffer_mesh_names_index_buffer = new Int16Buffer(512);
+const _str_buffer_mesh_names_index_buffer = New_int16_buffer(512);
 
 
 

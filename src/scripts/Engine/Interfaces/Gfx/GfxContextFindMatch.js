@@ -1,11 +1,11 @@
 "use strict";
 
-import { Vertex_buffer_exists_from_index, Vertex_buffer_info_get_sid } from "../../../Graphics/Buffers/VertexBuffers";
+import { Vertex_buffer_exists_from_index, Vertex_buffer_get, Vertex_buffer_info_get_sid } from "../../../Graphics/Buffers/VertexBuffers";
 import { Program_program_exists_from_index, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms";
 import { Widget_root_gfx_get_structured } from "../../Core/MeshBuffer";
 import { View_get_view_byidx } from "../../Core/MeshBufferViews";
 
-const DBG = false;
+const GFX_CONEXT_DEBUG = false;
 
 
 
@@ -31,7 +31,7 @@ export function Generate_graphics_context(FLAGS, mesh, gfxidxs = null) {
       else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC) {
 
          if (mesh.parent === INT_NULL) {
-            console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', mesh.GetName(), mesh);
+            if(GFX_CONEXT_DEBUG) console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', mesh.GetName(), mesh);
 
             // Case the mesh is a text mesh, and there is a gfx buffer to be found, then because we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
             if (mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH) {
@@ -64,19 +64,22 @@ export function Generate_graphics_context(FLAGS, mesh, gfxidxs = null) {
        */
       // Check the passed gfxidxs params if they are valid gfx indexes
       if (gfxidxs !== null) {
-         if (gfxidxs[0] === INT_NULL || gfxidxs[1] === INT_NULL) {
-            console.error('NO CORRECT gfxidxs passed for generating SPECIFIC gfx.\n_gfxidxs:', gfxidxs);
+         if (gfxidxs[0] === INT_NULL || gfxidxs[1] === INT_NULL || SID.CheckSidMatch(mesh.sid, Vertex_buffer_info_get_sid(gfxidxs[1]))===false) {
+            if(GFX_CONEXT_DEBUG) console.error('NO CORRECT gfxidxs passed for generating SPECIFIC gfx.\n_gfxidxs:', gfxidxs);
+            igfx = Generate_graphics_context(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, gfxidxs); // HACK: we explicitly pass FLAGS that are hard coded.
          }
          else {
             if (Program_program_exists_from_index(gfxidxs[0]) && Vertex_buffer_exists_from_index(gfxidxs[1])) {
-
+               
                igfx[0] = gfxidxs[0];
                igfx[1] = gfxidxs[1];
             }
          }
       }
       else { // If for some reason fails, re-call recursive this to resolve
-         igfx = Generate_graphics_context(FLAGS, mesh, gfxidxs);
+         // igfx = Generate_graphics_context(FLAGS, mesh, gfxidxs);
+         // We need to pass different flags, to avoid infinite loop, since the gfxidxs are always null
+         igfx = Generate_graphics_context(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, gfxidxs); // HACK: we explicitly pass FLAGS that are hard coded.
       }
    }
 
@@ -102,7 +105,7 @@ function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid) {
    let igfx = [INT_NULL, INT_NULL];
 
    if (root_bufferidx === INT_NULL) {
-      console.warn('FAILED TO Find_gfx_match, widget_root is NULL.');
+      if(GFX_CONEXT_DEBUG) console.warn('FAILED TO Find_gfx_match, widget_root is NULL.');
       return igfx;
    }
 
@@ -231,7 +234,7 @@ function Find_match_gfx_from_parent(mesh, parent) {
    let igfx = [INT_NULL, INT_NULL];
    let done = false;
 
-   if (!parent) return { igfx: igfx, done: true }
+   if (!parent || !parent.gfx) return { igfx: igfx, done: true }
 
    if (SID.CheckSidMatch(mesh.sid, parent.sid)) {
       igfx[0] = parent.gfx.prog.idx;

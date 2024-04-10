@@ -3,7 +3,7 @@
 import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
-import { M_Buffer } from "../../Core/Buffers.js";
+import { M_Buffer, New_generic_buffer } from "../../Core/Buffers.js";
 import { Widget_Button } from "./WidgetButton.js";
 import { CalculateArea } from "./WidgetLabel.js";
 import { Align_self_get_dif } from "../Operations/Alignment.js";
@@ -32,9 +32,9 @@ export class Widget_Menu_Bar extends Section {
    close_btn_idx;
    minimize_btn_idx;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [2, 5, 2]) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [2, 5, 2], is_debug_mesh) {
 
-      const text_mesh = Create_widget_text(_, text, pos, _fontsize, WHITE);
+      const text_mesh = Create_widget_text(_, text, pos, _fontsize, WHITE, is_debug_mesh);
 
       const dim = [
          (text_mesh.fontsize * 2 * Font_get_font_advancex(text_mesh.mat.texidx)) / 2,
@@ -721,9 +721,9 @@ export class Widget_Menu_Bar extends Section {
 
 export class Close_Button extends Widget_Button {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE, pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE, pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, pad, bold, style, font);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
 
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
@@ -774,9 +774,9 @@ export class Widget_Minimize extends Widget_Button {
    stored_children_meshes; // Store all children meshes of the root, to maximize the widget back to normal. 
    stored_children_events; // Store the 'children' buffer of the roots EventListeners (class).
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = [0, 4, 1.8], font) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = [0, 4, 1.8], font, is_debug_mesh) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, '-', ALIGN.RIGHT, pos, fontsize, col, text_col, pad, bold, style, font);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, '-', ALIGN.RIGHT, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
 
       this.toggle = false;
       this.store_children_meshes = null;
@@ -821,7 +821,7 @@ export class Widget_Minimize extends Widget_Button {
             if (!minim_mesh.toggle) {  // Maximize - toggle on
 
                // Copy root's children to a buffer
-               minim_mesh.stored_children_meshes = new M_Buffer(root.children); // TODO: Maybe copying all children is not efficient. Just get the pointer and use it later on maximize
+               minim_mesh.stored_children_meshes = New_generic_buffer(root.children); // TODO: Maybe copying all children is not efficient. Just get the pointer and use it later on maximize
 
 
                // Reset Graphics buffers;
@@ -832,7 +832,7 @@ export class Widget_Minimize extends Widget_Button {
                
                
                // Render only the menu bar at the root
-               root.children.ResetRENAMEME();
+               root.children.ResetFull();
                root.AddChild(menu_bar);
 
                

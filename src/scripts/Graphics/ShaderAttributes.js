@@ -1,6 +1,6 @@
 "use strict";
 
-import { M_Buffer } from "../Engine/Core/Buffers";
+import { New_generic_buffer  } from "../Engine/Core/Buffers";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Engine/Core/StringBuffer";
 
 
@@ -8,7 +8,7 @@ import { Str_buffer_get_by_idx, Str_buffer_store } from "../Engine/Core/StringBu
 const DISABLE_DEBUG = true;
 
 
-const _shader_attribs_buffer = new M_Buffer();
+const _shader_attribs_buffer = New_generic_buffer();
 
 
 

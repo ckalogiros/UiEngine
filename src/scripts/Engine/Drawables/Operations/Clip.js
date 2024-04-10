@@ -31,7 +31,7 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
          // Case for text meshes
          if(mesh.type & MESH_TYPE.TEXT_MESH){
 
-            mesh.ClipX(limit.right)
+            mesh.ClipX(limit.right-10)
          }
          else{
             
@@ -117,7 +117,7 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
 
 
 
-export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
+export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null, ydif=0) {
 
    let changes_hapened = false;
    const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
@@ -130,12 +130,18 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
       for(let j=0; j<=meshshes_idx.boundary; j++){
          
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+         
+         // mesh.geom.pos[1] += ydif;
+         // console.log(mesh.geom.pos[1])
+         
          const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
          const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
+         
    
          if(bottom < limit.up || top > limit.down){
 
-            if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
+            // if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
+            if(mesh.state.mask & MESH_STATE.ACTIVE){
 
                mesh.state.mask &= ~MESH_STATE.ACTIVE;
                mesh.state.mask |= MESH_STATE.CLIPED_Y;
@@ -144,14 +150,17 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
          }
          else{
             
-            if(mesh.state.mask & MESH_STATE.CLIPED_Y){
+            if(mesh.state.mask & MESH_STATE.CLIPED_Y)
+            {
             
                mesh.state.mask |= MESH_STATE.ACTIVE;
                mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
                changes_hapened = true;
             }
          }
+
       }
+
    }
 
 
@@ -211,6 +220,37 @@ export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bott
 /** Slow. Only if group is not yet */
 export function Clipy_from_tree_recursive(group_bufferidx=null, clip_top=null, clip_bottom=null) {
    // IMPLEMENT
+}
+
+
+export function Clipy_one_mesh(mesh=null, clip_top=null, clip_bottom=null){
+
+   const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
+
+
+   
+   const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
+   const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
+   
+
+   if(bottom < limit.up || top > limit.down){
+
+      // if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
+      if(mesh.state.mask & MESH_STATE.ACTIVE){
+
+         mesh.state.mask &= ~MESH_STATE.ACTIVE;
+         mesh.state.mask |= MESH_STATE.CLIPED_Y;
+      }
+   }
+   else{
+      
+      if(mesh.state.mask & MESH_STATE.CLIPED_Y)
+      {
+      
+         mesh.state.mask |= MESH_STATE.ACTIVE;
+         mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
+      }
+   }
 }
 
 

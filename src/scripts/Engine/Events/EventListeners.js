@@ -2,7 +2,7 @@
 
 import { Intersection_point_rect } from "../Drawables/Operations/Collisions.js";
 import { MouseGetPos } from "../Controls/Input/Mouse.js";
-import { M_Buffer } from "../Core/Buffers.js";
+import { M_Buffer, New_generic_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
 import { Info_listener_create_event, Info_listener_dispatch_event } from "../Drawables/DebugInfo/InfoListeners.js";
@@ -81,7 +81,7 @@ export class Event_Listener {
    AddEvent(TYPE_IDX, meshidx = null, Clbk = null, evt_params = null) {
 
       if (this.event_type[TYPE_IDX] === undefined) {
-         this.event_type[TYPE_IDX] = new M_Buffer();
+         this.event_type[TYPE_IDX] = New_generic_buffer();
       }
 
 
@@ -114,7 +114,7 @@ export class Event_Listener {
       if (this.event_type[TYPE_IDX] === undefined) {
 
          console.log('Creating new event type events buffer')
-         this.event_type[TYPE_IDX] = new M_Buffer();
+         this.event_type[TYPE_IDX] = New_generic_buffer();
       }
 
       const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
@@ -136,7 +136,7 @@ export class Event_Listener {
 
 
       if (!event.children) {
-         event.children = new M_Buffer();
+         event.children = New_generic_buffer();
       }
 
       event_params.evt_idx = event.children.Add(event_params);
@@ -152,7 +152,7 @@ export class Event_Listener {
    CopyChildren(TYPE_IDX, event_idx) {
 
       const children_events = this.event_type[TYPE_IDX].buffer[event_idx].children;
-      const temp = new M_Buffer;
+      const temp = New_generic_buffer();
 
       for (let i = 0; i <= children_events.boundary; i++) {
 
@@ -533,7 +533,7 @@ export function Listener_set_event_active_by_idx(TYPE_IDX, root, childs_evt_idx)
 
    if (evt.children === null) {
 
-      evt.children = new M_Buffer; // Create new buffer as a children's events buffer
+      evt.children = New_generic_buffer(); // Create new buffer as a children's events buffer
       evt.has_child_events = true;
    }
 

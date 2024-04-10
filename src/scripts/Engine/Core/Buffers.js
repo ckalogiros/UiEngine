@@ -1,4 +1,4 @@
-"use strict";
+// "use strict";
 
 
 
@@ -44,6 +44,8 @@ export class M_Buffer {
       for (let i = 0; i < size; i++) {
          this.buffer[i] = struct;
       }
+
+      DEBUG_INFO_STRUCTS.BUFFER.GENERIC.SIZE+=this.size;
    }
 
    InitFromText(size, text) {
@@ -71,13 +73,10 @@ export class M_Buffer {
 
    #GetNextFree() {
 
-      // if(this.freeidx !== INT_NULL){
       if (this.buffer[this.freeidx] === null) {
 
          if (this.freeidx > this.boundary) this.boundary = this.freeidx; // UNNECESSARY: Can freeidx be greater thn boundary???
 
-         // const idx = this.freeidx; 
-         // this.freeidx = INT_NULL;
          return this.freeidx;
       }
 
@@ -108,13 +107,16 @@ export class M_Buffer {
 
    Realloc() {
 
+      DEBUG_INFO_STRUCTS.BUFFER.GENERIC.SIZE-=this.size;
       const idx = this.size;
       this.size *= 2;
+      DEBUG_INFO_STRUCTS.BUFFER.GENERIC.SIZE+=this.size;
 
       const oldData = this.buffer;
       this.buffer = new Array(this.size);
 
       if (oldData) this.CopyFromBufferToStart(oldData);
+
 
       if (idx < 1) alert('Buffers.js, Realloc()');
       return idx;
@@ -122,7 +124,7 @@ export class M_Buffer {
    }
 
 
-   ResetRENAMEME() {
+   ResetFull() {
 
       this.size = 1;
       this.boundary = -1;
@@ -136,11 +138,8 @@ export class M_Buffer {
 
    Reset() {
 
-      // this.size = 1;
       this.boundary = -1;
       this.active_count = 0;
-      // this.buffer = [];
-      // this.buffer[0] = null;
       this.freeidx = 0;
       this.reserveidx = INT_NULL;
    }
@@ -289,11 +288,6 @@ export class M_Buffer {
    // TODO: Call this on every Destroy, to have all M_Buffer elements not sparsed
    ShiftElementOnDestroy(destroyed_idx) {
 
-      /**DEBUG*/ if (destroyed_idx > this.boundary && this.boundary >= 0) {
-
-         console.error('SEVERE_ERROR\ndestroyed_idx is out of bounds. @ ShiftElementOnDestroy(), Buffers.js.\destroyed_idx:', destroyed_idx, 'boundary:', this.boundary, '\nbuffer:');
-      }
-
       if (destroyed_idx < this.boundary) {
 
          this.buffer[destroyed_idx] = this.buffer[this.boundary];
@@ -333,11 +327,11 @@ export class M_Buffer {
          if (this.active_count <= INT_NULL)
             alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nM_Buffer active_count <= -1');
 
-         // return replacer_idx;
+         return true;
 
       }
 
-      return null;
+      return false;
    }
 
 
@@ -363,6 +357,13 @@ export class M_Buffer {
          // return INT_NULL; // Shows that there was no element move
       }
    }
+}
+
+
+export function New_generic_buffer(obj){
+
+   DEBUG_INFO_STRUCTS.BUFFER.GENERIC.COUNTER++;
+   return new M_Buffer(obj);
 }
 
 
@@ -537,8 +538,6 @@ export class ArrayBufferInterface {
 
    Add(elem) {
 
-      if (elem === _)
-         console.log()
       if (this.freeidx !== INT_NULL) {
 
          this.buffer[this.freeidx] = elem;
@@ -563,14 +562,16 @@ export class ArrayBufferInterface {
 
       // Realloc
       if (idx >= this.size) {
-         const idx = this.Realloc(); // buffer is full.
-         this.boundary = idx;
-         return idx;
+         this.Realloc(); // buffer is full.
+         this.boundary = idx; // Assuming after the realloc, the max-used elem is the 'idx' we just used to store
+         this.active_count++;
       }
-
-      this.buffer[idx] = elem;
-      this.active_count++;
-      if (idx > this.boundary) this.boundary = idx;
+      else if (idx > this.boundary) {
+         this.boundary = idx;
+         this.active_count++;
+      }
+      
+      this.buffer[idx] = elem; // We need to add At index
 
       return idx;
    }
@@ -612,12 +613,13 @@ export class ArrayBufferInterface {
    }
 
 
-   RemoveByIdxSortedVersion(idx) {
+   RemoveByIdxSortedVersion(idx, TEST=false) {
 
       if (this.buffer[idx] !== INT_NULL) {
 
          this.buffer[idx] = INT_NULL;
          this.active_count--;
+         if(TEST) console.log('[RemoveByIdxSortedVersion]', idx, this.active_count)
          
          const replacer_data = this.#ShortReplaceWithLast(idx);
          // this.#ShortReplaceWithLast(idx);
@@ -658,24 +660,6 @@ export class ArrayBufferInterface {
    }
 
 
-   // ShortShiftOne(removed_idx) {
-
-   //    // SHIFT
-   //    let cur = removed_idx;
-   //    let next = cur + 1;
-   //    for (next = removed_idx + 1; next <= this.boundary; next++, cur++) {
-
-   //       this.buffer[cur] = this.buffer[next];
-   //    }
-   //    // this.active_count--;
-   //    this.boundary--;
-   //    console.log('Short:', this.boundary, this.active_count)
-
-   //    // REMOVE LAST
-   //    this.buffer[next - 1] = INT_NULL;
-   // }
-
-
    CopyFromBufferToStart(oldData) {
 
       const size = oldData.length;
@@ -684,6 +668,8 @@ export class ArrayBufferInterface {
       }
 
    }
+
+   
 
 }
 
@@ -707,13 +693,16 @@ export class Int8Buffer extends ArrayBufferInterface {
       this.freeidx = 0;
       for (let i = 0; i < this.size; i++)
          this.buffer[i] = INT_NULL;
+
+      DEBUG_INFO_STRUCTS.BUFFER.INT8.SIZE+=this.size;
    }
 
    Realloc() {
 
+      DEBUG_INFO_STRUCTS.BUFFER.INT8.SIZE-=this.size;
       const old_size = this.size;
-
       this.size *= 2;
+      DEBUG_INFO_STRUCTS.BUFFER.INT8.SIZE+=this.size;
 
       const oldData = this.buffer;
       this.buffer = new Int8Array(this.size);
@@ -730,6 +719,13 @@ export class Int8Buffer extends ArrayBufferInterface {
 
 }
 
+
+
+export function New_int8_buffer(size){
+
+   DEBUG_INFO_STRUCTS.BUFFER.INT8.COUNTER++;
+   return new Int8Buffer(size);
+}
 
 
 
@@ -749,13 +745,17 @@ export class Int16Buffer extends ArrayBufferInterface {
       this.freeidx = 0;
       for (let i = 0; i < this.size; i++)
          this.buffer[i] = INT_NULL;
+
+      DEBUG_INFO_STRUCTS.BUFFER.INT16.SIZE+=this.size;
    }
 
 
    Realloc() {
 
+      DEBUG_INFO_STRUCTS.BUFFER.INT16.SIZE-=this.size;
       const old_size = this.size;
       this.size *= 2;
+      DEBUG_INFO_STRUCTS.BUFFER.INT16.SIZE+=this.size;
 
       const oldData = this.buffer;
       this.buffer = new Int16Array(this.size);
@@ -775,9 +775,17 @@ export class Int16Buffer extends ArrayBufferInterface {
 
 
 
+export function New_int16_buffer(size){
+
+   DEBUG_INFO_STRUCTS.BUFFER.INT16.COUNTER++;
+   return new Int16Buffer(size);
+}
+
+
 /**********************************************************************************************************************************************/
 // Uint8
 /**********************************************************************************************************************************************/
+
 // export class Uint8Buffer extends ArrayBufferInterface {
 
 

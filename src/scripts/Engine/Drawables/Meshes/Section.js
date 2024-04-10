@@ -6,7 +6,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Widget_root_create_root, Widget_root_batch_move_from_batch_buffer, Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
+import { Widget_root_create_root, Widget_root_batch_move_from_batch_buffer, Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Listener_create_child_event } from "../../Events/EventListeners.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
@@ -38,7 +38,9 @@ export class Section extends Rect {
       this.total_margin = [0, 0];
       this.options = options;
       this.pad = [0, 0];
-      this.margin = margin;
+      // this.margin = margin;
+      this.StylesSetMargin(margin);
+      this.StylesSetMargin(margin);
       this.max_size = [0, 0];
 
 
@@ -210,9 +212,8 @@ export class Section extends Rect {
       // Calculate the parent section's position, so that its items are positioned from top to bottom, (Ex. when a dropdown menu is opened). 
       // Add the parent's new size offset, so that its items are positioned from top to bottom, (Ex. when a dropdown menu is opened). 
       if ((options & SECTION.TOP_DOWN) && (options & SECTION.RESIZE_PARENT)) {
-         // NOTE: The position in the gfx buffers is updated at Calculate_positions_recursive().
-         section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.margin[0];
-         section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.margin[1];
+         section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.StylesGetMargin(STYLES.AXIS.X);
+         section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.StylesGetMargin(STYLES.AXIS.Y);
       }
 
 
@@ -273,8 +274,8 @@ export class Section extends Rect {
 
       // Add the parent's new size offset, so that its items are positioned from top to bottom, (Ex. when a dropdown menu is opened). 
       if ((options & SECTION.TOP_DOWN) && (options & SECTION.RESIZE_PARENT)) {
-         section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.margin[0];
-         section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.margin[1];
+         section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.StylesGetMargin(STYLES.AXIS.X);
+         section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.StylesGetMargin(STYLES.AXIS.Y);
       }
       
       // Update default position
@@ -410,8 +411,10 @@ export class Section extends Rect {
 
 
    SetMargin() {
-      this.geom.dim[0] += this.margin[0];
-      this.geom.dim[1] += this.margin[1];
+      // this.geom.dim[0] += this.margin[0];
+      // this.geom.dim[1] += this.margin[1];
+      this.geom.dim[0] += this.StylesGetMargin(STYLES.AXIS.X);
+      this.geom.dim[1] += this.StylesGetMargin(STYLES.AXIS.Y);
    }
 
 
@@ -597,6 +600,7 @@ export class Section extends Rect {
             Gl_set_wpos_XY(root.gfx, root.geom.pos, root.geom.num_faces)
 
             View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
+            // Mesh_per_vb_remove_all_from_index(root.gfx.vb.idx, root.per_vb_bufferidx);
 
             const clip_top = root.geom.pos[1] - root.geom.dim[1];
             const clip_bottom = root.geom.pos[1] + root.geom.dim[1];
@@ -940,6 +944,30 @@ function Section_on_move_section(params) {
 
 
 
+
+export function TEMP_Section_on_move_section(params) {
+
+   const section = params.params;
+
+   // Destroy the time interval calling this function if the mesh is not grabed.
+   if (section.StateCheck(MESH_STATE.IN_GRAB) === 0 && section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+
+      const intervalIdx = section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+      TimeIntervalsDestroyByIdx(intervalIdx);
+      section.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+
+      return;
+   }
+
+   const mouse_pos = MouseGetPosDif();
+   if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
+
+   section.Move(mouse_pos.x, -mouse_pos.y)
+
+}
+
+
+
 function Expand(parent, options, width, accum_margins) {
 
    let opt = options
@@ -950,7 +978,8 @@ function Expand(parent, options, width, accum_margins) {
 
       if (child.type & MESH_TYPE.WIDGET_LABEL && child.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
          // child.Resize(); // TODO: Implement
-         child.geom.dim[0] = width - (parent.margin[0] + accum_margins);
+         // child.geom.dim[0] = width - (parent.margin[0] + accum_margins);
+         child.geom.dim[0] = width - (parent.StylesGetMargin(STYLES.AXIS.X) + accum_margins);
          child.geom.defDim[0] = child.geom.dim[0];
       }
       else if (child.type & MESH_TYPE.SECTION_MESH) {
@@ -964,11 +993,13 @@ function Expand(parent, options, width, accum_margins) {
 
          }
 
-         accum_margins += child.margin[0];
+         // accum_margins += child.margin[0];
+         accum_margins += child.StylesGetMargin(STYLES.AXIS.X);
          // HACK: Pass the parent's options so that if parent parent is vertical align for children, the children will expand. The option of the child counts for it's children expansion. 
          // Expand(child, child.parent.options, width, accum_margins);
          Expand(child, opt, width, accum_margins);
-         accum_margins -= child.margin[0];
+         // accum_margins -= child.margin[0];
+         accum_margins -= child.StylesGetMargin(STYLES.AXIS.X);
       }
    }
 
@@ -1288,7 +1319,8 @@ export function Calculate_positions_recursive(parent, options) {
 
          const c_x = cur_pos[0], c_y = cur_pos[1]; // curent position
          const parent_dimx = parent.GetMaxWidth(), parent_dimy = parent.GetTotalHeight(); // parent mesh dimention
-         const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
+         // const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
+         const parent_margx = parent.StylesGetMargin(STYLES.AXIS.X), parent_margy = parent.StylesGetMargin(STYLES.AXIS.Y); // parent mesh margin
 
          const new_pos = [(c_x - parent_dimx) + mesh_max_width + parent_margx, (c_y - parent_dimy) + mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
          const pos_dif = [new_pos[0] - mesh.GetCenterPosX(), new_pos[1] - mesh.GetCenterPosY(), new_pos[2] + 1];
@@ -1344,7 +1376,9 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
    if (parent.text_mesh) {
       const c_x = cur_pos[0], c_y = cur_pos[1]; // curent position
       const parent_dimx = parent.GetMaxWidth(), parent_dimy = parent.GetTotalHeight(); // parent mesh dimention
-      const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
+      // const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
+
+      const parent_margx = parent.StylesGetMargin(STYLES.AXIS.X), parent_margy = parent.StylesGetMargin(STYLES.AXIS.Y); // parent mesh margin
       const new_pos = [(c_x - parent_dimx) + parent.text_mesh.GetMaxWidth() + parent_margx, (c_y - parent_dimy) + parent.text_mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
       const pos_dif = [new_pos[0] - (parent.text_mesh.GetCenterPosX()), new_pos[1] - parent.text_mesh.GetCenterPosY(), new_pos[2] + 1];
       parent.text_mesh.MoveNoGfxUpdate(pos_dif[0], pos_dif[1]);
@@ -1367,7 +1401,8 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
          
          const c_x = cur_pos[0], c_y = cur_pos[1]; // curent position
          const parent_dimx = parent.GetMaxWidth(), parent_dimy = parent.GetTotalHeight(); // parent mesh dimention
-         const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
+         // const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
+         const parent_margx = parent.StylesGetMargin(STYLES.AXIS.X), parent_margy = parent.StylesGetMargin(STYLES.AXIS.Y); // parent mesh margin
 
          const new_pos = [(c_x - parent_dimx) + mesh_max_width + parent_margx, (c_y - parent_dimy) + mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
          const pos_dif = [new_pos[0] - (mesh.GetCenterPosX()), new_pos[1] - mesh.GetCenterPosY(), new_pos[2] + 1];
@@ -1384,7 +1419,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
                // HACK: Because scrollers bar is a Rect_mesh, it does not handle any children, like: scrollers handle
                if (mesh.type & MESH_TYPE.WIDGET_SCROLLER_BAR) {
                   mesh.children.buffer[0].geom.pos[0] += pos_dif[0];
-                  mesh.children.buffer[0].geom.pos[1] += pos_dif[1];
+                  mesh.children.buffer[0].geom.pos[1] += pos_dif[1] + mesh.children.buffer[0].geom.dim[1];
                   CopyArr2(mesh.children.buffer[0].geom.defPos, mesh.children.buffer[0].geom.pos);
                }
    

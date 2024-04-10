@@ -1,17 +1,18 @@
 "use strict";
 
-import { Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPosDif } from "../Controls/Input/Mouse.js";
 import { TimeIntervalsDestroyByIdx } from "../Timers/TimeIntervals.js";
-import { Int16Buffer, Int8Buffer, M_Buffer } from "./Buffers.js";
-import { BLUEL, GREEN, GREY, ORANGE_240_160_10 } from "../Drawables/Material/Base/Colors.js";
+import { Int16Buffer, Int8Buffer, M_Buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
+import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Batch_store } from "../Batch/Batch.js";
-import { Debug_ui_create_notification, NOTIFICATION_TYPE_IDX } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-// import { Debug_info_update_clbk } from "../Drawables/DebugInfo/DebugInfoUi.js";
-import { View_destroy_view } from "./MeshBufferViews.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
+
+
+
+
 
 
 /**
@@ -21,14 +22,14 @@ import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 
 
 // TODO: Temporary for num_faces of meshidxs in per vb buffer 
-let temp_accum = [];
-temp_accum[0] = 0;
-temp_accum[1] = 0;
-temp_accum[2] = 0;
-temp_accum[3] = 0;
-temp_accum[4] = 0;
-temp_accum[5] = 0;
-export function TEMP_PRINT_ACCUM() { console.error(temp_accum); }
+let temp_num_faces = [];
+temp_num_faces[0] = 0;
+temp_num_faces[1] = 0;
+temp_num_faces[2] = 0;
+temp_num_faces[3] = 0;
+temp_num_faces[4] = 0;
+temp_num_faces[5] = 0;
+export function TEMP_PRINT_ACCUM() { console.error(temp_num_faces); }
 
 
 // TODO: Temporary for vb starts of meshidxs in per vb buffer 
@@ -42,15 +43,15 @@ temp_start[5] = 0xffff;
 export function TEMP_PRINT_START() { console.error(temp_start); }
 
 
-const _mesh_buffer = new M_Buffer();
-const _gfx_buffer = new M_Buffer();
+const _mesh_buffer = New_generic_buffer();
+const _mesh_per_vertex_buffer = New_generic_buffer();
 
 
-const _widget_root_buffer = new M_Buffer();
-const _root_batch_buffer = new M_Buffer();
-const _widget_root_gfx = new M_Buffer();
+const _widget_root_buffer = New_generic_buffer();
+const _root_batch_buffer = New_generic_buffer();
+const _widget_root_gfx = New_generic_buffer();
 
-// const _widget_groups_buffer = new M_Buffer();
+// const _widget_groups_buffer = New_generic_buffer();
 
 
 
@@ -88,22 +89,25 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
       alert('Mesh is NULL.\n@ Mesh_buffer_remove_mesh_byidx()\nSEE console error');
    }
 
-   if (mesh.gfx) {
+   // if (mesh.gfx) {
 
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      // if (mesh.state.mask & MESH_STATE.ACTIVE) {
 
-         temp_accum[mesh.gfx.vb.idx] += mesh.geom.num_faces;
-         if (temp_start[mesh.gfx.vb.idx] > mesh.gfx.vb.start)
-            temp_start[mesh.gfx.vb.idx] = mesh.gfx.vb.start;
-      }
+      //    temp_num_faces[mesh.gfx.vb.idx] += mesh.geom.num_faces;
+      //    if (temp_start[mesh.gfx.vb.idx] > mesh.gfx.vb.start) {
+      //       temp_start[mesh.gfx.vb.idx] = mesh.gfx.vb.start;
+      //    }
 
-      if (mesh.gfx_bufferidx === INT_NULL) {
-         // console.error('NO gfx_bufferidx for the mesh.\nMesh is not removed from the _gfx_buffer\nmesh:', mesh.GetName(), 'mesh:', mesh);
-      }
-      else {
-         Gfx_buffer_remove_mesh_by_vbidx(mesh.gfx.vb.idx, mesh.gfx_bufferidx);
-      }
-   }
+      //    Mesh_per_vb_update_mesh_gfx_start(mesh.root_bufferidx)
+      // }
+
+      // if (mesh.per_vb_bufferidx === INT_NULL) {
+      //    // console.error('NO per_vb_bufferidx for the mesh.\nMesh is not removed from the _mesh_per_vertex_buffer\nmesh:', mesh.GetName(), 'mesh:', mesh);
+      // }
+      // else {
+      //    Mesh_per_vb_remove_mesh(mesh.gfx.vb.idx, mesh.per_vb_bufferidx);
+      // }
+   // }
 
    // TODO: Remove the whole root is WRONG, we have to destroy all meshes, which we do not do
    // If the mesh is the root, destroy the whole root buffer, gfx_buffer, batch buffer.
@@ -119,7 +123,7 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
 
    }
 
-   Str_buffer_mesh_names_remove_by_idx(mesh.nameidx);
+   if (mesh.nameidx !== INT_NULL) Str_buffer_mesh_names_remove_by_idx(mesh.nameidx);
    _mesh_buffer.RemoveByIdx(mesh_bufferidx);
 }
 
@@ -153,76 +157,114 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
 /*******************************************************************************************************************************************************************************/
 
 const GFX_VIEW_MESH_DEFAULT_COUNT = 16;
-_gfx_buffer.Init(4); // For 4 vertex buffers
+_mesh_per_vertex_buffer.Init(4); // For 4 vertex buffers
 
 
-export function Gfx_buffer_get() { return _gfx_buffer; }
-
-
-
-export function Gfx_buffer_get_vb_by_vbidx(vbidx) { return _gfx_buffer.buffer[vbidx]; }
+export function Mesh_per_vb_get() { return _mesh_per_vertex_buffer; }
 
 
 
-export function Gfx_buffer_get_mesh_by_vbidx(vbidx, gfx_bufferidx) { return _gfx_buffer.buffer[vbidx][gfx_bufferidx]; }
+export function Mesh_per_vb_get_vb_byidx(vbidx) { return _mesh_per_vertex_buffer.buffer[vbidx]; }
 
 
 
-export function Gfx_buffer_create_vb(vbidx) { _gfx_buffer.AddAtIndex(vbidx, new Int16Buffer(GFX_VIEW_MESH_DEFAULT_COUNT)); }
+export function Mesh_per_vb_get_mesh(vbidx, per_vb_bufferidx) { return _mesh_per_vertex_buffer.buffer[vbidx][per_vb_bufferidx]; }
 
 
 
-export function Gfx_buffer_remove_mesh_by_vbidx(vbidx, gfx_bufferidx) {
-
-   if (gfx_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
-
-
-   _gfx_buffer.buffer[vbidx].RemoveByIdxSortedVersion(gfx_bufferidx);
-
-   // Update the gfx_bufferidx of the mesh that repalaced the removed mesh
-   const mesh = _mesh_buffer.buffer[_gfx_buffer.buffer[vbidx].buffer[gfx_bufferidx]];
+export function Mesh_per_vb_create_vb(vbidx) { _mesh_per_vertex_buffer.AddAtIndex(vbidx, New_int16_buffer(GFX_VIEW_MESH_DEFAULT_COUNT)); }
 
 
 
-   if (mesh && (mesh.state.mask & MESH_STATE.ACTIVE)) { // Case the removed mesh is last in the _gfx_buffer, then there is no replacement and no need for setting the 'mesh.gfx_bufferidx'
+export function Mesh_per_vb_remove_mesh(vbidx, per_vb_bufferidx) {
 
-      mesh.gfx_bufferidx = gfx_bufferidx;
+   if (per_vb_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
+
+
+   _mesh_per_vertex_buffer.buffer[vbidx].RemoveByIdxSortedVersion(per_vb_bufferidx);
+
+   // Update the per_vb_bufferidx of the swaped mesh that repalaced the removed mesh
+   const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vbidx].buffer[per_vb_bufferidx]];
+
+
+   if (mesh && (mesh.state.mask & MESH_STATE.ACTIVE)) { // Case the removed mesh is last in the _mesh_per_vertex_buffer, then there is no replacement and no need for setting the 'mesh.per_vb_bufferidx'
+
+      mesh.per_vb_bufferidx = per_vb_bufferidx;
    }
 
 }
 
 
-// HERE
-export function Gfx_buffer_store(vbidx, mesh_bufferidx) { return _gfx_buffer.buffer[vbidx].Add(mesh_bufferidx); }
 
+// export function Mesh_per_vb_remove_all_from_index(vbidx, per_vb_bufferidx) {
+export function Mesh_per_vb_remove_all_from_index(vbidx, meshidx) {
 
+   const mesh = _mesh_buffer.buffer[meshidx];
 
-export function Gfx_buffer_update_start(root_bufferidx) {
+   if (mesh.per_vb_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
 
-   const gfx = Widget_root_gfx_get_structured(root_bufferidx);
+   // for(let i=_mesh_per_vertex_buffer.buffer[vbidx].vb.boundary; i >= mesh.mesh_bufferidx; i--){
+   for(let i=_mesh_per_vertex_buffer.buffer[vbidx].boundary; i >= mesh.per_vb_bufferidx; i--){
 
-   const len = gfx.length;
-   for (let i = 0; i < len; i++) {
-
-      const vbidx = gfx[i].vbidx;
-      if (temp_accum[vbidx] === 0) {
-
-         // EFFICIENCY: We should loop through all mesh idxs in gfx_buffer only if there is an accumulated value to be updated to
-         for (let j = 0; j <= _gfx_buffer.buffer[vbidx].boundary; j++) {
-
-            const mesh = _mesh_buffer.buffer[_gfx_buffer.buffer[vbidx].buffer[j]];
-            if (mesh && mesh.gfx.vb.start >= temp_start[vbidx]) {
-
-               mesh.gfx.vb.start -= temp_accum[vbidx] * mesh.gfx.attribsPerVertex * mesh.gfx.vertsPerRect;
-            }
-         }
-      }
-
+      _mesh_per_vertex_buffer.buffer[vbidx].RemoveByIdxSortedVersion(mesh.per_vb_bufferidx);
+      
+      // REMOVE the meshes index????????
+      // mesh.per_vb_bufferidx = per_vb_bufferidx;
    }
+}
 
-   // TODO: Integrate these to the ??_gfx_buffers?? Because each element represents a vertex buffer.
-   temp_accum[0] = 0; temp_accum[1] = 0; temp_accum[2] = 0; temp_accum[3] = 0;
-   temp_start[0] = 0xffff; temp_start[1] = 0xffff; temp_start[2] = 0xffff; temp_start[3] = 0xffff;
+
+
+export function Mesh_per_vb_store_mesh(vbidx, mesh_bufferidx) { 
+   return _mesh_per_vertex_buffer.buffer[vbidx].Add(mesh_bufferidx); 
+}
+
+
+
+// export function Mesh_per_vb_update_mesh_gfx_start(root_bufferidx) {
+
+//    const gfx = Widget_root_gfx_get_structured(root_bufferidx);
+
+//    const len = gfx.length;
+//    for (let i = 0; i < len; i++) {
+
+//       const vbidx = gfx[i].vbidx;
+//       if (temp_num_faces[vbidx] === 0) {
+
+//          // EFFICIENCY: We should loop through all mesh idxs in gfx_buffer only if there is an accumulated value to be updated to
+//          for (let j = 0; j <= _mesh_per_vertex_buffer.buffer[vbidx].boundary; j++) {
+
+//             const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vbidx].buffer[j]];
+//             if (mesh && mesh.gfx.vb.start >= temp_start[vbidx]) {
+
+//                mesh.gfx.vb.start -= temp_num_faces[vbidx] * mesh.gfx.attribsPerVertex * mesh.gfx.vertsPerRect;
+//             }
+//          }
+//       }
+
+//    }
+
+//    // TODO: Integrate these to the ??_gfx_buffers?? Because each element represents a vertex buffer.
+//    temp_num_faces[0] = 0; temp_num_faces[1] = 0; temp_num_faces[2] = 0; temp_num_faces[3] = 0;
+//    temp_start[0] = 0xffff; temp_start[1] = 0xffff; temp_start[2] = 0xffff; temp_start[3] = 0xffff;
+// }
+export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
+
+
+   // EFFICIENCY: We should loop through all mesh idxs in gfx_buffer only if there is an accumulated value to be updated to
+   for (let j = 0; j <= _mesh_per_vertex_buffer.buffer[vbidx].boundary; j++) {
+   
+      const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vbidx].buffer[j]];
+      if (mesh && mesh.gfx.vb.start >= start) {
+
+         mesh.gfx.vb.start -= num_faces * mesh.gfx.attribsPerVertex * mesh.gfx.vertsPerRect;
+
+         console.log()
+      }
+   }
+   //    // TODO: Integrate these to the ??_gfx_buffers?? Because each element represents a vertex buffer.
+   //    temp_num_faces[0] = 0; temp_num_faces[1] = 0; temp_num_faces[2] = 0; temp_num_faces[3] = 0;
+   //    temp_start[0] = 0xffff; temp_start[1] = 0xffff; temp_start[2] = 0xffff; temp_start[3] = 0xffff;
 }
 
 
@@ -273,7 +315,7 @@ export function Widget_root_buffer_get_root_meshidx(idx) { return _widget_root_b
 
 export function Widget_root_create_root(mesh_bufferidx) {
 
-   const root_idx = _widget_root_buffer.Add(new Int16Buffer(6));
+   const root_idx = _widget_root_buffer.Add(New_int16_buffer(6));
    // _widget_root_buffer.buffer[root_idx].Init(INT_NULL);
 
    _widget_root_buffer.buffer[root_idx].Add(mesh_bufferidx);
@@ -672,7 +714,7 @@ export function Widget_root_gfx_get_structured(root_bufferidx) {
 
 function Widget_root_gfx_create(root_bufferidx) {
 
-   const idx = _widget_root_gfx.Add(new Int8Buffer(2)); // 2 elements is enough for 1 gfx indexes (0:progidx, 1:vbidx) 
+   const idx = _widget_root_gfx.Add(New_int8_buffer(2)); // 2 elements is enough for 1 gfx indexes (0:progidx, 1:vbidx) 
 
    if (root_bufferidx !== idx) alert('Widget root gfx buffer not the same with the Widget root buffer');
 }
@@ -760,8 +802,8 @@ export function Widget_movexy(params) {
       const mesh = _mesh_buffer.buffer[widget_buffer.buffer[i]];
       // if (mesh.state.mask & MESH_STATE.ACTIVE && mesh.gfx) {
       if (mesh.state.mask & MESH_STATE.ACTIVE) {
-         if(!mesh.gfx)
-         console.error(mesh.GetName())
+         if (!mesh.gfx)
+            console.error(mesh.GetName())
          mesh.geom.MoveXY(pos.x, -pos.y, mesh.gfx)
       }
 
@@ -776,10 +818,10 @@ export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
       // Increment each mesh, that is part of this widget_root
       _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[0] += x;
       _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1] += y;
-      
+
       // Update default position
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[0] += x; 
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[1] += y; 
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[0] += x;
+      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[1] += y;
    }
 
    const len = _root_batch_buffer.buffer[root_bufferidx].vb.length
@@ -829,7 +871,7 @@ export function TEMP_REMOVE_CHILDREN(root, firstidx, lastidx) {
 
    console.log(`root:${root.GetName()} firstidx:${firstidx} lastidx:${lastidx} first:${first} last:${last} toidx:${toidx}`)
 
-   const new_children_buffer = new M_Buffer();
+   const new_children_buffer = New_generic_buffer();
    new_children_buffer.Init(firstidx);
 
 
@@ -855,7 +897,7 @@ export function TEMP_REMOVE_CHILDREN_CENTER(root, firstidx, lastidx) {
 
    console.log(`root:${root.GetName()} firstidx:${firstidx} lastidx:${lastidx} first:${first} last:${last} toidx:${toidx}`)
 
-   const new_children_buffer = new M_Buffer();
+   const new_children_buffer = New_generic_buffer();
    new_children_buffer.Init(firstidx);
    for (let i = 0; i <= root.children.boundary; i++) {
 
@@ -933,7 +975,7 @@ export function Widget_root_reset_gfx(root_bufferidx) {
       const mesh = _mesh_buffer.buffer[root_mesh_per_vb_idx];
 
       // Add to vertexbuffer
-      Vertexbuffer_reset_to_index(rootgfx[i].progidx, rootgfx[i].vbidx, mesh.gfx.vb.start);
+      Vertex_buffer_reset_to_index(rootgfx[i].progidx, rootgfx[i].vbidx, mesh.gfx.vb.start);
    }
 }
 
@@ -1069,7 +1111,7 @@ export function Mesh_buffer_print_loop() {
             // 'id:', _mesh_buffer.buffer[i].id,
             'mbidx:', _mesh_buffer.buffer[i].mesh_bufferidx,
             'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
-            'gfxidx', _mesh_buffer.buffer[i].gfx_bufferidx,
+            'gfxidx', _mesh_buffer.buffer[i].per_vb_bufferidx,
             'batchidx:', _mesh_buffer.buffer[i].batch_buffer_vbidx,
             'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1],
             'child idx:', _mesh_buffer.buffer[i].idx,
@@ -1085,16 +1127,16 @@ export function Mesh_buffer_print_loop() {
 
 
 // export function Gfx_buffer_print_loop() {
-export function Gfx_buffer_print() {
+export function Mesh_per_vb_print() {
 
-   console.log('size:', _gfx_buffer.size, 'boundary:', _gfx_buffer.boundary, 'count:', _gfx_buffer.active_count,);
-   for (let i = 0; i <= _gfx_buffer.boundary; i++) {
+   console.log('size:', _mesh_per_vertex_buffer.size, 'boundary:', _mesh_per_vertex_buffer.boundary, 'count:', _mesh_per_vertex_buffer.active_count,);
+   for (let i = 0; i <= _mesh_per_vertex_buffer.boundary; i++) {
 
-      if (_gfx_buffer.buffer[i]) {
+      if (_mesh_per_vertex_buffer.buffer[i]) {
 
          console.log('vb', i,
-            '\n size:', _gfx_buffer.buffer[i].size, 'boundary:', _gfx_buffer.buffer[i].boundary, 'count:', _gfx_buffer.buffer[i].active_count,
-            '\n ', _gfx_buffer.buffer[i].buffer);
+            '\n size:', _mesh_per_vertex_buffer.buffer[i].size, 'boundary:', _mesh_per_vertex_buffer.buffer[i].boundary, 'count:', _mesh_per_vertex_buffer.buffer[i].active_count,
+            '\n ', _mesh_per_vertex_buffer.buffer[i].buffer);
       }
       else console.log(i, 'NULL')
    }
@@ -1104,15 +1146,15 @@ export function Gfx_buffer_print() {
 
 export function Gfx_buffer_print_loop() {
 
-   console.log('size:', _gfx_buffer.size, 'boundary:', _gfx_buffer.boundary, 'count:', _gfx_buffer.active_count,);
-   for (let i = 0; i <= _gfx_buffer.boundary; i++) {
+   console.log('size:', _mesh_per_vertex_buffer.size, 'boundary:', _mesh_per_vertex_buffer.boundary, 'count:', _mesh_per_vertex_buffer.active_count,);
+   for (let i = 0; i <= _mesh_per_vertex_buffer.boundary; i++) {
 
-      if (_gfx_buffer.buffer[i]) {
+      if (_mesh_per_vertex_buffer.buffer[i]) {
 
          console.log('vb', i,);
-         for (let j = 0; j <= _gfx_buffer.buffer[i].boundary; j++) {
+         for (let j = 0; j <= _mesh_per_vertex_buffer.buffer[i].boundary; j++) {
 
-            const mesh = _mesh_buffer.buffer[_gfx_buffer.buffer[i].buffer[j]];
+            const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[i].buffer[j]];
             console.log(j,
                ' mbidx:', mesh.mesh_bufferidx,
                'start:', mesh.gfx.vb.start,
@@ -1147,7 +1189,7 @@ export function Widgetroot_buffer_print_w1() {
                console.warn('   ', j,
                   'ridx:', _widget_root_buffer.buffer[i].buffer[j],
                   'batchidx', mesh.batch_buffer_vbidx,
-                  'gfxidx', mesh.gfx_bufferidx,
+                  'gfxidx', mesh.per_vb_bufferidx,
                   'msbidx', mesh.mesh_bufferidx,
                   'state', mesh.state.mask,
                   'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE.ACTIVE, mesh.GetName());
@@ -1156,7 +1198,7 @@ export function Widgetroot_buffer_print_w1() {
                console.log('   ', j,
                   'ridx:', _widget_root_buffer.buffer[i].buffer[j],
                   'batchidx', mesh.batch_buffer_vbidx,
-                  'gfxidx', mesh.gfx_bufferidx,
+                  'gfxidx', mesh.per_vb_bufferidx,
                   'msbidx', mesh.mesh_bufferidx,
                   'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.idx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
                   'state', mesh.state.mask,
@@ -1271,144 +1313,3 @@ export function Widget_group_buffer_print_w5() {
 
 
 
-
-/****************************************************************************************************************************************************/
-// DEBUG Info - Create text for render
-/****************************************************************************************************************************************************/
-
-function TEMP(params) {
-
-   const destroy_btn = params.evt_params;
-   const scroller_section = params.params;
-
-   View_destroy_view(scroller_section.group_bufferidxs);
-   scroller_section.Destroy();
-
-   const _params = {
-      notification_type: NOTIFICATION_TYPE_IDX.MESH_BUFFER,
-      parent_section: scroller_section.parent,
-   }
-
-   // Debug_ui_create_notification(Debug_info_update_clbk, _params);
-}
-
-
-
-export function Mesh_buffer_create_text_info() {
-
-   const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
-
-   const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), 'Mesh Buffer Info ORANGE');
-   s.SetTypeDebug();
-
-   const destroy = Create_widget_button(_, 'Recalc', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
-   destroy.Bind(TEMP, _, s);
-   destroy.SetTypeDebug();
-   s.AddItem(destroy);
-   // s.sid.gfx_group |= GFX_GROUPS.DEBUG.MASK;
-
-
-   const margin = [4, 4];
-   const style = [0, 3, 1];
-
-   const _0 = Create_widget_dropdown(_, 'Mesh Buffer', [100, 100, 0], col_dp, col_menu, _, _, _, _, style, margin);
-   _0.CreateClickEvent();
-   Dropdown_roots_set_root(_0, _0);
-   _0.SetTypeDebug();
-   s.AddItem(_0)
-   _0.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-
-   const mb = _mesh_buffer;
-   const mesh_buffer_info = Create_widget_text(_, `count:${mb.active_count} size:${mb.size}`);
-   mesh_buffer_info.SetTypeDebug();
-   _0.AddToMenu(mesh_buffer_info);
-
-   let counter = 0;
-   const len = mb.boundary; // Avoid infinite loop (Avoid creating info for dubug UI's)
-   for (let i = 0; i <= len; i++) {
-
-      const m = mb.buffer[i];
-
-      if(m && (m.type & MESH_TYPE.DEBUG_MESH)===0){ // Insert meshes that are only belong to DEFAULT grouping
-         // console.log(m.GetName(), m.mesh_bufferidx)
-         const _1 = Create_widget_dropdown(_, `${counter++} @[${m.mesh_bufferidx}]`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-
-         _1.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         _1.CreateClickEvent();
-         _1.SetTypeDebug();
-         _0.AddToMenu(_1);
-   
-         { // Name info
-            const info = Create_widget_text(_, `name:{${m.GetName()}}`);
-            info.SetTypeDebug();
-            _1.AddToMenu(info);
-         }
-   
-         { // Views indexes info
-            const view = Create_widget_dropdown(_, `view`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-            view.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-            view.CreateClickEvent();
-            view.SetTypeDebug();
-            _1.AddToMenu(view)
-            { const info = Create_widget_text(_, `gfx:${m.gfx_bufferidx}`);         info.SetTypeDebug(); view.AddToMenu(info); }
-            { const info = Create_widget_text(_, `root:${m.root_bufferidx}`);       info.SetTypeDebug(); view.AddToMenu(info); }
-            { const info = Create_widget_text(_, `batch:${m.batch_buffer_vbidx}`);  info.SetTypeDebug(); view.AddToMenu(info); }
-            { const info = Create_widget_text(_, `group:${m.group_bufferidxs}`);    info.SetTypeDebug(); view.AddToMenu(info); }
-            { const info = Create_widget_text(_, `fbidx:${m.fbidx}`);               info.SetTypeDebug(); view.AddToMenu(info); }
-            { const info = Create_widget_text(_, `batch_fnidx:${m.batch_fnidx}`);   info.SetTypeDebug(); view.AddToMenu(info); }
-         }
-   
-         { // Geometry info
-            const view = Create_widget_dropdown(_, `geometry`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-            view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-            view.CreateClickEvent();
-            view.SetTypeDebug();
-            _1.AddToMenu(view)
-            { const info = Create_widget_text(_, `pos:${m.geom.pos[0]}, ${m.geom.pos[1]}, ${m.geom.pos[2]}`); info.SetTypeDebug(); view.AddToMenu(info); }
-            { const info = Create_widget_text(_, `dim:${m.geom.dim[0]}, ${m.geom.dim[1]}`); info.SetTypeDebug(); view.AddToMenu(info); }
-         }
-   
-   
-         // Gfx info
-         const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, 0], col_dp, col_menu, _, [2, 1], _, _, style, margin);
-         gfx.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         gfx.CreateClickEvent();
-         gfx.SetTypeDebug(); 
-         _1.AddToMenu(gfx)
-         if (m.gfx) {
-            { // Program
-               const info = Create_widget_text(_, `prog: {idx:${m.gfx.prog.idx} attribsidx:${m.gfx.prog.attribsidx} }`);
-               info.SetTypeDebug();
-               gfx.AddToMenu(info);
-            }
-            { // Vertex buffer
-               const info = Create_widget_text(_, `vb: { idx:${m.gfx.vb.idx} start:${m.gfx.vb.start} count:${m.gfx.vb.count} }`);
-               info.SetTypeDebug();
-               gfx.AddToMenu(info);
-            }
-            { // Index buffer
-               const info = Create_widget_text(_, `ib: { idx:${m.gfx.ib.idx} count:${m.gfx.ib.count} }`);
-               info.SetTypeDebug();
-               gfx.AddToMenu(info);
-            }
-            { // Texture
-               const info = Create_widget_text(_, `tb: { idx:${m.gfx.tb.idx} }`);
-               info.SetTypeDebug();
-               gfx.AddToMenu(info);
-            }
-         }
-         else {
-            { // Vertex buffer
-               const info = Create_widget_text(_, `NULL`); 
-               info.SetTypeDebug();
-               gfx.AddToMenu(info);
-            }
-         }
-      }
-
-
-   }
-
-   return s;
-
-}

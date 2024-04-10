@@ -1,6 +1,6 @@
 "use strict";
 
-import { M_Buffer } from "../../Core/Buffers";
+import { M_Buffer, New_generic_buffer } from "../../Core/Buffers";
 
 
 
@@ -13,7 +13,7 @@ export class Info_Listeners {
 
    constructor() {
 
-      this.events = new M_Buffer();
+      this.events = New_generic_buffer();
    }
 
 

@@ -31,7 +31,7 @@ export class Textured_Mesh extends Mesh {
    // Graphics
 
 
-   GenGfxCtx(FLAGS=GFX_CTX_FLAGS.ANY, gfxidxs=[INT_NULL, INT_NULL]) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, INT_NULL]) {
 
       this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
 
@@ -45,9 +45,9 @@ export class Textured_Mesh extends Mesh {
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
       this.is_gfx_inserted = true;
 
-      
+
       // Add entry to Gfx Buffer
-      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
 
 
 
@@ -65,18 +65,33 @@ export class Textured_Mesh extends Mesh {
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
       this.StateEnable(MESH_STATE.ACTIVE);
       this.is_gfx_inserted = true;
-      
+
       // Add entry to Gfx Buffer
-      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
 
    }
+
+
+   UpdateGfx() {
+
+      alert('Implement me\nUpdateGfx() @ Textured_Mesh.js' )
+      // if(this.is_gfx_inserted) 
+      //    Vertex_buffer_update_vertices(this.gfx, this.geom, this.mat, this.GetName())
+      // else {
+      //    this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
+      //    this.is_gfx_inserted = true;
+      // }
+
+      // return this.gfx.vb.start;
+   }
+
 
 
 
    /********************************************************************************************************************************************************************** */
    // TODO: The: ConstructListeners(), OnClick() and OnMove(), belong to a widget rather than a _Mesh. Neither Text_Mesh or Rect_Mesh have these functions. Maybe create the apropriate widget for the Textured_mesh too.
    // SEE ### Construct Listeners
-   
+
    ConstructListeners(_root = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
@@ -194,14 +209,14 @@ export class Textured_Mesh extends Mesh {
       this.geom.pos[0] = x;
       this.geom.pos[1] = y;
    }
-   
 
-   SetTypeDebug(){
+
+   SetTypeDebug() {
       this.type |= MESH_TYPE.DEBUG_MESH;
    }
 
 
-   
+
    /*******************************************************************************************************************************************************/
    // Alignment
 

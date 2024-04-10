@@ -1,6 +1,6 @@
 "use strict";
 
-import { M_Buffer } from "../../Engine/Core/Buffers";
+import { New_generic_buffer } from "../../Engine/Core/Buffers";
 import { Program_use_program } from "../ShaderPrograms";
 import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilder";
 
@@ -121,7 +121,7 @@ class Uniform {
 }
 
 
-const _uniforms_buffer = new M_Buffer();
+const _uniforms_buffer = New_generic_buffer();
 
 
 
@@ -264,7 +264,7 @@ const ERROR_UBS = `
 
 
 
-let _uniform_blocks = new M_Buffer();
+let _uniform_blocks = New_generic_buffer();
 
 
 // const CreatedUniforms = [];

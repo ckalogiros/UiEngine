@@ -1,8 +1,8 @@
 "use strict";
 
-import { Vertexbuffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers";
-import { Int16Buffer, M_Buffer } from "./Buffers";
-import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer";
+import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers";
+import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer } from "./Buffers";
+import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index } from "./MeshBuffer";
 
 
 /**
@@ -60,14 +60,14 @@ class View {
    constructor(rootidx) {
 
       this.rootidx = rootidx;
-      this.vb = new M_Buffer(); // Array of arrays of per vertex buffer mesh indexes
+      this.vb = New_generic_buffer(); // Array of arrays of per vertex buffer mesh indexes
    }
 
 }
 
 
 
-const _view_buffer = new M_Buffer();
+const _view_buffer = New_generic_buffer();
 
 
 
@@ -178,7 +178,7 @@ function View_add_mesh(groupidx, mesh) {
 
       const data = {
          info: new Int16Array(VIEW_INFO.SIZE),
-         data: new Int16Buffer(), // TODOD: widget root gfx already knows the number of meshes, so maybe have an aproximation of the mesh count(per vb buffer)
+         data: New_int16_buffer(), // TODOD: widget root gfx already knows the number of meshes, so maybe have an aproximation of the mesh count(per vb buffer)
       };
 
       const vb_bufferidx = view.vb.Add(data);
@@ -360,8 +360,9 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
       const vbidx = view.vb.buffer[i].info[VIEW_INFO.VBIDX];
 
       const vb_start = view.vb.buffer[i].info[VIEW_INFO.START]; // We want the start of the root mesh of the group, not the start of the root widget
-      Vertexbuffer_reset_to_index(progidx, vbidx, vb_start);
+      Vertex_buffer_reset_to_index(progidx, vbidx, vb_start);
 
+      Mesh_per_vb_remove_all_from_index(vbidx, view.vb.buffer[i].data.buffer[0]); // Pass the meshidx of the first mesh on the current accessed vb
    }
 
 }
@@ -381,10 +382,6 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
          const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[j]);
          if (mesh.state.mask & MESH_STATE.ACTIVE) { 
             mesh.AddToGfxFromReset(); 
-// if(!mesh.Rerender)
-// console.log()
-//             mesh.Rerender(false); 
-            // console.log(mesh.mesh_bufferidx, mesh.GetName())
          }
       }
    }
@@ -405,16 +402,31 @@ export function View_remove_mesh_from_gfx_buffer_by_view_all_vb(view_bufferidx) 
 
    for (let i = 0; i <= view.vb.boundary; i++) {
 
-
       // Get the fist mesh of the vb group buffer
       const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[0]);
 
-      Gfx_buffer_remove_mesh_by_vbidx(mesh.gfx.vb.idx, mesh.gfx_bufferidx);
+      Mesh_per_vb_remove_mesh(mesh.gfx.vb.idx, mesh.per_vb_bufferidx);
 
    }
 
 }
 
+
+
+
+export function View_movey_group(view_bufferidx, ydif) {
+
+   const view = _view_buffer.buffer[view_bufferidx];
+
+   for (let i = 0; i <= view.vb.boundary; i++){
+
+      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){
+
+         const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[j]);
+         mesh.geom.pos[1] += ydif; 
+      }
+   }
+}
 
 
 

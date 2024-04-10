@@ -1041,6 +1041,64 @@ function ERROR_NULL(obj) {
 
 
 /***********************************************************************************************************************************************/
+// Styles
+
+
+
+_CNT=0;
+const STYLES = { // Default access indices for style arrays
+   MARG:_CNT++,
+   PAD:_CNT++,
+   HOVER_MARG:_CNT++,
+
+	AXIS:{
+		ALL:0,
+		X:1,
+		Y:2,
+	},
+};
+
+
+
+
+
+
+
+
+/***********************************************************************************************************************************************/
+// Some global values for debug info ui display information'
+const DEBUG_INFO_STRUCTS = {
+
+	BUFFER:{
+		GENERIC:{
+			COUNTER:0, // Count how many instantiations of Generic_Buffer class
+			SIZE:0,
+		},
+		INT8:{
+			COUNTER:0, // Count how many instantiations of Generic_Buffer class
+			SIZE:0,
+		},
+		INT16:{
+			COUNTER:0, // Count how many instantiations of Generic_Buffer class
+			SIZE:0,
+		},
+		// UINT8:{
+		// 	COUNTER:0, // Count how many instantiations of Generic_Buffer class
+		// },
+		// UINT16:{
+		// 	COUNTER:0, // Count how many instantiations of Generic_Buffer class
+		// },
+	},
+};
+
+
+
+
+
+
+
+
+/***********************************************************************************************************************************************/
 // TEMPORARY
 const TEMP_TEST_PERFORMANE_COUNTERS = {
 

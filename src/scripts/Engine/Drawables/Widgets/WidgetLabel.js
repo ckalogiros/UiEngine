@@ -13,7 +13,7 @@ import { Gl_set_alpha_from_offset, Gl_set_dim_X, Gl_set_dim_XY, Gl_set_wpos_X, G
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
@@ -45,7 +45,7 @@ export class Widget_Label extends Rect {
     text_mesh;
     pad = [0, 0];
 
-    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
+    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -55,7 +55,7 @@ export class Widget_Label extends Rect {
         const text = _text;
 
         /** Label tex mesh */
-        const text_mesh = Create_text_mesh(text, pos, fontSize, text_col);
+        const text_mesh = Create_text_mesh(text, pos, fontSize, text_col, _, _, is_debug_mesh);
 
         pos[2] -= 1; // Set z for area 'behind' this.text_mesh
 
@@ -146,10 +146,14 @@ export class Widget_Label extends Rect {
     // Graphics
     /*******************************************************************************************************************************************************/
 
-    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific = [INT_NULL, INT_NULL]) {
+    // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific = [INT_NULL, INT_NULL]) {
+    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific=null) {
 
         this.gfx = Gfx_generate_context(FLAGS, this, area_gfx_specific);
-        this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_gfx_specific);
+        if(!text_gfx_specific)
+            this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, this.text_mesh, text_gfx_specific);
+        else
+            this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_gfx_specific);
 
         return this.gfx;
     }
@@ -453,14 +457,14 @@ export class Widget_Label extends Rect {
 
 
     AddToGfxBuffer() {
-        this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
-        this.text_mesh.gfx_bufferidx = Gfx_buffer_store(this.text_mesh.gfx.vb.idx, this.text_mesh.mesh_bufferidx);
+        this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
+        this.text_mesh.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.text_mesh.gfx.vb.idx, this.text_mesh.mesh_bufferidx);
     }
 
 
     RemoveFromGfxBuffer() {
-        Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
-        Gfx_buffer_remove_mesh_by_vbidx(this.text_mesh.gfx.vb.idx, this.text_mesh.gfx_bufferidx);
+        Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+        Mesh_per_vb_remove_mesh(this.text_mesh.gfx.vb.idx, this.text_mesh.per_vb_bufferidx);
     }
 
 

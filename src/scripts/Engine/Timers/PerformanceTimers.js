@@ -1,7 +1,7 @@
 "use strict";
 
 // import { Floor } from '../../Helpers/Math/MathOperations.js';
-import { M_Buffer } from '../Core/Buffers.js';
+import { New_generic_buffer } from '../Core/Buffers.js';
 import { Str_buffer_store } from '../Core/StringBuffer.js';
 
 
@@ -43,7 +43,7 @@ class Performance_Timer {
    constructor() {
 
       this.t = window.performance.now();
-      this.group = new M_Buffer();
+      this.group = New_generic_buffer();
    }
 }
 
@@ -56,7 +56,7 @@ function Performance_timer_contruct(TYPE = INT_NULL, name) {
 }
 
 
-const _performance_timers_buffer = new M_Buffer();
+const _performance_timers_buffer = New_generic_buffer();
 
 // TYPE: SEE->PERFORMANCE_TIMER
 function Performance_timer_create(TYPE, name) {

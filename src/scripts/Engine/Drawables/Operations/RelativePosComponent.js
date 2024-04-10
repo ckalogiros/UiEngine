@@ -1,6 +1,6 @@
 "use strict";
 
-import { Int8Buffer, M_Buffer } from "../../Core/Buffers.js";
+import { Int8Buffer, M_Buffer, New_int8_buffer } from "../../Core/Buffers.js";
 
 
 
@@ -28,8 +28,8 @@ class RelativePosition extends M_Buffer {
 
       super();
 
-      this.AddAtIndex(REL_POS.LEFT, new Int8Buffer());
-      this.AddAtIndex(REL_POS.RIGHT, new Int8Buffer());
+      this.AddAtIndex(REL_POS.LEFT, New_int8_buffer());
+      this.AddAtIndex(REL_POS.RIGHT, New_int8_buffer());
    }
    
 } 
@@ -74,7 +74,8 @@ function Relative_pos_comp_align_child_left(whereidx, parent, childidx){
       xpos = last_elem.geom.pos[0] + last_elem.geom.dim[0];
    }
    else{ // Else get the left position of the parent
-      const extra = (parent.margin) ? parent.margin[0] : (parent.pad) ? parent.pad : 0;
+      // const extra = (parent.margin) ? parent.StylesGetMargin(STYLES.AXIS.X) : (parent.pad) ? parent.pad : 0;
+      const extra = parent.StylesGetMargin(STYLES.AXIS.X);
       xpos = parent.geom.pos[0] - parent.geom.dim[0] + extra;
    }
 
@@ -106,7 +107,8 @@ function Relative_pos_comp_align_child_right(whereidx, parent, childidx){
       xpos = last_elem.geom.pos[0] - last_elem.geom.dim[0];
    }
    else{ // Else get the right position of the parent as the initial start position
-      const extra = (parent.margin) ? parent.margin[0] : (parent.pad) ? parent.pad : 0; 
+      // const extra = (parent.margin) ? parent.margin[0] : (parent.pad) ? parent.pad : 0; 
+      const extra = parent.StylesGetMargin(STYLES.AXIS.X); 
       xpos = parent.geom.pos[0] + parent.geom.dim[0] - extra;
    }
 
@@ -150,8 +152,9 @@ export function Relative_pos_comp_recalc_right(parent){
 function _Relative_pos_comp_recalc_left(whereidx, parent){
 
    const children = parent.rel_comp.buffer[whereidx];
-   const marginx = (parent.margin) ? parent.margin[0] : 0;
-   let xpos = parent.geom.pos[0] - parent.geom.dim[0] + marginx;
+   // const marginx = (parent.margin) ? parent.margin[0] : 0;
+   // let xpos = parent.geom.pos[0] - parent.geom.dim[0] + marginx;
+   let xpos = parent.geom.pos[0] - parent.geom.dim[0] + parent.StylesGetMargin(STYLES.AXIS.X);
 
    for(let i=0; i <= children.boundary; i++){
       
@@ -172,8 +175,9 @@ function _Relative_pos_comp_recalc_left(whereidx, parent){
 function _Relative_pos_comp_recalc_right(whereidx, parent){
 
    const children = parent.rel_comp.buffer[whereidx];
-   const marginx = (parent.margin) ? parent.margin[0] : 0;
-   let xpos = parent.geom.pos[0] + parent.geom.dim[0] - marginx;
+   // const marginx = (parent.margin) ? parent.margin[0] : 0;
+   // let xpos = parent.geom.pos[0] + parent.geom.dim[0] - marginx;
+   let xpos = parent.geom.pos[0] + parent.geom.dim[0] - parent.StylesGetMargin(STYLES.AXIS.X);
 
    for(let i=0; i <= children.boundary; i++){
       

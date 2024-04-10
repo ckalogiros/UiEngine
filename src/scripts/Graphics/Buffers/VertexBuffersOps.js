@@ -17,16 +17,16 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx) {
    const shader_attribs = Shader_attributes_get_attribs(attribsidx);
    const names = shader_attribs.names;
 
-   if (Str_buffer_get_by_idx(names[0]) === 'a_col' && 
-       Str_buffer_get_by_idx(names[1]) === 'a_wpos_time' &&
-       Str_buffer_get_by_idx(names[2]) === 'a_params1' && 
-       Str_buffer_get_by_idx(names[3]) === 'a_pos') {
+   if (Str_buffer_get_by_idx(names[0]) === 'a_col' &&
+      Str_buffer_get_by_idx(names[1]) === 'a_wpos_time' &&
+      Str_buffer_get_by_idx(names[2]) === 'a_params1' &&
+      Str_buffer_get_by_idx(names[3]) === 'a_pos') {
       return 0;
    }
    if (Str_buffer_get_by_idx(names[0]) === 'a_col' &&
-       Str_buffer_get_by_idx(names[1]) === 'a_wpos_time' &&
-       Str_buffer_get_by_idx(names[2]) === 'a_pos' &&
-       Str_buffer_get_by_idx(names[3]) === 'a_tex') {
+      Str_buffer_get_by_idx(names[1]) === 'a_wpos_time' &&
+      Str_buffer_get_by_idx(names[2]) === 'a_pos' &&
+      Str_buffer_get_by_idx(names[3]) === 'a_tex') {
       return 1;
    }
 
@@ -252,13 +252,13 @@ export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
 
    // Structure to use for updating a removed mesh's start index pointing to it's location in the vertex buffer..
    const ret = {
-       counts: [0, 0], // 0:vb, 1:ib
-       start: start,
-       last: (start + gfx.vb.count * num_faces >= vb.count) ? true : false,
-       empty: false, // Is the buffer is empty?
+      counts: [0, 0], // 0:vb, 1:ib
+      start: start,
+      is_last: (start + gfx.vb.count * num_faces >= vb.count) ? true : false,
+      empty: false, // Is the buffer is empty?
    };
 
-   ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start);
+   ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last);
 
 
    return ret;
@@ -275,10 +275,10 @@ export function Gl_remove_geometry_params(vbidx, num_faces = 1, start_index = 0,
 
    // Structure to use for updating a removed mesh's start index pointing to it's location in the vertex buffer..
    const ret = {
-       counts: [0, 0], // 0:vb, 1:ib
-       start: start,
-       last: (start + ((attribsPerVertex * verticesPerRect) * num_faces) >= vb.count) ? true : false,
-       empty: false, // Is the buffer is empty?
+      counts: [0, 0], // 0:vb, 1:ib
+      start: start,
+      last: (start + ((attribsPerVertex * verticesPerRect) * num_faces) >= vb.count) ? true : false,
+      empty: false, // Is the buffer is empty?
    };
 
    ret.counts[0] = vb.Remove_geometry_params(num_faces, start, attribsPerVertex, verticesPerRect);
@@ -305,11 +305,11 @@ export function Gl_set_vb_mesh_priority(progidx, vbIdx, meshIdx, meshCount) {
    const temp = new Array(meshCount);
    let c = meshStart;
    for (let i = 0; i < meshCount; i++) {
-       temp[i] = new Float32Array(meshSize);
-       for (let j = 0; j < meshSize; j++) {
-           temp[i][j] = vb[c];
-           c++;
-       }
+      temp[i] = new Float32Array(meshSize);
+      for (let j = 0; j < meshSize; j++) {
+         temp[i][j] = vb[c];
+         c++;
+      }
    }
 
 
@@ -319,16 +319,16 @@ export function Gl_set_vb_mesh_priority(progidx, vbIdx, meshIdx, meshCount) {
    let meshNewIdx = meshIdx;
 
    for (let i = meshIdx + meshCount; i < allmeshCount; i++) {
-       const newStart = vb.meshes[i].vb.start;
-       const newSize = vb.meshes[i].vb.count;
-       for (let j = newStart; j < newStart + newSize; j++) {
-           vb[k] = vb[j];
-           k++;
-       }
-       vb.meshes[i].vb.start = start;
-       vb.meshes[i].meshIdx = meshNewIdx; // Update the meshe's index
-       meshNewIdx++;
-       start = k; // Keep the start of current mesh as the next's iteration previus meshe's start
+      const newStart = vb.meshes[i].vb.start;
+      const newSize = vb.meshes[i].vb.count;
+      for (let j = newStart; j < newStart + newSize; j++) {
+         vb[k] = vb[j];
+         k++;
+      }
+      vb.meshes[i].vb.start = start;
+      vb.meshes[i].meshIdx = meshNewIdx; // Update the meshe's index
+      meshNewIdx++;
+      start = k; // Keep the start of current mesh as the next's iteration previus meshe's start
    }
 
    /**
@@ -336,13 +336,13 @@ export function Gl_set_vb_mesh_priority(progidx, vbIdx, meshIdx, meshCount) {
     */
    let cnt = start;
    for (let i = 0; i < meshCount; i++) {
-       for (let j = 0; j < meshSize; j++) {
-           vb[cnt] = temp[i][j];
-           cnt++;
-       }
-       vb.meshes[meshIdx + i].vb.start = start;
-       vb.meshes[meshIdx + i].meshIdx = meshNewIdx; // Update the meshe's index
-       start = cnt;
+      for (let j = 0; j < meshSize; j++) {
+         vb[cnt] = temp[i][j];
+         cnt++;
+      }
+      vb.meshes[meshIdx + i].vb.start = start;
+      vb.meshes[meshIdx + i].meshIdx = meshNewIdx; // Update the meshe's index
+      start = cnt;
    }
 }
 
@@ -403,19 +403,19 @@ export function Gl_set_RGBA(gfxInfo, color, num_faces = 1) {
    let index = gfxInfo.vb.start + a.offset;
    let verts = num_faces * gfxInfo.vertsPerRect;
    let stride = gfxInfo.attribsPerVertex - a.size;
-   
-   if(gfxInfo.vb.start < 0)
-   console.log()
+
+   if (gfxInfo.vb.start < 0)
+      console.log()
 
    while (verts) {
 
-       vb_data[index++] = color[0]; // Move mesh's x pos by amt
-       vb_data[index++] = color[1]; // Move mesh's x pos by amt
-       vb_data[index++] = color[2]; // Move mesh's x pos by amt
-       vb_data[index++] = color[3]; // Move mesh's x pos by amt
+      vb_data[index++] = color[0]; // Move mesh's x pos by amt
+      vb_data[index++] = color[1]; // Move mesh's x pos by amt
+      vb_data[index++] = color[2]; // Move mesh's x pos by amt
+      vb_data[index++] = color[3]; // Move mesh's x pos by amt
 
-       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-       verts--;
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      verts--;
    }
 
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
@@ -435,11 +435,11 @@ export function Gl_set_alpha(gfxInfo, val, num_faces) {
    let i = 0;
    while (verts) {
 
-       index += GRAPHICS_LAYOUT.ATTR_SELF_OFFSETS.ALPHA;
-       vb_data[index] = val; // Move mesh's x pos by amt
+      index += GRAPHICS_LAYOUT.ATTR_SELF_OFFSETS.ALPHA;
+      vb_data[index] = val; // Move mesh's x pos by amt
 
-       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-       verts--;
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -461,10 +461,10 @@ export function Gl_set_alpha_from_offset(gfxInfo, val, from_offset, num_faces) {
    let i = 0;
    while (verts) {
 
-       vb_data[index] = val; // Move mesh's x pos by amt
+      vb_data[index] = val; // Move mesh's x pos by amt
 
-       index += stride; // Go to next alpha attrib
-       verts--;
+      index += stride; // Go to next alpha attrib
+      verts--;
    }
 
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
@@ -484,23 +484,23 @@ export function Gl_set_dim_XY(gfxInfo, dim, num_faces = 1) {
 
    while (faces) {
 
-       vb_data[index++] = -dim[0];
-       vb_data[index++] = dim[1];
-       index += stride;
+      vb_data[index++] = -dim[0];
+      vb_data[index++] = dim[1];
+      index += stride;
 
-       vb_data[index++] = -dim[0];
-       vb_data[index++] = -dim[1];
-       index += stride;
+      vb_data[index++] = -dim[0];
+      vb_data[index++] = -dim[1];
+      index += stride;
 
-       vb_data[index++] = dim[0];
-       vb_data[index++] = dim[1];
-       index += stride;
+      vb_data[index++] = dim[0];
+      vb_data[index++] = dim[1];
+      index += stride;
 
-       vb_data[index++] = dim[0];
-       vb_data[index++] = -dim[1];
-       index += stride;
+      vb_data[index++] = dim[0];
+      vb_data[index++] = -dim[1];
+      index += stride;
 
-       faces--;
+      faces--;
    }
 
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
@@ -519,16 +519,16 @@ export function Gl_set_dim_X(gfxInfo, x, num_faces = 1) {
 
    while (faces) {
 
-       vb_data[index] = -x;
-       index += stride;
-       vb_data[index] = -x;
-       index += stride;
-       vb_data[index] = x;
-       index += stride;
-       vb_data[index] = x;
-       index += stride;
+      vb_data[index] = -x;
+      index += stride;
+      vb_data[index] = -x;
+      index += stride;
+      vb_data[index] = x;
+      index += stride;
+      vb_data[index] = x;
+      index += stride;
 
-       faces--;
+      faces--;
 
    }
 
@@ -548,16 +548,16 @@ export function Gl_set_dim_Y(gfxInfo, y, num_faces = 1) {
 
    while (faces) {
 
-       vb_data[index] = y;
-       index += stride;
-       vb_data[index] = -y;
-       index += stride;
-       vb_data[index] = y;
-       index += stride;
-       vb_data[index] = -y;
-       index += stride;
+      vb_data[index] = y;
+      index += stride;
+      vb_data[index] = -y;
+      index += stride;
+      vb_data[index] = y;
+      index += stride;
+      vb_data[index] = -y;
+      index += stride;
 
-       faces--;
+      faces--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -575,12 +575,12 @@ export function Gl_add_wpos_XYZ(gfxInfo, wpos, num_faces = 1) {
 
    while (verts) {
 
-       vb_data[index++] += wpos[0]; // Move mesh's x pos by amt
-       vb_data[index++] += wpos[1]; // Move mesh's y pos by amt
-       vb_data[index++] += wpos[2]; // Move mesh's y pos by amt
+      vb_data[index++] += wpos[0]; // Move mesh's x pos by amt
+      vb_data[index++] += wpos[1]; // Move mesh's y pos by amt
+      vb_data[index++] += wpos[2]; // Move mesh's y pos by amt
 
-       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-       verts--;
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -598,13 +598,13 @@ export function Gl_set_wpos_XYZ(gfxInfo, pos, num_faces = 1) {
 
    while (verts) {
 
-       vb_data[index++] = pos[0];
-       vb_data[index++] = pos[1];
-       vb_data[index++] = pos[2];
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
 
 
-       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-       verts--;
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -622,13 +622,13 @@ export function Gl_set_wpos_XY(gfxInfo, wpos, num_faces = 1) {
 
    while (verts) {
 
-       vb_data[index++] = wpos[0]; // Move mesh's x pos by amt
-       vb_data[index++] = wpos[1]; // Move mesh's y pos by amt
+      vb_data[index++] = wpos[0]; // Move mesh's x pos by amt
+      vb_data[index++] = wpos[1]; // Move mesh's y pos by amt
 
-       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-       verts--;
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      verts--;
    }
-   
+
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
 
@@ -645,11 +645,11 @@ export function Gl_add_wpos_XY(gfxInfo, wpos, num_faces = 1) {
 
    while (verts) {
 
-       vb_data[index++] += wpos[0]; // Move mesh's x pos by amt
-       vb_data[index++] += wpos[1]; // Move mesh's y pos by amt
+      vb_data[index++] += wpos[0]; // Move mesh's x pos by amt
+      vb_data[index++] += wpos[1]; // Move mesh's y pos by amt
 
-       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-       verts--;
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -667,9 +667,9 @@ export function Gl_add_wpos_X(gfxInfo, x, num_faces = 1) {
 
    while (verts) {
 
-       vb_data[index] += x; // Move mesh's x pos by amt
-       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-       verts--;
+      vb_data[index] += x; // Move mesh's x pos by amt
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -687,9 +687,9 @@ export function Gl_add_wpos_Y(gfxInfo, y, num_faces = 1) {
 
    while (verts) {
 
-       vb_data[index] += y; // Move mesh's x pos by amt
-       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-       verts--;
+      vb_data[index] += y; // Move mesh's x pos by amt
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -707,16 +707,16 @@ export function Gl_set_wpos_X(gfxInfo, posx, num_faces = 1) {
 
    while (faces) {
 
-       vb_data[index] = posx;
-       index += stride; // Go to next vertice's wposx.
-       vb_data[index] = posx;
-       index += stride; // Go to next vertice's wposx.
-       vb_data[index] = posx;
-       index += stride; // Go to next vertice's wposx.
-       vb_data[index] = posx;
-       index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posx;
+      index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posx;
+      index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posx;
+      index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posx;
+      index += stride; // Go to next vertice's wposx.
 
-       faces--;
+      faces--;
    }
 
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
@@ -735,16 +735,16 @@ export function Gl_set_wpos_Y(gfxInfo, posy, num_faces = 1) {
 
    while (faces) {
 
-       vb_data[index] = posy;
-       index += stride; // Go to next vertice's wposx.
-       vb_data[index] = posy;
-       index += stride; // Go to next vertice's wposx.
-       vb_data[index] = posy;
-       index += stride; // Go to next vertice's wposx.
-       vb_data[index] = posy;
-       index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posy;
+      index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posy;
+      index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posy;
+      index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posy;
+      index += stride; // Go to next vertice's wposx.
 
-       faces--;
+      faces--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -762,16 +762,16 @@ export function Gl_set_wpos_Z(gfxInfo, posz, num_faces = 1) {
 
    while (faces) {
 
-       vb_data[index] = posz;
-       index += stride; // Go to next vertice's wposx.
-       vb_data[index] = posz;
-       index += stride; // Go to next vertice's wposx.
-       vb_data[index] = posz;
-       index += stride; // Go to next vertice's wposx.
-       vb_data[index] = posz;
-       index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posz;
+      index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posz;
+      index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posz;
+      index += stride; // Go to next vertice's wposx.
+      vb_data[index] = posz;
+      index += stride; // Go to next vertice's wposx.
 
-       faces--;
+      faces--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -789,10 +789,10 @@ export function GlSetAttrRoundCorner(gfxInfo, val) {
 
    while (verts) {
 
-       vb_data[index++] = val;
+      vb_data[index++] = val;
 
-       index += stride; // Go to next vertice's borderWidth attrib.
-       verts--;
+      index += stride; // Go to next vertice's borderWidth attrib.
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -810,10 +810,10 @@ export function GlSetAttrBorderWidth(gfxInfo, val) {
 
    while (verts) {
 
-       vb_data[index++] = val;
+      vb_data[index++] = val;
 
-       index += stride; // Go to next vertice's borderWidth attrib.
-       verts--;
+      index += stride; // Go to next vertice's borderWidth attrib.
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -831,10 +831,10 @@ export function GlSetAttrBorderFeather(gfxInfo, val) {
 
    while (verts) {
 
-       vb_data[index++] = val;
+      vb_data[index++] = val;
 
-       index += stride; // Go to next vertice's borderWidth attrib.
-       verts--;
+      index += stride; // Go to next vertice's borderWidth attrib.
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -852,23 +852,23 @@ export function Gl_set_uv(gfxInfo, uvs, num_faces = 1) {
 
    while (num_faces) {
 
-       vb_data[index++] = uvs[0];
-       vb_data[index++] = uvs[3];
-       index += stride;
+      vb_data[index++] = uvs[0];
+      vb_data[index++] = uvs[3];
+      index += stride;
 
-       vb_data[index++] = uvs[0];
-       vb_data[index++] = uvs[2];
-       index += stride;
+      vb_data[index++] = uvs[0];
+      vb_data[index++] = uvs[2];
+      index += stride;
 
-       vb_data[index++] = uvs[1];
-       vb_data[index++] = uvs[3];
-       index += stride;
+      vb_data[index++] = uvs[1];
+      vb_data[index++] = uvs[3];
+      index += stride;
 
-       vb_data[index++] = uvs[1];
-       vb_data[index++] = uvs[2];
-       index += stride;
+      vb_data[index++] = uvs[1];
+      vb_data[index++] = uvs[2];
+      index += stride;
 
-       num_faces--;
+      num_faces--;
    }
 
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
@@ -886,23 +886,23 @@ export function Gl_set_uv2(vbidx, uvs, start, attr_offset, attr_size, attribs_pe
 
    while (num_faces) {
 
-       vb_data[index++] = uvs[0];
-       vb_data[index++] = uvs[3];
-       index += stride;
+      vb_data[index++] = uvs[0];
+      vb_data[index++] = uvs[3];
+      index += stride;
 
-       vb_data[index++] = uvs[0];
-       vb_data[index++] = uvs[2];
-       index += stride;
+      vb_data[index++] = uvs[0];
+      vb_data[index++] = uvs[2];
+      index += stride;
 
-       vb_data[index++] = uvs[1];
-       vb_data[index++] = uvs[3];
-       index += stride;
+      vb_data[index++] = uvs[1];
+      vb_data[index++] = uvs[3];
+      index += stride;
 
-       vb_data[index++] = uvs[1];
-       vb_data[index++] = uvs[2];
-       index += stride;
+      vb_data[index++] = uvs[1];
+      vb_data[index++] = uvs[2];
+      index += stride;
 
-       num_faces--;
+      num_faces--;
    }
 
 }
@@ -919,9 +919,9 @@ export function Gl_set_wpos_time(gfxInfo, val) {
 
    while (verts) {
 
-       vb_data[index] = val;
-       index += stride; // Go to next vertice's borderWidth attrib.
-       verts--;
+      vb_data[index] = val;
+      index += stride; // Go to next vertice's borderWidth attrib.
+      verts--;
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE); // HACK. // TODO suppose to be implemented in MESH????
 }

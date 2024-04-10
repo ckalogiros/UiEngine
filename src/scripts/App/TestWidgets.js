@@ -1,12 +1,12 @@
 "use strict";
-import { Widget_Button, Widget_Switch } from '../Engine/Drawables/Widgets/WidgetButton.js';
+import { Widget_Switch } from '../Engine/Drawables/Widgets/WidgetButton.js';
 import { Widget_Text } from '../Engine/Drawables/Widgets/WidgetText.js';
 // import { CubeGeometry } from '../Engine/Drawables/Geometry/Geometry3DCube.js';
 import { TimeIntervalsCreate, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
 import { Mesh } from '../Engine/Drawables/Meshes/Base/Mesh.js';
 import { Widget_Menu_Bar, Widget_Minimize } from '../Engine/Drawables/Widgets/WidgetMenu.js';
 import { Geometry2D } from '../Engine/Drawables/Geometry/Base/Geometry.js';
-import { Floor, FloorArr2, FloorArr3 } from '../Helpers/Math/MathOperations.js';
+import { FloorArr2, FloorArr3 } from '../Helpers/Math/MathOperations.js';
 import { Material } from '../Engine/Drawables/Material/Base/Material.js';
 
 
@@ -14,7 +14,7 @@ import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keys.js';
 import { GetShaderTypeId } from '../Graphics/Debug/GfxDebug.js';
 
 import { Dropdown_roots_set_root, Widget_Dropdown } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Debug_info_create_all_generic_info, Debug_info_ui_performance, TEMP_111111111111111111111111111, TEMP_222222222222222222222222222, TEMP_333333333333333333333333333 } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Debug_info_mesh_buffer_create_ui, Debug_info_program_buffer_create_ui, Debug_info_string_buffer_create_ui, Debug_info_ui_performance, Debug_info_vertex_buffer_create_ui } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Widget_Scroller } from '../Engine/Drawables/Widgets/WidgetScroller.js';
 import { GetRandomColor, GetSequencedColor } from '../Helpers/Helpers.js';
 import { Gl_framebuffer_render, Gl_framebuffer_render_mesh } from '../Graphics/Buffers/FrameBuffers.js';
@@ -30,8 +30,9 @@ import { BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_2
 import { View_build_group_from_root_mesh, View_set_view_start_vb_index } from '../Engine/Core/MeshBufferViews.js';
 import { Index_buffer_info_create } from '../Graphics/Buffers/IndexBuffers.js';
 import { getFile } from '../Engine/Core/FileSystem.js';
-import { Widget_Switch_Simple } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
-import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from '../Engine/Drawables/Operations/RelativePosComponent.js';
+import { New_generic_buffer } from '../Engine/Core/Buffers.js';
+import { MouseGetPos } from '../Engine/Controls/Input/Mouse.js';
+import { TEMP_Section_on_move_section } from '../Engine/Drawables/Meshes/Section.js';
 
 // var osu = require('node-os-utils')
 // import {osu} from 'node-os-utils'
@@ -65,6 +66,125 @@ import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_
 
 const _fontsize = 10;
 
+const temp_buffer = New_generic_buffer();
+const p = 10;
+const dim = [50, 25];
+const pos = [750, dim[1] + p, 5];
+function UserCreateRect(){
+    
+    let ypos = 100
+    const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [90, ypos, 0], [80, 40], GREY[2], 'Section');
+    s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+
+    const btn = Create_widget_button(_, 'Create Rect', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [20, ypos, 1], fontsize, GREEN[7], WHITE, [5, 5], .5);
+    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
+
+    s.AddItem(btn);
+    
+    btn.Bind(UserCreateRectCreate, null, {parent:s})
+    
+
+    s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    s.options = SECTION.VERTICAL|SECTION.EXPAND|SECTION.TOP_DOWN|SECTION.RESIZE_PARENT
+    // s.options = SECTION.VERTICAL|SECTION.EXPAND|SECTION.TOP_DOWN
+    s.Calc_no_gfx_update();
+    s.Render();
+    s.ConstructListeners();
+
+}
+
+function UserCreateRectCreate(params){
+    
+    const btn = params.target_mesh
+    const parent = params.params.parent
+
+    const line = Create_widget_section(_, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(GetRandomColor(), 1), 'sdf linem2');
+    // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    line.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+    line.OnClick = UserCreateRectOnClick;
+    line.AddToWidgetRootBuffer(parent.root_bufferidx);
+
+    // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    line.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [parent.gfx.prog.idx, parent.gfx.vb.idx]);
+
+    line.Render();
+
+    line.ConstructListeners();
+
+    // const line = SdfLine(GetRandomColor(), [500, 780, 5], [10, 10]);
+    line.StateEnable(MESH_STATE.IS_RESIZEABLE);
+    // temp_buffer.Add(line)
+
+    pos[1] += dim[1]*2 + p
+}
+
+function UserCreateRectOnClick(params) {
+
+    const section = params.evt_params.target_mesh;
+
+    STATE.mesh.SetClicked(section);
+
+    const mouse_click = params.trigger_params;
+    if(mouse_click === MOUSE.BTN_ID.RIGHT){
+
+        const mesh = Mesh_buffer_get_mesh_byidx(params.meshidx);
+        mesh.Destroy();
+        pos[1] -= dim[1]*2 + p
+        return true;
+
+    }
+
+    if (section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+
+       const right = section.geom.pos[0] + section.geom.dim[0];
+       const bottom = section.geom.pos[1] + section.geom.dim[1];
+
+       const point = MouseGetPos();
+       if (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1]) {
+
+          // We have Resize
+
+          if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
+             // console.log('X Y RESIZE');
+
+             const OnResizeFn = section.OnResize;
+             const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, section);
+             section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+          }
+          else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
+             // console.log('X RESIZE');
+          }
+          else { // Its a height resize
+             // console.log('Y RESIZE');
+          }
+
+          section.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB;
+          STATE.mesh.SetGrabed(section);
+
+          return true;
+       }
+
+
+       /** Create Move event.
+        * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
+        * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
+        */
+       const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, TEMP_Section_on_move_section, section);
+       section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+
+       if (section.StateCheck(MESH_STATE.IS_GRABABLE)) {
+
+          STATE.mesh.SetGrabed(section);
+          section.StateEnable(MESH_STATE.IN_GRAB);
+       }
+
+    }
+
+    return true;
+
+ }
+
 export function TestWidgetsGeneric(scene) {
 
     // setInterval(()=>{
@@ -87,6 +207,10 @@ export function TestWidgetsGeneric(scene) {
     Time_intervals_initialize();
 
 
+
+    // Debug_info_mesh_buffer_create_ui();
+
+
     // getFile()
 
 
@@ -97,7 +221,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    const uidbg = Debug_info_ui_performance(scene);
+    // const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -135,8 +259,14 @@ export function TestWidgetsGeneric(scene) {
     // obj.Set(4.2);
     // obj.Update();
 
-    // SdfLine(GREEN[7], [500, 600, 5], [800, 10]);
-    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
+    UserCreateRect()
+
+    // SdfLine(GREEN[7], [500, 780, 5], [800, 10]);
+    // let ms = 2000;
+    // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000; 
+    // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000;
+    // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000;
+    // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000;
     // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
     // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
     // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
@@ -260,10 +390,10 @@ export function TestWidgetsGeneric(scene) {
 
     // Test_scroller_in_between();
 
-    // Debug_info_create_all_generic_info();
-    // TEMP_111111111111111111111111111();
-    // TEMP_222222222222222222222222222();
-    // TEMP_333333333333333333333333333();
+    Debug_info_mesh_buffer_create_ui();
+    // Debug_info_vertex_buffer_create_ui();
+    // Debug_info_program_buffer_create_ui();
+    // Debug_info_string_buffer_create_ui();
 
     // Scenes_debug_info_create(scene);
 
@@ -898,7 +1028,7 @@ function CreateSlider() {
 function SdfLine(col, pos, dim) {
 
 
-    const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(col, 1));
+    const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(col, 1), 'sdf linem2');
     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
 
     // const line1 = Create_widget_section(_, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(GREEN[7], 1.5));
@@ -913,7 +1043,7 @@ function SdfLine(col, pos, dim) {
     // const timer = TimersCreateTimer(0.01, 10, .1, 'T1', TEMP_TIMER_CLBK, params);
 
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    line.Activate();
+    // line.Activate();
     line.Render();
     // line.Calc();
     line.ConstructListeners();
@@ -1884,77 +2014,7 @@ function CreateMenuSectioned(scene) {
     // Widget_root_batch_create_from_root_children(section.root_bufferidx);
 }
 
-function CreateSectionedMixWidgetsWithMenu(scene) {
 
-    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 400, 0], [0, 0], TRANSPARENCY(GREY[1], .5))
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-    {
-        // Add Menu bar
-        // const menu = Create_widget_menubar (_, 'Widget Menu bar', ALIGN.LEFT, [60, 200, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
-        // menu.AddCloseButton(section, 'x');
-        // menu.AddMinimizeButton(section);
-        // menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-        // section.AddItem(menu)
-
-        // Add Minimizer
-        const minimizer = new Widget_Minimize(section, section.geom.pos, 10);
-        minimizer.SetName('minimizer')
-        minimizer.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        section.AddItem(minimizer)
-
-        // Add close button
-        // const close = new Close_Button(section, 'x', section.geom.pos, 10);
-        // close.SetName('close')
-        // close.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        // section.AddItem(close)
-    }
-    {
-        const lb = Create_widget_label(_, 'Label', ALIGN.BOTTOM, [0, 0, 0], 10, BLUE_10_120_220);
-        section.AddItem(lb);
-    }
-    {
-        const dt = Create_widget_multi_text(_, 'Dynamic text', '0000000', ALIGN.VERTICAL, [0, 0, 0], 10, BLUE_10_120_220, PURPLER[7]);
-        section.AddItem(dt);
-    }
-    {
-        const slider = Create_widget_slider(_, [0, 0, 0], [60, 10], PURPLER[7], [2, 4]);
-        section.AddItem(slider);
-    }
-    {
-        const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5))
-        s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-
-        const menu = Create_widget_menubar(_, 'Widget Menu bar', ALIGN.LEFT, [0, 0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), WHITE, [10, 6]);
-        menu.AddCloseButton(_, s2, 'x');
-        menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-        s2.AddItem(menu);
-
-        const slider = Create_widget_slider(_, [0, 0, 0], [80, 10], BLUEL[7]);
-        s2.AddItem(slider);
-
-        {
-            const s3 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREEN[7], .5))
-            s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-
-            const menu = Create_widget_menubar(_, 'Widget Menu bar', ALIGN.LEFT, [0, 0, 0], TRANSPARENCY(GREEN[7], .5), WHITE, [10, 6]);
-            menu.AddCloseButton(_, s3, 'x');
-            menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            s3.AddItem(menu);
-
-            const slider = Create_widget_slider(_, [0, 0, 0], [80, 10], GREEN[7]);
-            s3.AddItem(slider);
-            s2.AddItem(s3);
-        }
-
-        section.AddItem(s2);
-    }
-
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    section.Calc();
-    section.Render();
-    section.ConstructListeners();
-}
 
 function CreateManySectionsWithMenu(scene) {
 
@@ -2227,86 +2287,7 @@ function CreateSectionedMenuBarsWithNestedSliders2(scene) {
     return section;
 }
 
-function CreateSectionedMenuBarsWithNestedWidgets(scene) {
 
-    let cnt = 1;
-
-    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[1], .5))
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-
-    const menu = Create_widget_menubar(_, 'Widget Menu bar 0', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .5), WHITE, [10, 6]);
-    menu.AddCloseButton(_, section, 'x');
-    menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.AddItem(menu);
-
-    const slider = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-    section.AddItem(slider);
-
-    {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[6], .5))
-
-        const m = Create_widget_menubar(_, 'Widget Menu bar 1', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .9), WHITE, [10, 6]);
-        m.AddCloseButton(_, s, 'x');
-        m.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        s.AddItem(m);
-
-        const sl = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-        sl.SetName(`Slider 10`)
-        s.AddItem(sl);
-
-        section.AddItem(s);
-
-        {
-            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[6], .5))
-
-            const m2 = Create_widget_menubar(_, 'Widget Menu bar 2', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .5), WHITE, [10, 6]);
-            m2.AddCloseButton(_, s2, 'x');
-            s2.AddItem(m2);
-
-            const sl1 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-            s2.AddItem(sl1);
-
-            s.AddItem(s2);
-            {
-                const s3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [250, 600, 0], [0, 0], TRANSPARENCY(GREY[6], .5))
-
-                const m3 = Create_widget_menubar(_, 'Widget Menu bar 3', ALIGN.LEFT, [200, 400, 0], TRANSPARENCY(GREY[1], .5), WHITE, [10, 6]);
-                m3.AddCloseButton(_, s3, 'x');
-                s3.AddItem(m3);
-
-                const sl3 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-                s3.AddItem(sl3);
-
-                // With buttons
-                const btn = Create_widget_button(_, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _fontsize, GREY[1], WHITE, [4, 4], .5);
-                s3.AddItem(btn);
-
-                // With switch
-                const switch1 = new Widget_Switch('switch on', 'switch off', [0, 0, 0], _fontsize, GREY[1], WHITE, [4, 4], .5);
-                switch1.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
-                switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [6, 6, 3] })
-                switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
-                s3.AddItem(switch1);
-
-                // With dynamic text
-                const dt = Create_widget_multi_text(_, 'Dynamic text', 'value', ALIGN.VERTICAL, [100, 300, 0], _fontsize, BLUE_10_120_220, PURPLER[7]);
-                dt.CreateNewText('Text 2', _fontsize, PURPLE, [2, 2]);
-                dt.CreateNewText('Text 3', _fontsize, GREEN[7], [2, 2]);
-                dt.CreateNewText('Text 4 very long text', _fontsize, WHITE, [2, 2]);
-                dt.Align_pre(dt, ALIGN.VERTICAL);
-                s3.AddItem(dt);
-
-                s2.AddItem(s3);
-            }
-        }
-    }
-
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    section.Calc();
-    section.Render();
-    section.ConstructListeners();
-}
 
 function CreateMenuBarSectioned(count) {
 
@@ -2552,308 +2533,7 @@ function CreateManySections(scene) {
     return blu;
 }
 
-function CreateManySectionsWithLabelsAndMinimizer(scene) {
 
-    const tr = 1.;
-    const flags = (SECTION.ITEM_FIT | SECTION.EXPAND);
-
-    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [865, 600, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
-
-    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-    const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-    const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-    const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-
-
-    { // Construct sub-sections
-        var bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-        var blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[7], tr));
-        var pur_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE, tr));
-        var red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-        var yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-        var yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
-        var red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-        var yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-        var yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-        var gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[5], tr));
-        var gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[7], tr));
-        var gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-
-    }
-
-    // Construct widgets
-    const label = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0]);
-    label.SetName('Sectioned btn1')
-    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-    blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-    const btn = Create_widget_button(_, 'btnl', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0]);
-    btn.SetName('Sectioned btn1')
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-
-    { // Set naming and listeners
-        red.SetName('red');
-        gre.SetName('gre');
-        yel.SetName('yel');
-        ora.SetName('ora');
-        cie.SetName('cie');
-        bla.SetName('bla');
-        bla_1.SetName('bla_1');
-        pin_1.SetName('pin_1');
-        blu_1.SetName('blu_1');
-        pur_1.SetName('pur_1');
-        red_1.SetName('red_1');
-        yel_1.SetName('yel_1');
-        yel_2.SetName('yel_2');
-        red_3.SetName('red_3');
-        yel_3.SetName('yel_3');
-        gre_3.SetName('gre_3');
-        red_4.SetName('red_4');
-        yel_4.SetName('yel_4');
-        gre_4.SetName('gre_4');
-        ora_4.SetName('ora_4');
-        gry1_1.SetName('gry1_1');
-        gry1_2.SetName('gry1_2');
-        gry1_3.SetName('gry1_3');
-        gry2_1.SetName('gry2_1');
-        gry2_2.SetName('gry2_2');
-        gry2_3.SetName('gry2_3');
-        gry2_4.SetName('gry2_4');
-        vert_0.SetName('vert_0');
-    }
-
-    { // Set listeners
-        red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gre.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        ora.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        cie.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        bla.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        bla_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        pin_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        blu_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        pur_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        red_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        red_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gre_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        red_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gre_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        ora_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry1_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry1_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry2_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry2_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry2_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry2_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        vert_0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    }
-
-    { // Set hierarchy
-        pin_1.AddItem(gry2_1, flags); pin_1.AddItem(gry2_2, flags);
-        blu_1.AddItem(gry2_3, flags); blu_1.AddItem(gry2_4, flags);
-        bla_1.AddItem(pin_1, flags); bla_1.AddItem(blu_1, flags);
-        red.AddItem(bla_1); red.AddItem(yel, flags); red.AddItem(ora, flags); red.AddItem(cie, flags);
-        yel.AddItem(gre_4, flags); yel.AddItem(pur_1, flags); yel.AddItem(red_3, flags);
-        ora.AddItem(yel_4, flags); ora.AddItem(red_4, flags); ora.AddItem(yel_2, flags); ora.AddItem(ora_4, flags);
-        cie.AddItem(gre_3, flags); cie.AddItem(yel_3, flags); cie.AddItem(bla, flags);
-        bla.AddItem(gry1_1, flags); bla.AddItem(gry1_2, flags); bla.AddItem(gry1_3, flags);
-        gry1_1.AddItem(label, flags); gry1_1.AddItem(btn, flags); gry1_1.AddItem(vert_0, flags);
-        gre.AddItem(yel_1, flags); gre.AddItem(red_1, flags);
-    }
-
-    const minimizer = Create_widget_minimize_btn(_, blu, blu.geom.pos, 10);
-    minimizer.SetName('minimizer 000')
-    minimizer.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    blu.AddItem(minimizer);
-
-    yel.AddItem(gre, flags);
-    blu.AddItem(red, flags);
-
-    Widgetroot_buffer_print_w1();
-    Widgetroot_gfx_print_w3()
-
-    blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    blu.ActivateAndChildrenRecursive()
-    blu.Render();
-    blu.Calc();
-    blu.ConstructListeners();
-    return blu;
-}
-
-function CreateManySectionsWithScroller(scene) {
-
-    const tr = 1.;
-    const flags = (SECTION.ITEM_FIT | SECTION.EXPAND);
-
-    const blu = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [350, 500, 0], [10, 0], TRANSPARENCY(BLUEL[7], tr));
-
-    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-    const gre = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    const ora = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-    const cie = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-    const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-
-
-    { // Construct sub-sections
-        var bla_1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-        var blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[7], tr));
-        var pur_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE, tr));
-        var red_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-        var yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-        var yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
-        var red_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-        var yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-        var yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-        var gre_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-        var gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[5], tr));
-        var gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[7], tr));
-        var gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-        var vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-
-    }
-
-    // Construct widgets
-    const label = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0]);
-    const btn = Create_widget_button(_, 'btnl', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0]);
-
-    { // Set widgets parameters
-        label.SetName('Sectioned btn1')
-        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-
-        btn.SetName('Sectioned btn1')
-        btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-        btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    }
-
-    { // Set naming and listeners
-        red.SetName('red');
-        gre.SetName('gre');
-        yel.SetName('yel');
-        ora.SetName('ora');
-        cie.SetName('cie');
-        bla.SetName('bla');
-        bla_1.SetName('bla_1');
-        pin_1.SetName('pin_1');
-        blu_1.SetName('blu_1');
-        pur_1.SetName('pur_1');
-        red_1.SetName('red_1');
-        yel_1.SetName('yel_1');
-        yel_2.SetName('yel_2');
-        red_3.SetName('red_3');
-        yel_3.SetName('yel_3');
-        gre_3.SetName('gre_3');
-        red_4.SetName('red_4');
-        yel_4.SetName('yel_4');
-        gre_4.SetName('gre_4');
-        ora_4.SetName('ora_4');
-        gry1_1.SetName('gry1_1');
-        gry1_2.SetName('gry1_2');
-        gry1_3.SetName('gry1_3');
-        gry2_1.SetName('gry2_1');
-        gry2_2.SetName('gry2_2');
-        gry2_3.SetName('gry2_3');
-        gry2_4.SetName('gry2_4');
-        vert_0.SetName('vert_0');
-    }
-
-    { // Set listeners
-        red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gre.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        ora.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        cie.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        bla.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        bla_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        pin_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        blu_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        pur_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        red_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        red_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gre_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        red_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        yel_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gre_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        ora_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry1_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry1_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry2_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry2_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry2_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        gry2_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        vert_0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    }
-
-    { // Set hierarchy
-        pin_1.AddItem(gry2_1, flags); pin_1.AddItem(gry2_2, flags);
-        blu_1.AddItem(gry2_3, flags); blu_1.AddItem(gry2_4, flags);
-        bla_1.AddItem(pin_1, flags); bla_1.AddItem(blu_1, flags);
-        red.AddItem(bla_1); red.AddItem(yel, flags); red.AddItem(ora, flags); red.AddItem(cie, flags);
-        yel.AddItem(gre_4, flags); yel.AddItem(pur_1, flags); yel.AddItem(red_3, flags);
-        ora.AddItem(yel_4, flags); ora.AddItem(red_4, flags); ora.AddItem(yel_2, flags); ora.AddItem(ora_4, flags);
-        cie.AddItem(gre_3, flags); cie.AddItem(yel_3, flags); cie.AddItem(bla, flags);
-        bla.AddItem(gry1_1, flags); bla.AddItem(gry1_2, flags); bla.AddItem(gry1_3, flags);
-        gry1_1.AddItem(label, flags); gry1_1.AddItem(btn, flags); gry1_1.AddItem(vert_0, flags);
-        gre.AddItem(yel_1, flags); gre.AddItem(red_1, flags);
-    }
-
-    yel.AddItem(gre, flags);
-
-    const minimizer = Create_widget_minimize_btn(_, blu, blu.geom.pos, 10);
-    minimizer.SetName('minimizer')
-    minimizer.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    blu.AddItem(minimizer);
-
-    // Add close button
-    // const close = new Close_Button(blu, 'x', blu.geom.pos, 10);
-    // close.SetName('close')
-    // close.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // blu.AddItem(close)
-
-    blu.AddItem(red, flags);
-    blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // blu.ConstructListeners();
-
-    const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, blu, [100, 100]);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    scroller.Render();
-    scroller.Calc();
-    scroller.ConstructListeners();
-}
 
 function CreateScroller(scene) {
 
@@ -2983,207 +2663,6 @@ function CreateScroller(scene) {
 
     View_build_group_from_root_mesh(scroller.scrolled_section);
 
-
-
-    // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, scroller.scrolled_section);
-    // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, section);
-
-    // { // Add more items to the scroller's scrolled section, to debug the correct behavior of the scroller's re-size and reposition.
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [], []);
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-    // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx();
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-    // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx();
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-    // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx();
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-    // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx();
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-
-    return scroller;
-}
-
-function CreateScrollerManyMeshes(scene) {
-
-    const fontsize = 8;
-
-    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 450, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
-    const colors = [REDL[0], REDL[7], REDL[7], REDL[3], REDL[7], REDL[5], REDL[6], REDL[7], REDL[8], REDL[9],];
-    const count = colors.length;
-
-    for (let i = 0; i < 30; i++) {
-        {
-            const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GetRandomColor(), .6));
-            section.AddItem(s);
-            {
-                const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GetRandomColor(), .6));
-                s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-                s.AddItem(s1);
-                {
-                    // const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [5, 5], [280, 650, 0], [50, 5], TRANSPARENCY(GetRandomColor(), .6));
-                    // s.AddItem(s1);
-                    {
-                        const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                        s1.AddItem(s2);
-                    }
-                    {
-                        const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                        s1.AddItem(s2);
-                    }
-                    {
-                        const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                        s1.AddItem(s2);
-                    }
-                    {
-                        const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                        s1.AddItem(s2);
-                    }
-                    {
-                        const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                        s1.AddItem(s2);
-                    }
-                    {
-                        const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                        s1.AddItem(s2);
-                    }
-                    {
-                        const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                        s1.AddItem(s2);
-                    }
-                }
-            }
-            {
-                const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [5, 5], [280, 650, 0], [50, 5], TRANSPARENCY(GetRandomColor(), .6));
-                s.AddItem(s1);
-                {
-                    const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                    s1.AddItem(s2);
-                }
-                {
-                    const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                    s1.AddItem(s2);
-                }
-                {
-                    const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                    s1.AddItem(s2);
-                }
-                {
-                    const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                    s1.AddItem(s2);
-                }
-                {
-                    const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                    s1.AddItem(s2);
-                }
-                {
-                    const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                    s1.AddItem(s2);
-                }
-                {
-                    const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                    s1.AddItem(s2);
-                }
-            }
-            {
-                // const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [5, 5], [280, 650, 0], [50, 5], TRANSPARENCY(GetRandomColor(), .6));
-                // s.AddItem(s1);
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-            }
-            {
-                // const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [5, 5], [280, 650, 0], [50, 5], TRANSPARENCY(GetRandomColor(), .6));
-                // s.AddItem(s1);
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-                // {
-                //     const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6));
-                //     s1.AddItem(s2);
-                // }
-            }
-            // const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
-            // s.AddItem(l);
-        }
-    }
-
-    const scroller = new Widget_Scroller(section, [100, 100]);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    scroller.Calc();
-
-    // TEST CLAMP children buffer
-    {
-        scroller.renderables.size = 10;
-        scroller.renderables.center = scroller.renderables.size / 2;
-        scroller.renderables.first_all = 0;
-        scroller.renderables.last_all = scroller.renderables.size;
-        // TEMP_CONCATE_(scroller.scrolled_section, scroller.renderables);
-    }
-
-    scroller.Render();
-    scroller.ConstructListeners();
 
 
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, scroller.scrolled_section);
@@ -3775,51 +3254,6 @@ function Help(scene) {
     return section;
 }
 
-function Help2(scene) {
-
-
-    const flags = (SECTION.ITEM_FIT);
-
-    //options, margin, pos, dim, col, name
-    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [VIEWPORT.RIGHT - 230, VIEWPORT.BOTTOM - 340, 0], [100, 100], TRANSPARENCY(REDL, .2));
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.SetName('Help section')
-
-    // scene.StoreMesh(section)
-    const s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 10], [220, 400, 0], [0, 0], TRANSPARENCY(GREY[1], .2));
-    s1.SetName('Help section 2')
-
-    let msgs = [];
-    for (let i = 0; i < DEBUG_PRINT_KEYS.length; i++) {
-
-        msgs[i] = '\"' + DEBUG_PRINT_KEYS[i].key + '\": ' + DEBUG_PRINT_KEYS[i].discr
-
-        const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 10, TRANSPARENCY(ORANGE_240_160_10, 1.0), WHITE, [7, 3], .5, [0, 4, 3])
-        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-
-        s1.AddItem(label)
-    }
-
-    // s1.Calc()
-
-    const minimizer = Create_widget_minimize_btn(section, section.geom.pos, 10);
-    minimizer.SetName('minimizer2')
-
-    section.AddItem(minimizer);
-    section.AddItem(s1)
-
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    section.Calc()
-    section.Render();
-    //*Gfx_end_session(true);
-
-    section.ConstructListeners();
-
-    // Create_root_widget_buffer(section);
-    // Create_widget_tree_from_root(section);
-
-    return section;
-}
 
 
 let first_text_child_idx = INT_NULL; // If minimizer is anabled, have a ref to the fist text child for the text updates
@@ -3890,7 +3324,7 @@ function MeshInfoUpdate(params) {
     if(minimize_btn.toggle === true) 
         return;
 
-    _pt_mesh_info_tip.timer.Start();
+    // _pt_mesh_info_tip.timer.Start();
 
     // TODO: IMPLEMENT - Skip if nothing changed(from previous hover). The question is how to implement an easy and efficient change
 
@@ -3954,108 +3388,7 @@ function MeshInfoUpdate(params) {
         }
     }
 
-    _pt_mesh_info_tip.timer.Stop();
-}
-
-
-
-function Menu_labels_switches(scene) {
-
-    const flags = (SECTION.ITEM_FIT);
-
-    const section = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [120, 300, 0], [0, 0], TRANSPARENCY(GREY[1], .2));
-    const s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 2], [220, 400, 0], [0, 0], TRANSPARENCY(GREY[1], .2));
-    const s2 = Create_widget_section(_, SECTION.VERTICAL, [7, 2], [220, 400, 0], [0, 0], TRANSPARENCY(GREY[1], .3));
-
-    const label1 = Create_widget_label(_, 'options 1', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
-    const label2 = Create_widget_label(_, 'options 2', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
-    const label3 = Create_widget_label(_, 'options 3', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
-    const label4 = Create_widget_label(_, 'options 4', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [1, 1], [7, 6], .5, undefined, [0, 4, 1])
-
-    const switch1 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [4, 6], .5, undefined, [2, 8, 1]);
-    const switch2 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [4, 6], .5, undefined, [2, 8, 1]);
-    const switch3 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(GREY[1], .0), WHITE, [4, 6], .5, undefined, [2, 8, 1]);
-    const switch4 = new Widget_Switch('on', 'off', [400, 700, 0], 4, TRANSPARENCY(BLUE_10_120_220, .2), WHITE, [4, 6], .5, undefined, [2, 4, 1]);
-
-    s1.AddItem(label1, flags)
-    s1.AddItem(label2, flags)
-    s1.AddItem(label3, flags)
-    s1.AddItem(label4, flags)
-
-    s2.AddItem(switch1, flags)
-    s2.AddItem(switch2, flags)
-    s2.AddItem(switch3, flags)
-    s2.AddItem(switch4, flags)
-
-    section.AddItem(s1, flags)
-    section.AddItem(s2, flags)
-
-    section.Calc(flags)
-
-    scene.AddMesh(section);
-
-    scene.AddMesh(label1);
-    scene.AddMesh(label2);
-    scene.AddMesh(label3);
-    scene.AddMesh(label4);
-
-    scene.AddMesh(switch1);
-    scene.AddMesh(switch2);
-    scene.AddMesh(switch3);
-    scene.AddMesh(switch4);
-
-    section.UpdateGfx(section, scene.sceneidx);
-    // section.UpdateGfxRecursive(section);
-    console.log();
-}
-
-function CreateStyledRects(scene) {
-
-    {
-        const geom = new Geometry2D([100, 420, 0], [50, 50]);
-        const mat = new Material(ORANGE_240_160_10);
-
-        const mesh = new Mesh(geom, mat);
-        mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-        mesh.SetStyle([8, 35, 3]);
-        mesh.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
-        scene.AddMesh(mesh);
-        mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    }
-    {
-        const geom = new Geometry2D([204, 420, 0], [50, 50]);
-        const mat = new Material(PURPLER[7]);
-        mat.col = PURPLER[7];
-        const mesh = new Mesh(geom, mat);
-        mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-        mesh.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
-        mesh.SetStyle([20, 35, 3]);
-        scene.AddMesh(mesh);
-        mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    }
-    {
-        const geom = new Geometry2D([308, 420, 0], [50, 50]);
-        const mat = new Material(GREEN[7]);
-        const mesh = new Mesh(geom, mat);
-        mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-        mesh.SetStyle([10, 15, 3]);
-        mesh.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
-        mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        scene.AddMesh(mesh);
-        mesh.SetColor(WHITE);
-
-    }
-    {
-        const geom = new Geometry2D([412, 420, 0], [50, 50]);
-        const mat = new Material(BLUE_10_120_220);
-        const mesh = new Mesh(geom, mat);
-        mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-        mesh.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
-        mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        mesh.SetStyle([25, 15, 3]);
-        scene.AddMesh(mesh);
-        mesh.SetColor(ORANGE_240_160_10);
-    }
+    // _pt_mesh_info_tip.timer.Stop();
 }
 
 function Create3DCubes(scene) {

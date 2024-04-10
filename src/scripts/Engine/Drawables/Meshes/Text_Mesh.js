@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_set_texidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_set_texidx, Vertex_buffer_state_enable, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { AddArr3, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Gfx_generate_context, GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js"; ``
@@ -9,7 +9,7 @@ import { FontMaterial } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Font_get_char_plane_bounds, Font_get_char_uv_coords, Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { Gl_set_dim_XY, Gl_set_uv, Gl_set_uv2, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
 import { WHITE } from "../Material/Base/Colors.js";
 
@@ -56,12 +56,12 @@ export class Text_Mesh extends Mesh {
 
 
    AddToGfxBuffer() {
-      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
    }
 
 
    RemoveFromGfxBuffer() {
-      Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
+      Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
    }
 
 
@@ -128,7 +128,7 @@ export class Text_Mesh extends Mesh {
 
 
       // Add entry to Gfx Buffer
-      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
 
 
       this.is_gfx_inserted = true;
@@ -184,10 +184,64 @@ export class Text_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
 
    }
 
+
+   // TODO:Use it
+   UpdateGfx() {
+
+      const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
+         pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
+         dim: [this.geom.dim[0], this.geom.dim[1]],
+      }
+
+      const advancex = Font_get_font_advancex(this.mat.texidx);
+      this.gfx.tb.idx = this.mat.texidx;
+      const face_count = this.mat.char_buffer.active_count; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
+      const space_char_uv = Font_get_char_uv_coords(this.mat.uvIdx, ' ');
+
+
+      for (let i = 0; i < face_count; i++) {
+
+         // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
+         this.mat.uv = space_char_uv;
+
+         if (this.mat.char_buffer.buffer[i]) { // If there is a text, get char uv and metrics
+
+            this.mat.uv = Font_get_char_uv_coords(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
+            const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
+            geom_copy.dim[0] *= plane_bounds.width;
+            geom_copy.dim[1] *= plane_bounds.height;
+            geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
+
+         }
+
+         if(this.is_gfx_inserted) 
+            Vertex_buffer_update_vertices(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`)
+         else{
+
+            if (i === 0) {
+               this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
+               this.is_gfx_inserted = true;
+            }
+            else {
+               Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
+            }
+         }
+
+
+         geom_copy.pos[0] += (this.fontsize * 2 * advancex);
+
+         // Reset geometry copy
+         geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
+
+      }
+
+      this.is_gfx_inserted = true;
+
+   }
 
    ResetText(new_text) {
 
@@ -495,7 +549,7 @@ export class Text_Mesh extends Mesh {
                break
          }
       }
-      else if (right+face_width < limit && this.mat.char_buffer.active_count < text_len) {
+      else if (right+face_width< limit && this.mat.char_buffer.active_count < text_len) {
 
          changes_happended = true;
          for (let i = this.mat.char_buffer.active_count; i < text_len; i++) {

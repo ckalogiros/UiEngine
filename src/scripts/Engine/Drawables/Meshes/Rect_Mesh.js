@@ -6,8 +6,8 @@ import { Material } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Gfx_buffer_remove_mesh_by_vbidx, Gfx_buffer_store, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 
 
 export class Rect extends Mesh {
@@ -54,12 +54,12 @@ export class Rect extends Mesh {
 
 
    AddToGfxBuffer() { 
-      this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
    }
 
 
    RemoveFromGfxBuffer() { 
-      Gfx_buffer_remove_mesh_by_vbidx(this.gfx.vb.idx, this.gfx_bufferidx);
+      Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
    }
 
 
@@ -111,39 +111,33 @@ export class Rect extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
-
-
-      // if (this.batch_buffer_vbidx !== INT_NULL) Widget_root_batch_update_increment_accumulator(this.root_bufferidx, this.batch_buffer_vbidx, this.geom.num_faces);
-
-      // const params = {
-      //    progidx: this.gfx.prog.idx,
-      //    vbidx: this.gfx.vb.idx,
-      //    mesh: this,
-      // }
-      // Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_MESH, params);
-
-      // const params2 = {
-      //    progidx: this.gfx.prog.idx,
-      //    vbidx: this.gfx.vb.idx,
-      //    sceneidx: this.sceneidx,
-      //    isActive: true,
-      //    isPrivate: (FLAGS & GFX_CTX_FLAGS.PRIVATE) ? true : false,
-      //    type: INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX,
-      // }
-      // Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_GFX, params2);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
+      
+      return this.gfx.vb.start;
+   }
+   
+   
+   AddToGfxFromReset() {
+      
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName())
+      this.is_gfx_inserted = true;
+      
+      // Add entry to Gfx Buffer
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }
 
 
-   AddToGfxFromReset() {
+   // TODO: Use it
+   UpdateGfx() {
 
-      this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
-      this.is_gfx_inserted = true;
-
-      // Add entry to Gfx Buffer
-      // this.gfx_bufferidx = Gfx_buffer_store(this.gfx.vb.idx, this.mesh_bufferidx);
+      if(this.is_gfx_inserted) 
+         Vertex_buffer_update_vertices(this.gfx, this.geom, this.mat, this.GetName())
+      else {
+         this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
+         this.is_gfx_inserted = true;
+      }
 
       return this.gfx.vb.start;
    }

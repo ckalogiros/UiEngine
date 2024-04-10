@@ -9,7 +9,7 @@ import { Mesh_print_all_mesh_listeners } from "../../Drawables/Meshes/Base/Mesh.
 import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
 import { Info_listener_print_buffer } from "../../Drawables/DebugInfo/InfoListeners.js";
-import { Mesh_buffer_print, Mesh_buffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widget_group_buffer_print_w5, Widgetroot_buffer_print_w6, Gfx_buffer_print, Gfx_buffer_print_loop } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_print, Mesh_buffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widget_group_buffer_print_w5, Widgetroot_buffer_print_w6, Mesh_per_vb_print, Gfx_buffer_print_loop } from "../../Core/MeshBuffer.js";
 import { Str_buffer_print, Str_buffer_mesh_names_print, Str_buffer_mesh_names_print_loop, Str_buffer_print_loop } from "../../Core/StringBuffer.js";
 import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js";
@@ -18,6 +18,8 @@ import { Gl_program_print } from "../../../Graphics/ShaderPrograms.js";
 import { Shader_attributes_print } from "../../../Graphics/ShaderAttributes.js";
 import { Gfx_pool_print } from "../../Interfaces/Gfx/GfxPool.js";
 import { View_buffer_print, View_buffer_print_loop } from "../../Core/MeshBufferViews.js";
+import { Styles_hover_margin_print, Styles_hover_margin_print_loop, Styles_margin_print, Styles_margin_print_loop, Styles_pad_buffer_print, Styles_pad_buffer_print_loop } from "../../Styles.js";
+import { TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
 
 _CNT = 0;
 const em = _CNT++;
@@ -66,6 +68,13 @@ const g2 = _CNT++;
 const g5 = _CNT++;
 const g6 = _CNT++;
 const p1 = _CNT++;
+const t1 = _CNT++;
+const t2 = _CNT++;
+const t3 = _CNT++;
+const t4 = _CNT++;
+const t5 = _CNT++;
+const t6 = _CNT++;
+const y1 = _CNT++;
 
 export const DEBUG_PRINT_KEYS = [
 
@@ -402,10 +411,10 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'g1',
-      discr: 'Gfx_buffer_print',
+      discr: 'Mesh_per_vb_print',
       func: (e)=>{
-         console.log('------------------ Gfx_buffer_print ------------------');
-         Gfx_buffer_print()
+         console.log('------------------ Mesh_per_vb_print ------------------');
+         Mesh_per_vb_print()
       },
    },
    {
@@ -438,6 +447,62 @@ export const DEBUG_PRINT_KEYS = [
       func: (e)=>{
          console.log('------------------ Gl_program_print() ------------------');
          Gl_program_print();
+      },
+   },
+   {
+      key: 't1',
+      discr: 'Styles_margin_print()',
+      func: (e)=>{
+         console.log('------------------ Styles_margin_print() ------------------');
+         Styles_margin_print();
+      },
+   },
+   {
+      key: 't2',
+      discr: 'Styles_margin_print_loop()',
+      func: (e)=>{
+         console.log('------------------ Styles_margin_print_loop() ------------------');
+         Styles_margin_print_loop();
+      },
+   },
+   {
+      key: 't3',
+      discr: 'Styles_hover_margin_print()',
+      func: (e)=>{
+         console.log('------------------ Styles_hover_margin_print() ------------------');
+         Styles_hover_margin_print();
+      },
+   },
+   {
+      key: 't4',
+      discr: 'Styles_hover_margin_printt_loop()',
+      func: (e)=>{
+         console.log('------------------ Styles_hover_margin_printt_loop() ------------------');
+         Styles_hover_margin_print_loop();
+      },
+   },
+   {
+      key: 't5',
+      discr: 'Styles_pad_buffer_print()',
+      func: (e)=>{
+         console.log('------------------ Styles_pad_buffer_print() ------------------');
+         Styles_pad_buffer_print();
+      },
+   },
+   {
+      key: 't6',
+      discr: 'Styles_pad_buffer_print_loop()',
+      func: (e)=>{
+         console.log('------------------ Styles_pad_buffer_print_loop() ------------------');
+         Styles_pad_buffer_print_loop();
+      },
+   },
+   {
+      key: 'y1',
+      discr: 'TEMP_mesh_buffer_info_ui_print_entries_table()',
+      func: (e)=>{
+         console.log('------------------ TEMP_mesh_buffer_info_ui_print_entries_table() ------------------');
+         TEMP_mesh_buffer_info_ui_print_entries_table();
       },
    },
 
@@ -535,6 +600,14 @@ export function OnKeyUp(e){
          else if       (_keys_buffer[len].key === 'i') DEBUG_PRINT_KEYS[vi].func(e);  
          else if       (_keys_buffer[len].key === 's') DEBUG_PRINT_KEYS[vs].func(e);  
       }
+      else if  (_keys_buffer[0].key === 't') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[t1].func(e);  
+         else if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[t2].func(e);  
+         else if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[t3].func(e);  
+         else if       (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[t4].func(e);  
+         else if       (_keys_buffer[len].key === '5') DEBUG_PRINT_KEYS[t5].func(e);  
+         else if       (_keys_buffer[len].key === '6') DEBUG_PRINT_KEYS[t6].func(e);  
+      }
       else if  (_keys_buffer[0].key === 'g') { 
          if       (_keys_buffer[len].key === 's') DEBUG_PRINT_KEYS[gs].func(e);  
          else if       (_keys_buffer[len].key === 'w') DEBUG_PRINT_KEYS[gw].func(e);  
@@ -545,6 +618,9 @@ export function OnKeyUp(e){
       }
       else if  (_keys_buffer[0].key === 'p') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[p1].func(e);  
+      }
+      else if  (_keys_buffer[0].key === 'y') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[y1].func(e);  
       }
 
    }

@@ -20,7 +20,7 @@ export class Widget_Slider extends Rect {
 
    text_mesh;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = TRANSPARENCY(GREY[1], .6), hover_margin = [0, 0]) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = TRANSPARENCY(GREY[1], .6), hover_margin = [0, 0], is_debug_mesh) {
 
       // Calculate the bar's and handle's horizontal pading.
       const ratio = dim[0] / dim[1];
@@ -36,7 +36,7 @@ export class Widget_Slider extends Rect {
 
 
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
-      const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, 'Slider', pos, fontSize, WHITE, .4);
+      const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, 'Slider', pos, fontSize, WHITE, .4, is_debug_mesh);
       name_text.sid.gfx_group = this.sid.gfx_group;
 
       /** Label area mesh */
@@ -49,9 +49,7 @@ export class Widget_Slider extends Rect {
       this.SetStyle([0, 6, 2]);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      
-      
-      this.SetName('Widget_Slider');
+
       // this.StateEnable(MESH_STATE.HAS_POPUP);
 
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
@@ -65,14 +63,14 @@ export class Widget_Slider extends Rect {
       const barpos = [pos[0], pos[1] + this.geom.dim[1], pos[2]]
       const barMetrics = this.#CalculateBarArea(barpos, dim, pad)
 
-      const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, GREY[3]);
+      const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, GREY[3], is_debug_mesh);
       bar.sid.gfx_group = this.sid.gfx_group;
 
       bar.type |= MESH_TYPE.WIDGET_SLIDER_BAR | bar.geom | bar.mat;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       bar.SetStyle([0, 3, 2]);
       // bar.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      bar.SetName('Bar');
+
 
 
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -81,51 +79,57 @@ export class Widget_Slider extends Rect {
       const handleMetrics = this.#CalculateHandleArea(bar.geom.pos, dim, pad)
 
 
-      const handle = Create_rect_mesh(handleMetrics.pos, handleMetrics.dim, BLUE_10_120_220);
+      const handle = Create_rect_mesh(handleMetrics.pos, handleMetrics.dim, BLUE_10_120_220, is_debug_mesh);
       handle.sid.gfx_group = this.sid.gfx_group;
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([5, 35, 3]);
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      handle.SetName('handle');
-
-
+      
+      
+      
       // Create value_text
-      const value_text = Create_widget_text(ROOT_WIDGET_FLAGS, '0000', pos, fontSize, WHITE, .4);
+      const value_text = Create_widget_text(ROOT_WIDGET_FLAGS, '0000', pos, fontSize, WHITE, .4, is_debug_mesh);
       value_text.sid.gfx_group = this.sid.gfx_group;
-      value_text.SetName(this.GetName() + ' - value_text');
-
-
+      
+      
       // Make the vertical area of the bar larger for hover and handle moving.
       bar.hover_margin = [0, handle.geom.dim[1] + 4];
-
-
+      
+      
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Align
       const totalheight = (handle.geom.dim[1] + name_text.geom.dim[1] + value_text.geom.dim[1]);
       this.geom.dim[1] = totalheight;
-
+      
       bar.geom.pos[0] = this.geom.pos[0];
       bar.geom.pos[1] = this.geom.pos[1] + this.geom.dim[1] - handle.geom.dim[1] - pad[1];
-
+      
       handle.geom.pos[0] = bar.geom.pos[0];
       handle.geom.pos[1] = bar.geom.pos[1];
-
+      
       value_text.geom.pos[1] = handle.geom.pos[1] - handle.geom.dim[1] - value_text.geom.dim[1]
       value_text.geom.pos[0] = bar.geom.pos[0] + bar.geom.dim[0] - (value_text.geom.CalcTextWidth());
       value_text.geom.pos[2] = bar.geom.pos[2] + 1;
-
+      
       name_text.geom.pos[1] = handle.geom.pos[1] - handle.geom.dim[1] - name_text.geom.dim[1]
       name_text.geom.pos[0] = bar.geom.pos[0] - bar.geom.dim[0] + name_text.geom.dim[0];
       name_text.geom.pos[2] = this.geom.pos[2] + 1;
-
+      
       SLIDER_BAR_IDX = this.AddChild(bar)
       // this.AddChild(name_text)
       bar.AddChild(handle)
       bar.AddChild(value_text)
-
+      
       this.text_mesh = name_text;
-
+      
+      
+      
+      value_text.SetName(this.GetName() + ' - value_text');
+      handle.SetName('handle');
+      bar.SetName('Bar');
+      this.SetName('Widget_Slider');
+      
    }
 
 

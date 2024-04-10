@@ -37,6 +37,12 @@ Create a new branch
     git filter-branch
 
 
+/***************************
+merge
+go to 'master' branch, or the branch that will accept the merge
+and then:
+$ git merge 'name of the branch that will be merged with current branch'
+
 
 
 /***************************
