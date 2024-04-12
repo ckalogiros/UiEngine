@@ -14,7 +14,7 @@ const DISABLE_DEBUG = true;
 
 
 
-const _programs = New_generic_buffer();
+const _programs = New_generic_buffer(_, 'Shader Programs');
 
 
 /***************************************************************************************************************************************************/

@@ -62,11 +62,11 @@ export class Widget_Scroller extends Section {
    renderables; // Store the first/upper and last/lower meshes that is rendered by the gfx buffers
    is_scrolled_section_private; // A way to set a scroller to use separate vertex buffer for the scrolled mesh and all its items  
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, scrolled_mesh, dim = [100, 50], col = TRANSPARENCY(GREY[5], .5), is_debug_mesh=false) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, scrolled_mesh, dim = [100, 50], col = TRANSPARENCY(GREY[5], .5), is_debug_mesh=0x0) {
 
       const pos = [200, 400, 0];
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.HORIZONTAL, [10, 10], pos, dim, col);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.HORIZONTAL, [10, 10], pos, dim, col, is_debug_mesh);
 
       this.is_scrolled_section_private = false;
 
@@ -533,6 +533,7 @@ export class Widget_Scroller extends Section {
          const x = mouse_pos.x / 2;
          const y = -mouse_pos.y / 2;
 
+
          // Check for min dimentions. // TODO: Who decides for the minimum dimentions??????
          // const min_width = scroller.scrolled_section.geom.dim[0];
          const min_width = scroller.geom.defDim[0];
@@ -973,17 +974,25 @@ export function Scroller_on_update_handle(_params) {
     */
 
 
-   for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
+   // if (scrolled_section.listeners){
 
-      if (scrolled_section.listeners.buffer[i].is_child_event) {
-         Listener_remove_child_event_from_parent(i, scrolled_section.listeners.buffer[i].evt);
+      for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
+   
+         // if (!scrolled_section.listeners.buffer[i]) 
+         if (scrolled_section.listeners.buffer[i]) {
+            // console.log()
+            
+            if (scrolled_section.listeners.buffer[i].is_child_event) {
+               Listener_remove_child_event_from_parent(i, scrolled_section.listeners.buffer[i].evt);
+            }
+            else {
+               Listener_destroy_children_buffer(i, scrolled_section.listeners.buffer[i].evt.evt_idx);
+               Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i].evt)
+               scrolled_section.listeners.RemoveByIdx(i)
+            }
+         }
       }
-      else {
-         Listener_destroy_children_buffer(i, scrolled_section.listeners.buffer[i].evt.evt_idx);
-         Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i].evt)
-         scrolled_section.listeners.RemoveByIdx(i)
-      }
-   }
+   // }
 
 
    View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);

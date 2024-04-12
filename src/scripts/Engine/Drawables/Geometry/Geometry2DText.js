@@ -87,7 +87,7 @@ export class Geometry2D_Text extends Geometry2D {
 
       this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
       const update_data = {
-         sizes: [pos.length],
+         sizes: [2],
          data: [pos[0], pos[1]],
       }
       Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data, _);

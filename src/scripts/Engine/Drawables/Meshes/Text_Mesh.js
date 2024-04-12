@@ -21,7 +21,7 @@ export class Text_Mesh extends Mesh {
    advancex; // The advancex is a ratio with which we calculate the correct width of any text
    last_charidx; // An index to the last char of each state of the current text.(dynamic text changes, so it is good to always have the last char).
 
-   constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.MSDF_CONSOLAS_1024, scale = [1, 1]) {
+   constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.MSDF_CONSOLAS_1024, scale = [1, 1], is_debug_mesh) {
 
       const sdfouter = CalculateSdfOuterFromDim(fontsize);
       if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -32,7 +32,7 @@ export class Text_Mesh extends Mesh {
 
       this.last_charidx = text.length;
 
-      this.type |= MESH_TYPE.TEXT_MESH;
+      this.type |= MESH_TYPE.TEXT_MESH | is_debug_mesh;
       this.fontsize = fontsize;
       this.advancex = Font_get_font_advancex(font);
    }
@@ -52,11 +52,6 @@ export class Text_Mesh extends Mesh {
 
    SetTypeDebug() {
       this.type |= MESH_TYPE.DEBUG_MESH;
-   }
-
-
-   AddToGfxBuffer() {
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
    }
 
 
@@ -312,6 +307,14 @@ export class Text_Mesh extends Mesh {
 
          this.mat.char_buffer.Add(str[i]);
       }
+      
+      for (let i = len; i < this.mat.char_buffer.size; i++) {
+
+         this.mat.char_buffer[i] = ''; // We do not want to increment active_count for '' empty characters, so we avoid .Add
+      }
+
+      this.mat.text = str;
+      this.geom.num_faces = str.length;
    }
 
 
@@ -463,7 +466,8 @@ export class Text_Mesh extends Mesh {
       }
 
       // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
-      for (let i = this.mat.char_buffer.active_count; i < len; i++) {
+      // for (let i = this.mat.char_buffer.active_count; i < len; i++) {
+      for (let i = this.mat.char_buffer.boundary; i < this.mat.char_buffer.size; i++) {
 
          let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
          if (c[i] !== ''){
@@ -536,12 +540,15 @@ export class Text_Mesh extends Mesh {
       let right = this.GetTextRight_A();
 
       let changes_happended = false;
+if(this.mesh_bufferidx===5)
+console.log
 
       if (right-face_width > limit) {
 
          changes_happended = true;
          for (let i = this.mat.char_buffer.boundary; i >= 0; i--) {
-
+if(this.mesh_bufferidx===5)
+console.log
             this.mat.char_buffer.RemoveByIdx(i);
             this.geom.num_faces--;
             right -= face_width*2;
@@ -553,7 +560,6 @@ export class Text_Mesh extends Mesh {
 
          changes_happended = true;
          for (let i = this.mat.char_buffer.active_count; i < text_len; i++) {
-
             this.mat.char_buffer.buffer[i] = this.mat.text[i];
             this.mat.char_buffer.boundary++;
             this.mat.char_buffer.active_count++;

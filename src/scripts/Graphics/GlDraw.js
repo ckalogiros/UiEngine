@@ -59,9 +59,9 @@ export function Gl_draw(gl) {
         // _pt_test_misc_1.timer.Stop();
         
         
-        const vb = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
         if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
             
+            const vb = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
             gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
             gl.bufferData(gl.ARRAY_BUFFER, vb, gl.STATIC_DRAW, 0);
             vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;

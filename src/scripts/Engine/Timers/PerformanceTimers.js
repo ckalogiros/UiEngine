@@ -43,7 +43,7 @@ class Performance_Timer {
    constructor() {
 
       this.t = window.performance.now();
-      this.group = New_generic_buffer();
+      this.group = New_generic_buffer(_, 'Group Performance_Timer');
    }
 }
 
@@ -56,7 +56,7 @@ function Performance_timer_contruct(TYPE = INT_NULL, name) {
 }
 
 
-const _performance_timers_buffer = New_generic_buffer();
+const _performance_timers_buffer = New_generic_buffer(_, 'Performance_Timer');
 
 // TYPE: SEE->PERFORMANCE_TIMER
 function Performance_timer_create(TYPE, name) {

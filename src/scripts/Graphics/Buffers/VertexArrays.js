@@ -11,7 +11,7 @@ import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
 /*****************************************************************************************************************************************************/
 
 
-const _vertex_array_object = New_generic_buffer();
+const _vertex_array_object = New_generic_buffer(_, 'GFX Vertex Array');
 
 
 

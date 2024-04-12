@@ -25,15 +25,14 @@ export class Widget_Text extends Text_Mesh {
 
 	pad;
 
-	constructor(text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0]) {
+	constructor(text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0], is_debug_mesh) {
 
 		// const sdfouter = CalculateSdfOuterFromDim(fontSize);
 		// if (sdfouter + bold > 1) bold = 1 - sdfouter;
 
-		super(text, pos, fontSize, col)
-		this.type |= MESH_TYPE.WIDGET_TEXT | this.type;
+		super(text, pos, fontSize, col, is_debug_mesh)
+		this.type |= MESH_TYPE.WIDGET_TEXT;
 
-		// this.SetName(`[${this.mesh_bufferidx}]{${text}}-Widget-Text`);
 		this.pad = [0, 0];
 		AddArr2(this.pad, pad);
 	}
@@ -254,9 +253,9 @@ export class Widget_Multi_Text extends Widget_Text {
 	alignment = 0x0;
 
 	/** Set the max number of characters for the dynamic text, by passing any text as 'dynamic_text' of length= dynamic text number of characters*/
-	constructor(text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad) {
+	constructor(text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad, is_debug_mesh) {
 
-		super(text, pos, fontSize, text_col, bold, pad);
+		super(text, pos, fontSize, text_col, bold, pad, is_debug_mesh);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
 		// Default alignment for all children text meshes

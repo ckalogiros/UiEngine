@@ -14,7 +14,7 @@ import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keys.js';
 import { GetShaderTypeId } from '../Graphics/Debug/GfxDebug.js';
 
 import { Dropdown_roots_set_root, Widget_Dropdown } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Debug_info_mesh_buffer_create_ui, Debug_info_program_buffer_create_ui, Debug_info_string_buffer_create_ui, Debug_info_ui_performance, Debug_info_vertex_buffer_create_ui } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Debug_info_mesh_buffer_create_ui, Debug_info_program_buffer_create_ui, Debug_info_string_buffer_create_ui, Debug_info_ui, Debug_info_ui_performance, Debug_info_vertex_buffer_create_ui } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Widget_Scroller } from '../Engine/Drawables/Widgets/WidgetScroller.js';
 import { GetRandomColor, GetSequencedColor } from '../Helpers/Helpers.js';
 import { Gl_framebuffer_render, Gl_framebuffer_render_mesh } from '../Graphics/Buffers/FrameBuffers.js';
@@ -66,15 +66,16 @@ import { TEMP_Section_on_move_section } from '../Engine/Drawables/Meshes/Section
 
 const _fontsize = 10;
 
-const temp_buffer = New_generic_buffer();
-const p = 10;
-const dim = [50, 25];
+const temp_buffer = New_generic_buffer(_, 'For UserCreateRect sdf lines');
+const p = 0;
+const dim = [50, 10];
 const pos = [750, dim[1] + p, 5];
 function UserCreateRect(){
     
-    let ypos = 100
-    const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [90, ypos, 0], [80, 40], GREY[2], 'Section');
+    let ypos = 60
+    const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [600, ypos, 0], [80, 40], GREY[2], 'Section');
     s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    s.SetName('Create Rect');
 
     const btn = Create_widget_button(_, 'Create Rect', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [20, ypos, 1], fontsize, GREEN[7], WHITE, [5, 5], .5);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -104,6 +105,7 @@ function UserCreateRectCreate(params){
     line.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
     line.OnClick = UserCreateRectOnClick;
     line.AddToWidgetRootBuffer(parent.root_bufferidx);
+    line.SetName('line');
 
     // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     line.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [parent.gfx.prog.idx, parent.gfx.vb.idx]);
@@ -206,9 +208,13 @@ export function TestWidgetsGeneric(scene) {
     Performance_timers_init_all();
     Time_intervals_initialize();
 
-
-
+    // Notifications_create()
+    
+    
+    // Debug_info_string_buffer_create_ui();
     // Debug_info_mesh_buffer_create_ui();
+    // Debug_info_vertex_buffer_create_ui();
+    // Debug_info_program_buffer_create_ui();
 
 
     // getFile()
@@ -220,6 +226,9 @@ export function TestWidgetsGeneric(scene) {
 
 
     // Listeners_debug_info_create(scene);
+
+    Debug_info_ui()
+    UserCreateRect()
 
     // const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
@@ -259,7 +268,7 @@ export function TestWidgetsGeneric(scene) {
     // obj.Set(4.2);
     // obj.Update();
 
-    UserCreateRect()
+
 
     // SdfLine(GREEN[7], [500, 780, 5], [800, 10]);
     // let ms = 2000;
@@ -390,7 +399,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Test_scroller_in_between();
 
-    Debug_info_mesh_buffer_create_ui();
+    // Debug_info_mesh_buffer_create_ui();
     // Debug_info_vertex_buffer_create_ui();
     // Debug_info_program_buffer_create_ui();
     // Debug_info_string_buffer_create_ui();
@@ -1017,11 +1026,10 @@ function CreateSlider() {
     const slider = Create_widget_slider(_, [200, 300, 0], [150, 10]);
     // slider.CreateSliderHandleEvent();
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    slider.ConstructListeners();
-
+    
     slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    slider.Activate();
     slider.Render();
+    slider.ConstructListeners();
 
 }
 
@@ -1704,7 +1712,7 @@ function CreateMenu(scene) {
     const menu = Create_widget_menubar(_, pos, TRANSPARENCY(GREY[1], .6), WHITE, 'Widget', [10, 6]);
     // menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     // menu.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-    menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // menu.CreateListenEEvent(LISTEN_EVENT_TYPES.HOVER);
     menu.AddCloseButton(_, section, 'x');
     menu.AddMinimizeButton(_, section);
     menu.options = SECTION.HORIZONTAL | SECTION.INHERIT;
@@ -2366,6 +2374,7 @@ function CreateManySections(scene) {
     blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+    red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.EXPAND;
     blu.AddItem(red);
     const yel = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
     red.AddItem(yel);
@@ -2497,33 +2506,9 @@ function CreateManySections(scene) {
         vert_0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     }
 
-    // { // Set hierarchy
-    //     pin_1.AddItem(gry2_1, flags); pin_1.AddItem(gry2_2, flags);
-    //     blu_1.AddItem(gry2_3, flags); blu_1.AddItem(gry2_4, flags);
-    //     bla_1.AddItem(pin_1, flags); bla_1.AddItem(blu_1, flags);
-    //     red.AddItem(bla_1); red.AddItem(yel, flags); red.AddItem(ora, flags); red.AddItem(cie, flags);
-    //     yel.AddItem(gre_4, flags); yel.AddItem(pur_1, flags); yel.AddItem(red_3, flags);
-    //     ora.AddItem(yel_4, flags); ora.AddItem(red_4, flags); ora.AddItem(yel_2, flags); ora.AddItem(ora_4, flags);
-    //     cie.AddItem(gre_3, flags); cie.AddItem(yel_3, flags); cie.AddItem(bla, flags);
-    //     bla.AddItem(gry1_1, flags); bla.AddItem(gry1_2, flags); bla.AddItem(gry1_3, flags);
-    //     /* gry1_1.AddItem(label, flags);  gry1_1.AddItem(btn, flags);*/ gry1_1.AddItem(vert_0, flags);
-    //     gre.AddItem(yel_1, flags); gre.AddItem(red_1, flags);
-    //     yel.AddItem(gre, flags);
-    //     blu.AddItem(red, flags);
-    // }
-
-    // const minimizer = Create_widget_minimize_btn(_, blu, blu.geom.pos, 10);
-    // minimizer.SetName('minimizer 000')
-    // minimizer.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // blu.AddItem(minimizer);
-
-
-
-    // Widgetroot_buffer_print_w1();
-    // Widgetroot_gfx_print_w3()
 
     blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
+    blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.EXPAND;
     blu.Calc_no_gfx_update();
 
     blu.Render();

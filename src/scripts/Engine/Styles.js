@@ -8,9 +8,9 @@ import { New_generic_buffer } from "./Core/Buffers.js";
 // ALSO: Do we give the smae index to a mesh for all three buffers????? 1to1 ratio buffers
 
 
-const _margin_buffer = New_generic_buffer();
-const _pad_buffer = New_generic_buffer();
-const _hover_margin_buffer = New_generic_buffer();
+const _margin_buffer = New_generic_buffer(_, 'Margins');
+const _pad_buffer = New_generic_buffer(_, 'Paddings');
+const _hover_margin_buffer = New_generic_buffer(_, 'Hover Margins');
 
 
 

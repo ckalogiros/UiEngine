@@ -24,7 +24,7 @@ const DISABLE_DEBUG = true;
 /****************************************************************************************************************************************************/
 
 
-const _vertex_buffers = New_generic_buffer();
+const _vertex_buffers = New_generic_buffer(_, 'GFX Index Buffer');
 _vertex_buffers.Init(1);
 
 
@@ -91,7 +91,7 @@ export function Vertex_buffer_create(type, size) {
 /****************************************************************************************************************************************************/
 
 
-const _vertex_buffers_info = New_generic_buffer();
+const _vertex_buffers_info = New_generic_buffer(_, 'GFX Index Buffer Info');
 
 
 /****************************************************************************************************************************************************/
@@ -499,7 +499,7 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index, remov
     vb_info.vCount -= vCount;
 
     if (vb_info.count < 0)
-        console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb:', vb_info.idx)
+        console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb_info.idx=', vb_info.idx, '\nvb_info=', vb_info)
 
 
 

@@ -19,7 +19,8 @@ import { Shader_attributes_print } from "../../../Graphics/ShaderAttributes.js";
 import { Gfx_pool_print } from "../../Interfaces/Gfx/GfxPool.js";
 import { View_buffer_print, View_buffer_print_loop } from "../../Core/MeshBufferViews.js";
 import { Styles_hover_margin_print, Styles_hover_margin_print_loop, Styles_margin_print, Styles_margin_print_loop, Styles_pad_buffer_print, Styles_pad_buffer_print_loop } from "../../Styles.js";
-import { TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
+import { TEMP_dbg_info_ui_print_entries_table, TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
+import { DEBUG_INFO_BUFFERS_PRINT, DEBUG_INFO_BUFFERS_PRINT2 } from "../../Core/Buffers.js";
 
 _CNT = 0;
 const em = _CNT++;
@@ -75,6 +76,9 @@ const t4 = _CNT++;
 const t5 = _CNT++;
 const t6 = _CNT++;
 const y1 = _CNT++;
+const y2 = _CNT++;
+const b1 = _CNT++;
+const b2 = _CNT++;
 
 export const DEBUG_PRINT_KEYS = [
 
@@ -499,10 +503,34 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'y1',
+      discr: 'TEMP_dbg_info_ui_print_entries_table()',
+      func: (e)=>{
+         console.log('------------------ TEMP_dbg_info_ui_print_entries_table() ------------------');
+         TEMP_dbg_info_ui_print_entries_table();
+      },
+   },
+   {
+      key: 'y2',
       discr: 'TEMP_mesh_buffer_info_ui_print_entries_table()',
       func: (e)=>{
          console.log('------------------ TEMP_mesh_buffer_info_ui_print_entries_table() ------------------');
          TEMP_mesh_buffer_info_ui_print_entries_table();
+      },
+   },
+   {
+      key: 'b1',
+      discr: 'DEBUG_INFO_BUFFERS_PRINT()',
+      func: (e)=>{
+         console.log('------------------ DEBUG_INFO_BUFFERS_PRINT() ------------------');
+         DEBUG_INFO_BUFFERS_PRINT();
+      },
+   },
+   {
+      key: 'b2',
+      discr: 'DEBUG_INFO_BUFFERS_PRINT2()',
+      func: (e)=>{
+         console.log('------------------ DEBUG_INFO_BUFFERS_PRINT2() ------------------');
+         DEBUG_INFO_BUFFERS_PRINT2();
       },
    },
 
@@ -621,6 +649,11 @@ export function OnKeyUp(e){
       }
       else if  (_keys_buffer[0].key === 'y') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[y1].func(e);  
+         if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[y2].func(e);  
+      }
+      else if  (_keys_buffer[0].key === 'b') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[b1].func(e);  
+         if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[b2].func(e);  
       }
 
    }

@@ -736,6 +736,8 @@ _CNT = 0x1;
 // IDEA: Maybe we implement a negative bitfield for another 31 values ???
 const MESH_TYPE = {
 
+	DEBUG_MESH: _CNT <<= 1,
+
 	GEOMETRY2D: _CNT,
 	TEXT_GEOMETRY2D: _CNT <<= 1,
 	GEOMETRY3D: _CNT <<= 1,
@@ -777,8 +779,7 @@ const MESH_TYPE = {
 	
 	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
 	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
-	
-	DEBUG_MESH: _CNT <<= 1,
+
 };
 
 

@@ -22,7 +22,7 @@ export class Widget_Switch_Simple extends Rect {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], pad = 2, bold, style = [3, 6, 2], is_debug_mesh) {
 
       const switch_dim = [size * 2, size]
-      super(pos, switch_dim, TRANSPARENCY(GREY[1], .6))
+      super(pos, switch_dim, TRANSPARENCY(GREY[1], .6), is_debug_mesh)
 
       this.color_active = [0, 0, 0, 0];
       CopyArr4(this.color_active, col);

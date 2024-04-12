@@ -12,14 +12,14 @@ import { Vertex_buffer_add_vertices, Vertex_buffer_update_vertices } from "../..
 
 export class Rect extends Mesh {
 
-   constructor(pos = POSITION_CENTER, dim = [10, 10], col = BLUER3) {
+   constructor(pos = POSITION_CENTER, dim = [10, 10], col = BLUER3, is_debug_mesh=0x0) {
 
       const geom = new Geometry2D(pos, dim);
       const mat = new Material(col);
 
       super(geom, mat);
 
-      this.type |= MESH_TYPE.RECT_MESH;
+      this.type |= MESH_TYPE.RECT_MESH | is_debug_mesh;
 
    }
 
@@ -50,11 +50,6 @@ export class Rect extends Mesh {
          child.AddToWidgetRootBuffer(root_bufferidx);
       }
 
-   }
-
-
-   AddToGfxBuffer() { 
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
    }
 
 
@@ -159,10 +154,11 @@ export class Rect extends Mesh {
 
       CopyArr2(this.geom.defPos, this.geom.pos);
       AddArr2(this.geom.pos, pos_dif);
-      this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
+      // this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
+      this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
 
       const update_data = {
-         sizes: [pos_dif.length],
+         sizes: [2],
          data: [pos_dif[0], pos_dif[1]],
       }
       Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data, _);
@@ -172,7 +168,8 @@ export class Rect extends Mesh {
          AddArr2(this.children.buffer[i].geom.pos, pos_dif);
          CopyArr2(this.children.buffer[i].geom.defPos, this.children.buffer[i].geom.pos);
          
-         this.children.buffer[i].batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
+         // this.children.buffer[i].batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
+         this.children.buffer[i].batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
          Batch_store(this.children.buffer[i], SHADER_ATTRIBUTES.WPOS4, update_data, _);
       }
    }

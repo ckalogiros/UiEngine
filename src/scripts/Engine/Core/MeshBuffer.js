@@ -3,7 +3,7 @@
 import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPosDif } from "../Controls/Input/Mouse.js";
 import { TimeIntervalsDestroyByIdx } from "../Timers/TimeIntervals.js";
-import { Int16Buffer, Int8Buffer, M_Buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
+import { New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
 import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
@@ -21,37 +21,16 @@ import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
  */
 
 
-// TODO: Temporary for num_faces of meshidxs in per vb buffer 
-let temp_num_faces = [];
-temp_num_faces[0] = 0;
-temp_num_faces[1] = 0;
-temp_num_faces[2] = 0;
-temp_num_faces[3] = 0;
-temp_num_faces[4] = 0;
-temp_num_faces[5] = 0;
-export function TEMP_PRINT_ACCUM() { console.error(temp_num_faces); }
 
 
-// TODO: Temporary for vb starts of meshidxs in per vb buffer 
-let temp_start = [];
-temp_start[0] = 0xffff;
-temp_start[1] = 0xffff;
-temp_start[2] = 0xffff;
-temp_start[3] = 0xffff;
-temp_start[4] = 0xffff;
-temp_start[5] = 0xffff;
-export function TEMP_PRINT_START() { console.error(temp_start); }
+const _mesh_buffer = New_generic_buffer(_, 'Mesh Buffer');
+const _mesh_per_vertex_buffer = New_generic_buffer(_, 'Mesh per Vertex buffer');
 
 
-const _mesh_buffer = New_generic_buffer();
-const _mesh_per_vertex_buffer = New_generic_buffer();
+const _widget_root_buffer = New_generic_buffer(_, 'Widget root');
+const _root_batch_buffer = New_generic_buffer(_, 'Root batch');
+const _widget_root_gfx = New_generic_buffer(_, 'Root gfx');
 
-
-const _widget_root_buffer = New_generic_buffer();
-const _root_batch_buffer = New_generic_buffer();
-const _widget_root_gfx = New_generic_buffer();
-
-// const _widget_groups_buffer = New_generic_buffer();
 
 
 
@@ -69,6 +48,8 @@ _mesh_buffer.Init(16);
 
 
 export function Mesh_buffer_get() { return _mesh_buffer; }
+export function Mesh_buffer_get_count() { return _mesh_buffer.active_count; }
+export function Mesh_buffer_get_size() { return _mesh_buffer.size; }
 
 
 
@@ -89,25 +70,6 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
       alert('Mesh is NULL.\n@ Mesh_buffer_remove_mesh_byidx()\nSEE console error');
    }
 
-   // if (mesh.gfx) {
-
-      // if (mesh.state.mask & MESH_STATE.ACTIVE) {
-
-      //    temp_num_faces[mesh.gfx.vb.idx] += mesh.geom.num_faces;
-      //    if (temp_start[mesh.gfx.vb.idx] > mesh.gfx.vb.start) {
-      //       temp_start[mesh.gfx.vb.idx] = mesh.gfx.vb.start;
-      //    }
-
-      //    Mesh_per_vb_update_mesh_gfx_start(mesh.root_bufferidx)
-      // }
-
-      // if (mesh.per_vb_bufferidx === INT_NULL) {
-      //    // console.error('NO per_vb_bufferidx for the mesh.\nMesh is not removed from the _mesh_per_vertex_buffer\nmesh:', mesh.GetName(), 'mesh:', mesh);
-      // }
-      // else {
-      //    Mesh_per_vb_remove_mesh(mesh.gfx.vb.idx, mesh.per_vb_bufferidx);
-      // }
-   // }
 
    // TODO: Remove the whole root is WRONG, we have to destroy all meshes, which we do not do
    // If the mesh is the root, destroy the whole root buffer, gfx_buffer, batch buffer.
@@ -221,33 +183,6 @@ export function Mesh_per_vb_store_mesh(vbidx, mesh_bufferidx) {
 
 
 
-// export function Mesh_per_vb_update_mesh_gfx_start(root_bufferidx) {
-
-//    const gfx = Widget_root_gfx_get_structured(root_bufferidx);
-
-//    const len = gfx.length;
-//    for (let i = 0; i < len; i++) {
-
-//       const vbidx = gfx[i].vbidx;
-//       if (temp_num_faces[vbidx] === 0) {
-
-//          // EFFICIENCY: We should loop through all mesh idxs in gfx_buffer only if there is an accumulated value to be updated to
-//          for (let j = 0; j <= _mesh_per_vertex_buffer.buffer[vbidx].boundary; j++) {
-
-//             const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vbidx].buffer[j]];
-//             if (mesh && mesh.gfx.vb.start >= temp_start[vbidx]) {
-
-//                mesh.gfx.vb.start -= temp_num_faces[vbidx] * mesh.gfx.attribsPerVertex * mesh.gfx.vertsPerRect;
-//             }
-//          }
-//       }
-
-//    }
-
-//    // TODO: Integrate these to the ??_gfx_buffers?? Because each element represents a vertex buffer.
-//    temp_num_faces[0] = 0; temp_num_faces[1] = 0; temp_num_faces[2] = 0; temp_num_faces[3] = 0;
-//    temp_start[0] = 0xffff; temp_start[1] = 0xffff; temp_start[2] = 0xffff; temp_start[3] = 0xffff;
-// }
 export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
 
 
@@ -262,9 +197,7 @@ export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
          console.log()
       }
    }
-   //    // TODO: Integrate these to the ??_gfx_buffers?? Because each element represents a vertex buffer.
-   //    temp_num_faces[0] = 0; temp_num_faces[1] = 0; temp_num_faces[2] = 0; temp_num_faces[3] = 0;
-   //    temp_start[0] = 0xffff; temp_start[1] = 0xffff; temp_start[2] = 0xffff; temp_start[3] = 0xffff;
+
 }
 
 
@@ -871,7 +804,7 @@ export function TEMP_REMOVE_CHILDREN(root, firstidx, lastidx) {
 
    console.log(`root:${root.GetName()} firstidx:${firstidx} lastidx:${lastidx} first:${first} last:${last} toidx:${toidx}`)
 
-   const new_children_buffer = New_generic_buffer();
+   const new_children_buffer = New_generic_buffer(_, 'From TEMP_REMOVE_CHILDREN');
    new_children_buffer.Init(firstidx);
 
 
@@ -897,7 +830,7 @@ export function TEMP_REMOVE_CHILDREN_CENTER(root, firstidx, lastidx) {
 
    console.log(`root:${root.GetName()} firstidx:${firstidx} lastidx:${lastidx} first:${first} last:${last} toidx:${toidx}`)
 
-   const new_children_buffer = New_generic_buffer();
+   const new_children_buffer = New_generic_buffer(_, 'From TEMP_REMOVE_CHILDREN_CENTER');
    new_children_buffer.Init(firstidx);
    for (let i = 0; i <= root.children.boundary; i++) {
 

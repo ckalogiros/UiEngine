@@ -1,7 +1,7 @@
 "use strict";
 import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
-import { New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
+import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_create_child_event, Listener_create_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
@@ -9,7 +9,7 @@ import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_hover_margin_create, Styles_hover_margin_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_create, Styles_margin_destroy, Styles_margin_get, Styles_margin_set, Styles_pad_create, Styles_pad_destroy, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
-import { NOTIFICATION_TYPE_IDX, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
+import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 
 
 const NOTIFICATIONS_ON = true;
@@ -145,12 +145,13 @@ export class Mesh {
 
         this.parent = null;
 
-        this.listeners = New_generic_buffer();
-        this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
+        this.listeners = null;
+        // this.listeners = New_generic_buffer(_, 'Mesh listeners');
+        // this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
 
-        this.eventCallbacks = New_generic_buffer();
-        this.timedEvents = New_generic_buffer();
-        this.children = New_generic_buffer();
+        this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
+        this.timedEvents = New_generic_buffer(_, 'Mesh timedEvents');
+        this.children = New_generic_buffer(_, 'Mesh children');
         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE);
         
         this.rel_comp = null;
@@ -213,7 +214,10 @@ export class Mesh {
 
         /*************************************************************************************/
         // Remove event listeners
-        this.RemoveAllListenEvents();
+        if(this.listeners) {
+            this.RemoveAllListenEvents();
+            Free_generic_buffer(this.listeners)
+        }
 
 
         /*************************************************************************************/
@@ -235,7 +239,7 @@ export class Mesh {
         Styles_pad_destroy(this.styles[STYLES.PAD]);
 
         if(NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH)===0) 
-            Notifications_send(NOTIFICATION_TYPE_IDX.MESH_BUFFER, NOTIFICATION_TYPE_IDX.FLAGS.DESTROY, this.mesh_bufferidx);
+            Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, this.mesh_bufferidx);
 
 
         /*************************************************************************************/
@@ -248,7 +252,7 @@ export class Mesh {
             if(!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.geom.num_faces)
             Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
             
-            console.log('GFX vbidx', this.gfx.vb.idx, 'start', this.gfx.vb.start);
+            // console.log('GFX vbidx', this.gfx.vb.idx, 'start', this.gfx.vb.start);
             // this.gfx.vb.start = INT_NULL;
         }
         
@@ -270,8 +274,6 @@ export class Mesh {
         /*************************************************************************************/
         // Remove mesh from STATE.
         STATE.mesh.CheckAllAndRemove(this)
-
-
 
 
         return shift_children;
@@ -328,10 +330,12 @@ export class Mesh {
 
     CreateListenEvent(etype, is_fake_event = false) {
 
-        if (is_fake_event)
-            this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
-
         if (etype & LISTEN_EVENT_TYPES.HOVER) {
+
+            if(!this.listeners)  {
+                this.listeners = New_generic_buffer();
+                this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
+            }
 
             this.listeners.AddAtIndex(E.H, {
                 evt: null,
@@ -345,6 +349,11 @@ export class Mesh {
         }
         else if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
 
+            if(!this.listeners)  {
+                this.listeners = New_generic_buffer();
+                this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
+            }
+
             this.listeners.AddAtIndex(E.C, {
                 evt: null,
                 is_child_event: false,
@@ -356,6 +365,11 @@ export class Mesh {
 
         }
         else if (etype & LISTEN_EVENT_TYPES.MOVE) {
+
+            if(!this.listeners)  {
+                this.listeners = New_generic_buffer();
+                this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
+            }
 
             this.listeners.AddAtIndex(E.C, {
                 evt: null,
@@ -392,6 +406,8 @@ export class Mesh {
     RemoveAllListenEvents() {
         // TODO The if's maybe better implemented in EventListeners class RemoveEvent()???
 
+        if(!this.listeners) return;
+
         for (let etype = 0; etype <= this.listeners.boundary; etype++) {
 
             if (this.listeners.buffer[etype] && this.listeners.buffer[etype].evt) {
@@ -408,6 +424,7 @@ export class Mesh {
     CreateEventCallback(params = null) {
 
         if (!params) alert('CreateEventCallback(params = null). @ Mesh.js')
+        if(!this.eventCallbacks) New_generic_buffer(_, 'Mesh eventCallbacks');
         const eventIdx = this.eventCallbacks.Add(params);
         return eventIdx;
     }
@@ -525,7 +542,7 @@ export class Mesh {
 
 
     SetName(name = null) {
-        if (name !== '' && name) this.nameidx = Str_buffer_mesh_names_store(name, this.mesh_bufferidx);
+        if (name !== '' && name) this.nameidx = Str_buffer_mesh_names_store(name, this.mesh_bufferidx, this.type & MESH_TYPE.DEBUG_MESH);
         /**DEBUG*/this.name = name
     }
 

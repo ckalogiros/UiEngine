@@ -14,14 +14,14 @@ import { WHITE } from "../Material/Base/Colors.js";
 
 export class Textured_Mesh extends Mesh {
 
-   constructor(pos = [0, 0, 0], dim, color = WHITE, textureid = INT_NULL, name = 'UNDEFINED_TEXTURED_MESH_NAME') {
+   constructor(pos = [0, 0, 0], dim, color = WHITE, textureid = INT_NULL, name = 'UNDEFINED_TEXTURED_MESH_NAME', is_debug_mesh) {
 
       const mat = new Texture_Material(color, textureid);
       const geom = new Geometry2D(pos, dim);
 
       super(geom, mat);
       this.SetName(name);
-      this.type |= MESH_TYPE.TEXT_MESH;
+      this.type |= MESH_TYPE.TEXT_MESH | is_debug_mesh;
 
    }
 

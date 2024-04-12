@@ -121,7 +121,7 @@ class Uniform {
 }
 
 
-const _uniforms_buffer = New_generic_buffer();
+const _uniforms_buffer = New_generic_buffer(_, 'GFX Uniforms');
 
 
 
@@ -264,7 +264,7 @@ const ERROR_UBS = `
 
 
 
-let _uniform_blocks = New_generic_buffer();
+let _uniform_blocks = New_generic_buffer(_, 'GFX Uniforms Block');
 
 
 // const CreatedUniforms = [];

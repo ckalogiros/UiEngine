@@ -10,6 +10,7 @@
 /**********************************************************************************************************************************************/
 // Generic Array
 /**********************************************************************************************************************************************/
+
 // IMPORTANT: DO NOT USE M_BUFFER CLASS AS AN ARRAY OF INTEGERS, UNTIL CORRECT IMPLEMENTATION. SEE BUG AT 'Buffer_Interface, GetNextFree()'.
 export class M_Buffer {
 
@@ -360,10 +361,30 @@ export class M_Buffer {
 }
 
 
-export function New_generic_buffer(obj){
+
+const _generic_buffers_container = new M_Buffer();
+
+
+export function New_generic_buffer(obj, name='UNAMED BUFFER'){
 
    DEBUG_INFO_STRUCTS.BUFFER.GENERIC.COUNTER++;
-   return new M_Buffer(obj);
+   
+   const buffer = new M_Buffer(obj);
+   _generic_buffers_container.Add({
+      buffer: buffer,
+      name: name,
+   });
+
+   return buffer;
+}
+
+
+export function Free_generic_buffer(buffer){
+
+   DEBUG_INFO_STRUCTS.BUFFER.GENERIC.SIZE -= buffer.size;
+   DEBUG_INFO_STRUCTS.BUFFER.GENERIC.COUNTER--;
+   
+   buffer = null;
 }
 
 
@@ -458,10 +479,10 @@ export class CharBuffer extends M_Buffer {
       }
 
       if (this.buffer[idx] !== '') {
-
+         
          this.buffer[idx] = '';
-         this.active_count--;
          if (idx === this.boundary) this.boundary--; // Case the we removed the last element in existance
+         this.active_count--;
 
 
          // Check if previous elements are empty, and reduce boundary to the last active.
@@ -558,7 +579,7 @@ export class ArrayBufferInterface {
    AddAtIndex(idx, elem) {
 
       if (idx < 0) console.error('SEVERE_ERROR.\nWRONG Index. Adding item at: ', idx);
-      if (idx >= this.size) console.error('INFORMATIVE_ERROR\nAddAtIndex().\nNot enough size in Buffer.\nAdding item at: ', idx, ' buffer size:', this.size - 1, '\nCalling Realloc()');
+      // if (idx >= this.size) console.error('INFORMATIVE_ERROR\nAddAtIndex().\nNot enough size in Buffer.\nAdding item at: ', idx, ' buffer size:', this.size - 1, '\nCalling Realloc()');
 
       // Realloc
       if (idx >= this.size) {
@@ -725,6 +746,15 @@ export function New_int8_buffer(size){
 
    DEBUG_INFO_STRUCTS.BUFFER.INT8.COUNTER++;
    return new Int8Buffer(size);
+}
+
+
+
+export function Free_int8_buffer(buffer){
+
+   DEBUG_INFO_STRUCTS.BUFFER.INT8.COUNTER-=buffer.size;
+   DEBUG_INFO_STRUCTS.BUFFER.INT8.COUNTER--;
+   buffer = null;
 }
 
 
@@ -932,5 +962,56 @@ export function New_int16_buffer(size){
 //    }
 
 // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************************************************************************************************************************************/
+// DEBUG-PRINT
+/****************************************************************************************************************************************************/
+
+
+export function DEBUG_INFO_BUFFERS_PRINT() {
+   console.log(
+      'GENERIC: number of buffers:', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.COUNTER, 'total elements count', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.SIZE,
+      '\nINT16: number of buffers:', DEBUG_INFO_STRUCTS.BUFFER.INT16.COUNTER, 'total elements count', DEBUG_INFO_STRUCTS.BUFFER.INT16.SIZE,
+      '\nINT8: number of buffers:', DEBUG_INFO_STRUCTS.BUFFER.INT8.COUNTER, 'total elements count', DEBUG_INFO_STRUCTS.BUFFER.INT8.SIZE,
+      '\n_generic_buffers_container: boundary', _generic_buffers_container.boundary, 'active', _generic_buffers_container.active_count, 'size', _generic_buffers_container.size,
+   );
+   
+   let size = 0, actives = 0;
+   for(let i=0; i <= _generic_buffers_container.boundary; i++){
+      size += _generic_buffers_container.buffer[i].buffer.size;
+      actives += _generic_buffers_container.buffer[i].buffer.active_count;
+   }
+   console.log(
+      'From loop: Total sizes',size, 'Total actives', actives, 
+   );
+}
+
+
+export function DEBUG_INFO_BUFFERS_PRINT2() {
+   console.log(
+      _generic_buffers_container
+   );
+}
 
 

@@ -13,7 +13,7 @@ export class Info_Listeners {
 
    constructor() {
 
-      this.events = New_generic_buffer();
+      this.events = New_generic_buffer(_, 'Info_Listeners');
    }
 
 

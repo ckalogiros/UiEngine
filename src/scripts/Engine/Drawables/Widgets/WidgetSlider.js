@@ -37,10 +37,11 @@ export class Widget_Slider extends Rect {
 
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
       const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, 'Slider', pos, fontSize, WHITE, .4, is_debug_mesh);
-      name_text.sid.gfx_group = this.sid.gfx_group;
-
+      
       /** Label area mesh */
-      super(pos, dim, col);
+      super(pos, dim, col, is_debug_mesh);
+      
+      name_text.sid.gfx_group = this.sid.gfx_group;
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
@@ -932,7 +933,8 @@ export function Slider_connect(_params) {
       target: target,
       Clbk: Binding_function,
    }
-   sliderBar.eventCallbacks.Add(params);
+   // sliderBar.eventCallbacks.Add(params);
+   sliderBar.CreateEventCallback(params);
 
 }
 
@@ -944,7 +946,8 @@ export function Slider_bind_on_value_change(sliderBar, target, Clbk) {
       target: target,
       Clbk: Binding_function,
    }
-   sliderBar.eventCallbacks.Add(params);
+   // sliderBar.eventCallbacks.Add(params);
+   sliderBar.CreateEventCallback(params);
 
 }
 

@@ -16,7 +16,7 @@ const DISABLE_DEBUG = true;
 /****************************************************************************************************************************************************/
 
 
-const _index_buffers = New_generic_buffer();
+const _index_buffers = New_generic_buffer(_, 'GFX Index Buffer');
 
 
 
@@ -93,7 +93,7 @@ function Index_buffer_create(type, size) {
 /****************************************************************************************************************************************************/
 
 
-const _index_buffers_info = New_generic_buffer();
+const _index_buffers_info = New_generic_buffer(_, 'GFX Index Buffer Info');
 
 
 

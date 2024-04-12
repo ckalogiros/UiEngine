@@ -26,7 +26,7 @@ import { View_add_to_group, View_get_view_vb_root_meshidx, View_remove_from_grou
  * The reason being not to store a reference pointer of the root in the  dropdown, 
  * rather an index to a buffer of all root-dropdowns. (?Does it worthh it?)
  */
-let _root_dropdown = New_generic_buffer();
+let _root_dropdown = New_generic_buffer(_, 'Widget Dropdown roots');
 
 export function Dropdown_roots_set_root(root, dropdown) {
    dropdown.rootidx = _root_dropdown.Add(root);
@@ -73,7 +73,7 @@ export class Widget_Dropdown extends Section {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col_menu = PURPLER[7], text_col = WHITE, btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, style = [2, 5, 2], margin = [10, 10], is_debug_mesh) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, margin, pos, [10, 10], col1, null, style);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, margin, pos, [10, 10], col1, null, style, is_debug_mesh);
 
       // NOTE: The mesh_bufferidx and the root_bufferidx as the root creation, happen in the Section from super(). 
 
@@ -369,7 +369,6 @@ export class Widget_Dropdown extends Section {
       if (this.listeners.buffer[E.C]) { // If click exists on the dropdown, should be for moving event.
          
          this.AddListenEvent(E.C, this.SetOnMove, null, root.listeners.buffer);
-         /**DEBUG */ if (DEBUG.EVENTS_LISTENERS.WIDGET_DROP_DOWN) console.log(' ### Creating Moving event for dropdown:', this.GetName(), ' root', root.GetName())
       }
       else { // Create Fake click event for dropdown
          
@@ -380,17 +379,15 @@ export class Widget_Dropdown extends Section {
       /***********************************************************************************/
       // Button
       const btn = this.children.buffer[0];
-      /**DEBUG ERROR*/ if (!btn.listeners.buffer[E.C]) console.error('Dropdown\'s button is missing the click event. Add a CreateClickEvent() to the dropdown');
       
-      const params = { // Build the parameters for the OnClick callback function for the dp's button (menu expansion).
+      const params = { // Build the parameters for the OnClick callback function (menu expansion).
          drop_down: this,
          menu: this.menu,
       }
       btn.AddListenEvent(E.C, this.OnClick, params, this.listeners.buffer);
-      /**DEBUG */ if (DEBUG.EVENTS_LISTENERS.WIDGET_DROP_DOWN) console.log(' ### Create btn click for dropdown:', this.GetName(), ' root', root.GetName())
       
       /***********************************************************************************/
-      // Μενθ
+      // Mesh
       if (this.isOn & DP_MENU_STATE.ON) {
          this.menu.ConstructListeners(this); // @@@ 1. pass 'this' for creating the menu Fake event in its dropdown OR 2. pass the 'top root dropdown menu' for creating the event as child to to one menu only.
       }
@@ -412,98 +409,54 @@ export class Widget_Dropdown extends Section {
 
          // It is the button that may have any listen events.
          const btn = menu.children.buffer[0];
-         if (btn && btn.listeners.boundary)
+         if (btn)
             btn.RemoveAllListenEvents();
 
       }
    }
 
 
-   RemoveAllListenersFromDP(_dp = null) { // Mainly used to destroy listen events of any deactivated menus that have 'isActive=fale' listen events.
+   // RemoveAllListenersFromDP(_dp = null) { // Mainly used to destroy listen events of any deactivated menus that have 'isActive=fale' listen events.
 
-      const dp = (_dp) ? _dp : this;
+   //    const dp = (_dp) ? _dp : this;
 
-      /**DEBUG ERROR*/ if (!dp || !(dp.type & MESH_TYPE.WIDGET_DROP_DOWN)) {
-         console.error('ERROR: in RemoveAllListenersFromDP(). dp is null or not a Dropdown type. dp:', dp);
-         return;
-      }
+   //    /**DEBUG ERROR*/ if (!dp || !(dp.type & MESH_TYPE.WIDGET_DROP_DOWN)) {
+   //       console.error('ERROR: in RemoveAllListenersFromDP(). dp is null or not a Dropdown type. dp:', dp);
+   //       return;
+   //    }
 
-      const btn = dp.children.buffer[0]; // The button of any dropdown should always be the 0-th child .
+   //    dp.RemoveAllListenEvents()
 
-      // Remove dropdown button's listen events.
-      for (let etype = 0; etype < LISTEN_EVENT_TYPES_INDEX.SIZE; etype++) {
+   //    // const btn = dp.children.buffer[0]; // The button of any dropdown should always be the 0-th child .
 
-         if (btn.listeners.buffer[etype]) {
+   //    // // Remove dropdown button's listen events.
+   //    // for (let etype = 0; etype < LISTEN_EVENT_TYPES_INDEX.SIZE; etype++) {
+
+   //    //    if (btn.listeners.buffer[etype]) {
          
-            const parent_event = dp.listeners.buffer[etype].evt.parent_evt;
+   //    //       const parent_event = dp.listeners.buffer[etype].evt.parent_evt;
 
-            if (parent_event[etype] === null)
-               console.error('DROPR DOWN RemoveAllListenersFromDP(). Parent event null')
+   //    //       if (parent_event[etype] === null)
+   //    //          console.error('DROP DOWN RemoveAllListenersFromDP(). Parent event null')
          
-               // Listener_remove_child_event_from_parent(etype, parent_event[etype].idx);
-               Listener_remove_child_event_from_parent(etype, parent_event);
-            btn.listeners.RemoveByIdx(etype);
-         }
-      }
-   }
+   //    //          // Listener_remove_child_event_from_parent(etype, parent_event[etype].idx);
+   //    //       if(dp.listeners) Listener_remove_child_event_from_parent(etype, parent_event);
+   //    //       btn.listeners.RemoveByIdx(etype);
+   //    //    }
+   //    // }
+   // }
 
 
-   DpDestroyListeners(menu, root) {
+   DpDestroyListeners(menu) {
 
       // Case we have stored this menu's items events to the root menu Fake event,
       // Remove all listen events of this menu's items from EventListeners buffer.(one by one, based on the root menu event(parent_event)).
-
-      if(menu.listeners.buffer[E.H]) Listener_remove_child_event_from_parent(E.H, menu.listeners.buffer[E.H].evt);
-      else if(menu.listeners.buffer[E.C]) Listener_remove_child_event_from_parent(E.C, menu.listeners.buffer[E.C].evt);
-
-      /** Here we remove all listen events(registered as children events of the root menu).
-       *  IMPORTANT! The listen events may exist in any nested child widget-mesh, 
-       *  so not only dropdown recursion is required but we must visit all nested meshes to check for listen events.
-       *  NOTE: For widgets, let their class handle all the listen events removal,
-       *  for structures that may have arbitary meshes(children buffer), we must check and remove.
-       */
-      // for (let i = 0; i <= menu.children.boundary; i++) {
-
-      //    const child = menu.children.buffer[i];
-
-      //    if ((child.type & MESH_TYPE.WIDGET_DROP_DOWN) && child.children.active_count) // If child is of type Dropdown...
-      //       child.RemoveAllListenersFromDP(child); // ...remove it's button click listener.
-      //       // child.RemoveAllListenersFromDP(child, root.menu.listeners.buffer); // ...remove it's button click listener.
-
-      //    if (child.listeners.buffer[i] && child.listeners.buffer[i].is_child_event) { // In any other case, if the child has a listener, remove it.
-
-      //       // One of the two is required to remove child event from the parent event children 
-      //       if(child.listeners.buffer[hoveridx]) Listener_remove_child_event_from_parent(hoveridx, child.listeners.buffer[hoveridx].evt);
-      //       else if(child.listeners.buffer[clickidx]) Listener_remove_child_event_from_parent(clickidx, child.listeners.buffer[clickidx].evt);
-      //    }
-      // }
+      if(menu.listeners) {
+         if(menu.listeners.buffer[E.H]) Listener_remove_child_event_from_parent(E.H, menu.listeners.buffer[E.H].evt);
+         else if(menu.listeners.buffer[E.C]) Listener_remove_child_event_from_parent(E.C, menu.listeners.buffer[E.C].evt);
+      }
    }
-   // DpDestroyListeners(menu, root) {
 
-   //    const clickidx = E.C;
-   //    // Case we have stored this menu's items events to the root menu Fake event,
-   //    // Remove all listen events of this menu's items from EventListeners buffer.(one by one, based on the root menu event(parent_event)).
-   //    // if (menu.listeners.buffer[clickidx] === null) {
-
-   //       /** Here we remove all listen events(registered as children events of the root menu).
-   //        *  IMPORTANT! The listen events may exist in any nested child widget-mesh, 
-   //        *  so not only dropdown recursion is required but we must visit all nested meshes to check for listen events.
-   //        *  NOTE: For widgets, let their class handle all the listen events removal,
-   //        *  for structures that may have arbitary meshes(children buffer), we must check and remove.
-   //        */
-   //       for (let i = 0; i <= menu.children.boundary; i++) {
-
-   //          const child = menu.children.buffer[i];
-
-   //          if ((child.type & MESH_TYPE.WIDGET_DROP_DOWN) && child.children.active_count) // If child is of type Dropdown...
-   //             child.RemoveAllListenersFromDP(child, root.menu.listeners.buffer); // ...remove it's button click listener.
-
-   //          if (child.listeners.buffer[clickidx] && child.listeners.buffer[clickidx].is_child_event) // In any other case, if the child has a listener, remove it.
-   //             Listener_remove_child_event_from_parent(clickidx, child.listeners.buffer[clickidx]);
-   //             // Listener_remove_child_event_from_parent(clickidx, root.menu.listeners.buffer[clickidx], child.listeners.buffer[clickidx]);
-   //       }
-   //    // }
-   // }
 
 
 
@@ -685,14 +638,13 @@ export class Widget_Dropdown extends Section {
 
       // Reset vertex buffers from group
       View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
-      // Mesh_per_vb_remove_all_from_index(root.gfx.vb.idx, root.per_vb_bufferidx);
 
       // Remove menu and all its items from the group view
       if (menu.group_bufferidxs[0] !== INT_NULL) {
          View_remove_from_group(menu);
       }
 
-      this.DpDestroyListeners(menu, root);
+      this.DpDestroyListeners(menu);
       this.DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 

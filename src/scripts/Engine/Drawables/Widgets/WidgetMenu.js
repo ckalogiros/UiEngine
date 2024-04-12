@@ -41,7 +41,7 @@ export class Widget_Menu_Bar extends Section {
          text_mesh.geom.dim[1]
       ];
       const areaMetrics = CalculateArea(text, dim, pos, pad)
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [6, 6], areaMetrics.pos, areaMetrics.dim, col, _, style);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [6, 6], areaMetrics.pos, areaMetrics.dim, col, _, style, is_debug_mesh);
 
       this.pad[0] = pad[0];
       this.pad[1] = pad[1];
@@ -380,343 +380,6 @@ export class Widget_Menu_Bar extends Section {
    }
 
 }
-/**SAVE */
-// export class Widget_Menu_Bar extends Widget_Label {
-
-//    close_btn_idx;
-//    minimize_btn_idx;
-
-//    // UNUSED: The align param is unused from the Widget_Label class
-//    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, align, pos, col = GREY[3], text_col = WHITE, pad = [14, 6], bold = .4, style = [2, 5, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
-
-//       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, align, pos, _fontsize, col, text_col, pad, bold, font, style);
-
-//       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) {
-//          this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
-//       }
-
-//       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-//       this.SetStyle(style);
-//       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-//       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-
-
-//       this.SetName('Widget_Menu_Bar');
-//       this.type |= MESH_TYPE.WIDGET_MENU_BAR;
-
-//       this.close_btn_idx = INT_NULL;
-//       this.minimize_btn_idx = INT_NULL;
-
-//    }
-
-
-//    AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[3], text_col = WHITE, pad = [4, 2], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024) {
-
-//       if (!fontsize) fontsize = this.text_mesh.geom.dim[0];
-
-//       const pos = [0, 0, 0];
-//       CopyArr3(pos, this.geom.pos)
-//       pos[2] += 1; // Put close button in front of the parent widget.
-//       // pos[0] += this.geom.dim[0] - ; // Align right
-
-//       const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col, text_col, pad, bold, style, font);
-//       close_btn.geom.pos[0] += this.geom.dim[0] - close_btn.geom.dim[0]; // Align right
-//       close_btn.text_mesh.geom.pos[0] += this.geom.dim[0] - close_btn.geom.dim[0]; // Align right
-//       close_btn.SetName('close_btn');
-
-//       // this.geom.dim[0] += close_btn.geom.dim[0]; // Widen the menu rect area by the width of the close button
-//       this.geom.dim[0] += close_btn.geom.dim[0] * 2;
-//       this.geom.dim[1] = (this.geom.dim[1] < close_btn.geom.dim[1]) ? close_btn.geom.dim[1] + this.pad[1] : this.geom.dim[1];
-
-//       this.close_btn_idx = this.AddChild(close_btn);
-
-//       // Realign menu's children
-//       this.ReAlign();
-//    }
-
-
-//    AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[3], text_col = WHITE, pad = [4, 2], bold = .4, font = TEXTURES.MSDF_CONSOLAS_1024, style = [6, 5, 3]) {
-
-//       if (!fontsize) fontsize = this.text_mesh.geom.dim[0];
-//       let pos = [100, 200, 0]
-//       pos[2] += 1; // Put close button in front of the parent widget.
-
-//       const minimize_btn = Create_widget_minimize_btn(ROOT_WIDGET_FLAGS, root, pos, fontsize, col, text_col, pad, bold, style);
-//       minimize_btn.text_mesh.geom.pos[0] += this.geom.dim[0] - minimize_btn.geom.dim[0]; // Align right
-//       minimize_btn.SetName('minimize_btn')
-
-//       this.geom.dim[0] += minimize_btn.geom.dim[0];
-//       this.geom.dim[1] = (this.geom.dim[1] < minimize_btn.geom.dim[1]) ? minimize_btn.geom.dim[1] + this.pad[1] : this.geom.dim[1];
-
-//       this.minimize_btn_idx = this.AddChild(minimize_btn);
-
-//       this.ReAlign();
-
-//    }
-
-
-//    Destroy(_this) {
-
-//       // Menu's children(close/minimize etc) destruction
-//       for (let i = 0; i <= _this.children.boundary; i++) {
-
-//          const child = _this.children.buffer[i];
-//          child.Destroy();
-//       }
-
-//       // Menus's destruction
-//       return super.Destroy();
-//    }
-
-
-//    AddToWidgetRootBuffer(root_bufferidx) {
-
-//       this.root_bufferidx = root_bufferidx;
-//       Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
-
-//       this.text_mesh.root_bufferidx = root_bufferidx;
-//       Widget_root_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
-
-//       if (this.close_btn_idx !== INT_NULL) {
-
-//          const close_btn = this.children.buffer[this.close_btn_idx];
-//          close_btn.AddToWidgetRootBuffer(root_bufferidx)
-//       }
-
-//       if (this.minimize_btn_idx !== INT_NULL) {
-
-//          const minimize_btn = this.children.buffer[this.minimize_btn_idx];
-//          minimize_btn.AddToWidgetRootBuffer(root_bufferidx)
-//       }
-//    }
-
-
-//    /*******************************************************************************************************************************************************/
-//    // Graphics
-//    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx) {
-
-//       const gfx = super.GenGfxCtx(FLAGS, gfxidx); // For the menu meshes
-
-//       for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
-//          const child = this.children.buffer[i];
-//          child.GenGfxCtx(FLAGS, gfxidx)
-//       }
-//       return gfx;
-//    }
-
-
-//    Render() {
-
-//       super.Render(); // For the menu meshes
-
-//       for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
-
-//          const child = this.children.buffer[i];
-//          if (!child.is_gfx_inserted) { child.Render(); }
-//          if (!child.text_mesh.is_gfx_inserted) { child.text_mesh.Render(); }
-//       }
-//    }
-
-
-
-//    /*******************************************************************************************************************************************************/
-//    // Setters-Getters
-
-//    /** Return type: Array. Returns an array of all widgets meshes */
-//    GetAllMeshes() {
-
-//       let all_meshes = [this, this.text_mesh];
-//       for (let i = 0; i <= this.children.boundary; i++) {
-//          const child = this.children.buffer[i]
-//          all_meshes = child.GetAllMeshes(all_meshes)
-//       }
-//       return all_meshes;
-//    }
-
-
-
-//    /*******************************************************************************************************************************************************/
-//    // Events Handling
-
-//    // SEE ### OnMove Events Implementation Logic
-//    OnMove(params) {
-
-//       // The 'OnMove' function is called by the timeInterval.
-//       // The timeInterval has been set by the 'OnClick' event.
-//       const menu = params.params;
-//       const text_mesh = menu.text_mesh;
-
-//       // Destroy the time interval and the Move operation, if the mesh is not grabed
-//       // MESH_STATE.IN_GRAB is deactivated upon mouse click up in Events.js.
-//       if (menu.StateCheck(MESH_STATE.IN_GRAB) === 0 && menu.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
-
-//          const intervalIdx = menu.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-//          TimeIntervalsDestroyByIdx(intervalIdx);
-//          menu.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
-
-//          return;
-//       }
-
-//       // Move menu widget
-//       const mouse_pos = MouseGetPosDif();
-//       menu.geom.MoveXY(mouse_pos.x, -mouse_pos.y, menu.gfx);
-
-
-//       // Move menu children widgets(close/minimize buttons)
-//       for (let i = 0; i <= menu.children.boundary; i++) {
-
-//          const widget_child = menu.children.buffer[i];
-//          widget_child.geom.MoveXY(mouse_pos.x, -mouse_pos.y, widget_child.gfx)
-//          widget_child.text_mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, widget_child.text_mesh.gfx)
-//       }
-
-//    }
-
-
-//    // SEE ### Construct Listeners
-//    ConstructListeners(_root = null) {
-
-//       // const mesh = (_mesh) ? _mesh : this; // If in recursion, use as the current mesh the passed param. 
-//       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-//       const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-//       // console.log('****', mesh.GetName(), mesh.listeners.buffer)
-
-//       const root_evt = root.listeners.buffer;
-
-//       for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
-
-//          if(mesh.listeners.buffer[i]){
-
-//             mesh.AddListenEvent(etypeidx, child.OnClick, evt_params, root_evt);
-//          }
-
-//          for (let i = 0; i <= mesh.children.boundary; i++) {
-
-//             const child = mesh.children.buffer[i];
-//             if (child) {
-//                const evt = child.listeners.buffer[etypeidx];
-//                if (evt) { // If event is not null
-//                   const evt_params = {
-//                      EventClbk: null,
-//                      targetBindingFunctions: null,
-//                      target_mesh: child,
-//                      params: null,
-//                   }
-//                   child.AddListenEvent(etypeidx, child.OnClick, evt_params, root_evt);
-//                }
-//             }
-//          }
-//       }
-//    }
-//    // ConstructListeners(_root = null) {
-
-//    //    // const mesh = (_mesh) ? _mesh : this; // If in recursion, use as the current mesh the passed param. 
-//    //    const mesh = this; // If in recursion, use as the current mesh the passed param. 
-//    //    const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-//    //    // console.log('****', mesh.GetName(), mesh.listeners.buffer)
-
-//    //    const root_evt = root.listeners.buffer;
-
-//    //    for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
-
-//    //       for (let i = 0; i <= mesh.children.boundary; i++) {
-
-//    //          const child = mesh.children.buffer[i];
-//    //          if (child) {
-//    //             const evt = child.listeners.buffer[etypeidx];
-//    //             if (evt) { // If event is not null
-//    //                const evt_params = {
-//    //                   EventClbk: null,
-//    //                   targetBindingFunctions: null,
-//    //                   target_mesh: child,
-//    //                   params: null,
-//    //                }
-//    //                child.AddListenEvent(etypeidx, child.OnClick, evt_params, root_evt);
-//    //             }
-//    //          }
-//    //       }
-//    //    }
-//    // }
-
-
-
-//    /*******************************************************************************************************************************************************/
-//    // Alignment
-
-//    ReAlign() {
-
-//       // Realign menu's text
-//       this.Align(ALIGN.LEFT, this.pad);
-
-//       let pad = [this.pad[0], this.pad[1]];
-
-//       for (let i = 0; i <= this.children.boundary; i++) {
-
-//          const child = this.children.buffer[i];
-//          Align_self_get_dif(ALIGN.RIGHT, this.geom, _, child.geom, pad); // Align the close/minimize buttons area_mesh to the menu area mesh.
-//          child.Align(ALIGN.RIGHT, pad); // Also we need to update the close/minimize buttons text_mesh position(by aligning)
-//          pad[0] += this.children.buffer[i].geom.dim[0] * 2; // Each child widget of the menu is positioned relative to the previous child.
-//       }
-
-//    }
-
-
-//    Reposition_post(pos_dif) {
-
-//       this.MoveXYZ(pos_dif);
-//       this.text_mesh.MoveXYZ(pos_dif);
-
-//       // Menu's children(close/minimize etc) destruction
-//       for (let i = 0; i <= this.children.boundary; i++) {
-//          const child = this.children.buffer[i];
-//          child.Reposition_post(pos_dif);
-//       }
-//    }
-
-
-//    Reposition_pre(pos_dif) {
-//       console.error('NO BATCH CREATED')
-//       AddArr2(this.geom.pos, pos_dif);
-//       CopyArr2(this.geom.defPos, this.geom.pos);
-//       this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-//       // Batch_store(this, _, { pos: pos_dif }, _);
-
-//       AddArr2(this.text_mesh.geom.pos, pos_dif);
-//       CopyArr2(this.text_mesh.geom.defPos, this.text_mesh.geom.pos);
-//       this.text_mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-//       // Batch_store(this.text_mesh, _, { pos: pos_dif }, _);
-
-//       // Menu's children(close/minimize etc) destruction
-//       for (let i = 0; i <= this.children.boundary; i++) {
-
-//          const child = this.children.buffer[i];
-//          child.Reposition_pre(pos_dif);
-//       }
-//    }
-
-
-
-//    /*******************************************************************************************************************************************************/
-//    // Transformations
-
-//    Move(x, y) {
-
-//       if (x === 0 && y === 0) return;
-
-//       // Move 'this' text
-//       this.geom.MoveXY(x, y, this.gfx);
-//       this.text_mesh.geom.MoveXY(x, y, this.text_mesh.gfx);
-
-//       // Move menu children widgets(close/minimize buttons)
-//       for (let i = 0; i <= this.children.boundary; i++) {
-
-//          const child = this.children.buffer[i];
-//          child.geom.MoveXY(x, y, child.gfx);
-//          child.text_mesh.geom.MoveXY(x, y, child.text_mesh.gfx);
-//       }
-//    }
-
-// }
 
 
 export class Close_Button extends Widget_Button {
@@ -734,8 +397,9 @@ export class Close_Button extends Widget_Button {
          evt_params: root, // root should be the root widget from which the recursive destruction should start.
          // Clbk: root.OnCloseButtonClick, // The callback that will destroy the root and all of its children(recursive)
       }
-      this.eventCallbacks.Add(params); // Pass the root and the callback for destroying the parent widget
-
+      // this.eventCallbacks.Add(params); 
+      // Pass the root and the callback for destroying the parent widget
+      this.CreateEventCallback(params);
    }
 
 
@@ -790,7 +454,9 @@ export class Widget_Minimize extends Widget_Button {
          evt_params: root,
       }
       // The eventCallbacks are going to run from the OnClick() in Widget_Button class.
-      this.eventCallbacks.Add(params); // Pass the root and the callback for destroying the parent widget
+      // this.eventCallbacks.Add(params); 
+      // Pass the root and the callback for destroying the parent widget
+      this.CreateEventCallback(params);
 
    }
 
@@ -821,7 +487,7 @@ export class Widget_Minimize extends Widget_Button {
             if (!minim_mesh.toggle) {  // Maximize - toggle on
 
                // Copy root's children to a buffer
-               minim_mesh.stored_children_meshes = New_generic_buffer(root.children); // TODO: Maybe copying all children is not efficient. Just get the pointer and use it later on maximize
+               minim_mesh.stored_children_meshes = New_generic_buffer(root.children, 'minim_mesh.stored_children_meshes'); // TODO: Maybe copying all children is not efficient. Just get the pointer and use it later on maximize
 
 
                // Reset Graphics buffers;

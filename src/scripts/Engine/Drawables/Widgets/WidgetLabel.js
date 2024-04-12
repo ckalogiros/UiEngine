@@ -456,12 +456,6 @@ export class Widget_Label extends Rect {
     /*******************************************************************************************************************************************************/
 
 
-    AddToGfxBuffer() {
-        this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
-        this.text_mesh.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.text_mesh.gfx.vb.idx, this.text_mesh.mesh_bufferidx);
-    }
-
-
     RemoveFromGfxBuffer() {
         Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
         Mesh_per_vb_remove_mesh(this.text_mesh.gfx.vb.idx, this.text_mesh.per_vb_bufferidx);
@@ -481,17 +475,19 @@ export class Widget_Label extends Rect {
 
         const root_evt = root.listeners.buffer;
 
-        for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+        if(mesh.listeners){
+            for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
-            const evt = mesh.listeners.buffer[etypeidx];
-            if (evt) { // If event is not null
-                const evt_params = {
-                    EventClbk: null,
-                    targetBindingFunctions: null,
-                    target_mesh: mesh,
-                    params: null,
+                const evt = mesh.listeners.buffer[etypeidx];
+                if (evt) { // If event is not null
+                    const evt_params = {
+                        EventClbk: null,
+                        targetBindingFunctions: null,
+                        target_mesh: mesh,
+                        params: null,
+                    }
+                    mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, root_evt);
                 }
-                mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, root_evt);
             }
         }
     }

@@ -60,14 +60,14 @@ class View {
    constructor(rootidx) {
 
       this.rootidx = rootidx;
-      this.vb = New_generic_buffer(); // Array of arrays of per vertex buffer mesh indexes
+      this.vb = New_generic_buffer(_, 'Mesh buffer Views VB buffer'); // Array of arrays of per vertex buffer mesh indexes
    }
 
 }
 
 
 
-const _view_buffer = New_generic_buffer();
+const _view_buffer = New_generic_buffer(_, 'Mesh buffer Views');
 
 
 

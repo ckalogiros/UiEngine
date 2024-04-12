@@ -30,9 +30,9 @@ export class Section extends Rect {
 
 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin = [4, 4], pos = [200, 400, 0], dim = [40, 40], col = TRANSPARENCY(BLUE, .6), name = 'SECTION UNAMED', style = [0, 3.5, 2.]) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin = [4, 4], pos = [200, 400, 0], dim = [40, 40], col = TRANSPARENCY(BLUE, .6), name = 'SECTION UNAMED', style = [0, 3.5, 2.], is_debug_mesh) {
 
-      super(pos, dim, col);
+      super(pos, dim, col, is_debug_mesh);
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.total_margin = [0, 0];
@@ -120,7 +120,7 @@ export class Section extends Rect {
             // TODO: implement
          }
          else if (options & SECTION.ITEM_FIT) {
-            CopyArr3(mesh.geom.pos, this.geom.pos);
+            CopyArr2(mesh.geom.pos, this.geom.pos);
          }
       }
       else { // Handle Items 
@@ -183,7 +183,7 @@ export class Section extends Rect {
 
       Calculate_sizes_recursive(section, options, target_child_idx);
 
-
+      // UNNECESSARY: we handle this at: if(options & SECTION.RESIZE_PARENT)
       if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
          section.geom.dim[0] = section.max_size[0]; // For scroller widgets, do not set the height
          section.geom.defDim[0] = section.max_size[0];
@@ -653,6 +653,7 @@ export class Section extends Rect {
 
       // Create listen events for the section
       const root_evt = root.listeners.buffer;
+      if(mesh.listeners)
       for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
          const evt = mesh.listeners.buffer[etypeidx];
@@ -697,12 +698,15 @@ export class Section extends Rect {
 
             // Case item is of type section, run recursively.
             // If the root mesh does not have an event, create a fake event to store the children events to. 
-            if (mesh.listeners.buffer[E.H] === null) {
+            // if (mesh.listeners.buffer[E.H] === null) 
+            if (!mesh.listeners) 
+            {
 
                mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, true);
                mesh.AddListenEvent(E.H, null, null, parent_root.listeners.buffer);
-            }
-            if (mesh.listeners.buffer[E.C] === null) {
+            // }
+            // if (mesh.listeners.buffer[E.C] === null) 
+            // {
 
                mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
                mesh.AddListenEvent(E.C, null, null, parent_root.listeners.buffer);
@@ -1114,30 +1118,34 @@ function Calculate_sizes_recursive(parent, options, target_child_idx) {
 
          if (opt & SECTION.VERTICAL) {
 
-            if (mesh.text_mesh) {
-               accum_size_per_section[1] += mesh.text_mesh.geom.dim[1];
-               accum_size_per_section[0] = mesh.text_mesh.GetMaxWidth();
-               // parent.max_size[1] += mesh.text_mesh.geom.dim[1];
-            }
+            // if (mesh.text_mesh) {
+            //    accum_size_per_section[1] += mesh.text_mesh.geom.dim[1];
+            //    accum_size_per_section[0] = mesh.text_mesh.GetMaxWidth();
+            //    // parent.max_size[1] += mesh.text_mesh.geom.dim[1];
+            // }
+            // else{
 
-            accum_size_per_section[1] += mesh.geom.dim[1];
-            accum_size_per_section[0] = mesh.geom.dim[0];
+               accum_size_per_section[1] += mesh.geom.dim[1];
+               accum_size_per_section[0] = mesh.geom.dim[0];
+            // }
 
             parent.max_size[1] += mesh.geom.dim[1];
 
-            if (parent.max_size[0] < accum_size_per_section[0])
+            if (parent.max_size[0] <= accum_size_per_section[0])
                parent.max_size[0] = mesh.geom.dim[0]; // For horizontal, grow to the max width of all meshes
          }
          else if (opt & SECTION.HORIZONTAL) {
 
-            if (mesh.text_mesh) {
-               accum_size_per_section[0] += mesh.text_mesh.GetMaxWidth();
-               accum_size_per_section[1] = mesh.text_mesh.geom.dim[1];
-               parent.max_size[0] += mesh.text_mesh.GetMaxWidth();
-            }
+            // if (mesh.text_mesh) {
+            //    accum_size_per_section[0] += mesh.text_mesh.GetMaxWidth();
+            //    accum_size_per_section[1] = mesh.text_mesh.geom.dim[1];
+            //    parent.max_size[0] += mesh.text_mesh.GetMaxWidth();
+            // }
+            // else{
 
-            accum_size_per_section[0] += mesh.geom.dim[0];
-            accum_size_per_section[1] = mesh.geom.dim[1];
+               accum_size_per_section[0] += mesh.geom.dim[0];
+               accum_size_per_section[1] = mesh.geom.dim[1];
+            // }
 
             parent.max_size[0] += mesh.geom.dim[0];
 
@@ -1341,6 +1349,7 @@ export function Calculate_positions_recursive(parent, options) {
                   data: [new_pos[0], new_pos[1], mesh.geom.dim[0], mesh.geom.dim[1],]
                };
 
+               // mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
                mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
                Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, _);
             }

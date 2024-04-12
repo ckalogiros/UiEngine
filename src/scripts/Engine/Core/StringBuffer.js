@@ -1,7 +1,12 @@
 "use strict";
 
+import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
+
+
+
+const NOTIFICATIONS_ON = true;
 
 
 
@@ -12,7 +17,7 @@ import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
  * For the '_str_buffer' we can get only a pointer refference.
  */
 
-const _str_buffer = New_generic_buffer();
+const _str_buffer = New_generic_buffer(_, 'String buffer');
 _str_buffer.Add(''); // Empty string
 
 
@@ -64,7 +69,7 @@ export function Str_buffer_change(nameidx, new_name) {
 /****************************************************************************************************************************************************/
 
 
-const _str_buffer_mesh_names = New_generic_buffer();
+const _str_buffer_mesh_names = New_generic_buffer(_, 'String buffer names');
 
 
 
@@ -103,7 +108,7 @@ function Mesh_name_exists(meshidx) {
 
 
 
-export function Str_buffer_mesh_names_store(str, mesh_bufferidx) {
+export function Str_buffer_mesh_names_store(str, mesh_bufferidx, is_debug_mesh) {
 
    if (mesh_bufferidx === -1)
       console.log()
@@ -122,6 +127,10 @@ export function Str_buffer_mesh_names_store(str, mesh_bufferidx) {
       const idx = _str_buffer_mesh_names.Add(str);
       _str_buffer_mesh_names_index_buffer.AddAtIndex(idx, mesh_bufferidx);
 
+
+      if(NOTIFICATIONS_ON && is_debug_mesh===0) 
+         Notifications_send(NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
+
       return idx;
    }
    else { // Else add the new mesh string name
@@ -132,7 +141,6 @@ export function Str_buffer_mesh_names_store(str, mesh_bufferidx) {
       _str_buffer_mesh_names_index_buffer.AddAtIndex(idx, mesh_bufferidx)
       return idx;
    }
-
 
 }
 
@@ -148,12 +156,17 @@ export function Str_buffer_mesh_names_remove_by_idx(nameidx) {
       // console.log('mesh nameidx:', nameidx, 'meshidx:', _str_buffer_mesh_names_index_buffer.buffer[nameidx], 'name', _str_buffer_mesh_names.buffer[nameidx])
    }
 
+   if(NOTIFICATIONS_ON) 
+      Notifications_send(NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, _str_buffer_mesh_names_index_buffer.buffer[nameidx]);
+
    _str_buffer_mesh_names.RemoveByIdxSortedVersion(nameidx);
 
    _str_buffer_mesh_names_index_buffer.RemoveByIdxSortedVersion(nameidx);
    
    // Get the mesh index. 
    const replacer_meshidx = _str_buffer_mesh_names_index_buffer.buffer[nameidx];
+
+   
 
    // Because we moved an element, and the removed is replaced by the last, we need to set the new index for the mesh that pointed at the last(moved) element.
    // Else if destroyed already last element, do nothing

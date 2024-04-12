@@ -8,7 +8,7 @@ import { Str_buffer_get_by_idx, Str_buffer_store } from "../Engine/Core/StringBu
 const DISABLE_DEBUG = true;
 
 
-const _shader_attribs_buffer = New_generic_buffer();
+const _shader_attribs_buffer = New_generic_buffer(_, '_shader_attribs_buffer');
 
 
 
