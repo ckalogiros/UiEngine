@@ -397,10 +397,11 @@ export class Mesh {
 
         for (let i = 0; i <= this.listeners.boundary; i++) {
 
-            if (this.listeners.buffer[i]) {
+            if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
                 Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
                 // this.listeners.buffer[i] = null;
                 this.listeners.buffer[i] = INT_NULL;
+                console.log(this.GetName())
             }
         }
     }

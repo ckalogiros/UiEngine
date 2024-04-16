@@ -842,6 +842,9 @@ export class Widget_Scroller extends Section {
       }
       
       const parent_events = [scroller.listeners.buffer[0], scroller.listeners.buffer[1]];
+      // HACK: We create all event listeners for scrolled section, so that on scrolling, any children events will be removed from the scroole section parent event 
+      scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
+      scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
       scrolled_section.ConstructListeners(parent_events);
 
    }
@@ -1036,19 +1039,13 @@ export function Scroller_on_update_handle(_params) {
    for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
 
       // if (!scrolled_section.listeners.buffer[i]) 
-      if (scrolled_section.listeners.buffer[i]) {
+      if (scrolled_section.listeners.buffer[i] !== null && scrolled_section.listeners.buffer[i] !== INT_NULL) {
          // console.log()
 
          Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i])
+         scrolled_section.listeners.buffer[i] = INT_NULL;
+         // console.log('REMOVE')
          
-         // if (scrolled_section.listeners.buffer[i].is_child_event) {
-         //    Listener_remove_child_event_from_parent(i, scrolled_section.listeners.buffer[i]);
-         // }
-         // else {
-         //    Listener_destroy_children_buffer(i, scrolled_section.listeners.buffer[i]);
-         //    Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i])
-         //    scrolled_section.listeners.RemoveByIdx(i)
-         // }
       }
    }
 

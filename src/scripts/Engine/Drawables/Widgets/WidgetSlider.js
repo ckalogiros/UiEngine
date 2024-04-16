@@ -442,6 +442,13 @@ export class Widget_Slider extends Rect {
    // SEE ### Construct Listeners
    ConstructListeners(parent_listeners = null) {
 
+      alert('IMPLEMENT ME\n SEE console.error')
+      console.error('ConstructListeners() @ Slider.js')
+      /**
+       * If checks for listen events should be for null and int_null
+       * Also create a llop
+       * Copy from  other widget's ConstructListeners
+       */
       const slider = this;
       const bar = slider.children.buffer[SLIDER_BAR_IDX];
       const handle = bar.children.buffer[0];

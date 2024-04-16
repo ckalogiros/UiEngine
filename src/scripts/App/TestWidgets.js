@@ -322,7 +322,7 @@ export function TestWidgetsGeneric(scene) {
     // CreateLargeDropdown();
 
     // CreateScroller(scene);
-    CreateScrollerClampAlphaTest(scene)
+    // CreateScrollerClampAlphaTest(scene)
     // CreateScrollerDp(scene)
     // CreateScrollerWithWidgets(scene);
 

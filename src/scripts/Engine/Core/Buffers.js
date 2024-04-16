@@ -177,6 +177,9 @@ export class M_Buffer {
 
          this.buffer[idx] = null;
          this.active_count--;
+// if(this.active_count === 0 && this.boundary > -1)
+// console.log()
+         // if (idx > this.boundary) this.boundary--; // Case the we removed the last element in existance
          if (idx === this.boundary) this.boundary--; // Case the we removed the last element in existance
 
 
@@ -187,9 +190,12 @@ export class M_Buffer {
             if (this.buffer[this.boundary] !== null) break;
             this.boundary--;
          }
-
+// if(this.active_count === 0 && this.boundary > -1)
+// console.log()
          if (this.boundary < INT_NULL) alert('M_Buffer boundary = -1')
          ERROR_NULL(this.active_count);
+
+         if(this.active_count === 0) this.boundary = INT_NULL
       }
    }
 

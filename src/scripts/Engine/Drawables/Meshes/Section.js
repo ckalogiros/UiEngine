@@ -635,7 +635,8 @@ export class Section extends Rect {
       if(mesh.listeners){
          for (let i = 0; i <= mesh.listeners.boundary; i++) {
    
-            if (mesh.listeners.buffer[i]) { // If NOT null, has a listen event
+            // if (mesh.listeners.buffer[i] !== null && mesh.listeners.buffer[i] !== INT_NULL) { // If NOT null, has a listen event
+            if (mesh.listeners.buffer[i] !== null) { // If NOT null, has a listen event
    
                const evt_params = {
                   EventClbk: null,
@@ -729,6 +730,7 @@ export class Section extends Rect {
       }
 
    }
+
 
    SetPosXY(x, y) { Section_set_posxy_children_recursive([x, y], this); }
 

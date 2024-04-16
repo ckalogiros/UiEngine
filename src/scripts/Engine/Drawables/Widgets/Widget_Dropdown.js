@@ -4,10 +4,10 @@ import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { Listener_get_parent_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
+import { Listener_get_parent_event, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_per_vb_store_mesh, Mesh_buffer_get_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Mesh_per_vb_remove_all_from_index, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
 import { Clampx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { Section } from "../Meshes/Section.js";
 import { BLUEL, GREEN, GREY, PURPLER, REDL, WHITE } from "../Material/Base/Colors.js";
@@ -382,18 +382,19 @@ export class Widget_Dropdown extends Section {
                   this.AddListenEvent(i, null, null, parent_listeners[i]);
                }
                else { // Else construct the params
-                  const params = { // Build the parameters for the OnClick callback function (menu expansion).
-                     drop_down: this,
-                     menu: this.menu,
+                  const params = {
+                     EventClbk: null, targetBindingFunctions: null,
+                     target_mesh: this, params: null,
                   }
 
-                  this.AddListenEvent(i, this.OnClick, params, parent_listeners[i]);
+                  this.AddListenEvent(i, super.OnClick, params, parent_listeners[i]);
                }
             }
          }
       }
 
-
+// if(parent_listeners[1]===13)
+// console.log()
 
       /*****************************************************************************************************************/
       // Create Listen Events for the button
@@ -484,7 +485,7 @@ export class Widget_Dropdown extends Section {
 
                menu.CreateListenEvent(Listen_event_types_get_type_from_index(j), FAKE_LISTEN_EVENT);
 
-               if (this.children.buffer[0].listeners.buffer[j] === null) {
+               if (this.children.buffer[0].listeners.buffer[j] === null || this.children.buffer[0].listeners.buffer[j] === INT_NULL) {
                   const parent_event_idx = Find_parent_listen_event(j, menu)
                   menu.AddListenEvent(j, null, null, parent_event_idx);
                }
@@ -496,57 +497,13 @@ export class Widget_Dropdown extends Section {
             }
          }
 
-         item.ConstructListeners(menu.listeners.buffer);
+         // const temp = [menu.listeners.buffer[0], menu.listeners.buffer[1]]
+         // item.ConstructListeners(temp);
+         // EFFICIENCY: Allocations happen in this function
+         item.ConstructListeners([menu.listeners.buffer[0], menu.listeners.buffer[1]]);
 
       }
    }
-
-
-   // RemoveAllListenersFromDP(_dp = null) { // Mainly used to destroy listen events of any deactivated menus that have 'isActive=fale' listen events.
-
-   //    const dp = (_dp) ? _dp : this;
-
-   //    /**DEBUG ERROR*/ if (!dp || !(dp.type & MESH_TYPE.WIDGET_DROP_DOWN)) {
-   //       console.error('ERROR: in RemoveAllListenersFromDP(). dp is null or not a Dropdown type. dp:', dp);
-   //       return;
-   //    }
-
-   //    dp.RemoveAllListenEvents()
-
-   //    // const btn = dp.children.buffer[0]; // The button of any dropdown should always be the 0-th child .
-
-   //    // // Remove dropdown button's listen events.
-   //    // for (let etype = 0; etype < LISTEN_EVENT_TYPES_INDEX.SIZE; etype++) {
-
-   //    //    if (btn.listeners.buffer[etype]) {
-
-   //    //       const parent_event = dp.listeners.buffer[etype].evt.parent_evt;
-
-   //    //       if (parent_event[etype] === null)
-   //    //          console.error('DROP DOWN RemoveAllListenersFromDP(). Parent event null')
-
-   //    //          // Listener_remove_child_event_from_parent(etype, parent_event[etype].idx);
-   //    //       if(dp.listeners) Listener_remove_child_event_from_parent(etype, parent_event);
-   //    //       btn.listeners.RemoveByIdx(etype);
-   //    //    }
-   //    // }
-   // }
-
-
-   // DpDestroyListeners(menu) {
-
-   //    // Case we have stored this menu's items events to the root menu Fake event,
-   //    // Remove all listen events of this menu's items from EventListeners buffer.(one by one, based on the root menu event(parent_event)).
-   //    // if(menu.listeners) {
-   //    //    if(menu.listeners.buffer[E.H]) Listener_remove_child_event_from_parent(E.H, menu.listeners.buffer[E.H]);
-   //    //    else if(menu.listeners.buffer[E.C]) Listener_remove_child_event_from_parent(E.C, menu.listeners.buffer[E.C]);
-   //    // }
-   //    if (menu.listeners) {
-   //       if (menu.listeners.buffer[E.H]) Listener_remove_event_by_idx(E.H, menu.listeners.buffer[E.H]);
-   //       else if (menu.listeners.buffer[E.C]) Listener_remove_event_by_idx(E.C, menu.listeners.buffer[E.C]);
-   //    }
-   // }
-
 
 
 
@@ -826,7 +783,7 @@ export class Widget_Dropdown extends Section {
       /*DEBUG*/if (!params.evt_params) { console.error('Target_params.params is null, in a OnClick() event. evt_params:', params.evt_params); return; }
       /*DEBUG*/if (dp.rootidx === INT_NULL) { alert('Root for dropdown must be set. ', dp.GetName()); return; }
 
-      const btn = Mesh_buffer_get_mesh_byidx(params.meshidx);
+      const btn = dp.children.buffer[0];
       Dropdown_roots_get_root_by_idx(dp.rootidx);
 
       if (dp.isOn & DP_MENU_STATE.OFF) { // Case: Activate Menu 
