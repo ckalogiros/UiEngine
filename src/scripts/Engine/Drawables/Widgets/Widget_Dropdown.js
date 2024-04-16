@@ -4,14 +4,15 @@ import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
+import { Listener_get_parent_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_per_vb_store_mesh, Mesh_buffer_get_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Mesh_per_vb_remove_all_from_index } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_store_mesh, Mesh_buffer_get_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Mesh_per_vb_remove_all_from_index, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
 import { Clampx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { Section } from "../Meshes/Section.js";
 import { BLUEL, GREEN, GREY, PURPLER, REDL, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_get_view_vb_root_meshidx, View_remove_from_group, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
+import { Find_parent_listen_event } from "../Operations/Recursions.js";
 
 /**
  * SEE: ### Widget_Dropdown
@@ -44,8 +45,8 @@ function Dropdown_roots_get_root_by_idx(rootidx) {
 
 function Dropdown_roots_destroy_byidx(rootidx, caller_mesh_bufferidx) {
    // Destroy only if the caller dropdown is the root
-   if(caller_mesh_bufferidx === _root_dropdown.buffer[rootidx].mesh_bufferidx)
-      _root_dropdown.RemoveByIdx(rootidx);   
+   if (caller_mesh_bufferidx === _root_dropdown.buffer[rootidx].mesh_bufferidx)
+      _root_dropdown.RemoveByIdx(rootidx);
 }
 
 
@@ -100,20 +101,20 @@ export class Widget_Dropdown extends Section {
          // this.menu.mat.col[1][15] = .6;
       }
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
-      
+
       this.dp_symbols = ['+', '-'];
       const btn = new Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, ALIGN.LEFT, [pos[0], pos[1], this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
       // AddArr2(btn.total_margin, this.menu.total_margin);
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
-      
+
       this.AddItem(btn);
-      
+
       this.menu_active = false;
-      
+
       btn.SetName(`[${btn.mesh_bufferidx}]{${text}}-BTN_DP`);
       this.menu.SetName(`[${this.menu.mesh_bufferidx}]{${text}}-MENU_DP`);
       this.SetName(`[${this.mesh_bufferidx}]{${text}}-DP`);
-      
+
    }
 
 
@@ -170,7 +171,7 @@ export class Widget_Dropdown extends Section {
 
       const btn = this.children.buffer[0];
       btn.AddToWidgetRootBuffer(root_bufferidx);
-      
+
       this.menu.AddToWidgetRootBuffer(root_bufferidx);
    }
 
@@ -212,7 +213,7 @@ export class Widget_Dropdown extends Section {
    SetTypeDebug() {
 
       this.type |= MESH_TYPE.DEBUG_MESH;
-      
+
       this.children.buffer[0].SetTypeDebug();
 
       this.menu.type |= MESH_TYPE.DEBUG_MESH;
@@ -225,7 +226,7 @@ export class Widget_Dropdown extends Section {
    /*******************************************************************************************************************************************************/
 
    /** If FLAG===PRIVATE, then we get the gfx of the parent. If no parent exists, then the Gfx_generate_context creates new gfx. */
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx=_) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = _) {
 
       this.gfx = Gfx_generate_context(FLAGS, this, gfxidx);
 
@@ -233,7 +234,7 @@ export class Widget_Dropdown extends Section {
       btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [this.gfx.prog.idx, this.gfx.vb.idx], _); // Set button's area gfx same with dropDown mesh 
 
       this.menu.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [this.gfx.prog.idx, this.gfx.vb.idx], _)
-      if(this.group_bufferidxs[0]!==INT_NULL) console.error('TRUE:', this.GetName())
+      if (this.group_bufferidxs[0] !== INT_NULL) console.error('TRUE:', this.GetName())
 
       return this.gfx;
    }
@@ -332,7 +333,6 @@ export class Widget_Dropdown extends Section {
 
       Dropdown_roots_destroy_byidx(this.rootidx);
 
-      // this.RemoveAllListenEvents();
       return super.Destroy();
 
    }
@@ -356,40 +356,93 @@ export class Widget_Dropdown extends Section {
    // Events Listeners
    /*******************************************************************************************************************************************************/
 
-   // SEE ### Construct Listeners
-   ConstructListeners(_root = null, _mesh = null) {
+   ConstructListeners(parent_listeners = null, _mesh = null) {
 
-      const root = _root ? _root : this;
+      /*****************************************************************************************************************/
+      // Create Listen Events for the dropdown
+      if (this.listeners) {
 
-      /***********************************************************************************/
-      // Drop down
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, true);
-      this.AddListenEvent(E.H, null, null, root.listeners.buffer);
-      
-      if (this.listeners.buffer[E.C]) { // If click exists on the dropdown, should be for moving event.
-         
-         this.AddListenEvent(E.C, this.SetOnMove, null, root.listeners.buffer);
+         for (let i = 0; i <= this.listeners.boundary; i++) {
+
+            if (this.listeners.buffer[i] !== null) {
+
+               if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+                  parent_listeners = [null, null];
+               }
+
+               // if (parent_listeners[i] !== null && parent_listeners[i] !== INT_NULL) {
+               if (parent_listeners[i] === null || parent_listeners[i] === INT_NULL) {
+                  parent_listeners[i] = Find_parent_listen_event(i, this);
+               }
+
+
+               // If FAKE or HOVER, pass null params and null callback
+               if (this.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
+
+                  this.AddListenEvent(i, null, null, parent_listeners[i]);
+               }
+               else { // Else construct the params
+                  const params = { // Build the parameters for the OnClick callback function (menu expansion).
+                     drop_down: this,
+                     menu: this.menu,
+                  }
+
+                  this.AddListenEvent(i, this.OnClick, params, parent_listeners[i]);
+               }
+            }
+         }
       }
-      else { // Create Fake click event for dropdown
-         
-         this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
-         this.AddListenEvent(E.C, null, null, root.listeners.buffer);
-      }
-      
-      /***********************************************************************************/
-      // Button
+
+
+
+      /*****************************************************************************************************************/
+      // Create Listen Events for the button
       const btn = this.children.buffer[0];
-      
-      const params = { // Build the parameters for the OnClick callback function (menu expansion).
-         drop_down: this,
-         menu: this.menu,
+      for (let i = 0; i <= btn.listeners.boundary; i++) {
+
+         if (btn.listeners.buffer[i] !== null) {
+
+
+            // Case there is a dropdown listener for dropdown, then make certain the button listener is a child
+            if(this.listeners !== null && this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL){
+
+               parent_listeners[i] = this.listeners.buffer[i];
+            }
+            else {
+
+               if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+                  parent_listeners = [null, null];
+               }
+   
+               if (parent_listeners[i] === null || parent_listeners[i] === INT_NULL) {
+                  parent_listeners[i] = Find_parent_listen_event(i, btn);
+               }
+            }
+
+
+            if (btn.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
+
+               btn.AddListenEvent(i, null, null, parent_listeners[i]);
+            }
+            else { // Else construct the params
+
+               const params = { // Build the parameters for the OnClick callback function (menu expansion).
+                  drop_down: this,
+                  menu: this.menu,
+               }
+   
+               // CAUTION: We run for i:Hover and click, but the callback is always 'this.OnClick'. For Hover callback, check the event type and pass the apropriate callback.
+               btn.AddListenEvent(i, this.OnClick, params, parent_listeners[i]);
+            }
+         }
       }
-      btn.AddListenEvent(E.C, this.OnClick, params, this.listeners.buffer);
-      
-      /***********************************************************************************/
-      // Mesh
+
+
+
+      /*****************************************************************************************************************/
+      // Create Listen Events for the menu and its items
       if (this.isOn & DP_MENU_STATE.ON) {
-         this.menu.ConstructListeners(this); // @@@ 1. pass 'this' for creating the menu Fake event in its dropdown OR 2. pass the 'top root dropdown menu' for creating the event as child to to one menu only.
+         this.ConstructListenersForMenu(this.menu)
       }
 
    }
@@ -416,6 +469,39 @@ export class Widget_Dropdown extends Section {
    }
 
 
+   ConstructListenersForMenu(dp_menu) { // Handle the dropdown's menu listen events creation. (if any of the items has listen events)
+
+      const menu = dp_menu;
+
+      for (let i = 0; i <= menu.children.boundary; i++) {
+
+         const item = menu.children.buffer[i];
+
+         for (let j = 0; j <= LISTEN_EVENT_TYPES_INDEX.SIZE; j++) {
+
+            // If no listeners, create Fake
+            if (((menu.listeners === null || menu.listeners.buffer[j] === null) || menu.listeners.buffer[j] === INT_NULL)) {
+
+               menu.CreateListenEvent(Listen_event_types_get_type_from_index(j), FAKE_LISTEN_EVENT);
+
+               if (this.children.buffer[0].listeners.buffer[j] === null) {
+                  const parent_event_idx = Find_parent_listen_event(j, menu)
+                  menu.AddListenEvent(j, null, null, parent_event_idx);
+               }
+               else {
+
+                  const parent_event_idx = Listener_get_parent_event(j, this.children.buffer[0].listeners.buffer[j]);
+                  menu.AddListenEvent(j, null, null, parent_event_idx);
+               }
+            }
+         }
+
+         item.ConstructListeners(menu.listeners.buffer);
+
+      }
+   }
+
+
    // RemoveAllListenersFromDP(_dp = null) { // Mainly used to destroy listen events of any deactivated menus that have 'isActive=fale' listen events.
 
    //    const dp = (_dp) ? _dp : this;
@@ -433,12 +519,12 @@ export class Widget_Dropdown extends Section {
    //    // for (let etype = 0; etype < LISTEN_EVENT_TYPES_INDEX.SIZE; etype++) {
 
    //    //    if (btn.listeners.buffer[etype]) {
-         
+
    //    //       const parent_event = dp.listeners.buffer[etype].evt.parent_evt;
 
    //    //       if (parent_event[etype] === null)
    //    //          console.error('DROP DOWN RemoveAllListenersFromDP(). Parent event null')
-         
+
    //    //          // Listener_remove_child_event_from_parent(etype, parent_event[etype].idx);
    //    //       if(dp.listeners) Listener_remove_child_event_from_parent(etype, parent_event);
    //    //       btn.listeners.RemoveByIdx(etype);
@@ -447,15 +533,19 @@ export class Widget_Dropdown extends Section {
    // }
 
 
-   DpDestroyListeners(menu) {
+   // DpDestroyListeners(menu) {
 
-      // Case we have stored this menu's items events to the root menu Fake event,
-      // Remove all listen events of this menu's items from EventListeners buffer.(one by one, based on the root menu event(parent_event)).
-      if(menu.listeners) {
-         if(menu.listeners.buffer[E.H]) Listener_remove_child_event_from_parent(E.H, menu.listeners.buffer[E.H].evt);
-         else if(menu.listeners.buffer[E.C]) Listener_remove_child_event_from_parent(E.C, menu.listeners.buffer[E.C].evt);
-      }
-   }
+   //    // Case we have stored this menu's items events to the root menu Fake event,
+   //    // Remove all listen events of this menu's items from EventListeners buffer.(one by one, based on the root menu event(parent_event)).
+   //    // if(menu.listeners) {
+   //    //    if(menu.listeners.buffer[E.H]) Listener_remove_child_event_from_parent(E.H, menu.listeners.buffer[E.H]);
+   //    //    else if(menu.listeners.buffer[E.C]) Listener_remove_child_event_from_parent(E.C, menu.listeners.buffer[E.C]);
+   //    // }
+   //    if (menu.listeners) {
+   //       if (menu.listeners.buffer[E.H]) Listener_remove_event_by_idx(E.H, menu.listeners.buffer[E.H]);
+   //       else if (menu.listeners.buffer[E.C]) Listener_remove_event_by_idx(E.C, menu.listeners.buffer[E.C]);
+   //    }
+   // }
 
 
 
@@ -464,115 +554,8 @@ export class Widget_Dropdown extends Section {
    // Dropdown activation
    /*******************************************************************************************************************************************************/
 
-   ActivateMenuFake(root) { // TODO: OLD - REIMPLEMENT
-      // SEE ### Fake Remove
-      // Must remove listener
-
-      const menu = this.menu;
-
-      if (menu.is_gfx_inserted) { // Case: Menu removed by alpha, justset alpha back to default.
-
-         menu.FakeAddFromGfxPosy(menu.geom.defPos[1]);
-
-         for (let i = 0; i <= menu.children.boundary; i++) {
-
-            const item = menu.children.buffer[i];
-
-            if (item.state.mask & MESH_STATE.ACTIVE) {
-               if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
-
-                  item.FakeAddFromGfxPosy(item.geom.defPos[1]);
-
-                  const btn = item.children.buffer[0];
-                  btn.FakeAddFromGfxPosy(btn.geom.defPos[1]);
-
-                  if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
-
-                     // If the menu was deactivated while open, then on activation keep its '-' symbol
-                     btn.text_mesh.SliceText(0, 1);
-                     btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
-                     
-                     item.ActivateMenuFake(root);
-                  }
-
-               }
-               else { // Case: Non dropdown meshes. Generate gfx for any other children meshes.
-                  item.FakeAddFromGfxPosy(item.geom.defPos[1]);
-                  // item.FakeAddFromGfxAlpha(1);
-               }
-            }
-         }
-      }
-      else { // TODO: Handle Case: First time initialization OR each dp's menu to its own gfx, add menu to gfx
-
-      }
-
-      this.isOn |= DP_MENU_STATE.ON;
-
-   }
 
 
-   DeactivateMenuFake(dp = null) { // TODO: OLD - REIMPLEMENT
-      // SEE ### Fake Remove
-      // Must remove listeners
-      // Must remove menu (and consequently the items as part of the menu) from the dropdown's children buffer.
-
-      if (!dp) dp = this;
-      const menu = dp.menu;
-
-      for (let j = 0; j <= menu.children.boundary; j++) {
-
-         const item = menu.children.buffer[j];
-
-         /** Avoid any clamped items of been faked removed. 
-          * (It will not produce error but the un rendered items have no start index in the vertex buffer, 
-          * so we will fake remove meshes that happen to be at that location )
-          */
-         if (item.state.mask & MESH_STATE.ACTIVE) {
-
-            // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
-            if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-
-               if (dp.isOn & DP_MENU_STATE.ON) {
-
-                  this.DeactivateMenuFake(item); // Run recursive for every dropdown in every menu
-
-                  // Deactivate the dropdown's button
-                  const btn = item.children.buffer[0];
-
-                  btn.FakeRemoveFromGfxPosy(OUT_OF_VIEW);
-
-                  // Deactivate gfx for menu's children meshes.
-                  item.FakeRemoveFromGfxPosy(OUT_OF_VIEW);
-                  // item.FakeRemoveFromGfxAlpha(0);
-                  item.RemoveAllListenEvents();
-                  console.log('DEACTIVATE:', item.GetName())
-               }
-            }
-            else {
-               /**DEBUG*/ if (DEBUG.WIDGET_DROPDOWN) if (!item.gfx) console.log(item.GetName())
-               if (item.gfx) {
-                  item.FakeRemoveFromGfxPosy(OUT_OF_VIEW);
-                  console.log('DEACTIVATE:', item.GetName())
-                  // item.FakeRemoveFromGfxAlpha(0);
-               }
-            }
-         }
-
-      }
-
-      if (menu.gfx) {
-         menu.FakeRemoveFromGfxPosy(OUT_OF_VIEW);
-         console.log('DEACTIVATE:', menu.GetName())
-         // menu.FakeRemoveFromGfxAlpha(0);
-      }
-
-      // Remove menu's Fake listen events
-      menu.RemoveAllListenEvents();
-
-      dp.isOn |= DP_MENU_STATE.OFF_FAKE;
-
-   }
 
 
    // Reset and rebuild vertex buffers x
@@ -610,11 +593,11 @@ export class Widget_Dropdown extends Section {
                }
             }
          }
-         
+
          if (menu.gfx && menu.is_gfx_inserted) {
-            
+
             menu.state.mask &= ~MESH_STATE.ACTIVE;
-            
+
             // Mesh_per_vb_remove_mesh(menu.gfx.vb.idx, menu.per_vb_bufferidx);
             menu.RemoveFromGfxBuffer();
 
@@ -644,7 +627,7 @@ export class Widget_Dropdown extends Section {
          View_remove_from_group(menu);
       }
 
-      this.DpDestroyListeners(menu);
+      // this.DpDestroyListeners(menu);
       this.DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 
@@ -667,7 +650,7 @@ export class Widget_Dropdown extends Section {
 
             clip_top = group_root_mesh.parent.geom.pos[1] - group_root_mesh.parent.geom.dim[1];
             clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1];
-            clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0]-20;
+            clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
          }
       }
       else {
@@ -739,7 +722,7 @@ export class Widget_Dropdown extends Section {
       }
 
       // Case its the first time this menu will be rendered
-      if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0]!==INT_NULL) {
+      if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
          View_add_to_group(menu, this.group_bufferidxs[0])
       }
 
@@ -761,7 +744,7 @@ export class Widget_Dropdown extends Section {
          // Get the group root mesh to Recalc position/dimentions 
          const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
          const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-   
+
          // group_root_mesh.Recalc_no_gfx_update(_, this.idx);
          group_root_mesh.Recalc_no_gfx_update(_);
 
@@ -772,19 +755,19 @@ export class Widget_Dropdown extends Section {
             clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1];
             clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
          }
-         
+
       }
       else {
          root.Recalc_no_gfx_update(_);
          console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
       }
-      
+
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
       Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 
-      menu.ConstructListeners(this); // Create listeners, as children of menu listeners.
+      this.ConstructListenersForMenu(menu); // Create listeners, as children of menu listeners.
 
    }
 
@@ -820,6 +803,11 @@ export class Widget_Dropdown extends Section {
 
 
    CreateClickEvent() {
+      // If dp is root (direct child of scene), create FAKE click event,
+      // else let the Construct listeners decide the parent event listener for dp's button
+      if (Widget_root_is_widget_root(this.root_bufferidx, this.mesh_bufferidx)) {
+         this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
+      }
       const btn = this.children.buffer[0];
       btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    }
@@ -827,28 +815,6 @@ export class Widget_Dropdown extends Section {
 
    CreateMoveEvent() {
       this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   }
-
-
-   CreateAndAddEvent(evt_type, root_evt) {
-
-      const btn = this.children.buffer[0];
-      switch (evt_type) {
-         case E.H: {
-            btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-            btn.AddListenEvent(E.H, null, null, root_evt);
-            break;
-         }
-         case E.C: {
-            btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-            const params = { // Build the parameters for the OnClick callback function for the dp's button (menu expansion).
-               drop_down: this,
-               menu: this.menu,
-            }
-            btn.AddListenEvent(E.C, this.OnClick, params, this.listeners.buffer);
-            break;
-         }
-      }
    }
 
 

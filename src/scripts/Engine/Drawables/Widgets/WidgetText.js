@@ -194,12 +194,12 @@ export class Widget_Text extends Text_Mesh {
 
 		this.geom.pos[0] += x;
 		this.geom.pos[1] += y;
-		
+
 		const update_data = {
-         sizes: [2],
-         data: [x,y],
-      }
-      Batch_store(this, _, update_data, _);
+			sizes: [2],
+			data: [x, y],
+		}
+		Batch_store(this, _, update_data, _);
 
 	}
 
@@ -244,6 +244,9 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
+	// For now plain text meshes have no listen events 
+	ConstructListeners(parent_listeners = null) { }
+
 }
 
 
@@ -271,9 +274,9 @@ export class Widget_Multi_Text extends Widget_Text {
 		for (let i = 0; i <= this.children.boundary; i++) {
 
 			if (this.children.buffer[i]) {
-				
+
 				const shift_children = this.children.buffer[i].Destroy();
-            if(shift_children) i--;
+				if (shift_children) i--;
 			}
 		}
 
@@ -714,14 +717,14 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.geom.pos[1] += y;
 
 		const update_data = {
-         sizes: [2],
-         data: [x,y],
-      }
-      Batch_store(this, _, update_data, _);
-		
+			sizes: [2],
+			data: [x, y],
+		}
+		Batch_store(this, _, update_data, _);
+
 		// Move children text
 		for (let i = 0; i <= this.children.boundary; i++) {
-			
+
 			const child = this.children.buffer[i];
 			if (child) {
 				child.geom.pos[0] += x;

@@ -42,7 +42,7 @@ export function Debug_info_ui_performance(scene) {
    const switch_col = TRANSPARENCY(BLUEL[7], .6);
 
    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Generic Ui Debug Info', [180, 40, 0], GREY[0], GREY[1], BLUEL[7], [18, 3], _, _, _, dp_margin);
-   dp.CreateClickEvent();
+   // dp.CreateClickEvent();
    dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
 
@@ -719,6 +719,8 @@ function Debug_info_create_mesh_info(params) {
    const tr = 1.45;
 
    const section = Create_widget_section(_, SECTION.VERTICAL, _, DEBUG_INFO.UI_MESH.POS, [0, 0], TRANSPARENCY(REDL[7], .7), 'MeshInfo DebugUi');
+   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
+   section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
 
    const dp = Create_widget_dropdown(_, `InfoUi Mesh DP`, DEBUG_INFO.UI_MESH.POS, GREY[1], TRANSPARENCY(GREY[1], tr), WHITE, temp_btnpad);
    dp.StateEnable(MESH_STATE.ACTIVE);
@@ -1208,8 +1210,9 @@ export function Debug_info_ui() {
    const switch_col = TRANSPARENCY(BLUEL[7], .6);
 
    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Debug Info', [180, 40, 0], GREY[0], GREY[1], BLUEL[7], [18, 3], _, _, _, dp_margin);
+   dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    dp.CreateClickEvent();
-   dp.CreateMoveEvent();
+   // dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
 
 
@@ -1271,6 +1274,8 @@ function Dbg_info_ui_create_ui(pos, name) {
    
    // Create the scolled section where a dropdown is going to exist 
    const scrolled = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [pos[0], pos[1], pos[2]+1], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), 'DBG UI Scrolled section', _, MESH_TYPE.DEBUG_MESH);
+   scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
+   scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
    scrolled.SetTypeDebug();
    
    // Create the dropdown where all entries for the info will be stored

@@ -440,13 +440,13 @@ export class Widget_Slider extends Rect {
 
 
    // SEE ### Construct Listeners
-   ConstructListeners(_root = null) {
+   ConstructListeners(parent_listeners = null) {
 
       const slider = this;
       const bar = slider.children.buffer[SLIDER_BAR_IDX];
       const handle = bar.children.buffer[0];
 
-      const root_evt = _root ? _root.listeners.buffer : null;
+      // const root_evt = _root ? _root.listeners.buffer : null;
 
       // Create hover events, NOT as part of the root listen events.
       if (slider.listeners.buffer[E.H]) slider.AddListenEvent(E.H);
@@ -467,8 +467,8 @@ export class Widget_Slider extends Rect {
       else {
 
          // Create a Fake click event with no callback and params, but any root events. 
-         slider.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
-         slider.AddListenEvent(E.C, null, null, root_evt);
+         slider.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
+         slider.AddListenEvent(E.C, null, null, parent_event_idx);
       }
       bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       bar.AddListenEvent(E.C, slider.OnClick, evt_params, slider.listeners.buffer);

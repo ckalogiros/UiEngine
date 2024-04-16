@@ -54,6 +54,44 @@ export function Mesh_buffer_get_size() { return _mesh_buffer.size; }
 
 
 export function Mesh_buffer_get_mesh_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx]; }
+/**For Debugging*/ export function Mesh_buffer_get_mesh_name_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].GetName(); }
+
+
+
+export function Mesh_buffer_get_mesh_geometry(mesh_bufferidx) { 
+   return {
+      pos: _mesh_buffer.buffer[mesh_bufferidx].geom.pos,
+      dim: _mesh_buffer.buffer[mesh_bufferidx].geom.dim,
+   }
+}
+
+
+
+export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) { 
+   return {
+      left: _mesh_buffer.buffer[mesh_bufferidx].geom.pos[0] - _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0],
+      right: _mesh_buffer.buffer[mesh_bufferidx].geom.pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0],
+      top: _mesh_buffer.buffer[mesh_bufferidx].geom.pos[1] - _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1],
+      top: _mesh_buffer.buffer[mesh_bufferidx].geom.pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1],
+   }
+}
+
+
+const temp_no_allocation_buffer = []
+temp_no_allocation_buffer[0] = [0,0]
+temp_no_allocation_buffer[1] = [0,0]
+export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferidx) { 
+   temp_no_allocation_buffer[0][0] =
+      _mesh_buffer.buffer[mesh_bufferidx].geom.pos[0] - _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] - _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
+   temp_no_allocation_buffer[0][1] =
+      _mesh_buffer.buffer[mesh_bufferidx].geom.pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
+   temp_no_allocation_buffer[1][0] =
+      _mesh_buffer.buffer[mesh_bufferidx].geom.pos[1] - _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] - _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+   temp_no_allocation_buffer[1][1] =
+      _mesh_buffer.buffer[mesh_bufferidx].geom.pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+   
+   return temp_no_allocation_buffer;
+}
 
 
 
@@ -366,7 +404,7 @@ export function Widget_root_add_mesh(root_bufferidx, mesh_bufferidx) {
 
 
 
-function Widget_root_is_widget_root(root_bufferidx, mesh_bufferidx) {
+export function Widget_root_is_widget_root(root_bufferidx, mesh_bufferidx) {
 
    // The widget root buffer store the root mesh at index 0, which is an index to the _mesh_buffer.
    // So if the index 'mesh_bufferidx' is the same as the 0-th element of the widget_buffer[root_bufferidx],

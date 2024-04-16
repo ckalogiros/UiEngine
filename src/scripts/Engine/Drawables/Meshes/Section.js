@@ -1,21 +1,24 @@
 "use strict";
 
-import { CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
-import { Check_intersection_point_rect } from "../Operations/Collisions.js";
+import { CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Widget_root_create_root, Widget_root_batch_move_from_batch_buffer, Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index } from "../../Core/MeshBuffer.js";
+import { Widget_root_create_root, Widget_root_batch_move_from_batch_buffer } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Listener_create_child_event } from "../../Events/EventListeners.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Clampx_from_group, Clipx_from_group, Clipy_from_group } from "../Operations/Clip.js";
+import { Clampx_from_group, Clipy_from_group } from "../Operations/Clip.js";
+import { New_generic_buffer } from "../../Core/Buffers.js";
+import { Find_parent_listen_event } from "../Operations/Recursions.js";
 
 
-
+const temp_parent_listeners = New_generic_buffer();
+// temp_parent_listeners.Add(INT_NULL);
+temp_parent_listeners.Add(INT_NULL);
+temp_parent_listeners.Add(INT_NULL);
 
 
 
@@ -489,7 +492,7 @@ export class Section extends Rect {
          const bottom = section.geom.pos[1] + section.geom.dim[1];
 
          const point = MouseGetPos();
-         if (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1]) {
+         if (section.state.mask & MESH_STATE.IS_RESIZEABLE && (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1])) {
 
             // We have Resize
 
@@ -623,60 +626,38 @@ export class Section extends Rect {
    }
 
 
-   // SEE ### Construct Listeners
-   ConstructListeners(_root = null, _Clbk = null) {
 
-      /**
-       * Concept of creating tree like event structure:
-       * 
-       * First we 'AddListenEvent' any listen events that the user alredy have instructed on widget creation.
-       * 
-       * Then we must create all listen events for all children recursively,
-       * calling on each widgets '.ConstructListeners()' function.
-       * 
-       * In the loop, before calling 'ConstructListeners', we 
-       * check if the current 'root', which may be the root or the 'this' mesh,
-       * has events in its 'listeners' buffer. If it has not, then we
-       * create a fake event, with no callback or evt_params, so as to have an 
-       * event in the ListenersBuffer to store any possible children events.
-       * In the ListenersBuffer, we create a 'children's' buffer, and in that buffer
-       * any child event will go.
-       * 
-       * // IMPORTANT ISSUES: 
-       * The fake event in the parent is created 
-       * despite the fact that no child may not have any events to register.
-       * 
-       */
+   ConstructListeners(parent_listeners = null, _Clbk = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-      let root = (_root) ? _root : this; // If in recursion, use as root the passed param. 
 
       // Create listen events for the section
-      const root_evt = root.listeners.buffer;
-      if(mesh.listeners)
-      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+      if(mesh.listeners){
+         for (let i = 0; i <= mesh.listeners.boundary; i++) {
+   
+            if (mesh.listeners.buffer[i]) { // If NOT null, has a listen event
+   
+               const evt_params = {
+                  EventClbk: null,
+                  targetBindingFunctions: null,
+                  target_mesh: mesh,
+                  params: null,
+               }
+               
+               const Clbk = (_Clbk) ? _Clbk : mesh.OnClick;
 
-         const evt = mesh.listeners.buffer[etypeidx];
+               if(!parent_listeners){
+                  parent_listeners = [null, null];
+               }
 
-         if (evt) { // If mesh has events to add...
+               if(parent_listeners[i] === null){
+                  parent_listeners[i] = Find_parent_listen_event(i, mesh);
+               }
+               
+               mesh.AddListenEvent(i, Clbk, evt_params, parent_listeners[i]); 
 
-            const evt_params = {
-               EventClbk: null,
-               targetBindingFunctions: null,
-               target_mesh: mesh,
-               params: null,
+               parent_listeners[i] = mesh.listeners.buffer[i]; 
             }
-
-            /** // TODO: Pass the mesh event as is to be stored by ListeEvents buffer.
-             * Preriquisites:
-             * 1. Re-implement the ListeEvents to be able to store events directly from meshes via function call 
-             */
-            const Clbk = (_Clbk) ? _Clbk : mesh.OnClick;
-            if (evt.is_child_event) {
-               mesh.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, mesh.mesh_bufferidx, Clbk, evt_params, root_evt[etypeidx].evt);
-               root = Mesh_buffer_get_mesh_byidx(evt.evt.parent_evt.meshidx);
-            }
-            else { mesh.AddListenEvent(etypeidx, Clbk, evt_params, root_evt); }
          }
       }
 
@@ -685,39 +666,19 @@ export class Section extends Rect {
 
          const child = mesh.children.buffer[i];
          if (child && (child.state.mask & MESH_STATE.ACTIVE)) {
-            /**
-             * Create a Fake listen event as a parent event, if the section has no listen events,
-             * so that the actual listen events of the section's children meshes have a parent event to be grouped.
-             * 
-             * // TODO!!: IMPORTANT!
-             * 1. We create Fake event only for click events.
-             * 2. We create Fake event despite the fact that there may not be any children events.
-             */
-
-            const parent_root = root ? root : root.parent;
-
-            // Case item is of type section, run recursively.
-            // If the root mesh does not have an event, create a fake event to store the children events to. 
-            // if (mesh.listeners.buffer[E.H] === null) 
-            if (!mesh.listeners) 
-            {
-
-               mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, true);
-               mesh.AddListenEvent(E.H, null, null, parent_root.listeners.buffer);
-            // }
-            // if (mesh.listeners.buffer[E.C] === null) 
-            // {
-
-               mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true);
-               mesh.AddListenEvent(E.C, null, null, parent_root.listeners.buffer);
+            if (child.ConstructListeners) { // Call the widget's specific .ConstructListeners() to handle the widget's listen events creation
+               child.ConstructListeners(parent_listeners);
+               // child.ConstructListeners(this.listeners.buffer[i]);
+               
+               // if(mesh.listeners){
+               //    if(mesh.listeners.buffer[i]) parent_listeners[i] = mesh.listeners.buffer[i];
+               // }
             }
-
-            if (child.ConstructListeners) // Call the widget's specific .ConstructListeners() to handle the widget's listen events creation
-               child.ConstructListeners(this);
-
          }
       }
    }
+
+
 
 
 
@@ -730,7 +691,7 @@ export class Section extends Rect {
       if (x === 0 && y === 0) return;
 
       if (this.root_bufferidx === INT_NULL) return;
-
+      
       Widget_root_batch_move_from_batch_buffer(this.root_bufferidx, x, y)
 
    }
@@ -942,6 +903,7 @@ function Section_on_move_section(params) {
    const mouse_pos = MouseGetPosDif();
    if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
 
+   // HERE: In one example, the section is a child, but the Move runs from widget root and we move from root and not from this section
    section.Move(mouse_pos.x, -mouse_pos.y)
 
 }

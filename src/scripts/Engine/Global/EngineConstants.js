@@ -31,6 +31,10 @@ const NANOSEC = 0.000001;
 const ALL = 0xffff;
 
 
+
+const FAKE_LISTEN_EVENT = true;
+
+
 const UNCHANGED = 0xffff; // Just a flag, used for checking if a value should change or remain the same.
 
 
@@ -851,8 +855,16 @@ const LISTEN_EVENT_TYPES = {
 	MOVE: _CNT <<= 1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
 
 	NULL: _CNT <<= 1,
+
+	GetTypeFromIndex(idx){
+	}
 };
 
+function Listen_event_types_get_type_from_index(idx){
+	
+	if(idx === LISTEN_EVENT_TYPES_INDEX.HOVER) return LISTEN_EVENT_TYPES.HOVER;
+	if(idx === LISTEN_EVENT_TYPES_INDEX.CLICK) return LISTEN_EVENT_TYPES.CLICK_UP;
+}
 
 
 

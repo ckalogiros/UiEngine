@@ -84,6 +84,7 @@ export function Events_handle_immidiate(e) {
     if (e.type === 'hover') {
 
         // Apply Hover Color, if the hhovered mesh is not already in hover.
+        // HERE: isn't it anecessary to check if colorable????? The purpose of hover is to color????
         if (e.params.mesh.StateCheck(MESH_STATE.IS_HOVER_COLORABLE) && e.params.mesh.id !== STATE.mesh.hoveredId) {
 
             // Unhover any hovered mesh. // TODO: Decide who unhovers an already hovered mesh: here OR EventListeners.js. The diff is that if we unhover here, is faster since there is no separate call to 'Events_handle_immidiate()' for the 'else if (e.type === 'unhover')'

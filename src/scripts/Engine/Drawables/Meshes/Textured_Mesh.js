@@ -92,13 +92,9 @@ export class Textured_Mesh extends Mesh {
    // TODO: The: ConstructListeners(), OnClick() and OnMove(), belong to a widget rather than a _Mesh. Neither Text_Mesh or Rect_Mesh have these functions. Maybe create the apropriate widget for the Textured_mesh too.
    // SEE ### Construct Listeners
 
-   ConstructListeners(_root = null) {
+   ConstructListeners(parent_listeners = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-      const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-      // console.log('****', mesh.GetName(), mesh.listeners.buffer)
-
-      const root_evt = root.listeners.buffer;
 
       for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
@@ -110,7 +106,7 @@ export class Textured_Mesh extends Mesh {
                target_mesh: mesh,
                params: null,
             }
-            mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, root_evt);
+            mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, parent_listeners[etypeidx]);
          }
       }
    }

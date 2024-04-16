@@ -342,7 +342,6 @@ export class M_Buffer {
       if (removed_idx !== this.boundary) { // Handle removing any elements except the last
 
          // const replacer = this.boundary;
-
          
          // const replacer = this.buffer[this.boundary];
          // REPLACE WITH LAST ELEM

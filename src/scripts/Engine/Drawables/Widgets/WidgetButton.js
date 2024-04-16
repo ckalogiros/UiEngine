@@ -1,6 +1,7 @@
 "use strict";
 
 import { GREY, WHITE } from '../Material/Base/Colors.js';
+import { Find_parent_listen_event } from '../Operations/Recursions.js';
 import { Widget_Label } from './WidgetLabel.js';
 
 
@@ -60,17 +61,24 @@ export class Widget_Button extends Widget_Label {
 
 
    // SEE ### Construct Listeners
-   ConstructListeners(_root = null) {
+   ConstructListeners(parent_listeners = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-      const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-      const root_evt = root.listeners.buffer;
 
-      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+      for (let i = 0; i <= mesh.listeners.boundary; i++) {
 
-         const evt = mesh.listeners.buffer[etypeidx];
-         if (evt) { 
-            mesh.AddListenEvent(etypeidx, mesh.OnClick, this.evt_params, root_evt);
+         if (mesh.listeners.buffer[i]) { 
+
+            if(parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+               parent_listeners = [null, null];
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+            else if(parent_listeners[i] === null){
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+
+
+            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
          }
       }
    }
@@ -148,17 +156,23 @@ export class Widget_Switch extends Widget_Button {
 
 
    // SEE ### Construct Listeners
-   ConstructListeners(_root = null) {
+   ConstructListeners(parent_listeners = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-      const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-      const root_evt = root.listeners.buffer;
 
-      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+      for (let i = 0; i <= mesh.listeners.boundary; i++) {
 
-         const evt = mesh.listeners.buffer[etypeidx];
-         if (evt) { 
-            mesh.AddListenEvent(etypeidx, mesh.OnClick, this.evt_params, root_evt);
+         if (mesh.listeners.buffer[i]) { // If there is an event to be created
+
+            if(parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+               parent_listeners = [null, null];
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+            else if(parent_listeners[i] === null){
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+            
+            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
          }
       }
    }

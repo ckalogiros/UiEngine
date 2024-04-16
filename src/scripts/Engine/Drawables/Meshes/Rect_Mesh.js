@@ -258,11 +258,9 @@ export class Rect extends Mesh {
 
 
    // SEE ### Construct Listeners
-   ConstructListeners(_root = null) {
+   ConstructListeners(parent_listeners = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-      const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-      const root_evt = root.listeners.buffer;
 
       for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
@@ -274,7 +272,7 @@ export class Rect extends Mesh {
                target_mesh: mesh,
                params: null,
             }
-            mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, root_evt);
+            mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, parent_listeners[etypeidx]);
          }
       }
    }

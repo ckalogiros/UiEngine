@@ -263,10 +263,10 @@ export class Widget_Menu_Bar extends Section {
 
 
    // SEE ### Construct Listeners
-   ConstructListeners(_root = null) {
+   ConstructListeners(parent_listeners = null) {
 
-      const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-      super.ConstructListeners(root);
+      // const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
+      super.ConstructListeners(parent_listeners);
 
    }
 

@@ -193,25 +193,42 @@ export class Widget_Switch_Simple extends Rect {
 
 
    // SEE ### Construct Listeners
-   ConstructListeners(_root = null) {
+   // ConstructListeners(parent_listeners = null) {
+
+   //    const mesh = this; // If in recursion, use as the current mesh the passed param. 
+
+   //    for (let i = 0; i <= mesh.listeners.boundary; i++) {
+
+   //       const evt = mesh.listeners.buffer[i];
+   //       if (evt) {
+   //          mesh.AddListenEvent(i, mesh.OnClick, this.evt_params, parent_listeners[i]);
+   //       }
+   //    }
+
+   // }
+   
+
+   // SEE ### Construct Listeners
+   ConstructListeners(parent_listeners = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-      const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-      const root_evt = root.listeners.buffer;
 
-      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+      for (let i = 0; i <= mesh.listeners.boundary; i++) {
 
-         const evt = mesh.listeners.buffer[etypeidx];
-         if (evt) {
-            mesh.AddListenEvent(etypeidx, mesh.OnClick, this.evt_params, root_evt);
+         if (mesh.listeners.buffer[i]) { 
+
+            if(parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+               parent_listeners = [null, null];
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+            else if(parent_listeners[i] === null){
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+
+
+            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
          }
       }
-
-      // const switch0 = mesh.children.buffer[0];
-      // if(mesh.listeners.active_count){
-
-      //    switch0.ConstructListeners(this);
-      // }
    }
 
 }

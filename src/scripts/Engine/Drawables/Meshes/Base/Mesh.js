@@ -3,7 +3,7 @@ import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Listener_create_child_event, Listener_create_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
+import { Listener_create_child_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
@@ -46,6 +46,7 @@ export class Mesh {
     sid;        // BitField: Shader Program Unique Identifier
     type;       // BitField: All different class types of this mesh. 
     state;      // BitField: Mesh state. 
+    event_flags;// Bitfield: Event flags
     alignment;  // BitField: Control this mesh's children alignment.
     gfx_pool_request;     // BitField: 
 
@@ -332,51 +333,46 @@ export class Mesh {
 
         if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
+            // HERE: The construction of the listeners is been set 3 times. Make it one time in one place
             if(!this.listeners)  {
                 this.listeners = New_generic_buffer();
                 this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
             }
-
-            this.listeners.AddAtIndex(E.H, {
-                evt: null,
-                is_child_event: false,
-            });
-
+            
+            this.listeners.AddAtIndex(E.H, INT_NULL);
+            
             this.state.mask |= (MESH_STATE.IS_HOVERABLE | MESH_STATE.IS_HOVER_COLORABLE);
-
+            this.event_flags |= LISTEN_EVENT_TYPES.HOVER;
+            
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
-
+            
         }
         else if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
-
+            
             if(!this.listeners)  {
                 this.listeners = New_generic_buffer();
                 this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
             }
-
-            this.listeners.AddAtIndex(E.C, {
-                evt: null,
-                is_child_event: false,
-            });
-
+            
+            this.listeners.AddAtIndex(E.C, INT_NULL)
+            
             this.state.mask |= (MESH_STATE.IS_CLICKABLE);
-
+            this.event_flags |= LISTEN_EVENT_TYPES.CLICK_UP;
+            
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_CLICKABLE);
 
         }
         else if (etype & LISTEN_EVENT_TYPES.MOVE) {
-
+            
             if(!this.listeners)  {
                 this.listeners = New_generic_buffer();
                 this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
             }
-
-            this.listeners.AddAtIndex(E.C, {
-                evt: null,
-                is_child_event: false,
-            });
-
+            
+            this.listeners.AddAtIndex(E.C, INT_NULL);
+            
             this.state.mask |= (MESH_STATE.IS_GRABABLE | MESH_STATE.IS_MOVABLE | MESH_STATE.IS_CLICKABLE);
+            this.event_flags |= LISTEN_EVENT_TYPES.MOVE;
 
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_CLICKABLE);
 
@@ -385,20 +381,11 @@ export class Mesh {
     }
 
 
-    AddListenEvent(etypeidx, Clbk = null, params = null, parent_event = null) {
+    // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
+    AddListenEvent(etypeidx, Clbk = null, params = null, parent_event_idx = null) {
 
-        if (!this.listeners.buffer[etypeidx])
-            console.error('NO LISTENER IN this.listeners.buffer[etypeidx]')
-
-        if(this.state.mask & MESH_STATE.ACTIVE){
-
-            if (parent_event && parent_event[etypeidx] && parent_event[etypeidx].evt) {
-                this.listeners.buffer[etypeidx].evt = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, parent_event[etypeidx].evt);
-                this.listeners.buffer[etypeidx].is_child_event = true;
-            }
-            else {
-                this.listeners.buffer[etypeidx].evt = Listener_create_event(etypeidx, this.mesh_bufferidx, Clbk, params);
-            }
+        if(this.state.mask & MESH_STATE.ACTIVE){ // HERE: see if can remove check
+            this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, parent_event_idx);
         }
     }
 
@@ -408,14 +395,12 @@ export class Mesh {
 
         if(!this.listeners) return;
 
-        for (let etype = 0; etype <= this.listeners.boundary; etype++) {
+        for (let i = 0; i <= this.listeners.boundary; i++) {
 
-            if (this.listeners.buffer[etype] && this.listeners.buffer[etype].evt) {
-
-                if (!this.listeners.buffer[etype].is_child_event)
-                    Listener_remove_event_by_idx(etype, this.listeners.buffer[etype].evt);
-                else
-                    Listener_remove_child_event_from_parent(etype, this.listeners.buffer[etype].evt);
+            if (this.listeners.buffer[i]) {
+                Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
+                // this.listeners.buffer[i] = null;
+                this.listeners.buffer[i] = INT_NULL;
             }
         }
     }

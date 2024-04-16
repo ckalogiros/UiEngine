@@ -1,7 +1,7 @@
 "use strict";
 
 import { PrintAttributes, PrintIndexBuffer, PrintVertexBufferDataAndNames } from "../../../Graphics/Debug/GfxDebug.js";
-import { Listener_debug_print_all, Listener_debug_print_info } from "../../Events/EventListeners.js";
+import { Listener_debug_print_all, Listener_debug_print_info_e1, Listener_debug_print_storage_buffer_e2, Listener_debug_print_view_storage_buffer_e3 } from "../../Events/EventListeners.js";
 import { Renderqueue_get } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scenes_get_scene_by_idx } from "../../Scenes.js";
 import { TimeIntervalsPrintAll } from "../../Timers/TimeIntervals.js";
@@ -36,8 +36,9 @@ const f = _CNT++;
 const F = _CNT++;
 const i = _CNT++;
 const b = _CNT++;
-const ee = _CNT++;
-const E = _CNT++;
+const e1 = _CNT++;
+const e2 = _CNT++;
+const e3 = _CNT++;
 const m = _CNT++;
 const M = _CNT++;
 const s3 = _CNT++;
@@ -189,19 +190,29 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
-      key: 'e',
-      discr: 'Listener_debug_print_all',
+      key: 'e1',
+      discr: 'Listener_debug_print_info_e1',
       func: (e)=>{
          console.log('------------------ Listener_debug_print_all ------------------')
-         Listener_debug_print_all();
+         Listener_debug_print_info_e1();
+
       },
    },
    {
-      key: 'E',
-      discr: 'Listener_debug_print_info',
+      key: 'e2',
+      discr: 'Listener_debug_print_storage_buffer_e2',
       func: (e)=>{
-         console.log('------------------ Listener_debug_print_all ------------------')
-         Listener_debug_print_info();
+         console.log('------------------ Listener_debug_print_storage_buffer_e2 ------------------')
+         Listener_debug_print_storage_buffer_e2();
+
+      },
+   },
+   {
+      key: 'e3',
+      discr: 'Listener_debug_print_view_storage_buffer_e3',
+      func: (e)=>{
+         console.log('------------------ Listener_debug_print_view_storage_buffer_e3 ------------------')
+         Listener_debug_print_view_storage_buffer_e3();
 
       },
    },
@@ -586,8 +597,10 @@ export function OnKeyUp(e){
       else if  (_keys_buffer[len].key === 'C' && _keys_buffer[0].key === 'Shift') { 
          DEBUG_PRINT_KEYS[C].func(e);  
       }
-      else if  (_keys_buffer[len].key === 'E' && _keys_buffer[0].key === 'Shift') { 
-         DEBUG_PRINT_KEYS[E].func(e);  
+      else if  (_keys_buffer[0].key === 'e') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[e1].func(e);  
+         else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[e2].func(e);  
+         else if  (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[e3].func(e);  
       }
       else if  (_keys_buffer[len].key === 'F' && _keys_buffer[0].key === 'Shift') { 
          DEBUG_PRINT_KEYS[F].func(e);  
@@ -667,7 +680,7 @@ export function OnKeyUp(e){
       else if  (_keys_buffer[len].key === 'f') { DEBUG_PRINT_KEYS[f].func(e);  }
       else if  (_keys_buffer[len].key === 'i') { DEBUG_PRINT_KEYS[i].func(e);  }
       else if  (_keys_buffer[len].key === 'b') { DEBUG_PRINT_KEYS[b].func(e);  }
-      else if  (_keys_buffer[len].key === 'e') { DEBUG_PRINT_KEYS[ee].func(e);  }
+      // else if  (_keys_buffer[len].key === 'e') { DEBUG_PRINT_KEYS[ee].func(e);  }
       else if  (_keys_buffer[len].key === 'm') { DEBUG_PRINT_KEYS[m].func(e); }
       else if  (_keys_buffer[len].key === 'g') { DEBUG_PRINT_KEYS[g].func(e); }
    }
