@@ -537,11 +537,16 @@ export class Widget_Multi_Text extends Widget_Text {
 	/*******************************************************************************************************************************************************/
 	// 
 
+	// TODO: Implement align self correctly
+	// TODO: Is there a way to align differently for each text mesh????
+
 	CreateNewText(dynamic_text, fontSize, text_col2, pad = [0, 0], bold = this.bold) {
 
 		/** DEBUG ERROR*/ if (!Array.isArray(pad)) console.error('Pad is not of type array');
 
 		let pos = [0, 0, 0];
+		CopyArr3(pos, this.geom.pos)
+		pos[2] += 1;
 
 		// Find the last text mesh.
 		let prev_text_mesh = null;
@@ -552,7 +557,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 		else prev_text_mesh = this;
 
-		CopyArr3(pos, this.geom.pos); // Copy the dynamic's text mesh pos
+		// CopyArr3(pos, this.geom.pos); // Copy the dynamic's text mesh pos
 		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad);
 		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
@@ -663,7 +668,8 @@ export class Widget_Multi_Text extends Widget_Text {
 			/** Destroy old timeInterval and create a new one with all the previous meshes and their callbacks and callback_params */
 			TimeIntervalsDestroyByIdx(interval.idx);
 			const tIdx = TimeIntervalsCreate(msInterval, name, TIME_INTERVAL_REPEAT_ALWAYS, this.Update, params);
-			this.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+			this.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, tIdx);
+			// this.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 		}
 	}
 

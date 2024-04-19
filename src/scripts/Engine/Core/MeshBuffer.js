@@ -9,8 +9,11 @@ import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Cr
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Batch_store } from "../Batch/Batch.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
+import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 
 
+
+const NOTIFICATIONS_ON = true;
 
 
 
@@ -81,6 +84,9 @@ const temp_no_allocation_buffer = []
 temp_no_allocation_buffer[0] = [0,0]
 temp_no_allocation_buffer[1] = [0,0]
 export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferidx) { 
+   if(_mesh_buffer.buffer[mesh_bufferidx]===null || _mesh_buffer.buffer[mesh_bufferidx]===_) {
+      console.log('Meshbuffer: idx', mesh_bufferidx, _mesh_buffer.buffer); 
+      return false;}
    temp_no_allocation_buffer[0][0] =
       _mesh_buffer.buffer[mesh_bufferidx].geom.pos[0] - _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] - _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
    temp_no_allocation_buffer[0][1] =
@@ -156,11 +162,14 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
 // Gfx buffer: All mesh indexes by vertex buffer
 /*******************************************************************************************************************************************************************************/
 
+
 const GFX_VIEW_MESH_DEFAULT_COUNT = 16;
 _mesh_per_vertex_buffer.Init(4); // For 4 vertex buffers
 
 
 export function Mesh_per_vb_get() { return _mesh_per_vertex_buffer; }
+export function Mesh_per_vb_get_count() { return _mesh_per_vertex_buffer.active_count; }
+export function Mesh_per_vb_get_size() { return _mesh_per_vertex_buffer.size; }
 
 
 
@@ -172,7 +181,13 @@ export function Mesh_per_vb_get_mesh(vbidx, per_vb_bufferidx) { return _mesh_per
 
 
 
-export function Mesh_per_vb_create_vb(vbidx) { _mesh_per_vertex_buffer.AddAtIndex(vbidx, New_int16_buffer(GFX_VIEW_MESH_DEFAULT_COUNT)); }
+export function Mesh_per_vb_create_vb(vbidx) { 
+
+   _mesh_per_vertex_buffer.AddAtIndex(vbidx, New_int16_buffer(GFX_VIEW_MESH_DEFAULT_COUNT)); 
+
+   if(NOTIFICATIONS_ON) 
+      Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, vbidx);
+}
 
 
 
@@ -191,6 +206,10 @@ export function Mesh_per_vb_remove_mesh(vbidx, per_vb_bufferidx) {
 
       mesh.per_vb_bufferidx = per_vb_bufferidx;
    }
+
+
+   // if(NOTIFICATIONS_ON) 
+   //    Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, vbidx);
 
 }
 
@@ -231,8 +250,6 @@ export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
       if (mesh && mesh.gfx.vb.start >= start) {
 
          mesh.gfx.vb.start -= num_faces * mesh.gfx.attribsPerVertex * mesh.gfx.vertsPerRect;
-
-         console.log()
       }
    }
 
@@ -331,7 +348,7 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
          if (is_batch_vb_empty) {
 
             _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = INT_NULL;
-            console.log('EMPTY root_batch:', _root_batch_buffer.buffer[root_bufferidx])
+            // console.log('EMPTY root_batch:', _root_batch_buffer.buffer[root_bufferidx])
          }
 
 

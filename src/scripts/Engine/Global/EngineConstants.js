@@ -995,42 +995,48 @@ const DEBUG = {
 
 const DEBUG_INFO = {
 
+	UI_STATS: {
+		IS_ON: false,
+		IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [300, 100, 10]
+	},
 	UI_TIMERS: {
 		IS_ON: false,
 		IDX: INT_NULL,
 		MESH_BUFFER_IDX: INT_NULL,
-		POS: [250, 400, 0]
+		POS: [0, 0, 10]
 	},
 	UI_MOUSE: {
 		IS_ON: false,
 		IDX: INT_NULL,
 		MESH_BUFFER_IDX: INT_NULL,
-		POS: [300, 330, 0]
+		POS: [0, 0, 10]
 	},
 	UI_GFX: {
 		IS_ON: false,
 		ROOT_IDX: INT_NULL,
 		MESH_BUFFER_IDX: INT_NULL,
-		POS: [400, 300, 0]
+		POS: [400, 300, 10]
 	},
 	UI_MESH: {
 		IS_ON: false,
 		ROOT_IDX: INT_NULL,
 		MESH_BUFFER_IDX: INT_NULL,
-		POS: [530, 50, 0]
+		POS: [530, 50, 10]
 	},
 	UI_BATCH: {
 		IS_ON: false,
 		IDX: INT_NULL,
 		ROOT_IDX: INT_NULL,
 		MESH_BUFFER_IDX: INT_NULL,
-		POS: [530, 50, 0]
+		POS: [530, 50, 10]
 	},
 	UI_VB_2D: {
 		IS_ON: false,
 		ROOT_IDX: INT_NULL,
 		MESH_BUFFER_IDX: INT_NULL,
-		POS: [340, 100, 0]
+		POS: [340, 100, 10]
 	},
 };
 

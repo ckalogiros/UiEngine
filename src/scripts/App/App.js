@@ -10,6 +10,7 @@ import { Texture_init_texture_storage_buffer } from '../Engine/Loaders/Textures/
 import { Input_create_user_input_listeners } from '../Engine/Controls/Input/Input.js';
 import { TestWidgetsGeneric } from './TestWidgets.js';
 import { TimeIntervalsInit } from '../Engine/Timers/TimeIntervals.js';
+import { Debug_info_ui_performance_set_initial_position_screen_right } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 
 
 // var osu = require('node-os-utils')
@@ -53,6 +54,8 @@ export function AppInit() {
 
     TestWidgetsGeneric(scene);
 
+
+    Debug_info_ui_performance_set_initial_position_screen_right()
 
     // If camera is static, update projection matrix uniform only once
     // camera.UpdateProjectionUniformAll(renderer.gl);

@@ -124,6 +124,7 @@ export class Mesh {
 
         this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
+        // this.state = { mask: 0x0 }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
         this.alignment = 0x0;
         this.gfx_pool_request = GFX_POOL_REQUESTS.ANY;
 
@@ -213,12 +214,15 @@ export class Mesh {
 
     Destroy() {
 
+
         /*************************************************************************************/
         // Remove event listeners
         if(this.listeners) {
             this.RemoveAllListenEvents();
             Free_generic_buffer(this.listeners)
         }
+        
+
 
 
         /*************************************************************************************/
@@ -241,20 +245,35 @@ export class Mesh {
 
         if(NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH)===0) 
             Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, this.mesh_bufferidx);
+        
+
 
 
         /*************************************************************************************/
         // Remove from gfx buffers.
+        
+        /** */
         // Bacause of clipping we must check if current mesh exists in vertex buffer(rendered and not clipped)
         if (this.state.mask & MESH_STATE.ACTIVE) {
             
-            const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces);
-            
-            if(!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.geom.num_faces)
-            Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
-            
-            // console.log('GFX vbidx', this.gfx.vb.idx, 'start', this.gfx.vb.start);
-            // this.gfx.vb.start = INT_NULL;
+            if(this.type & (MESH_TYPE.WIDGET_TEXT|MESH_TYPE.WIDGET_TEXT_DYNAMIC|MESH_TYPE.TEXT_MESH)){ // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
+
+                const ret = Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
+                if(!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.mat.temp_max_chars_inserted_in_gfx)
+                Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+            }
+            else {
+
+                const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
+                if(!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.geom.num_faces)
+                Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+            }
+
+            // if(this.gfx.vb.idx===7)console.log('ACTIVE- Destroy:', this.mesh_bufferidx)
+            // const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
+            // if(!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.geom.num_faces)
+            // Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+
         }
         
         let shift_children = false; // A way to store and return if this was removed from paren's children so that the caller will reduce the i from the loop by 1.
@@ -262,15 +281,17 @@ export class Mesh {
         if (this.parent && this.parent !== NO_MESH_PARENT && this.idx !== INT_NULL) {
             
             shift_children = this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
-            // if (this.state.mask & MESH_STATE.ACTIVE) console.log('-{1} Removing:', this.GetName(), 'idx:', this.idx, 'parent name', 'start', this.gfx.vb.start, this.parent.GetName())
         }
-        // else if (this.state.mask & MESH_STATE.ACTIVE) console.log('-{1-NO-PARENT} Removing:', 'start', this.gfx.vb.start, this.GetName(), 'idx:', this.idx)
         
+
+
+
         /*************************************************************************************/
         // Remove from widget root buffer.
         Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
-
         
+
+
 
         /*************************************************************************************/
         // Remove mesh from STATE.
@@ -387,6 +408,7 @@ export class Mesh {
         if(this.state.mask & MESH_STATE.ACTIVE){ // HERE: see if can remove check
             this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, parent_event_idx);
         }
+        // else console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{')
     }
 
 
@@ -401,7 +423,7 @@ export class Mesh {
                 Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
                 // this.listeners.buffer[i] = null;
                 this.listeners.buffer[i] = INT_NULL;
-                console.log(this.GetName())
+                // console.log(this.GetName())
             }
         }
     }

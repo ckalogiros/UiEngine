@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_set_texidx, Vertex_buffer_state_enable, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_info_set_texidx, Vertex_buffer_state_enable, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { AddArr3, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Gfx_generate_context, GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js"; ``
@@ -117,8 +117,15 @@ export class Text_Mesh extends Mesh {
 
       }
 
+
+      // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
+      // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy
+      if(this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary+1) 
+         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary+1;
+
+
       // BUG: If one text has by mistake a different 'this.mat.uvIdx', then the vb will store that uv-map index. Cause a vertex buffer may use only one texture.
-      Vertex_buffer_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
+      Vertex_buffer_info_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
 
 
 
@@ -175,6 +182,13 @@ export class Text_Mesh extends Mesh {
          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
 
       }
+      
+
+      // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
+      // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy
+      if(this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary+1) 
+         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary+1;
+
 
       this.is_gfx_inserted = true;
 
@@ -233,6 +247,14 @@ export class Text_Mesh extends Mesh {
          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
 
       }
+
+
+      // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
+      // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy
+      if(this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary+1) 
+         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary+1;
+
+
 
       this.is_gfx_inserted = true;
 
@@ -310,7 +332,7 @@ export class Text_Mesh extends Mesh {
       
       for (let i = len; i < this.mat.char_buffer.size; i++) {
 
-         this.mat.char_buffer[i] = ''; // We do not want to increment active_count for '' empty characters, so we avoid .Add
+         this.mat.char_buffer.buffer[i] = ''; // We do not want to increment active_count for '' empty characters, so we avoid .Add
       }
 
       this.mat.text = str;
@@ -467,16 +489,18 @@ export class Text_Mesh extends Mesh {
 
       // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
       // for (let i = this.mat.char_buffer.active_count; i < len; i++) {
-      for (let i = this.mat.char_buffer.boundary; i < this.mat.char_buffer.size; i++) {
+      for (let i = this.mat.char_buffer.boundary+1; i < this.mat.char_buffer.size; i++) {
 
          let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
-         if (c[i] !== ''){
+         Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex);
+         
+         // if (c[i] !== ''){
 
-            Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex);
+         //    Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex);
 
-            // Take the oportunity to set the characters of char_buffer to '', instead of running a loop.
-            c[i] = '';
-         }
+         //    // Take the oportunity to set the characters of char_buffer to '', instead of running a loop.
+         //    c[i] = '';
+         // }
 
          gfx_copy.vb.start += gfx_copy.vb.count
       }

@@ -4,10 +4,11 @@ import * as math from '../../../../Helpers/Math/MathOperations.js'
 import { Gl_set_RGBA, Gl_set_alpha, Gl_set_RGBA_per_vertex } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 import { CharBuffer, M_Buffer } from '../../../Core/Buffers.js';
+import { BLUEL, PURPLER } from './Colors.js';
 
 
 let _materialId = 0;
-
+const temp_vertex_color = [BLUEL[6], PURPLER[6],BLUEL[6], PURPLER[6]];
 
 export class Material {
 
@@ -52,12 +53,14 @@ export class Material {
 
    SetColor(col, gfx) {
       if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
-         math.CopyMat4(this.col, col);
-         Gl_set_RGBA_per_vertex(gfx, this.col);
+         // math.CopyMat4(this.col, col);
+         // Gl_set_RGBA_per_vertex(gfx, this.col);
+         Gl_set_RGBA_per_vertex(gfx, temp_vertex_color);
       }
       else {
          math.CopyArr4(this.col, col);
          Gl_set_RGBA(gfx, this.col);
+         // Gl_set_RGBA(gfx, temp_vertex_color);
       }
    }
 
@@ -74,7 +77,8 @@ export class Material {
    SetHoverColorDefault(gfx) {
       if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
          math.CopyMat4(this.col, this.defCol);
-         Gl_set_RGBA_per_vertex(gfx, this.col);
+         // Gl_set_RGBA_per_vertex(gfx, this.col);
+         Gl_set_RGBA_per_vertex(gfx, temp_vertex_color);
       }
       else {
          math.CopyArr4(this.col, this.defCol);
@@ -135,15 +139,18 @@ export class FontMaterial extends Material {
 
    text;
    char_buffer;
+   temp_max_chars_inserted_in_gfx;
    sdf_params;
-
+   
    constructor(col = [1, 1, 1, 1], texidx = INT_NULL, text = '', sdf_params = [.5, .5]) {
-
+      
       super(col, texidx);
-
+      
       const len = text.length;
       this.char_buffer = new CharBuffer();
       this.char_buffer.Init(len, text);
+      
+      this.temp_max_chars_inserted_in_gfx = 0;
 
 
       this.text = text;

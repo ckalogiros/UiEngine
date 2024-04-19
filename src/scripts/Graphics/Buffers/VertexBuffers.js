@@ -9,11 +9,14 @@ import { Gl_operation_add } from "./VertexBuffersOps";
 import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays";
 import { Floor } from "../../Helpers/Math/MathOperations";
 import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers";
+import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications";
 
 
 
 
 
+
+const NOTIFICATIONS_ON = true;
 
 
 const DISABLE_DEBUG = true;
@@ -26,6 +29,10 @@ const DISABLE_DEBUG = true;
 
 const _vertex_buffers = New_generic_buffer(_, 'GFX Index Buffer');
 _vertex_buffers.Init(1);
+
+
+
+export function Vertex_buffer_get_Active_count() { return _vertex_buffers.active_count; }
 
 
 
@@ -48,7 +55,7 @@ export function Vertex_buffer_get_attrib_value_from_vb_byidx(vbidx, attr_idx) {
 
 
 /** Returns struct: { vbidx:INT, vbo:OBJ } */
-export function Vertex_buffer_create(type, size) {
+function Vertex_buffer_create(type, size) {
 
     const ret = {
         vbidx: INT_NULL,
@@ -102,6 +109,17 @@ export function Vertex_buffer_info_get() { return _vertex_buffers_info; }
 
 
 
+export function Vertex_buffer_info_get_count() {
+    return _vertex_buffers_info.active_count;
+}
+
+
+
+export function Vertex_buffer_info_get_size() {
+    return _vertex_buffers_info.size;
+}
+
+
 export function Vertex_buffer_info_get_by_vbidx(vbidx) {
     if (!DISABLE_DEBUG) (_vertex_buffers_info, vbidx, new Error().lineNumber);
     return _vertex_buffers_info.buffer[vbidx];
@@ -109,7 +127,7 @@ export function Vertex_buffer_info_get_by_vbidx(vbidx) {
 
 
 
-export function Gl_vertex_buffer_get_vao(vbidx) {
+export function Gl_vertex_info_buffer_get_vao(vbidx) {
     return {
         vao: _vertex_buffers_info.buffer[vbidx].vao,
         vaoidx: _vertex_buffers_info.buffer[vbidx].vaoidx,
@@ -118,13 +136,13 @@ export function Gl_vertex_buffer_get_vao(vbidx) {
 
 
 
-export function Vertex_buffer_set_texidx(vbidx, texidx) {
+export function Vertex_buffer_info_set_texidx(vbidx, texidx) {
     _vertex_buffers_info.buffer[vbidx].texidx = texidx;
 }
 
 
 
-export function Vertex_buffer_set_ibidx(vbidx, ibidx) {
+export function Vertex_buffer_info_set_ibidx(vbidx, ibidx) {
     _vertex_buffers_info.buffer[vbidx].ibidx = ibidx;
 }
 
@@ -279,6 +297,9 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, pr
     // console.warn('Create Shader Attributes:')
 
     vb_info.state.mask |= BUFFER_STATE.IS_ACTIVE;
+
+    if(NOTIFICATIONS_ON) 
+        Notifications_send(NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, ret.vbidx);
 
     return vb_info;
 }

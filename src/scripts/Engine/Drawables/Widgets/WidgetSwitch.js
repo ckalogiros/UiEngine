@@ -3,7 +3,7 @@
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations";
 import { Create_rect_mesh } from "../../Core/CreateWidget";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer";
-import { BLUEL, GREEN, GREY } from "../Material/Base/Colors";
+import { BLUE, BLUEL, GREEN, GREY } from "../Material/Base/Colors";
 import { Rect } from "../Meshes/Rect_Mesh";
 
 
@@ -19,13 +19,13 @@ export class Widget_Switch_Simple extends Rect {
 
    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize = 5, col = GREY[1], text_col = WHITE, pad = [fontsize, fontsize], bold, style = [3, 6, 2], font) {
    // constructor(col = GREY[1], pos, size=20, bold, style = [3, 6, 2]) {
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], pad = 2, bold, style = [3, 6, 2], is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2=BLUE[7], pad = 2, bold, style = [3, 6, 2], is_debug_mesh) {
 
       const switch_dim = [size * 2, size]
-      super(pos, switch_dim, TRANSPARENCY(GREY[1], .6), is_debug_mesh)
+      super(pos, switch_dim, col, is_debug_mesh)
 
       this.color_active = [0, 0, 0, 0];
-      CopyArr4(this.color_active, col);
+      CopyArr4(this.color_active, col2);
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.isOn = 0x0;
@@ -43,7 +43,7 @@ export class Widget_Switch_Simple extends Rect {
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, true)
 
       const switch_pos = [pos[0] - size, pos[1], pos[2] + 1];
-      const switch0 = Create_rect_mesh(switch_pos, [size - pad, size - pad], TRANSPARENCY(GREY[9], .7), is_debug_mesh);
+      const switch0 = Create_rect_mesh(switch_pos, [size - pad, size - pad], GREY[9], is_debug_mesh);
       switch0.sid.gfx_group = this.sid.gfx_group;
       switch0.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       switch0.SetStyle([3, 15, 3]);

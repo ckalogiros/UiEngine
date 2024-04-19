@@ -166,7 +166,7 @@ export class Section extends Rect {
    StateDisable(MASK = 0x0) {
 
 
-      this.state.mask &= ~MASK; // HERE
+      this.state.mask &= ~MASK;
       for (let i = 0; i <= this.children.boundary; i++) {
          if (!this.children.buffer[i]) console.error('child missisng. this:', this.GetName(), 'children', this.children)
          this.children.buffer[i].StateDisable(MASK);

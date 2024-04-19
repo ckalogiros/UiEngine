@@ -257,6 +257,25 @@ export class Rect extends Mesh {
    }
 
 
+   SetDimNoGfxUpdate(x, y) {
+
+      this.geom.dim[0] = x;
+      this.geom.pos[1] = y;
+   }
+
+
+   SetDimYNoGfxUpdate(y) {
+
+      this.geom.dim[1] = y;
+   }
+
+
+   SetDimXNoGfxUpdate(x) {
+
+      this.geom.dim[0] = x;
+   }
+
+
    // SEE ### Construct Listeners
    ConstructListeners(parent_listeners = null) {
 

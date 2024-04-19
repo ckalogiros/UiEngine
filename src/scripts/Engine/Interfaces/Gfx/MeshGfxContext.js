@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { Vertex_buffer_info_create, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_set_ibidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_info_create, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_info_set_ibidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_store_vertex_buffer_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
@@ -279,14 +279,11 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs=[INT_NULL, I
    
    if(is_vertex_buffer_created){
       
-      if(ibidx === -1)
-      console.log()
-      
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vbidx, ibidx, true);
       Renderqueue_set_active(progidx, vbidx, true); // Update the draw buffer
 
-      Vertex_buffer_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
+      Vertex_buffer_info_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
       
 
       // Create new entry for the new vertex buffer in widget root gfx buffer

@@ -73,6 +73,7 @@ class Interval {
 
          if (this.t >= this.interval) {
 
+            // HERE // TODO: set berak point and llok for performance timers debug ui. All the callbacks are stored to a buffer, but there are duplicate function pointers. See if we cal optimize by storing unique functions only
             if (this.clbk) this.clbk(this.clbkParams); // Call the callback, if exists.
             // console.log(this.GetName())
             this.t = 0; // Reset interval timer
@@ -176,9 +177,22 @@ class TimeIntervals {
 
    DestroyByIdx(idx) {
 
-      this.#Destroy(idx);
-      this.count--;
-      if(this.count < 0) console.error('Time interval index is:', this.count)
+      /**
+       * Because of the dynamic text widget, 
+       * we share intervals between different dynamic text 
+       * but also between different widgets.
+       * So on widget destroy we call this many times to destroy the same interval.
+       * A quick fix is to check if the interval exists.
+       * TODO: Find more efficient way
+       */
+
+      if(this.ti[idx].isActive){
+
+         this.#Destroy(idx);
+         this.count--;
+         if(this.count < 0) 
+            console.error('Time interval index is:', this.count, this)
+      }
    }
 
 
@@ -191,7 +205,6 @@ class TimeIntervals {
       this.ti[idx].repeat = INT_NULL;
       this.ti[idx].isActive = false;
       this.ti[idx].idx = INT_NULL;
-      this.ti[idx].name = INT_NULL;
    }
 
 
@@ -249,6 +262,7 @@ export function TimeIntervalsUpdateAll() {
 
 //  Returns the timeInterval index
 export function TimeIntervalsCreate(interval, name, repeat, clbk, params) {
+   console.log('INTERVAL create', name)
    return intervalTimers.Create(interval, name, repeat, clbk, params);
 }
 

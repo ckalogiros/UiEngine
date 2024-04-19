@@ -88,12 +88,12 @@ export class WebGlRenderer {
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
          
-         // _pt_all_timers.timer.Start();
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
          TimeIntervalsUpdateAll(); // Update and run callbacks for each interval timer that has been set.
-         // _pt_all_timers.timer.Stop();
          TimersUpdateGlobalTimer(); // This is a globbal timer, going only forward
          TimersUpdateTimers();
          // TimersUpdateStepTimers();
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
          
          Framebuffer_update_draw();
          // _pt_scene_update.timer.Start(); 
@@ -106,9 +106,9 @@ export class WebGlRenderer {
          
          Notifications_update();
          
-         // _pt_gl_draw.timer.Start(); 
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
          Gl_draw(this.gl); 
-         // _pt_gl_draw.timer.Stop();
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)
          
          
          MouseResetDif(.5);

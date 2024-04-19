@@ -92,13 +92,13 @@ export class Widget_Dropdown extends Section {
       AddArr2(this.menu.total_margin, this.menu.StylesGetMargin());
       AddArr2(this.menu.total_margin, this.StylesGetMargin());
       { // Multi color vertex
-         // this.menu.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-         // this.menu.mat.col = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
-         // this.menu.mat.defCol = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
-         // this.menu.mat.col[1][3] = .5;
-         // this.menu.mat.col[1][7] = .5;
-         // this.menu.mat.col[1][11] = .5;
-         // this.menu.mat.col[1][15] = .6;
+         this.menu.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
+         this.menu.mat.col = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
+         this.menu.mat.defCol = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
+         this.menu.mat.col[1][3] = .5;
+         this.menu.mat.col[1][7] = .5;
+         this.menu.mat.col[1][11] = .5;
+         this.menu.mat.col[1][15] = .6;
       }
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
 

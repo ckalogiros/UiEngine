@@ -234,5 +234,4 @@ export function Shader_attributes_print() {
          console.log('loc', attribs.locs[k], 'size', attribs.sizes[k], 'offsets', attribs.offsets[k], Str_buffer_get_by_idx(attribs.names[k]),)
       }
    }
-   console.log();
 }

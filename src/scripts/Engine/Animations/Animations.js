@@ -16,6 +16,7 @@ export class Animation{
     index = 0;
     name = '';
 
+
     Create(animationClbk, stopAnimationClbk, params, index, name){
         this.params = params;
         this.animationClbk = animationClbk;
@@ -23,30 +24,45 @@ export class Animation{
         this.index = index;
         this.name = name;
     }
+
+
     Run(){
         this.inAnimation = this.animationClbk(this.params);
     }
+
+
     Stop(){
         this.isActive = false;
         this.stopAnimationClbk(this.params);
     }
+
 }
 
+
+
 export class Animations{
+
     animations = [];
     count = 0;
     size = MAX_ANIMATIONS_SIZE;
 
-    constructor(){
-        this.Init();
-    }
 
-    Init(){
+    constructor(){
+
+        // this.Init();
         for(let i=0; i<this.size; i++){
             this.animations[i] = new Animation;
             this.animations[i].Create(null, null, null);
         }
     }
+
+
+    // Init(){
+    //     for(let i=0; i<this.size; i++){
+    //         this.animations[i] = new Animation;
+    //         this.animations[i].Create(null, null, null);
+    //     }
+    // }
 
     
     GetNextFree() {
@@ -60,11 +76,11 @@ export class Animations{
 
 
     Create(animationClbk, stopAnimationClbk, params, name){
+        
         const freeIdx = this.GetNextFree();
         if(freeIdx !== INT_NULL){
+            
             const anim = this.animations[freeIdx]
-            if(anim === undefined)
-                console.log()
             anim.Create(animationClbk, stopAnimationClbk, params, this.count, name);
             anim.inAnimation = true; 
             anim.isActive = true; 
@@ -92,8 +108,12 @@ export class Animations{
     }
 }
 
+
+
+
 const animations = new Animations;
-export function AnimationsGet(){
-    return animations;
-}
+
+
+
+export function AnimationsGet(){ return animations; }
 

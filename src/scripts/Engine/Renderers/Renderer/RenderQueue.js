@@ -1,6 +1,18 @@
 "use strict";
 
-const MAX_DRAWQUEUE_COUNT = 64; // Number of Gl programs for the queue  
+import { NOTIFICATION_TYPE, Notifications_send } from "../../Drawables/DebugInfo/DebugInfoUiNotifications";
+
+
+
+
+
+
+const MAX_DRAWQUEUE_COUNT = 64; // Number of vertex buffers for the queue  
+const NOTIFICATIONS_ON = true;
+
+
+
+
 
 class RenderQueueData {
 
@@ -9,7 +21,6 @@ class RenderQueueData {
    ibidx;
    queueIdx;
    isActive;
-   draw_count;
 
    constructor(){
       this.Reset();
@@ -22,7 +33,6 @@ class RenderQueueData {
       this.ibidx    = elem.ibidx;
       this.queueIdx = elem.queueIdx;
       this.isActive = elem.isActive;
-      this.draw_count = elem.draw_count;
    }
 
    
@@ -31,7 +41,6 @@ class RenderQueueData {
       this.vbidx    = INT_NULL;
       this.queueIdx = INT_NULL;
       this.isActive = false;
-      this.draw_count = 0;
    }
 
 }
@@ -89,18 +98,19 @@ class RenderQueue {
 
    Add(progidx, vbidx, ibidx, isActive) {
 
-      // index = (i * (columns * depth)) + (j * depth) + k
-      // index = (groupidx * (max_progs * max_vbs)) + (progidx * max_vbs) + vbidx
       const obj = {
          progidx: progidx,
          vbidx: vbidx,
          ibidx: ibidx,
          queueIdx: this.count,
          isActive: isActive,
-         draw_count: 0,
       }
       this.buffer[this.count].Set(obj);
       this.count++;
+
+      
+    if(NOTIFICATIONS_ON) 
+      Notifications_send(NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, obj.queueIdx);
 
       // DEBUG
       if(this.count > this.size) alert('ERROR - RenderQueue buffer is FULL')
@@ -258,12 +268,23 @@ export function Renderqueue_get() { return _render_queue; }
 
 
 
+export function Renderqueue_get_byidx(idx) { return _render_queue.buffer[idx]; }
+
+
+
+export function Renderqueue_get_count() { return _render_queue.count; }
+
+
+
+export function Renderqueue_get_size() { return _render_queue.size; }
+
+
+
 export function Renderqueue_get_active() { return _render_queue.active; }
 
 
 
 export function Renderqueue_active_get_count() { return _render_queue.activeCount; }
-
 
 
 

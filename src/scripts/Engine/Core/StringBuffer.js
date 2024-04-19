@@ -110,9 +110,6 @@ function Mesh_name_exists(meshidx) {
 
 export function Str_buffer_mesh_names_store(str, mesh_bufferidx, is_debug_mesh) {
 
-   if (mesh_bufferidx === -1)
-      console.log()
-
    const existsidx = Mesh_name_exists(mesh_bufferidx);
 
    // If string name already exists, replace it with the new. 

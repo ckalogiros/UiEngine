@@ -7,28 +7,19 @@ import { Program_get_programs } from './ShaderPrograms.js';
 
 
 
-let temp_change = false;
 
 export function Gl_draw(gl) {
 
-    // const gfx_group = Program_get_groups();
     const drawQueue = Renderqueue_get_active();
     const drawQueueCount = Renderqueue_active_get_count();
     
     gl.clearColor(0.18, 0.18, 0.18, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    if(temp_change){
-
-        // UBO_change_val();
-        // Uniforms_block_update_uniform();
-        temp_change = false;
-    }
 
 
     for (let i = 0; i < drawQueueCount; i++) {
         
-        // _pt_test_misc_1.timer.Start();
         const progidx = drawQueue[i].progidx;
         const vbidx = drawQueue[i].vbidx;
         const ibidx = drawQueue[i].ibidx;
@@ -41,9 +32,6 @@ export function Gl_draw(gl) {
             GL.BOUND_PROG = progs.buffer[progidx].shader_program;
         }
         
-        // // Update all program uniforms
-        // if(progs.buffer[progidx].state.mask & PROGRAM_STATE.UNIFORMS_NEED_UPDATE)
-        //     progs.buffer[progidx].UniformsUpdate(gl);
         
         const vb_info = Vertex_buffer_info_get_by_vbidx(vbidx);
         const ib_info = Index_buffer_info_get_by_ibidx(ibidx);
@@ -56,7 +44,6 @@ export function Gl_draw(gl) {
             Gl_texture_unit_bind(gl, texture);
             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
         }
-        // _pt_test_misc_1.timer.Stop();
         
         
         if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {

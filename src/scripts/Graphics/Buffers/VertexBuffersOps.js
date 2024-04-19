@@ -243,10 +243,12 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
 // Add, Remove, Shift Attribs - Vertex Buffer Functions
 /**************************************************************************************************************************************/
 
+let DBG = ''
 
-export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
+export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0, debug_mesh=null) {
 
-   const vb = Vertex_buffer_info_get_by_vbidx(gfx.vb.idx);
+   const temp_vb = Vertex_buffer_get_by_vbidx(gfx.vb.idx);
+   const vb_info = Vertex_buffer_info_get_by_vbidx(gfx.vb.idx);
 
    const start = (start_index) ? start_index : gfx.vb.start;
 
@@ -254,10 +256,34 @@ export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0) {
    const ret = {
       counts: [0, 0], // 0:vb, 1:ib
       start: start,
-      is_last: (start + gfx.vb.count * num_faces >= vb.count) ? true : false,
+      // is_last: (start + gfx.vb.count * num_faces >= vb_info.count) ? true : false,
+      is_last: (start + gfx.vb.count * num_faces === vb_info.count) ? true : false,
       empty: false, // Is the buffer is empty?
    };
 
+   // DBG += `name:${debug_mesh.GetName()} text:${debug_mesh.mat.text}`
+   // DBG += `vbidx: ${gfx.vb.idx} start: ${gfx.vb.start} count: ${gfx.vb.count} num_faces: ${num_faces} attribs: ${gfx.vb.count * num_faces}
+   // vb: count: ${vb_info.count} draw_count: ${vb_info.draw_count} idx: ${vb_info.draw_count} `
+   // console.log(DBG)
+
+   // if(vb_info.vbidx===7){
+
+   //    if(debug_mesh){
+   //       console.log('#########', debug_mesh.mat.text, debug_mesh.GetName())
+   //       console.log('char_buffer', debug_mesh.mat.char_buffer.buffer, 'boundary', debug_mesh.mat.char_buffer.boundary, 'size', debug_mesh.mat.char_buffer.size)
+   //    }
+   //    console.log(
+   //       'vbidx', gfx.vb.idx,
+   //       'gfx.vb.start', gfx.vb.start,
+   //       'gfx.vb.count', gfx.vb.count,
+   //       'num_faces', num_faces,
+   //       'gfx.vb.count * num_faces', gfx.vb.count * num_faces,
+   //       '\nvb: count', vb_info.count,
+   //       'draw_count', vb_info.draw_count,
+   //       'idx', vb_info.draw_count,
+   //       'vb', temp_vb,
+   //    );
+   // }
    ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last);
 
 
@@ -357,13 +383,41 @@ export function Gl_set_vb_mesh_priority(progidx, vbIdx, meshIdx, meshCount) {
 
 export function Gl_set_RGBA_per_vertex(gfxInfo, color, num_faces = 1) {
 
-   alert('IMPLEMENT ME. @ Gl_set_RGBA()');
-   // /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_RGBA()'); }
+   // alert('IMPLEMENT ME. @ Gl_set_RGBA()');
+   /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_RGBA()'); }
 
-   // // const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-   // const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
+   const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.COL4);
 
-   // const offset = Shader_attributes_get_attrib_offset_by_nameid(SHADER_ATTRIBUTES.COL4);
+   let index = gfxInfo.vb.start + a.offset;
+   let verts = num_faces * gfxInfo.vertsPerRect;
+   let stride = gfxInfo.attribsPerVertex - a.size;
+
+
+   let k = 0;
+
+   while (verts) {
+
+      vb_data[index++] = color[0];
+      vb_data[index++] = color[1];
+      vb_data[index++] = color[2];
+      vb_data[index++] = color[3];
+
+      vb_data[index++] = color[k][0];
+      vb_data[index++] = color[k][1];
+      vb_data[index++] = color[k][0];
+      vb_data[index++] = color[k][3];
+
+      index += stride;
+      vb_data.count += V_COL_COUNT;
+      k++;
+      if (k >= 4) k = 0;
+      verts--;
+
+      // index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      // verts--;
+   }
+
 
    // let index = gfxInfo.vb.start + offset;
    // let verts = num_faces * gfxInfo.vertsPerRect;
@@ -389,6 +443,8 @@ export function Gl_set_RGBA_per_vertex(gfxInfo, color, num_faces = 1) {
 
    // Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
    // return count;
+
+   Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -404,8 +460,6 @@ export function Gl_set_RGBA(gfxInfo, color, num_faces = 1) {
    let verts = num_faces * gfxInfo.vertsPerRect;
    let stride = gfxInfo.attribsPerVertex - a.size;
 
-   if (gfxInfo.vb.start < 0)
-      console.log()
 
    while (verts) {
 

@@ -14,7 +14,7 @@ import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keys.js';
 import { GetShaderTypeId } from '../Graphics/Debug/GfxDebug.js';
 
 import { Dropdown_roots_set_root, Widget_Dropdown } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Debug_info_mesh_buffer_create_ui, Debug_info_program_buffer_create_ui, Debug_info_string_buffer_create_ui, Debug_info_ui, Debug_info_ui_performance, Debug_info_vertex_buffer_create_ui } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Debug_info_ui } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Widget_Scroller } from '../Engine/Drawables/Widgets/WidgetScroller.js';
 import { GetRandomColor, GetSequencedColor } from '../Helpers/Helpers.js';
 import { Gl_framebuffer_render, Gl_framebuffer_render_mesh } from '../Graphics/Buffers/FrameBuffers.js';
@@ -34,6 +34,7 @@ import { New_generic_buffer } from '../Engine/Core/Buffers.js';
 import { MouseGetPos } from '../Engine/Controls/Input/Mouse.js';
 import { TEMP_Section_on_move_section } from '../Engine/Drawables/Meshes/Section.js';
 import { Listener_init_event_storage_buffers } from '../Engine/Events/EventListeners.js';
+import { Notifications_initialize } from '../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js';
 
 // var osu = require('node-os-utils')
 // import {osu} from 'node-os-utils'
@@ -208,6 +209,7 @@ export function TestWidgetsGeneric(scene) {
     Performance_timers_init_all();
     Time_intervals_initialize();
     Listener_init_event_storage_buffers();
+    Notifications_initialize();
 
     // Notifications_create()
 
@@ -228,10 +230,9 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    // Debug_info_ui()
+    Debug_info_ui()
     // UserCreateRect()
 
-    const uidbg = Debug_info_ui_performance(scene);
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, uidbg);
@@ -1005,7 +1006,7 @@ function CreateSwitchSimple() {
 
     let ypos = 450
        
-    const switch1 = Create_widget_switch_simple(_, [250, ypos, 0], 20, GREEN[4], 5);
+    const switch1 = Create_widget_switch_simple(_, [250, ypos, 0], 20, GREEN[4], _, 5);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })

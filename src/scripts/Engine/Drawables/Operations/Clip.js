@@ -130,10 +130,7 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
       for(let j=0; j<=meshshes_idx.boundary; j++){
          
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-         
-         // mesh.geom.pos[1] += ydif;
-         // console.log(mesh.geom.pos[1])
-         
+
          const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
          const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
          
@@ -227,7 +224,6 @@ export function Clipy_one_mesh(mesh=null, clip_top=null, clip_bottom=null){
 
    const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
-
    
    const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
    const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
@@ -235,19 +231,21 @@ export function Clipy_one_mesh(mesh=null, clip_top=null, clip_bottom=null){
 
    if(bottom < limit.up || top > limit.down){
 
-      // if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
       if(mesh.state.mask & MESH_STATE.ACTIVE){
 
-         mesh.state.mask &= ~MESH_STATE.ACTIVE;
+         // Because we dont run from group or root buffer, we need to deactivate any meshe's children (from class).
+         // BUG: We need a class method for setting 'CLIPED_Y', else the children meshes will no be activated on a clipy(this or any other clipy function)
+         mesh.Deactivate();
          mesh.state.mask |= MESH_STATE.CLIPED_Y;
+         // console.log(mesh.mesh_bufferidx, mesh.state.mask & MESH_STATE.ACTIVE)
       }
    }
    else{
       
       if(mesh.state.mask & MESH_STATE.CLIPED_Y)
       {
-      
-         mesh.state.mask |= MESH_STATE.ACTIVE;
+         
+         mesh.Activate();
          mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
       }
    }
@@ -468,15 +466,11 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top=null,
    // The first and last meshes of scrolled section after been clamped.
    let firstupper = 0, lastupper = INT_NULL, firstlower = INT_NULL, lastlower = INT_NULL;
 
-   let cnt = 0;
    for (let i = 0; i <= section.children.boundary; i++) {
 
       const child = section.children.buffer[i];
       const top = child.geom.pos[1] - child.geom.dim[1];
       const bottom = child.geom.pos[1] + child.geom.dim[1];
-
-      if(child.mesh_bufferidx === 365)
-      console.log()
 
       if (bottom <= clip_top) {
 

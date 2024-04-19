@@ -1,6 +1,7 @@
 "use strict";
 
-import { M_Buffer, New_generic_buffer } from "../../Core/Buffers";
+import { New_generic_buffer } from "../../Core/Buffers";
+import { Dbg_ui_init_buffer_entries, Dbg_ui_store_changes } from "./DebugInfoUi";
 
 
 _CNT = 0x1;
@@ -9,6 +10,9 @@ export const NOTIFICATION_TYPE = {
    
    MESH_BUFFER: _CNT,
    STRING_BUFFER: _CNT<<=0x1,
+   MESH_PER_VB_BUFFER: _CNT<<=0x1,
+   VERTEX_BUFFER: _CNT<<=0x1,
+   RENDER_QUEUE_BUFFER: _CNT<<=0x1,
    
    MESH_BUFFER_IDXS: {
       NOTIF:INT_NULL,
@@ -18,14 +22,21 @@ export const NOTIFICATION_TYPE = {
       NOTIF:INT_NULL,
       ENTRIES:INT_NULL,
    },
-   
-   
-   // MESH_BUFFER_IDX: INT_NULL,
-   GFX_VERTEX_BUFFER_IDX: INT_NULL,
-   GFX_PROGRAM_IDX: INT_NULL,
-   // STRING_BUFFER_IDX: INT_NULL,
+   MESH_PER_VB_BUFFER_IDXS: {
+      NOTIF:INT_NULL,
+      ENTRIES:INT_NULL,
+   },
+   VERTEX_BUFFER_IDXS: {
+      NOTIF:INT_NULL,
+      ENTRIES:INT_NULL,
+   },
+   RENDER_QUEUE_BUFFER_IDXS: {
+      NOTIF:INT_NULL,
+      ENTRIES:INT_NULL,
+   },
 
-   SIZE: 0,
+
+   SIZE: 3,
 
    FLAGS:{
       CREATE: xxx,
@@ -34,27 +45,25 @@ export const NOTIFICATION_TYPE = {
       IS_INSERTED:xxx<<=0x1, // This is set by the function that inserts a new entry to the entries flag table, to denote if the current entry has been drawn.
    },
 
-   ToSting(idx) {
+   TypeToSting(idx) {
 
-      if (idx === this.GFX_PROGRAM_IDX) return 'GFX_PROGRAM';
-      if (idx === this.GFX_VERTEX_BUFFER_IDX) return 'GFX_VERTEX_BUFFER';
-      if (idx === this.MESH_BUFFER_IDX) return 'MESH_BUFFER';
-   }
-}
+      if (idx === this.MESH_BUFFER) return 'MESH_BUFFER';
+      if (idx === this.STRING_BUFFER) return 'STRING_BUFFER';
+      if (idx === this.MESH_PER_VB_BUFFER) return 'MESH_PER_VB_BUFFER';
+      if (idx === this.VERTEX_BUFFER) return 'VERTEX_BUFFER';
+      if (idx === this.RENDER_QUEUE_BUFFER) return 'RENDER_QUEUE_BUFFER';
+   },
 
+   ProcessToSting(idx) {
 
+      let res = '';
+      if (idx === this.FLAGS.CREATE) res += 'MESH_BUFFER';
+      if (idx === this.FLAGS.DESTROY) res += 'DESTROY';
+      if (idx === this.FLAGS.CHANGE) res += 'CHANGE';
+      if (idx === this.FLAGS.IS_INSERTED) res += 'IS_INSERTED';
 
-
-export class Notification {
-
-
-   constructor() {
-
-      this.is_active = false;
-      this.Clbk = null;
-      this.params = {};
-   }
-
+      return res;
+   },
 }
 
 
@@ -69,46 +78,111 @@ export function Notifications_get_ui_widget(TYPE_IDX){
 }
 
 
-export function Notifications_assign(TYPE, Clbk_store, Clbk_update, params) {
 
-   // const notification = _notifications_buffer.buffer[TYPE_IDX];
-   // _notifications_buffer.AddAtIndex(TYPE_IDX, {
+export function Notifications_set_ui_widget(TYPE_IDX, ui_widget_root){
+   _notifications_buffer.buffer[TYPE_IDX].params.root = ui_widget_root;
+}
+
+
+
+export function Notifications_get_by_idx(idx) {
+   return _notifications_buffer.buffer[idx];
+}
+
+
+
+function Create(){
+
+   const ret = Dbg_ui_init_buffer_entries();
+
    const type_idx = _notifications_buffer.Add({
-      is_active: true,
-      Clbk_store: Clbk_store,
-      Clbk_update: Clbk_update,
-      params: params,
+      is_active: false,
+      needs_update: true,
+      Clbk_update: ret.update,
+      params: {
+         type_idxs: null,
+         flags: 0x0,
+         root: null,
+      },
    });
 
-   if(TYPE & NOTIFICATION_TYPE.MESH_BUFFER){
-      NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF = type_idx
+   return { type_idx:type_idx, entries_bufferidx:ret.entries_bufferidx };
+}
+
+export function Notifications_initialize() {
+
+   {
+      const ret = Create();
+      NOTIFICATION_TYPE.MESH_BUFFER_IDXS.ENTRIES = ret.entries_bufferidx;
+      NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF = ret.type_idx;
+      _notifications_buffer.buffer[ret.type_idx].params.type_idxs = NOTIFICATION_TYPE.MESH_BUFFER_IDXS; // A reference
    }
-   if(TYPE & NOTIFICATION_TYPE.STRING_BUFFER){
-      NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF = type_idx
+   {
+      const ret = Create();
+      NOTIFICATION_TYPE.STRING_BUFFER_IDXS.ENTRIES = ret.entries_bufferidx;
+      NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF = ret.type_idx;
+      _notifications_buffer.buffer[ret.type_idx].params.type_idxs = NOTIFICATION_TYPE.STRING_BUFFER_IDXS; // A reference
+   }
+   {
+      const ret = Create();
+      NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.ENTRIES = ret.entries_bufferidx;
+      NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF = ret.type_idx;
+      _notifications_buffer.buffer[ret.type_idx].params.type_idxs = NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS; // A reference
+   }
+   {
+      const ret = Create();
+      NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.ENTRIES = ret.entries_bufferidx;
+      NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF = ret.type_idx;
+      _notifications_buffer.buffer[ret.type_idx].params.type_idxs = NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS; // A reference
+   }
+   {
+      const ret = Create();
+      NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS.ENTRIES = ret.entries_bufferidx;
+      NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS.NOTIF = ret.type_idx;
+      _notifications_buffer.buffer[ret.type_idx].params.type_idxs = NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS; // A reference
    }
 
 }
 
 
 
-export function Notifications_send(TYPE_IDX, FLAGS, meshidx) {
+// export function Notifications_assign(TYPE, Clbk_store, Clbk_update, params) {
 
-   if(_notifications_buffer.buffer[TYPE_IDX] === null) return;
-   if(_notifications_buffer.buffer[TYPE_IDX] === _) return;
-   if(_notifications_buffer.buffer[TYPE_IDX].params === null) return;
+//    // const type_idx = _notifications_buffer.Add({
+//    //    is_active: false,
+//    //    needs_update: true,
+//    //    Clbk_store: Clbk_store,
+//    //    Clbk_update: Clbk_update,
+//    //    params: params,
+//    // });
+
+//    // if(TYPE & NOTIFICATION_TYPE.MESH_BUFFER){
+//    //    NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF = type_idx
+//    // }
+//    // else if(TYPE & NOTIFICATION_TYPE.STRING_BUFFER){
+//    //    NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF = type_idx
+//    // }
+//    // else if(TYPE & NOTIFICATION_TYPE.VERTEX_BUFFER){
+//    //    NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF = type_idx
+//    // }
+
+// }
+
+
+
+export function Notifications_send(TYPE_IDX, FLAGS, bufferidx) {
 
    const notification = _notifications_buffer.buffer[TYPE_IDX];
+   
+   Dbg_ui_store_changes(notification.params.type_idxs, bufferidx, FLAGS);
 
-   notification.is_active = true;
+   notification.needs_update = true;
    notification.params.flags = FLAGS;
-   
-   if(TYPE_IDX === NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF) notification.Clbk_store(NOTIFICATION_TYPE.MESH_BUFFER_IDXS, meshidx, FLAGS);
-   else if(TYPE_IDX === NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF) notification.Clbk_store(NOTIFICATION_TYPE.STRING_BUFFER_IDXS, meshidx, FLAGS);
-   
+
+   if(_notifications_buffer.buffer[TYPE_IDX].params.root) 
+      notification.is_active = true;
 
 }
-
-
 
 
 
@@ -119,15 +193,13 @@ export function Notifications_update() {
    for (let i = 0; i <= len; i++) {
 
       const notification = _notifications_buffer.buffer[i];
-      // if (notification.is_active) {
-      if (notification && notification.is_active) {
+      if (notification && notification.is_active && notification.needs_update) {
 
          notification.Clbk_update(notification.params);
-         notification.is_active = false;
+         notification.needs_update = false;
       }
    }
 }
-
 
 
 
@@ -136,14 +208,17 @@ export function Notifications_destroy(TYPE_IDX) {
    _notifications_buffer.RemoveByIdx(TYPE_IDX);
    if(TYPE_IDX === NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF = INT_NULL;
    else if(TYPE_IDX === NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF = INT_NULL;
+   else if(TYPE_IDX === NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF = INT_NULL;
+   else if(TYPE_IDX === NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF = INT_NULL;
+   else if(TYPE_IDX === NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS.NOTIF = INT_NULL;
 }
 
 
 
+export function Notifications_deactivate(TYPE_IDX) {
 
-export function Notifications_get_by_idx(idx) {
-
-   return _notifications_buffer.buffer[idx];
+   _notifications_buffer.buffer[TYPE_IDX].is_active = false;
+   _notifications_buffer.buffer[TYPE_IDX].params.root = null; // Detach the refference to the ui widget
 }
 
 
