@@ -1,5 +1,6 @@
 "use strict";
 
+import { Vertex_buffer_info_get_render_queueidx, Vertex_buffer_info_set_render_queueidx } from "../../../Graphics/Buffers/VertexBuffers";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Drawables/DebugInfo/DebugInfoUiNotifications";
 
 
@@ -21,24 +22,24 @@ class RenderQueueData {
    // isActive;
    flags;
 
-   constructor(){
+   constructor() {
       this.Reset();
    }
 
 
-   Set(elem){
-      this.progidx  = elem.progidx;
-      this.vbidx    = elem.vbidx;
-      this.ibidx    = elem.ibidx;
+   Set(elem) {
+      this.progidx = elem.progidx;
+      this.vbidx = elem.vbidx;
+      this.ibidx = elem.ibidx;
       this.queueIdx = elem.queueIdx;
       // this.isActive = elem.isActive;
-      if(elem.isActive) this.flags |= RENDER_QUEUE_FLAGS.IS_ACTIVE;
+      if (elem.isActive) this.flags |= RENDER_QUEUE_FLAGS.IS_ACTIVE;
    }
-   
-   
-   Reset(){
-      this.progidx  = INT_NULL;
-      this.vbidx    = INT_NULL;
+
+
+   Reset() {
+      this.progidx = INT_NULL;
+      this.vbidx = INT_NULL;
       this.queueIdx = INT_NULL;
       // this.isActive = false;
       this.flags = 0x0;
@@ -63,38 +64,42 @@ class RenderQueue {
 
 
    Init() {
-      
+
       for (let i = 0; i < this.size; i++) {
          this.buffer[i] = new RenderQueueData;
       }
    }
 
 
-   Deactivate(progidx, vbidx){
+   Deactivate(vbidx) {
 
-      const foundIdx = this.Find(progidx, vbidx);
-      if (foundIdx !== INT_NULL && foundIdx < this.count-1) {
-         // this.buffer[foundIdx].isActive = false;
-         this.buffer[foundIdx].flags &= ~RENDER_QUEUE_FLAGS.IS_ACTIVE;
-         this.RebuildActiveQueue()
+      const idx = Vertex_buffer_info_get_render_queueidx(vbidx);
+
+      if (idx !== INT_NULL && idx < this.count - 1) {
+
+         this.buffer[idx].flags &= ~RENDER_QUEUE_FLAGS.IS_ACTIVE;
+         this.RebuildActiveQueue();
+
+         Vertex_buffer_info_set_render_queueidx(vbidx, INT_NULL);
       }
    }
 
 
-   RebuildActiveQueue(){ // Recreates an array of all active vertex buffers from the draw queue on every Frame.
+   RebuildActiveQueue() { // Recreates an array of all active vertex buffers from the draw queue on every Frame.
 
       this.activeCount = 0;
       this.active = []; // Reset curent active queue buffer
+
       for (let i = 0; i < this.size; i++) {
-         // if(this.buffer[i].isActive){ // recreate the active queue buffer from the renderqueue buffer 
-         if(this.buffer[i].flags & RENDER_QUEUE_FLAGS.IS_ACTIVE){ // recreate the active queue buffer from the renderqueue buffer 
+
+         if (this.buffer[i].flags & RENDER_QUEUE_FLAGS.IS_ACTIVE) { // recreate the active queue buffer from the renderqueue buffer 
             this.active[this.activeCount++] = this.buffer[i];
          }
       }
    }
 
 
-   UpdateActiveQueueByIdx(idx){ // Recreates an array of all active vertex buffers from the draw queue on every Frame.
+   UpdateActiveQueueByIdx(idx) { // Recreates an array of all active vertex buffers from the draw queue on every Frame.
       this.active[this.activeCount++] = this.buffer[idx];
    }
 
@@ -108,35 +113,38 @@ class RenderQueue {
          queueIdx: this.count,
          isActive: isActive,
       }
+
       this.buffer[this.count].Set(obj);
-      if(isActive === true) this.buffer[this.count].flags |= RENDER_QUEUE_FLAGS.IS_ACTIVE;
+      if (isActive === true) this.buffer[this.count].flags |= RENDER_QUEUE_FLAGS.IS_ACTIVE;
       this.count++;
 
-      
-    if(NOTIFICATIONS_ON) 
-      Notifications_send(NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, obj.queueIdx);
+      Vertex_buffer_info_set_render_queueidx(vbidx, obj.queueIdx);
+
+
+      if (NOTIFICATIONS_ON)
+         Notifications_send(NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, obj.queueIdx);
 
       // DEBUG
-      if(this.count > this.size) alert('ERROR - RenderQueue buffer is FULL')
+      if (this.count > this.size) alert('ERROR - RenderQueue buffer is FULL')
    }
 
 
    Find(progidx, vbidx) {
 
-      if(!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
+      if (!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
       for (let i = 0; i < this.size; i++) {
          if (this.buffer[i].vbidx === vbidx &&
-            this.buffer[i].progidx === progidx ) {
+            this.buffer[i].progidx === progidx) {
             return i;
          }
       }
       return INT_NULL;
    }
-   
+
 
    FindAllBuffersFromProgram(progidx) {
 
-      if(!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
+      if (!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
       let idxs = [];
       for (let i = 0; i < this.size; i++) {
          if (this.buffer[i].progidx === progidx) {
@@ -147,7 +155,7 @@ class RenderQueue {
    }
 
 
-   Swap(obj1, obj2){
+   Swap(obj1, obj2) {
 
       const temp = new RenderQueueData;
       temp.Set(obj1);
@@ -156,89 +164,91 @@ class RenderQueue {
    }
 
 
-   // IMIDIATELY: SLOW 
-   SetPriority(flag, progidx, vbidx = ALL){
+   SetPriorityAll(flag, progidx, vbidx = ALL) {
+      // TODO: IMPLEMENT
 
-      if(vbidx === ALL){
+      const idxs = this.FindAllBuffersFromProgram(progidx);
+      // const idxs = Vertex_buffer_info_get_render_queueidx(vbidx);
 
-         const idxs = this.FindAllBuffersFromProgram(progidx);
-         
-         for(let k=0; k<idxs.length; k++){
-            
-            // if((this.buffer[i].flags & RENDER_QUEUE_FLAGS.SKIP_PRIORITY)===0 && )
+      for (let k = 0; k < idxs.length; k++) {
 
-            if(flag === FIRST && idxs[k] > 0){
+         // if((this.buffer[i].flags & RENDER_QUEUE_FLAGS.SKIP_PRIORITY)===0 && )
 
-               // Move all elements to the right
-               for(let i = idxs[k]; i>0; i--){
-                  this.buffer[i].Set(this.buffer[i-1]);
-               }
-               // Store back prioritized element
-               this.buffer[0].Set(temp);
-            }
-            else if(flag === LAST && idxs[k] < this.count-1){
-               // Move all elements to the left
-               for(let i = idxs[k]; i<this.count; i++){
-                  this.buffer[i].Set(this.buffer[i+1]);
-               }
-               // Store back prioritized element
-               this.buffer[this.count-1].Set(temp); 
-            }
-         }
+         if (flag === FIRST && idxs[k] > 0) {
 
-      }
-
-      /**************************************************************************/
-
-      const idx = this.Find(progidx, vbidx);
-      if(idx !== INT_NULL){
-
-         const temp = new RenderQueueData;
-         temp.Set(this.buffer[idx]); // Temporary store the prioritized element
-
-         if(flag === FIRST && idx > 0){
             // Move all elements to the right
-            for(let i = idx; i>0; i--){
-               this.buffer[i].Set(this.buffer[i-1]);
+            for (let i = idxs[k]; i > 0; i--) {
+               this.buffer[i].Set(this.buffer[i - 1]);
             }
             // Store back prioritized element
             this.buffer[0].Set(temp);
          }
-         else if(flag === LAST && idx<this.count-1){
+         else if (flag === LAST && idxs[k] < this.count - 1) {
+
             // Move all elements to the left
-            for(let i = idx; i<this.count; i++){
-               this.buffer[i].Set(this.buffer[i+1]);
+            for (let i = idxs[k]; i < this.count; i++) {
+
+               this.buffer[i].Set(this.buffer[i + 1]);
+               Vertex_buffer_info_set_render_queueidx(this.buffer[i].vbidx, i + 1);
             }
+
             // Store back prioritized element
-            this.buffer[this.count-1].Set(temp); 
+            this.buffer[this.count - 1].Set(temp);
+            Vertex_buffer_info_set_render_queueidx(this.buffer[this.count - 1].vbidx, this.count - 1);
          }
+      }
+
+   }
+
+
+   SetPriority(flag, vbidx) {
+
+      const idx = Vertex_buffer_info_get_render_queueidx(vbidx);
+
+      if (idx === INT_NULL) { alert('Wrong render queue index, coming from vertex buffer queueidx\nSEE console.error'); console.error('Wrong render queue index, coming from vertex buffer queueidx'); }
+
+      const temp = new RenderQueueData;
+      temp.Set(this.buffer[idx]); // Temporary store the prioritized element
+
+      if (flag === FIRST && idx > 0) {
+
+         // Move all elements to the right
+         for (let i = idx; i > 0; i--) {
+
+            if((this.buffer[i].flags & RENDER_QUEUE_FLAGS.SKIP_PRIORITY)===0) {
+
+               this.buffer[i].Set(this.buffer[i - 1]);
+               Vertex_buffer_info_set_render_queueidx(this.buffer[i].vbidx, i);
+            }
+         }
+
+         // Store back prioritized element
+         this.buffer[0].Set(temp);
+         Vertex_buffer_info_set_render_queueidx(this.buffer[0].vbidx, 0);
+
+      }
+      else if (flag === LAST && idx < this.count - 1) {
+
+         // Shift all elements to the left
+         for (let i = idx; i < this.count - 1; i++) { // Leave the last element for outside the loop assignment
+
+            this.buffer[i].Set(this.buffer[i + 1]);
+            Vertex_buffer_info_set_render_queueidx(this.buffer[i].vbidx, i); // If next elem goes left, pass current index as the new vb queueidx
+         }
+
+         // Store back prioritized element
+         this.buffer[this.count - 1].Set(temp);
+         Vertex_buffer_info_set_render_queueidx(this.buffer[this.count - 1].vbidx, this.count - 1);
       }
    }
 
 
-   /**
-    * INEFFICIENT.
-    * But we do not care for now.
-    * // TODO: Implement correctly: using bubble sort? 
-    */
-   SetPriorityProgram(flag, progidx){
+   SetPrioritySwap(vbIdx1, vbIdx2) {
 
-      if(!this.count) return; // Case RenderQueue hasn't been initialized
+      const idx1 = Vertex_buffer_info_get_render_queueidx(vbIdx1);
+      const idx2 = Vertex_buffer_info_get_render_queueidx(vbIdx2);
 
-      for (let i = 0; i < this.count; i++) {
-         
-         if ((this.buffer[i].flags & RENDER_QUEUE_FLAGS.SKIP_PRIORITY)===0 && this.buffer[i].progidx === progidx) {
-            this.SetPriority(flag, progidx, this.buffer[i].vbidx)
-         }
-      }
-   }
-
-
-   SetPrioritySwap(progs_groupidx1, progIdx1, vbIdx1, progs_groupidx2, progIdx2, vbIdx2){
-
-      const idx1 = this.Find(progs_groupidx1, progIdx1, vbIdx1);
-      const idx2 = this.Find(progs_groupidx2, progIdx2, vbIdx2);
-      if(idx1 !== INT_NULL && idx2 !== INT_NULL){
+      if (idx1 !== INT_NULL && idx2 !== INT_NULL) {
          const temp = new RenderQueueData;
          temp.Set(this.buffer[idx1]); // Temporary store the prioritized element
          this.buffer[idx1].Set(this.buffer[idx2]);
@@ -250,8 +260,8 @@ class RenderQueue {
    // Debug
    PrintAll() {
       console.log('--- RenderQueue All');
-      for(let i=0; i<this.count; i++){
-         if(this.buffer[i]) console.log(this.buffer[i]);
+      for (let i = 0; i < this.count; i++) {
+         if (this.buffer[i]) console.log(this.buffer[i]);
       }
    }
 
@@ -259,8 +269,8 @@ class RenderQueue {
    PrintActive() {
       console.log('--- RenderQueue Active');
       console.log(this.active);
-      for(let i=0; i<this.activeCount; i++){
-         if(this.active[i]) console.log(this.active[i]);
+      for (let i = 0; i < this.activeCount; i++) {
+         if (this.active[i]) console.log(this.active[i]);
       }
    }
 
@@ -294,14 +304,14 @@ export function Renderqueue_active_get_count() { return _render_queue.activeCoun
 
 
 
-export function Renderqueue_set_priority_by_program(flag, progidx) { 
-   _render_queue.SetPriorityProgram(flag, progidx); 
+export function Renderqueue_set_priority_by_program(flag, progidx) {
+   _render_queue.SetPriorityProgram(flag, progidx);
 }
 
 
 
-export function Renderqueue_set_priority_by_vb(flag, progidx, vbidx) { 
-   _render_queue.SetPriority(flag, progidx, vbidx); 
+export function Renderqueue_set_priority_by_vb(flag, vbidx) {
+   _render_queue.SetPriority(flag, vbidx);
 }
 
 
@@ -317,15 +327,14 @@ export function Renderqueue_update_active_queue() { _render_queue.RebuildActiveQ
  * changed(enabled or disabled for drawing), we must add or remove
  * these programs-vertex buffers from the draw queue.
  */
-export function Renderqueue_set_active(progidx, vbidx, isActive){ 
+export function Renderqueue_set_active(vbidx, isActive) {
 
-   const idx = _render_queue.Find(progidx, vbidx);
-   if(idx !== INT_NULL){
+   const idx = Vertex_buffer_info_get_render_queueidx(vbidx);
+   if (idx !== INT_NULL) {
 
-      // _render_queue.buffer[idx].isActive = isActive;
-      if(isActive === true) _render_queue.buffer[idx].flags |= isActive;
-      else if(isActive === false) _render_queue.buffer[idx].flags &= ~isActive;
-      
+      if (isActive === true) _render_queue.buffer[idx].flags |= isActive;
+      else if (isActive === false) _render_queue.buffer[idx].flags &= ~isActive;
+
       // IMPORTANT: Rebuild the queue once, if this function is called at least once
       _render_queue.RebuildActiveQueue(); // Create a new active buffer from the updated queue
    }
@@ -341,7 +350,8 @@ export function Renderqueue_Add(progidx, vbidx, ibidx, isActive) {
 
 export function Renderqueue_set_flags(progidx, vbidx, flags) {
 
-   const idx = _render_queue.Find(progidx, vbidx);
+   // const idx = _render_queue.(progidx, vbidx);
+   const idx = Vertex_buffer_info_get_render_queueidx(vbidx);
    _render_queue.buffer[idx].flags |= flags;
 }
 

@@ -281,7 +281,7 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs=[INT_NULL, I
       
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vbidx, ibidx, true);
-      Renderqueue_set_active(progidx, vbidx, true); // Update the draw buffer
+      Renderqueue_set_active(vbidx, true); // Update the draw buffer
 
       Vertex_buffer_info_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
       

@@ -983,7 +983,7 @@ export function Widget_root_set_in_focus(root_bufferidx) {
    for(let i=0; i < len; i++){
 
       const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
-      Renderqueue_set_priority_by_vb(LAST, gfx.prog.idx, gfx.vb.idx);
+      Renderqueue_set_priority_by_vb(LAST, gfx.vb.idx);
    }
 
 }

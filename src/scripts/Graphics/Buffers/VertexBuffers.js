@@ -148,6 +148,18 @@ export function Vertex_buffer_info_set_ibidx(vbidx, ibidx) {
 
 
 
+export function Vertex_buffer_info_set_render_queueidx(vbidx, render_queueidx) {
+    _vertex_buffers_info.buffer[vbidx].render_queueidx = render_queueidx;
+}
+
+
+
+export function Vertex_buffer_info_get_render_queueidx(vbidx) {
+    return _vertex_buffers_info.buffer[vbidx].render_queueidx;
+}
+
+
+
 export function Vertex_buffer_info_get_sid(vbidx) {
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_info, vbidx, new Error().lineNumber);
     return _vertex_buffers_info.buffer[vbidx].sid;
@@ -163,13 +175,14 @@ class Vertex_Buffer_Info {
         this.count = 0;	    // Current size oof the typed array buffer (in elements)
         this.vCount = 0;    // Number of vertices
 
-        this.progidx = progidx;   // Just for debuging.
-        this.vbo = vbo;         // WebGl vertex buffer object.
-        this.vbidx = vbidx;     // index to the array of stored vertex buffers.
-        this.vao = vao;         // WebGl vertex array object.
-        this.vaoidx = vaoidx;   // Index to the array of stored VAO's
-        this.texidx = INT_NULL; // index to the array all textures are stored.
-        this.ibidx = INT_NULL; // index ref to index buffer this vb uses.
+        this.progidx = progidx;     // Just for debuging.
+        this.vbo = vbo;             // WebGl vertex buffer object.
+        this.vbidx = vbidx;         // index to the array of stored vertex buffers.
+        this.vao = vao;             // WebGl vertex array object.
+        this.vaoidx = vaoidx;       // Index to the array of stored VAO's
+        this.texidx = INT_NULL;     // index to the array all textures are stored.
+        this.ibidx = INT_NULL;      // index ref to index buffer this vb uses.
+        this.render_queueidx = INT_NULL; // index to the Render queue buffer of the current vb 
         /*DO NOT DELETE*///this.ib_count = 0;      // Case that the index buffer is shared between vertex buffers, each vb needs to know how many indices the Draw function should access
 
         this.type = type; // The type of the typed array buffer
@@ -298,7 +311,7 @@ export function Vertex_buffer_info_create(sid, size = MAX_VERTEX_BUFFER_SIZE, pr
 
     vb_info.state.mask |= BUFFER_STATE.IS_ACTIVE;
 
-    if(NOTIFICATIONS_ON) 
+    if (NOTIFICATIONS_ON)
         Notifications_send(NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, ret.vbidx);
 
     return vb_info;
@@ -397,7 +410,7 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
 
     const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-    
+
 
     vb_info.count += Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
 
@@ -489,7 +502,7 @@ export function Vertex_buffer_update_vertices(gfx, geom, mat, dbg_mesh_name) {
 
     const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-    
+
 
     Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
 
@@ -502,13 +515,13 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index, remov
 
 
     const vb_info = _vertex_buffers_info.buffer[gfx.vb.idx];
-    
+
     const removed_attribs = gfx.attribsPerVertex * gfx.vertsPerRect * num_faces;
-    
+
     let start = start_index;
     const end = start + removed_attribs;
-    
-    
+
+
     // Shift all attributes left to fil the gap of the removed attributes. 
     const vb_data = _vertex_buffers.buffer[gfx.vb.idx];
     for (let i = end; i < vb_info.count; i++) {
@@ -526,12 +539,12 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index, remov
 
 
     const indices_per_face = Index_buffer_info_get_indices_per_face(vb_info.ibidx);
-    vb_info.draw_count -= num_faces * indices_per_face; 
+    vb_info.draw_count -= num_faces * indices_per_face;
 
     // POTENTIAL_BUG: If the buffer is empty MUST be updated!!!
     // TODO: If The buffer is not used, by deactivating it below, then we need to update the render queue
     // Set inactive 
-    if (vb_info.count === 0){
+    if (vb_info.count === 0) {
 
         vb_info.state.mask &= ~BUFFER_STATE.IS_ACTIVE
     }

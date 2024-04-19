@@ -177,7 +177,7 @@ export function Gl_framebuffer_render_mesh(FBID = FB.NEW, FB_TYPE = FRAMEBUFFER_
 
    // setInterval(() => {
    //    for (let i = 0; i < gfx_queue.length; i++) {
-   //       Renderqueue_set_active(gfx_queue[i].progidx, gfx_queue[i].vbidx, false)
+   //       Renderqueue_set_active(gfx_queue[i].vbidx, false)
    //    }
    // }, 100)
 
