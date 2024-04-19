@@ -6,7 +6,7 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/Tim
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { AddArr2, RoundFloat1Decimal } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js';
-import { Widget_root_add_mesh } from '../../Core/MeshBuffer.js';
+import { Widget_root_add_mesh, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
 import { Generate_graphics_context } from '../../Interfaces/Gfx/GfxContextFindMatch.js';
@@ -404,7 +404,10 @@ export class Widget_Slider extends Rect {
             // bar.timeIntervalsIdxBuffer.Add(idx);
 
             STATE.mesh.SetGrabed(bar);
-            bar.StateEnable(MESH_STATE.IN_GRAB);
+            STATE.mesh.SetFocused(mesh);
+            mesh.state.mask |= MESH_STATE.IN_FOCUS;
+            bar.StateEnable(MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS);
+            Widget_root_set_in_focus(mesh.root_bufferidx);
          }
 
          return true;
@@ -423,7 +426,9 @@ export class Widget_Slider extends Rect {
             // mesh.timeIntervalsIdxBuffer.Add(idx);
 
             STATE.mesh.SetGrabed(mesh);
-            mesh.StateEnable(MESH_STATE.IN_GRAB);
+            STATE.mesh.SetFocused(mesh);
+            mesh.StateEnable(MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS);
+            Widget_root_set_in_focus(mesh.root_bufferidx);
          }
 
          // Handle any menu (on leftClick only)

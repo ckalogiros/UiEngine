@@ -151,29 +151,29 @@ export class WebGlRenderer {
       // this.gl.getExtension('OES_standard_derivatives');
       // this.gl.getExtension('EXT_shader_texture_lod');
 
-      this.gl.enable(this.gl.DEPTH_TEST);
-      this.gl.depthFunc(this.gl.LEQUAL)
-      // this.gl.depthFunc(this.gl.GEQUAL)
-      this.gl.depthMask(true);
+      // this.gl.enable(this.gl.DEPTH_TEST);
+      // this.gl.depthFunc(this.gl.LEQUAL)
+      // // this.gl.depthFunc(this.gl.GEQUAL)
+      // this.gl.depthMask(true);
 
-      this.gl.enable(this.gl.BLEND);
       /**
-      gl.ZERO 	                        Multiplies all colors by 0.
-      gl.ONE 	                        Multiplies all colors by 1.
-      gl.SRC_COLOR 	                  Multiplies all colors by the source colors.
-      gl.ONE_MINUS_SRC_COLOR 	         Multiplies all colors by 1 minus each source color.
-      gl.DST_COLOR 	                  Multiplies all colors by the destination color.
-      gl.ONE_MINUS_DST_COLOR 	         Multiplies all colors by 1 minus each destination color.
-      gl.SRC_ALPHA 	                  Multiplies all colors by the source alpha value.
-      gl.ONE_MINUS_SRC_ALPHA 	         Multiplies all colors by 1 minus the source alpha value.
-      gl.DST_ALPHA 	                  Multiplies all colors by the destination alpha value.
-      gl.ONE_MINUS_DST_ALPHA 	         Multiplies all colors by 1 minus the destination alpha value.
-      gl.CONSTANT_COLOR 	            Multiplies all colors by a constant color.
-      gl.ONE_MINUS_CONSTANT_COLOR 	   Multiplies all colors by 1 minus a constant color.
-      gl.CONSTANT_ALPHA 	            Multiplies all colors by a constant alpha value.
-      gl.ONE_MINUS_CONSTANT_ALPHA 	   Multiplies all colors by 1 minus a constant alpha value.
-      gl.SRC_ALPHA_SATURATE 	         Multiplies the RGB colors by the smaller of either the source alpha value or the value of 1 minus the destination alpha value. The alpha value is multiplied by 1. 
-      */
+       gl.ZERO 	                        Multiplies all colors by 0.
+       gl.ONE 	                        Multiplies all colors by 1.
+       gl.SRC_COLOR 	                  Multiplies all colors by the source colors.
+       gl.ONE_MINUS_SRC_COLOR 	         Multiplies all colors by 1 minus each source color.
+       gl.DST_COLOR 	                  Multiplies all colors by the destination color.
+       gl.ONE_MINUS_DST_COLOR 	         Multiplies all colors by 1 minus each destination color.
+       gl.SRC_ALPHA 	                  Multiplies all colors by the source alpha value.
+       gl.ONE_MINUS_SRC_ALPHA 	         Multiplies all colors by 1 minus the source alpha value.
+       gl.DST_ALPHA 	                  Multiplies all colors by the destination alpha value.
+       gl.ONE_MINUS_DST_ALPHA 	         Multiplies all colors by 1 minus the destination alpha value.
+       gl.CONSTANT_COLOR 	            Multiplies all colors by a constant color.
+       gl.ONE_MINUS_CONSTANT_COLOR 	   Multiplies all colors by 1 minus a constant color.
+       gl.CONSTANT_ALPHA 	            Multiplies all colors by a constant alpha value.
+       gl.ONE_MINUS_CONSTANT_ALPHA 	   Multiplies all colors by 1 minus a constant alpha value.
+       gl.SRC_ALPHA_SATURATE 	         Multiplies the RGB colors by the smaller of either the source alpha value or the value of 1 minus the destination alpha value. The alpha value is multiplied by 1. 
+       */
+      this.gl.enable(this.gl.BLEND);
       this.gl.blendFunc(this.gl.DST_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
       
       // this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);

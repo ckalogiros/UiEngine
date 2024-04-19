@@ -72,24 +72,6 @@ export function Progarm_get_program(progidx) {
 
 
 
-/** Find the programs group index by the group's index */
-export function Progarm_get_prog_groupidx(progidx, groupidx) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber)
-
-	const groupidxs = _programs.buffer[progidx].prog_groupidxs;
-	for (let i = 0; i <= groupidxs.boundary; i++) {
-
-		if (groupidxs.buffer[i] === groupidx)
-			return i;
-
-	}
-
-	alert('NO apropriate prog_groupidx was found in program')
-	return INT_NULL;
-}
-
-
-
 export function Program_get_shader_attributes_index(progidx) {
 	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
 	return _programs.buffer[progidx].attribsidx;
@@ -155,28 +137,10 @@ export function Program_program_exists_from_index(progidx) {
 function Create_program(sid, uniforms) {
 
 	/***************************************************************************************************/
-	// Create Program Group if it doesn't exist
-	// let groupidx = GFX_GROUPS.GetIdxByMask(sid.gfx_group);
-	// if (groupidx === INT_NULL || _programs[groupidx] === null) {
-
-	// 	groupidx = Gfx_groups_create_group();
-
-	// 	// IMPORTANT! Here we set globaly the index of the program group.
-	// 	if (sid.gfx_group & GFX_GROUPS.DEBUG.MASK) GFX_GROUPS.DEBUG.IDX = groupidx;
-	// 	else if (sid.gfx_group & GFX_GROUPS.DEFAULT.MASK) GFX_GROUPS.DEFAULT.IDX = groupidx;
-
-	// }
-
-
-	/***************************************************************************************************/
 	// Create Shader Program
 	const prog = new Gl_Program(gfxCtx.gl, sid, uniforms);
 	const progidx = _programs.Add(prog);
 	prog.idx = progidx; // Store the programs index to self
-
-	// Add to Gfx Groups
-	// const prog_groupidx = Gfx_groups_store_program(groupidx, progidx);
-	// prog.prog_groupidxs.Add(prog_groupidx);
 
 
 	/****************************************************************************************************/
@@ -207,7 +171,6 @@ export function Program_create_program(sid, uniforms) {
 	const prog = _programs.buffer[progidx];
 
 
-	/**********************************************************************/
 	// Bind shader program's uniforms
 	gfxCtx.gl.useProgram(prog.shader_program);
 	GL.BOUND_PROG_IDX = progidx;
@@ -253,7 +216,7 @@ class Gl_Program {
 
 
 		/****************************************************************************************************/
-		// Sampler uniforms
+		// Sampler uniforms. // TODO: This must be implemented with regular uiniforms???
 		this.shaderinfo = {
 			uniforms: {
 				sampler: gl.getUniformLocation(this.shader_program, 'u_sampler0'),	// Sampler for texture units 	
@@ -347,29 +310,3 @@ function DEBUG_PRINT(buffer, index, line) {
 export function Gl_program_print() {
 	console.log('Program Groups', _programs)
 }
-
-
-
-
-/** Gather all program's uniforms */
-
-// const numUniforms = gl.getProgramParameter(this.shader_program, gl.ACTIVE_UNIFORMS);
-// const indices = [...Array(numUniforms).keys()];
-// const blockIndices = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_BLOCK_INDEX);
-// const offsets = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_OFFSET);
-
-// const uniforms = [];
-// for (let ii = 0; ii < numUniforms; ++ii) {
-//   const uniformInfo = gl.getActiveUniform(this.shader_program, ii);
-// //   if (isBuiltIn(uniformInfo)) {
-// // 		continue;
-// //   }
-//   uniforms.push(uniformInfo);
-//   const {name, type, size} = uniformInfo;
-//   const blockIndex = blockIndices[ii];
-//   const offset = offsets[ii];
-// //   console.log(
-// // 	  name, size, glEnumToString(gl, type),
-// // 	  blockIndex, offset);
-// console.log(uniformInfo, blockIndex, offset)
-// }

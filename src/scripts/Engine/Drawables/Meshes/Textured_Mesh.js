@@ -9,6 +9,7 @@ import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Texture_Material } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { WHITE } from "../Material/Base/Colors.js";
+import { Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 
 
 
@@ -140,7 +141,9 @@ export class Textured_Mesh extends Mesh {
             if (mesh.StateCheck(MESH_STATE.IS_GRABABLE)) {
 
                STATE.mesh.SetGrabed(mesh);
-               mesh.StateEnable(MESH_STATE.IN_GRAB);
+               STATE.mesh.SetFocused(mesh);
+               mesh.StateEnable(MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS);
+               Widget_root_set_in_focus(mesh.root_bufferidx);
             }
 
          }

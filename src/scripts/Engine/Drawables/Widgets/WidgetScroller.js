@@ -5,7 +5,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Mesh_per_vb_remove_all_from_index, Movey_from_widget_root_buffer, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_all_from_index, Movey_from_widget_root_buffer, Widget_root_add_mesh, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Clampx_from_group,Clipy_from_group } from "../Operations/Clip.js";
@@ -452,9 +452,11 @@ export class Widget_Scroller extends Section {
             // console.log('Y RESIZE');
          }
 
-         mesh.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB;
+         mesh.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS;
          STATE.mesh.SetGrabed(mesh);
-         console.log(point, right, bottom, TEMP_RESIZE_MARGIN)
+         STATE.mesh.SetFocused(mesh);
+         Widget_root_set_in_focus(mesh.root_bufferidx);
+         // console.log(point, right, bottom, TEMP_RESIZE_MARGIN)
          
          return true;
       }
@@ -473,7 +475,10 @@ export class Widget_Scroller extends Section {
                bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
    
                STATE.mesh.SetGrabed(bar);
+               STATE.mesh.SetFocused(mesh);
+               mesh.state.mask |= MESH_STATE.IN_FOCUS;
                bar.StateEnable(MESH_STATE.IN_GRAB);
+               Widget_root_set_in_focus(mesh.root_bufferidx);
             }
    
             return true;
@@ -489,7 +494,9 @@ export class Widget_Scroller extends Section {
                mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
    
                STATE.mesh.SetGrabed(mesh);
-               mesh.StateEnable(MESH_STATE.IN_GRAB);
+               STATE.mesh.SetFocused(mesh);
+               mesh.StateEnable(MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS);
+               Widget_root_set_in_focus(mesh.root_bufferidx);
             }
    
             return true;

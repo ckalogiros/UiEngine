@@ -10,6 +10,7 @@ import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js
 import { Batch_store } from "../Batch/Batch.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
+import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 
 
 
@@ -57,6 +58,7 @@ export function Mesh_buffer_get_size() { return _mesh_buffer.size; }
 
 
 export function Mesh_buffer_get_mesh_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx]; }
+export function Mesh_buffer_get_mesh_gfx_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].gfx; }
 /**For Debugging*/ export function Mesh_buffer_get_mesh_name_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].GetName(); }
 
 
@@ -495,7 +497,9 @@ export function Widget_root_batch_get(root_bufferidx) {
 export function Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx) {
 
    let roots = [];
-   for (let i = 0; i <= _root_batch_buffer.buffer[root_bufferidx].boundary; i++) {
+   const len = _root_batch_buffer.buffer[root_bufferidx].vb.length;
+
+   for (let i = 0; i < len; i++) {
       roots[i] = _root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx;
    }
    return roots;
@@ -968,6 +972,38 @@ export function Widget_root_reset_gfx(root_bufferidx) {
 }
 
 
+
+
+export function Widget_root_set_in_focus(root_bufferidx) {
+   
+
+   const vb_mesh_roots = Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx);
+   const len = vb_mesh_roots.length;
+
+   for(let i=0; i < len; i++){
+
+      const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
+      Renderqueue_set_priority_by_vb(LAST, gfx.prog.idx, gfx.vb.idx);
+   }
+
+}
+
+
+
+
+export function Widget_root_set_render_queue_flags(root_bufferidx, flags) {
+   
+
+   const vb_mesh_roots = Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx);
+   const len = vb_mesh_roots.length;
+
+   for(let i=0; i < len; i++){
+
+      const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
+      Renderqueue_set_flags(gfx.prog.idx, gfx.vb.idx, flags)
+   }
+
+}
 
 
 

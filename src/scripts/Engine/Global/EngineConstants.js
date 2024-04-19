@@ -428,6 +428,21 @@ const MOUSE = {
 
 
 
+
+
+_CNT = 0x1;
+const RENDER_QUEUE_FLAGS = {
+   IS_ACTIVE: _CNT,
+   SKIP_PRIORITY: _CNT<<=0x1,
+}
+
+
+
+
+
+
+
+
 _CNT = 0x1;
 const ALIGN = {
 

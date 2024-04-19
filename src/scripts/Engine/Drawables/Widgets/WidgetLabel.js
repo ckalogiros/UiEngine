@@ -13,7 +13,7 @@ import { Gl_set_alpha_from_offset, Gl_set_dim_X, Gl_set_dim_XY, Gl_set_wpos_X, G
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
@@ -552,7 +552,9 @@ export class Widget_Label extends Rect {
             if (mesh.StateCheck(MESH_STATE.IS_GRABABLE)) {
 
                 STATE.mesh.SetGrabed(mesh);
-                mesh.StateEnable(MESH_STATE.IN_GRAB);
+                STATE.mesh.SetFocused(mesh);
+                mesh.StateEnable(MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS);
+                Widget_root_set_in_focus(mesh.root_bufferidx);
             }
 
         }

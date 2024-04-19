@@ -7,7 +7,7 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/Tim
 import { Listener_get_parent_event, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_is_widget_root, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { Clampx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { Section } from "../Meshes/Section.js";
 import { BLUEL, GREEN, GREY, PURPLER, REDL, WHITE } from "../Material/Base/Colors.js";
@@ -833,7 +833,9 @@ export class Widget_Dropdown extends Section {
          if (mesh.StateCheck(MESH_STATE.IS_GRABABLE)) {
 
             STATE.mesh.SetGrabed(mesh);
-            mesh.StateEnable(MESH_STATE.IN_GRAB);
+            STATE.mesh.SetFocused(mesh);
+            mesh.StateEnable(MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS);
+            Widget_root_set_in_focus(mesh.root_bufferidx);
          }
 
       }

@@ -4,7 +4,7 @@ import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals.js";
 import { Dbg_ui_create2 } from "./DebugInfoUiFactory.js";
 import { Program_get_programs } from "../../../Graphics/ShaderPrograms.js";
@@ -327,6 +327,8 @@ function Debug_info_create_ui_stats() {
    section.Render()
    // section.options = SECTION.VERTICAL;
    section.ConstructListeners();
+
+   Widget_root_set_render_queue_flags(section.root_bufferidx, RENDER_QUEUE_FLAGS.SKIP_PRIORITY)
 
 
    DEBUG_INFO.UI_STATS.MESH_BUFFER_IDX = section.mesh_bufferidx;
@@ -2698,8 +2700,8 @@ function Helper_render_queue_buffer_info_create_more_info(parent, info_data, zin
    
    
    const pos = [0,0,zindex+2]
-   { const info = Create_widget_text(_, `draw count:${info_data.draw_count}`, pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `is active:${info_data.isActive}`,    pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
+   { const info = Create_widget_text(_, `isactiveflag:${info_data.flags&0x1}`,    pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `progidx:${info_data.progidx}`,       pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `vbidx:${info_data.vbidx}`,           pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `ibidx:${info_data.ibidx}`,           pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
