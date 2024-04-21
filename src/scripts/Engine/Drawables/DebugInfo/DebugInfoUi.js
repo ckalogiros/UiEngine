@@ -17,6 +17,7 @@ import { Str_buffer_mesh_names_get_by_idx } from "../../Core/StringBuffer.js";
 import { GetRandomColor } from "../../../Helpers/Helpers.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
+import { Styles_batch_destroy_run } from "../../Styles.js";
 
 
 
@@ -1778,6 +1779,8 @@ export function Debug_info_mesh_buffer_create_ui() {
 
       View_destroy_view(ui_widget.group_bufferidxs);
       ui_widget.Destroy();
+
+      Styles_batch_destroy_run()
 
 
       // Set all entries to NOT inserted, so next time the ui wil open, all entries will be drawn

@@ -5,10 +5,10 @@ import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
-import { Styles_batch_destroy_store, Styles_hover_margin_create, Styles_hover_margin_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_create, Styles_margin_destroy, Styles_margin_get, Styles_margin_set, Styles_pad_create, Styles_pad_destroy, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
+import { Styles_batch_destroy_store, Styles_create, Styles_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 
 
@@ -160,10 +160,7 @@ export class Mesh {
 
 
         this.hover_margin = [0, 0];
-        this.styles = [0,0,0];
-        this.styles[STYLES.MARG] = Styles_margin_create([0,0])
-        this.styles[STYLES.HOVER_MARG] = Styles_hover_margin_create([0,0])
-        this.styles[STYLES.PAD] = Styles_pad_create([0,0])
+        this.styles = Styles_create();
         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]]; // TODO: do the same for the clamx too
 
 
@@ -239,11 +236,12 @@ export class Mesh {
             }
         }
 
-        Styles_margin_destroy(this.styles[STYLES.MARG]);
-        Styles_hover_margin_destroy(this.styles[STYLES.HOVER_MARG]);
-        Styles_pad_destroy(this.styles[STYLES.PAD]);
+        // Styles_margin_destroy(this.styles[STYLES.MARG]);
+        // Styles_hover_margin_destroy(this.styles[STYLES.HOVER_MARG]);
+        // Styles_pad_destroy(this.styles[STYLES.PAD]);
 
-        // Styles_batch_destroy_store();
+        Styles_batch_destroy_store(this.styles);
+        // Styles_destroy(this.styles);
 
         if(NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH)===0) 
             Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, this.mesh_bufferidx);
@@ -534,22 +532,22 @@ export class Mesh {
     RotateZ(angle) { GlRotateZ2D(this.gfx, this.geom.dim, angle); }
     
 
-    StylesGetMargin(axis=STYLES.AXIS.ALL){ return Styles_margin_get(axis, this.styles[STYLES.MARG]); }
+    StylesGetMargin(axis=STYLES.AXIS.ALL){ return Styles_margin_get(axis, this.styles); }
 
 
-    StylesGetHoverMargin(axis=STYLES.AXIS.ALL){  return Styles_hover_margin_get(axis, this.styles[STYLES.HOVER_MARG]); } 
+    StylesGetHoverMargin(axis=STYLES.AXIS.ALL){  return Styles_hover_margin_get(axis, this.styles); } 
 
 
-    StylesGetPad(axis=STYLES.AXIS.ALL){ return Styles_pad_get(axis, this.styles[STYLES.PAD]); }
+    StylesGetPad(axis=STYLES.AXIS.ALL){ return Styles_pad_get(axis, this.styles); }
 
 
-    StylesSetMargin(margin){ Styles_margin_set(this.styles[STYLES.MARG], margin); }
+    StylesSetMargin(margin){ Styles_margin_set(this.styles, margin); }
 
 
-    StylesSetHoverMargin(margin){ Styles_hover_margin_set(this.styles[STYLES.MARG], margin); }
+    StylesSetHoverMargin(margin){ Styles_hover_margin_set(this.styles, margin); }
 
 
-    StylesSetPad(margin){ Styles_pad_set(this.styles[STYLES.MARG], margin); }
+    StylesSetPad(margin){ Styles_pad_set(this.styles, margin); }
 
 
     SetUpdateFrameBuffer() {

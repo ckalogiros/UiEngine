@@ -5,7 +5,7 @@ import { New_generic_buffer, New_int16_buffer } from "./Core/Buffers.js";
 
 
 //TODO: Make 'New_int16_buffer'
-// ALSO: Do we give the smae index to a mesh for all three buffers????? 1to1 ratio buffers
+// ALSO: Do we give the same index to a mesh for all three buffers????? 1to1 ratio buffers
 
 
 const _margin_buffer = New_generic_buffer(_, 'Margins');
@@ -24,17 +24,29 @@ const _hover_margin_buffer = New_generic_buffer(_, 'Hover Margins');
 /*******************************************************************************************************************************************/
 // CREATE
 
-export function Styles_margin_create(margin=[0,0]){ return _margin_buffer.Add(margin); }
+export function Styles_create(margin=[0,0], pad=[0,0], hover_margin=[0,0]){ 
+
+   const idx = Styles_margin_create(margin);
+   Styles_pad_create(pad);
+   Styles_hover_margin_create(hover_margin);
+
+   return idx; 
+}
 
 
 
 
-export function Styles_hover_margin_create(margin=[0,0]){ return _hover_margin_buffer.Add(margin); }
+function Styles_margin_create(margin=[0,0]){ return _margin_buffer.Add(margin); }
 
 
 
 
-export function Styles_pad_create(pad=[0,0]){ return _pad_buffer.Add(pad); }
+function Styles_hover_margin_create(margin=[0,0]){ return _hover_margin_buffer.Add(margin); }
+
+
+
+
+function Styles_pad_create(pad=[0,0]){ return _pad_buffer.Add(pad); }
 
 
 
@@ -121,26 +133,14 @@ export function Styles_pad_set(idx, pad){
 /*******************************************************************************************************************************************/
 // DESTROY
 
-export function Styles_margin_destroy(idx){
+export function Styles_destroy(idx){
    // TODOD: DEBUG the idx if exists and in boundaries
+
    _margin_buffer.RemoveByIdx(idx);
-}
-
-
-
-
-export function Styles_hover_margin_destroy(idx){
-   // TODOD: DEBUG the idx if exists and in boundaries
    _hover_margin_buffer.RemoveByIdx(idx);
-}
-
-
-
-
-export function Styles_pad_destroy(idx){
-   // TODOD: DEBUG the idx if exists and in boundaries
    _pad_buffer.RemoveByIdx(idx);
 }
+
 
 
 
@@ -173,6 +173,7 @@ export function Styles_batch_destroy_run(){
       _pad_buffer.RemoveByIdx(idx);
 
    }
+
    _batch_destroy_storage.Reset();
 }
 
