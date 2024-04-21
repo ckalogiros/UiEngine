@@ -1,6 +1,6 @@
 "use strict";
 
-import { Str_buffer_store } from "../Core/StringBuffer";
+import { Str_buffer_store } from "../Core/StringBuffer.js";
 
 
 

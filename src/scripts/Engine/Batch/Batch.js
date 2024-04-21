@@ -1,8 +1,8 @@
 "use strict";
 
-import { Gl_batch_update_fn_byidx } from "../../Graphics/Buffers/VertexBufferOpsBatch";
-import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs_per_vertex } from "../../Graphics/ShaderAttributes";
-import { Program_get_shader_attributes_index } from "../../Graphics/ShaderPrograms";
+import { Gl_batch_update_fn_byidx } from "../../Graphics/Buffers/VertexBufferOpsBatch.js";
+import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs_per_vertex } from "../../Graphics/ShaderAttributes.js";
+import { Program_get_shader_attributes_index } from "../../Graphics/ShaderPrograms.js";
 
 
 /**

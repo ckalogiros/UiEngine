@@ -29,11 +29,11 @@ import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clampx_from_group, Clipy_from
 import { BLACK, BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { View_build_group_from_root_mesh, View_set_view_start_vb_index } from '../Engine/Core/MeshBufferViews.js';
 import { Index_buffer_info_create } from '../Graphics/Buffers/IndexBuffers.js';
-import { getFile } from '../Engine/Core/FileSystem.js';
+// import { getFile } from '../Engine/Core/FileSystem.js';
 import { New_generic_buffer } from '../Engine/Core/Buffers.js';
 import { MouseGetPos } from '../Engine/Controls/Input/Mouse.js';
 import { TEMP_Section_on_move_section } from '../Engine/Drawables/Meshes/Section.js';
-import { Listener_init_event_storage_buffers } from '../Engine/Events/EventListeners.js';
+import { Listener_init_event_storage_buffers, Listener_set_root_mesh_priority } from '../Engine/Events/EventListeners.js';
 import { Notifications_initialize } from '../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js';
 
 // var osu = require('node-os-utils')
@@ -231,7 +231,7 @@ export function TestWidgetsGeneric(scene) {
     // Listeners_debug_info_create(scene);
 
     Debug_info_ui()
-    // UserCreateRect()
+    UserCreateRect()
 
     // uidbg.RotateZ(5.5);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, uidbg);
@@ -274,13 +274,7 @@ export function TestWidgetsGeneric(scene) {
 
     // SdfLine(GREEN[7], [500, 780, 5], [800, 10]);
     // let ms = 2000;
-    // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000; 
     // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000;
-    // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000;
-    // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000;
-    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
-    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
-    // SdfLine(PURPLER[7], [500, 400, 5], [800, 10]);
 
     // const fb = Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, line);
     { // Draw multiple lines to multiple framebuffers
@@ -328,26 +322,12 @@ export function TestWidgetsGeneric(scene) {
     // CreateScrollerWithWidgets(scene);
 
 
-    // CLAMPING TESTS
-    {
-        // CreateClampWidgets()
-    }
-
-    // TEST_CALC_POS_SIZE();
-    // TEST_CALC_POS_SIZE2()
-    // TEST_CALC_POS_SIZE3()
-    // TEST_CALC_POS_SIZE4()
     // TEST_CALC_POS_SIZE5()
 
 
+    // SdfLine([500, TEST_CLIP_TOP, 10], [800, 10]);
 
 
-    // SdfLine([500, TEST_CLIP_TOP, 10], [800, 10]);
-    // SdfLine([500, TEST_CLIP_TOP, 10], [800, 10]);
-    // SdfLine([500, TEST_CLIP_TOP, 10], [800, 10]);
-    // SdfLine([500, TEST_CLIP_TOP, 10], [800, 10]);
-    // SdfLine([500, TEST_CLIP_TOP, 10], [800, 10]);
-    // SdfLine([500, TEST_CLIP_BOTTOM, 10], [800, 1]);
 
     /** Section Synthesizes */
     {
@@ -414,6 +394,9 @@ export function TestWidgetsGeneric(scene) {
         // Create_read_write_test();
     }
 
+
+    // UNNECESSARY: the order should be set for the listeners and not for the renderqueue
+    Listener_set_root_mesh_priority()
 
 
 }
@@ -2970,216 +2953,6 @@ function CreateScrollerDp(scene) {
     return scroller;
 }
 
-
-function CreateClampWidgets(scene) {
-
-    const fontsize = 10;
-
-    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
-
-    {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
-        section.AddItem(s);
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-    }
-
-    {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
-        section.AddItem(s);
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-    }
-
-    {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
-        section.AddItem(s);
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-    }
-
-    {
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
-        section.AddItem(s);
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-        {
-            const slider = Create_widget_slider(_, [200, 100, 0], [150, 10])
-            s.AddItem(slider);
-            const text = Create_widget_switch(_, 'switch on', 'switch off', [0, 0, 0], fontsize, GREY[1], WHITE, [4, 4], .5)
-            s.AddItem(text);
-            const label = Create_widget_label(_, `label`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(GREEN3, .7), WHITE)
-            s.AddItem(label);
-        }
-    }
-
-    // Create scroller for the ui-mesh info widget
-    const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [0, 60]);
-    scroller.StateEnable(MESH_STATE.ACTIVE);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // scroller.scrolled_section.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL ;
-    scroller.scrolled_section.options = SECTION.VERTICAL;
-
-    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-    scroller.options = SECTION.VERTICAL | SECTION.INHERIT;
-    // s.Recalc();
-    scroller.Calc_no_gfx_update();
-    scroller.Render();
-    scroller.ConstructListeners();
-
-
-
-    // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, scroller.scrolled_section);
-    // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, scroller.scrolled_section);
-
-
-    return scroller;
-}
 
 function CreateScrollerWithWidgets(scene) {
 

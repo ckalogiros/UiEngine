@@ -1,7 +1,7 @@
 "use strict";
 
-import { Create_widget_label, Create_widget_section, Create_widget_switch_simple } from "../../Core/CreateWidget";
-import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent";
+import { Create_widget_label, Create_widget_section, Create_widget_switch_simple } from "../../Core/CreateWidget.js";
+import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 
 
 export function Dbg_ui_create2(name, fontsize, switch_size, switch_fn, callback_params, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex){

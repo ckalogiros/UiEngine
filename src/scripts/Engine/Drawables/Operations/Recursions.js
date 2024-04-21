@@ -1,6 +1,6 @@
 "use strict";
 
-import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_root_meshidx } from "../../Core/MeshBuffer";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_root_meshidx } from "../../Core/MeshBuffer.js";
 
 
 

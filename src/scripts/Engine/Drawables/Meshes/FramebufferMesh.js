@@ -1,6 +1,6 @@
-import { Textured_Mesh } from "./Textured_Mesh";
-import { Renderqueue_set_priority_by_program } from "../../Renderers/Renderer/RenderQueue";
-import { Framebuffer_get } from "../../../Graphics/Buffers/FrameBuffers";
+import { Textured_Mesh } from "./Textured_Mesh.js";
+import { Renderqueue_set_priority_by_program } from "../../Renderers/Renderer/RenderQueue.js";
+import { Framebuffer_get } from "../../../Graphics/Buffers/FrameBuffers.js";
 
 
 

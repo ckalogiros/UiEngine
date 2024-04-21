@@ -56,7 +56,7 @@ export function HandleEvents() {
                 if (STATE.mesh.grabed.StateCheck(MESH_STATE.IN_GRAB)) {
                     STATE.mesh.grabed.state.mask &= ~MESH_STATE.IN_GRAB; // Set false
                     STATE.mesh.SetGrabed(null)
-                    STATE.mesh.SetFocused(null);
+                    // STATE.mesh.SetFocused(null);
                 }
             }
 

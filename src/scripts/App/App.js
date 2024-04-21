@@ -1,12 +1,10 @@
 "use strict";
-// import { Mesh } from '../Engine/Drawables/Meshes/Base/Mesh.js';
 import { Scenes_create_scene } from '../Engine/Scenes.js'
 import { Renderqueue_init } from '../Engine/Renderers/Renderer/RenderQueue.js';
-import { WebGlRenderer } from '../Engine/Renderers/WebGlRenderer.js';
-import { CAMERA_CONTROLS, CameraOrthographic, CameraPerspective } from '../Engine/Renderers/Renderer/Camera.js';
+import { Renderer_create_renderer } from '../Engine/Renderers/WebGlRenderer.js';
+import { CameraOrthographic } from '../Engine/Renderers/Renderer/Camera.js';
 import { Texture_init_texture_storage_buffer } from '../Engine/Loaders/Textures/Texture.js';
 
-// import { Buffer } from 'buffer';
 import { Input_create_user_input_listeners } from '../Engine/Controls/Input/Input.js';
 import { TestWidgetsGeneric } from './TestWidgets.js';
 import { TimeIntervalsInit } from '../Engine/Timers/TimeIntervals.js';
@@ -44,7 +42,7 @@ export function AppInit() {
         // STATE.scene.active_idx = scene.sceneidx;
     }
 
-    renderer = new WebGlRenderer(scene, camera);
+    renderer = Renderer_create_renderer(scene, camera);
 
     Input_create_user_input_listeners();
     Renderqueue_init();

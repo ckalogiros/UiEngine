@@ -1,8 +1,8 @@
 "use strict";
 
-import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers";
-import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer } from "./Buffers";
-import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index } from "./MeshBuffer";
+import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer } from "./Buffers.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index } from "./MeshBuffer.js";
 
 
 /**

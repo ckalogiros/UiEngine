@@ -1,7 +1,7 @@
 "use strict";
 
-import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer";
-import { View_get_view_byidx } from "../../Core/MeshBufferViews";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
+import { View_get_view_byidx } from "../../Core/MeshBufferViews.js";
 
 
 

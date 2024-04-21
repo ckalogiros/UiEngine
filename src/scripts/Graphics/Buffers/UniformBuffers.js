@@ -1,8 +1,8 @@
 "use strict";
 
-import { New_generic_buffer } from "../../Engine/Core/Buffers";
-import { Program_use_program } from "../ShaderPrograms";
-import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilder";
+import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
+import { Program_use_program } from "../ShaderPrograms.js";
+import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilder.js";
 
 
 

@@ -3,21 +3,20 @@
 import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners.js";
-import { Create_widget_button, Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
+import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals.js";
 import { Dbg_ui_create2 } from "./DebugInfoUiFactory.js";
 import { Program_get_programs } from "../../../Graphics/ShaderPrograms.js";
 import { BLACK, BLUEL, GREEN, GREY, ORANGE_240_160_10, PURPLEB, PURPLER, REDL, WHITE, YELLOWL } from "../Material/Base/Colors.js";
 import { NOTIFICATION_TYPE, Notifications_deactivate, Notifications_get_ui_widget, Notifications_set_ui_widget } from "./DebugInfoUiNotifications.js";
-import { View_add_to_group, View_build_group_from_root_mesh, View_destroy_view, View_remove_from_group, View_set_view_start_vb_index } from "../../Core/MeshBufferViews.js";
+import { View_add_to_group, View_build_group_from_root_mesh, View_destroy_view, View_remove_from_group } from "../../Core/MeshBufferViews.js";
 import { Clipy_one_mesh } from "../Operations/Clip.js";
-import { Vertex_buffer_get_Active_count, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_info_get_count, Vertex_buffer_info_get_sid, Vertex_buffer_info_get_size } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_get_Active_count, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_info_get_count, Vertex_buffer_info_get_size } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Str_buffer_mesh_names_get_by_idx } from "../../Core/StringBuffer.js";
-import { CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { GetRandomColor } from "../../../Helpers/Helpers.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
-import { Renderqueue_get, Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
 
 
 
@@ -2521,7 +2520,7 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
    if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
    else buffer_info.SetText(text);
 
-   scroller.Recalc();
+   // scroller.Recalc();
 
 }
 
@@ -2686,7 +2685,7 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
    if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
    else buffer_info.SetText(text);
 
-   scroller.Recalc();
+   // scroller.Recalc();
 
 }
 

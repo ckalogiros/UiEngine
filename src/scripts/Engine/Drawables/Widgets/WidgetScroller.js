@@ -5,13 +5,13 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Mesh_per_vb_remove_all_from_index, Movey_from_widget_root_buffer, Widget_root_add_mesh, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { Widget_root_add_mesh, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Clampx_from_group,Clipy_from_group } from "../Operations/Clip.js";
-import { BLUEL, BLUE_10_120_220, GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
+import { BLUEL, GREY } from "../Material/Base/Colors.js";
 import { View_movey_group, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
-import { Listener_destroy_children_buffer, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
+import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 import { Gl_set_dim_XY, Gl_set_dim_Y, Gl_set_wpos_X, Gl_set_wpos_XY, Gl_set_wpos_Y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 

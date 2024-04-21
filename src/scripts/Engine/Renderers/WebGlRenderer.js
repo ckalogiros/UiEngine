@@ -50,6 +50,15 @@ import { Performance_timer_start, Performance_timer_stop } from "../Timers/Perfo
 // TODO: Make PLATFORM, Device and VIEWPORT private to Renderer???
 
 
+var _renderer = null;
+
+export function Renderer_create_renderer(scene, camera){
+   _renderer = new WebGlRenderer(scene, camera);
+   return _renderer;
+}
+
+
+
 export class WebGlRenderer {
 
    scene;
@@ -233,7 +242,6 @@ export class WebGlRenderer {
       VIEWPORT.centerX = VIEWPORT.LEFT + (VIEWPORT.WIDTH / 2);
       VIEWPORT.centerY = VIEWPORT.TOP + (VIEWPORT.HEIGHT / 2);
 
-      VIEWPORT.ASPECT_RATIO = this.canvas.width / this.canvas.height;
       VIEWPORT.MARGIN.LEFT = (window.innerWidth - VIEWPORT.WIDTH) / 2;
       VIEWPORT.MARGIN.TOP = (window.innerHeight - VIEWPORT.HEIGHT) / 2
       // VIEWPORT.MARGIN.LEFT = (window.outerWidth - (window.innerWidth - VIEWPORT.WIDTH))/2;
@@ -245,6 +253,31 @@ export class WebGlRenderer {
 
    }
 
+}
+
+
+
+export function On_window_resize(){
+
+      Device.width = window.innerWidth;
+      Device.height = window.innerHeight;
+
+      // Update (global) VIEWPORT object
+      VIEWPORT.WIDTH = _renderer.canvas.width;
+      VIEWPORT.HEIGHT = _renderer.canvas.height;
+
+      VIEWPORT.LEFT = 0;
+      VIEWPORT.RIGHT = _renderer.canvas.width;
+      VIEWPORT.TOP = 0;
+      VIEWPORT.BOTTOM = _renderer.canvas.height;
+      VIEWPORT.centerX = VIEWPORT.LEFT + (VIEWPORT.WIDTH / 2);
+      VIEWPORT.centerY = VIEWPORT.TOP + (VIEWPORT.HEIGHT / 2);
+
+      VIEWPORT.MARGIN.LEFT = (window.innerWidth - VIEWPORT.WIDTH) / 2;
+      VIEWPORT.MARGIN.TOP = (window.innerHeight - VIEWPORT.HEIGHT) / 2
+
+      POSITION_CENTER[0] = VIEWPORT.WIDTH / 2;
+      POSITION_CENTER[1] = VIEWPORT.HEIGHT / 2;
 }
 
 

@@ -1,6 +1,6 @@
 "use strict";
 
-import { M_Buffer, New_generic_buffer } from "../../Core/Buffers";
+import { New_generic_buffer } from "../../Core/Buffers.js";
 
 
 

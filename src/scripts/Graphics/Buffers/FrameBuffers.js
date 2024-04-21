@@ -1,10 +1,10 @@
 "use strict";
 
-import { GfxExists_rename_me, Temp_Create_child_gfx_rename_me } from "../../Engine/Drawables/Meshes/Base/Mesh";
-import { Texture_create_renderbuffer_texture, Texture_set_texture_name } from "../../Engine/Loaders/Textures/Texture";
-import { Gl_draw_specific } from "../GlDraw";
-import { Create_mesh_for_framebuffer } from "../../Engine/Drawables/Meshes/FramebufferMesh";
-import { Str_buffer_change } from "../../Engine/Core/StringBuffer";
+import { GfxExists_rename_me, Temp_Create_child_gfx_rename_me } from "../../Engine/Drawables/Meshes/Base/Mesh.js";
+import { Texture_create_renderbuffer_texture, Texture_set_texture_name } from "../../Engine/Loaders/Textures/Texture.js";
+import { Gl_draw_specific } from "../GlDraw.js";
+import { Create_mesh_for_framebuffer } from "../../Engine/Drawables/Meshes/FramebufferMesh.js";
+import { Str_buffer_change } from "../../Engine/Core/StringBuffer.js";
 
 // SEE: ## Framebuffer VS Renderbuffer
 

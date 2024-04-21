@@ -1,4 +1,4 @@
-// "use strict";
+"use strict";
 
 
 
@@ -263,7 +263,7 @@ export class M_Buffer {
       // Realloc
       if (idx >= this.size) {
 
-         console.error('INFORMATIVE_ERROR\nAddAtIndex().\nNot enough size in Buffer.\nAdding item at: ', idx, ' buffer size:', this.size - 1, '\nCalling Realloc()');
+         // console.error('INFORMATIVE_ERROR\nAddAtIndex().\nNot enough size in Buffer.\nAdding item at: ', idx, ' buffer size:', this.size - 1, '\nCalling Realloc()');
 
          const new_idx = this.Realloc(); // buffer is full.
          this.buffer[new_idx] = elem;

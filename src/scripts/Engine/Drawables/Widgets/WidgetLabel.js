@@ -1,7 +1,7 @@
 "use strict";
 
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
-import { AddArr2, CopyArr2, Floor } from "../../../Helpers/Math/MathOperations.js";
+import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
@@ -9,11 +9,11 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/Tim
 import { Rect } from "../Meshes/Rect_Mesh.js";
 import { Align_self_get_dif } from "../Operations/Alignment.js";
 import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
-import { Gl_set_alpha_from_offset, Gl_set_dim_X, Gl_set_dim_XY, Gl_set_wpos_X, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 

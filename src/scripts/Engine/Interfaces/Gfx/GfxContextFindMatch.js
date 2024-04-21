@@ -1,9 +1,11 @@
 "use strict";
 
-import { Vertex_buffer_exists_from_index, Vertex_buffer_get, Vertex_buffer_info_get_sid } from "../../../Graphics/Buffers/VertexBuffers";
-import { Program_program_exists_from_index, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms";
-import { Widget_root_gfx_get_structured } from "../../Core/MeshBuffer";
-import { View_get_view_byidx } from "../../Core/MeshBufferViews";
+import { Vertex_buffer_exists_from_index, Vertex_buffer_info_get_sid } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Program_program_exists_from_index } from "../../../Graphics/ShaderPrograms.js";
+import { Widget_root_gfx_get_structured } from "../../Core/MeshBuffer.js";
+
+
+
 
 const GFX_CONEXT_DEBUG = false;
 

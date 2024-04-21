@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_get_by_vbidx, Vertex_buffer_state_enable } from "./VertexBuffers";
+import { Vertex_buffer_get_by_vbidx, Vertex_buffer_state_enable } from "./VertexBuffers.js";
 
 
 

@@ -1,7 +1,7 @@
 "use strict";
 
-import { Vertex_buffer_info_get_render_queueidx, Vertex_buffer_info_set_render_queueidx } from "../../../Graphics/Buffers/VertexBuffers";
-import { NOTIFICATION_TYPE, Notifications_send } from "../../Drawables/DebugInfo/DebugInfoUiNotifications";
+import { Vertex_buffer_info_get_render_queueidx, Vertex_buffer_info_set_render_queueidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { NOTIFICATION_TYPE, Notifications_send } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 
 
 

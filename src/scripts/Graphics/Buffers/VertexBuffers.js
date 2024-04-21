@@ -1,15 +1,15 @@
 "use strict";
 
 
-import { New_generic_buffer } from "../../Engine/Core/Buffers";
-import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex } from "../ShaderAttributes";
-import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index } from "../ShaderPrograms";
-import { Typed_array_create_from_type } from "./TypedArrayBuffers";
-import { Gl_operation_add } from "./VertexBuffersOps";
-import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays";
-import { Floor } from "../../Helpers/Math/MathOperations";
-import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers";
-import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications";
+import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
+import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex } from "../ShaderAttributes.js";
+import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index } from "../ShaderPrograms.js";
+import { Typed_array_create_from_type } from "./TypedArrayBuffers.js";
+import { Gl_operation_add } from "./VertexBuffersOps.js";
+import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays.js";
+import { Floor } from "../../Helpers/Math/MathOperations.js";
+import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers.js";
+import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js";
 
 
 

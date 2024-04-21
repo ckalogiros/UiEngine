@@ -1,7 +1,7 @@
 "use strict";
 
-import { New_generic_buffer  } from "../Engine/Core/Buffers";
-import { Str_buffer_get_by_idx, Str_buffer_store } from "../Engine/Core/StringBuffer";
+import { New_generic_buffer  } from "../Engine/Core/Buffers.js";
+import { Str_buffer_get_by_idx, Str_buffer_store } from "../Engine/Core/StringBuffer.js";
 
 
 

@@ -3,7 +3,7 @@
 import { Gl_texture_unit_create } from "../../../Graphics/GlTextureUnit.js";
 import { Str_buffer_store } from "../../Core/StringBuffer.js";
 import { Font_create_uvmap } from "../Font/ChlumskyFontMetricsLoader.js";
-import { Font_init_fonts_storage_buffer, Font_is_loaded, Font_load_uvs, Font_retrieve_fontidx } from "../Font/Font.js";
+import { Font_init_fonts_storage_buffer, Font_load_uvs, Font_retrieve_fontidx } from "../Font/Font.js";
 import { ImageLoader } from "../ImageLoader.js";
 
 

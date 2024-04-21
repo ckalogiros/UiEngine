@@ -262,7 +262,7 @@ export function TimeIntervalsUpdateAll() {
 
 //  Returns the timeInterval index
 export function TimeIntervalsCreate(interval, name, repeat, clbk, params) {
-   console.log('INTERVAL create', name)
+   // console.log('INTERVAL create', name)
    return intervalTimers.Create(interval, name, repeat, clbk, params);
 }
 

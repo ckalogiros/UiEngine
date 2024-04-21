@@ -3,12 +3,12 @@ import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Listener_create_child_event, Listener_remove_child_event_from_parent, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
+import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
-import { Styles_hover_margin_create, Styles_hover_margin_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_create, Styles_margin_destroy, Styles_margin_get, Styles_margin_set, Styles_pad_create, Styles_pad_destroy, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
+import { Styles_batch_destroy_store, Styles_hover_margin_create, Styles_hover_margin_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_create, Styles_margin_destroy, Styles_margin_get, Styles_margin_set, Styles_pad_create, Styles_pad_destroy, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 
 
@@ -243,6 +243,8 @@ export class Mesh {
         Styles_hover_margin_destroy(this.styles[STYLES.HOVER_MARG]);
         Styles_pad_destroy(this.styles[STYLES.PAD]);
 
+        // Styles_batch_destroy_store();
+
         if(NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH)===0) 
             Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, this.mesh_bufferidx);
         
@@ -276,6 +278,7 @@ export class Mesh {
 
         }
         
+
         let shift_children = false; // A way to store and return if this was removed from paren's children so that the caller will reduce the i from the loop by 1.
         // Remove from parent's children buffer
         if (this.parent && this.parent !== NO_MESH_PARENT && this.idx !== INT_NULL) {
@@ -301,6 +304,7 @@ export class Mesh {
         return shift_children;
     }
 
+
     ActivateAndChildren() {
         this.state.mask |= MESH_STATE.ACTIVE;
         for (let i = 0; i <= this.children.boundary; i++) {
@@ -308,6 +312,7 @@ export class Mesh {
             child.state.mask |= MESH_STATE.ACTIVE;
         }
     }
+
 
     ActivateAndChildrenRecursive() {
         this.state.mask |= MESH_STATE.ACTIVE;
@@ -334,6 +339,9 @@ export class Mesh {
 
 
 
+
+
+
     /*******************************************************************************************************************************************************/
     /* Mesh State.
     /*******************************************************************************************************************************************************/
@@ -342,6 +350,9 @@ export class Mesh {
 
 
     StateCheck(bit) { return this.state.mask & bit; }
+
+
+
 
 
 
@@ -439,8 +450,11 @@ export class Mesh {
 
 
 
+
+
+
     /*******************************************************************************************************************************************************/
-    // Transformations   
+    // Transformations   Setters-Getters
     /*******************************************************************************************************************************************************/
 
     SetHoverColor() { this.SetUpdateFrameBuffer(); this.mat.SetHoverColor(this.gfx); }
@@ -519,6 +533,7 @@ export class Mesh {
 
     RotateZ(angle) { GlRotateZ2D(this.gfx, this.geom.dim, angle); }
     
+
     StylesGetMargin(axis=STYLES.AXIS.ALL){ return Styles_margin_get(axis, this.styles[STYLES.MARG]); }
 
 
@@ -537,13 +552,6 @@ export class Mesh {
     StylesSetPad(margin){ Styles_pad_set(this.styles[STYLES.MARG], margin); }
 
 
-
-
-
-    /*******************************************************************************************************************************************************/
-    // Setters-Getters    
-    /*******************************************************************************************************************************************************/
-
     SetUpdateFrameBuffer() {
         if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
     }
@@ -552,18 +560,6 @@ export class Mesh {
     SetName(name = null) {
         if (name !== '' && name) this.nameidx = Str_buffer_mesh_names_store(name, this.mesh_bufferidx, this.type & MESH_TYPE.DEBUG_MESH);
         /**DEBUG*/this.name = name
-    }
-
-
-    FindIdInChildren(id) {
-
-        for (let i = 0; i <= this.children.boundary; i++) {
-            const child = this.children.buffer[i];
-            if (child && id === child.id && child.StateCheck(MESH_STATE.IS_HOVERABLE)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -606,6 +602,8 @@ export class Mesh {
             default: console.error('Enable material\'s shader param failed. @ Material.js');
         }
     }
+
+
     EnableGfxUniforms(flags, name, type, shader_flags) {
 
         if (this.alreadyAdded === true) {
@@ -645,8 +643,6 @@ export class Mesh {
 
     }
 
-
-    OnFakeClick() { console.log('FAKE CLICK! : ', Mesh_buffer_get_mesh_byidx(this.meshidx.GetName())); }
 }
 
 
@@ -744,28 +740,5 @@ export function GfxExists_rename_me(gfx_buffer, gfx_indexes) {
 /******************************************************************************************************************************************************/
 // DEBUG PRINT
 
-export function Mesh_print_all_mesh_listeners() {
 
-    const children = Scenes_get_root_meshes(STATE.scene.active_idx);
-
-    if (children) Mesh_print_all_mesh_listeners_recursive(children);
-}
-
-
-
-function Mesh_print_all_mesh_listeners_recursive(meshes) {
-
-    for (let i = 0; i <= meshes.boundary; i++) {
-
-        const mesh = meshes.buffer[i];
-        if (mesh) {
-
-            if (mesh.children)
-                Mesh_print_all_mesh_listeners_recursive(mesh.children);
-
-            if (mesh.listeners.buffer)
-                console.log(`id:${mesh.id} name:${mesh.GetName()} boundary:${mesh.listeners.boundary}`, mesh.listeners.buffer);
-        }
-    }
-}
 

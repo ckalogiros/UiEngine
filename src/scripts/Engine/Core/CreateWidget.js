@@ -1,16 +1,16 @@
-import { Mesh_buffer_get } from "./MeshBuffer";
+import { Mesh_buffer_get } from "./MeshBuffer.js";
 import { Section } from "../Drawables/Meshes/Section.js";
 import { Widget_Label } from "../Drawables/Widgets/WidgetLabel.js";
 import { Widget_Button, Widget_Switch } from "../Drawables/Widgets/WidgetButton.js";
 import { Widget_Multi_Text, Widget_Text } from "../Drawables/Widgets/WidgetText.js";
 import { Widget_Scroller } from "../Drawables/Widgets/WidgetScroller.js";
 import { Widget_Slider } from "../Drawables/Widgets/WidgetSlider.js";
-import { Widget_Dropdown } from "../Drawables/Widgets/Widget_Dropdown";
-import { Rect } from "../Drawables/Meshes/Rect_Mesh";
-import { Text_Mesh } from "../Drawables/Meshes/Text_Mesh";
-import { Close_Button, Widget_Menu_Bar, Widget_Minimize } from "../Drawables/Widgets/WidgetMenu";
-import { Widget_Switch_Simple } from "../Drawables/Widgets/WidgetSwitch";
-import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications";
+import { Widget_Dropdown } from "../Drawables/Widgets/Widget_Dropdown.js";
+import { Rect } from "../Drawables/Meshes/Rect_Mesh.js";
+import { Text_Mesh } from "../Drawables/Meshes/Text_Mesh.js";
+import { Close_Button, Widget_Menu_Bar, Widget_Minimize } from "../Drawables/Widgets/WidgetMenu.js";
+import { Widget_Switch_Simple } from "../Drawables/Widgets/WidgetSwitch.js";
+import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 
 /**
  * All Functions to create widgets.

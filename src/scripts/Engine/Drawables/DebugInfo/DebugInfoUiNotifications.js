@@ -1,7 +1,7 @@
 "use strict";
 
-import { New_generic_buffer } from "../../Core/Buffers";
-import { Dbg_ui_init_buffer_entries, Dbg_ui_store_changes } from "./DebugInfoUi";
+import { New_generic_buffer } from "../../Core/Buffers.js";
+import { Dbg_ui_init_buffer_entries, Dbg_ui_store_changes } from "./DebugInfoUi.js";
 
 
 _CNT = 0x1;

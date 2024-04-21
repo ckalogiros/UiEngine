@@ -5,9 +5,10 @@ import { MouseGetPos } from "../Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
-import { Info_listener_create_event, Info_listener_dispatch_event } from "../Drawables/DebugInfo/InfoListeners.js";
+import { Info_listener_create_event } from "../Drawables/DebugInfo/InfoListeners.js";
 import { GREY } from "../Drawables/Material/Base/Colors.js";
-import { Mesh_buffer_get_mesh_bounding_box, Mesh_buffer_get_mesh_bounding_box_with_hover_margin, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_geometry, Mesh_buffer_get_mesh_name_byidx } from "../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_bounding_box_with_hover_margin, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_name_byidx } from "../Core/MeshBuffer.js";
+import { Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 
 
 
@@ -71,11 +72,13 @@ const _listeners_buffer_view_storage = New_generic_buffer();
 
 
 export function Listener_get_parent_event(TYPE_IDX, idx) {
-   // if(_listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx]===null || _listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx]===_)
-   // console.log()
    const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].parent_idx;
    return parent_event;
 }
+
+
+
+
 export function Listener_get_parent_event_meshidx(TYPE_IDX, idx) {
    const parent_idx = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].parent_idx;
    const parent_meshidx = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_idx].meshidx;
@@ -116,8 +119,6 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
 
       // Get the parent event.
       const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_event_idx];
-      // if(!parent_event)
-      // console.log(parent_event_idx)
 
       if (parent_event.view && !parent_event.view.children) {
          parent_event.view.children = New_generic_buffer(_, 'parent_event.children');
@@ -155,6 +156,17 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
 /**********************************************************************************************************************************************************/
 // Destroy Listener
 
@@ -189,7 +201,7 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
 
    }
 
-   // Listener_debug_print_info_e1()
+   // Listener_debug_print_view_recursive()
 
    // HERE: We need to run a recursive loop in view storage buffer, to remove all childs from the events storage buffer
 
@@ -201,6 +213,9 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
       LISTENERS_FLAGS[TYPE_IDX] = false;
 
 }
+
+
+
 
 function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
 
@@ -228,6 +243,15 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
 
 
 
+
+
+
+
+
+
+
+
+
 /**********************************************************************************************************************************************************/
 // HOVER CHECK
 
@@ -240,16 +264,48 @@ export function Listener_dispatch_check_hover_event() {
 
    let intersects = false;
 
+   if(STATE.mesh.focused){
+      
+      const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(STATE.mesh.focusedIdx);
+      const point = MouseGetPos();
+
+      // If and only if mouse is intersecting with the current mesh(mouse hover) ...
+      intersects = Intersection_point_rect(point, bounding_box);
+
+      if (intersects) {
+
+         const mesh = Mesh_buffer_get_mesh_byidx(STATE.mesh.focusedIdx);
+         const event = _listeners_buffer_storage.buffer[E.H].buffer[mesh.listeners.buffer[E.H]];
+
+         if(event){
+
+            if(event.view.children){
+   
+               if (Check_hover_recursive(event.view.children, point)) {
+                  // intersects = true;
+                  return;
+               }
+            }
+   
+            Events_handle_immidiate({ type: 'hover', params: { mesh: mesh } });
+         }
+
+         return;
+      }
+   }
+
    for (let i = 0; i <= view_buffer.boundary; i++) {
 
       if (view_buffer.buffer[i]) {
+
          const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(view_buffer.buffer[i].meshidx);
-         if (bounding_box === false) {
+         const point = MouseGetPos();
+         
+         /**DEBUG*/if (bounding_box === false) {
             console.log('i', i, 'view_buffer.buffer[i]', view_buffer.buffer[i], 'view_buffer', view_buffer);
             STATE.loop.paused = true;
             return;
          }
-         const point = MouseGetPos();
 
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
@@ -295,6 +351,7 @@ export function Listener_dispatch_check_hover_event() {
 
 
 
+
 function Check_hover_recursive(view_children, point) {
 
    for (let i = 0; i <= view_children.boundary; i++) {
@@ -329,6 +386,22 @@ function Check_hover_recursive(view_children, point) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**********************************************************************************************************************************************************/
 // CLICK CHECK(Only click for now)
 
@@ -336,9 +409,73 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.EventListener);
 
-   const view_buffer = _listeners_buffer_view_storage.buffer[TYPE_IDX];
+   let view_buffer = _listeners_buffer_view_storage.buffer[TYPE_IDX];
 
    let intersects = false;
+
+
+   if(STATE.mesh.focused){
+      
+      const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(STATE.mesh.focusedIdx);
+      const point = MouseGetPos();
+
+      // If and only if mouse is intersecting with the current mesh(mouse hover) ...
+      intersects = Intersection_point_rect(point, bounding_box);
+
+      if (intersects) {
+
+         const mesh = Mesh_buffer_get_mesh_byidx(STATE.mesh.focusedIdx);
+         const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[mesh.listeners.buffer[TYPE_IDX]];
+
+         if(event.view.children){
+
+            const event_found = Check_child_events_recursive(event.view.children, point);
+            if (event_found) {
+
+               // Get the the event (which has all the event data) from the listeners storage buffer
+               const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_found.idx];
+
+               const dispatch_params = {
+                  meshidx: event.meshidx,
+                  evt_params: event.evt_params,
+                  trigger_params: trigger_params,
+                  event_type: TYPE_IDX,
+               }
+
+               if (event.Clbk) {
+
+                  event.Clbk(dispatch_params);
+                  Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+
+                  // const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
+                  // STATE.mesh.SetFocused(mesh);
+                  return; // Return if at least one event is handled. Also return so that any event of the main event will not run.
+               }
+            }
+         }
+
+         // Else handle this event
+         if (event.Clbk) {
+            // Else if no children event was triggered, run any events of the main event.
+            const dispatch_params = {
+               meshidx: event.meshidx,
+               evt_params: event.evt_params,
+               trigger_params: trigger_params,
+               event_type: TYPE_IDX,
+            }
+
+            event.Clbk(dispatch_params); // Call the event
+            Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+
+            // const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
+            // STATE.mesh.SetFocused(mesh);
+
+         } 
+         return;
+      }
+
+
+   }
 
    for (let i = 0; i <= view_buffer.boundary; i++) {
 
@@ -346,9 +483,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
          const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(view_buffer.buffer[i].meshidx);
          const point = MouseGetPos();
-
-         const name = Mesh_buffer_get_mesh_name_byidx(view_buffer.buffer[i].meshidx)
-
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          intersects = Intersection_point_rect(point, bounding_box);
@@ -377,8 +511,8 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                      event.Clbk(dispatch_params);
                      Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
 
-                     const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
-                     STATE.mesh.SetFocused(mesh);
+                     // const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
+                     // STATE.mesh.SetFocused(mesh);
                      return; // Return if at least one event is handled. Also return so that any event of the main event will not run.
                   }
                }
@@ -401,8 +535,8 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                event.Clbk(dispatch_params); // Call the event
                Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
 
-               const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
-               STATE.mesh.SetFocused(mesh);
+               // const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
+               // STATE.mesh.SetFocused(mesh);
 
                return;
             }
@@ -415,6 +549,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
 
 
+
 function Check_child_events_recursive(view_children, point) {
 
    for (let i = 0; i <= view_children.boundary; i++) {
@@ -424,7 +559,7 @@ function Check_child_events_recursive(view_children, point) {
 
          const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(child_evt.meshidx);
 
-         const name = Mesh_buffer_get_mesh_name_byidx(child_evt.meshidx)
+         // const name = Mesh_buffer_get_mesh_name_byidx(child_evt.meshidx)
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          const intersects = Intersection_point_rect(point, bounding_box);
@@ -464,293 +599,37 @@ function Check_child_events_recursive(view_children, point) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// TODO: Maybe the meshidx and target params are just mesh_bufferidxs
-// export class Event_Listener {
-
-//    event_type;
-
-//    constructor() {
-
-//       this.event_type = new Array(LISTEN_EVENT_TYPES_INDEX.SIZE);
-//    }
-
-
-//    AddEvent(TYPE_IDX, meshidx = null, Clbk = null, evt_params = null) {
-
-//       if (this.event_type[TYPE_IDX] === undefined) {
-//          this.event_type[TYPE_IDX] = New_generic_buffer(_, 'Event Listeners buffer');
-//       }
-
-
-//       const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-//       const event_params = {
-//       /**DEBUG */name: (mesh) ? mesh.GetName() : 'NO SOURCE PARAMS',
-//          type: TYPE_IDX,
-//          Clbk: Clbk,
-//          evt_idx: INT_NULL,
-//          parent_evt: INT_NULL,
-//          meshidx: meshidx,
-//          evt_params: evt_params,
-//          isActive: false, // UNUSED: TODO: Make use of the is Active or remove it.
-//          children: null, // current mesh may have children with events. This is the buffer to store them, but only after 'ReconstructEvents' function call.
-//          has_child_events: false, // This is to check if the current event has any children events(eficient since we do not have to check every child event if 'isActive')
-//       }
-
-//       LISTENERS_FLAGS[TYPE_IDX] = true;
-//       event_params.evt_idx = this.event_type[TYPE_IDX].Add(event_params);
-
-//       if (mesh.debug_info.type === 0)
-//          Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.LISTENERS, event_params);
-
-//       return this.event_type[TYPE_IDX].buffer[event_params.evt_idx];
-//    }
-
-
-//    AddChildEvent(TYPE_IDX, meshidx = null, Clbk = null, evt_params = null, parent_event = null) {
-
-//       if (this.event_type[TYPE_IDX] === undefined) {
-
-//          console.log('Creating new event type events buffer')
-//          this.event_type[TYPE_IDX] = New_generic_buffer(_, 'Child Event Listeners buffer 1');
-//       }
-
-//       const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-//       const event_params = {
-//       /**DEBUG */name: (mesh) ? mesh.GetName() : 'NO SOURCE PARAMS',
-//          type: TYPE_IDX,
-//          Clbk: Clbk,
-//          evt_idx: INT_NULL,
-//          parent_evt: parent_event,
-//          meshidx: meshidx,
-//          evt_params: evt_params,
-//          isActive: true,
-//          children: null, // current mesh may have children with events. This is the buffer to store them, but only after 'ReconstructEvents' function call.
-//          has_child_events: false, // This is to check if the current event has any children events(eficient since we do not have to check every child event if 'isActive')
-//       }
-
-//       LISTENERS_FLAGS[TYPE_IDX] = true;
-//       const event = parent_event;
-
-
-//       if (!event.children) {
-//          event.children = New_generic_buffer(_, 'Child Event Listeners buffer 2');
-//       }
-
-//       event_params.evt_idx = event.children.Add(event_params);
-//       event.has_child_events = true;
-
-//       if (mesh.debug_info.type === 0)
-//          Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.LISTENERS, event_params);
-
-//       return event.children.buffer[event_params.evt_idx];
-//    }
-
-
-//    CopyChildren(TYPE_IDX, event_idx) {
-
-//       const children_events = this.event_type[TYPE_IDX].buffer[event_idx].children;
-//       const temp = New_generic_buffer(_, 'Listeners buffer COPY TEM buffer');
-
-//       for (let i = 0; i <= children_events.boundary; i++) {
-
-//          const evt = children_events.buffer[i];
-
-//          const event_params = {
-//             type: evt.type,
-//             Clbk: evt.Clbk,
-//             meshidx: evt.meshidx,
-//             evt_params: evt.evt_params,
-//             isActive: evt.isActive,
-//             children: null, // TODO: MUST COPY ALL CHILDRENS BUFFER RECURSIVELY???
-//             has_child_events: evt.has_child_events,
-//          }
-
-//          temp.Add(event_params);
-//       }
-//       return temp;
-//    }
-
-
-//    /** Debug */
-//    PrintAll() {
-//       console.log('Listener: ', view_buffer.buffer)
-//    }
-
-// }
-
-
-
-// export function Listeners_copy_event_children_buffer(TYPE_IDX, event_idx) { return _listener.CopyChildren(TYPE_IDX, event_idx); }
-
-
-
-
-
-// const _listener = new Event_Listener();
-
-
-
-// export function Listeners_get_event(TYPE_IDX, event_idx) { return view_buffer.buffer[TYPE_IDX].buffer[event_idx]; }
-
-
-
-
 /**********************************************************************************************************************************************************/
-// CLICK CHECK(Only click for now)
+// Misc
 
-// export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
+export function Listener_set_root_mesh_priority() {
 
+   // Set render priority of all widget root meshes, based on their position in the listeners view buffer 
+   for (let i=0; i <= _listeners_buffer_view_storage.boundary; i++ ){
+      
+      for (let j=0; j <= _listeners_buffer_view_storage.buffer[i].boundary; j++ ){
+   
+         const view_buffer = _listeners_buffer_view_storage.buffer[i].buffer[j];
+   
+         const mesh = Mesh_buffer_get_mesh_byidx(view_buffer.meshidx);
+   
+         Renderqueue_set_priority_by_vb(FIRST, mesh.gfx.vb.idx);
+      }
+   }
 
-//    // _pt_event_listener.timer.Start(); /* Performance measure */
-//    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.EventListener);
-
-//    if (view_buffer.buffer[TYPE_IDX] === undefined) return;
-//    /**DEBUG*/if (TYPE_IDX < 0 || TYPE_IDX >= LISTEN_EVENT_TYPES_INDEX.SIZE) alert('Event type index does not exist.');
-
-
-//    let intersected = false;
-
-//    for (let i = 0; i <= view_buffer.buffer[TYPE_IDX].boundary; i++) {
-
-//       const evt = view_buffer.buffer[TYPE_IDX].buffer[i];
-
-//       if (evt) {
-
-//          const mesh = Mesh_buffer_get_mesh_byidx(evt.meshidx);
-//          const point = MouseGetPos();
-//          const verticalMargin = mesh.hover_margin;
-
-//          const rect = [ // The rect area to check for event(mouse hover)
-//          [mesh.geom.pos[0] - mesh.geom.dim[0] - verticalMargin[0], mesh.geom.pos[0] + mesh.geom.dim[0] + verticalMargin[0]], // Left  Right 
-//          [(mesh.geom.pos[1] - mesh.geom.dim[1]) - verticalMargin[1], (mesh.geom.pos[1] + mesh.geom.dim[1]) + verticalMargin[1]], // Top  Bottom
-//       ];
-
-//       // If and only if mouse is intersecting with the current mesh(mouse hover) ...
-//       intersected = Intersection_point_rect(point, rect);
-
-//       if (intersected) {
-
-//          if (evt.has_child_events) { // Check all of its children(recursively)
-//             const event_found = Check_child_events_recursive(evt, point);
-//             if (event_found) {
-
-//                const dispatch_params = {
-//                   meshidx: event_found.meshidx,
-//                   evt_params: event_found.evt_params,
-//                   trigger_params: trigger_params,
-//                   event_type: TYPE_IDX,
-//                }
-
-//                if (event_found.Clbk) {
-
-//                   event_found.Clbk(dispatch_params);
-//                   Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
-//                   // console.log('STOP111111')
-
-//                   const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
-//                   STATE.mesh.SetFocused(mesh);
-//                   return; // Return if at least one event is handled. Also return so that any event of the main event will not run.
-//                }
-//             }
-//          }
-
-//          if (evt.Clbk) {
-//             // Else if no children event was triggered, run any events of the main event.
-//             const dispatch_params = {
-//                meshidx: evt.meshidx,
-//                evt_params: evt.evt_params,
-//                trigger_params: trigger_params,
-//                event_type: TYPE_IDX,
-//             }
-
-//             evt.Clbk(dispatch_params);
-//             Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
-//             // console.log('STOP22222222222')
-
-//             const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
-//             STATE.mesh.SetFocused(mesh);
-
-//             return;
-//             }
-//          }
-//          mesh.SetUpdateFrameBuffer();
-//       }
-//    }
-
-//    // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
-//    // console.log('STOP333')
-
-// }
+}
 
 
 
-// function Check_child_events_recursive(evt, point) {
 
-//    let ret = null;
 
-//    for (let i = 0; i <= evt.children.boundary; i++) {
 
-//       const child_evt = evt.children.buffer[i];
-//       if (child_evt) {
 
-//          const mesh = Mesh_buffer_get_mesh_byidx(child_evt.meshidx);
-//          const verticalMargin = mesh.hover_margin;
 
-//          const rect = [ // The rect area to check for event(mouse hover)
-//             [mesh.geom.pos[0] - mesh.geom.dim[0] - verticalMargin[0], mesh.geom.pos[0] + mesh.geom.dim[0] + verticalMargin[0]], // Left  Right 
-//             [(mesh.geom.pos[1] - mesh.geom.dim[1]) - verticalMargin[1], (mesh.geom.pos[1] + mesh.geom.dim[1]) + verticalMargin[1]], // Top  Bottom
-//          ];
 
-//          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
-//          const intersects = Intersection_point_rect(point, rect);
 
-//          if (intersects && child_evt.has_child_events) { // Check all of its children(recursively)
-//             const ret = Check_child_events_recursive(child_evt, point)
-//             if (ret) return ret; // Because it a recursive procedure, when the mesh is found we must return it recursively immidiately after the return of the each recursion.
-//          }
-//          else{
 
-//             if (intersects && (mesh.StateCheck(MESH_STATE.IS_FAKE_EVENT) === 0)) { // 
-//                // console.log(mesh.GetName())
-//                return child_evt;
-//             }
-//             if (intersects) 
-//                return child_evt;
-//          }
-//       }
-//    }
 
-//    return null;
-// }
 
 
 
@@ -805,9 +684,11 @@ export function Listener_remove_child_event_from_parent(TYPE_IDX, evt) {
 
 
 
+
 export function Listener_destroy_children_buffer(TYPE_IDX, event_idx) {
    view_buffer.buffer[TYPE_IDX].buffer[event_idx].children = null;
 }
+
 
 
 
@@ -815,6 +696,7 @@ export function Listener_recover_children_buffer(TYPE_IDX, event_idx, children_b
    view_buffer.buffer[TYPE_IDX].buffer[event_idx].children = children_buffer;
    view_buffer.buffer[TYPE_IDX].buffer[event_idx].has_child_events = true;
 }
+
 
 
 
@@ -837,6 +719,7 @@ export function Listener_events_set_mesh_events_active(FLAGS, mesh_listeners, bo
       }
    }
 }
+
 
 
 
@@ -934,80 +817,21 @@ export function Listeners_debug_info_create(scene) {
 /**********************************************************************************************************************************************************/
 // Debug Print
 
-export function Debug_get_event_listeners() { return _listener; }
 
 
-
-export function Listener_debug_print_all() {
-
-   _listener.PrintAll();
-}
-
-
-
-// export function Listener_debug_print_info_e1() {
-
-//    const count = view_buffer.buffer.length;
-//    for (let i = 0; i < count; i++) {
-
-//       console.log('-Event type:', i);
-
-//       let events_count = 0;
-//       const e = view_buffer.buffer[i];
-//       if (e) {
-//          events_count += Listener_debug_print_info_recursive(e, events_count);
-//       }
-//       console.log(`+++ Total count:${events_count}`)
-//    }
-// }
-
-
-
-// function Listener_debug_print_info_recursive(children, count) {
-
-//    let total_count = 0;
-
-//    for (let i = 0; i <= children.boundary; i++) {
-
-//       const e = children.buffer[i];
-
-//       if (e) {
-
-//          let r = '  ';
-
-//          for (let j = 0; j < count; j++) { r += '->'; }
-
-//          const mesh = Mesh_buffer_get_mesh_byidx(e.meshidx);
-//          const is_child_event = (mesh.listeners.buffer[1]) ? mesh.listeners.buffer[1].is_child_event : false;
-//          const parentEvent = e.parent_event ? e.parent_event.GetName() : 'NULL'
-//          console.log(`${r} :(${mesh.GetName()})-(has children:${e.has_child_events})-(is child:${is_child_event})-(evtidx:${e.evt_idx})-(parent:${parentEvent})`);
-//          total_count++;
-
-//          if (e.children) {
-//             count++;
-//             total_count += Listener_debug_print_info_recursive(e.children, count);
-//             count--;
-//          }
-//       }
-//    }
-
-//    return total_count;
-// }
-
-
-export function Listener_debug_print_storage_buffer_e2() {
+export function Listener_debug_print_storage_buffer() {
 
    for (let i = 0; i <= _listeners_buffer_storage.boundary; i++) {
       console.log('Events Storage Buffer\n   ', _listeners_buffer_storage.buffer[i].buffer);
    }
 }
-export function Listener_debug_print_view_storage_buffer_e3() {
+export function Listener_debug_print_view_storage_buffer() {
 
    for (let i = 0; i <= _listeners_buffer_view_storage.boundary; i++) {
       console.log('Events Storage Buffer:type:', i, '\n   ', _listeners_buffer_view_storage.buffer[i].buffer);
    }
 }
-export function Listener_debug_print_info_e1() {
+export function Listener_debug_print_view_recursive() {
 
    for (let i = 0; i <= _listeners_buffer_view_storage.boundary; i++) {
 

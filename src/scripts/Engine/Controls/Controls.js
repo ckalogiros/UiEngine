@@ -1,6 +1,6 @@
 "use strict";
 
-import { MouseGetPosDif } from "./Input/Mouse";
+import { MouseGetPosDif } from "./Input/Mouse.js";
 
 /**
  * Contols-Input is set via a callback function or an object

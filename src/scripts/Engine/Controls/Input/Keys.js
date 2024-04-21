@@ -1,15 +1,13 @@
 "use strict";
 
-import { PrintAttributes, PrintIndexBuffer, PrintVertexBufferDataAndNames } from "../../../Graphics/Debug/GfxDebug.js";
-import { Listener_debug_print_all, Listener_debug_print_info_e1, Listener_debug_print_storage_buffer_e2, Listener_debug_print_view_storage_buffer_e3 } from "../../Events/EventListeners.js";
+import { Listener_debug_print_view_recursive, Listener_debug_print_storage_buffer, Listener_debug_print_view_storage_buffer } from "../../Events/EventListeners.js";
 import { Renderqueue_get } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scenes_get_scene_by_idx } from "../../Scenes.js";
 import { TimeIntervalsPrintAll } from "../../Timers/TimeIntervals.js";
-import { Mesh_print_all_mesh_listeners } from "../../Drawables/Meshes/Base/Mesh.js";
 import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
 import { Info_listener_print_buffer } from "../../Drawables/DebugInfo/InfoListeners.js";
-import { Mesh_buffer_print, Mesh_buffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widget_group_buffer_print_w5, Widgetroot_buffer_print_w6, Mesh_per_vb_print, Gfx_buffer_print_loop } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_print, Mesh_buffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widgetroot_buffer_print_w6, Mesh_per_vb_print, Gfx_buffer_print_loop } from "../../Core/MeshBuffer.js";
 import { Str_buffer_print, Str_buffer_mesh_names_print, Str_buffer_mesh_names_print_loop, Str_buffer_print_loop } from "../../Core/StringBuffer.js";
 import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js";
@@ -23,32 +21,21 @@ import { TEMP_dbg_info_ui_print_entries_table, TEMP_mesh_buffer_info_ui_print_en
 import { DEBUG_INFO_BUFFERS_PRINT, DEBUG_INFO_BUFFERS_PRINT2 } from "../../Core/Buffers.js";
 
 _CNT = 0;
-const em = _CNT++;
 const p = _CNT++;
-const x = _CNT++;
-const X = _CNT++;
-const c = _CNT++;
-const C = _CNT++;
-const z = _CNT++;
-const r = _CNT++;
-const R = _CNT++;
-const f = _CNT++;
-const F = _CNT++;
-const i = _CNT++;
-const b = _CNT++;
-const e1 = _CNT++;
-const e2 = _CNT++;
-const e3 = _CNT++;
-const m = _CNT++;
-const M = _CNT++;
+const a1 = _CNT++;
+const a2 = _CNT++;
+const r1 = _CNT++;
+const r2 = _CNT++;
+const f1 = _CNT++;
+const f2 = _CNT++;
+const i1 = _CNT++;
+const l1 = _CNT++;
+const l2 = _CNT++;
+const l3 = _CNT++;
+const s1 = _CNT++;
+const s2 = _CNT++;
 const s3 = _CNT++;
 const s4 = _CNT++;
-const s6 = _CNT++;
-const s7 = _CNT++;
-const s8 = _CNT++;
-const s9 = _CNT++;
-const L = _CNT++;
-const g = _CNT++;
 const dp = _CNT++;
 const il = _CNT++;
 const m1 = _CNT++;
@@ -62,14 +49,16 @@ const w6 = _CNT++;
 const va = _CNT++;
 const vb = _CNT++;
 const vi = _CNT++;
+const vp = _CNT++;
 const vs = _CNT++;
 const gs = _CNT++;
 const gw = _CNT++;
 const g1 = _CNT++;
 const g2 = _CNT++;
+const g3 = _CNT++;
+const g4 = _CNT++;
 const g5 = _CNT++;
 const g6 = _CNT++;
-const p1 = _CNT++;
 const t1 = _CNT++;
 const t2 = _CNT++;
 const t3 = _CNT++;
@@ -78,19 +67,11 @@ const t5 = _CNT++;
 const t6 = _CNT++;
 const y1 = _CNT++;
 const y2 = _CNT++;
-const b1 = _CNT++;
-const b2 = _CNT++;
+
 
 export const DEBUG_PRINT_KEYS = [
 
-   { 
-      key: 'em',
-      discr: 'Mesh_print_all_mesh_listeners',
-      func: (e)=>{
-         console.log('------------------ Mesh_print_all_mesh_listeners ------------------')
-         Mesh_print_all_mesh_listeners();
-      },
-   },
+
    {
       key: 'p',
       discr: 'PAUSE APP',
@@ -101,45 +82,23 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
-      key: 'x',
-      discr: 'Gl_vertex_buffer_print',
+      key: 'a1',
+      discr: 'DEBUG_INFO_BUFFERS_PRINT()',
       func: (e)=>{
-         console.log('------------------ EMPTY ------------------');
+         console.log('------------------ DEBUG_INFO_BUFFERS_PRINT() ------------------');
+         DEBUG_INFO_BUFFERS_PRINT();
       },
    },
    {
-      key: 'X',
-      discr: 'PrintVertexBufferDataAndNames',
+      key: 'a2',
+      discr: 'DEBUG_INFO_BUFFERS_PRINT2()',
       func: (e)=>{
-         console.log('------------------ PrintVertexBufferDataAndNames ------------------');
-         PrintVertexBufferDataAndNames();
+         console.log('------------------ DEBUG_INFO_BUFFERS_PRINT2() ------------------');
+         DEBUG_INFO_BUFFERS_PRINT2();
       },
    },
    {
-      key: 'c',
-      discr: 'EMPTY',
-      func: (e)=>{
-         console.log('------------------ EMPTY ------------------');
-      },
-   },
-   {
-      key: 'C',
-      discr: 'PrintIndexBuffer',
-      func: (e)=>{
-         console.log('------------------ PrintIndexBuffer ------------------');
-         PrintIndexBuffer();
-      },
-   },
-   {
-      key: 'z',
-      discr: 'PrintAttributes',
-      func: (e)=>{
-         console.log('------------------ PrintAttributes ------------------');
-         PrintAttributes();
-      },
-   },
-   {
-      key: 'r',
+      key: 'r1',
       discr: 'RenderQueue All',
       func: (e)=>{
          console.log('------------------ RenderQueue All ------------------');
@@ -147,7 +106,7 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
-      key: 'R',
+      key: 'r2',
       discr: 'RenderQueue Active',
       func: (e)=>{
          console.log('------------------ RenderQueue Active ------------------');
@@ -155,27 +114,23 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
-      key: 'f',
+      key: 'f1',
       discr: 'FramebufferPrintBuffer',
       func: (e)=>{
          console.log('------------------ FramebufferPrintBuffer ------------------');
          FramebufferPrintBuffer();
-         // const fps = FpsGet();
-         // console.log(`UNUSED: Used to be for Fps`)
       },
    },
    {
-      key: 'F',
+      key: 'f2',
       discr: 'FramebufferPrintBuffer',
       func: (e)=>{
          console.log('------------------ FramebufferPrintBuffer ------------------');
          FramebufferPrintBufferAll();
-         // const fps = FpsGet();
-         // console.log(`UNUSED: Used to be for Fps`)
       },
    },
    {
-      key: 'i',
+      key: 'i1',
       discr: 'TimeIntervalsPrintAll',
       func: (e)=>{
          console.log('------------------ TimeIntervalsPrintAll ------------------')
@@ -183,73 +138,34 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
-      key: 'b',
-      discr: 'EMPTY',
+      key: 'l1',
+      discr: 'Listener_debug_print_storage_buffer',
       func: (e)=>{
-         console.log('------------------ EMPTY ------------------')
-      },
-   },
-   {
-      key: 'e1',
-      discr: 'Listener_debug_print_info_e1',
-      func: (e)=>{
-         console.log('------------------ Listener_debug_print_all ------------------')
-         Listener_debug_print_info_e1();
+         console.log('------------------ Listener_debug_print_storage_buffer ------------------')
+         Listener_debug_print_storage_buffer();
 
       },
    },
    {
-      key: 'e2',
-      discr: 'Listener_debug_print_storage_buffer_e2',
+      key: 'l2',
+      discr: 'Listener_debug_print_view_storage_buffer',
       func: (e)=>{
-         console.log('------------------ Listener_debug_print_storage_buffer_e2 ------------------')
-         Listener_debug_print_storage_buffer_e2();
+         console.log('------------------ Listener_debug_print_view_storage_buffer ------------------')
+         Listener_debug_print_view_storage_buffer();
 
       },
    },
    {
-      key: 'e3',
-      discr: 'Listener_debug_print_view_storage_buffer_e3',
+      key: 'l3',
+      discr: 'Listener_debug_print_view_recursive',
       func: (e)=>{
-         console.log('------------------ Listener_debug_print_view_storage_buffer_e3 ------------------')
-         Listener_debug_print_view_storage_buffer_e3();
+         console.log('------------------ Listener_debug_print_view_recursive ------------------')
+         Listener_debug_print_view_recursive();
 
       },
    },
    {
-      key: 'm',
-      discr: 'EMPTY',
-      func: (e)=>{
-         console.log('------------------ EMPTY ------------------')
-      },
-   },
-   {
-      key: 'M',
-      discr: 'EMPTY',
-      func: (e)=>{
-         console.log('------------------ EMPTY ------------------')
-      },
-   },
-   {
-      key: 's3',
-      discr: 'Scene:PrintGfxStorageBuffer()',
-      func: (e)=>{
-         console.log('------------------ Scene:PrintGfxStorageBuffer ------------------');
-         const scene = Scenes_get_scene_by_idx(STATE.scene.active_idx);
-         scene.PrintGfxStorageBuffer();
-      },
-   },
-   {
-      key: 's4',
-      discr: 'Scene:PrintRootMeshBuffer()',
-      func: (e)=>{
-         console.log('------------------ Scene:PrintRootMeshBuffer ------------------');
-         const scene = Scenes_get_scene_by_idx(STATE.scene.active_idx);
-         scene.PrintRootMeshBuffer();
-      },
-   },
-   {
-      key: 's6',
+      key: 's1',
       discr: 'Str_buffer_print()',
       func: (e)=>{
          console.log('------------------ Str_buffer_print() ------------------');
@@ -257,7 +173,7 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
-      key: 's7',
+      key: 's2',
       discr: 'Str_buffer_print_loop()',
       func: (e)=>{
          console.log('------------------ Str_buffer_print_loop() ------------------');
@@ -265,7 +181,7 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
-      key: 's8',
+      key: 's3',
       discr: 'Str_buffer_mesh_names_print()',
       func: (e)=>{
          console.log('------------------ Str_buffer_mesh_names_print() ------------------');
@@ -273,27 +189,11 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
-      key: 's9',
+      key: 's4',
       discr: 'Str_buffer_mesh_names_print_loop()',
       func: (e)=>{
          console.log('------------------ Str_buffer_mesh_names_print_loop() ------------------');
          Str_buffer_mesh_names_print_loop();
-      },
-   },
-   {
-      key: 'L',
-      discr: 'NULL',
-      func: (e)=>{
-         console.log('------------------ UN-ASSIGNED ------------------');
-         // Listener_hover_Print();
-      },
-   },
-   {
-      key: 'g',
-      discr: 'Gfx_pool_print',
-      func: (e)=>{
-         console.log('------------------ Gfx_pool_print ------------------');
-         Gfx_pool_print();
       },
    },
    {
@@ -364,8 +264,8 @@ export const DEBUG_PRINT_KEYS = [
       key: 'w5',
       discr: 'Widget_group_buffer_print_w5',
       func: (e)=>{
-         console.log('------------------ Widget_group_buffer_print_w5() ------------------');
-         Widget_group_buffer_print_w5();
+         console.log('------------------ EMPTY ------------------');
+         // Widget_group_buffer_print_w5();
       },
    },
    {
@@ -398,6 +298,14 @@ export const DEBUG_PRINT_KEYS = [
       func: (e)=>{
          console.log('------------------ Gl_index_buffer_print() ------------------');
          Gl_index_buffer_print();
+      },
+   },
+   {
+      key: 'vp',
+      discr: 'Gl_program_print',
+      func: (e)=>{
+         console.log('------------------ Gl_program_print() ------------------');
+         Gl_program_print();
       },
    },
    {
@@ -441,6 +349,22 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
+      key: 'g3',
+      discr: 'EMPTY',
+      func: (e)=>{
+         console.log('------------------ EMPTY ------------------');
+         Mesh_per_vb_print()
+      },
+   },
+   {
+      key: 'g4',
+      discr: 'EMPTY',
+      func: (e)=>{
+         console.log('------------------ EMPTY ------------------');
+
+      },
+   },
+   {
       key: 'g5',
       discr: 'View_buffer_print',
       func: (e)=>{
@@ -454,14 +378,6 @@ export const DEBUG_PRINT_KEYS = [
       func: (e)=>{
          console.log('------------------ View_buffer_print_loop ------------------');
          View_buffer_print_loop()
-      },
-   },
-   {
-      key: 'p1',
-      discr: 'Gl_program_print',
-      func: (e)=>{
-         console.log('------------------ Gl_program_print() ------------------');
-         Gl_program_print();
       },
    },
    {
@@ -528,22 +444,7 @@ export const DEBUG_PRINT_KEYS = [
          TEMP_mesh_buffer_info_ui_print_entries_table();
       },
    },
-   {
-      key: 'b1',
-      discr: 'DEBUG_INFO_BUFFERS_PRINT()',
-      func: (e)=>{
-         console.log('------------------ DEBUG_INFO_BUFFERS_PRINT() ------------------');
-         DEBUG_INFO_BUFFERS_PRINT();
-      },
-   },
-   {
-      key: 'b2',
-      discr: 'DEBUG_INFO_BUFFERS_PRINT2()',
-      func: (e)=>{
-         console.log('------------------ DEBUG_INFO_BUFFERS_PRINT2() ------------------');
-         DEBUG_INFO_BUFFERS_PRINT2();
-      },
-   },
+
 
 
 ];
@@ -574,45 +475,37 @@ export function OnKeyUp(e){
 
    if(len === 1){
       
-      if (_keys_buffer[0].key === 'e' && _keys_buffer[1].key === 'm') { 
-         
-         const idx = 'e'.charCodeAt(0) + 'm'.charCodeAt(0) - CHAR_ARRAY_LETTERS_START_OFFSET;
-         DEBUG_PRINT_KEYS[em].func(e);  
+      if  (_keys_buffer[0].key === 'r') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[r1].func(e);  
+         else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[r2].func(e);  
       }
-      else if  (_keys_buffer[len].key === 'M' && _keys_buffer[0].key === 'Shift') { 
-         DEBUG_PRINT_KEYS[M].func(e); 
+      else if  (_keys_buffer[0].key === 'a') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[a1].func(e);  
+         if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[a2].func(e);  
       }
-      else if  (_keys_buffer[len].key === 'S' && _keys_buffer[0].key === 'Shift') { 
-         DEBUG_PRINT_KEYS[S].func(e); 
+      else if  (_keys_buffer[0].key === 'f') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[f1].func(e);  
+         else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[f2].func(e);  
       }
-      else if  (_keys_buffer[len].key === 'L' && _keys_buffer[0].key === 'Shift') { 
-         DEBUG_PRINT_KEYS[L].func(e); 
+      else if  (_keys_buffer[0].key === 'i') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[i1].func(e);  
+         // else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[i2].func(e);  
       }
-      else if  (_keys_buffer[len].key === 'R' && _keys_buffer[0].key === 'Shift') { 
-         DEBUG_PRINT_KEYS[R].func(e);  
-      }
-      else if  (_keys_buffer[len].key === 'X' && _keys_buffer[0].key === 'Shift') { 
-         DEBUG_PRINT_KEYS[X].func(e);  
-      }
-      else if  (_keys_buffer[len].key === 'C' && _keys_buffer[0].key === 'Shift') { 
-         DEBUG_PRINT_KEYS[C].func(e);  
-      }
-      else if  (_keys_buffer[0].key === 'e') { 
-         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[e1].func(e);  
-         else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[e2].func(e);  
-         else if  (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[e3].func(e);  
-      }
-      else if  (_keys_buffer[len].key === 'F' && _keys_buffer[0].key === 'Shift') { 
-         DEBUG_PRINT_KEYS[F].func(e);  
+      else if  (_keys_buffer[0].key === 'l') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[l1].func(e);  
+         else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[l2].func(e);  
+         else if  (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[l3].func(e);  
       }
       else if  (_keys_buffer[0].key === 's') { 
-
-         if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[s3].func(e);  
-         else if  (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[s4].func(e);  
-         else if  (_keys_buffer[len].key === '6') DEBUG_PRINT_KEYS[s6].func(e);  
-         else if  (_keys_buffer[len].key === '7') DEBUG_PRINT_KEYS[s7].func(e);  
-         else if  (_keys_buffer[len].key === '8') DEBUG_PRINT_KEYS[s8].func(e);  
-         else if  (_keys_buffer[len].key === '9') DEBUG_PRINT_KEYS[s9].func(e);  
+         
+         if  (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[s6].func(e);  
+         else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[s7].func(e);  
+         else if  (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[s8].func(e);  
+         else if  (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[s9].func(e);  
+      }
+      else if  (_keys_buffer[0].key === 'm') { 
+         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[m1].func(e);  
+         else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[m2].func(e);  
       }
       else if  (_keys_buffer[0].key === 'd' && _keys_buffer[1].key === 'p') { 
          DEBUG_PRINT_KEYS[dp].func(e);  
@@ -620,13 +513,6 @@ export function OnKeyUp(e){
       else if  (_keys_buffer[0].key === 'i' && _keys_buffer[1].key === 'l') { 
          DEBUG_PRINT_KEYS[il].func(e);  
       }
-      else if  (_keys_buffer[0].key === 'm' && _keys_buffer[1].key === '1') { 
-         DEBUG_PRINT_KEYS[m1].func(e);  
-      }
-      else if  (_keys_buffer[0].key === 'm' && _keys_buffer[1].key === '2') { 
-         DEBUG_PRINT_KEYS[m2].func(e);  
-      }
-      // else if  (_keys_buffer[0].key === 'w' && _keys_buffer[1].key === '1') { 
       else if  (_keys_buffer[0].key === 'w') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[w1].func(e);  
          else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[w2].func(e);  
@@ -639,6 +525,7 @@ export function OnKeyUp(e){
          if       (_keys_buffer[len].key === 'a') DEBUG_PRINT_KEYS[va].func(e);  
          else if       (_keys_buffer[len].key === 'b') DEBUG_PRINT_KEYS[vb].func(e);  
          else if       (_keys_buffer[len].key === 'i') DEBUG_PRINT_KEYS[vi].func(e);  
+         else if       (_keys_buffer[len].key === 'p') DEBUG_PRINT_KEYS[vp].func(e);  
          else if       (_keys_buffer[len].key === 's') DEBUG_PRINT_KEYS[vs].func(e);  
       }
       else if  (_keys_buffer[0].key === 't') { 
@@ -654,35 +541,33 @@ export function OnKeyUp(e){
          else if       (_keys_buffer[len].key === 'w') DEBUG_PRINT_KEYS[gw].func(e);  
          else if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[g1].func(e);  
          else if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[g2].func(e);  
+         else if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[g2].func(e);  
+         else if       (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[g2].func(e);  
          else if       (_keys_buffer[len].key === '5') DEBUG_PRINT_KEYS[g5].func(e);  
          else if       (_keys_buffer[len].key === '6') DEBUG_PRINT_KEYS[g6].func(e);  
-      }
-      else if  (_keys_buffer[0].key === 'p') { 
-         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[p1].func(e);  
       }
       else if  (_keys_buffer[0].key === 'y') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[y1].func(e);  
          if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[y2].func(e);  
       }
-      else if  (_keys_buffer[0].key === 'b') { 
-         if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[b1].func(e);  
-         if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[b2].func(e);  
-      }
+
 
    }
    else if(len === 0){
 
-      if       (_keys_buffer[len].key === 'p') { DEBUG_PRINT_KEYS[p].func(e);  }
-      else if  (_keys_buffer[len].key === 'x') { DEBUG_PRINT_KEYS[x].func(e);  }
-      else if  (_keys_buffer[len].key === 'c') { DEBUG_PRINT_KEYS[c].func(e);  }
-      else if  (_keys_buffer[len].key === 'z') { DEBUG_PRINT_KEYS[z].func(e);  }
-      else if  (_keys_buffer[len].key === 'r') { DEBUG_PRINT_KEYS[r].func(e);  }
-      else if  (_keys_buffer[len].key === 'f') { DEBUG_PRINT_KEYS[f].func(e);  }
-      else if  (_keys_buffer[len].key === 'i') { DEBUG_PRINT_KEYS[i].func(e);  }
-      else if  (_keys_buffer[len].key === 'b') { DEBUG_PRINT_KEYS[b].func(e);  }
-      // else if  (_keys_buffer[len].key === 'e') { DEBUG_PRINT_KEYS[ee].func(e);  }
-      else if  (_keys_buffer[len].key === 'm') { DEBUG_PRINT_KEYS[m].func(e); }
-      else if  (_keys_buffer[len].key === 'g') { DEBUG_PRINT_KEYS[g].func(e); }
+      if       (_keys_buffer[len].key === 'p') { DEBUG_PRINT_KEYS[p].func(e); }
+      else if  (_keys_buffer[len].key === 'a') { console.log('@ Render Queue', `\n  1:${DEBUG_PRINT_KEYS[r1].discr}, 2:${DEBUG_PRINT_KEYS[r2].discr}`); }
+      else if  (_keys_buffer[len].key === 'r') { console.log('@ Buffers Allocations', `\n  1:${DEBUG_PRINT_KEYS[a1].discr}, 2:${DEBUG_PRINT_KEYS[a2].discr}`); }
+      else if  (_keys_buffer[len].key === 'f') { console.log('@ Frame Buuffer', `\n  1:${DEBUG_PRINT_KEYS[f1].discr}, 2:${DEBUG_PRINT_KEYS[f2].discr}`);  }
+      else if  (_keys_buffer[len].key === 'i') { console.log('@ Time Intervals Queue', `\n  1:${DEBUG_PRINT_KEYS[i1].discr}`); }
+      else if  (_keys_buffer[len].key === 'l') { console.log('@ Event Listeners', `\n  1:${DEBUG_PRINT_KEYS[l1].discr}\n  2:${DEBUG_PRINT_KEYS[l2].discr}\n  3:${DEBUG_PRINT_KEYS[l3].discr}`); }
+      else if  (_keys_buffer[len].key === 's') { console.log('@ String Buffer', `\n  1:${DEBUG_PRINT_KEYS[s1].discr}\n  2:${DEBUG_PRINT_KEYS[s2].discr}\n  3:${DEBUG_PRINT_KEYS[s3].discr}\n  4:${DEBUG_PRINT_KEYS[s4].discr}`); }
+      else if  (_keys_buffer[len].key === 'w') { console.log('@ Widget Root', `\n  1:${DEBUG_PRINT_KEYS[w1].discr}\n  2:${DEBUG_PRINT_KEYS[w2].discr}\n  3:${DEBUG_PRINT_KEYS[w3].discr}\n  4:${DEBUG_PRINT_KEYS[w4].discr}\n  5:${DEBUG_PRINT_KEYS[w5].discr}\n  6:${DEBUG_PRINT_KEYS[w6].discr}`); }
+      else if  (_keys_buffer[len].key === 't') { console.log('@ Styles', `\n  1:${DEBUG_PRINT_KEYS[t1].discr}\n  2:${DEBUG_PRINT_KEYS[t2].discr}\n  3:${DEBUG_PRINT_KEYS[t3].discr}\n  4:${DEBUG_PRINT_KEYS[t4].discr}\n  5:${DEBUG_PRINT_KEYS[t5].discr}\n  6:${DEBUG_PRINT_KEYS[t6].discr}`); }
+      else if  (_keys_buffer[len].key === 'v') { console.log('@ GL', `\n  a:${DEBUG_PRINT_KEYS[va].discr}\n  b:${DEBUG_PRINT_KEYS[vb].discr}\n  i:${DEBUG_PRINT_KEYS[vi].discr}\n  p:${DEBUG_PRINT_KEYS[vp].discr}\n  s:${DEBUG_PRINT_KEYS[vs].discr}`); }
+      else if  (_keys_buffer[len].key === 'g') { console.log('@ +++', `\n  s:${DEBUG_PRINT_KEYS[gs].discr}\n  w:${DEBUG_PRINT_KEYS[gw].discr}\n  1:${DEBUG_PRINT_KEYS[g1].discr}\n  2:${DEBUG_PRINT_KEYS[g2].discr}\n  3:${DEBUG_PRINT_KEYS[g3].discr}\n  4:${DEBUG_PRINT_KEYS[g4].discr}\n  5:${DEBUG_PRINT_KEYS[g5].discr}\n  6:${DEBUG_PRINT_KEYS[g6].discr}`); }
+      else if  (_keys_buffer[len].key === 'm') { console.log('@ Mesh Buuffer', `\n  1:${DEBUG_PRINT_KEYS[m1].discr}, 2:${DEBUG_PRINT_KEYS[m2].discr}`); }
+      else if  (_keys_buffer[len].key === 'y') { console.log('@ Debuug ui entries table', `\n  1:${DEBUG_PRINT_KEYS[y1].discr}\n  2:${DEBUG_PRINT_KEYS[y2].discr}`); }
    }
 
    // e.preventDefault();

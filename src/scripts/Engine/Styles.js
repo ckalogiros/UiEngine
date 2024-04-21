@@ -1,6 +1,6 @@
 "use strict";
 
-import { New_generic_buffer } from "./Core/Buffers.js";
+import { New_generic_buffer, New_int16_buffer } from "./Core/Buffers.js";
 
 
 
@@ -145,6 +145,38 @@ export function Styles_pad_destroy(idx){
 
 
 
+/****************************************************/
+// Batch Destroy
+
+const _batch_destroy_storage = New_int16_buffer();
+
+
+
+
+export function Styles_batch_destroy_store(idx){
+   // TODOD: DEBUG the idx if exists and in boundaries
+   _batch_destroy_storage.Add(idx);
+}
+
+
+
+
+export function Styles_batch_destroy_run(){
+   // TODOD: DEBUG the idx if exists and in boundaries
+
+   for(let i=0; i <= _batch_destroy_storage.boundary; i++){
+
+      const idx = _batch_destroy_storage.buffer[i];
+
+      _margin_buffer.RemoveByIdx(idx);
+      _hover_margin_buffer.RemoveByIdx(idx);
+      _pad_buffer.RemoveByIdx(idx);
+
+   }
+   _batch_destroy_storage.Reset();
+}
+
+
 
 
 
@@ -180,7 +212,7 @@ export function Styles_margin_print_loop() {
    for (let i = 0; i <= _margin_buffer.boundary; i++) {
 
       const marg = _margin_buffer.buffer[i];
-      console.log(' ', j, `marg:${marg[i]}`);
+      if(marg) console.log(' ', i, `marg:${marg}`);
    }
 }
 
@@ -189,7 +221,7 @@ export function Styles_hover_margin_print_loop() {
    for (let i = 0; i <= _hover_margin_buffer.boundary; i++) {
 
       const hover_marg = _hover_margin_buffer.buffer[i];
-      console.log(' ', j, `hover marg:${hover_marg[i]}`);
+      if(hover_marg) console.log(' ', i, `hover marg:${hover_marg}`);
    }
 }
 
@@ -198,7 +230,7 @@ export function Styles_pad_buffer_print_loop() {
    for (let i = 0; i <= _pad_buffer.boundary; i++) {
 
       const pad = _pad_buffer.buffer[i];
-      console.log(' ', j, `marg x:${pad[i]}`);
+      if(pad) console.log(' ', i, `marg x:${pad}`);
    }
 }
 

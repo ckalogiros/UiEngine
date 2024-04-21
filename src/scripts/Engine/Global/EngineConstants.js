@@ -239,7 +239,7 @@ const STATE = {
 			}
 			else {
 				this.hoveredId = mesh.id;
-				this.hoveredIdx = mesh.idx;
+				this.hoveredIdx = mesh.mesh_bufferidx;
 			}
 		},
 		SetGrabed(mesh) {
@@ -250,7 +250,7 @@ const STATE = {
 			}
 			else {
 				this.grabedId = mesh.id;
-				this.grabedIdx = mesh.idx;
+				this.grabedIdx = mesh.mesh_bufferidx;
 			}
 		},
 		SetClicked(mesh) {
@@ -261,10 +261,12 @@ const STATE = {
 			}
 			else {
 				this.clickedId = mesh.id;
-				this.clickedIdx = mesh.idx;
+				this.clickedIdx = mesh.mesh_bufferidx;
 			}
 		},
 		SetFocused(mesh) {
+			
+			if(this.focused !== mesh) console.log('FOCUSED:', mesh.mesh_bufferidx, mesh.GetName())
 			this.focused = mesh;
 			if (!mesh) {
 				this.focusedId = INT_NULL;
@@ -272,7 +274,7 @@ const STATE = {
 			}
 			else {
 				this.focusedId = mesh.id;
-				this.focusedIdx = mesh.idx;
+				this.focusedIdx = mesh.mesh_bufferidx;
 			}
 		},
 		CheckAllAndRemove(mesh){

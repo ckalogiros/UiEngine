@@ -1,11 +1,4 @@
 
-
-
-
-
-
-
-
 export function Get_name_from_mesh_type(type) {
 
 	let meshType = []

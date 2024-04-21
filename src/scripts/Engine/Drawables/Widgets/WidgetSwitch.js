@@ -1,10 +1,10 @@
 "use strict";
 
-import { CopyArr4 } from "../../../Helpers/Math/MathOperations";
-import { Create_rect_mesh } from "../../Core/CreateWidget";
-import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer";
-import { BLUE, BLUEL, GREEN, GREY } from "../Material/Base/Colors";
-import { Rect } from "../Meshes/Rect_Mesh";
+import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
+import { Create_rect_mesh } from "../../Core/CreateWidget.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
+import { BLUE, GREY } from "../Material/Base/Colors.js";
+import { Rect } from "../Meshes/Rect_Mesh.js";
 
 
 

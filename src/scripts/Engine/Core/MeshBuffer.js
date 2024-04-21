@@ -102,7 +102,6 @@ export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferi
 }
 
 
-
 export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
 
    const mesh = _mesh_buffer.buffer[mesh_bufferidx];
@@ -277,7 +276,6 @@ export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
 
 
 
-
 /*******************************************************************************************************************************************************************************/
 // Widget root buffer: Stores all root meshes of a scene
 /*******************************************************************************************************************************************************************************/
@@ -324,7 +322,7 @@ function Widget_root_remove_root_byidx(root_bufferidx) {
 
       Widget_root_batch_remove_byidx(root_bufferidx);
       Widget_root_gfx_remove_byidx(root_bufferidx)
-      console.warn('Removing widget root:', root_bufferidx, _widget_root_buffer.buffer[root_bufferidx]);
+      console.error('Removing widget root:', root_bufferidx, _widget_root_buffer.buffer[root_bufferidx]);
       _widget_root_buffer.RemoveByIdx(root_bufferidx);
    }
 }
@@ -433,6 +431,14 @@ export function Widget_root_is_widget_root(root_bufferidx, mesh_bufferidx) {
    return false;
 }
 
+
+
+
+export function Widget_root_destroy_all_meshes(root_bufferidx, mesh_bufferidx) { 
+   //TODO: IMPLEMENT
+   // Run for all meshes in root
+   // 
+}
 
 
 
@@ -1300,21 +1306,21 @@ export function Widget_root_batch_print_w4() {
 // Print the widget groups buffer
 export function Widget_group_buffer_print_w5() {
 
-   console.log('Wole Group Buffer:', _widget_groups_buffer)
-   for (let i = 0; i <= _widget_groups_buffer.boundary; i++) {
+   // console.log('Wole Group Buffer:', _widget_groups_buffer)
+   // for (let i = 0; i <= _widget_groups_buffer.boundary; i++) {
 
-      const mesh = Mesh_buffer_get_mesh_byidx(_widget_groups_buffer.buffer[i].meshidx)
-      console.log('mesh_bufferidx:', _widget_groups_buffer.buffer[i].meshidx, ' mesh name:', mesh.GetName())
-      for (let j = 0; j < _widget_groups_buffer.buffer[i].group_data.length; j++) {
-         console.log('  vb:', j,
-            'vb_start:', _widget_groups_buffer.buffer[i].group_data[j].start,
-            'ib_start:', _widget_groups_buffer.buffer[i].group_data[j].ib_start,
-            'first mesh:', _widget_groups_buffer.buffer[i].group_data[j].meshidx,
-            'num_faces:', _widget_groups_buffer.buffer[i].group_data[j].num_faces,
-            'gfx:', _widget_groups_buffer.buffer[i].group_data[j].gfx_idxs,
-         );
-      }
-   }
+   //    const mesh = Mesh_buffer_get_mesh_byidx(_widget_groups_buffer.buffer[i].meshidx)
+   //    console.log('mesh_bufferidx:', _widget_groups_buffer.buffer[i].meshidx, ' mesh name:', mesh.GetName())
+   //    for (let j = 0; j < _widget_groups_buffer.buffer[i].group_data.length; j++) {
+   //       console.log('  vb:', j,
+   //          'vb_start:', _widget_groups_buffer.buffer[i].group_data[j].start,
+   //          'ib_start:', _widget_groups_buffer.buffer[i].group_data[j].ib_start,
+   //          'first mesh:', _widget_groups_buffer.buffer[i].group_data[j].meshidx,
+   //          'num_faces:', _widget_groups_buffer.buffer[i].group_data[j].num_faces,
+   //          'gfx:', _widget_groups_buffer.buffer[i].group_data[j].gfx_idxs,
+   //       );
+   //    }
+   // }
 }
 
 
