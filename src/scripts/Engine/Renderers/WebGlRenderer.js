@@ -10,6 +10,7 @@ import { Batch_update } from "../Batch/Batch.js";
 import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
+import { Command_buffer_run } from "../Core/Commandbuffer.js";
 
 
 
@@ -111,9 +112,11 @@ export class WebGlRenderer {
          
          Batch_update()
          
-         Uniforms_block_update_uniform();
+         Command_buffer_run()
          
          Notifications_update();
+         
+         Uniforms_block_update_uniform();
          
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
          Gl_draw(this.gl); 

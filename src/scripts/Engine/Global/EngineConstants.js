@@ -609,6 +609,27 @@ const GFX = {
 
 
 /*************************************************************************************************/
+// Commands
+
+_CNT = 0x4;
+const COMMANDS = {
+
+	ID:{
+		MESH_BUFFER_BATCH_DESTROY: _CNT,
+		LISTENERS_BATCH_DESTROY: _CNT<<=0x1,
+		STYLE_BATCH_DESTROY: _CNT<<=0x1,
+	}
+};
+
+
+
+
+
+
+
+
+
+/*************************************************************************************************/
 // 
 const OUT_OF_VIEW = 100000; // Out of screen view in pixels
 

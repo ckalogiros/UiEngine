@@ -284,7 +284,29 @@ export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0, debug_me
    //       'vb', temp_vb,
    //    );
    // }
-   ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last);
+   // ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last);
+   const r = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last);
+   console.log(
+      'vbidx', gfx.vb.idx,
+      'mesh', debug_mesh.mesh_bufferidx,
+      'num_faces', num_faces,
+      'count', gfx.vb.count * num_faces,
+      'vb: count', vb_info.count
+
+   )
+   if(r){
+               console.log(
+            'vbidx', gfx.vb.idx,
+            'gfx.vb.start', gfx.vb.start,
+            'gfx.vb.count', gfx.vb.count,
+            'num_faces', num_faces,
+            'gfx.vb.count * num_faces', gfx.vb.count * num_faces,
+            '\nvb: count', vb_info.count,
+            // 'draw_count', vb_info.draw_count,
+            // 'idx', vb_info.draw_count,
+            // 'vb', temp_vb,
+         );
+   }
 
 
    return ret;

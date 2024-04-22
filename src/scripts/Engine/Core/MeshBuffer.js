@@ -134,6 +134,40 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
    _mesh_buffer.RemoveByIdx(mesh_bufferidx);
 }
 
+
+
+
+
+/****************************************************/
+// Batch Destroy
+
+const _batch_destroy_storage = New_int16_buffer();
+
+
+
+
+export function Mesh_buffer_batch_destroy_store(idx){
+   // TODOD: DEBUG the idx if exists and in boundaries
+   _batch_destroy_storage.Add(idx);
+   console.log(idx)
+}
+
+
+
+
+export function Mesh_buffer_batch_destroy_run(){
+   // TODOD: DEBUG the idx if exists and in boundaries
+
+   for(let i=0; i <= _batch_destroy_storage.boundary; i++){
+
+      const idx = _batch_destroy_storage.buffer[i];
+
+      Mesh_buffer_remove_mesh_byidx(idx);
+
+   }
+
+   _batch_destroy_storage.Reset();
+}
 /** // NOTE:
  * The insertion of meshes to the _mesh_buffer 
  * happens at CreateWidgets.js, directly accessing the _mesh_buffer buffer

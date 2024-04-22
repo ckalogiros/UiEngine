@@ -3,13 +3,14 @@ import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
+import { Listener_batch_destroy_run, Listener_batch_destroy_store, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
-import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_batch_destroy_run, Mesh_buffer_batch_destroy_store, Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
-import { Styles_batch_destroy_store, Styles_create, Styles_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
+import { Styles_batch_destroy_run, Styles_batch_destroy_store, Styles_create, Styles_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
+import { Command_buffer_store } from "../../../Core/Commandbuffer.js";
 
 
 const NOTIFICATIONS_ON = true;
@@ -155,7 +156,7 @@ export class Mesh {
         this.timedEvents = New_generic_buffer(_, 'Mesh timedEvents');
         this.children = New_generic_buffer(_, 'Mesh children');
         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE);
-        
+
         this.rel_comp = null;
 
 
@@ -214,11 +215,11 @@ export class Mesh {
 
         /*************************************************************************************/
         // Remove event listeners
-        if(this.listeners) {
+        if (this.listeners) {
             this.RemoveAllListenEvents();
             Free_generic_buffer(this.listeners)
         }
-        
+
 
 
 
@@ -236,61 +237,55 @@ export class Mesh {
             }
         }
 
-        // Styles_margin_destroy(this.styles[STYLES.MARG]);
-        // Styles_hover_margin_destroy(this.styles[STYLES.HOVER_MARG]);
-        // Styles_pad_destroy(this.styles[STYLES.PAD]);
-
         Styles_batch_destroy_store(this.styles);
-        // Styles_destroy(this.styles);
+        Command_buffer_store(Styles_batch_destroy_run, null, COMMANDS.ID.STYLE_BATCH_DESTROY); // Store the 'destroy styles' as a command to be executed later(once per frame)
 
-        if(NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH)===0) 
+        if (NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH) === 0)
             Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, this.mesh_bufferidx);
-        
+
 
 
 
         /*************************************************************************************/
         // Remove from gfx buffers.
-        
-        /** */
-        // Bacause of clipping we must check if current mesh exists in vertex buffer(rendered and not clipped)
-        if (this.state.mask & MESH_STATE.ACTIVE) {
-            
-            if(this.type & (MESH_TYPE.WIDGET_TEXT|MESH_TYPE.WIDGET_TEXT_DYNAMIC|MESH_TYPE.TEXT_MESH)){ // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
+
+        // A mesh maybe active buut not inserted in vertex buffer
+        if (this.is_gfx_inserted) {
+
+            if (this.type & (MESH_TYPE.WIDGET_TEXT | MESH_TYPE.WIDGET_TEXT_DYNAMIC | MESH_TYPE.TEXT_MESH)) { // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
 
                 const ret = Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
-                if(!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.mat.temp_max_chars_inserted_in_gfx)
+                if (!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.mat.temp_max_chars_inserted_in_gfx)
                 Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+                // console.log(this.mesh_bufferidx, this.GetName())
             }
             else {
 
                 const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
-                if(!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.geom.num_faces)
+                if (!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.geom.num_faces)
                 Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+                // console.log(this.mesh_bufferidx, this.GetName())
             }
 
-            // if(this.gfx.vb.idx===7)console.log('ACTIVE- Destroy:', this.mesh_bufferidx)
-            // const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
-            // if(!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.geom.num_faces)
-            // Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
-
         }
-        
+
 
         let shift_children = false; // A way to store and return if this was removed from paren's children so that the caller will reduce the i from the loop by 1.
         // Remove from parent's children buffer
         if (this.parent && this.parent !== NO_MESH_PARENT && this.idx !== INT_NULL) {
-            
+
             shift_children = this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
         }
-        
+
 
 
 
         /*************************************************************************************/
         // Remove from widget root buffer.
+        // Mesh_buffer_batch_destroy_store(this.mesh_bufferidx);
+        // Command_buffer_store(Mesh_buffer_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
         Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
-        
+
 
 
 
@@ -364,43 +359,43 @@ export class Mesh {
         if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
             // HERE: The construction of the listeners is been set 3 times. Make it one time in one place
-            if(!this.listeners)  {
+            if (!this.listeners) {
                 this.listeners = New_generic_buffer();
                 this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
             }
-            
+
             this.listeners.AddAtIndex(E.H, INT_NULL);
-            
+
             this.state.mask |= (MESH_STATE.IS_HOVERABLE | MESH_STATE.IS_HOVER_COLORABLE);
             this.event_flags |= LISTEN_EVENT_TYPES.HOVER;
-            
+
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
-            
+
         }
         else if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
-            
-            if(!this.listeners)  {
+
+            if (!this.listeners) {
                 this.listeners = New_generic_buffer();
                 this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
             }
-            
+
             this.listeners.AddAtIndex(E.C, INT_NULL)
-            
+
             this.state.mask |= (MESH_STATE.IS_CLICKABLE);
             this.event_flags |= LISTEN_EVENT_TYPES.CLICK_UP;
-            
+
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_CLICKABLE);
 
         }
         else if (etype & LISTEN_EVENT_TYPES.MOVE) {
-            
-            if(!this.listeners)  {
+
+            if (!this.listeners) {
                 this.listeners = New_generic_buffer();
                 this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
             }
-            
+
             this.listeners.AddAtIndex(E.C, INT_NULL);
-            
+
             this.state.mask |= (MESH_STATE.IS_GRABABLE | MESH_STATE.IS_MOVABLE | MESH_STATE.IS_CLICKABLE);
             this.event_flags |= LISTEN_EVENT_TYPES.MOVE;
 
@@ -414,7 +409,7 @@ export class Mesh {
     // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
     AddListenEvent(etypeidx, Clbk = null, params = null, parent_event_idx = null) {
 
-        if(this.state.mask & MESH_STATE.ACTIVE){ // HERE: see if can remove check
+        if (this.state.mask & MESH_STATE.ACTIVE) { // HERE: see if can remove check
             this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, parent_event_idx);
         }
         // else console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{')
@@ -424,24 +419,25 @@ export class Mesh {
     RemoveAllListenEvents() {
         // TODO The if's maybe better implemented in EventListeners class RemoveEvent()???
 
-        if(!this.listeners) return;
+        if (!this.listeners) return;
 
         for (let i = 0; i <= this.listeners.boundary; i++) {
 
             if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
                 Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
-                // this.listeners.buffer[i] = null;
+                // Listener_batch_destroy_store(i, this.listeners.buffer[i]);
                 this.listeners.buffer[i] = INT_NULL;
-                // console.log(this.GetName())
             }
         }
+
+        // Command_buffer_store(Listener_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
     }
 
 
     CreateEventCallback(params = null) {
 
         if (!params) alert('CreateEventCallback(params = null). @ Mesh.js')
-        if(!this.eventCallbacks) New_generic_buffer(_, 'Mesh eventCallbacks');
+        if (!this.eventCallbacks) New_generic_buffer(_, 'Mesh eventCallbacks');
         const eventIdx = this.eventCallbacks.Add(params);
         return eventIdx;
     }
@@ -530,24 +526,24 @@ export class Mesh {
 
 
     RotateZ(angle) { GlRotateZ2D(this.gfx, this.geom.dim, angle); }
-    
-
-    StylesGetMargin(axis=STYLES.AXIS.ALL){ return Styles_margin_get(axis, this.styles); }
 
 
-    StylesGetHoverMargin(axis=STYLES.AXIS.ALL){  return Styles_hover_margin_get(axis, this.styles); } 
+    StylesGetMargin(axis = STYLES.AXIS.ALL) { return Styles_margin_get(axis, this.styles); }
 
 
-    StylesGetPad(axis=STYLES.AXIS.ALL){ return Styles_pad_get(axis, this.styles); }
+    StylesGetHoverMargin(axis = STYLES.AXIS.ALL) { return Styles_hover_margin_get(axis, this.styles); }
 
 
-    StylesSetMargin(margin){ Styles_margin_set(this.styles, margin); }
+    StylesGetPad(axis = STYLES.AXIS.ALL) { return Styles_pad_get(axis, this.styles); }
 
 
-    StylesSetHoverMargin(margin){ Styles_hover_margin_set(this.styles, margin); }
+    StylesSetMargin(margin) { Styles_margin_set(this.styles, margin); }
 
 
-    StylesSetPad(margin){ Styles_pad_set(this.styles, margin); }
+    StylesSetHoverMargin(margin) { Styles_hover_margin_set(this.styles, margin); }
+
+
+    StylesSetPad(margin) { Styles_pad_set(this.styles, margin); }
 
 
     SetUpdateFrameBuffer() {

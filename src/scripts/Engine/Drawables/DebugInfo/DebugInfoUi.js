@@ -1488,7 +1488,7 @@ let render_queue_buffer_ui_pos = [800, 600, 0];
 
 
 /************************************************************************************************************************************************/
-// Create mesh info from mesh per vb buffer
+// Create mesh info Generic
 /************************************************************************************************************************************************/
 
 const _ui_info_buffer = New_generic_buffer();
@@ -1539,82 +1539,6 @@ function Dbg_info_ui_create_ui(pos, name) {
    View_build_group_from_root_mesh(scroller.scrolled_section);
 
    return scroller;
-}
-
-
-
-function Dbg_ui_create_entry(params, TYPE_IDX) {
-
-   // TODO: IMPLEMENT generic with some specific functions from tables
-
-   // const scroller = params.root;
-   // const scrolled = scroller.scrolled_section;
-   // scrolled.options |= SECTION.RESIZE_PARENT
-   // const root_dp = scrolled.children.buffer[0];
-   // const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
-   // const flags = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries_flags;
-
-   // const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
-   // const margin = [root_dp.StylesGetMargin(STYLES.AXIS.X), root_dp.StylesGetMargin(STYLES.AXIS.Y)];
-   // const style = [0, 3, 1];
-   // const zindex = root_dp.menu.geom.pos[2]
-
-   // const len = new_entries.boundary; // Avoid infinite loop (Avoid creating info for dubug UI's)
-
-   // for (let i = 0; i <= len; i++) {
-
-   //    const vb_info = Vertex_buffer_info_get_by_vbidx(new_entries.buffer[i][0]);
-
-   //    const is_inserted = (flags.buffer[i] & NOTIFICATION_TYPE.FLAGS.IS_INSERTED);
-
-   //    if (!is_inserted) {
-
-   //       flags.buffer[i] |= NOTIFICATION_TYPE.FLAGS.IS_INSERTED; // Set flag for current entry to 'INSERTED'
-   //       const entry_mesh = Create_widget_dropdown(_, `${vertex_buffer_ui_counter++} VB[${vb_info.vbidx}]`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
-
-   //       /*****************************************************/
-   //       // Connect entry's mesh_bufferidx to mesh
-   //       new_entries.buffer[i][1] = entry_mesh.mesh_bufferidx;
-   //       /*****************************************************/
-
-   //       entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-   //       entry_mesh.CreateClickEvent();
-   //       entry_mesh.SetTypeDebug();
-   //       root_dp.AddToMenu(entry_mesh);
-
-
-   //       // Helper_mesh_buffer_info_create_more_info(entry_mesh, info_data, zindex, col_menu, col_dp, margin, style);
-
-   //       /*********************************************************************************************************************************************/
-   //       // Set up and Render new meshes
-   //       entry_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-   //       if (root_dp.menu.is_gfx_inserted) {
-
-   //          scrolled.Recalc_no_gfx_update();
-
-   //          const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]
-   //          Clipy_one_mesh(entry_mesh, clip_top, clip_bottom)
-   //          if (entry_mesh.state.mask & MESH_STATE.ACTIVE) {
-   //             entry_mesh.Render();
-   //             const parent_events = [root_dp.menu.listeners.buffer[0], root_dp.menu.listeners.buffer[1]];
-   //             entry_mesh.ConstructListeners(parent_events);
-   //          }
-   //          if (root_dp.menu.group_bufferidxs[0] !== INT_NULL) View_add_to_group(entry_mesh, root_dp.group_bufferidxs[0])
-   //       }
-
-   //    }
-   // }
-
-
-   // // Update size and count info of the mesh buffer
-   // const buffer_info = root_dp.menu.children.buffer[0];
-   // const size = Vertex_buffer_info_get_size(), count = Vertex_buffer_info_get_count();
-   // const text = `count:${count} size:${size}`;
-   // if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
-   // else buffer_info.SetText(text);
-
-   // scroller.Recalc();
-
 }
 
 
@@ -1779,8 +1703,6 @@ export function Debug_info_mesh_buffer_create_ui() {
 
       View_destroy_view(ui_widget.group_bufferidxs);
       ui_widget.Destroy();
-
-      Styles_batch_destroy_run()
 
 
       // Set all entries to NOT inserted, so next time the ui wil open, all entries will be drawn
@@ -2182,7 +2104,7 @@ export function TEMP_string_buffer_info_ui_print_entries_table() {
 
 
 /****************************************************************************************************************************************************/
-// DEBUG Info - Create mesh info from String Buffer
+// DEBUG Info - Create mesh info from mesh per vb buffer
 /****************************************************************************************************************************************************/
 
 
@@ -2291,6 +2213,9 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
             }
             if (root_dp.menu.group_bufferidxs[0] !== INT_NULL) View_add_to_group(entry_mesh, root_dp.group_bufferidxs[0])
          }
+      else{
+         entry_mesh.state.mask &= ~MESH_STATE.ACTIVE;
+      }
 
       }
    }

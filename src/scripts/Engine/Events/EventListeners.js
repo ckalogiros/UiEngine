@@ -2,7 +2,7 @@
 
 import { Intersection_point_rect } from "../Drawables/Operations/Collisions.js";
 import { MouseGetPos } from "../Controls/Input/Mouse.js";
-import { New_generic_buffer } from "../Core/Buffers.js";
+import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
 import { Info_listener_create_event } from "../Drawables/DebugInfo/InfoListeners.js";
@@ -105,7 +105,7 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
    const event_idx = _listeners_buffer_storage.buffer[TYPE_IDX].Add({
       /**DEBUG */name: (mesh) ? mesh.GetName() : 'NO SOURCE PARAMS',
       type: TYPE_IDX,
-      parent_idx: parent_event_idx,
+      parent_idx: parent_event_idx!==null ? parent_event_idx : INT_NULL,
       Clbk: Clbk,
       meshidx: meshidx,
       evt_params: evt_params,
@@ -178,7 +178,7 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
    const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
 
    // If event is root, has no 'parent_idx', then destroy its children from the view storage buffer
-   if (event.parent_idx === null) {
+   if (event.parent_idx === INT_NULL) {
 
       event.view.children = null;
       const view_idx = event.view_idx
@@ -238,6 +238,70 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
    }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************************************************/
+
+// Batch Destroy
+
+const _batch_destroy_storage = New_generic_buffer();
+_batch_destroy_storage.Add(New_int16_buffer()); // Add for starters one listeners buffer. Maybe we could add via SIZE of LISTEN_EVENT_TYPE
+
+
+
+
+export function Listener_batch_destroy_store(TYPE_IDX, idx){
+   // TODOD: DEBUG the idx if exists and in boundaries
+
+   if(_batch_destroy_storage.buffer[TYPE_IDX] === undefined){
+      _batch_destroy_storage.Add(New_int16_buffer()); // If the buffer of the listener type does not exist, create one
+   }
+   // console.log('oooooo', TYPE_IDX, idx,_listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].meshidx)
+
+   _batch_destroy_storage.buffer[TYPE_IDX].Add(idx);
+}
+
+
+
+
+export function Listener_batch_destroy_run(){
+   // TODOD: DEBUG the idx if exists and in boundaries
+
+   for(let i=0; i <= _batch_destroy_storage.boundary; i++){
+
+      for(let j=0; j <= _batch_destroy_storage.buffer[i].boundary; j++){
+
+         const idx = _batch_destroy_storage.buffer[i].buffer[j];
+
+         const parent_idx = _listeners_buffer_storage.buffer[i].buffer[idx].parent_idx;
+         if(parent_idx !== INT_NULL){ // Remove event from parent
+
+            const view_child_idx = _listeners_buffer_storage.buffer[i].buffer[idx].view_idx;
+            _listeners_buffer_storage.buffer[i].buffer[parent_idx].view.children.RemoveByIdx(view_child_idx);
+            _listeners_buffer_storage.buffer[i].buffer[idx].parent_idx = INT_NULL;
+            _listeners_buffer_storage.buffer[i].buffer[idx].view_idx = INT_NULL;
+         }
+         console.log('oooooo', 'type:', i, 'index:', idx,_listeners_buffer_storage.buffer[i].buffer[idx])
+         _listeners_buffer_storage.buffer[i].buffer[idx].view = null;
+         _listeners_buffer_storage.buffer[i].RemoveByIdx(idx);
+      }
+
+      // console.log('oooooo', TYPE_IDX, idx,_listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].meshidx)
+      _batch_destroy_storage.buffer[i].Reset();
+   }
+
+}
 
 
 
