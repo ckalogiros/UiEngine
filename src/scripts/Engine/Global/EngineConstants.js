@@ -35,6 +35,7 @@ const ALL = 0xffff;
 const FAKE_LISTEN_EVENT = true;
 
 
+
 const UNCHANGED = 0xffff; // Just a flag, used for checking if a value should change or remain the same.
 
 
@@ -324,9 +325,12 @@ const SECTION = {
 	EXPAND: _CNT <<= 0x1,
 	FIT: _CNT <<= 0x1,
 
+	FIXED_W: _CNT <<= 0x1,
+	FIXED_H: _CNT <<= 0x1,
+
 	RESIZE_PARENT: _CNT <<= 0x1,
-	// RESIZE_PARENTX: _CNT <<= 0x1,
-	// RESIZE_PARENTY: _CNT <<= 0x1,
+	RESIZE_PARENTX: _CNT <<= 0x1,
+	RESIZE_PARENTY: _CNT <<= 0x1,
 
 	FOLLOW: _CNT <<= 0x1,
 
@@ -582,7 +586,7 @@ const PERFORMANCE_TIMER = {
 _CNT = 0x1;
 const ROOT_WIDGETS = {
 	CREATE_ROOT: _CNT,
-	CREATE_BATCH: _CNT <<= 0x1,
+	// CREATE_BATCH: _CNT <<= 0x1,
 }
 
 

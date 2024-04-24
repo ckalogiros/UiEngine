@@ -12,7 +12,8 @@ export function Gl_draw(gl) {
 
     const drawQueue = Renderqueue_get_active();
     const drawQueueCount = Renderqueue_active_get_count();
-    
+
+
     gl.clearColor(0.18, 0.18, 0.18, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 

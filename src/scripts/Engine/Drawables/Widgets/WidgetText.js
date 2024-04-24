@@ -178,7 +178,7 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
-	SetZPos(val) {
+	SetPosZNoGfxUpdate(val) {
 		this.geom.pos[2] = val;
 	}
 
@@ -525,7 +525,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	SetZPos(val) {
+	SetPosZNoGfxUpdate(val) {
 		this.geom.pos[2] = val;
 		for (let i = 0; i <= this.children.boundary; i++) {
 			this.children.buffer[i].geom.pos[2] = val;

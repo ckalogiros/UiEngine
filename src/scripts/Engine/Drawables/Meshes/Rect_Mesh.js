@@ -207,23 +207,28 @@ export class Rect extends Mesh {
    GetAllMeshes() { return [this]; }
 
 
-   SetZPos(val) {
-      this.geom.pos[2] = val;
+   SetPosX(x) {
+      super.SetPosX(x);
    }
-
-
+   
+   
    SetFrameBufferIdx(fbidx) {
       this.isFramebufferRendered = fbidx;
    }
-
-
+   
+   
    SetPosXNoGfxUpdate(x) {
       this.geom.pos[0] = x;
    }
-
-
+   
+   
    SetPosYNoGfxUpdate(y) {
       this.geom.pos[1] = y;
+   }
+
+
+   SetPosZNoGfxUpdate(val) {
+      this.geom.pos[2] = val;
    }
 
 

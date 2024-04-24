@@ -243,7 +243,6 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
 // Add, Remove, Shift Attribs - Vertex Buffer Functions
 /**************************************************************************************************************************************/
 
-let DBG = ''
 
 export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0, debug_mesh=null) {
 
@@ -261,52 +260,30 @@ export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0, debug_me
       empty: false, // Is the buffer is empty?
    };
 
-   // DBG += `name:${debug_mesh.GetName()} text:${debug_mesh.mat.text}`
-   // DBG += `vbidx: ${gfx.vb.idx} start: ${gfx.vb.start} count: ${gfx.vb.count} num_faces: ${num_faces} attribs: ${gfx.vb.count * num_faces}
-   // vb: count: ${vb_info.count} draw_count: ${vb_info.draw_count} idx: ${vb_info.draw_count} `
-   // console.log(DBG)
 
-   // if(vb_info.vbidx===7){
+   ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last, debug_mesh);
+   // const r = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last);
+   // console.log(
+   //    'vbidx', gfx.vb.idx,
+   //    'mesh', debug_mesh.mesh_bufferidx,
+   //    'num_faces', num_faces,
+   //    'count', gfx.vb.count * num_faces,
+   //    'vb: count', vb_info.count
 
-   //    if(debug_mesh){
-   //       console.log('#########', debug_mesh.mat.text, debug_mesh.GetName())
-   //       console.log('char_buffer', debug_mesh.mat.char_buffer.buffer, 'boundary', debug_mesh.mat.char_buffer.boundary, 'size', debug_mesh.mat.char_buffer.size)
-   //    }
-   //    console.log(
-   //       'vbidx', gfx.vb.idx,
-   //       'gfx.vb.start', gfx.vb.start,
-   //       'gfx.vb.count', gfx.vb.count,
-   //       'num_faces', num_faces,
-   //       'gfx.vb.count * num_faces', gfx.vb.count * num_faces,
-   //       '\nvb: count', vb_info.count,
-   //       'draw_count', vb_info.draw_count,
-   //       'idx', vb_info.draw_count,
-   //       'vb', temp_vb,
-   //    );
+   // )
+   // if(r){
+   //             console.log(
+   //          'vbidx', gfx.vb.idx,
+   //          'gfx.vb.start', gfx.vb.start,
+   //          'gfx.vb.count', gfx.vb.count,
+   //          'num_faces', num_faces,
+   //          'gfx.vb.count * num_faces', gfx.vb.count * num_faces,
+   //          '\nvb: count', vb_info.count,
+   //          // 'draw_count', vb_info.draw_count,
+   //          // 'idx', vb_info.draw_count,
+   //          // 'vb', temp_vb,
+   //       );
    // }
-   // ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last);
-   const r = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last);
-   console.log(
-      'vbidx', gfx.vb.idx,
-      'mesh', debug_mesh.mesh_bufferidx,
-      'num_faces', num_faces,
-      'count', gfx.vb.count * num_faces,
-      'vb: count', vb_info.count
-
-   )
-   if(r){
-               console.log(
-            'vbidx', gfx.vb.idx,
-            'gfx.vb.start', gfx.vb.start,
-            'gfx.vb.count', gfx.vb.count,
-            'num_faces', num_faces,
-            'gfx.vb.count * num_faces', gfx.vb.count * num_faces,
-            '\nvb: count', vb_info.count,
-            // 'draw_count', vb_info.draw_count,
-            // 'idx', vb_info.draw_count,
-            // 'vb', temp_vb,
-         );
-   }
 
 
    return ret;

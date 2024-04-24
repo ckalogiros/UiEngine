@@ -3,7 +3,7 @@
 import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
-import { M_Buffer, New_generic_buffer } from "../../Core/Buffers.js";
+import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Widget_Button } from "./WidgetButton.js";
 import { CalculateArea } from "./WidgetLabel.js";
 import { Align_self_get_dif } from "../Operations/Alignment.js";

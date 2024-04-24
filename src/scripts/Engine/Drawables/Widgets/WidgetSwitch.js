@@ -119,6 +119,12 @@ export class Widget_Switch_Simple extends Rect {
       this.geom.pos[0] += x;
       this.children.buffer[0].geom.pos[0] += x;
    }
+   
+   SetPosX(x) {
+
+      super.SetPosX(x);
+      this.children.buffer[0].SetPosX(x);
+   }
 
    SetPosXNoGfxUpdate(x) {
       this.geom.pos[0] = x;

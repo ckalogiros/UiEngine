@@ -35,7 +35,7 @@ export function Command_buffer_store(Clbk = null, params = null, ID = null) {
    
    
    // Add command if does not exist OR if user explicitly tells y passing null as ID 
-   if (ID === null || (_command_flags.mask & ID)) return;
+   if (ID !== null && (_command_flags.mask & ID)) return;
 
    _command_storage_buffer.Add({
       Clbk: Clbk,
@@ -63,7 +63,7 @@ export function Command_buffer_run() {
 
    console.log('Command buffer: commands count -> ', _command_storage_buffer.active_count)
 
-   _command_storage_buffer.Reset;
+   _command_storage_buffer.Reset();
    _command_flags.mask = 0x0; // Reset the flags
 
 }

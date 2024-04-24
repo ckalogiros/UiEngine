@@ -275,6 +275,7 @@ export class Text_Mesh extends Mesh {
    // Transformations
    /*******************************************************************************************************************************************************/
 
+
    MoveNoGfxUpdate(x, y) {
 
       this.geom.pos[0] += x;
@@ -308,13 +309,23 @@ export class Text_Mesh extends Mesh {
 
    }
 
+   SetPosX(x) {
+
+      super.SetPosX(x);
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) child.SetPosX(x);
+      }
+   }
+   
 
    UpdatePosZ(z) {
       this.geom.UpdatePosZ(z, this.gfx, this.geom.num_faces)      // const params = {
    }
 
 
-   SetZPos(z) {
+
+   SetPosZNoGfxUpdate(z) {
       this.geom.pos[2] = z;
    }
 
@@ -494,14 +505,6 @@ export class Text_Mesh extends Mesh {
          let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
          Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex);
          
-         // if (c[i] !== ''){
-
-         //    Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex);
-
-         //    // Take the oportunity to set the characters of char_buffer to '', instead of running a loop.
-         //    c[i] = '';
-         // }
-
          gfx_copy.vb.start += gfx_copy.vb.count
       }
 
@@ -564,15 +567,13 @@ export class Text_Mesh extends Mesh {
       let right = this.GetTextRight_A();
 
       let changes_happended = false;
-if(this.mesh_bufferidx===5)
-console.log
+
 
       if (right-face_width > limit) {
 
          changes_happended = true;
          for (let i = this.mat.char_buffer.boundary; i >= 0; i--) {
-if(this.mesh_bufferidx===5)
-console.log
+
             this.mat.char_buffer.RemoveByIdx(i);
             this.geom.num_faces--;
             right -= face_width*2;

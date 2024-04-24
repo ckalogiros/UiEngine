@@ -99,15 +99,14 @@ function Relative_pos_comp_align_child_right(whereidx, parent, childidx){
    let xpos = 0;
 
    
-   // If the mesh its the first child in the left sequence of meshes, use the last mesh as the initial start pos
+   // If the mesh its the first child is left in the sequence of meshes(buffer), use the last mesh as the initial start pos
    if(children.boundary > 0){
 
       const lastidx = children.boundary-1;
       const last_elem = parent.children.buffer[lastidx];
       xpos = last_elem.geom.pos[0] - last_elem.geom.dim[0];
    }
-   else{ // Else get the right position of the parent as the initial start position
-      // const extra = (parent.margin) ? parent.margin[0] : (parent.pad) ? parent.pad : 0; 
+   else{ // Else its the first 'right' mesh, so get the right position of the parent as the initial start position
       const extra = parent.StylesGetMargin(STYLES.AXIS.X); 
       xpos = parent.geom.pos[0] + parent.geom.dim[0] - extra;
    }
@@ -152,20 +151,22 @@ export function Relative_pos_comp_recalc_right(parent){
 function _Relative_pos_comp_recalc_left(whereidx, parent){
 
    const children = parent.rel_comp.buffer[whereidx];
-   // const marginx = (parent.margin) ? parent.margin[0] : 0;
-   // let xpos = parent.geom.pos[0] - parent.geom.dim[0] + marginx;
-   let xpos = parent.geom.pos[0] - parent.geom.dim[0] + parent.StylesGetMargin(STYLES.AXIS.X);
+   // let xpos = parent.geom.pos[0] - parent.geom.dim[0] + parent.StylesGetMargin(STYLES.AXIS.X);
+   let xpos = parent.geom.pos[0] - parent.geom.dim[0];
 
    for(let i=0; i <= children.boundary; i++){
       
       const elemidx = children.buffer[i];
       const elem = parent.children.buffer[elemidx];
 
-      xpos += elem.geom.dim[0];
+      if(elem.state.mask & MESH_STATE.ACTIVE){
+         xpos += elem.geom.dim[0];
+         elem.SetPosXNoGfxUpdate(xpos);
+         // elem.SetPosX(xpos, elem.gfx);
+         // console.log('xpos',elem.GetName()) 
+         xpos += elem.geom.dim[0];
+      }
 
-      elem.SetPosXNoGfxUpdate(xpos);
-
-      xpos += elem.geom.dim[0];
    }
 }
 
@@ -175,19 +176,21 @@ function _Relative_pos_comp_recalc_left(whereidx, parent){
 function _Relative_pos_comp_recalc_right(whereidx, parent){
 
    const children = parent.rel_comp.buffer[whereidx];
-   // const marginx = (parent.margin) ? parent.margin[0] : 0;
-   // let xpos = parent.geom.pos[0] + parent.geom.dim[0] - marginx;
-   let xpos = parent.geom.pos[0] + parent.geom.dim[0] - parent.StylesGetMargin(STYLES.AXIS.X);
+   // let xpos = parent.geom.pos[0] + parent.geom.dim[0] - parent.StylesGetMargin(STYLES.AXIS.X);
+   let xpos = parent.geom.pos[0] + parent.geom.dim[0] ;
 
    for(let i=0; i <= children.boundary; i++){
       
       const elemidx = children.buffer[i];
       const elem = parent.children.buffer[elemidx];
 
-      xpos -= elem.geom.dim[0];
+      // if(elem.state.mask & MESH_STATE.ACTIVE){
 
-      elem.SetPosXNoGfxUpdate(xpos);
-
-      xpos -= elem.geom.dim[0];
+         xpos -= elem.geom.dim[0];
+         elem.SetPosXNoGfxUpdate(xpos);
+         // elem.SetPosX(xpos, elem.gfx);
+         // console.log(i, 'RIGHT:xpos', xpos, 'parentpos', parent.geom.pos, elem.GetName(), 'parent:', parent.GetName()) 
+         xpos -= elem.geom.dim[0];
+      // }
    }
 }

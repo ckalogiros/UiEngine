@@ -132,13 +132,13 @@ export class CameraOrthographic extends Camera {
 	}
 
 
-	Init() {
+	Init(width, height) {
 
 		const zoom = 1;
-		const dx = ( VIEWPORT.WIDTH- 0 ) / ( 2 * zoom );
-		const dy = ( 0 - VIEWPORT.HEIGHT ) / ( 2 * zoom );
-		const cx = ( VIEWPORT.WIDTH + 0 ) / 2;
-		const cy = ( 0 + VIEWPORT.HEIGHT ) / 2;
+		const dx = ( width - 0 ) / ( 2 * zoom );
+		const dy = ( 0 - height ) / ( 2 * zoom );
+		const cx = ( width + 0 ) / 2;
+		const cy = ( 0 + height ) / 2;
 
 		let left = cx - dx;
 		let right = cx + dx;
@@ -151,6 +151,27 @@ export class CameraOrthographic extends Camera {
 		this.isSet = true;
 
 		console.log('Camera Projection:', this.matrix)
+	}
+
+	Set(width, height){
+
+		const zoom = 1;
+		const dx = ( width - 0 ) / ( 2 * zoom );
+		const dy = ( 0 - height ) / ( 2 * zoom );
+		const cx = ( width + 0 ) / 2;
+		const cy = ( 0 + height ) / 2;
+
+		let left = cx - dx;
+		let right = cx + dx;
+		let top = cy + dy;
+		let bottom = cy - dy;
+
+		const near = 0, far = 1000;
+
+		this.makeOrthographic( left, right, top, bottom, near, far );
+		this.isSet = true;
+
+		// console.log('Camera Projection:', this.matrix)
 	}
 
 }

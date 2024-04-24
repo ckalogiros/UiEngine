@@ -172,6 +172,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx, num_faces 
  * I the group in sid is set, then create a new group for the vertex buffers
  * Else default to the default group
  */
+//(this.sid, this.sceneidx, this.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
 export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs=[INT_NULL, INT_NULL]) {
 
 

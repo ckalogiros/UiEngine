@@ -328,7 +328,7 @@ export function Listener_dispatch_check_hover_event() {
 
    let intersects = false;
 
-   if(STATE.mesh.focused){
+   if(STATE.mesh.focused && STATE.mesh.focused.listeners){ // TODO: efficiency: must check because the focused may not have a listen event. FIXME
       
       const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(STATE.mesh.focusedIdx);
       const point = MouseGetPos();
@@ -339,8 +339,8 @@ export function Listener_dispatch_check_hover_event() {
       if (intersects) {
 
          const mesh = Mesh_buffer_get_mesh_byidx(STATE.mesh.focusedIdx);
-         const event = _listeners_buffer_storage.buffer[E.H].buffer[mesh.listeners.buffer[E.H]];
 
+         const event = _listeners_buffer_storage.buffer[E.H].buffer[mesh.listeners.buffer[E.H]];
          if(event){
 
             if(event.view.children){
@@ -478,7 +478,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
    let intersects = false;
 
 
-   if(STATE.mesh.focused){
+   if(STATE.mesh.focused && STATE.mesh.focused.listeners){ // TODO: efficiency: must check because the focused may not have a listen event. FIXME
       
       const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(STATE.mesh.focusedIdx);
       const point = MouseGetPos();

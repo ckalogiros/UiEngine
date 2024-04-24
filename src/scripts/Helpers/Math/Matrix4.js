@@ -756,59 +756,7 @@ class Matrix4 {
 
 	}
 
-	// makePerspective(left, right, top, bottom, near, far) {
 
-	// 	const te = this.matrix;
-	// 	const x = -2 * near / (right - left);
-	// 	const y = -2 * near / (top - bottom);
-
-	// 	const a = (right + left) / (right - left);
-	// 	const b = (top + bottom) / (top - bottom);
-	// 	const c = far / (far - near);
-	// 	const d = -(far * near) / (far - near);
-
-	// 	/**
-	// 	 	-2x   0  0   0 
-	// 		  0 -2y  0   0
-	// 		  a   b -c  -1
-	// 		  0   0 -2d  0
-	// 	 */
-	// 	te[0] = x; te[4] = 0; te[8]  = 0; 	te[12] = 0;
-	// 	te[1] = 0; te[5] = y; te[9]  = 0; 	te[13] = 0;
-	// 	te[2] = 0; te[6] = 0; te[10] = c; 	te[11] = d;
-	// 	te[3] = 0; te[7] = 0; te[14] = -2; 	te[15] = 0;
-
-
-	// 	return this;
-
-	// }
-	
-	// makePerspective(left, right, top, bottom, near, far) {
-
-	// 	const te = this.matrix;
-	// 	const x = -2 * near / (right - left);
-	// 	const y = -2 * near / (top - bottom);
-
-	// 	const a = (right + left) / (right - left);
-	// 	const b = (top + bottom) / (top - bottom);
-	// 	const c = - (far + near) / (far - near);
-	// 	const d = - (2 * far * near / (far - near));
-
-	// 	/**
-	// 	 	-2x   0   0   0 
-	// 		  0 -2y   0   0
-	// 		  a   b  -c  -1
-	// 		  0   0 -2d   0
-	// 	 */
-	// 	te[0] = x; te[4] = 0; te[8]  = a; 	te[12] = 0;
-	// 	te[1] = 0; te[5] = y; te[9]  = b; 	te[13] = 0;
-	// 	te[2] = 0; te[6] = 0; te[10] = c; 	te[14] = d;
-	// 	te[3] = 0; te[7] = 0; te[11] = -1; 	te[15] = 0;
-
-
-	// 	return this;
-
-	// }
 
 	makePerspective( left, right, top, bottom, near, far ) {
 

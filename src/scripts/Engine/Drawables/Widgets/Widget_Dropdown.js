@@ -10,7 +10,7 @@ import { Create_widget_button, Create_widget_section } from "../../Core/CreateWi
 import { Mesh_buffer_get_mesh_byidx, Widget_movexy, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_is_widget_root, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { Clampx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { Section } from "../Meshes/Section.js";
-import { BLUEL, GREEN, GREY, PURPLER, REDL, WHITE } from "../Material/Base/Colors.js";
+import { BLUEL, GREEN, GREY, PURPLEB, PURPLER, REDL, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_get_view_vb_root_meshidx, View_remove_from_group, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 
@@ -59,7 +59,7 @@ export function Dropdown_roots_print_root_buffer() {
 }
 
 
-const tr = .5;
+const tr = 1.5;
 const _font_size = 9;
 
 export class Widget_Dropdown extends Section {
@@ -92,13 +92,13 @@ export class Widget_Dropdown extends Section {
       AddArr2(this.menu.total_margin, this.menu.StylesGetMargin());
       AddArr2(this.menu.total_margin, this.StylesGetMargin());
       { // Multi color vertex
-         this.menu.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-         this.menu.mat.col = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
-         this.menu.mat.defCol = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
-         this.menu.mat.col[1][3] = .5;
-         this.menu.mat.col[1][7] = .5;
-         this.menu.mat.col[1][11] = .5;
-         this.menu.mat.col[1][15] = .6;
+         // this.menu.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
+         // this.menu.mat.col = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
+         // this.menu.mat.defCol = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
+         // this.menu.mat.col[1][3] = .5;
+         // this.menu.mat.col[1][7] = .5;
+         // this.menu.mat.col[1][11] = .5;
+         // this.menu.mat.col[1][15] = .6;
       }
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
 
@@ -300,7 +300,7 @@ export class Widget_Dropdown extends Section {
 
                const btn1 = item.children.buffer[0];
                btn1.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx_rect, igfx_text);
-               btn1.SetZPos(item.geom.pos[2] + 1);
+               btn1.SetPosZNoGfxUpdate(item.geom.pos[2] + 1);
 
                if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's dp menu (runs recursive for any opened sub dp menus). 
 
@@ -974,7 +974,7 @@ export class Widget_Dropdown extends Section {
       for (let i = 0; i <= this.menu.children.boundary; i++) {
          const child = this.menu.children.buffer[i];
          if (child)
-            child.SetZPos(this.menu.geom.pos[2] + 1);
+            child.SetPosZNoGfxUpdate(this.menu.geom.pos[2] + 1);
       }
    }
 

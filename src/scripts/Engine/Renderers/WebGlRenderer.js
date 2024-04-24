@@ -11,41 +11,10 @@ import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuf
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Command_buffer_run } from "../Core/Commandbuffer.js";
+import { Scene_set_projection_matrix } from "../Scenes.js";
 
 
 
-/**
- * WebGl
- * 
- * GlDepthFunc Constant Parameters
-         gl.NEVER (never pass)
-         gl.LESS (pass if the incoming value is less than the depth buffer value)
-         gl.EQUAL (pass if the incoming value equals the depth buffer value)
-         gl.LEQUAL (pass if the incoming value is less than or equal to the depth buffer value)
-         gl.GREATER (pass if the incoming value is greater than the depth buffer value)
-         gl.NOTEQUAL (pass if the incoming value is not equal to the depth buffer value)
-         gl.GEQUAL (pass if the incoming value is greater than or equal to the depth buffer value)
-         gl.ALWAYS (always pass)
- *
- *     
- * GlBlend Constants
-         gl.ZERO 	                    Multiplies all colors by 0.
-         gl.ONE 	                        Multiplies all colors by 1.
-         gl.SRC_COLOR 	                Multiplies all colors by the source colors.
-         gl.ONE_MINUS_SRC_COLOR 	        Multiplies all colors by 1 minus each source color.
-         gl.DST_COLOR 	                Multiplies all colors by the destination color.
-         gl.ONE_MINUS_DST_COLOR 	        Multiplies all colors by 1 minus each destination color.
-         gl.SRC_ALPHA 	                Multiplies all colors by the source alpha value.
-         gl.ONE_MINUS_SRC_ALPHA 	        Multiplies all colors by 1 minus the source alpha value.
-         gl.DST_ALPHA 	                Multiplies all colors by the destination alpha value.
-         gl.ONE_MINUS_DST_ALPHA 	        Multiplies all colors by 1 minus the destination alpha value.
-         gl.CONSTANT_COLOR 	            Multiplies all colors by a constant color.
-         gl.ONE_MINUS_CONSTANT_COLOR 	Multiplies all colors by 1 minus a constant color.
-         gl.CONSTANT_ALPHA 	            Multiplies all colors by a constant alpha value.
-         gl.ONE_MINUS_CONSTANT_ALPHA 	Multiplies all colors by 1 minus a constant alpha value.
-         gl.SRC_ALPHA_SATURATE 	        Multiplies the RGB colors by the smaller of either the source alpha value or the value of 1 minus the destination alpha value. The alpha value is multiplied by 1. 
-      
- */
 
 
 // TODO: Make PLATFORM, Device and VIEWPORT private to Renderer???
@@ -53,7 +22,7 @@ import { Command_buffer_run } from "../Core/Commandbuffer.js";
 
 var _renderer = null;
 
-export function Renderer_create_renderer(scene, camera){
+export function Renderer_create_renderer(scene, camera) {
    _renderer = new WebGlRenderer(scene, camera);
    return _renderer;
 }
@@ -63,7 +32,7 @@ export function Renderer_create_renderer(scene, camera){
 export class WebGlRenderer {
 
    scene;
-   // camera;
+   camera;
    canvas;
    gl;
    extensions;
@@ -76,8 +45,11 @@ export class WebGlRenderer {
       this.Init();
 
       this.scene = scene;
+      
+      
       scene.SetCamera(camera);
-      camera.Init();
+      camera.Init(VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
+      this.camera = camera;
 
 
 
@@ -97,35 +69,35 @@ export class WebGlRenderer {
          TimeUpdate();
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
-         
+
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
          TimeIntervalsUpdateAll(); // Update and run callbacks for each interval timer that has been set.
          TimersUpdateGlobalTimer(); // This is a globbal timer, going only forward
          TimersUpdateTimers();
          // TimersUpdateStepTimers();
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
-         
+
          Framebuffer_update_draw();
          // _pt_scene_update.timer.Start(); 
-         this.scene.OnUpdate(); 
+         this.scene.OnUpdate();
          // _pt_scene_update.timer.Stop();
-         
+
          Batch_update()
          
-         Command_buffer_run()
-         
          Notifications_update();
-         
+
+         Command_buffer_run()
+
          Uniforms_block_update_uniform();
-         
+
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
-         Gl_draw(this.gl); 
+         Gl_draw(this.gl);
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)
-         
-         
+
+
          MouseResetDif(.5);
          MouseResetWheel();
-         
+
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
 
 
@@ -187,7 +159,7 @@ export class WebGlRenderer {
        */
       this.gl.enable(this.gl.BLEND);
       this.gl.blendFunc(this.gl.DST_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-      
+
       // this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
       // this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_DST_ALPHA);
       // this.gl.blendFunc(this.gl.DST_ALPHA, this.gl.ONE_MINUS_DST_ALPHA);
@@ -260,27 +232,36 @@ export class WebGlRenderer {
 
 
 
-export function On_window_resize(){
+export function On_window_resize() {
 
-      Device.width = window.innerWidth;
-      Device.height = window.innerHeight;
+   Device.width = window.innerWidth;
+   Device.height = window.innerHeight;
 
-      // Update (global) VIEWPORT object
-      VIEWPORT.WIDTH = _renderer.canvas.width;
-      VIEWPORT.HEIGHT = _renderer.canvas.height;
+   _renderer.canvas.width  = Device.width;
+   _renderer.canvas.height = Device.height;
 
-      VIEWPORT.LEFT = 0;
-      VIEWPORT.RIGHT = _renderer.canvas.width;
-      VIEWPORT.TOP = 0;
-      VIEWPORT.BOTTOM = _renderer.canvas.height;
-      VIEWPORT.centerX = VIEWPORT.LEFT + (VIEWPORT.WIDTH / 2);
-      VIEWPORT.centerY = VIEWPORT.TOP + (VIEWPORT.HEIGHT / 2);
+   VIEWPORT.WIDTH  = Device.width;
+   VIEWPORT.HEIGHT = Device.height;
 
-      VIEWPORT.MARGIN.LEFT = (window.innerWidth - VIEWPORT.WIDTH) / 2;
-      VIEWPORT.MARGIN.TOP = (window.innerHeight - VIEWPORT.HEIGHT) / 2
+   VIEWPORT.LEFT = 0;
+   VIEWPORT.RIGHT = _renderer.canvas.width;
+   VIEWPORT.TOP = 0;
+   VIEWPORT.BOTTOM = _renderer.canvas.height;
+   VIEWPORT.centerX = VIEWPORT.LEFT + (VIEWPORT.WIDTH / 2);
+   VIEWPORT.centerY = VIEWPORT.TOP + (VIEWPORT.HEIGHT / 2);
 
-      POSITION_CENTER[0] = VIEWPORT.WIDTH / 2;
-      POSITION_CENTER[1] = VIEWPORT.HEIGHT / 2;
+   VIEWPORT.MARGIN.LEFT = (window.innerWidth - VIEWPORT.WIDTH) / 2;
+   VIEWPORT.MARGIN.TOP = (window.innerHeight - VIEWPORT.HEIGHT) / 2
+
+   POSITION_CENTER[0] = VIEWPORT.WIDTH / 2;
+   POSITION_CENTER[1] = VIEWPORT.HEIGHT / 2;
+
+
+   gfxCtx.gl.viewport(0, 0, VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
+
+   _renderer.camera.Set(VIEWPORT.WIDTH, VIEWPORT.HEIGHT); // Set the new camera projection matrix
+   Scene_set_projection_matrix(_renderer.scene.sceneidx); // update camera's projection matrix
+   // console.log(window.innerWidth, VIEWPORT.WIDTH)
 }
 
 

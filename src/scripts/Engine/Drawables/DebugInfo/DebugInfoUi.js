@@ -25,7 +25,8 @@ import { Styles_batch_destroy_run } from "../../Styles.js";
 
 const _font_size = 8.5;
 
-export function Debug_info_ui() {
+/** 'is_root_widget' can be two values: 1. ROOT_WIDGETS.CREATE_ROOT-which creates an independed widget, 2. undefined-which means that ths widget will belong to some parent structure */
+export function Debug_info_ui(is_root_widget=undefined) {
 
    // Style generic for widgets.
    const tr = 1.5; // Transparency
@@ -47,7 +48,7 @@ export function Debug_info_ui() {
    const switch_col = TRANSPARENCY(GREY[0], .9);
    const switch_col2 = TRANSPARENCY(BLUEL[5], .9);
 
-   const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Options', [10, 30, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
+   const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [10, 30, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    dp.CreateMoveEvent();
    // dp.CreateMoveEvent();
@@ -130,19 +131,23 @@ export function Debug_info_ui() {
 
 
 
-   dp.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-   // dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-   dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENTY;
 
-   dp.Calc_no_gfx_update();
+   dp.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
+   
+   if(is_root_widget !== undefined){
 
-   dp.Render();
-
-   dp.ConstructListeners();
-
-
-   // Create Group for this dropdown, to easily remove meshes from their vertex buffers and rebuild the vertex buffer
-   View_build_group_from_root_mesh(dp);
+      dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   
+      dp.Calc_no_gfx_update();
+   
+      dp.Render();
+   
+      dp.ConstructListeners();
+   
+      // Create Group for this dropdown, to easily remove meshes from their vertex buffers and rebuild the vertex buffer
+      View_build_group_from_root_mesh(dp);
+   }
 
    return dp;
 }
@@ -1038,7 +1043,10 @@ function Debug_info_create_mesh_info(params) {
    dp.CreateClickEvent();
    dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
-   dp.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
+   
+   // dp.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
+   dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+   dp.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
 
    section.AddItem(dp);
 
@@ -1048,7 +1056,8 @@ function Debug_info_create_mesh_info(params) {
    scroller.StateEnable(MESH_STATE.ACTIVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.EXPAND | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+   // scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.EXPAND | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+   scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
 
 
    // Create the dropdown structure representing all the applications's meshes
@@ -1090,6 +1099,8 @@ function Debug_info_mesh_add_meshes_as_tree_struct(mesh, parent) {
    // Create a dropdown for the mesh, and then create some info of the mesh as text and add it to the dropdown's menu
    const dp_mesh = Create_widget_dropdown(_, `${mesh.GetName()}`, [0, 0, parent.geom.pos[2] + 1], TRANSPARENCY(GREY[5], .5), TRANSPARENCY(GREY[1], .8), WHITE, temp_btnpad, _, _, _, [4, 4]);
    parent.AddToMenu(dp_mesh);
+   dp_mesh.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+   dp_mesh.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
 
    const fontsize = 10;
 
@@ -1150,6 +1161,8 @@ function Debug_info_mesh_update(params) {
 
       const dp_mesh = Create_widget_dropdown(_, ` ${added_mesh_gfx.mesh.GetName()}`, [0, 0, parent.geom.pos[2] + 1], TRANSPARENCY(GREEN[7], .5), GREY[1], WHITE, [8, 3]);
       root_info_dp.AddToMenu(dp_mesh);
+      dp_mesh.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+      dp_mesh.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
 
       const gfx_idxs = [root_info_dp.menu.gfx.prog.idx, root_info_dp.menu.gfx.vb.idx];
       dp_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, gfx_idxs);

@@ -147,11 +147,11 @@ export class Widget_Label extends Rect {
     /*******************************************************************************************************************************************************/
 
     // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific = [INT_NULL, INT_NULL]) {
-    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific=null) {
+    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific = null) {
 
         this.gfx = Gfx_generate_context(FLAGS, this, area_gfx_specific);
-        if(!text_gfx_specific)
-            this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, this.text_mesh, text_gfx_specific);
+        if (!text_gfx_specific)
+            this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, this.text_mesh, text_gfx_specific);
         else
             this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_gfx_specific);
 
@@ -208,8 +208,14 @@ export class Widget_Label extends Rect {
         return all_meshes;
     }
 
+    SetPosX(x) {
 
-    SetZPos(z) {
+        super.SetPosX(x);
+        this.text_mesh.SetPosX(x);
+    }
+
+
+    SetPosZNoGfxUpdate(z) {
         this.geom.pos[2] = z;
         this.text_mesh.geom.pos[2] = z + 1;
     }
@@ -228,7 +234,7 @@ export class Widget_Label extends Rect {
 
     SetPosXNoGfxUpdate(x) {
         this.geom.pos[0] = x;
-        this.text_mesh.geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0] ) + this.text_mesh.geom.dim[0] + this.pad[0];
+        this.text_mesh.geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
     }
 
 
@@ -262,7 +268,7 @@ export class Widget_Label extends Rect {
              */
             this.text_mesh.geom.MoveXY(move_dif[0], move_dif[1], this.text_mesh.gfx);
         }
-        else{
+        else {
             this.text_mesh.geom.pos[0] += move_dif[0];
             this.text_mesh.geom.pos[1] += move_dif[0];
         }
@@ -472,7 +478,7 @@ export class Widget_Label extends Rect {
 
         const mesh = this; // If in recursion, use as the current mesh the passed param. 
 
-        if(mesh.listeners){
+        if (mesh.listeners) {
             for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
                 const evt = mesh.listeners.buffer[etypeidx];
@@ -553,7 +559,7 @@ export class Widget_Label extends Rect {
 
                 STATE.mesh.SetGrabed(mesh);
                 STATE.mesh.SetFocused(mesh);
-                mesh.StateEnable(MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS);
+                mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
                 Widget_root_set_in_focus(mesh.root_bufferidx);
             }
 
@@ -610,42 +616,42 @@ export class Widget_Label extends Rect {
     OnResize(params) {
 
         const mesh = params.params;
-        
+
         if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
-            
+
             const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
             TimeIntervalsDestroyByIdx(intervalIdx);
             mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
-            
+
             return;
         }
-        
+
         // console.log('RESIZING ', mesh.GetName());
         const mouse_pos = MouseGetPosDif();
-        
+
         if (mouse_pos.x !== 0 || mouse_pos.y !== 0) {
 
-            const x = mouse_pos.x /2;
-            const y = -mouse_pos.y /2;
-            
+            const x = mouse_pos.x / 2;
+            const y = -mouse_pos.y / 2;
+
             // Check for min dimentions. // TODO: Who decides for the minimum dimentions??????
             const min_width = 40;
             const min_height = 20;
-            
-            if(mesh.geom.dim[0] + x > min_width) {
+
+            if (mesh.geom.dim[0] + x > min_width) {
                 mesh.geom.dim[0] += x;
                 mesh.geom.pos[0] += x;
             }
-            if(mesh.geom.dim[1] + y > min_height) {
-                mesh.geom.dim[1] += y; 
+            if (mesh.geom.dim[1] + y > min_height) {
+                mesh.geom.dim[1] += y;
                 mesh.geom.pos[1] += y;
             }
-            
-            
+
+
             Gl_set_dim_XY(mesh.gfx, mesh.geom.dim, mesh.geom.num_faces)
             Gl_set_wpos_XY(mesh.gfx, mesh.geom.pos, mesh.geom.num_faces)
-            
-            
+
+
             // TODO: Align text
             const text_mesh = mesh.text_mesh;
 

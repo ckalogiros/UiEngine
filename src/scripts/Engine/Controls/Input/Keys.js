@@ -2,7 +2,6 @@
 
 import { Listener_debug_print_view_recursive, Listener_debug_print_storage_buffer, Listener_debug_print_view_storage_buffer } from "../../Events/EventListeners.js";
 import { Renderqueue_get } from "../../Renderers/Renderer/RenderQueue.js";
-import { Scenes_get_scene_by_idx } from "../../Scenes.js";
 import { TimeIntervalsPrintAll } from "../../Timers/TimeIntervals.js";
 import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
@@ -14,7 +13,6 @@ import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js
 import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/VertexArrays.js";
 import { Gl_program_print } from "../../../Graphics/ShaderPrograms.js";
 import { Shader_attributes_print } from "../../../Graphics/ShaderAttributes.js";
-import { Gfx_pool_print } from "../../Interfaces/Gfx/GfxPool.js";
 import { View_buffer_print, View_buffer_print_loop } from "../../Core/MeshBufferViews.js";
 import { Styles_hover_margin_print, Styles_hover_margin_print_loop, Styles_margin_print, Styles_margin_print_loop, Styles_pad_buffer_print, Styles_pad_buffer_print_loop } from "../../Styles.js";
 import { TEMP_dbg_info_ui_print_entries_table, TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
@@ -556,8 +554,8 @@ export function OnKeyUp(e){
    else if(len === 0){
 
       if       (_keys_buffer[len].key === 'p') { DEBUG_PRINT_KEYS[p].func(e); }
-      else if  (_keys_buffer[len].key === 'a') { console.log('@ Render Queue', `\n  1:${DEBUG_PRINT_KEYS[r1].discr}, 2:${DEBUG_PRINT_KEYS[r2].discr}`); }
-      else if  (_keys_buffer[len].key === 'r') { console.log('@ Buffers Allocations', `\n  1:${DEBUG_PRINT_KEYS[a1].discr}, 2:${DEBUG_PRINT_KEYS[a2].discr}`); }
+      else if  (_keys_buffer[len].key === 'a') { console.log('@ Buffers Allocations', `\n  1:${DEBUG_PRINT_KEYS[a1].discr}, 2:${DEBUG_PRINT_KEYS[a2].discr}`); }
+      else if  (_keys_buffer[len].key === 'r') { console.log('@ Render Queue', `\n  1:${DEBUG_PRINT_KEYS[r1].discr}, 2:${DEBUG_PRINT_KEYS[r2].discr}`); }
       else if  (_keys_buffer[len].key === 'f') { console.log('@ Frame Buuffer', `\n  1:${DEBUG_PRINT_KEYS[f1].discr}, 2:${DEBUG_PRINT_KEYS[f2].discr}`);  }
       else if  (_keys_buffer[len].key === 'i') { console.log('@ Time Intervals Queue', `\n  1:${DEBUG_PRINT_KEYS[i1].discr}`); }
       else if  (_keys_buffer[len].key === 'l') { console.log('@ Event Listeners', `\n  1:${DEBUG_PRINT_KEYS[l1].discr}\n  2:${DEBUG_PRINT_KEYS[l2].discr}\n  3:${DEBUG_PRINT_KEYS[l3].discr}`); }
@@ -566,7 +564,7 @@ export function OnKeyUp(e){
       else if  (_keys_buffer[len].key === 't') { console.log('@ Styles', `\n  1:${DEBUG_PRINT_KEYS[t1].discr}\n  2:${DEBUG_PRINT_KEYS[t2].discr}\n  3:${DEBUG_PRINT_KEYS[t3].discr}\n  4:${DEBUG_PRINT_KEYS[t4].discr}\n  5:${DEBUG_PRINT_KEYS[t5].discr}\n  6:${DEBUG_PRINT_KEYS[t6].discr}`); }
       else if  (_keys_buffer[len].key === 'v') { console.log('@ GL', `\n  a:${DEBUG_PRINT_KEYS[va].discr}\n  b:${DEBUG_PRINT_KEYS[vb].discr}\n  i:${DEBUG_PRINT_KEYS[vi].discr}\n  p:${DEBUG_PRINT_KEYS[vp].discr}\n  s:${DEBUG_PRINT_KEYS[vs].discr}`); }
       else if  (_keys_buffer[len].key === 'g') { console.log('@ +++', `\n  s:${DEBUG_PRINT_KEYS[gs].discr}\n  w:${DEBUG_PRINT_KEYS[gw].discr}\n  1:${DEBUG_PRINT_KEYS[g1].discr}\n  2:${DEBUG_PRINT_KEYS[g2].discr}\n  3:${DEBUG_PRINT_KEYS[g3].discr}\n  4:${DEBUG_PRINT_KEYS[g4].discr}\n  5:${DEBUG_PRINT_KEYS[g5].discr}\n  6:${DEBUG_PRINT_KEYS[g6].discr}`); }
-      else if  (_keys_buffer[len].key === 'm') { console.log('@ Mesh Buuffer', `\n  1:${DEBUG_PRINT_KEYS[m1].discr}, 2:${DEBUG_PRINT_KEYS[m2].discr}`); }
+      else if  (_keys_buffer[len].key === 'm') { console.log('@ Mesh Buffer', `\n  1:${DEBUG_PRINT_KEYS[m1].discr}, 2:${DEBUG_PRINT_KEYS[m2].discr}`); }
       else if  (_keys_buffer[len].key === 'y') { console.log('@ Debuug ui entries table', `\n  1:${DEBUG_PRINT_KEYS[y1].discr}\n  2:${DEBUG_PRINT_KEYS[y2].discr}`); }
    }
 

@@ -6,10 +6,11 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/Tim
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { AddArr2, RoundFloat1Decimal } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js';
-import { Widget_root_add_mesh, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
+import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
 import { Generate_graphics_context } from '../../Interfaces/Gfx/GfxContextFindMatch.js';
+import { Find_parent_listen_event } from '../Operations/Recursions.js';
 
 
 
@@ -25,14 +26,13 @@ export class Widget_Slider extends Rect {
       // Calculate the bar's and handle's horizontal pading.
       const ratio = dim[0] / dim[1];
       const pad = [dim[0] * 0.5, dim[1] / 2.8];
-      // const pad = [dim[0], dim[1] / 2.8];
       pad[0] /= ratio;
 
       // Calculate the font size of the sliders texts, base on the sliders dimentions
-      // const min_font_size = 4, max_font_size = 10;
-      // const r = 3;
-      // const fontSize = max_font_size < (dim[1] / r) ? max_font_size : (min_font_size > (dim[1] / r) ? min_font_size : (dim[1] / r));
-      const fontSize = 10;
+      const min_font_size = 7, max_font_size = 25;
+      const r = 2;
+      const fontSize = max_font_size < (dim[1] / r) ? max_font_size : (min_font_size > (dim[1] / r) ? min_font_size : (dim[1] / r));
+      // const fontSize = 10;
 
 
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
@@ -53,9 +53,6 @@ export class Widget_Slider extends Rect {
 
       // this.StateEnable(MESH_STATE.HAS_POPUP);
 
-      if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
-         this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
-      }
 
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Slider Bar: Bar is child of the slider mesh
@@ -71,21 +68,25 @@ export class Widget_Slider extends Rect {
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       bar.SetStyle([0, 3, 2]);
       // bar.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-
-
-
+      // bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT)
+      bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+      
+      
+      
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Slider Handle: Handle is a child of the bar mesh
       pad[1] = dim[1] / 10;
       const handleMetrics = this.#CalculateHandleArea(bar.geom.pos, dim, pad)
-
-
+      
+      
       const handle = Create_rect_mesh(handleMetrics.pos, handleMetrics.dim, BLUE_10_120_220, is_debug_mesh);
       handle.sid.gfx_group = this.sid.gfx_group;
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([5, 35, 3]);
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+      // handle.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT)
+      // handle.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
       
       
       
@@ -113,7 +114,7 @@ export class Widget_Slider extends Rect {
       value_text.geom.pos[0] = bar.geom.pos[0] + bar.geom.dim[0] - (value_text.geom.CalcTextWidth());
       value_text.geom.pos[2] = bar.geom.pos[2] + 1;
       
-      name_text.geom.pos[1] = handle.geom.pos[1] - handle.geom.dim[1] - name_text.geom.dim[1]
+      // name_text.geom.pos[1] = handle.geom.pos[1] - handle.geom.dim[1] - name_text.geom.dim[1]
       name_text.geom.pos[0] = bar.geom.pos[0] - bar.geom.dim[0] + name_text.geom.dim[0];
       name_text.geom.pos[2] = this.geom.pos[2] + 1;
       
@@ -123,8 +124,15 @@ export class Widget_Slider extends Rect {
       bar.AddChild(value_text)
       
       this.text_mesh = name_text;
+      // this.text_mesh.parent = this;
+
       
       
+      if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
+         this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
+         
+         this.AddToWidgetRootBuffer(this.root_bufferidx)
+      }
       
       value_text.SetName(this.GetName() + ' - value_text');
       handle.SetName('handle');
@@ -257,29 +265,22 @@ export class Widget_Slider extends Rect {
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY) {
 
 
-      let rect_igfx = null;
-      rect_igfx = Generate_graphics_context(FLAGS, this);
-      this.gfx = Gfx_generate_context(this.sid, this.sceneidx, this.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
-      rect_igfx.idxs = [this.gfx.prog.idx, this.gfx.vb.idx]; // Copy the gfx from the scroller area.
+      this.gfx = Gfx_generate_context(FLAGS, this);
+      const rect_igfx = [this.gfx.prog.idx, this.gfx.vb.idx]; // Copy the gfx from the scroller area.
       
       
-      let text_igfx = null;
-      text_igfx = Generate_graphics_context(FLAGS, this.text_mesh);
-      this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.sid, this.text_mesh.sceneidx, this.text_mesh.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, text_igfx.idxs, this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
-      text_igfx.idxs = [this.text_mesh.gfx.prog.idx, this.text_mesh.gfx.vb.idx];
-
-
       const name_text = this.text_mesh;
-      name_text.gfx = Gfx_generate_context(name_text.sid, name_text.sceneidx, name_text.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, text_igfx.idxs, name_text.root_bufferidx, name_text.mesh_bufferidx);
+      name_text.gfx = Gfx_generate_context(FLAGS|GFX_CTX_FLAGS.SPECIFIC, name_text);
+      const text_igfx = [name_text.gfx.prog.idx, name_text.gfx.vb.idx];
 
       const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.gfx = Gfx_generate_context(bar.sid, bar.sceneidx, bar.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, bar.root_bufferidx, bar.mesh_bufferidx);
+      bar.gfx = Gfx_generate_context(FLAGS, bar, rect_igfx);
 
       const handle = bar.children.buffer[0];
-      handle.gfx = Gfx_generate_context(handle.sid, handle.sceneidx, handle.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, handle.root_bufferidx, handle.mesh_bufferidx);
+      handle.gfx = Gfx_generate_context(FLAGS, handle, rect_igfx);
 
       const value_text = bar.children.buffer[1];
-      value_text.gfx = Gfx_generate_context(value_text.sid, value_text.sceneidx, value_text.geom.num_faces, FLAGS | GFX_CTX_FLAGS.SPECIFIC, text_igfx.idxs, value_text.root_bufferidx, value_text.mesh_bufferidx);
+      value_text.gfx = Gfx_generate_context(FLAGS|GFX_CTX_FLAGS.SPECIFIC, value_text, text_igfx);
    
       return this.gfx;
    }
@@ -390,7 +391,7 @@ export class Widget_Slider extends Rect {
       const mesh = params.evt_params.target_mesh;
       const point = MouseGetPos();
 
-      // Check if the click happened on bar
+      // Check if the click happened on bar for slide event
       const bar = mesh.children.buffer[SLIDER_BAR_IDX];
       if (point[1] > bar.geom.pos[1] - bar.hover_margin[1]) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
 
@@ -412,18 +413,15 @@ export class Widget_Slider extends Rect {
 
          return true;
       }
-      else {
+      else { // Else Move Widget Slider 
 
          STATE.mesh.SetClicked(bar);
          // STATE.mesh.SetFocused(mesh);
 
-         // Move Slider 
          if ((mesh.type & MESH_TYPE.WIDGET_SLIDER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
-            // const idx = TimeIntervalsCreate(10, 'Move Slider', TIME_INTERVAL_REPEAT_ALWAYS, Slider_move_event, mesh);
             const idx = TimeIntervalsCreate(10, 'Move Slider', TIME_INTERVAL_REPEAT_ALWAYS, mesh.OnMove, mesh);
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
-            // mesh.timeIntervalsIdxBuffer.Add(idx);
 
             STATE.mesh.SetGrabed(mesh);
             STATE.mesh.SetFocused(mesh);
@@ -447,44 +445,60 @@ export class Widget_Slider extends Rect {
    // SEE ### Construct Listeners
    ConstructListeners(parent_listeners = null) {
 
-      alert('IMPLEMENT ME\n SEE console.error')
-      console.error('ConstructListeners() @ Slider.js')
-      /**
-       * If checks for listen events should be for null and int_null
-       * Also create a llop
-       * Copy from  other widget's ConstructListeners
-       */
       const slider = this;
       const bar = slider.children.buffer[SLIDER_BAR_IDX];
       const handle = bar.children.buffer[0];
 
-      // const root_evt = _root ? _root.listeners.buffer : null;
 
-      // Create hover events, NOT as part of the root listen events.
-      if (slider.listeners.buffer[E.H]) slider.AddListenEvent(E.H);
-      if (handle.listeners.buffer[E.H]) handle.AddListenEvent(E.H);
-      if (bar.listeners.buffer[E.H]) bar.AddListenEvent(E.H);
+      for (let i = 0; i < LISTEN_EVENT_TYPES_INDEX.SIZE; i++) {
+         
+               
+         if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+            parent_listeners = [null, null];
+         }
 
-      const evt_params = {
-         EventClbk: null,
-         targetBindingFunctions: null,
-         target_mesh: slider,
-         params: null,
+         if(slider.listeners){
+
+            const params = {
+               EventClbk: null, targetBindingFunctions: null,
+               target_mesh: slider, params: null,
+            }
+
+            if(slider.listeners.buffer[i] !== null){
+               
+               slider.AddListenEvent(i, slider.OnClick, params, slider.listeners.buffer[i]);
+               parent_listeners[i] = slider.listeners.buffer[i];
+            }
+            
+            if(bar.listeners.buffer[i] !== null){
+               bar.AddListenEvent(i, slider.OnClick, params, parent_listeners[i]);
+            }
+            if(handle.listeners.buffer[i] !== null){
+               bar.AddListenEvent(i, slider.OnClick, params, parent_listeners[i]);
+            }
+         }
+         else {
+
+
+            if (parent_listeners[i] === null || parent_listeners[i] === INT_NULL) {
+               parent_listeners[i] = Find_parent_listen_event(i, bar);
+            }
+
+            if (bar.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
+   
+               bar.AddListenEvent(i, null, null, parent_listeners[i])
+            }
+            else { // Else construct with Clbk and params
+   
+               const params = {
+                  EventClbk: null, targetBindingFunctions: null,
+                  target_mesh: slider, params: null,
+               }
+   
+               bar.AddListenEvent(i, slider.OnClick, params, parent_listeners[i]);
+            }
+         }
       }
-      if (slider.listeners.buffer[E.C]) { // This is a check mainly if the user has activated the 'Move' event for the scroller.
-
-         slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE, false);
-         slider.AddListenEvent(E.C, slider.OnClick, evt_params);
-      }
-      else {
-
-         // Create a Fake click event with no callback and params, but any root events. 
-         slider.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
-         slider.AddListenEvent(E.C, null, null, parent_event_idx);
-      }
-      bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      bar.AddListenEvent(E.C, slider.OnClick, evt_params, slider.listeners.buffer);
-
    }
 
 
@@ -734,7 +748,7 @@ export class Widget_Slider extends Rect {
    }
 
 
-   SetZPos(z) {
+   SetPosZNoGfxUpdate(z) {
       this.geom.pos[2] = z;
 
       const bar = this.children.buffer[SLIDER_BAR_IDX];

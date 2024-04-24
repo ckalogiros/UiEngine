@@ -511,7 +511,7 @@ export function Vertex_buffer_update_vertices(gfx, geom, mat, dbg_mesh_name) {
 }
 
 
-export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index, remove_and_shift) {
+export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index, remove_and_shift, debug_mesh) {
 
 
     const vb_info = _vertex_buffers_info.buffer[gfx.vb.idx];
@@ -532,9 +532,18 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index, remov
     const vCount = removed_attribs / gfx.attribsPerVertex;
     vb_info.vCount -= vCount;
 
-    if (vb_info.count < 0)
-        console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb_info.idx=', vb_info.idx, '\nvb_info=', vb_info)
-    if (vb_info.count < 0) return true
+    if (vb_info.count < 0){
+
+        // console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb_info.idx=', vb_info.idx, '\nvb_info=', vb_info)   // console.log(
+        console.error('!!!!!!!!!!!!!!!!!!!!!!!!!',
+               'vbidx', gfx.vb.idx,
+               'mesh', debug_mesh.mesh_bufferidx,
+               'num_faces', num_faces,
+               'count', gfx.vb.count * num_faces,
+               'vb: count', vb_info.count,
+        );
+    }
+    // if (vb_info.count < 0) return true
 
 
 

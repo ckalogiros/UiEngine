@@ -854,6 +854,7 @@ export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
       // Update default position
       _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[0] += x;
       _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[1] += y;
+
    }
 
    const len = _root_batch_buffer.buffer[root_bufferidx].vb.length
