@@ -16,12 +16,11 @@ import { Find_parent_listen_event } from '../Operations/Recursions.js';
 
 let SLIDER_BAR_IDX = INT_NULL;
 
-// export class Widget_Slider extends Widget_Label {
 export class Widget_Slider extends Rect {
 
    text_mesh;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = TRANSPARENCY(GREY[1], .6), hover_margin = [0, 0], is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col = TRANSPARENCY(GREY[0], .6), hover_margin = [0, 0], is_debug_mesh) {
 
       // Calculate the bar's and handle's horizontal pading.
       const ratio = dim[0] / dim[1];
@@ -33,6 +32,9 @@ export class Widget_Slider extends Rect {
       const r = 2;
       const fontSize = max_font_size < (dim[1] / r) ? max_font_size : (min_font_size > (dim[1] / r) ? min_font_size : (dim[1] / r));
       // const fontSize = 10;
+
+
+      const pos = (ROOT_WIDGET_FLAGS !== undefined) ? _pos  : [0, 0, _pos[2]];
 
 
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
@@ -58,17 +60,14 @@ export class Widget_Slider extends Rect {
       // Slider Bar: Bar is child of the slider mesh
 
       // Calculate bar's dimentions and position.
-      const barpos = [pos[0], pos[1] + this.geom.dim[1], pos[2]]
-      const barMetrics = this.#CalculateBarArea(barpos, dim, pad)
+      const barMetrics = this.#CalculateBarArea(pos, dim, pad)
 
       const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, GREY[3], is_debug_mesh);
       bar.sid.gfx_group = this.sid.gfx_group;
 
       bar.type |= MESH_TYPE.WIDGET_SLIDER_BAR | bar.geom | bar.mat;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      bar.SetStyle([0, 3, 2]);
-      // bar.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      // bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT)
+      bar.SetStyle([0, 1, .4]);
       bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
       
       
@@ -85,8 +84,6 @@ export class Widget_Slider extends Rect {
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([5, 35, 3]);
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      // handle.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT)
-      // handle.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
       
       
       
@@ -104,28 +101,26 @@ export class Widget_Slider extends Rect {
       const totalheight = (handle.geom.dim[1] + name_text.geom.dim[1] + value_text.geom.dim[1]);
       this.geom.dim[1] = totalheight;
       
-      bar.geom.pos[0] = this.geom.pos[0];
-      bar.geom.pos[1] = this.geom.pos[1] + this.geom.dim[1] - handle.geom.dim[1] - pad[1];
+      bar.geom.dim[1] = 2;
+      bar.geom.pos[0] = pad[0];
+      bar.geom.pos[1] = this.geom.dim[1]*2-(handle.geom.dim[1]);
       
       handle.geom.pos[0] = bar.geom.pos[0];
-      handle.geom.pos[1] = bar.geom.pos[1];
+      handle.geom.pos[1] = bar.geom.pos[1] - handle.geom.dim[1];
       
-      value_text.geom.pos[1] = handle.geom.pos[1] - handle.geom.dim[1] - value_text.geom.dim[1]
-      value_text.geom.pos[0] = bar.geom.pos[0] + bar.geom.dim[0] - (value_text.geom.CalcTextWidth());
+      value_text.geom.pos[0] = this.geom.dim[0] - (value_text.geom.CalcTextWidth()) ;
+      value_text.geom.pos[1] = 4;
       value_text.geom.pos[2] = bar.geom.pos[2] + 1;
       
-      // name_text.geom.pos[1] = handle.geom.pos[1] - handle.geom.dim[1] - name_text.geom.dim[1]
-      name_text.geom.pos[0] = bar.geom.pos[0] - bar.geom.dim[0] + name_text.geom.dim[0];
+      name_text.geom.pos[0] = 0;
+      name_text.geom.pos[1] = 4;
       name_text.geom.pos[2] = this.geom.pos[2] + 1;
       
       SLIDER_BAR_IDX = this.AddChild(bar)
-      // this.AddChild(name_text)
       bar.AddChild(handle)
       bar.AddChild(value_text)
       
       this.text_mesh = name_text;
-      // this.text_mesh.parent = this;
-
       
       
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
@@ -368,9 +363,10 @@ export class Widget_Slider extends Rect {
 
       const mouse_pos = MouseGetPosDif();
       // mesh.SetUpdateFramebuffer();
+     
 
-      // alert('MoveY @ WidgetLabel')
-      // Move 'this' text
+      mesh.geom.pos[0] += mouse_pos.x;
+      mesh.geom.pos[1] += -mouse_pos.y;
       mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, mesh.gfx);
 
       const bar = mesh.children.buffer[SLIDER_BAR_IDX];
@@ -393,8 +389,15 @@ export class Widget_Slider extends Rect {
 
       // Check if the click happened on bar for slide event
       const bar = mesh.children.buffer[SLIDER_BAR_IDX];
-      if (point[1] > bar.geom.pos[1] - bar.hover_margin[1]) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
+      const sliderypos = bar.parent.geom.pos[1] -bar.parent.geom.dim[1]
 
+      if (point[1] > bar.GetPosY() - bar.hover_margin[1]) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
+      // if (point[1] > bar.GetPosY()) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
+      // if (point[1] > sliderypos+bar.geom.pos[1]*2) { 
+         
+         console.log('mouse', point[1], 'bar ypos', bar.geom.pos[1]*2, 'hover margin', bar.hover_margin[1], bar.geom.pos[1]*2+sliderypos, bar.GetPosY())
+         
+         
          STATE.mesh.SetClicked(bar);
          // STATE.mesh.SetFocused(mesh);
 
@@ -510,6 +513,7 @@ export class Widget_Slider extends Rect {
 
       if (x === 0 && y === 0) return;
 
+      AddArr2(this.geom.pos, [x,y]);
       this.geom.MoveXY(x, y, this.gfx);
 
       const bar = this.children.buffer[SLIDER_BAR_IDX];
@@ -896,8 +900,7 @@ export class Widget_Slider extends Rect {
    #CalculateBarArea(_pos, _dim, pad) {
 
       const dim = [RoundFloat1Decimal(_dim[0] - (pad[0] * 2)), RoundFloat1Decimal(_dim[1] - (pad[1] * 2))];
-      // const pos = [_pos[0] + pad[0], _pos[1] + pad[1]];
-      const pos = [_pos[0], _pos[1], _pos[2] + 1]; // Does not need to change for center positioning.
+      const pos = [0, 0, _pos[2] + 1]; // Does not need to change for center positioning.
 
       return {
          pos: pos,
@@ -911,7 +914,7 @@ export class Widget_Slider extends Rect {
 
       const dim = [0, _dim[1] - (pad[1] * 2)];
       dim[0] = dim[1];
-      const pos = [_pos[0], _pos[1], _pos[2] + 1]; // Does not need to change for center positioning.
+      const pos = [_pos[0], 0, _pos[2] + 1]; // Does not need to change for center positioning.
 
       return {
          pos: pos,
@@ -1034,35 +1037,27 @@ export function Slider_on_update_handle(_params) {
 
 function Slider_move_handle(bar, handle) {
 
-   /** Move the handle acoring to the mouse position */
-   const barLeft = bar.geom.pos[0] - bar.geom.dim[0];
-   const barRight = bar.geom.pos[0] + bar.geom.dim[0];
-   const x = MouseGetPos()[0];
+   const x = MouseGetPosDif().x;
+   if(x===0) return;
 
-   if (x > barLeft && x < barRight)
-      handle.geom.SetPosX(x, handle.gfx)
-
-   else if (x > barRight)
-      handle.geom.SetPosX(barRight, handle.gfx)
-
-   else if (x < barLeft)
-      handle.geom.SetPosX(barLeft, handle.gfx)
+   if(handle.geom.pos[0] + x >= 0 && handle.geom.pos[0] + x <= bar.geom.dim[0]*2){
+      handle.geom.pos[0] += x;
+      handle.geom.MoveX(x, handle.gfx);
+      // console.log(handle.geom.pos[0], bar.geom.dim[0])
+   }
 
    handle.SetUpdateFrameBuffer(); // IMIDIATELY: It is very complicated that we do not have a pipeline for the "mesh update gfx buffers". We need something more concrete  as to where the updates are passing through
-
+   
    return true;
 }
 
 
 
 function Slider_calculate_value(bar, handle) {
-
-   const handlexpos = handle.geom.pos[0];
-   const barwidth = bar.geom.dim[0] * 2;
-   const barleft = bar.geom.pos[0] - bar.geom.dim[0];
-
-   const val = handlexpos - barleft;
-
+   
+   const barwidth = bar.geom.dim[0]*2;
+   const val = handle.geom.pos[0];
+   
    const max = 100; // Set the max value the slider will interpolate to.
    // Interpolate to a 0-max value.
    const sliderVal = (val * max) / (barwidth);

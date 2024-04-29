@@ -35,6 +35,7 @@ export class Text_Mesh extends Mesh {
       this.type |= MESH_TYPE.TEXT_MESH | is_debug_mesh;
       this.fontsize = fontsize;
       this.advancex = Font_get_font_advancex(font);
+      this.geom.pos[0] -= (this.geom.dim[0]/2-1)*this.advancex;
    }
 
 
@@ -75,8 +76,14 @@ export class Text_Mesh extends Mesh {
 
    AddToGfx() {
 
+      const pos = this.GetPosXY();
+      pos[0] += this.geom.dim[0];
+      pos[1] += this.geom.dim[1];
+
+
+
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-         pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
+         pos: [pos[0], pos[1], this.geom.pos[2]],
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
@@ -113,7 +120,7 @@ export class Text_Mesh extends Mesh {
          geom_copy.pos[0] += (this.fontsize * 2 * advancex);
 
          // Reset geometry copy
-         geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
+         geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = pos[1];
 
       }
 
@@ -140,8 +147,14 @@ export class Text_Mesh extends Mesh {
 
    AddToGfxFromReset() {
 
+      // const root = Widget_root_buffer_get_mesh_by_rootidx(this.root_bufferidx);
+      const pos = this.GetPosXY();
+      pos[0] += this.geom.dim[0];
+      pos[1] += this.geom.dim[1];
+      // console.log(pos, this.GetName())
+
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-         pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
+         pos: [pos[0], pos[1], this.geom.pos[2]],
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
@@ -179,7 +192,7 @@ export class Text_Mesh extends Mesh {
          geom_copy.pos[0] += (this.fontsize * 2 * advancex);
 
          // Reset geometry copy
-         geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
+         geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = pos[1];
 
       }
       
@@ -201,8 +214,13 @@ export class Text_Mesh extends Mesh {
    // TODO:Use it
    UpdateGfx() {
 
+      // const root = Widget_root_buffer_get_mesh_by_rootidx(this.root_bufferidx);
+      const pos = this.GetPosXY();
+      pos[0] += this.geom.dim[0];
+      pos[1] += this.geom.dim[1];
+
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-         pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
+         pos: [pos[0], pos[1], this.geom.pos[2]],
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
@@ -244,7 +262,7 @@ export class Text_Mesh extends Mesh {
          geom_copy.pos[0] += (this.fontsize * 2 * advancex);
 
          // Reset geometry copy
-         geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
+         geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = pos[1];
 
       }
 
@@ -324,9 +342,24 @@ export class Text_Mesh extends Mesh {
    }
 
 
+   SetPosXYNoGfxUpdate(x, y) {
+      this.geom.pos[0] = x;
+      this.geom.pos[1] = y;
+   }
 
-   SetPosZNoGfxUpdate(z) {
-      this.geom.pos[2] = z;
+   
+   SetPosXNoGfxUpdate(x) {
+      this.geom.pos[0] = x;
+   }
+   
+   
+   SetPosYNoGfxUpdate(y) {
+      this.geom.pos[1] = y;
+   }
+
+
+   SetPosZNoGfxUpdate(val) {
+      this.geom.pos[2] = val;
    }
 
 
@@ -441,7 +474,7 @@ export class Text_Mesh extends Mesh {
    RenderText() {
 
       if (!this.gfx) return; // Case replace text before insert to gfx buffers;
-
+      
       const gfx_copy = {
          vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
          prog: { attribsidx: this.gfx.prog.attribsidx },
@@ -449,8 +482,13 @@ export class Text_Mesh extends Mesh {
          attribsPerVertex: this.gfx.attribsPerVertex,
       }
 
+      // TODO: Remove arrays, substitute with variables
+      const pos = this.GetPosXY();
+      pos[0] += this.geom.dim[0];
+      pos[1] += this.geom.dim[1];
+
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-         pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
+         pos: [pos[0], pos[1], this.geom.pos[2]],
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
@@ -484,13 +522,13 @@ export class Text_Mesh extends Mesh {
 
             // // Set character y position and advance.
             geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
-            Gl_set_wpos_XY(gfx_copy, geom_copy.pos);
+            // Gl_set_wpos_XY(gfx_copy, geom_copy.pos[0], geom_copy.pos[1], geom_copy.pos[2]);
             geom_copy.pos[0] += Floor(this.fontsize * 2 * advancex);
 
             // Get the correct uv coordinates.
             uvs = Font_get_char_uv_coords(this.mat.uvIdx, c[i]);
 
-            geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
+            geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = pos[1]; // Reset 
          }
 
          Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex)
@@ -532,10 +570,14 @@ export class Text_Mesh extends Mesh {
       }
       gfx_copy.vb.start = this.gfx.vb.start + (gfx_copy.vb.count * idx); // Calc the characters position inside the char array.
 
+      // const root = Widget_root_buffer_get_mesh_by_rootidx(this.root_bufferidx);
+      const pos = this.GetPosXY();
+      pos[0] += this.geom.pos[0];
+      pos[1] += this.geom.pos[1];
 
       // Make a copy to not change the default face.
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-         pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
+         pos: [pos[0], pos[1], this.geom.pos[2]],
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
@@ -601,9 +643,8 @@ export class Text_Mesh extends Mesh {
 
    /*******************************************************************************************************************************************************/
    // Setters-Getters
-   // IMPORTANT !!! The dim[0] of any text should be multiplied with advancex for correct calculation.
 
-   // GetMaxWidth() { return this.geom.dim[0] / 2 * (this.geom.num_faces) + 1; }
+   // IMPORTANT !!! The dim[0] of any text should be multiplied with advancex for correct calculation.
    GetMaxWidth() { return (this.geom.dim[0] * this.advancex) * (this.geom.num_faces); }
 
 
@@ -651,21 +692,6 @@ export class Text_Mesh extends Mesh {
       this.isFramebufferRendered = fbidx;
    }
 
-
-   SetPosXNoGfxUpdate(x) {
-      this.geom.pos[0] = x;
-   }
-
-
-   SetPosYNoGfxUpdate(y) {
-      this.geom.pos[1] = y;
-   }
-
-
-   SetPosXYNoGfxUpdate(x, y) {
-      this.geom.pos[0] = x;
-      this.geom.pos[1] = y;
-   }
 
 
 

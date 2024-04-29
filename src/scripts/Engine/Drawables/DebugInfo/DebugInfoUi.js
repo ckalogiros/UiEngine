@@ -39,7 +39,7 @@ export function Debug_info_ui(is_root_widget=undefined) {
    // Style for the label widgets: [BORDER, ROUND_CORNERS, FEATHER]
    const label_style = [0, 3.5, 2.];
    const label_pad = [5, 4];
-   const label_col = TRANSPARENCY(GREY[1], .0);
+   const label_col = TRANSPARENCY(GREY[0], 1.0);
    const label_text_col = BLUEL[9];
 
    // Style for the switch widgets
@@ -131,9 +131,9 @@ export function Debug_info_ui(is_root_widget=undefined) {
 
 
 
-   dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENTY;
+   dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENTY | SECTION.INHERIT;
 
-   dp.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
+   dp.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT; // Set menu to expand to the dropdown's width
    
    if(is_root_widget !== undefined){
 
@@ -170,13 +170,8 @@ export function Debug_info_ui(is_root_widget=undefined) {
 
 
 /************************************************************************************************************************************************/
-// Performance timers
+// Generic Stats
 /************************************************************************************************************************************************/
-
-// export function Debug_info_ui_stats_set_initial_position_screen_right(){
-
-//    DEBUG_INFO.UI_TIMERS.POS[1] = VIEWPORT.RIGHT;
-// }
 
 
 function Debug_info_create_ui_stats() {
@@ -185,10 +180,6 @@ function Debug_info_create_ui_stats() {
    if (DEBUG_INFO.UI_STATS.IS_ON) {
 
       const section = Mesh_buffer_get_mesh_byidx(DEBUG_INFO.UI_STATS.MESH_BUFFER_IDX);
-
-      const w = section.GetMaxWidth();
-      const h = section.geom.dim[1];
-      section.MoveNoGfxUpdate(w, -h)
 
       DEBUG_INFO.UI_STATS.POS = section.geom.pos; // Remember the info's position.
       section.Destroy();
@@ -217,117 +208,24 @@ function Debug_info_create_ui_stats() {
    // Use custom interval for all debug ui for efficiency
    let generic_time_interval = INT_NULL;
 
+   ms = (g_ms) ? g_ms : 500;
+   const timer = Create_widget_multi_text(_, 'Meshes:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
+   // dp.AddItem(timer);
+   section.AddItem(timer);
 
+   timer.CreateNewText('000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   timer.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_buffer_get_count, _, _, _); // idx is for use in creating separate time intervals for each dynamic text.
+   generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-
-   {
-      ms = (g_ms) ? g_ms : 500;
-      const timer = Create_widget_multi_text(_, 'Meshes:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
-      // dp.AddItem(timer);
-      section.AddItem(timer);
-
-      timer.CreateNewText('000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_buffer_get_count, _, _, _); // idx is for use in creating separate time intervals for each dynamic text.
-      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-
-      timer.CreateNewText('Active VB:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Vertex_buffer_get_Active_count, _, _, generic_time_interval)
-
-
-   }
-
-   // { // All Timers Update timer
-   //    ms = (g_ms) ? g_ms : 1000;
-   //    const timer = Create_widget_multi_text(_, 'Timers:avg:', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2]+1], fontsize, GREY[7], .5, pad1);
-   //    section.AddItem(timer);
-
-   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} Timers avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.AllTimersUpdate, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
-   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-
-   //    let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
-   //    timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} Timers 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.AllTimersUpdate, timeridx], _, generic_time_interval)
-
-   //    timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
-   //    timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-   //    timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} Timers worst`, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.AllTimersUpdate, timeridx], _, generic_time_interval)
-
-   // }
-   // { // Gl_draw timer.
-   //    ms = (g_ms) ? g_ms : 1000;
-   //    const timer = Create_widget_multi_text(_, 'GlDraw:avg', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2]+1], fontsize, GREY[7], .5, pad1);
-   //    section.AddItem(timer);
-
-   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} GlDraw avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.GlDraw, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
-   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-
-   //    let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.GlDraw);
-   //    timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} GlDraw 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.GlDraw, timeridx], _, generic_time_interval)
-
-   //    timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.GlDraw);
-   //    timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-   //    timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} GlDraw worst`, ms, PerformanceTimersGetWorstFps,[PERFORMANCE_TIMERS_IDXS.GlDraw, timeridx], _, generic_time_interval)
-
-   // }
-   // { // Event Listener.
-   //    ms = (g_ms) ? g_ms : 1000;
-   //    const timer = Create_widget_multi_text(_, 'Events:avg', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2]+1], fontsize, GREY[7], .5, pad1);
-   //    section.AddItem(timer);
-
-   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} Events avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.EventListener, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
-   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-
-   //    let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.EventListener);
-   //    timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} Events 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.EventListener, timeridx], _, generic_time_interval)
-
-   //    timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.EventListener);
-   //    timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-   //    timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} Events worst`, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.EventListener, timeridx], _, generic_time_interval)
-
-   // }
-   // { // Hover Listener.
-   //    ms = (g_ms) ? g_ms : 1000;
-   //    const timer = Create_widget_multi_text(_, 'Hover:avg', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2]+1], fontsize, GREY[7], .5, pad1);
-   //    section.AddItem(timer);
-
-   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.HoverListener, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
-   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-
-   //    let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.HoverListener);
-   //    timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-   //    timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.HoverListener, timeridx], _, generic_time_interval)
-
-   //    timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.HoverListener);
-   //    timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-   //    timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-   //    timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps,  [PERFORMANCE_TIMERS_IDXS.HoverListener, timeridx], _, generic_time_interval)
-
-   // }
-
+   timer.CreateNewText('Active VB:', fontsize, GREY[7], pad2, .9);
+   timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Vertex_buffer_get_Active_count, _, _, generic_time_interval)
 
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    section.ActivateAndChildren()
    section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
    section.Calc_no_gfx_update();
-
-   const w = section.GetMaxWidth();
-   const h = section.geom.dim[1];
-   section.MoveNoGfxUpdate(-w, h);
 
    section.Render()
    // section.options = SECTION.VERTICAL;
@@ -375,9 +273,7 @@ function Debug_info_create_ui_performance_timers() {
 
       const section = Mesh_buffer_get_mesh_byidx(DEBUG_INFO.UI_TIMERS.MESH_BUFFER_IDX);
 
-      const w = section.GetMaxWidth();
-      const h = section.geom.dim[1];
-      section.MoveNoGfxUpdate(w, -h)
+      section.geom.pos[0] = VIEWPORT.RIGHT;
 
       DEBUG_INFO.UI_TIMERS.POS = section.geom.pos; // Remember the info's position.
       section.Destroy();
@@ -611,16 +507,13 @@ function Debug_info_create_ui_performance_timers() {
 
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-   section.ActivateAndChildren()
    section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
    section.Calc_no_gfx_update();
 
    const w = section.GetMaxWidth();
-   const h = section.geom.dim[1];
-   section.MoveNoGfxUpdate(-w, h);
+   section.geom.pos[0] = VIEWPORT.RIGHT - w*2;
 
    section.Render()
-   // section.options = SECTION.VERTICAL;
    section.ConstructListeners();
 
 
@@ -661,9 +554,9 @@ function Debug_info_create_ui_mouse() {
 
       Info_listener_destroy_event(section.debug_info.evtidx);
 
-      const w = section.GetMaxWidth();
-      const h = section.geom.dim[1];
-      section.MoveNoGfxUpdate(-w, -h)
+      // const w = section.GetMaxWidth();
+      // const h = section.geom.dim[1];
+      // section.MoveNoGfxUpdate(-w, -h)
 
       DEBUG_INFO.UI_MOUSE.POS = section.geom.pos; // Remember the info's position.
       section.Destroy();
@@ -696,9 +589,9 @@ function Debug_info_create_ui_mouse() {
    section.Calc_no_gfx_update();
 
    // Set the ui to the upper left screen corner
-   const w = section.GetMaxWidth();
-   const h = section.geom.dim[1];
-   section.MoveNoGfxUpdate(w, h)
+   // const w = section.GetMaxWidth();
+   // const h = section.geom.dim[1];
+   // section.MoveNoGfxUpdate(w, h)
 
    section.Render()
 

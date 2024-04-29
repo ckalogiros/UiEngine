@@ -31,6 +31,7 @@ export class Geometry2D {
         math.CopyArr2(this.dim, dim);
         math.CopyArr2(this.scale, scale);
 
+
         // Keep a copy of the starting dimention and position
         math.CopyArr2(this.defDim, dim);
         math.CopyArr2(this.defScale, scale);
@@ -40,87 +41,35 @@ export class Geometry2D {
         this.num_faces = 1;
         this.type |= MESH_TYPE.GEOMETRY2D;
 
-
-        /** Debug properties */
-        if (DEBUG.GEOMETRY) {
-            Object.defineProperty(this, 'id', { value: _geometryId++ });
-        }
     }
 
     /*******************************************************************************************************************************************************/
     // Graphics
 
-    SetPosXYZ(pos, gfx, numFaces) {
-        this.pos[0] = pos[0];
-        this.pos[1] = pos[1];
-        this.pos[2] = pos[2];
-        glBufferOps.Gl_set_wpos_XYZ(gfx, pos, numFaces);
-    }
-    SetPosXY(pos, gfx) {
-        this.pos[0] = pos[0];
-        this.pos[1] = pos[1];
-        glBufferOps.Gl_set_wpos_XY(gfx, pos);
-    }
-    SetPosX(x, gfx, numFaces) {
-        this.pos[0] = x;
-        glBufferOps.Gl_set_wpos_X(gfx, x, numFaces);
-    }
-    SetPosY(y, gfx, numFaces) {
-        this.pos[1] = y;
-        glBufferOps.Gl_set_wpos_Y(gfx, y, numFaces);
-    }
-    UpdatePosXYZ(gfx) {
-        glBufferOps.Gl_set_wpos_XYZ(gfx, this.pos);
-    }
-    UpdateFromPosXYZ(gfx, pos) {
-        glBufferOps.Gl_set_wpos_XYZ(gfx, pos);
-    }
-    UpdatePosXY(gfx) {
-        glBufferOps.Gl_set_wpos_XY(gfx, this.pos);
-    }
-    SetDefaultPosXY(gfx) {
-        this.pos[0] = this.defPos[0];
-        this.pos[1] = this.defPos[1];
-        glBufferOps.Gl_set_wpos_XY(gfx, this.defPos);
-    }
-    UpdatePosZ(z, gfx, numFaces) {
-        this.pos[2] = z;
-        glBufferOps.Gl_set_wpos_Z(gfx, z, numFaces);
-    }
-    MoveXYZ(pos, gfx, num_faces) {
-        /**DEBUG ERROR*/ if (pos.length !== 3) console.error('Wrong array dimention for position xyz. @ class Geometry2D, Geometry.js')
-        this.pos[0] += pos[0];
-        this.pos[1] += pos[1];
-        this.pos[2] += pos[2];
-        glBufferOps.Gl_add_wpos_XYZ(gfx, pos, num_faces);
-    }
-    MoveXY(x, y, gfx) {
-        // if(x===0 && y===0) return;
-        this.pos[0] += x;
-        this.pos[1] += y;
-        glBufferOps.Gl_add_wpos_XY(gfx, [x, y], this.num_faces);
-    }
-    MoveX(x, gfx) {
-        if(x===0) return;
-        this.pos[0] += x;
-        glBufferOps.Gl_add_wpos_X(gfx, x,);
-    }
-    MoveY(y, gfx) {
-        if(y===0) return;
-        this.pos[1] += y;
-        glBufferOps.Gl_add_wpos_Y(gfx, y);
-    }
+    SetPosXYZ(pos, gfx, numFaces)   { glBufferOps.Gl_set_wpos_XYZ   (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1], pos[2], numFaces); }
+    SetPosXY(pos, gfx)              { glBufferOps.Gl_set_wpos_XY    (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1]); }
+    SetPosX(x, gfx, numFaces)       { glBufferOps.Gl_set_wpos_X     (gfx, x + this.dim[0], numFaces); }
+    SetPosY(y, gfx, numFaces)       { glBufferOps.Gl_set_wpos_Y     (gfx, y + this.dim[1], numFaces); }
+    UpdatePosXYZ(gfx)               { glBufferOps.Gl_set_wpos_XYZ   (gfx, this.pos[0] + this.dim[0], this.pos[1] + this.dim[1], this.pos[2]); }
+    UpdateFromPosXYZ(gfx, pos)      { glBufferOps.Gl_set_wpos_XYZ   (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1], pos[2]); }
+    UpdatePosXY(gfx)                { glBufferOps.Gl_set_wpos_XY    (gfx, this.pos[0] + this.dim[0], pos[1] + this.dim[1]); }
+    SetDefaultPosXY(gfx)            { glBufferOps.Gl_set_wpos_XY    (gfx, this.pos[0] + this.dim[0], this.pos[1] + this.dim[1], this.pos[2]); }
+    UpdatePosZ(z, gfx, numFaces)    { glBufferOps.Gl_set_wpos_Z     (gfx, z, numFaces); }
+    MoveXYZ(pos, gfx, num_faces)    { glBufferOps.Gl_add_wpos_XYZ   (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1], pos[2], num_faces); }
+    MoveXY(x, y, gfx)   { if (x === 0 && y === 0) return; glBufferOps.Gl_add_wpos_XY(gfx, [x + this.dim[0], y + this.dim[1]], this.num_faces); }
+    MoveX(x, gfx)       { if (x === 0) return; glBufferOps.Gl_add_wpos_X(gfx, x + this.dim[0],); }
+    MoveY(y, gfx)       { if (y === 0) return; glBufferOps.Gl_add_wpos_Y(gfx, y + this.dim[1]); }
     //////////////////////////////////////////////////////////////
     SetDim(dim, gfx) {
-        
-        const dimentions = [0,0];
-        
-        if(dim[0] !== UNCHANGED) dimentions[0] = dim[0]; // Set x dimention
+
+        const dimentions = [0, 0];
+
+        if (dim[0] !== UNCHANGED) dimentions[0] = dim[0]; // Set x dimention
         else dimentions[0] = this.dim[0]; // else use the same x dimention
-        
-        if(dim[1] !== UNCHANGED) dimentions[1] = dim[1];
+
+        if (dim[1] !== UNCHANGED) dimentions[1] = dim[1];
         else dimentions[1] = this.dim[1];
-        
+
         math.CopyArr2(this.dim, dimentions);
         glBufferOps.Gl_set_dim_XY(gfx, dimentions);
     }
@@ -201,33 +150,33 @@ export class Geometry3D {
         }
     }
 
-    //////////////////////////////////////////////////////////////
-    SetPos(pos, gfx) {
-        math.CopyArr3(this.pos, pos);
-        glBufferOps.Gl_set_wpos_XY(gfx, pos);
-    }
-    SetPosXY(pos, gfx) {
-        math.CopyArr2(this.pos, pos);
-        glBufferOps.Gl_set_wpos_XY(gfx, pos);
-    }
-    SetPosX(x, gfx) {
-        this.pos[0] = x;
-        glBufferOps.Gl_set_wpos_X(gfx, x);
-    }
-    SetPosY(y) {
-        this.pos[1] = y;
-        glBufferOps.Gl_set_wpos_Y(gfx, y);
-    }
-    UpdatePosXY() {
-        glBufferOps.Gl_set_wpos_XY(gfx, this.pos);
-    }
-    UpdatePosZ(z) {
-        this.pos[2] = z;
-        glBufferOps.Gl_set_wpos_Z(gfx, z);
-    }
-    //////////////////////////////////////////////////////////////
-    StoreDefPos(pos) {
-        math.CopyArr2(this.defPos, pos);
-    }
+    // //////////////////////////////////////////////////////////////
+    // SetPos(pos, gfx) {
+    //     math.CopyArr3(this.pos, pos);
+    //     glBufferOps.Gl_set_wpos_XY(gfx, pos);
+    // }
+    // SetPosXY(pos, gfx) {
+    //     math.CopyArr2(this.pos, pos);
+    //     glBufferOps.Gl_set_wpos_XY(gfx, pos);
+    // }
+    // SetPosX(x, gfx) {
+    //     this.pos[0] = x;
+    //     glBufferOps.Gl_set_wpos_X(gfx, x);
+    // }
+    // SetPosY(y) {
+    //     this.pos[1] = y;
+    //     glBufferOps.Gl_set_wpos_Y(gfx, y);
+    // }
+    // UpdatePosXY() {
+    //     glBufferOps.Gl_set_wpos_XY(gfx, this.pos);
+    // }
+    // UpdatePosZ(z) {
+    //     this.pos[2] = z;
+    //     glBufferOps.Gl_set_wpos_Z(gfx, z);
+    // }
+    // //////////////////////////////////////////////////////////////
+    // StoreDefPos(pos) {
+    //     math.CopyArr2(this.defPos, pos);
+    // }
 }
 

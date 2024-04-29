@@ -13,7 +13,7 @@ import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexB
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_set_in_focus, Widget_root_create_root } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
@@ -45,27 +45,46 @@ export class Widget_Label extends Rect {
     text_mesh;
     pad = [0, 0];
 
-    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
+    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
-        pos[2] += 1; // Text in front of the label's area.
+        _pos[2] += 1; // Text in front of the label's area.
 
-        // const text = `[${mesh_bufferidx}]${_text}`;
         const text = _text;
 
-        /** Label tex mesh */
-        const text_mesh = Create_text_mesh(text, pos, fontSize, text_col, _, _, is_debug_mesh);
+        // Create the text, to calculate its dimensions, then createthe label
+        const text_mesh = Create_text_mesh(text, [0,0,_pos[2]], fontSize, text_col, _, _, is_debug_mesh);
 
-        pos[2] -= 1; // Set z for area 'behind' this.text_mesh
+        _pos[2] -= 1; // Set z for area 'behind' this.text_mesh
 
-        /** Label area mesh */
         const dim = [
-            (text_mesh.fontsize * 2 * Font_get_font_advancex(text_mesh.mat.texidx)) / 2,
-            text_mesh.geom.dim[1]
+            text_mesh.GetMaxWidth(),
+            text_mesh.geom.dim[1],
         ];
-        const areaMetrics = CalculateArea(text, dim, pos, pad)
-        super(areaMetrics.pos, areaMetrics.dim, col);
+        
+        super(_pos, dim, col);
+
+        this.geom.dim[0] += pad[0];
+        this.geom.dim[1] += pad[1];
+
+        if(Align & ALIGN.RIGHT){
+            const d = this.geom.dim[0] - text_mesh.GetMaxWidth()
+            text_mesh.geom.pos[0] += d
+        }
+        else if(Align & ALIGN.HOR_CENTER){
+            const d = this.geom.dim[0] - text_mesh.GetMaxWidth()
+            text_mesh.geom.pos[0] += d/2
+        }
+        if(Align & ALIGN.VERT_CENTER){
+            text_mesh.geom.pos[1] = (this.geom.dim[1] - text_mesh.geom.dim[1])/2; 
+        }
+        else if(Align & ALIGN.BOTTOM){
+            const d = this.geom.dim[1] - text_mesh.geom.dim[1]
+            text_mesh.geom.pos[1] += d
+        }
+        // else if(Align & ALIGN.VERT_CENTER){
+        // }
 
         // Must call super() before using the 'this', that is why we write the code here.
         text_mesh.SetSceneIdx(this.sceneidx);
@@ -74,7 +93,8 @@ export class Widget_Label extends Rect {
         this.mesh_bufferidx = mesh_bufferidx;
 
         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-        this.SetStyle(style);
+        this.SetStyle([0,0,0]);
+        // this.SetStyle(style);
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
         this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -84,6 +104,14 @@ export class Widget_Label extends Rect {
 
         this.text_mesh = text_mesh;
         this.text_mesh.parent = NO_MESH_PARENT; // Use a special case for text meshes that are part of a widget without being in children's buffer.
+
+              
+      
+        if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
+            this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
+
+            this.AddToWidgetRootBuffer(this.root_bufferidx)
+        }
 
     }
 
@@ -208,18 +236,6 @@ export class Widget_Label extends Rect {
         return all_meshes;
     }
 
-    SetPosX(x) {
-
-        super.SetPosX(x);
-        this.text_mesh.SetPosX(x);
-    }
-
-
-    SetPosZNoGfxUpdate(z) {
-        this.geom.pos[2] = z;
-        this.text_mesh.geom.pos[2] = z + 1;
-    }
-
 
     SetUpdateFrameBuffer() {
         if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
@@ -231,25 +247,6 @@ export class Widget_Label extends Rect {
         this.text_mesh.isFramebufferRendered = fbidx;
     }
 
-
-    SetPosXNoGfxUpdate(x) {
-        this.geom.pos[0] = x;
-        this.text_mesh.geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
-    }
-
-
-    SetPosYNoGfxUpdate(y) {
-        this.geom.pos[1] = y;
-        this.text_mesh.geom.pos[1] = y;
-    }
-
-
-    SetPosXYNoGfxUpdate(x, y) {
-        this.geom.pos[0] = x;
-        this.text_mesh.geom.pos[0] = x;
-        this.geom.pos[1] = y;
-        this.text_mesh.geom.pos[1] = y;
-    }
 
 
 
@@ -318,6 +315,39 @@ export class Widget_Label extends Rect {
         this.geom.pos[0] += x;
         this.text_mesh.geom.pos[0] += x;
 
+    }
+
+
+    SetPosXYNoGfxUpdate(x, y) {
+        this.geom.pos[0] = x;
+        this.geom.pos[1] = y;
+        this.text_mesh.geom.pos[0] = x;
+        this.text_mesh.geom.pos[1] = y;
+    }
+
+    
+    SetPosXNoGfxUpdate(x) {
+        this.geom.pos[0] = x;
+        this.text_mesh.geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
+    }
+
+
+    SetPosYNoGfxUpdate(y) {
+        this.geom.pos[1] = y;
+        this.text_mesh.geom.pos[1] = y;
+    }
+
+
+    SetPosZNoGfxUpdate(z) {
+        this.geom.pos[2] = z;
+        this.text_mesh.geom.pos[2] = z + 1;
+    }
+
+    
+    SetPosX(x) {
+
+        super.SetPosX(x);
+        this.text_mesh.SetPosX(x);
     }
 
 
@@ -489,6 +519,9 @@ export class Widget_Label extends Rect {
                         target_mesh: mesh,
                         params: null,
                     }
+                    if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+                        parent_listeners = [null, null];
+                    }
                     mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, parent_listeners[etypeidx]);
                 }
             }
@@ -558,9 +591,10 @@ export class Widget_Label extends Rect {
             if (mesh.StateCheck(MESH_STATE.IS_GRABABLE)) {
 
                 STATE.mesh.SetGrabed(mesh);
-                STATE.mesh.SetFocused(mesh);
-                mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-                Widget_root_set_in_focus(mesh.root_bufferidx);
+                mesh.StateEnable(MESH_STATE.IN_GRAB);
+                // STATE.mesh.SetFocused(mesh);
+                // mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
+                // Widget_root_set_in_focus(mesh.root_bufferidx);
             }
 
         }
@@ -649,7 +683,7 @@ export class Widget_Label extends Rect {
 
 
             Gl_set_dim_XY(mesh.gfx, mesh.geom.dim, mesh.geom.num_faces)
-            Gl_set_wpos_XY(mesh.gfx, mesh.geom.pos, mesh.geom.num_faces)
+            Gl_set_wpos_XY(mesh.gfx, mesh.geom.pos[0]+mesh.geom.dim[0], mesh.geom.pos[1]+mesh.geom.dim[1], mesh.geom.num_faces)
 
 
             // TODO: Align text

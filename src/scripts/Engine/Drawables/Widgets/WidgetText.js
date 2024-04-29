@@ -25,13 +25,15 @@ export class Widget_Text extends Text_Mesh {
 
 	pad;
 
-	constructor(text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0], is_debug_mesh) {
+	constructor(ROOT_WIDGET_FLAGS, text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0], is_debug_mesh) {
 
 		// const sdfouter = CalculateSdfOuterFromDim(fontSize);
 		// if (sdfouter + bold > 1) bold = 1 - sdfouter;
 
-		super(text, pos, fontSize, col, is_debug_mesh)
+		super(text, pos, fontSize, col, _, _, _, is_debug_mesh)
 		this.type |= MESH_TYPE.WIDGET_TEXT;
+
+		// if(ROOT_WIDGET_FLAGS !== undefined) this.root_bufferidx = 
 
 		this.pad = [0, 0];
 		AddArr2(this.pad, pad);
@@ -256,9 +258,9 @@ export class Widget_Multi_Text extends Widget_Text {
 	alignment = 0x0;
 
 	/** Set the max number of characters for the dynamic text, by passing any text as 'dynamic_text' of length= dynamic text number of characters*/
-	constructor(text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad, is_debug_mesh) {
+	constructor(ROOT_WIDGET_FLAGS, text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad, is_debug_mesh) {
 
-		super(text, pos, fontSize, text_col, bold, pad, is_debug_mesh);
+		super(ROOT_WIDGET_FLAGS, text, pos, fontSize, text_col, bold, pad, is_debug_mesh);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
 		// Default alignment for all children text meshes
@@ -525,12 +527,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	SetPosZNoGfxUpdate(val) {
-		this.geom.pos[2] = val;
-		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].geom.pos[2] = val;
-		}
-	}
+
 
 
 
@@ -747,7 +744,9 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.geom.pos[1] += y;
 		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
-			if (child) child.MoveNoGfxUpdate(x, y);
+			child.geom.pos[0] += x;
+			child.geom.pos[1] += y;
+			// if (child) child.MoveNoGfxUpdate(x, y);
 		}
 
 	}
@@ -773,6 +772,42 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 
 	}
+
+	
+
+   SetPosXYNoGfxUpdate(x, y) {
+      this.geom.pos[0] = x;
+      this.geom.pos[1] = y;
+		for (let i = 0; i <= this.children.boundary; i++) {
+			// this.children.buffer[i].geom.pos[0] = x+this.geom.pos[0]+30;
+			this.children.buffer[i].geom.pos[0] += x;
+			this.children.buffer[i].geom.pos[1] += y;
+		}
+   }
+
+   
+   SetPosXNoGfxUpdate(x) {
+      this.geom.pos[0] = x;
+		for (let i = 0; i <= this.children.boundary; i++) {
+			this.children.buffer[i].geom.pos[0] = x;
+		}
+   }
+   
+   
+   SetPosYNoGfxUpdate(y) {
+      this.geom.pos[1] = y;
+		for (let i = 0; i <= this.children.boundary; i++) {
+			this.children.buffer[i].geom.pos[1] = y;
+		}
+   }
+
+	SetPosZNoGfxUpdate(z) {
+		this.geom.pos[2] = z;
+		for (let i = 0; i <= this.children.boundary; i++) {
+			this.children.buffer[i].geom.pos[2] = z;
+		}
+	}
+
 
 
 	Align_pre(target_mesh, flags, pad = [0, 0]) { // Align pre-added to the vertexBuffers
@@ -801,51 +836,5 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	}
 
-
-	// ClampX(x, margin = 0) {
-
-	// 	const clamp = x - margin * 2;
-	// 	const char_width = Floor(this.fontsize * Font_get_font_advancex(this.mat.texidx));
-	// 	let text_width = char_width * 2;
-
-	// 	let k = 0; // Will store the number of characters need to be clamped.
-	// 	// Calculate how many characters we must ommit.
-	// 	while (text_width < clamp && k < this.geom.num_faces) {
-	// 		text_width += char_width * 2;
-	// 		k++;
-	// 	}
-	// 	this.geom.num_faces = k - 1;
-
-	// 	// Update the gfx buffers, if the mesh is already inserted.
-	// 	if (this.is_gfx_inserted) {
-	// 		// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
-
-	// 		const ommited_chars = this.mat.char_buffer.active_count - (k + 1);
-	// 		Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
-	// 	}
-
-	// 	for (let i = 0; i <= this.children.boundary; i++) {
-
-	// 		const child = this.children.buffer[i];
-	// 		if (child) {
-
-	// 			k = 0; // Will store the number of characters need to be clamped.
-	// 			// Calculate how many characters we must ommit.
-	// 			while (text_width < clamp && k < child.geom.num_faces) {
-	// 				text_width += char_width;
-	// 				k++;
-	// 			}
-	// 			child.geom.num_faces = k - 1;
-
-	// 			// Update the gfx buffers, if the mesh is already inserted.
-	// 			if (this.is_gfx_inserted) {
-	// 				// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
-
-	// 				const ommited_chars = this.mat.char_buffer.active_count - (k + 1);
-	// 				Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 

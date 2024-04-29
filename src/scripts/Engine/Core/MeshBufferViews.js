@@ -55,6 +55,14 @@ export const VIEW_INFO = {
 
 
 
+/**
+   view:[]
+      .buffer[i]:       {vb:[]GenericBuffer}
+         .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
+            .info:      [PROGIDX, VBIDX, IBIDX, START, NUM_FACES],
+            .data:      meshidx
+ */
+
 class View {
 
    constructor(rootidx) {
@@ -94,7 +102,24 @@ export function View_get_view_meshidx_byidx(group_bufferidxs) {
 
 export function View_get_view_vb_root_meshidx(group_bufferidxs) {
    // TODO: Buffer Error Check
-   return _view_buffer.buffer[group_bufferidxs[0]].vb.buffer[group_bufferidxs[1]].data.buffer[0];
+   return _view_buffer.buffer[group_bufferidxs[0]].rootidx;
+}
+
+
+
+export function View_is_group_root(group_bufferidxs, mesh_bufferidx) {
+   // TODO: Buffer Error Check
+   // The root mesh of the group 'sits' at inde
+   const rootidx =  _view_buffer.buffer[group_bufferidxs[0]].rootidx;
+   if(rootidx === mesh_bufferidx) return true; 
+   return false;
+}
+
+
+
+export function View_get_view_vb_mesh_meshidx(group_bufferidxs) {
+   // TODO: Buffer Error Check
+   return _view_buffer.buffer[group_bufferidxs[0]].vb.buffer[group_bufferidxs[1]].data.buffer[group_bufferidxs[2]];
 }
 
 
@@ -194,6 +219,7 @@ function View_add_mesh(groupidx, mesh) {
    }
 
 }
+
 
 
 

@@ -35,9 +35,12 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
          }
          else{
             
-            const right  = mesh.geom.pos[0] + mesh.geom.dim[0];
+            const right  = mesh.GetPosX() + mesh.geom.defDim[0]*2;
             const reduce = (right) - limit.right;
+            alert('CORRECT THIS:\nmesh.geom.pos[0] + mesh.geom.defDim[0]\n At Clip.js')
+            // TODO: Also check all 'mesh.geom.pos'
             const def_right   = mesh.geom.pos[0] + mesh.geom.defDim[0];
+
 
             if(right > limit.right){
                
@@ -87,8 +90,8 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
       for(let j=0; j<=meshshes_idx.boundary; j++){
          
          const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-         const left    = mesh.geom.pos[0] - mesh.geom.dim[0];
-         const right   = mesh.geom.pos[0] + mesh.geom.dim[0];
+         const left    = mesh.GetPosX();
+         const right   = left + mesh.geom.dim[0]*2;
    
          if(right < limit.left){
 
@@ -117,10 +120,10 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
 
 
 
-export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null, ydif=0) {
+export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
 
    let changes_hapened = false;
-   const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
+   const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
    const group = View_get_view_byidx(group_bufferidx);
 
@@ -131,8 +134,8 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
          
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
 
-         const top      = mesh.geom.pos[1] - mesh.geom.dim[1];
-         const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
+         const top      = mesh.GetPosY();
+         const bottom   = top + mesh.geom.dim[1]*2;
          
    
          if(bottom < limit.up || top > limit.down){
@@ -182,7 +185,7 @@ export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bott
          const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
          
          // We run for all meshes of the group so that on scoll every mesh is clipped
-            
+            alert('clip.js')
          const bottom   = mesh.geom.pos[1] + mesh.geom.dim[1];
          const def_bottom   = mesh.geom.pos[1] + mesh.geom.defDim[1];
 

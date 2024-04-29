@@ -36,6 +36,7 @@ const _root_batch_buffer = New_generic_buffer(_, 'Root batch');
 const _widget_root_gfx = New_generic_buffer(_, 'Root gfx');
 
 
+const _root_uniforms_for_wpos = New_generic_buffer(_, 'root_uniforms_for_wpos');
 
 
 
@@ -56,19 +57,13 @@ export function Mesh_buffer_get_count() { return _mesh_buffer.active_count; }
 export function Mesh_buffer_get_size() { return _mesh_buffer.size; }
 
 
-
 export function Mesh_buffer_get_mesh_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx]; }
 export function Mesh_buffer_get_mesh_gfx_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].gfx; }
-/**For Debugging*/ export function Mesh_buffer_get_mesh_name_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].GetName(); }
+export function Mesh_buffer_get_mesh_name_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].GetName(); }
 
 
-
-export function Mesh_buffer_get_mesh_geometry(mesh_bufferidx) { 
-   return {
-      pos: _mesh_buffer.buffer[mesh_bufferidx].geom.pos,
-      dim: _mesh_buffer.buffer[mesh_bufferidx].geom.dim,
-   }
-}
+export function Mesh_buffer_get_mesh_pos(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].geom.pos; }
+export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].geom.dim; }
 
 
 
@@ -89,14 +84,12 @@ export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferi
    if(_mesh_buffer.buffer[mesh_bufferidx]===null || _mesh_buffer.buffer[mesh_bufferidx]===_) {
       console.log('Meshbuffer: idx', mesh_bufferidx, _mesh_buffer.buffer); 
       return false;}
-   temp_no_allocation_buffer[0][0] =
-      _mesh_buffer.buffer[mesh_bufferidx].geom.pos[0] - _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] - _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
-   temp_no_allocation_buffer[0][1] =
-      _mesh_buffer.buffer[mesh_bufferidx].geom.pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
-   temp_no_allocation_buffer[1][0] =
-      _mesh_buffer.buffer[mesh_bufferidx].geom.pos[1] - _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] - _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
-   temp_no_allocation_buffer[1][1] =
-      _mesh_buffer.buffer[mesh_bufferidx].geom.pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+
+   const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
+   temp_no_allocation_buffer[0][0] = pos[0];
+   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0]*2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
+   temp_no_allocation_buffer[1][0] = pos[1] ;
+   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1]*2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
    
    return temp_no_allocation_buffer;
 }
@@ -174,6 +167,37 @@ export function Mesh_buffer_batch_destroy_run(){
  */
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/
+// Widget roots World positions as uniforms 
+/*******************************************************************************************************************************************************************************/
+
+function TEMP_create_widget_root_wpos_uniform(pos){
+   const entry = [pos[0], pos[1]];
+   _root_uniforms_for_wpos.Add(entry)
+}
+
+export function TEMP_get_widget_root_wpos(idx){
+   return _root_uniforms_for_wpos.buffer[idx];
+}
 
 
 
@@ -323,7 +347,16 @@ export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
 _widget_root_buffer.Init(8);
 
 
+export function Widget_root_buffer_is_root(idx, meshidx) { 
+   // [0]-th element is the root and holds the 'mesh_bufferidx' of the mesh
+   if(_widget_root_buffer.buffer[idx].buffer[0] === meshidx) return true; 
+   return false; 
+}
 export function Widget_root_buffer_get() { return _widget_root_buffer; }
+
+
+
+export function Widget_root_buffer_get_root_pos(idx) { return _mesh_buffer.buffer[_widget_root_buffer.buffer[idx].buffer[0]].geom.pos; }
 
 
 
@@ -335,22 +368,33 @@ export function Widget_root_buffer_get_root_meshidx(idx) { return _widget_root_b
 
 
 
+export function Widget_root_buffer_get_mesh_by_rootidx(idx) { 
+
+   const mesh = Mesh_buffer_get_mesh_byidx(_widget_root_buffer.buffer[idx].buffer[0]);
+   return mesh; 
+}
+
+
+
 export function Widget_root_create_root(mesh_bufferidx) {
 
    const root_idx = _widget_root_buffer.Add(New_int16_buffer(6));
-   // _widget_root_buffer.buffer[root_idx].Init(INT_NULL);
 
    _widget_root_buffer.buffer[root_idx].Add(mesh_bufferidx);
 
    Widget_root_gfx_create(root_idx);
 
-   Widget_root_batch_create_root(root_idx, mesh_bufferidx)
+   Widget_root_batch_create_root(root_idx, mesh_bufferidx);
+
+   // const mesh = _mesh_buffer.buffer[mesh_bufferidx];
+   // const idx = TEMP_create_widget_root_wpos_uniform(mesh.geom.pos);
+   // if(idx !== root_idx) alert('root_wpos_uniform index not the same with the root widget index');
 
    return root_idx;
 }
 
 
-// DANGER!!! if the root is removed, the whole root buffer should be invalid and destroyed
+// POTENTIAL_BUG!!! if the root is removed, the whole root buffer should be invalid and destroyed
 function Widget_root_remove_root_byidx(root_bufferidx) {
    if (_widget_root_buffer.buffer[root_bufferidx] !== INT_NULL) {
 
@@ -846,16 +890,16 @@ export function Widget_movexy(params) {
 
 export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
 
-   for (let i = 0; i <= _widget_root_buffer.buffer[root_bufferidx].boundary; i++) {
-      // Increment each mesh, that is part of this widget_root
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[0] += x;
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1] += y;
+   // for (let i = 0; i <= _widget_root_buffer.buffer[root_bufferidx].boundary; i++) {
+   //    // Increment each mesh, that is part of this widget_root
+   //    _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[0] += x;
+   //    _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1] += y;
 
-      // Update default position
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[0] += x;
-      _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[1] += y;
+   //    // Update default position
+   //    _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[0] += x;
+   //    _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[1] += y;
 
-   }
+   // }
 
    const len = _root_batch_buffer.buffer[root_bufferidx].vb.length
    for (let i = 0; i < len; i++) {
@@ -1178,7 +1222,7 @@ export function Mesh_buffer_print_loop() {
             'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
             'gfxidx', _mesh_buffer.buffer[i].per_vb_bufferidx,
             'batchidx:', _mesh_buffer.buffer[i].batch_buffer_vbidx,
-            'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1],
+            'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1], _mesh_buffer.buffer[i].group_bufferidxs[2],
             'child idx:', _mesh_buffer.buffer[i].idx,
             'is active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE.ACTIVE,
             'nameidx:', _mesh_buffer.buffer[i].nameidx,

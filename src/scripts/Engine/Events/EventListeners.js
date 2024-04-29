@@ -331,6 +331,7 @@ export function Listener_dispatch_check_hover_event() {
    if(STATE.mesh.focused && STATE.mesh.focused.listeners){ // TODO: efficiency: must check because the focused may not have a listen event. FIXME
       
       const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(STATE.mesh.focusedIdx);
+      
       const point = MouseGetPos();
 
       // If and only if mouse is intersecting with the current mesh(mouse hover) ...
@@ -370,10 +371,11 @@ export function Listener_dispatch_check_hover_event() {
             STATE.loop.paused = true;
             return;
          }
-
-
+         
+         
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          intersects = Intersection_point_rect(point, bounding_box);
+         // console.log(bounding_box[0][0], bounding_box[1][0], point[0])
 
          if (intersects) {
 

@@ -96,7 +96,7 @@ export function Create_widget_text(ROOT_WIDGET_FLAGS=0x0, text, pos, fontSize, c
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(text, pos, fontSize, col, bold, pad, is_debug_mesh));
+   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, fontSize, col, bold, pad, is_debug_mesh));
 
    
    // Store the meshbuffer's index to the newly created mesh.
@@ -115,7 +115,7 @@ export function Create_widget_multi_text(ROOT_WIDGET_FLAGS=0x0, text, ALIGNMENT,
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(text, ALIGNMENT, pos, fontSize, text_col, bold, pad, is_debug_mesh));
+   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(ROOT_WIDGET_FLAGS, text, ALIGNMENT, pos, fontSize, text_col, bold, pad, is_debug_mesh));
    
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
@@ -275,7 +275,7 @@ export function Create_widget_text_for_debug_ui_only(ROOT_WIDGET_FLAGS=0x0, text
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(text, pos, fontSize, col, bold, pad));
+   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, fontSize, col, bold, pad));
 
    
    // Store the meshbuffer's index to the newly created mesh.

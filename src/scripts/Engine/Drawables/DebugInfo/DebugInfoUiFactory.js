@@ -9,9 +9,10 @@ export function Dbg_ui_create2(name, fontsize, switch_size, switch_fn, callback_
 
    const section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zindex + 1], [0, 0], section_col, `DBG_UI ${name}`);
    section.SetName(`DBG_UI ${name}`);
-   section.options = SECTION.HORIZONTAL | SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.INHERIT;
+   // section.options = SECTION.HORIZONTAL | SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.INHERIT;
+   section.options = SECTION.HORIZONTAL | SECTION.EXPAND | SECTION.TOP_DOWN;
+   // section.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
    section.rel_comp = Relative_pos_comp_create_new_comp();
-
    
    const label = Create_widget_label(_, `${name}`, (ALIGN.BOTTOM | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, label_col, label_text_col, label_pad, _, label_style);
    section.AddItem(label);

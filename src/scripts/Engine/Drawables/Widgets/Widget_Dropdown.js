@@ -103,7 +103,8 @@ export class Widget_Dropdown extends Section {
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
 
       this.dp_symbols = ['+', '-'];
-      const btn = new Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, ALIGN.LEFT, [pos[0], pos[1], this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
+      // const btn = new Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, ALIGN.LEFT, [pos[0], pos[1], this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
+      const btn = new Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, ALIGN.LEFT, [0, 0, this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
       // AddArr2(btn.total_margin, this.menu.total_margin);
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
 
@@ -616,8 +617,8 @@ export class Widget_Dropdown extends Section {
       }
 
 
-      Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-      Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
+      // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 
    }
@@ -719,8 +720,8 @@ export class Widget_Dropdown extends Section {
          console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
       }
 
-      Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-      Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
+      // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 

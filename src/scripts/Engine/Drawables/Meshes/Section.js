@@ -1,11 +1,11 @@
 "use strict";
 
-import { CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
+import { CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Widget_root_create_root, Widget_root_batch_move_from_batch_buffer, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { Widget_root_create_root, Widget_root_batch_move_from_batch_buffer, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
@@ -120,20 +120,7 @@ export class Section extends Rect {
 
       mesh.StateEnable(this.state.mask & MESH_STATE.ACTIVE);
 
-      // UNNECESSARY: the calc rearanges all items
-      if (mesh.type & MESH_TYPE.SECTION_MESH) { // Handle other sections
-
-         if (options & SECTION.FIT) {
-
-            // TODO: implement
-         }
-         else if (options & SECTION.ITEM_FIT) {
-            CopyArr2(mesh.geom.pos, this.geom.pos);
-         }
-      }
-      else { // Handle Items 
-         // TODO: implement
-      }
+      // CopyArr2(mesh.geom.pos, this.geom.pos);
 
       mesh.idx = idx;
 
@@ -211,24 +198,24 @@ export class Section extends Rect {
       }
 
 
-      /** OPTIONS:EXPAND 
-       * Expand width of items to match the max width of section, minus the margin.
-       * Happens on a second pass of all items of current section, since each section may have different options for expand.
-       * Only if the section has VERTICAL align for its items. 
-       */
-      // if (options & SECTION.EXPAND && (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))) {
-      // if (options & SECTION.EXPAND) {
-      //    Expand(section, options);
-      // }
+      // /** OPTIONS:EXPAND 
+      //  * Expand width of items to match the max width of section, minus the margin.
+      //  * Happens on a second pass of all items of current section, since each section may have different options for expand.
+      //  * Only if the section has VERTICAL align for its items. 
+      //  */
+      // // if (options & SECTION.EXPAND && (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))) {
+      // // if (options & SECTION.EXPAND) {
+      // //    Expand(section, options);
+      // // }
       Expand(section, options);
 
 
       // Calculate the parent section's position, so that its items are positioned from top to bottom, (Ex. when a dropdown menu is opened). 
       // Add the parent's new size offset, so that its items are positioned from top to bottom, (Ex. when a dropdown menu is opened). 
-      if ((options & SECTION.TOP_DOWN) && (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))) {
-         section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.StylesGetMargin(STYLES.AXIS.X);
-         section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.StylesGetMargin(STYLES.AXIS.Y);
-      }
+      // if ((options & SECTION.TOP_DOWN) && (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))) {
+      //    section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.StylesGetMargin(STYLES.AXIS.X);
+      //    section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.StylesGetMargin(STYLES.AXIS.Y);
+      // }
 
 
       if (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))
@@ -238,12 +225,12 @@ export class Section extends Rect {
 
 
       // Update for the root
-      section.batch_fnidx = BATCH_FN_IDX.SET_POS2; // HACK
-      const update_data = {
-         sizes: [2],
-         data: [section.geom.dim[0], section.geom.dim[1]],
-      };
-      Batch_store(section, SHADER_ATTRIBUTES.POS2, update_data, _);
+      // section.batch_fnidx = BATCH_FN_IDX.SET_POS2; // HACK
+      // const update_data = {
+      //    sizes: [2],
+      //    data: [section.geom.dim[0], section.geom.dim[1]],
+      // };
+      // Batch_store(section, SHADER_ATTRIBUTES.POS2, update_data, _);
 
       return section.max_size;
 
@@ -280,37 +267,21 @@ export class Section extends Rect {
          if (options & SECTION.RESIZE_PARENTY) section.geom.dim[1] = section.max_size[1];
       }
 
-      /** OPTIONS:EXPAND 
-       * Happens on a second pass of all items of current section, since each section may have different options for expand.
-       * Expand width of items to match the max width of section, minus the margin.
-       * Only if the section has VERTICAL align for its items. 
-       */
-      // if (options & SECTION.EXPAND && (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))) {
-      // if (options & SECTION.EXPAND) {
-      //    Expand(section, options);
-      // }
+
       Expand(section, options);
 
 
       // Add the parent's new size offset, so that its items are positioned from top to bottom, (Ex. when a dropdown menu is opened). 
-      if ((options & SECTION.TOP_DOWN) && (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))) {
-         section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.StylesGetMargin(STYLES.AXIS.X);
-         section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.StylesGetMargin(STYLES.AXIS.Y);
-      }
+      // if ((options & SECTION.TOP_DOWN) && (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))) {
+      //    section.geom.pos[0] += (section.max_size[0] - old_sizex) + section.StylesGetMargin(STYLES.AXIS.X);
+      //    section.geom.pos[1] += (section.max_size[1] - old_sizey) + section.StylesGetMargin(STYLES.AXIS.Y);
+      // }
 
-      // Update default position
-      // CopyArr2(section.geom.defPos, section.geom.pos);
 
       if (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))
          section.SetMargin();
 
-      // if (section.rel_comp) { // Reposition any meshes that have relative position for their children
-      //    Relative_pos_comp_recalc_all(section)
-      // }
-
       Calculate_positions_no_gfx_update_recursive(section, options);
-      // console.log('-----------------------------', section.geom.pos);
-
 
       return section.max_size;
 
@@ -638,7 +609,7 @@ export class Section extends Rect {
 
 
             Gl_set_dim_XY(root.gfx, root.geom.dim, root.geom.num_faces)
-            Gl_set_wpos_XY(root.gfx, root.geom.pos, root.geom.num_faces)
+            Gl_set_wpos_XY(root.gfx, root.geom.pos[0]+root.geom.dim[0], root.geom.pos[1]+root.geom.dim[1], root.geom.num_faces)
 
             View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
             // Mesh_per_vb_remove_all_from_index(root.gfx.vb.idx, root.per_vb_bufferidx);
@@ -706,7 +677,7 @@ export class Section extends Rect {
          const child = mesh.children.buffer[i];
          if (child && (child.state.mask & MESH_STATE.ACTIVE)) {
             if (child.ConstructListeners) { // Call the widget's specific .ConstructListeners() to handle the widget's listen events creation
-               child.ConstructListeners(parent_listeners);
+               child.ConstructListeners([parent_listeners[0], parent_listeners[1]]);
                // child.ConstructListeners(this.listeners.buffer[i]);
 
                // if(mesh.listeners){
@@ -731,6 +702,8 @@ export class Section extends Rect {
 
       if (this.root_bufferidx === INT_NULL) return;
 
+      this.geom.pos[0] += x;
+      this.geom.pos[1] += y;
       Widget_root_batch_move_from_batch_buffer(this.root_bufferidx, x, y)
 
    }
@@ -974,10 +947,9 @@ export function TEMP_Section_on_move_section(params) {
 
 
 
-
 function Expand(parent, options) {
 
-   const width = parent.geom.dim[0];
+   const width = parent.geom.dim[0] - parent.StylesGetMargin(STYLES.AXIS.X);
    let opt = options
 
    for (let i = 0; i <= parent.children.boundary; i++) {
@@ -985,26 +957,26 @@ function Expand(parent, options) {
       const child = parent.children.buffer[i];
       if (options & SECTION.INHERIT) opt = parent.options
 
-      // if (child.type & MESH_TYPE.WIDGET_LABEL || child.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
       if (child.type & MESH_TYPE.WIDGET_LABEL) {
-         // For other than section widgets, the parent should control child expansion 
-         if(options & SECTION.EXPAND) {
-            child.geom.dim[0] = width - (parent.StylesGetMargin(STYLES.AXIS.X));
-            child.geom.defDim[0] = child.geom.dim[0];
-         }
+         // // For other than section widgets, the parent should control child expansion 
+         // if(options & SECTION.EXPAND) {
+         //    // child.geom.dim[0] = width - (parent.StylesGetMargin(STYLES.AXIS.X));
+         //    child.geom.dim[0] = width;
+         //    child.geom.defDim[0] = child.geom.dim[0];
+         // }
       }
       else if (child.type & MESH_TYPE.SECTION_MESH) {
          // For section widgets, the child's options should control child expansion 
          
          if (opt & SECTION.VERTICAL) {
             if(child.options & SECTION.EXPAND) {
-               child.geom.dim[0] = width - (parent.StylesGetMargin(STYLES.AXIS.X));
+               child.geom.dim[0] = width;
                child.geom.defDim[0] = child.geom.dim[0];
             }
          }
          else if (opt & SECTION.HORIZONTAL) {
             if(child.options & SECTION.EXPAND) {
-               child.geom.dim[0] = width - (parent.StylesGetMargin(STYLES.AXIS.X));
+               child.geom.dim[0] = width;
                child.geom.defDim[0] = child.geom.dim[0];
             }
          }
@@ -1133,16 +1105,8 @@ function Calculate_sizes_recursive(parent, options, target_child_idx) {
          }
          else if (opt & SECTION.HORIZONTAL) {
 
-            // if (mesh.text_mesh) {
-            //    accum_size_per_section[0] += mesh.text_mesh.GetMaxWidth();
-            //    accum_size_per_section[1] = mesh.text_mesh.geom.dim[1];
-            //    parent.max_size[0] += mesh.text_mesh.GetMaxWidth();
-            // }
-            // else{
-
             accum_size_per_section[0] += mesh.geom.dim[0];
             accum_size_per_section[1] = mesh.geom.dim[1];
-            // }
 
             parent.max_size[0] += mesh.geom.dim[0];
 
@@ -1305,69 +1269,140 @@ function Calculate_sizes_recursive(parent, options, target_child_idx) {
 // }
 
 
+/** */
+// export function Calculate_positions_recursive(parent, options) {
+// // alert()
+//    const pad = [0, 0]
+//    const cur_pos = [parent.geom.pos[0], parent.geom.pos[1]];
+
+//    for (let i = 0; i <= parent.children.boundary; i++) {
+
+//       const mesh = parent.children.buffer[i];
+//       let continue_recur = true;
+//       let opt = options
+
+//       if (options & SECTION.INHERIT) opt = parent.options
+
+//       const mesh_max_width = mesh.GetMaxWidth();
+//       if (parent.type & MESH_TYPE.SECTION_MESH) { // For meshes with a parent of type Section
+
+//          const c_x = cur_pos[0], c_y = cur_pos[1]; // curent position
+//          const parent_dimx = parent.GetMaxWidth(), parent_dimy = parent.GetTotalHeight(); // parent mesh dimention
+//          // const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
+//          const parent_margx = parent.StylesGetMargin(STYLES.AXIS.X), parent_margy = parent.StylesGetMargin(STYLES.AXIS.Y); // parent mesh margin
+
+//          const new_pos = [(c_x - parent_dimx) + mesh_max_width + parent_margx, (c_y - parent_dimy) + mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
+//          const pos_dif = [new_pos[0] - mesh.GetCenterPosX(), new_pos[1] - mesh.GetCenterPosY(), new_pos[2] + 1];
+
+//          if (pos_dif[0] !== 0 || pos_dif[1] !== 0) {
+
+//             if ((mesh.type & MESH_TYPE.SECTION_MESH) === 0) { // Case mesh not of type section, have it update it's new pos-dim on a later when it's gfx exists.
+
+//                mesh.Reposition_pre(pos_dif);
+//                continue_recur = false; // Stop recursion for mesh's children. Let the mesh deal with it's children positioning.
+//             }
+//             else { // Case  mesh is of type section  
+
+//                CopyArr2(mesh.geom.pos, new_pos);
+//                CopyArr2(mesh.geom.defPos, mesh.geom.pos);
+//                const update_data = {
+//                   sizes: [2],
+//                   data: [new_pos[0], new_pos[1], mesh.geom.dim[0], mesh.geom.dim[1],]
+//                };
+
+//                // mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
+//                mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
+//                Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, _);
+//             }
+//          }
+
+//       }
+
+//       // if ((mesh.state.mask & MESH_STATE.ACTIVE) && continue_recur)
+//       if (continue_recur)
+//          Calculate_positions_recursive(mesh, options)
+
+//       const mesh_width = mesh_max_width;
+//       const mesh_height = mesh.GetTotalHeight();
+
+//       if (opt & SECTION.VERTICAL) {
+//          cur_pos[1] += (mesh_height * 2);
+//       }
+//       else if (opt & SECTION.HORIZONTAL) {
+//          cur_pos[0] += mesh_width * 2;
+//       }
+//    }
+
+// }
+
+
+
+
 
 export function Calculate_positions_recursive(parent, options) {
 
    const pad = [0, 0]
-   const cur_pos = [parent.geom.pos[0], parent.geom.pos[1]];
 
+   const root = Widget_root_buffer_get_mesh_by_rootidx(parent.root_bufferidx);
+   const pos = root.GetPosXYZ(); 
+   const top  = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[0] + parent.geom.pos[0] + parent.StylesGetMargin(STYLES.AXIS.X) : pos[0] + parent.StylesGetMargin(STYLES.AXIS.X); 
+   const left = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[1] + parent.geom.pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y) : pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y);
+   const cur_pos = [top, left] 
+
+   if (parent.text_mesh) {
+      const rel_pos = [ (cur_pos[0]) - root.geom.pos[0], (cur_pos[1] ) - root.geom.pos[1], parent.geom.pos[2] + 1 ];
+      parent.text_mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
+      console.log('TEXT: ', rel_pos, parent.text_mesh.geom.dim, parent.text_mesh.GetName())
+   }
+   
    for (let i = 0; i <= parent.children.boundary; i++) {
-
+      
       const mesh = parent.children.buffer[i];
       let continue_recur = true;
       let opt = options
-
+      
       if (options & SECTION.INHERIT) opt = parent.options
 
-      const mesh_max_width = mesh.GetMaxWidth();
-      if (parent.type & MESH_TYPE.SECTION_MESH) { // For meshes with a parent of type Section
+      const rel_pos = [ (cur_pos[0]) - root.geom.pos[0], (cur_pos[1] ) - root.geom.pos[1], parent.geom.pos[2] + 1 ];
 
-         const c_x = cur_pos[0], c_y = cur_pos[1]; // curent position
-         const parent_dimx = parent.GetMaxWidth(), parent_dimy = parent.GetTotalHeight(); // parent mesh dimention
-         // const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
-         const parent_margx = parent.StylesGetMargin(STYLES.AXIS.X), parent_margy = parent.StylesGetMargin(STYLES.AXIS.Y); // parent mesh margin
 
-         const new_pos = [(c_x - parent_dimx) + mesh_max_width + parent_margx, (c_y - parent_dimy) + mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
-         const pos_dif = [new_pos[0] - mesh.GetCenterPosX(), new_pos[1] - mesh.GetCenterPosY(), new_pos[2] + 1];
+      if ((mesh.type & MESH_TYPE.SECTION_MESH) === 0) { // Case mesh not of type section, have it update it's new pos-dim on a later when it's gfx exists.
 
-         if (pos_dif[0] !== 0 || pos_dif[1] !== 0) {
+         mesh.Reposition_pre(rel_pos);
+         continue_recur = false; // Stop recursion for mesh's children. Let the mesh deal with it's children positioning.
+      }
+      else { // Case  mesh is of type section  
 
-            if ((mesh.type & MESH_TYPE.SECTION_MESH) === 0) { // Case mesh not of type section, have it update it's new pos-dim on a later when it's gfx exists.
+         CopyArr2(mesh.geom.pos, rel_pos);
+         CopyArr2(mesh.geom.defPos, mesh.geom.pos);
+         const update_data = {
+            sizes: [2],
+            data: [rel_pos[0], rel_pos[1], mesh.geom.dim[0], mesh.geom.dim[1],]
+         };
 
-               mesh.Reposition_pre(pos_dif);
-               continue_recur = false; // Stop recursion for mesh's children. Let the mesh deal with it's children positioning.
-            }
-            else { // Case  mesh is of type section  
+         // mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
+         mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
+         Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, _);
+      }
 
-               CopyArr2(mesh.geom.pos, new_pos);
-               CopyArr2(mesh.geom.defPos, mesh.geom.pos);
-               const update_data = {
-                  sizes: [2],
-                  data: [new_pos[0], new_pos[1], mesh.geom.dim[0], mesh.geom.dim[1],]
-               };
-
-               // mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
-               mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
-               Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, _);
-            }
-         }
+      if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
+         // Calculate_positions_no_gfx_update_recursive(mesh, opt, cur_pos)
+         Calculate_positions_no_gfx_update_recursive(mesh, opt);
 
       }
 
-      // if ((mesh.state.mask & MESH_STATE.ACTIVE) && continue_recur)
-      if (continue_recur)
-         Calculate_positions_recursive(mesh, options)
 
-      const mesh_width = mesh_max_width;
-      const mesh_height = mesh.GetTotalHeight();
+      // Increment current position tracker
+      if (parent.options & SECTION.VERTICAL) {
+         cur_pos[1] += mesh.geom.dim[1] * 2;
+      }
+      else if (parent.options & SECTION.HORIZONTAL) {
+         cur_pos[0] += mesh.geom.dim[0] * 2;
+      }
 
-      if (opt & SECTION.VERTICAL) {
-         cur_pos[1] += (mesh_height * 2);
-      }
-      else if (opt & SECTION.HORIZONTAL) {
-         cur_pos[0] += mesh_width * 2;
-      }
    }
+
+
 
 }
 
@@ -1376,116 +1411,71 @@ export function Calculate_positions_recursive(parent, options) {
 export function Calculate_positions_no_gfx_update_recursive(parent, options) {
 
    const pad = [0, 0]
-   const cur_pos = [parent.geom.pos[0], parent.geom.pos[1]];
 
-   // TODO: Quick and Dirty-Implement Better. Here we check for any parent's that have text meshes 
-   if (parent.text_mesh) {
-      const c_x = cur_pos[0], c_y = cur_pos[1]; // curent position
-      const parent_dimx = parent.GetMaxWidth(), parent_dimy = parent.GetTotalHeight(); // parent mesh dimention
-      // const parent_margx = parent.margin[0], parent_margy = parent.margin[1]; // parent mesh margin
+   const root = Widget_root_buffer_get_mesh_by_rootidx(parent.root_bufferidx);
+   const pos = root.GetPosXYZ(); 
+   const top  = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[0] + parent.geom.pos[0] + parent.StylesGetMargin(STYLES.AXIS.X) : pos[0] + parent.StylesGetMargin(STYLES.AXIS.X); 
+   const left = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[1] + parent.geom.pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y) : pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y);
+   const cur_pos = [top, left] 
 
-      const parent_margx = parent.StylesGetMargin(STYLES.AXIS.X), parent_margy = parent.StylesGetMargin(STYLES.AXIS.Y); // parent mesh margin
-      const new_pos = [(c_x - parent_dimx) + parent.text_mesh.GetMaxWidth() + parent_margx, (c_y - parent_dimy) + parent.text_mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
-      const pos_dif = [new_pos[0] - (parent.text_mesh.GetCenterPosX()), new_pos[1] - parent.text_mesh.GetCenterPosY(), new_pos[2] + 1];
-      parent.text_mesh.MoveNoGfxUpdate(pos_dif[0], pos_dif[1]);
-   }
-
-
+   // if (parent.text_mesh) {
+   //    const rel_pos = [ (cur_pos[0]) - root.geom.pos[0], (cur_pos[1] ) - root.geom.pos[1], parent.geom.pos[2] + 1 ];
+   //    parent.text_mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
+   //    console.log('TEXT: ', rel_pos, parent.text_mesh.geom.dim, parent.text_mesh.GetName())
+   // }
+   
    for (let i = 0; i <= parent.children.boundary; i++) {
-
+      
       const mesh = parent.children.buffer[i];
       let continue_recur = true;
       let opt = options
-
-
+      
       if (options & SECTION.INHERIT) opt = parent.options
 
-      const mesh_max_width = mesh.GetMaxWidth();
+      const rel_pos = [ (cur_pos[0]) - root.geom.pos[0], (cur_pos[1] ) - root.geom.pos[1], parent.geom.pos[2] + 1 ];
 
-
-      if (parent.type & MESH_TYPE.SECTION_MESH) { // For meshes with a parent of type Section
-
-         let new_pos = [0,0,0];
-         CopyArr3(new_pos, mesh.geom.pos);
+      if(mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC){
          
-         const c_x = cur_pos[0];
-         const c_y = cur_pos[1];
+         mesh.geom.pos[0] += rel_pos[0] 
+         mesh.geom.pos[1] += rel_pos[1]
+         // console.log('WIDGET_TEXT_DYNAMIC: ', rel_pos, mesh.geom.dim, mesh.GetName())
+      }
+      else if(mesh.type & MESH_TYPE.WIDGET_SCROLLER){
+         alert('Section\n->Calculate_positions_no_gfx_update_recursive\n->For Scroller')
+         mesh.ScrollerAlign();
+         // console.log('WIDGET_SCROLLER: ', rel_pos, mesh.geom.dim, mesh.GetName())
+         continue_recur = false;
+      }
+      else if (mesh.type & MESH_TYPE.SECTION_MESH) 
+      { // For meshes with a parent of type Section
 
-         const parent_dimx = parent.GetMaxWidth(), parent_dimy = parent.GetTotalHeight(); // parent mesh dimention
-         const parent_margx = parent.StylesGetMargin(STYLES.AXIS.X), parent_margy = parent.StylesGetMargin(STYLES.AXIS.Y); // parent mesh margin
+         mesh.geom.pos[0] = rel_pos[0] 
+         mesh.geom.pos[1] = rel_pos[1]
+         // console.log('SECTION: ', rel_pos, mesh.geom.dim, mesh.GetName())
+      }
+      else{
+         
+         mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
+         // mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
+         // console.log('WIDGET: ', rel_pos, mesh.geom.dim, mesh.GetName())
+         continue_recur = false;
+      }
 
-         new_pos = [(c_x - parent_dimx) + mesh_max_width + parent_margx, (c_y - parent_dimy) + mesh.geom.dim[1] + parent_margy, parent.geom.pos[2] + 1,];
-         const pos_dif = [new_pos[0] - (mesh.GetCenterPosX()), new_pos[1] - mesh.GetCenterPosY(), new_pos[2] + 1];
-
-         // console.log('ooooooooooo', pos_dif, mesh.GetName())
-
-         if (pos_dif[0] || pos_dif[1]) {
-
-            if ((mesh.type & MESH_TYPE.SECTION_MESH) === 0) { // Case mesh not of type section, have it update it's new pos-dim on a later when it's gfx exists.
-
-
-               mesh.MoveNoGfxUpdate(pos_dif[0], pos_dif[1]);
-               // console.log('{===}', mesh.mesh_bufferidx, mesh.GetName())
-
-
-               // HACK: Because scrollers bar is a Rect_mesh, it does not handle any children, like: scrollers handle
-               if (mesh.type & MESH_TYPE.WIDGET_SCROLLER_BAR) {
-                  mesh.children.buffer[0].geom.pos[0] += pos_dif[0];
-                  mesh.children.buffer[0].geom.pos[1] += pos_dif[1] + mesh.children.buffer[0].geom.dim[1];
-                  CopyArr2(mesh.children.buffer[0].geom.defPos, mesh.children.buffer[0].geom.pos);
-               }
-
-               if (parent.rel_comp) { // Reposition any meshes that have relative position for their children
-                  Relative_pos_comp_recalc_all(parent)
-               }
-               // if (mesh.rel_comp) { // Reposition any meshes that have relative position for their children
-               //    Relative_pos_comp_recalc_all(mesh)
-               // }
-
-               continue_recur = false; // Stop recursion for mesh's children. Let the mesh deal with it's children positioning.
-            }
-            else { // Case  mesh is of type section  
-
-               CopyArr2(mesh.geom.pos, new_pos);
-               CopyArr2(mesh.geom.defPos, mesh.geom.pos);
-               if (parent.rel_comp) { // Reposition any meshes that have relative position for their children
-                  Relative_pos_comp_recalc_all(parent)
-               }
-            }
-         }
-         // else {
-         //    continue_recur = false;
-         // }
-
+      if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
+         // Calculate_positions_no_gfx_update_recursive(mesh, opt, cur_pos)
+         Calculate_positions_no_gfx_update_recursive(mesh, opt);
 
       }
 
 
-      // if (parent.rel_comp) { // Reposition any meshes that have relative position for their children
-      //    Relative_pos_comp_recalc_all(parent)
-      // }
-      
-      
-      
-      if (continue_recur) // Continue recursively, if the mesh does not handle any its children.
-         Calculate_positions_no_gfx_update_recursive(mesh, options)
-
-      const mesh_width = mesh_max_width;
-      const mesh_height = mesh.GetTotalHeight();
-
-
-      // Increment current postision tracker
-      if (opt & SECTION.VERTICAL) {
-         cur_pos[1] += (mesh_height * 2);
+      // Increment current position tracker
+      if (parent.options & SECTION.VERTICAL) {
+         cur_pos[1] += mesh.geom.dim[1] * 2;
       }
-      else if (opt & SECTION.HORIZONTAL) {
-         cur_pos[0] += mesh_width * 2;
+      else if (parent.options & SECTION.HORIZONTAL) {
+         cur_pos[0] += mesh.geom.dim[0] * 2;
       }
 
-            
-      // if (mesh.rel_comp) { // Reposition any meshes that have relative position for their children
-      //    Relative_pos_comp_recalc_all(mesh)
-      // }
    }
 
 

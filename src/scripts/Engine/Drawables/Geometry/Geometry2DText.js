@@ -10,25 +10,14 @@ import { Geometry2D } from "./Base/Geometry.js";
 export class Geometry2D_Text extends Geometry2D {
 
    text;
-   // char_ratio;
 
    constructor(pos=[0,0,0], fontSize=4, scale=[0,0], text='', texidx = INT_NULL) {
 
-      
-      // let advancex = 1;
-      if (texidx !== INT_NULL) {
-         
-         // advancex = Font_get_font_advancex(texidx);
-         // var char_ratio = Font_get_font_ratio(texidx);
-         pos[0] += fontSize; // Case pos is set to 0, then we must add half text face width.
-      }
       let dim = [0, 0]
       dim = [fontSize, fontSize];
-      // dim = [fontSize*advancex, fontSize];
 
       super(pos, dim, scale);
 
-      // this.char_ratio = char_ratio;
       this.text = text;
       this.num_faces = text.length;
       this.type |= MESH_TYPE.TEXT_GEOMETRY2D;
@@ -57,24 +46,24 @@ export class Geometry2D_Text extends Geometry2D {
    UpdatePosXY(gfx) {
       
       // For text face position update, we must calculate the x pos of each face.
-      const charPos = [0, 0];
-      charPos[0] = this.pos[0];
-      charPos[1] = this.pos[1];
+      const x = 0;
+      const y = 0;
 
       // Copy gfx, to pass new start for each character
       let gfxCopy = new GfxInfoMesh(gfx);
       for (let i = 0; i < this.num_faces; i++) {
 
-         Gl_set_wpos_XY(gfxCopy, charPos);
+         Gl_set_wpos_XY(gfxCopy, x, y);
          gfxCopy.vb.start += gfxCopy.vb.count;
-         charPos[0] += this.dim[0];
+         x += this.dim[0];
+
          console.error('MADE A CHANGE FOR DIMENTION CALCULATION. SEE UpdatePosXY(gfx) @ Geometry2DText TO RESOLVE ANY ISSUES OF THE CHANGE')
       }
    }
 
    /*******************************************************************************************************************************************************/
    // Helpers
-   CalcTextWidth() {
+   CalcTextWidth() { // CAUTION: If font is not 'monospace', the calculation is of. For correct calc must sum all characters width from font's metrics
       // return this.num_faces * this.dim[0] * 2;
       return this.num_faces * this.dim[0];
    }

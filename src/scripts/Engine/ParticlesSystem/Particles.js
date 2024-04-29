@@ -47,12 +47,14 @@ class Particle {
 
 
     SetPos(pos) {
+        alert('Particles.js')
         math.CopyArr2(this.mesh.pos, pos);
         Gl_set_wpos_XY(this.gfxInfo, pos);
     }
 
 
     UpdatePos() {
+        alert('Particles.js')
         Gl_set_wpos_XY(this.gfxInfo, this.mesh.pos);
     }
 
@@ -91,6 +93,7 @@ export class Particles{
     Update(){
         for(let i=0; i< this.count; i++){
             if( this.buffer[i].isAlive){
+                alert('Particles.js')
                 Gl_set_wpos_XY(this.buffer[i].gfxInfo,   this.buffer[i].mesh.pos);
                 Gl_set_wpos_time(this.buffer[i].gfxInfo, this.buffer[i].timer.t);
             }
@@ -110,6 +113,7 @@ export class Particles{
     Destroy(idx){ // The index comes from the callers site destruction function
         this. buffer[idx].isAlive = false;
         // Set the wpos far from screen view, so the destroyed particle does not show.
+        alert('Particles.js')
         Gl_set_wpos_XY(this.buffer[idx].gfxInfo, [OUT_OF_VIEW, OUT_OF_VIEW]);
     }
 

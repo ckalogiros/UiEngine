@@ -226,9 +226,9 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
-    const dbg_dp = Debug_info_ui()
-    CreateSceneMenuBar(dbg_dp);
+    const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
+    // const dbg_dp = Debug_info_ui()
+    // CreateSceneMenuBar(dbg_dp);
     // UserCreateRect()
 
     // uidbg.RotateZ(5.5);
@@ -313,11 +313,10 @@ export function TestWidgetsGeneric(scene) {
     // CreateDropdown2(scene, [160, 200, 0], 0);
     // CreateDropdown2InSection(scene, [160, 200, 0], 0);
     // CreateDropdown3(scene, [160, 200, 0], 0);
-    // CreateDropdown4(scene, [160, 200, 0], 0);
-    // CreateLargeDropdown();
+    // CreateLargeDropdownInScroller();
 
     // CreateScroller(scene);
-    // CreateScrollerClampAlphaTest(scene)
+    CreateScrollerClampAlphaTest(scene)
     // CreateScrollerDp(scene)
     // CreateScrollerWithWidgets(scene);
 
@@ -331,6 +330,10 @@ export function TestWidgetsGeneric(scene) {
 
     /** Section Synthesizes */
     {
+        // TestSections1();
+
+
+
         // CreateSectioned_LabelSliderButtonSwitchDynemicText();
 
         // WIDGET DROPDOWN MENU
@@ -344,7 +347,7 @@ export function TestWidgetsGeneric(scene) {
         // CreateMenuSectioned(scene)
 
         // PLENTY SECTIONS
-        // const s = CreateSectionsSimple(scene);
+
         // CreateManySections(scene);
         // CreateManySectionsWithLabelsAndMinimizer(scene);
         { // 
@@ -508,6 +511,167 @@ function Test_scroller_in_between() {
     console.log()
 
 
+}
+
+
+
+
+
+
+/**************************************************************************************************************************************/
+// Widget Section Tests
+
+function TestSections1(){
+
+    const marg = [10,10];
+
+    // const pos = [VIEWPORT.WIDTH/2, VIEWPORT.HEIGHT/2, 0];
+    const pos = [0, 0, 0];
+    
+    const root = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, marg, pos, [0, 0], TRANSPARENCY(BLUEL[5], 1));
+    root.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    root.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    root.SetName('root_blue');
+    
+    { // Test 1
+        const s1 = Sections4(_, SECTION.HORIZONTAL, pos);
+        root.AddItem(s1);
+        const s2 = Sections4(_, SECTION.HORIZONTAL, pos);
+        root.AddItem(s2);
+    }
+    
+    { // Test 2
+        // const s1 = Sections2(_, SECTION.VERTICAL, pos); root.AddItem(s1);
+
+        // { // Test: one into another recursive 
+        //     const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2);
+        //     const s3 = Sections2(_, SECTION.VERTICAL, pos); s2.AddItem(s3);
+        //     const s4 = Sections2(_, SECTION.HORIZONTAL, pos); s3.AddItem(s4);
+        // }
+        
+        // { const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2); }
+        // { const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2); }
+        
+        // const s2 = Sections2(_, SECTION.VERTICAL, pos); root.AddItem(s2);
+        // const s3 = Sections2(_, SECTION.HORIZONTAL, pos); root.AddItem(s3);
+        
+        // const s4 = Sections2(_, SECTION.HORIZONTAL, pos); root.AddItem(s4);
+    }
+    
+    { // Test 3
+        {
+            const s = Create_widget_section(_, SECTION.HORIZONTAL, marg, [0,0,0], [10, 100], TRANSPARENCY(REDL[7], .6));
+            s.SetName('red1');
+            root.AddItem(s)
+            
+            { 
+                const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+                // const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+            }
+            {
+                
+                const sr = Create_widget_section(_, SECTION.VERTICAL, marg, [0,0,0], [10, 10], TRANSPARENCY(REDL[7], .6));
+                sr.SetName('red2');
+                root.AddItem(sr)
+                const s1 = Sections2(_, SECTION.VERTICAL); sr.AddItem(s1); 
+                const s2 = Sections2(_, SECTION.HORIZONTAL); sr.AddItem(s2);
+            }
+            { 
+                const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+                const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+            }
+        }
+        // {
+        //     const s = Create_widget_section(_, SECTION.HORIZONTAL, marg, [0,0,0], [10, 100], TRANSPARENCY(REDL[7], .6));
+        //     s.SetName('red3');
+        //     root.AddItem(s)
+            
+        //     { 
+        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+        //         // const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+        //     }
+        //     {
+                
+        //         const sr = Create_widget_section(_, SECTION.VERTICAL, marg, [0,0,0], [10, 10], TRANSPARENCY(REDL[7], .6));
+        //         sr.SetName('red4');
+        //         root.AddItem(sr)
+        //         const s1 = Sections2(_, SECTION.VERTICAL); sr.AddItem(s1); 
+        //         const s2 = Sections2(_, SECTION.HORIZONTAL); sr.AddItem(s2);
+        //     }
+        //     { 
+        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+        //         const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+        //     }
+        // }
+
+    }
+    
+    
+
+
+    root.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    
+    root.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+    root.Calc_no_gfx_update();
+
+    root.Render();
+
+    root.ConstructListeners();
+}
+let grey_cnt = 0;
+let green_cnt = 0;
+let orange_cnt = 0;
+function Sections2(is_root, align) {
+
+    const tr = .7;
+    const marg = [10, 10];
+    const dim = [10, 10];
+
+    const grey = Create_widget_section(is_root, align, marg, [0, 0, 0], dim, TRANSPARENCY(GREY[0], tr));
+    grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    grey.SetName(`grey${grey_cnt++}`);
+
+    const green = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(GREEN[3], tr));
+    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    green.SetName(`green${green_cnt++}`);
+    grey.AddItem(green);
+
+    const orange = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(ORANGER[7], tr));
+    orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    orange.SetName(`orange${orange_cnt++}`);
+    green.AddItem(orange);
+
+    return grey;
+}
+
+function Sections4(is_root, align) {
+
+    const tr = 1.;
+
+    const blu = Create_widget_section(is_root, align, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+    blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    blu.SetName('grey');
+
+    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+    red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    red.SetName('red');
+    blu.AddItem(red);
+    const green = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[6], tr));
+    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    green.SetName('green');
+    blu.AddItem(green);
+    // const purple = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+    // purple.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // purple.SetName('purple');
+    // blu.AddItem(purple);
+    // const orange = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGER[7], tr));
+    // orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // orange.SetName('orange');
+    // blu.AddItem(orange);
+
+
+
+    return blu;
 }
 
 
@@ -933,28 +1097,18 @@ function Test_uniforms_uTime() {
 let labelCount = 1;
 function CreateLabel(name = 'Label ') {
 
-    const pos = [20, 310 + (labelCount * 35), 2];
-    // const pos = [80, 600, 2];
-    // const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, 10, GREY[1], WHITE, [6, 4], .5);
-    const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
+    const pos = [100, 310 + (labelCount * 35), 2];
+    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
+    // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.RIGHT | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
+    // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.BOTTOM, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
+    // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
+    
+    label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    label.Render()
     label.ConstructListeners();
 
-    // label.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
-    // label.text_mesh.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
-    // label.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-
-
-
-    // label.Activate();
-    // label.GenGfxCtx(GFX_CTX_FLAGS.NEW);
-    label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    // label.GenGfxCtx(GFX_CTX_FLAGS.ANY);
-    label.Render()
-
-    // label.ClampX(30);
     // label.text_mesh.SetColorRGB(REDL);
     // label.text_mesh.RenderTextFromString('REDL');
 
@@ -971,12 +1125,13 @@ function CreateLabel(name = 'Label ') {
 function CreateButton() {
 
     let ypos = 400
-    const btn = Create_widget_button(_, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [20, ypos, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
+    const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [20, ypos, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    btn.ConstructListeners();
+
     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     btn.Render();
+    btn.ConstructListeners();
     // btn.text_mesh.SetColorRGB(BLUE_10_120_220);
 
     // btn.Align(ALIGN.LEFT | ALIGN.TOP, [0, 0]);
@@ -989,15 +1144,15 @@ function CreateSwitchSimple() {
 
     let ypos = 450
        
-    const switch1 = Create_widget_switch_simple(_, [250, ypos, 0], 20, GREEN[4], _, 5);
+    const switch1 = Create_widget_switch_simple(ROOT_WIDGETS.CREATE_ROOT, [250, ypos, 0], 20, _, _, 5);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
-    switch1.ConstructListeners();
-
+    
     switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     switch1.Render();
-
+    
+    switch1.ConstructListeners();
 
     return switch1;
 }
@@ -1005,7 +1160,7 @@ function CreateSwitchSimple() {
 function CreateSwitch() {
 
     let ypos = 500
-    const switch1 = Create_widget_switch(_, 'switch on', 'switch off', [20, ypos, 0], fontsize, GREY[1], BLUE_10_120_220, [5, 5], .5);
+    const switch1 = Create_widget_switch(ROOT_WIDGETS.CREATE_ROOT, 'switch on', 'switch off', [100, ypos, 0], fontsize, GREY[1], BLUE_10_120_220, [5, 5], .5);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
@@ -1015,7 +1170,7 @@ function CreateSwitch() {
     switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     switch1.Render();
     switch1.text_mesh.SetColorRGB(PURPLER[7], 4);
-    ypos += switch1.geom.dim[1] * 2 + 5;
+    // ypos += switch1.geom.dim[1] * 2 + 5;
 
 
     return switch1;
@@ -1024,6 +1179,7 @@ function CreateSwitch() {
 function CreateSlider() {
 
     const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 300, 0], [150, 10]);
+    slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
     // slider.CreateSliderHandleEvent();
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
@@ -1060,7 +1216,8 @@ function CreateChangeMeshColorFromSliders() {
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
-    section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+    // section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+    section.options = SECTION.TOP_DOWN | SECTION.VERTICAL ;
     section.Calc_no_gfx_update();
     
     section.Render();
@@ -1164,9 +1321,12 @@ function CreateDropdown(scene, pos, id) {
     }
 
     dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-    dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN;
-    dp.Render(dp.group_bufferidxs[0])
-    dp.Calc();
+
+    dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+    dp.Calc_no_gfx_update();
+    
+    dp.Render()
+    
     dp.ConstructListeners();
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
@@ -1220,38 +1380,6 @@ function CreateDropdown3(scene, pos, dim) {
 
 }
 
-
-function CreateDropdown4(scene, pos, dim) {
-
-    const pad = [4, 2]
-    const margin = [8, 8]
-    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `0`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
-    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    Dropdown_roots_set_root(dp, dp)
-    
-    
-    const sub_dp1_count = 2;
-    const sub_dp2_count = 5;
-    
-    const col = GetSequencedColor()
-    for (let i = 0; i < sub_dp1_count; i++) {
-        
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[7], .5), `0${i}`)
-        s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-        dp.AddToMenu(s);
-    }
-
-    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-    dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
-    dp.Calc_no_gfx_update();
-    dp.Render()
-    dp.ConstructListeners();
-
-    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-    View_build_group_from_root_mesh(dp)
-
-}
 
 
 function CreateDropdown2(scene, pos, id) {
@@ -1374,7 +1502,7 @@ function CreateDropdown2InSection(scene, pos, id) {
     for (let i = 0; i < sub_dp1_count; i++) {
         
         
-        const label = Create_widget_label(_, `sssdsdsdsdsLabel ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY[1], WHITE, [14, 4], .5);
+        const label = Create_widget_label(_, `sssdsdsdsdsLabel ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0,0,pos[2]], fontsize, GREY[1], WHITE, [14, 4], .5);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         dp.AddToMenu(label);
@@ -1610,7 +1738,7 @@ function CreateDropDownWithDropdownsInside(scene) {
 
 }
 
-function CreateLargeDropdown() {
+function CreateLargeDropdownInScroller() {
 
     const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [593, 262, 0], [0, 0], TRANSPARENCY(GREY[3], 1.5));
 
@@ -1739,7 +1867,7 @@ function CreateLargeDropdown() {
 
 function CreateManyTextInSection() {
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [350, 400, 0], [0, 0], GREY[0]);
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [350, 400, 0], [100, 100], GREY[0]);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
@@ -1749,8 +1877,8 @@ function CreateManyTextInSection() {
         section.AddItem(text);
     }
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-    section.Calc();
+    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    section.Calc_no_gfx_update();
     section.Render();
 
     section.ConstructListeners();
@@ -1841,7 +1969,7 @@ function CreateMenu(scene) {
     section.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
 
 
-    const menu = Create_widget_menubar(_, pos, TRANSPARENCY(GREY[1], .6), WHITE, 'Widget', [10, 6]);
+    const menu = Create_widget_menubar(_, [0,0,pos[2]], TRANSPARENCY(GREY[1], .6), WHITE, 'Widget', [10, 6]);
     // menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     // menu.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
     // menu.CreateListenEEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -2449,58 +2577,7 @@ function CreateMenuBarSectioned(count) {
     return section;
 }
 
-function CreateSectionsSimple(scene) {
 
-    const tr = 1.;
-
-    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [200, 200, 0], [10, 100], TRANSPARENCY(BLUEL[7], tr));
-    blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    blu.SetName('root');
-
-    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[3], tr));
-    red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    red.SetName('red');
-    blu.AddItem(red);
-
-    {
-        // const label = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0]);
-        // label.SetName('Sectioned btn1')
-        // label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, )
-        // label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE , )
-        // red.AddItem(label);
-
-        const s = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[4], tr));
-        s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-
-        s.SetName('section child 1');
-        red.AddItem(s);
-
-        // {
-        //     const l = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0]);
-        //     l.SetName('Sectioned btn2')
-        //     l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, )
-        //     l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE , )
-        //     s.AddItem(l);
-        // }
-    }
-
-    const green = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[3], tr));
-    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    green.SetName('green');
-    blu.AddItem(green);
-
-
-
-    blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
-    blu.Calc_no_gfx_update();
-
-    blu.Render();
-
-    blu.ConstructListeners();
-    return blu;
-}
 
 function CreateManySections(scene) {
 
@@ -2512,6 +2589,7 @@ function CreateManySections(scene) {
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
     red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.EXPAND;
+    // red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
     blu.AddItem(red);
 
     
@@ -2606,18 +2684,6 @@ function CreateManySections(scene) {
     vert_0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     gry1_1.AddItem(vert_0);
 
-    // Construct widgets
-    // const label = Create_widget_label(_, 'label', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0]);
-    // label.SetName('Sectioned btn1')
-    // label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-    // blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-    // const btn = Create_widget_button(_, 'btnl', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0]);
-    // btn.SetName('Sectioned btn1')
-    // btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-    // btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-
     { // Set naming and listeners
         red.SetName('red');
         grey11.SetName('grey11');
@@ -2652,11 +2718,10 @@ function CreateManySections(scene) {
 
 
     blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    // blu.options = SECTION.INHERIT | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
     blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
     blu.Calc_no_gfx_update();
-
     blu.Render();
-
     blu.ConstructListeners();
 
     return blu;
@@ -2829,26 +2894,50 @@ function CreateScroller(scene) {
 function CreateScrollerClampAlphaTest(scene) {
 
     const colors = [
-        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8], BLUEL[9],
-        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8], BLUEL[9],
-        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8], BLUEL[9],
-        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8], BLUEL[9],
-        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8], BLUEL[9],
-        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8], BLUEL[9],
-        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8], BLUEL[9],
-        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8], BLUEL[9],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
+        REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
     ];
-    const count = colors.length;
     const fontsize = 14;
-
+    
     const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
-
-
-    // const count = 100;
+    
+    
+    // const count = colors.length;
+    const count = 16;
     for (let i = 0; i < count; i++) {
         // const label = Create_widget_section(_, _, _, [400, 300, 0], [20,20], TRANSPARENCY(colors[i], .7), `Section${i + 1}`)
         // const label = Create_widget_text(_, `${i}`, [100, 100, 2], fontsize, TRANSPARENCY(colors[i], .7), WHITE)
-        const label = Create_widget_label(_, `${i}`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE)
+        const label = Create_widget_label(_, `${i}`, ALIGN.HOR_CENTER, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE)
 
         label.SetName(`${label.id}`);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
@@ -2867,7 +2956,8 @@ function CreateScrollerClampAlphaTest(scene) {
     scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
 
     scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
-    scroller.Calc_no_gfx_update();
+    // scroller.Calc_no_gfx_update();
+    scroller.ScrollerAlign();
 
     View_build_group_from_root_mesh(scroller.scrolled_section);
 
@@ -3296,7 +3386,9 @@ function MeshInfoUpdate(params) {
         }
 
         // msgs.push(`Framebuffer counter:${TEMP_TEST_PERFORMANE_COUNTERS.FRAMEBUFFER}`);
-        msgs[TEMP_TEST_PERFORMANE_COUNTERS.MISC_IDX] = `MISC:${TEMP_TEST_PERFORMANE_COUNTERS.MISC}`;
+        // msgs[TEMP_TEST_PERFORMANE_COUNTERS.MISC_IDX] = `MISC:${TEMP_TEST_PERFORMANE_COUNTERS.MISC}`;
+        const mouse_pos = MouseGetPos();
+        msgs[TEMP_TEST_PERFORMANE_COUNTERS.MISC_IDX] = `MISC:${mouse_pos[0]} ${mouse_pos[1]}`;
 
         // Update info text
         for (let i = 0; i <= textMesh.children.boundary; i++) {

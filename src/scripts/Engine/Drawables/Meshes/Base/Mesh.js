@@ -5,12 +5,13 @@ import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_batch_destroy_run, Listener_batch_destroy_store, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
-import { Mesh_buffer_batch_destroy_run, Mesh_buffer_batch_destroy_store, Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_batch_destroy_run, Mesh_buffer_batch_destroy_store, Mesh_buffer_get_mesh_pos, Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_buffer_get_root_meshidx, Widget_root_buffer_get_root_pos, Widget_root_buffer_is_root } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_batch_destroy_run, Styles_batch_destroy_store, Styles_create, Styles_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 import { Command_buffer_store } from "../../../Core/Commandbuffer.js";
+import { View_get_view_vb_mesh_meshidx, View_get_view_vb_root_meshidx, View_is_group_root } from "../../../Core/MeshBufferViews.js";
 
 
 const NOTIFICATIONS_ON = true;
@@ -493,6 +494,188 @@ export class Mesh {
     GetName() { return Str_buffer_mesh_names_get_by_idx(this.nameidx); }
 
 
+    GetPosXYZ() {
+
+        const pos = [0, 0, this.geom.pos[2]];
+
+        const p = this.GetPosXY();
+        pos[0] += p[0];
+        pos[1] += p[1];
+
+
+        return pos;
+    }
+    // GetPosXYZ() {
+
+    //     // TODO: All meshes muust have index to root parent mesh. So if NOT -> alert
+    //     if (this.root_bufferidx === INT_NULL) alert('GetPosXYZ()');
+
+    //     const root = Widget_root_buffer_get_mesh_by_rootidx(this.root_bufferidx);
+
+    //     if (this.mesh_bufferidx === root.mesh_bufferidx)
+    //         return [
+    //             this.geom.pos[0],
+    //             this.geom.pos[1],
+    //             this.geom.pos[2]
+    //         ]; // If this is the root, absolute position is its position
+
+    //     // else calculate pos from root (Top-Left implementation)
+    //     const pos = [
+    //         root.geom.pos[0] + this.geom.pos[0],
+    //         root.geom.pos[1] + this.geom.pos[1],
+    //         this.geom.pos[2],
+    //     ];
+    //     return pos;
+    // }
+
+
+    // GetPosXY() {
+
+    //     // TODO: All meshes muust have index to root parent mesh. So if NOT -> alert
+    //     if (this.root_bufferidx === INT_NULL) alert('GetPosXY()');
+
+    //     const root = Widget_root_buffer_get_mesh_by_rootidx(this.root_bufferidx);
+
+    //     if (this.mesh_bufferidx === root.mesh_bufferidx)
+    //         return [
+    //             this.geom.pos[0],
+    //             this.geom.pos[1],
+    //         ];
+
+    //     const pos = [
+    //         root.geom.pos[0] + this.geom.pos[0],
+    //         root.geom.pos[1] + this.geom.pos[1],
+    //     ];
+    //     return pos;
+    // }
+
+
+    GetPosXY() {
+
+        const pos = [0, 0];
+
+        if (this.group_bufferidxs[0] !== INT_NULL) {
+
+            if (!View_is_group_root(this.group_bufferidxs, this.mesh_bufferidx)) {
+
+                const group_root_mesh_meshidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+                const group_pos = Mesh_buffer_get_mesh_pos(group_root_mesh_meshidx);
+                pos[0] += group_pos[0];
+                pos[1] += group_pos[1];
+                // console.log('group_pos', group_pos, this.GetName())
+            }
+        }
+
+
+        if (!Widget_root_buffer_is_root(this.root_bufferidx, this.mesh_bufferidx)) {
+
+            const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
+
+            if (root_meshidx !== this.root_bufferidx) {
+                const root_pos = Widget_root_buffer_get_root_pos(this.root_bufferidx);
+                pos[0] += root_pos[0];
+                pos[1] += root_pos[1];
+                // console.log('root_pos', root_pos, this.GetName())
+            }
+        }
+
+
+        pos[0] += this.geom.pos[0];
+        pos[1] += this.geom.pos[1];
+        // console.log('this.geom.pos', this.geom.pos, this.GetName())
+
+        return pos;
+    }
+
+
+    GetPosX() {
+
+        let pos = 0;
+
+        if (this.group_bufferidxs[0] !== INT_NULL) {
+
+            if (!View_is_group_root(this.group_bufferidxs, this.mesh_bufferidx)) {
+                
+                const group_meshidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+                const group_pos = Mesh_buffer_get_mesh_pos(group_meshidx);
+                if (group_meshidx !== this.mesh_bufferidx) pos += group_pos[0];
+            }
+        }
+
+
+        if (!Widget_root_buffer_is_root(this.root_bufferidx, this.mesh_bufferidx)) {
+
+            const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
+            if (root_meshidx !== this.root_bufferidx) {
+                const root_pos = Widget_root_buffer_get_root_pos(this.root_bufferidx);
+                pos += root_pos[0];
+            }
+        }
+
+        pos += this.geom.pos[0];
+
+        return pos;
+    }
+
+
+    GetPosY() {
+
+        let pos = 0;
+
+        if (this.group_bufferidxs[0] !== INT_NULL) {
+
+            if (!View_is_group_root(this.group_bufferidxs, this.mesh_bufferidx)) {
+                
+                const group_meshidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+                const group_pos = Mesh_buffer_get_mesh_pos(group_meshidx);
+                // Skip if this is the root mesh of the group. The position will be added by the 'this.geom.pos[1]'
+                if (group_meshidx !== this.mesh_bufferidx) pos += group_pos[1];
+            }
+        }
+
+
+        if (!Widget_root_buffer_is_root(this.root_bufferidx, this.mesh_bufferidx)) {
+
+            const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
+            if (root_meshidx !== this.root_bufferidx) {
+                const root_pos = Widget_root_buffer_get_root_pos(this.root_bufferidx);
+                pos += root_pos[1];
+            }
+        }
+
+        pos += this.geom.pos[1];
+
+        return pos;
+    }
+
+
+    // GetPosX() {
+
+    //     // TODO: All meshes muust have index to root parent mesh. So if NOT -> alert
+    //     if (this.root_bufferidx === INT_NULL) alert('GetPosX()');
+
+    //     const root = Widget_root_buffer_get_mesh_by_rootidx(this.root_bufferidx);
+
+    //     if (this.mesh_bufferidx === root.mesh_bufferidx) return this.geom.pos[0];
+
+    //     return root.geom.pos[0] + this.geom.pos[0];
+    // }
+
+
+    // GetPosY() {
+
+    //     // TODO: All meshes must have index to root parent mesh. So if NOT -> alert
+    //     if (this.root_bufferidx === INT_NULL) alert('GetPosY()');
+
+    //     const root = Widget_root_buffer_get_mesh_by_rootidx(this.root_bufferidx);
+
+    //     if (this.mesh_bufferidx === root.mesh_bufferidx) return this.geom.pos[1];
+
+    //     return root.geom.pos[1] + this.geom.pos[1];
+    // }
+
+
+
     UpdatePosXY() { this.SetUpdateFrameBuffer(); this.geom.UpdatePosXY(this.gfx); }
 
 
@@ -608,7 +791,7 @@ export class Mesh {
         /**
          * How to set up a uniform:
          * 1. Call this, with uniform name and a glg:SID.UNIF. the type of uniform to enable.
-         *      This means that the user is responsiblee to add any new uniform type in SID global object.
+         *      This means that the user is responsible to add any new uniform type in SID global object.
          *      That is so we can check and enable code in the shader builder. 
          * 2. We need to bind the 'Set' and 'Update' functions for the uniforms to be usefull.
          *      . For the block uniforms, we only need to 'Set' the value via 

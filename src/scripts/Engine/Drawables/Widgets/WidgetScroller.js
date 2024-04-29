@@ -5,15 +5,16 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Widget_root_add_mesh, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { Widget_root_add_mesh, Widget_root_batch_move_from_batch_buffer, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
-import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
+import { AddArr2, CopyArr2, Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Clampx_from_group,Clipy_from_group } from "../Operations/Clip.js";
 import { BLUEL, GREY } from "../Material/Base/Colors.js";
 import { View_movey_group, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 import { Gl_set_dim_XY, Gl_set_dim_Y, Gl_set_wpos_X, Gl_set_wpos_XY, Gl_set_wpos_Y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
+import { Styles_margin_print_loop } from "../../Styles.js";
 
 
 /** ### Scroller Widget
@@ -73,8 +74,9 @@ export class Widget_Scroller extends Section {
       this.is_scrolled_section_private = false;
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      this.SetStyle([0, 6, 2]);
-      this.state.mask |= MESH_STATE.IS_RESIZEABLE;
+      // this.SetStyle([0, 6, 2]);
+      this.SetStyle([0, 3, 1]);
+      // this.state.mask |= MESH_STATE.IS_RESIZEABLE;
 
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -84,22 +86,20 @@ export class Widget_Scroller extends Section {
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
 
       // If there is a group (section) passed by the user, use that section as scrolled section.
-      // if (scrolled_mesh && (scrolled_mesh.type & MESH_TYPE.SECTION_MESH)) {
       if (scrolled_mesh) {
 
          this.scrolled_section = scrolled_mesh;
          this.scrolled_section.SetName(`[${this.mesh_bufferidx}]-Scrolled section`)
 
          // Calculate the scroller's position based on scrooled mesh position
-         // this.geom.pos[0] = (this.scrolled_section.geom.pos[0] - this.scrolled_section.geom.dim[0]) - this.StylesGetMargin(STYLES.AXIS.X); // Include the margin in the calculation
-         // this.geom.pos[1] = (this.scrolled_section.geom.pos[1] - this.scrolled_section.geom.dim[1]) + this.StylesGetMargin(STYLES.AXIS.Y);
-         this.geom.pos[0] = this.scrolled_section.geom.pos[0]; 
-         this.geom.pos[1] = this.scrolled_section.geom.pos[1];
+         this.scrolled_section.geom.pos[0] = this.geom.pos[0]; 
+         this.scrolled_section.geom.pos[1] = this.geom.pos[1];
       }
       else { // else create a new scrolled section.
          // We need to calculate the sizes correctly.
          // E.x. we need to create a new scrolled_section section, add the items, calculate with .Calc() and get the size to use for aligning the scroller and the scroll bar...
          console.error('IMPLEMENT Scroller create new scrolled section.')
+         return;
       }
 
       this.scrolled_section.type |= MESH_TYPE.SCROLLED_SECTION;
@@ -117,17 +117,15 @@ export class Widget_Scroller extends Section {
 
       // Calculate the bar's and handle's horizontal pading.
       const pad = [1.4, 1.4];
-
-
+      
+      
       /********************************************************************************************************************************************/
-      // Scroller Bar: Bar is child of 'this'
-
-      // Calculate bar's dimentions and position.
-      const barpos = [pos[0], pos[1] + this.geom.dim[1], this.scrolled_section.geom.pos[2]+40]
-      const barMetrics = this.#CalculateBarArea(barpos, [10, dim[1]], pad)
-
-
-      const bar = Create_rect_mesh(barMetrics.pos, barMetrics.dim, GREY[1], is_debug_mesh);
+      // Scroll Bar
+      
+      const bar_dim = [10, dim[1]-pad[1]*2];
+      const bar_pos = [this.geom.dim[0]*2 - bar_dim[0]*2 - pad[0]*2, pad[1]*2, pos[2]];
+      
+      const bar = Create_rect_mesh(bar_pos, bar_dim, GREY[1], is_debug_mesh);
       bar.sid.gfx_group = this.sid.gfx_group;
       bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -138,10 +136,10 @@ export class Widget_Scroller extends Section {
       
       
       /********************************************************************************************************************************************/
-      // Scroller Handle: Handle is a child of the bar mesh
+      // Scroll Handle
       
       const handleMetrics = this.#CalculateHandleArea(bar.geom.pos, bar.geom.dim, pad)
-      const handle = Create_rect_mesh([0,0,bar.geom.pos[2]+1], handleMetrics.dim, BLUEL[4], is_debug_mesh);
+      const handle = Create_rect_mesh(handleMetrics.pos, handleMetrics.dim, BLUEL[4], is_debug_mesh);
       handle.sid.gfx_group = this.sid.gfx_group;
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([0, 3, 1.6]);
@@ -158,14 +156,6 @@ export class Widget_Scroller extends Section {
       /********************************************************************************************************************************************/
       // Align
 
-      // Calculate the scroller's width
-      // this.geom.pos[0] += this.geom.dim[0]; // Correct the scrollers pos now that we know its width.
-      // this.geom.pos[1] += this.geom.dim[1]; // Correct the scrollers pos now that we know its height.
-
-      // Calculate handle's position, from bar's position
-      handle.geom.pos[0] = bar.geom.pos[0];
-      handle.geom.pos[1] = bar.geom.pos[1] - bar.geom.dim[1] + handle.StylesGetMargin(STYLES.AXIS.Y);
-
       handle.StylesSetPad([13,3]);
 
       bar.AddChild(handle);
@@ -180,6 +170,7 @@ export class Widget_Scroller extends Section {
       this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       bar.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
    }
 
 
@@ -432,8 +423,8 @@ export class Widget_Scroller extends Section {
        */
 
       // Check for Resize
-      const right = mesh.geom.pos[0] + mesh.geom.dim[0];
-      const bottom = mesh.geom.pos[1] + mesh.geom.dim[1];
+      const right = mesh.GetPosX() + mesh.geom.dim[0]*2;
+      const bottom = mesh.GetPosY() + mesh.geom.dim[1]*2;
 
       if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) {
 
@@ -460,12 +451,14 @@ export class Widget_Scroller extends Section {
          
          return true;
       }
-      else {
+      else 
+      {
 
          // Check if the click happened on bar
          const bar = mesh.scroll_bar;
-         // if (point[0] > bar.geom.pos[0] - bar.geom.dim[0] + bar.hover_margin[0]) { // Check only if click is on the right of the left side of the bar mesh
-         if (point[0] > bar.geom.pos[0] - bar.geom.dim[0] + bar.StylesGetHoverMargin(STYLES.AXIS.X)) { // Check only if click is on the right of the left side of the bar mesh
+         const bar_pos = bar.GetPosX();
+         // if (point[0] > bar.geom.pos[0] - bar.geom.dim[0] + bar.StylesGetHoverMargin(STYLES.AXIS.X)) { // Check only if click is on the right of the left side of the bar mesh
+         if (point[0] > bar_pos - bar.geom.dim[0] + bar.StylesGetHoverMargin(STYLES.AXIS.X)) { // Check only if click is on the right of the left side of the bar mesh
    
             STATE.mesh.SetClicked(bar);
    
@@ -547,6 +540,11 @@ export class Widget_Scroller extends Section {
       const mouse_pos = MouseGetPosDif();
       const bar = scroller.scroll_bar;     
 
+      const offset_posx = mouse_pos.x - scroller.geom.pos[0];
+      const offset_posy = mouse_pos.y - scroller.geom.pos[1];
+      
+
+
       // TODO: We can set all positions and simentions and call 'Gl_set_pos_dim' for all meshes of the scroller
       if (mouse_pos.x !== 0 || mouse_pos.y !== 0) {
 
@@ -559,51 +557,72 @@ export class Widget_Scroller extends Section {
          const min_width = scroller.geom.defDim[0];
          const min_height = scroller.geom.defDim[1];
 
+         // Resize X
          if (x > POSSITIVE || (x < NEGATIVE && scroller.geom.dim[0] + x > min_width)) {
             
             scroller.geom.dim[0] += x;
-            scroller.geom.pos[0] += x;
 
-            // Move bar
-
-            bar.geom.pos[0] += x*2;
-            Gl_set_wpos_X(bar.gfx, bar.geom.pos[0], bar.geom.num_faces)
-
-            // re-position handle
-            const dif = x*2;
+            // Bar
+            // bar.geom.pos[0] = scroller.geom.dim[0]*2 - bar.geom.dim[0] - scroller.StylesGetMargin(STYLES.AXIS.X);
+            bar.geom.pos[0] = scroller.geom.dim[0]*2 - bar.geom.dim[0] - scroller.StylesGetMargin(STYLES.AXIS.X)- bar.StylesGetPad(STYLES.AXIS.X);
+            // Gl_set_wpos_X(bar.gfx, bar.geom.pos[0]+bar.geom.dim[0], bar.geom.num_faces)
+            Gl_set_wpos_X(bar.gfx, bar.GetPosX()+bar.geom.dim[0], bar.geom.num_faces)
+            
+            // Handle
             const handle = bar.children.buffer[0];            
-            handle.geom.pos[0] += dif;
-            Gl_set_wpos_X(handle.gfx, handle.geom.pos[0], handle.geom.num_faces)
-
+            handle.geom.pos[0] = bar.geom.pos[0]+bar.StylesGetPad(STYLES.AXIS.X)*2;
+            Gl_set_wpos_X(handle.gfx, handle.GetPosX()+handle.geom.dim[0], handle.geom.num_faces)
          }
          
-         
+         // Resize Y
          if (y > POSSITIVE || (y < NEGATIVE && scroller.geom.dim[1] + y > min_height)) {
             
             scroller.geom.dim[1] += y;
-            scroller.geom.pos[1] += y;
-
-            // resize bar
-                  
-            bar.geom.dim[1] += y;
-            bar.geom.pos[1] += y;
-            Gl_set_dim_Y(bar.gfx, bar.geom.dim[1], bar.geom.num_faces)
-            Gl_set_wpos_Y(bar.gfx, bar.geom.pos[1], bar.geom.num_faces)
-
-
-            // const dif_percentage = bar.geom.dim[1] / bar_old_height;
             
-            // re-position handle
-            const dif = y/2;
+            // Bar
+            bar.geom.dim[1] = scroller.geom.dim[1];
+            bar.geom.pos[1] = 0;
+            Gl_set_dim_Y(bar.gfx, bar.geom.dim[1], bar.geom.num_faces)
+            Gl_set_wpos_Y(bar.gfx, bar.GetPosY()+bar.geom.dim[1], bar.geom.num_faces)
+
+            
+            // Handle
             const handle = bar.children.buffer[0];            
-            handle.geom.pos[1] += dif;
-            Gl_set_wpos_Y(handle.gfx, handle.geom.pos[1], handle.geom.num_faces)
+            // Calculate handle dimention to the ratio of the scroller/scrolled_section
+            // const handle = bar.children.buffer[0];
+            const ratio = scroller.geom.dim[1] / scroller.scrolled_section.geom.dim[1];
+            const h = (ratio*scroller.geom.dim[1] >= scroller.geom.dim[1]) ? bar.geom.dim[1]-handle.StylesGetMargin(STYLES.AXIS.Y) : ratio*scroller.geom.dim[1];
+            
+            // handle.geom.pos[1] += h-handle.geom.dim[1];
+            
+            const top_offset = handle.geom.pos[1]
+            const bottom_offset = (bar.geom.pos[1]+bar.geom.dim[1]*2) - (handle.geom.pos[1]+handle.geom.dim[1]*2)
+            // const d = (top_offset<bottom_offset) ? top_offset/bottom_offset : (bottom_offset/top_offset)-1
+            const d = top_offset/bottom_offset 
+            const r = (h-handle.geom.dim[1])/2*d
+            // console.log(top_offset, bottom_offset, d, r)
+            console.log( d, r)
+            // handle.geom.pos[1] += (h-handle.geom.dim[1])*r;
+
+            // const move_ratio = handle.geom.pos[1] / bar.geom.dim[1];
+            const move_ratio = ratio - 1;
+            // handle.geom.pos[1] -= r;
+            // handle.geom.pos[1] += d;
+            // handle.geom.pos[1] += (h-handle.geom.dim[1])*move_ratio;
+            // handle.geom.pos[1] += (h-handle.geom.dim[1])*move_ratio*((handle.geom.pos[1]+handle.geom.dim[1])*(handle.geom.pos[1]/handle.geom.dim[1])*.2);
+            // handle.geom.pos[1] += (handle.geom.pos[1])*move_ratio;
+            // console.log(handle.geom.pos[1], h, ratio, move_ratio)
+            handle.SetDim([UNCHANGED, h]);
+
+
+            Gl_set_wpos_Y(handle.gfx, handle.GetPosY()+handle.geom.dim[1], handle.geom.num_faces)
             
          }
 
 
          Gl_set_dim_XY(scroller.gfx, scroller.geom.dim, scroller.geom.num_faces)
-         Gl_set_wpos_XY(scroller.gfx, scroller.geom.pos, scroller.geom.num_faces)
+         Gl_set_wpos_XY(scroller.gfx, scroller.geom.pos[0]+scroller.geom.dim[0], scroller.geom.pos[1]+scroller.geom.dim[1], scroller.geom.num_faces);
+         // Gl_set_wpos_XY(scroller.gfx, scroller.geom.pos[0], scroller.geom.pos[1], scroller.geom.num_faces);
 
          View_reset_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0]);
          // Mesh_per_vb_remove_all_from_index(scroller.scrolled_section.gfx.vb.idx, scroller.scrolled_section.per_vb_bufferidx);
@@ -614,7 +633,7 @@ export class Widget_Scroller extends Section {
          // const clip_right = scroller.geom.pos[0] + scroller.geom.dim[0] + (scroller.StylesGetMargin(STYLES.AXIS.X));
          const clip_right = scroller.geom.pos[0] + scroller.geom.dim[0] - (scroller.StylesGetMargin(STYLES.AXIS.X) + bar.geom.dim[0]*2);
          
-         Clampx_from_group(scroller.scrolled_section.group_bufferidxs[0], 0, clip_right);
+         // Clampx_from_group(scroller.scrolled_section.group_bufferidxs[0], 0, clip_right);
          
          View_rerender_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0], false);
 
@@ -624,14 +643,11 @@ export class Widget_Scroller extends Section {
    }
 
 
-   // IMPORTANT: This Move Calls Section's Move which runs on the meshbuffer for all widget_root_buffer meshes (LINEAR ACCESS)
-   Move(x, y) { // Called from any widget. Example: If the scroller is child of a section, the section's Move() will call this Move for the scroller widget
+   Move(x, y) {
 
-      if (this.scrolled_section) {
-         /**DEBUG */ if (!this.scrolled_section.Move) alert('Move() function is missing from scrolled mesh. @WidgetScroller.js');
-         // console.log('--------------------')
-         this.scrolled_section.Move(x, y); // Let the scrolled mesh handle the Move().
-      }
+      this.geom.pos[0] += x;
+      this.geom.pos[1] += y;
+      Widget_root_batch_move_from_batch_buffer(this.root_bufferidx, x, y)
 
    }
 
@@ -891,27 +907,37 @@ export class Widget_Scroller extends Section {
    }
 
 
+   ScrollerAlign(){
+
+      this.scrolled_section.options |= SECTION.RESIZE_PARENT; // For the scrolled section to encapsulate all items.
+      this.scrolled_section.Calc_no_gfx_update();
+
+      // Calculate handle dimention to the ratio of the scroller/scrolled_section
+      const bar = this.scroll_bar; 
+      const handle = bar.children.buffer[0];
+      const ratio = this.geom.dim[1] / this.scrolled_section.geom.dim[1];
+      const h = (ratio*this.geom.dim[1] >= this.geom.dim[1]) ? bar.geom.dim[1]-handle.StylesGetMargin(STYLES.AXIS.Y) : ratio*this.geom.dim[1];
+      handle.geom.dim[1] = h;
+
+   }
+
+
+
+
+
+
+
+
    /*******************************************************************************************************************************************************/
    // Private Methods 
    /*******************************************************************************************************************************************************/
-
-   #CalculateBarArea(_pos, _dim, pad) {
-
-      const dim = [_dim[0], _dim[1]];
-      const pos = [_pos[0], _pos[1], _pos[2] + 1]; // Does not need to change for center positioning.
-
-      return {
-         pos: pos,
-         dim, dim,
-      };
-   }
 
 
    #CalculateHandleArea(_pos, _dim, pad) {
 
       const dim = [_dim[0] - (pad[0] * 2), 0];
       dim[1] = dim[0];
-      const pos = [_pos[0], _pos[1], _pos[2] + 1]; // Pos does not need to change for positioning in the center.
+      const pos = [_pos[0]+pad[0]*2, _pos[1]+pad[1]*2, _pos[2]+1]; // Pos does not need to change for positioning in the center.
 
       return {
          pos: pos,
@@ -940,8 +966,6 @@ export class Widget_Scroller extends Section {
 }
 
 
-let temp_ypos_accum = 0;
-let _scroller_handle_ypos = 0; // IMIDIATELY: Implement a var to store any changes of scroll
 export function Scroller_on_update_handle(_params) {
 
    /**
@@ -968,105 +992,60 @@ export function Scroller_on_update_handle(_params) {
    const scroller = bar.parent;
 
    // Case the handle is grabbed but not moved, then we do not have anything to calculate, just move the scroller and return
-   if (handle.geom.pos[1] === _scroller_handle_ypos) {
-      Scroller_move_handle(bar, handle);
-      return;
-   }
-
-   // Else procceed
    Scroller_move_handle(bar, handle);
-   _scroller_handle_ypos = handle.geom.pos[1]
 
+// TODO: cache bar pos, bar top etc once, and pass them to Scroller_calculate_value 
+   
+   // console.log(val)
+   // console.log(handle.geom.pos[1])
    const val = Scroller_calculate_value(bar, handle); // Calculate slider's value based on the handles position.
+   // const val = 1
    
    const scrolled_section = scroller.scrolled_section;
+   const scroller_top = scroller.GetPosY();
+   const scrolled_posy = scrolled_section.GetPosY() + scrolled_section.geom.dim[1];
    
    // Calculate height of handle
    const ratio = scroller.geom.dim[1] / scrolled_section.geom.dim[1];
-   // const h = (ratio*scroller.geom.dim[1] > scroller.geom.dim[1]) ? bar.geom.dim[1]-handle.StylesGetMargin(STYLES.AXIS.Y) : ratio*scroller.geom.dim[1];
-   const h = (ratio*scroller.geom.dim[1] >= scroller.geom.dim[1]) ? bar.geom.dim[1]-handle.StylesGetMargin(STYLES.AXIS.Y) : ratio*scroller.geom.dim[1];
-   handle.SetDim([UNCHANGED, h]);
-   // handle.SetDimYNoGfxUpdate(d*scroller.geom.dim[1]);
-
-   const scroller_pady = scroller.StylesGetMargin(STYLES.AXIS.Y);
-   const move_ratio = ((scrolled_section.geom.dim[1] * 2) - ((scroller.geom.dim[1] * 2)-scroller_pady*2));
-   // const move_ratio = ((scrolled_section.geom.dim[1] * 2) - ((scroller.geom.dim[1] * 2) - 30));
-
+   
+   const move_ratio = ((scrolled_section.geom.dim[1] * 2) - ((scroller.geom.dim[1] * 2)));
+   
    // Calculate the absolute position for the scrolled mesh. (Can't use the scolled_section's pos because it changes).
-   const scroller_top = scroller.geom.pos[1] - (scroller.geom.dim[1]-scroller_pady);
    const posy = (move_ratio * -val) + scroller_top + scrolled_section.geom.dim[1];
-   const ydif = posy - scrolled_section.geom.pos[1];
+   const ydif = posy - scrolled_posy;
 
-   temp_ypos_accum += ydif;
+   // Set handle dimention
+   // const h = (ratio*scroller.geom.dim[1] >= scroller.geom.dim[1]) ? bar.geom.dim[1]-handle.StylesGetMargin(STYLES.AXIS.Y) : ratio*scroller.geom.dim[1];
+   // handle.SetDim([UNCHANGED, h]);
 
-   /**
-    * // TODO: clip and move at the same function. Update positions once a change 'rendering a mesh' happens???Only for scolled meshes??? 
-    * 
-    * Create a position accumulator.
-    * 
-    * The position of the meshes should change in 'Clipy_from_group'
-    * 
-    * Acumulate the positions
-    * 
-    * If change in the 'Clipy_from_group' happened, update the pos of all meshes
-    * 
-    * reset the accumulator
-    */
-
-   // Movey_from_widget_root_buffer(scrolled_section, ydif);
-   // scrolled_section.MoveYNoGfxUpdate(ydif)
-   View_movey_group(scrolled_section.group_bufferidxs[0], ydif);
+   scrolled_section.geom.pos[1] += ydif;
+   // console.log(scrolled_section.geom.pos[1])
+   // View_movey_group(scrolled_section.group_bufferidxs[0], ydif);
 
 
-   const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
-   const changes_hapened = Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom, ydif);
+   const clip_top = scroller_top, clip_bottom = (scroller_top) + scroller.geom.dim[1]*2;
 
-   View_reset_from_view_all_buffers(scrolled_section.group_bufferidxs[0]);
-   // Mesh_per_vb_remove_all_from_index(scrolled_section.gfx.vb.idx, scrolled_section.per_vb_bufferidx);
-
-
-   /**
-    * REMOVING SCOLLED SECTION'S EVENTS TO RECONSTRUCT THEM FOR THE NEW EVENTS OF THE ACTIVATED SCROLLED ITEMS 
-    * 
-    * Explanation:
-    * 1. For HOVER the root event is the scrolled section
-    * 2. For CLICK the root event is the scroller
-    * 
-    * So there is different approach as to how to remove HOVER & CLICK events
-    * from scrolled_section as wel as for the children events too.
-    * // NOTE: The children events are 'winked', because the are in
-    * scrolled section's event children buffer, so we just set the buffer to null.
-    *   
-    * The NON loop way to remove children events is 'Listener_remove_child_event_from_parent'.
-    * But this function needs a parent event to remove the children.
-    * In case of HOVER, the top root event is that of scrolled section.
-    * So to remove for hover we must:
-    * HOVER:
-    *    1. Wink the children's event buffer, by setting it to null.
-    *    2. Remove the parent event(scrolled section).
-    *    3. Remove the scrolled section's index of its 'listeners' buffer
-    *       so that on 'Reconstruct()' a new event for scrooled section will be created
-    *       and its index to be stored at the scrolled section's 'listeners' buffer.
-    *    
-    */
-
-
-
-   for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
-
-      // if (!scrolled_section.listeners.buffer[i]) 
-      if (scrolled_section.listeners.buffer[i] !== null && scrolled_section.listeners.buffer[i] !== INT_NULL) {
-         // console.log()
-
-         Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i])
-         scrolled_section.listeners.buffer[i] = INT_NULL;
-         // console.log('REMOVE')
-         
+   const changes_hapened = Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+   
+   if(changes_hapened){
+      console.log('0')
+      
+      View_reset_from_view_all_buffers(scrolled_section.group_bufferidxs[0]);
+   
+   
+      // Remove all listen events. To rebuild from scratch all items listen events after the clip
+      for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
+   
+         if (scrolled_section.listeners.buffer[i] !== null && scrolled_section.listeners.buffer[i] !== INT_NULL) {
+   
+            Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i])
+            scrolled_section.listeners.buffer[i] = INT_NULL;
+         }
       }
+   
+   
+      View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
    }
-
-
-   View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
 
    /**FOR FRAMEBUFFER. DO NOT DELETE */
    // if(scrolled_section.isFramebufferRendered !== INT_NULL){
@@ -1082,20 +1061,22 @@ export function Scroller_on_update_handle(_params) {
 
 
 export function Scroller_calc_posy_from_handle(scroller, scrolled_section) {
+alert('scroller')
+   // const bar = scroller.scroll_bar;
+   // const handle = bar.children.buffer[0];
 
-   const bar = scroller.scroll_bar;
-   const handle = bar.children.buffer[0];
+   // const val = Scroller_calculate_value(bar, handle); // Calculate slider's value based on the handles position.
 
-   const val = Scroller_calculate_value(bar, handle); // Calculate slider's value based on the handles position.
+   // const move_ratio = ((scrolled_section.geom.dim[1] * 2) - (scroller.geom.dim[1] * 2) );
 
-   const move_ratio = ((scrolled_section.geom.dim[1] * 2) - (scroller.geom.dim[1] * 2) );
+   // // Calculate the absolute position for the scrolled mesh. (Can't use the scolled_section's pos because it changes).
+   // const scrolled_posy = scrolled_section.GetPosY();
+   // const scroller_top = scrolled_posy;
+   // const posy = (move_ratio * -val) + scroller_top + scrolled_section.geom.dim[1];
+   // // const posy = (move_ratio * -val) ;
+   // const ydif = posy - scrolled_posy;
 
-   // Calculate the absolute position for the scrolled mesh. (Can't use the scolled_section's pos because it changes).
-   const scroller_top = scroller.geom.pos[1] - scroller.geom.dim[1];
-   const posy = (move_ratio * -val) + scroller_top + scrolled_section.geom.dim[1];
-   const ydif = posy - scrolled_section.geom.pos[1];
-
-   return ydif;
+   // return ydif;
 }
 
 
@@ -1118,19 +1099,36 @@ export function Scroller_get_pos_left(scroller) {
 function Scroller_move_handle(bar, handle) {
 
    /** Move the handle acoring to the mouse position */
-   const pad = handle.StylesGetMargin(STYLES.AXIS.Y);
-   const barupper = bar.geom.pos[1] - bar.geom.dim[1] + (handle.geom.dim[1] + pad);
-   const barlower = bar.geom.pos[1] + bar.geom.dim[1] - (handle.geom.dim[1] + pad);
    const y = MouseGetPos()[1];
 
-   if (y > barupper && y < barlower)
-      handle.geom.SetPosY(y, handle.gfx)
+   if(handle.geom.pos[1] === y) return;
 
-   else if (y > barlower)
+   const pad = handle.StylesGetMargin(STYLES.AXIS.Y);
+   const bar_top = bar.GetPosY();
+   const barupper = bar_top + pad*2;
+   const barlower = (bar_top + bar.geom.dim[1]*2) - (handle.geom.dim[1]*2 + pad*2);
+
+
+   // if (y > barlower){
+   if (y > barlower){
+
+      handle.geom.pos[1] = barlower-bar_top;
       handle.geom.SetPosY(barlower, handle.gfx)
-
-   else if (y < barupper)
+   }
+   
+   else if (y < barupper){
+      
+      handle.geom.pos[1] = barupper-bar_top;
       handle.geom.SetPosY(barupper, handle.gfx)
+   }
+   
+   if (y > barupper && y < barlower){
+
+      handle.geom.pos[1] = y-bar_top;
+      handle.geom.SetPosY(y, handle.gfx)
+   }
+
+   // console.log(handle.geom.pos[1])
 
    return true;
 }
@@ -1141,19 +1139,49 @@ function Scroller_move_handle(bar, handle) {
 export function Scroller_calculate_value(bar, handle) {
 
    const pad = handle.StylesGetMargin(STYLES.AXIS.Y);
-   const handleypos = handle.geom.pos[1];
-   let barheight = bar.geom.dim[1] * 2 - ((handle.geom.dim[1] + pad) * 2);
-   let bartop = bar.geom.pos[1] - bar.geom.dim[1] + (handle.geom.dim[1] + pad);
+   // const handleypos =  handle.geom.pos[1] + handle.geom.dim[1] - pad*2;
+   const handleypos =  handle.geom.pos[1] - pad*2;
+   let bartop = 0;
+   let barheight = bar.geom.dim[1] * 2 - ((handle.geom.dim[1] + pad*2) * 2);
 
    const val = handleypos - bartop;
 
+   
    if(barheight===0) barheight=1
-
-   // Interpolate to a 0-max value.
-   const scrollerVal = val / (barheight);
+   
+   // Interpolate to a 0-1 value.
+   const scrollerVal = (barheight===0) ? val : val / (barheight);
+   // console.log('bartop', Floor(bartop),'barheight',  Floor(barheight),'handleypos',  Floor(handleypos), 'val', Floor(handleypos - bartop), 'scrollerVal', scrollerVal)
 
    return scrollerVal;
 }
+
+
+
+
+// export function Scroller_calculate_value(bar, handle) {
+
+//    const pad = handle.StylesGetMargin(STYLES.AXIS.Y);
+//    const handleypos = handle.GetPosY() + handle.geom.dim[1];
+//    // let barheight = bar.geom.dim[1] * 2 - ((handle.geom.dim[1] + pad) * 2);
+//    // let bartop = bar.GetPosY() - bar.geom.dim[1] + (handle.geom.dim[1] + pad);
+//    let bartop = bar.GetPosY() + (handle.geom.dim[1] + pad);
+//    // let bartop = bar.GetPosY() ;
+//    // const handleypos = handle.geom.pos[1];
+//    let barheight = bar.geom.dim[1] * 2 - ((handle.geom.dim[1] + pad*2) * 2);
+//    // let bartop = -bar.geom.dim[1] + (handle.geom.dim[1] + pad);
+
+//    const val = handleypos - bartop;
+
+//    if(barheight===0) barheight=1
+
+//    // Interpolate to a 0-max value.
+//    const scrollerVal = (barheight===0) ? val : val / (barheight);
+
+//    return scrollerVal;
+// }
+
+
 // export function Scroller_calculate_value(bar, handle) {
 
 //    const pad = handle.StylesGetMargin(STYLES.AXIS.Y);
