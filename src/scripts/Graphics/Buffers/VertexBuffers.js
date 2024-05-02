@@ -10,6 +10,7 @@ import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } f
 import { Floor } from "../../Helpers/Math/MathOperations.js";
 import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js";
+import { Performance_timer_start, Performance_timer_stop } from "../../Engine/Timers/PerformanceTimers.js";
 
 
 
@@ -411,8 +412,9 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
-
+    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest3)
     vb_info.count += Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
+    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest3)
 
 
 
@@ -460,7 +462,10 @@ export function Vertex_buffer_add_vertices_from_non_existant_mesh(gfx, geom, mat
 
     const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+
+    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest3)
     vb_info.count += Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
+    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest3)
 
     prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
     vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;

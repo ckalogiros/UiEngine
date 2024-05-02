@@ -586,6 +586,40 @@ export function Gl_set_alpha_from_offset(gfxInfo, val, from_offset, num_faces) {
 
 
 
+export function Gl_set_dim_XY2(vbidx, start, attribsidx, attribsPerVertex, x, y, num_faces = 1) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   const a = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.POS2);
+
+   let index = start + a.offset;
+   let faces = num_faces;
+   let stride = attribsPerVertex - a.size;
+
+
+   while (faces) {
+
+      vb_data[index++] = -x;
+      vb_data[index++] = y;
+      index += stride;
+
+      vb_data[index++] = -x;
+      vb_data[index++] = -y;
+      index += stride;
+
+      vb_data[index++] = x;
+      vb_data[index++] = y;
+      index += stride;
+
+      vb_data[index++] = x;
+      vb_data[index++] = -y;
+      index += stride;
+
+      faces--;
+   }
+
+   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
+}
+/**ΣΑΩΕ */
 export function Gl_set_dim_XY(gfxInfo, dim, num_faces = 1) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
@@ -725,6 +759,27 @@ export function Gl_set_wpos_XYZ(gfxInfo, x, y, z, num_faces = 1) {
 
 
 
+export function Gl_set_wpos_XY2(vbidx, start, attribsidx, attribsPerVertex, vertsPerRect, x, y, num_faces = 1) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   const offset = Shader_attributes_get_attrib_offset_by_nameid(attribsidx, SHADER_ATTRIBUTES.WPOS4);
+
+   let index = start + offset;
+   let verts = num_faces * vertsPerRect;
+   let stride = attribsPerVertex - GRAPHICS_LAYOUT.ATTR_SIZES.XY;
+
+   while (verts) {
+
+      vb_data[index++] = x; // Move mesh's x pos by amt
+      vb_data[index++] = y; // Move mesh's y pos by amt
+
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      verts--;
+   }
+
+   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
+}
+/**SAVE */
 export function Gl_set_wpos_XY(gfxInfo, x, y, num_faces = 1) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);

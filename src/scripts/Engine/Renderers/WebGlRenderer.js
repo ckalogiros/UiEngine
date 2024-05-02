@@ -9,7 +9,7 @@ import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js"
 import { Batch_update } from "../Batch/Batch.js";
 import { Uniforms_block_update_uniform, Uniforms_buffer_update_uniform, Uniforms_buffer_update_uniforms_all } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
+import { Performance_timer_start, Performance_timer_stop, Performance_timers_update_tick } from "../Timers/PerformanceTimers.js";
 import { Command_buffer_run } from "../Core/Commandbuffer.js";
 import { Scene_set_projection_matrix } from "../Scenes.js";
 
@@ -103,6 +103,7 @@ export class WebGlRenderer {
 
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
 
+         Performance_timers_update_tick();
 
          TimeSample();
 

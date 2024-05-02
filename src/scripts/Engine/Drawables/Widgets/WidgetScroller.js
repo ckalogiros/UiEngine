@@ -14,6 +14,7 @@ import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers }
 import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 import { Gl_set_dim_XY, Gl_set_dim_Y, Gl_set_wpos_X, Gl_set_wpos_XY, Gl_set_wpos_Y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
+import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 
 
 /** ### Scroller Widget
@@ -947,32 +948,34 @@ function Scroller_on_move_clbk(params) {// Called by timeInterval as a callback 
 
 export function Scroller_on_update_handle(_params) {
 
+
+   
    /**
     * The function is called by the timeInterval.
     * The timeInterval has been set by the 'Scroller_create_on_click_event',
     * that is called from 'HandleEvents()' 
     * as 'mesh.eventCallbacks.buffer[i].Clbk(target, Clbk);'
     * The 'HandleEvents()' passes the param '_params' to this function.
-    */
-
-   const bar = _params.params;
-
-   if (bar.StateCheck(MESH_STATE.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
-
+   */
+  
+  const bar = _params.params;
+  
+  if (bar.StateCheck(MESH_STATE.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
+     
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       TimeIntervalsDestroyByIdx(intervalIdx);
       bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
-
+      
       return;
    }
-
+   
    const handle = bar.children.buffer[0];
    const scroller = bar.parent;
-
+   
    // Case the handle is grabbed but not moved, then we do not have anything to calculate, just move the scroller and return
    Scroller_move_handle(bar, handle);
-
+   
    const val = Scroller_calculate_value(bar, handle); // Calculate slider's value based on the handles position.
    
    const scrolled_section = scroller.scrolled_section;
@@ -987,11 +990,11 @@ export function Scroller_on_update_handle(_params) {
    // Calculate the absolute position for the scrolled mesh. (Can't use the scolled_section's pos because it changes).
    const posy = (move_ratio * -val) + scroller_top + scrolled_section.geom.dim[1];
    const ydif = posy - scrolled_posy;
-
-
+   
+   
    // Add the move difference to all vb's root positions.
    Widget_root_gfx_add_unif_wpos_per_vb(scroller.root_bufferidx, [0,ydif]);
-
+   
    const clip_top = scroller_top, clip_bottom = (scroller_top) + scroller.geom.dim[1]*2;
    
    const changes_hapened = Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
@@ -1000,33 +1003,35 @@ export function Scroller_on_update_handle(_params) {
     * HERE: // IMIDIATELY
     *   CAN WE SKIP RE-RENDER, BASED ON THE FACT THAT WE HAVE OFFSET POSITIONS FOR THE SCROOLED MOVE????
     */
-   if(changes_hapened){
-      
-      View_reset_from_view_all_buffers(scrolled_section.group_bufferidxs[0]);
-   
-   
-      // Remove all listen events. To rebuild from scratch all items listen events after the clip
-      for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
-   
-         if (scrolled_section.listeners.buffer[i] !== null && scrolled_section.listeners.buffer[i] !== INT_NULL) {
-   
-            Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i])
-            scrolled_section.listeners.buffer[i] = INT_NULL;
+  if(changes_hapened){
+     
+     View_reset_from_view_all_buffers(scrolled_section.group_bufferidxs[0]);
+     
+     
+     // Remove all listen events. To rebuild from scratch all items listen events after the clip
+     for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
+        
+        if (scrolled_section.listeners.buffer[i] !== null && scrolled_section.listeners.buffer[i] !== INT_NULL) {
+           
+           Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i])
+           scrolled_section.listeners.buffer[i] = INT_NULL;
          }
       }
-   
-   
+      
+      
+
       View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
    }
-
+   
    /**FOR FRAMEBUFFER. DO NOT DELETE */
    // if(scrolled_section.isFramebufferRendered !== INT_NULL){
-   //    // const r = scroller.geom.dim[1] / scrolled_section.geom.dim[1]
+      //    // const r = scroller.geom.dim[1] / scrolled_section.geom.dim[1]
    //    const r = (scroller.scroll_bar.children.buffer[SCROLL_BAR_IDX].geom.dim[1] / scroller.scroll_bar.geom.dim[1]) /1000
    //    // const r = scroller.scroll_bar.children.buffer[SCROLL_BAR_IDX].geom.dim[1]/(scrolled_section.geom.dim[1] * scroller.scroll_bar.geom.dim[1]) 
    //    // const r = (scroller.scroll_bar.children.buffer[SCROLL_BAR_IDX].geom.dim[1]/(scrolled_section.geom.dim[1]) )/100
    //    Framebuffer_moveY(scrolled_section.isFramebufferRendered, ydif, r)
    // }
+
 
 }
 

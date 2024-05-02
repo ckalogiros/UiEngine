@@ -1,6 +1,7 @@
 "use strict";
 
 import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index } from "./MeshBuffer.js";
 
@@ -402,20 +403,24 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
    const view = _view_buffer.buffer[view_bufferidx];
 
    for (let i = 0; i <= view.vb.boundary; i++){
-
+      
       for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){
-
+         
          const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[j]);
          if (mesh.state.mask & MESH_STATE.ACTIVE) { 
+            Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest1)
             mesh.AddToGfxFromReset(); 
+            Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest1)
          }
       }
    }
    
    // Get the root mesh
+   Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2)
    const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
    const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
    if(do_reconstruct_listeners) mesh.ConstructListeners(parent_events); 
+   Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2)
    // if(do_reconstruct_listeners) mesh.ConstructListeners(); 
 
 }

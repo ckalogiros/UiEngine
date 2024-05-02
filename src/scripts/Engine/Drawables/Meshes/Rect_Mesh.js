@@ -8,6 +8,7 @@ import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Widget_root_add_mesh, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 
 
 export class Rect extends Mesh {
@@ -120,9 +121,11 @@ export class Rect extends Mesh {
    
    AddToGfxFromReset() {
 
+
       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName())
       this.is_gfx_inserted = true;
       
+
       // Add entry to Gfx Buffer
       this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
 

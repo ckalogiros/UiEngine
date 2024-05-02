@@ -90,55 +90,10 @@ export function Performance_timer_start(timer_groupidx) {
    pt_group.t = window.performance.now(); // In miliseconds
 }
 
-// HOW TO COMBINE ONE BASE TIMER WITH A DETAILED TIMER AT THE SAME GROUP????
-// Because we need to update different variables.
-// export function Performance_timer_base_stop(timer_groupidx) {
-
-//    const timer_group = _performance_timers_buffer.buffer[timer_groupidx];
-//    /**DEBUG */ if (DEBUG_PERFORMANCE_TIMERS) if (timer_group === undefined) console.error('SEVERE_ERROR\nUndefined performance timer\ntimer_group', timer_group, '\nTimers buffer:', _performance_timers_buffer.buffer);
-
-
-//    const new_t = window.performance.now(); // In miliseconds
-//    const delta = new_t - timer_group.t;
-
-//    for (let i = 0; i <= timer_group.boundary; i++) {
-
-//       timer_group.buffer[i].accum += delta;
-//       timer_group.group.buffer[i].cnt++;
-//    }
-// }
-// export function Performance_timer_detailed_stop(timer_groupidx) {
-
-//    const timer_group = _performance_timers_buffer.buffer[timer_groupidx];
-
-//    const new_t = window.performance.now() + VERY_SMALL_FLOAT; // In miliseconds
-//    const delta = new_t - timer_group.t;
-   
-//    // if(timer_groupidx===PERFORMANCE_TIMERS_IDXS.EventListener)
-//    // console.log('1/delta', ~~(1000 / (timer_group.group.buffer[0].accum/timer_group.group.buffer[0].cnt)), 'cnt', timer_group.group.buffer[0].cnt, 'accum', timer_group.group.buffer[0].accum, 'delta', delta, 'prev', timer_group.t, 'cur', new_t)
-
-//    for (let i = 0; i <= timer_group.group.boundary; i++) {
-
-//       timer_group.group.buffer[i].accum += delta;
-
-//       if (timer_group.group.buffer[i].worst < delta) {
-//          timer_group.group.buffer[i].worst = delta;
-//       }
-//       if (timer_group.group.buffer[i].best > delta && delta > 0.0) {
-//          timer_group.group.buffer[i].best = delta;
-//       }
-//       timer_group.group.buffer[i].called++;
-//       timer_group.group.buffer[i].cnt++;
-
-//    }
-
-//    timer_group.t = 0;
-
-// }
 
 function Performance_timer_base_stop_(timer, delta){
    timer.accum += delta;
-   timer.cnt++;
+   // timer.cnt++;
 }
 
 function Performance_timer_detailed_stop_(timer, delta){
@@ -146,7 +101,7 @@ function Performance_timer_detailed_stop_(timer, delta){
    if (timer.worst < delta) timer.worst = delta;
    if (timer.best > delta && delta > 0.0) timer.best = delta;
    timer.called++;
-   timer.cnt++;
+   // timer.cnt++;
 }
 
 const fn_table = [
@@ -170,6 +125,15 @@ export function Performance_timer_stop(timer_groupidx){
 }
 
 
+export function Performance_timers_update_tick(){
+   for (let i = 0; i <= _performance_timers_buffer.boundary; i++){
+
+      const timer_group = _performance_timers_buffer.buffer[i];
+      for (let j = 0; j <= timer_group.group.boundary; j++){
+         timer_group.group.buffer[j].cnt++
+      }
+   }
+}
 
 
 
@@ -184,7 +148,11 @@ export function PerformanceTimersGetFps(timer_idxs) {
 }
 export function PerformanceTimersGetMilisec(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
-   return (timer.accum / timer.cnt).toFixed(4);
+   const ret = (timer.accum / timer.cnt);
+   timer.accum = 0.0;
+   timer.cnt = 0;
+   return ret;
+   // return (timer.accum / timer.cnt).toFixed(4);
 }
 export function PerformanceTimersGetNanosec(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
@@ -277,6 +245,18 @@ export function Performance_timers_init_all() {
    {
       const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MeshInfoTip');
       PERFORMANCE_TIMERS_IDXS.MeshInfoTip = idx;
+   }
+   {
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest1');
+      PERFORMANCE_TIMERS_IDXS.MiscTest1 = idx;
+   }
+   {
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest2');
+      PERFORMANCE_TIMERS_IDXS.MiscTest2 = idx;
+   }
+   {
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest3');
+      PERFORMANCE_TIMERS_IDXS.MiscTest3 = idx;
    }
 
    // PERFORMANCE_TIMERS_IDXS.MiscTest1 = idx;
