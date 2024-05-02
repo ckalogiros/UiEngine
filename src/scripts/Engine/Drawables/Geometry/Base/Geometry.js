@@ -27,6 +27,7 @@ export class Geometry2D {
             pass: 0,
         };
 
+
         math.CopyArr3(this.pos, pos);
         math.CopyArr2(this.dim, dim);
         math.CopyArr2(this.scale, scale);
@@ -57,8 +58,8 @@ export class Geometry2D {
     UpdatePosZ(z, gfx, numFaces)    { glBufferOps.Gl_set_wpos_Z     (gfx, z, numFaces); }
     MoveXYZ(pos, gfx, num_faces)    { glBufferOps.Gl_add_wpos_XYZ   (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1], pos[2], num_faces); }
     MoveXY(x, y, gfx)   { if (x === 0 && y === 0) return; glBufferOps.Gl_add_wpos_XY(gfx, [x + this.dim[0], y + this.dim[1]], this.num_faces); }
-    MoveX(x, gfx)       { if (x === 0) return; glBufferOps.Gl_add_wpos_X(gfx, x + this.dim[0],); }
-    MoveY(y, gfx)       { if (y === 0) return; glBufferOps.Gl_add_wpos_Y(gfx, y + this.dim[1]); }
+    MoveX(x, gfx)       { if (x === 0) return; glBufferOps.Gl_add_wpos_X(gfx, x); }
+    MoveY(y, gfx)       { if (y === 0) return; glBufferOps.Gl_add_wpos_Y(gfx, y); }
     //////////////////////////////////////////////////////////////
     SetDim(dim, gfx) {
 

@@ -126,6 +126,7 @@ const SID = {
 
         // Individual Uniforms
         TIME: BIT5 <<= 0x1,
+        WPOS: BIT5 <<= 0x1,
 
         // Extension:
         // IS_PROJECTION_MATRIX_BUFFERED: BIT5 <<= 0x1,
@@ -188,10 +189,8 @@ const SID = {
         if (
             sid1.shad === sid2.shad &&
             sid1.attr === sid2.attr &&
-            // sid1.unif === sid2.unif &&
-            unif1 === unif2 &&
+            unif1 === unif2 && 
             sid1.pass === sid2.pass
-            // sid1.gfx_group === sid2.gfx_group
         ) {
             return true;
         }
@@ -426,10 +425,21 @@ const PROGRAM_STATE = {
 
 _CNT = 0x1;
 const UNIFORM = {
+    NULL: 0x0,
     IN_VS: _CNT,
     IN_FS: _CNT<<=0x1,
     IS_SHARED: _CNT<<=0x1,
 }
+
+
+
+const TEMP_UNIFORM_BUFFER_INDEXES = {
+    U_WPOS: INT_NULL, // Stores the index of the wpos uniform of theWill be set by the Program, wwhen the uniform
+}
+// _CNT = 0;
+// const UNIFORM_BUFFER_INDEXES = {
+//     U_WPOS: INT_NULL, // Stores the index of the wpos uniform of theWill be set by the Program, wwhen the uniform 
+// }
 
 
 

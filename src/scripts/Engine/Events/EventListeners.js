@@ -510,8 +510,8 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
                if (event.Clbk) {
 
-                  event.Clbk(dispatch_params);
                   Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+                  event.Clbk(dispatch_params);
 
                   // const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
                   // STATE.mesh.SetFocused(mesh);
@@ -530,8 +530,8 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                event_type: TYPE_IDX,
             }
 
-            event.Clbk(dispatch_params); // Call the event
             Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+            event.Clbk(dispatch_params); // Call the event
 
             // const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
             // STATE.mesh.SetFocused(mesh);
@@ -555,27 +555,29 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
          if (intersects) {
 
+            // Get the event (which has all the event data) from the listeners storage buffer
+            const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view_buffer.buffer[i].idx];
 
             // Check all children (recursive)
             if (view_buffer.buffer[i].children) {
 
                const event_found = Check_child_events_recursive(view_buffer.buffer[i].children, point);
-               if (event_found) {
+               if (event_found) { // If the child event is found but does not have a Callback, handle the parent event
 
                   // Get the the event (which has all the event data) from the listeners storage buffer
-                  const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_found.idx];
+                  const e = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_found.idx];
 
                   const dispatch_params = {
-                     meshidx: event.meshidx,
-                     evt_params: event.evt_params,
+                     meshidx: e.meshidx,
+                     evt_params: e.evt_params,
                      trigger_params: trigger_params,
                      event_type: TYPE_IDX,
                   }
 
-                  if (event.Clbk) {
+                  if (e.Clbk) {
 
-                     event.Clbk(dispatch_params);
                      Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+                     e.Clbk(dispatch_params);
 
                      // const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
                      // STATE.mesh.SetFocused(mesh);
@@ -586,9 +588,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
             // Else handle this event
 
-            // Get the event (which has all the event data) from the listeners storage buffer
-            const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view_buffer.buffer[i].idx];
-
             if (event.Clbk) {
                // Else if no children event was triggered, run any events of the main event.
                const dispatch_params = {
@@ -598,8 +597,8 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                   event_type: TYPE_IDX,
                }
 
-               event.Clbk(dispatch_params); // Call the event
                Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+               event.Clbk(dispatch_params); // Call the event
 
                // const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
                // STATE.mesh.SetFocused(mesh);
@@ -613,6 +612,15 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
 }
 
+/**
+ * TODO:
+ * Create a diagram of the implementation for a nice Listen events check.
+ * 
+ * 1. Go down the tree
+ * 2. if event=null return the parent event
+ * 3. if the event is FAKE, continue
+ */
+
 
 
 
@@ -625,7 +633,8 @@ function Check_child_events_recursive(view_children, point) {
 
          const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(child_evt.meshidx);
 
-         // const name = Mesh_buffer_get_mesh_name_byidx(child_evt.meshidx)
+         const name = Mesh_buffer_get_mesh_name_byidx(child_evt.meshidx)
+         const mesh = Mesh_buffer_get_mesh_byidx(child_evt.meshidx)
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          const intersects = Intersection_point_rect(point, bounding_box);
@@ -633,8 +642,19 @@ function Check_child_events_recursive(view_children, point) {
          if (intersects) {
 
             if (child_evt.children) { // Check all of its children(recursively)
+               
                const ret = Check_child_events_recursive(view_children.buffer[i].children, point)
-               if (ret) return ret; // Because it a recursive procedure, when the mesh is found we must return it recursively immidiately after the return of the each recursion.
+               
+               if (ret) { // I has Callback then it is not a FAKE event, so its ok to return the event
+                  
+                  // Get the the event (which has all the event data) from the listeners storage buffer
+                  const e = _listeners_buffer_storage.buffer[E.C].buffer[ret.idx];
+                  // console.log(e.Clbk)
+   
+                  // Because its a recursive procedure, when the mesh is found we must return it recursively immidiately after the return of the each recursion.
+                  if (ret && e.Clbk) return ret; // I has Callback then it is not a FAKE event, so its ok to return the event
+                  // Else continue
+               }
             }
             else
                return child_evt;

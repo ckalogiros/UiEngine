@@ -4,7 +4,7 @@ import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners.js";
 import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, TEMP_get_widget_root_wpos, TEMP_set_widget_root_wpos, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_gfx_set_unif_wpos_per_vb, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals.js";
 import { Dbg_ui_create2 } from "./DebugInfoUiFactory.js";
 import { Program_get_programs } from "../../../Graphics/ShaderPrograms.js";
@@ -129,6 +129,7 @@ export function Debug_info_ui(is_root_widget=undefined) {
    // dp.AddToMenu(vb2D_ui);
 
 
+    
 
 
    dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENTY | SECTION.INHERIT;
@@ -144,6 +145,8 @@ export function Debug_info_ui(is_root_widget=undefined) {
       dp.Render();
    
       dp.ConstructListeners();
+
+      Widget_root_gfx_set_unif_wpos_per_vb(dp.root_bufferidx);
    
       // Create Group for this dropdown, to easily remove meshes from their vertex buffers and rebuild the vertex buffer
       View_build_group_from_root_mesh(dp);
@@ -181,7 +184,9 @@ function Debug_info_create_ui_stats() {
 
       const section = Mesh_buffer_get_mesh_byidx(DEBUG_INFO.UI_STATS.MESH_BUFFER_IDX);
 
-      DEBUG_INFO.UI_STATS.POS = section.geom.pos; // Remember the info's position.
+      const pos = TEMP_get_widget_root_wpos(section.root_posidx);
+      DEBUG_INFO.UI_TIMERS.POS = [pos[0], pos[1], section.geom.pos[2]]; // Remember the info's position.
+
       section.Destroy();
 
       DEBUG_INFO.UI_STATS.MESH_BUFFER_IDX = INT_NULL;
@@ -190,7 +195,7 @@ function Debug_info_create_ui_stats() {
    }
 
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], DEBUG_INFO.UI_STATS.POS, [0, 0], TRANSPARENCY(GREY[1], .8), 'ui stats timers panel');
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, DEBUG_INFO.UI_STATS.POS[2]], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui stats timers panel');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('InfoUi-Stats section');
 
@@ -203,14 +208,12 @@ function Debug_info_create_ui_stats() {
    let ms = 500;
    const align = ALIGN.HORIZONTAL;
 
-   //TODO: Name all the timers correctly
 
    // Use custom interval for all debug ui for efficiency
    let generic_time_interval = INT_NULL;
 
    ms = (g_ms) ? g_ms : 500;
    const timer = Create_widget_multi_text(_, 'Meshes:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
-   // dp.AddItem(timer);
    section.AddItem(timer);
 
    timer.CreateNewText('000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
@@ -223,15 +226,17 @@ function Debug_info_create_ui_stats() {
 
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-   section.ActivateAndChildren()
+
    section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
    section.Calc_no_gfx_update();
 
    section.Render()
-   // section.options = SECTION.VERTICAL;
+
    section.ConstructListeners();
 
-   Widget_root_set_render_queue_flags(section.root_bufferidx, RENDER_QUEUE_FLAGS.SKIP_PRIORITY)
+   Widget_root_gfx_set_unif_wpos_per_vb(section.root_bufferidx);
+
+   Widget_root_set_render_queue_flags(section.root_bufferidx, RENDER_QUEUE_FLAGS.SKIP_PRIORITY);
 
 
    DEBUG_INFO.UI_STATS.MESH_BUFFER_IDX = section.mesh_bufferidx;
@@ -273,9 +278,8 @@ function Debug_info_create_ui_performance_timers() {
 
       const section = Mesh_buffer_get_mesh_byidx(DEBUG_INFO.UI_TIMERS.MESH_BUFFER_IDX);
 
-      section.geom.pos[0] = VIEWPORT.RIGHT;
-
-      DEBUG_INFO.UI_TIMERS.POS = section.geom.pos; // Remember the info's position.
+      const pos = TEMP_get_widget_root_wpos(section.root_posidx);''
+      DEBUG_INFO.UI_TIMERS.POS = [pos[0], pos[1], section.geom.pos[2]]; // Remember the info's position.
       section.Destroy();
 
       DEBUG_INFO.UI_TIMERS.MESH_BUFFER_IDX = INT_NULL;
@@ -283,8 +287,8 @@ function Debug_info_create_ui_performance_timers() {
       return;
    }
 
-
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], DEBUG_INFO.UI_TIMERS.POS, [0, 0], TRANSPARENCY(GREY[1], .8), 'ui performance timers panel');
+   const zpos = DEBUG_INFO.UI_TIMERS.POS[2];
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0,0,zpos], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui performance timers panel');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('InfoUi-PerformanceTimers section');
 
@@ -304,7 +308,7 @@ function Debug_info_create_ui_performance_timers() {
 
    { // FPS average 1 second
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Render:avg:', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
+      const timer = Create_widget_multi_text(_, 'Render:avg:', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
@@ -324,7 +328,7 @@ function Debug_info_create_ui_performance_timers() {
    }
    { // All Timers Update timer
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Timers:avg:', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
+      const timer = Create_widget_multi_text(_, 'Timers:avg:', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
@@ -344,7 +348,7 @@ function Debug_info_create_ui_performance_timers() {
    }
    { // Gl_draw timer.
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'GlDraw:avg', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
+      const timer = Create_widget_multi_text(_, 'GlDraw:avg', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
@@ -364,7 +368,7 @@ function Debug_info_create_ui_performance_timers() {
    }
    { // Event Listener.
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Events:avg', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
+      const timer = Create_widget_multi_text(_, 'Events:avg', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
@@ -384,7 +388,7 @@ function Debug_info_create_ui_performance_timers() {
    }
    { // Hover Listener.
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Hover:avg', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
+      const timer = Create_widget_multi_text(_, 'Hover:avg', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
@@ -405,7 +409,7 @@ function Debug_info_create_ui_performance_timers() {
    {
       // { // Batch Buffer
       //    ms = (g_ms) ? g_ms : 1000;
-      //    const timer = Create_widget_multi_text(_, 'Batch: | avg:', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2]+1], fontsize, GREY[7], .5, pad1);
+      //    const timer = Create_widget_multi_text(_, 'Batch: | avg:', align, [0, 0, zpos+1], fontsize, GREY[7], .5, pad1);
       //    section.AddItem(timer);
       //    timer.CreateNewText('00000000', fontsize, PURPLER[7], pad2, .9);
       //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_batch_update.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
@@ -445,7 +449,7 @@ function Debug_info_create_ui_performance_timers() {
       // }
       // { // Framebuffer Rendering.
       //    ms = (g_ms) ? g_ms : 1000;
-      //    const timer = Create_widget_multi_text(_, 'Framebuffer Rendering: | avg:', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2]+1], fontsize, GREY[7], .5, pad1);
+      //    const timer = Create_widget_multi_text(_, 'Framebuffer Rendering: | avg:', align, [0, 0, zpos+1], fontsize, GREY[7], .5, pad1);
       //    section.AddItem(timer);
       //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
       //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_framebuffer_rendering.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
@@ -465,7 +469,7 @@ function Debug_info_create_ui_performance_timers() {
       // }
       // { // Mesh info tip.
       //    ms = (g_ms) ? g_ms : 1000;
-      //    const timer = Create_widget_multi_text(_, 'MeshInfo: | avg:', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2]+1], fontsize, GREY[7], .5, pad1);
+      //    const timer = Create_widget_multi_text(_, 'MeshInfo: | avg:', align, [0, 0, zpos+1], fontsize, GREY[7], .5, pad1);
       //    section.AddItem(timer);
       //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
       //    timer.SetDynamicText(`ms${ms} MeshInfo avg`, ms, PerformanceTimersGetFps, _pt_mesh_info_tip.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
@@ -485,7 +489,7 @@ function Debug_info_create_ui_performance_timers() {
       // }
       // { // Scene Update timer
       //    ms = (g_ms) ? g_ms : 1000;
-      //    const timer = Create_widget_multi_text(_, 'Scene: | avg:', align, [0, 0, DEBUG_INFO.UI_TIMERS.POS[2]+1], fontsize, GREY[7], .5, pad1);
+      //    const timer = Create_widget_multi_text(_, 'Scene: | avg:', align, [0, 0, zpos+1], fontsize, GREY[7], .5, pad1);
       //    section.AddItem(timer);
       //    timer.CreateNewText('0000000', fontsize, BLUEL[7], pad2, .9);
       //    timer.SetDynamicText(`ms${ms} Scene avg`, ms, PerformanceTimersGetFps, _pt_scene_update.timer, _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
@@ -511,11 +515,13 @@ function Debug_info_create_ui_performance_timers() {
    section.Calc_no_gfx_update();
 
    const w = section.GetMaxWidth();
-   section.geom.pos[0] = VIEWPORT.RIGHT - w*2;
+   TEMP_set_widget_root_wpos(section.root_posidx,[VIEWPORT.RIGHT - w*2, 0]);
 
    section.Render()
+
    section.ConstructListeners();
 
+   Widget_root_gfx_set_unif_wpos_per_vb(section.root_bufferidx);
 
    DEBUG_INFO.UI_TIMERS.MESH_BUFFER_IDX = section.mesh_bufferidx;
    DEBUG_INFO.UI_TIMERS.IS_ON = true;
@@ -554,28 +560,26 @@ function Debug_info_create_ui_mouse() {
 
       Info_listener_destroy_event(section.debug_info.evtidx);
 
-      // const w = section.GetMaxWidth();
-      // const h = section.geom.dim[1];
-      // section.MoveNoGfxUpdate(-w, -h)
+      const pos = TEMP_get_widget_root_wpos(section.root_posidx);
+      DEBUG_INFO.UI_MOUSE.POS = [pos[0], pos[1], section.geom.pos[2]]; // Remember the info's position.
 
-      DEBUG_INFO.UI_MOUSE.POS = section.geom.pos; // Remember the info's position.
       section.Destroy();
 
       DEBUG_INFO.UI_MOUSE.IS_ON = false;
       return;
    }
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [3, 3], DEBUG_INFO.UI_MOUSE.POS, [0, 0], TRANSPARENCY(GREY[0], .4), 'ui mouse info panel');
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [3, 3], [0, 0, DEBUG_INFO.UI_MOUSE.POS[2]], [0, 0], TRANSPARENCY(GREY[0], .4), 'ui mouse info panel');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('InfoUi-Mouse section');
 
 
    const fontsize = _font_size;
 
-   const infomesh = Create_widget_multi_text(_, 'Mouse:', ALIGN.HORIZONTAL, [0, 0, DEBUG_INFO.UI_MOUSE.POS[2] + 1], fontsize, YELLOWL[7], .4);
+   const infomesh = Create_widget_multi_text(_, 'Mouse:', ALIGN.HORIZONTAL, [0, 0, DEBUG_INFO.UI_MOUSE.POS[2] + 1], fontsize, YELLOWL[7], .4, [10,10]);
    section.AddItem(infomesh);
-   infomesh.CreateNewText('pos[0000, 0000]', fontsize, GREEN[7], [10, 10], .9);
-   infomesh.CreateNewText('area[0000, 0000]', fontsize, GREEN[7], [0, 0], .9);
+   infomesh.CreateNewText('pos[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9);
+   infomesh.CreateNewText('area[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9);
 
 
    section.gfx_pool_request |= GFX_POOL_REQUESTS.SMALLEST; // Assign so the gfx pool requests the smalest buffers
@@ -966,6 +970,7 @@ function Debug_info_create_mesh_info(params) {
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    scroller.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
    scroller.Calc_no_gfx_update();
+   // scroller.ScrollerAlign();
    scroller.Render();
    scroller.ConstructListeners();
 
@@ -1405,14 +1410,17 @@ function Dbg_info_ui_create_ui(pos, name) {
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
    const margin = [4, 4], style = [0, 3, 1], fontsize = 9.8;
 
+   pos[0] = 0;
+   pos[1] = 0;
+
    // Create the scolled section where a dropdown is going to exist 
-   const scrolled = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [pos[0], pos[1], pos[2] + 1], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), 'DBG UI Scrolled section', _, MESH_TYPE.DEBUG_MESH);
+   const scrolled = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [0, 0, pos[2] + 1], [0, 0], TRANSPARENCY(ORANGE_240_160_10, .5), 'DBG UI Scrolled section', _, MESH_TYPE.DEBUG_MESH);
    scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
    scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
    scrolled.SetTypeDebug();
 
    // Create the dropdown where all entries for the info will be stored
-   const dp = Create_widget_dropdown(_, name, [pos[0], pos[1], pos[2] + 2], col_dp, col_menu, _, _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
+   const dp = Create_widget_dropdown(_, name, [0, 0, pos[2] + 2], col_dp, col_menu, _, _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
    dp.CreateClickEvent();
    Dropdown_roots_set_root(dp, dp);
    dp.SetTypeDebug();
@@ -1420,7 +1428,7 @@ function Dbg_info_ui_create_ui(pos, name) {
    dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
 
    // Create a text widget for count and size info of a buffer
-   const info = Create_widget_text(_, `count:000000 size:000000`, [pos[0], pos[1], pos[2] + 2], fontsize, BLACK, _, _, MESH_TYPE.DEBUG_MESH);
+   const info = Create_widget_text(_, `count:000000 size:000000`, [0, 0, pos[2] + 2], fontsize, BLACK, _, _, MESH_TYPE.DEBUG_MESH);
    info.SetTypeDebug();
    dp.AddToMenu(info);
 
@@ -1436,7 +1444,9 @@ function Dbg_info_ui_create_ui(pos, name) {
 
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-   scroller.Calc_no_gfx_update();
+   
+   // scroller.Calc_no_gfx_update();
+   scroller.ScrollerAlign();
 
    scroller.Render();
 

@@ -6,7 +6,7 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/Tim
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { AddArr2, RoundFloat1Decimal } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js';
-import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
+import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_gfx_update_unif_wpos_per_vb, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
 import { Generate_graphics_context } from '../../Interfaces/Gfx/GfxContextFindMatch.js';
@@ -102,13 +102,13 @@ export class Widget_Slider extends Rect {
       this.geom.dim[1] = totalheight;
       
       bar.geom.dim[1] = 2;
-      bar.geom.pos[0] = pad[0];
-      bar.geom.pos[1] = this.geom.dim[1]*2-(handle.geom.dim[1]);
+      bar.geom.pos[0] = pad[0]*2;
+      bar.geom.pos[1] = this.geom.dim[1]*2-handle.geom.dim[1]-pad[1];
       
       handle.geom.pos[0] = bar.geom.pos[0];
       handle.geom.pos[1] = bar.geom.pos[1] - handle.geom.dim[1];
       
-      value_text.geom.pos[0] = this.geom.dim[0] - (value_text.geom.CalcTextWidth()) ;
+      value_text.geom.pos[0] = this.geom.dim[0]*2 - (value_text.geom.CalcTextWidth()*2) ;
       value_text.geom.pos[1] = 4;
       value_text.geom.pos[2] = bar.geom.pos[2] + 1;
       
@@ -360,23 +360,31 @@ export class Widget_Slider extends Rect {
 
          return;
       }
-
+            
       const mouse_pos = MouseGetPosDif();
+      if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
+      
+      Widget_root_gfx_update_unif_wpos_per_vb(mesh.root_bufferidx, [mouse_pos.x, -mouse_pos.y]);
+      
+      mesh.SetUpdateFrameBuffer();
+
+      // const mouse_pos = MouseGetPosDif();
       // mesh.SetUpdateFramebuffer();
      
 
-      mesh.geom.pos[0] += mouse_pos.x;
-      mesh.geom.pos[1] += -mouse_pos.y;
-      mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, mesh.gfx);
+      // mesh.geom.pos[0] += mouse_pos.x;
+      // mesh.geom.pos[1] += -mouse_pos.y;
+      // mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, mesh.gfx);
 
-      const bar = mesh.children.buffer[SLIDER_BAR_IDX];
-      bar.geom.MoveXY(mouse_pos.x, -mouse_pos.y, bar.gfx);
-      const name_text = mesh.text_mesh;
-      name_text.geom.MoveXY(mouse_pos.x, -mouse_pos.y, name_text.gfx);
-      const handle = bar.children.buffer[0];
-      handle.geom.MoveXY(mouse_pos.x, -mouse_pos.y, handle.gfx);
-      const value_text = bar.children.buffer[1];
-      value_text.geom.MoveXY(mouse_pos.x, -mouse_pos.y, value_text.gfx);
+      // const bar = mesh.children.buffer[SLIDER_BAR_IDX];
+      // bar.geom.MoveXY(mouse_pos.x, -mouse_pos.y, bar.gfx);
+      // const name_text = mesh.text_mesh;
+      // name_text.geom.MoveXY(mouse_pos.x, -mouse_pos.y, name_text.gfx);
+      // const handle = bar.children.buffer[0];
+      // handle.geom.MoveXY(mouse_pos.x, -mouse_pos.y, handle.gfx);
+      // const value_text = bar.children.buffer[1];
+      // value_text.geom.MoveXY(mouse_pos.x, -mouse_pos.y, value_text.gfx);
+
 
    }
 
@@ -591,6 +599,19 @@ export class Widget_Slider extends Rect {
       value_text.geom.pos[0] += x;
 
    }
+   
+
+   TEMP_recalc(x, y) {
+
+      console.error('IMPLEMENT\nTEMP_recalc()\nWidget Slider')
+
+      // const dx = this.text_mesh.geom.pos[0]-this.geom.pos[0];
+      // const dy = this.text_mesh.geom.pos[1]-this.geom.pos[1];
+      // this.geom.pos[0] = x;
+      // this.geom.pos[1] = y;
+      // this.text_mesh.geom.pos[0] = x+dx;
+      // this.text_mesh.geom.pos[1] = y+dy;
+  }
 
 
    SetColorAlpha(alpha) {

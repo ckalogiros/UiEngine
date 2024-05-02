@@ -7,7 +7,7 @@ import { TimersUpdateGlobalTimer, TimersUpdateTimers } from "../Timers/Timers.js
 import { TimeIntervalsUpdateAll } from "../Timers/TimeIntervals.js";
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
 import { Batch_update } from "../Batch/Batch.js";
-import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
+import { Uniforms_block_update_uniform, Uniforms_buffer_update_uniform, Uniforms_buffer_update_uniforms_all } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Command_buffer_run } from "../Core/Commandbuffer.js";
@@ -89,6 +89,9 @@ export class WebGlRenderer {
          Command_buffer_run()
 
          Uniforms_block_update_uniform();
+
+
+         // Uniforms_buffer_update_uniforms_all();
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
          Gl_draw(this.gl);

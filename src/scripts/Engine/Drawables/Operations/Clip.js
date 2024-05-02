@@ -1,6 +1,6 @@
 "use strict";
 
-import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, TEMP_get_widget_root_wposy } from "../../Core/MeshBuffer.js";
 import { View_get_view_byidx } from "../../Core/MeshBufferViews.js";
 
 
@@ -133,7 +133,6 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
       for(let j=0; j<=meshshes_idx.boundary; j++){
          
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-
          const top      = mesh.GetPosY();
          const bottom   = top + mesh.geom.dim[1]*2;
          

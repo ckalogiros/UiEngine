@@ -25,15 +25,10 @@ export class Widget_Text extends Text_Mesh {
 
 	pad;
 
-	constructor(ROOT_WIDGET_FLAGS, text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0], is_debug_mesh) {
-
-		// const sdfouter = CalculateSdfOuterFromDim(fontSize);
-		// if (sdfouter + bold > 1) bold = 1 - sdfouter;
+	constructor(ROOT_WIDGET_FLAGS, text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [10, 10], is_debug_mesh) {
 
 		super(text, pos, fontSize, col, _, _, _, is_debug_mesh)
 		this.type |= MESH_TYPE.WIDGET_TEXT;
-
-		// if(ROOT_WIDGET_FLAGS !== undefined) this.root_bufferidx = 
 
 		this.pad = [0, 0];
 		AddArr2(this.pad, pad);
@@ -539,7 +534,6 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	CreateNewText(dynamic_text, fontSize, text_col2, pad = [0, 0], bold = this.bold) {
 
-		/** DEBUG ERROR*/ if (!Array.isArray(pad)) console.error('Pad is not of type array');
 
 		let pos = [0, 0, 0];
 		CopyArr3(pos, this.geom.pos)
@@ -681,7 +675,9 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		for (let i = 0; i < mesheslen; i++) {
 			const val = params.params.func[i](params.params.func_params[i]); // Callback with parameters
+				// console.log(meshes[i].geom.pos)
 			meshes[i].RenderTextFromNumber(val);
+
 		}
 
 	}
@@ -772,7 +768,6 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 
 	}
-
 	
 
    SetPosXYNoGfxUpdate(x, y) {

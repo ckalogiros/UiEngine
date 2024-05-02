@@ -30,6 +30,11 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx) {
       Str_buffer_get_by_idx(names[3]) === 'a_tex') {
       return 1;
    }
+   if (Str_buffer_get_by_idx(names[0]) === 'a_col' &&
+      Str_buffer_get_by_idx(names[1]) === 'a_wpos_time' &&
+      Str_buffer_get_by_idx(names[2]) === 'a_pos') {
+      return 2;
+   }
 
    console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names);
    alert('SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:')
@@ -40,6 +45,7 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx) {
 const Vertex_buffer_fn_table_operation_add = [
    FILL_VERTEX_BUFFER_COL4_WPOS4_PARAMS1_POS2_FN0,
    FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1,
+   FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN0,
 ];
 
 
@@ -152,6 +158,82 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_PARAMS1_POS2_FN0(vb_data, geom, mat, star
 }
 
 
+function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN0(vb_data, geom, mat, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+
+   // const pos = 
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride * 4; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
+
+
 
 function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, num_faces, stride) {
 
@@ -167,8 +249,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
       vb_data[index++] = mat.col[2];
       vb_data[index++] = mat.col[3];
 
-      vb_data[index++] = geom.pos[0];
-      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
       vb_data[index++] = geom.pos[2];
       index++; // For WPOS4
 
@@ -186,8 +268,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
       vb_data[index++] = mat.col[2];
       vb_data[index++] = mat.col[3];
 
-      vb_data[index++] = geom.pos[0];
-      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
       vb_data[index++] = geom.pos[2];
       index++; // For WPOS4
 
@@ -204,8 +286,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
       vb_data[index++] = mat.col[2];
       vb_data[index++] = mat.col[3];
 
-      vb_data[index++] = geom.pos[0];
-      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
       vb_data[index++] = geom.pos[2];
       index++; // For WPOS4
 
@@ -222,8 +304,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
       vb_data[index++] = mat.col[2];
       vb_data[index++] = mat.col[3];
 
-      vb_data[index++] = geom.pos[0];
-      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
       vb_data[index++] = geom.pos[2];
       index++; // For WPOS4
 
@@ -597,7 +679,7 @@ export function Gl_set_dim_Y(gfxInfo, y, num_faces = 1) {
 
 
 export function Gl_add_wpos_XYZ(gfxInfo, x, y, z, num_faces = 1) {
-
+   console.log(vb_data[index-1], y)
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS4);
 
@@ -620,7 +702,7 @@ export function Gl_add_wpos_XYZ(gfxInfo, x, y, z, num_faces = 1) {
 
 
 export function Gl_set_wpos_XYZ(gfxInfo, x, y, z, num_faces = 1) {
-
+   console.log(vb_data[index-1], y)
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS4);
 
@@ -655,7 +737,10 @@ export function Gl_set_wpos_XY(gfxInfo, x, y, num_faces = 1) {
    while (verts) {
 
       vb_data[index++] = x; // Move mesh's x pos by amt
+      // console.log(vb_data[index])
       vb_data[index++] = y; // Move mesh's y pos by amt
+      // console.log(vb_data[index-1], y)
+      // console.log( y)
 
       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       verts--;
@@ -689,17 +774,18 @@ export function Gl_add_wpos_XY(gfxInfo, x, y, num_faces = 1) {
 
 
 export function Gl_add_wpos_X(gfxInfo, x, num_faces = 1) {
-
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS4);
-
+   
    let index = gfxInfo.vb.start + offset;
    let verts = num_faces * gfxInfo.vertsPerRect;
    let stride = gfxInfo.attribsPerVertex
-
+   
    while (verts) {
-
+      
+      // console.log(vb_data[index-1], y)
       vb_data[index] += x; // Move mesh's x pos by amt
+      // console.log(vb_data[index])
       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       verts--;
    }

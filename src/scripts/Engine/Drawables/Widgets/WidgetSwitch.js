@@ -30,7 +30,7 @@ export class Widget_Switch_Simple extends Rect {
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.isOn = 0x0;
-      this.type |= MESH_TYPE.WIDGET_BUTTON;
+      this.type |= MESH_TYPE.WIDGET_SWITCH;
       this.SetName('Switch Widget');
 
       this.evt_params = null;
@@ -84,6 +84,17 @@ export class Widget_Switch_Simple extends Rect {
       if (this.state.mask & MESH_STATE.ACTIVE) {
          super.AddToGfx();
          this.children.buffer[0].AddToGfx();
+      }
+
+   }
+
+
+   AddToGfxFromReset() {
+
+      if (this.state.mask & MESH_STATE.ACTIVE) {
+         super.AddToGfxFromReset();
+         console.log('2', this.children.buffer[0].geom.pos,this.GetName())
+         this.children.buffer[0].AddToGfxFromReset();
       }
 
    }
@@ -155,6 +166,18 @@ export class Widget_Switch_Simple extends Rect {
       this.children.buffer[0].geom.pos[0] = x;
       this.children.buffer[0].geom.pos[1] = y;
    }
+   
+
+   TEMP_recalc(x, y) {
+
+      const dx = this.children.buffer[0].geom.pos[0]-this.geom.pos[0];
+      const dy = this.children.buffer[0].geom.pos[1]-this.geom.pos[1];
+      this.geom.pos[0] = x;
+      this.geom.pos[1] = y;
+      this.children.buffer[0].geom.pos[0] = x+dx;
+      this.children.buffer[0].geom.pos[1] = y+dy;
+      console.log('1', this.children.buffer[0].geom.pos,this.GetName())
+  }
 
    /*******************************************************************************************************************************************************/
    // Events Handling
@@ -170,10 +193,12 @@ export class Widget_Switch_Simple extends Rect {
 
       if (mesh.isOn) {
          mesh.SetColor(mesh.color_active, .7);
+         switch0.geom.pos[0] += mesh.geom.dim[0];
          switch0.geom.MoveX(mesh.geom.dim[0], switch0.gfx);
       }
       else {
          mesh.SetDefaultColor();
+         switch0.geom.pos[0] -= mesh.geom.dim[0];
          switch0.geom.MoveX(-mesh.geom.dim[0], switch0.gfx);
       }
 

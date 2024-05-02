@@ -133,42 +133,6 @@ function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid) {
 }
 
 
-/** */
-// function Find_gfx_match_widget_group_impl(group_bufferidx, target_sid) {
-
-//    let igfx = [INT_NULL, INT_NULL];
-
-//    // If group has not been created yet, return NOT FOUND
-//    if (group_bufferidx === INT_NULL) {
-//       console.warn('FAILED TO Find_gfx_match, widget_root is NULL.\nSet for creating new vertex buuffer');
-//       return igfx;
-//    }
-
-//    const group = View_get_view_byidx(group_bufferidx);
-
-
-
-//    for (let i = 0; i <= group.boundary; i++) {
-
-//       for (let i = 0; i <= group.vb.buffer[i].boundary; i++) {
-
-//          const vb_info = group.vb.buffer[i].info.buffer[j];
-
-//          const prog_sid = Vertex_buffer_info_get_sid(vb_info[VIEW_INFO.VBIDX])
-
-//          if (SID.CheckSidMatch(target_sid, prog_sid)) {
-
-//             igfx[0] = vb_info[VIEW_INFO.PROGIDX];
-//             igfx[1] = vb_info[VIEW_INFO.VBIDX];
-//             // igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC; // If no matching vertex buffer found, new buffer must be created
-//             break;
-//          }
-//       }
-//    }
-
-//    return igfx;
-
-// }
 
 
 

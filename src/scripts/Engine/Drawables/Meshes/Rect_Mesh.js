@@ -102,12 +102,13 @@ export class Rect extends Mesh {
 
    AddToGfx() {
 
-      const g = {
-         pos:this.GetPosXYZ(),
-         dim:this.geom.dim,
-      };
+      // const g = {
+      //    pos:this.GetPosXYZ(),
+      //    dim:this.geom.dim,
+      // };
 
-      this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, g, this.mat, this.GetName(), this.idx);
+      // this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, g, this.mat, this.GetName(), this.idx);
+      this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
@@ -119,12 +120,7 @@ export class Rect extends Mesh {
    
    AddToGfxFromReset() {
 
-      const g = {
-         pos:this.GetPosXYZ(),
-         dim:this.geom.dim,
-      };
-
-      Vertex_buffer_add_vertices(this.gfx, g, this.mat, this.GetName())
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName())
       this.is_gfx_inserted = true;
       
       // Add entry to Gfx Buffer
@@ -290,6 +286,11 @@ export class Rect extends Mesh {
       this.geom.dim[0] = x;
    }
 
+   
+   TEMP_recalc(x, y) {
+      this.geom.pos[0] = x;
+      this.geom.pos[1] = y;
+  }
 
    // SEE ### Construct Listeners
    ConstructListeners(parent_listeners = null) {

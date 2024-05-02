@@ -145,19 +145,23 @@ function Create_program(sid, uniforms) {
 
 	/****************************************************************************************************/
 	// Shared-Block uniforms
-	const ub_idx = Uniforms_block_buffer_create(sid.unif, prog.shader_program, uniforms);
-	// prog.ubb.Add(ub_idx);
+	const ubb_idx = Uniforms_block_buffer_create(sid.unif, prog.shader_program, uniforms);
+	// prog.ubbidx.Add(ub_idx);
 
 
 	/****************************************************************************************************/
 	// Individual uniforms
 	const len = uniforms.length;
 	for (let i = 0; i < len; i++) {
-		if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0)
-			Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name);
+		if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0){
+
+			// TODO: For now we have only one unique uniform, the 'u_wpos', and we just store this ubx globaly, given the fact that this is the only uniform for now. Later we need to clear that out
+			// in order to update the correct uuniform in the 'Draw' function, we need the correct index from the 'prog.ubidxs' buffer
+			const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name);
+			prog.ubidxs.Add(ubidx);
+			TEMP_UNIFORM_BUFFER_INDEXES.U_WPOS = ubidx;
+		}
 	}
-
-
 
 	return progidx;
 
@@ -203,6 +207,7 @@ class Gl_Program {
 		this.vao = null;
 		this.vaoidx = INT_NULL;
 
+		this.ubidxs = New_generic_buffer(_, 'Program ubidxs');
 
 
 		this.attribsidx = Shader_attributes_create(sid, this.shader_program);
@@ -270,9 +275,18 @@ export function Program_use_program(shader_program, progidx) {
 export function Program_uniform_bind(progidx, functions_obj, unif_name) {
 	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
 
-	Uniforms_buffer_bind_uniform_functions(functions_obj, unif_name);
+	return Uniforms_buffer_bind_uniform_functions(functions_obj, unif_name);
 
 }
+
+
+
+// export function Program_uniform_bind(progidx, functions_obj, unif_name) {
+// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
+
+// 	Uniforms_buffer_bind_uniform_functions(functions_obj, unif_name);
+
+// }
 
 
 

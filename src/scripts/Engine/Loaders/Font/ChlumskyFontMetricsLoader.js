@@ -2,6 +2,7 @@
 
 // import { consola_msdf_test_1024_metrics } from "../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js";
 import { consola_msdf_test_1024_metrics } from "../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js";
+import { Abs } from "../../../Helpers/Math/MathOperations.js";
 
 
 const _font_metrics_buffer = [];
@@ -49,7 +50,8 @@ export function Parse_json_metrics(json_metrics_object){
    const descender   = obj.metrics.descender;
    const ascender    = obj.metrics.ascender;
 
-   const scale = 1.18; // A value that works at aligning the yoffset position for the mtsdf font texture(by Chlumsky) characters.(Probably I am missing something!!)
+   // const scale = 1.18; // A value that works at aligning the yoffset position for the mtsdf font texture(by Chlumsky) characters.(Probably I am missing something!!)
+   const scale = 1; // A value that works at aligning the yoffset position for the mtsdf font texture(by Chlumsky) characters.(Probably I am missing something!!)
 
    const uvmap = [];
    uvmap[0] = [0.0, 0.0, 0.0, 0.0];          // Set for space character
@@ -89,9 +91,12 @@ export function Parse_json_metrics(json_metrics_object){
          right:   glyphs[i].planeBounds.right,
          top:     glyphs[i].planeBounds.top,
          bottom:  glyphs[i].planeBounds.bottom,
-         width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
+         // width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
+         width:   Abs(Abs(glyphs[i].planeBounds.right)-Abs(glyphs[i].planeBounds.left)),
          height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
-         yoffset: -((ascender-glyphs[i].planeBounds.top)+(descender-glyphs[i].planeBounds.bottom)) * scale,
+         // yoffset: -((ascender-glyphs[i].planeBounds.top)+(descender-glyphs[i].planeBounds.bottom)) * scale,
+         yoffset: (Abs(ascender)-Abs(glyphs[i].planeBounds.top)) * 2,
+         xoffset: (Abs(ascender)-Abs(glyphs[i].planeBounds.top)) * 2,
       };
       atlas_bounds[i] = {
          left:    m.left,

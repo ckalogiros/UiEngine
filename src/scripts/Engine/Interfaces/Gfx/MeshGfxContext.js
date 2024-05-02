@@ -4,9 +4,9 @@
 import { Vertex_buffer_info_create, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_info_set_ibidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
-import { Program_store_vertex_buffer_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
-import { Mesh_per_vb_create_vb, Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
-import { Renderqueue_Add, Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
+import { Program_store_vertex_buffer_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Program_uniform_bind } from "../../../Graphics/ShaderPrograms.js";
+import { Mesh_per_vb_create_vb, TEMP_create_widget_root_wpos_uniform, TEMP_get_widget_root_wpos, TEMP_store_widget_root_wpos, Widget_root_batch_assign_and_accum_to_vb, Widget_root_buffer_get_root_pos, Widget_root_buffer_get_root_unif_wpos, Widget_root_buffer_is_root, Widget_root_gfx_add, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
+import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private } from "./GfxPool.js";
@@ -145,7 +145,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx, num_faces 
    gfx_ctx.prog.progvbidx = prog.vb.buffer[vbidx];
    gfx_ctx.prog.progibidx = prog.ib.buffer[ibidx];
    gfx_ctx.prog.attribsidx = prog.attribsidx;
-   
+
 
    gfx_ctx.vb.idx = vbidx;
    gfx_ctx.vb.start = 0; // NOTE: The start of the mesh in the vertex buffer is calculated when the mesh is added to the vertex buffer.
@@ -173,12 +173,12 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx, num_faces 
  * Else default to the default group
  */
 //(this.sid, this.sceneidx, this.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
-export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs=[INT_NULL, INT_NULL]) {
+export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL, INT_NULL]) {
 
 
    // Cash
    const sid = mesh.sid;
-   const sceneidx = mesh.sceneidx; 
+   const sceneidx = mesh.sceneidx;
    const mesh_count = mesh.geom.num_faces;
    const root_bufferidx = mesh.root_bufferidx;
    const mesh_bufferidx = mesh.mesh_bufferidx;
@@ -215,9 +215,26 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs=[INT_NULL, I
       const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
       Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
       
+      
+         
+      // MUST BIND AND INIT THE UNIFORM, OTHERWISE THE SHADER IS NOT GONNA HAVE A VALUE FOR THE UNIFORM 
+      const obj = {
+         Set: null,
+         Update: null,
+      };
+
+      const ubidx = Program_uniform_bind(progidx, obj, 'u_wposxy');
+      obj.Set([mesh.geom.pos[0], mesh.geom.pos[1]]);
+      // const ubidx = Program_uniform_bind(progidx, null, 'u_wposxy');
+
+      // if(ubidx === INT_NULL) console.error('Uniform u_wposxy did not bound correctly.');
+      // else{
+      //    mesh.SetUniformIndex(ubidx, 'u_wposxy');
+      // }
+
+      // obj.Set([0, 0]);
+      
    }
-
-
 
 
 
@@ -227,30 +244,50 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs=[INT_NULL, I
    let is_vertex_buffer_created = false;
 
    const pool_request_flags = mesh.gfx_pool_request;
-   
-   if(vbidx === INT_NULL){
-      
+
+   if (vbidx === INT_NULL) {
+
       // First look a the gfx pool for any matching vertex buffer
       vbidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags);
-      
-      if(vbidx === INT_NULL){
+
+      if (vbidx === INT_NULL) {
 
          const vb_info = Vertex_buffer_info_create(sid, _, progidx);
          vbidx = vb_info.vbidx;
-   
-   
+
+
          Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE | BUFFER_STATE.SHOW);
          if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidx);
-         
+
          Program_store_vertex_buffer_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
-         
+
          // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
          Mesh_per_vb_create_vb(vbidx);
 
-         is_vertex_buffer_created = true;
+         // Create entry for world position uniform for this vertex buffer, and store the index to that entry in the root mesh's 'root_posidx'.
+         // IMPORTANT: The 'root_posidx' must have the same value with the vbidx (1-1)
+         // Also, must initialize all same root vb wpos uniforms to the widget root position. Because all meshes from any vb of the same widget root have offset positions to the root widget mesh.  
          
+         // // UNNECESSARY: For all vb except the widget root. All the root wpos are set from a functions call, based on the root root_wpos 
+         // const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh.geom.pos);
+         // if(root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
+
+         
+         // /**
+         //  * TEMPORARY:
+         //  * Remove the mesh pos here, and add it to the root pos buffer.
+         //  * At some point we have to figure out a better way of dealing with the root positions.
+         //  * The thing is:
+         //  * Position is passes to a widget creation function, and is stored by Geometry as the mesh's position.
+         //  * But the root pos element for that vertex buffer is created on the 'GenGfxCtx()' path. 
+         //  */
+         // mesh.geom.pos[0] = 0;
+         // mesh.geom.pos[1] = 0;
+
+         is_vertex_buffer_created = true;
+
       }
-      
+
    }
 
 
@@ -259,35 +296,44 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs=[INT_NULL, I
 
    /*******************************************************************************************************************/
    // Index buffer
-   
-   if(sid.shad & SID.SHAD.INDEXED){
+
+   if (sid.shad & SID.SHAD.INDEXED) {
 
       // IMPORTANT: WHO IS RESPONSIBLE OF DECIDING THE INDEX BUFFER PATTERN ?????????????
       ibidx = Gfx_pool_find_ib_notActive(TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN.rect_123_234); // HACK: At this point we just pass the only usable of the app, index buffer pattern
-      
+
       if (ibidx === INT_NULL) { // Create new index buffer
-         
+
          const ib_info = Index_buffer_info_create(sid, _, TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN.rect_123_234);
          ibidx = ib_info.ibidx;
 
          Program_store_index_buffer_idx(progidx, ibidx); // Store the indexbuffer index to the programs ib array
-                  
+
       }
 
    }
-   
-   
-   if(is_vertex_buffer_created){
-      
+
+
+   if (is_vertex_buffer_created) {
+
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vbidx, ibidx, true);
       Renderqueue_set_active(vbidx, true); // Update the draw buffer
 
       Vertex_buffer_info_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
-      
 
       // Create new entry for the new vertex buffer in widget root gfx buffer
       Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbidx);
+
+      // UNNECESSARY: For all vb except the widget root. All the root wpos are set from a function call, based on the root root_wpos 
+      const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh.geom.pos, mesh.GetName());
+      if(root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
+      // console.log('------------------------',  mesh.geom.pos, mesh.GetName())
+      if(Widget_root_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx)){
+         mesh.geom.pos[0] = 0;
+         mesh.geom.pos[1] = 0;
+         // console.log('+++++++++++++++++++++++++++++++++++',  mesh.geom.pos, mesh.GetName())
+      }
    }
 
 
@@ -296,7 +342,13 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs=[INT_NULL, I
    // Add mesh to the root batch buffer for batch update
    Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vbidx, mesh_count);
 
-   
+
+
+   // Store the root pos in each mesh
+   mesh.root_posidx = vbidx;
+
+
+
    const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx, mesh_count);
    return gfx;
 

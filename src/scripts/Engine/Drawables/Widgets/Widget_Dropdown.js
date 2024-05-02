@@ -104,7 +104,7 @@ export class Widget_Dropdown extends Section {
 
       this.dp_symbols = ['+', '-'];
       // const btn = new Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, ALIGN.LEFT, [pos[0], pos[1], this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
-      const btn = new Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, ALIGN.LEFT, [0, 0, this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
+      const btn = Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
       // AddArr2(btn.total_margin, this.menu.total_margin);
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
 
@@ -394,8 +394,8 @@ export class Widget_Dropdown extends Section {
          }
       }
 
-// if(parent_listeners[1]===13)
-// console.log()
+      // if(parent_listeners[1]===13)
+      // console.log()
 
       /*****************************************************************************************************************/
       // Create Listen Events for the button
@@ -406,7 +406,7 @@ export class Widget_Dropdown extends Section {
 
 
             // Case there is a dropdown listener for dropdown, then make certain the button listener is a child
-            if(this.listeners !== null && this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL){
+            if (this.listeners !== null && this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
 
                parent_listeners[i] = this.listeners.buffer[i];
             }
@@ -415,7 +415,7 @@ export class Widget_Dropdown extends Section {
                if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
                   parent_listeners = [null, null];
                }
-   
+
                if (parent_listeners[i] === null || parent_listeners[i] === INT_NULL) {
                   parent_listeners[i] = Find_parent_listen_event(i, btn);
                }
@@ -432,7 +432,7 @@ export class Widget_Dropdown extends Section {
                   drop_down: this,
                   menu: this.menu,
                }
-   
+
                // CAUTION: We run for i:Hover and click, but the callback is always 'this.OnClick'. For Hover callback, check the event type and pass the apropriate callback.
                btn.AddListenEvent(i, this.OnClick, params, parent_listeners[i]);
             }
@@ -606,8 +606,8 @@ export class Widget_Dropdown extends Section {
          // TODO: If the group root is a scrolled_section, maybe the responsibility for Clip is at scroller ?????????
          if (group_root_mesh.parent) {
 
-            clip_top = group_root_mesh.parent.geom.pos[1] - group_root_mesh.parent.geom.dim[1];
-            clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1];
+            clip_top = group_root_mesh.parent.geom.pos[1];
+            clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1]*2;
             clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
          }
       }
@@ -617,7 +617,7 @@ export class Widget_Dropdown extends Section {
       }
 
 
-      // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
       // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 
@@ -691,9 +691,7 @@ export class Widget_Dropdown extends Section {
       this.ActivateMenu(root); // Add dropdown to gfx buffers.
       menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
 
-      /**
-       * // TODO: If group root mesh does not have a Recalc function, we MUST search for the first 'Section' fro the group root 
-       */
+
       // Re-calculate dimensions and positions
       let clip_top = null, clip_bottom = null;
       let clip_right = null;
@@ -709,8 +707,8 @@ export class Widget_Dropdown extends Section {
          // TODO: If the group root is a scrolled_section, maybe the responsibility for Clip is at scroller ?????????
          if (group_root_mesh.parent) {
 
-            clip_top = group_root_mesh.parent.geom.pos[1] - group_root_mesh.parent.geom.dim[1];
-            clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1];
+            clip_top = group_root_mesh.parent.geom.pos[1];
+            clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1]*2;
             clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
          }
 
@@ -720,7 +718,7 @@ export class Widget_Dropdown extends Section {
          console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
       }
 
-      // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
       // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
@@ -835,7 +833,7 @@ export class Widget_Dropdown extends Section {
 
             STATE.mesh.SetGrabed(mesh);
             STATE.mesh.SetFocused(mesh);
-            mesh.StateEnable(MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS);
+            mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
             Widget_root_set_in_focus(mesh.root_bufferidx);
          }
 
@@ -896,6 +894,23 @@ export class Widget_Dropdown extends Section {
    /*******************************************************************************************************************************************************/
    // Setters_Getters
    /*******************************************************************************************************************************************************/
+
+
+   TEMP_recalc(x, y) {
+
+      const btn = this.children.buffer[0];
+
+      const dx = btn.geom.pos[0] - this.geom.pos[0];
+      const dy = btn.geom.pos[1] - this.geom.pos[1];
+
+      console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{ TEMP_recalc DROPDOWN')
+
+      this.geom.pos[0] = x;
+      this.geom.pos[1] = y;
+
+      btn.geom.pos[0] = x + dx;
+      btn.geom.pos[1] = y + dy;
+   }
 
    SetType(type_flag) {
 

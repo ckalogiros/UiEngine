@@ -5,7 +5,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Widget_root_create_root, Widget_root_batch_move_from_batch_buffer, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx } from "../../Core/MeshBuffer.js";
+import { Widget_root_create_root, Widget_root_batch_move_from_batch_buffer, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, TEMP_get_widget_root_wpos, TEMP_add_widget_root_wpos, Widget_root_gfx_update_unif_wpos_per_vb } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
@@ -13,6 +13,7 @@ import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexB
 import { Clampx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
+import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 
 
 
@@ -108,8 +109,6 @@ export class Section extends Rect {
 
       this.options |= options;
 
-      // SID.InheritUniform(mesh.sid.unif, this.sid.unif); // Inherits the parent's uniform flags
-
       const idx = this.AddChild(mesh);
 
       if (this.root_bufferidx !== INT_NULL && mesh.root_bufferidx === INT_NULL) {
@@ -117,11 +116,7 @@ export class Section extends Rect {
       }
 
       mesh.isFramebufferRendered = this.isFramebufferRendered;
-
       mesh.StateEnable(this.state.mask & MESH_STATE.ACTIVE);
-
-      // CopyArr2(mesh.geom.pos, this.geom.pos);
-
       mesh.idx = idx;
 
       return idx;
@@ -243,15 +238,14 @@ export class Section extends Rect {
       const section = this;
       if (options === _) options = section.options; // Here set as options: the passed options(de-activates any mesh self-set-options), or the mesh self-options
 
-
-      const old_sizex = section.geom.dim[0];
-      const old_sizey = section.geom.dim[1];
-
       if(section.options & SECTION.FIXED_W) section.max_size[0] = section.geom.dim[0];
       if(section.options & SECTION.FIXED_H) section.max_size[1] = section.geom.dim[1];
 
       Calculate_sizes_recursive(section, options, target_child_idx);
 
+
+      // if (options & (SECTION.RESIZE_PARENT | SECTION.RESIZE_PARENTX | SECTION.RESIZE_PARENTY))
+      //    section.SetMargin();
 
       if (section.type & MESH_TYPE.WIDGET_SCROLLER) {
          section.geom.dim[0] = section.max_size[0]; // For scroller widgets, do not set the height
@@ -528,7 +522,7 @@ export class Section extends Rect {
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
           * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
           */
-         const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_section, section);
+         const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, section);
          section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
          if (section.StateCheck(MESH_STATE.IS_GRABABLE)) {
@@ -614,10 +608,10 @@ export class Section extends Rect {
             View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
             // Mesh_per_vb_remove_all_from_index(root.gfx.vb.idx, root.per_vb_bufferidx);
 
-            const clip_top = root.geom.pos[1] - root.geom.dim[1];
-            const clip_bottom = root.geom.pos[1] + root.geom.dim[1];
-            const clip_left = root.geom.pos[0] - root.geom.dim[0];
-            const clip_right = root.geom.pos[0] + root.geom.dim[0];
+            const clip_top = root.geom.pos[1];
+            const clip_bottom = root.geom.pos[1] + root.geom.dim[1]*2;
+            const clip_left = root.geom.pos[0];
+            const clip_right = root.geom.pos[0] + root.geom.dim[0]*2;
             // console.log('clip_right ', clip_right);
 
             Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
@@ -664,7 +658,12 @@ export class Section extends Rect {
                   parent_listeners[i] = Find_parent_listen_event(i, mesh);
                }
 
-               mesh.AddListenEvent(i, Clbk, evt_params, parent_listeners[i]);
+               if (mesh.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
+                  mesh.AddListenEvent(i, null, null, parent_listeners[i]);
+               }
+               else { // Else construct with Clbk and params
+                  mesh.AddListenEvent(i, Clbk, evt_params, parent_listeners[i]);
+               }
 
                parent_listeners[i] = mesh.listeners.buffer[i];
             }
@@ -697,20 +696,19 @@ export class Section extends Rect {
    /*******************************************************************************************************************************************************/
 
    Move(x, y) {
-
+      alert('Section.js\nMove')
       if (x === 0 && y === 0) return;
-
-      if (this.root_bufferidx === INT_NULL) return;
-
-      this.geom.pos[0] += x;
-      this.geom.pos[1] += y;
-      Widget_root_batch_move_from_batch_buffer(this.root_bufferidx, x, y)
-
+      
+      // HERE: We need a way to get the unif idx by name: 'u_wposxy' 
+      TEMP_add_widget_root_wpos(this.root_posidx, [x,y]);
+      
+      
    }
-
-
+   
+   
    MoveNoGfxUpdate(x, y) {
-
+      
+      alert('Section.js\nMoveNoGfxUpdate')
       this.geom.pos[0] += x;
       this.geom.pos[1] += y;
       for (let i = 0; i <= this.children.boundary; i++) {
@@ -741,7 +739,19 @@ export class Section extends Rect {
       }
 
    }
+      
+   
+   TEMP_recalc(x, y) {
+      
+      // alert('Section.js\nTEMP_recalc')
+      this.geom.pos[0] += x;
+      this.geom.pos[1] += y;
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) child.TEMP_recalc(x, y);
+      }
 
+   }
 
    SetPosXY(x, y) { Section_set_posxy_children_recursive([x, y], this); }
 
@@ -899,7 +909,7 @@ function Section_set_posxy_children_recursive(pos, mesh) {
 
 
 
-function Section_on_move_section(params) {
+function Section_on_move_clbk(params) {
 
    const section = params.params;
 
@@ -916,8 +926,7 @@ function Section_on_move_section(params) {
    const mouse_pos = MouseGetPosDif();
    if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
 
-   // HERE: In one example, the section is a child, but the Move runs from widget root and we move from root and not from this section
-   section.Move(mouse_pos.x, -mouse_pos.y)
+   Widget_root_gfx_update_unif_wpos_per_vb(section.root_bufferidx, [mouse_pos.x, -mouse_pos.y]);
 
 }
 
@@ -1413,16 +1422,13 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
    const pad = [0, 0]
 
    const root = Widget_root_buffer_get_mesh_by_rootidx(parent.root_bufferidx);
-   const pos = root.GetPosXYZ(); 
-   const top  = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[0] + parent.geom.pos[0] + parent.StylesGetMargin(STYLES.AXIS.X) : pos[0] + parent.StylesGetMargin(STYLES.AXIS.X); 
-   const left = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[1] + parent.geom.pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y) : pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y);
+   // const pos = root.GetPosXY(); 
+   const pos = root.geom.pos; 
+   const top  = pos[0]  + parent.geom.pos[0] + parent.StylesGetMargin(STYLES.AXIS.X); 
+   const left = pos[1]  + parent.geom.pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y);
+  
    const cur_pos = [top, left] 
 
-   // if (parent.text_mesh) {
-   //    const rel_pos = [ (cur_pos[0]) - root.geom.pos[0], (cur_pos[1] ) - root.geom.pos[1], parent.geom.pos[2] + 1 ];
-   //    parent.text_mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
-   //    console.log('TEXT: ', rel_pos, parent.text_mesh.geom.dim, parent.text_mesh.GetName())
-   // }
    
    for (let i = 0; i <= parent.children.boundary; i++) {
       
@@ -1438,7 +1444,6 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
          
          mesh.geom.pos[0] += rel_pos[0] 
          mesh.geom.pos[1] += rel_pos[1]
-         // console.log('WIDGET_TEXT_DYNAMIC: ', rel_pos, mesh.geom.dim, mesh.GetName())
       }
       else if(mesh.type & MESH_TYPE.WIDGET_SCROLLER){
          alert('Section\n->Calculate_positions_no_gfx_update_recursive\n->For Scroller')
@@ -1446,6 +1451,13 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
          // console.log('WIDGET_SCROLLER: ', rel_pos, mesh.geom.dim, mesh.GetName())
          continue_recur = false;
       }
+      // else if (parent.type & MESH_TYPE.WIDGET_DROP_DOWN) 
+      // { // For meshes with a parent of type Section
+         
+      //    mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
+      //    continue_recur = false;
+      //    // console.log('SECTION: ', rel_pos, mesh.geom.dim, mesh.GetName())
+      // }
       else if (mesh.type & MESH_TYPE.SECTION_MESH) 
       { // For meshes with a parent of type Section
 
@@ -1454,17 +1466,22 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
          // console.log('SECTION: ', rel_pos, mesh.geom.dim, mesh.GetName())
       }
       else{
-         
-         mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
+         console.log(mesh.constructor.name, mesh.GetName(), mesh.geom.pos)
+
+         if(mesh.constructor.name==='Widget_Text')
+         console.log()
+         mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
          // mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
-         // console.log('WIDGET: ', rel_pos, mesh.geom.dim, mesh.GetName())
-         continue_recur = false;
+
+         // console.log('WIDGET: ', rel_pos, mesh.geom.pos, mesh.geom.dim, mesh.GetName())
+         if(mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
+         if(mesh.text_mesh) continue_recur = false;
+         // console.log('WIDGET: ', rel_pos, mesh.text_mesh.geom.pos, mesh.text_mesh.geom.dim, mesh.GetName())
       }
 
-      if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
-         // Calculate_positions_no_gfx_update_recursive(mesh, opt, cur_pos)
-         Calculate_positions_no_gfx_update_recursive(mesh, opt);
 
+      if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
+         Calculate_positions_no_gfx_update_recursive(mesh, opt);
       }
 
 
@@ -1478,7 +1495,78 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
 
    }
 
-
-
 }
+// export function Calculate_positions_no_gfx_update_recursive(parent, options) {
+
+//    const pad = [0, 0]
+
+//    const root = Widget_root_buffer_get_mesh_by_rootidx(parent.root_bufferidx);
+//    const pos = root.GetPosXYZ(); 
+//    // const top  = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[0] + parent.geom.pos[0] + parent.StylesGetMargin(STYLES.AXIS.X) : pos[0] + parent.StylesGetMargin(STYLES.AXIS.X); 
+//    // const left = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[1] + parent.geom.pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y) : pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y);
+//    const top  = pos[0]  + parent.geom.pos[0] + parent.StylesGetMargin(STYLES.AXIS.X); 
+//    const left = pos[1]  + parent.geom.pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y);
+//    const cur_pos = [top, left] 
+
+//    // if (parent.text_mesh) {
+//    //    const rel_pos = [ (cur_pos[0]) - root.geom.pos[0], (cur_pos[1] ) - root.geom.pos[1], parent.geom.pos[2] + 1 ];
+//    //    parent.text_mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
+//    //    console.log('TEXT: ', rel_pos, parent.text_mesh.geom.dim, parent.text_mesh.GetName())
+//    // }
+   
+//    for (let i = 0; i <= parent.children.boundary; i++) {
+      
+//       const mesh = parent.children.buffer[i];
+//       let continue_recur = true;
+//       let opt = options
+      
+//       if (options & SECTION.INHERIT) opt = parent.options
+
+//       const rel_pos = [ (cur_pos[0]) - root.geom.pos[0], (cur_pos[1] ) - root.geom.pos[1], parent.geom.pos[2] + 1 ];
+
+//       if(mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC){
+         
+//          mesh.geom.pos[0] += rel_pos[0] 
+//          mesh.geom.pos[1] += rel_pos[1]
+//          // console.log('WIDGET_TEXT_DYNAMIC: ', rel_pos, mesh.geom.dim, mesh.GetName())
+//       }
+//       else if(mesh.type & MESH_TYPE.WIDGET_SCROLLER){
+//          alert('Section\n->Calculate_positions_no_gfx_update_recursive\n->For Scroller')
+//          mesh.ScrollerAlign();
+//          // console.log('WIDGET_SCROLLER: ', rel_pos, mesh.geom.dim, mesh.GetName())
+//          continue_recur = false;
+//       }
+//       else if (mesh.type & MESH_TYPE.SECTION_MESH) 
+//       { // For meshes with a parent of type Section
+
+//          mesh.geom.pos[0] = rel_pos[0] 
+//          mesh.geom.pos[1] = rel_pos[1]
+//          console.log('SECTION: ', rel_pos, mesh.geom.dim, mesh.GetName())
+//       }
+//       else{
+         
+//          mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
+//          // mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
+//          // console.log('WIDGET: ', rel_pos, mesh.geom.dim, mesh.GetName())
+//          continue_recur = false;
+//       }
+
+//       if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
+//          // Calculate_positions_no_gfx_update_recursive(mesh, opt, cur_pos)
+//          Calculate_positions_no_gfx_update_recursive(mesh, opt);
+
+//       }
+
+
+//       // Increment current position tracker
+//       if (parent.options & SECTION.VERTICAL) {
+//          cur_pos[1] += mesh.geom.dim[1] * 2;
+//       }
+//       else if (parent.options & SECTION.HORIZONTAL) {
+//          cur_pos[0] += mesh.geom.dim[0] * 2;
+//       }
+
+//    }
+
+// }
 

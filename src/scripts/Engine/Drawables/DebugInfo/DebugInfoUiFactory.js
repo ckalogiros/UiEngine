@@ -14,7 +14,7 @@ export function Dbg_ui_create2(name, fontsize, switch_size, switch_fn, callback_
    // section.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
    section.rel_comp = Relative_pos_comp_create_new_comp();
    
-   const label = Create_widget_label(_, `${name}`, (ALIGN.BOTTOM | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, label_col, label_text_col, label_pad, _, label_style);
+   const label = Create_widget_label(_, `${name}`, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, label_col, label_text_col, label_pad, _, label_style);
    section.AddItem(label);
    
    const ui_switch = Create_widget_switch_simple(_, [0, 0, zindex + 2], switch_size, switch_col, switch_col2, switch_pad);
@@ -23,8 +23,8 @@ export function Dbg_ui_create2(name, fontsize, switch_size, switch_fn, callback_
    // const callback_params = null; // Pass any params for the callback and get them at 'switch_fn' site
    ui_switch.Bind(switch_fn, null, callback_params);
    const ui_switchidx = section.AddItem(ui_switch);
-   Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, section, ui_switchidx);
-   Command_buffer_store(Relative_pos_comp_recalc_all, section);
+   // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, section, ui_switchidx);
+   // Command_buffer_store(Relative_pos_comp_recalc_all, section);
    // Relative_pos_comp_recalc_all(section)
    
 

@@ -111,11 +111,13 @@ class Uniform {
    Set(val) {
       this.val = val;
       this.needsUpdate = true;
+      // console.log('UNIFORMS SET', this.val, this.name, _uniforms_buffer)
    }
 
 
    Update() {
       this.UpdateUniform(gfxCtx.gl, this.loc, this.val);
+      // console.log('UNIFORMS UPDATE', this.val, this.name)
       this.needsUpdate = false;
    }
 }
@@ -130,28 +132,37 @@ export function Uniforms_buffer_create_uniform(gl, shader_program, type, name) {
    const uniform = new Uniform(gl, shader_program, type, name);
    const idx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
    console.warn('1111111 Uniform Created at index:', idx, _uniforms_buffer)
-   // return uniform
+   return idx
 }
 
 
 
 export function Uniforms_buffer_get_uniform_byidx(ubidx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
-   return _uniforms_buffer[ubidx];
+   return _uniforms_buffer.buffer[ubidx];
 }
 
 
 
 export function Uniforms_buffer_set_uniform(ubidx, val) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
-   _uniforms_buffer[ubidx].Set(val);
+   _uniforms_buffer.buffer[ubidx].Set(val);
 }
 
 
 
 export function Uniforms_buffer_update_uniform(ubidx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
-   _uniforms_buffer[ubidx].Update();
+   _uniforms_buffer.buffer[ubidx].Update();
+}
+
+
+
+export function Uniforms_buffer_update_uniforms_all() {
+
+   for(let i=0; i <= _uniforms_buffer.boundary; i++){
+      if(_uniforms_buffer.buffer[i].needsUpdate) _uniforms_buffer.buffer[i].Update();
+   }
 }
 
 
@@ -159,26 +170,37 @@ export function Uniforms_buffer_update_uniform(ubidx) {
 /** 'functions' MUST HAVE .Set and .Update fields, so they can be bound to the uniforms Set() and Update(). */
 export function Uniforms_buffer_bind_uniform_functions(functions, unif_name = '') {
 
+   let ubidx = INT_NULL;
+
    // Find uniform by name
    for (let i = 0; i <= _uniforms_buffer.boundary; i++) {
 
       const unif = _uniforms_buffer.buffer[i];
-      /**DEBUG*/if (unif.is_set_bound) alert('Uniform function \'Set\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
-      /**DEBUG*/if (unif.is_update_bound) alert('Uniform function \'Update\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
-
+      
       if (unif.name === unif_name) {
+
+         // /**DEBUG*/if (unif.is_set_bound) 
+         //    alert('Uniform function \'Set\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
+         // /**DEBUG*/if (unif.is_update_bound) 
+         //    alert('Uniform function \'Update\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
 
          // Set the 'Set' and 'Update' 
          if (!unif.is_set_bound) {
 
             functions.Set = unif.Set.bind(unif);
             unif.is_set_bound = true;
+            ubidx = i;
+            console.log('UNIFORM SET', unif);
          }
          if (!unif.is_update_bound) {
-
+            
             functions.Update = unif.Update.bind(unif);
             unif.is_update_bound = true;
+            ubidx = i;
+            console.log('UNIFORM UPDATE', unif)
          }
+
+         if(ubidx !== INT_NULL) return ubidx;
       }
    }
 
@@ -191,6 +213,42 @@ export function Uniforms_buffer_bind_uniform_functions(functions, unif_name = ''
    //       That means to have a buffer of invalidation callback functions.
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -474,6 +532,55 @@ function DEBUG_PRINT(buffer, index, line) {
    if (buffer.buffer[index] === null) {
       console.error('Buffer at index is NULL. @GlProgram.js\nLine:', line, 'index:', index, buffer);
       alert('Buffer at index is NULL. @GlProgram.js.');
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************************************************************************************************************/
+// DEBUG-PRINT
+/*******************************************************************************************************************************************************************************/
+
+export function Uniforms_buffer_block_print() {
+   console.log('_uniform_blocks:', _uniform_blocks);
+}
+
+// this.val = 0;// Uniform value
+// this.loc = loc; // Uniform location
+// this.name = name; // Uniform name
+// this.needsUpdate = false;
+// this.UpdateUniform = null; // Gl specific type function for updating the uniform.
+// this.is_set_bound = false;
+// this.is_update_bound = false;
+
+export function Uniforms_buffer_print() {
+   console.log('_uniforms_buffer:');
+   for(let i=0; i <= _uniforms_buffer.boundary; i++){
+      console.log('count', _uniforms_buffer.active_count,
+         'name', _uniforms_buffer.buffer[i].name,
+         'val', _uniforms_buffer.buffer[i].val,
+      );
    }
 }
 

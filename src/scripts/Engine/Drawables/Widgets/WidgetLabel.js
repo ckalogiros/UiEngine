@@ -8,12 +8,11 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Rect } from "../Meshes/Rect_Mesh.js";
 import { Align_self_get_dif } from "../Operations/Alignment.js";
-import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_set_in_focus, Widget_root_create_root } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root, TEMP_add_widget_root_wpos, Widget_root_gfx_update_unif_wpos_per_vb } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
@@ -59,42 +58,51 @@ export class Widget_Label extends Rect {
         _pos[2] -= 1; // Set z for area 'behind' this.text_mesh
 
         const dim = [
-            text_mesh.GetMaxWidth(),
-            text_mesh.geom.dim[1],
+            text_mesh.GetMaxWidth()+pad[0]*2,
+            text_mesh.geom.dim[1]+pad[1]*2,
         ];
+                
         
         super(_pos, dim, col);
-
-        this.geom.dim[0] += pad[0];
-        this.geom.dim[1] += pad[1];
+        
 
         if(Align & ALIGN.RIGHT){
-            const d = this.geom.dim[0] - text_mesh.GetMaxWidth()
-            text_mesh.geom.pos[0] += d
+            const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2 - pad[0]
+            text_mesh.geom.pos[0] = d
+        }
+        else if(Align & ALIGN.LEFT){
+            // const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2
+            const d = pad[0]
+            text_mesh.geom.pos[0] = d
         }
         else if(Align & ALIGN.HOR_CENTER){
-            const d = this.geom.dim[0] - text_mesh.GetMaxWidth()
-            text_mesh.geom.pos[0] += d/2
+            const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2
+            text_mesh.geom.pos[0] = d/2
         }
         if(Align & ALIGN.VERT_CENTER){
-            text_mesh.geom.pos[1] = (this.geom.dim[1] - text_mesh.geom.dim[1])/2; 
-        }
-        else if(Align & ALIGN.BOTTOM){
+            // const d = this.geom.dim[1] - text_mesh.geom.dim[1]+ pad[1]
             const d = this.geom.dim[1] - text_mesh.geom.dim[1]
             text_mesh.geom.pos[1] += d
         }
-        // else if(Align & ALIGN.VERT_CENTER){
-        // }
+        else if(Align & ALIGN.BOTTOM){
+            const d = this.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1]
+            // const d = this.geom.dim[1]
+            text_mesh.geom.pos[1] += d
+        }
+        else if(Align & ALIGN.TOP){
+            // const d = this.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1]
+            text_mesh.geom.pos[1] += pad[1]
+        }
 
-        // Must call super() before using the 'this', that is why we write the code here.
         text_mesh.SetSceneIdx(this.sceneidx);
 
 
         this.mesh_bufferidx = mesh_bufferidx;
 
         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-        this.SetStyle([0,0,0]);
-        // this.SetStyle(style);
+
+        this.SetStyle(style);
+        
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
         this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -109,8 +117,8 @@ export class Widget_Label extends Rect {
       
         if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
             this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
-
-            this.AddToWidgetRootBuffer(this.root_bufferidx)
+            this.text_mesh.root_bufferidx = this.root_bufferidx;
+            Widget_root_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
         }
 
     }
@@ -299,6 +307,17 @@ export class Widget_Label extends Rect {
         this.geom.pos[1] += y;
         this.text_mesh.geom.pos[0] += x;
         this.text_mesh.geom.pos[1] += y;
+    }
+
+
+    TEMP_recalc(x, y) {
+
+        const dx = this.text_mesh.geom.pos[0]-this.geom.pos[0];
+        const dy = this.text_mesh.geom.pos[1]-this.geom.pos[1];
+        this.geom.pos[0] = x;
+        this.geom.pos[1] = y;
+        this.text_mesh.geom.pos[0] = x+dx;
+        this.text_mesh.geom.pos[1] = y+dy;
     }
 
 
@@ -582,7 +601,8 @@ export class Widget_Label extends Rect {
 
 
             if (!is_resizesed) { // implement move 
-                const OnMoveFn = mesh.OnMove;
+                // const OnMoveFn = mesh.OnMove;
+                const OnMoveFn = Section_on_move_clbk;
                 const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
                 mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
             }
@@ -599,51 +619,6 @@ export class Widget_Label extends Rect {
 
         }
         return true;
-    }
-
-
-    // SEE ### OnMove Events Implementation Logic
-    OnMove(params) {
-
-        // The 'OnMove' function is called by the timeInterval.
-        // The timeInterval has been set by the 'OnClick' event.
-        const mesh = params.params;
-        const text_mesh = mesh.text_mesh;
-
-
-        // Destroy the time interval and the Move operation, if the mesh is not grabed
-        // MESH_STATE.IN_GRAB is deactivated upon mouse 'click up' in Events.js.
-        if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
-
-            const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-            TimeIntervalsDestroyByIdx(intervalIdx);
-            mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
-
-            return;
-        }
-
-        // Move 
-        const mouse_pos = MouseGetPosDif();
-
-        if (mouse_pos.x !== 0 || mouse_pos.y !== 0) {
-
-            mesh.geom.pos[0] += mouse_pos.x;
-            mesh.geom.pos[1] += -mouse_pos.y;
-            mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-            const update_data = {
-                sizes: [2],
-                data: [mouse_pos.x, -mouse_pos.y],
-            };
-            Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
-
-            text_mesh.geom.pos[0] += mouse_pos.x;
-            text_mesh.geom.pos[1] += -mouse_pos.y;
-            text_mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-            Batch_store(text_mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
-        }
-
-        mesh.SetUpdateFrameBuffer();
-
     }
 
 
@@ -695,6 +670,28 @@ export class Widget_Label extends Rect {
 
 }
 
+
+function Section_on_move_clbk(params) {
+
+    const mesh = params.params;
+
+    if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+
+        const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+        TimeIntervalsDestroyByIdx(intervalIdx);
+        mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+
+        return;
+    }
+
+    
+    const mouse_pos = MouseGetPosDif();
+    if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
+    
+    Widget_root_gfx_update_unif_wpos_per_vb(mesh.root_bufferidx, [mouse_pos.x, -mouse_pos.y]);
+    
+    mesh.SetUpdateFrameBuffer();
+ }
 
 
 /** This is just to have a class named specific for menus text, like the popup menu,

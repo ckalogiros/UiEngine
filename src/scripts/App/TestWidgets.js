@@ -24,7 +24,7 @@ import { Font_get_char_uv_coords } from '../Engine/Loaders/Font/ChlumskyFontMetr
 import { Str_buffer_store } from '../Engine/Core/StringBuffer.js';
 import { PerformanceTimersGetFps, PerformanceTimersGetWorstFps, Performance_timers_get_avg_1sec_reset, Performance_timers_init_all } from '../Engine/Timers/PerformanceTimers.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
-import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_byidx, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3 } from '../Engine/Core/MeshBuffer.js';
+import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_byidx, Widget_root_gfx_set_unif_wpos_per_vb, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3 } from '../Engine/Core/MeshBuffer.js';
 import { Clamp_y_remove_children_FIRST_TIME_CLAMP, Clampx_from_group, Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
 import { BLACK, BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { View_build_group_from_root_mesh, View_set_view_start_vb_index } from '../Engine/Core/MeshBufferViews.js';
@@ -270,7 +270,7 @@ export function TestWidgetsGeneric(scene) {
 
 
 
-    // SdfLine(GREEN[7], [500, 780, 5], [800, 10]);
+    // SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
     // let ms = 2000;
     // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000;
 
@@ -290,6 +290,10 @@ export function TestWidgetsGeneric(scene) {
     /** Misc widgets */
 
     // const label = CreateLabel('ABCDEFGHIJKLM');
+    // CreateLabel('Gl._framebuffer:-{render}|[mesh](FB.agqtpQji,TYPE.DIMENTION!,@23#scene,(label);');
+    // CreateLabel('[a][f][m][o][j][q]');
+    // CreateLabel('{a}{f}{m}');
+    // CreateLabel('(a)(f)(m)');
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene, label);
 
@@ -316,7 +320,7 @@ export function TestWidgetsGeneric(scene) {
     // CreateLargeDropdownInScroller();
 
     // CreateScroller(scene);
-    CreateScrollerClampAlphaTest(scene)
+    // CreateScrollerClampAlphaTest(scene)
     // CreateScrollerDp(scene)
     // CreateScrollerWithWidgets(scene);
 
@@ -541,7 +545,7 @@ function TestSections1(){
     }
     
     { // Test 2
-        // const s1 = Sections2(_, SECTION.VERTICAL, pos); root.AddItem(s1);
+        const s1 = Sections2(_, SECTION.VERTICAL, pos); root.AddItem(s1);
 
         // { // Test: one into another recursive 
         //     const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2);
@@ -559,28 +563,28 @@ function TestSections1(){
     }
     
     { // Test 3
-        {
-            const s = Create_widget_section(_, SECTION.HORIZONTAL, marg, [0,0,0], [10, 100], TRANSPARENCY(REDL[7], .6));
-            s.SetName('red1');
-            root.AddItem(s)
+        // {
+        //     const s = Create_widget_section(_, SECTION.HORIZONTAL, marg, [0,0,0], [10, 100], TRANSPARENCY(REDL[7], .6));
+        //     s.SetName('red1');
+        //     root.AddItem(s)
             
-            { 
-                const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
-                // const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
-            }
-            {
+        //     { 
+        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+        //         // const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+        //     }
+        //     {
                 
-                const sr = Create_widget_section(_, SECTION.VERTICAL, marg, [0,0,0], [10, 10], TRANSPARENCY(REDL[7], .6));
-                sr.SetName('red2');
-                root.AddItem(sr)
-                const s1 = Sections2(_, SECTION.VERTICAL); sr.AddItem(s1); 
-                const s2 = Sections2(_, SECTION.HORIZONTAL); sr.AddItem(s2);
-            }
-            { 
-                const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
-                const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
-            }
-        }
+        //         const sr = Create_widget_section(_, SECTION.VERTICAL, marg, [0,0,0], [10, 10], TRANSPARENCY(REDL[7], .6));
+        //         sr.SetName('red2');
+        //         root.AddItem(sr)
+        //         const s1 = Sections2(_, SECTION.VERTICAL); sr.AddItem(s1); 
+        //         const s2 = Sections2(_, SECTION.HORIZONTAL); sr.AddItem(s2);
+        //     }
+        //     { 
+        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+        //         const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+        //     }
+        // }
         // {
         //     const s = Create_widget_section(_, SECTION.HORIZONTAL, marg, [0,0,0], [10, 100], TRANSPARENCY(REDL[7], .6));
         //     s.SetName('red3');
@@ -1098,9 +1102,10 @@ let labelCount = 1;
 function CreateLabel(name = 'Label ') {
 
     const pos = [100, 310 + (labelCount * 35), 2];
-    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
+    // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.RIGHT | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.BOTTOM, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
+    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
@@ -1108,6 +1113,8 @@ function CreateLabel(name = 'Label ') {
     label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     label.Render()
     label.ConstructListeners();
+
+    Widget_root_gfx_set_unif_wpos_per_vb(label.root_bufferidx);
 
     // label.text_mesh.SetColorRGB(REDL);
     // label.text_mesh.RenderTextFromString('REDL');
@@ -1132,6 +1139,8 @@ function CreateButton() {
     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     btn.Render();
     btn.ConstructListeners();
+
+    Widget_root_gfx_set_unif_wpos_per_vb(btn.root_bufferidx);
     // btn.text_mesh.SetColorRGB(BLUE_10_120_220);
 
     // btn.Align(ALIGN.LEFT | ALIGN.TOP, [0, 0]);
@@ -1154,6 +1163,8 @@ function CreateSwitchSimple() {
     
     switch1.ConstructListeners();
 
+    Widget_root_gfx_set_unif_wpos_per_vb(switch1.root_bufferidx);
+
     return switch1;
 }
 
@@ -1172,6 +1183,8 @@ function CreateSwitch() {
     switch1.text_mesh.SetColorRGB(PURPLER[7], 4);
     // ypos += switch1.geom.dim[1] * 2 + 5;
 
+    Widget_root_gfx_set_unif_wpos_per_vb(switch1.root_bufferidx);
+
 
     return switch1;
 }
@@ -1186,6 +1199,8 @@ function CreateSlider() {
     slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     slider.Render();
     slider.ConstructListeners();
+
+    Widget_root_gfx_set_unif_wpos_per_vb(slider.root_bufferidx);
 
 }
 
@@ -1224,6 +1239,8 @@ function CreateChangeMeshColorFromSliders() {
     
     section.ConstructListeners();
 
+    Widget_root_gfx_set_unif_wpos_per_vb(section.root_bufferidx);
+
 }
 
 function SdfLine(col, pos, dim) {
@@ -1231,6 +1248,7 @@ function SdfLine(col, pos, dim) {
 
     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(col, 1), 'sdf linem2');
     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
     // const line1 = Create_widget_section(_, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(GREEN[7], 1.5));
     // line1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
@@ -1249,6 +1267,7 @@ function SdfLine(col, pos, dim) {
     // line.Calc();
     line.ConstructListeners();
 
+    Widget_root_gfx_set_unif_wpos_per_vb(line.root_bufferidx);
 
     // setInterval(()=>{GlRotateZ2D(mesh.gfx, mesh.geom.dim, TimerGetGlobalTimer()*.55)}, 16)
     // GlRotateZ2D(mesh.gfx, mesh.geom.dim, 1.23)
@@ -1329,6 +1348,7 @@ function CreateDropdown(scene, pos, id) {
     
     dp.ConstructListeners();
 
+    Widget_root_gfx_set_unif_wpos_per_vb(dp.root_bufferidx);
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(dp);
 
@@ -1386,8 +1406,9 @@ function CreateDropdown2(scene, pos, id) {
 
     const pad = [2, 1]
     const margin = [7, 7]
-    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
-    dp.CreateMoveEvent();
+    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `${id}`, pos, GREY[1], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // dp.CreateMoveEvent();
     dp.CreateClickEvent();
 
 
@@ -1467,6 +1488,8 @@ function CreateDropdown2(scene, pos, id) {
     dp.Render()
     // dp.Calc();
     dp.ConstructListeners();
+
+    Widget_root_gfx_set_unif_wpos_per_vb(dp.root_bufferidx);
 
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
@@ -2738,7 +2761,7 @@ function CreateScroller(scene) {
     const colors = REDL;
     const count = colors.length;
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 100; i++) {
 
         const chunk = i;
         let row = 0;
@@ -2844,18 +2867,44 @@ function CreateScroller(scene) {
     }
 
     // Create scroller for the ui-mesh info widget
-    const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [0, 60]);
+    const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [100, 140]);
     scroller.StateEnable(MESH_STATE.ACTIVE);
     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    scroller.scrolled_section.options = SECTION.VERTICAL;
-    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+
     scroller.options = SECTION.VERTICAL | SECTION.INHERIT;
-    scroller.Calc_no_gfx_update();
+    scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.INHERIT;
+    
+    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+    
+    scroller.ScrollerAlign();
+    
+    View_build_group_from_root_mesh(scroller.scrolled_section);
+
+    const clip_top = scroller.geom.pos[1];
+    const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]*2;
+    Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+
     scroller.Render();
+
+    View_set_view_start_vb_index(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
+
     scroller.ConstructListeners();
 
-    View_build_group_from_root_mesh(scroller.scrolled_section);
+    Widget_root_gfx_set_unif_wpos_per_vb(scroller.root_bufferidx);
+
+
+
+
+    // scroller.Calc_no_gfx_update();
+
+    // scroller.Render();
+    
+    // scroller.ConstructListeners();
+
+    // Widget_root_gfx_set_unif_wpos_per_vb(scroller.root_bufferidx);
+
+    // View_build_group_from_root_mesh(scroller.scrolled_section);
 
 
 
@@ -2929,7 +2978,7 @@ function CreateScrollerClampAlphaTest(scene) {
     ];
     const fontsize = 14;
     
-    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [270, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
+    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [470, 350, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
     
     
     // const count = colors.length;
@@ -2937,7 +2986,7 @@ function CreateScrollerClampAlphaTest(scene) {
     for (let i = 0; i < count; i++) {
         // const label = Create_widget_section(_, _, _, [400, 300, 0], [20,20], TRANSPARENCY(colors[i], .7), `Section${i + 1}`)
         // const label = Create_widget_text(_, `${i}`, [100, 100, 2], fontsize, TRANSPARENCY(colors[i], .7), WHITE)
-        const label = Create_widget_label(_, `${i}`, ALIGN.HOR_CENTER, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE)
+        const label = Create_widget_label(_, `${i}`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6,4])
 
         label.SetName(`${label.id}`);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
@@ -2950,19 +2999,19 @@ function CreateScrollerClampAlphaTest(scene) {
     scroller.StateEnable(MESH_STATE.ACTIVE);
     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // scroller.scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
+
+    scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
     scroller.scrolled_section.options = SECTION.VERTICAL;
 
     scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
 
-    scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
-    // scroller.Calc_no_gfx_update();
     scroller.ScrollerAlign();
+    // scroller.Calc_no_gfx_update();
 
     View_build_group_from_root_mesh(scroller.scrolled_section);
 
-    const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1];
-    const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
+    const clip_top = scroller.geom.pos[1];
+    const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]*2;
     Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
 
     scroller.Render();
@@ -2970,6 +3019,8 @@ function CreateScrollerClampAlphaTest(scene) {
     View_set_view_start_vb_index(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
 
     scroller.ConstructListeners();
+
+    Widget_root_gfx_set_unif_wpos_per_vb(scroller.root_bufferidx);
 
 
 
@@ -3069,8 +3120,8 @@ function CreateScrollerDp(scene) {
 
     View_build_group_from_root_mesh(scroller.scrolled_section);
 
-    const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1];
-    const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
+    const clip_top = scroller.geom.pos[1];
+    const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]*2;
     Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
     // Clampx_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
 

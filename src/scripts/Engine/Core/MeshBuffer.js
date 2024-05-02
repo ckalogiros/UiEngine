@@ -11,6 +11,7 @@ import { Batch_store } from "../Batch/Batch.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
+import { Uniforms_buffer_set_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 
 
 
@@ -190,13 +191,55 @@ export function Mesh_buffer_batch_destroy_run(){
 // Widget roots World positions as uniforms 
 /*******************************************************************************************************************************************************************************/
 
-function TEMP_create_widget_root_wpos_uniform(pos){
-   const entry = [pos[0], pos[1]];
-   _root_uniforms_for_wpos.Add(entry)
+const temp_debug_names_of_root_uniform_wpos = New_generic_buffer(_, 'temp_debug_names_of_root_uniform_wpos');
+
+// Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
+export function TEMP_create_widget_root_wpos_uniform(pos, debug_name){
+   const entry = [0, 0];
+   entry[0] = pos[0];
+   entry[1] = pos[1];
+
+   temp_debug_names_of_root_uniform_wpos.Add(debug_name);
+
+   return _root_uniforms_for_wpos.Add(entry);
 }
 
-export function TEMP_get_widget_root_wpos(idx){
-   return _root_uniforms_for_wpos.buffer[idx];
+
+
+// Can take vbidx as the 'idx' to return the wpos for all meshes of a vertex buffer
+export function TEMP_store_widget_root_wpos(idx, pos){
+   // TODO: check NULL object
+   
+   _root_uniforms_for_wpos.buffer[idx][0] = pos[0];
+   _root_uniforms_for_wpos.buffer[idx][1] = pos[1];
+}
+
+
+
+// Can take vbidx as the 'idx' to return the wpos for all meshes of a vertex buffer
+export function TEMP_get_widget_root_wpos(idx){ return _root_uniforms_for_wpos.buffer[idx]; }
+export function TEMP_get_widget_root_wposx(idx){ return _root_uniforms_for_wpos.buffer[idx][0]; }
+export function TEMP_get_widget_root_wposy(idx){ return _root_uniforms_for_wpos.buffer[idx][1]; }
+
+export function TEMP_set_widget_root_wpos (idx, pos){ 
+   _root_uniforms_for_wpos.buffer[idx][0] = pos[0];
+   _root_uniforms_for_wpos.buffer[idx][1] = pos[1]; 
+}
+export function TEMP_set_widget_root_wposx(idx, pos){ 
+   _root_uniforms_for_wpos.buffer[idx][0] = pos;  
+}
+export function TEMP_set_widget_root_wposy(idx, pos){ 
+   _root_uniforms_for_wpos.buffer[idx][1] = pos;  
+}
+export function TEMP_add_widget_root_wpos (idx, pos){ 
+   _root_uniforms_for_wpos.buffer[idx][0] += pos[0]; 
+   _root_uniforms_for_wpos.buffer[idx][1] += pos[1]; 
+}
+export function TEMP_add_widget_root_wposx(idx, pos){ 
+   _root_uniforms_for_wpos.buffer[idx][0] += pos;  
+}
+export function TEMP_add_widget_root_wposy(idx, pos){ 
+   _root_uniforms_for_wpos.buffer[idx][1] += pos;  
 }
 
 
@@ -250,6 +293,13 @@ export function Mesh_per_vb_create_vb(vbidx) {
 
 
 
+export function Mesh_per_vb_store_mesh(vbidx, mesh_bufferidx) { 
+
+   return _mesh_per_vertex_buffer.buffer[vbidx].Add(mesh_bufferidx); 
+}
+
+
+
 export function Mesh_per_vb_remove_mesh(vbidx, per_vb_bufferidx) {
 
    if (per_vb_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
@@ -293,12 +343,6 @@ export function Mesh_per_vb_remove_all_from_index(vbidx, meshidx) {
 
 
 
-export function Mesh_per_vb_store_mesh(vbidx, mesh_bufferidx) { 
-   return _mesh_per_vertex_buffer.buffer[vbidx].Add(mesh_bufferidx); 
-}
-
-
-
 export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
 
 
@@ -311,8 +355,8 @@ export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
          mesh.gfx.vb.start -= num_faces * mesh.gfx.attribsPerVertex * mesh.gfx.vertsPerRect;
       }
    }
-
 }
+
 
 
 
@@ -360,6 +404,15 @@ export function Widget_root_buffer_get_root_pos(idx) { return _mesh_buffer.buffe
 
 
 
+export function Widget_root_buffer_get_root_unif_wpos(idx) { 
+   const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[idx].buffer[0]];
+   if(root_mesh.root_posidx===INT_NULL) alert('No root was constructed yet\nWidget_root_buffer_get_root_unif_wpos()')
+   const wpos = TEMP_get_widget_root_wpos(root_mesh.root_posidx); 
+   return wpos;
+}
+
+
+
 export function Widget_root_buffer_get_byidx(idx) { return _widget_root_buffer.buffer[idx]; }
 
 
@@ -385,10 +438,6 @@ export function Widget_root_create_root(mesh_bufferidx) {
    Widget_root_gfx_create(root_idx);
 
    Widget_root_batch_create_root(root_idx, mesh_bufferidx);
-
-   // const mesh = _mesh_buffer.buffer[mesh_bufferidx];
-   // const idx = TEMP_create_widget_root_wpos_uniform(mesh.geom.pos);
-   // if(idx !== root_idx) alert('root_wpos_uniform index not the same with the root widget index');
 
    return root_idx;
 }
@@ -745,6 +794,7 @@ export function Widget_root_batch_update_decrement_accumulator(root_bufferidx, b
 
 
 
+
 /*******************************************************************************************************************************************************************************/
 // Widget Root All Gfx Indexes
 // Widgets all gfx indexes. Store in a buffer(per root widget) all of the childrens (recursive) gfx indexes (one index per gfx buffer) to have fast access to all gfx buffers
@@ -809,6 +859,48 @@ export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbi
    // This is the easiest way to store the 'vb_dataidx' to the mesh's batch_buffer_vbidx variable.
    const mesh = _mesh_buffer.buffer[mesh_bufferidx]; // Get the mesh from MeshBuffer
    mesh.batch_buffer_vbidx = vb_dataidx; // Assign the 'batch_buffer_vbidx'
+
+}
+
+
+
+/** Ruun for all vertex buffers of specific widget root and update the uniform positions for each vb. */
+export function Widget_root_gfx_update_unif_wpos_per_vb(root_bufferidx, pos) {
+
+   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j+=2) {
+      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j+1];
+      TEMP_add_widget_root_wpos (vbidx, pos)
+   }
+
+}
+
+
+
+/** Run through all vbs of the widget root, and set all root_pos's to the widget root pos */
+export function Widget_root_gfx_set_unif_wpos_per_vb(root_bufferidx) {
+
+   const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[0]];
+   const pos = TEMP_get_widget_root_wpos(root_mesh.root_posidx);
+   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j+=2) {
+      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j+1];
+      if(vbidx !== root_mesh.gfx.vb.idx) TEMP_set_widget_root_wpos(vbidx, pos);
+   }
+
+}
+
+
+
+/** Run through all vbs of the widget root, and set all root_pos's to the widget root pos */
+export function Widget_root_gfx_add_unif_wpos_per_vb(root_bufferidx, dif) {
+
+   const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[0]];
+   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j+=2) {
+      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j+1];
+      if(vbidx !== root_mesh.gfx.vb.idx) {
+         TEMP_add_widget_root_wpos(vbidx, dif);
+         // console.log(vbidx, TEMP_get_widget_root_wpos(vbidx))
+      }
+   }
 
 }
 
@@ -909,6 +1001,8 @@ export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
 
       if (mesh) {
 
+         // console.log(mesh.geom.pos, mesh.GetName())
+
          mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
 
          const update_data = {
@@ -917,10 +1011,10 @@ export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
          };
 
          // The batch_store needs the number of meshes to update as well as the move value
-         Batch_store(mesh,
-            SHADER_ATTRIBUTES.WPOS4,
-            update_data,
-            _root_batch_buffer.buffer[root_bufferidx].vb[i].num_faces);
+         // Batch_store(mesh,
+         //    SHADER_ATTRIBUTES.WPOS4,
+         //    update_data,
+         //    _root_batch_buffer.buffer[root_bufferidx].vb[i].num_faces);
       }
 
    }
@@ -1226,6 +1320,7 @@ export function Mesh_buffer_print_loop() {
             'child idx:', _mesh_buffer.buffer[i].idx,
             'is active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE.ACTIVE,
             'nameidx:', _mesh_buffer.buffer[i].nameidx,
+            'pos:', _mesh_buffer.buffer[i].geom.pos,
             'name:', _mesh_buffer.buffer[i].GetName(),
          );
       }
@@ -1301,17 +1396,21 @@ export function Widgetroot_buffer_print_w1() {
                   'gfxidx', mesh.per_vb_bufferidx,
                   'msbidx', mesh.mesh_bufferidx,
                   'state', mesh.state.mask,
-                  'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE.ACTIVE, mesh.GetName());
-            }
-            else {
-               console.log('   ', j,
+                  'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
+                  'pos', mesh.geom.pos, mesh.GetName());
+                  // 'ubidxs', mesh.uniforms, mesh.GetName());
+               }
+               else {
+                  console.log('   ', j,
                   'ridx:', _widget_root_buffer.buffer[i].buffer[j],
                   'batchidx', mesh.batch_buffer_vbidx,
                   'gfxidx', mesh.per_vb_bufferidx,
                   'msbidx', mesh.mesh_bufferidx,
                   'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.idx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
                   'state', mesh.state.mask,
-                  'start', mesh.gfx.vb.start, mesh.GetName());
+                  'start', mesh.gfx.vb.start,
+                  'pos', mesh.geom.pos, mesh.GetName());
+                  // 'ubidxs', mesh.uniforms, mesh.GetName());
             }
          }
       }
@@ -1400,6 +1499,20 @@ export function Widget_group_buffer_print_w5() {
    //       );
    //    }
    // }
+}
+
+
+
+// Print the widget groups buffer
+export function Root_uniforms_for_wpos() {
+
+   console.log('_root_uniforms_for_wpos:')
+   for (let i = 0; i <= _root_uniforms_for_wpos.boundary; i++) {
+      console.log(i,
+         'pos:', _root_uniforms_for_wpos.buffer[i],
+         'name:', temp_debug_names_of_root_uniform_wpos.buffer[i],
+      );
+   }
 }
 
 
