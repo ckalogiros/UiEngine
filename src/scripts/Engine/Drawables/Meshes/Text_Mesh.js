@@ -381,25 +381,88 @@ export class Text_Mesh extends Mesh {
    }
 
 
+   // RenderText() {
+
+   //    if (!this.gfx) return; // Case replace text before insert to gfx buffers;
+      
+   //    const vbidx = this.gfx.vb.idx; 
+   //    let start = this.gfx.vb.start;
+   //    const count = this.gfx.vb.count;
+   //    const attribsidx= this.gfx.prog.attribsidx
+   //    const vertsPerRect= this.gfx.vertsPerRect;
+   //    const attribsPerVertex= this.gfx.attribsPerVertex;
+
+   //    let x = this.geom.pos[0]
+   //    let y = this.geom.pos[1]
+   //    let w = this.geom.dim[0]
+   //    let h = this.geom.dim[1]
+
+   //    const advancex = Font_get_font_advancex(this.mat.texidx);
+   //    const c = this.mat.char_buffer.buffer;
+   //    const attr = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.TEX2);
+
+   //    // Update text faces
+   //    for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
+
+   //       let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
+
+   //       if (c[i] !== '') // If char=' ' space, just render [0,0] uv coordinates.
+   //       {
+   //          // Set character dimentions.
+   //          const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, c[i]);
+   //          w *= plane_bounds.width;
+   //          h *= plane_bounds.height;
+   //          Gl_set_dim_XY2(vbidx, start, attribsidx, attribsPerVertex, w, h);
+            
+   //          // Set character y position and advance.
+   //          x +=  (advancex+plane_bounds.left) * 2 * this.fontsize;
+   //          y += h + plane_bounds.yoffset * this.fontsize;
+   //          Gl_set_wpos_XY2(vbidx, start, attribsidx, attribsPerVertex, vertsPerRect, x, y);
+
+   //          // Get the correct uv coordinates.
+   //          uvs = Font_get_char_uv_coords(this.mat.uvIdx, c[i]);
+
+   //          w = this.geom.dim[0]; h = this.geom.dim[1]; y = this.geom.pos[1]; // Reset 
+   //       }
+
+   //       Gl_set_uv2(vbidx, uvs, start, attr.offset, attr.size, attribsPerVertex)
+
+   //       start += count
+   //    }
+
+   //    // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
+   //    for (let i = this.mat.char_buffer.boundary+1; i < this.mat.char_buffer.size; i++) {
+
+   //       let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
+   //       Gl_set_uv2(vbidx, uvs, start, attr.offset, attr.size, attribsPerVertex);
+         
+   //       start += count
+   //    }
+
+   //    // console.log(this.geom.pos)
+   //    Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
+
+   // }
+   /** OBJECT-ARRAY ALLOCATIONS */
    RenderText() {
 
-      if (!this.gfx) return; // Case replace text before insert to gfx buffers;
+      const gfx_copy = {
+         vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
+         prog: { attribsidx: this.gfx.prog.attribsidx },
+         vertsPerRect: this.gfx.vertsPerRect,
+         attribsPerVertex: this.gfx.attribsPerVertex,
+      }
       
-      const vbidx = this.gfx.vb.idx; 
-      let start = this.gfx.vb.start;
-      const count = this.gfx.vb.count;
-      const attribsidx= this.gfx.prog.attribsidx
-      const vertsPerRect= this.gfx.vertsPerRect;
-      const attribsPerVertex= this.gfx.attribsPerVertex;
-
-      let x = this.geom.pos[0]
-      let y = this.geom.pos[1]
-      let w = this.geom.dim[0]
-      let h = this.geom.dim[1]
-
+      // TODO: Remove arrays, substitute with variables
+      
+      const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
+         pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
+         dim: [this.geom.dim[0], this.geom.dim[1]],
+      }
+      
       const advancex = Font_get_font_advancex(this.mat.texidx);
       const c = this.mat.char_buffer.buffer;
-      const attr = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.TEX2);
+      const attr = Shader_attributes_get_attribs_offset_size(gfx_copy.prog.attribsidx, SHADER_ATTRIBUTES.TEX2);
 
       // Update text faces
       for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
@@ -410,99 +473,36 @@ export class Text_Mesh extends Mesh {
          {
             // Set character dimentions.
             const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, c[i]);
-            w *= plane_bounds.width;
-            h *= plane_bounds.height;
-            Gl_set_dim_XY2(vbidx, start, attribsidx, attribsPerVertex, w, h);
+            geom_copy.dim[0] *= plane_bounds.width;
+            geom_copy.dim[1] *= plane_bounds.height;
+            Gl_set_dim_XY(gfx_copy, geom_copy.dim);
             
             // Set character y position and advance.
-            x +=  (advancex+plane_bounds.left) * 2 * this.fontsize;
-            y += h + plane_bounds.yoffset * this.fontsize;
-            Gl_set_wpos_XY2(vbidx, start, attribsidx, attribsPerVertex, vertsPerRect, x, y);
+            geom_copy.pos[0] +=  (advancex+plane_bounds.left) * 2 * this.fontsize;
+            geom_copy.pos[1] += geom_copy.dim[1] + plane_bounds.yoffset * this.fontsize;
+            Gl_set_wpos_XY(gfx_copy, geom_copy.pos[0], geom_copy.pos[1]);
 
             // Get the correct uv coordinates.
             uvs = Font_get_char_uv_coords(this.mat.uvIdx, c[i]);
 
-            w = this.geom.dim[0]; h = this.geom.dim[1]; y = this.geom.pos[1]; // Reset 
+            geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
          }
 
-         Gl_set_uv2(vbidx, uvs, start, attr.offset, attr.size, attribsPerVertex)
+         Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex)
 
-         start += count
+         gfx_copy.vb.start += gfx_copy.vb.count
       }
 
       // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
       for (let i = this.mat.char_buffer.boundary+1; i < this.mat.char_buffer.size; i++) {
 
          let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
-         Gl_set_uv2(vbidx, uvs, start, attr.offset, attr.size, attribsPerVertex);
+         Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex);
          
-         start += count
+         gfx_copy.vb.start += gfx_copy.vb.count
       }
 
-      // console.log(this.geom.pos)
-      Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
-
-
-      
-      /**SAVE */
-
-      // const gfx_copy = {
-      //    vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
-      //    prog: { attribsidx: this.gfx.prog.attribsidx },
-      //    vertsPerRect: this.gfx.vertsPerRect,
-      //    attribsPerVertex: this.gfx.attribsPerVertex,
-      // }
-      
-      // // TODO: Remove arrays, substitute with variables
-      
-      // const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-      //    pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
-      //    dim: [this.geom.dim[0], this.geom.dim[1]],
-      // }
-      
-      // const advancex = Font_get_font_advancex(this.mat.texidx);
-      // const c = this.mat.char_buffer.buffer;
-      // const attr = Shader_attributes_get_attribs_offset_size(gfx_copy.prog.attribsidx, SHADER_ATTRIBUTES.TEX2);
-
-      // // Update text faces
-      // for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
-
-      //    let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
-
-      //    if (c[i] !== '') // If char=' ' space, just render [0,0] uv coordinates.
-      //    {
-      //       // Set character dimentions.
-      //       const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, c[i]);
-      //       geom_copy.dim[0] *= plane_bounds.width;
-      //       geom_copy.dim[1] *= plane_bounds.height;
-      //       Gl_set_dim_XY(gfx_copy, geom_copy.dim);
-            
-      //       // Set character y position and advance.
-      //       geom_copy.pos[0] +=  (advancex+plane_bounds.left) * 2 * this.fontsize;
-      //       geom_copy.pos[1] += geom_copy.dim[1] + plane_bounds.yoffset * this.fontsize;
-      //       Gl_set_wpos_XY(gfx_copy, geom_copy.pos[0], geom_copy.pos[1]);
-
-      //       // Get the correct uv coordinates.
-      //       uvs = Font_get_char_uv_coords(this.mat.uvIdx, c[i]);
-
-      //       geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
-      //    }
-
-      //    Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex)
-
-      //    gfx_copy.vb.start += gfx_copy.vb.count
-      // }
-
-      // // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
-      // for (let i = this.mat.char_buffer.boundary+1; i < this.mat.char_buffer.size; i++) {
-
-      //    let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
-      //    Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex);
-         
-      //    gfx_copy.vb.start += gfx_copy.vb.count
-      // }
-
-      // Vertex_buffer_state_enable(gfx_copy.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
+      Vertex_buffer_state_enable(gfx_copy.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
    }
 
 

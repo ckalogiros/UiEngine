@@ -2,12 +2,12 @@
 -Convert all mesh attribs to indexes in a vertex buffer ???
 +Resizing
 -Horizontal scrolling
--Set Focused and enable order drawing
++Set Focused and enable order drawing
 -Set draw STATIC/DYNAMIC for vertex buffers
 -Set draw STATIC/DYNAMIC for meshes through frame buffers
 -Dynamic Creation and Connection of sliders to utilities
 -DragNdrop
--A quick type of drawing with out neceseraly creating all the boiler plate of mesh creation. Create once and render. Destroy on event.
+-A quick type of drawing with out necessarely creating all the boiler plate of mesh creation. Create once and render. Destroy on event.
 -Animations
 -Save 
 -Undo

@@ -51,7 +51,6 @@ export function Debug_info_ui(is_root_widget=undefined) {
    const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [VIEWPORT.RIGHT-280, 30, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    dp.CreateMoveEvent();
-   // dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
 
 
@@ -79,22 +78,11 @@ export function Debug_info_ui(is_root_widget=undefined) {
    dp.AddToMenu(mouse_ui);
 
 
-   // /************************************************************************************************************************************************/
-   // // Gfx Info
-   // const gfx_ui = Dbg_ui_create('Gfx', fontsize, switch_size, Debug_info_create_gfx_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
-   // dp.AddToMenu(gfx_ui);
-
-
    /************************************************************************************************************************************************/
    // Mesh Info
    const mesh_ui = Dbg_ui_create2('Mesh Tree', fontsize, switch_size, Debug_info_create_mesh_info, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
    dp.AddToMenu(mesh_ui);
 
-
-   // /************************************************************************************************************************************************/
-   // // Batch Buffer Info
-   // const batch_ui = Dbg_ui_create('Batch', fontsize, switch_size, Debug_info_create_batch_info, section_col, label_col, label_text_col, switch_col, section_pad, label_pad, switch_pad, label_style, zindex);
-   // dp.AddToMenu(batch_ui);
 
    /************************************************************************************************************************************************/
    // Mesh Buffer
@@ -2647,7 +2635,7 @@ function Helper_render_queue_buffer_info_create_more_info(parent, info_data, zin
    
    const pos = [0,0,zindex+2]
    { const info = Create_widget_text(_, `is active:${info_data.isActive}`,    pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `isactiveflag:${info_data.flags&0x1}`,    pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
+   { const info = Create_widget_text(_, `isactiveflag:${info_data.flags&0x1}`,pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `progidx:${info_data.progidx}`,       pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `vbidx:${info_data.vbidx}`,           pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `ibidx:${info_data.ibidx}`,           pos, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); info_mesh.AddItem(info); }

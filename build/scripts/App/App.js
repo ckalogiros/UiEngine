@@ -1,8 +1,8 @@
 "use strict";
 import { Scenes_create_scene } from '../Engine/Scenes.js'
 import { Renderqueue_init } from '../Engine/Renderers/Renderer/RenderQueue.js';
-import { WebGlRenderer } from '../Engine/Renderers/WebGlRenderer.js';
-import { CAMERA_CONTROLS, CameraOrthographic, CameraPerspective } from '../Engine/Renderers/Renderer/Camera.js';
+import { Renderer_create_renderer } from '../Engine/Renderers/WebGlRenderer.js';
+import { CameraOrthographic } from '../Engine/Renderers/Renderer/Camera.js';
 import { Texture_init_texture_storage_buffer } from '../Engine/Loaders/Textures/Texture.js';
 
 import { Input_create_user_input_listeners } from '../Engine/Controls/Input/Input.js';
@@ -42,7 +42,7 @@ export function AppInit() {
         // STATE.scene.active_idx = scene.sceneidx;
     }
 
-    renderer = new WebGlRenderer(scene, camera);
+    renderer = Renderer_create_renderer(scene, camera);
 
     Input_create_user_input_listeners();
     Renderqueue_init();

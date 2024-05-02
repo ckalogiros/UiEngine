@@ -411,6 +411,7 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
 
             mesh.AddToGfxFromReset(); 
          }
+         // else console.log('INACTIVE', mesh.GetName())
       }
    }
    

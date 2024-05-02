@@ -99,3 +99,12 @@ Also see camera in general for problems
 # Only widget roots have position, all children meshes use relative to the root pos
 
 # Implement fast remove from root and grouup
+
+# Implement dynamic update of mesh per vb - meshes info (and for all other debug UI's)
+
+# Maybe for sliders we set listener only on slider widget and check in class Slider 
+      if the mouse click happened inside bar area,
+      instead of creating for bar and slider for move
+
+
+# pad for Text_Mesh-MultiText is anused. Check it

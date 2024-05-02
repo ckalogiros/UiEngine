@@ -4,6 +4,8 @@ import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
+import { TEMP_get_widget_root_wpos } from '../Engine/Core/MeshBuffer.js';
+import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from './Buffers/UniformBuffers.js';
 
 
 
@@ -12,7 +14,8 @@ export function Gl_draw(gl) {
 
     const drawQueue = Renderqueue_get_active();
     const drawQueueCount = Renderqueue_active_get_count();
-    
+
+
     gl.clearColor(0.18, 0.18, 0.18, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -44,6 +47,13 @@ export function Gl_draw(gl) {
             Gl_texture_unit_bind(gl, texture);
             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
         }
+
+        // Uniforms - wpos per vertex buffer uniform
+        const pos = TEMP_get_widget_root_wpos(vbidx);
+        // if(vbidx === 1)console.log(pos)
+        const ubidx = progs.buffer[progidx].ubidxs.buffer[0];
+        Uniforms_buffer_set_uniform(ubidx, pos);
+        Uniforms_buffer_update_uniform(ubidx);
         
         
         if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {

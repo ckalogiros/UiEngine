@@ -195,7 +195,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.FEATHER) ? '#include <out_border_feather>' : '',
       (sid.pass & SID.PASS.TIME1) ? '#include <out_vtime1>' : '',
       (sid.pass & SID.PASS.RES2) ? '#include <out_vres2>' : '',
-      // (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? 'out vec2 v_screen_res;' : '',
       '\n',
       
 
@@ -212,15 +211,12 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       // ASSIGNMENTS
       (sid.pass & SID.PASS.COL4) ? '  v_col = a_col;' : '', 
       (sid.pass & SID.PASS.DIM2) ? '  v_dim = abs(a_pos);' : '',
-      // (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS)) ? '  v_wpos = vec2(a_wpos_time.xy.x + u_wposxy.x, a_wpos_time.xy.x + u_wposxy.x);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS)) ? '  v_wpos = vec2(a_wpos_time.x + u_wposxy.x, a_wpos_time.y + u_wposxy.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
-      // (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
       (sid.attr & SID.ATTR.BORDER) ? '  v_border_width = a_params1.x;' : '',
       (sid.attr & SID.ATTR.R_CORNERS) ? '  v_rCorners = a_params1.y;' : '',
       (sid.attr & SID.ATTR.FEATHER) ? '  v_border_feather = a_params1.z;' : '',
-      // (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '  v_screen_res = u_screen_res;' : '',
       // (true) ? '   gl_PointSize = 10.0;' : '',
       '}',
 

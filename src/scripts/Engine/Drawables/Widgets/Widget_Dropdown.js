@@ -718,7 +718,7 @@ export class Widget_Dropdown extends Section {
          console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
       }
 
-      // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
       // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
       
       this.ConstructListenersForMenu(menu); // Create listeners, as children of menu listeners.
