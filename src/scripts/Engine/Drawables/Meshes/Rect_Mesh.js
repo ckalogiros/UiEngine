@@ -121,8 +121,9 @@ export class Rect extends Mesh {
    
    AddToGfxFromReset() {
 
-
+      Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName())
+      Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       this.is_gfx_inserted = true;
       
 

@@ -12,6 +12,7 @@ import { Gl_set_dim_XY, Gl_set_dim_XY2, Gl_set_uv, Gl_set_uv2, Gl_set_wpos_XY, G
 import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
 import { WHITE } from "../Material/Base/Colors.js";
+import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 
 
 
@@ -96,7 +97,11 @@ export class Text_Mesh extends Mesh {
 
    AddToGfxFromReset() {
 
+      
+
+      Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxText)
       this.#TEMP();
+      Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxText)
      
       // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
       // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy

@@ -408,19 +408,20 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
          
          const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[j]);
          if (mesh.state.mask & MESH_STATE.ACTIVE) { 
-            Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest1)
+
             mesh.AddToGfxFromReset(); 
-            Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest1)
          }
       }
    }
    
    // Get the root mesh
-   Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2)
    const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
    const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
-   if(do_reconstruct_listeners) mesh.ConstructListeners(parent_events); 
-   Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2)
+   Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2)
+   if(do_reconstruct_listeners) 
+   mesh.ConstructListeners(parent_events); 
+   const delta = Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2)
+   // console.log(delta)
    // if(do_reconstruct_listeners) mesh.ConstructListeners(); 
 
 }

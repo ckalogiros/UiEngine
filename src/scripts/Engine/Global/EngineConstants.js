@@ -561,6 +561,8 @@ const PERFORMANCE_TIMERS_IDXS = {
 	HoverListener: INT_NULL,
 	MeshInfoTip: INT_NULL,
 	FramebufferRendering: INT_NULL,
+	AddToGfxRect: INT_NULL,
+	AddToGfxText: INT_NULL,
 	MiscTest1: INT_NULL,
 	MiscTest2: INT_NULL,
 	MiscTest3: INT_NULL,

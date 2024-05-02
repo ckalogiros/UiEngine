@@ -382,11 +382,11 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
 
 
     // console.log(meshidx, dbg_mesh_name)
-    /**DEBUG ERROR*/ if (geom.pos[0] === undefined) { console.error('Pos is UNDEFINED. mesh:', dbg_mesh_name) }
-    /**DEBUG ERROR*/ if (geom.dim[0] === undefined) { console.error('Dim is UNDEFINED. mesh:', dbg_mesh_name) }
-    /**DEBUG ERROR*/ if (mat.col[0] === undefined) { console.error('Col is UNDEFINED. mesh:', dbg_mesh_name) }
-    /**DEBUG ERROR*/ if (mat.style[0] === undefined) { console.error('Style is UNDEFINED. mesh:', dbg_mesh_name) }
-    /**DEBUG ERROR*/ temp_check_nan_rename_me(geom.pos); temp_check_nan_rename_me(geom.dim); temp_check_nan_rename_me(mat.col); temp_check_nan_rename_me(mat.style);
+    // /**DEBUG ERROR*/ if (geom.pos[0] === undefined) { console.error('Pos is UNDEFINED. mesh:', dbg_mesh_name) }
+    // /**DEBUG ERROR*/ if (geom.dim[0] === undefined) { console.error('Dim is UNDEFINED. mesh:', dbg_mesh_name) }
+    // /**DEBUG ERROR*/ if (mat.col[0] === undefined) { console.error('Col is UNDEFINED. mesh:', dbg_mesh_name) }
+    // /**DEBUG ERROR*/ if (mat.style[0] === undefined) { console.error('Style is UNDEFINED. mesh:', dbg_mesh_name) }
+    // /**DEBUG ERROR*/ temp_check_nan_rename_me(geom.pos); temp_check_nan_rename_me(geom.dim); temp_check_nan_rename_me(mat.col); temp_check_nan_rename_me(mat.style);
     // /**DEBUG ERROR*/ if(meshidx === undefined){ console.error('Mesh index is not passed as a param. mesh:', dbg_mesh_name)}
 
     const progidx = gfx.prog.idx;
@@ -412,9 +412,9 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
-    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest3)
+    // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest3)
     vb_info.count += Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
-    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest3)
+    // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest3)
 
 
 
@@ -463,9 +463,9 @@ export function Vertex_buffer_add_vertices_from_non_existant_mesh(gfx, geom, mat
     const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
-    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest3)
+    // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest3)
     vb_info.count += Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
-    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest3)
+    // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest3)
 
     prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
     vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;

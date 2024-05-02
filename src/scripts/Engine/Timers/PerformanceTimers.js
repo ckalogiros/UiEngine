@@ -88,6 +88,7 @@ export function Performance_timer_start(timer_groupidx) {
 
    const pt_group = _performance_timers_buffer.buffer[timer_groupidx];
    pt_group.t = window.performance.now(); // In miliseconds
+
 }
 
 
@@ -122,6 +123,9 @@ export function Performance_timer_stop(timer_groupidx){
    }
 
    timer_group.t = 0;
+
+   
+   /**DEBUG*/return delta
 }
 
 
@@ -247,26 +251,17 @@ export function Performance_timers_init_all() {
       PERFORMANCE_TIMERS_IDXS.MeshInfoTip = idx;
    }
    {
-      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest1');
-      PERFORMANCE_TIMERS_IDXS.MiscTest1 = idx;
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'AddToGfxRect');
+      PERFORMANCE_TIMERS_IDXS.AddToGfxRect = idx;
+   }
+   {
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'AddToGfxText');
+      PERFORMANCE_TIMERS_IDXS.AddToGfxText = idx;
    }
    {
       const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest2');
       PERFORMANCE_TIMERS_IDXS.MiscTest2 = idx;
    }
-   {
-      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest3');
-      PERFORMANCE_TIMERS_IDXS.MiscTest3 = idx;
-   }
-
-   // PERFORMANCE_TIMERS_IDXS.MiscTest1 = idx;
-   // PERFORMANCE_TIMERS_IDXS.MiscTest2 = idx;
-   // PERFORMANCE_TIMERS_IDXS.MiscTest3 = idx;
-   // PERFORMANCE_TIMERS_IDXS.MiscTest4 = idx;
-   // const idx = Performance_timers_create_timer('MiscTest1');
-   // const idx = Performance_timers_create_timer('MiscTest2');
-   // const idx = Performance_timers_create_timer('MiscTest3');
-   // const idx = Performance_timers_create_timer('MiscTest4');
 }
 
 

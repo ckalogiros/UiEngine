@@ -48,7 +48,7 @@ export function Debug_info_ui(is_root_widget=undefined) {
    const switch_col = TRANSPARENCY(GREY[0], .9);
    const switch_col2 = TRANSPARENCY(BLUEL[5], .9);
 
-   const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [10, 30, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
+   const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [VIEWPORT.RIGHT-280, 30, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    dp.CreateMoveEvent();
    // dp.CreateMoveEvent();
@@ -408,27 +408,52 @@ function Debug_info_create_ui_performance_timers() {
    }
    { // MiscTest1.
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'AddToGfxFromReset', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
+      const timer = Create_widget_multi_text(_, 'AddToGfxRect', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.MiscTest1, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+      timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.AddToGfxRect, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-      let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.MiscTest1);
+      let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.AddToGfxRect);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
       timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.MiscTest1, timeridx], _, generic_time_interval)
+      timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.AddToGfxRect, timeridx], _, generic_time_interval)
 
-      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.MiscTest1);
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AddToGfxRect);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
       timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.MiscTest1, timeridx], _, generic_time_interval)
+      timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.AddToGfxRect, timeridx], _, generic_time_interval)
 
-      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.MiscTest1);
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AddToGfxRect);
       timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('00.00', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.MiscTest1, timeridx], _, generic_time_interval)
+      timer.CreateNewText('00.0000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.AddToGfxRect, timeridx], _, generic_time_interval)
+
+   }
+   { // MiscTest1.
+      ms = (g_ms) ? g_ms : 1000;
+      const timer = Create_widget_multi_text(_, 'AddToGfxText', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
+      section.AddItem(timer);
+
+      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.AddToGfxText, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+      let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.AddToGfxText);
+      timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.AddToGfxText, timeridx], _, generic_time_interval)
+
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AddToGfxText);
+      timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.AddToGfxText, timeridx], _, generic_time_interval)
+
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AddToGfxText);
+      timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
+      timer.CreateNewText('00.0000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.AddToGfxText, timeridx], _, generic_time_interval)
 
    }
    { // MiscTest2.
@@ -452,35 +477,35 @@ function Debug_info_create_ui_performance_timers() {
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.MiscTest2);
       timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('00.00', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      timer.CreateNewText('00.0000', fontsize, ORANGE_240_160_10, [0, 0], .9);
       timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.MiscTest2, timeridx], _, generic_time_interval)
 
    }
-   { // MiscTest3.
-      ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Gl_operation_add', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
-      section.AddItem(timer);
+   // { // MiscTest3.
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'Gl_operation_add', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
+   //    section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.MiscTest3, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
-      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.MiscTest3, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-      let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.MiscTest3);
-      timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.MiscTest3, timeridx], _, generic_time_interval)
+   //    let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.MiscTest3);
+   //    timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.MiscTest3, timeridx], _, generic_time_interval)
 
-      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.MiscTest3);
-      timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.MiscTest3, timeridx], _, generic_time_interval)
+   //    timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.MiscTest3);
+   //    timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.MiscTest3, timeridx], _, generic_time_interval)
 
-      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.MiscTest3);
-      timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('00.00', fontsize, ORANGE_240_160_10, [0, 0], .9);
-      timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.MiscTest3, timeridx], _, generic_time_interval)
+   //    timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.MiscTest3);
+   //    timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
+   //    timer.CreateNewText('00.00', fontsize, ORANGE_240_160_10, [0, 0], .9);
+   //    timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.MiscTest3, timeridx], _, generic_time_interval)
 
-   }
+   // }
    {
       // { // Batch Buffer
       //    ms = (g_ms) ? g_ms : 1000;
@@ -1500,7 +1525,9 @@ function Dbg_info_ui_create_ui(pos, name) {
    Dropdown_roots_set_root(dp, dp);
    dp.SetTypeDebug();
    scrolled.AddItem(dp)
-   dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   // dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   // dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL;
+   // dp.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; 
 
    // Create a text widget for count and size info of a buffer
    const info = Create_widget_text(_, `count:000000 size:000000`, [0, 0, pos[2] + 2], fontsize, BLACK, _, _, MESH_TYPE.DEBUG_MESH);
@@ -1514,7 +1541,7 @@ function Dbg_info_ui_create_ui(pos, name) {
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
 
-   scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+   // scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
    scroller.SetTypeDebug();
 
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -1574,7 +1601,7 @@ function Dbg_ui_destroy_entry(params) {
 
    const scroller = params.root;
    const scrolled = scroller.scrolled_section;
-   scrolled.options |= SECTION.RESIZE_PARENT;
+   // scrolled.options |= SECTION.RESIZE_PARENT;
    const ui_buffer = _ui_info_buffer.buffer[params.type_idxs.ENTRIES];
 
 
@@ -1974,13 +2001,13 @@ function Dbg_ui_string_buffer_create_entry(params) {
          new_entries.buffer[i][1] = entry_mesh.mesh_bufferidx;
          /*****************************************************/
 
-         entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+         // entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
          entry_mesh.CreateClickEvent();
          entry_mesh.SetTypeDebug();
          root_dp.AddToMenu(entry_mesh);
 
 
-         // Helper_string_buffer_info_create_more_info(entry_mesh, info_data, zindex, col_menu, col_dp, margin, style);
+         Helper_string_buffer_info_create_more_info(entry_mesh, info_data, zindex, col_menu, col_dp, margin, style);
 
          /*********************************************************************************************************************************************/
          // Set up and Render new meshes
@@ -2020,7 +2047,7 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
 
    { // Views indexes info
       const view = Create_widget_dropdown(_, `view`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
-      view.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+      // view.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.EXPAND;
       view.CreateClickEvent();
       view.SetTypeDebug();
       parent.AddToMenu(view)
@@ -2034,7 +2061,7 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
 
    { // Geometry info
       const view = Create_widget_dropdown(_, `geometry`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
-      view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+      // view.options = SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL | SECTION.INHERIT;
       view.CreateClickEvent();
       view.SetTypeDebug();
       parent.AddToMenu(view)
@@ -2044,7 +2071,7 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
 
    { // Gfx info
       const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
-      gfx.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+      // gfx.options = SECTION.TOP_DOWN | SECTION.EXPAND  | SECTION.VERTICAL | SECTION.INHERIT;
       gfx.CreateClickEvent();
       gfx.SetTypeDebug();
       parent.AddToMenu(gfx)
