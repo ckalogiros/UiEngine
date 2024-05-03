@@ -69,12 +69,14 @@ export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.b
 
 
 export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) { 
-   return {
-      left: _mesh_buffer.buffer[mesh_bufferidx].geom.pos[0] - _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0],
-      right: _mesh_buffer.buffer[mesh_bufferidx].geom.pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0],
-      top: _mesh_buffer.buffer[mesh_bufferidx].geom.pos[1] - _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1],
-      top: _mesh_buffer.buffer[mesh_bufferidx].geom.pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1],
-   }
+   
+   const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
+   temp_no_allocation_buffer[0][0] = pos[0];
+   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0]*2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
+   temp_no_allocation_buffer[1][0] = pos[1] ;
+   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1]*2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+   
+   return temp_no_allocation_buffer;
 }
 
 

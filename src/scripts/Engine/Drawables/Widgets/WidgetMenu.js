@@ -7,12 +7,12 @@ import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Widget_Button } from "./WidgetButton.js";
 import { Align_self_get_dif } from "../Operations/Alignment.js";
 import { TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { Create_widget_close_btn, Create_widget_minimize_btn, Create_widget_text } from "../../Core/CreateWidget.js";
-import { Widget_root_add_mesh, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
+import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn, Create_widget_text } from "../../Core/CreateWidget.js";
+import { Mesh_buffer_get_mesh_bounding_box, Mesh_buffer_get_mesh_bounding_box_with_hover_margin, Widget_root_add_mesh, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 import { Calculate_positions_no_gfx_update_recursive, Section } from "../Meshes/Section.js";
 import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
-import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp, Relative_pos_comp_recalc_right } from "../Operations/RelativePosComponent.js";
+import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp, Relative_pos_comp_recalc_all, Relative_pos_comp_recalc_right } from "../Operations/RelativePosComponent.js";
 
 
 
@@ -33,17 +33,27 @@ export class Widget_Menu_Bar extends Section {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [2, 5, 2], is_debug_mesh) {
 
-      const text_mesh = Create_widget_text(_, text, pos, _fontsize, WHITE, is_debug_mesh);
+      // const text_mesh = Create_widget_text(_, text, pos, _fontsize, WHITE, is_debug_mesh);
+      //                                       text, Align, pos, fontSize, col, text_col, pad, bold, style, font, is_debug_mesh
+      const text_mesh = Create_widget_label(_, text, _, pos, _fontsize, WHITE, _, _, _, _, _, is_debug_mesh);
 
-      const dim = [
-         (text_mesh.fontsize * 2 * Font_get_font_advancex(text_mesh.mat.texidx)) / 2,
-         text_mesh.geom.dim[1]
-      ];
+
+      // const dim = [
+      //    (text_mesh.fontsize * Font_get_font_advancex(text_mesh.mat.texidx) * text_mesh.geom.num_faces)  + pad[0],
+      //    text_mesh.geom.dim[1] + pad[1]
+      // ];
+
+      const dim = text_mesh.GetMaxWidth();
       const areaMetrics = CalculateArea(text, dim, pos, pad)
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [6, 6], areaMetrics.pos, areaMetrics.dim, col, _, style, is_debug_mesh);
+      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [6, 6], areaMetrics.pos, areaMetrics.dim, col, _, style, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [6, 6], [0,0,pos[2]], dim, col, _, style, is_debug_mesh);
 
       this.pad[0] = pad[0];
       this.pad[1] = pad[1];
+
+      // text_mesh.geom.pos[0] = text_mesh.geom.dim[0] + pad[0]
+      // const d = this.geom.pos[1] + (this.geom.dim[1] + this.pad[1]- text_mesh.geom.dim[1])
+      // text_mesh.geom.pos[1] = d
 
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -66,7 +76,7 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
-   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[3], text_col = WHITE, pad = [4, 2], bold = .4, style=[0, 0, 0.4], font = TEXTURES.MSDF_CONSOLAS_1024) {
+   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, pad = [4, 2], bold = .4, style=[0, 0, 0.4], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
       if (!fontsize) fontsize = this.text_mesh.geom.dim[0];
       const pos = [0, 0, 0];
@@ -75,9 +85,9 @@ export class Widget_Menu_Bar extends Section {
 
       if(!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
       
-      const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, pos, fontsize, TRANSPARENCY(col, .1), text_col, pad, bold, style, font);
-      close_btn.geom.pos[0] += this.geom.dim[0] - close_btn.geom.dim[0]; // Align right
-      close_btn.text_mesh.geom.pos[0] += this.geom.dim[0] - close_btn.geom.dim[0]; // Align right
+      const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, pos, fontsize, TRANSPARENCY(col, 1.), text_col, pad, bold, style, font);
+      // close_btn.geom.pos[0] += this.geom.dim[0] - close_btn.geom.dim[0]; // Align right
+      // close_btn.text_mesh.geom.pos[0] += this.geom.dim[0] - close_btn.geom.dim[0]; // Align right
       close_btn.SetName('close_btn');
       // close_btn.AddToWidgetRootBuffer(root.root_bufferidx);
       
@@ -86,11 +96,12 @@ export class Widget_Menu_Bar extends Section {
       
       this.close_btn_idx = this.AddChild(close_btn);
       Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, this.close_btn_idx);
+      
 
    }
 
 
-   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[3], text_col = WHITE, pad = [4, 2], bold = .4, font = TEXTURES.MSDF_CONSOLAS_1024, style=[0, 0, 0.4]) {
+   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[1], text_col = WHITE, pad = [4, 2], bold = .4, font = TEXTURES.MSDF_CONSOLAS_1024, style=[0, 0, 0.4]) {
 
       if (!fontsize) fontsize = this.text_mesh.geom.dim[0];
       const pos = [0, 0, 0];
@@ -105,7 +116,7 @@ export class Widget_Menu_Bar extends Section {
       }
 
       const minimize_btn = Create_widget_minimize_btn(ROOT_WIDGET_FLAGS, root, pos, fontsize, TRANSPARENCY(col, .9), text_col, pad, bold, style);
-      minimize_btn.text_mesh.geom.pos[0] += this.geom.dim[0] - minimize_btn.geom.dim[0]; // Align right
+      // minimize_btn.text_mesh.geom.pos[0] += this.geom.dim[0] - minimize_btn.geom.dim[0]; // Align right
       minimize_btn.SetName('minimize_btn');
       // minimize_btn.AddToWidgetRootBuffer(root.root_bufferidx);
 
@@ -214,38 +225,38 @@ export class Widget_Menu_Bar extends Section {
    // Events Handling
 
    // SEE ### OnMove Events Implementation Logic
-   OnMove(params) {
+   // OnMove(params) {
 
-      // The 'OnMove' function is called by the timeInterval.
-      // The timeInterval has been set by the 'OnClick' event.
-      const menu = params.params;
-      const text_mesh = menu.text_mesh;
+   //    // The 'OnMove' function is called by the timeInterval.
+   //    // The timeInterval has been set by the 'OnClick' event.
+   //    const menu = params.params;
+   //    const text_mesh = menu.text_mesh;
 
-      // Destroy the time interval and the Move operation, if the mesh is not grabed
-      // MESH_STATE.IN_GRAB is deactivated upon mouse click up in Events.js.
-      if (menu.StateCheck(MESH_STATE.IN_GRAB) === 0 && menu.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+   //    // Destroy the time interval and the Move operation, if the mesh is not grabed
+   //    // MESH_STATE.IN_GRAB is deactivated upon mouse click up in Events.js.
+   //    if (menu.StateCheck(MESH_STATE.IN_GRAB) === 0 && menu.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
-         const intervalIdx = menu.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-         TimeIntervalsDestroyByIdx(intervalIdx);
-         menu.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+   //       const intervalIdx = menu.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+   //       TimeIntervalsDestroyByIdx(intervalIdx);
+   //       menu.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
-         return;
-      }
+   //       return;
+   //    }
 
-      // Move menu widget
-      const mouse_pos = MouseGetPosDif();
-      menu.geom.MoveXY(mouse_pos.x, -mouse_pos.y, menu.gfx);
+   //    // Move menu widget
+   //    const mouse_pos = MouseGetPosDif();
+   //    // menu.geom.MoveXY(mouse_pos.x, -mouse_pos.y, menu.gfx);
 
 
-      // Move menu children widgets(close/minimize buttons)
-      for (let i = 0; i <= menu.children.boundary; i++) {
+   //    // Move menu children widgets(close/minimize buttons)
+   //    // for (let i = 0; i <= menu.children.boundary; i++) {
 
-         const widget_child = menu.children.buffer[i];
-         widget_child.geom.MoveXY(mouse_pos.x, -mouse_pos.y, widget_child.gfx)
-         widget_child.text_mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, widget_child.text_mesh.gfx)
-      }
+   //    //    const widget_child = menu.children.buffer[i];
+   //    //    widget_child.geom.MoveXY(mouse_pos.x, -mouse_pos.y, widget_child.gfx)
+   //    //    widget_child.text_mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, widget_child.text_mesh.gfx)
+   //    // }
 
-   }
+   // }
 
 
 
@@ -284,22 +295,22 @@ export class Widget_Menu_Bar extends Section {
    /*******************************************************************************************************************************************************/
    // Transformations
 
-   Move(x, y) {
+   // Move(x, y) {
 
-      if (x === 0 && y === 0) return;
+   //    if (x === 0 && y === 0) return;
 
-      // Move 'this' text
-      this.geom.MoveXY(x, y, this.gfx);
-      this.text_mesh.geom.MoveXY(x, y, this.text_mesh.gfx);
+   //    // Move 'this' text
+   //    this.geom.MoveXY(x, y, this.gfx);
+   //    this.text_mesh.geom.MoveXY(x, y, this.text_mesh.gfx);
 
-      // Move menu children widgets(close/minimize buttons)
-      for (let i = 0; i <= this.children.boundary; i++) {
+   //    // Move menu children widgets(close/minimize buttons)
+   //    for (let i = 0; i <= this.children.boundary; i++) {
 
-         const child = this.children.buffer[i];
-         child.geom.MoveXY(x, y, child.gfx);
-         child.text_mesh.geom.MoveXY(x, y, child.text_mesh.gfx);
-      }
-   }
+   //       const child = this.children.buffer[i];
+   //       child.geom.MoveXY(x, y, child.gfx);
+   //       child.text_mesh.geom.MoveXY(x, y, child.text_mesh.gfx);
+   //    }
+   // }
 
 
    // Resize menu bar. Keep the menu elements to their relative positions 
@@ -406,10 +417,12 @@ export class Widget_Minimize extends Widget_Button {
 
       const minim_mesh = params.source_params;
       const root = params.evt_params;
-      const point = MouseGetPos();
-      const m = minim_mesh.geom;
+      // const point = MouseGetPos();
+      // const m = minim_mesh.geom;
 
-      if (Check_intersection_point_rect(m.pos, m.dim, point, [0, 0])) {
+      // Mesh_buffer_get_mesh_bounding_box()
+
+      // if (Check_intersection_point_rect(m.pos, m.dim, point, [0, 0])) {
 
          STATE.mesh.SetClicked(minim_mesh);
 
@@ -445,7 +458,7 @@ export class Widget_Minimize extends Widget_Button {
                root.Recalc_no_gfx_update(root.options|SECTION.RESIZE_PARENT, menu_bar.idx)
                root.Rerender();
                
-               root.StateDisable(MESH_STATE.IS_RESIZEABLE);
+               // root.StateDisable(MESH_STATE.IS_RESIZEABLE);
                minim_mesh.toggle = true;
                
             }
@@ -472,13 +485,13 @@ export class Widget_Minimize extends Widget_Button {
                Calculate_positions_no_gfx_update_recursive(root, SECTION.TOP_DOWN | SECTION.INHERIT | SECTION.VERTICAL)
                root.Rerender();
                
-               root.StateEnable(MESH_STATE.IS_RESIZEABLE);
+               // root.StateEnable(MESH_STATE.IS_RESIZEABLE);
                minim_mesh.toggle = false;
             }
          }
 
          return true;
-      }
+      // }
 
       return false;
    }

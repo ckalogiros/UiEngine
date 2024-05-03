@@ -579,7 +579,7 @@ export class Section extends Rect {
             Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
             // Clampy_from_group(root.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom)
 
-            Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
+            // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
             // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
             View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
@@ -1262,12 +1262,18 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options) {
          // console.log('WIDGET_SCROLLER: ', rel_pos, mesh.geom.dim, mesh.GetName())
          continue_recur = false;
       }
-
+      
       else if (mesh.type & MESH_TYPE.SECTION_MESH) 
-      { // For meshes with a parent of type Section
-
-         mesh.geom.pos[0] = rel_pos[0] 
-         mesh.geom.pos[1] = rel_pos[1]
+         { // For meshes with a parent of type Section
+            
+            mesh.geom.pos[0] = rel_pos[0]; 
+            mesh.geom.pos[1] = rel_pos[1];
+            
+            // Case of menu bar, that has text directly as a child
+            if(mesh.text_mesh){
+               mesh.text_mesh.geom.pos[0] += rel_pos[0] 
+               mesh.text_mesh.geom.pos[1] += rel_pos[1]
+            }
          // console.log('SECTION: ', rel_pos, mesh.geom.dim, mesh.GetName())
       }
       else{

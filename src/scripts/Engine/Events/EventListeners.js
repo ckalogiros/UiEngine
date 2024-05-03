@@ -7,7 +7,7 @@ import { Performance_timer_start, Performance_timer_stop } from "../Timers/Perfo
 import { Events_handle_immidiate } from "./Events.js";
 import { Info_listener_create_event } from "../Drawables/DebugInfo/InfoListeners.js";
 import { GREY } from "../Drawables/Material/Base/Colors.js";
-import { Mesh_buffer_get_mesh_bounding_box_with_hover_margin, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_name_byidx } from "../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_bounding_box, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_name_byidx } from "../Core/MeshBuffer.js";
 import { Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 
 
@@ -330,7 +330,7 @@ export function Listener_dispatch_check_hover_event() {
 
    if(STATE.mesh.focused && STATE.mesh.focused.listeners){ // TODO: efficiency: must check because the focused may not have a listen event. FIXME
       
-      const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(STATE.mesh.focusedIdx);
+      const bounding_box = Mesh_buffer_get_mesh_bounding_box(STATE.mesh.focusedIdx);
       
       const point = MouseGetPos();
 
@@ -363,7 +363,7 @@ export function Listener_dispatch_check_hover_event() {
 
       if (view_buffer.buffer[i]) {
 
-         const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(view_buffer.buffer[i].meshidx);
+         const bounding_box = Mesh_buffer_get_mesh_bounding_box(view_buffer.buffer[i].meshidx);
          const point = MouseGetPos();
          
          /**DEBUG*/if (bounding_box === false) {
@@ -425,7 +425,7 @@ function Check_hover_recursive(view_children, point) {
       const child_evt = view_children.buffer[i];
       if (child_evt) {
 
-         const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(child_evt.meshidx);
+         const bounding_box = Mesh_buffer_get_mesh_bounding_box(child_evt.meshidx);
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          const intersects = Intersection_point_rect(point, bounding_box);
@@ -482,7 +482,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
    if(STATE.mesh.focused && STATE.mesh.focused.listeners){ // TODO: efficiency: must check because the focused may not have a listen event. FIXME
       
-      const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(STATE.mesh.focusedIdx);
+      const bounding_box = Mesh_buffer_get_mesh_bounding_box(STATE.mesh.focusedIdx);
       const point = MouseGetPos();
 
       // If and only if mouse is intersecting with the current mesh(mouse hover) ...
@@ -547,7 +547,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
       if (view_buffer.buffer[i]) {
 
-         const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(view_buffer.buffer[i].meshidx);
+         const bounding_box = Mesh_buffer_get_mesh_bounding_box(view_buffer.buffer[i].meshidx);
          const point = MouseGetPos();
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
@@ -631,7 +631,7 @@ function Check_child_events_recursive(view_children, point) {
       const child_evt = view_children.buffer[i];
       if (child_evt) {
 
-         const bounding_box = Mesh_buffer_get_mesh_bounding_box_with_hover_margin(child_evt.meshidx);
+         const bounding_box = Mesh_buffer_get_mesh_bounding_box(child_evt.meshidx);
 
          const name = Mesh_buffer_get_mesh_name_byidx(child_evt.meshidx)
          const mesh = Mesh_buffer_get_mesh_byidx(child_evt.meshidx)

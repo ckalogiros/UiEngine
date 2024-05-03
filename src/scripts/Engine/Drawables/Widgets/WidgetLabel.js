@@ -56,12 +56,14 @@ export class Widget_Label extends Rect {
             text_mesh.geom.pos[0] = d
         }
         else if(Align & ALIGN.HOR_CENTER){
-            const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2
+            // const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2
+            const d = this.geom.pos[0] + (this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2)
             text_mesh.geom.pos[0] = d/2
         }
         if(Align & ALIGN.VERT_CENTER){
             // const d = this.geom.dim[1] - text_mesh.geom.dim[1]+ pad[1]
-            const d = this.geom.dim[1] - text_mesh.geom.dim[1]
+            // const d = this.geom.dim[1] - text_mesh.geom.dim[1]
+            const d = this.geom.pos[1] + (this.geom.dim[1] - text_mesh.geom.dim[1])
             text_mesh.geom.pos[1] += d
         }
         else if(Align & ALIGN.BOTTOM){

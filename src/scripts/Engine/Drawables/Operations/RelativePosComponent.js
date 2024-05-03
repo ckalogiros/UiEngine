@@ -177,7 +177,7 @@ function _Relative_pos_comp_recalc_right(whereidx, parent){
 
    const children = parent.rel_comp.buffer[whereidx];
    // let xpos = parent.geom.pos[0] + parent.geom.dim[0] - parent.StylesGetMargin(STYLES.AXIS.X);
-   let xpos = parent.geom.pos[0] + parent.geom.dim[0] ;
+   let xpos = parent.geom.pos[0] + parent.geom.dim[0]*2;
 
    for(let i=0; i <= children.boundary; i++){
       
