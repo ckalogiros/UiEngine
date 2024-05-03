@@ -13,7 +13,7 @@ import { Performance_timer_start, Performance_timer_stop } from "../../Timers/Pe
 
 export class Rect extends Mesh {
 
-   constructor(pos = POSITION_CENTER, dim = [10, 10], col = BLUER3, is_debug_mesh=0x0) {
+   constructor(pos = POSITION_CENTER, dim = [10, 10], col = BLUER3, is_debug_mesh = 0x0) {
 
       const geom = new Geometry2D(pos, dim);
       const mat = new Material(col);
@@ -41,11 +41,11 @@ export class Rect extends Mesh {
       Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
       for (let i = 0; i <= this.children.boundary; i++) {
-         
+
          const child = this.children.buffer[i];
 
          /**CATCH ERROR - INFINITE LOOP */
-         if(child.type & MESH_TYPE.RECT_MESH){
+         if (child.type & MESH_TYPE.RECT_MESH) {
             console.warn('RECT_MESH. Recursive call on AddToWidgetRootBuffer().\nSee for infinite loop', '\nchild:', child.constructor.name, 'name:', child.GetName());
          }
          child.AddToWidgetRootBuffer(root_bufferidx);
@@ -54,7 +54,7 @@ export class Rect extends Mesh {
    }
 
 
-   RemoveFromGfxBuffer() { 
+   RemoveFromGfxBuffer() {
       Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
    }
 
@@ -71,19 +71,19 @@ export class Rect extends Mesh {
    }
 
 
-   StateEnable(MASK=0x0) {
+   StateEnable(MASK = 0x0) {
 
       this.state.mask |= MASK;
    }
 
 
-   StateDisable(MASK=0x0) {
+   StateDisable(MASK = 0x0) {
 
       this.state.mask &= ~MASK;
    }
 
 
-   SetTypeDebug(){
+   SetTypeDebug() {
       this.type |= MESH_TYPE.DEBUG_MESH;
    }
 
@@ -93,7 +93,7 @@ export class Rect extends Mesh {
    /*******************************************************************************************************************************************************/
    // Graphics
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs=[INT_NULL, INT_NULL]) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, INT_NULL]) {
 
       this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
 
@@ -108,18 +108,18 @@ export class Rect extends Mesh {
 
       // Add entry to Gfx Buffer
       this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
-      
+
       return this.gfx.vb.start;
    }
-   
-   
+
+
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName())
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       this.is_gfx_inserted = true;
-      
+
 
       // Add entry to Gfx Buffer
       this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
@@ -131,7 +131,7 @@ export class Rect extends Mesh {
    // TODO: Use it
    UpdateGfx() {
 
-      if(this.is_gfx_inserted) 
+      if (this.is_gfx_inserted)
          Vertex_buffer_update_vertices(this.gfx, this.geom, this.mat, this.GetName())
       else {
          this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
@@ -144,39 +144,7 @@ export class Rect extends Mesh {
    /*******************************************************************************************************************************************************/
    // Alignment
 
-   Reposition_post(pos_dif) {
 
-      this.MoveXYZ(pos_dif);
-
-      for (let i = 0; i <= this.children.boundary; i++) {
-         this.children.buffer[i].MoveXYZ(pos_dif);
-      }
-   }
-
-
-   Reposition_pre(pos_dif) {
-
-      CopyArr2(this.geom.defPos, this.geom.pos);
-      AddArr2(this.geom.pos, pos_dif);
-      // this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-
-      const update_data = {
-         sizes: [2],
-         data: [pos_dif[0], pos_dif[1]],
-      }
-      Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data, _);
-      
-      for (let i = 0; i <= this.children.boundary; i++) {
-
-         AddArr2(this.children.buffer[i].geom.pos, pos_dif);
-         CopyArr2(this.children.buffer[i].geom.defPos, this.children.buffer[i].geom.pos);
-         
-         // this.children.buffer[i].batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-         this.children.buffer[i].batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-         Batch_store(this.children.buffer[i], SHADER_ATTRIBUTES.WPOS4, update_data, _);
-      }
-   }
 
 
 
@@ -189,43 +157,26 @@ export class Rect extends Mesh {
    GetTotalHeight() { return this.geom.dim[1]; }
 
 
-   GetCenterPosX() { return this.geom.pos[0]; }
-
-
-   GetCenterPosY() { return this.geom.pos[1]; }
-
-
-   GetLeft_A() { return this.geom.pos[0] - this.geom.dim[0]; }
-
-
-   GetRight_A() { return this.geom.pos[0] + this.geom.dim[0]; }
-
-
-   GetTop_A() { return this.geom.pos[1] - this.geom.dim[1]; }
-
-
-   GetBottom_A() { return this.geom.pos[1] + this.geom.dim[1]; }
-
-
-   /** Return type: Array. Returns an array of all widgets meshes */
-   GetAllMeshes() { return [this]; }
+   SetIsGfxInserted(flag) {
+      if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
+   }
 
 
    SetPosX(x) {
       super.SetPosX(x);
    }
-   
-   
+
+
    SetFrameBufferIdx(fbidx) {
       this.isFramebufferRendered = fbidx;
    }
-   
-   
+
+
    SetPosXNoGfxUpdate(x) {
       this.geom.pos[0] = x;
    }
-   
-   
+
+
    SetPosYNoGfxUpdate(y) {
       this.geom.pos[1] = y;
    }
@@ -240,11 +191,6 @@ export class Rect extends Mesh {
       this.geom.pos[0] = x;
       this.geom.pos[1] = y;
    }
-
-
-	SetIsGfxInserted(flag){
-		if(this.is_gfx_inserted !== flag)this.is_gfx_inserted = flag; // If true then set false
-	}
 
 
    MoveNoGfxUpdate(x, y) {
@@ -284,11 +230,11 @@ export class Rect extends Mesh {
       this.geom.dim[0] = x;
    }
 
-   
+
    TEMP_recalc(x, y) {
       this.geom.pos[0] = x;
       this.geom.pos[1] = y;
-  }
+   }
 
    // SEE ### Construct Listeners
    ConstructListeners(parent_listeners = null) {

@@ -6,13 +6,16 @@ import { Widget_Label } from './WidgetLabel.js';
 
 
 
+
+
+
+
 export class Widget_Button extends Widget_Label {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad = [20, 15], bold = .4, style = [0, 6, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh)
       this.type |= MESH_TYPE.WIDGET_BUTTON;
-      // this.SetName('Button');
 
       // Bind a default function for OnClick() event
       this.Bind(Button_click_default_callback, _, 'Default Button Binding Function')
@@ -89,18 +92,19 @@ export class Widget_Button extends Widget_Label {
 /** DO NOT DELETE - WIDGET SWITCH - With text on/off */
 export class Widget_Switch extends Widget_Button {
 
-   isOn;
-   state_text;
-   evt_params;
-
+   // isOn;
+   // state_text;
+   // evt_params;
+   
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize = 5, col = GREY[1], text_col = WHITE, pad = [fontsize, fontsize], bold, style = [3, 6, 2], font, is_debug_mesh) {
-
+      
       // super(text_off, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos, fontsize, col, text_col, pad, bold, style, font)
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_off, _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh)
-
+      
       this.isOn = 0x0;
       this.state_text = [text_off, text_on];
-
+      this.evt_params = null;
+      
       this.type |= MESH_TYPE.WIDGET_BUTTON;
       this.SetName('Switch');
 

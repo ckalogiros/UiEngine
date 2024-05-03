@@ -1,6 +1,5 @@
 "use strict";
 
-import { GfxExists_rename_me, Temp_Create_child_gfx_rename_me } from "../../Engine/Drawables/Meshes/Base/Mesh.js";
 import { Texture_create_renderbuffer_texture, Texture_set_texture_name } from "../../Engine/Loaders/Textures/Texture.js";
 import { Gl_draw_specific } from "../GlDraw.js";
 import { Create_mesh_for_framebuffer } from "../../Engine/Drawables/Meshes/FramebufferMesh.js";
@@ -97,9 +96,10 @@ class Framebuffer {
 
 
    AddGfxidx(gfxidx) {
-
+alert('IMPLEMENT:\n a function that checs if a vbidx exists in the framebuffer queue')
       // check if the vbidx already exists in the framebuffer gfx queue.
       for (let i = 0; i < gfxidx.length; i++) {
+
          // If the vbidx is not in the queue, add it
          if (!GfxExists_rename_me(this.gfx_queue, gfxidx[i])) { // If gfx is not already stored, store it
             this.gfx_queue.push(gfxidx[i]);
@@ -167,8 +167,9 @@ export function Gl_framebuffer_render_mesh(FBID = FB.NEW, FB_TYPE = FRAMEBUFFER_
    // Must set mesh pos at origin ([0,0] left-bottom), before rendering to the renderbuffer.
    // mesh.Move(-mesh.geom.pos[0]+mesh.geom.dim[0], VIEWPORT.HEIGHT - mesh.geom.pos[1]-mesh.geom.dim[1]);
 
-   const gfx_queue = Temp_Create_child_gfx_rename_me(mesh); // Gather all unique gfx buffer indexes to an array. 
-   fb.AddGfxidx(gfx_queue); // Check if any gfxidx is not rendered by the framebuffer and add it.
+   alert('Call Widget gfx get all gfx indexes for the mesh')
+   // const gfx_queue = Temp_Create_child_gfx_rename_me(mesh); // Gather all unique gfx buffer indexes to an array. 
+   // fb.AddGfxidx(gfx_queue); // Check if any gfxidx is not rendered by the framebuffer and add it.
    fb.needs_update = true; // Inform the framebuffer that it needs to be redrawn. The bool is checked somewhere in the App Loop.
    console.log('{{{{fb.gfx_queue}}}} ', fb.gfx_queue)
    // TODO: Implement a Callback event for the Gl_framebuffer_render() to run if 

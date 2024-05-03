@@ -3,15 +3,14 @@ import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Listener_batch_destroy_run, Listener_batch_destroy_store, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
+import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Scenes_get_count } from "../../../Scenes.js";
-import { Mesh_buffer_batch_destroy_run, Mesh_buffer_batch_destroy_store, Mesh_buffer_get_mesh_pos, Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start, TEMP_get_widget_root_wpos, TEMP_get_widget_root_wposx, TEMP_get_widget_root_wposy, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_buffer_get_root_meshidx, Widget_root_buffer_get_root_pos, Widget_root_buffer_is_root } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start, TEMP_get_widget_root_wpos, TEMP_get_widget_root_wposx, TEMP_get_widget_root_wposy } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
-import { Styles_batch_destroy_run, Styles_batch_destroy_store, Styles_create, Styles_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
+import { Styles_batch_destroy_run, Styles_batch_destroy_store, Styles_create, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 import { Command_buffer_store } from "../../../Core/Commandbuffer.js";
-import { View_get_view_vb_mesh_meshidx, View_get_view_vb_root_meshidx, View_is_group_root } from "../../../Core/MeshBufferViews.js";
 
 
 const NOTIFICATIONS_ON = true;
@@ -195,13 +194,6 @@ export class Mesh {
     }
 
 
-    SetSceneIdx(scene_idx) {
-
-        if (scene_idx === INT_NULL || scene_idx >= Scenes_get_count()) alert('ERROR scene index.');
-        this.sceneidx = scene_idx;
-    }
-
-
     RemoveChildren() {
 
         const count = this.children.boundary;
@@ -345,10 +337,8 @@ export class Mesh {
 
 
     /*******************************************************************************************************************************************************/
-    /* Mesh State.
+    // Mesh State.
     /*******************************************************************************************************************************************************/
-
-    StateToggle(bit) { this.state.mask ^= bit; }
 
 
     StateCheck(bit) { return this.state.mask & bit; }
@@ -515,7 +505,6 @@ export class Mesh {
     }
 
 
-
     GetPosXY() {
 
         const p = TEMP_get_widget_root_wpos(this.root_posidx);
@@ -555,27 +544,9 @@ export class Mesh {
     }
 
 
-    UpdatePosXY() { this.SetUpdateFrameBuffer(); this.geom.UpdatePosXY(this.gfx); }
-
-
-    UpdatePosXYZ() { this.SetUpdateFrameBuffer(); this.geom.UpdatePosXYZ(this.gfx); }
-
-
-    UpdateDim() { this.SetUpdateFrameBuffer(); this.geom.UpdateDim(this.gfx); }
-
-
-    UpdateZindex(z) { this.SetUpdateFrameBuffer(); this.geom.UpdatePosZ(z, this.gfx); }
-
-
     MoveXY(x, y) {
         this.SetUpdateFrameBuffer();
         this.geom.MoveXY(x, y, this.gfx, _, this.state.mask & MESH_STATE.ACTIVE); // console.log('Mesh MoveXY')
-    }
-
-
-    MoveXYZ(pos) {
-        this.SetUpdateFrameBuffer();
-        this.geom.MoveXYZ(pos, this.gfx, _, this.state.mask & MESH_STATE.ACTIVE); // console.log('Mesh MoveXYZ')
     }
 
 
@@ -720,118 +691,6 @@ export class Mesh {
     }
 
 }
-
-
-export function Recursive_gfx_operations(_mesh, Clbk, params) {
-
-    const children = _mesh.children;
-    for (let i = 0; i <= children.boundary; i++) {
-
-        const mesh = children.buffer[i];
-        if (mesh.children.active_count)
-            Recursive_gfx_operations(mesh, Clbk, params)
-
-        Clbk(mesh, params);
-    }
-}
-
-
-
-// Run recursively from a root mesh down to all children and gather all unique gfx indexes into a buffer
-export function Temp_Create_child_gfx_rename_me(mesh) {
-
-    const gfx_buffer_rename_me = [];
-    gfx_buffer_rename_me.push({
-        progidx: mesh.gfx.prog.idx,
-        vbidx: mesh.gfx.vb.idx,
-    });
-
-    // Case the mesh is label and has a text mesh
-    if (mesh.text_mesh) {
-        gfx_buffer_rename_me.push({
-            progidx: mesh.text_mesh.gfx.prog.idx,
-            vbidx: mesh.text_mesh.gfx.vb.idx,
-        });
-    }
-
-    Temp_Create_child_gfx_recursive_rename_me(mesh, gfx_buffer_rename_me);
-    return gfx_buffer_rename_me;
-}
-
-
-
-export function Temp_Create_child_gfx_recursive_rename_me(mesh, gfx_buffer_rename_me) {
-
-    const count = mesh.children.boundary;
-    for (let i = 0; i < count; i++) {
-
-        const child = mesh.children.buffer[i];
-
-        if (child) {
-
-            if (child.children.boundary) { // Run recursively
-                Temp_Create_child_gfx_recursive_rename_me(child, gfx_buffer_rename_me);
-            }
-
-            const gfx_indexes = {
-                progidx: child.gfx.prog.idx,
-                vbidx: child.gfx.vb.idx,
-            };
-            if (!GfxExists_rename_me(gfx_buffer_rename_me, gfx_indexes)) { // If gfx is not already stored, store it
-                gfx_buffer_rename_me.push(gfx_indexes);
-            }
-            // Case the mesh is label and has a text mesh
-            if (child.text_mesh) {
-
-                const text_gfx_indexes = {
-                    progidx: child.text_mesh.gfx.prog.idx,
-                    vbidx: child.text_mesh.gfx.vb.idx,
-                };
-                if (!GfxExists_rename_me(gfx_buffer_rename_me, text_gfx_indexes)) { // If gfx is not already stored, store it
-                    gfx_buffer_rename_me.push(text_gfx_indexes);
-                }
-            }
-        }
-
-    }
-}
-
-
-
-export function GfxExists_rename_me(gfx_buffer, gfx_indexes) {
-
-    const count = gfx_buffer.length;
-    for (let i = 0; i < count; i++) {
-        if (gfx_buffer[i].progidx === gfx_indexes.progidx &&
-            gfx_buffer[i].vbidx === gfx_indexes.vbidx) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-
-/******************************************************************************************************************************************************/
-// TEMPORARY FUUNCTIONS TO UPDATE THE WPOS UINIFORM
-/******************************************************************************************************************************************************/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// DEBUG PRINT
 
 
 

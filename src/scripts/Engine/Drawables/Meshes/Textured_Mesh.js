@@ -179,11 +179,6 @@ export class Textured_Mesh extends Mesh {
    }
 
 
-   UpdatePosZ(z) {
-      this.geom.UpdatePosZ(z, this.gfx, this.geom.num_faces);
-   }
-
-
    SetPosZNoGfxUpdate(z) {
       this.geom.pos[2] = z;
    }

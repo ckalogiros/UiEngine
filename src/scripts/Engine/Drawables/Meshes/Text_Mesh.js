@@ -245,11 +245,6 @@ export class Text_Mesh extends Mesh {
          if (child) child.TEMP_recalc(x, y);
       }
   }
-   
-
-   UpdatePosZ(z) {
-      this.geom.UpdatePosZ(z, this.gfx, this.geom.num_faces)      // const params = {
-   }
 
 
    SetPosXYNoGfxUpdate(x, y) {
@@ -337,25 +332,6 @@ export class Text_Mesh extends Mesh {
          this.mat.char_buffer.RemoveByIdx(i);
       }
 
-   }
-
-
-   UpdatePosXYZ() {
-
-      const len = this.geom.num_faces > this.mat.char_buffer.active_count ? this.geom.num_faces : this.mat.char_buffer.active_count;
-
-      const charPos = [0, 0, 0];
-      CopyArr3(charPos, this.geom.pos)
-
-      // Copy gfx, to pass new start for each character
-      let gfxcopy = new GfxInfoMesh(this.gfx);
-
-      for (let i = 0; i < len; i++) {
-
-         this.geom.UpdateFromPosXYZ(gfxcopy, charPos); // For text we need to give a 'next' position for every characters
-         gfxcopy.vb.start += gfxcopy.vb.boundary;
-         charPos[0] += this.geom.dim[0] * 2;
-      }
    }
 
 
@@ -506,9 +482,6 @@ export class Text_Mesh extends Mesh {
    }
 
 
-
-
-
    /** Update a specific character in text char array */
    UpdateTextCharacter(_text, idx) {
 
@@ -606,32 +579,10 @@ export class Text_Mesh extends Mesh {
    GetCenterPosX() { return this.geom.pos[0] + this.GetMaxWidth() - this.geom.dim[0]; }
 
 
-   GetCenterPosY() { return this.geom.pos[1]; }
-
-
-   GetLeft_A() { return this.geom.pos[0] - this.geom.pos[0]; }
-
-
-   GetRight_A() { return this.geom.pos[0] + this.geom.pos[0]; }
-
-
-   GetTop_A() { return this.geom.pos[1] - this.geom.pos[1]; }
-
-
-   GetBottom_A() { return this.geom.pos[1] + this.geom.pos[1]; }
-
-
    GetTextLeft_A() { return this.GetCenterPosX() - this.GetMaxWidth(); }
 
 
    GetTextRight_A() { return this.GetCenterPosX() + this.GetMaxWidth(); }
-
-
-   GetTextTop_A() { return this.GetTop_A(); } // UNNECESSARY
-
-
-   GetTextBottom_A() { return this.GetBottom_A(); } // UNNECESSARY
-
 
 
    SetColorRGB(col, char_len = 0) {
@@ -643,22 +594,6 @@ export class Text_Mesh extends Mesh {
    SetFrameBufferIdx(fbidx) {
       this.isFramebufferRendered = fbidx;
    }
-
-
-
-
-   /*******************************************************************************************************************************************************/
-   // Alignment
-
-   Reposition_pre(pos_dif) {
-      console.error('NO BATCH CREATED')
-
-      AddArr3(this.geom.pos, pos_dif);
-      CopyArr3(this.geom.defPos, this.geom.pos);
-   }
-
-
-
 
 }
 

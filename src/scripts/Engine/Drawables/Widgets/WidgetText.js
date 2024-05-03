@@ -104,46 +104,6 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
-	Reposition_post(pos_dif) {
-
-		this.MoveXYZ(pos_dif)
-		for (let i = 0; i <= this.children.boundary; i++) {
-
-			const child = this.children.buffer[i];
-			child.MoveXYZ(pos_dif)
-		}
-	}
-
-
-	Reposition_pre(pos_dif) {
-
-		AddArr2(this.geom.pos, pos_dif)
-		CopyArr2(this.geom.defPos, this.geom.pos)
-
-		if (this.batch_fnidx === INT_NULL)
-			this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-
-		const update_data = {
-			sizes: [2],
-			data: [pos_dif[0], pos_dif[1]],
-		};
-		Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data, _);
-
-		for (let i = 0; i <= this.children.boundary; i++) {
-
-			const child = this.children.buffer[i];
-			AddArr2(child.geom.pos, pos_dif);
-			CopyArr2(child.geom.defPos, child.geom.pos);
-
-			if (child.batch_fnidx === INT_NULL)
-				child.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-
-			Batch_store(child, SHADER_ATTRIBUTES.WPOS4, update_data, _);
-			// Batch_store(child, _, { pos: pos_dif }, _);
-		}
-	}
-
-
 
 	/*******************************************************************************************************************************************************/
 	// Getters-Setters
@@ -203,34 +163,6 @@ export class Widget_Text extends Text_Mesh {
 		}
 		Batch_store(this, _, update_data, _);
 
-	}
-
-
-	FakeRemoveFromGfxPosy(posy) {
-
-		this.geom.defPos[1] = this.geom.pos[1]; // Copy the current position to the mesh's default pos, so it can be retrieved.
-		this.geom.SetPosY(posy, this.gfx);
-	}
-
-
-	FakeAddFromGfxPosy(posy) {
-
-		this.geom.pos[1] = this.geom.defPos[1]; // Copy the current position to the mesh's default pos, so it can be retrieved.
-		this.geom.SetPosY(posy, this.gfx);
-	}
-
-
-	FakeRemoveFromGfxAlpha(alpha) {
-
-		this.mat.defCol[3] = this.mat.col[3];
-		this.mat.SetColorAlpha(alpha, this.gfx);
-	}
-
-
-	FakeAddFromGfxAlpha(alpha) {
-
-		this.mat.col[3] = this.mat.defCol[3];
-		this.mat.SetColorAlpha(alpha, this.gfx);
 	}
 
 
@@ -407,19 +339,6 @@ export class Widget_Multi_Text extends Widget_Text {
 	/*******************************************************************************************************************************************************/
 	// Setters-Getters
 
-	/** Return type: Array. Returns an array of all widgets meshes */
-	GetAllMeshes(parent_meshes_buf) {
-
-		const all_meshes = parent_meshes_buf ? parent_meshes_buf : [];
-		all_meshes.push(this);
-		for (let i = 0; i <= this.children.boundary; i++) {
-
-			const child = this.children.buffer[i];
-			if (child) all_meshes.push(child);
-		}
-		return all_meshes;
-	}
-
 
 	GetMaxWidth() {
 
@@ -478,53 +397,6 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 	}
 
-
-	FakeRemoveFromGfxPosy(posy) {
-
-		this.geom.defPos[1] = this.geom.pos[1]; // Copy the current position to the mesh's default pos, so it can be retrieved.
-		super.SetPosY(posy);
-
-		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].geom.defPos[1] = this.children.buffer[i].geom.pos[1];
-			this.children.buffer[i].SetPosY(posy);
-		}
-	}
-
-
-	FakeAddFromGfxPosy(posy) {
-
-		this.geom.pos[1] = this.geom.defPos[1]; // Copy the current position to the mesh's default pos, so it can be retrieved.
-		super.SetPosY(posy);
-
-		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].geom.pos[1] = this.children.buffer[i].geom.defPos[1];
-			this.children.buffer[i].SetPosY(posy);
-		}
-	}
-
-
-	FakeRemoveFromGfxAlpha(alpha) {
-
-		this.mat.defCol[3] = this.mat.col[3];
-		this.mat.SetColorAlpha(alpha, this.gfx);
-
-		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].mat.defCol[3] = this.children.buffer[i].mat.col[3];
-			this.children.buffer[i].mat.SetColorAlpha(alpha, this.gfx);
-		}
-	}
-
-
-	FakeAddFromGfxAlpha(alpha) {
-
-		this.mat.col[3] = this.mat.defCol[3];
-		this.mat.SetColorAlpha(alpha, this.gfx);
-
-		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].mat.col[3] = this.children.buffer[i].mat.defCol[3];
-			this.children.buffer[i].mat.SetColorAlpha(alpha, this.gfx);
-		}
-	}
 
 
 
@@ -774,7 +646,6 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 	
-
    SetPosXYNoGfxUpdate(x, y) {
       this.geom.pos[0] = x;
       this.geom.pos[1] = y;
@@ -801,6 +672,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
    }
 
+	
 	SetPosZNoGfxUpdate(z) {
 		this.geom.pos[2] = z;
 		for (let i = 0; i <= this.children.boundary; i++) {

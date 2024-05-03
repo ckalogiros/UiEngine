@@ -1,11 +1,10 @@
 "use strict";
 
-import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
+import { CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Widget_Button } from "./WidgetButton.js";
-import { CalculateArea } from "./WidgetLabel.js";
 import { Align_self_get_dif } from "../Operations/Alignment.js";
 import { TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Create_widget_close_btn, Create_widget_minimize_btn, Create_widget_text } from "../../Core/CreateWidget.js";
@@ -210,18 +209,6 @@ export class Widget_Menu_Bar extends Section {
    /*******************************************************************************************************************************************************/
    // Setters-Getters
 
-   /** Return type: Array. Returns an array of all widgets meshes */
-   GetAllMeshes() {
-
-      let all_meshes = [this, this.text_mesh];
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i]
-         all_meshes = child.GetAllMeshes(all_meshes)
-      }
-      return all_meshes;
-   }
-
-
 
    /*******************************************************************************************************************************************************/
    // Events Handling
@@ -276,28 +263,6 @@ export class Widget_Menu_Bar extends Section {
    /*******************************************************************************************************************************************************/
    // Alignment
 
-   // ReAlign(Align) {
-
-   //    // Realign menu's text
-   //    this.Align(ALIGN.LEFT, this.pad);
-
-   //    let pad = [this.pad[0], this.pad[1]];
-
-   //    for (let i = 0; i <= this.children.boundary; i++) {
-
-   //       const child = this.children.buffer[i];
-         
-   //       const pos = Align_self_get_dif(Align, this.geom, child.geom, pad); // Align the close/minimize buttons area_mesh to the menu area mesh.
-   //       child.geom.pos[0] = pos[0];
-   //       child.geom.pos[1] = pos[1];
-   //       console.log('ooooooooooooooooooooooooo', child.geom.pos, child.geom.dim, child.GetName())
-
-   //       // child.Align(ALIGN.RIGHT, pad); // Also we need to update the close/minimize buttons text_mesh position(by aligning)
-   //       // pad[0] += this.children.buffer[i].geom.dim[0] * 2; // Each child widget of the menu is positioned relative to the previous child.
-   //    }
-
-   // }
-
 
    Align(flags, pad = [0, 0]) { // Align pre-added to the vertexBuffers
 
@@ -313,39 +278,6 @@ export class Widget_Menu_Bar extends Section {
 
    }
 
-
-   Reposition_post(pos_dif) {
-
-      this.MoveXYZ(pos_dif);
-      this.text_mesh.MoveXYZ(pos_dif);
-
-      // Menu's children(close/minimize etc) destruction
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         child.Reposition_post(pos_dif);
-      }
-   }
-
-
-   Reposition_pre(pos_dif) {
-      console.error('NO BATCH CREATED')
-      AddArr2(this.geom.pos, pos_dif);
-      CopyArr2(this.geom.defPos, this.geom.pos);
-      this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      // Batch_store(this, _, { pos: pos_dif }, _);
-
-      AddArr2(this.text_mesh.geom.pos, pos_dif);
-      CopyArr2(this.text_mesh.geom.defPos, this.text_mesh.geom.pos);
-      this.text_mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      // Batch_store(this.text_mesh, _, { pos: pos_dif }, _);
-
-      // Menu's children(close/minimize etc) destruction
-      for (let i = 0; i <= this.children.boundary; i++) {
-
-         const child = this.children.buffer[i];
-         child.Reposition_pre(pos_dif);
-      }
-   }
 
 
 
@@ -555,24 +487,24 @@ export class Widget_Minimize extends Widget_Button {
 
 
 
-function Reset_gfx_from_parent_recursive(mesh) {
 
-   for (let i = 0; i <= mesh.children.boundary; i++) {
-      const child = mesh.children.buffer[i];
-      // console.log('1111W', child.GetName())
-      if (child)
-         Reset_gfx_from_parent_recursive(child);
-   }
+function CalculateArea(text, _dim, pos, pad = [0, 0]) {
 
-   // NOTE: Avoid calling Reset on an alredy reseted buffer should take place in Vertex_buffer_reset() and Index_buffer_reset()
-   Vertex_buffer_reset(mesh.gfx);
-   Index_buffer_reset(mesh.gfx.ib.idx);
+   const numchars = text.length;
+   const dim = [_dim[0] * numchars, _dim[1]];
 
-   mesh.is_gfx_inserted = false; // So that we can re-render the mesh to the vertex buffer.
-   if (mesh.text_mesh) { // Do this for any text meshes.
-      Vertex_buffer_reset(mesh.text_mesh.gfx);
-      Index_buffer_reset(mesh.text_mesh.gfx.ib.idx);
-      mesh.text_mesh.is_gfx_inserted = false;
-   }
+   const areaWpos = [pos[0], pos[1], pos[2]];
+
+   dim[0] += pad[0] * 2; // Add padding to the total area's width
+   dim[1] += pad[1] * 2; // Add padding to the total area's height
+
+   areaWpos[0] += dim[0] - _dim[0]; // center the area's x pos.
+   areaWpos[0] -= pad[0] * 2; // center the area's x pos including the padding.
+   // Area's y pos is already centered
+
+   return {
+       dim: dim,
+       pos: areaWpos,
+   };
 }
 

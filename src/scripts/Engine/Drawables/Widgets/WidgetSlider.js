@@ -9,8 +9,11 @@ import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js
 import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_gfx_update_unif_wpos_per_vb, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
-import { Generate_graphics_context } from '../../Interfaces/Gfx/GfxContextFindMatch.js';
 import { Find_parent_listen_event } from '../Operations/Recursions.js';
+
+
+
+
 
 
 
@@ -31,7 +34,6 @@ export class Widget_Slider extends Rect {
       const min_font_size = 7, max_font_size = 25;
       const r = 2;
       const fontSize = max_font_size < (dim[1] / r) ? max_font_size : (min_font_size > (dim[1] / r) ? min_font_size : (dim[1] / r));
-      // const fontSize = 10;
 
 
       const pos = (ROOT_WIDGET_FLAGS !== undefined) ? _pos  : [0, 0, _pos[2]];
@@ -176,7 +178,6 @@ export class Widget_Slider extends Rect {
       Widget_root_add_mesh(value_text.root_bufferidx, value_text.mesh_bufferidx);
 
    }
-
 
 
    Activate() {
@@ -368,24 +369,6 @@ export class Widget_Slider extends Rect {
       
       mesh.SetUpdateFrameBuffer();
 
-      // const mouse_pos = MouseGetPosDif();
-      // mesh.SetUpdateFramebuffer();
-     
-
-      // mesh.geom.pos[0] += mouse_pos.x;
-      // mesh.geom.pos[1] += -mouse_pos.y;
-      // mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, mesh.gfx);
-
-      // const bar = mesh.children.buffer[SLIDER_BAR_IDX];
-      // bar.geom.MoveXY(mouse_pos.x, -mouse_pos.y, bar.gfx);
-      // const name_text = mesh.text_mesh;
-      // name_text.geom.MoveXY(mouse_pos.x, -mouse_pos.y, name_text.gfx);
-      // const handle = bar.children.buffer[0];
-      // handle.geom.MoveXY(mouse_pos.x, -mouse_pos.y, handle.gfx);
-      // const value_text = bar.children.buffer[1];
-      // value_text.geom.MoveXY(mouse_pos.x, -mouse_pos.y, value_text.gfx);
-
-
    }
 
 
@@ -400,8 +383,6 @@ export class Widget_Slider extends Rect {
       const sliderypos = bar.parent.geom.pos[1] -bar.parent.geom.dim[1]
 
       if (point[1] > bar.GetPosY() - bar.hover_margin[1]) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
-      // if (point[1] > bar.GetPosY()) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
-      // if (point[1] > sliderypos+bar.geom.pos[1]*2) { 
          
          console.log('mouse', point[1], 'bar ypos', bar.geom.pos[1]*2, 'hover margin', bar.hover_margin[1], bar.geom.pos[1]*2+sliderypos, bar.GetPosY())
          
@@ -449,7 +430,6 @@ export class Widget_Slider extends Rect {
 
          return true;
       }
-      return false;
    }
 
 
@@ -650,120 +630,11 @@ export class Widget_Slider extends Rect {
    }
 
 
-   FakeRemoveFromGfxPosy(posy) {
-
-      this.geom.defPos[1] = this.geom.pos[1]; // Copy the current position to the mesh's default pos, so it can be retrieved.
-      this.geom.SetPosY(posy, this.gfx);
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.geom.defPos[1] = bar.geom.pos[1];
-      bar.geom.SetPosY(posy, bar.gfx);
-
-      const name_text = this.text_mesh;
-      name_text.geom.defPos[1] = name_text.geom.pos[1];
-      name_text.geom.SetPosY(posy, name_text.gfx);
-
-      const handle = bar.children.buffer[0];
-      handle.geom.defPos[1] = handle.geom.pos[1];
-      handle.geom.SetPosY(posy, handle.gfx);
-
-      const value_text = bar.children.buffer[1];
-      value_text.geom.defPos[1] = value_text.geom.pos[1];
-      value_text.geom.SetPosY(posy, value_text.gfx);
-   }
-
-
-   FakeAddFromGfxPosy(posy) {
-
-      this.geom.pos[1] = this.geom.defPos[1]; // Copy the current alpha to the mesh's default col, so it can be retrieved.
-      this.geom.SetPosY(posy, this.gfx);
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.geom.pos[1] = bar.geom.defPos[1];
-      bar.geom.SetPosY(posy, bar.gfx);
-
-      const name_text = this.text_mesh;
-      name_text.geom.pos[1] = name_text.geom.defPos[1];
-      name_text.geom.SetPosY(posy, name_text.gfx);
-
-      const handle = bar.children.buffer[0];
-      handle.geom.pos[1] = handle.geom.defPos[1];
-      handle.geom.SetPosY(posy, handle.gfx);
-
-      const value_text = bar.children.buffer[1];
-      value_text.geom.pos[1] = value_text.geom.defPos[1];
-      value_text.geom.SetPosY(posy, value_text.gfx);
-   }
-
-
-   FakeAddFromGfxAlpha(alpha) {
-
-      this.mat.col[3] = this.mat.defCol[3];
-      this.mat.SetColorAlpha(alpha, this.gfx);
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.mat.col[3] = bar.mat.defCol[3];
-      bar.mat.SetColorAlpha(alpha, bar.gfx);
-
-      const name_text = this.text_mesh;
-      name_text.mat.col[3] = name_text.mat.defCol[3];
-      name_text.mat.SetColorAlpha(alpha, name_text.gfx);
-
-      const handle = bar.children.buffer[0];
-      handle.mat.col[3] = handle.mat.defCol[3];
-      handle.mat.SetColorAlpha(alpha, handle.gfx);
-
-      const value_text = bar.children.buffer[1];
-      value_text.mat.col[3] = value_text.mat.defCol[3];
-      value_text.mat.SetColorAlpha(alpha, value_text.gfx);
-   }
-
-
-   FakeRemoveFromGfxAlpha(alpha) {
-
-      this.mat.defCol[3] = this.mat.col[3];
-      this.mat.SetColorAlpha(alpha, this.gfx);
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.mat.defCol[3] = bar.mat.col[3];
-      bar.mat.SetColorAlpha(alpha, bar.gfx);
-
-      const name_text = this.text_mesh;
-      name_text.mat.defCol[3] = name_text.mat.col[3];
-      name_text.mat.SetColorAlpha(alpha, name_text.gfx);
-
-      const handle = bar.children.buffer[0];
-      handle.mat.defCol[3] = handle.mat.col[3];
-      handle.mat.SetColorAlpha(alpha, handle.gfx);
-
-      const value_text = bar.children.buffer[1];
-      value_text.mat.defCol[3] = value_text.mat.col[3];
-      value_text.mat.SetColorAlpha(alpha, value_text.gfx);
-   }
 
 
 
    /*******************************************************************************************************************************************************/
    // Setters-Getters
-
-   /** Return type: Array. Returns an array with all widget's children + this */
-   GetAllMeshes(parent_meshes_buf) {
-
-      // If a parent mesh called this method, all_meshes buffer should include the parents all_meshes (put at the start of the buffer)
-      const all_meshes = parent_meshes_buf ? parent_meshes_buf : [];
-
-      all_meshes.push(this);
-      all_meshes.push(this.text_mesh);
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      all_meshes.push(bar);
-      const handle = bar.children.buffer[0];
-      all_meshes.push(handle);
-      const value_text = bar.children.buffer[1];
-      all_meshes.push(value_text);
-
-      return all_meshes;
-   }
 
 
    SetMenuOptionsClbk(ClbkFunction) {
@@ -864,48 +735,7 @@ export class Widget_Slider extends Rect {
    /*******************************************************************************************************************************************************/
    // Alignment
 
-   Reposition_post(pos_dif) {
 
-      this.MoveXYZ(pos_dif);
-      const name_mesh = this.text_mesh;
-      name_mesh.MoveXYZ(pos_dif);
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.MoveXYZ(pos_dif);
-      const handle = bar.children.buffer[0];
-      handle.MoveXYZ(pos_dif);
-      const value = bar.children.buffer[1];
-      value.MoveXYZ(pos_dif);
-   }
-
-
-   Reposition_pre(pos_dif) {
-      console.error('NO BATCH CREATED')
-
-      AddArr2(this.geom.pos, pos_dif);
-      this.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      // Batch_store(this, _, { pos: pos_dif }, _);
-
-      const name_mesh = this.text_mesh;
-      AddArr2(name_mesh.geom.pos, pos_dif);
-      name_mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      // Batch_store(name_mesh, _, { pos: pos_dif }, _);
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      AddArr2(bar.geom.pos, pos_dif);
-      bar.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      // Batch_store(bar, _, { pos: pos_dif }, _);
-
-      const handle = bar.children.buffer[0];
-      AddArr2(handle.geom.pos, pos_dif);
-      handle.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      // Batch_store(handle, _, { pos: pos_dif }, _);
-
-      const value = bar.children.buffer[1];
-      AddArr2(value.geom.pos, pos_dif);
-      value.batch_fnidx = BATCH_FN_IDX.SET_WPOS4;
-      // Batch_store(value, _, { pos: pos_dif }, _);
-
-   }
 
 
 

@@ -3,23 +3,26 @@
 import * as math from '../../../../Helpers/Math/MathOperations.js'
 import { Gl_set_RGBA, Gl_set_alpha, Gl_set_RGBA_per_vertex } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
-import { CharBuffer, M_Buffer } from '../../../Core/Buffers.js';
+import { CharBuffer } from '../../../Core/Buffers.js';
 import { BLUEL, PURPLER } from './Colors.js';
 
 
-let _materialId = 0;
-const temp_vertex_color = [BLUEL[6], PURPLER[6],BLUEL[6], PURPLER[6]];
+
+
+
+
+const temp_vertex_color = [BLUEL[6], PURPLER[6], BLUEL[6], PURPLER[6]];
 
 export class Material {
 
-   sid; // Bitfield: Shader id for the material
-   type; // Bitfield: 
-   col; // Array: of[red,green,blue,alpha]
-   defCol; // Array: Store the initial color, used as a storage buffer
-   style; // Array: of [];
-   uv; // Array: of [v1,u1,v2,u2]
-   uvIdx; // Value: The index of the uvmap data for the texture
-   texidx; // Value: The index of the texture
+   // sid;  Bitfield: Shader id for the material
+   // type;  Bitfield: 
+   // col;  Array: of[red,green,blue,alpha]
+   // defCol;  Array: Store the initial color, used as a storage buffer
+   // style;  Array: of [];
+   // uv;  Array: of [v1,u1,v2,u2]
+   // uvIdx;  Value: The index of the uvmap data for the texture
+   // texidx;  Value: The index of the texture
 
    // TODO
    // col_id; // An index to the Str_buffer. As a name, is the name of the shader's color attribute. 
@@ -45,11 +48,8 @@ export class Material {
       this.uvIdx = INT_NULL;
       this.texidx = INT_NULL;
 
-
-      { // Debug
-         /**Unique id*/if (DEBUG.MATERIAL) Object.defineProperty(this, 'id', { value: _materialId++ });
-      }
    }
+
 
    SetColor(col, gfx) {
       if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
@@ -60,9 +60,9 @@ export class Material {
       else {
          math.CopyArr4(this.col, col);
          Gl_set_RGBA(gfx, this.col);
-         // Gl_set_RGBA(gfx, temp_vertex_color);
       }
    }
+
 
    SetHoverColor(gfx) {
       const intensity = 1.4;
@@ -73,6 +73,7 @@ export class Material {
          Gl_set_RGBA(gfx, math.Mult_arr4_scalar2(this.col, intensity));
       }
    }
+
 
    SetHoverColorDefault(gfx) {
       if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
@@ -86,30 +87,29 @@ export class Material {
       }
    }
 
+
    SetDefaultColor(gfx, num_faces) {
       math.CopyArr4(this.col, this.defCol);
       Gl_set_RGBA(gfx, this.col, num_faces);
    }
+
 
    SetColorRGB(col, gfx, num_faces) {
       math.CopyArr3(this.col, col);
       Gl_set_RGBA(gfx, this.col, num_faces);
    }
 
+
    SetColorAlpha(alpha, gfx, num_faces) {
       this.col[3] = alpha;
       Gl_set_alpha(gfx, this.col[3], num_faces);
    }
 
+
    SetStyle(style) {
       if (!Array.isArray(style)) console.error
       math.CopyArr3(this.style, style);
    }
-
-   SetNewAttribute(attribName = null,) { }
-
-
-   SetNewUniform() { }
 
 
    Copy(mat = {}) {
@@ -137,19 +137,19 @@ export class Material {
 
 export class FontMaterial extends Material {
 
-   text;
-   char_buffer;
-   temp_max_chars_inserted_in_gfx;
-   sdf_params;
-   
+   // text;
+   // char_buffer;
+   // temp_max_chars_inserted_in_gfx;
+   // sdf_params;
+
    constructor(col = [1, 1, 1, 1], texidx = INT_NULL, text = '', sdf_params = [.5, .5]) {
-      
+
       super(col, texidx);
-      
+
       const len = text.length;
       this.char_buffer = new CharBuffer();
       this.char_buffer.Init(len, text);
-      
+
       this.temp_max_chars_inserted_in_gfx = 0;
 
 

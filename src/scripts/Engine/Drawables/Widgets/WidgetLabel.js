@@ -1,7 +1,6 @@
 "use strict";
 
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
-import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
@@ -11,31 +10,12 @@ import { Align_self_get_dif } from "../Operations/Alignment.js";
 import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
-import { Batch_store } from "../../Batch/Batch.js";
-import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root, TEMP_add_widget_root_wpos, Widget_root_gfx_update_unif_wpos_per_vb } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root, Widget_root_gfx_update_unif_wpos_per_vb } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
 
-export function CalculateArea(text, _dim, pos, pad = [0, 0]) {
 
-    const numchars = text.length;
-    const dim = [_dim[0] * numchars, _dim[1]];
-
-    const areaWpos = [pos[0], pos[1], pos[2]];
-
-    dim[0] += pad[0] * 2; // Add padding to the total area's width
-    dim[1] += pad[1] * 2; // Add padding to the total area's height
-
-    areaWpos[0] += dim[0] - _dim[0]; // center the area's x pos.
-    areaWpos[0] -= pad[0] * 2; // center the area's x pos including the padding.
-    // Area's y pos is already centered
-
-    return {
-        dim: dim,
-        pos: areaWpos,
-    };
-}
 
 
 
@@ -94,7 +74,7 @@ export class Widget_Label extends Rect {
             text_mesh.geom.pos[1] += pad[1]
         }
 
-        text_mesh.SetSceneIdx(this.sceneidx);
+        text_mesh.sceneidx = this.sceneidx;
 
 
         this.mesh_bufferidx = mesh_bufferidx;
@@ -235,15 +215,6 @@ export class Widget_Label extends Rect {
     // Setters-Getters
     /*******************************************************************************************************************************************************/
 
-    /** Return type: Array. Returns an array of all widgets meshes */
-    GetAllMeshes(parent_meshes_buf) {
-
-        const all_meshes = parent_meshes_buf ? parent_meshes_buf : [];
-        all_meshes.push(this);
-        all_meshes.push(this.text_mesh);
-        return all_meshes;
-    }
-
 
     SetUpdateFrameBuffer() {
         if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
@@ -370,41 +341,6 @@ export class Widget_Label extends Rect {
     }
 
 
-    Reposition_post(pos_dif) { // Update the widget's position, after it is added to the gfx buffers
-
-        this.geom.MoveXY(pos_dif[0], pos_dif[1], this.gfx);
-        this.text_mesh.geom.MoveXY(pos_dif[0], pos_dif[1], this.text_mesh.gfx);
-    }
-
-
-    Reposition_pre(pos_dif) { // Update the widget's position, after it is added to the gfx buffers
-
-        if (this.batch_fnidx === INT_NULL)
-            this.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-
-        AddArr2(this.geom.pos, pos_dif);
-        CopyArr2(this.geom.defPos, this.geom.pos);
-
-        const update_data = {
-            sizes: [2],
-            data: [pos_dif[0], pos_dif[1]],
-        };
-
-        Batch_store(this, SHADER_ATTRIBUTES.WPOS4, update_data);
-
-        AddArr2(this.text_mesh.geom.pos, pos_dif);
-        CopyArr2(this.text_mesh.geom.defPos, this.text_mesh.geom.pos);
-        this.text_mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-        Batch_store(this.text_mesh, SHADER_ATTRIBUTES.WPOS4, update_data);
-    }
-
-
-    UpdatePosXYZ() {
-        this.geom.UpdatePosXYZ(this.gfx);
-        this.text_mesh.geom.UpdatePosXYZ(this.gfx);
-    }
-
-
     SetGfxInserted(flag) {
 
         if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
@@ -425,82 +361,6 @@ export class Widget_Label extends Rect {
         this.text_mesh.SetPosY(posy);
     }
 
-
-    // IMIDIATELY: Call SetPos from .geom directly
-    FakeRemoveFromGfxPosy(posy) {
-
-        this.geom.defPos[1] = this.geom.pos[1]; // Copy the current position to the mesh's default pos, so it can be retrieved.
-        super.SetPosY(posy);
-
-        this.text_mesh.geom.defPos[1] = this.text_mesh.geom.pos[1];
-        this.text_mesh.SetPosY(posy);
-    }
-
-
-    FakeAddFromGfxPosy(posy) {
-
-        this.geom.pos[1] = this.geom.defPos[1]; // Copy the current position to the mesh's default pos, so it can be retrieved.
-        super.SetPosY(posy);
-
-        this.text_mesh.geom.pos[1] = this.text_mesh.geom.defPos[1];
-        this.text_mesh.SetPosY(posy);
-    }
-
-
-    FakeRemoveFromGfxAlpha(alpha) {
-
-        this.mat.defCol[3] = this.mat.col[3]; // Copy the current position to the mesh's default pos, so it can be retrieved.
-        this.mat.SetColorAlpha(alpha, this.gfx);
-
-        this.text_mesh.mat.defCol[3] = this.text_mesh.mat.col[3];
-        this.text_mesh.mat.SetColorAlpha(alpha, this.text_mesh.gfx);
-    }
-
-
-    FakeAddFromGfxAlpha(alpha) {
-
-        this.mat.col[3] = this.mat.defCol[3]; // Copy the current position to the mesh's default pos, so it can be retrieved.
-        this.mat.SetColorAlpha(alpha, this.gfx);
-
-        this.text_mesh.mat.col[3] = this.text_mesh.mat.defCol[3];
-        this.text_mesh.mat.SetColorAlpha(alpha, this.text_mesh.gfx);
-    }
-
-
-    // ClampX(x, margin = 0) { // UNNECESSARY ???
-
-    //     const clamp = x - margin - this.pad[0];
-
-    //     // Do not clamp if mesh already smaller
-    //     if (this.geom.dim[0] * 2 < clamp) return;
-
-    //     this.geom.pos[0] -= this.geom.dim[0]; // Center meshe's position at left .
-    //     this.geom.dim[0] = clamp / 2; // Subtract the clamped value from the labels area dimention.
-    //     this.geom.pos[0] += clamp / 2; // Move mesh by half the new width.
-
-    //     const label_area_w = this.geom.dim[0] - (this.pad[0] * 2); // Need to include only the left pad
-
-    //     const char_width = Floor(this.text_mesh.fontsize * Font_get_font_advancex(this.text_mesh.mat.texidx));
-    //     let text_width = char_width;
-    //     let k = 0; // Will store the number of characters need to be clamped.
-    //     // Calculate how many characters we must ommit.
-    //     while (text_width < label_area_w) {
-    //         text_width += char_width;
-    //         k++;
-    //     }
-
-    //     if (k + 1 < this.text_mesh.geom.num_faces) // Avoid +1 if k===num_faces
-    //         this.text_mesh.geom.num_faces = k + 1;
-
-    //     // Update the gfx buffers, if the mesh is already inserted.
-    //     if (this.is_gfx_inserted) {
-    //         // TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
-    //         Gl_set_dim_X(this.gfx, this.geom.dim[0]); // Update dim in vertex buffer
-    //         Gl_set_wpos_X(this.gfx, this.geom.pos[0]); // Update pos in vertex buffer
-    //         const ommited_chars = this.text_mesh.mat.char_buffer.active_count - (k + 1);
-    //         Gl_set_alpha_from_offset(this.text_mesh.gfx, 0, this.text_mesh.geom.num_faces, ommited_chars); // Update alpha in text vertex buffer
-    //     }
-    // }
 
 
 
