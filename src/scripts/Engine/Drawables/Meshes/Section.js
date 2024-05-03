@@ -5,15 +5,13 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Widget_root_create_root, Widget_root_batch_move_from_batch_buffer, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, TEMP_get_widget_root_wpos, TEMP_add_widget_root_wpos, Widget_root_gfx_update_unif_wpos_per_vb } from "../../Core/MeshBuffer.js";
+import { Widget_root_create_root, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, TEMP_add_widget_root_wpos, Widget_root_gfx_update_unif_wpos_per_vb } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Clampx_from_group, Clipy_from_group } from "../Operations/Clip.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
-import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 
 
 

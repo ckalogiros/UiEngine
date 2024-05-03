@@ -7,9 +7,9 @@ import { HandleEvents } from './Events/Events.js';
 
 export class Scene {
 
-    sceneidx = 0; // Scene ID (of type: SCENE const structure).
-    camera; // Cameras buffer used by the scene
-    name;
+    // sceneidx: Scene ID (of type: SCENE const structure).
+    // camera: Cameras buffer used by the scene
+    // name:
 
     constructor(idx) {
 
@@ -17,6 +17,10 @@ export class Scene {
         this.camera = null;
         this.type |= MESH_TYPE.SCENE;
         this.name = 'scene, idx:' + this.idx;
+
+
+        STATE.scene.active = this;
+        STATE.scene.active_idx = this.sceneidx;
 
     }
 
@@ -48,9 +52,7 @@ class Scenes extends M_Buffer {
 
     Create() {
 
-        // this.boundary++;
-        // this.active_count++;
-        const scene = new Scene(this.boundary+1);
+        const scene = new Scene(this.boundary + 1);
         this.Add(scene);
         return scene;
     }
@@ -78,7 +80,7 @@ export function Scenes_get_count() { return _scenes.active_count; }
 
 
 
-export function Scene_set_projection_matrix(sceneidx) { 
+export function Scene_set_projection_matrix(sceneidx) {
 
     const unifidx = Uniforms_block_bind_uniform_layout('u_projection');
     Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);

@@ -1,0 +1,210 @@
+"use strict";
+
+import { Gl_draw } from "../../Graphics/GlDraw.js";
+import { MouseResetDif, MouseResetWheel } from "../Controls/Input/Mouse.js";
+import { TimeSample, TimeUpdate } from "../Timers/Time.js";
+import { TimersUpdateGlobalTimer, TimersUpdateTimers } from "../Timers/Timers.js";
+import { TimeIntervalsUpdateAll } from "../Timers/TimeIntervals.js";
+import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
+import { Batch_update } from "../Batch/Batch.js";
+import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
+import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
+import { Performance_timer_start, Performance_timer_stop, Performance_timers_update_tick } from "../Timers/PerformanceTimers.js";
+import { Command_buffer_run } from "../Core/Commandbuffer.js";
+import { Scene_set_projection_matrix } from "../Scenes.js";
+import { Input_reset } from "../Controls/Input/Input.js";
+
+
+
+
+
+
+
+var _renderer = null;
+
+export function Renderer_create_renderer(scene, camera) {
+
+   _renderer = new Renderer(scene, camera);
+   return _renderer;
+}
+
+
+
+export class Renderer {
+
+   // scene
+   // camera
+   // canvas 
+   // gfxctx: Graphics Platform Context
+   // extensions: Graphics Platform Extensions
+   // Draw: Function pointer to Graphics Platform specific draw function
+
+   constructor(scene, camera) {
+
+      this.canvas = document.getElementById("canvas");
+
+      this.canvas.width  = VIEWPORT.WIDTH;
+      this.canvas.height = VIEWPORT.HEIGHT;
+
+      const ctx = Renderer_create_webgl_context(this.canvas);
+      this.gfxctx = ctx.gfxctx;
+      this.extensions = ctx.extensions;
+
+      this.scene = scene;
+      
+      scene.SetCamera(camera);
+      camera.Init(VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
+      this.camera = camera;
+
+   }
+   
+   SetCanvasSize(width, height){
+
+      this.canvas.width  = width;
+      this.canvas.height = height;
+   }
+
+   Render() {
+
+      if (STATE.loop.paused === false) {
+
+         TimeUpdate();
+
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
+
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
+         TimeIntervalsUpdateAll(); // Update and run callbacks for each interval timer that has been set.
+         TimersUpdateGlobalTimer(); // This is a globbal timer, going only forward
+         TimersUpdateTimers();
+         // TimersUpdateStepTimers();
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
+
+         Framebuffer_update_draw();
+         this.scene.OnUpdate();
+
+         Batch_update()
+         
+         Notifications_update();
+
+         Command_buffer_run()
+
+         Uniforms_block_update_uniform();
+
+
+         // Uniforms_buffer_update_uniforms_all();
+
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
+         Gl_draw(this.gfxctx); // REIMPLEMENT: Draw should be independed of graphics platform
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)
+
+         Input_reset();
+
+
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
+
+         Performance_timers_update_tick();
+
+         TimeSample();
+
+         // PerformanceTimersTick();
+      }
+
+      // if(!STATE.loop.paused) STATE.loop.paused = true;
+
+
+   }
+
+
+}
+
+
+
+export function Renderer_set_canvas_size(width, height){
+
+   _renderer.SetCanvasSize(width, height);
+   _renderer.camera.Set(width, height); // Set the new camera projection matrix
+   Scene_set_projection_matrix(_renderer.scene.sceneidx); // update camera's projection matrix
+}
+
+
+function Renderer_create_webgl_context(canvas){
+
+   console.log('Initializing Graphics.')
+
+   /** Create Graphics Context */
+   // https://registry.khronos.org/webgl/specs/1.0/#WEBGLCONTEXTATTRIBUTES
+   const gfxctx = canvas.getContext("webgl2", {
+      alpha: true, //If the value is true, the drawing buffer has an alpha channel for the purposes of performing OpenGL destination alpha operations and compositing with the page. If the value is false, no alpha buffer is available. 
+      premultipliedAlpha: true, // If the value is true the page compositor will assume the drawing buffer contains colors with premultiplied alpha.
+      antialias: false,
+      // colorSpace: 'srgb',
+      // alpha: true,
+      // preserveDrawingBuffer: true,
+   });
+   if (!gfxctx) alert('Unable to initialize WebGL.');
+
+   console.log('WebGl version: ', gfxctx.getParameter(gfxctx.SHADING_LANGUAGE_VERSION));
+   console.log('WebGl renderer info: ', gfxctx.getParameter(gfxctx.RENDERER));
+
+
+   const extensions = gfxctx.getSupportedExtensions();
+   // gfxctx.getExtension('OES_standard_derivatives');
+   // gfxctx.getExtension('EXT_shader_texture_lod');
+
+   // gfxctx.enable(gfxctx.DEPTH_TEST);
+   // gfxctx.depthFunc(gfxctx.LEQUAL)
+   // // gfxctx.depthFunc(gfxctx.GEQUAL)
+   // gfxctx.depthMask(true);
+
+   /**
+    gl.ZERO 	                        Multiplies all colors by 0.
+    gl.ONE 	                        Multiplies all colors by 1.
+    gl.SRC_COLOR 	                  Multiplies all colors by the source colors.
+    gl.ONE_MINUS_SRC_COLOR 	         Multiplies all colors by 1 minus each source color.
+    gl.DST_COLOR 	                  Multiplies all colors by the destination color.
+    gl.ONE_MINUS_DST_COLOR 	         Multiplies all colors by 1 minus each destination color.
+    gl.SRC_ALPHA 	                  Multiplies all colors by the source alpha value.
+    gl.ONE_MINUS_SRC_ALPHA 	         Multiplies all colors by 1 minus the source alpha value.
+    gl.DST_ALPHA 	                  Multiplies all colors by the destination alpha value.
+    gl.ONE_MINUS_DST_ALPHA 	         Multiplies all colors by 1 minus the destination alpha value.
+    gl.CONSTANT_COLOR 	            Multiplies all colors by a constant color.
+    gl.ONE_MINUS_CONSTANT_COLOR 	   Multiplies all colors by 1 minus a constant color.
+    gl.CONSTANT_ALPHA 	            Multiplies all colors by a constant alpha value.
+    gl.ONE_MINUS_CONSTANT_ALPHA 	   Multiplies all colors by 1 minus a constant alpha value.
+    gl.SRC_ALPHA_SATURATE 	         Multiplies the RGB colors by the smaller of either the source alpha value or the value of 1 minus the destination alpha value. The alpha value is multiplied by 1. 
+    */
+   gfxctx.enable(gfxctx.BLEND);
+   gfxctx.blendFunc(gfxctx.DST_ALPHA, gfxctx.ONE_MINUS_SRC_ALPHA);
+
+   {
+      // gfxctx.blendFunc(gfxctx.SRC_ALPHA, gfxctx.ONE_MINUS_SRC_ALPHA);
+      // gfxctx.blendFunc(gfxctx.SRC_ALPHA, gfxctx.ONE_MINUS_DST_ALPHA);
+      // gfxctx.blendFunc(gfxctx.DST_ALPHA, gfxctx.ONE_MINUS_DST_ALPHA);
+
+      // gfxctx.blendFunc(gfxctx.ONE_MINUS_SRC_ALPHA, gfxctx.DST_ALPHA);
+      // gfxctx.blendFunc(gfxctx.ONE_MINUS_DST_ALPHA, gfxctx.DST_ALPHA);
+      // gfxctx.blendFunc(gfxctx.ONE_MINUS_SRC_ALPHA, gfxctx.SRC_ALPHA);
+      // gfxctx.blendFunc(gfxctx.ONE_MINUS_DST_ALPHA,gfxctx.SRC_ALPHA) ;
+
+
+      // gfxctx.enable(gfxctx.SAMPLE_COVERAGE);
+      // gfxctx.sampleCoverage(2.2, false);
+   }
+
+
+   gfxCtx.gl = gfxctx;
+   gfxCtx.ext = extensions;
+
+
+   // Print some gl info
+   var maxTextureSize = gfxctx.getParameter(gfxctx.MAX_TEXTURE_SIZE);
+   console.log("Maximum Texture Size: " + maxTextureSize);
+
+   return {gfxctx:gfxctx, extensions:extensions};
+}
+
+
+
+
+
+

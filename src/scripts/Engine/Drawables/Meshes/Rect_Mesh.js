@@ -103,12 +103,6 @@ export class Rect extends Mesh {
 
    AddToGfx() {
 
-      // const g = {
-      //    pos:this.GetPosXYZ(),
-      //    dim:this.geom.dim,
-      // };
-
-      // this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, g, this.mat, this.GetName(), this.idx);
       this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
       this.is_gfx_inserted = true;
 

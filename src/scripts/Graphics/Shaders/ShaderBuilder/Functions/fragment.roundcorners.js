@@ -89,7 +89,7 @@ vec4 Stylize()                                                    \n\
   \n\
   vec2 res = u_screen_res;    \n\
   vec2 uv = gl_FragCoord.xy/res;                                  \n\
-  uv -= vec2(v_wpos.x/res.x, 1.-(v_wpos.y/res.y));                \n\
+  uv -= vec2((v_wpos.x/res.x), 1.-(v_wpos.y/res.y));                \n\
   pos = uv;                                                       \n\
   vec2 dim = vec2(v_dim.x/res.x, v_dim.y/res.y);                  \n\
   \n\
@@ -115,15 +115,14 @@ vec4 Stylize()                                                    \n\
   float alpha = src.a * (wa * wb);                                \n\
   color += color * (1.0 - alpha) + src.rgb * alpha;               \n\
   \n\
-  // // Border Width. It is 0.001 for every pixel                    \n\
-  // float borderWidth = v_border_width * 0.001;                     \n\
+  // // Border Width. It is 0.001 for every pixel                  \n\
+  // float borderWidth = v_border_width * 0.001;                   \n\
   // float bd = (abs(d)-borderWidth) - blur.x;                     \n\
-  // wa = clamp(-bd * AA, 0.0, 1.0);                                 \n\
-  // wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);                    \n\
-  // color += color * vec3(abs(wa * wb));                            \n\
+  // wa = clamp(-bd * AA, 0.0, 1.0);                               \n\
+  // wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);                  \n\
+  // color += color * vec3(abs(wa * wb));                          \n\
   \n\
-  color *= alpha; \n\
-  return vec4(color, alpha);                                      \n\
+  return vec4(color, alpha);                                       \n\
 } \n\
 ';
 /** CLASSIC SDF RECT IMPLEMENTYATION */

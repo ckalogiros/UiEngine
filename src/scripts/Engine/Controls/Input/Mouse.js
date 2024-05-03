@@ -139,28 +139,22 @@ export function MouseGetPosDif() {
 }
 
 
-// export function MouseGetPosDif2(storage) {
-//    storage.x = mouse.pos.xdiff;
-//    storage.y = mouse.pos.ydiff;
-// }
-
-
-export function MouseGetDir() {
+function MouseGetDir() {
    return mouse.pos.GetDif();
 }
 
 
-export function MouseGetXdir() {
+function MouseGetXdir() {
    return mouse.pos.xdiff;
 }
 
 
-export function MouseGetYdir() {
+function MouseGetYdir() {
    return mouse.pos.ydiff;
 }
 
 
-export function MouseGetArea() {
+function MouseGetArea() {
    return mouse.click.drag;
 }
 
@@ -179,6 +173,9 @@ export function MouseGetWheel(){
 export function MouseResetWheel(){  // HOT-PATH
    mouse.wheel.Reset();
 }
+
+
+
 
 
 /**
@@ -382,7 +379,7 @@ export function OnTouchCancel(e) {
 export function OnTouchMove(e) {
    e.stopPropagation();
    e.preventDefault(); 
-   console.log('OnTouchMove:',[e.changedTouches[0].clientX, e.changedTouches[0].clientY]);
+   // console.log('OnTouchMove:',[e.changedTouches[0].clientX, e.changedTouches[0].clientY]);
    // Update mouse coordinates
    const x = e.changedTouches[0].clientX;
    const y = e.changedTouches[0].clientY;
@@ -390,7 +387,7 @@ export function OnTouchMove(e) {
 
    mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
    mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
-   console.log('updated mouse:',mouse.pos);
+   // console.log('updated mouse:',mouse.pos);
    
 }
 
