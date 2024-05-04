@@ -182,6 +182,13 @@ export function AddArr3(arr1, arr2){
     arr1[2] += arr2[2];
 }
 
+export function SubArr2(arr1, arr2){
+    //TODO: IIMPLEMENT
+}
+export function SubArr3(arr1, arr2){
+    //TODO: IIMPLEMENT
+}
+
 
 export function Floor(val){
     return ~~val;

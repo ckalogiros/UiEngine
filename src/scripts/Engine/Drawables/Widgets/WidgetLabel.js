@@ -6,7 +6,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Rect } from "../Meshes/Rect_Mesh.js";
-import { Align_self_get_dif } from "../Operations/Alignment.js";
+import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
@@ -24,7 +24,8 @@ export class Widget_Label extends Rect {
     text_mesh;
     pad = [0, 0];
 
-    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [200, 300, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
+    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
+    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.BOTTOM), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -44,37 +45,38 @@ export class Widget_Label extends Rect {
                 
         
         super(_pos, dim, col);
-        
+        this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
+        this.SetName(`[${this.mesh_bufferidx}]{${text}}-LABEL`);
+        this.pad = pad;
+        this.StylesSetPad(pad);
 
-        if(Align & ALIGN.RIGHT){
-            const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2 - pad[0]
-            text_mesh.geom.pos[0] = d
-        }
-        else if(Align & ALIGN.LEFT){
-            // const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2
-            const d = pad[0]
-            text_mesh.geom.pos[0] = d
-        }
-        else if(Align & ALIGN.HOR_CENTER){
-            // const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2
-            const d = this.geom.pos[0] + (this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2)
-            text_mesh.geom.pos[0] = d/2
-        }
-        if(Align & ALIGN.VERT_CENTER){
-            // const d = this.geom.dim[1] - text_mesh.geom.dim[1]+ pad[1]
-            // const d = this.geom.dim[1] - text_mesh.geom.dim[1]
-            const d = this.geom.pos[1] + (this.geom.dim[1] - text_mesh.geom.dim[1])
-            text_mesh.geom.pos[1] += d
-        }
-        else if(Align & ALIGN.BOTTOM){
-            const d = this.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1]
-            // const d = this.geom.dim[1]
-            text_mesh.geom.pos[1] += d
-        }
-        else if(Align & ALIGN.TOP){
-            // const d = this.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1]
-            text_mesh.geom.pos[1] += pad[1]
-        }
+        this.text_mesh = text_mesh;
+        
+        Align_text_in_rect_parent(Align, this)
+
+        // if(Align & ALIGN.RIGHT){
+        //     const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2 - pad[0]
+        //     text_mesh.geom.pos[0] = d
+        // }
+        // else if(Align & ALIGN.LEFT){
+        //     const d = pad[0]
+        //     text_mesh.geom.pos[0] = d
+        // }
+        // else if(Align & ALIGN.HOR_CENTER){
+        //     const d = this.geom.pos[0] + (this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2)
+        //     text_mesh.geom.pos[0] = d/2
+        // }
+        // if(Align & ALIGN.VERT_CENTER){
+        //     const d = this.geom.pos[1] + (this.geom.dim[1] - text_mesh.geom.dim[1])
+        //     text_mesh.geom.pos[1] = d
+        // }
+        // else if(Align & ALIGN.BOTTOM){
+        //     const d = this.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1]
+        //     text_mesh.geom.pos[1] = d
+        // }
+        // else if(Align & ALIGN.TOP){
+        //     text_mesh.geom.pos[1] += pad[1]
+        // }
 
         text_mesh.sceneidx = this.sceneidx;
 
@@ -88,11 +90,7 @@ export class Widget_Label extends Rect {
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
         this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
-        this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
-        this.SetName(`[${this.mesh_bufferidx}]{${text}}-LABEL`);
-        this.pad = pad;
-
-        this.text_mesh = text_mesh;
+  
         this.text_mesh.parent = NO_MESH_PARENT; // Use a special case for text meshes that are part of a widget without being in children's buffer.
 
               
@@ -293,6 +291,13 @@ export class Widget_Label extends Rect {
         this.text_mesh.geom.pos[1] = y+dy;
     }
 
+    TEMP_recalc_x(x) {
+
+        const dx = this.text_mesh.geom.pos[0]-this.geom.pos[0];
+        this.geom.pos[0] = x;
+        this.text_mesh.geom.pos[0] = x+dx;
+    }
+
 
     MoveYNoGfxUpdate(y) {
 
@@ -320,7 +325,9 @@ export class Widget_Label extends Rect {
     
     SetPosXNoGfxUpdate(x) {
         this.geom.pos[0] = x;
-        this.text_mesh.geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
+        // this.text_mesh.geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
+        this.text_mesh.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0]) - this.text_mesh.geom.dim[0] + this.pad[0];
+        // this.text_mesh.geom.pos[0] = (this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
     }
 
 

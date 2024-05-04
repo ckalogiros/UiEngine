@@ -48,8 +48,10 @@ export function Relative_pos_comp_add_child_to_comp(whereidx, parent, childidx){
    
    const comp = parent.rel_comp;
    const idx = comp.buffer[whereidx].Add(childidx);
+
+   // if(childidx !== idx) console.error('Relative_pos_comp_add_child_to_comp\nYou are storing a child with idx different to the ');
    
-   Rel_pos_fn_ptr[whereidx](whereidx, parent, idx);
+   Rel_pos_fn_ptr[whereidx](whereidx, parent, childidx);
    
    return idx;
 
@@ -63,7 +65,7 @@ function Relative_pos_comp_align_child_left(whereidx, parent, childidx){
    const left_children = parent.rel_comp.buffer[whereidx];
    const new_elem = parent.children.buffer[childidx];
 
-   let xpos = 0;
+   let x = 0;
 
 
    // If the mesh its the first child in the left sequence of meshes, use the last mesh as the initial start pos
@@ -71,20 +73,20 @@ function Relative_pos_comp_align_child_left(whereidx, parent, childidx){
 
       const lastidx = left_children.boundary-1;
       const last_elem = parent.children.buffer[lastidx];
-      xpos = last_elem.geom.pos[0] + last_elem.geom.dim[0];
+      x = last_elem.geom.pos[0] + last_elem.geom.dim[0];
    }
    else{ // Else get the left position of the parent
       // const extra = (parent.margin) ? parent.StylesGetMargin(STYLES.AXIS.X) : (parent.pad) ? parent.pad : 0;
       const extra = parent.StylesGetMargin(STYLES.AXIS.X);
-      xpos = parent.geom.pos[0] - parent.geom.dim[0] + extra;
+      x = parent.geom.pos[0] - parent.geom.dim[0] + extra;
    }
 
 
    // Find the corect position
-   xpos += new_elem.geom.dim[0];
+   x += new_elem.geom.dim[0];
 
    // Update children's position
-   parent.children.buffer[childidx].SetPosXNoGfxUpdate(xpos); // Guarantees the recursive move of all it's children
+   parent.children.buffer[childidx].SetPosXNoGfxUpdate(x); // Guarantees the recursive move of all it's children
    
 }
 
@@ -96,26 +98,25 @@ function Relative_pos_comp_align_child_right(whereidx, parent, childidx){
    const children = parent.rel_comp.buffer[whereidx];
    const new_elem = parent.children.buffer[childidx];
 
-   let xpos = 0;
+   let x = 0;
 
-   
    // If the mesh its the first child is left in the sequence of meshes(buffer), use the last mesh as the initial start pos
    if(children.boundary > 0){
 
       const lastidx = children.boundary-1;
       const last_elem = parent.children.buffer[lastidx];
-      xpos = last_elem.geom.pos[0] - last_elem.geom.dim[0];
+      x = last_elem.geom.pos[0];
    }
    else{ // Else its the first 'right' mesh, so get the right position of the parent as the initial start position
-      const extra = parent.StylesGetMargin(STYLES.AXIS.X); 
-      xpos = parent.geom.pos[0] + parent.geom.dim[0] - extra;
+      const extra = new_elem.geom.dim[0]*2 - parent.StylesGetMargin(STYLES.AXIS.X); 
+      x = parent.geom.pos[0] + parent.geom.dim[0]*2 - extra;
    }
 
    // Find the corect position
-   xpos -= new_elem.geom.dim[0];
+   x -= new_elem.geom.dim[0];
 
    // Update children's position
-   parent.children.buffer[childidx].SetPosXNoGfxUpdate(xpos); // Guarantees the recursive move of all it's children
+   new_elem.TEMP_recalc_x(x); // Guarantees the recursive move of all it's children
 
 }
 
@@ -151,8 +152,7 @@ export function Relative_pos_comp_recalc_right(parent){
 function _Relative_pos_comp_recalc_left(whereidx, parent){
 
    const children = parent.rel_comp.buffer[whereidx];
-   // let xpos = parent.geom.pos[0] - parent.geom.dim[0] + parent.StylesGetMargin(STYLES.AXIS.X);
-   let xpos = parent.geom.pos[0] - parent.geom.dim[0];
+   let x = parent.geom.pos[0] - parent.geom.dim[0];
 
    for(let i=0; i <= children.boundary; i++){
       
@@ -160,37 +160,64 @@ function _Relative_pos_comp_recalc_left(whereidx, parent){
       const elem = parent.children.buffer[elemidx];
 
       if(elem.state.mask & MESH_STATE.ACTIVE){
-         xpos += elem.geom.dim[0];
-         elem.SetPosXNoGfxUpdate(xpos);
-         // elem.SetPosX(xpos, elem.gfx);
-         // console.log('xpos',elem.GetName()) 
-         xpos += elem.geom.dim[0];
+         x += elem.geom.dim[0];
+         elem.SetPosXNoGfxUpdate(x);
+         x += elem.geom.dim[0];
       }
 
    }
 }
 
-
+// IMIDIATELY: !!!!!!!!!!!!
+// PAD EVERYWHERE, Organize the styles.pad, margin in all files
 
 
 function _Relative_pos_comp_recalc_right(whereidx, parent){
 
    const children = parent.rel_comp.buffer[whereidx];
-   // let xpos = parent.geom.pos[0] + parent.geom.dim[0] - parent.StylesGetMargin(STYLES.AXIS.X);
-   let xpos = parent.geom.pos[0] + parent.geom.dim[0]*2;
+   let x = parent.geom.pos[0] + parent.geom.dim[0]*2;
 
    for(let i=0; i <= children.boundary; i++){
       
       const elemidx = children.buffer[i];
       const elem = parent.children.buffer[elemidx];
 
-      // if(elem.state.mask & MESH_STATE.ACTIVE){
+      x -= elem.geom.dim[0]*2 + elem.pad[0]*2;
+      // elem.SetPosXNoGfxUpdate(x);
+      elem.TEMP_recalc_x(x);
+      x += elem.geom.dim[0] - elem.pad[0]*2;
+   }
+}
 
-         xpos -= elem.geom.dim[0];
-         elem.SetPosXNoGfxUpdate(xpos);
-         // elem.SetPosX(xpos, elem.gfx);
-         // console.log(i, 'RIGHT:xpos', xpos, 'parentpos', parent.geom.pos, elem.GetName(), 'parent:', parent.GetName()) 
-         xpos -= elem.geom.dim[0];
-      // }
+
+
+
+
+
+
+
+
+
+/**************************************************************************************************************/
+// Move specific buffer: For resize we do not need to recalculate the positions, just move the meshes
+
+
+
+
+/** Move all meshes that belong to the buffer of the 'right' relative positioning */
+export function Relative_pos_comp_move_right_buffer(whereidx, parent, x){
+   
+   const children = parent.rel_comp.buffer[whereidx];
+
+   for(let i=0; i <= children.boundary; i++){
+      
+      const elemidx = children.buffer[i];
+      const elem = parent.children.buffer[elemidx];
+
+      
+      // console.log(elem.GetName())
+
+      // If elem is a synthesized mesh (widget), move elem and all its children
+      elem.MoveXNoGfxUpdate(x)
    }
 }

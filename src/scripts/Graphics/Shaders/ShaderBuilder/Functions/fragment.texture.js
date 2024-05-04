@@ -60,7 +60,7 @@ vec4 Msdf() {\n\
   float pxDist = screenPxRange() * (dist - 0.5);\n\
   float opacity = clamp(pxDist + 0.5, 0.0, 1.0);\n\
   // opacity += Glow() * 2.4; // Combine the original texture with the blurred alpha\n\
-  vec4 alpha = vec4(opacity+.0); \n\
+  vec4 alpha = vec4(opacity+.2); \n\
   return alpha; \n\
 }\n\
 ';

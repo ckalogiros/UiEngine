@@ -1,13 +1,67 @@
 "use strict";
 
+import { AddArr2 } from "../../../Helpers/Math/MathOperations";
+
+
+
+
+
+
+
+/** Uses exact algorithm as the Widget_Label class for alignment */
+export function Align_text_in_rect_parent(Align, parent) {
+
+    if(!parent || !parent.text_mesh) alert('Handles only text as text_mesh of a mesh\nAlign_text_in_rect_parent()\nAlignment.js')
+
+    const text_mesh = parent.text_mesh;
+
+    const pad = parent.StylesGetPad();
+
+    // const root_pos = parent.GetPosXY();
+    // const pos = [
+    //     root_pos[0] - parent.geom.pos[0],
+    //     root_pos[1] - parent.geom.pos[1],
+    // ];  
+
+    const text_width = text_mesh.GetMaxWidth()*2;
+
+    // const dim = [
+    //     text_mesh.GetMaxWidth()+pad[0]*2,
+    //     text_mesh.geom.dim[1]+pad[1]*2,
+    // ];
+            
+    
+
+    if(Align & ALIGN.RIGHT){
+        const d = parent.geom.dim[0]*2 - text_width - pad[0]
+        text_mesh.geom.pos[0] = d
+    }
+    else if(Align & ALIGN.LEFT){
+        const d = pad[0]
+        text_mesh.geom.pos[0] = d
+    }
+    else if(Align & ALIGN.HOR_CENTER){
+        const d = parent.geom.pos[0] + (parent.geom.dim[0]*2 -text_width)
+        text_mesh.geom.pos[0] = d/2
+    }
+    if(Align & ALIGN.VERT_CENTER){
+        const d = parent.geom.pos[1] + (parent.geom.dim[1] - text_mesh.geom.dim[1])
+        text_mesh.geom.pos[1] = d
+    }
+    else if(Align & ALIGN.BOTTOM){
+        const d = parent.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1]
+        text_mesh.geom.pos[1] = d
+    }
+    else if(Align & ALIGN.TOP){
+        text_mesh.geom.pos[1] = pad[1]
+    }
+}
+
+
 
 
 /**
  * 
- * @param {*} flags 
- * @param {*} first_mesh 
- * @param {*} second_mesh 
- * @param {*} pad 
  */
 
 export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0], second_pad = [0, 0], advancex) {

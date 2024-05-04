@@ -510,18 +510,6 @@ export class Mesh {
         const p = TEMP_get_widget_root_wpos(this.root_posidx);
         let pos = [p[0], p[1], 0];
 
-        // if (this.group_bufferidxs[0] !== INT_NULL) {
-
-        //     if (!View_is_group_root(this.group_bufferidxs, this.mesh_bufferidx)) {
-
-        //         const group_root_mesh_meshidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
-        //         const group_pos = Mesh_buffer_get_mesh_pos(group_root_mesh_meshidx);
-        //         pos[0] += group_pos[0];
-        //         pos[1] += group_pos[1];
-        //         // console.log('group_pos', group_pos, this.GetName())
-        //     }
-        // }
-
         pos[0]+=this.geom.pos[0]; 
         pos[1]+=this.geom.pos[1];
         return pos;
@@ -576,7 +564,7 @@ export class Mesh {
     StylesSetHoverMargin(margin) { Styles_hover_margin_set(this.styles, margin); }
 
 
-    StylesSetPad(margin) { Styles_pad_set(this.styles, margin); }
+    StylesSetPad(pad) { Styles_pad_set(this.styles, pad); }
 
 
     SetUpdateFrameBuffer() {

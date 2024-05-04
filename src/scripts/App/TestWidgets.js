@@ -1268,20 +1268,24 @@ function CreateMenu() {
 
     const pos = [200, 500, 0]
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [100, 200], TRANSPARENCY(YELLOWR[2], .9))
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [100, 200], TRANSPARENCY(GREEN[2], .9))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // section.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
+    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
 
 
     const menu = Create_widget_menubar(_, [0,0,pos[2]], TRANSPARENCY(GREY[1], .6), WHITE, 'Widget', [10, 6]);
-    // menu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // menu.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-    // menu.CreateListenEEvent(LISTEN_EVENT_TYPES.HOVER);
-    // menu.AddCloseButton(_, section, 'x');
-    menu.AddMinimizeButton(_, section);
-    menu.options = SECTION.HORIZONTAL | SECTION.INHERIT;
     section.AddItem(menu);
+
+    menu.AddCloseButton(_, section, 'x');
+    menu.AddMinimizeButton(_, section);
+    
+    const label = Create_widget_label(_, 'Hi', _, _, 8, PURPLER[5], WHITE);
+    menu.AddToMenuBar(label);
+
+
+    // menu.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
+    menu.options = SECTION.HORIZONTAL | SECTION.EXPAND;
 
     // Create items for the section
     // {
@@ -1299,7 +1303,6 @@ function CreateMenu() {
     //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     //     section.AddItem(label)
     // }
-
     // {
     //     const dp = Create_widget_dropdown(_, 'Dp', [100, 100, 0], GREEN[4], GREY[2], _, _, _, _, _, _);
     //     dp.CreateClickEvent();
@@ -1318,7 +1321,6 @@ function CreateMenu() {
     //         dp.AddToMenu(label)
     //     }
     // }
-
     // {
     //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
     //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -1333,9 +1335,8 @@ function CreateMenu() {
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
-    section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
+    section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
     section.Calc_no_gfx_update();
-    Relative_pos_comp_recalc_all(menu)
     
     section.Render();
     
@@ -1343,7 +1344,6 @@ function CreateMenu() {
     
     Widget_root_gfx_set_unif_wpos_per_vb(section.root_bufferidx);
     
-    // Command_buffer_store(Relative_pos_comp_recalc_all, menu);
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(section);

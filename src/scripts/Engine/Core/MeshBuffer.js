@@ -12,6 +12,7 @@ import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 import { Uniforms_buffer_set_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
+import { REL_POS, Relative_pos_comp_move_right_buffer } from "../Drawables/Operations/RelativePosComponent.js";
 
 
 
@@ -944,6 +945,8 @@ export function Widget_root_gfx_add_unif_wpos_per_vb(root_bufferidx, dif) {
 /*******************************************************************************************************************************************************************************/
 
 
+// TODO: 
+// UNNECESSARY: we do not use move in that way anymore
 export function Widget_movexy(params) {
 
    const root = params.params;
@@ -982,6 +985,8 @@ export function Widget_movexy(params) {
 
 
 
+// TODO: 
+// UNNECESSARY: we do not use move in that way anymore
 export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
 
    // for (let i = 0; i <= _widget_root_buffer.buffer[root_bufferidx].boundary; i++) {
@@ -1066,6 +1071,7 @@ export function TEMP_REMOVE_CHILDREN(root, firstidx, lastidx) {
 
 
 
+
 export function TEMP_REMOVE_CHILDREN_CENTER(root, firstidx, lastidx) {
 
    console.log(`root:${root.GetName()} firstidx:${firstidx} lastidx:${lastidx} first:${first} last:${last} toidx:${toidx}`)
@@ -1085,6 +1091,8 @@ export function TEMP_REMOVE_CHILDREN_CENTER(root, firstidx, lastidx) {
 
 
 
+// TODO: 
+// UNNECESSARY: we do not use move in that way anymore
 export function Movey_from_widget_root_buffer(mesh, ydif) {
 
    const widget_root_buffer = Widget_root_buffer_get_byidx(mesh.root_bufferidx);
@@ -1099,7 +1107,8 @@ export function Movey_from_widget_root_buffer(mesh, ydif) {
 }
 
 
-
+// TODO: 
+// UNNECESSARY: we do not use move in that way anymore
 export function Movey_from_widget_root_buffer_and_batch_update(mesh, ydif) {
 
    const widget_root_buffer = Widget_root_buffer_get_byidx(mesh.root_bufferidx);
@@ -1140,9 +1149,6 @@ export function Widget_root_reset_gfx(root_bufferidx) {
 
    for (let i = 0; i < len; i++) {
 
-      // if (rootgfx.buffer[i] === INT_NULL || rootgfx.buffer[i + GFX.VB_IDX] === INT_NULL)
-      //    alert('Gfx indexes from the Int8Buffer array are initialized with -1. So the error here is because we hit -1 as an index of one of the 3 gfx indexes')
-
       // Get the root mesh from root_batch_buffer, touse the start index of every root for the vertex buffer
       const root_mesh_per_vb_idx = _root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx; // IMPORTANT: // TODO: Maybe we store the start to the batch buffer: batch_buffer.vb[i].start={meshidx, num_faces, start}
       const mesh = _mesh_buffer.buffer[root_mesh_per_vb_idx];
@@ -1150,6 +1156,93 @@ export function Widget_root_reset_gfx(root_bufferidx) {
       // Add to vertexbuffer
       Vertex_buffer_reset_to_index(rootgfx[i].progidx, rootgfx[i].vbidx, mesh.gfx.vb.start);
    }
+}
+
+
+
+/** Render all group's meshes from all vertex buffers via AddToGfxFromReset()  */
+export function Widget_root_rerender_from_root_all_buffers(root_bufferidx, do_reconstruct_listeners=true) {
+
+   const root = _widget_root_buffer.buffer[root_bufferidx];
+
+   for (let i = 0; i <= root.boundary; i++){
+      
+      const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
+      if (mesh.state.mask & MESH_STATE.ACTIVE) { 
+
+         mesh.AddToGfxFromReset(); 
+      }
+      // else console.log('INACTIVE', mesh.GetName())
+   }
+   
+   // Reconstruct all listeners(from root, recursive(SLOW))
+   if(do_reconstruct_listeners) {
+      
+      // Get the root mesh
+      const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[0]);
+      const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
+      mesh.ConstructListeners(parent_events); 
+   }
+
+}
+
+
+
+/**
+ * // EFFICIENCY
+ * VERY INEFICIENT:
+ * If the root has 1000 meshes, and only 1 or 2 are to be resized,
+ * we run 1000 times for no reason
+ */
+
+// Faster than calling for resize and rerender seperately 
+/** Resize (x,y) dimentions and re-render for all meshes in widget root  */
+export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconstruct_listeners=true) {
+
+   const root = _widget_root_buffer.buffer[root_bufferidx];
+   
+   // Do for root
+   // Resize: Only to Section meshes that have the option:EXPAND
+   const root_mesh = Mesh_buffer_get_mesh_byidx(root.buffer[0]);
+   root_mesh.geom.dim[0] += x;
+   root_mesh.geom.dim[1] += y;
+
+   // Rerender
+   root_mesh.AddToGfxFromReset();  
+
+
+   // Do children
+   for (let i = 1; i <= root.boundary; i++){
+      
+      const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
+      if (mesh.state.mask & MESH_STATE.ACTIVE) { 
+
+         // Resize: Only to Section meshes that have the option:EXPAND
+         if(mesh.options && mesh.options & SECTION.EXPAND){
+            mesh.geom.dim[0] += x;
+            // mesh.geom.dim[1] += y; // TODO: Deal with y resize. Most of meshes should be resized in x only. 
+         }
+
+         // Do: meshes with rel_comp. Move the children positioned relative right
+         if(mesh.rel_comp){
+            Relative_pos_comp_move_right_buffer(REL_POS.RIGHT, mesh, x*2)
+         }
+
+
+         // Rerender
+         mesh.AddToGfxFromReset(); 
+      }
+      // else console.log('INACTIVE', mesh.GetName())
+   }
+   
+   // Reconstruct all listeners(from root, recursive(SLOW))
+   if(do_reconstruct_listeners) {
+      
+      // Get the root mesh
+      const parent_events = root_mesh.parent ? [root_mesh.parent.listeners.buffer[0], root_mesh.parent.listeners.buffer[1]] : [null, null];
+      root_mesh.ConstructListeners(parent_events); 
+   }
+
 }
 
 
@@ -1404,14 +1497,16 @@ export function Widgetroot_buffer_print_w1() {
                }
                else {
                   console.log('   ', j,
-                  'ridx:', _widget_root_buffer.buffer[i].buffer[j],
-                  'batchidx', mesh.batch_buffer_vbidx,
-                  'gfxidx', mesh.per_vb_bufferidx,
+                  // 'ridx:', _widget_root_buffer.buffer[i].buffer[j],
+                  // 'batchidx', mesh.batch_buffer_vbidx,
+                  // 'gfxidx', mesh.per_vb_bufferidx,
                   'msbidx', mesh.mesh_bufferidx,
                   'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.idx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
                   'state', mesh.state.mask,
                   'start', mesh.gfx.vb.start,
-                  'pos', mesh.geom.pos, mesh.GetName());
+                  // 'pos', mesh.GetPosXY(),
+                  'dim', mesh.geom.dim,
+                  'rel pos', mesh.geom.pos, mesh.GetName());
                   // 'ubidxs', mesh.uniforms, mesh.GetName());
             }
          }
