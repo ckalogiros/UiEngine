@@ -1,6 +1,6 @@
 "use strict";
 
-import { Int8Buffer, M_Buffer, New_int8_buffer } from "../../Core/Buffers.js";
+import { M_Buffer, New_int8_buffer } from "../../Core/Buffers.js";
 
 
 
@@ -77,7 +77,7 @@ function Relative_pos_comp_align_child_left(whereidx, parent, childidx){
    }
    else{ // Else get the left position of the parent
       // const extra = (parent.margin) ? parent.StylesGetMargin(STYLES.AXIS.X) : (parent.pad) ? parent.pad : 0;
-      const extra = parent.StylesGetMargin(STYLES.AXIS.X);
+      const extra = new_elem.geom.dim[0] + parent.StylesGetMargin(STYLES.AXIS.X); 
       x = parent.geom.pos[0] - parent.geom.dim[0] + extra;
    }
 
@@ -86,7 +86,7 @@ function Relative_pos_comp_align_child_left(whereidx, parent, childidx){
    x += new_elem.geom.dim[0];
 
    // Update children's position
-   parent.children.buffer[childidx].SetPosXNoGfxUpdate(x); // Guarantees the recursive move of all it's children
+   new_elem.TEMP_recalc_x(x); // Guarantees the recursive move of all it's children
    
 }
 
@@ -152,24 +152,25 @@ export function Relative_pos_comp_recalc_right(parent){
 function _Relative_pos_comp_recalc_left(whereidx, parent){
 
    const children = parent.rel_comp.buffer[whereidx];
-   let x = parent.geom.pos[0] - parent.geom.dim[0];
+   let x = parent.geom.pos[0];
 
    for(let i=0; i <= children.boundary; i++){
       
       const elemidx = children.buffer[i];
       const elem = parent.children.buffer[elemidx];
 
+      console.log('1111111111111111111111', elem.GetName())
+
       if(elem.state.mask & MESH_STATE.ACTIVE){
-         x += elem.geom.dim[0];
-         elem.SetPosXNoGfxUpdate(x);
+         x += elem.geom.dim[0]*2;
+         elem.TEMP_recalc_x(x);
          x += elem.geom.dim[0];
       }
 
    }
 }
 
-// IMIDIATELY: !!!!!!!!!!!!
-// PAD EVERYWHERE, Organize the styles.pad, margin in all files
+
 
 
 function _Relative_pos_comp_recalc_right(whereidx, parent){
@@ -182,10 +183,10 @@ function _Relative_pos_comp_recalc_right(whereidx, parent){
       const elemidx = children.buffer[i];
       const elem = parent.children.buffer[elemidx];
 
-      x -= elem.geom.dim[0]*2 + elem.pad[0]*2;
-      // elem.SetPosXNoGfxUpdate(x);
+      const pad = elem.StylesGetPad(STYLES.AXIS.X)
+
+      x -= elem.geom.dim[0]*2;
       elem.TEMP_recalc_x(x);
-      x += elem.geom.dim[0] - elem.pad[0]*2;
    }
 }
 

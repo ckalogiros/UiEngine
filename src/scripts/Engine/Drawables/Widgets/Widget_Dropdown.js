@@ -106,7 +106,6 @@ export class Widget_Dropdown extends Section {
    menu; // SEE ## Dropdown Menu 
    rootidx; // Store the root's dropdown index (of the '_root_dropdown');
    dp_symbols; // Text symbols for denoting a dropdown's Expanded/contracted menu. // TODO: Add textured symbols OR create a font texture with symbols for dropdown expansion/contraction.
-   // depth_level; // The tree depth level that the dropdown exists (root dp = 0 depth).
 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col_menu = PURPLER[7], text_col = WHITE, btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, style = [2, 5, 2], margin = [10, 10], is_debug_mesh) {
@@ -123,7 +122,8 @@ export class Widget_Dropdown extends Section {
       this.rootidx = INT_NULL;
 
       pos[2] += 1;
-      this.menu = Create_widget_section(_, SECTION.VERTICAL, margin, [OUT_OF_VIEW, OUT_OF_VIEW, pos[2]], [1, 1], TRANSPARENCY(col_menu, tr), _, _, is_debug_mesh);
+      // this.menu = Create_widget_section(_, SECTION.VERTICAL, margin, [OUT_OF_VIEW, OUT_OF_VIEW, pos[2]], [1, 1], TRANSPARENCY(col_menu, tr), _, _, is_debug_mesh);
+      this.menu = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, pos[2]], [1, 1], TRANSPARENCY(col_menu, tr), _, _, is_debug_mesh);
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.parent = this;
       AddArr2(this.menu.total_margin, this.menu.StylesGetMargin());
@@ -169,8 +169,6 @@ export class Widget_Dropdown extends Section {
 
 
       if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-
-         // mesh.depth_level = this.depth_level + 1; // Set the depth of the new dp.
 
          if (this.rootidx === INT_NULL) {
 
@@ -218,6 +216,9 @@ export class Widget_Dropdown extends Section {
 
       this.state.mask |= MESH_STATE.ACTIVE;
       this.children.buffer[0].Activate(); // Button
+      if(this.isOn & DP_MENU_STATE.ON){
+         this.menu.Activate(); // Button
+      }
    }
 
 
@@ -225,6 +226,9 @@ export class Widget_Dropdown extends Section {
 
       this.state.mask &= ~MESH_STATE.ACTIVE;
       this.children.buffer[0].Deactivate(); // Button
+      if(this.isOn & DP_MENU_STATE.ON){
+         this.menu.Deactivate(); // Button
+      }
    }
 
 
@@ -551,7 +555,6 @@ export class Widget_Dropdown extends Section {
       // TODO: If group root mesh does not have a Recalc function, we MUST search for the first 'Section' fro the group root 
       // Re-calculate dimensions and positions
       let clip_top = null, clip_bottom = null;
-      let clip_right = null;
       if (root.group_bufferidxs[0] !== INT_NULL) {
 
          // Get the group root mesh to Recalc position/dimentions 
@@ -566,13 +569,13 @@ export class Widget_Dropdown extends Section {
 
             clip_top = group_root_mesh.parent.geom.pos[1];
             clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1]*2;
-            clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
+         }
+         else {
+            clip_top = group_root_mesh.GetPosY();
+            clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
          }
       }
-      else {
-         // root.Recalc_no_gfx_update(_, this.idx);
-         root.Recalc_no_gfx_update(_);
-      }
+      else alert('Dropdown')
 
 
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
@@ -632,7 +635,6 @@ export class Widget_Dropdown extends Section {
 
       this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
 
-
       // Case its the first time this menu will be rendered
       if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
          View_add_to_group(menu, this.group_bufferidxs[0])
@@ -648,7 +650,6 @@ export class Widget_Dropdown extends Section {
 
       // Re-calculate dimensions and positions
       let clip_top = null, clip_bottom = null;
-      let clip_right = null;
       if (root.group_bufferidxs[0] !== INT_NULL) {
 
          // Get the group root mesh to Recalc position/dimentions 
@@ -661,16 +662,17 @@ export class Widget_Dropdown extends Section {
          // TODO: If the group root is a scrolled_section, maybe the responsibility for Clip is at scroller ?????????
          if (group_root_mesh.parent) {
 
-            clip_top = group_root_mesh.parent.geom.pos[1];
-            clip_bottom = group_root_mesh.parent.geom.pos[1] + group_root_mesh.parent.geom.dim[1]*2;
-            clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
+            clip_top = group_root_mesh.parent.GetPosY();
+            clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
+            // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
+         }
+         else {
+            clip_top = group_root_mesh.GetPosY();
+            clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
          }
 
       }
-      else {
-         root.Recalc_no_gfx_update(_);
-         console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
-      }
+      else alert('Dropdown')
 
       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
       // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
@@ -678,7 +680,6 @@ export class Widget_Dropdown extends Section {
       this.ConstructListenersForMenu(menu); // Create listeners, as children of menu listeners.
 
       View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-
 
    }
 
@@ -799,6 +800,47 @@ export class Widget_Dropdown extends Section {
 
       btn.geom.pos[0] = x + dx;
       btn.geom.pos[1] = y + dy;
+
+      // if(this.isOn & DP_MENU_STATE.ON){
+      //    // this.menu.TEMP_recalc(xp, yp)
+      //    // HACK
+      //    this.menu.geom.pos[0] = this.geom.pos[0] + this.StylesGetMargin(STYLES.AXIS.X)
+      //    this.menu.geom.pos[1] = this.geom.pos[1] + this.geom.dim[1]*2
+      //    // this.menu.geom.dim[0] = this.geom.dim[0]
+      //    this.menu.Recalc_no_gfx_update();
+      // }
+   }
+
+
+   TEMP_recalc_x(x) {
+
+      const btn = this.children.buffer[0];
+
+      // const dx = btn.geom.pos[0] - this.geom.pos[0];
+
+      this.geom.pos[0] = x;
+
+      // btn.TEMP_recalc_x(x + this.StylesGetMargin(STYLES.AXIS.X));
+
+      // TODO: Conceptualize how to implement the code below that will reflect a broader context.
+
+      const xp = x + this.StylesGetMargin(STYLES.AXIS.X);
+      const yp = this.geom.pos[1] + this.StylesGetMargin(STYLES.AXIS.Y)*2;
+      const dx = btn.text_mesh.geom.pos[0]-btn.geom.pos[0];
+      const dy = btn.text_mesh.geom.pos[1]-btn.geom.pos[1];
+      btn.geom.pos[0] = xp;
+      btn.geom.pos[1] = yp;
+      btn.text_mesh.geom.pos[0] = xp+dx;
+      btn.text_mesh.geom.pos[1] = yp+dy;
+
+      if(this.isOn & DP_MENU_STATE.ON){
+         // this.menu.TEMP_recalc(xp, yp)
+         // HACK
+         this.menu.geom.pos[0] = this.geom.pos[0] + this.StylesGetMargin(STYLES.AXIS.X)
+         this.menu.geom.pos[1] = this.geom.pos[1] + this.geom.dim[1]*2
+         // this.menu.geom.dim[0] = this.geom.dim[0]
+         this.menu.Recalc_no_gfx_update();
+      }
    }
 
    SetType(type_flag) {

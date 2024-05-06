@@ -153,8 +153,6 @@ export class Mesh {
         this.parent = null;
 
         this.listeners = null;
-        // this.listeners = New_generic_buffer(_, 'Mesh listeners');
-        // this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
 
         this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
         this.timedEvents = New_generic_buffer(_, 'Mesh timedEvents');

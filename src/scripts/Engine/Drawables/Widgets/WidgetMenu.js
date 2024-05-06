@@ -4,11 +4,13 @@ import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Widget_Button } from "./WidgetButton.js";
 import { Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "../../Core/CreateWidget.js";
-import { Widget_root_add_mesh, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 import { Calculate_positions_no_gfx_update_recursive, Section } from "../Meshes/Section.js";
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 import { Styles_pad_set } from "../../Styles.js";
+import { Clipy_from_group } from "../Operations/Clip.js";
+import { View_get_view_vb_root_meshidx } from "../../Core/MeshBufferViews.js";
 
 
 
@@ -16,11 +18,17 @@ import { Styles_pad_set } from "../../Styles.js";
  * TODO:
  * Menus should not have specific elements, like close and minimize, nor variables of the children elesments, neither should have the CreateCloseButton functionality.
  * They should be generic containers, ready to have any kind of elements-widgets.
+ * 
+ * // IMIDIATELY:
+ * For the close button
  */
 
 
 
 const _fontsize = 10;
+const temp_close_minim_style = [0,0,0];
+
+
 export class Widget_Menu_Bar extends Section {
 
    label;
@@ -33,13 +41,16 @@ export class Widget_Menu_Bar extends Section {
 
 
       const dim = [label.GetMaxWidth(), 10];
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [6, 6], [0, 0, pos[2]], dim, col, _, style, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [0, 0], [0, 0, pos[2]], dim, col, _, style, is_debug_mesh);
 
       Styles_pad_set(this.styles, pad)
       Styles_pad_set(label.styles, pad)
 
-      this.pad[0] = pad[0];
-      this.pad[1] = pad[1];
+      this.geom.dim[1] = label.geom.dim[1];
+
+      this.StylesSetPad(pad)
+      // this.pad[0] = pad[0];
+      // this.pad[1] = pad[1];
 
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -67,13 +78,13 @@ export class Widget_Menu_Bar extends Section {
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
 
       // Use only the top-down pad
-      const pad = [5, 0];
-      // pad[0] = this.label.StylesGetPad(STYLES.AXIS.Y) + 1;
-      // pad[1] = pad[0]-2;
+      const pad = [0, 0]; // IMPORTANT: If we are to set the dim of the close_btn's to a 'y padding', we better set the close_btn.pad[1] to 0
+
+      temp_close_minim_style[2] = this.mat.style[2]; // Make the button to feather on hover.
 
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
-      const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.), text_col, pad, bold, style, font);
+      const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.), text_col, pad, bold, temp_close_minim_style, font);
       close_btn.SetName('close_btn');
 
 
@@ -88,15 +99,17 @@ export class Widget_Menu_Bar extends Section {
             for (let i = 0; i <= this.children.boundary; i++) {
                const child = this.children.buffer[i];
                child.geom.dim[1] = this.geom.dim[1];
-
+               child.geom.dim[0] = this.geom.dim[1];
+               
                // Because we changed the size of the button, we need to realign the text
                Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
             }
          }
       }
       else { // Set mesh height to the max height 
-
+         
          close_btn.geom.dim[1] = this.geom.dim[1];
+         close_btn.geom.dim[0] = this.geom.dim[1];
          // Because we changed the size of the button, we need to realign the text
          Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, close_btn);
       }
@@ -114,10 +127,11 @@ export class Widget_Menu_Bar extends Section {
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
 
       // Use only the top-down pad
-      const pad = [5, 0];
+      const pad = [0, 0];
       // pad[0] = this.label.StylesGetPad(STYLES.AXIS.Y) + 1;
       // pad[1] = pad[0]-2;
 
+      temp_close_minim_style[2] = this.mat.style[2]; // Make the button to feather on hover.
 
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
@@ -126,7 +140,7 @@ export class Widget_Menu_Bar extends Section {
          return;
       }
 
-      const minimize_btn = Create_widget_minimize_btn(ROOT_WIDGET_FLAGS, root, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, .9), text_col, pad, bold, style);
+      const minimize_btn = Create_widget_minimize_btn(ROOT_WIDGET_FLAGS, root, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, .9), text_col, pad, bold, temp_close_minim_style);
       minimize_btn.SetName('minimize_btn');
 
 
@@ -141,6 +155,8 @@ export class Widget_Menu_Bar extends Section {
             for (let i = 0; i <= this.children.boundary; i++) {
                const child = this.children.buffer[i];
                child.geom.dim[1] = this.geom.dim[1];
+               child.geom.dim[0] = this.geom.dim[1];
+               
 
                // Because we changed the size of the button, we need to realign the text
                Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
@@ -149,7 +165,9 @@ export class Widget_Menu_Bar extends Section {
       }
       else { // Set mesh height to the max height 
 
-         minimize_btn.geom.dim[1] = this.geom.dim[1] + 10;
+         minimize_btn.geom.dim[1] = this.geom.dim[1];
+         minimize_btn.geom.dim[0] = this.geom.dim[1];
+               
          // Because we changed the size of the button, we need to realign the text
          Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, minimize_btn);
       }
@@ -163,11 +181,13 @@ export class Widget_Menu_Bar extends Section {
 
 
    // TODO: pass: REL_POS right-left-middle, so user can assign the rel pos of the mesh
-   AddToMenuBar(mesh) {
+   AddToMenuBar(mesh, RelPosAlign) {
 
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
-      mesh.SetStyle([2, 5, 2])
+      mesh.SetStyle([2, 5, 2]);
+
+      const align_item_flag = (RelPosAlign!==undefined) ? RelPosAlign : REL_POS.LEFT;
 
 
       // Set the height of the menu item to be the same across all other items
@@ -181,6 +201,7 @@ export class Widget_Menu_Bar extends Section {
             for (let i = 0; i <= this.children.boundary; i++) {
                const child = this.children.buffer[i];
                child.geom.dim[1] = this.geom.dim[1];
+               // child.geom.dim[0] = child.geom.dim[1];
 
                // Because we changed the size of the button, we need to realign the text
                Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
@@ -198,7 +219,9 @@ export class Widget_Menu_Bar extends Section {
 
       this.AddItem(mesh)
 
-      Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, mesh.idx);
+      // TODO: Use the parem 'RelPosAlign', but first implement correctly the 'REL_POS.LEFT' alingment
+      // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, mesh.idx);
+      if(RelPosAlign & REL_POS.RIGHT) Relative_pos_comp_add_child_to_comp(align_item_flag, this, mesh.idx);
 
    }
 
@@ -360,7 +383,7 @@ export class Widget_Minimize extends Widget_Button {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = [0, 4, 1.8], font, is_debug_mesh) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, '-', _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, '_', _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
 
       this.toggle = false;
       this.store_children_meshes = null;
@@ -369,7 +392,6 @@ export class Widget_Minimize extends Widget_Button {
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
 
-      this.SetStyle(root.mat.style);
 
       const params = {
          source_params: this,
@@ -417,6 +439,12 @@ export class Widget_Minimize extends Widget_Button {
 
 
             // Render only the menu bar at the root
+
+            // Deactivate all children, except the menu bar, so they are not gonna be drawn to the vertex buffer on any re-render 
+            for(let i=menu_bar.idx+1; i <= root.children.boundary; i++ ){
+               root.children.buffer[i].Deactivate()
+            }
+
             root.children.ResetFull(); // Reset the children's buffer and allocate new array
             root.AddChild(menu_bar);
 
@@ -442,12 +470,16 @@ export class Widget_Minimize extends Widget_Button {
 
             // Gfx_deactivate_no_listeners_touch(root);
             Widget_root_reset_gfx(root.root_bufferidx)
-
+            
             root.children.Reset();
             root.children = minim_mesh.stored_children_meshes;
 
-            const dif = root.geom.defDim[0] - root.geom.dim[0];
+            // Re-Activate all children, except the menu bar, so they are gonna be drawn to the vertex buffer on re-render 
+            for(let i=root.children.buffer[0].idx+1; i <= root.children.boundary; i++ ){
+               root.children.buffer[i].Activate()
+            }
 
+            
             // Retrieve stored pos and dim
             root.geom.pos[1] = root.geom.defPos[1];
             root.geom.dim[1] = root.geom.defDim[1];
@@ -455,7 +487,25 @@ export class Widget_Minimize extends Widget_Button {
 
             minim_mesh.text_mesh.RenderTextFromString('-');
 
+
+
+            /**
+             * // EFFICIENCY
+             * Unfortunately we have to run through all meshes for:
+             * 1. Activating all
+             * 2. ClipY all 
+             */
+
+            // Get the group root mesh to Recalc position/dimentions 
+            const group_rootidx = View_get_view_vb_root_meshidx(root.group_bufferidxs);
+            const group_root = Mesh_buffer_get_mesh_byidx(group_rootidx);
+            const clip_top = group_root.GetPosY();
+            const clip_bottom = clip_top + group_root.geom.dim[1]*2;
+            Clipy_from_group(group_root.group_bufferidxs[0], clip_top, clip_bottom);
+
             Calculate_positions_no_gfx_update_recursive(root, SECTION.TOP_DOWN | SECTION.INHERIT | SECTION.VERTICAL)
+
+
             root.Rerender();
 
             root.StateEnable(MESH_STATE.IS_RESIZEABLE);

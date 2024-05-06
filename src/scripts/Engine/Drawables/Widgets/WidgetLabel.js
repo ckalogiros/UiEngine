@@ -22,10 +22,10 @@ import { GREY, WHITE } from "../Material/Base/Colors.js";
 export class Widget_Label extends Rect {
 
     text_mesh;
-    pad = [0, 0];
+    // pad = [0, 0];
 
-    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
-    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.BOTTOM), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
+    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
+    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.BOTTOM), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -47,7 +47,6 @@ export class Widget_Label extends Rect {
         super(_pos, dim, col);
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
         this.SetName(`[${this.mesh_bufferidx}]{${text}}-LABEL`);
-        this.pad = pad;
         this.StylesSetPad(pad);
 
         this.text_mesh = text_mesh;
@@ -235,7 +234,7 @@ export class Widget_Label extends Rect {
 
     Align(flags, pad = [0, 0]) { // Align pre-added to the vertexBuffers
 
-        const move_dif = Align_self_get_dif(flags, this.geom, this.text_mesh.geom, _, this.text_mesh.geom.num_faces, this.pad);
+        const move_dif = Align_self_get_dif(flags, this.geom, this.text_mesh.geom, _, this.text_mesh.geom.num_faces, this.StylesGetPad());
 
         // Update vertex buffers
         if (this.is_gfx_inserted) {
@@ -326,7 +325,7 @@ export class Widget_Label extends Rect {
     SetPosXNoGfxUpdate(x) {
         this.geom.pos[0] = x;
         // this.text_mesh.geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
-        this.text_mesh.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0]) - this.text_mesh.geom.dim[0] + this.pad[0];
+        this.text_mesh.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0]) - this.text_mesh.geom.dim[0] + this.StylesGetPad(STYLES.AXIS.X);
         // this.text_mesh.geom.pos[0] = (this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
     }
 

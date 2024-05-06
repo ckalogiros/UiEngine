@@ -135,6 +135,8 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
          const top      = mesh.GetPosY();
          const bottom   = top + mesh.geom.dim[1]*2;
+         // const top      = mesh.geom.pos[1];
+         // const bottom   = top + mesh.geom.dim[1]*2;
          
    
          if(bottom < limit.up || top > limit.down){

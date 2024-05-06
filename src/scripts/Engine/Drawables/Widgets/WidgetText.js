@@ -23,7 +23,7 @@ import { Align_between, Align_self_get_dif } from "../Operations/Alignment.js";
  */
 export class Widget_Text extends Text_Mesh {
 
-	pad;
+	// pad;
 
 	constructor(ROOT_WIDGET_FLAGS, text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0], is_debug_mesh) {
 
@@ -35,8 +35,9 @@ export class Widget_Text extends Text_Mesh {
 
 		// if(ROOT_WIDGET_FLAGS !== undefined) this.root_bufferidx = 
 
-		this.pad = [0, 0];
-		AddArr2(this.pad, pad);
+		// this.pad = [0, 0];
+		this.StylesSetPad(pad);
+		// AddArr2(this.pad, pad);
 	}
 
 
@@ -346,13 +347,13 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
 			for (let i = 0; i <= this.children.boundary; i++) {
-				max_width += this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].pad[0];
+				max_width += this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 			}
 			return max_width;
 		}
 		else {
 			for (let i = 0; i <= this.children.boundary; i++) {
-				const w = this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].pad[0];
+				const w = this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 				if (max_width < w)
 					max_width = w;
 			}
@@ -364,7 +365,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	GetTotalHeight() {
 
-		let max_height = this.geom.dim[1] + this.pad[1];
+		let max_height = this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
 
 		// HACK: TODO: Set only one of both(SECTION or ALIGN) as global align bit field
 		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
@@ -372,7 +373,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 		else { // Else calculate all the lines of the text meshes
 			for (let i = 0; i <= this.children.boundary; i++) {
-				max_height += this.children.buffer[i].geom.dim[1] + this.children.buffer[i].pad[1];
+				max_height += this.children.buffer[i].geom.dim[1] + this.children.buffer[i].StylesGetPad(STYLES.AXIS.Y);
 			}
 			return max_height;
 		}
@@ -435,7 +436,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC | new_text.geom.type | new_text.mat.type;
 
 
-		Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.pad, prev_text_mesh.advancex)
+		Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.StylesGetPad(), prev_text_mesh.advancex)
 		const pos_dif = Align_self_get_dif(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
 		AddArr2(new_text.geom.pos, pos_dif);
 

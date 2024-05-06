@@ -67,7 +67,6 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_PARAMS1_POS2_FN0(vb_data, geom, mat, star
    let attribs_count = 0;
    let index = start;
 
-   // const pos = 
 
    for (let i = 0; i < num_faces; i++) {
 
@@ -163,7 +162,6 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN0(vb_data, geom, mat, start, num_f
    let attribs_count = 0;
    let index = start;
 
-   // const pos = 
 
    for (let i = 0; i < num_faces; i++) {
 
@@ -713,7 +711,7 @@ export function Gl_set_dim_Y(gfxInfo, y, num_faces = 1) {
 
 
 export function Gl_add_wpos_XYZ(gfxInfo, x, y, z, num_faces = 1) {
-   console.log(vb_data[index-1], y)
+   
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS4);
 
@@ -736,7 +734,7 @@ export function Gl_add_wpos_XYZ(gfxInfo, x, y, z, num_faces = 1) {
 
 
 export function Gl_set_wpos_XYZ(gfxInfo, x, y, z, num_faces = 1) {
-   console.log(vb_data[index-1], y)
+   
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS4);
 
@@ -763,6 +761,7 @@ export function Gl_set_wpos_XY2(vbidx, start, attribsidx, attribsPerVertex, vert
 
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
    const offset = Shader_attributes_get_attrib_offset_by_nameid(attribsidx, SHADER_ATTRIBUTES.WPOS4);
+
 
    let index = start + offset;
    let verts = num_faces * vertsPerRect;
@@ -792,10 +791,7 @@ export function Gl_set_wpos_XY(gfxInfo, x, y, num_faces = 1) {
    while (verts) {
 
       vb_data[index++] = x; // Move mesh's x pos by amt
-      // console.log(vb_data[index])
       vb_data[index++] = y; // Move mesh's y pos by amt
-      // console.log(vb_data[index-1], y)
-      // console.log( y)
 
       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       verts--;
@@ -831,16 +827,14 @@ export function Gl_add_wpos_XY(gfxInfo, x, y, num_faces = 1) {
 export function Gl_add_wpos_X(gfxInfo, x, num_faces = 1) {
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS4);
-   
+
    let index = gfxInfo.vb.start + offset;
    let verts = num_faces * gfxInfo.vertsPerRect;
    let stride = gfxInfo.attribsPerVertex
    
    while (verts) {
       
-      // console.log(vb_data[index-1], y)
       vb_data[index] += x; // Move mesh's x pos by amt
-      // console.log(vb_data[index])
       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       verts--;
    }

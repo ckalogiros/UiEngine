@@ -1217,8 +1217,8 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
       if (mesh.state.mask & MESH_STATE.ACTIVE) { 
 
-         // Resize: Only to Section meshes that have the option:EXPAND
-         if(mesh.options && mesh.options & SECTION.EXPAND){
+         // Resize: Only to Menu_Bar meshes that have the option:EXPAND
+         if(mesh.type & MESH_TYPE.WIDGET_MENU_BAR && mesh.options & SECTION.EXPAND){
             mesh.geom.dim[0] += x;
             // mesh.geom.dim[1] += y; // TODO: Deal with y resize. Most of meshes should be resized in x only. 
          }
@@ -1228,6 +1228,8 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
             Relative_pos_comp_move_right_buffer(REL_POS.RIGHT, mesh, x*2)
          }
 
+         if(mesh.mesh_bufferidx===58)
+            console.log()
 
          // Rerender
          mesh.AddToGfxFromReset(); 
@@ -1236,12 +1238,12 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
    }
    
    // Reconstruct all listeners(from root, recursive(SLOW))
-   if(do_reconstruct_listeners) {
+   // if(do_reconstruct_listeners) {
       
-      // Get the root mesh
-      const parent_events = root_mesh.parent ? [root_mesh.parent.listeners.buffer[0], root_mesh.parent.listeners.buffer[1]] : [null, null];
-      root_mesh.ConstructListeners(parent_events); 
-   }
+   //    // Get the root mesh
+   //    const parent_events = root_mesh.parent ? [root_mesh.parent.listeners.buffer[0], root_mesh.parent.listeners.buffer[1]] : [null, null];
+   //    root_mesh.ConstructListeners(parent_events); 
+   // }
 
 }
 

@@ -264,26 +264,6 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
          // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
          Mesh_per_vb_create_vb(vbidx);
 
-         // Create entry for world position uniform for this vertex buffer, and store the index to that entry in the root mesh's 'root_posidx'.
-         // IMPORTANT: The 'root_posidx' must have the same value with the vbidx (1-1)
-         // Also, must initialize all same root vb wpos uniforms to the widget root position. Because all meshes from any vb of the same widget root have offset positions to the root widget mesh.  
-         
-         // // UNNECESSARY: For all vb except the widget root. All the root wpos are set from a functions call, based on the root root_wpos 
-         // const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh.geom.pos);
-         // if(root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
-
-         
-         // /**
-         //  * TEMPORARY:
-         //  * Remove the mesh pos here, and add it to the root pos buffer.
-         //  * At some point we have to figure out a better way of dealing with the root positions.
-         //  * The thing is:
-         //  * Position is passes to a widget creation function, and is stored by Geometry as the mesh's position.
-         //  * But the root pos element for that vertex buffer is created on the 'GenGfxCtx()' path. 
-         //  */
-         // mesh.geom.pos[0] = 0;
-         // mesh.geom.pos[1] = 0;
-
          is_vertex_buffer_created = true;
 
       }
@@ -326,13 +306,12 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
       Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbidx);
 
       // UNNECESSARY: For all vb except the widget root. All the root wpos are set from a function call, based on the root root_wpos 
+      console.log('------------------------',  mesh.geom.pos, mesh.GetName())
       const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh.geom.pos, mesh.GetName());
       if(root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
-      // console.log('------------------------',  mesh.geom.pos, mesh.GetName())
       if(Widget_root_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx)){
          mesh.geom.pos[0] = 0;
          mesh.geom.pos[1] = 0;
-         // console.log('+++++++++++++++++++++++++++++++++++',  mesh.geom.pos, mesh.GetName())
       }
    }
 

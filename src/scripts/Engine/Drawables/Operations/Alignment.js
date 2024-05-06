@@ -11,7 +11,10 @@ import { AddArr2 } from "../../../Helpers/Math/MathOperations";
 /** Uses exact algorithm as the Widget_Label class for alignment */
 export function Align_text_in_rect_parent(Align, parent) {
 
-    if(!parent || !parent.text_mesh) alert('Handles only text as text_mesh of a mesh\nAlign_text_in_rect_parent()\nAlignment.js')
+    if(!parent || !parent.text_mesh) {
+        console.error('Handles only text as text_mesh of a mesh\nAlign_text_in_rect_parent()\nAlignment.js');
+        return;
+    }
 
     const text_mesh = parent.text_mesh;
 

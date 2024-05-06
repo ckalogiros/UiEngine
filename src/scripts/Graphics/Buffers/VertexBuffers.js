@@ -539,7 +539,6 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index, remov
 
     if (vb_info.count < 0){
 
-        // console.error('!!!!!!!!!!!!!!!!!!!!!!!! Count < 0. vb_info.idx=', vb_info.idx, '\nvb_info=', vb_info)   // console.log(
         console.error('!!!!!!!!!!!!!!!!!!!!!!!!!',
                'vbidx', gfx.vb.idx,
                'mesh', debug_mesh.mesh_bufferidx,

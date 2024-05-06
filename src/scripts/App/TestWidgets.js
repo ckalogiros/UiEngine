@@ -18,7 +18,7 @@ import { Textured_Mesh } from '../Engine/Drawables/Meshes/Textured_Mesh.js';
 import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_byidx, Widget_root_gfx_set_unif_wpos_per_vb } from '../Engine/Core/MeshBuffer.js';
 import { Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
-import { BLACK, BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
+import { BLACK, BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOWL, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { View_build_group_from_root_mesh, View_set_view_start_vb_index } from '../Engine/Core/MeshBufferViews.js';
 import { Index_buffer_info_create } from '../Graphics/Buffers/IndexBuffers.js';
 // import { getFile } from '../Engine/Core/FileSystem.js';
@@ -27,6 +27,7 @@ import { MouseGetPos } from '../Engine/Controls/Input/Mouse.js';
 import { Listener_set_root_mesh_priority } from '../Engine/Events/EventListeners.js';
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp, Relative_pos_comp_recalc_all } from '../Engine/Drawables/Operations/RelativePosComponent.js';
 import { Command_buffer_store } from '../Engine/Core/Commandbuffer.js';
+import { Calculate_sizes_recursive } from '../Engine/Drawables/Meshes/Section.js';
 
 // var osu = require('node-os-utils')
 // import {osu} from 'node-os-utils'
@@ -293,7 +294,7 @@ export function TestWidgetsGeneric(scene) {
     // CreateChangeMeshColorFromSliders();
 
 
-    CreateMenu(scene);
+    CreateMenuBar(scene);
 
     // const dp = CreateDropdown(scene, [160, 200, 0], 0);
 
@@ -1264,86 +1265,162 @@ function CreateSceneMenuBar(item) {
 }
 
 
-function CreateMenu() {
+function CreateMenuBar() {
 
     const pos = [200, 500, 0]
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [100, 200], TRANSPARENCY(GREEN[2], .9))
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [0, 0], TRANSPARENCY(GREEN[2], .9))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.SetName('ROOT')
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
 
 
-    const menu = Create_widget_menubar(_, [0,0,pos[2]], TRANSPARENCY(GREY[1], .6), WHITE, 'Widget', [10, 6]);
+    const menu = Create_widget_menubar(_, [0,0,pos[2]], TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
     section.AddItem(menu);
 
     menu.AddCloseButton(_, section, 'x');
     menu.AddMinimizeButton(_, section);
     
-    const label = Create_widget_label(_, 'Hi', _, _, 8, PURPLER[5], WHITE);
-    menu.AddToMenuBar(label);
 
 
     // menu.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
     menu.options = SECTION.HORIZONTAL | SECTION.EXPAND;
 
     // Create items for the section
-    // {
-    //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-    //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     section.AddItem(label)
-    // }
-    // {
-    //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-    //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     section.AddItem(label)
-    // }
-    // {
-    //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-    //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     section.AddItem(label)
-    // }
-    // {
-    //     const dp = Create_widget_dropdown(_, 'Dp', [100, 100, 0], GREEN[4], GREY[2], _, _, _, _, _, _);
-    //     dp.CreateClickEvent();
-    //     dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-    //     Dropdown_roots_set_root(dp, dp);
-    //     section.AddItem(dp);
+    {
+        const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
+    {
+        const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
+    {
+        const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
+    {
+        const dp = Create_widget_dropdown(_, 'Dp', [100, 100, 0], GREEN[4], GREY[2], _, _, _, _, _, _);
+        dp.CreateClickEvent();
+        dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+        Dropdown_roots_set_root(dp, dp);
+        section.AddItem(dp);
 
-    //     {
-    //         const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-    //         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //         dp.AddToMenu(label)
-    //     }
-    //     {
-    //         const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-    //         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //         dp.AddToMenu(label)
-    //     }
-    // }
-    // {
-    //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-    //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     section.AddItem(label)
-    // }
-    // {
-    //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-    //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     section.AddItem(label)
-    // }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+        {
+            const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+            label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dp.AddToMenu(label)
+        }
+    }
+    {
+        const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
+    {
+        const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        section.AddItem(label)
+    }
+
+
+    // Create dropdown menu
+    {
+        const dp = Create_widget_dropdown(_, 'Options', [260, 200, 0], GREY[1], TRANSPARENCY(YELLOWL[8], .3), WHITE, _, _, _, _, [2,2]);
+        Dropdown_roots_set_root(dp, dp);
+        dp.menu.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
+        dp.options = SECTION.VERTICAL;
+        // menu.AddToMenuBar(dp, REL_POS.LEFT);
+        menu.AddToMenuBar(dp, REL_POS.LEFT);
+        {
+            const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
+            dp.AddToMenu(label);
+        }
+        {
+            const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
+            dp.AddToMenu(label);
+        }
+        {
+            const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
+            dp.AddToMenu(label);
+        }
+    }
+    {
+        const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(GREY[1], 1.0), WHITE);
+        menu.AddToMenuBar(label);
+    }
+    {
+        const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(PURPLER[5],1.0), WHITE);
+        menu.AddToMenuBar(label);
+    }
+    
+
+    // TEMPORARY: After we have established the menu with ist items, we run 'Calculate_sizes_recursive()' for testing purpose
+    Calculate_sizes_recursive(menu)
+
 
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
     section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
     section.Calc_no_gfx_update();
+    section.options &= ~SECTION.RESIZE_PARENT;
     
     section.Render();
     
     section.ConstructListeners();
     
     Widget_root_gfx_set_unif_wpos_per_vb(section.root_bufferidx);
-    
+
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(section);
