@@ -208,7 +208,13 @@ function Find_match_gfx_from_parent(mesh, parent) {
       done = true;
    }
    // Check if the parent has a text_mesh
-   else if (parent.text_mesh && SID.CheckSidMatch(mesh.sid, parent.text_mesh.sid)) {
+   // CAUTION
+   // BUG: We changed the text meshes to have a parent. 
+   // Below we avoid a cyclical dependecy: If the mesh is a text mesh, the the parent.text_mesh is the mesh its self,
+   // so maybe this couuld cause problems 
+   else if (parent.text_mesh && parent !== mesh.parent && SID.CheckSidMatch(mesh.sid, parent.text_mesh.sid)) {
+      if(parent.text_mesh.gfx===null)
+         console.log()
       igfx[0] = parent.text_mesh.gfx.prog.idx;
       igfx[1] = parent.text_mesh.gfx.vb.idx;
       done = true;

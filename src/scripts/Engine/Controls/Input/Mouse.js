@@ -134,8 +134,20 @@ export function MouseGetPos() {
 
 
 export function MouseGetPosDif() {
-   // console.log('Mouse GetDif', mouse.pos.GetDif())
-   return mouse.pos.GetDif();
+   return {
+      x:mouse.pos.xdiff,
+      y:mouse.pos.ydiff,
+   };;
+}
+
+
+export function MouseGetPosDifX() {
+   return mouse.pos.xdiff;
+}
+
+
+export function MouseGetPosDifY() {
+   return mouse.pos.ydiff;
 }
 
 
@@ -205,10 +217,10 @@ export function OnMouseMove(e) {
    const oldPosx = mouse.pos.x;
    const oldPosy = mouse.pos.y;
    // console.log(newPosX, newPosY)
-      
+   
    mouse.pos.x = newPosX;
    mouse.pos.y = newPosY;
-
+   
    if(mouse.pos.xprev !== INT_NULL){ // I think the if statement avoids mesh dissapear if mouse goes beyond the canvas 
       mouse.pos.xprev = oldPosx;
       mouse.pos.yprev = oldPosy;
@@ -217,10 +229,11 @@ export function OnMouseMove(e) {
       mouse.pos.xprev = newPosX;
       mouse.pos.yprev = newPosY;
    }
-
+   
    // NOTE: The *2 is required for google chrome browser.
    mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
    mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
+   // console.log(mouse.pos.xdiff, mouse.pos.ydiff)
 
    RegisterEvent('mouse-move', null);
 

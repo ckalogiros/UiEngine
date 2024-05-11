@@ -10,7 +10,7 @@ import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Ali
 import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
-import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root, Widget_root_gfx_update_unif_wpos_per_vb } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root, Widget_root_gfx_add_unif_wpos_per_vb, TEMP_set_widget_root_wposy, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wpos, TEMP_is_widget_root_wpos } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 
 
@@ -25,7 +25,7 @@ export class Widget_Label extends Rect {
     // pad = [0, 0];
 
     constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
-    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.BOTTOM), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
+        // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.BOTTOM), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -34,48 +34,25 @@ export class Widget_Label extends Rect {
         const text = _text;
 
         // Create the text, to calculate its dimensions, then createthe label
-        const text_mesh = Create_text_mesh(text, [0,0,_pos[2]], fontSize, text_col, _, _, is_debug_mesh);
+        const text_mesh = Create_text_mesh(text, [0, 0, _pos[2]], fontSize, text_col, _, _, is_debug_mesh);
 
         _pos[2] -= 1; // Set z for area 'behind' this.text_mesh
 
         const dim = [
-            text_mesh.GetMaxWidth()+pad[0]*2,
-            text_mesh.geom.dim[1]+pad[1]*2,
+            text_mesh.GetMaxWidth() + pad[0] * 2,
+            text_mesh.geom.dim[1] + pad[1] * 2,
         ];
-                
-        
+
+
         super(_pos, dim, col);
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
         this.SetName(`[${this.mesh_bufferidx}]{${text}}-LABEL`);
         this.StylesSetPad(pad);
 
         this.text_mesh = text_mesh;
-        
+
         Align_text_in_rect_parent(Align, this)
 
-        // if(Align & ALIGN.RIGHT){
-        //     const d = this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2 - pad[0]
-        //     text_mesh.geom.pos[0] = d
-        // }
-        // else if(Align & ALIGN.LEFT){
-        //     const d = pad[0]
-        //     text_mesh.geom.pos[0] = d
-        // }
-        // else if(Align & ALIGN.HOR_CENTER){
-        //     const d = this.geom.pos[0] + (this.geom.dim[0]*2 - text_mesh.GetMaxWidth()*2)
-        //     text_mesh.geom.pos[0] = d/2
-        // }
-        // if(Align & ALIGN.VERT_CENTER){
-        //     const d = this.geom.pos[1] + (this.geom.dim[1] - text_mesh.geom.dim[1])
-        //     text_mesh.geom.pos[1] = d
-        // }
-        // else if(Align & ALIGN.BOTTOM){
-        //     const d = this.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1]
-        //     text_mesh.geom.pos[1] = d
-        // }
-        // else if(Align & ALIGN.TOP){
-        //     text_mesh.geom.pos[1] += pad[1]
-        // }
 
         text_mesh.sceneidx = this.sceneidx;
 
@@ -85,15 +62,16 @@ export class Widget_Label extends Rect {
         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
 
         this.SetStyle(style);
-        
+
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
         this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
-  
-        this.text_mesh.parent = NO_MESH_PARENT; // Use a special case for text meshes that are part of a widget without being in children's buffer.
 
-              
-      
+        // this.text_mesh.parent = NO_MESH_PARENT; // Use a special case for text meshes that are part of a widget without being in children's buffer.
+        this.text_mesh.parent = this; // Use a special case for text meshes that are part of a widget without being in children's buffer.
+
+
+
         if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
             this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
             this.text_mesh.root_bufferidx = this.root_bufferidx;
@@ -282,19 +260,19 @@ export class Widget_Label extends Rect {
 
     TEMP_recalc(x, y) {
 
-        const dx = this.text_mesh.geom.pos[0]-this.geom.pos[0];
-        const dy = this.text_mesh.geom.pos[1]-this.geom.pos[1];
+        const dx = this.text_mesh.geom.pos[0] - this.geom.pos[0];
+        const dy = this.text_mesh.geom.pos[1] - this.geom.pos[1];
         this.geom.pos[0] = x;
         this.geom.pos[1] = y;
-        this.text_mesh.geom.pos[0] = x+dx;
-        this.text_mesh.geom.pos[1] = y+dy;
+        this.text_mesh.geom.pos[0] = x + dx;
+        this.text_mesh.geom.pos[1] = y + dy;
     }
 
     TEMP_recalc_x(x) {
 
-        const dx = this.text_mesh.geom.pos[0]-this.geom.pos[0];
+        const dx = this.text_mesh.geom.pos[0] - this.geom.pos[0];
         this.geom.pos[0] = x;
-        this.text_mesh.geom.pos[0] = x+dx;
+        this.text_mesh.geom.pos[0] = x + dx;
     }
 
 
@@ -315,24 +293,52 @@ export class Widget_Label extends Rect {
 
 
     SetPosXYNoGfxUpdate(x, y) {
-        this.geom.pos[0] = x;
-        this.geom.pos[1] = y;
-        this.text_mesh.geom.pos[0] = x;
-        this.text_mesh.geom.pos[1] = y;
+        
+        if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+            TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+        }
+        else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+
+            this.geom.pos[0] = x;
+            this.geom.pos[1] = y;
+
+            this.text_mesh.geom.pos[0] = x; 
+            this.text_mesh.geom.pos[1] = y; 
+        }
     }
 
-    
+
     SetPosXNoGfxUpdate(x) {
+
         this.geom.pos[0] = x;
-        // this.text_mesh.geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
-        this.text_mesh.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0]) - this.text_mesh.geom.dim[0] + this.StylesGetPad(STYLES.AXIS.X);
-        // this.text_mesh.geom.pos[0] = (this.geom.dim[0]) + this.text_mesh.geom.dim[0] + this.pad[0];
+
+        if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+            TEMP_set_widget_root_wposx(this.root_posidx, x);
+        }
+        else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+            // if (this.text_mesh.root_posidx !== INT_NULL) { // Same for the text_mesh
+            //     TEMP_set_widget_root_wposx(this.text_mesh.root_posidx, x);
+            // }
+            // else 
+            this.text_mesh.geom.pos[0] = x; 
+        }
     }
 
 
     SetPosYNoGfxUpdate(y) {
+
         this.geom.pos[1] = y;
-        this.text_mesh.geom.pos[1] = y;
+        
+        if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+            TEMP_set_widget_root_wposy(this.root_posidx, y);
+        }
+        else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+            // if (this.text_mesh.root_posidx !== INT_NULL) { // Same for the text_mesh
+            //     TEMP_set_widget_root_wposy(this.text_mesh.root_posidx, y);
+            // }
+            // else 
+            this.text_mesh.geom.pos[1] = y; 
+        }
     }
 
 
@@ -341,7 +347,7 @@ export class Widget_Label extends Rect {
         this.text_mesh.geom.pos[2] = z + 1;
     }
 
-    
+
     SetPosX(x) {
 
         super.SetPosX(x);
@@ -526,11 +532,11 @@ export class Widget_Label extends Rect {
 
 
             Gl_set_dim_XY(mesh.gfx, mesh.geom.dim, mesh.geom.num_faces)
-            Gl_set_wpos_XY(mesh.gfx, mesh.geom.pos[0]+mesh.geom.dim[0], mesh.geom.pos[1]+mesh.geom.dim[1], mesh.geom.num_faces)
+            Gl_set_wpos_XY(mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces)
 
 
-            // TODO: Align text
-            const text_mesh = mesh.text_mesh;
+            // // TODO: Align text
+            // const text_mesh = mesh.text_mesh;
 
         }
 
@@ -552,14 +558,14 @@ function Section_on_move_clbk(params) {
         return;
     }
 
-    
+
     const mouse_pos = MouseGetPosDif();
     if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
-    
-    Widget_root_gfx_update_unif_wpos_per_vb(mesh.root_bufferidx, [mouse_pos.x, -mouse_pos.y]);
-    
+
+    // Widget_root_gfx_add_unif_wpos_per_vb(mesh.root_bufferidx, [mouse_pos.x, -mouse_pos.y]);
+
     mesh.SetUpdateFrameBuffer();
- }
+}
 
 
 /** This is just to have a class named specific for menus text, like the popup menu,

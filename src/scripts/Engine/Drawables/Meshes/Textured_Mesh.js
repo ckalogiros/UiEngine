@@ -9,7 +9,7 @@ import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Texture_Material } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { WHITE } from "../Material/Base/Colors.js";
-import { Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 
 
 
@@ -75,7 +75,7 @@ export class Textured_Mesh extends Mesh {
 
    UpdateGfx() {
 
-      alert('Implement me\nUpdateGfx() @ Textured_Mesh.js' )
+      alert('Implement me\nUpdateGfx() @ Textured_Mesh.js')
       // if(this.is_gfx_inserted) 
       //    Vertex_buffer_update_vertices(this.gfx, this.geom, this.mat, this.GetName())
       // else {
@@ -142,7 +142,7 @@ export class Textured_Mesh extends Mesh {
 
                STATE.mesh.SetGrabed(mesh);
                STATE.mesh.SetFocused(mesh);
-               mesh.StateEnable(MESH_STATE.IN_GRAB|MESH_STATE.IN_FOCUS);
+               mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
                Widget_root_set_in_focus(mesh.root_bufferidx);
             }
 
@@ -190,18 +190,29 @@ export class Textured_Mesh extends Mesh {
 
 
    SetPosXNoGfxUpdate(x) {
-      this.geom.pos[0] = x;
+      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      }
+      else this.geom.pos[0] = x;
    }
 
 
    SetPosYNoGfxUpdate(y) {
-      this.geom.pos[1] = y;
+      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      }
+      else this.geom.pos[1] = y;
    }
 
 
    SetPosXYNoGfxUpdate(x, y) {
-      this.geom.pos[0] = x;
-      this.geom.pos[1] = y;
+      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      }
+      else {
+         this.geom.pos[0] = x;
+         this.geom.pos[1] = y;
+      }
    }
 
 

@@ -9,7 +9,7 @@ import { GREY, WHITE } from "../Material/Base/Colors.js";
 import { Calculate_positions_no_gfx_update_recursive, Section } from "../Meshes/Section.js";
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 import { Styles_pad_set } from "../../Styles.js";
-import { Clipy_from_group } from "../Operations/Clip.js";
+import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/MeshBufferViews.js";
 
 
@@ -49,14 +49,13 @@ export class Widget_Menu_Bar extends Section {
       this.geom.dim[1] = label.geom.dim[1];
 
       this.StylesSetPad(pad)
-      // this.pad[0] = pad[0];
-      // this.pad[1] = pad[1];
 
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle(style);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.options = SECTION.INDEPENDENT;
 
 
       this.SetName('Widget_Menu_Bar');
@@ -186,6 +185,10 @@ export class Widget_Menu_Bar extends Section {
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
       mesh.SetStyle([2, 5, 2]);
+
+      // Any mesh of bese type Section, must be calculated(position/size) independent of any other mesh of the menu bar and/or parent/parent-children
+      // if(mesh.type & MESH_TYPE.SECTION_MESH) mesh.options |= this.options = SECTION.INDEPENDENT;
+      if(mesh.type & MESH_TYPE.SECTION_MESH) mesh.OptionsEnable(SECTION.INDEPENDENT);
 
       const align_item_flag = (RelPosAlign!==undefined) ? RelPosAlign : REL_POS.LEFT;
 
@@ -488,7 +491,8 @@ export class Widget_Minimize extends Widget_Button {
             minim_mesh.text_mesh.RenderTextFromString('-');
 
 
-
+            // NO NEED TO CHANGE ANYTHING.
+            // The un minimize does not have anything else, as log as the window does not resize. Everything is in place
             /**
              * // EFFICIENCY
              * Unfortunately we have to run through all meshes for:
@@ -501,9 +505,11 @@ export class Widget_Minimize extends Widget_Button {
             const group_root = Mesh_buffer_get_mesh_byidx(group_rootidx);
             const clip_top = group_root.GetPosY();
             const clip_bottom = clip_top + group_root.geom.dim[1]*2;
-            Clipy_from_group(group_root.group_bufferidxs[0], clip_top, clip_bottom);
+            // Clipy_from_group(group_root.group_bufferidxs[0], clip_top, clip_bottom);
+            Clipy_from_tree_recursive(group_root, clip_top, clip_bottom);
 
-            Calculate_positions_no_gfx_update_recursive(root, SECTION.TOP_DOWN | SECTION.INHERIT | SECTION.VERTICAL)
+            // Calculate_positions_no_gfx_update_recursive(root, SECTION.TOP_DOWN | SECTION.INHERIT | SECTION.VERTICAL, [this.geom.pos[0], this.geom.pos[1]])
+            // Calculate_positions_no_gfx_update_recursive(root, SECTION.TOP_DOWN | SECTION.INHERIT | SECTION.VERTICAL, [0, 0])
 
 
             root.Rerender();

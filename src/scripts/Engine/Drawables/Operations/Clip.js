@@ -126,17 +126,18 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
    const group = View_get_view_byidx(group_bufferidx);
-
-   for(let i=0; i <= group.vb.boundary; i++){
    
+   for(let i=0; i <= group.vb.boundary; i++){
+      
       const meshshes_idx = group.vb.buffer[i].data;
-      for(let j=0; j<=meshshes_idx.boundary; j++){
+      const root_group_mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[0]);
+      const root_wposy = root_group_mesh.GetPosY(); // Get the root wpos from each vb root mesh, no need to get the root wpos for every group mesh.
+   
+      for(let j=0; j <= meshshes_idx.boundary; j++){
          
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-         const top      = mesh.GetPosY();
+         const top      = root_wposy + mesh.geom.pos[1];
          const bottom   = top + mesh.geom.dim[1]*2;
-         // const top      = mesh.geom.pos[1];
-         // const bottom   = top + mesh.geom.dim[1]*2;
          
    
          if(bottom < limit.up || top > limit.down){
@@ -164,6 +165,50 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
 
    }
 
+
+   return changes_hapened;
+}
+
+
+
+export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=null) {
+
+   if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
+
+   let changes_hapened = false;
+   const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
+
+
+
+   const top      = mesh.GetPosY();
+   const bottom   = top + mesh.geom.dim[1]*2;
+
+   if((bottom <= limit.down && bottom > limit.up) || (top >= limit.up && top < limit.down)){
+      // Clip for any children. Only if this mesh is active, else skip
+      for(let i=0; i <= mesh.children.boundary; i++){
+         const child = mesh.children.buffer[i];
+         Clipy_from_tree_recursive(child, clip_top, clip_bottom);
+      }
+   }
+
+   if(bottom < limit.up || top > limit.down){
+      
+      if(mesh.state.mask & MESH_STATE.ACTIVE){
+   
+         mesh.StateDisable(MESH_STATE.ACTIVE);
+         mesh.StateEnable(MESH_STATE.CLIPED_Y);
+         changes_hapened = true;
+      }
+   }
+   else{
+      
+      if(mesh.state.mask & MESH_STATE.CLIPED_Y)
+      {
+         mesh.StateEnable(MESH_STATE.ACTIVE);
+         mesh.StateDisable(MESH_STATE.CLIPED_Y);
+         changes_hapened = true;
+      }
+   }
 
    return changes_hapened;
 }
@@ -217,11 +262,6 @@ export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bott
    return changes_hapened;
 }
 
-
-/** Slow. Only if group is not yet */
-export function Clipy_from_tree_recursive(group_bufferidx=null, clip_top=null, clip_bottom=null) {
-   // IMPLEMENT
-}
 
 
 export function Clipy_one_mesh(mesh=null, clip_top=null, clip_bottom=null){

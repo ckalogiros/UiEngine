@@ -1,8 +1,5 @@
 "use strict";
 
-import { AddArr2 } from "../../../Helpers/Math/MathOperations";
-
-
 
 
 
@@ -44,11 +41,11 @@ export function Align_text_in_rect_parent(Align, parent) {
         text_mesh.geom.pos[0] = d
     }
     else if(Align & ALIGN.HOR_CENTER){
-        const d = parent.geom.pos[0] + (parent.geom.dim[0]*2 -text_width)
+        const d = (parent.geom.dim[0]*2 -text_width)
         text_mesh.geom.pos[0] = d/2
     }
     if(Align & ALIGN.VERT_CENTER){
-        const d = parent.geom.pos[1] + (parent.geom.dim[1] - text_mesh.geom.dim[1])
+        const d = (parent.geom.dim[1] - text_mesh.geom.dim[1])
         text_mesh.geom.pos[1] = d
     }
     else if(Align & ALIGN.BOTTOM){
@@ -58,6 +55,31 @@ export function Align_text_in_rect_parent(Align, parent) {
     else if(Align & ALIGN.TOP){
         text_mesh.geom.pos[1] = pad[1]
     }
+    
+
+    // if(Align & ALIGN.RIGHT){
+    //     const d = parent.geom.dim[0]*2 - text_width - pad[0]
+    //     text_mesh.geom.pos[0] = d
+    // }
+    // else if(Align & ALIGN.LEFT){
+    //     const d = pad[0]
+    //     text_mesh.geom.pos[0] = d
+    // }
+    // else if(Align & ALIGN.HOR_CENTER){
+    //     const d = parent.geom.pos[0] + (parent.geom.dim[0]*2 -text_width)
+    //     text_mesh.geom.pos[0] = d/2
+    // }
+    // if(Align & ALIGN.VERT_CENTER){
+    //     const d = parent.geom.pos[1] + (parent.geom.dim[1] - text_mesh.geom.dim[1])
+    //     text_mesh.geom.pos[1] = d
+    // }
+    // else if(Align & ALIGN.BOTTOM){
+    //     const d = parent.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1]
+    //     text_mesh.geom.pos[1] = d
+    // }
+    // else if(Align & ALIGN.TOP){
+    //     text_mesh.geom.pos[1] = pad[1]
+    // }
 }
 
 

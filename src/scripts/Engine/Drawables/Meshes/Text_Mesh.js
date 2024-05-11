@@ -3,13 +3,13 @@
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_info_set_texidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { AddArr3, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
-import { Gfx_generate_context, GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js"; 
+import { Gfx_generate_context, GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D_Text } from "../Geometry/Geometry2DText.js";
 import { FontMaterial } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Font_get_char_plane_bounds, Font_get_char_uv_coords, Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { Gl_set_dim_XY, Gl_set_dim_XY2, Gl_set_uv, Gl_set_uv2, Gl_set_wpos_XY, Gl_set_wpos_XY2 } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy } from "../../Core/MeshBuffer.js";
 import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
@@ -81,8 +81,8 @@ export class Text_Mesh extends Mesh {
 
       // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
       // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy
-      if(this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary+1) 
-         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary+1;
+      if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary + 1)
+         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary + 1;
 
       // BUG: If one text has by mistake a different 'this.mat.uvIdx', then the vb will store that uv-map index. Cause a vertex buffer may use only one texture.
       Vertex_buffer_info_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
@@ -97,16 +97,16 @@ export class Text_Mesh extends Mesh {
 
    AddToGfxFromReset() {
 
-      
+
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxText)
       this.#TEMP();
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxText)
-     
+
       // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
       // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy
-      if(this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary+1) 
-         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary+1;
+      if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary + 1)
+         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary + 1;
 
       this.is_gfx_inserted = true;
 
@@ -123,15 +123,15 @@ export class Text_Mesh extends Mesh {
 
       // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
       // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy
-      if(this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary+1) 
-         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary+1;
+      if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary + 1)
+         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary + 1;
 
       this.is_gfx_inserted = true;
 
    }
-   
 
-   #TEMP(){
+
+   #TEMP() {
 
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
          pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
@@ -150,7 +150,7 @@ export class Text_Mesh extends Mesh {
 
          let left_bounds = 0;
          if (this.mat.char_buffer.buffer[i]) { // If there is a text, get char uv and metrics
-            
+
             this.mat.uv = Font_get_char_uv_coords(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
             const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
             geom_copy.dim[0] *= plane_bounds.width;
@@ -168,7 +168,7 @@ export class Text_Mesh extends Mesh {
             Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
          }
 
-         geom_copy.pos[0] += (this.fontsize * 2 * (advancex-left_bounds));
+         geom_copy.pos[0] += (this.fontsize * 2 * (advancex - left_bounds));
 
          // Reset geometry copy
          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
@@ -244,22 +244,35 @@ export class Text_Mesh extends Mesh {
          const child = this.children.buffer[i];
          if (child) child.TEMP_recalc(x, y);
       }
-  }
+   }
 
 
    SetPosXYNoGfxUpdate(x, y) {
-      this.geom.pos[0] = x;
-      this.geom.pos[1] = y;
+      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      }
+      else {
+         this.geom.pos[0] = x;
+         this.geom.pos[1] = y;
+      }
    }
 
-   
+
    SetPosXNoGfxUpdate(x) {
-      this.geom.pos[0] = x;
+
+      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      }
+      else this.geom.pos[0] = x;
    }
-   
-   
+
+
    SetPosYNoGfxUpdate(y) {
-      this.geom.pos[1] = y;
+
+      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      }
+      else this.geom.pos[1] = y;
    }
 
 
@@ -273,12 +286,12 @@ export class Text_Mesh extends Mesh {
       this.mat.char_buffer.Reset();
 
       const len = (str.length < this.mat.char_buffer.size) ? str.length : this.mat.char_buffer.size;
-      
+
       for (let i = 0; i < len; i++) {
 
          this.mat.char_buffer.Add(str[i]);
       }
-      
+
       for (let i = len; i < this.mat.char_buffer.size; i++) {
 
          this.mat.char_buffer.buffer[i] = ''; // We do not want to increment active_count for '' empty characters, so we avoid .Add
@@ -295,7 +308,7 @@ export class Text_Mesh extends Mesh {
       this.mat.char_buffer.Reset();
 
       const len = str_array.length;
-      
+
       for (let i = 0; i < len; i++) {
 
          const len2 = str_array[i].length;
@@ -309,10 +322,10 @@ export class Text_Mesh extends Mesh {
 
    SetTextAtIndex(str, start) {
 
-      /**DEBUG */ if(start > this.mat.char_buffer.size) console.error('ERROR @SetTextAtIndex().\n start greater than buffer size.\nstart=', start);
+      /**DEBUG */ if (start > this.mat.char_buffer.size) console.error('ERROR @SetTextAtIndex().\n start greater than buffer size.\nstart=', start);
 
       const len = str.length;
-      
+
       for (let i = start; i < len; i++) {
 
          this.mat.char_buffer.AddAtIndex(i, str[i]);
@@ -320,13 +333,13 @@ export class Text_Mesh extends Mesh {
    }
 
 
-   SliceText(_start=0, _count=_) {
+   SliceText(_start = 0, _count = _) {
       // If no start is passed, all characters are removed/replaced
       // count=0, the loop does not run for i<0
 
-      const count = (_count===_ || _count > this.mat.char_buffer.size) ? this.mat.char_buffer.active_count : _count;
+      const count = (_count === _ || _count > this.mat.char_buffer.size) ? this.mat.char_buffer.active_count : _count;
       // If start > buffer last char, replace last element
-      const start = (_start > this.mat.char_buffer.boundary) ? this.mat.char_buffer.boundary : _start; 
+      const start = (_start > this.mat.char_buffer.boundary) ? this.mat.char_buffer.boundary : _start;
 
       for (let i = start; i < count; i++) {
          this.mat.char_buffer.RemoveByIdx(i);
@@ -360,7 +373,7 @@ export class Text_Mesh extends Mesh {
    // RenderText() {
 
    //    if (!this.gfx) return; // Case replace text before insert to gfx buffers;
-      
+
    //    const vbidx = this.gfx.vb.idx; 
    //    let start = this.gfx.vb.start;
    //    const count = this.gfx.vb.count;
@@ -389,7 +402,7 @@ export class Text_Mesh extends Mesh {
    //          w *= plane_bounds.width;
    //          h *= plane_bounds.height;
    //          Gl_set_dim_XY2(vbidx, start, attribsidx, attribsPerVertex, w, h);
-            
+
    //          // Set character y position and advance.
    //          x +=  (advancex+plane_bounds.left) * 2 * this.fontsize;
    //          y += h + plane_bounds.yoffset * this.fontsize;
@@ -411,7 +424,7 @@ export class Text_Mesh extends Mesh {
 
    //       let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
    //       Gl_set_uv2(vbidx, uvs, start, attr.offset, attr.size, attribsPerVertex);
-         
+
    //       start += count
    //    }
 
@@ -428,14 +441,14 @@ export class Text_Mesh extends Mesh {
          vertsPerRect: this.gfx.vertsPerRect,
          attribsPerVertex: this.gfx.attribsPerVertex,
       }
-      
+
       // TODO: Remove arrays, substitute with variables
-      
+
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
          pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
-      
+
       const advancex = Font_get_font_advancex(this.mat.texidx);
       const c = this.mat.char_buffer.buffer;
       const attr = Shader_attributes_get_attribs_offset_size(gfx_copy.prog.attribsidx, SHADER_ATTRIBUTES.TEX2);
@@ -452,9 +465,9 @@ export class Text_Mesh extends Mesh {
             geom_copy.dim[0] *= plane_bounds.width;
             geom_copy.dim[1] *= plane_bounds.height;
             Gl_set_dim_XY(gfx_copy, geom_copy.dim);
-            
+
             // Set character y position and advance.
-            geom_copy.pos[0] +=  (advancex+plane_bounds.left) * 2 * this.fontsize;
+            geom_copy.pos[0] += (advancex + plane_bounds.left) * 2 * this.fontsize;
             geom_copy.pos[1] += geom_copy.dim[1] + plane_bounds.yoffset * this.fontsize;
             Gl_set_wpos_XY(gfx_copy, geom_copy.pos[0], geom_copy.pos[1]);
 
@@ -470,11 +483,11 @@ export class Text_Mesh extends Mesh {
       }
 
       // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
-      for (let i = this.mat.char_buffer.boundary+1; i < this.mat.char_buffer.size; i++) {
+      for (let i = this.mat.char_buffer.boundary + 1; i < this.mat.char_buffer.size; i++) {
 
          let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
          Gl_set_uv2(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex);
-         
+
          gfx_copy.vb.start += gfx_copy.vb.count
       }
 
@@ -536,19 +549,19 @@ export class Text_Mesh extends Mesh {
       let changes_happended = false;
 
 
-      if (right-face_width > limit) {
+      if (right - face_width > limit) {
 
          changes_happended = true;
          for (let i = this.mat.char_buffer.boundary; i >= 0; i--) {
 
             this.mat.char_buffer.RemoveByIdx(i);
             this.geom.num_faces--;
-            right -= face_width*2;
+            right -= face_width * 2;
             if (right < limit)
                break
          }
       }
-      else if (right+face_width< limit && this.mat.char_buffer.active_count < text_len) {
+      else if (right + face_width < limit && this.mat.char_buffer.active_count < text_len) {
 
          changes_happended = true;
          for (let i = this.mat.char_buffer.active_count; i < text_len; i++) {
@@ -556,7 +569,7 @@ export class Text_Mesh extends Mesh {
             this.mat.char_buffer.boundary++;
             this.mat.char_buffer.active_count++;
             this.geom.num_faces++;
-            right += face_width*2;
+            right += face_width * 2;
             if (right > limit)
                break
          }

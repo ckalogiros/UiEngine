@@ -305,14 +305,20 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
       // Create new entry for the new vertex buffer in widget root gfx buffer
       Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbidx);
 
+
       // UNNECESSARY: For all vb except the widget root. All the root wpos are set from a function call, based on the root root_wpos 
-      console.log('------------------------',  mesh.geom.pos, mesh.GetName())
-      const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh.geom.pos, mesh.GetName());
+      // console.log('------------------------',  mesh.geom.pos, mesh.GetName())
+      // const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh.geom.pos, parent_rel_pos, mesh.GetName());
+      const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh, vbidx);
+      mesh.root_posidx = root_posidx;
+      // mesh.geom.pos[0] = 0;
+      // mesh.geom.pos[1] = 0;
+
       if(root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
-      if(Widget_root_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx)){
-         mesh.geom.pos[0] = 0;
-         mesh.geom.pos[1] = 0;
-      }
+      // if(Widget_root_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx)){
+      //    mesh.geom.pos[0] = 0;
+      //    mesh.geom.pos[1] = 0;
+      // }
    }
 
 
@@ -323,7 +329,7 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
 
 
 
-   // Store the root pos in each mesh
+   // Store the root pos in each mesh. Assuumes the indexing of root_wpos and vbs are 1-1.
    mesh.root_posidx = vbidx;
 
 

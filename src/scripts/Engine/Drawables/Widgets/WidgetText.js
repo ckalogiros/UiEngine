@@ -5,7 +5,7 @@ import { AddArr2, CopyArr2, CopyArr3, Floor } from "../../../Helpers/Math/MathOp
 import { Batch_store } from "../../Batch/Batch.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
-import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx, TimeIntervalsGetByIdx } from "../../Timers/TimeIntervals.js";
 import { WHITE } from "../Material/Base/Colors.js";
@@ -56,6 +56,7 @@ export class Widget_Text extends Text_Mesh {
 
 		this.AddToGfxFromReset();
 	}
+
 
 	AddToWidgetRootBuffer(root_bufferidx) {
 
@@ -234,7 +235,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		// this.children_all.Add(text_mesh.mesh_bufferidx);
 
 		// this.Align_pre(text_mesh, this.alignment)
-		// this.Align_pre(this, this.alignment)
+		this.Align_pre(this, this.alignment)
 		return text_mesh.idx;
 	}
 
@@ -648,29 +649,58 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	
    SetPosXYNoGfxUpdate(x, y) {
-      this.geom.pos[0] = x;
-      this.geom.pos[1] = y;
-		for (let i = 0; i <= this.children.boundary; i++) {
-			// this.children.buffer[i].geom.pos[0] = x+this.geom.pos[0]+30;
-			this.children.buffer[i].geom.pos[0] += x;
-			this.children.buffer[i].geom.pos[1] += y;
+
+		if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+			for (let i = 0; i <= this.children.boundary; i++) {
+				console.log(Floor(this.children.buffer[i].geom.pos[0]),this.children.buffer[i].geom.pos[1], this.mat.text)
+			}
+      }
+		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+			this.geom.pos[0] = x;
+			this.geom.pos[1] = y;
+			for (let i = 0; i <= this.children.boundary; i++) {
+				this.children.buffer[i].geom.pos[0] = x;
+				this.children.buffer[i].geom.pos[1] = y;
+			}
 		}
    }
 
    
    SetPosXNoGfxUpdate(x) {
-      this.geom.pos[0] = x;
-		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].geom.pos[0] = x;
+		if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      }
+		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+			for (let i = 0; i <= this.children.boundary; i++) {
+				this.children.buffer[i].geom.pos[0] = x;
+			}
 		}
    }
    
    
    SetPosYNoGfxUpdate(y) {
       this.geom.pos[1] = y;
-		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].geom.pos[1] = y;
+		if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      }
+		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+			for (let i = 0; i <= this.children.boundary; i++) {
+				this.children.buffer[i].geom.pos[1] = y;
+			}
 		}
+   }
+
+	
+
+   TEMP_recalc(x, y) {
+alert('IMPLEMENT ME\nTEMP_recalc\nWidget_Multi_Text')
+      // this.geom.pos[0] = x;
+      // this.geom.pos[1] = y;
+      // for (let i = 0; i <= this.children.boundary; i++) {
+      //    const child = this.children.buffer[i];
+      //    if (child) child.TEMP_recalc(x, y);
+      // }
    }
 
 	
@@ -696,7 +726,7 @@ export class Widget_Multi_Text extends Widget_Text {
 				const child = this.children.buffer[i];
 				pos[1] = ypos;
 
-				child.geom.Reposition_pre(pos);
+				// child.geom.Reposition_pre(pos);
 				ypos += child.geom.dim[1] * 2;
 			}
 		}

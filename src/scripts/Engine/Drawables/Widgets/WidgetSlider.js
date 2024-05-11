@@ -6,7 +6,7 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/Tim
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { AddArr2, RoundFloat1Decimal } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js';
-import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_gfx_update_unif_wpos_per_vb, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
+import { TEMP_add_widget_root_wpos, TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy, Widget_root_add_mesh, Widget_root_create_root, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
 import { Find_parent_listen_event } from '../Operations/Recursions.js';
@@ -110,13 +110,15 @@ export class Widget_Slider extends Rect {
       handle.geom.pos[0] = bar.geom.pos[0];
       handle.geom.pos[1] = bar.geom.pos[1] - handle.geom.dim[1];
       
-      value_text.geom.pos[0] = this.geom.dim[0]*2 - (value_text.geom.CalcTextWidth()*2) ;
+      value_text.geom.pos[0] = this.geom.dim[0]*2 - (value_text.GetMaxWidth()*2) ;
       value_text.geom.pos[1] = 4;
       value_text.geom.pos[2] = bar.geom.pos[2] + 1;
+      // value_text.parent = bar;
       
       name_text.geom.pos[0] = 0;
       name_text.geom.pos[1] = 4;
       name_text.geom.pos[2] = this.geom.pos[2] + 1;
+      name_text.parent = this;
       
       SLIDER_BAR_IDX = this.AddChild(bar)
       bar.AddChild(handle)
@@ -365,7 +367,8 @@ export class Widget_Slider extends Rect {
       const mouse_pos = MouseGetPosDif();
       if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
       
-      Widget_root_gfx_update_unif_wpos_per_vb(mesh.root_bufferidx, [mouse_pos.x, -mouse_pos.y]);
+      // Widget_root_gfx_add_unif_wpos_per_vb(mesh.root_bufferidx, [mouse_pos.x, -mouse_pos.y]);
+      TEMP_add_widget_root_wpos(mesh.root_posidx, [mouse_pos.x, -mouse_pos.y]);
       
       mesh.SetUpdateFrameBuffer();
 
@@ -581,16 +584,108 @@ export class Widget_Slider extends Rect {
    }
    
 
+   SetPosXNoGfxUpdate(x) {
+
+      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      }
+      else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+         
+         this.geom.pos[0] = x;
+         
+         const bar = this.children.buffer[SLIDER_BAR_IDX];
+         bar.geom.pos[0] += x;
+   
+         const name_text = this.text_mesh;
+         name_text.geom.pos[0] += x;
+   
+         const handle = bar.children.buffer[0];
+         handle.geom.pos[0] += x;
+   
+         const value_text = bar.children.buffer[1];
+         value_text.geom.pos[0] += x;
+      }
+
+   }
+
+
+   SetPosYNoGfxUpdate(y) {
+
+      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      }
+      else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+         
+         this.geom.pos[1] = y;
+
+         const bar = this.children.buffer[SLIDER_BAR_IDX];
+         bar.geom.pos[1] += y;
+   
+         const name_text = this.text_mesh;
+         name_text.geom.pos[1] += y;
+   
+         const handle = bar.children.buffer[0];
+         handle.geom.pos[1] += y;
+   
+         const value_text = bar.children.buffer[1];
+         value_text.geom.pos[1] += y;
+      }
+
+   }
+
+
+   SetPosXYNoGfxUpdate(x, y) {
+      
+      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      }
+      else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+   
+         this.geom.pos[0] = x;
+         this.geom.pos[1] = y;
+   
+         const bar = this.children.buffer[SLIDER_BAR_IDX];
+         bar.geom.pos[0] += x;
+         bar.geom.pos[1] += y;
+   
+         const name_text = this.text_mesh;
+         name_text.geom.pos[0] += x;
+         name_text.geom.pos[1] += y;
+   
+         const handle = bar.children.buffer[0];
+         handle.geom.pos[0] += x;
+         handle.geom.pos[1] += y;
+   
+         const value_text = bar.children.buffer[1];
+         value_text.geom.pos[0] += x;
+         value_text.geom.pos[1] += y;
+      }
+   }
+   
+
    TEMP_recalc(x, y) {
 
-      console.error('IMPLEMENT\nTEMP_recalc()\nWidget Slider')
+      const dx = x-this.geom.pos[0];
+      const dy = y-this.geom.pos[1];
 
-      // const dx = this.text_mesh.geom.pos[0]-this.geom.pos[0];
-      // const dy = this.text_mesh.geom.pos[1]-this.geom.pos[1];
-      // this.geom.pos[0] = x;
-      // this.geom.pos[1] = y;
-      // this.text_mesh.geom.pos[0] = x+dx;
-      // this.text_mesh.geom.pos[1] = y+dy;
+      this.geom.pos[0] = x;
+      this.geom.pos[1] = y;
+
+      const bar = this.children.buffer[SLIDER_BAR_IDX];
+      bar.geom.pos[0] += dx;
+      bar.geom.pos[1] += dy;
+
+      const name_text = this.text_mesh;
+      name_text.geom.pos[0] += dx;
+      name_text.geom.pos[1] += dy;
+
+      const handle = bar.children.buffer[0];
+      handle.geom.pos[0] += dx;
+      handle.geom.pos[1] += dy;
+
+      const value_text = bar.children.buffer[1];
+      value_text.geom.pos[0] += dx;
+      value_text.geom.pos[1] += dy;
   }
 
 
@@ -671,64 +766,6 @@ export class Widget_Slider extends Rect {
       value_text.isFramebufferRendered = fbidx;
    }
 
-
-   SetPosXNoGfxUpdate(x) {
-
-      this.geom.pos[0] = x;
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.geom.pos[0] = x;
-
-      const name_text = this.text_mesh;
-      name_text.geom.pos[0] = x;
-
-      const handle = bar.children.buffer[0];
-      handle.geom.pos[0] = x;
-
-      const value_text = bar.children.buffer[1];
-      value_text.geom.pos[0] = x;
-   }
-
-
-   SetPosYNoGfxUpdate(y) {
-
-      this.geom.pos[1] = y;
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.geom.pos[1] = y;
-
-      const name_text = this.text_mesh;
-      name_text.geom.pos[1] = y;
-
-      const handle = bar.children.buffer[0];
-      handle.geom.pos[1] = y;
-
-      const value_text = bar.children.buffer[1];
-      value_text.geom.pos[1] = y;
-   }
-
-
-   SetPosXYNoGfxUpdate(x, y) {
-
-      this.geom.pos[0] = x;
-      this.geom.pos[1] = y;
-
-      const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.geom.pos[0] = x;
-      bar.geom.pos[1] = y;
-
-      const name_text = this.text_mesh;
-      name_text.geom.pos[0] = x;
-      name_text.geom.pos[1] = y;
-
-      const handle = bar.children.buffer[0];
-      handle.geom.pos[0] = x;
-      handle.geom.pos[1] = y;
-
-      const value_text = bar.children.buffer[1];
-      value_text.geom.pos[0] = x;
-      value_text.geom.pos[1] = y;
-   }
 
 
 

@@ -322,24 +322,23 @@ const SECTION = {
 	VERTICAL: _CNT,
 	HORIZONTAL: _CNT <<= 0x1,
 	INHERIT: _CNT <<= 0x1,
+	
+	RESIZE_PARENT: _CNT <<= 0x1,
+	RESIZE_PARENTX: _CNT <<= 0x1,
+	RESIZE_PARENTY: _CNT <<= 0x1,
+	
 	EXPAND: _CNT <<= 0x1,
-	FIT: _CNT <<= 0x1,
+	ITEM_FIT: _CNT <<= 0x1,
+	ITEM_RESTRICT: _CNT <<= 0x1,
 
 	FIXED_W: _CNT <<= 0x1,
 	FIXED_H: _CNT <<= 0x1,
 
-	RESIZE_PARENT: _CNT <<= 0x1,
-	RESIZE_PARENTX: _CNT <<= 0x1,
-	RESIZE_PARENTY: _CNT <<= 0x1,
-
-	FOLLOW: _CNT <<= 0x1,
-
-	ITEM_FIT: _CNT <<= 0x1,
-	ITEM_RESTRICT: _CNT <<= 0x1,
-
 	NO_ITEMS_CALC: _CNT <<= 0x1,
 	TOP_DOWN: _CNT <<= 0x1,
 	LEFT_RIGHT: _CNT <<= 0x1,
+
+	INDEPENDENT: _CNT <<= 0x1,
 
 };
 
@@ -587,6 +586,7 @@ const PERFORMANCE_TIMER = {
 // 
 _CNT = 0x1;
 const ROOT_WIDGETS = {
+	NULL: 0x0,
 	CREATE_ROOT: _CNT,
 	// CREATE_BATCH: _CNT <<= 0x1,
 }
@@ -823,8 +823,9 @@ const MESH_TYPE = {
 	WIDGET_DROP_DOWN: _CNT <<= 1,
 	DROP_DOWN_MENU: _CNT <<= 1,
 	
-	SCENE: _CNT <<= 1,
+	WIDGET_WINDOW: _CNT <<= 1,
 	
+	SCENE: _CNT <<= 1,
 	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
 	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
 

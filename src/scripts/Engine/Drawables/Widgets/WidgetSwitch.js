@@ -2,7 +2,7 @@
 
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_create_root } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy, Widget_root_create_root } from "../../Core/MeshBuffer.js";
 import { BLUE, GREEN, GREY } from "../Material/Base/Colors.js";
 import { Rect } from "../Meshes/Rect_Mesh.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
@@ -89,11 +89,21 @@ export class Widget_Switch_Simple extends Rect {
    }
 
 
+   Rerender() {
+
+      // if (this.state.mask & MESH_STATE.ACTIVE) {
+         super.AddToGfxFromReset();
+         this.children.buffer[0].AddToGfxFromReset();
+      // }
+
+   }
+
+
    AddToGfxFromReset() {
 
       if (this.state.mask & MESH_STATE.ACTIVE) {
          super.AddToGfxFromReset();
-         console.log('2', this.children.buffer[0].geom.pos,this.GetName())
+         // console.log('2', this.children.buffer[0].geom.pos,this.GetName())
          this.children.buffer[0].AddToGfxFromReset();
       }
 
@@ -148,23 +158,39 @@ export class Widget_Switch_Simple extends Rect {
    }
 
    SetPosXNoGfxUpdate(x) {
-      this.geom.pos[0] = x;
-      this.children.buffer[0].geom.pos[0] = x;
-      this.children.buffer[0].geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0]) + this.children.buffer[0].geom.dim[0] + this.pad;
+      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      }
+      else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.child, and must update both offsets 
+         this.geom.pos[0] = x;
+         this.children.buffer[0].geom.pos[0] = x;
+         this.children.buffer[0].geom.pos[0] = (this.geom.pos[0] - this.geom.dim[0]) + this.children.buffer[0].geom.dim[0] + this.pad;
+      }
    }
 
 
    SetPosYNoGfxUpdate(y) {
-      this.geom.pos[1] = y;
-      this.children.buffer[0].geom.pos[1] = y;;
+      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      }
+      else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.child, and must update both offsets 
+         this.geom.pos[1] = y;
+         this.children.buffer[0].geom.pos[1] = y;
+      }
    }
 
 
    SetPosXYNoGfxUpdate(x, y) {
-      this.geom.pos[0] = x;
-      this.geom.pos[1] = y;
-      this.children.buffer[0].geom.pos[0] = x;
-      this.children.buffer[0].geom.pos[1] = y;
+
+      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      }
+      else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.child, and must update both offsets 
+         this.geom.pos[0] = x;
+         this.geom.pos[1] = y;
+         this.children.buffer[0].geom.pos[0] = x;
+         this.children.buffer[0].geom.pos[1] = y;
+      }
    }
    
 
@@ -176,7 +202,7 @@ export class Widget_Switch_Simple extends Rect {
       this.geom.pos[1] = y;
       this.children.buffer[0].geom.pos[0] = x+dx;
       this.children.buffer[0].geom.pos[1] = y+dy;
-      console.log('1', this.children.buffer[0].geom.pos,this.GetName())
+      // console.log('1', this.children.buffer[0].geom.pos,this.GetName())
   }
 
    /*******************************************************************************************************************************************************/

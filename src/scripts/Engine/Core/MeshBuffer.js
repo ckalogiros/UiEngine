@@ -8,7 +8,7 @@ import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Batch_store } from "../Batch/Batch.js";
-import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
+import { Str_buffer_get_by_idx, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 import { Uniforms_buffer_set_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
@@ -37,8 +37,6 @@ const _widget_root_buffer = New_generic_buffer(_, 'Widget root');
 const _root_batch_buffer = New_generic_buffer(_, 'Root batch');
 const _widget_root_gfx = New_generic_buffer(_, 'Root gfx');
 
-
-const _root_uniforms_for_wpos = New_generic_buffer(_, 'root_uniforms_for_wpos');
 
 
 
@@ -69,32 +67,33 @@ export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.b
 
 
 
-export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) { 
-   
+export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
+
    const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
    temp_no_allocation_buffer[0][0] = pos[0];
-   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0]*2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
-   temp_no_allocation_buffer[1][0] = pos[1] ;
-   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1]*2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
-   
+   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
+   temp_no_allocation_buffer[1][0] = pos[1];
+   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+
    return temp_no_allocation_buffer;
 }
 
 
 const temp_no_allocation_buffer = []
-temp_no_allocation_buffer[0] = [0,0]
-temp_no_allocation_buffer[1] = [0,0]
-export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferidx) { 
-   if(_mesh_buffer.buffer[mesh_bufferidx]===null || _mesh_buffer.buffer[mesh_bufferidx]===_) {
-      console.log('Meshbuffer: idx', mesh_bufferidx, _mesh_buffer.buffer); 
-      return false;}
+temp_no_allocation_buffer[0] = [0, 0]
+temp_no_allocation_buffer[1] = [0, 0]
+export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferidx) {
+   if (_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === _) {
+      console.log('Meshbuffer: idx', mesh_bufferidx, _mesh_buffer.buffer);
+      return false;
+   }
 
    const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
    temp_no_allocation_buffer[0][0] = pos[0];
-   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0]*2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
-   temp_no_allocation_buffer[1][0] = pos[1] ;
-   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1]*2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
-   
+   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
+   temp_no_allocation_buffer[1][0] = pos[1];
+   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+
    return temp_no_allocation_buffer;
 }
 
@@ -143,7 +142,7 @@ const _batch_destroy_storage = New_int16_buffer();
 
 
 
-export function Mesh_buffer_batch_destroy_store(idx){
+export function Mesh_buffer_batch_destroy_store(idx) {
    // TODOD: DEBUG the idx if exists and in boundaries
    _batch_destroy_storage.Add(idx);
    console.log(idx)
@@ -152,10 +151,10 @@ export function Mesh_buffer_batch_destroy_store(idx){
 
 
 
-export function Mesh_buffer_batch_destroy_run(){
+export function Mesh_buffer_batch_destroy_run() {
    // TODOD: DEBUG the idx if exists and in boundaries
 
-   for(let i=0; i <= _batch_destroy_storage.boundary; i++){
+   for (let i = 0; i <= _batch_destroy_storage.boundary; i++) {
 
       const idx = _batch_destroy_storage.buffer[i];
 
@@ -194,55 +193,168 @@ export function Mesh_buffer_batch_destroy_run(){
 // Widget roots World positions as uniforms 
 /*******************************************************************************************************************************************************************************/
 
+
+const _root_uniforms_for_wpos = New_generic_buffer(_, 'root_uniforms_for_wpos');
 const temp_debug_names_of_root_uniform_wpos = New_generic_buffer(_, 'temp_debug_names_of_root_uniform_wpos');
 
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
-export function TEMP_create_widget_root_wpos_uniform(pos, debug_name){
-   const entry = [0, 0];
-   entry[0] = pos[0];
-   entry[1] = pos[1];
+// export function TEMP_create_widget_root_wpos_uniform(pos, parent, debug_name){
+export function TEMP_create_widget_root_wpos_uniform(mesh, debug_vbidx) {
 
-   temp_debug_names_of_root_uniform_wpos.Add(debug_name);
 
-   return _root_uniforms_for_wpos.Add(entry);
+   // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
+   let meshidx = mesh.mesh_bufferidx;
+   let parent_posidx = INT_NULL
+   /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
+   const wpos = [0, 0];
+
+   wpos[0] = mesh.geom.pos[0];
+   wpos[1] = mesh.geom.pos[1];
+ 
+
+   if (mesh.parent !== null && mesh.parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
+
+
+      parent_meshidx = mesh.parent.mesh_bufferidx;
+      parent_posidx = mesh.parent.root_posidx;
+
+   }
+
+   // If the mesh is a text mesh, we want to connect it(take its wpos offset) from any 'root wpos' that the parent of the text mesh takes its offset position.
+   // See code below for explanation
+   if (mesh.parent !== null && mesh.type & MESH_TYPE.TEXT_MESH) {
+
+      const root_posidx = mesh.parent.root_posidx;
+
+      // Here we want to get the 'root wpos' of the 'root wpos' that the text mesh's parent its connected to.
+      /**
+       * For Example: there are 3 meshes:{rect, label and label text}. 
+       * What we want for the label text is to have as a parent 'root wpos' the parent 'root wpos' of the label. 
+       * That is the rect's 'root wpos' in this example.  
+       * Other wise the text will draw its offset pos from label, which in its turn will draw its offset pos from the rect.
+       * The correct is both label and text have offset positions to rect.
+       */
+      let parent_root_wpos = _root_uniforms_for_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
+      if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
+         parent_root_wpos = _root_uniforms_for_wpos.buffer[parent_root_wpos.parent_posidx];
+      }
+      
+      // Now, because we are gonna need the 'mesh_bufferidx' of the 'root wpos', we need to get the mesh from the mesh buffer.
+      const mesh_that_has_the_root_wpos = _mesh_buffer.buffer[parent_root_wpos.meshidx];
+      parent_meshidx = mesh_that_has_the_root_wpos.mesh_bufferidx;
+      parent_posidx = mesh_that_has_the_root_wpos.root_posidx;
+
+      // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
+      wpos[0] = 0;
+      wpos[1] = 0;
+   }
+   else{
+
+      mesh.geom.pos[0] = 0;
+      mesh.geom.pos[1] = 0;
+   }
+
+   const entry = {
+      wpos: [0, 0],
+      meshidx: meshidx, // Is needed to have a ref to the mesh from inside the '_root_uniforms_for_wpos' buffer
+      parent_posidx: parent_posidx,
+   }
+
+   entry.wpos[0] += wpos[0];
+   entry.wpos[1] += wpos[1];
+
+   temp_debug_names_of_root_uniform_wpos.Add({ nameidx: mesh.nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vbidx });
+
+   const idx = _root_uniforms_for_wpos.Add(entry);
+   console.log('ROOT POSITIONS BUFFER', _root_uniforms_for_wpos.buffer, entry)
+   return idx;
 }
 
 
 
 // Can take vbidx as the 'idx' to return the wpos for all meshes of a vertex buffer
-export function TEMP_store_widget_root_wpos(idx, pos){
+export function TEMP_store_widget_root_wpos(idx, pos) {
    // TODO: check NULL object
-   
-   _root_uniforms_for_wpos.buffer[idx][0] = pos[0];
-   _root_uniforms_for_wpos.buffer[idx][1] = pos[1];
+
+   _root_uniforms_for_wpos.buffer[idx].wpos[0] = pos[0];
+   _root_uniforms_for_wpos.buffer[idx].wpos[1] = pos[1];
 }
 
 
 
+/*********************************************************************************************************/
+// GETTERS
 // Can take vbidx as the 'idx' to return the wpos for all meshes of a vertex buffer
-export function TEMP_get_widget_root_wpos(idx){ return _root_uniforms_for_wpos.buffer[idx]; }
-export function TEMP_get_widget_root_wposx(idx){ return _root_uniforms_for_wpos.buffer[idx][0]; }
-export function TEMP_get_widget_root_wposy(idx){ return _root_uniforms_for_wpos.buffer[idx][1]; }
+export function TEMP_get_widget_root_wpos_meshidx(idx) {
+   return _root_uniforms_for_wpos.buffer[idx].meshidx;
+}
+export function TEMP_is_widget_root_wpos(idx, meshidx) {
+   if(_root_uniforms_for_wpos.buffer[idx] === undefined) return false;
+   if(_root_uniforms_for_wpos.buffer[idx].meshidx === meshidx) return true;
+   return false;
+}
+export function TEMP_get_widget_root_wpos(idx) {
 
-export function TEMP_set_widget_root_wpos (idx, pos){ 
-   _root_uniforms_for_wpos.buffer[idx][0] = pos[0];
-   _root_uniforms_for_wpos.buffer[idx][1] = pos[1]; 
+   const _this = _root_uniforms_for_wpos.buffer[idx];
+   let pos = [_this.wpos[0], _this.wpos[1]];
+
+   // If this relative position has a parent position, add it
+   if (_this.parent_posidx !== INT_NULL) {
+      const p = TEMP_get_widget_root_wpos(_this.parent_posidx);
+      pos[0] += p[0];
+      pos[1] += p[1];
+   }
+
+   return pos;
 }
-export function TEMP_set_widget_root_wposx(idx, pos){ 
-   _root_uniforms_for_wpos.buffer[idx][0] = pos;  
+export function TEMP_get_widget_root_wposx(idx) {
+
+   const _this = _root_uniforms_for_wpos.buffer[idx];
+   let pos = _this.wpos[0];
+
+   // If this relative position has a parent position, add it
+   if (_this.parent_posidx !== INT_NULL) {
+      const p = TEMP_get_widget_root_wposx(_this.parent_posidx);
+      pos += p;
+   }
+
+   return pos;
 }
-export function TEMP_set_widget_root_wposy(idx, pos){ 
-   _root_uniforms_for_wpos.buffer[idx][1] = pos;  
+export function TEMP_get_widget_root_wposy(idx) {
+
+   const _this = _root_uniforms_for_wpos.buffer[idx];
+   let pos = _this.wpos[1];
+
+   // If this relative position has a parent position, add it
+   if (_this.parent_posidx !== INT_NULL) {
+      const p = TEMP_get_widget_root_wposy(_this.parent_posidx);
+      pos += p;
+   }
+
+   return pos;
 }
-export function TEMP_add_widget_root_wpos (idx, pos){ 
-   _root_uniforms_for_wpos.buffer[idx][0] += pos[0]; 
-   _root_uniforms_for_wpos.buffer[idx][1] += pos[1]; 
+
+/*********************************************************************************************************/
+// SETTERS
+export function TEMP_set_widget_root_wpos(idx, x, y) {
+   _root_uniforms_for_wpos.buffer[idx].wpos[0] = x;
+   _root_uniforms_for_wpos.buffer[idx].wpos[1] = y;
 }
-export function TEMP_add_widget_root_wposx(idx, pos){ 
-   _root_uniforms_for_wpos.buffer[idx][0] += pos;  
+export function TEMP_set_widget_root_wposx(idx, pos) {
+   _root_uniforms_for_wpos.buffer[idx].wpos[0] = pos;
 }
-export function TEMP_add_widget_root_wposy(idx, pos){ 
-   _root_uniforms_for_wpos.buffer[idx][1] += pos;  
+export function TEMP_set_widget_root_wposy(idx, pos) {
+   _root_uniforms_for_wpos.buffer[idx].wpos[1] = pos;
+}
+export function TEMP_add_widget_root_wpos(idx, pos) {
+   _root_uniforms_for_wpos.buffer[idx].wpos[0] += pos[0];
+   _root_uniforms_for_wpos.buffer[idx].wpos[1] += pos[1];
+}
+export function TEMP_add_widget_root_wposx(idx, pos) {
+   _root_uniforms_for_wpos.buffer[idx].wpos[0] += pos;
+}
+export function TEMP_add_widget_root_wposy(idx, pos) {
+   _root_uniforms_for_wpos.buffer[idx].wpos[1] += pos;
 }
 
 
@@ -286,19 +398,26 @@ export function Mesh_per_vb_get_mesh(vbidx, per_vb_bufferidx) { return _mesh_per
 
 
 
-export function Mesh_per_vb_create_vb(vbidx) { 
+export function Mesh_per_vb_create_vb(vbidx) {
 
-   _mesh_per_vertex_buffer.AddAtIndex(vbidx, New_int16_buffer(GFX_VIEW_MESH_DEFAULT_COUNT)); 
+   _mesh_per_vertex_buffer.AddAtIndex(vbidx, New_int16_buffer(GFX_VIEW_MESH_DEFAULT_COUNT));
 
-   if(NOTIFICATIONS_ON) 
+   if (NOTIFICATIONS_ON)
       Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, vbidx);
 }
 
 
 
-export function Mesh_per_vb_store_mesh(vbidx, mesh_bufferidx) { 
+export function Mesh_per_vb_store_mesh(vbidx, mesh_bufferidx) {
+// console.log(_mesh_per_vertex_buffer.boundary)
+   return _mesh_per_vertex_buffer.buffer[vbidx].Add(mesh_bufferidx);
+}
 
-   return _mesh_per_vertex_buffer.buffer[vbidx].Add(mesh_bufferidx); 
+
+
+export function Mesh_per_vb_reset_buffer(vbidx) {
+
+   return _mesh_per_vertex_buffer.buffer[vbidx].Reset();
 }
 
 
@@ -335,10 +454,10 @@ export function Mesh_per_vb_remove_all_from_index(vbidx, meshidx) {
    if (mesh.per_vb_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
 
    // for(let i=_mesh_per_vertex_buffer.buffer[vbidx].vb.boundary; i >= mesh.mesh_bufferidx; i--){
-   for(let i=_mesh_per_vertex_buffer.buffer[vbidx].boundary; i >= mesh.per_vb_bufferidx; i--){
+   for (let i = _mesh_per_vertex_buffer.buffer[vbidx].boundary; i >= mesh.per_vb_bufferidx; i--) {
 
       _mesh_per_vertex_buffer.buffer[vbidx].RemoveByIdxSortedVersion(mesh.per_vb_bufferidx);
-      
+
       // REMOVE the meshes index????????
       // mesh.per_vb_bufferidx = per_vb_bufferidx;
    }
@@ -351,7 +470,7 @@ export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
 
    // EFFICIENCY: We should loop through all mesh idxs in gfx_buffer only if there is an accumulated value to be updated to
    for (let j = 0; j <= _mesh_per_vertex_buffer.buffer[vbidx].boundary; j++) {
-   
+
       const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vbidx].buffer[j]];
       if (mesh && mesh.gfx.vb.start >= start) {
 
@@ -394,10 +513,10 @@ export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
 _widget_root_buffer.Init(8);
 
 
-export function Widget_root_buffer_is_root(idx, meshidx) { 
+export function Widget_root_buffer_is_root(idx, meshidx) {
    // [0]-th element is the root and holds the 'mesh_bufferidx' of the mesh
-   if(_widget_root_buffer.buffer[idx].buffer[0] === meshidx) return true; 
-   return false; 
+   if (_widget_root_buffer.buffer[idx].buffer[0] === meshidx) return true;
+   return false;
 }
 export function Widget_root_buffer_get() { return _widget_root_buffer; }
 
@@ -407,10 +526,10 @@ export function Widget_root_buffer_get_root_pos(idx) { return _mesh_buffer.buffe
 
 
 
-export function Widget_root_buffer_get_root_unif_wpos(idx) { 
+export function Widget_root_buffer_get_root_unif_wpos(idx) {
    const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[idx].buffer[0]];
-   if(root_mesh.root_posidx===INT_NULL) alert('No root was constructed yet\nWidget_root_buffer_get_root_unif_wpos()')
-   const wpos = TEMP_get_widget_root_wpos(root_mesh.root_posidx); 
+   if (root_mesh.root_posidx === INT_NULL) alert('No root was constructed yet\nWidget_root_buffer_get_root_unif_wpos()')
+   const wpos = TEMP_get_widget_root_wpos(root_mesh.root_posidx);
    return wpos;
 }
 
@@ -424,10 +543,10 @@ export function Widget_root_buffer_get_root_meshidx(idx) { return _widget_root_b
 
 
 
-export function Widget_root_buffer_get_mesh_by_rootidx(idx) { 
+export function Widget_root_buffer_get_mesh_by_rootidx(idx) {
 
    const mesh = Mesh_buffer_get_mesh_byidx(_widget_root_buffer.buffer[idx].buffer[0]);
-   return mesh; 
+   return mesh;
 }
 
 
@@ -564,7 +683,7 @@ export function Widget_root_is_widget_root(root_bufferidx, mesh_bufferidx) {
 
 
 
-export function Widget_root_destroy_all_meshes(root_bufferidx, mesh_bufferidx) { 
+export function Widget_root_destroy_all_meshes(root_bufferidx, mesh_bufferidx) {
    //TODO: IMPLEMENT
    // Run for all meshes in root
    // 
@@ -868,14 +987,14 @@ export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbi
 
 
 /** Ruun for all vertex buffers of specific widget root and update the uniform positions for each vb. */
-export function Widget_root_gfx_update_unif_wpos_per_vb(root_bufferidx, pos) {
+// export function Widget_root_gfx_add_unif_wpos_per_vb(root_bufferidx, pos) {
 
-   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j+=2) {
-      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j+1];
-      TEMP_add_widget_root_wpos (vbidx, pos)
-   }
+//    for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j += 2) {
+//       const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j + 1];
+//       TEMP_add_widget_root_wpos(vbidx, pos)
+//    }
 
-}
+// }
 
 
 
@@ -884,9 +1003,9 @@ export function Widget_root_gfx_set_unif_wpos_per_vb(root_bufferidx) {
 
    const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[0]];
    const pos = TEMP_get_widget_root_wpos(root_mesh.root_posidx);
-   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j+=2) {
-      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j+1];
-      if(vbidx !== root_mesh.gfx.vb.idx) TEMP_set_widget_root_wpos(vbidx, pos);
+   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j += 2) {
+      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j + 1];
+      if (vbidx !== root_mesh.gfx.vb.idx) TEMP_set_widget_root_wpos(vbidx, pos[0], pos[1]);
    }
 
 }
@@ -897,12 +1016,28 @@ export function Widget_root_gfx_set_unif_wpos_per_vb(root_bufferidx) {
 export function Widget_root_gfx_add_unif_wpos_per_vb(root_bufferidx, dif) {
 
    const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[0]];
-   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j+=2) {
-      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j+1];
-      if(vbidx !== root_mesh.gfx.vb.idx) {
+   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j += 2) {
+      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j + 1];
+      if (vbidx !== root_mesh.gfx.vb.idx) {
          TEMP_add_widget_root_wpos(vbidx, dif);
-         // console.log(vbidx, TEMP_get_widget_root_wpos(vbidx))
       }
+   }
+
+}
+
+
+
+/** Run through all vbs of the widget root, and resets the vb buffers of the '_mesh_per_vertex_buffer' struct */
+export function Widget_root_gfx_reset_mesh_per_vb_buffer(root_bufferidx) {
+   
+   const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[0]];
+   
+   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j += 2) {
+
+      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j + 1];
+      // if (vbidx !== root_mesh.gfx.vb.idx) {
+         Mesh_per_vb_reset_buffer(vbidx);
+      // }
    }
 
 }
@@ -1161,27 +1296,27 @@ export function Widget_root_reset_gfx(root_bufferidx) {
 
 
 /** Render all group's meshes from all vertex buffers via AddToGfxFromReset()  */
-export function Widget_root_rerender_from_root_all_buffers(root_bufferidx, do_reconstruct_listeners=true) {
+export function Widget_root_rerender_from_root_all_buffers(root_bufferidx, do_reconstruct_listeners = true) {
 
    const root = _widget_root_buffer.buffer[root_bufferidx];
 
-   for (let i = 0; i <= root.boundary; i++){
-      
-      const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
-      if (mesh.state.mask & MESH_STATE.ACTIVE) { 
+   for (let i = 0; i <= root.boundary; i++) {
 
-         mesh.AddToGfxFromReset(); 
+      const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
+      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+
+         mesh.AddToGfxFromReset();
       }
       // else console.log('INACTIVE', mesh.GetName())
    }
-   
+
    // Reconstruct all listeners(from root, recursive(SLOW))
-   if(do_reconstruct_listeners) {
-      
+   if (do_reconstruct_listeners) {
+
       // Get the root mesh
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[0]);
       const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
-      mesh.ConstructListeners(parent_events); 
+      mesh.ConstructListeners(parent_events);
    }
 
 }
@@ -1197,10 +1332,11 @@ export function Widget_root_rerender_from_root_all_buffers(root_bufferidx, do_re
 
 // Faster than calling for resize and rerender seperately 
 /** Resize (x,y) dimentions and re-render for all meshes in widget root  */
-export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconstruct_listeners=true) {
+export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconstruct_listeners = true) {
 
    const root = _widget_root_buffer.buffer[root_bufferidx];
-   
+   // console.log(root)
+
    // Do for root
    // Resize: Only to Section meshes that have the option:EXPAND
    const root_mesh = Mesh_buffer_get_mesh_byidx(root.buffer[0]);
@@ -1208,38 +1344,35 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
    root_mesh.geom.dim[1] += y;
 
    // Rerender
-   root_mesh.AddToGfxFromReset();  
+   root_mesh.AddToGfxFromReset();
 
-
+   // console.log('---------------------')
    // Do children
-   for (let i = 1; i <= root.boundary; i++){
-      
+   for (let i = 1; i <= root.boundary; i++) {
+
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
-      if (mesh.state.mask & MESH_STATE.ACTIVE) { 
+      if (mesh.state.mask & MESH_STATE.ACTIVE) {
 
          // Resize: Only to Menu_Bar meshes that have the option:EXPAND
-         if(mesh.type & MESH_TYPE.WIDGET_MENU_BAR && mesh.options & SECTION.EXPAND){
+         if (mesh.type & MESH_TYPE.WIDGET_MENU_BAR && mesh.options & SECTION.EXPAND) {
             mesh.geom.dim[0] += x;
             // mesh.geom.dim[1] += y; // TODO: Deal with y resize. Most of meshes should be resized in x only. 
          }
 
          // Do: meshes with rel_comp. Move the children positioned relative right
-         if(mesh.rel_comp){
-            Relative_pos_comp_move_right_buffer(REL_POS.RIGHT, mesh, x*2)
+         if (mesh.rel_comp) {
+            Relative_pos_comp_move_right_buffer(REL_POS.RIGHT, mesh, x * 2)
          }
 
-         if(mesh.mesh_bufferidx===58)
-            console.log()
-
          // Rerender
-         mesh.AddToGfxFromReset(); 
+         mesh.AddToGfxFromReset();
       }
       // else console.log('INACTIVE', mesh.GetName())
    }
-   
+
    // Reconstruct all listeners(from root, recursive(SLOW))
    // if(do_reconstruct_listeners) {
-      
+
    //    // Get the root mesh
    //    const parent_events = root_mesh.parent ? [root_mesh.parent.listeners.buffer[0], root_mesh.parent.listeners.buffer[1]] : [null, null];
    //    root_mesh.ConstructListeners(parent_events); 
@@ -1251,12 +1384,12 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
 
 
 export function Widget_root_set_in_focus(root_bufferidx) {
-   
+
 
    const vb_mesh_roots = Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx);
    const len = vb_mesh_roots.length;
 
-   for(let i=0; i < len; i++){
+   for (let i = 0; i < len; i++) {
 
       const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
       Renderqueue_set_priority_by_vb(LAST, gfx.vb.idx);
@@ -1268,12 +1401,12 @@ export function Widget_root_set_in_focus(root_bufferidx) {
 
 
 export function Widget_root_set_render_queue_flags(root_bufferidx, flags) {
-   
+
 
    const vb_mesh_roots = Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx);
    const len = vb_mesh_roots.length;
 
-   for(let i=0; i < len; i++){
+   for (let i = 0; i < len; i++) {
 
       const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
       Renderqueue_set_flags(gfx.prog.idx, gfx.vb.idx, flags)
@@ -1494,6 +1627,7 @@ export function Widgetroot_buffer_print_w1() {
                   'msbidx', mesh.mesh_bufferidx,
                   'state', mesh.state.mask,
                   'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
+                  'root_pos', mesh.root_posidx,
                   'pos', mesh.geom.pos, mesh.GetName());
                   // 'ubidxs', mesh.uniforms, mesh.GetName());
                }
@@ -1504,12 +1638,14 @@ export function Widgetroot_buffer_print_w1() {
                   // 'gfxidx', mesh.per_vb_bufferidx,
                   'msbidx', mesh.mesh_bufferidx,
                   'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.idx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
+                  'root_pos', mesh.root_posidx,
+                  'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
                   'state', mesh.state.mask,
                   'start', mesh.gfx.vb.start,
                   // 'pos', mesh.GetPosXY(),
                   'dim', mesh.geom.dim,
                   'rel pos', mesh.geom.pos, mesh.GetName());
-                  // 'ubidxs', mesh.uniforms, mesh.GetName());
+               // 'ubidxs', mesh.uniforms, mesh.GetName());
             }
          }
       }
@@ -1607,9 +1743,18 @@ export function Root_uniforms_for_wpos() {
 
    console.log('_root_uniforms_for_wpos:')
    for (let i = 0; i <= _root_uniforms_for_wpos.boundary; i++) {
+
+      const parent = (temp_debug_names_of_root_uniform_wpos.buffer[i].parent_meshidx !== INT_NULL)
+         ? (_mesh_buffer.buffer[temp_debug_names_of_root_uniform_wpos.buffer[i].parent_meshidx]) : null;
+      const parent_name = (parent)
+         ? Str_buffer_mesh_names_get_by_idx(parent.nameidx) : 'NULL'
+
       console.log(i,
-         'pos:', _root_uniforms_for_wpos.buffer[i],
-         'name:', temp_debug_names_of_root_uniform_wpos.buffer[i],
+         'pos:', _root_uniforms_for_wpos.buffer[i].wpos,
+         'name:', Str_buffer_mesh_names_get_by_idx(temp_debug_names_of_root_uniform_wpos.buffer[i].nameidx),
+         '||| parent:', parent_name,
+         'parent_posidx:', _root_uniforms_for_wpos.buffer[i].parent_posidx,
+         'vbidx:', temp_debug_names_of_root_uniform_wpos.buffer[i].vbidx,
       );
    }
 }
