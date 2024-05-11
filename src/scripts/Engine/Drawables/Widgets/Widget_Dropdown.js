@@ -523,7 +523,7 @@ export class Widget_Dropdown extends Section {
       if (dp.isOn & DP_MENU_STATE.ON) {
          for (let j = 0; j <= menu.children.boundary; j++) {
 
-            const item = menu.children.buffer[j];
+            const item = menu.children.buffer[j]; 
 
 
             // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
