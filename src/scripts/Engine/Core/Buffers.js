@@ -2,7 +2,7 @@
 
 
 
-// TODO: Implement all Realloc() functions growing algorithm. NOT doubling but just big enough
+// TODO: Implement all Realloc() functions growing algorithm. NOT doubleing but just big enough
 
 // TODO: Correct the Init logic of 'Buffer_Interface' and 'M_Buffer'. Currently if object is passed and elements are initialized, the boundary remains 0. 
 

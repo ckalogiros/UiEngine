@@ -25,7 +25,7 @@ import { View_get_view_vb_root_meshidx } from "../../Core/MeshBufferViews.js";
 
 
 
-const _fontsize = 10;
+const _fontsize = 8.5;
 const temp_close_minim_style = [0,0,0];
 
 

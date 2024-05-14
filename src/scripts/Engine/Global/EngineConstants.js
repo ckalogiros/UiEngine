@@ -21,8 +21,8 @@ const MAX_UINT16 = 65535;
 const MAX_UINT32 = 0xFFFFFFFF; // 4294967295;
 // const MAX_UINT64 = 0xFFFFFFFFFFFFFFFF; // 18446744073709551615 ;
 
-const MAX_BIT_MASK =  0xFFFFFFFFFFFFF; 
-const MAX_BIT_MASK_COMBINATIONS =  52; 
+const MAX_BIT_MASK = 0xFFFFFFFFFFFFF;
+const MAX_BIT_MASK_COMBINATIONS = 52;
 
 const MILISEC_TO_SEC = 0.001;
 const NANOSEC = 0.000001;
@@ -266,8 +266,8 @@ const STATE = {
 			}
 		},
 		SetFocused(mesh) {
-			
-			if(this.focused !== mesh) console.log('FOCUSED:', mesh.mesh_bufferidx, mesh.GetName())
+
+			if (this.focused !== mesh) console.log('FOCUSED:', mesh.mesh_bufferidx, mesh.GetName())
 			this.focused = mesh;
 			if (!mesh) {
 				this.focusedId = INT_NULL;
@@ -278,23 +278,23 @@ const STATE = {
 				this.focusedIdx = mesh.mesh_bufferidx;
 			}
 		},
-		CheckAllAndRemove(mesh){
-			if(mesh === this.hovered){
+		CheckAllAndRemove(mesh) {
+			if (mesh === this.hovered) {
 				this.hovered = null;
 				this.hoveredId = INT_NULL;
 				this.hoveredIdx = INT_NULL;
 			}
-			if(mesh === this.clicked){
+			if (mesh === this.clicked) {
 				this.clicked = null;
 				this.grabedId = INT_NULL;
 				this.grabedIdx = INT_NULL;
 			}
-			if(mesh === this.grabed){
+			if (mesh === this.grabed) {
 				this.grabed = null;
 				this.clickedId = INT_NULL;
 				this.clickedIdx = INT_NULL;
 			}
-			if(mesh === this.focused){
+			if (mesh === this.focused) {
 				this.focused = null;
 				this.focusedId = INT_NULL;
 				this.focusedIdx = INT_NULL;
@@ -322,11 +322,11 @@ const SECTION = {
 	VERTICAL: _CNT,
 	HORIZONTAL: _CNT <<= 0x1,
 	INHERIT: _CNT <<= 0x1,
-	
+
 	RESIZE_PARENT: _CNT <<= 0x1,
 	RESIZE_PARENTX: _CNT <<= 0x1,
 	RESIZE_PARENTY: _CNT <<= 0x1,
-	
+
 	EXPAND: _CNT <<= 0x1,
 	ITEM_FIT: _CNT <<= 0x1,
 	ITEM_RESTRICT: _CNT <<= 0x1,
@@ -362,7 +362,7 @@ const MESH_STATE = {
 	IN_RESIZE: _CNT <<= 1,
 	IN_GRAB: _CNT <<= 1,
 	IN_HOVER_COLOR: _CNT <<= 1,
-	
+
 	IS_HOVERABLE: _CNT <<= 1,
 	IS_CLICKABLE: _CNT <<= 1,
 	IS_RESIZEABLE: _CNT <<= 1,
@@ -372,7 +372,7 @@ const MESH_STATE = {
 	IS_FAKE_HOVERABLE: _CNT <<= 1,
 	IS_FAKE_CLICKABLE: _CNT <<= 1,
 	IS_HOVER_COLORABLE: _CNT <<= 1,
-	
+
 	IN_SCALE: _CNT <<= 1,
 	HAS_POPUP: _CNT <<= 1,
 	HAS_CLIP: _CNT <<= 1,
@@ -437,8 +437,8 @@ const MOUSE = {
 
 _CNT = 0x1;
 const RENDER_QUEUE_FLAGS = {
-   IS_ACTIVE: _CNT,
-   SKIP_PRIORITY: _CNT<<=0x1,
+	IS_ACTIVE: _CNT,
+	SKIP_PRIORITY: _CNT <<= 0x1,
 }
 
 
@@ -562,6 +562,7 @@ const PERFORMANCE_TIMERS_IDXS = {
 	FramebufferRendering: INT_NULL,
 	AddToGfxRect: INT_NULL,
 	AddToGfxText: INT_NULL,
+	Animations: INT_NULL,
 	MiscTest1: INT_NULL,
 	MiscTest2: INT_NULL,
 	MiscTest3: INT_NULL,
@@ -620,10 +621,10 @@ const GFX = {
 _CNT = 0x4;
 const COMMANDS = {
 
-	ID:{
+	ID: {
 		MESH_BUFFER_BATCH_DESTROY: _CNT,
-		LISTENERS_BATCH_DESTROY: _CNT<<=0x1,
-		STYLE_BATCH_DESTROY: _CNT<<=0x1,
+		LISTENERS_BATCH_DESTROY: _CNT <<= 0x1,
+		STYLE_BATCH_DESTROY: _CNT <<= 0x1,
 	}
 };
 
@@ -776,6 +777,57 @@ const FRAMEBUFFER_TYPE = {
 
 
 /*************************************************************************************************/
+// Animations
+
+_CNT = 0x1;
+// let idx = 0;
+let cnt2 = 0x1;
+let cnt3 = 0x1;
+// let cnt4 = 0x1;
+const ANIMATIONS = {
+	TYPE: {
+		COLOR: _CNT,
+		WPOS: _CNT<<=0x1,
+
+		CYCLICAL: _CNT<<=0x1,
+	},
+	INDEX: {
+		COLOR: INT_NULL,
+	},
+	DATA: {
+		COLOR: {
+			R: cnt2,
+			G: cnt2 <<= 0x1,
+			B: cnt2 <<= 0x1,
+			A: cnt2 <<= 0x1,
+			RG: cnt2 <<= 0x1,
+			RB: cnt2 <<= 0x1,
+			RA: cnt2 <<= 0x1,
+			GB: cnt2 <<= 0x1,
+			GA: cnt2 <<= 0x1,
+			BA: cnt2 <<= 0x1,
+			RGB: cnt2 <<= 0x1,
+			RGA: cnt2 <<= 0x1,
+			RBA: cnt2 <<= 0x1,
+			GBA: cnt2 <<= 0x1,
+			RGBA: cnt2 <<= 0x1,
+		},
+		POS: {
+			XY: cnt3,
+			X: cnt3 << 0x1,
+			Y: cnt3 << 0x1,
+		},
+	},
+};
+
+
+
+
+
+
+
+
+/*************************************************************************************************/
 // Meshes  
 
 // MESH_TYPE: A bitmask to check if a mesh is of a specific type
@@ -806,25 +858,25 @@ const MESH_TYPE = {
 	WIDGET_SWITCH: _CNT <<= 1,
 	WIDGET_TEXT: _CNT <<= 1,
 	WIDGET_TEXT_DYNAMIC: _CNT <<= 1,
-	
+
 	WIDGET_SLIDER: _CNT <<= 1,
 	WIDGET_SLIDER_BAR: _CNT <<= 1,
 	WIDGET_SLIDER_HANDLE: _CNT <<= 1,
-	
+
 	WIDGET_SCROLLER: _CNT <<= 1,
 	WIDGET_SCROLLER_BAR: _CNT <<= 1,
 	WIDGET_SCROLLER_HANDLE: _CNT <<= 1,
-	
+
 	SCROLLED_SECTION: _CNT <<= 1,
-	
+
 	WIDGET_POP_UP: _CNT <<= 1,
 	WIDGET_MENU_BAR: _CNT <<= 1,
-	
+
 	WIDGET_DROP_DOWN: _CNT <<= 1,
 	DROP_DOWN_MENU: _CNT <<= 1,
-	
+
 	WIDGET_WINDOW: _CNT <<= 1,
-	
+
 	SCENE: _CNT <<= 1,
 	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
 	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
@@ -901,14 +953,14 @@ const LISTEN_EVENT_TYPES = {
 
 	NULL: _CNT <<= 1,
 
-	GetTypeFromIndex(idx){
+	GetTypeFromIndex(idx) {
 	}
 };
 
-function Listen_event_types_get_type_from_index(idx){
-	
-	if(idx === LISTEN_EVENT_TYPES_INDEX.HOVER) return LISTEN_EVENT_TYPES.HOVER;
-	if(idx === LISTEN_EVENT_TYPES_INDEX.CLICK) return LISTEN_EVENT_TYPES.CLICK_UP;
+function Listen_event_types_get_type_from_index(idx) {
+
+	if (idx === LISTEN_EVENT_TYPES_INDEX.HOVER) return LISTEN_EVENT_TYPES.HOVER;
+	if (idx === LISTEN_EVENT_TYPES_INDEX.CLICK) return LISTEN_EVENT_TYPES.CLICK_UP;
 }
 
 
@@ -929,8 +981,8 @@ const LISTEN_EVENT_TYPES_INDEX = {
 
 
 const E = {
-   H:LISTEN_EVENT_TYPES_INDEX.HOVER,
-   C:LISTEN_EVENT_TYPES_INDEX.CLICK,
+	H: LISTEN_EVENT_TYPES_INDEX.HOVER,
+	C: LISTEN_EVENT_TYPES_INDEX.CLICK,
 }
 
 
@@ -1109,16 +1161,16 @@ function ERROR_NULL(obj) {
 
 
 
-_CNT=0;
+_CNT = 0;
 const STYLES = { // Default access indices for style arrays
-   MARG:_CNT++,
-   PAD:_CNT++,
-   HOVER_MARG:_CNT++,
+	MARG: _CNT++,
+	PAD: _CNT++,
+	HOVER_MARG: _CNT++,
 
-	AXIS:{
-		ALL:0,
-		X:1,
-		Y:2,
+	AXIS: {
+		ALL: 0,
+		X: 1,
+		Y: 2,
 	},
 };
 
@@ -1133,18 +1185,18 @@ const STYLES = { // Default access indices for style arrays
 // Some global values for debug info ui display information'
 const DEBUG_INFO_STRUCTS = {
 
-	BUFFER:{
-		GENERIC:{
-			COUNTER:0, // Count how many instantiations of Generic_Buffer class
-			SIZE:0,
+	BUFFER: {
+		GENERIC: {
+			COUNTER: 0, // Count how many instantiations of Generic_Buffer class
+			SIZE: 0,
 		},
-		INT8:{
-			COUNTER:0, // Count how many instantiations of Generic_Buffer class
-			SIZE:0,
+		INT8: {
+			COUNTER: 0, // Count how many instantiations of Generic_Buffer class
+			SIZE: 0,
 		},
-		INT16:{
-			COUNTER:0, // Count how many instantiations of Generic_Buffer class
-			SIZE:0,
+		INT16: {
+			COUNTER: 0, // Count how many instantiations of Generic_Buffer class
+			SIZE: 0,
 		},
 		// UINT8:{
 		// 	COUNTER:0, // Count how many instantiations of Generic_Buffer class

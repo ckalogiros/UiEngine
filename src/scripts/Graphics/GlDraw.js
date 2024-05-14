@@ -77,7 +77,8 @@ export function Gl_draw(gl) {
             GL.BOUND_IBIDX = ib_info.ibidx;
         }
         
-        
+        // gl.drawArraysInstanced(gl.TRIANGLES, 0, 4, 2)
+        // gl.drawArraysInstanced(gl.TRIANGLES, 0, vb_info.draw_count, 1)
         gl.drawElements(gl.TRIANGLES, vb_info.draw_count, gl.UNSIGNED_SHORT, 0);
 
     }

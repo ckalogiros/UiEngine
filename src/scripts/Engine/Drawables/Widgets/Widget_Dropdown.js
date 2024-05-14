@@ -98,7 +98,7 @@ export function Dropdown_roots_print_root_buffer() {
 
 
 const tr = 1.5;
-const _font_size = 9;
+const _font_size = 7.5;
 
 export class Widget_Dropdown extends Section {
 

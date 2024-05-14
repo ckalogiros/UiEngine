@@ -47,7 +47,7 @@ export class Section extends Rect {
       this.min_size = [0, 0];
 
 
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 

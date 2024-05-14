@@ -13,6 +13,7 @@ import { Performance_timer_start, Performance_timer_stop, Performance_timers_upd
 import { Command_buffer_run } from "../Core/Commandbuffer.js";
 import { Scene_set_projection_matrix } from "../Scenes.js";
 import { Input_reset } from "../Controls/Input/Input.js";
+import { Animations_run } from "../Animations/Animations.js";
 
 
 
@@ -77,7 +78,11 @@ export class Renderer {
          TimersUpdateGlobalTimer(); // This is a globbal timer, going only forward
          TimersUpdateTimers();
          // TimersUpdateStepTimers();
-         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
+         
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Animations);
+         Animations_run();
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Animations);
 
          Framebuffer_update_draw();
          this.scene.OnUpdate();

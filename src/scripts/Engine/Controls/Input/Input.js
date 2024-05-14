@@ -52,12 +52,13 @@ export function Input_create_user_input_listeners() {
 
     if (PLATFORM.ANDROID_IMPL) {
 
-        document.addEventListener('mousemove', OnMouseMove_Android, false);
+        // document.addEventListener('mousemove', OnMouseMove_Android, false);
         // Touch screen events
-        document.addEventListener("touchstart", OnTouchStart);
+        document.addEventListener("touchstart", OnTouchStart, false);
         document.addEventListener("touchend", OnTouchEnd);
         document.addEventListener("touchcancel", OnTouchCancel);
-        document.addEventListener("touchmove", OnTouchMove);
+        // document.addEventListener("touchmove", OnTouchMove,  {passive:false});
+        document.addEventListener("touchmove", OnTouchMove, false);
     }
     else {
 

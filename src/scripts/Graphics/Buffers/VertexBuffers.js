@@ -121,6 +121,7 @@ export function Vertex_buffer_info_get_size() {
 }
 
 
+
 export function Vertex_buffer_info_get_by_vbidx(vbidx) {
     if (!DISABLE_DEBUG) (_vertex_buffers_info, vbidx, new Error().lineNumber);
     return _vertex_buffers_info.buffer[vbidx];

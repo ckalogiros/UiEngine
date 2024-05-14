@@ -1,0 +1,179 @@
+// <canvas id="canvas"></canvas>
+// <!-- vertex shader -->
+// <script  id="vertex-shader-3d" type="x-shader/x-vertex">
+// attribute vec4 a_position;
+// attribute vec4 color;
+// attribute mat4 matrix;
+// uniform mat4 projection;
+// uniform mat4 view;
+
+// varying vec4 v_color;
+
+// void main() {
+//   // Multiply the position by the matrix.
+//   gl_Position = projection * view * matrix * a_position;
+
+//   // Pass the vertex color to the fragment shader.
+//   v_color = color;
+// }
+// </script>
+// <!-- fragment shader -->
+// <script  id="fragment-shader-3d" type="x-shader/x-fragment">
+// precision mediump float;
+
+// // Passed in from the vertex shader.
+// varying vec4 v_color;
+
+// void main() {
+//   gl_FragColor = v_color;
+// }
+// </script><!--
+// for most samples webgl-utils only provides shader compiling/linking and
+// canvas resizing because why clutter the examples with code that's the same in every sample.
+// See https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
+// and https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+// for webgl-utils, m3, m4, and webgl-lessons-ui.
+// -->
+// <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+// <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+
+
+'use strict';
+
+function main() {
+  // Get A WebGL context
+  /** @type {HTMLCanvasElement} */
+  const canvas = document.querySelector('#canvas');
+  const gl = canvas.getContext('webgl');
+  if (!gl) {
+    return;
+  }
+
+  const ext = gl.getExtension('ANGLE_instanced_arrays');
+  if (!ext) {
+    return alert('need ANGLE_instanced_arrays');  // eslint-disable-line
+  }
+
+  // setup GLSL programs
+  // compiles shaders, links program
+  const program = webglUtils.createProgramFromScripts(
+      gl, ['vertex-shader-3d', 'fragment-shader-3d']);
+
+  const positionLoc = gl.getAttribLocation(program, 'a_position');
+  const colorLoc = gl.getAttribLocation(program, 'color');
+  const matrixLoc = gl.getAttribLocation(program, 'matrix');
+  const projectionLoc = gl.getUniformLocation(program, 'projection');
+  const viewLoc = gl.getUniformLocation(program, 'view');
+
+  const positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -0.1,  0.4,
+      -0.1, -0.4,
+       0.1, -0.4,
+       0.1, -0.4,
+      -0.1,  0.4,
+       0.1,  0.4,
+       0.4, -0.1,
+      -0.4, -0.1,
+      -0.4,  0.1,
+      -0.4,  0.1,
+       0.4, -0.1,
+       0.4,  0.1,
+    ]), gl.STATIC_DRAW);
+  const numVertices = 12;
+
+  // setup matrices, one per instance
+  const numInstances = 5;
+  // make a typed array with one view per matrix
+  const matrixData = new Float32Array(numInstances * 16);
+  const matrices = [];
+  for (let i = 0; i < numInstances; ++i) {
+    const byteOffsetToMatrix = i * 16 * 4;
+    const numFloatsForView = 16;
+    matrices.push(new Float32Array(
+        matrixData.buffer,
+        byteOffsetToMatrix,
+        numFloatsForView));
+  }
+
+  const matrixBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer);
+  // just allocate the buffer
+  gl.bufferData(gl.ARRAY_BUFFER, matrixData.byteLength, gl.DYNAMIC_DRAW);
+
+  // setup colors, one per instance
+  const colorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER,
+      new Float32Array([
+          1, 0, 0, 1,  // red
+          0, 1, 0, 1,  // green
+          0, 0, 1, 1,  // blue
+          1, 0, 1, 1,  // magenta
+          0, 1, 1, 1,  // cyan
+        ]),
+      gl.STATIC_DRAW);
+
+  
+  function render(time) {
+    time *= 0.001; // seconds
+
+    webglUtils.resizeCanvasToDisplaySize(gl.canvas);
+
+    // Tell WebGL how to convert from clip space to pixels
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    gl.useProgram(program);
+
+    // set the view and projection matrices since
+    // they are shared by all instances
+    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    gl.uniformMatrix4fv(projectionLoc, false, m4.orthographic(-aspect, aspect, -1, 1, -1, 1));
+    gl.uniformMatrix4fv(viewLoc, false, m4.zRotation(time * .1));
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.enableVertexAttribArray(positionLoc);
+    gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
+
+    // update all the matrices
+    matrices.forEach((mat, ndx) => {
+      m4.translation(-0.5 + ndx * 0.25, 0, 0, mat);
+      m4.zRotate(mat, time * (0.1 + 0.1 * ndx), mat);
+    });
+
+    // upload the new matrix data
+    gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer);
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, matrixData);
+
+    // set all 4 attributes for matrix
+    const bytesPerMatrix = 4 * 16;
+    for (let i = 0; i < 4; ++i) {
+      const loc = matrixLoc + i;
+      gl.enableVertexAttribArray(loc);
+      // note the stride and offset
+      const offset = i * 16;  // 4 floats per row, 4 bytes per float
+      gl.vertexAttribPointer(loc, 4, gl.FLOAT, false, bytesPerMatrix, offset);
+      // this line says this attribute only changes for each 1 instance
+      ext.vertexAttribDivisorANGLE(loc, 1);
+    }
+
+    // set attribute for color
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.enableVertexAttribArray(colorLoc);
+    gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
+    // this line says this attribute only changes for each 1 instance
+    ext.vertexAttribDivisorANGLE(colorLoc, 1);
+
+    ext.drawArraysInstancedANGLE(
+      gl.TRIANGLES,
+      0,             // offset
+      numVertices,   // num vertices per instance
+      numInstances,  // num instances
+    );
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+}
+
+main();

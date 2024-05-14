@@ -35,6 +35,15 @@ export function Shader_attributes_get_attrib_offset_by_nameid(attribsidx, nameid
 
 
 
+export function Shader_attributes_get_attribs_size(attribsidx, nameid) {
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
+
+   const attrib_idx = Shader_attributes_get_attrib_by_nameid(attribsidx, nameid);
+   return _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx];
+}
+
+
+
 export function Shader_attributes_get_attribs_offset_size(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
@@ -42,6 +51,39 @@ export function Shader_attributes_get_attribs_offset_size(attribsidx, nameid) {
    return {
       offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
       size: _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx],
+   };
+}
+
+
+
+export function Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, nameid) {
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
+
+   const attrib_idx = Shader_attributes_get_attrib_by_nameid(attribsidx, nameid);
+   return {
+      offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
+      attribs_per_vertex: _shader_attribs_buffer.buffer[attribsidx].attribs_per_vertex,
+   };
+}
+
+
+
+export function Shader_attributes_get_attribs_attribs_per_vertex(attribsidx) {
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
+
+   return _shader_attribs_buffer.buffer[attribsidx].attribs_per_vertex;
+}
+
+
+
+export function Shader_attributes_get_attribs_offset_size_attribs_per_vertex(attribsidx, nameid) {
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
+
+   const attrib_idx = Shader_attributes_get_attrib_by_nameid(attribsidx, nameid);
+   return {
+      offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
+      size: _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx],
+      attribs_per_vertex: _shader_attribs_buffer.buffer[attribsidx].attribs_per_vertex,
    };
 }
 
@@ -192,9 +234,11 @@ export function Shader_attributes_enable(attribsidx) {
 
    const len = shader_attribs.locs.length;
    for (let i = 0; i < len; i++) {
+      gfxCtx.gl.enableVertexAttribArray(shader_attribs.locs[i]);
       gfxCtx.gl.vertexAttribPointer(shader_attribs.locs[i], shader_attribs.sizes[i], gl_type, false, shader_attribs.attribs_per_vertex * FLOAT32_BYTE_SIZE, shader_attribs.offsets[i] * FLOAT32_BYTE_SIZE);
 
-      gfxCtx.gl.enableVertexAttribArray(shader_attribs.locs[i]);
+      // gfxCtx.gl.vertexAttribDivisor(shader_attribs.locs[i], 4)
+
    }
 }
 

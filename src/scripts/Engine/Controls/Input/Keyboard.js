@@ -18,11 +18,13 @@ import { Styles_hover_margin_print, Styles_hover_margin_print_loop, Styles_margi
 import { TEMP_dbg_info_ui_print_entries_table, TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
 import { DEBUG_INFO_BUFFERS_PRINT, DEBUG_INFO_BUFFERS_PRINT2 } from "../../Core/Buffers.js";
 import { Uniforms_buffer_block_print, Uniforms_buffer_print } from "../../../Graphics/Buffers/UniformBuffers.js";
+import { Animations_print } from "../../Animations/Animations.js";
 
 _CNT = 0;
 const p = _CNT++;
 const a1 = _CNT++;
 const a2 = _CNT++;
+const a3 = _CNT++;
 const r1 = _CNT++;
 const r2 = _CNT++;
 const f1 = _CNT++;
@@ -97,6 +99,14 @@ export const DEBUG_PRINT_KEYS = [
       func: (e)=>{
          console.log('------------------ DEBUG_INFO_BUFFERS_PRINT2() ------------------');
          DEBUG_INFO_BUFFERS_PRINT2();
+      },
+   },
+   {
+      key: 'a3',
+      discr: 'Animations_print()',
+      func: (e)=>{
+         console.log('------------------ Animations_print() ------------------');
+         Animations_print();
       },
    },
    {
@@ -506,7 +516,8 @@ export function OnKeyUp(e){
       }
       else if  (_keys_buffer[0].key === 'a') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[a1].func(e);  
-         if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[a2].func(e);  
+         else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[a2].func(e);  
+         else if  (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[a3].func(e);  
       }
       else if  (_keys_buffer[0].key === 'f') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[f1].func(e);  
@@ -586,7 +597,7 @@ export function OnKeyUp(e){
    else if(len === 0){
 
       if       (_keys_buffer[len].key === 'p') { DEBUG_PRINT_KEYS[p].func(e); }
-      else if  (_keys_buffer[len].key === 'a') { console.log('@ Buffers Allocations', `\n  1:${DEBUG_PRINT_KEYS[a1].discr}, 2:${DEBUG_PRINT_KEYS[a2].discr}`); }
+      else if  (_keys_buffer[len].key === 'a') { console.log('@ Buffers Allocations', `\n  1:${DEBUG_PRINT_KEYS[a1].discr}\n2:${DEBUG_PRINT_KEYS[a2].discr}\n3:${DEBUG_PRINT_KEYS[a3].discr}`); }
       else if  (_keys_buffer[len].key === 'r') { console.log('@ Render Queue', `\n  1:${DEBUG_PRINT_KEYS[r1].discr}, 2:${DEBUG_PRINT_KEYS[r2].discr}`); }
       else if  (_keys_buffer[len].key === 'f') { console.log('@ Frame Buuffer', `\n  1:${DEBUG_PRINT_KEYS[f1].discr}, 2:${DEBUG_PRINT_KEYS[f2].discr}`);  }
       else if  (_keys_buffer[len].key === 'i') { console.log('@ Time Intervals Queue', `\n  1:${DEBUG_PRINT_KEYS[i1].discr}`); }

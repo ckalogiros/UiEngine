@@ -26,6 +26,19 @@
 
 
 
+--------------------------------------------------- Nice Animation Color Effect!
+-If for ech vertex we animate a different color:
+v1:R
+v2:G
+v3:B
+
+That is acomplished by animating on color:R
+but the stride remains for 4 colors 
+so that each vertex the index gets to the next color attribute(R->G->B ....)
+--------------------------------------------------- Nice Animation Color Effect!
+
+
+
 --------------------------------------------------- Ideas!
 - Implement Draw Commands, so that we can later implement UNDO command.
   Batch is allready a kind of command gathering(keeps the move values)

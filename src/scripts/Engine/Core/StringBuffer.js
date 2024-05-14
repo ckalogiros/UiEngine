@@ -30,7 +30,7 @@ export function Str_buffer_get_DEBUG() {
 
 
 
-export function Str_buffer_store(str, mesh_refference) {
+export function Str_buffer_store(str) {
 
    const idx = _str_buffer.Add(str);
    return idx;

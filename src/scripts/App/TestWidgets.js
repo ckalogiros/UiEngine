@@ -28,6 +28,7 @@ import { Listener_set_root_mesh_priority } from '../Engine/Events/EventListeners
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp, Relative_pos_comp_recalc_all } from '../Engine/Drawables/Operations/RelativePosComponent.js';
 import { Command_buffer_store } from '../Engine/Core/Commandbuffer.js';
 import { Calculate_sizes_recursive } from '../Engine/Drawables/Meshes/Section.js';
+import { Animations_create } from '../Engine/Animations/Animations.js';
 
 // var osu = require('node-os-utils')
 // import {osu} from 'node-os-utils'
@@ -257,10 +258,20 @@ export function TestWidgetsGeneric(scene) {
     // obj.Update();
 
 
-
-    // SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
+    const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
     // let ms = 2000;
     // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000;
+    {
+        // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
+        // const mesh_data = {
+        //     vbidx: line.gfx.vb.idx,
+        //     start: line.gfx.vb.start,
+        //     attribs_per_vertex: line.gfx.attribsPerVertex,
+        //     attribsidx: line.gfx.prog.attribsidx,
+        //     values: line.mat.col,
+        // };
+        // Animations_create(ANIMATIONS.TYPE.COLOR, mesh_data, .1, )
+    }
 
     // const fb = Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);
     { // Draw multiple lines to multiple framebuffers
@@ -280,6 +291,10 @@ export function TestWidgetsGeneric(scene) {
     // Test_widgets(ypos);
 
     // const label = CreateLabel('ABCDEFGHIJKLM');
+    // const label = CreateLabel('CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line););CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line');
+    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
+
+
     // CreateLabel('Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);');
     // CreateLabel('Gl._framebuffer:-{render}|[mesh](FB.agqtpQji,TYPE.DIMENTION!,@23#scene,(label);');
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, label);
@@ -298,11 +313,11 @@ export function TestWidgetsGeneric(scene) {
 
 
     // CreateWindowWithMenu();
-    CreateSceneMenuBar();
+    // CreateSceneMenuBar();
 
 
 
-    CreateDropdown2([0, ypos+=40, 0], 0);
+    // CreateDropdown2([0, ypos+=40, 0], 0);
     // CreateDropdown2InSection([0, ypos+=40, 0], 0);
     // CreateDropdown3([0, ypos+=40, 0], 0);
     
@@ -527,7 +542,7 @@ function Sections4(is_root, align) {
 
 
 function Test_widgets(ypos){
-    CreateWindowWithMenu();
+    // CreateWindowWithMenu();
     CreateDropdown2([0, ypos+=40, 0], 0);
     CreateDropdown2InSection([0, ypos+=40, 0], 0);
     CreateDropdown3([0, ypos+=40, 0], 0);
@@ -726,6 +741,16 @@ function SdfLine(col, pos, dim) {
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     line.Render();
     line.ConstructListeners();
+
+
+    // const line2 = Create_widget_section(_, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(col, 1), 'sdf linem2');
+    // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    // line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+
+    // // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    // line.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [line.gfx.prog.idx, line.gfx.vb.idx]);
+    // line.Render();
+    // line.ConstructListeners();
 
 
     // setInterval(()=>{GlRotateZ2D(mesh.gfx, mesh.geom.dim, TimerGetGlobalTimer()*.55)}, 16)
@@ -1082,11 +1107,13 @@ function CreateDropdown2InSection(pos, id) {
 // }
 
 
+
+
 function CreateSceneMenuBar() {
 
-    const pos = [200, 200, 0]
+    const pos = [0, 0, 0]
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [0, 0], TRANSPARENCY(GREEN[2], .9))
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [VIEWPORT.WIDTH/2, 100], TRANSPARENCY(GREY[1], .4))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.SetName('Main Window')
@@ -1134,7 +1161,7 @@ function CreateSceneMenuBar() {
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
-    section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+    section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.FIXED_W;
     section.Calc_no_gfx_update();
     section.options &= ~SECTION.RESIZE_PARENT;
     
@@ -1145,6 +1172,13 @@ function CreateSceneMenuBar() {
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(section);
     // View_set_view_start_vb_index(section.group_bufferidxs, section.gfx.vb.start);
+
+
+    /** Create Test Animations */
+    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, dp, .03, 0., 1.)
+    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, statistics, .01, 0., .4)
+    const btn = statistics.children.buffer[0]
+    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn.text_mesh, .01, 0.1, .9)
 }
 
 

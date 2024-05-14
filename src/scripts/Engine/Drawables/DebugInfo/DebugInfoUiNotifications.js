@@ -45,25 +45,26 @@ export const NOTIFICATION_TYPE = {
       IS_INSERTED:xxx<<=0x1, // This is set by the function that inserts a new entry to the entries flag table, to denote if the current entry has been drawn.
    },
 
-   TypeToSting(idx) {
+}
 
-      if (idx === this.MESH_BUFFER) return 'MESH_BUFFER';
-      if (idx === this.STRING_BUFFER) return 'STRING_BUFFER';
-      if (idx === this.MESH_PER_VB_BUFFER) return 'MESH_PER_VB_BUFFER';
-      if (idx === this.VERTEX_BUFFER) return 'VERTEX_BUFFER';
-      if (idx === this.RENDER_QUEUE_BUFFER) return 'RENDER_QUEUE_BUFFER';
-   },
+function Notification_type_to_sting(idx) {
 
-   ProcessToSting(idx) {
+   if (idx === this.MESH_BUFFER) return 'MESH_BUFFER';
+   if (idx === this.STRING_BUFFER) return 'STRING_BUFFER';
+   if (idx === this.MESH_PER_VB_BUFFER) return 'MESH_PER_VB_BUFFER';
+   if (idx === this.VERTEX_BUFFER) return 'VERTEX_BUFFER';
+   if (idx === this.RENDER_QUEUE_BUFFER) return 'RENDER_QUEUE_BUFFER';
+}
 
-      let res = '';
-      if (idx === this.FLAGS.CREATE) res += 'MESH_BUFFER';
-      if (idx === this.FLAGS.DESTROY) res += 'DESTROY';
-      if (idx === this.FLAGS.CHANGE) res += 'CHANGE';
-      if (idx === this.FLAGS.IS_INSERTED) res += 'IS_INSERTED';
+function Notification_process_to_sting(idx) {
 
-      return res;
-   },
+   let res = '';
+   if (idx === this.FLAGS.CREATE) res += 'MESH_BUFFER';
+   if (idx === this.FLAGS.DESTROY) res += 'DESTROY';
+   if (idx === this.FLAGS.CHANGE) res += 'CHANGE';
+   if (idx === this.FLAGS.IS_INSERTED) res += 'IS_INSERTED';
+
+   return res;
 }
 
 

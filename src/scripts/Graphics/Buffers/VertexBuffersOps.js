@@ -1,8 +1,7 @@
 "use strict";
 
 import { Str_buffer_get_by_idx } from "../../Engine/Core/StringBuffer.js";
-import { YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
-import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size } from "../ShaderAttributes.js";
+import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_attribs_per_vertex, Shader_attributes_get_attribs_offset_attribs_per_vertex, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_offset_size_attribs_per_vertex, Shader_attributes_get_attribs_size } from "../ShaderAttributes.js";
 import { Index_buffer_get_by_ibidx } from "./IndexBuffers.js";
 import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_remove_geometry, Vertex_buffer_state_enable } from "./VertexBuffers.js";
 
@@ -531,6 +530,101 @@ export function Gl_set_RGBA(gfxInfo, color, num_faces = 1) {
    }
 
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
+}
+
+
+/** 'starts' and 'color_indices' should be of the same element couunt arrays */
+// export function Gl_batch_set_RGBA(vbidx, starts, colors, color_indices, colors_len, attribsidx, num_faces) {
+
+//    const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
+//    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+//    const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.COL4);
+
+//    let stride = shader_attribs_info.attribs_per_vertex - colors_len;
+   
+//    const color_indices_len = color_indices.length;
+//    for(let i=0; i < color_indices_len; i++){
+      
+//       let index = starts[i] + shader_attribs_info.offset;
+//       for(let j=0; j <= vertices_per_rect * num_faces; j++){
+
+//          for(let k=0; k < colors_len; k++){
+//             vb_data[index++] = colors[color_indices[i]+k]; 
+//          }
+
+//          index += stride;
+//       }
+
+
+//    }
+
+//    Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
+// }
+/** 'starts' and 'color_indices' should be of the same element couunt arrays */
+export function Gl_batch_set_RGBA(vbidx, starts, colors, color_indices, colors_len, attribsidx, num_faces, color_offsets) {
+
+   const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.COL4);
+
+   // let stride = shader_attribs_info.attribs_per_vertex - colors_len;
+   let stride = shader_attribs_info.attribs_per_vertex;
+   
+   const color_indices_len = color_indices.length;
+   for(let i=0; i < color_indices_len; i++){
+
+      let index = starts[i] + shader_attribs_info.offset;
+      for(let j=0; j <= vertices_per_rect * num_faces; j++){
+
+         for(let k=0; k < colors_len; k++){
+            vb_data[index + color_offsets[k]] = colors[color_indices[i]+k]; 
+         }
+
+         index += stride;
+      }
+
+
+   }
+
+   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
+}
+
+
+/** 'starts' and 'color_indices' should be of the same element couunt arrays */
+export function Gl_batch_set_pos_xy(vbidx, starts, pos, pos_indices, pos_len, attribsidx, num_faces) {
+
+   const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   const shader_attribs_info = Shader_attributes_get_attribs_offset_size_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.WPOS4);
+
+   let stride = shader_attribs_info.attribs_per_vertex - shader_attribs_info.size;
+   
+   const pos_indices_len = pos_indices.length;
+   for(let i=0; i < pos_indices_len; i++){
+      
+      let index = starts[i] + shader_attribs_info.offset;
+
+      for(let j=0; j <= vertices_per_rect * num_faces[i]; j++){
+         
+         for(let k=0; k < pos_len; k++){
+            vb_data[index++] = pos[pos_indices[i]+k]; 
+            index++
+         }
+         
+         
+         // vb_data[index++] = pos[pos_indices[i]+0]; 
+         // vb_data[index++] = pos[pos_indices[i]+1]; 
+         // index++
+         // index++
+         // vb_data[index++] = pos[pos_indices[i]+1]; 
+         
+         index += stride;
+      }
+
+
+   }
+
+   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
 }
 
 

@@ -317,7 +317,7 @@ export function OnMouseUp(e) {
 
 export function OnMouseMove_Android(e) {
    MouseSetCoords([e.clientX, e.clientY]);
-   // console.log('OnMouseMove_Android: ', mouse.x, mouse.y)
+   console.log('OnMouseMove_Android: ', mouse.pos.x, mouse.pos.y)
 }
 
 
