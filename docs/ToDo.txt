@@ -37,6 +37,27 @@ but the stride remains for 4 colors
 so that each vertex the index gets to the next color attribute(R->G->B ....)
 --------------------------------------------------- Nice Animation Color Effect!
 
+--------------------------------------------------- Nice Effects!
+- Jiggle effect
+  Get random pos (x,y)
+        const x = GetRandomInt(1, 20);
+        const y = GetRandomInt(1, 30);
+  Subtract the previous position. To sloaw down the giggle, multiply by a factor < 1
+        particle.pos[0] += (x-particle.pos[0])*.07;
+        particle.pos[1] += (y-particle.pos[1])*.07;
+  Also try mult the prev pos by factor <1
+        particle.pos[0] += x-particle.pos[0]*.04;
+        particle.pos[1] += y-particle.pos[1]*.04;
+
+  Code:
+  // particle.pos[0] += (x-particle.pos[0]*.04)*.2;
+  // particle.pos[1] += (y-particle.pos[1]*.04)*.2;
+  // particle.pos[0] += (x-particle.pos[0])*.06;
+  // particle.pos[1] += (y-particle.pos[1])*.06;
+  // particle.pos[0] += (x-particle.pos[0])*.07;
+  // particle.pos[1] += (y-particle.pos[1])*.07;
+--------------------------------------------------- Nice Effects!
+
 
 
 --------------------------------------------------- Ideas!

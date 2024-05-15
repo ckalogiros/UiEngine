@@ -34,6 +34,15 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx) {
       Str_buffer_get_by_idx(names[2]) === 'a_pos') {
       return 2;
    }
+   if (Str_buffer_get_by_idx(names[0]) === 'a_wpos_time' &&
+      Str_buffer_get_by_idx(names[1]) === 'a_params1' &&
+      Str_buffer_get_by_idx(names[2]) === 'a_pos') {
+      return 3;
+   }
+   if (Str_buffer_get_by_idx(names[0]) === 'a_wpos_time' &&
+      Str_buffer_get_by_idx(names[1]) === 'a_pos') {
+      return 4;
+   }
 
    console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names);
    alert('SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:')
@@ -44,7 +53,9 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx) {
 const Vertex_buffer_fn_table_operation_add = [
    FILL_VERTEX_BUFFER_COL4_WPOS4_PARAMS1_POS2_FN0,
    FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1,
-   FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN0,
+   FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2,
+   FILL_VERTEX_BUFFER_WPOS4_PARAMS1_POS2_FN3,
+   FILL_VERTEX_BUFFER_WPOS4_POS2_FN4,
 ];
 
 
@@ -156,81 +167,6 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_PARAMS1_POS2_FN0(vb_data, geom, mat, star
 }
 
 
-function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN0(vb_data, geom, mat, start, num_faces, stride) {
-
-   let attribs_count = 0;
-   let index = start;
-
-
-   for (let i = 0; i < num_faces; i++) {
-
-      // V1
-      vb_data[index++] = mat.col[0];
-      vb_data[index++] = mat.col[1];
-      vb_data[index++] = mat.col[2];
-      vb_data[index++] = mat.col[3];
-
-      vb_data[index++] = geom.pos[0] + geom.dim[0];
-      vb_data[index++] = geom.pos[1] + geom.dim[1];
-      vb_data[index++] = geom.pos[2];
-      index++; // For WPOS4
-
-      vb_data[index++] = -geom.dim[0];
-      vb_data[index++] = geom.dim[1];
-
-
-      // V2
-      vb_data[index++] = mat.col[0];
-      vb_data[index++] = mat.col[1];
-      vb_data[index++] = mat.col[2];
-      vb_data[index++] = mat.col[3];
-
-      vb_data[index++] = geom.pos[0] + geom.dim[0];
-      vb_data[index++] = geom.pos[1] + geom.dim[1];
-      vb_data[index++] = geom.pos[2];
-      index++; // For WPOS4
-
-      vb_data[index++] = -geom.dim[0];
-      vb_data[index++] = -geom.dim[1];
-
-
-      // V3
-      vb_data[index++] = mat.col[0];
-      vb_data[index++] = mat.col[1];
-      vb_data[index++] = mat.col[2];
-      vb_data[index++] = mat.col[3];
-
-      vb_data[index++] = geom.pos[0] + geom.dim[0];
-      vb_data[index++] = geom.pos[1] + geom.dim[1];
-      vb_data[index++] = geom.pos[2];
-      index++; // For WPOS4
-
-      vb_data[index++] = geom.dim[0];
-      vb_data[index++] = geom.dim[1];
-
-
-      // V4
-      vb_data[index++] = mat.col[0];
-      vb_data[index++] = mat.col[1];
-      vb_data[index++] = mat.col[2];
-      vb_data[index++] = mat.col[3];
-
-      vb_data[index++] = geom.pos[0] + geom.dim[0];
-      vb_data[index++] = geom.pos[1] + geom.dim[1];
-      vb_data[index++] = geom.pos[2];
-      index++; // For WPOS4
-
-      vb_data[index++] = geom.dim[0];
-      vb_data[index++] = -geom.dim[1];
-
-      // index += stride;
-      attribs_count += stride * 4; // TODO: Store Vertices_per_rect in shder_attribs?????
-   }
-
-   return attribs_count;
-}
-
-
 
 function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, num_faces, stride) {
 
@@ -318,6 +254,211 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
    return attribs_count;
 }
 
+
+
+function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2(vb_data, geom, mat, start, num_faces, stride) {
+
+   let index = start;
+   let attribs_count = 0;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride * 4; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
+
+
+function FILL_VERTEX_BUFFER_WPOS4_PARAMS1_POS2_FN3(vb_data, geom, mat, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For PARAMS1 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For PARAMS1 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For PARAMS1 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For PARAMS1 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride * 4; // TODO: Store Vertices_per_rect in shader_attribs?????
+   }
+
+   return attribs_count;
+}
+
+
+function FILL_VERTEX_BUFFER_WPOS4_POS2_FN4(vb_data, geom, mat, start, num_faces, stride){
+
+   let attribs_count = 0;
+   let index = start;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride * 4; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
 
 
 
@@ -610,13 +751,6 @@ export function Gl_batch_set_pos_xy(vbidx, starts, pos, pos_indices, pos_len, at
             vb_data[index++] = pos[pos_indices[i]+k]; 
             index++
          }
-         
-         
-         // vb_data[index++] = pos[pos_indices[i]+0]; 
-         // vb_data[index++] = pos[pos_indices[i]+1]; 
-         // index++
-         // index++
-         // vb_data[index++] = pos[pos_indices[i]+1]; 
          
          index += stride;
       }
@@ -1186,6 +1320,227 @@ export function Gl_set_wpos_time(gfxInfo, val) {
    }
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE); // HACK. // TODO suppose to be implemented in MESH????
 }
+
+
+
+
+/**************************************************************************************************************/
+// Particle System: Batch Update Particles
+export function Gl_particles_batch_set(vbidx, start, colors, positions, dimention) {
+
+   // const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   // const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.COL4);
+
+   // let stride = shader_attribs_info.attribs_per_vertex;
+   
+   let index = start;
+   // const len = colors.length;
+   const len = 1;
+
+   for (let i = 0; i < len; i++) {
+
+      // const col = colors[i];
+      // const pos = positions[i];
+      const col = colors;
+      const pos = positions;
+      const dim = dimention;
+
+      // V1
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      // vb_data[index++] = pos[3]; // Timer t
+      index++;
+      
+      index++;
+      index++;
+      // vb_data[index++] = -dim[0];
+      // vb_data[index++] = dim[1];
+      
+      
+      // V2
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      // vb_data[index++] = pos[3]; // Timer t
+      index++;
+            
+      index++;
+      index++;
+      // vb_data[index++] = -dim[0];
+      // vb_data[index++] = -dim[1];
+      
+      
+      // V3
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      // vb_data[index++] = pos[3]; // Timer t
+      index++;
+            
+      index++;
+      index++;
+      // vb_data[index++] = dim[0];
+      // vb_data[index++] = dim[1];
+      
+      
+      // V4
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      // vb_data[index++] = pos[3]; // Timer t
+      index++;
+      
+      index++;
+      index++;
+      // vb_data[index++] = dim[0];
+      // vb_data[index++] = -dim[1];
+
+   }
+
+   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
+}
+
+export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colors, positions, dimention) {
+
+   // const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   // const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.COL4);
+
+   // let stride = shader_attribs_info.attribs_per_vertex;
+   
+   let index = start;
+   // const len = colors.length;
+   const len = 1;
+
+   for (let i = 0; i < len; i++) {
+
+      // const col = colors[i];
+      // const pos = positions[i];
+      const col = colors;
+      const pos = positions;
+      const dim = dimention;
+
+      // V1
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      // vb_data[index++] = pos[3]; // Timer t
+      index++;
+      
+      index++;
+      index++;
+      index++;
+      index++;
+
+      index++;
+      index++;
+      // vb_data[index++] = -dim[0];
+      // vb_data[index++] = dim[1];
+      
+      
+      // V2
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      // vb_data[index++] = pos[3]; // Timer t
+      index++;
+                 
+      index++;
+      index++;
+      index++;
+      index++;
+
+      index++;
+      index++;
+      // vb_data[index++] = -dim[0];
+      // vb_data[index++] = -dim[1];
+      
+      
+      // V3
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      // vb_data[index++] = pos[3]; // Timer t
+      index++;
+                  
+      index++;
+      index++;
+      index++;
+      index++;
+
+      index++;
+      index++;
+      // vb_data[index++] = dim[0];
+      // vb_data[index++] = dim[1];
+      
+      
+      // V4
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      // vb_data[index++] = pos[3]; // Timer t
+      index++;
+            
+      index++;
+      index++;
+      index++;
+      index++;
+
+      index++;
+      index++;
+      // vb_data[index++] = dim[0];
+      // vb_data[index++] = -dim[1];
+
+   }
+
+   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
+}
+
+
+
+
 
 
 // NOT IMPLEMENTED

@@ -126,7 +126,8 @@ const SID = {
 
         // Individual Uniforms
         TIME: BIT5 <<= 0x1,
-        WPOS: BIT5 <<= 0x1,
+        WPOS4: BIT5 <<= 0x1,
+        COL4: BIT5 <<= 0x1,
 
         // Extension:
         // IS_PROJECTION_MATRIX_BUFFERED: BIT5 <<= 0x1,

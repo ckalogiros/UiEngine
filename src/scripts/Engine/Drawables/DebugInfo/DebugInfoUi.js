@@ -464,6 +464,31 @@ function Debug_info_create_ui_performance_timers() {
       timer.SetDynamicText(`ms${ms} Animations worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.Animations, timeridx], _, generic_time_interval)
 
    }
+   { // Particles.
+      ms = (g_ms) ? g_ms : 1000;
+      const timer = Create_widget_multi_text(_, 'Particles', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
+      section.AddItem(timer);
+
+      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      timer.SetDynamicText(`ms${ms} Particles avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.Particles, 0], _, generic_time_interval); // idx is for use in creating separate time intervals for each dynamic text.
+      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+      let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.Particles);
+      timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      timer.SetDynamicText(`ms${ms} Particles 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.Particles, timeridx], _, generic_time_interval)
+
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.Particles);
+      timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      timer.SetDynamicText(`ms${ms} Particles worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.Particles, timeridx], _, generic_time_interval)
+
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.Particles);
+      timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
+      timer.CreateNewText('00.0000', fontsize, ORANGE_240_160_10, [0, 0], .9);
+      timer.SetDynamicText(`ms${ms} Particles worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.Particles, timeridx], _, generic_time_interval)
+
+   }
    { // MiscTest2.
       ms = (g_ms) ? g_ms : 1000;
       const timer = Create_widget_multi_text(_, 'ConstructListeners', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);

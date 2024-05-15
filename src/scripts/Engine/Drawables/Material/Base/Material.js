@@ -5,6 +5,7 @@ import { Gl_set_RGBA, Gl_set_alpha, Gl_set_RGBA_per_vertex } from '../../../../G
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 import { CharBuffer } from '../../../Core/Buffers.js';
 import { BLUEL, PURPLER } from './Colors.js';
+import { Uniforms_buffer_set_uniform } from '../../../../Graphics/Buffers/UniformBuffers.js';
 
 
 
@@ -53,8 +54,6 @@ export class Material {
 
    SetColor(col, gfx) {
       if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
-         // math.CopyMat4(this.col, col);
-         // Gl_set_RGBA_per_vertex(gfx, this.col);
          Gl_set_RGBA_per_vertex(gfx, temp_vertex_color);
       }
       else {
@@ -66,12 +65,13 @@ export class Material {
 
    SetHoverColor(gfx) {
       const intensity = 1.4;
-      if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
+      if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) { // Handle attribute color per vertex 
          Gl_set_RGBA_per_vertex(gfx, math.Mult_mat4_scalar2(this.col, intensity));
       }
-      else {
+      else { // Handle attribute color 
          Gl_set_RGBA(gfx, math.Mult_arr4_scalar2(this.col, intensity));
       }
+
    }
 
 
@@ -159,8 +159,7 @@ export class FontMaterial extends Material {
       this.texidx = texidx;
 
       this.sid.shad |= SID.SHAD.PRE_MULTIPLIED_ALPHA; // E
-      this.sid.attr |= SID.ATTR.TEX2; // 
-      this.sid.attr |= SID.ATTR.MSDF; // 
+      this.sid.attr |= SID.ATTR.TEX2 | SID.ATTR.MSDF; // 
       this.type |= MESH_TYPE.FONT_MATERIAL;
 
       // Load texture and uv map, via indexes to the actual buffers

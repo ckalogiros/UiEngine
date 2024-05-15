@@ -255,12 +255,16 @@ export function Performance_timers_init_all() {
       PERFORMANCE_TIMERS_IDXS.AddToGfxRect = idx;
    }
    {
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'AddToGfxText');
+      PERFORMANCE_TIMERS_IDXS.AddToGfxText = idx;
+   }
+   {
       const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'Animations');
       PERFORMANCE_TIMERS_IDXS.Animations = idx;
    }
    {
-      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'AddToGfxText');
-      PERFORMANCE_TIMERS_IDXS.AddToGfxText = idx;
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'Particles');
+      PERFORMANCE_TIMERS_IDXS.Particles = idx;
    }
    {
       const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest2');

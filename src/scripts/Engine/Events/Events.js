@@ -32,7 +32,7 @@ export function HandleEvents() {
                 Listener_dispatch_check_hover_event();
 
         }
-        else if (e.type === 'mouse-click-down') {
+        else if (e.type === 'mouse-click-down' && e.params.mouseButton === MOUSE.BTN_ID.LEFT) {
 
             STATE.mouse.activeClickedButtonId = e.params.mouseButton;
 
@@ -57,6 +57,29 @@ export function HandleEvents() {
                     STATE.mesh.grabed.state.mask &= ~MESH_STATE.IN_GRAB; // Set false
                     STATE.mesh.SetGrabed(null)
                     // STATE.mesh.SetFocused(null);
+                }
+            }
+            // Resolve click n hold
+            if (STATE.mesh.click_hold && e.params.mouseButton === MOUSE.BTN_ID.LEFT) {
+                if (STATE.mesh.click_hold.StateCheck(MESH_STATE.IS_HOLD_CLICK)) {
+
+                    STATE.mouse.activeClickedButtonId = e.params.mouseButton;
+                    STATE.mesh.click_hold.state.mask &= ~MESH_STATE.IN_HOLD_CLICK; // Set false
+
+                    /**
+                     * // HACK:  Remove time interval of a click n hold button.
+                     * Case the mouse 'click-up' happens outside the buttons area.
+                     * Instead of run the buttons 'OnClick' method, we call directly a method
+                     * to remove the the time interval.
+                     * Else we should call the ListenEvents, which could not find any 
+                     * intersection between the mouse and the button
+                     */
+                    STATE.mesh.click_hold.RemoveTimeInterval(INTERVALS.UPDATE);
+                    
+                    // if (LISTENERS_FLAGS[E.C] === true)  // NOTE: Avoid dispatching if there are no listeners in the ListenersBuffer
+                    //     Listener_dispatch_event(E.C, e.params.mouseButton);
+                    
+                    STATE.mesh.SetClickHold(null)
                 }
             }
 

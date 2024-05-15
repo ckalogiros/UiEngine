@@ -198,33 +198,33 @@ const _root_uniforms_for_wpos = New_generic_buffer(_, 'root_uniforms_for_wpos');
 const temp_debug_names_of_root_uniform_wpos = New_generic_buffer(_, 'temp_debug_names_of_root_uniform_wpos');
 
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
-// export function TEMP_create_widget_root_wpos_uniform(pos, parent, debug_name){
-export function TEMP_create_widget_root_wpos_uniform(mesh, debug_vbidx) {
+// export function TEMP_create_widget_root_wpos_uniform(mesh, debug_vbidx) {
+export function TEMP_create_widget_root_wpos_uniform(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vbidx) {
 
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
-   let meshidx = mesh.mesh_bufferidx;
+   let meshidx = mesh_bufferidx;
    let parent_posidx = INT_NULL
    /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
    const wpos = [0, 0];
 
-   wpos[0] = mesh.geom.pos[0];
-   wpos[1] = mesh.geom.pos[1];
+   wpos[0] = mesh_pos[0];
+   wpos[1] = mesh_pos[1];
  
 
-   if (mesh.parent !== null && mesh.parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
+   if (mesh_parent !== null && mesh_parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
 
 
-      parent_meshidx = mesh.parent.mesh_bufferidx;
-      parent_posidx = mesh.parent.root_posidx;
+      parent_meshidx = mesh_parent.mesh_bufferidx;
+      parent_posidx = mesh_parent.root_posidx;
 
    }
 
    // If the mesh is a text mesh, we want to connect it(take its wpos offset) from any 'root wpos' that the parent of the text mesh takes its offset position.
    // See code below for explanation
-   if (mesh.parent !== null && mesh.type & MESH_TYPE.TEXT_MESH) {
+   if (mesh_parent !== null && mesh_type & MESH_TYPE.TEXT_MESH) {
 
-      const root_posidx = mesh.parent.root_posidx;
+      const root_posidx = mesh_parent.root_posidx;
 
       // Here we want to get the 'root wpos' of the 'root wpos' that the text mesh's parent its connected to.
       /**
@@ -250,8 +250,8 @@ export function TEMP_create_widget_root_wpos_uniform(mesh, debug_vbidx) {
    }
    else{
 
-      mesh.geom.pos[0] = 0;
-      mesh.geom.pos[1] = 0;
+      mesh_pos[0] = 0;
+      mesh_pos[1] = 0;
    }
 
    const entry = {
@@ -263,12 +263,82 @@ export function TEMP_create_widget_root_wpos_uniform(mesh, debug_vbidx) {
    entry.wpos[0] += wpos[0];
    entry.wpos[1] += wpos[1];
 
-   temp_debug_names_of_root_uniform_wpos.Add({ nameidx: mesh.nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vbidx });
+   temp_debug_names_of_root_uniform_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vbidx });
 
    const idx = _root_uniforms_for_wpos.Add(entry);
    console.log('ROOT POSITIONS BUFFER', _root_uniforms_for_wpos.buffer, entry)
    return idx;
 }
+// export function TEMP_create_widget_root_wpos_uniform(mesh, debug_vbidx) {
+
+
+//    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
+//    let meshidx = mesh.mesh_bufferidx;
+//    let parent_posidx = INT_NULL
+//    /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
+//    const wpos = [0, 0];
+
+//    wpos[0] = mesh.geom.pos[0];
+//    wpos[1] = mesh.geom.pos[1];
+ 
+
+//    if (mesh.parent !== null && mesh.parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
+
+
+//       parent_meshidx = mesh.parent.mesh_bufferidx;
+//       parent_posidx = mesh.parent.root_posidx;
+
+//    }
+
+//    // If the mesh is a text mesh, we want to connect it(take its wpos offset) from any 'root wpos' that the parent of the text mesh takes its offset position.
+//    // See code below for explanation
+//    if (mesh.parent !== null && mesh.type & MESH_TYPE.TEXT_MESH) {
+
+//       const root_posidx = mesh.parent.root_posidx;
+
+//       // Here we want to get the 'root wpos' of the 'root wpos' that the text mesh's parent its connected to.
+//       /**
+//        * For Example: there are 3 meshes:{rect, label and label text}. 
+//        * What we want for the label text is to have as a parent 'root wpos' the parent 'root wpos' of the label. 
+//        * That is the rect's 'root wpos' in this example.  
+//        * Other wise the text will draw its offset pos from label, which in its turn will draw its offset pos from the rect.
+//        * The correct is both label and text have offset positions to rect.
+//        */
+//       let parent_root_wpos = _root_uniforms_for_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
+//       if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
+//          parent_root_wpos = _root_uniforms_for_wpos.buffer[parent_root_wpos.parent_posidx];
+//       }
+      
+//       // Now, because we are gonna need the 'mesh_bufferidx' of the 'root wpos', we need to get the mesh from the mesh buffer.
+//       const mesh_that_has_the_root_wpos = _mesh_buffer.buffer[parent_root_wpos.meshidx];
+//       parent_meshidx = mesh_that_has_the_root_wpos.mesh_bufferidx;
+//       parent_posidx = mesh_that_has_the_root_wpos.root_posidx;
+
+//       // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
+//       wpos[0] = 0;
+//       wpos[1] = 0;
+//    }
+//    else{
+
+//       mesh.geom.pos[0] = 0;
+//       mesh.geom.pos[1] = 0;
+//    }
+
+//    const entry = {
+//       wpos: [0, 0],
+//       meshidx: meshidx, // Is needed to have a ref to the mesh from inside the '_root_uniforms_for_wpos' buffer
+//       parent_posidx: parent_posidx,
+//    }
+
+//    entry.wpos[0] += wpos[0];
+//    entry.wpos[1] += wpos[1];
+
+//    temp_debug_names_of_root_uniform_wpos.Add({ nameidx: mesh.nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vbidx });
+
+//    const idx = _root_uniforms_for_wpos.Add(entry);
+//    console.log('ROOT POSITIONS BUFFER', _root_uniforms_for_wpos.buffer, entry)
+//    return idx;
+// }
 
 
 

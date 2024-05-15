@@ -232,6 +232,10 @@ const STATE = {
 		focusedId: INT_NULL,
 		focusedIdx: INT_NULL,
 
+		click_hold: null,
+		click_holdid: INT_NULL,
+		click_holdidx: INT_NULL,
+
 		SetHovered(mesh) {
 			this.hovered = mesh;
 			if (!mesh) {
@@ -267,7 +271,6 @@ const STATE = {
 		},
 		SetFocused(mesh) {
 
-			if (this.focused !== mesh) console.log('FOCUSED:', mesh.mesh_bufferidx, mesh.GetName())
 			this.focused = mesh;
 			if (!mesh) {
 				this.focusedId = INT_NULL;
@@ -276,6 +279,18 @@ const STATE = {
 			else {
 				this.focusedId = mesh.id;
 				this.focusedIdx = mesh.mesh_bufferidx;
+			}
+		},
+		SetClickHold(mesh) {
+
+			this.click_hold = mesh;
+			if (!mesh) {
+				this.click_holdid = INT_NULL;
+				this.click_holdidx = INT_NULL;
+			}
+			else {
+				this.click_holdid = mesh.id;
+				this.click_holdidx = mesh.mesh_bufferidx;
 			}
 		},
 		CheckAllAndRemove(mesh) {
@@ -362,7 +377,8 @@ const MESH_STATE = {
 	IN_RESIZE: _CNT <<= 1,
 	IN_GRAB: _CNT <<= 1,
 	IN_HOVER_COLOR: _CNT <<= 1,
-
+	IN_HOLD_CLICK: _CNT <<= 1,
+	
 	IS_HOVERABLE: _CNT <<= 1,
 	IS_CLICKABLE: _CNT <<= 1,
 	IS_RESIZEABLE: _CNT <<= 1,
@@ -372,6 +388,7 @@ const MESH_STATE = {
 	IS_FAKE_HOVERABLE: _CNT <<= 1,
 	IS_FAKE_CLICKABLE: _CNT <<= 1,
 	IS_HOVER_COLORABLE: _CNT <<= 1,
+	IS_HOLD_CLICK: _CNT <<= 1,
 
 	IN_SCALE: _CNT <<= 1,
 	HAS_POPUP: _CNT <<= 1,
@@ -563,6 +580,7 @@ const PERFORMANCE_TIMERS_IDXS = {
 	AddToGfxRect: INT_NULL,
 	AddToGfxText: INT_NULL,
 	Animations: INT_NULL,
+	Particles: INT_NULL,
 	MiscTest1: INT_NULL,
 	MiscTest2: INT_NULL,
 	MiscTest3: INT_NULL,
@@ -834,6 +852,7 @@ const ANIMATIONS = {
 _CNT = 0x1;
 // MAX cnt is 31 times shifted and the 32nd is valid but a negative number
 // IDEA: Maybe we implement a negative bitfield for another 31 values ???
+// TODO: Not enough space for all types. Re-organize and re-implement
 const MESH_TYPE = {
 
 	DEBUG_MESH: _CNT <<= 1,
@@ -876,6 +895,8 @@ const MESH_TYPE = {
 	DROP_DOWN_MENU: _CNT <<= 1,
 
 	WIDGET_WINDOW: _CNT <<= 1,
+
+	PARTICLES: _CNT <<= 1,
 
 	SCENE: _CNT <<= 1,
 	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,

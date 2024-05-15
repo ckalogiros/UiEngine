@@ -201,17 +201,20 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       'void main(void) ',
       '{',
-      (sid.unif & SID.UNIF.WPOS) ? '  vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
+      (sid.unif & SID.UNIF.WPOS4) ? '  vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
          ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);' 
          : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
 
+      // (sid.unif & SID.UNIF.COL4) ? '  v_col = a_col;' : '',
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // ASSIGNMENTS
-      (sid.pass & SID.PASS.COL4) ? '  v_col = a_col;' : '', 
+      (sid.pass & SID.PASS.COL4) 
+         ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') 
+         : '', 
       (sid.pass & SID.PASS.DIM2) ? '  v_dim = abs(a_pos);' : '',
-      (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS)) ? '  v_wpos = vec2(a_wpos_time.x + u_wposxy.x, a_wpos_time.y + u_wposxy.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
+      (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS4)) ? '  v_wpos = vec2(a_wpos_time.x + u_wposxy.x, a_wpos_time.y + u_wposxy.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
       (sid.attr & SID.ATTR.BORDER) ? '  v_border_width = a_params1.x;' : '',

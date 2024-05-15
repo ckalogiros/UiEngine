@@ -14,6 +14,7 @@ import { Command_buffer_run } from "../Core/Commandbuffer.js";
 import { Scene_set_projection_matrix } from "../Scenes.js";
 import { Input_reset } from "../Controls/Input/Input.js";
 import { Animations_run } from "../Animations/Animations.js";
+import { Particle_system_update } from "../ParticlesSystem/NewParticlesSystem.js";
 
 
 
@@ -95,15 +96,19 @@ export class Renderer {
 
          Uniforms_block_update_uniform();
 
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles)
+         Particle_system_update()
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles)
+
 
          // Uniforms_buffer_update_uniforms_all();
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
          Gl_draw(this.gfxctx); // REIMPLEMENT: Draw should be independed of graphics platform
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)
-
+         
          Input_reset();
-
+         
 
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
 

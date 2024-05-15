@@ -1,5 +1,6 @@
 "use strict";
 
+import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/TimeIntervals.js';
 import { GREY, WHITE } from '../Material/Base/Colors.js';
 import { Find_parent_listen_event } from '../Operations/Recursions.js';
 import { Widget_Label } from './WidgetLabel.js';
@@ -28,38 +29,60 @@ export class Widget_Button extends Widget_Label {
 
    OnClick(params) {
 
-      /**
-       * For popup menu options and slider connections.
-       * If the option is clicked, then we must call the slider connect function
-       */
+      const mesh = params.evt_params.target_mesh;
 
-      if (params.evt_params && params.evt_params.EventClbk) {
+      // Run for buttons that are enabled to a continuous click
+      if(mesh.StateCheck(MESH_STATE.IS_HOLD_CLICK)){
 
+        if (params.evt_params && params.evt_params.EventClbk) {
+           
          const EventClbk = params.evt_params.EventClbk;
-         EventClbk(params.evt_params);
+         const target_params = params.evt_params.params.target_params
+         const idx = TimeIntervalsCreate(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
+         mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+         
+         STATE.mesh.SetClickHold(mesh)
       }
-      else { // Fallback to label OnClick()
-         super.OnClick(params);
+
       }
-      
-      // console.log('CLICKED')
-      return true;
+      else { // Run for one click buttons
+
+         /**
+          * For popup menu options and slider connections.
+          * If the option is clicked, then we must call the slider connect function
+          */
+         if (params.evt_params && params.evt_params.EventClbk) {
+            
+            const EventClbk = params.evt_params.EventClbk;
+            EventClbk(params.evt_params);
+         }
+         else { // Fallback to label OnClick()
+            super.OnClick(params);
+         }
+   
+         
+         // console.log('CLICKED')
+         return true;
+      }
    }
 
 
    /*******************************************************************************************************************************************************/
    // Misc
-   Bind(EventClbk=null, targetBindingFunctions=_, params) {
+   Bind(EventClbk=null, targetBindingFunctions=_, params, click_flags) {
 
       if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
       
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      this.evt_params = { // Create the parameters to pass for the switch's click event. 
+      this.evt_params = { // Create the parameters to pass for the button's click event. 
          EventClbk: EventClbk,
          targetBindingFunctions: targetBindingFunctions,
          target_mesh: this,
          params: params,
       };
+
+      if(click_flags) this.state.mask |= click_flags;
+
    }
 
 
@@ -84,6 +107,13 @@ export class Widget_Button extends Widget_Label {
             mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
          }
       }
+   }
+
+
+   RemoveTimeInterval(idx){
+      const intervalIdx = this.timeIntervalsIdxBuffer.buffer[idx];
+      TimeIntervalsDestroyByIdx(intervalIdx);
+      this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(idx);
    }
 }
 

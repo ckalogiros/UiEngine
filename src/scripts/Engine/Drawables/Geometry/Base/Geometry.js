@@ -22,6 +22,8 @@ export class Geometry2D {
         this.defDim = [0, 0];
         this.defScale = [0, 0];
 
+
+        
         this.sid = {
             shad: 0,
             attr: (SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4),

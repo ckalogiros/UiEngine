@@ -29,6 +29,7 @@ import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_
 import { Command_buffer_store } from '../Engine/Core/Commandbuffer.js';
 import { Calculate_sizes_recursive } from '../Engine/Drawables/Meshes/Section.js';
 import { Animations_create } from '../Engine/Animations/Animations.js';
+import { Particle_system_create_emitter, Particle_system_emitt } from '../Engine/ParticlesSystem/NewParticlesSystem.js';
 
 // var osu = require('node-os-utils')
 // import {osu} from 'node-os-utils'
@@ -258,7 +259,9 @@ export function TestWidgetsGeneric(scene) {
     // obj.Update();
 
 
-    const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
+    // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
+
+
     // let ms = 2000;
     // setTimeout(()=>{SdfLine(PURPLER[7], [500, 800, 5], [800, 10]);}, ms); ms+=1000;
     {
@@ -313,7 +316,7 @@ export function TestWidgetsGeneric(scene) {
 
 
     // CreateWindowWithMenu();
-    // CreateSceneMenuBar();
+    CreateSceneMenuBar();
 
 
 
@@ -332,6 +335,22 @@ export function TestWidgetsGeneric(scene) {
 
     // SdfLine([500, TEST_CLIP_TOP, 10], [800, 10]);
 
+
+    // PARTICLES
+    {
+        const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [100,100,10], [10,10], .1, 2, 'Tst Particle System');
+        const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [100, 260, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
+        btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        btn.Bind(Particle_system_emitt, _, { target_params: particle_system_idx }, MESH_STATE.IS_HOLD_CLICK)
+        
+        btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        btn.Render();
+        btn.ConstructListeners();
+        
+        // // const idx = TimeIntervalsCreate(16, 'Particle System', TIME_INTERVAL_REPEAT_ALWAYS, Particle_system_emitt, { target_params: particle_system_idx });
+        // // setInterval(()=>{Particle_system_emitt({params:{ target_params: particle_system_idx }});}, 1);
+    }
 
 
     /** Section Synthesizes */
@@ -733,7 +752,8 @@ function SdfLine(col, pos, dim) {
 
     // line.sid.unif |= SID.UNIF.TIME;
 
-
+    line.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
+    line.sid.attr &= ~SID.ATTR.COL4;
 
     // const params = null;
     // const timer = TimersCreateTimer(0.01, 10, .1, 'T1', TEMP_TIMER_CLBK, params);

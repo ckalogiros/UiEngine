@@ -158,7 +158,7 @@
             . If non sid match found, create new PRIVATE (The creation of the sid gfx program will be automaticaly constructed) 
 
          INFO:
-            GFX_GROUPS: Where the '.sid.gfx_group' value is set (for all dps, dp buttons, menus and menu items).
+            GFX_GROUPS: Where the '.sid.gfx_group' value is set (for all dp's, dp buttons, menus and menu items).
                1. It is set by the GenGfxCtx function, where the menu and button of the dropdown are set equal to the dp's .sid.gfx_group.
                2. On dp activation it is set in GenMenuGfxCtx_recursive() method.
 

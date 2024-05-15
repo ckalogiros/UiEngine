@@ -225,14 +225,11 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
 
       const ubidx = Program_uniform_bind(progidx, obj, 'u_wposxy');
       obj.Set([mesh.geom.pos[0], mesh.geom.pos[1]]);
+      mesh.SetUniformIndex(ubidx, 'u_wposxy')
+      // const ubidx2 = Program_uniform_bind(progidx, obj, 'u_col4');
+      // obj.Set([mesh.mat.col[0], mesh.mat.col[1], mesh.mat.col[2], mesh.mat.col[3]]);
+      // mesh.SetUniformIndex(ubidx2, 'u_col4')
       // const ubidx = Program_uniform_bind(progidx, null, 'u_wposxy');
-
-      // if(ubidx === INT_NULL) console.error('Uniform u_wposxy did not bound correctly.');
-      // else{
-      //    mesh.SetUniformIndex(ubidx, 'u_wposxy');
-      // }
-
-      // obj.Set([0, 0]);
       
    }
 
@@ -307,18 +304,13 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
 
 
       // UNNECESSARY: For all vb except the widget root. All the root wpos are set from a function call, based on the root root_wpos 
-      // console.log('------------------------',  mesh.geom.pos, mesh.GetName())
-      // const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh.geom.pos, parent_rel_pos, mesh.GetName());
-      const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh, vbidx);
+
+      const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vbidx);
       mesh.root_posidx = root_posidx;
-      // mesh.geom.pos[0] = 0;
-      // mesh.geom.pos[1] = 0;
+
 
       if(root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
-      // if(Widget_root_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx)){
-      //    mesh.geom.pos[0] = 0;
-      //    mesh.geom.pos[1] = 0;
-      // }
+
    }
 
 
@@ -335,6 +327,142 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
 
 
    const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx, mesh_count);
+   return gfx;
+
+
+}
+
+
+
+
+export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool_request) {
+
+
+   // Cash
+   const sid = emitter.sid;
+   const sceneidx = emitter.sceneidx;
+   const uniforms = emitter.uniforms;
+
+
+   let progidx = INT_NULL;
+   let vbidx = INT_NULL;
+   let ibidx = INT_NULL;
+
+
+
+
+   /*******************************************************************************************************************/
+   // Program
+
+   // Check if program already exists
+   progidx = Program_program_exists_from_sid(sid);
+
+   if (progidx === INT_NULL) { // If shader program does not exist, create new program.
+
+      progidx = Program_create_program(sid, uniforms);
+      
+      Scene_set_projection_matrix(sceneidx)
+      
+      // HACK: the uniform block should not be implemented HERE, Also weather or not the 'u_screen_res' should be enabled is responsibility of 'WHO'???????????????????
+      const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
+      Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
+      
+      
+         
+      // MUST BIND AND INIT THE UNIFORM, OTHERWISE THE SHADER IS NOT GONNA HAVE A VALUE FOR THE UNIFORM 
+      const obj = {
+         Set: null,
+         Update: null,
+      };
+
+      const ubidx = Program_uniform_bind(progidx, obj, 'u_wposxy');
+      obj.Set([emitter.pos[0], emitter.pos[1]]);
+      // const ubidx = Program_uniform_bind(progidx, null, 'u_wposxy');
+      
+   }
+
+
+
+   /*******************************************************************************************************************/
+   // Vertex buffer
+
+   let is_vertex_buffer_created = false;
+
+   const pool_request_flags = gfx_pool_request;
+
+   if (vbidx === INT_NULL) {
+
+      // First look at the gfx pool for any matching vertex buffer
+      vbidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags);
+
+      if (vbidx === INT_NULL) {
+
+         const vb_info = Vertex_buffer_info_create(sid, _, progidx);
+         vbidx = vb_info.vbidx;
+
+
+         Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE | BUFFER_STATE.SHOW);
+         if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidx);
+
+         Program_store_vertex_buffer_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
+
+         // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
+         Mesh_per_vb_create_vb(vbidx);
+
+         is_vertex_buffer_created = true;
+
+      }
+
+   }
+
+
+
+
+
+   /*******************************************************************************************************************/
+   // Index buffer
+
+   if (sid.shad & SID.SHAD.INDEXED) {
+
+      ibidx = Gfx_pool_find_ib_notActive(TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN.rect_123_234);
+
+      if (ibidx === INT_NULL) { // Create new index buffer
+
+         const ib_info = Index_buffer_info_create(sid, _, TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN.rect_123_234);
+         ibidx = ib_info.ibidx;
+
+         Program_store_index_buffer_idx(progidx, ibidx); // Store the indexbuffer index to the programs ib array
+
+      }
+
+   }
+
+
+   if (is_vertex_buffer_created) {
+
+      // Add the new vertexBuffer to the render queue
+      Renderqueue_Add(progidx, vbidx, ibidx, true);
+      Renderqueue_set_active(vbidx, true); // Update the draw buffer
+
+      Vertex_buffer_info_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
+
+// mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vbidx
+      const root_posidx = TEMP_create_widget_root_wpos_uniform(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vbidx);
+      emitter.root_posidx = root_posidx;
+
+      if(root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
+   }
+
+
+
+
+   // Store the root pos in each mesh. Assuumes the indexing of root_wpos and vbs are 1-1.
+   emitter.root_posidx = vbidx;
+
+
+
+   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx);
+
    return gfx;
 
 

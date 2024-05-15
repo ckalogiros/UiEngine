@@ -517,6 +517,29 @@ export function Vertex_buffer_update_vertices(gfx, geom, mat, dbg_mesh_name) {
 }
 
 
+
+export function Vertex_buffer_update_vertices_Expicit_Params(progidx, vbidx, start, geom, mat) {
+
+    const prog = Progarm_get_program(progidx);
+    const vb_info = Vertex_buffer_info_get_by_vbidx(vbidx);
+
+    const num_faces = 1;
+
+    if ((vb_info.vCount % 1) !== 0)
+        console.error('index buffer count mismatch')
+
+
+    const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
+    const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+
+
+    Gl_operation_add(prog.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, shader_attribs.attribs_per_vertex);
+
+    vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+
+}
+
+
 export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index, remove_and_shift, debug_mesh) {
 
 

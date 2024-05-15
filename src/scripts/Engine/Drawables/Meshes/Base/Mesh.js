@@ -11,6 +11,8 @@ import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_batch_destroy_run, Styles_batch_destroy_store, Styles_create, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 import { Command_buffer_store } from "../../../Core/Commandbuffer.js";
+import { Progarm_get_program } from "../../../../Graphics/ShaderPrograms.js";
+import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from "../../../../Graphics/Buffers/UniformBuffers.js";
 
 
 const NOTIFICATIONS_ON = true;
@@ -183,7 +185,7 @@ export class Mesh {
             evtidx: INT_NULL, // Stores the index of the events in the Info_Listeners buffer.
         };
 
-        this.EnableGfxUniforms(SID.UNIF.WPOS, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        this.EnableGfxUniforms(SID.UNIF.WPOS4, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
         /** Debug  properties */
         if (DEBUG.MESH) {
@@ -448,10 +450,30 @@ export class Mesh {
     // Transformations   Setters-Getters
     /*******************************************************************************************************************************************************/
 
-    SetHoverColor() { this.SetUpdateFrameBuffer(); this.mat.SetHoverColor(this.gfx); }
+    SetHoverColor() {
+        this.SetUpdateFrameBuffer();
+        if (this.gfx.sid.attr & (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.COL4)) { // Handle attribute color per vertex 
+            this.mat.SetHoverColor(this.gfx);
+        }
+        else if (this.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
+            const ubidx = this.GetUniformIndexFromName('u_col4');
+            Uniforms_buffer_set_uniform(ubidx, this.mat.col);
+            Uniforms_buffer_update_uniform(ubidx);
+        }
+    }
 
 
-    SetHoverColorDefault() { this.SetUpdateFrameBuffer(); this.mat.SetHoverColorDefault(this.gfx); }
+    SetHoverColorDefault() {
+        this.SetUpdateFrameBuffer();
+        if (this.gfx.sid.attr & (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.COL4)) { // Handle attribute color per vertex 
+            this.mat.SetHoverColorDefault(this.gfx);
+        }
+        else if (this.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
+            const ubidx = this.GetUniformIndexFromName('u_col4');
+            Uniforms_buffer_set_uniform(ubidx, this.mat.col);
+            Uniforms_buffer_update_uniform(ubidx);
+        }
+    }
 
 
     SetColor(col) { this.SetUpdateFrameBuffer(); this.mat.SetColor(col, this.gfx); }
@@ -508,8 +530,8 @@ export class Mesh {
         const p = TEMP_get_widget_root_wpos(this.root_posidx);
         let pos = [p[0], p[1], 0];
 
-        pos[0]+=this.geom.pos[0]; 
-        pos[1]+=this.geom.pos[1];
+        pos[0] += this.geom.pos[0];
+        pos[1] += this.geom.pos[1];
         return pos;
     }
 
@@ -518,15 +540,15 @@ export class Mesh {
 
         let p = TEMP_get_widget_root_wposx(this.root_posidx);
 
-        return p+this.geom.pos[0];
+        return p + this.geom.pos[0];
     }
 
 
     GetPosY() {
 
         let p = TEMP_get_widget_root_wposy(this.root_posidx);
-        
-        return p+this.geom.pos[1];
+
+        return p + this.geom.pos[1];
     }
 
 
@@ -626,12 +648,12 @@ export class Mesh {
 
         /**
          * How to set up a uniform:
-         * 1. Call this, with uniform name and a glg:SID.UNIF. the type of uniform to enable.
-         *      This means that the user is responsible to add any new uniform type in SID global object.
+         * 1. Call this, with uniform name and a gl:SID.UNIF. the type of uniform to enable.
+         *      This means that the user is responsible to add any new uniform type in 'SID' global object.
          *      That is so we can check and enable code in the shader builder. 
          * 2. We need to bind the 'Set' and 'Update' functions for the uniforms to be usefull.
-         *      . For the block uniforms, we only need to 'Set' the value via 
-         *      'Uniforms_block_set_uniform()' function, the Update happens by gl.bindBuffer.
+         *      . For the block uniforms, we only need to 'Set' the value via 'Uniforms_block_set_uniform()' 
+         *          function, the Update happens by gl.bindBuffer.
          *      . For individual uniforms, both 'Set' and 'Update' must be bound via 'Program_uniform_bind()' function.
          *          Use the 'Program_uniform_bind' and not 'Uniforms_bind...' Because the uniform update uses only a 'loc', 
          *          this might lead to unwilingly updating same loc of another program's uniform. 
@@ -647,7 +669,7 @@ export class Mesh {
                 skip = true;
         }
 
-        if (!skip){
+        if (!skip) {
 
             const idx = this.uniforms.push({
                 name: name,
@@ -656,18 +678,18 @@ export class Mesh {
                 shader: shader_flags,
             });
 
-            this.temp_unif_wpos = idx-1;
+            this.temp_unif_wpos = idx - 1;
 
         }
 
     }
 
 
-    SetUniformIndex(ubidx, unif_name){
+    SetUniformIndex(ubidx, unif_name) {
 
         const len = this.uniforms.length;
         for (let i = 0; i < len; i++) {
-            if (this.uniforms[i].name === unif_name){
+            if (this.uniforms[i].name === unif_name) {
                 this.uniforms[i].ubidx = ubidx;
                 return;
             }
@@ -675,6 +697,19 @@ export class Mesh {
 
         alert('SetUniformIndex(ubidx, unif_name)\nNo mesh uniform found.')
     }
+
+    GetUniformIndexFromName(unif_name) {
+
+        const len = this.uniforms.length;
+        for (let i = 0; i < len; i++) {
+            if (this.uniforms[i].name === unif_name) {
+                return this.uniforms[i].ubidx;
+            }
+        }
+
+        alert('GetUniformIndexFromName(ubidx, unif_name)\nNo uniform found with name:', unif_name,)
+    }
+
 
 }
 
