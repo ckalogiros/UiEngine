@@ -4,15 +4,14 @@ import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
-import { Scenes_get_count } from "../../../Scenes.js";
-import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start, TEMP_get_widget_root_wpos, TEMP_get_widget_root_wposx, TEMP_get_widget_root_wposy } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_batch_destroy_run, Styles_batch_destroy_store, Styles_create, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 import { Command_buffer_store } from "../../../Core/Commandbuffer.js";
-import { Progarm_get_program } from "../../../../Graphics/ShaderPrograms.js";
-import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from "../../../../Graphics/Buffers/UniformBuffers.js";
+import { Set_color_a, Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../../Operations/MeshAttributesFunctions.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from "../../../Core/MeshUniformsBuffer.js";
 
 
 const NOTIFICATIONS_ON = true;
@@ -450,42 +449,14 @@ export class Mesh {
     // Transformations   Setters-Getters
     /*******************************************************************************************************************************************************/
 
-    SetHoverColor() {
-        this.SetUpdateFrameBuffer();
-        if (this.gfx.sid.attr & (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.COL4)) { // Handle attribute color per vertex 
-            this.mat.SetHoverColor(this.gfx);
-        }
-        else if (this.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
-            const ubidx = this.GetUniformIndexFromName('u_col4');
-            Uniforms_buffer_set_uniform(ubidx, this.mat.col);
-            Uniforms_buffer_update_uniform(ubidx);
-        }
-    }
-
-
-    SetHoverColorDefault() {
-        this.SetUpdateFrameBuffer();
-        if (this.gfx.sid.attr & (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.COL4)) { // Handle attribute color per vertex 
-            this.mat.SetHoverColorDefault(this.gfx);
-        }
-        else if (this.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
-            const ubidx = this.GetUniformIndexFromName('u_col4');
-            Uniforms_buffer_set_uniform(ubidx, this.mat.col);
-            Uniforms_buffer_update_uniform(ubidx);
-        }
-    }
-
-
-    SetColor(col) { this.SetUpdateFrameBuffer(); this.mat.SetColor(col, this.gfx); }
-
 
     SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
 
 
-    SetColorAlpha(alpha) { this.SetUpdateFrameBuffer(); this.mat.SetColorAlpha(alpha, this.gfx, this.geom.num_faces); }
+    // SetColorAlpha(alpha) { this.SetUpdateFrameBuffer(); Set_color_a(this, alpha); }
 
 
-    SetDefaultColor() { this.SetUpdateFrameBuffer(); this.mat.SetDefaultColor(this.gfx, this.geom.num_faces); }
+    // SetDefaultColor() { this.SetUpdateFrameBuffer(); Set_default_color_rgba(this) }
 
 
     SetStyle(style) { this.SetUpdateFrameBuffer(); this.mat.SetStyle(style); }
@@ -527,7 +498,7 @@ export class Mesh {
 
     GetPosXY() {
 
-        const p = TEMP_get_widget_root_wpos(this.root_posidx);
+        const p = Mesh_unif_get_vb_root_wpos(this.root_posidx);
         let pos = [p[0], p[1], 0];
 
         pos[0] += this.geom.pos[0];
@@ -538,7 +509,7 @@ export class Mesh {
 
     GetPosX() {
 
-        let p = TEMP_get_widget_root_wposx(this.root_posidx);
+        let p = Mesh_unif_get_vb_root_wposx(this.root_posidx);
 
         return p + this.geom.pos[0];
     }
@@ -546,7 +517,7 @@ export class Mesh {
 
     GetPosY() {
 
-        let p = TEMP_get_widget_root_wposy(this.root_posidx);
+        let p = Mesh_unif_get_vb_root_wposy(this.root_posidx);
 
         return p + this.geom.pos[1];
     }
@@ -674,7 +645,7 @@ export class Mesh {
             const idx = this.uniforms.push({
                 name: name,
                 type: type,
-                ubidx: INT_NULL, // Shoud be set by the Gl Program creation. So the first mesh that will push to create the program will have the ubidx
+                ubidx: INT_NULL, // Should be set by the Gl Program creation. So the first mesh that will push to create the program will have the ubidx
                 shader: shader_flags,
             });
 
@@ -685,30 +656,6 @@ export class Mesh {
     }
 
 
-    SetUniformIndex(ubidx, unif_name) {
-
-        const len = this.uniforms.length;
-        for (let i = 0; i < len; i++) {
-            if (this.uniforms[i].name === unif_name) {
-                this.uniforms[i].ubidx = ubidx;
-                return;
-            }
-        }
-
-        alert('SetUniformIndex(ubidx, unif_name)\nNo mesh uniform found.')
-    }
-
-    GetUniformIndexFromName(unif_name) {
-
-        const len = this.uniforms.length;
-        for (let i = 0; i < len; i++) {
-            if (this.uniforms[i].name === unif_name) {
-                return this.uniforms[i].ubidx;
-            }
-        }
-
-        alert('GetUniformIndexFromName(ubidx, unif_name)\nNo uniform found with name:', unif_name,)
-    }
 
 
 }

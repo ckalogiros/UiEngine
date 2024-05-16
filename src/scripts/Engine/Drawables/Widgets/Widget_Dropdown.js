@@ -7,13 +7,14 @@ import { TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Listener_get_parent_event } from "../../Events/EventListeners.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, Widget_root_add_mesh, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
-import { Clampx_from_group, Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
-import { Calculate_positions_no_gfx_update_recursive, Calculate_sizes_recursive, Expand, Section } from "../Meshes/Section.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
+import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
+import { Calculate_sizes_recursive, Expand, Section } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_get_view_vb_root_meshidx, View_remove_from_group, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
+import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 
 
 
@@ -852,8 +853,8 @@ export class Widget_Dropdown extends Section {
 
    SetPosXYNoGfxUpdate(x, y) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
          this.geom.pos[0] = x;

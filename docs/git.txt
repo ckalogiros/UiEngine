@@ -117,3 +117,19 @@ Move Commits to an Existing Synchronized Branch in Git
 
 #Use the git cherry-pick command and the commit’s hash to move it, as shown below.
     git cherry-pick <sha1-commit-hash>
+
+
+
+
+
+
+// Create new branch, save before any changes for roll back
+
+git branch '#number of the branch and title'
+git switch to new branch
+git add -A 
+// Save the current project before any changes
+git commit -m '#number of the branch and title. Save before any changes'
+// Go back to main, and save all changes there
+git switch main
+// So that way there is a roll back to pre-changes state, with the name of the purpose of the changes

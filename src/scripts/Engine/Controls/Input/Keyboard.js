@@ -55,6 +55,7 @@ const vp = _CNT++;
 const vs = _CNT++;
 const gs = _CNT++;
 const gw = _CNT++;
+const gd = _CNT++;
 const g1 = _CNT++;
 const g2 = _CNT++;
 const g3 = _CNT++;
@@ -352,6 +353,14 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
+      key: 'gd',
+      discr: 'VIEWPORT, DEVICE',
+      func: (e)=>{
+         console.log('------------------ VIEWPORT, DEVICE ------------------');
+         console.log('VIEWPORT:', VIEWPORT, '\nDEVICE', DEVICE)
+      },
+   },
+   {
       key: 'g1',
       discr: 'Mesh_per_vb_print',
       func: (e)=>{
@@ -576,6 +585,7 @@ export function OnKeyUp(e){
       else if  (_keys_buffer[0].key === 'g') { 
          if       (_keys_buffer[len].key === 's') DEBUG_PRINT_KEYS[gs].func(e);  
          else if       (_keys_buffer[len].key === 'w') DEBUG_PRINT_KEYS[gw].func(e);  
+         else if       (_keys_buffer[len].key === 'd') DEBUG_PRINT_KEYS[gd].func(e);  
          else if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[g1].func(e);  
          else if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[g2].func(e);  
          else if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[g2].func(e);  
@@ -606,7 +616,7 @@ export function OnKeyUp(e){
       else if  (_keys_buffer[len].key === 'w') { console.log('@ Widget Root', `\n  1:${DEBUG_PRINT_KEYS[w1].discr}\n  2:${DEBUG_PRINT_KEYS[w2].discr}\n  3:${DEBUG_PRINT_KEYS[w3].discr}\n  4:${DEBUG_PRINT_KEYS[w4].discr}\n  5:${DEBUG_PRINT_KEYS[w5].discr}\n  6:${DEBUG_PRINT_KEYS[w6].discr}\n  6:${DEBUG_PRINT_KEYS[w7].discr}`); }
       else if  (_keys_buffer[len].key === 't') { console.log('@ Styles', `\n  1:${DEBUG_PRINT_KEYS[t1].discr}\n  2:${DEBUG_PRINT_KEYS[t2].discr}\n  3:${DEBUG_PRINT_KEYS[t3].discr}\n  4:${DEBUG_PRINT_KEYS[t4].discr}\n  5:${DEBUG_PRINT_KEYS[t5].discr}\n  6:${DEBUG_PRINT_KEYS[t6].discr}`); }
       else if  (_keys_buffer[len].key === 'v') { console.log('@ GL', `\n  a:${DEBUG_PRINT_KEYS[va].discr}\n  b:${DEBUG_PRINT_KEYS[vb].discr}\n  i:${DEBUG_PRINT_KEYS[vi].discr}\n  p:${DEBUG_PRINT_KEYS[vp].discr}\n  s:${DEBUG_PRINT_KEYS[vs].discr}`); }
-      else if  (_keys_buffer[len].key === 'g') { console.log('@ +++', `\n  s:${DEBUG_PRINT_KEYS[gs].discr}\n  w:${DEBUG_PRINT_KEYS[gw].discr}\n  1:${DEBUG_PRINT_KEYS[g1].discr}\n  2:${DEBUG_PRINT_KEYS[g2].discr}\n  3:${DEBUG_PRINT_KEYS[g3].discr}\n  4:${DEBUG_PRINT_KEYS[g4].discr}\n  5:${DEBUG_PRINT_KEYS[g5].discr}\n  6:${DEBUG_PRINT_KEYS[g6].discr}`); }
+      else if  (_keys_buffer[len].key === 'g') { console.log('@ +++', `\n  s:${DEBUG_PRINT_KEYS[gs].discr}\n  w:${DEBUG_PRINT_KEYS[gw].discr}\n  d:${DEBUG_PRINT_KEYS[gd].discr}\n  1:${DEBUG_PRINT_KEYS[g1].discr}\n  2:${DEBUG_PRINT_KEYS[g2].discr}\n  3:${DEBUG_PRINT_KEYS[g3].discr}\n  4:${DEBUG_PRINT_KEYS[g4].discr}\n  5:${DEBUG_PRINT_KEYS[g5].discr}\n  6:${DEBUG_PRINT_KEYS[g6].discr}`); }
       else if  (_keys_buffer[len].key === 'm') { console.log('@ Mesh Buffer', `\n  1:${DEBUG_PRINT_KEYS[m1].discr}, 2:${DEBUG_PRINT_KEYS[m2].discr}`); }
       else if  (_keys_buffer[len].key === 'y') { console.log('@ Debuug ui entries table', `\n  1:${DEBUG_PRINT_KEYS[y1].discr}\n  2:${DEBUG_PRINT_KEYS[y2].discr}`); }
       else if  (_keys_buffer[len].key === 'u') { console.log('@ Debuug ui entries table', `\n  1:${DEBUG_PRINT_KEYS[u1].discr}\n  2:${DEBUG_PRINT_KEYS[u2].discr}`); }

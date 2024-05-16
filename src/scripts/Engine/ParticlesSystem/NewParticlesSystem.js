@@ -37,11 +37,13 @@ const dir_factor = .6
 
 
 let yy = .1
-let speed = .1;
+let speed = .05;
 // let accel = .1;
 let accel = 2.;
 let max = 100;
-let gravity = 1.06;
+let gravity = 1.02;
+// let gravity = 1.06;
+// let gravity = 1.3;
 
 
 
@@ -112,7 +114,7 @@ class Emitter {
       
       this.particles_buffer = New_generic_buffer();
       this.free_particles_idxs_buffer = New_int16_buffer();
-      /**
+      /** 
              this.sid.shad |= SID.SHAD.PRE_MULTIPLIED_ALPHA; // E
             this.sid.attr |= SID.ATTR.TEX2 | SID.ATTR.MSDF; // 
             // SID.ATTR.COL4
@@ -126,13 +128,15 @@ class Emitter {
          // gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
       };
 
-      this.style = [0,10,2]
+      this.style = [0, 40, 1.5]
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
 
 
       this.uniforms = [];
       if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
          this.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+
+      this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
       this.EnableGfxUniforms(SID.UNIF.WPOS4, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // this.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
@@ -286,30 +290,35 @@ export function Particle_system_create_emitter(col, pos, dim, t_step, life_time,
 // export function Particle_system_emitt(emitter_idx) {
 export function Particle_system_emitt(params) {
 
-   const emitter_idx = params.params.target_params
-   const emitter = _emitters.buffer[emitter_idx];
-   const last_elem = emitter.free_particles_idxs_buffer.boundary;
-   
-   
-   if(last_elem === INT_NULL){
+
+   const len = params.params.target_params.length;
+   for (let i=0; i < len; i++){
+
+      const emitter_idx = params.params.target_params[i]
+      const emitter = _emitters.buffer[emitter_idx];
+      const last_elem = emitter.free_particles_idxs_buffer.boundary;
       
-      const particle = new Particle(emitter);
-      const particle_idx = emitter.particles_buffer.Add(particle);
-      particle.is_alive = true;
-      // Push particle to the gfx buffers
-      emitter.ParticleAddToGfx(particle_idx);
-   }
-   else{
       
-      const particle_idx = emitter.free_particles_idxs_buffer.buffer[last_elem];
-      const particle = emitter.particles_buffer.buffer[particle_idx];
-      if(particle !== undefined){
+      if(last_elem === INT_NULL){
          
+         const particle = new Particle(emitter);
+         const particle_idx = emitter.particles_buffer.Add(particle);
          particle.is_alive = true;
-         emitter.free_particles_idxs_buffer.RemoveByIdx(last_elem);
-         // console.log('USED ', 'idx', particle_idx, 'posx', emitter.particles_buffer.buffer[particle_idx].pos[0], 'start',emitter.particles_buffer.buffer[particle_idx].start)
+         // Push particle to the gfx buffers
+         emitter.ParticleAddToGfx(particle_idx);
       }
-      else console.log('UNDEFINED')
+      else{
+         
+         const particle_idx = emitter.free_particles_idxs_buffer.buffer[last_elem];
+         const particle = emitter.particles_buffer.buffer[particle_idx];
+         if(particle !== undefined){
+            
+            particle.is_alive = true;
+            emitter.free_particles_idxs_buffer.RemoveByIdx(last_elem);
+            // console.log('USED ', 'idx', particle_idx, 'posx', emitter.particles_buffer.buffer[particle_idx].pos[0], 'start',emitter.particles_buffer.buffer[particle_idx].start)
+         }
+         else console.log('UNDEFINED')
+      }
    }
 
 
@@ -348,7 +357,7 @@ export function Particle_system_update() {
             // Gl_particles_batch_set(emitter.gfx.vb.idx, particle.start, particle.col, particle.pos, particle.dim)
             Gl_particles_batch_set_col4_wpos4_pos2_style3(emitter.gfx.vb.idx, particle.start, particle.col, particle.pos, particle.dim)
             
-            particle.t += .01;
+            particle.t += .003;
             if(particle.t >= 1){
                // console.log('Reset', particle.start, 'particle_idx', j)
                

@@ -1,14 +1,6 @@
 "use strict";
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Multiply Array */
-export function MulArr4Val(arr, val){
-    arr[0] *= val;
-    arr[1] *= val;
-    arr[2] *= val;
-    arr[3] *= val;
-}
 export function Pow(base, exp){
     let res = base;
     while(exp){
@@ -24,6 +16,15 @@ export function Pow(base, exp){
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Set Array */
 // TODO: dst and src are logicaly opposite, swap them
+
+export function Set_mat4_collumn(mat, scalar, colidx){
+    return[
+        mat[0][colidx] * scalar,
+        mat[1][colidx] * scalar,
+        mat[2][colidx] * scalar,
+        mat[3][colidx] * scalar,
+    ];
+}
 
 export function Mult_arr4_scalar2(arr, scalar){
     return[

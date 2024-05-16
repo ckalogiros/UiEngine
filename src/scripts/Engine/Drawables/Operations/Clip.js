@@ -1,6 +1,6 @@
 "use strict";
 
-import { Mesh_buffer_get_mesh_byidx, TEMP_get_widget_root_wposy } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { View_get_view_byidx } from "../../Core/MeshBufferViews.js";
 
 

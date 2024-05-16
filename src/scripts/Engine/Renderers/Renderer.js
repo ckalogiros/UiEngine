@@ -11,7 +11,7 @@ import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuf
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Performance_timer_start, Performance_timer_stop, Performance_timers_update_tick } from "../Timers/PerformanceTimers.js";
 import { Command_buffer_run } from "../Core/Commandbuffer.js";
-import { Scene_set_projection_matrix } from "../Scenes.js";
+import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../Scenes.js";
 import { Input_reset } from "../Controls/Input/Input.js";
 import { Animations_run } from "../Animations/Animations.js";
 import { Particle_system_update } from "../ParticlesSystem/NewParticlesSystem.js";
@@ -134,6 +134,7 @@ export function Renderer_set_canvas_size(width, height){
    _renderer.SetCanvasSize(width, height);
    _renderer.camera.Set(width, height); // Set the new camera projection matrix
    Scene_set_projection_matrix(_renderer.scene.sceneidx); // update camera's projection matrix
+   Scene_set_screen_res_uniform(); // Update screen dimentions uniform
 }
 
 

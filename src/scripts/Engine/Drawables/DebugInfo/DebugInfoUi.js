@@ -4,7 +4,7 @@ import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
 import { Info_listener_create_event, Info_listener_destroy_event } from "./InfoListeners.js";
 import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, TEMP_get_widget_root_wpos, TEMP_set_widget_root_wpos, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals.js";
 import { Dbg_ui_create2 } from "./DebugInfoUiFactory.js";
 import { BLACK, BLUEL, GREEN, GREY, ORANGE_240_160_10, REDL, WHITE, YELLOWL } from "../Material/Base/Colors.js";
@@ -17,6 +17,7 @@ import { GetRandomColor } from "../../../Helpers/Helpers.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 
 
 
@@ -169,7 +170,7 @@ function Debug_info_create_ui_stats() {
 
       const section = Mesh_buffer_get_mesh_byidx(DEBUG_INFO.UI_STATS.MESH_BUFFER_IDX);
 
-      const pos = TEMP_get_widget_root_wpos(section.root_posidx);
+      const pos = Mesh_unif_get_vb_root_wpos(section.root_posidx);
       DEBUG_INFO.UI_TIMERS.POS = [pos[0], pos[1], section.geom.pos[2]]; // Remember the info's position.
 
       section.Destroy();
@@ -261,7 +262,7 @@ function Debug_info_create_ui_performance_timers() {
 
       const section = Mesh_buffer_get_mesh_byidx(DEBUG_INFO.UI_TIMERS.MESH_BUFFER_IDX);
 
-      const pos = TEMP_get_widget_root_wpos(section.root_posidx);''
+      const pos = Mesh_unif_get_vb_root_wpos(section.root_posidx);''
       DEBUG_INFO.UI_TIMERS.POS = [pos[0], pos[1], section.geom.pos[2]]; // Remember the info's position.
       section.Destroy();
 
@@ -655,7 +656,7 @@ function Debug_info_create_ui_performance_timers() {
    section.Calc_no_gfx_update();
 
    const w = section.GetMaxWidth();
-   TEMP_set_widget_root_wpos(section.root_posidx, VIEWPORT.RIGHT - w*2, 0);
+   Mesh_unif_set_vb_root_wpos(section.root_posidx, VIEWPORT.RIGHT - w*2, 0);
 
    section.Render()
 
@@ -699,7 +700,7 @@ function Debug_info_create_ui_mouse() {
 
       Info_listener_destroy_event(section.debug_info.evtidx);
 
-      const pos = TEMP_get_widget_root_wpos(section.root_posidx);
+      const pos = Mesh_unif_get_vb_root_wpos(section.root_posidx);
       DEBUG_INFO.UI_MOUSE.POS = [pos[0], pos[1], section.geom.pos[2]]; // Remember the info's position.
 
       section.Destroy();

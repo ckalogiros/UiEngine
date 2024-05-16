@@ -1,5 +1,6 @@
 "use strict";
 
+import { Set_default_color_rgba, Set_hover_color_rgba } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Listener_dispatch_check_hover_event, Listener_dispatch_event } from "./EventListeners.js";
 
 
@@ -115,11 +116,11 @@ export function Events_handle_immidiate(e) {
             // Unhover any hovered mesh. // TODO: Decide who unhovers an already hovered mesh: here OR EventListeners.js. The diff is that if we unhover here, is faster since there is no separate call to 'Events_handle_immidiate()' for the 'else if (e.type === 'unhover')'
             if (STATE.mesh.hovered) {
 
-                STATE.mesh.hovered.SetHoverColorDefault();
+                Set_default_color_rgba(STATE.mesh.hovered);
                 e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER_COLOR; // Set false
             }
 
-            e.params.mesh.SetHoverColor();
+            Set_hover_color_rgba(e.params.mesh);
 
             e.params.mesh.state.mask |= (MESH_STATE.IN_HOVER_COLOR | MESH_STATE.IN_HOVER); 
             
@@ -133,7 +134,7 @@ export function Events_handle_immidiate(e) {
     else if (e.type === 'unhover') {
 
         if (e.params.mesh.StateCheck(MESH_STATE.IN_HOVER_COLOR)) {
-            e.params.mesh.SetHoverColorDefault();
+            Set_default_color_rgba(e.params.mesh);
             e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER_COLOR; // Set false
         }
         

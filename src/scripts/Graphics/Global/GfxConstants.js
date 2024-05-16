@@ -172,14 +172,15 @@ const SID = {
 
 
     // This function is used only to be able to reason of which mesh inherits from which mesh
-    InheritUniform(target, src){
-        target.unif |= src.unif;
-    },
+    // InheritUniform(target, src){
+    //     target.unif |= src.unif;
+    // },
 
 
     CheckSidMatch(sid1, sid2) {
 
         // Remove all Block Uniforms flags. Better to reuse a program than to create a duplicate only because some meshes dont use Blocked Uniforms. 
+        // For individual uniforms we must include for the match, since a Program's shaders may be compiled before the creation of other meshes with the same sid except an extra uniform
         const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
         const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
         /**

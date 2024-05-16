@@ -34,29 +34,29 @@ class Particle {
     }
 
 
-    SetColor(col) {
-        math.CopyArr4(this.mesh.col, col);
-        Gl_set_RGBA(this.gfxInfo, col);
-    }
+    // SetColor(col) {
+    //     math.CopyArr4(this.mesh.col, col);
+    //     Gl_set_RGBA(this.gfxInfo, col);
+    // }
 
 
-    SetColorAlpha(a) {
-        this.mesh.col[3] = a;
-        Gl_set_alpha(this.gfxInfo, a);
-    }
+    // SetColorAlpha(a) {
+    //     this.mesh.col[3] = a;
+    //     Gl_set_alpha(this.gfxInfo, a);
+    // }
 
 
-    SetPos(pos) {
-        alert('Particles.js')
-        math.CopyArr2(this.mesh.pos, pos);
-        Gl_set_wpos_XY(this.gfxInfo, pos);
-    }
+    // SetPos(pos) {
+    //     alert('Particles.js')
+    //     math.CopyArr2(this.mesh.pos, pos);
+    //     Gl_set_wpos_XY(this.gfxInfo, pos);
+    // }
 
 
-    UpdatePos() {
-        alert('Particles.js')
-        Gl_set_wpos_XY(this.gfxInfo, this.mesh.pos);
-    }
+    // UpdatePos() {
+    //     alert('Particles.js')
+    //     Gl_set_wpos_XY(this.gfxInfo, this.mesh.pos);
+    // }
 
 };
 
@@ -140,13 +140,6 @@ export class Particles{
         return this.buffer[idx].mesh.col;
     }
 
-
-    SetColor(col) {
-        for(let i=0; i< this.count; i++){
-            math.CopyArr4(this.buffer[i].mesh.col, col);
-            Gl_set_RGBA(this.buffer[i].gfxInfo, col);
-        }
-    }
 
 
     SetParams1Attr(paramOffset, val){

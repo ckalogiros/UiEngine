@@ -166,7 +166,7 @@ const PLATFORM = {
 
 /*************************************************************************************************/
 // Engine Constants
-const Device = {
+const DEVICE = {
 	MAX_WIDTH: 1600,
 	MAX_HEIGHT: 800,
 	width: 0,

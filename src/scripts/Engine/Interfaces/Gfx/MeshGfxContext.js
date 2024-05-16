@@ -4,13 +4,15 @@
 import { Vertex_buffer_info_create, Vertex_buffer_info_get_by_vbidx, Vertex_buffer_info_set_ibidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
-import { Program_store_vertex_buffer_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Program_uniform_bind } from "../../../Graphics/ShaderPrograms.js";
-import { Mesh_per_vb_create_vb, TEMP_create_widget_root_wpos_uniform, TEMP_get_widget_root_wpos, TEMP_store_widget_root_wpos, Widget_root_batch_assign_and_accum_to_vb, Widget_root_buffer_get_root_pos, Widget_root_buffer_get_root_unif_wpos, Widget_root_buffer_is_root, Widget_root_gfx_add, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
+import { Program_store_vertex_buffer_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
+import { Mesh_per_vb_create_vb, Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
-import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from "../../../Graphics/Buffers/UniformBuffers.js";
+import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout, Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform, Uniforms_buffer_find_ubidx_from_name } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private } from "./GfxPool.js";
 import { Generate_graphics_context } from "./GfxContextFindMatch.js";
+import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
 
 
 
@@ -208,29 +210,32 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
    if (progidx === INT_NULL) { // If shader program does not exist, create new program.
 
       progidx = Program_create_program(sid, uniforms);
-      
+
       Scene_set_projection_matrix(sceneidx)
-      
+
       // HACK: the uniform block should not be implemented HERE, Also weather or not the 'u_screen_res' should be enabled is responsibility of 'WHO'???????????????????
       const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
       Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
-      
-      
-         
-      // MUST BIND AND INIT THE UNIFORM, OTHERWISE THE SHADER IS NOT GONNA HAVE A VALUE FOR THE UNIFORM 
-      const obj = {
-         Set: null,
-         Update: null,
-      };
 
-      const ubidx = Program_uniform_bind(progidx, obj, 'u_wposxy');
-      obj.Set([mesh.geom.pos[0], mesh.geom.pos[1]]);
-      mesh.SetUniformIndex(ubidx, 'u_wposxy')
-      // const ubidx2 = Program_uniform_bind(progidx, obj, 'u_col4');
-      // obj.Set([mesh.mat.col[0], mesh.mat.col[1], mesh.mat.col[2], mesh.mat.col[3]]);
-      // mesh.SetUniformIndex(ubidx2, 'u_col4')
-      // const ubidx = Program_uniform_bind(progidx, null, 'u_wposxy');
-      
+
+      /**
+       * Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms buffer.
+       */
+      for (let i = 0; i < uniforms.length; i++) {
+
+         if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
+
+            const ubidx = Uniforms_buffer_find_ubidx_from_name(uniforms[i].name);
+            Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, uniforms[i].name);
+            // mesh.SetUniformIndex(ubidx, uniforms[i].name)
+            Uniforms_buffer_set_uniform(ubidx, [mesh.geom.pos[0], mesh.geom.pos[1]]);
+            Uniforms_buffer_update_uniform(ubidx);
+            // console.warn(ubidx, uniforms[i].name, mesh.GetName())
+         }
+
+      }
+
+
    }
 
 
@@ -305,20 +310,33 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
 
       // UNNECESSARY: For all vb except the widget root. All the root wpos are set from a function call, based on the root root_wpos 
 
-      const root_posidx = TEMP_create_widget_root_wpos_uniform(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vbidx);
+      const root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vbidx);
       mesh.root_posidx = root_posidx;
 
 
-      if(root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
+      /**
+       * Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms buffer.
+       */
+      for (let i = 0; i < uniforms.length; i++) {
+
+         if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
+
+            const ubidx = uniforms[i].ubidx
+            // if has unif u_col, create uunif col root
+            Mesh_unif_create_vb_root_col(mesh.mat.col)
+            console.warn(ubidx, uniforms[i].name, mesh.GetName())
+         }
+
+      }
+
+
+      if (root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
 
    }
 
 
-
-
    // Add mesh to the root batch buffer for batch update
    Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vbidx, mesh_count);
-
 
 
    // Store the root pos in each mesh. Assuumes the indexing of root_wpos and vbs are 1-1.
@@ -360,25 +378,31 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
    if (progidx === INT_NULL) { // If shader program does not exist, create new program.
 
       progidx = Program_create_program(sid, uniforms);
-      
+
       Scene_set_projection_matrix(sceneidx)
-      
+
       // HACK: the uniform block should not be implemented HERE, Also weather or not the 'u_screen_res' should be enabled is responsibility of 'WHO'???????????????????
       const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
       Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
-      
-      
-         
-      // MUST BIND AND INIT THE UNIFORM, OTHERWISE THE SHADER IS NOT GONNA HAVE A VALUE FOR THE UNIFORM 
-      const obj = {
-         Set: null,
-         Update: null,
-      };
 
-      const ubidx = Program_uniform_bind(progidx, obj, 'u_wposxy');
-      obj.Set([emitter.pos[0], emitter.pos[1]]);
-      // const ubidx = Program_uniform_bind(progidx, null, 'u_wposxy');
-      
+
+      /**
+       * Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms buffer.
+       */
+      for (let i = 0; i < uniforms.length; i++) {
+
+         if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
+
+            const ubidx = Uniforms_buffer_find_ubidx_from_name(uniforms[i].name)
+            Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, uniforms[i].name);
+            Uniforms_buffer_set_uniform(ubidx, [emitter.pos[0], emitter.pos[1]]);
+            Uniforms_buffer_update_uniform(ubidx);
+            // console.warn(ubidx, uniforms[i].name, mesh.GetName())
+         }
+
+      }
+
+
    }
 
 
@@ -446,11 +470,27 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
 
       Vertex_buffer_info_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
 
-// mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vbidx
-      const root_posidx = TEMP_create_widget_root_wpos_uniform(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vbidx);
+      // mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vbidx
+      const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vbidx);
       emitter.root_posidx = root_posidx;
 
-      if(root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
+      
+      /**
+       * Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms buffer.
+       */
+      for (let i = 0; i < uniforms.length; i++) {
+
+         if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
+
+            const ubidx = uniforms[i].ubidx
+            // if has unif u_col, create uunif col root
+            Mesh_unif_create_vb_root_col(emitter.col)
+            // console.warn(ubidx, uniforms[i].name, emitter.GetName())
+         }
+
+      }
+
+      if (root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
    }
 
 

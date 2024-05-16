@@ -375,7 +375,7 @@ export function Listener_dispatch_check_hover_event() {
          
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          intersects = Intersection_point_rect(point, bounding_box);
-         // console.log(bounding_box[0][0], bounding_box[1][0], point[0])
+         // console.log(bounding_box[0][0], bounding_box[1][0], point[0], 'intersects', intersects)
 
          if (intersects) {
 

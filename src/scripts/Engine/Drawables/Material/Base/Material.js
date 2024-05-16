@@ -51,59 +51,16 @@ export class Material {
 
    }
 
-
-   SetColor(col, gfx) {
-      if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
-         Gl_set_RGBA_per_vertex(gfx, temp_vertex_color);
-      }
-      else {
-         math.CopyArr4(this.col, col);
-         Gl_set_RGBA(gfx, this.col);
-      }
-   }
-
-
-   SetHoverColor(gfx) {
-      const intensity = 1.4;
-      if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) { // Handle attribute color per vertex 
-         Gl_set_RGBA_per_vertex(gfx, math.Mult_mat4_scalar2(this.col, intensity));
-      }
-      else { // Handle attribute color 
-         Gl_set_RGBA(gfx, math.Mult_arr4_scalar2(this.col, intensity));
-      }
-
-   }
-
-
-   SetHoverColorDefault(gfx) {
-      if (gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
-         math.CopyMat4(this.col, this.defCol);
-         // Gl_set_RGBA_per_vertex(gfx, this.col);
-         Gl_set_RGBA_per_vertex(gfx, temp_vertex_color);
-      }
-      else {
-         math.CopyArr4(this.col, this.defCol);
-         Gl_set_RGBA(gfx, this.col);
-      }
-   }
-
-
-   SetDefaultColor(gfx, num_faces) {
-      math.CopyArr4(this.col, this.defCol);
-      Gl_set_RGBA(gfx, this.col, num_faces);
-   }
-
-
    SetColorRGB(col, gfx, num_faces) {
       math.CopyArr3(this.col, col);
       Gl_set_RGBA(gfx, this.col, num_faces);
    }
 
 
-   SetColorAlpha(alpha, gfx, num_faces) {
-      this.col[3] = alpha;
-      Gl_set_alpha(gfx, this.col[3], num_faces);
-   }
+   // SetColorAlpha(alpha, gfx, num_faces) {
+   //    this.col[3] = alpha;
+   //    Gl_set_alpha(gfx, this.col[3], num_faces);
+   // }
 
 
    SetStyle(style) {

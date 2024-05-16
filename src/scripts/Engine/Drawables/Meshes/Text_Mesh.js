@@ -2,17 +2,17 @@
 
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_info_set_texidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
-import { AddArr3, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
-import { Gfx_generate_context, GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js";
+import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D_Text } from "../Geometry/Geometry2DText.js";
 import { FontMaterial } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Font_get_char_plane_bounds, Font_get_char_uv_coords, Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
-import { Gl_set_dim_XY, Gl_set_dim_XY2, Gl_set_uv, Gl_set_uv2, Gl_set_wpos_XY, Gl_set_wpos_XY2 } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy } from "../../Core/MeshBuffer.js";
+import { Gl_set_dim_XY, Gl_set_uv2, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
+import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 
 
 
@@ -248,8 +248,8 @@ export class Text_Mesh extends Mesh {
 
 
    SetPosXYNoGfxUpdate(x, y) {
-      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
       }
       else {
          this.geom.pos[0] = x;
@@ -260,8 +260,8 @@ export class Text_Mesh extends Mesh {
 
    SetPosXNoGfxUpdate(x) {
 
-      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
       }
       else this.geom.pos[0] = x;
    }
@@ -269,8 +269,8 @@ export class Text_Mesh extends Mesh {
 
    SetPosYNoGfxUpdate(y) {
 
-      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
       }
       else this.geom.pos[1] = y;
    }

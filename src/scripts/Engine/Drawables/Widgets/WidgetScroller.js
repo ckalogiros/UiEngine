@@ -5,7 +5,7 @@ import { MouseGetPos, MouseGetPosDif, MouseGetPosDifY } from "../../Controls/Inp
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { TEMP_add_widget_root_wpos, TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy, Widget_root_add_mesh, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { Widget_root_add_mesh, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
 import { BLUEL, GREY } from "../Material/Base/Colors.js";
@@ -14,6 +14,7 @@ import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 import { Gl_set_dim_XY, Gl_set_dim_Y, Gl_set_wpos_X, Gl_set_wpos_XY, Gl_set_wpos_Y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 import { Abs, Floor, Max, Min } from "../../../Helpers/Math/MathOperations.js";
+import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 
 
 
@@ -590,7 +591,7 @@ export class Widget_Scroller extends Section {
       if (x === 0 && y === 0) return;
 
       // HERE: We need a way to get the unif idx by name: 'u_wposxy' 
-      TEMP_add_widget_root_wpos(this.root_posidx, [x, y]);
+      Mesh_unif_add_vb_root_wpos(this.root_posidx, [x, y]);
 
       // Add the move difference to all vb's root positions.
       // Widget_root_gfx_add_unif_wpos_per_vb(this.root_bufferidx, [x, y]);
@@ -650,8 +651,8 @@ export class Widget_Scroller extends Section {
 	
    SetPosXYNoGfxUpdate(x, y) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
       }
 		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update them as offsets 
 			
@@ -670,8 +671,8 @@ export class Widget_Scroller extends Section {
    
    SetPosXNoGfxUpdate(x) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
       }
 		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update them as offsets 
 			
@@ -687,8 +688,8 @@ export class Widget_Scroller extends Section {
    
    SetPosYNoGfxUpdate(y) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
       }
 		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update them as offsets 
 			

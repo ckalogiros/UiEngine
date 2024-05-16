@@ -6,10 +6,12 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/Tim
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { AddArr2, RoundFloat1Decimal } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_text } from '../../Core/CreateWidget.js';
-import { TEMP_add_widget_root_wpos, TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy, Widget_root_add_mesh, Widget_root_create_root, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
+import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
 import { Find_parent_listen_event } from '../Operations/Recursions.js';
+import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos } from '../../Core/MeshUniformsBuffer.js';
+import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 
 
 
@@ -368,7 +370,7 @@ export class Widget_Slider extends Rect {
       if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
       
       // Widget_root_gfx_add_unif_wpos_per_vb(mesh.root_bufferidx, [mouse_pos.x, -mouse_pos.y]);
-      TEMP_add_widget_root_wpos(mesh.root_posidx, [mouse_pos.x, -mouse_pos.y]);
+      Mesh_unif_add_vb_root_wpos(mesh.root_posidx, [mouse_pos.x, -mouse_pos.y]);
       
       mesh.SetUpdateFrameBuffer();
 
@@ -586,8 +588,8 @@ export class Widget_Slider extends Rect {
 
    SetPosXNoGfxUpdate(x) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
          
@@ -611,8 +613,8 @@ export class Widget_Slider extends Rect {
 
    SetPosYNoGfxUpdate(y) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
          
@@ -636,8 +638,8 @@ export class Widget_Slider extends Rect {
 
    SetPosXYNoGfxUpdate(x, y) {
       
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
    
@@ -692,18 +694,23 @@ export class Widget_Slider extends Rect {
    SetColorAlpha(alpha) {
 
       this.mat.SetColorAlpha(alpha, this.gfx);
-
+      Set_color_a(this, alpha);
+      
       const bar = this.children.buffer[SLIDER_BAR_IDX];
-      bar.mat.SetColorAlpha(alpha, bar.gfx);
-
+      Set_color_a(bar, alpha);
+      // bar.mat.SetColorAlpha(alpha, bar.gfx);
+      
       const name_text = this.text_mesh;
-      name_text.mat.SetColorAlpha(alpha, name_text.gfx);
-
+      Set_color_a(name_text, alpha);
+      // name_text.mat.SetColorAlpha(alpha, name_text.gfx);
+      
       const handle = bar.children.buffer[0];
-      handle.mat.SetColorAlpha(alpha, handle.gfx);
-
+      Set_color_a(handle, alpha);
+      // handle.mat.SetColorAlpha(alpha, handle.gfx);
+      
       const value_text = bar.children.buffer[1];
-      value_text.mat.SetColorAlpha(alpha, value_text.gfx);
+      Set_color_a(value_text, alpha);
+      // value_text.mat.SetColorAlpha(alpha, value_text.gfx);
    }
 
 
@@ -833,7 +840,7 @@ export function Slider_connect(_params) {
          if (newTargetId === existingTargetId) {
 
             console.log('Disconnecting target:', sliderBar.eventCallbacks.buffer[i].target.GetName(), ' clicked:', STATE.mesh.clickedId);
-            /*FOR DEBUG*/clicked_mesh.SetColor(REDL[7])
+            /*FOR DEBUG*/Set_color_rgba(clicked_mesh, REDL[7]);
 
             // Disconnect
             sliderBar.eventCallbacks.RemoveByIdx(i);
@@ -844,7 +851,7 @@ export function Slider_connect(_params) {
    }
 
    console.log('Connecting target:', target.GetName(), ' clicked:', STATE.mesh.clickedId);
-   /*FOR DEBUG*/clicked_mesh.SetColor(GREEN)
+   /*FOR DEBUG*/Set_color_rgba(clicked_mesh, GREEN);
 
    const params = {
       target: target,

@@ -9,7 +9,8 @@ import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Texture_Material } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { WHITE } from "../Material/Base/Colors.js";
-import { TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 
 
 
@@ -190,24 +191,24 @@ export class Textured_Mesh extends Mesh {
 
 
    SetPosXNoGfxUpdate(x) {
-      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
       }
       else this.geom.pos[0] = x;
    }
 
 
    SetPosYNoGfxUpdate(y) {
-      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
       }
       else this.geom.pos[1] = y;
    }
 
 
    SetPosXYNoGfxUpdate(x, y) {
-      if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
       }
       else {
          this.geom.pos[0] = x;

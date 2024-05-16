@@ -5,12 +5,14 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Widget_root_create_root, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, TEMP_add_widget_root_wpos, Widget_root_reset_gfx, Widget_root_resize_and_rerender, TEMP_set_widget_root_wposy, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wpos, TEMP_is_widget_root_wpos, Widget_root_gfx_reset_mesh_per_vb_buffer } from "../../Core/MeshBuffer.js";
+import { Widget_root_create_root, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_reset_gfx, Widget_root_resize_and_rerender, Widget_root_gfx_reset_mesh_per_vb_buffer } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
-import { Clipx_from_group, Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
+import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
+import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -47,7 +49,7 @@ export class Section extends Rect {
       this.min_size = [0, 0];
 
 
-      // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -420,8 +422,8 @@ export class Section extends Rect {
 
    SetPosXNoGfxUpdate(x) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
          this.geom.pos[0] = x;
@@ -435,8 +437,8 @@ export class Section extends Rect {
 
    SetPosYNoGfxUpdate(y) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
          this.geom.pos[1] = y;
@@ -450,8 +452,8 @@ export class Section extends Rect {
 
    SetPosXYNoGfxUpdate(x, y) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
          this.geom.pos[0] = x;
@@ -678,7 +680,7 @@ export class Section extends Rect {
       if (x === 0 && y === 0) return;
       
       // HERE: We need a way to get the unif idx by name: 'u_wposxy' 
-      TEMP_add_widget_root_wpos(this.root_posidx, [x,y]);
+      Mesh_unif_add_vb_root_wpos(this.root_posidx, [x,y]);
       
       
    }
@@ -751,11 +753,11 @@ export class Section extends Rect {
 
    SetColorAlpha(alpha) {
 
-      super.SetColorAlpha(alpha);
+      Set_color_a(this, alpha);
 
       for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
-         child.SetColorAlpha(alpha, alpha)
+         Set_color_a(child, alpha);
       }
    }
 
@@ -857,7 +859,7 @@ export function Section_on_move_clbk(params) {
    const mouse_dif = MouseGetPosDif();
    if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
 
-   TEMP_add_widget_root_wpos(section.root_posidx, [mouse_dif.x, -mouse_dif.y])
+   Mesh_unif_add_vb_root_wpos(section.root_posidx, [mouse_dif.x, -mouse_dif.y])
 
    // Widget_root_gfx_add_unif_wpos_per_vb(section.root_bufferidx, [mouse_dif.x, -mouse_dif.y]);
 
@@ -874,16 +876,14 @@ export function Expand(parent, options) {
 
       const child = parent.children.buffer[i];
       if (options & SECTION.INHERIT) opt = parent.options;
-      // else opt = child.options
-      if(child.mesh_bufferidx===58)
-         console.log()
+
       if (child.type & MESH_TYPE.WIDGET_LABEL) {
          // // For other than section widgets, the parent should control child expansion 
-         // if(options & SECTION.EXPAND) {
-         //    // child.geom.dim[0] = width - (parent.StylesGetMargin(STYLES.AXIS.X));
-         //    child.geom.dim[0] = width;
-         //    child.geom.defDim[0] = child.geom.dim[0];
-         // }
+         if(options & SECTION.EXPAND) {
+            // child.geom.dim[0] = width - (parent.StylesGetMargin(STYLES.AXIS.X));
+            child.geom.dim[0] = width;
+            child.geom.defDim[0] = child.geom.dim[0];
+         }
       }
       else if (child.type & MESH_TYPE.SECTION_MESH) {
          // For section widgets, the child's options should control child expansion 

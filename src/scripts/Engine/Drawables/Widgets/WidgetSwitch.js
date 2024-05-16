@@ -2,9 +2,11 @@
 
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy, Widget_root_create_root } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_create_root } from "../../Core/MeshBuffer.js";
+import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { BLUE, GREEN, GREY } from "../Material/Base/Colors.js";
 import { Rect } from "../Meshes/Rect_Mesh.js";
+import { Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 
 
@@ -158,8 +160,8 @@ export class Widget_Switch_Simple extends Rect {
    }
 
    SetPosXNoGfxUpdate(x) {
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposx(this.root_posidx, x);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.child, and must update both offsets 
          this.geom.pos[0] = x;
@@ -170,8 +172,8 @@ export class Widget_Switch_Simple extends Rect {
 
 
    SetPosYNoGfxUpdate(y) {
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposy(this.root_posidx, y);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.child, and must update both offsets 
          this.geom.pos[1] = y;
@@ -182,8 +184,8 @@ export class Widget_Switch_Simple extends Rect {
 
    SetPosXYNoGfxUpdate(x, y) {
 
-      if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.child, and must update both offsets 
          this.geom.pos[0] = x;
@@ -218,12 +220,12 @@ export class Widget_Switch_Simple extends Rect {
       STATE.mesh.SetClicked(mesh);
 
       if (mesh.isOn) {
-         mesh.SetColor(mesh.color_active, .7);
+         Set_color_rgba(mesh, mesh.color_active);
          switch0.geom.pos[0] += mesh.geom.dim[0];
          switch0.geom.MoveX(mesh.geom.dim[0], switch0.gfx);
       }
       else {
-         mesh.SetDefaultColor();
+         Set_default_color_rgba(mesh);
          switch0.geom.pos[0] -= mesh.geom.dim[0];
          switch0.geom.MoveX(-mesh.geom.dim[0], switch0.gfx);
       }
@@ -239,9 +241,10 @@ export class Widget_Switch_Simple extends Rect {
    }
 
 
-   SetHoverColor() { this.SetUpdateFrameBuffer(); this.children.buffer[0].mat.SetHoverColor(this.children.buffer[0].gfx); }
+   SetHoverColor() { this.SetUpdateFrameBuffer(); 
+      Set_hover_color_rgba(this.children.buffer[0]); }
 
-   SetHoverColorDefault() { this.SetUpdateFrameBuffer(); this.children.buffer[0].mat.SetHoverColorDefault(this.children.buffer[0].gfx); }
+   SetHoverColorDefault() { this.SetUpdateFrameBuffer();  Set_default_color_rgba(this.children.buffer[0]); }
 
    /*******************************************************************************************************************************************************/
    // Misc

@@ -8,6 +8,8 @@ import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilde
 
 const DISABLE_DEBUG = true;
 
+const _debug_programidx_per_uniform = []
+
 
 
 /*************************************************************************************************************************************/
@@ -75,8 +77,7 @@ class Uniform {
       this.needsUpdate = false;
       this.UpdateUniform = null; // Gl specific type function for updating the uniform.
 
-      this.is_set_bound = false;
-      this.is_update_bound = false;
+      this.is_bound = false;
 
 
       switch (type) {
@@ -127,11 +128,14 @@ const _uniforms_buffer = New_generic_buffer(_, 'GFX Uniforms');
 
 
 
-export function Uniforms_buffer_create_uniform(gl, shader_program, type, name) {
+export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, debug_progidx) {
 
    const uniform = new Uniform(gl, shader_program, type, name);
    const idx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
    console.warn('1111111 Uniform Created at index:', idx, _uniforms_buffer)
+
+   _debug_programidx_per_uniform[idx] = debug_progidx
+
    return idx
 }
 
@@ -168,49 +172,68 @@ export function Uniforms_buffer_update_uniforms_all() {
 
 
 /** 'functions' MUST HAVE .Set and .Update fields, so they can be bound to the uniforms Set() and Update(). */
-export function Uniforms_buffer_bind_uniform_functions(functions, unif_name = '') {
+// export function Uniforms_buffer_bind_uniform_functions(functions, unif_name = '') {
 
-   let ubidx = INT_NULL;
+//    let ubidx = INT_NULL;
+
+//    // Find uniform by name
+//    for (let i = 0; i <= _uniforms_buffer.boundary; i++) {
+
+//       const unif = _uniforms_buffer.buffer[i];
+      
+//       if (unif.name === unif_name) {
+
+//          // /**DEBUG*/if (unif.is_bound) 
+//          //    alert('Uniform function \'Set\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
+//          // /**DEBUG*/if (unif.is_update_bound) 
+//          //    alert('Uniform function \'Update\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
+
+//          // Set the 'Set' and 'Update' 
+//          if (!unif.is_bound) {
+
+//             // functions.Set = unif.Set.bind(unif);
+//             unif.is_bound = true;
+//             ubidx = i;
+//             console.log('UNIFORM SET', unif);
+//          }
+//          if (!unif.is_update_bound) {
+            
+//             // functions.Update = unif.Update.bind(unif);
+//             unif.is_update_bound = true;
+//             ubidx = i;
+//             console.log('UNIFORM UPDATE', unif)
+//          }
+
+//          if(ubidx !== INT_NULL) return ubidx;
+//       }
+//    }
+
+
+//    // TODO: 
+//    // Create an 'export function Uniforms_invalidate_uniform_bind()', for the caller to voluntarily unbind from the uniform
+//    // What happens if the uniform gets invalidated by deleting the program????
+//    // Solutions: 
+//    //    1. Pass a third function callback, to call uppon invalidation and unbind the 'Set' and 'Update' function at caller site 
+//    //       That means to have a buffer of invalidation callback functions.
+
+// }
+export function Uniforms_buffer_find_ubidx_from_name(unif_name = '') {
 
    // Find uniform by name
    for (let i = 0; i <= _uniforms_buffer.boundary; i++) {
 
       const unif = _uniforms_buffer.buffer[i];
-      
-      if (unif.name === unif_name) {
 
-         // /**DEBUG*/if (unif.is_set_bound) 
-         //    alert('Uniform function \'Set\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
-         // /**DEBUG*/if (unif.is_update_bound) 
-         //    alert('Uniform function \'Update\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
-
-         // Set the 'Set' and 'Update' 
-         if (!unif.is_set_bound) {
-
-            functions.Set = unif.Set.bind(unif);
-            unif.is_set_bound = true;
-            ubidx = i;
-            console.log('UNIFORM SET', unif);
-         }
-         if (!unif.is_update_bound) {
-            
-            functions.Update = unif.Update.bind(unif);
-            unif.is_update_bound = true;
-            ubidx = i;
-            console.log('UNIFORM UPDATE', unif)
-         }
-
-         if(ubidx !== INT_NULL) return ubidx;
+      if (unif.name === unif_name && unif.is_bound === false){
+         // Since different program uniforms use the same name, we use the flag 'unif.is_bound = true' 
+         // to differintiate uniforms that have alredy be bound to a program
+         unif.is_bound = true;
+         return i;
       }
    }
 
-
-   // TODO: 
-   // Create an 'export function Uniforms_invalidate_uniform_bind()', for the caller to voluntarily unbind from the uniform
-   // What happens if the uniform gets invalidated by deleting the program????
-   // Solutions: 
-   //    1. Pass a third function callback, to call uppon invalidation and unbind the 'Set' and 'Update' function at caller site 
-   //       That means to have a buffer of invalidation callback functions.
+   console.error('NO uniform with name found\n', unif_name)
+   alert('NO uniform with name found\nSEE CONSOLE ERROR')
 
 }
 
@@ -571,7 +594,7 @@ export function Uniforms_buffer_block_print() {
 // this.name = name; // Uniform name
 // this.needsUpdate = false;
 // this.UpdateUniform = null; // Gl specific type function for updating the uniform.
-// this.is_set_bound = false;
+// this.is_bound = false;
 // this.is_update_bound = false;
 
 export function Uniforms_buffer_print() {
@@ -580,6 +603,7 @@ export function Uniforms_buffer_print() {
       console.log('count', _uniforms_buffer.active_count,
          'name', _uniforms_buffer.buffer[i].name,
          'val', _uniforms_buffer.buffer[i].val,
+         'progidx', _debug_programidx_per_uniform[i],
       );
    }
 }

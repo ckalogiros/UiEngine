@@ -88,4 +88,12 @@ export function Scene_set_projection_matrix(sceneidx) {
 
 
 
+export function Scene_set_screen_res_uniform() {
+
+    const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
+    Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
+}
+
+
+
 

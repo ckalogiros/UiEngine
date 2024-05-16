@@ -4,8 +4,8 @@ import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get_by_vbidx } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
-import { TEMP_get_widget_root_wpos } from '../Engine/Core/MeshBuffer.js';
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from './Buffers/UniformBuffers.js';
+import { Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
 
 
 
@@ -49,7 +49,7 @@ export function Gl_draw(gl) {
         }
 
         // Uniforms - wpos per vertex buffer uniform
-        const pos = TEMP_get_widget_root_wpos(vbidx);
+        const pos = Mesh_unif_get_vb_root_wpos(vbidx);
         // if(vbidx === 1)console.log(pos)
         const ubidx = progs.buffer[progidx].ubidxs.buffer[0];
         Uniforms_buffer_set_uniform(ubidx, pos);

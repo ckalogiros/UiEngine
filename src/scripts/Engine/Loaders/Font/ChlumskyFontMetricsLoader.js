@@ -131,6 +131,9 @@ export function Parse_json_metrics(json_metrics_object){
 
 
 export function Font_get_char_uv_coords(fontIdx, ch) {
+   if(!ch.charCodeAt)
+      console.log
+   
 	return _font_metrics_buffer[fontIdx].uvmap[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET];
 }
 

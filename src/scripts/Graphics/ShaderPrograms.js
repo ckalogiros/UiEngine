@@ -1,6 +1,6 @@
 "use strict";
 import { Shaders_load } from './GlShaders.js';
-import { Uniforms_block_buffer_create, Uniforms_buffer_create_uniform, Uniforms_buffer_bind_uniform_functions } from './Buffers/UniformBuffers.js';
+import { Uniforms_block_buffer_create, Uniforms_buffer_create_uniform } from './Buffers/UniformBuffers.js';
 import { New_generic_buffer, New_int8_buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_create, Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
 import { Select_fnidx_to_fill_vertex_buffer } from './Buffers/VertexBuffersOps.js';
@@ -157,7 +157,7 @@ function Create_program(sid, uniforms) {
 
 			// TODO: For now we have only one unique uniform, the 'u_wpos', and we just store this ubx globaly, given the fact that this is the only uniform for now. Later we need to clear that out
 			// in order to update the correct uuniform in the 'Draw' function, we need the correct index from the 'prog.ubidxs' buffer
-			const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name);
+			const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name, progidx);
 			prog.ubidxs.Add(ubidx);
 			TEMP_UNIFORM_BUFFER_INDEXES.U_WPOS = ubidx;
 		}
@@ -266,27 +266,6 @@ export function Program_use_program(shader_program, progidx) {
 }
 
 
-
-
-// IMPORTANT:
-// Update individual uniforms via the Program function, so that there is no confusion as to under what program a uniform is boumd. 
-// Because the uniform update uses only a 'loc', this might lead to unwilingly updating same loc of another progrm'a uniform. 
-/** 'functions' MUST HAVE .Set and .Update fields, so they can be bound to the uniforms Set() and Update(). */
-export function Program_uniform_bind(progidx, functions_obj, unif_name) {
-	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
-
-	return Uniforms_buffer_bind_uniform_functions(functions_obj, unif_name);
-
-}
-
-
-
-// export function Program_uniform_bind(progidx, functions_obj, unif_name) {
-// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
-
-// 	Uniforms_buffer_bind_uniform_functions(functions_obj, unif_name);
-
-// }
 
 
 

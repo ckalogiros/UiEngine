@@ -5,12 +5,14 @@ import { AddArr2, CopyArr2, CopyArr3, Floor } from "../../../Helpers/Math/MathOp
 import { Batch_store } from "../../Batch/Batch.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
-import { TEMP_is_widget_root_wpos, TEMP_set_widget_root_wpos, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wposy, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx, TimeIntervalsGetByIdx } from "../../Timers/TimeIntervals.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
 import { Align_between, Align_self_get_dif } from "../Operations/Alignment.js";
+import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -384,9 +386,11 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	SetColorAlpha(alpha) {
 
-		super.SetColorAlpha(alpha);
+		// super.SetColorAlpha(alpha);
+		Set_color_a(this, alpha);
 		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].SetColorAlpha(alpha);
+			// this.children.buffer[i].SetColorAlpha(alpha);
+			Set_color_a(this.children.buffer[i], alpha);
 		}
 	}
 
@@ -650,8 +654,8 @@ export class Widget_Multi_Text extends Widget_Text {
 	
    SetPosXYNoGfxUpdate(x, y) {
 
-		if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+		if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
 			for (let i = 0; i <= this.children.boundary; i++) {
 				console.log(Floor(this.children.buffer[i].geom.pos[0]),this.children.buffer[i].geom.pos[1], this.mat.text)
 			}
@@ -668,8 +672,8 @@ export class Widget_Multi_Text extends Widget_Text {
 
    
    SetPosXNoGfxUpdate(x) {
-		if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposx(this.root_posidx, x);
+		if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
       }
 		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
 			for (let i = 0; i <= this.children.boundary; i++) {
@@ -681,8 +685,8 @@ export class Widget_Multi_Text extends Widget_Text {
    
    SetPosYNoGfxUpdate(y) {
       this.geom.pos[1] = y;
-		if(TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         TEMP_set_widget_root_wposy(this.root_posidx, y);
+		if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
       }
 		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
 			for (let i = 0; i <= this.children.boundary; i++) {

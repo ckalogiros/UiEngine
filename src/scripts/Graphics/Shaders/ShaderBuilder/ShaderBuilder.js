@@ -167,6 +167,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // INS
+
       (sid.attr & SID.ATTR.COL4) ? 'in vec4 a_col;' : '',
       (sid.attr & SID.ATTR.WPOS_TIME4) ? 'in vec4 a_wpos_time;' : '',
       (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? '#include <in_a_vec4_params1>' : '',
@@ -233,6 +234,14 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
    return vs;
 }
 
+/** // https://www.khronos.org/opengl/wiki/Fragment_Shader
+ * Fragment Shaders have the following built-in input variables.
+
+   in vec4 gl_FragCoord;
+   in bool gl_FrontFacing;
+   in vec2 gl_PointCoord;
+
+ */
 
 export function Shaders_build_fragment_shader(sid, uniforms_info){
 
@@ -244,6 +253,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // DEFINES
       '\n',
+      // true ? 'layout(origin_upper_left) in vec4 frag_color;' : '',
       true ? '#include <precision_medium>' : '',
       true ? '#include <out_frag_color>' : '',
 

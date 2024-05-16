@@ -10,8 +10,10 @@ import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Ali
 import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
-import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root, Widget_root_gfx_add_unif_wpos_per_vb, TEMP_set_widget_root_wposy, TEMP_set_widget_root_wposx, TEMP_set_widget_root_wpos, TEMP_is_widget_root_wpos } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
+import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
+import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -294,8 +296,8 @@ export class Widget_Label extends Rect {
 
     SetPosXYNoGfxUpdate(x, y) {
         
-        if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-            TEMP_set_widget_root_wpos(this.root_posidx, x, y);
+        if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+            Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
         }
         else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
 
@@ -312,12 +314,12 @@ export class Widget_Label extends Rect {
 
         this.geom.pos[0] = x;
 
-        if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-            TEMP_set_widget_root_wposx(this.root_posidx, x);
+        if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+            Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
         }
         else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
             // if (this.text_mesh.root_posidx !== INT_NULL) { // Same for the text_mesh
-            //     TEMP_set_widget_root_wposx(this.text_mesh.root_posidx, x);
+            //     Mesh_unif_set_vb_root_wposx(this.text_mesh.root_posidx, x);
             // }
             // else 
             this.text_mesh.geom.pos[0] = x; 
@@ -329,12 +331,12 @@ export class Widget_Label extends Rect {
 
         this.geom.pos[1] = y;
         
-        if (TEMP_is_widget_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-            TEMP_set_widget_root_wposy(this.root_posidx, y);
+        if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+            Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
         }
         else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
             // if (this.text_mesh.root_posidx !== INT_NULL) { // Same for the text_mesh
-            //     TEMP_set_widget_root_wposy(this.text_mesh.root_posidx, y);
+            //     Mesh_unif_set_vb_root_wposy(this.text_mesh.root_posidx, y);
             // }
             // else 
             this.text_mesh.geom.pos[1] = y; 
@@ -364,8 +366,10 @@ export class Widget_Label extends Rect {
 
     SetColorAlpha(btn_alpha = 1, text_alpha = 1) {
 
-        super.SetColorAlpha(btn_alpha);
-        this.text_mesh.SetColorAlpha(text_alpha);
+        // super.SetColorAlpha(btn_alpha);
+        // this.text_mesh.SetColorAlpha(text_alpha);
+        Set_color_a(this, btn_alpha);
+        Set_color_a(this.text_mesh, text_alpha);
     }
 
 
