@@ -34,7 +34,7 @@ export class Widget_Button extends Widget_Label {
       // Run for buttons that are enabled to a continuous click
       if(mesh.StateCheck(MESH_STATE.IS_HOLD_CLICK)){
 
-        if (params.evt_params && params.evt_params.EventClbk) {
+        if (params.evt_params && params.evt_params.EventClbk) { 
            
          const EventClbk = params.evt_params.EventClbk;
          const target_params = params.evt_params.params.target_params
