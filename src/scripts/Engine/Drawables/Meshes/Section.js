@@ -49,7 +49,7 @@ export class Section extends Rect {
       this.min_size = [0, 0];
 
 
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -1122,7 +1122,7 @@ export function Calculate_positions_recursive(parent, options) {
 
          // mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
          mesh.batch_fnidx = BATCH_FN_IDX.SET_WPOS4_POS2; // HACK
-         Batch_store(mesh, SHADER_ATTRIBUTES.WPOS4, update_data, _);
+         Batch_store(mesh, SHADER_ATTRIBUTES.WPOS_TIME4, update_data, _);
       }
 
       if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.

@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_exists_from_index, Vertex_buffer_info_get_sid } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_exists_from_index, Vertex_buffer_group_get_sid } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Program_program_exists_from_index } from "../../../Graphics/ShaderPrograms.js";
 import { Widget_root_gfx_get_structured } from "../../Core/MeshBuffer.js";
 
@@ -18,7 +18,7 @@ const GFX_CONEXT_DEBUG = false;
 
 /** Check buffers validity, or find buffers based on Flags */
 // TODO: the flags are anecessary, just return [prog, vb, and maybe ib]
-export function Generate_graphics_context(FLAGS, mesh, gfxidxs = null) {
+export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, gfxidxs = null) {
 
 
    let igfx = [INT_NULL, INT_NULL];
@@ -66,9 +66,9 @@ export function Generate_graphics_context(FLAGS, mesh, gfxidxs = null) {
        */
       // Check the passed gfxidxs params if they are valid gfx indexes
       if (gfxidxs !== null) {
-         if (gfxidxs[0] === INT_NULL || gfxidxs[1] === INT_NULL || SID.CheckSidMatch(mesh.sid, Vertex_buffer_info_get_sid(gfxidxs[1]))===false) {
+         if (gfxidxs[0] === INT_NULL || gfxidxs[1] === INT_NULL || SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(gfxidxs[1]))===false) {
             if(GFX_CONEXT_DEBUG) console.error('NO CORRECT gfxidxs passed for generating SPECIFIC gfx.\n_gfxidxs:', gfxidxs);
-            igfx = Generate_graphics_context(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, gfxidxs); // HACK: we explicitly pass FLAGS that are hard coded.
+            igfx = Find_gfx_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, gfxidxs); // HACK: we explicitly pass FLAGS that are hard coded.
          }
          else {
             if (Program_program_exists_from_index(gfxidxs[0]) && Vertex_buffer_exists_from_index(gfxidxs[1])) {
@@ -79,9 +79,9 @@ export function Generate_graphics_context(FLAGS, mesh, gfxidxs = null) {
          }
       }
       else { // If for some reason fails, re-call recursive this to resolve
-         // igfx = Generate_graphics_context(FLAGS, mesh, gfxidxs);
+         // igfx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, gfxidxs);
          // We need to pass different flags, to avoid infinite loop, since the gfxidxs are always null
-         igfx = Generate_graphics_context(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, gfxidxs); // HACK: we explicitly pass FLAGS that are hard coded.
+         igfx = Find_gfx_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, gfxidxs); // HACK: we explicitly pass FLAGS that are hard coded.
       }
    }
 
@@ -117,12 +117,12 @@ function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid) {
 
    for (let i = 0; i < len; i++) {
 
-      const gfx_sid = Vertex_buffer_info_get_sid(gfx_idxs[i].vbidx); // Get the sid of the current gfx from the vertex buffer.
+      const gfx_sid = Vertex_buffer_group_get_sid(gfx_idxs[i].vb_groupidx); // Get the sid of the current gfx from the vertex buffer.
 
       if (SID.CheckSidMatch(target_sid, gfx_sid)) {
 
          igfx[0] = gfx_idxs[i].progidx;
-         igfx[1] = gfx_idxs[i].vbidx;
+         igfx[1] = gfx_idxs[i].vb_groupidx;
          break;
       }
 
@@ -170,13 +170,13 @@ function Find_match_from_children(mesh, parent) {
          if (SID.CheckSidMatch(mesh.sid, child.sid)) {
 
             igfx[0] = child.gfx.prog.idx;
-            igfx[1] = child.gfx.vb.idx;
+            igfx[1] = child.gfx.vb.groupidx;
             done = true;
             return { igfx: igfx, done: done };
          }
          else if (child.text_mesh && child.text_mesh.gfx && SID.CheckSidMatch(mesh.sid, child.text_mesh.sid)) {
             igfx[0] = child.text_mesh.gfx.prog.idx;
-            igfx[1] = child.text_mesh.gfx.vb.idx;
+            igfx[1] = child.text_mesh.gfx.vb.groupidx;
             done = true;
             return { igfx: igfx, done: done };
          }
@@ -204,7 +204,7 @@ function Find_match_gfx_from_parent(mesh, parent) {
 
    if (SID.CheckSidMatch(mesh.sid, parent.sid)) {
       igfx[0] = parent.gfx.prog.idx;
-      igfx[1] = parent.gfx.vb.idx;
+      igfx[1] = parent.gfx.vb.groupidx;
       done = true;
    }
    // Check if the parent has a text_mesh
@@ -216,7 +216,7 @@ function Find_match_gfx_from_parent(mesh, parent) {
       if(parent.text_mesh.gfx===null)
          console.log()
       igfx[0] = parent.text_mesh.gfx.prog.idx;
-      igfx[1] = parent.text_mesh.gfx.vb.idx;
+      igfx[1] = parent.text_mesh.gfx.vb.groupidx;
       done = true;
    }
 
@@ -284,7 +284,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 //    if (parent.text_mesh) {
 //       /**DEBUG */ if (!parent.text_mesh.gfx) { console.error('parent.text_mesh.gfx is NULL.'); return null; }
 //       igfx[0] = parent.text_mesh.gfx.prog.idx;
-//       igfx[1] = parent.text_mesh.gfx.vb.idx;
+//       igfx[1] = parent.text_mesh.gfx.vb.groupidx;
 //       done = true;
 //       if (DEBUG.CONTEXT_FIND) console.log('$$ Parent has text_mesh', parent.GetName())
 //    }
@@ -300,7 +300,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 //                /**DEBUG */ if (!child.text_mesh.gfx) { console.error('parent child.text_mesh.gfx is NULL.'); return null; }
 //                console.log('$$ child has text_mesh:', child.GetName())
 //                igfx[0] = child.text_mesh.gfx.prog.idx;
-//                igfx[1] = child.text_mesh.gfx.vb.idx;
+//                igfx[1] = child.text_mesh.gfx.vb.groupidx;
 //                done = true;
 //             }
 //          }
@@ -344,13 +344,13 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 //       if (!(done & RECT_FOUND) && SID.CheckSidMatch(mesh.sid, parent.sid)) {
 
 //          igfx.rect.idxs[0] = parent.gfx.prog.idx;
-//          igfx.rect.idxs[1] = parent.gfx.vb.idx;
+//          igfx.rect.idxs[1] = parent.gfx.vb.groupidx;
 //          igfx.rect.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
 //          done |= RECT_FOUND;
 
 //          if (!(done & TEXT_FOUND) && mesh.text_mesh && parent.text_mesh) { // Case the parent has a text mesh, use that gfx buffers
 //             igfx.text.idxs[0] = parent.text_mesh.gfx.prog.idx;
-//             igfx.text.idxs[1] = parent.text_mesh.gfx.vb.idx;
+//             igfx.text.idxs[1] = parent.text_mesh.gfx.vb.groupidx;
 //             igfx.text.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
 //             done |= TEXT_FOUND;
 //          }
@@ -370,7 +370,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 //             if (!(done & RECT_FOUND) && SID.CheckSidMatch(mesh.sid, child.sid)) {
 
 //                igfx.rect.idxs[0] = child.gfx.prog.idx;
-//                igfx.rect.idxs[1] = child.gfx.vb.idx;
+//                igfx.rect.idxs[1] = child.gfx.vb.groupidx;
 //                igfx.rect.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
 //                done |= RECT_FOUND;
 //                if (DBG) console.log('0. ----------- | mesh:child', mesh.GetName(), child.GetName())
@@ -431,7 +431,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 //          if (!(done & RECT_FOUND) && SID.CheckSidMatch(mesh.sid, child.sid)) {
 
 //             igfx.rect.idxs[0] = child.gfx.prog.idx;
-//             igfx.rect.idxs[1] = child.gfx.vb.idx;
+//             igfx.rect.idxs[1] = child.gfx.vb.groupidx;
 //             igfx.rect.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
 //             done |= RECT_FOUND;
 //             if (DBG) console.log('DESCENDING FOUND RECT GFX ----------- | mesh:child', mesh.GetName(), child.GetName())
@@ -475,7 +475,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 
 //       if (SID.CheckSidMatch(mesh.sid, child.sid)) {
 //          igfx[0] = child.gfx.prog.idx;
-//          igfx[1] = child.gfx.vb.idx;
+//          igfx[1] = child.gfx.vb.groupidx;
 //          // igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
 
 //          igfx.isMesh_text_mesh = true; // NOTE: To avoid the non breaking of the for loop keep searching for the .rect buffers, if the mesh is only text(with no rect)
@@ -487,7 +487,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 
 //       if (SID.CheckSidMatch(mesh.text_mesh.sid, child.sid)) {
 //          igfx[0] = child.gfx.prog.idx;
-//          igfx[1] = child.gfx.vb.idx;
+//          igfx[1] = child.gfx.vb.groupidx;
 //          // igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
 
 //          if (DBG) console.log('2. ----------- | mesh:child', mesh.GetName(), child.GetName())
@@ -497,7 +497,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 
 //       if (SID.CheckSidMatch(mesh.sid, child.text_mesh.sid)) {
 //          igfx[0] = child.text_mesh.gfx.prog.idx;
-//          igfx[1] = child.text_mesh.gfx.vb.idx;
+//          igfx[1] = child.text_mesh.gfx.vb.groupidx;
 //          // igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
 
 //          igfx.isMesh_text_mesh = true; // NOTE: To avoid the non breaking of the for loop keep searching for the .rect buffers, if the mesh is only text(with no rect)
@@ -511,7 +511,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 
 //          if (SID.CheckSidMatch(mesh.text_mesh.sid, child.text_mesh.sid)) {
 //             igfx[0] = child.text_mesh.gfx.prog.idx;
-//             igfx[1] = child.text_mesh.gfx.vb.idx;
+//             igfx[1] = child.text_mesh.gfx.vb.groupidx;
 //             // igfx.FLAGS = GFX_CTX_FLAGS.SPECIFIC;
 
 //             if (DBG) console.log('4. ----------- | mesh:child', mesh.GetName(), child.GetName())

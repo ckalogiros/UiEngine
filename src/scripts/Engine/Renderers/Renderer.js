@@ -206,6 +206,9 @@ function Renderer_create_webgl_context(canvas){
    gfxCtx.gl = gfxctx;
    gfxCtx.ext = extensions;
 
+   // NOTE: Gets the maximum allowed attributes count
+   // const MAX_VERTEX_ATTRIBS = gfxCtx.gl.getParameter(gfxCtx.gl.MAX_VERTEX_ATTRIBS); // Get the max available attributes for a shader.
+
 
    // Print some gl info
    var maxTextureSize = gfxctx.getParameter(gfxctx.MAX_TEXTURE_SIZE);

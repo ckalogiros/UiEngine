@@ -200,7 +200,7 @@ class Gl_Program {
 
 		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
 
-		this.vb = New_int8_buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffers_info' buffer. 
+		this.vb_group = New_int8_buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffer_groups' buffer. 
 
 		this.ib = New_int8_buffer(1); // Array of indexes to all index buffers in '_index_buffers_info' buffer. 
 
@@ -215,7 +215,7 @@ class Gl_Program {
 
 
 		// Store the function's index that is responsible of been used to add mesh data to apropriately to a vertex buffer
-		this.add_to_vb_fnidx = Select_fnidx_to_fill_vertex_buffer(this.attribsidx);
+		// this.add_to_vb_fnidx = Select_fnidx_to_fill_vertex_buffer(this.attribsidx);
 
 
 
@@ -242,8 +242,8 @@ class Gl_Program {
 
 
 
-export function Program_store_vertex_buffer_idx(progidx, vbidx, vao, vaoidx) {
-	const progvbidx = _programs.buffer[progidx].vb.Add(vbidx);
+export function Program_store_vertex_buffer_group_idx(progidx, vb_groupidx, vao, vaoidx) {
+	const progvbidx = _programs.buffer[progidx].vb_group.Add(vb_groupidx);
 	_programs.buffer[progidx].vao = vao;
 	_programs.buffer[progidx].vaoidx = vaoidx;
 	return progvbidx;

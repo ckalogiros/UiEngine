@@ -27,6 +27,9 @@ export class Geometry2D {
         this.sid = {
             shad: 0,
             attr: (SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4),
+            // attr: SID.ATTR.POS2,
+            inst: SID.ATTR.WPOS_TIME4,
+            // inst: 0x0,
             unif: 0,
             pass: 0,
         };

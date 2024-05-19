@@ -1,7 +1,7 @@
 "use strict";
 
 import { Index_buffer_info_get } from "../../../Graphics/Buffers/IndexBuffers.js";
-import { Vertex_buffer_get_by_vbidx, Vertex_buffer_info_get } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_remove_geometry } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Progarm_get_program } from "../../../Graphics/ShaderPrograms.js";
 
@@ -54,22 +54,27 @@ export function Gfx_pool_remove_geometry(gfx, num_faces, start_index, debug_mesh
 
 export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags) {
 
-   const vb_buffer = Vertex_buffer_info_get();
+   const vb_group_buffer = Vertex_buffer_group_get();
 
    // Return first buffer match
    if(pool_request_flags & GFX_POOL_REQUESTS.ANY){ 
 
-      for (let i = 0; i <= vb_buffer.boundary; i++) {
-   
-         if((vb_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
-            
-            const vb_sid = vb_buffer.buffer[i].sid;
-            if(SID.CheckSidMatch(sid, vb_sid)){
-   
-               vb_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
-               return i;
+      for (let i = 0; i <= vb_group_buffer.boundary; i++) {
+         
+         const len = vb_group_buffer.buffer[i].vbs.length;
+         for (let j = 0; j < len; j++) {
+
+            const vb_info = vb_group_buffer.buffer[i].vbs[j];
+            if((vb_info.state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
+               
+               if(SID.CheckSidMatch(sid, vb_info.sid)){
+      
+                  vb_info.state.mask |= BUFFER_STATE.IS_ACTIVE;
+                  return i;
+               }
             }
          }
+
       }
    }
 

@@ -263,7 +263,21 @@ export function TestWidgetsGeneric(scene) {
     // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
     { // Test sdf lines
         {
-            const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 200, 0], [100, 20], TRANSPARENCY(GREEN[7], 1), 'sdf linem2');
+            const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 200, 0], [100, 20], TRANSPARENCY(GREEN[2], .1), 'sdf linem2');
+            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+
+        
+            // line.sid.unif |= SID.UNIF.TIME;
+            // line.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
+            // line.sid.attr &= ~SID.ATTR.COL4;
+        
+            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+            line.Render();
+            line.ConstructListeners();
+        }
+        {
+            const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 270, 0], [100, 20], TRANSPARENCY(YELLOWR[7], 1), 'sdf linem2');
             line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
             line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
         
@@ -275,19 +289,6 @@ export function TestWidgetsGeneric(scene) {
             line.Render();
             line.ConstructListeners();
         }
-        // {
-        //     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 270, 0], [100, 20], TRANSPARENCY(YELLOWR[7], 1), 'sdf linem2');
-        //     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-        //     line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-        
-        //     // line.sid.unif |= SID.UNIF.TIME;
-        //     // line.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
-        //     // line.sid.attr &= ~SID.ATTR.COL4;
-        
-        //     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        //     line.Render();
-        //     line.ConstructListeners();
-        // }
     }
 
 
@@ -336,15 +337,15 @@ export function TestWidgetsGeneric(scene) {
     // const button = CreateButton(); 
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, button);
 
-    CreateSwitchSimple([0, ypos, 0]);
-    const switch1 = CreateSwitch();
+    // CreateSwitchSimple([0, ypos, 0]);
+    // const switch1 = CreateSwitch();
 
-    CreateSlider();
+    // CreateSlider();
     // CreateChangeMeshColorFromSliders(ROOT_WIDGETS.CREATE_ROOT);
 
 
     // CreateWindowWithMenu();
-    CreateSceneMenuBar();
+    // CreateSceneMenuBar();
 
 
 
@@ -370,23 +371,23 @@ export function TestWidgetsGeneric(scene) {
         // const particle_system_idx2 = Particle_system_create_emitter(BLUEL[9], [10,60,10], [12,12], .1, 2, 'Test Particle System2');
         // const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
      
-        const particle_system_idx5 = Particle_system_create_emitter(ORANGEL[9], [10,120,10], [10,10], .1, 2, 'Test Particle System3');
-        const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,100,10], [10,10], .1, 2, 'Test Particle System3');
-        const particle_system_idx3 = Particle_system_create_emitter(PURPLER[9], [10,80,10], [10,10], .1, 2, 'Test Particle System3');
-        const particle_system_idx2 = Particle_system_create_emitter(BLUEL[9], [10,60,10], [10,10], .1, 2, 'Test Particle System2');
-        const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
+        // const particle_system_idx5 = Particle_system_create_emitter(ORANGEL[9], [10,120,10], [10,10], .1, 2, 'Test Particle System3');
+        // const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,100,10], [10,10], .1, 2, 'Test Particle System3');
+        // const particle_system_idx3 = Particle_system_create_emitter(PURPLER[9], [10,80,10], [10,10], .1, 2, 'Test Particle System3');
+        // const particle_system_idx2 = Particle_system_create_emitter(BLUEL[9], [10,60,10], [10,10], .1, 2, 'Test Particle System2');
+        // const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
         
         
         
-        const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 260, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
-        btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        // const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 260, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
+        // btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        // btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-        btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx, particle_system_idx2, particle_system_idx3, particle_system_idx4, particle_system_idx5] }, MESH_STATE.IS_HOLD_CLICK)
+        // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx, particle_system_idx2, particle_system_idx3, particle_system_idx4, particle_system_idx5] }, MESH_STATE.IS_HOLD_CLICK)
         
-        btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        btn.Render();
-        btn.ConstructListeners();
+        // btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        // btn.Render();
+        // btn.ConstructListeners();
     }
 
 
@@ -428,7 +429,7 @@ export function TestWidgetsGeneric(scene) {
 
 
     // UNNECESSARY: the order should be set for the listeners and not for the renderqueue
-    Listener_set_root_mesh_priority()
+    // Listener_set_root_mesh_priority()
 
 
 }

@@ -118,6 +118,21 @@ const SID = {
         PLAY_ARROUND1: BIT2 <<= 1,
     },
 
+    INST:{
+        COL4: BIT3,
+        POS2: BIT3 <<= 1,
+        TEX2: BIT3 <<= 1,
+        WPOS_TIME4: BIT3 <<= 1,
+        TIME: BIT3 <<= 1,
+        SDF: BIT3 <<= 1,
+        MSDF: BIT3 <<= 1,
+        PARAMS1: BIT3 <<= 1,
+        STYLE: BIT3 <<= 1,
+        POS3: BIT3 <<= 1,
+        COL4_PER_VERTEX: BIT3 <<= 1,
+        EMPTY: BIT3 <<= 1,
+    },
+
     UNIF: {
 
         // Block Uniforms
@@ -219,6 +234,16 @@ if(SID.ATTR > MAX_BIT_MASK) console.error('SID ATTR exceeding javascript\'s max 
 if(SID.UNIF > MAX_BIT_MASK) console.error('SID UNIF exceeding javascript\'s max number value');
 if(SID.PASS > MAX_BIT_MASK) console.error('SID PASS exceeding javascript\'s max number value');
 
+
+
+
+
+
+
+
+
+// Create a copy of the SID.ATTR, so we can compare with 'sid'
+const SHADER_ATTRIBUTES = SID.ATTR;
 
 
 
@@ -346,8 +371,8 @@ const GFX_CTX_FLAGS = {
 _CNT = 0x1;
 const BUFFER_STATE = {
 
-    SHOW: _CNT,
-    NEEDS_UPDATE: _CNT <<= 0x1,
+    // SHOW: _CNT,
+    NEEDS_UPDATE: _CNT,
     IS_PRIVATE: _CNT <<= 0x1,
     IS_ACTIVE: _CNT <<= 0x1,
 };

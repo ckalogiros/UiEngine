@@ -24,9 +24,10 @@ import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer";
 const _per_vb_mesh_unif_wpos = New_generic_buffer(_, '_per_vb_mesh_unif_wpos');
 const _debug_names_per_vb_mesh_unif_wpos = New_generic_buffer(_, '_debug_names_per_vb_mesh_unif_wpos');
 
+// IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
-export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vbidx) {
+export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vb_groupidx) {
 
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
@@ -86,12 +87,13 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
       wpos: [0, 0],
       meshidx: meshidx, // Is needed to have a ref to the mesh from inside the '_per_vb_mesh_unif_wpos' buffer
       parent_posidx: parent_posidx,
+      debug_vb_groupidx:debug_vb_groupidx,
    }
 
    entry.wpos[0] += wpos[0];
    entry.wpos[1] += wpos[1];
 
-   _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vbidx });
+   _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
 
    const idx = _per_vb_mesh_unif_wpos.Add(entry);
    console.log('ROOT POSITIONS BUFFER', _per_vb_mesh_unif_wpos.buffer, entry)
@@ -100,18 +102,18 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
 
 
-export function Mesh_unif_store_vb_root_wpos(idx, pos) {
+export function Mesh_unif_store_vb_root_wpos(vbgroupidx, pos) {
    // TODO: check NULL object
 
-   _per_vb_mesh_unif_wpos.buffer[idx].wpos[0] = pos[0];
-   _per_vb_mesh_unif_wpos.buffer[idx].wpos[1] = pos[1];
+   _per_vb_mesh_unif_wpos.buffer[vbgroupidx].wpos[0] = pos[0];
+   _per_vb_mesh_unif_wpos.buffer[vbgroupidx].wpos[1] = pos[1];
 }
 
 
 
-export function Mesh_unif_is_vb_root_wpos(idx, meshidx) {
-   if(_per_vb_mesh_unif_wpos.buffer[idx] === undefined) return false;
-   if(_per_vb_mesh_unif_wpos.buffer[idx].meshidx === meshidx) return true;
+export function Mesh_unif_is_vb_root_wpos(vbgroupidx, meshidx) {
+   if(_per_vb_mesh_unif_wpos.buffer[vbgroupidx] === undefined) return false;
+   if(_per_vb_mesh_unif_wpos.buffer[vbgroupidx].meshidx === meshidx) return true;
    return false;
 }
 
@@ -122,15 +124,15 @@ export function Mesh_unif_is_vb_root_wpos(idx, meshidx) {
 /*********************************************************************************************************/
 // GETTERS
 // Can take vbidx as the 'idx' to return the wpos for all meshes of a vertex buffer
-export function Mesh_unif_get_vb_root_wpos_meshidx(idx) {
-   return _per_vb_mesh_unif_wpos.buffer[idx].meshidx;
+export function Mesh_unif_get_vb_root_wpos_meshidx(vbgroupidx) {
+   return _per_vb_mesh_unif_wpos.buffer[vbgroupidx].meshidx;
 }
 
 
 
-export function Mesh_unif_get_vb_root_wpos(idx) {
+export function Mesh_unif_get_vb_root_wpos(vbgroupidx) {
 
-   const _this = _per_vb_mesh_unif_wpos.buffer[idx];
+   const _this = _per_vb_mesh_unif_wpos.buffer[vbgroupidx];
    let pos = [_this.wpos[0], _this.wpos[1]];
 
    // If this relative position has a parent position, add it
@@ -145,9 +147,9 @@ export function Mesh_unif_get_vb_root_wpos(idx) {
 
 
 
-export function Mesh_unif_get_vb_root_wposx(idx) {
+export function Mesh_unif_get_vb_root_wposx(vbgroupidx) {
 
-   const _this = _per_vb_mesh_unif_wpos.buffer[idx];
+   const _this = _per_vb_mesh_unif_wpos.buffer[vbgroupidx];
    let pos = _this.wpos[0];
 
    // If this relative position has a parent position, add it
@@ -161,9 +163,9 @@ export function Mesh_unif_get_vb_root_wposx(idx) {
 
 
 
-export function Mesh_unif_get_vb_root_wposy(idx) {
+export function Mesh_unif_get_vb_root_wposy(vbgroupidx) {
 
-   const _this = _per_vb_mesh_unif_wpos.buffer[idx];
+   const _this = _per_vb_mesh_unif_wpos.buffer[vbgroupidx];
    let pos = _this.wpos[1];
 
    // If this relative position has a parent position, add it

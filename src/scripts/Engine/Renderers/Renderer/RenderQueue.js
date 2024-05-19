@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_info_get_render_queueidx, Vertex_buffer_info_set_render_queueidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_get_render_queueidx, Vertex_buffer_group_set_render_queueidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 
 
@@ -15,33 +15,27 @@ const NOTIFICATIONS_ON = true;
 
 class RenderQueueData {
 
-   progidx;
-   vbidx;
-   ibidx;
-   queueIdx;
-   // isActive;
-   flags;
-
    constructor() {
       this.Reset();
+
    }
 
 
    Set(elem) {
       this.progidx = elem.progidx;
-      this.vbidx = elem.vbidx;
+      this.vb_groupidx = elem.vb_groupidx,
       this.ibidx = elem.ibidx;
       this.queueIdx = elem.queueIdx;
-      // this.isActive = elem.isActive;
+      this.flags = 0x0;
       if (elem.isActive) this.flags |= RENDER_QUEUE_FLAGS.IS_ACTIVE;
    }
 
 
    Reset() {
       this.progidx = INT_NULL;
-      this.vbidx = INT_NULL;
+      this.vb_groupidx = INT_NULL;
+      this.ibidx = INT_NULL;
       this.queueIdx = INT_NULL;
-      // this.isActive = false;
       this.flags = 0x0;
    }
 
@@ -71,16 +65,16 @@ class RenderQueue {
    }
 
 
-   Deactivate(vbidx) {
+   Deactivate(vb_groupidx) {
 
-      const idx = Vertex_buffer_info_get_render_queueidx(vbidx);
+      const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
 
       if (idx !== INT_NULL && idx < this.count - 1) {
 
          this.buffer[idx].flags &= ~RENDER_QUEUE_FLAGS.IS_ACTIVE;
          this.RebuildActiveQueue();
 
-         Vertex_buffer_info_set_render_queueidx(vbidx, INT_NULL);
+         Vertex_buffer_group_set_render_queueidx(vb_groupidx, INT_NULL);
       }
    }
 
@@ -104,11 +98,11 @@ class RenderQueue {
    }
 
 
-   Add(progidx, vbidx, ibidx, isActive) {
+   Add(progidx, vb_groupidx, ibidx, isActive) {
 
       const obj = {
          progidx: progidx,
-         vbidx: vbidx,
+         vb_groupidx: vb_groupidx,
          ibidx: ibidx,
          queueIdx: this.count,
          isActive: isActive,
@@ -118,7 +112,7 @@ class RenderQueue {
       if (isActive === true) this.buffer[this.count].flags |= RENDER_QUEUE_FLAGS.IS_ACTIVE;
       this.count++;
 
-      Vertex_buffer_info_set_render_queueidx(vbidx, obj.queueIdx);
+      Vertex_buffer_group_set_render_queueidx(vb_groupidx, obj.queueIdx);
 
 
       if (NOTIFICATIONS_ON)
@@ -129,12 +123,11 @@ class RenderQueue {
    }
 
 
-   Find(progidx, vbidx) {
+   #Find(vb_groupidx) {
 
       if (!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
       for (let i = 0; i < this.size; i++) {
-         if (this.buffer[i].vbidx === vbidx &&
-            this.buffer[i].progidx === progidx) {
+         if (this.buffer[i].vb_groupidx === vb_groupidx){
             return i;
          }
       }
@@ -164,46 +157,43 @@ class RenderQueue {
    }
 
 
-   SetPriorityAll(flag, progidx, vbidx = ALL) {
-      // TODO: IMPLEMENT
+   // SetPriorityAll(flag, progidx) {
+   //    // TODO: IMPLEMENT
 
-      const idxs = this.FindAllBuffersFromProgram(progidx);
-      // const idxs = Vertex_buffer_info_get_render_queueidx(vbidx);
+   //    const idxs = this.FindAllBuffersFromProgram(progidx);
 
-      for (let k = 0; k < idxs.length; k++) {
+   //    for (let k = 0; k < idxs.length; k++) {
 
-         // if((this.buffer[i].flags & RENDER_QUEUE_FLAGS.SKIP_PRIORITY)===0 && )
+   //       if (flag === FIRST && idxs[k] > 0) {
 
-         if (flag === FIRST && idxs[k] > 0) {
+   //          // Move all elements to the right
+   //          for (let i = idxs[k]; i > 0; i--) {
+   //             this.buffer[i].Set(this.buffer[i - 1]);
+   //          }
+   //          // Store back prioritized element
+   //          this.buffer[0].Set(temp);
+   //       }
+   //       else if (flag === LAST && idxs[k] < this.count - 1) {
 
-            // Move all elements to the right
-            for (let i = idxs[k]; i > 0; i--) {
-               this.buffer[i].Set(this.buffer[i - 1]);
-            }
-            // Store back prioritized element
-            this.buffer[0].Set(temp);
-         }
-         else if (flag === LAST && idxs[k] < this.count - 1) {
+   //          // Move all elements to the left
+   //          for (let i = idxs[k]; i < this.count; i++) {
 
-            // Move all elements to the left
-            for (let i = idxs[k]; i < this.count; i++) {
+   //             this.buffer[i].Set(this.buffer[i + 1]);
+   //             Vertex_buffer_group_set_render_queueidx(this.buffer[i].vb_groupidx, i + 1);
+   //          }
 
-               this.buffer[i].Set(this.buffer[i + 1]);
-               Vertex_buffer_info_set_render_queueidx(this.buffer[i].vbidx, i + 1);
-            }
+   //          // Store back prioritized element
+   //          this.buffer[this.count - 1].Set(temp);
+   //          Vertex_buffer_group_set_render_queueidx(this.buffer[this.count - 1].vb_groupidx, this.count - 1);
+   //       }
+   //    }
 
-            // Store back prioritized element
-            this.buffer[this.count - 1].Set(temp);
-            Vertex_buffer_info_set_render_queueidx(this.buffer[this.count - 1].vbidx, this.count - 1);
-         }
-      }
-
-   }
+   // }
 
 
-   SetPriority(flag, vbidx) {
+   SetPriority(flag, vb_groupidx) {
 
-      const idx = Vertex_buffer_info_get_render_queueidx(vbidx);
+      const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
 
       if (idx === INT_NULL) { alert('Wrong render queue index, coming from vertex buffer queueidx\nSEE console.error'); console.error('Wrong render queue index, coming from vertex buffer queueidx'); }
 
@@ -218,13 +208,13 @@ class RenderQueue {
             if((this.buffer[i].flags & RENDER_QUEUE_FLAGS.SKIP_PRIORITY)===0) {
 
                this.buffer[i].Set(this.buffer[i - 1]);
-               Vertex_buffer_info_set_render_queueidx(this.buffer[i].vbidx, i);
+               Vertex_buffer_group_set_render_queueidx(this.buffer[i].vb_groupidx, i);
             }
          }
 
          // Store back prioritized element
          this.buffer[0].Set(temp);
-         Vertex_buffer_info_set_render_queueidx(this.buffer[0].vbidx, 0);
+         Vertex_buffer_group_set_render_queueidx(this.buffer[0].vb_groupidx, 0);
 
       }
       else if (flag === LAST && idx < this.count - 1) {
@@ -233,20 +223,20 @@ class RenderQueue {
          for (let i = idx; i < this.count - 1; i++) { // Leave the last element for outside the loop assignment
 
             this.buffer[i].Set(this.buffer[i + 1]);
-            Vertex_buffer_info_set_render_queueidx(this.buffer[i].vbidx, i); // If next elem goes left, pass current index as the new vb queueidx
+            Vertex_buffer_group_set_render_queueidx(this.buffer[i].vb_groupidx, i); // If next elem goes left, pass current index as the new vb queueidx
          }
 
          // Store back prioritized element
          this.buffer[this.count - 1].Set(temp);
-         Vertex_buffer_info_set_render_queueidx(this.buffer[this.count - 1].vbidx, this.count - 1);
+         Vertex_buffer_group_set_render_queueidx(this.buffer[this.count - 1].vb_groupidx, this.count - 1);
       }
    }
 
 
    SetPrioritySwap(vbIdx1, vbIdx2) {
 
-      const idx1 = Vertex_buffer_info_get_render_queueidx(vbIdx1);
-      const idx2 = Vertex_buffer_info_get_render_queueidx(vbIdx2);
+      const idx1 = Vertex_buffer_group_get_render_queueidx(vbIdx1);
+      const idx2 = Vertex_buffer_group_get_render_queueidx(vbIdx2);
 
       if (idx1 !== INT_NULL && idx2 !== INT_NULL) {
          const temp = new RenderQueueData;
@@ -310,8 +300,8 @@ export function Renderqueue_set_priority_by_program(flag, progidx) {
 
 
 
-export function Renderqueue_set_priority_by_vb(flag, vbidx) {
-   _render_queue.SetPriority(flag, vbidx);
+export function Renderqueue_set_priority_by_vb(flag, vb_groupidx) {
+   _render_queue.SetPriority(flag, vb_groupidx);
 }
 
 
@@ -327,9 +317,9 @@ export function Renderqueue_update_active_queue() { _render_queue.RebuildActiveQ
  * changed(enabled or disabled for drawing), we must add or remove
  * these programs-vertex buffers from the draw queue.
  */
-export function Renderqueue_set_active(vbidx, isActive) {
+export function Renderqueue_set_active(vb_groupidx, isActive) {
 
-   const idx = Vertex_buffer_info_get_render_queueidx(vbidx);
+   const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
    if (idx !== INT_NULL) {
 
       if (isActive === true) _render_queue.buffer[idx].flags |= isActive;
@@ -342,16 +332,15 @@ export function Renderqueue_set_active(vbidx, isActive) {
 
 
 
-export function Renderqueue_Add(progidx, vbidx, ibidx, isActive) {
-   _render_queue.Add(progidx, vbidx, ibidx, isActive);
+export function Renderqueue_Add(progidx, vb_groupidx, ibidx, isActive) {
+   _render_queue.Add(progidx, vb_groupidx, ibidx, isActive);
 }
 
 
 
-export function Renderqueue_set_flags(progidx, vbidx, flags) {
+export function Renderqueue_set_flags(vb_groupidx, flags) {
 
-   // const idx = _render_queue.(progidx, vbidx);
-   const idx = Vertex_buffer_info_get_render_queueidx(vbidx);
+   const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
    _render_queue.buffer[idx].flags |= flags;
 }
 

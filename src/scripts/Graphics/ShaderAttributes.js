@@ -29,7 +29,7 @@ export function Shader_attributes_get_attribs_per_vertex(attribsidx) {
 export function Shader_attributes_get_attrib_offset_by_nameid(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
-   const attrib_idx = Shader_attributes_get_attrib_by_nameid(attribsidx, nameid);
+   const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
    return _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx];
 }
 
@@ -38,7 +38,7 @@ export function Shader_attributes_get_attrib_offset_by_nameid(attribsidx, nameid
 export function Shader_attributes_get_attribs_size(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
-   const attrib_idx = Shader_attributes_get_attrib_by_nameid(attribsidx, nameid);
+   const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
    return _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx];
 }
 
@@ -47,7 +47,7 @@ export function Shader_attributes_get_attribs_size(attribsidx, nameid) {
 export function Shader_attributes_get_attribs_offset_size(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
-   const attrib_idx = Shader_attributes_get_attrib_by_nameid(attribsidx, nameid);
+   const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
    return {
       offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
       size: _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx],
@@ -59,7 +59,7 @@ export function Shader_attributes_get_attribs_offset_size(attribsidx, nameid) {
 export function Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
-   const attrib_idx = Shader_attributes_get_attrib_by_nameid(attribsidx, nameid);
+   const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
    return {
       offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
       attribs_per_vertex: _shader_attribs_buffer.buffer[attribsidx].attribs_per_vertex,
@@ -79,7 +79,7 @@ export function Shader_attributes_get_attribs_attribs_per_vertex(attribsidx) {
 export function Shader_attributes_get_attribs_offset_size_attribs_per_vertex(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
-   const attrib_idx = Shader_attributes_get_attrib_by_nameid(attribsidx, nameid);
+   const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
    return {
       offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
       size: _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx],
@@ -89,7 +89,7 @@ export function Shader_attributes_get_attribs_offset_size_attribs_per_vertex(att
 
 
 
-function Shader_attributes_get_attrib_by_nameid(attribsidx, nameid) {
+export function Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
    const shader_attribs = _shader_attribs_buffer.buffer[attribsidx];
@@ -110,19 +110,19 @@ function Calc_size_in_bytes_from_attribs_type(type) { // TODO: This should go GL
 
    switch (type) {
 
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_32_UNSIGNED_INT_24_8_REV: return 1; // 36269:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_VEC2: return 2; // 35664:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_VEC3: return 3; // 35665:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_VEC4: return 4; // 35666:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_MAT2: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35674:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_MAT2x3: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35685:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_MAT2x4: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35686:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_MAT3: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35675:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_MAT3x2: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35687:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_MAT3x4: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35688:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_MAT4: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35676:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_MAT4x2: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35689:
-      case SHADER_PROGAM_ATTRIBS_TYPE.FLOAT_MAT4x3: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35690:
+      case GL_TYPES.FLOAT_32_UNSIGNED_INT_24_8_REV: return 1; // 36269:
+      case GL_TYPES.FLOAT_VEC2: return 2; // 35664:
+      case GL_TYPES.FLOAT_VEC3: return 3; // 35665:
+      case GL_TYPES.FLOAT_VEC4: return 4; // 35666:
+      case GL_TYPES.FLOAT_MAT2: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35674:
+      case GL_TYPES.FLOAT_MAT2x3: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35685:
+      case GL_TYPES.FLOAT_MAT2x4: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35686:
+      case GL_TYPES.FLOAT_MAT3: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35675:
+      case GL_TYPES.FLOAT_MAT3x2: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35687:
+      case GL_TYPES.FLOAT_MAT3x4: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35688:
+      case GL_TYPES.FLOAT_MAT4: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35676:
+      case GL_TYPES.FLOAT_MAT4x2: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35689:
+      case GL_TYPES.FLOAT_MAT4x3: alert(' @ShaderAttributes.js, Calc_size_in_bytes'); // 35690:
    }
 }
 
@@ -141,10 +141,8 @@ export function Shader_attributes_create(sid, shader_program) {
       /**DEBUG*/names: [],
    };
 
-   /*************************************************************************************/
-   //
-   // TODO: Maybe store it in canvas initialization 
-   // const MAX_VERTEX_ATTRIBS = gfxCtx.gl.getParameter(gfxCtx.gl.MAX_VERTEX_ATTRIBS); // Get the max available attributes for a shader.
+
+   
    const ACTIVE_ATTRIBUTES_COUNT = gfxCtx.gl.getProgramParameter(shader_program, gfxCtx.gl.ACTIVE_ATTRIBUTES); // Get the active attributes count for a shader.
 
    for (let i = 0; i < ACTIVE_ATTRIBUTES_COUNT; i++) {
@@ -154,14 +152,14 @@ export function Shader_attributes_create(sid, shader_program) {
       const attrib_info = gfxCtx.gl.getActiveAttrib(shader_program, i);
       if (!attrib_info) break;
       shader_attribs.names[i] = Str_buffer_store(attrib_info.name);
-      shader_attribs.types[i] = attrib_info.type; // SEE: SHADER_PROGAM_ATTRIBS_TYPE
+      shader_attribs.types[i] = attrib_info.type; // SEE: GL_TYPES
       /** DO NOT DELETE */ // const attr_size = a.size; // This probably computes the size of array attributes, because for vec4 and vec2 the size is 1.
 
       shader_attribs.locs[i] = i; // Seems redundant because the index and its value are the same, but that does not happen with sizes and offsets.
       shader_attribs.sizes[i] = Calc_size_in_bytes_from_attribs_type(shader_attribs.types[i]); // TODO: May extend for .COL3 or any other case
 
       if (attrib_info.name === 'a_col') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.COL4;
-      else if (attrib_info.name === 'a_wpos_time') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.WPOS4;
+      else if (attrib_info.name === 'a_wpos_time') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.WPOS_TIME4;
       else if (attrib_info.name === 'a_pos') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.POS2;
       else if (attrib_info.name === 'a_params1') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.PARAMS1;
       else if (attrib_info.name === 'a_tex') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.TEX2;
@@ -191,7 +189,7 @@ export function Shader_attributes_create(sid, shader_program) {
       sizes: new Uint8Array(attributes_count),
       offsets: new Uint8Array(attributes_count),
       types: new Uint16Array(attributes_count),
-      nameids: new Uint8Array(attributes_count),
+      nameids: new Uint16Array(attributes_count),
       names: new Uint16Array(attributes_count),
       attribs_per_vertex: size,
    }
@@ -205,12 +203,12 @@ export function Shader_attributes_create(sid, shader_program) {
       shader_attribs_typed_arrays.types[i] = shader_attribs.types[i];
       shader_attribs_typed_arrays.nameids[i] = shader_attribs.nameids[i];
 
-      /**DEBUG */ // IMPORTANT: If for some reason the typed arrays that we are checking below is changed, the we must compare to the new MAX_... max value
+      /**DEBUG */ // IMPORTANT: Use the right Uint array size type for the attributes info. Checking is we overflow any type
       if (shader_attribs.locs[i] > MAX_UINT8) alert('Not enough bit depth of array to store a large int value. -locs- @ShaderAttributes.js, Shader_attributes_create().')
       if (shader_attribs.sizes[i] > MAX_UINT8) alert('Not enough bit depth of array to store a large int value. -sizes- @ShaderAttributes.js, Shader_attributes_create().')
       if (shader_attribs.offsets[i] > MAX_UINT8) alert('Not enough bit depth of array to store a large int value. -offsets- @ShaderAttributes.js, Shader_attributes_create().')
       if (shader_attribs.types[i] > MAX_UINT16) alert('Not enough bit depth of array to store a large int value. -types- @ShaderAttributes.js, Shader_attributes_create().')
-      if (shader_attribs.nameids[i] > MAX_UINT8) alert('Not enough bit depth of array to store a large int value. -nameids- @ShaderAttributes.js, Shader_attributes_create().')
+      if (shader_attribs.nameids[i] > MAX_UINT16) alert('Not enough bit depth of array to store a large int value. -nameids- @ShaderAttributes.js, Shader_attributes_create().')
       if (shader_attribs.names[i] > MAX_UINT16) alert('Not enough bit depth of array to store a large int value. -names- @ShaderAttributes.js, Shader_attributes_create().')
    }
 
@@ -226,22 +224,63 @@ export function Shader_attributes_create(sid, shader_program) {
 
 
 
-export function Shader_attributes_enable(attribsidx) {
+
+export function Shader_attributes_enable(attribsidx, vb_attribs) {
 
    const gl_type = gfxCtx.gl.FLOAT; // TODO: store the gl.type inside the shaderinfo???
 
-   const shader_attribs = _shader_attribs_buffer.buffer[attribsidx];
-
-   const len = shader_attribs.locs.length;
+   const len = vb_attribs.locs.length;
    for (let i = 0; i < len; i++) {
-      gfxCtx.gl.enableVertexAttribArray(shader_attribs.locs[i]);
-      gfxCtx.gl.vertexAttribPointer(shader_attribs.locs[i], shader_attribs.sizes[i], gl_type, false, shader_attribs.attribs_per_vertex * FLOAT32_BYTE_SIZE, shader_attribs.offsets[i] * FLOAT32_BYTE_SIZE);
 
-      // gfxCtx.gl.vertexAttribDivisor(shader_attribs.locs[i], 4)
+      gfxCtx.gl.enableVertexAttribArray(vb_attribs.locs[i]);
+      gfxCtx.gl.vertexAttribPointer(vb_attribs.locs[i], vb_attribs.sizes[i], gl_type, false, vb_attribs.count * FLOAT32_BYTE_SIZE, vb_attribs.offsets[i] * FLOAT32_BYTE_SIZE);
+      gfxCtx.gl.vertexAttribDivisor(vb_attribs.locs[i], vb_attribs.attrib_divisor);
 
    }
 }
 
+
+
+
+
+/** Calculate the attributes info for a vb that consumes some of the total Program's attributes */
+export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid, attrib_divisor) {
+
+   // Get the Programs already created attributes info
+   const shader_attribs = Shader_attributes_get_attribs(attribsidx);
+
+   const attribs_info = {
+      attrib_divisor: attrib_divisor,
+      count: 0,
+      locs: [],
+      offsets: [],
+      sizes: [],
+      // nameids: [],
+      // types: [],
+   }
+
+   let offset = 0;
+
+   // Select and build the info from the attributes that the vertex buffer has
+   const len = shader_attribs.nameids.length;
+   for (let i=0; i<len; i++){
+
+      if(sid & shader_attribs.nameids[i]){
+
+         attribs_info.count += shader_attribs.sizes[i];
+
+         attribs_info.locs.push(shader_attribs.locs[i]);
+         attribs_info.sizes.push(shader_attribs.sizes[i]);
+         // attribs_info.types.push(shader_attribs.types[i]);
+         attribs_info.offsets.push(offset);
+         offset += shader_attribs.sizes[i]
+      }
+
+   }
+
+   return attribs_info;
+
+}
 
 
 

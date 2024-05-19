@@ -4,7 +4,7 @@ import { Section } from "../Meshes/Section.js";
 import { MouseGetPos, MouseGetPosDif, MouseGetPosDifY } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { Vertex_buffer_info_get_by_vbidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_get_byidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Widget_root_add_mesh, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
@@ -333,7 +333,7 @@ export class Widget_Scroller extends Section {
    SetScissorBox() {
 
       // Enable scissoring
-      const vb = Vertex_buffer_info_get_by_vbidx(this.gfx.vb.idx);
+      const vb = Vertex_buffer_group_get_byidx(this.gfx.vb.idx);
       /**DEBUG */ if (!vb) alert('SetScissorBox() in Scroller cannot resolve vertex buffer');
       const scissorbox = [
          this.geom.pos[0] - this.geom.dim[0],
@@ -346,7 +346,7 @@ export class Widget_Scroller extends Section {
 
       const textgfx = Find_textgfx_from_parent_descending(this);
       if (textgfx) {
-         const vb_text = Vertex_buffer_info_get_by_vbidx(textgfx.vb.idx);
+         const vb_text = Vertex_buffer_group_get_byidx(textgfx.vb.idx);
          /**DEBUG */ if (!vb_text) alert('SetScissorBox() in Scroller cannot resolve vertex buffer for text');
          vb_text.EnableScissorBox();
          vb_text.SetScissorBox(scissorbox);

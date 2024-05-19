@@ -620,8 +620,9 @@ const ROOT_WIDGETS = {
 /*************************************************************************************************/
 //  
 const GFX = {
-	PROG_IDX: 0, // Indexing array of [group, program, vertexbuffer]
-	VB_IDX: 1, // Indexing array of [group, program, vertexbuffer]
+	PROG_IDX: 0, 
+	VB_GROUP_IDX: 1,
+	VB_IDX_START: 2,
 
 	SIZE: 2,
 };
@@ -920,21 +921,6 @@ const BATCH_FN_IDX = {
 	SET_WPOS4_POS2: _CNT++,
 }
 
-
-
-
-
-
-
-
-_CNT = 0x1;
-const SHADER_ATTRIBUTES = {
-	COL4: _CNT,
-	WPOS4: _CNT <<= 0x1,
-	POS2: _CNT <<= 0x1,
-	PARAMS1: _CNT <<= 0x1,
-	TEX2: _CNT <<= 0x1,
-};
 
 
 

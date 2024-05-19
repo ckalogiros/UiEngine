@@ -1,7 +1,7 @@
 "use strict";
 
 import { Mesh } from "./Base/Mesh.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_info_set_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_group_set_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
@@ -44,7 +44,7 @@ export class Textured_Mesh extends Mesh {
    AddToGfx() { // TODO: Should be named 'AddToGfx' like Rect_Mesh and Text_Mesh
 
       // Get the starting index of the text in the vertex buffer.
-      this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
       this.is_gfx_inserted = true;
 
 
@@ -56,7 +56,7 @@ export class Textured_Mesh extends Mesh {
       // If texture exists, store texture index, else if font texture exists, store font texture index, else store null
       // BUG: Make sure the below statement makes sense for Texture_Material(it is copied from the Font_Material)
       this.gfx.tb.idx = (this.mat.texidx !== INT_NULL) ? this.mat.texidx : ((this.mat.uvIdx !== INT_NULL) ? this.mat.uvIdx : INT_NULL);
-      Vertex_buffer_info_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
+      Vertex_buffer_group_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
 
       return this.gfx;
    }
@@ -64,7 +64,7 @@ export class Textured_Mesh extends Mesh {
 
    AddToGfxFromReset() {
 
-      this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
       this.StateEnable(MESH_STATE.ACTIVE);
       this.is_gfx_inserted = true;
 

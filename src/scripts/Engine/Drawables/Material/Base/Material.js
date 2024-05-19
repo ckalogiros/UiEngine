@@ -35,6 +35,7 @@ export class Material {
       this.sid = {
          shad: 0,
          attr: SID.ATTR.COL4,
+         inst: SID.ATTR.COL4,
          unif: 0,
          pass: 0,
       };

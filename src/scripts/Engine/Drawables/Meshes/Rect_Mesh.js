@@ -94,7 +94,7 @@ export class Rect extends Mesh {
    /*******************************************************************************************************************************************************/
    // Graphics
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, INT_NULL]) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, null]) {
 
       this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
 
@@ -104,11 +104,11 @@ export class Rect extends Mesh {
 
    AddToGfx() {
 
-      this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }
@@ -135,7 +135,7 @@ export class Rect extends Mesh {
       if (this.is_gfx_inserted)
          Vertex_buffer_update_vertices(this.gfx, this.geom, this.mat, this.GetName())
       else {
-         this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
+         Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
          this.is_gfx_inserted = true;
       }
 

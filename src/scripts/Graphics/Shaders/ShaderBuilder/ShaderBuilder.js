@@ -207,6 +207,8 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
          ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);' 
          : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
 
+      // true ? 'vec4 p = a_wpos_time;' : '',
+      // true ? 'gl_Position = vec4(a_pos.x, a_pos.y, 1., 1.0);' : '',
       // (sid.unif & SID.UNIF.COL4) ? '  v_col = a_col;' : '',
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,6 +311,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // TESTS
       (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
+
+      // true ? 'frag_color = vec4(1.);' : '',
       
       true ? '}' : '',
       
