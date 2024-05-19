@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { Vertex_buffer_group_state_enable, Vertex_buffer_group_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_state_enable, Vertex_buffer_group_get_vbidxs } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_state_enable, Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_state_enable, Vertex_buffer_group_get_vbidxs, VBI_get_byidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_store_vertex_buffer_group_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
@@ -44,10 +44,11 @@ export class GfxInfoMesh {
       this.attribsPerVertex = 0;
       this.meshIdx = INT_NULL; // The index of the current mesh from scene's mesh buffer.
       this.vao = null;
+      // this.update_fn_idx = INT_NULL;
 
       this.prog = {
          idx: INT_NULL,
-         progvbidx: INT_NULL,
+         // progvbidx: INT_NULL,
          progibidx: INT_NULL,
          attribsidx: INT_NULL,
       };
@@ -84,7 +85,7 @@ export class GfxInfoMesh {
 
 
 
-function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, vbidxs, ibidx, num_faces = 1) {
+function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_faces = 1) {
 
    const prog = Progarm_get_program(progidx);
    const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
@@ -106,27 +107,31 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, vbidxs, ibi
    gfx_ctx.vao = vb_group.vao;
 
    gfx_ctx.prog.idx = progidx;
-   gfx_ctx.prog.progvbidx = prog.vb_group.buffer[vb_groupidx];
+   // gfx_ctx.prog.progvbidx = prog.vb_group.buffer[vb_groupidx];
    gfx_ctx.prog.progibidx = prog.ib.buffer[ibidx];
    gfx_ctx.prog.attribsidx = prog.attribsidx;
 
 
    gfx_ctx.vb.groupidx = vb_groupidx;
-   const len = vbidxs.length;
-   for(let i=0; i < len; i++){
-      gfx_ctx.vb.idxs.Add(vbidxs[i]);
+
+   
+   for(let i=0; i <= vb_group.vb_idxs.boundary; i++){
+      
+      
+      const vbidx = vb_group.vb_idxs.buffer[i];
+      gfx_ctx.vb.idxs.Add(vbidx);
       gfx_ctx.vb.starts.Add(0);
 
-      const vb = vb_group.vbs[i];
+      const vb_info = VBI_get_byidx(vbidx);
 
       // Set bool is instanced or is per_vertex. If the vb's sid isn't included in the mesh's sid.intstanced, then it is per_vertex
-      if((vb_group.sid.inst & vb.sid)===0) gfx_ctx.vb.is_per_vertex.Add(true);
+      if((vb_group.sid.inst & vb_info.sid)===0) gfx_ctx.vb.is_per_vertex.Add(true);
       else gfx_ctx.vb.is_per_vertex.Add(false);
       // Here we assign the correct vertex buffer index to the mesh attributes(COL,WPOS,DIM, etc)
-      if((vb.sid & (SID.ATTR.COL4|SID.ATTR.COL4_PER_VERTEX))) gfx_ctx.vb.idx_per_attrib.col_buf = i; // Recognize that the color vertex buffer is at this index 
-      if((vb.sid & SID.ATTR.WPOS_TIME4)) gfx_ctx.vb.idx_per_attrib.wpos_buf = i; // same 
-      if((vb.sid & SID.ATTR.POS2)) gfx_ctx.vb.idx_per_attrib.dim_buf = i; // same 
-      if((vb.sid & SID.ATTR.TEX2)) gfx_ctx.vb.idx_per_attrib.tex_buf = i; // same 
+      if((vb_info.sid & (SID.ATTR.COL4|SID.ATTR.COL4_PER_VERTEX))) gfx_ctx.vb.idx_per_attrib.col_buf = i; // Recognize that the color vertex buffer is at this index 
+      if((vb_info.sid & SID.ATTR.WPOS_TIME4)) gfx_ctx.vb.idx_per_attrib.wpos_buf = i; // same 
+      if((vb_info.sid & SID.ATTR.POS2)) gfx_ctx.vb.idx_per_attrib.dim_buf = i; // same 
+      if((vb_info.sid & SID.ATTR.TEX2)) gfx_ctx.vb.idx_per_attrib.tex_buf = i; // same 
    } 
 
    console.log(gfx_ctx.vb)
@@ -134,7 +139,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, vbidxs, ibi
    gfx_ctx.ib.idx = ibidx; // Stores the programs index for the indexbuffer.
    gfx_ctx.ib.count = ib.count;
 
-   gfx_ctx.update_fn_idx = INT_NULL;
+   // gfx_ctx.update_fn_idx = INT_NULL;
 
 
    return gfx_ctx;
@@ -233,13 +238,12 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
 
       if (vb_groupidx === INT_NULL) {
 
-         vb_group = Vertex_buffer_group_create(sid, _, progidx); 
-         // vbidx = vb_info.vbidx;
+         vb_group = Vertex_buffer_create(sid, _, progidx); 
          vb_groupidx = vb_group.idx;
          vbidxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
 
 
-         Vertex_buffer_group_state_enable(vb_group.idx, BUFFER_STATE.IS_PRIVATE);
+         // Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_PRIVATE);
          if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidxs);
 
          // Program_store_vertex_buffer_group_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array  
@@ -325,7 +329,7 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
 
 
 
-   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, vbidxs, ibidx, mesh_count);
+   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, mesh_count);
    return gfx;
 
 
@@ -402,12 +406,12 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
 
       if (vbidx === INT_NULL) {
 
-         const vb_info = Vertex_buffer_group_create(sid, _, progidx);
+         const vb_info = Vertex_buffer_create(sid, _, progidx);
          vbidx = vb_info.vbidx;
 
 
          // Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE | BUFFER_STATE.SHOW);
-         Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE);
+         // Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE);
          if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidx);
 
          Program_store_vertex_buffer_group_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array

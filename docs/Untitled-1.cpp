@@ -79,9 +79,9 @@ line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
             Uniforms_block_bind_uniform_layout('u_screen_res')
             Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT])
             // Vertex buffer
-            Vertex_buffer_group_create(sid, _, progidx)
+            Vertex_buffer_create(sid, _, progidx)
             {
-               Vertex_buffer_create(type, size)
+               Vertex_buffer_data_create(type, size)
                {
                   Typed_array_create_from_type(type, size)
                   // TODO: Here we decide if we need interleaved buffer or instanced buffer and create that number of vertex buffers?

@@ -60,25 +60,19 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags) 
    if(pool_request_flags & GFX_POOL_REQUESTS.ANY){ 
 
       for (let i = 0; i <= vb_group_buffer.boundary; i++) {
-         
-         const len = vb_group_buffer.buffer[i].vbs.length;
-         for (let j = 0; j < len; j++) {
 
-            const vb_info = vb_group_buffer.buffer[i].vbs[j];
-            if((vb_info.state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
+         if((vb_group_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
                
-               if(SID.CheckSidMatch(sid, vb_info.sid)){
-      
-                  vb_info.state.mask |= BUFFER_STATE.IS_ACTIVE;
-                  return i;
-               }
+            if(SID.CheckSidMatch(sid, vb_group_buffer.buffer[i].sid)){
+   
+               vb_group_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
+               return i;
             }
          }
-
       }
    }
 
-   else{ // Else search from conditions. Searches through all buffers
+   else{ // Else search from conditions. Searches through all vertex buffer groups
 
       let found = INT_NULL;
       let size = INT_NULL;

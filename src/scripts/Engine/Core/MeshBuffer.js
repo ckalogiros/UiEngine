@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_group_get_vbs, Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPosDif } from "../Controls/Input/Mouse.js";
 import { TimeIntervalsDestroyByIdx } from "../Timers/TimeIntervals.js";
 import { New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
@@ -8,12 +8,11 @@ import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Batch_store } from "../Batch/Batch.js";
-import { Str_buffer_get_by_idx, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
+import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
-import { Uniforms_buffer_set_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { REL_POS, Relative_pos_comp_move_right_buffer } from "../Drawables/Operations/RelativePosComponent.js";
-import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "./MeshUniformsBuffer.js";
+import { Mesh_unif_get_vb_root_wpos } from "./MeshUniformsBuffer.js";
 
 
 
@@ -814,15 +813,12 @@ export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_
 
    if (root_bufferidx === INT_NULL) return; // Case there is no widget root creation.
 
-   // _widget_root_gfx.buffer[root_bufferidx].Add(progidx);
-   // _widget_root_gfx.buffer[root_bufferidx].Add(vb_groupidx);
    _widget_root_gfx.buffer[root_bufferidx].progidx = progidx;
    _widget_root_gfx.buffer[root_bufferidx].vb_groupidx = vb_groupidx;
 
    // Add the vb group vertex buffer indexes
-   // const vbs = Vertex_buffer_group_get_vbs(vb_groupidx);
-   for(let i=0; i < vbidxs.length; i++){
-      _widget_root_gfx.buffer[root_bufferidx].vbidxs.Add(vbidxs[i]);
+   for(let i=0; i <= vbidxs.boundary; i++){
+      _widget_root_gfx.buffer[root_bufferidx].vbidxs.Add(vbidxs.buffer[i]);
    }
 
    const vb_dataidx = Widget_root_batch_create_vb(root_bufferidx, mesh_bufferidx);
@@ -851,7 +847,7 @@ export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_
 
 /** Run through all vbs of the widget root, and set all root_pos's to the widget root pos */
 export function Widget_root_gfx_add_unif_wpos_per_vb(root_bufferidx, dif) {
-
+alert('1234')
    const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[0]];
 
    for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j += 2) {

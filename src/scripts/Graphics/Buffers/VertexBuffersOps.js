@@ -2,7 +2,7 @@
 
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_attribs_per_vertex, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_offset_size_attribs_per_vertex } from "../ShaderAttributes.js";
 import { Index_buffer_get_by_ibidx } from "./IndexBuffers.js";
-import { Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_vb, Vertex_buffer_remove_geometry, Vertex_buffer_state_enable } from "./VertexBuffers.js";
+import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_remove_geometry, Vertex_buffer_state_enable } from "./VertexBuffers.js";
 
 
 
@@ -551,26 +551,26 @@ function FILL_VERTEX_BUFFER_POS2_FN6(vb_data, geom, mat, start, num_faces, strid
 /**************************************************************************************************************************************/
 
 function INST_FILL_VERTEX_BUFFER_COL4_WPOS4_PARAMS1_FN0(vb_data, geom, start, num_faces, stride){
-   alert('Create stride\nFILL_VERTEX_BUFFER')
-   for (let i = 0; i < num_faces; i++) {
-      // V1
-      vb_data[index++] = mat.col[0];
-      vb_data[index++] = mat.col[1];
-      vb_data[index++] = mat.col[2];
-      vb_data[index++] = mat.col[3];
+   // alert('Create stride\nFILL_VERTEX_BUFFER')
+   // for (let i = 0; i < num_faces; i++) {
+   //    // V1
+   //    vb_data[index++] = mat.col[0];
+   //    vb_data[index++] = mat.col[1];
+   //    vb_data[index++] = mat.col[2];
+   //    vb_data[index++] = mat.col[3];
 
-      vb_data[index++] = geom.pos[0] + geom.dim[0];
-      vb_data[index++] = geom.pos[1] + geom.dim[1];
-      vb_data[index++] = geom.pos[2];
-      index++; // For WPOS4
+   //    vb_data[index++] = geom.pos[0] + geom.dim[0];
+   //    vb_data[index++] = geom.pos[1] + geom.dim[1];
+   //    vb_data[index++] = geom.pos[2];
+   //    index++; // For WPOS4
 
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
-      vb_data[index++] = mat.style[2];
-      index++; // For PARAMS1 - STYLE3
+   //    vb_data[index++] = mat.style[0];
+   //    vb_data[index++] = mat.style[1];
+   //    vb_data[index++] = mat.style[2];
+   //    index++; // For PARAMS1 - STYLE3
 
-      attribs_count += stride * 4; // TODO: Store Vertices_per_rect in shder_attribs?????
-   }
+   //    attribs_count += stride * 4; // TODO: Store Vertices_per_rect in shder_attribs?????
+   // }
 }
 function INST_FILL_VERTEX_BUFFER_COL4_WPOS4_FN1(vb_data, geom, mat, start, num_faces, stride=0){
    // alert('Create stride\nFILL_VERTEX_BUFFER')
@@ -641,7 +641,7 @@ export function Gl_set_RGBA(gfxInfo, color, num_faces = 1) {
    /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_RGBA()'); }
 
    const vbidx = gfxInfo.vb.idx_per_attrib.col_buf; 
-   const vb_info = Vertex_buffer_group_get_vb(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
    // const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.COL4);

@@ -23,54 +23,186 @@ const NOTIFICATIONS_ON = true;
 const DISABLE_DEBUG = true;
 
 
+
+
+
+export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx) {
+
+    /***********************************************************************************************/
+    // Create VAO
+
+    let vaoidx = INT_NULL;
+
+    if (vaoidx === INT_NULL) {
+        vaoidx = Gl_vertex_array_object_create(sid);
+    }
+
+    const vao = Gl_vertex_array_object_get_by_vaoidx(vaoidx); // Get VAO
+    gfxCtx.gl.bindVertexArray(vao.vao);
+
+
+    const attribsidx = Program_get_shader_attributes_index(progidx);
+
+    // Create vertex buffer group
+    const vb_group = new Vertex_Buffer_Group(progidx, vaoidx, vao.vao, sid);
+    
+    if(sid.inst){
+        
+        const type = BUFFER_TYPE.FLOAT32;
+
+
+        // Create vertex buffer data
+        const vb_buffer = Typed_array_create_from_type(type, size);
+        const vbo = gfxCtx.gl.createBuffer();
+        gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, vbo);
+        gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb_buffer, gfxCtx.gl.STATIC_DRAW, 0);
+        const vbidx = _vertex_buffers_data.Add(vb_buffer);
+
+
+        // Create vertex buffer info
+        const vbinfo = new Vertex_Buffer_Info(size, vbo, vbidx, type, sid.inst);
+        vbinfo.SetAddFn(attribsidx, 0x0, sid.inst);
+        const vb_infoidx = _vertex_buffer_infos.Add(vbinfo);
+
+
+        
+        const attrib_divisor = 1; // run per instance
+        // Calculate the attributes info specific for the attributes of this vertex buffer.
+        vbinfo.attribs_info = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.inst, attrib_divisor);
+
+
+        Shader_attributes_enable(attribsidx, vbinfo.attribs_info)
+        
+        // Store the vbidx to the group
+        vb_group.vb_idxs.Add(vbidx);
+        
+        if(vbidx !== vb_infoidx) alert('vbidx !== vb_infoidx\nAt Vertex_buffer_create()\nAt VertexBuffers.js')
+
+    }
+    if(sid.attr){
+        
+        const type = BUFFER_TYPE.FLOAT32;
+
+
+        // Create vertex buffer data
+        const vb_buffer = Typed_array_create_from_type(type, size);
+        const vbo = gfxCtx.gl.createBuffer();
+        gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, vbo);
+        gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb_buffer, gfxCtx.gl.STATIC_DRAW, 0);
+        const vbidx = _vertex_buffers_data.Add(vb_buffer);
+
+
+        // Create vertex buffer info
+        const vbinfo = new Vertex_Buffer_Info(size, vbo, vbidx, type, sid.attr & ~sid.inst);
+        vbinfo.SetAddFn(attribsidx, sid.attr & ~sid.inst, 0x0);
+        const vb_infoidx = _vertex_buffer_infos.Add(vbinfo);
+
+
+        
+        const attrib_divisor = 0; // run per instance
+        // Calculate the attributes info specific for the attributes of this vertex buffer.
+        vbinfo.attribs_info = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.attr & ~sid.inst, attrib_divisor);
+
+
+        Shader_attributes_enable(attribsidx, vbinfo.attribs_info)
+        
+        // Store the vbidx to the group
+        vb_group.vb_idxs.Add(vbidx);
+        
+        if(vbidx !== vb_infoidx) alert('vbidx !== vb_infoidx\nAt Vertex_buffer_create()\nAt VertexBuffers.js')
+
+    }
+    
+    // if(sid.attr){
+        
+    //     const type = BUFFER_TYPE.FLOAT32;
+    //     const ret = Vertex_buffer_data_create(type, size);
+    //     const vbinfoidx = vb_group.CreateBuffer(size, ret.vbo, ret.vbidx, ret.type, sid.attr & ~sid.inst);
+
+    //     // Set the add function for the vertex buffer
+    //     vb_group.SetAddFnForVb(attribsidx, vbinfoidx, sid.attr & ~sid.inst, 0x0);
+
+    //     const attrib_divisor = 0; // run per instance
+    //     // Calculate the attributes info for the attributes this vertex buffer represents
+    //     vb_group.vbs[vbinfoidx].attribs_info = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.attr & ~sid.inst, attrib_divisor);
+        
+    //     const vb = _vertex_buffers_data.buffer[ret.vbidx];
+    //     gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
+    //     gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb, gfxCtx.gl.STATIC_DRAW, 0);
+        
+    //     Shader_attributes_enable(attribsidx, vb_group.vbs[vbinfoidx].attribs_info)
+    // }
+    
+    
+    // if (NOTIFICATIONS_ON)
+    //     Notifications_send(NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, ret.vbidx);
+
+
+    const vb_groupidx = _vertex_buffer_groups.Add(vb_group);
+    vb_group.idx = vb_groupidx;
+
+
+
+
+    return vb_group;
+}
+
+
+
+
+
+
+
+
+
 /****************************************************************************************************************************************************/
-// Vertex Buffer Data Array
+// Vertex Buffer Data
 /****************************************************************************************************************************************************/
 
 
-const _vertex_buffers = New_generic_buffer(_, 'GFX Index Buffer');
-_vertex_buffers.Init(1);
+const _vertex_buffers_data = New_generic_buffer(_, 'GFX Index Buffer');
+_vertex_buffers_data.Init(1);
 
 
 
-export function Vertex_buffer_get_Active_count() { return _vertex_buffers.active_count; }
+export function Vertex_buffer_get_Active_count() { return _vertex_buffers_data.active_count; }
 
 
 
-export function Vertex_buffer_get() { return _vertex_buffers; }
+export function Vertex_buffer_get() { return _vertex_buffers_data; }
 
 
 
 export function Vertex_buffer_get_by_vbidx(vbidx) {
-    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers, vbidx, new Error().lineNumber);
-    return _vertex_buffers.buffer[vbidx];
+    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_data, vbidx, new Error().lineNumber);
+    return _vertex_buffers_data.buffer[vbidx];
 }
 
 
 
 export function Vertex_buffer_get_attrib_value_from_vb_byidx(vbidx, attr_idx) {
-    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers, vbidx, new Error().lineNumber);
-    return _vertex_buffers.buffer[vbidx][attr_idx];
+    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_data, vbidx, new Error().lineNumber);
+    return _vertex_buffers_data.buffer[vbidx][attr_idx];
 }
 
 
 
 /** Returns struct: { vbidx:INT, vbo:OBJ } */
-function Vertex_buffer_create(type, size) {
+function Vertex_buffer_data_create(type, size) {
 
-    const ret = {
+    const temp_struct = {
         vbidx: INT_NULL,
         vbo: INT_NULL, // VBO is stored directly to the vertex buffer class object.
     };
 
-    const vb = Typed_array_create_from_type(type, size);
-    ret.vbidx = _vertex_buffers.Add(vb);
-    ret.vbo = gfxCtx.gl.createBuffer();
-    gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
-    gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb, gfxCtx.gl.STATIC_DRAW, 0);
+    const vb_data = Typed_array_create_from_type(type, size);
+    temp_struct.vbidx = _vertex_buffers_data.Add(vb_data);
+    temp_struct.vbo = gfxCtx.gl.createBuffer();
+    gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, temp_struct.vbo);
+    gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb_data, gfxCtx.gl.STATIC_DRAW, 0);
 
 
-    return ret;
+    return temp_struct;
 }
 
 
@@ -95,12 +227,141 @@ function Vertex_buffer_create(type, size) {
 
 
 /****************************************************************************************************************************************************/
-// Vertex Buffer Info Array
+// Vertex Buffer Info
+/****************************************************************************************************************************************************/
+// Vb info describes a '_vertex_buffers_data'. One info for every '_vertex_buffers_data'.
+const _vertex_buffer_infos = New_generic_buffer(_, 'GFX Vertex Buffer Infos'); 
+
+
+
+class Vertex_Buffer_Info {
+
+    constructor(size, vbo, vbidx, type, sid){
+
+        this.sid = sid;     // Bit field: Shader ID. Specific to this buffer
+        this.state = { mask: BUFFER_STATE.IS_ACTIVE }; // SEE: 'BUFFER_STATE'. Gather the state of the vertex buffer info into a bit field
+        this.size = size;   // Total size of the typed array buffer (in elements).
+        this.count = 0;	    // Current size oof the typed array buffer (in elements)
+        this.vCount = 0;    // Number of vertices
+        this.vbo = vbo;     // WebGl vertex buffer object.
+        this.vbidx = vbidx; // index to the array of stored vertex buffers.
+        this.type = type;   // The type of the typed array buffer
+
+        this.attribs_info = {
+            count: 0,
+            offsets: New_int8_buffer(),
+        }
+
+        this.add_to_vb_fnidx = null; // Function pointer. Each vertex buffer has a function that knows how to add attributes to the buffer
+    }
+
+    SetAddFn(attribsidx, attr, inst){
+        this.add_to_vb_fnidx = Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst);
+    }
+
+}
+
+
+export function VBI_get_byidx(vb_infoidx){
+    // TODO: Check for valid buffer element
+    return _vertex_buffer_infos.buffer[vb_infoidx];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************************************************************************************************************************************/
+// Vertex Buffer Group
 /****************************************************************************************************************************************************/
 
 
-const _vertex_buffer_groups = New_generic_buffer(_, 'GFX Index Buffer Info');
+// A group defines a set of vertex buffers that render a particular mesh/meshes (vb's are separated by attributes of that mesh)
+const _vertex_buffer_groups = New_generic_buffer(_, 'GFX Vertex Buffer Groups'); 
 
+
+
+class Vertex_Buffer_Group {
+    
+    constructor(progidx, vaoidx, vao, sid) {
+        
+        this.sid = sid;             // Bit field: Shader ID
+        this.state = { mask: BUFFER_STATE.IS_ACTIVE }; 
+        this.progidx = progidx;     // Just for debuging.
+        this.vao = vao;             // WebGl vertex array object.
+        this.vaoidx = vaoidx;       // Index to the array of stored VAO's
+        this.texidx = INT_NULL;     // index to the array all textures are stored.
+        this.ibidx = INT_NULL;      // index ref to index buffer this vb uses.
+        this.draw_count = 0;
+        this.vertices_per_face = 4; // HACK: How vertex buffer should conclude the vertices per face ????????????????
+        this.idx = INT_NULL;        // Self index to the '_vertex_buffer_groups' buffer
+        this.needs_any_update = false; // 
+        
+        this.render_queueidx = INT_NULL; // index to the Render queue buffer of the current vb 
+
+        this.vb_idxs = New_int8_buffer();
+    }
+
+
+    // TODOD: This must be moved to VertexBufferInfo class
+    // EFFICIENCY: Can pass an aproximation of all the meshes count (extra_size) from the root caller where the widget is constructed
+    Realloc(extra_size = 0) {
+
+        this.size = this.#CalculateMemoryPaddedSize(this.size, extra_size);
+        const new_data = Typed_array_create_from_type(this.type, this.size)
+
+        const old_data = _vertex_buffers_data.buffer[this.vbidx];
+        const size = old_data.length;
+        for (let i = 0; i < size; i++) {
+            new_data[i] = old_data[i];
+        }
+        _vertex_buffers_data.buffer[this.vbidx] = new_data;
+
+        if (DEBUG.GFX.BUFFERS) console.warn('Resizing vertex buffer!')
+        if (this.size > 35000) { console.error(this.size, '-------------------------'); }
+    }
+
+
+    #CalculateMemoryPaddedSize(cur_size, extra_size) {
+
+        let stride = 64;
+
+        if (cur_size + extra_size < 64) { return 64; }
+        if (cur_size + extra_size < 128) { return 128; }
+        if (cur_size + extra_size < 256) { return 256; }
+        if (cur_size + extra_size < 512) { return 512; }
+        else if (cur_size > 32768) { stride = 2048; }
+        else if (cur_size > 16384) { stride = 1024; }
+        else if (cur_size > 4096) { stride = 128; }
+
+        let new_size = cur_size;
+        const target_size = cur_size + extra_size;
+        while (new_size < target_size) {
+            new_size += stride;
+        }
+
+        if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
+
+        new_size += stride; // Make it greater than the target_size
+        return new_size;
+    }
+
+}
 
 /****************************************************************************************************************************************************/
 // GETTERS-SETTERS 
@@ -168,15 +429,18 @@ export function Vertex_buffer_group_set_render_queueidx(vb_groupidx, render_queu
 
 
 /*************************************************************************************************************************/
-export function Vertex_buffer_group_get_vbs(vb_groupidx) {
-    if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
-    return _vertex_buffer_groups.buffer[vb_groupidx].vbs;
-}
+// export function Vertex_buffer_group_get_vbs(vb_groupidx) {
+//     alert()
+//     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
+//     return _vertex_buffer_groups.buffer[vb_groupidx].vbs;
+// }
 export function Vertex_buffer_group_get_vb(vb_groupidx, vbidx) {
+    alert()
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
     return _vertex_buffer_groups.buffer[vb_groupidx].vbs[vbidx];
 }
 export function Vertex_buffer_group_copy_vbs(vb_groupidx, buffer) {
+    alert()
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
     const len = _vertex_buffer_groups.buffer[vb_groupidx].vbs.length;
     for(let i=0; i < len; i++){
@@ -186,131 +450,17 @@ export function Vertex_buffer_group_copy_vbs(vb_groupidx, buffer) {
 }
 export function Vertex_buffer_group_get_vbidxs(vb_groupidx) {
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
-
-    const buffer = [];
-    const len = _vertex_buffer_groups.buffer[vb_groupidx].vbs.length;
-    for(let i=0; i < len; i++){
-        buffer[i] = _vertex_buffer_groups.buffer[vb_groupidx].vbs[i].vbidx;
-    }
-    return buffer;
-}
-
-
-
-class Vertex_Buffer_Info {
-
-    constructor(size, vbo, vbidx, type, sid){
-
-        this.sid = sid;     // Bit field: Shader ID. Specific to this buffer
-        this.state = { mask: BUFFER_STATE.IS_ACTIVE }; // SEE: 'BUFFER_STATE'. Gather the state of the vertex buffer info into a bit field
-        this.size = size;   // Total size of the typed array buffer (in elements).
-        this.count = 0;	    // Current size oof the typed array buffer (in elements)
-        this.vCount = 0;    // Number of vertices
-        this.vbo = vbo;     // WebGl vertex buffer object.
-        this.vbidx = vbidx; // index to the array of stored vertex buffers.
-        this.type = type;   // The type of the typed array buffer
-
-        this.attribs_info = {
-            count: 0,
-            offsets: New_int8_buffer(),
-        }
-
-        this.add_to_vb_fnidx = null; // Function pointer. Each vertex buffer has a function that knows how to add attributes to the buffer
-    }
-
-    SetAddFn(attribsidx, attr, inst){
-        this.add_to_vb_fnidx = Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst);
-    }
-
-}
-
-class Vertex_Buffer_Group {
     
-    constructor(progidx, vaoidx, vao, sid) {
-        
-        this.sid = sid;             // Bit field: Shader ID
-        this.progidx = progidx;     // Just for debuging.
-        this.vao = vao;             // WebGl vertex array object.
-        this.vaoidx = vaoidx;       // Index to the array of stored VAO's
-        this.texidx = INT_NULL;     // index to the array all textures are stored.
-        this.ibidx = INT_NULL;      // index ref to index buffer this vb uses.
-        this.draw_count = 0;
-        this.vertices_per_face = 4; // HACK: How vertex buffer should conclude the vertices per face ????????????????
-        this.idx = INT_NULL;        // Self index to the '_vertex_buffer_groups' buffer
-        this.needs_any_update = false; // 
-        
-        this.render_queueidx = INT_NULL; // index to the Render queue buffer of the current vb 
-
-        this.vbs = [];
-    }
-
-
-    CreateBuffer(size, vbo, vbidx, type, sid){
-        
-        const vb = new Vertex_Buffer_Info(size, vbo, vbidx, type, sid);
-        const idx = this.vbs.push(vb);
-        this.count++;
-
-        return idx-1;
-    }
-
-
-    SetAddFnForVb(attribsidx, idx, attr, inst){
-        this.vbs[idx].SetAddFn(attribsidx, attr, inst);
-    }
-
-
-    // EFFICIENCY: Can pass an aproximation of all the meshes count (extra_size) from the root caller where the widget is constructed
-    Realloc(extra_size = 0) {
-
-        this.size = this.#CalculateMemoryPaddedSize(this.size, extra_size);
-        const new_data = Typed_array_create_from_type(this.type, this.size)
-
-        const old_data = _vertex_buffers.buffer[this.vbidx];
-        const size = old_data.length;
-        for (let i = 0; i < size; i++) {
-            new_data[i] = old_data[i];
-        }
-        _vertex_buffers.buffer[this.vbidx] = new_data;
-
-        if (DEBUG.GFX.BUFFERS) console.warn('Resizing vertex buffer!')
-        if (this.size > 35000) { console.error(this.size, '-------------------------'); }
-    }
-
-
-    #CalculateMemoryPaddedSize(cur_size, extra_size) {
-
-        let stride = 64;
-
-        if (cur_size + extra_size < 64) { return 64; }
-        if (cur_size + extra_size < 128) { return 128; }
-        if (cur_size + extra_size < 256) { return 256; }
-        if (cur_size + extra_size < 512) { return 512; }
-        else if (cur_size > 32768) { stride = 2048; }
-        else if (cur_size > 16384) { stride = 1024; }
-        else if (cur_size > 4096) { stride = 128; }
-
-        let new_size = cur_size;
-        const target_size = cur_size + extra_size;
-        while (new_size < target_size) {
-            new_size += stride;
-        }
-
-        if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
-
-        new_size += stride; // Make it greater than the target_size
-        return new_size;
-    }
-
-};
-
+    return _vertex_buffer_groups.buffer[vb_groupidx].vb_idxs;
+}
 
 
 
 
 
 export function Vertex_buffer_state_enable(vb_grouidx, vbidx, STATE_FLAG) {
-    _vertex_buffer_groups.buffer[vb_grouidx].vbs[vbidx].state.mask |= STATE_FLAG;
+    // alert()
+    _vertex_buffer_infos.buffer[vbidx].state.mask |= STATE_FLAG;
     _vertex_buffer_groups.buffer[vb_grouidx].needs_any_update = true; // Set the groups needs update, so we don't have to check all vertex buffers if none needs update
 }
 
@@ -319,17 +469,16 @@ export function Vertex_buffer_state_enable(vb_grouidx, vbidx, STATE_FLAG) {
 
 export function Vertex_buffer_group_state_enable(vb_grouidx, STATE_FLAG) {
 
-    const len = _vertex_buffer_groups.buffer[vb_grouidx].vbs.length;
-    for(let i=0; i < len; i++){
-        _vertex_buffer_groups.buffer[vb_grouidx].vbs[i].state.mask |= STATE_FLAG;
+    _vertex_buffer_groups.buffer[vb_grouidx].state.mask |= STATE_FLAG;
+    if(STATE_FLAG & BUFFER_STATE.NEEDS_UPDATE)
         _vertex_buffer_groups.buffer[vb_grouidx].needs_any_update = true; // Set the groups needs update, so we don't have to check all vertex buffers if none needs update
-    }
 }
 
 
 
 
 export function Vertex_buffer_state_disable(vb_grouidx, STATE_FLAG) {
+    alert()
     const len = _vertex_buffer_groups.buffer[vb_grouidx].vbs.length;
     for(let i=0; i < len; i++){
         _vertex_buffer_groups.buffer[vb_grouidx].vbs[i].state.mask &= ~STATE_FLAG;
@@ -351,95 +500,11 @@ export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset
 
 
 
-export function Vertex_buffer_group_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx) {
-
-    /***********************************************************************************************/
-    // Create VAO
-
-    let vaoidx = INT_NULL;
-
-    if (vaoidx === INT_NULL) {
-        vaoidx = Gl_vertex_array_object_create(sid);
-    }
-
-    const vao = Gl_vertex_array_object_get_by_vaoidx(vaoidx); // Get VAO
-    gfxCtx.gl.bindVertexArray(vao.vao);
-
-
-
-    /***********************************************************************************************/
-    // Create vertex buffer
-    
-    // HERE: we muust create all vertex buffers for all dif kind of attribute combinations: Instanced/PerVertex 
-    
-    
-    
-    const vb_group = new Vertex_Buffer_Group(progidx, vaoidx, vao.vao, sid);
-    
-    const attribsidx = Program_get_shader_attributes_index(progidx);
-    if(sid.inst){
-        
-        const type = BUFFER_TYPE.FLOAT32;
-        const ret = Vertex_buffer_create(type, size);
-        const vbinfoidx = vb_group.CreateBuffer(size, ret.vbo, ret.vbidx, ret.type, sid.inst);
-
-        // Set the add function for the vertex buffer
-        vb_group.SetAddFnForVb(attribsidx, vbinfoidx, 0x0, sid.inst);
-        
-        const attrib_divisor = 1; // run per instance
-        // Calculate the attributes info for the attributes this vertex buffer represents
-        vb_group.vbs[vbinfoidx].attribs_info = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.inst, attrib_divisor);
-        
-        const vb = _vertex_buffers.buffer[ret.vbidx];
-        gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
-        gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb, gfxCtx.gl.STATIC_DRAW, 0);
-        
-        Shader_attributes_enable(attribsidx, vb_group.vbs[vbinfoidx].attribs_info)
-        // if (NOTIFICATIONS_ON)
-            // Notifications_send(NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, ret.vbidx);
-        
-    }
-    
-    if(sid.attr){
-        
-        const type = BUFFER_TYPE.FLOAT32;
-        const ret = Vertex_buffer_create(type, size);
-        const vbinfoidx = vb_group.CreateBuffer(size, ret.vbo, ret.vbidx, ret.type, sid.attr & ~sid.inst);
-
-        // Set the add function for the vertex buffer
-        vb_group.SetAddFnForVb(attribsidx, vbinfoidx, sid.attr & ~sid.inst, 0x0);
-
-        const attrib_divisor = 0; // run per instance
-        // Calculate the attributes info for the attributes this vertex buffer represents
-        vb_group.vbs[vbinfoidx].attribs_info = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.attr & ~sid.inst, attrib_divisor);
-        
-        const vb = _vertex_buffers.buffer[ret.vbidx];
-        gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, ret.vbo);
-        gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb, gfxCtx.gl.STATIC_DRAW, 0);
-        
-        Shader_attributes_enable(attribsidx, vb_group.vbs[vbinfoidx].attribs_info)
-        // if (NOTIFICATIONS_ON)
-        //     Notifications_send(NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, ret.vbidx);
-    }
-
-
-
-
-    const vbgroupidx = _vertex_buffer_groups.Add(vb_group);
-    vb_group.idx = vbgroupidx;
-
-
-
-
-    return vb_group;
-}
-
-
 
 /** Returns true/false */
 export function Vertex_buffer_exists_from_index(vbidx) {
 
-    if (_vertex_buffers.buffer[vbidx] === undefined || _vertex_buffers.buffer[vbidx] === null)
+    if (_vertex_buffers_data.buffer[vbidx] === undefined || _vertex_buffers_data.buffer[vbidx] === null)
         return false
 
     return true;
@@ -510,13 +575,13 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     const prog = Progarm_get_program(progidx);
     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
     
-    const num_faces = 1;
+    // const num_faces = 1;
+    const num_faces = geom.num_faces;
     
     // Run for every vertex buffer of the group.
-    const len = vb_group.vbs.length;
-    for(let i=0; i < len; i++){
+    for(let i=0; i <= vb_group.vb_idxs.boundary; i++){
         
-        const vb_info = vb_group.vbs[i];
+        const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[i])
 
         const start = vb_info.count;
         gfx.vb.starts.buffer[i] = start;
@@ -676,7 +741,7 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, start_index, remov
 
 
     // Shift all attributes left to fil the gap of the removed attributes. 
-    const vb_data = _vertex_buffers.buffer[gfx.vb.idx];
+    const vb_data = _vertex_buffers_data.buffer[gfx.vb.idx];
     for (let i = end; i < vb_info.count; i++) {
         vb_data[start++] = vb_data[i]
     }
@@ -758,7 +823,7 @@ function DEBUG_PRINT(buffer, index, line) {
 
 
 export function Gl_vertex_buffer_print() {
-    console.log('VertexBuffer:', _vertex_buffers)
+    console.log('VertexBuffer:', _vertex_buffers_data)
     console.log('VertexBufferInfo', _vertex_buffer_groups)
 }
 
@@ -810,8 +875,8 @@ function Vertex_to_string(flags, progidx, vbidx, count) {
 
             if (is_wpos) {
 
-                wpos += `${Floor(_vertex_buffers.buffer[vbidx][i++])}, `;
-                wpos += `${Floor(_vertex_buffers.buffer[vbidx][i++])}, `;
+                wpos += `${Floor(_vertex_buffers_data.buffer[vbidx][i++])}, `;
+                wpos += `${Floor(_vertex_buffers_data.buffer[vbidx][i++])}, `;
             }
 
             i += stride - 2;

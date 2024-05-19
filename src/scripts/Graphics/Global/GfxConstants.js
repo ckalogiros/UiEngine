@@ -277,7 +277,7 @@ const GRAPHICS_LAYOUT = {
 
 
 // TODO: Create a smaller buffer that ca resize its self
-const MAX_VERTEX_BUFFER_SIZE = 256;
+const MAX_VERTEX_BUFFER_SIZE = 64;
 const MAX_INDEX_BUFFER_SIZE = 64;
 const INDICES_PER_RECT = 6;
 const VERTS_PER_RECT = 6;
@@ -373,7 +373,7 @@ const BUFFER_STATE = {
 
     // SHOW: _CNT,
     NEEDS_UPDATE: _CNT,
-    IS_PRIVATE: _CNT <<= 0x1,
+    // IS_PRIVATE: _CNT <<= 0x1,
     IS_ACTIVE: _CNT <<= 0x1,
 };
 

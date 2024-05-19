@@ -956,7 +956,7 @@ export function Scroller_on_update_handle(_params) {
 
 
    // Add the move difference to all vb's root positions.
-   Widget_root_gfx_add_unif_wpos_per_vb(scroller.root_bufferidx, [0, ydif]);
+   // Widget_root_gfx_add_unif_wpos_per_vb(scroller.root_bufferidx, [0, ydif]);
 
    const clip_top = scroller_top, clip_bottom = (scroller_top) + scroller.geom.dim[1] * 2;
 

@@ -2,7 +2,7 @@ import { Texture_get_texture_byidx } from '../Engine/Loaders/Textures/Texture.js
 import { Renderqueue_get_active, Renderqueue_active_get_count } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
-import { Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx } from './Buffers/VertexBuffers.js';
+import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from './Buffers/UniformBuffers.js';
 import { Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
@@ -40,9 +40,13 @@ export function Gl_draw(gl) {
         const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
         const ib_info = Index_buffer_info_get_by_ibidx(ibidx);
         
+
         if (GL.BOUND_VAO !== vb_group.vao){
-            gl.bindVertexArray(vb_group.vao)
+            gl.bindVertexArray(vb_group.vao);
+            GL.BOUND_VAO = vb_group.vao;
         }
+
+
         if (GL.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
             const texture = Texture_get_texture_byidx(vb_group.texidx);
             Gl_texture_unit_bind(gl, texture);
@@ -55,22 +59,21 @@ export function Gl_draw(gl) {
         Uniforms_buffer_set_uniform(ubidx, pos);
         Uniforms_buffer_update_uniform(ubidx);
         
-        // FIXME: We need a loop to check if a vb (instanced) needs to update
-        // ALSO: we already are in one vb, so it is unecessary to update 2 vbs
-        if(vb_group.needs_any_update){
+        if(vb_group.needs_any_update)
+        {
             
-            const len = vb_group.vbs.length;
-            for(let j=0; j<len; j++){
+            for(let j=0; j <= vb_group.vb_idxs.boundary; j++){
                 
-                const vb_info = vb_group.vbs;
-                if (vb_info[j].state.mask & BUFFER_STATE.NEEDS_UPDATE) {
+                const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[j]);
+                if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
                     
-                    const vb = Vertex_buffer_get_by_vbidx(vb_info[j].vbidx);
-                    gl.bindBuffer(gl.ARRAY_BUFFER, vb_info[j].vbo)
-                    gl.bufferData(gl.ARRAY_BUFFER, vb, gl.STATIC_DRAW, 0);
-                    vb_info[j].state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-                    GL.BOUND_VBO = vb_group.ibo;
-                    GL.BOUND_VBIDX = vb_group.ibidx;
+                    const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
+                    // TODO: Set bufferData instead
+                    gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.STATIC_DRAW, 0);
+                    vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+                    GL.BOUND_VBO = vb_info.vbo;
+                    GL.BOUND_VBIDX = vb_info.vbidx;
                 }
             }
             vb_group.needs_any_update = false
@@ -87,10 +90,9 @@ export function Gl_draw(gl) {
             GL.BOUND_IBIDX = ib_info.ibidx;
         }
         
-        // gl.drawArraysInstanced(gl.TRIANGLES, 0, 3, 1)
-        // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, 1)
+        // gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, 1)
         gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
-        // gl.drawElements(gl.TRIANGLES, vb_info.draw_count, gl.UNSIGNED_SHORT, 0);
+        // gl.drawElements(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0);
 
     }
 
