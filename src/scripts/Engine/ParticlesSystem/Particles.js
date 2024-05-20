@@ -1,7 +1,7 @@
 "use strict";
 
 import * as math from '../../Helpers/Math/MathOperations.js'
-import { Gl_set_wpos_time, Gl_set_wpos_XY, Gl_set_RGBA, Gl_set_alpha, GlSetAttrParams1 } from "../../VertexBuffersOps.js";
+import { Gl_set_wpos_time, Gl_set_wpos_XY, Gl_set_rgba, Gl_set_alpha, GlSetAttrParams1 } from "../../VertexBuffersOps.js";
 import { Mesh } from "../Drawables/Meshes/Base/Mesh.js";
 import { TimersCreateTimer } from "../Timers/Timers.js";
 
@@ -36,7 +36,7 @@ class Particle {
 
     // SetColor(col) {
     //     math.CopyArr4(this.mesh.col, col);
-    //     Gl_set_RGBA(this.gfxInfo, col);
+    //     Gl_set_rgba(this.gfxInfo, col);
     // }
 
 

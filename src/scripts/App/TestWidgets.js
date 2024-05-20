@@ -262,33 +262,33 @@ export function TestWidgetsGeneric(scene) {
 
     // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
     { // Test sdf lines
-        {
-            const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 200, 0], [100, 20], TRANSPARENCY(GREEN[2], .1), 'sdf linem2');
-            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+        // {
+        //     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 200, 0], [100, 20], TRANSPARENCY(GREEN[2], .1), 'sdf linem2');
+        //     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+        //     line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         
-            // line.sid.unif |= SID.UNIF.TIME;
-            // line.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
-            // line.sid.attr &= ~SID.ATTR.COL4;
+        //     // line.sid.unif |= SID.UNIF.TIME;
+        //     // line.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
+        //     // line.sid.attr &= ~SID.ATTR.COL4;
         
-            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-            line.Render();
-            line.ConstructListeners();
-        }
-        {
-            const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 270, 0], [100, 20], TRANSPARENCY(YELLOWR[7], 1), 'sdf linem2');
-            line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-            line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+        //     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        //     line.Render();
+        //     line.ConstructListeners();
+        // }
+        // {
+        //     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 270, 0], [100, 20], TRANSPARENCY(YELLOWR[7], 1), 'sdf linem2');
+        //     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+        //     line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
         
-            // line.sid.unif |= SID.UNIF.TIME;
-            // line.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
-            // line.sid.attr &= ~SID.ATTR.COL4;
+        //     // line.sid.unif |= SID.UNIF.TIME;
+        //     // line.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
+        //     // line.sid.attr &= ~SID.ATTR.COL4;
         
-            line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-            line.Render();
-            line.ConstructListeners();
-        }
+        //     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        //     line.Render();
+        //     line.ConstructListeners();
+        // }
     }
 
 
@@ -324,6 +324,7 @@ export function TestWidgetsGeneric(scene) {
     // Test_widgets(ypos);
 
     // const label = CreateLabel('ABCDEFGHIJKLM');
+    // CreateLabel('\\/+0');
     // const label = CreateLabel('CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line););CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line');
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
 
@@ -340,7 +341,7 @@ export function TestWidgetsGeneric(scene) {
     // CreateSwitchSimple([0, ypos, 0]);
     // const switch1 = CreateSwitch();
 
-    // CreateSlider();
+    CreateSlider();
     // CreateChangeMeshColorFromSliders(ROOT_WIDGETS.CREATE_ROOT);
 
 
@@ -642,6 +643,9 @@ function CreateLabel(name = 'Label ') {
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
+
+    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
+    // label.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
     
     label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     label.Render()
@@ -702,7 +706,7 @@ function CreateSwitchSimple(pos, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 function CreateSwitch() {
 
     let ypos = 500
-    const switch1 = Create_widget_switch(ROOT_WIDGETS.CREATE_ROOT, 'switch on', 'switch off', [100, ypos, 0], fontsize, GREY[1], BLUE_10_120_220, [5, 5], .5);
+    const switch1 = Create_widget_switch(ROOT_WIDGETS.CREATE_ROOT, 'switch on', 'switch off', [100, ypos, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })

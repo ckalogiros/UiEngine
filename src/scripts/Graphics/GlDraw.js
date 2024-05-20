@@ -61,7 +61,6 @@ export function Gl_draw(gl) {
         
         if(vb_group.needs_any_update)
         {
-            
             for(let j=0; j <= vb_group.vb_idxs.boundary; j++){
                 
                 const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[j]);
@@ -92,6 +91,7 @@ export function Gl_draw(gl) {
         
         // gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, 1)
         gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
+        // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, 4)
         // gl.drawElements(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0);
 
     }

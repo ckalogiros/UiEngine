@@ -1,0 +1,11 @@
+-Instanced Geometry-
+gl.drawElementsInstanced(gl.TRIANGLES, draw_count, gl.UNSIGNED_SHORT, 0, num_instances)
+The maximum instances are:
+   1. If at least one vertex buffer has per_vertex geomtry, then the max instances are the max number of triangles/rect represented by the per_vertex buffer
+
+
+
+-attrib_divisor-
+attrib_divisor dictates how many times an attribute will be used for one instance.
+That means: We have attrib: color. If attrib_divisor is set to {2}, then the shader will run
+for each instance once, and use the same attribute twice.

@@ -223,6 +223,8 @@ export class Widget_Switch_Simple extends Rect {
          Set_color_rgba(mesh, mesh.color_active);
          switch0.geom.pos[0] += mesh.geom.dim[0];
          switch0.geom.MoveX(mesh.geom.dim[0], switch0.gfx);
+         // switch0.geom.MoveY(mesh.geom.dim[0], switch0.gfx);
+         // switch0.geom.MoveXY(mesh.geom.dim[0], mesh.geom.dim[1], switch0.gfx);
       }
       else {
          Set_default_color_rgba(mesh);

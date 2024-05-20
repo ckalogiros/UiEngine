@@ -3,7 +3,7 @@
 
 
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../../../Graphics/Buffers/UniformBuffers.js';
-import { Gl_set_RGBA, Gl_set_RGBA_per_vertex } from '../../../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba, Gl_set_RGBA_per_vertex } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
 
 
@@ -51,7 +51,7 @@ export function Set_color_rgba(mesh, col) {
    }
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
       math.CopyArr4(mesh.mat.col, color);
-      Gl_set_RGBA(mesh.gfx, color);
+      Gl_set_rgba(mesh.gfx, color);
    }
    else if (mesh.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
       Set_mesh_uniform_color(mesh_unif_buffer, color)
@@ -72,7 +72,7 @@ export function Set_color_rgb(mesh, col) {
       Gl_set_RGBA_per_vertex(mesh.gfx, color);
    }
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
-      Gl_set_RGBA(mesh.gfx, color);
+      Gl_set_rgba(mesh.gfx, color);
    }
    else if (mesh.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
       Set_mesh_uniform_color(mesh_unif_buffer, color); // BUG: The Set uniform sets rgba, not rgb
@@ -94,7 +94,7 @@ export function Set_hover_color_rgba(mesh) {
    }
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
       math.Mult_arr4_scalar(mesh.mat.col, intensity);
-      Gl_set_RGBA(mesh.gfx, mesh.mat.col);
+      Gl_set_rgba(mesh.gfx, mesh.mat.col);
    }
    else if (mesh.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
       math.Mult_arr4_scalar(mesh.mat.col, intensity);
@@ -114,7 +114,7 @@ export function Set_default_color_rgba(mesh) {
       Gl_set_RGBA_per_vertex(mesh.gfx, color);
    }
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
-      Gl_set_RGBA(mesh.gfx, color);
+      Gl_set_rgba(mesh.gfx, color);
    }
    else if (mesh.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
       Set_mesh_uniform_color(mesh_unif_buffer, color)

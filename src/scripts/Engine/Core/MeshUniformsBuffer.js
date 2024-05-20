@@ -9,6 +9,7 @@
 
 import { New_generic_buffer } from "./Buffers";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer";
+import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer";
 
 
 
@@ -301,4 +302,57 @@ export function Mesh_unif_add_vb_root_col(idx, rgba) {
    _per_vb_mesh_unif_col.buffer[idx].col[1] += rgba[1];
    _per_vb_mesh_unif_col.buffer[idx].col[2] += rgba[2];
    _per_vb_mesh_unif_col.buffer[idx].col[3] += rgba[3];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*********************************************************************************************************/
+// DEBUG-PRINT
+
+
+
+// Print the widget groups buffer
+export function Root_uniforms_for_wpos() {
+
+   console.log('_per_vb_mesh_unif_wpos:')
+   for (let i = 0; i <= _per_vb_mesh_unif_wpos.boundary; i++) {
+
+      const parent = Mesh_buffer_get_mesh_byidx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].parent_meshidx);
+      // const parent = (_debug_names_per_vb_mesh_unif_wpos.buffer[i].parent_meshidx !== INT_NULL)
+      //    ? (_mesh_buffer.buffer[_debug_names_per_vb_mesh_unif_wpos.buffer[i].parent_meshidx]) : null;
+      
+         const parent_name = (parent) ? Str_buffer_mesh_names_get_by_idx(parent.nameidx) : 'NULL'
+
+      console.log(i,
+         'pos:', _per_vb_mesh_unif_wpos.buffer[i].wpos,
+         'name:', Str_buffer_mesh_names_get_by_idx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].nameidx),
+         '||| parent:', parent_name,
+         'parent_posidx:', _per_vb_mesh_unif_wpos.buffer[i].parent_posidx,
+         'vbidx:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
+      );
+   }
 }

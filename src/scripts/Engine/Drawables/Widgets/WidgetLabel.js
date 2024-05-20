@@ -61,9 +61,9 @@ export class Widget_Label extends Rect {
 
         this.mesh_bufferidx = mesh_bufferidx;
 
-        this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+        // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
 
-        this.SetStyle(style);
+        // this.SetStyle(style);
 
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
         this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);

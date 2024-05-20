@@ -235,6 +235,9 @@ export function Shader_attributes_enable(attribsidx, vb_attribs) {
       gfxCtx.gl.enableVertexAttribArray(vb_attribs.locs[i]);
       gfxCtx.gl.vertexAttribPointer(vb_attribs.locs[i], vb_attribs.sizes[i], gl_type, false, vb_attribs.count * FLOAT32_BYTE_SIZE, vb_attribs.offsets[i] * FLOAT32_BYTE_SIZE);
       gfxCtx.gl.vertexAttribDivisor(vb_attribs.locs[i], vb_attribs.attrib_divisor);
+      // if(vb_attribs.count===8 && vb_attribs.attrib_divisor===1) 
+      //    gfxCtx.gl.vertexAttribDivisor(vb_attribs.locs[i], 1);
+      // else gfxCtx.gl.vertexAttribDivisor(vb_attribs.locs[i], vb_attribs.attrib_divisor);
 
    }
 }

@@ -1,7 +1,7 @@
 "use strict";
 
 import * as math from '../../../../Helpers/Math/MathOperations.js'
-import { Gl_set_RGBA, Gl_set_alpha, Gl_set_RGBA_per_vertex } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba, Gl_set_alpha, Gl_set_RGBA_per_vertex } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 import { CharBuffer } from '../../../Core/Buffers.js';
 import { BLUEL, PURPLER } from './Colors.js';
@@ -35,7 +35,8 @@ export class Material {
       this.sid = {
          shad: 0,
          attr: SID.ATTR.COL4,
-         inst: SID.ATTR.COL4,
+         // inst: SID.ATTR.COL4,
+         inst: 0x0,
          unif: 0,
          pass: 0,
       };
@@ -54,7 +55,7 @@ export class Material {
 
    SetColorRGB(col, gfx, num_faces) {
       math.CopyArr3(this.col, col);
-      Gl_set_RGBA(gfx, this.col, num_faces);
+      Gl_set_rgba(gfx, this.col, num_faces);
    }
 
 

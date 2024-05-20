@@ -1574,27 +1574,6 @@ export function Widget_group_buffer_print_w5() {
 
 
 
-// Print the widget groups buffer
-export function Root_uniforms_for_wpos() {
-
-   console.log('_root_uniforms_for_wpos:')
-   for (let i = 0; i <= _root_uniforms_for_wpos.boundary; i++) {
-
-      const parent = (temp_debug_names_of_root_uniform_wpos.buffer[i].parent_meshidx !== INT_NULL)
-         ? (_mesh_buffer.buffer[temp_debug_names_of_root_uniform_wpos.buffer[i].parent_meshidx]) : null;
-      const parent_name = (parent)
-         ? Str_buffer_mesh_names_get_by_idx(parent.nameidx) : 'NULL'
-
-      console.log(i,
-         'pos:', _root_uniforms_for_wpos.buffer[i].wpos,
-         'name:', Str_buffer_mesh_names_get_by_idx(temp_debug_names_of_root_uniform_wpos.buffer[i].nameidx),
-         '||| parent:', parent_name,
-         'parent_posidx:', _root_uniforms_for_wpos.buffer[i].parent_posidx,
-         'vbidx:', temp_debug_names_of_root_uniform_wpos.buffer[i].vbidx,
-      );
-   }
-}
-
 
 
 

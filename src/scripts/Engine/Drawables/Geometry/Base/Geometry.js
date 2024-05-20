@@ -27,9 +27,8 @@ export class Geometry2D {
         this.sid = {
             shad: 0,
             attr: (SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4),
-            // attr: SID.ATTR.POS2,
-            inst: SID.ATTR.WPOS_TIME4,
-            // inst: 0x0,
+            // inst: SID.ATTR.WPOS_TIME4,
+            inst: 0x0,
             unif: 0,
             pass: 0,
         };
@@ -58,7 +57,8 @@ export class Geometry2D {
     SetPosX(x, gfx, numFaces)       { glBufferOps.Gl_set_wpos_X     (gfx, x + this.dim[0], numFaces); }
     SetPosY(y, gfx, numFaces)       { glBufferOps.Gl_set_wpos_Y     (gfx, y + this.dim[1], numFaces); }
     SetDefaultPosXY(gfx)            { glBufferOps.Gl_set_wpos_XY    (gfx, this.pos[0] + this.dim[0], this.pos[1] + this.dim[1], this.pos[2]); }
-    MoveXY(x, y, gfx)   { if (x === 0 && y === 0) return; glBufferOps.Gl_add_wpos_XY(gfx, [x + this.dim[0], y + this.dim[1]], this.num_faces); }
+    // MoveXY(x, y, gfx)   { if (x === 0 && y === 0) return; glBufferOps.Gl_add_wpos_XY(gfx, x + this.dim[0], y + this.dim[1], this.num_faces); }
+    MoveXY(x, y, gfx)   { if (x === 0 && y === 0) return; glBufferOps.Gl_add_wpos_XY(gfx, x, y, this.num_faces); }
     MoveX(x, gfx)       { if (x === 0) return; glBufferOps.Gl_add_wpos_X(gfx, x); }
     MoveY(y, gfx)       { if (y === 0) return; glBufferOps.Gl_add_wpos_Y(gfx, y); }
 

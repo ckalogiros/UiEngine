@@ -3,7 +3,7 @@
 
 import { Vertex_buffer_group_state_enable, Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_state_enable, Vertex_buffer_group_get_vbidxs, VBI_get_byidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
-import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
+import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_store_vertex_buffer_group_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_per_vb_create_vb, Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
@@ -13,7 +13,7 @@ import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private } fr
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
 import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
-import { New_int8_buffer } from "../../Core/Buffers.js";
+import { New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 
 
 // const Table_combi_look_up_wich_attrib_to_wich_vb = [
@@ -54,16 +54,25 @@ export class GfxInfoMesh {
       };
 
       this.vb = { // The vertex buffer info the mesh belongs to
+         
          groupidx: INT_NULL,	// 
          idxs: New_int8_buffer(),	// The vertex buffer (float*) idx that this Mesh is stored to.
-         starts: New_int8_buffer(),		// The current meshe's starting index in vertex buffer. 
-         counts: New_int8_buffer(),		// Current size of the float buffer (in floats)
-         /*DO NOT DELETE*///ib_count: 0,    // Case that the index buffer is shared between vertex buffers, each vb nedds to know how many indices the Draw function should access
-         idx_per_attrib: { // Fst way of using the correct vbuffer for an attribute
-            col_buf: INT_NULL,
-            wpos_buf: INT_NULL,
-            dim_buf: INT_NULL,
-            tex_buf: INT_NULL,
+         starts: New_int16_buffer(),		// The current meshe's starting index in vertex buffer. 
+         counts: New_int16_buffer(),		// Current size of the float buffer (in floats)
+         
+         which_vb: { // If this gfx has attributes scattered between vertex buffers, we need to specify which attribute belongs to which vertex buffer
+            col_buf: INT_NULL,   // The index of the vertex buffer the color attribute is stored to
+            wpos_buf: INT_NULL,  // The index of the vertex buffer the wpos attribute is stored to
+            params1_buf: INT_NULL,  // The index of the vertex buffer the wpos attribute is stored to
+            dim_buf: INT_NULL,   // The index of the vertex buffer the vertex pos attribute is stored to
+            tex_buf: INT_NULL,   // The index of the vertex buffer the texture attribute is stored to
+         },
+         which_attrib: { // If this gfx has attributes scattered between vertex buffers, we need the index of the buffer for each attribute(index to:{idxs,starts,counts,...})
+            col_idx: INT_NULL,   // The index of the color attribute
+            wpos_idx: INT_NULL,  // The index of the wpos attribute
+            params1_idx: INT_NULL,  // The index of the wpos attribute
+            dim_idx: INT_NULL,   // The index of the vertex pos attribute
+            tex_idx: INT_NULL,   // The index of the texture attribute
          },
          is_per_vertex: New_int8_buffer(), // 
       };
@@ -78,6 +87,35 @@ export class GfxInfoMesh {
          idx: INT_NULL,
       };
 
+   }
+
+   CopyVb(){
+
+      const gfx = { 
+         
+         groupidx: this.vb.groupidx,
+         idxs: this.vb.idxs,
+         starts: this.vb.starts,
+         counts: this.vb.counts,
+         
+         which_vb: {       
+            col_buf: this.vb.which_vb.col_buf,
+            wpos_buf: this.vb.which_vb.wpos_buf,
+            params1_buf: this.vb.which_vb.params1_buf,
+            dim_buf: this.vb.which_vb.dim_buf,
+            tex_buf: this.vb.which_vb.tex_buf,
+         },
+         which_attrib: { 
+            col_idx: this.vb.which_attrib.col_idx,
+            wpos_idx: this.vb.which_attrib.wpos_idx,
+            params1_idx: this.vb.which_attrib.params1_idx,
+            dim_idx: this.vb.which_attrib.dim_idx,
+            tex_idx: this.vb.which_attrib.tex_idx,
+         },
+         is_per_vertex: New_int8_buffer(), // 
+      };
+
+      return gfx;
    }
 
 }
@@ -95,7 +133,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
    // Cash values
    const vertsPerRect = VERTS_PER_RECT_INDEXED; // TODO: Let the program creation decide for the vertices per rect
    const attribsPerVertex = Shader_attributes_get_attribs_per_vertex(prog.attribsidx);
-   const count = vertsPerRect * attribsPerVertex; // Total attributes of the mesh. All text meshes have only one face registered, the rest of the faces are calculated if needed.
+   // const count = vertsPerRect * attribsPerVertex; // Total attributes of the mesh. All text meshes have only one face registered, the rest of the faces are calculated if needed.
 
    // Create meshe's gfx info
    const gfx_ctx = new GfxInfoMesh; // NOTE: This is the only construction of a new GfxInfoMesh object(as for now), all other calls are for creating a copy of an existing GfxInfoMesh. 
@@ -107,34 +145,48 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
    gfx_ctx.vao = vb_group.vao;
 
    gfx_ctx.prog.idx = progidx;
-   // gfx_ctx.prog.progvbidx = prog.vb_group.buffer[vb_groupidx];
    gfx_ctx.prog.progibidx = prog.ib.buffer[ibidx];
    gfx_ctx.prog.attribsidx = prog.attribsidx;
 
-
    gfx_ctx.vb.groupidx = vb_groupidx;
 
+   const prog_attribs = Shader_attributes_get_attribs(prog.attribsidx)
    
    for(let i=0; i <= vb_group.vb_idxs.boundary; i++){
       
       
       const vbidx = vb_group.vb_idxs.buffer[i];
-      gfx_ctx.vb.idxs.Add(vbidx);
+      const idx = gfx_ctx.vb.idxs.Add(vbidx);
       gfx_ctx.vb.starts.Add(0);
+      gfx_ctx.vb.counts.Add(0);
 
       const vb_info = VBI_get_byidx(vbidx);
 
       // Set bool is instanced or is per_vertex. If the vb's sid isn't included in the mesh's sid.intstanced, then it is per_vertex
       if((vb_group.sid.inst & vb_info.sid)===0) gfx_ctx.vb.is_per_vertex.Add(true);
       else gfx_ctx.vb.is_per_vertex.Add(false);
+
       // Here we assign the correct vertex buffer index to the mesh attributes(COL,WPOS,DIM, etc)
-      if((vb_info.sid & (SID.ATTR.COL4|SID.ATTR.COL4_PER_VERTEX))) gfx_ctx.vb.idx_per_attrib.col_buf = i; // Recognize that the color vertex buffer is at this index 
-      if((vb_info.sid & SID.ATTR.WPOS_TIME4)) gfx_ctx.vb.idx_per_attrib.wpos_buf = i; // same 
-      if((vb_info.sid & SID.ATTR.POS2)) gfx_ctx.vb.idx_per_attrib.dim_buf = i; // same 
-      if((vb_info.sid & SID.ATTR.TEX2)) gfx_ctx.vb.idx_per_attrib.tex_buf = i; // same 
+      if((vb_info.sid & (SID.ATTR.COL4|SID.ATTR.COL4_PER_VERTEX))) { gfx_ctx.vb.which_vb.col_buf = i; }
+      if((vb_info.sid & SID.ATTR.WPOS_TIME4)) { gfx_ctx.vb.which_vb.wpos_buf = i; }
+      if((vb_info.sid & SID.ATTR.PARAMS1)) { gfx_ctx.vb.which_vb.params1_buf = i; }
+      if((vb_info.sid & SID.ATTR.POS2)) { gfx_ctx.vb.which_vb.dim_buf = i; }
+      if((vb_info.sid & SID.ATTR.TEX2)) { gfx_ctx.vb.which_vb.tex_buf = i; }
+
+
    } 
 
-   console.log(gfx_ctx.vb)
+   const len = prog_attribs.nameids.length;
+   for(let i=0; i < len; i++){
+      
+      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i; 
+      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS_TIME4) gfx_ctx.vb.which_attrib.wpos_idx = i; 
+      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.PARAMS1) gfx_ctx.vb.which_attrib.params1_idx = i; 
+      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.POS2) gfx_ctx.vb.which_attrib.dim_idx = i; 
+      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i; 
+   }
+
+   console.log('gfx_ctx.vb:\n  ', gfx_ctx.vb)
 
    gfx_ctx.ib.idx = ibidx; // Stores the programs index for the indexbuffer.
    gfx_ctx.ib.count = ib.count;

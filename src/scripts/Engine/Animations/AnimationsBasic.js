@@ -1,6 +1,6 @@
 "use strict";
 
-import { GlSetAttrSdfParamsOuter, Gl_set_wpos_X, Gl_set_dim_XY, Gl_set_RGBA } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { GlSetAttrSdfParamsOuter, Gl_set_wpos_X, Gl_set_dim_XY, Gl_set_rgba } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { CalculateSdfOuterFromDim } from "../../Helpers/Helpers.js";
 import { GfxInfoMesh } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { AnimationsGet } from "./Animations.js";
@@ -332,7 +332,7 @@ function Animations_run_dim_color_rgb_start(params) {
    if (col[maxcolidx] <= dimfloor) return false;
 
    col[0] *= amt; col[1] *= amt; col[2] *= amt;
-   Gl_set_RGBA(gfx, col);
+   Gl_set_rgba(gfx, col);
 
    return true;
 }
@@ -375,7 +375,7 @@ function Animations_run_bright_color_rgb_start(params) {
    if (col[maxcolidx] >= maxcol) return false;
 
    col[0] *= amt; col[1] *= amt; col[2] *= amt;
-   Gl_set_RGBA(gfx, col);
+   Gl_set_rgba(gfx, col);
 
    return true;
 }
