@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_get_vbidxs, Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPosDif } from "../Controls/Input/Mouse.js";
 import { TimeIntervalsDestroyByIdx } from "../Timers/TimeIntervals.js";
 import { New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
@@ -12,7 +12,7 @@ import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_remove_by_idx }
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 import { REL_POS, Relative_pos_comp_move_right_buffer } from "../Drawables/Operations/RelativePosComponent.js";
-import { Mesh_unif_get_vb_root_wpos } from "./MeshUniformsBuffer.js";
+import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "./MeshUniformsBuffer.js";
 
 
 
@@ -280,27 +280,27 @@ export function Mesh_per_vb_remove_mesh(vbidx, per_vb_bufferidx) {
 
 
 // export function Mesh_per_vb_remove_all_from_index(vbidx, per_vb_bufferidx) {
-export function Mesh_per_vb_remove_all_from_index(vbidx, meshidx) {
+export function Mesh_per_vb_remove_all_from_index(vb_groupidx, meshidx) {
 
    const mesh = _mesh_buffer.buffer[meshidx];
 
    if (mesh.per_vb_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
 
-   for (let i = _mesh_per_vertex_buffer.buffer[vbidx].boundary; i >= mesh.per_vb_bufferidx; i--) {
+   for (let i = _mesh_per_vertex_buffer.buffer[vb_groupidx].boundary; i >= mesh.per_vb_bufferidx; i--) {
 
-      _mesh_per_vertex_buffer.buffer[vbidx].RemoveByIdxSortedVersion(mesh.per_vb_bufferidx);
+      _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxSortedVersion(mesh.per_vb_bufferidx);
    }
 }
 
 
 
-export function Mesh_per_vb_update_mesh_gfx_start(vbidx, start, num_faces) {
+export function Mesh_per_vb_update_mesh_gfx_start(vb_groupidx, start, num_faces) {
 
 
    // EFFICIENCY: We should loop through all mesh idxs in gfx_buffer only if there is an accumulated value to be updated to
-   for (let j = 0; j <= _mesh_per_vertex_buffer.buffer[vbidx].boundary; j++) {
+   for (let j = 0; j <= _mesh_per_vertex_buffer.buffer[vb_groupidx].boundary; j++) {
 
-      const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vbidx].buffer[j]];
+      const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[j]];
       if (mesh && mesh.gfx.vb.start >= start) {
 
          mesh.gfx.vb.start -= num_faces * mesh.gfx.attribsPerVertex * mesh.gfx.vertsPerRect;
@@ -633,11 +633,11 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
 
    if (root_bufferidx === INT_NULL) return;
 
-   const gfxidxs = Widget_root_gfx_get_structured(root_bufferidx);
+   const gfxidxs = Widget_root_gfx_get_all_vb_groupidx(root_bufferidx);
    const len = gfxidxs.vbidxs;
 
    let stored = false;
-   for (let i = 0; i <=  gfxidxs.vbidxs.bouundary; i++) {
+   for (let i = 0; i <=  gfxidxs.vbidxs.boundary; i++) {
 
       if (gfxidxs[i].progidx === progidx && gfxidxs[i].vbidx === vbidx) {
 
@@ -772,25 +772,29 @@ export function Widget_root_gfx_remove_byidx(root_bufferidx) {
 
 function Widget_root_gfx_create(root_bufferidx) {
 
-   // const idx = _widget_root_gfx.Add(New_int8_buffer(2), New_int8_buffer(1)); // 2 elements is enough for 1 gfx indexes (0:progidx, 1:vb_groupidx) and for vbs (vbidxs:[])
-   // const idx = _widget_root_gfx.Add(New_int8_buffer(3)); // 2 elements is enough for 1 gfx indexes (0:progidx, 1:vb_groupidx, 2..n:vbidxs)
-   const gfx_idxs = {
-      progidx: INT_NULL,
-      vb_groupidx: INT_NULL,
-      vbidxs: New_int8_buffer(1),
-   }; 
-   const idx = _widget_root_gfx.Add(gfx_idxs); 
+   // const a = New_generic_buffer(); 
+   // const idx1 = _widget_root_gfx.Add(a); 
+
+   // const gfx_idxs = {
+   //    progidx: INT_NULL,
+   //    vb_groupidx: INT_NULL,
+   //    vbidxs: New_int8_buffer(1),
+   // }; 
+   // const idx = _widget_root_gfx.buffer[idx1].Add(gfx_idxs); 
+   
+   // const vb_groupidx = INT_NULL;
+   const idx = _widget_root_gfx.Add(New_int8_buffer()); 
 
    if (root_bufferidx !== idx) alert('Widget root gfx buffer not the same with the Widget root buffer');
 }
 
 
 // Create a stuctured representation of all widget root gfx buffers istead of the int8 array of triads of plain integers.
-export function Widget_root_gfx_get_structured(root_bufferidx) {
+export function Widget_root_gfx_get_all_vb_groupidx(root_bufferidx) {
 
    return _widget_root_gfx.buffer[root_bufferidx];
 }
-// export function Widget_root_gfx_get_structured(root_bufferidx) {
+// export function Widget_root_gfx_get_all_vb_groupidx(root_bufferidx) {
 
 //    const gfx_idxs = _widget_root_gfx.buffer[root_bufferidx];
 //    let structured = [];
@@ -809,17 +813,38 @@ export function Widget_root_gfx_get_structured(root_bufferidx) {
 
 
 
+// export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs) {
+
+//    if (root_bufferidx === INT_NULL) return; // Case there is no widget root creation.
+
+//    _widget_root_gfx.buffer[root_bufferidx].progidx = progidx;
+//    _widget_root_gfx.buffer[root_bufferidx].vb_groupidx = vb_groupidx;
+
+//    // Add the vb group vertex buffer indexes
+//    for(let i=0; i <= vbidxs.boundary; i++){
+//       _widget_root_gfx.buffer[root_bufferidx].vbidxs.Add(vbidxs.buffer[i]);
+//    }
+
+//    const vb_dataidx = Widget_root_batch_create_vb(root_bufferidx, mesh_bufferidx);
+
+//    // This is the easiest way to store the 'vb_dataidx' to the mesh's batch_buffer_vbidx variable.
+//    const mesh = _mesh_buffer.buffer[mesh_bufferidx]; // Get the mesh from MeshBuffer
+//    mesh.batch_buffer_vbidx = vb_dataidx; // Assign the 'batch_buffer_vbidx'
+
+// }
 export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs) {
 
    if (root_bufferidx === INT_NULL) return; // Case there is no widget root creation.
 
-   _widget_root_gfx.buffer[root_bufferidx].progidx = progidx;
-   _widget_root_gfx.buffer[root_bufferidx].vb_groupidx = vb_groupidx;
+   // _widget_root_gfx.buffer[root_bufferidx].progidx = progidx;
+   // _widget_root_gfx.buffer[root_bufferidx].vb_groupidx = vb_groupidx;
 
    // Add the vb group vertex buffer indexes
-   for(let i=0; i <= vbidxs.boundary; i++){
-      _widget_root_gfx.buffer[root_bufferidx].vbidxs.Add(vbidxs.buffer[i]);
-   }
+   // for(let i=0; i <= vbidxs.boundary; i++){
+   //    _widget_root_gfx.buffer[root_bufferidx].vbidxs.Add(vbidxs.buffer[i]);
+   // }
+   
+   _widget_root_gfx.buffer[root_bufferidx].Add(vb_groupidx);
 
    const vb_dataidx = Widget_root_batch_create_vb(root_bufferidx, mesh_bufferidx);
 
@@ -845,19 +870,30 @@ export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_
 
 
 
-/** Run through all vbs of the widget root, and set all root_pos's to the widget root pos */
+/** Run through all vbs of the widget wpos root, and set all root_pos's to the widget root pos */
 export function Widget_root_gfx_add_unif_wpos_per_vb(root_bufferidx, dif) {
-alert('1234')
+
    const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[0]];
 
-   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j += 2) {
+   const root_vb_groupidxs = _widget_root_gfx.buffer[root_bufferidx];
 
-      const vb_groupidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j + 1];
-      // const vbs = Vertex_buffer_group_get_vbs(vb_groupidx);
-      // if (vbidx !== root_mesh.gfx.vb.idx) {
-      //    Mesh_unif_add_vb_root_wpos(vbidx, dif);
-      // }
+   // Run for all vertex buffer groups that belong to the root widget
+   for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
+
+      const vb_groupidx = root_vb_groupidxs.buffer[i];
+      // TODO: A way of not change the root's wpos, but the all next. FIX it. (For scroller maybe we should call a View function that updates the unif pos of the scrolled meshes only) 
+      if (vb_groupidx !== root_mesh.gfx.vb.groupidx) {
+         Mesh_unif_add_vb_root_wpos(vb_groupidx, dif); 
+      }
    }
+
+   // for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].vbidxs.boundary; j++) {
+
+   //    const vb_groupidx = _widget_root_gfx.buffer[root_bufferidx].vbidxs.buffer[j];
+   //    if (vb_groupidx !== root_mesh.gfx.vb.groupidx) {// TODO: A way of not change the root's wpos, but the all next. FIX it. (For scroller maybe we should call a View function that updates the unif pos of the scrolled meshes only) 
+   //       Mesh_unif_add_vb_root_wpos(vb_groupidx, dif); 
+   //    }
+   // }
 
 }
 
@@ -866,14 +902,11 @@ alert('1234')
 /** Run through all vbs of the widget root, and resets the vb buffers of the '_mesh_per_vertex_buffer' struct */
 export function Widget_root_gfx_reset_mesh_per_vb_buffer(root_bufferidx) {
    
-   const root_mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[0]];
+   const root_vb_groupidxs = _widget_root_gfx.buffer[root_bufferidx];
    
-   for (let j = 0; j <= _widget_root_gfx.buffer[root_bufferidx].boundary; j += 2) {
+   for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
 
-      const vbidx = _widget_root_gfx.buffer[root_bufferidx].buffer[j + 1];
-      // if (vbidx !== root_mesh.gfx.vb.idx) {
-         Mesh_per_vb_reset_buffer(vbidx);
-      // }
+      Mesh_per_vb_reset_buffer(root_vb_groupidxs.buffer[i]);
    }
 
 }
@@ -1114,18 +1147,14 @@ export function Movey_from_widget_root_buffer_and_batch_update(mesh, ydif) {
 /** Reset all gfx buffers, from start index 0, for the widget_root buffer, via it's widget_root_gfx buffer */
 export function Widget_root_reset_gfx(root_bufferidx) {
 
-   // const rootgfx = _widget_root_gfx.buffer[root_bufferidx];
-   const rootgfx = Widget_root_gfx_get_structured(root_bufferidx);
-   const len = rootgfx.length;
-
-   for (let i = 0; i < len; i++) {
-
-      // Get the root mesh from root_batch_buffer, touse the start index of every root for the vertex buffer
+   const rootgfx = Widget_root_gfx_get_all_vb_groupidx(root_bufferidx);
+   
+   for (let i = 0; i <= rootgfx.boundary; i++) {
+      
       const root_mesh_per_vb_idx = _root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx; // IMPORTANT: // TODO: Maybe we store the start to the batch buffer: batch_buffer.vb[i].start={meshidx, num_faces, start}
       const mesh = _mesh_buffer.buffer[root_mesh_per_vb_idx];
 
-      // Add to vertexbuffer
-      Vertex_buffer_reset_to_index(rootgfx[i].progidx, rootgfx[i].vbidx, mesh.gfx.vb.start);
+      Vertex_buffer_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer);
    }
 }
 
@@ -1473,7 +1502,7 @@ export function Widgetroot_buffer_print_w1() {
                   // 'batchidx', mesh.batch_buffer_vbidx,
                   // 'gfxidx', mesh.per_vb_bufferidx,
                   'msbidx', mesh.mesh_bufferidx,
-                  'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.idx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
+                  'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.groupidx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
                   'root_pos', mesh.root_posidx,
                   'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
                   'state', mesh.state.mask,

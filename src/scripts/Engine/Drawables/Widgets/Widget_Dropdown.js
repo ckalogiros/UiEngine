@@ -284,14 +284,14 @@ export class Widget_Dropdown extends Section {
    /*******************************************************************************************************************************************************/
 
    /** If FLAG===PRIVATE, then we get the gfx of the parent. If no parent exists, then the Gfx_generate_context creates new gfx. */
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = _) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx=INT_NULL) {
 
-      this.gfx = Gfx_generate_context(FLAGS, this, gfxidx);
+      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
       const btn = this.children.buffer[0];
-      btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [this.gfx.prog.idx, this.gfx.vb.idx], _); // Set button's area gfx same with dropDown mesh 
+      btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx); // Set button's area gfx same with dropDown mesh 
 
-      this.menu.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [this.gfx.prog.idx, this.gfx.vb.idx], _)
+      this.menu.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx)
       if (this.group_bufferidxs[0] !== INT_NULL) console.error('TRUE:', this.GetName())
 
       return this.gfx;
@@ -555,7 +555,7 @@ export class Widget_Dropdown extends Section {
 
             menu.state.mask &= ~MESH_STATE.ACTIVE;
 
-            // Mesh_per_vb_remove_mesh(menu.gfx.vb.idx, menu.per_vb_bufferidx);
+            // Mesh_per_vb_remove_mesh(menu.gfx.vb.groupidx, menu.per_vb_bufferidx);
             menu.RemoveFromGfxBuffer();
 
             // Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
@@ -683,7 +683,7 @@ export class Widget_Dropdown extends Section {
       }
 
       View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
-      // Mesh_per_vb_remove_all_from_index(root.gfx.vb.idx, root.per_vb_bufferidx);
+      // Mesh_per_vb_remove_all_from_index(root.gfx.vb.groupidx, root.per_vb_bufferidx);
 
 
       this.#ActivateMenu(root); // Add dropdown to gfx buffers.

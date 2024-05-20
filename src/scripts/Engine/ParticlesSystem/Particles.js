@@ -1,7 +1,7 @@
 "use strict";
 
 import * as math from '../../Helpers/Math/MathOperations.js'
-import { Gl_set_wpos_time, Gl_set_wpos_XY, Gl_set_rgba, Gl_set_alpha, GlSetAttrParams1 } from "../../VertexBuffersOps.js";
+import { Gl_set_wpos_time, Gl_set_wpos_xy, Gl_set_rgba, Gl_set_alpha, GlSetAttrParams1 } from "../../VertexBuffersOps.js";
 import { Mesh } from "../Drawables/Meshes/Base/Mesh.js";
 import { TimersCreateTimer } from "../Timers/Timers.js";
 
@@ -49,13 +49,13 @@ class Particle {
     // SetPos(pos) {
     //     alert('Particles.js')
     //     math.CopyArr2(this.mesh.pos, pos);
-    //     Gl_set_wpos_XY(this.gfxInfo, pos);
+    //     Gl_set_wpos_xy(this.gfxInfo, pos);
     // }
 
 
     // UpdatePos() {
     //     alert('Particles.js')
-    //     Gl_set_wpos_XY(this.gfxInfo, this.mesh.pos);
+    //     Gl_set_wpos_xy(this.gfxInfo, this.mesh.pos);
     // }
 
 };
@@ -94,7 +94,7 @@ export class Particles{
         for(let i=0; i< this.count; i++){
             if( this.buffer[i].isAlive){
                 alert('Particles.js')
-                Gl_set_wpos_XY(this.buffer[i].gfxInfo,   this.buffer[i].mesh.pos);
+                Gl_set_wpos_xy(this.buffer[i].gfxInfo,   this.buffer[i].mesh.pos);
                 Gl_set_wpos_time(this.buffer[i].gfxInfo, this.buffer[i].timer.t);
             }
         }
@@ -114,7 +114,7 @@ export class Particles{
         this. buffer[idx].isAlive = false;
         // Set the wpos far from screen view, so the destroyed particle does not show.
         alert('Particles.js')
-        Gl_set_wpos_XY(this.buffer[idx].gfxInfo, [OUT_OF_VIEW, OUT_OF_VIEW]);
+        Gl_set_wpos_xy(this.buffer[idx].gfxInfo, [OUT_OF_VIEW, OUT_OF_VIEW]);
     }
 
 

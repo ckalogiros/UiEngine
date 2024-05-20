@@ -1,15 +1,14 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_group_set_texidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_group_set_texidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D_Text } from "../Geometry/Geometry2DText.js";
 import { FontMaterial } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Font_get_char_plane_bounds, Font_get_char_uv_coords, Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
-import { Gl_set_dim_XY, Gl_set_uv2, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_dim_xy, Gl_set_uv, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Shader_attributes_get_attribs_offset_size } from "../../../Graphics/ShaderAttributes.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
@@ -67,9 +66,9 @@ export class Text_Mesh extends Mesh {
    /*******************************************************************************************************************************************************/
 
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, INT_NULL]) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
+      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
       return this.gfx;
    }
@@ -97,10 +96,9 @@ export class Text_Mesh extends Mesh {
 
    AddToGfxFromReset() {
 
-
-
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxText)
       this.#TEMP();
+      // this.#TEMP_re_add();
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxText)
 
       // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
@@ -165,7 +163,7 @@ export class Text_Mesh extends Mesh {
             Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
          }
          else { // The first face exista as an entity, the rest are constructed here and store only to the vertex buffer
-            Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
+            Vertex_buffer_add_vertices_from_reset(this.gfx, geom_copy, this.mat, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
          }
 
          geom_copy.pos[0] += (this.fontsize * 2 * (advancex - left_bounds));
@@ -175,6 +173,7 @@ export class Text_Mesh extends Mesh {
 
       }
    }
+
 
 
    ResetText(new_text) {
@@ -372,14 +371,7 @@ export class Text_Mesh extends Mesh {
 
 
    RenderText() {
-      console.error('This functions is not implemented for instancing\nAt RenderText()\n At Text_Mesh.js')
-
-      // const gfx_copy = {
-      //    vb: { groupidx: this.gfx.vb.groupidx, start: this.gfx.vb.start, count: this.gfx.vb.count },
-      //    prog: { attribsidx: this.gfx.prog.attribsidx },
-      //    vertsPerRect: this.gfx.vertsPerRect,
-      //    attribsPerVertex: this.gfx.attribsPerVertex,
-      // }
+      // console.error('This functions is not implemented for instancing\nAt RenderText()\n At Text_Mesh.js')
 
       const store_start = this.gfx.vb.starts.buffer[0]
 
@@ -389,38 +381,38 @@ export class Text_Mesh extends Mesh {
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
-      
+
       const advancex = Font_get_font_advancex(this.mat.texidx);
       const c = this.mat.char_buffer.buffer;
       // const attr = Shader_attributes_get_attribs_offset_size(this.gfx.prog.attribsidx, SHADER_ATTRIBUTES.TEX2);
-      
+
       // Update text faces
       for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
-         
+
          let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
-         
+
          if (c[i] !== '') // If char=' ' space, just render [0,0] uv coordinates.
          {
             // Set character dimentions.
             const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, c[i]);
             geom_copy.dim[0] *= plane_bounds.width;
             geom_copy.dim[1] *= plane_bounds.height;
-            Gl_set_dim_XY(this.gfx, geom_copy.dim);
-            
+            Gl_set_dim_xy(this.gfx, geom_copy.dim[0], geom_copy.dim[1]);
+
             // Set character y position and advance.
             geom_copy.pos[0] += (advancex + plane_bounds.left) * 2 * this.fontsize;
             geom_copy.pos[1] += geom_copy.dim[1] + plane_bounds.yoffset * this.fontsize;
-            Gl_set_wpos_XY(this.gfx, geom_copy.pos[0], geom_copy.pos[1]);
-            
+            Gl_set_wpos_xy(this.gfx, geom_copy.pos[0], geom_copy.pos[1]);
+
             // Get the correct uv coordinates.
             uvs = Font_get_char_uv_coords(this.mat.uvIdx, c[i]);
-            
+
             geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
          }
-         
-         // Gl_set_uv2(this.gfx.vb.groupidx, uvs, start, attr.offset, attr.size, this.gfx.attribsPerVertex)
-         Gl_set_uv2(this.gfx, uvs);
-         
+
+         // Gl_set_uv(this.gfx.vb.groupidx, uvs, start, attr.offset, attr.size, this.gfx.attribsPerVertex)
+         Gl_set_uv(this.gfx, uvs);
+
          this.gfx.vb.starts.buffer[0] += this.gfx.vb.counts.buffer[0];
       }
 
@@ -428,7 +420,7 @@ export class Text_Mesh extends Mesh {
       for (let i = this.mat.char_buffer.boundary + 1; i < this.mat.char_buffer.size; i++) {
 
          let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
-         Gl_set_uv2(this.gfx, uvs);
+         Gl_set_uv(this.gfx, uvs);
 
          this.gfx.vb.starts.buffer[0] += this.gfx.vb.counts.buffer[0]
       }
@@ -469,7 +461,7 @@ export class Text_Mesh extends Mesh {
       // // Set character dimentions. 
       // geom_copy.dim[0] *= plane_bounds.width;
       // geom_copy.dim[1] *= plane_bounds.height;
-      // Gl_set_dim_XY(gfx_copy, geom_copy.dim);
+      // Gl_set_dim_xy(gfx_copy, geom_copy.dim);
 
       // // Set character y position and advance.
       // geom_copy.pos[0] +=  (advancex+plane_bounds.left) * 2 * this.fontsize;

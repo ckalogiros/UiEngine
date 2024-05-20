@@ -57,6 +57,18 @@ export const VIEW_INFO = {
 
 
 /**
+ * 
+ * Θελουμε το mesh, απο το οποιο θα αντλησουμε τα starts
+ * και μαλλον τα num_faces
+   
+   NEW
+   view:[]
+      .buffer[i]:       {vb:[]GenericBuffer} For all vb_groupidxs
+         .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
+            .vb_info:    {num_faces:int, starts:[]},
+            .mesh_data:      meshidx
+
+   OLD
    view:[]
       .buffer[i]:       {vb:[]GenericBuffer}
          .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
@@ -172,7 +184,7 @@ function View_add_mesh(groupidx, mesh) {
    const mesh_bufferidx = mesh.mesh_bufferidx;
    const num_faces = mesh.geom.num_faces;
    const start = mesh.gfx.vb.start;
-   const vbidx = mesh.gfx.vb.idx;
+   const vbidx = mesh.gfx.vb.groupidx;
    const ibidx = mesh.gfx.ib.idx;
    const progidx = mesh.gfx.prog.idx;
 
@@ -376,20 +388,20 @@ export function View_remove_from_group(mesh) {
 /******************************************************************************************************************************/
 // Functionality
 /*****************************************************************************************************************************/
-
+// HERE: must add multi vbidx for the Views
 export function View_reset_from_view_all_buffers(view_bufferidx) {
 
    const view = _view_buffer.buffer[view_bufferidx];
 
    for (let i = 0; i <= view.vb.boundary; i++) {
 
-      const progidx = view.vb.buffer[i].info[VIEW_INFO.PROGIDX];
-      const vbidx = view.vb.buffer[i].info[VIEW_INFO.VBIDX];
+      // const progidx = view.vb.buffer[i].info[VIEW_INFO.PROGIDX];
+      const vb_groupidx = view.vb.buffer[i].info[VIEW_INFO.VBIDX];
 
       const vb_start = view.vb.buffer[i].info[VIEW_INFO.START]; // We want the start of the root mesh of the group, not the start of the root widget
-      Vertex_buffer_reset_to_index(progidx, vbidx, vb_start);
+      Vertex_buffer_reset_to_index(vb_groupidx, vb_start);
 
-      Mesh_per_vb_remove_all_from_index(vbidx, view.vb.buffer[i].data.buffer[0]); // Pass the meshidx of the first mesh on the current accessed vb
+      Mesh_per_vb_remove_all_from_index(vb_groupidx, view.vb.buffer[i].data.buffer[0]); // Pass the meshidx of the first mesh on the current accessed vb
    }
 
 }
@@ -406,10 +418,14 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
       
       for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){
          
-         const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[j]);
-         if (mesh.state.mask & MESH_STATE.ACTIVE) { 
+         const meshidx = view.vb.buffer[i].data.buffer[j];
+         if(meshidx !== INT_NULL){
 
-            mesh.AddToGfxFromReset(); 
+            const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
+            if (mesh.state.mask & MESH_STATE.ACTIVE) { 
+   
+               mesh.AddToGfxFromReset(); 
+            }
          }
          // else console.log('INACTIVE', mesh.GetName())
       }
@@ -440,7 +456,7 @@ export function View_remove_mesh_from_gfx_buffer_by_view_all_vb(view_bufferidx) 
       // Get the fist mesh of the vb group buffer
       const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[0]);
 
-      Mesh_per_vb_remove_mesh(mesh.gfx.vb.idx, mesh.per_vb_bufferidx);
+      Mesh_per_vb_remove_mesh(mesh.gfx.vb.groupidx, mesh.per_vb_bufferidx);
 
    }
 

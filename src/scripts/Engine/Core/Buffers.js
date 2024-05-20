@@ -612,7 +612,8 @@ export class ArrayBufferInterface {
          const idx = this.Realloc(); // buffer is full.
          this.boundary = idx;
 
-         this.freeidx = idx+1; // POTENTIAL_BUG: we assume that the realloc allocated more space than the curent .boundary holds
+         if(idx+1 < this.size)
+            this.freeidx = idx+1; // POTENTIAL_BUG: we assume that the realloc allocated more space than the curent .boundary holds
          // console.warn(this.freeidx, this.size)
          return idx;
       }

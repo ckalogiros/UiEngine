@@ -1,6 +1,6 @@
 "use strict";
 
-import { Gl_set_wpos_Y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Geometry2D } from "./Base/Geometry.js";
 
 
@@ -40,7 +40,7 @@ export class Geometry2D_Text extends Geometry2D {
 
    SetPosY(y, gfx) {
       this.pos[1] = y;
-      Gl_set_wpos_Y(gfx, y, this.num_faces);
+      Gl_set_wpos_y(gfx, y, this.num_faces);
    }
 
 

@@ -126,6 +126,7 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
    const group = View_get_view_byidx(group_bufferidx);
+   // console.log('========================')
    
    for(let i=0; i <= group.vb.boundary; i++){
       
@@ -138,6 +139,9 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
          const top      = root_wposy + mesh.geom.pos[1];
          const bottom   = top + mesh.geom.dim[1]*2;
+
+         // if((mesh.type & MESH_TYPE.TEXT_MESH)===0)console.log(j, top, limit.up, bottom, limit.down)
+         // if((mesh.type & MESH_TYPE.TEXT_MESH)===0 && j!==0) console.log(j, top, bottom, '<', limit.up)
          
    
          if(bottom < limit.up || top > limit.down){

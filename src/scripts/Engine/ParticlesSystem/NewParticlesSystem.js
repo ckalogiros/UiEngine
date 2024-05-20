@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_non_existant_mesh, Vertex_buffer_update_vertices, Vertex_buffer_update_vertices_Expicit_Params } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_update_vertices, Vertex_buffer_update_vertices_Expicit_Params } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set, Gl_particles_batch_set_col4_wpos4_pos2_style3 } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomColor, GetRandomInt } from "../../Helpers/Helpers.js";
 import { CopyArr3 } from "../../Helpers/Math/MathOperations.js";
@@ -158,7 +158,7 @@ class Emitter {
       // const progidx = this.gfx.prog.idx; 
       // const vbidx = this.gfx.vb.idx; 
       // const start = this.particles_buffer.buffer[particle_idx].start; 
-      const start = Vertex_buffer_add_vertices_from_non_existant_mesh(this.gfx, geom, mat);
+      const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, mat);
       // console.log('1. start', start, 'particle_idx', particle_idx)
       
       this.particles_buffer.buffer[particle_idx].SetGfxStart(start);

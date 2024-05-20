@@ -647,12 +647,12 @@ function Debug_info_create_ui_performance_timers() {
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
    
-   for (let i = 0; i <= section.children.boundary; i++) {
-      console.log(Floor(section.children.buffer[i].geom.pos[0]), section.children.buffer[i].geom.pos[1], section.children.buffer[i].GetName())
-      for (let j = 0; j <= section.children.buffer[i].children.boundary; j++) {
-         console.log('--->', Floor(section.children.buffer[i].children.buffer[j].geom.pos[0]), section.children.buffer[i].children.buffer[j].geom.pos[1])
-      }
-   }
+   // for (let i = 0; i <= section.children.boundary; i++) {
+   //    console.log(Floor(section.children.buffer[i].geom.pos[0]), section.children.buffer[i].geom.pos[1], section.children.buffer[i].GetName())
+   //    for (let j = 0; j <= section.children.buffer[i].children.boundary; j++) {
+   //       console.log('--->', Floor(section.children.buffer[i].children.buffer[j].geom.pos[0]), section.children.buffer[i].children.buffer[j].geom.pos[1])
+   //    }
+   // }
    section.Calc_no_gfx_update();
 
    const w = section.GetMaxWidth();

@@ -33,9 +33,9 @@ export class Textured_Mesh extends Mesh {
    // Graphics
 
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, INT_NULL]) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
+      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
       return this.gfx;
    }
@@ -49,14 +49,14 @@ export class Textured_Mesh extends Mesh {
 
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
 
 
       // If texture exists, store texture index, else if font texture exists, store font texture index, else store null
       // BUG: Make sure the below statement makes sense for Texture_Material(it is copied from the Font_Material)
       this.gfx.tb.idx = (this.mat.texidx !== INT_NULL) ? this.mat.texidx : ((this.mat.uvIdx !== INT_NULL) ? this.mat.uvIdx : INT_NULL);
-      Vertex_buffer_group_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
+      Vertex_buffer_group_set_texidx(this.gfx.vb.groupidx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
 
       return this.gfx;
    }
@@ -69,7 +69,7 @@ export class Textured_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
    }
 

@@ -262,16 +262,16 @@ export class Widget_Slider extends Rect {
    /*******************************************************************************************************************************************************/
    // Graphics
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
 
-      this.gfx = Gfx_generate_context(FLAGS, this);
-      const rect_igfx = [this.gfx.prog.idx, this.gfx.vb.idx]; // Copy the gfx from the scroller area.
+      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      const rect_igfx = this.gfx.vb.groupidx; // Copy the gfx from the scroller area.
       
       
       const name_text = this.text_mesh;
-      name_text.gfx = Gfx_generate_context(FLAGS|GFX_CTX_FLAGS.SPECIFIC, name_text);
-      const text_igfx = [name_text.gfx.prog.idx, name_text.gfx.vb.idx];
+      name_text.gfx = Gfx_generate_context(FLAGS|GFX_CTX_FLAGS.SPECIFIC, name_text, );
+      const text_igfx = name_text.gfx.vb.groupidx;
 
       const bar = this.children.buffer[SLIDER_BAR_IDX];
       bar.gfx = Gfx_generate_context(FLAGS, bar, rect_igfx);

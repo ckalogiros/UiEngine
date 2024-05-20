@@ -7,7 +7,7 @@ import { Mesh } from "./Base/Mesh.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Mesh_unif_is_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 
@@ -56,7 +56,7 @@ export class Rect extends Mesh {
 
 
    RemoveFromGfxBuffer() {
-      Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+      Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
    }
 
 
@@ -94,9 +94,9 @@ export class Rect extends Mesh {
    /*******************************************************************************************************************************************************/
    // Graphics
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidxs = [INT_NULL, null]) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      this.gfx = Gfx_generate_context(FLAGS, this, gfxidxs);
+      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
       return this.gfx;
    }
@@ -117,13 +117,15 @@ export class Rect extends Mesh {
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName())
+      // Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName())
+      Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, this.GetName())
+
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       this.is_gfx_inserted = true;
 
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.idx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }
@@ -174,7 +176,7 @@ export class Rect extends Mesh {
 
 
    SetPosXNoGfxUpdate(x) {
-      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
          Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
       }
       else this.geom.pos[0] = x;
@@ -182,7 +184,7 @@ export class Rect extends Mesh {
 
 
    SetPosYNoGfxUpdate(y) {
-      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
          Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
       }
       else this.geom.pos[1] = y;
@@ -195,7 +197,7 @@ export class Rect extends Mesh {
 
 
    SetPosXYNoGfxUpdate(x, y) {
-      if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
          Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
       }
       else {

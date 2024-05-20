@@ -341,12 +341,12 @@ export function TestWidgetsGeneric(scene) {
     // CreateSwitchSimple([0, ypos, 0]);
     // const switch1 = CreateSwitch();
 
-    CreateSlider();
+    // CreateSlider();
     // CreateChangeMeshColorFromSliders(ROOT_WIDGETS.CREATE_ROOT);
 
 
     // CreateWindowWithMenu();
-    // CreateSceneMenuBar();
+    CreateSceneMenuBar();
 
 
 
@@ -1447,6 +1447,9 @@ function CreateManySections(scene) {
 
     const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
     blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE); blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+    // blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
+    // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)
     
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
     red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -1804,7 +1807,7 @@ function CreateScrollerClampAlphaTest(scene) {
     
     
     // const count = colors.length;
-    const count = 10;
+    const count = 16;
     for (let i = 0; i < count; i++) {
         // const label = Create_widget_section(_, _, _, [0, 0, 0], [20,20], TRANSPARENCY(colors[i], .7), `Section${i + 1}`)
         // const label = Create_widget_text(_, `${i}`, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], .7), WHITE)
@@ -1830,13 +1833,14 @@ function CreateScrollerClampAlphaTest(scene) {
     
     scroller.ScrollerAlign();
 
-    scroller.SetPosYNoGfxUpdate(100)
+    scroller.SetPosYNoGfxUpdate(200)
     scroller.SetPosXNoGfxUpdate(100)
 
     View_build_group_from_root_mesh(scroller.scrolled_section);
 
-    const clip_top = scroller.geom.pos[1];
-    const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]*2;
+    const clip_top = scroller.GetPosY();
+    const clip_bottom = clip_top + scroller.geom.dim[1]*2;
+    // const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
     Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
 
     scroller.Render();

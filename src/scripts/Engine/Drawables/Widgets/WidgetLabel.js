@@ -7,7 +7,7 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Rect } from "../Meshes/Rect_Mesh.js";
 import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Alignment.js";
-import { Gl_set_dim_XY, Gl_set_wpos_XY } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
@@ -61,7 +61,7 @@ export class Widget_Label extends Rect {
 
         this.mesh_bufferidx = mesh_bufferidx;
 
-        // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+        this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
 
         // this.SetStyle(style);
 
@@ -142,13 +142,13 @@ export class Widget_Label extends Rect {
     /*******************************************************************************************************************************************************/
 
     // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific = [INT_NULL, INT_NULL]) {
-    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific = null) {
+    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_specific_vb_groupidx = INT_NULL, text_specific_vb_groupidx = INT_NULL) {
 
-        this.gfx = Gfx_generate_context(FLAGS, this, area_gfx_specific);
-        if (!text_gfx_specific)
-            this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, this.text_mesh, text_gfx_specific);
+        this.gfx = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
+        if (text_specific_vb_groupidx===INT_NULL)
+            this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, this.text_mesh);
         else
-            this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_gfx_specific);
+            this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
 
         return this.gfx;
     }
@@ -295,17 +295,17 @@ export class Widget_Label extends Rect {
 
 
     SetPosXYNoGfxUpdate(x, y) {
-        
+
         if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
             Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
         }
-        else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+        else { // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
 
             this.geom.pos[0] = x;
             this.geom.pos[1] = y;
 
-            this.text_mesh.geom.pos[0] = x; 
-            this.text_mesh.geom.pos[1] = y; 
+            this.text_mesh.geom.pos[0] = x;
+            this.text_mesh.geom.pos[1] = y;
         }
     }
 
@@ -317,12 +317,12 @@ export class Widget_Label extends Rect {
         if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
             Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
         }
-        else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+        else { // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
             // if (this.text_mesh.root_posidx !== INT_NULL) { // Same for the text_mesh
             //     Mesh_unif_set_vb_root_wposx(this.text_mesh.root_posidx, x);
             // }
             // else 
-            this.text_mesh.geom.pos[0] = x; 
+            this.text_mesh.geom.pos[0] = x;
         }
     }
 
@@ -330,16 +330,16 @@ export class Widget_Label extends Rect {
     SetPosYNoGfxUpdate(y) {
 
         this.geom.pos[1] = y;
-        
+
         if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
             Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
         }
-        else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+        else { // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
             // if (this.text_mesh.root_posidx !== INT_NULL) { // Same for the text_mesh
             //     Mesh_unif_set_vb_root_wposy(this.text_mesh.root_posidx, y);
             // }
             // else 
-            this.text_mesh.geom.pos[1] = y; 
+            this.text_mesh.geom.pos[1] = y;
         }
     }
 
@@ -390,8 +390,8 @@ export class Widget_Label extends Rect {
 
 
     RemoveFromGfxBuffer() {
-        Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
-        Mesh_per_vb_remove_mesh(this.text_mesh.gfx.vb.idx, this.text_mesh.per_vb_bufferidx);
+        Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
+        Mesh_per_vb_remove_mesh(this.text_mesh.gfx.vb.groupidx, this.text_mesh.per_vb_bufferidx);
     }
 
 
@@ -535,8 +535,8 @@ export class Widget_Label extends Rect {
             }
 
 
-            Gl_set_dim_XY(mesh.gfx, mesh.geom.dim, mesh.geom.num_faces)
-            Gl_set_wpos_XY(mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces)
+            Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1], mesh.geom.num_faces)
+            Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces)
 
 
             // // TODO: Align text

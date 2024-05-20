@@ -53,14 +53,14 @@ export class Geometry2D {
     // Graphics
 
     SetPosXYZ(pos, gfx, numFaces)   { glBufferOps.Gl_set_wpos_XYZ   (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1], pos[2], numFaces); }
-    SetPosXY(pos, gfx)              { glBufferOps.Gl_set_wpos_XY    (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1]); }
-    SetPosX(x, gfx, numFaces)       { glBufferOps.Gl_set_wpos_X     (gfx, x + this.dim[0], numFaces); }
-    SetPosY(y, gfx, numFaces)       { glBufferOps.Gl_set_wpos_Y     (gfx, y + this.dim[1], numFaces); }
-    SetDefaultPosXY(gfx)            { glBufferOps.Gl_set_wpos_XY    (gfx, this.pos[0] + this.dim[0], this.pos[1] + this.dim[1], this.pos[2]); }
-    // MoveXY(x, y, gfx)   { if (x === 0 && y === 0) return; glBufferOps.Gl_add_wpos_XY(gfx, x + this.dim[0], y + this.dim[1], this.num_faces); }
-    MoveXY(x, y, gfx)   { if (x === 0 && y === 0) return; glBufferOps.Gl_add_wpos_XY(gfx, x, y, this.num_faces); }
-    MoveX(x, gfx)       { if (x === 0) return; glBufferOps.Gl_add_wpos_X(gfx, x); }
-    MoveY(y, gfx)       { if (y === 0) return; glBufferOps.Gl_add_wpos_Y(gfx, y); }
+    SetPosXY(pos, gfx)              { glBufferOps.Gl_set_wpos_xy    (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1]); }
+    SetPosX(x, gfx, numFaces)       { glBufferOps.Gl_set_wpos_x     (gfx, x + this.dim[0], numFaces); }
+    SetPosY(y, gfx, numFaces)       { glBufferOps.Gl_set_wpos_y     (gfx, y + this.dim[1], numFaces); }
+    SetDefaultPosXY(gfx)            { glBufferOps.Gl_set_wpos_xy    (gfx, this.pos[0] + this.dim[0], this.pos[1] + this.dim[1], this.pos[2]); }
+    // MoveXY(x, y, gfx)   { if (x === 0 && y === 0) return; glBufferOps.Gl_add_wpos_xy(gfx, x + this.dim[0], y + this.dim[1], this.num_faces); }
+    MoveXY(x, y, gfx)   { if (x === 0 && y === 0) return; glBufferOps.Gl_add_wpos_xy(gfx, x, y, this.num_faces); }
+    MoveX(x, gfx)       { if (x === 0) return; glBufferOps.Gl_add_wpos_x(gfx, x); }
+    MoveY(y, gfx)       { if (y === 0) return; glBufferOps.Gl_add_wpos_y(gfx, y); }
 
     
     SetDim(dim, gfx) {
@@ -74,7 +74,7 @@ export class Geometry2D {
         else dimentions[1] = this.dim[1];
 
         math.CopyArr2(this.dim, dimentions);
-        glBufferOps.Gl_set_dim_XY(gfx, dimentions);
+        glBufferOps.Gl_set_dim_xy(gfx, dimentions[0], dimentions[1]);
     }
 
 

@@ -295,19 +295,20 @@ export class Widget_Multi_Text extends Widget_Text {
 	/*******************************************************************************************************************************************************/
 	// GFX
 
-	GenGfxCtx(FLAGS, gfxidx) {
+	GenGfxCtx(FLAGS, specific_vb_groupidx=null) {
 
-		super.GenGfxCtx(FLAGS, gfxidx);
+		super.GenGfxCtx(FLAGS, specific_vb_groupidx);
 
 		// We know that the 'this' is of type text, so we use the same gfx buffer index for all children texts
 		FLAGS |= GFX_CTX_FLAGS.SPECIFIC;
-		const igfx = [this.gfx.prog.idx, this.gfx.vb.idx];
+		const vb_groupidx = this.gfx.vb.groupidx;
 
 		for (let i = 0; i <= this.children.boundary; i++) {
 
 			const child = this.children.buffer[i];
+			console.log('',vb_groupidx, child.GetName())
 			// if (child) child.gfx = child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx); // Pass the already exixting gfx buffers for use
-			if (child) child.gfx = child.GenGfxCtx(FLAGS, igfx); // Pass the already exixting gfx buffers for use
+			if (child) child.gfx = child.GenGfxCtx(FLAGS, vb_groupidx); // Pass the already exixting gfx buffers for use
 
 			// NOTE: The batch_buffer_vbidx for the parent text is created from the super.GenGfxCtx(). So we have to set it for all children from here.
 			child.batch_buffer_vbidx = this.batch_buffer_vbidx;

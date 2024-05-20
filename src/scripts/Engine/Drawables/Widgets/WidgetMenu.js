@@ -26,7 +26,7 @@ import { View_get_view_vb_root_meshidx } from "../../Core/MeshBufferViews.js";
 
 
 const _fontsize = 8.5;
-const temp_close_minim_style = [0,0,0];
+const temp_close_minim_style = [0, 0, 0];
 
 
 export class Widget_Menu_Bar extends Section {
@@ -99,14 +99,14 @@ export class Widget_Menu_Bar extends Section {
                const child = this.children.buffer[i];
                child.geom.dim[1] = this.geom.dim[1];
                child.geom.dim[0] = this.geom.dim[1];
-               
+
                // Because we changed the size of the button, we need to realign the text
                Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
             }
          }
       }
       else { // Set mesh height to the max height 
-         
+
          close_btn.geom.dim[1] = this.geom.dim[1];
          close_btn.geom.dim[0] = this.geom.dim[1];
          // Because we changed the size of the button, we need to realign the text
@@ -155,7 +155,7 @@ export class Widget_Menu_Bar extends Section {
                const child = this.children.buffer[i];
                child.geom.dim[1] = this.geom.dim[1];
                child.geom.dim[0] = this.geom.dim[1];
-               
+
 
                // Because we changed the size of the button, we need to realign the text
                Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
@@ -166,7 +166,7 @@ export class Widget_Menu_Bar extends Section {
 
          minimize_btn.geom.dim[1] = this.geom.dim[1];
          minimize_btn.geom.dim[0] = this.geom.dim[1];
-               
+
          // Because we changed the size of the button, we need to realign the text
          Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, minimize_btn);
       }
@@ -188,9 +188,9 @@ export class Widget_Menu_Bar extends Section {
 
       // Any mesh of bese type Section, must be calculated(position/size) independent of any other mesh of the menu bar and/or parent/parent-children
       // if(mesh.type & MESH_TYPE.SECTION_MESH) mesh.options |= this.options = SECTION.INDEPENDENT;
-      if(mesh.type & MESH_TYPE.SECTION_MESH) mesh.OptionsEnable(SECTION.INDEPENDENT);
+      if (mesh.type & MESH_TYPE.SECTION_MESH) mesh.OptionsEnable(SECTION.INDEPENDENT);
 
-      const align_item_flag = (RelPosAlign!==undefined) ? RelPosAlign : REL_POS.LEFT;
+      const align_item_flag = (RelPosAlign !== undefined) ? RelPosAlign : REL_POS.LEFT;
 
 
       // Set the height of the menu item to be the same across all other items
@@ -224,7 +224,7 @@ export class Widget_Menu_Bar extends Section {
 
       // TODO: Use the parem 'RelPosAlign', but first implement correctly the 'REL_POS.LEFT' alingment
       // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, mesh.idx);
-      if(RelPosAlign & REL_POS.RIGHT) Relative_pos_comp_add_child_to_comp(align_item_flag, this, mesh.idx);
+      if (RelPosAlign & REL_POS.RIGHT) Relative_pos_comp_add_child_to_comp(align_item_flag, this, mesh.idx);
 
    }
 
@@ -268,17 +268,17 @@ export class Widget_Menu_Bar extends Section {
 
    /*******************************************************************************************************************************************************/
    // Graphics
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      const gfx = super.GenGfxCtx(FLAGS, gfxidx, _, false); // For the menu meshes
+      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, _, false); // For the menu meshes
 
-      const rect_igfx = [this.gfx.prog.idx, this.gfx.vb.idx];
+      const rect_specific_vb_groupidx = this.gfx.vb.groupidx;
       // const text_igfx = [this.label.text_mesh.gfx.prog.idx, this.label.text_mesh.gfx.vb.idx];
 
       for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
          const child = this.children.buffer[i];
          // child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, rect_igfx, text_igfx)
-         child.GenGfxCtx(FLAGS, rect_igfx)
+         child.GenGfxCtx(FLAGS, rect_specific_vb_groupidx)
       }
       return gfx;
    }
@@ -444,7 +444,7 @@ export class Widget_Minimize extends Widget_Button {
             // Render only the menu bar at the root
 
             // Deactivate all children, except the menu bar, so they are not gonna be drawn to the vertex buffer on any re-render 
-            for(let i=menu_bar.idx+1; i <= root.children.boundary; i++ ){
+            for (let i = menu_bar.idx + 1; i <= root.children.boundary; i++) {
                root.children.buffer[i].Deactivate()
             }
 
@@ -473,16 +473,16 @@ export class Widget_Minimize extends Widget_Button {
 
             // Gfx_deactivate_no_listeners_touch(root);
             Widget_root_reset_gfx(root.root_bufferidx)
-            
+
             root.children.Reset();
             root.children = minim_mesh.stored_children_meshes;
 
             // Re-Activate all children, except the menu bar, so they are gonna be drawn to the vertex buffer on re-render 
-            for(let i=root.children.buffer[0].idx+1; i <= root.children.boundary; i++ ){
+            for (let i = root.children.buffer[0].idx + 1; i <= root.children.boundary; i++) {
                root.children.buffer[i].Activate()
             }
 
-            
+
             // Retrieve stored pos and dim
             root.geom.pos[1] = root.geom.defPos[1];
             root.geom.dim[1] = root.geom.defDim[1];
@@ -504,7 +504,7 @@ export class Widget_Minimize extends Widget_Button {
             const group_rootidx = View_get_view_vb_root_meshidx(root.group_bufferidxs);
             const group_root = Mesh_buffer_get_mesh_byidx(group_rootidx);
             const clip_top = group_root.GetPosY();
-            const clip_bottom = clip_top + group_root.geom.dim[1]*2;
+            const clip_bottom = clip_top + group_root.geom.dim[1] * 2;
             // Clipy_from_group(group_root.group_bufferidxs[0], clip_top, clip_bottom);
             Clipy_from_tree_recursive(group_root, clip_top, clip_bottom);
 

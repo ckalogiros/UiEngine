@@ -1,6 +1,6 @@
 "use strict";
 
-import { GlSetAttrSdfParamsOuter, Gl_set_wpos_X, Gl_set_dim_XY, Gl_set_rgba } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { GlSetAttrSdfParamsOuter, Gl_set_wpos_x, Gl_set_dim_xy, Gl_set_rgba } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { CalculateSdfOuterFromDim } from "../../Helpers/Helpers.js";
 import { GfxInfoMesh } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { AnimationsGet } from "./Animations.js";
@@ -46,7 +46,7 @@ function Animations_run_scale_up_start(mesh) {
    mesh.geom.dim[1] *= scaleFactor; // Update button's text dimentions y
    let posx = mesh.geom.pos[0];
 
-   Gl_set_wpos_X(mesh.gfx, posx);
+   Gl_set_wpos_x(mesh.gfx, posx);
    mesh.UpdateDim();
 
    if (mesh.children.boundary) {
@@ -94,7 +94,7 @@ function Animations_run_scale_down_start(mesh) {
 
    let posx = mesh.geom.pos[0];
 
-   Gl_set_wpos_X(mesh.gfx, posx);
+   Gl_set_wpos_x(mesh.gfx, posx);
    mesh.UpdateDim();
 
    if (mesh.children.boundary) {
@@ -124,9 +124,9 @@ function Animations_run_scale_down_start(mesh) {
       // for (let i = 0; i < textLen; i++) {                                                                      
 
       //    posx = (mesh.geom.pos[0] - mesh.geom.dim[0]) + extraWidth + accumTextWidth;
-      //    Gl_set_wpos_X(_gfx, posx);                                                                      
+      //    Gl_set_wpos_x(_gfx, posx);                                                                      
       //    accumTextWidth += advance;                                                                      
-      //    Gl_set_dim_XY(_gfx, textMesh.geom.dim)                                                                        
+      //    Gl_set_dim_xy(_gfx, textMesh.geom.dim)                                                                        
 
       //    const sdfOuter = CalculateSdfOuterFromDim(textMesh.geom.dim[0]);                                                                       
       //    GlSetAttrSdfParamsOuter(_gfx, sdfOuter);                                                                                                           
@@ -181,9 +181,9 @@ function Animations_run_scale_down_stop(mesh) {
       // for (let i = 0; i < textLen; i++) {
 
       //    posx = (mesh.geom.pos[0] - mesh.geom.dim[0]) + extraWidth + accumTextWidth;
-      //    Gl_set_wpos_X(_gfx, posx);
+      //    Gl_set_wpos_x(_gfx, posx);
       //    accumTextWidth += advance;
-      //    Gl_set_dim_XY(_gfx, textMesh.geom.dim)
+      //    Gl_set_dim_xy(_gfx, textMesh.geom.dim)
 
       //    const sdfOuter = CalculateSdfOuterFromDim(textMesh.geom.dim[0]);
       //    GlSetAttrSdfParamsOuter(_gfx, sdfOuter);
@@ -222,7 +222,7 @@ function Helper_scale_rect(_mesh, scaleFactor) {
       mesh.geom.dim[0] *= scaleFactor; 
       mesh.geom.dim[1] *= scaleFactor; 
 
-      Gl_set_dim_XY(mesh.gfx, mesh.geom.dim)
+      Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
    }
 }
 
@@ -255,9 +255,9 @@ function Helper_scale_text(mesh, scaleFactor, flag) {
    for (let i = 0; i < textMesh.mat.char_buffer.boundary; i++) {
 
       posx = (mesh.geom.pos[0] - mesh.geom.dim[0]) + extraWidth + accumTextWidth;
-      Gl_set_wpos_X(_gfx, posx);
+      Gl_set_wpos_x(_gfx, posx);
       accumTextWidth += advance;
-      Gl_set_dim_XY(_gfx, textMesh.geom.dim)
+      Gl_set_dim_xy(_gfx, textMesh.geom.dim[0], textMesh.geom.dim[1])
 
       const sdfOuter = CalculateSdfOuterFromDim(textMesh.geom.dim[0]);
       GlSetAttrSdfParamsOuter(_gfx, sdfOuter);

@@ -49,7 +49,7 @@ export class Section extends Rect {
       this.min_size = [0, 0];
 
 
-      // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -311,15 +311,19 @@ export class Section extends Rect {
    /*******************************************************************************************************************************************************/
 
    // HACK: I need to pass an extra param from Menu_bar widget, so that its children are handled by its class(all that because Widget_Menu_Bar inherits from Section)
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null, params = null, run_for_children = true) {
+   // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL, params = null, run_for_children = true) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      const gfx = super.GenGfxCtx(FLAGS, gfxidx, params);
+      // const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, params);
+      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
 
-      if (run_for_children) {
+      // if (run_for_children) {
+      if (true) {
          for (let i = 0; i <= this.children.boundary; i++) {
 
             const child = this.children.buffer[i];
-            if (child) child.GenGfxCtx(FLAGS, gfxidx, params);
+            // if (child) child.GenGfxCtx(FLAGS, specific_vb_groupidx, params);
+            if (child) child.GenGfxCtx(FLAGS, specific_vb_groupidx);
          }
       }
 
@@ -949,7 +953,6 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
             parent.max_size[1] = parent.geom.dim[1];  // For horizontal, grow to the max height of all meshes
       }
    }
-   console.log('333: PARENT', parent.GetName())
 
    for (let i = target_idx; i <= parent.children.boundary; i++) {
 
@@ -979,7 +982,6 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
 
          }
 
-         console.log('333', mesh.GetName(), recur_cnt)
          mesh.SetMargin();
 
          if (opt & SECTION.VERTICAL) {

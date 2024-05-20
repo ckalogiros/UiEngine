@@ -72,10 +72,10 @@ export class Widget_Switch_Simple extends Rect {
    }
 
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, gfxidx = null, params = null) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL, params = null) {
 
-      const gfx = super.GenGfxCtx(FLAGS, gfxidx, params);
-      this.children.buffer[0].GenGfxCtx(FLAGS, gfxidx, params);
+      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, params);
+      this.children.buffer[0].GenGfxCtx(FLAGS, specific_vb_groupidx, params);
 
       return gfx;
    }

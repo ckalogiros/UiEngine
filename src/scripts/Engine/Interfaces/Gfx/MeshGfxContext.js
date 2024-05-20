@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { Vertex_buffer_group_state_enable, Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_state_enable, Vertex_buffer_group_get_vbidxs, VBI_get_byidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_state_enable, Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_state_enable, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_store_vertex_buffer_group_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
@@ -186,7 +186,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
       if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i; 
    }
 
-   console.log('gfx_ctx.vb:\n  ', gfx_ctx.vb)
+   // console.log('gfx_ctx.vb:\n  ', gfx_ctx.vb)
 
    gfx_ctx.ib.idx = ibidx; // Stores the programs index for the indexbuffer.
    gfx_ctx.ib.count = ib.count;
@@ -208,7 +208,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
  * Else default to the default group
  */
 //(this.sid, this.sceneidx, this.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
-export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL, null]) {
+export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NULL) {
 
 
    // Cash
@@ -224,14 +224,22 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
    let ibidx = INT_NULL;
    let vb_group = null;
    let vbidxs = null;
+   let vb_groupidx = INT_NULL;
    
    
-   // Check buffers validity, or find buffers based on Flags
-   const igfx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, spesific_gfx_idxs);
-   progidx = igfx[0];
-   let vb_groupidx = igfx[1];
-   if(vb_groupidx !== INT_NULL) // Get the vbidxs if an apropriate vb group is found
-      vbidxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
+   if(specific_vb_groupidx !== INT_NULL) { // Get the vbidxs if an apropriate vb group is found
+      vbidxs = Vertex_buffer_group_get_vbidxs(specific_vb_groupidx);
+      progidx = Vertex_buffer_group_get_progidx(specific_vb_groupidx);
+      vb_groupidx = specific_vb_groupidx
+   }
+   else{
+      // Check buffers validity, or find buffers based on Flags
+      vb_groupidx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, specific_vb_groupidx);
+      
+if(vb_groupidx===1)
+   console.log()
+
+   }
 
 
 
@@ -285,7 +293,7 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
 
    if (vb_groupidx === INT_NULL) {
 
-      // First look a the gfx pool for any matching vertex buffer
+      // First look the gfx pool for any matching vertex buffer
       vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags);
 
       if (vb_groupidx === INT_NULL) {
@@ -308,8 +316,6 @@ export function Gfx_generate_context(FLAGS, mesh, spesific_gfx_idxs = [INT_NULL,
       }
 
    }
-
-
 
 
 
