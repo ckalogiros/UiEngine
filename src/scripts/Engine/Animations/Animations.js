@@ -290,7 +290,7 @@ function Analyze_flag(anim_type_flag, flag){
 export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=null, step=0, min=0, max=0){
         
 
-    const vbidx = mesh.gfx.vb.idx;
+    const vbidx = mesh.gfx.vb.groupidx;
     const starts = mesh.gfx.vb.start;
     const attribs_per_vertex = mesh.gfx.attribsPerVertex;
     const attribsidx = mesh.gfx.prog.attribsidx;

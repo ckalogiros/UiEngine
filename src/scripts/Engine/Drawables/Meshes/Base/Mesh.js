@@ -4,7 +4,7 @@ import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
-import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start, Widgetroot_buffer_print_w1 } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_batch_destroy_run, Styles_batch_destroy_store, Styles_create, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
@@ -152,6 +152,7 @@ export class Mesh {
         this.parent = null;
 
         this.listeners = null;
+        this.parent_event_idx = INT_NULL; // An index to the Listeners Buffer Struct. In many cases the parent event is not the mesh's parent, to avoid any annecessary listen events creation.
 
         this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
         this.timedEvents = New_generic_buffer(_, 'Mesh timedEvents');
@@ -236,7 +237,8 @@ export class Mesh {
         }
 
         Styles_batch_destroy_store(this.styles);
-        Command_buffer_store(Styles_batch_destroy_run, null, COMMANDS.ID.STYLE_BATCH_DESTROY); // Store the 'destroy styles' as a command to be executed later(once per frame)
+        // BUG: There seems to be a bug in the removal of the styles from the M_Buffer, so as to the '.active_count' isn't incremented/Decremented correctly
+        // Command_buffer_store(Styles_batch_destroy_run, null, COMMANDS.ID.STYLE_BATCH_DESTROY); // Store the 'destroy styles' as a command to be executed later(once per frame)
 
         if (NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH) === 0)
             Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, this.mesh_bufferidx);
@@ -248,20 +250,23 @@ export class Mesh {
         // Remove from gfx buffers.
 
         // A mesh maybe active buut not inserted in vertex buffer
-        if (this.is_gfx_inserted) {
+        if (this.is_gfx_inserted && this.state.mask & MESH_STATE.ACTIVE) {
 
             if (this.type & (MESH_TYPE.WIDGET_TEXT | MESH_TYPE.WIDGET_TEXT_DYNAMIC | MESH_TYPE.TEXT_MESH)) { // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
 
+                console.log('Destroy1:', this.name, this.gfx.vb.groupidx, this.geom.num_faces, this.mat.temp_max_chars_inserted_in_gfx)
+                // Widgetroot_buffer_print_w1()
                 const ret = Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
-                if (!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.mat.temp_max_chars_inserted_in_gfx)
-                Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+                // if (!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.groupidx, ret.start, this.mat.temp_max_chars_inserted_in_gfx)
+                    // Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
                 // console.log(this.mesh_bufferidx, this.GetName())
             }
             else {
-
+                
+                console.log('Destroy:', this.name, this.gfx.vb.groupidx, this.geom.num_faces)
                 const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
-                if (!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.idx, ret.start, this.geom.num_faces)
-                Mesh_per_vb_remove_mesh(this.gfx.vb.idx, this.per_vb_bufferidx);
+                // if (!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.groupidx, ret.start, this.geom.num_faces)
+                // Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
                 // console.log(this.mesh_bufferidx, this.GetName())
             }
 
@@ -407,6 +412,7 @@ export class Mesh {
 
         if (this.state.mask & MESH_STATE.ACTIVE) { // HERE: see if can remove check
             this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, parent_event_idx);
+            this.parent_event_idx = (parent_event_idx) ? parent_event_idx : INT_NULL;
         }
         // else console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{')
     }
@@ -417,6 +423,7 @@ export class Mesh {
 
         if (!this.listeners) return;
 
+        console.log('Removing listen events of', this.GetName())
         for (let i = 0; i <= this.listeners.boundary; i++) {
 
             if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
@@ -427,6 +434,22 @@ export class Mesh {
         }
 
         // Command_buffer_store(Listener_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
+    }
+
+
+    /** Remove all mesh's listen events from the Listeners buffer struct, but keep the .listeners intact so that we may re-constuct the events for the mesh */
+    RemoveAllListenEventsNotSelf_RenameMe() {
+
+        if (!this.listeners) return;
+
+        console.log('Removing listen events of', this.GetName())
+        for (let i = 0; i <= this.listeners.boundary; i++) {
+
+            if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
+                this.parent_event = Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
+                // this.listeners.buffer[i] = INT_NULL;
+            }
+        }
     }
 
 

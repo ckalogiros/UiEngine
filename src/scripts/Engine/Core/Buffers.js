@@ -77,7 +77,7 @@ export class M_Buffer {
       if (this.buffer[this.freeidx] === null) {
 
          if (this.freeidx > this.boundary) this.boundary = this.freeidx; // UNNECESSARY: Can freeidx be greater thn boundary???
-         console.log('Freeidx used')
+         // console.log('Freeidx used')
 
          return this.freeidx;
       }

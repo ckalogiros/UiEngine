@@ -872,8 +872,10 @@ export function Section_on_move_clbk(params) {
 
 
 export function Expand(parent, options) {
-
-   const width = parent.geom.dim[0] - parent.StylesGetMargin(STYLES.AXIS.X);
+   
+   // const width = parent.geom.dim[0] - parent.StylesGetMargin(STYLES.AXIS.X);
+   const width = parent.geom.dim[0] + parent.StylesGetMargin(STYLES.AXIS.X);
+   // const width = parent.geom.dim[0] ;
    let opt = options
 
    for (let i = 0; i <= parent.children.boundary; i++) {
@@ -1110,11 +1112,11 @@ export function Calculate_positions_recursive(parent, options) {
 
 
       if ((mesh.type & MESH_TYPE.SECTION_MESH) === 0) { // Case mesh not of type section, have it update it's new pos-dim on a later when it's gfx exists.
-         alert()
+         // alert('1010101010')
          continue_recur = false; // Stop recursion for mesh's children. Let the mesh deal with it's children positioning.
       }
       else { // Case  mesh is of type section  
-         alert()
+         // alert('10101010')
          CopyArr2(mesh.geom.pos, rel_pos);
          CopyArr2(mesh.geom.defPos, mesh.geom.pos);
          const update_data = {

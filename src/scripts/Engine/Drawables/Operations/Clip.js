@@ -2,6 +2,7 @@
 
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { View_get_view_byidx } from "../../Core/MeshBufferViews.js";
+import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 
 
 
@@ -140,17 +141,23 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
          const top      = root_wposy + mesh.geom.pos[1];
          const bottom   = top + mesh.geom.dim[1]*2;
 
-         // if((mesh.type & MESH_TYPE.TEXT_MESH)===0)console.log(j, top, limit.up, bottom, limit.down)
-         // if((mesh.type & MESH_TYPE.TEXT_MESH)===0 && j!==0) console.log(j, top, bottom, '<', limit.up)
-         
    
          if(bottom < limit.up || top > limit.down){
 
             // if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
             if(mesh.state.mask & MESH_STATE.ACTIVE){
 
-               mesh.state.mask &= ~MESH_STATE.ACTIVE;
-               mesh.state.mask |= MESH_STATE.CLIPED_Y;
+               // mesh.state.mask &= ~MESH_STATE.ACTIVE;
+               // mesh.state.mask |= MESH_STATE.CLIPED_Y;
+               mesh.StateDisable(MESH_STATE.ACTIVE);
+               mesh.StateEnable(MESH_STATE.CLIPED_Y);
+
+               // mesh.RemoveAllListenEvents();
+               // mesh.RemoveAllListenEventsNotSelf_RenameMe();
+
+               console.log(mesh.GetName())
+               // console.log
+               
                changes_hapened = true;
             }
          }
@@ -158,9 +165,13 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
             
             if(mesh.state.mask & MESH_STATE.CLIPED_Y)
             {
-            
-               mesh.state.mask |= MESH_STATE.ACTIVE;
-               mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
+               
+               mesh.StateEnable(MESH_STATE.ACTIVE);
+               mesh.StateDisable(MESH_STATE.CLIPED_Y);
+               
+               // if(mesh.ConstructListeners) 
+               //    mesh.ConstructListeners(mesh.parent_event_idx);
+
                changes_hapened = true;
             }
          }
@@ -174,48 +185,494 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
 }
 
 
+function TEMP_init(group){
+
+   temp.prev_top_out = []
+   temp.prev_top_in = []
+   temp.prev_bot_out = []
+   temp.prev_bot_in = []
+   for(let i=0; i <= group.vb.boundary; i++){
+      
+      const meshshes_idx = group.vb.buffer[i].data;
+      temp.prev_top_in[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[1])
+      temp.prev_top_out[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[1])
+      // temp.prev_bot_out[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[2])
+      // temp.prev_bot_in[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[2])
+      // temp.prev_top_out[i] = null;
+      // temp.prev_top_in[i] = Mesh_buffer_get_mesh_byidx(1+i)
+      temp.prev_bot_in[i] = Mesh_buffer_get_mesh_byidx(7+i)
+      temp.prev_bot_out[i] = Mesh_buffer_get_mesh_byidx(9+i)
+
+      // console.log(temp.prev_top_in[i].GetName(), temp.prev_top_out[i].GetName())
+      // console.log(temp.prev_bot_in[i].GetName(), temp.prev_bot_out[i].GetName())
+   }
+}
+const temp = {
+   prev_top_out: null,
+   prev_top_in: null,
+   prev_bot_out: null,
+   prev_bot_in: null,
+} 
+export function TEMP_Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null, dir_down) {
+
+
+   
+   let changes_hapened = false;
+   const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
+   
+   const group = View_get_view_byidx(group_bufferidx);
+   // console.log('========================')
+   
+   if(!temp.prev_bot_out && !temp.prev_top_out && !temp.prev_bot_in && !temp.prev_top_in) TEMP_init(group);
+
+   let c = 0;
+   for(let i=0; i <= group.vb.boundary; i++){
+      
+      if(dir_down){
+         
+         let prev_top_in = temp.prev_top_in[i];
+         
+         let cur = prev_top_in;
+         let pos_top = cur.GetPosY()
+         let pos_bot = pos_top + cur.geom.dim[1]*2
+         
+         
+         let mesh_cnt = cur.group_bufferidxs[2];
+         
+         // Check Top Clip
+         if(pos_bot < limit.up){
+            
+            cur.StateDisable(MESH_STATE.ACTIVE);
+            cur.StateEnable(MESH_STATE.CLIPED_Y);
+            changes_hapened = true;
+            
+            temp.prev_top_out[i] = cur;
+            
+            mesh_cnt++;
+            const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
+            cur = Mesh_buffer_get_mesh_byidx(meshidx)
+            
+            temp.prev_top_in[i] = cur;
+         }
+
+         cur = temp.prev_bot_out[i];
+         pos_top = cur.GetPosY()
+         // pos_bot = pos_top + cur.geom.dim[1]*2
+         if(pos_top < limit.down){
+            
+            cur.StateEnable(MESH_STATE.ACTIVE);
+            cur.StateDisable(MESH_STATE.CLIPED_Y);
+            changes_hapened = true;
+            
+            temp.prev_bot_in[i] = cur;
+            
+            mesh_cnt = cur.group_bufferidxs[2]+1;
+            const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
+            cur = Mesh_buffer_get_mesh_byidx(meshidx)
+            // pos_top = cur.GetPosY();
+            
+            temp.prev_bot_out[i] = cur;
+            // if(i===1){
+            //    console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
+            // }
+   
+         }
+      }
+      // if(prev_pos_top > limit.up){
+         
+      //    cur.StateEnable(MESH_STATE.ACTIVE);
+      //    cur.StateDisable(MESH_STATE.CLIPED_Y);
+      //    changes_hapened = true;
+         
+      //    temp.prev_top_in[i] = cur;
+         
+      //    mesh_cnt--;
+      //    if(mesh_cnt===INT_NULL) break;
+      //    const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
+      //    cur = Mesh_buffer_get_mesh_byidx(meshidx)
+      //    prev_pos_top = cur.GetPosY();
+         
+      //    temp.prev_top_out[i] = cur;
+      //    // if(i===1){
+      //    //    console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
+      //    // }
+
+      // }
+
+
+
+
+
+     
+   }
+
+
+   return changes_hapened;
+}
+// export function TEMP_Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
+
+
+   
+//    let changes_hapened = false;
+//    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
+   
+//    const group = View_get_view_byidx(group_bufferidx);
+//    // console.log('========================')
+   
+//    if(!temp.prev_bot_out || !temp.prev_top_out || !temp.prev_bot_in || !temp.prev_top_in) TEMP_init(group);
+
+//    let c = 0;
+//    for(let i=0; i <= group.vb.boundary; i++){
+      
+      
+//       let prev_top_out = temp.prev_top_out[i];
+//       let prev_top_in = temp.prev_top_in[i];
+//       // let cur = temp.prev_top[i];
+
+//       let cur = prev_top_in;
+//       let prev_pos_top = cur.GetPosY()
+//       let prev_pos_bot = prev_pos_top + cur.geom.dim[1]*2
+      
+      
+//       let mesh_cnt = cur.group_bufferidxs[2];
+      
+//       // Check Top Clip
+//       if(prev_pos_bot < limit.up){
+         
+//          while(prev_pos_bot < limit.up){
+
+//             cur.StateDisable(MESH_STATE.ACTIVE);
+//             cur.StateEnable(MESH_STATE.CLIPED_Y);
+//             changes_hapened = true;
+            
+//             mesh_cnt++;
+//             const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
+//             if(meshidx === INT_NULL) 
+//                break;
+//             cur = Mesh_buffer_get_mesh_byidx(meshidx)
+//             prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2;
+            
+//             c++
+//          }
+//          if(i===1){
+//             // console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
+//          }
+
+//          temp.prev_top_out[i] = cur;
+//          // console.log(cur.GetName(), cur.state.mask & MESH_STATE.CLIPED_Y)
+//       }
+//       else if(prev_pos_bot > limit.up){
+
+//          // const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
+//          // cur = Mesh_buffer_get_mesh_byidx(meshidx)
+//          // while(prev_pos_bot > limit.up && (cur.state.mask & MESH_STATE.CLIPED_Y)===0){
+//          while(prev_pos_bot > limit.up){
+
+//             cur.StateEnable(MESH_STATE.ACTIVE);
+//             cur.StateDisable(MESH_STATE.CLIPED_Y);
+//             changes_hapened = true;
+            
+//             mesh_cnt--;
+//             if(mesh_cnt <= 0) 
+//                break;
+//             const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
+//             cur = Mesh_buffer_get_mesh_byidx(meshidx)
+//             prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2;
+            
+//             c++
+//          }
+//          if(i===1){
+//             console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
+//          }
+
+//          temp.prev_top_in[i] = cur;
+//       }
+
+
+//       // Run for activating 
+            
+//       let prev_bot_out = temp.prev_bot_out[i];
+//       let prev_bot_in = temp.prev_bot_in[i];
+//       cur = prev_top_in;
+//       // cur = prev_bot_out;
+//       prev_pos_top = cur.GetPosY()
+//       prev_pos_bot = prev_pos_top + cur.geom.dim[1]*2
+//       // if(prev_pos_bot < limit.down ){
+//       //    c=0         
+//       //    // while(prev_pos_bot > limit.up){
+//       //    while(prev_pos_bot < limit.down){
+
+//       //       cur.StateEnable(MESH_STATE.ACTIVE);
+//       //       cur.StateDisable(MESH_STATE.CLIPED_Y);
+//       //       changes_hapened = true;
+            
+//       //       mesh_cnt++;
+//       //       const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
+//       //       if(meshidx === INT_NULL) 
+//       //          break;
+//       //       cur = Mesh_buffer_get_mesh_byidx(meshidx)
+//       //       prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2;
+//       //       // console.log(prev_pos_bot, limit.down)
+            
+//       //       c++
+//       //    }
+//       //    if(i===1){
+//       //       // console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
+//       //    }
+
+//       //    temp.prev_top_in[i] = cur;
+
+//       // }
+//       // else if(prev_pos_bot > limit.down ){
+//       //    c=0         
+//       //    while(prev_pos_bot > limit.down){
+
+//       //       cur.StateDisable(MESH_STATE.ACTIVE);
+//       //       cur.StateEnable(MESH_STATE.CLIPED_Y);
+//       //       changes_hapened = true;
+            
+//       //       mesh_cnt--;
+//       //       if(mesh_cnt < 1) // TODO: less than the top last in
+//       //          break;
+//       //       const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
+//       //       if(meshidx === INT_NULL) 
+//       //          break;
+//       //       cur = Mesh_buffer_get_mesh_byidx(meshidx)
+//       //       prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2;
+            
+//       //       c++
+//       //    }
+//       //    if(i===1){
+//       //       // console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
+//       //    }
+
+//       //    temp.prev_top_out[i] = cur;
+
+//       // }
+
+
+
+
+//       //////////////////////////////////////////////////////////////////////
+
+//       // let prev_bot_out = temp.prev_top_out[i];
+//       // let prev_bot_in = temp.prev_top_in[i];
+//       // cur = prev_bot_out;
+//       // prev_pos_top = cur.GetPosY()
+//       // prev_pos_bot = prev_pos_top + cur.geom.dim[1]*2
+//       // if(prev_pos_top < limit.up){
+         
+//       //    while(cur && cur!==undefined && prev_pos_bot > limit.up){
+            
+//       //       cur.StateDisable(MESH_STATE.ACTIVE);
+//       //       cur.StateEnable(MESH_STATE.CLIPED_Y);
+//       //       changes_hapened = true;
+            
+//       //       prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2
+//       //       const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt++];
+//       //       if(meshidx === INT_NULL) 
+//       //          break;
+//       //       cur = Mesh_buffer_get_mesh_byidx(meshidx)
+//       //    }
+//       // }
+
+//       // cur = temp.prev_bot[i];
+//       // let bot_pos_top = temp.prev_bot[i].GetPosY()
+//       // let bot_pos_bot = bot_pos_top + cur.geom.dim[1]*2
+//       // mesh_cnt = cur.group_bufferidxs[2];
+      
+//       // if(bot_pos_bot < limit.down){
+         
+//       //    // while(cur && cur!==undefined && bot_pos_top < limit.down){
+//       //    while(bot_pos_top < limit.down){
+            
+//       //       cur.StateEnable(MESH_STATE.ACTIVE);
+//       //       cur.StateDisable(MESH_STATE.CLIPED_Y);
+//       //       changes_hapened = true;
+            
+//       //       bot_pos_top = cur.GetPosY()
+//       //       mesh_cnt++;
+//       //       const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
+//       //       // console.log(meshidx)
+//       //       if(meshidx === INT_NULL) 
+//       //          break;
+//       //       cur = Mesh_buffer_get_mesh_byidx(meshidx)
+
+//       //       c++
+//       //    }
+         
+//       //    if(i===1)
+//       //       console.log(c, cur.mat.text)
+
+//       //    // temp.prev_bot[i] = cur;
+//       // }
+      
+      
+//       // const meshshes_idx = group.vb.buffer[i].data;
+//       // const root_group_mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[0]);
+//       // const root_wposy = root_group_mesh.GetPosY(); // Get the root wpos from each vb root mesh, no need to get the root wpos for every group mesh.
+   
+//       // for(let j=0; j <= meshshes_idx.boundary; j++){
+         
+//       //    const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+//       //    const top      = root_wposy + mesh.geom.pos[1];
+//       //    const bottom   = top + mesh.geom.dim[1]*2;
+
+   
+//       //    if(bottom < limit.up || top > limit.down){
+
+//       //       // if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
+//       //       if(mesh.state.mask & MESH_STATE.ACTIVE){
+
+//       //          // mesh.state.mask &= ~MESH_STATE.ACTIVE;
+//       //          // mesh.state.mask |= MESH_STATE.CLIPED_Y;
+//       //          mesh.StateDisable(MESH_STATE.ACTIVE);
+//       //          mesh.StateEnable(MESH_STATE.CLIPED_Y);
+//       //          changes_hapened = true;
+//       //       }
+//       //    }
+//       //    else{
+            
+//       //       // if(mesh.state.mask & MESH_STATE.CLIPED_Y)
+//       //       {
+            
+//       //          // mesh.state.mask |= MESH_STATE.ACTIVE;
+//       //          // mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
+//       //          mesh.StateEnable(MESH_STATE.ACTIVE);
+//       //          mesh.StateDisable(MESH_STATE.CLIPED_Y);
+//       //          changes_hapened = true;
+//       //       }
+//       //    }
+
+//       // }
+
+//    }
+
+
+//    return changes_hapened;
+// }
+
+export var temp_info = []
 
 export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=null) {
-
+   temp_info = []
    if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
 
    let changes_hapened = false;
    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
 
+   const top   = mesh.GetPosY();
+   const bot   = top + mesh.geom.dim[1]*2;
 
-   const top      = mesh.GetPosY();
-   const bottom   = top + mesh.geom.dim[1]*2;
+   if((bot >= limit.up && top < limit.up) || (bot > limit.down && top < limit.down)){
+      
+      // if(mesh.ClipY) mesh.clipY(limit);
 
-   if((bottom <= limit.down && bottom > limit.up) || (top >= limit.up && top < limit.down)){
-      // Clip for any children. Only if this mesh is active, else skip
-      for(let i=0; i <= mesh.children.boundary; i++){
-         const child = mesh.children.buffer[i];
-         Clipy_from_tree_recursive(child, clip_top, clip_bottom);
-      }
+
+      // else{
+
+         for(let i=0; i <= mesh.children.boundary; i++){
+            const child = mesh.children.buffer[i];
+   
+            changes_hapened = Clipy_from_tree_recursive(child, clip_top, clip_bottom);
+   
+            // This is the return point of an 
+            if(changes_hapened){
+   
+               if(mesh.state.mask & MESH_STATE.ACTIVE){
+   
+                  temp_info.push({
+                     info:'Activate',
+                     mesh: mesh.GetName(),
+                     meshidx: mesh.mesh_bufferidx,
+                  });
+               }
+               else{
+                  temp_info.push({
+                     info:'Deactivate',
+                     mesh: mesh.GetName(),
+                     meshidx: mesh.mesh_bufferidx,
+                  });
+               }
+            }
+         }
+      // }
    }
+   // if((bot <= limit.down && bot > limit.up) || (top >= limit.up && top < limit.down)){
+   //    // Clip for any children. Only if this mesh is active, else skip
+   //    for(let i=0; i <= mesh.children.boundary; i++){
+   //       const child = mesh.children.buffer[i];
+   //       Clipy_from_tree_recursive(child, clip_top, clip_bottom);
+   //    }
+   // }
 
-   if(bottom < limit.up || top > limit.down){
+   if(bot < limit.up || top > limit.down){
       
       if(mesh.state.mask & MESH_STATE.ACTIVE){
    
          mesh.StateDisable(MESH_STATE.ACTIVE);
          mesh.StateEnable(MESH_STATE.CLIPED_Y);
+         console.log('Deactivate', mesh.GetName())
          changes_hapened = true;
       }
    }
    else{
       
-      if(mesh.state.mask & MESH_STATE.CLIPED_Y)
-      {
+      if(mesh.state.mask & MESH_STATE.CLIPED_Y){
+
          mesh.StateEnable(MESH_STATE.ACTIVE);
          mesh.StateDisable(MESH_STATE.CLIPED_Y);
+         console.log('Activate', mesh.GetName())
          changes_hapened = true;
       }
    }
 
    return changes_hapened;
 }
+
+
+// export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=null) {
+
+//    if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
+
+//    let changes_hapened = false;
+//    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
+
+
+
+//    const top      = mesh.GetPosY();
+//    const bottom   = top + mesh.geom.dim[1]*2;
+
+//    if((bottom <= limit.down && bottom > limit.up) || (top >= limit.up && top < limit.down)){
+//       // Clip for any children. Only if this mesh is active, else skip
+//       for(let i=0; i <= mesh.children.boundary; i++){
+//          const child = mesh.children.buffer[i];
+//          Clipy_from_tree_recursive(child, clip_top, clip_bottom);
+//       }
+//    }
+
+//    if(bottom < limit.up || top > limit.down){
+      
+//       if(mesh.state.mask & MESH_STATE.ACTIVE){
+   
+//          mesh.StateDisable(MESH_STATE.ACTIVE);
+//          mesh.StateEnable(MESH_STATE.CLIPED_Y);
+//          changes_hapened = true;
+//       }
+//    }
+//    else{
+      
+//       if(mesh.state.mask & MESH_STATE.CLIPED_Y)
+//       {
+//          mesh.StateEnable(MESH_STATE.ACTIVE);
+//          mesh.StateDisable(MESH_STATE.CLIPED_Y);
+//          changes_hapened = true;
+//       }
+//    }
+
+//    return changes_hapened;
+// }
 
 
 

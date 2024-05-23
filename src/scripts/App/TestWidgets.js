@@ -19,7 +19,7 @@ import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Crea
 import { Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 import { Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
 import { BLACK, BLUEL, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
-import { View_build_group_from_root_mesh, View_set_view_start_vb_index } from '../Engine/Core/MeshBufferViews.js';
+import { View_build_group_from_root_mesh, View_set_view_vb_start } from '../Engine/Core/MeshBufferViews.js';
 import { Index_buffer_info_create } from '../Graphics/Buffers/IndexBuffers.js';
 // import { getFile } from '../Engine/Core/FileSystem.js';
 import { New_generic_buffer } from '../Engine/Core/Buffers.js';
@@ -113,7 +113,7 @@ function UserCreateRectCreate(params) {
     line.SetName('line');
     section.AddItem(line)
 
-    line.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [parent.gfx.prog.idx, parent.gfx.vb.idx]);
+    line.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, parent.gfx.vb.groupidx);
 
     // section.Recalc_no_gfx_update()
     line.Render();
@@ -217,9 +217,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
-    // const dbg_dp = Debug_info_ui()
-    // CreateSceneMenuBar(dbg_dp);
+    const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
     // UserCreateRect()
 
     // uidbg.RotateZ(5.5);
@@ -346,10 +344,10 @@ export function TestWidgetsGeneric(scene) {
 
 
     // CreateWindowWithMenu();
-    CreateSceneMenuBar();
+    // CreateSceneMenuBar();
 
 
-
+    // CreateDropdown([0,0, 0])
     // CreateDropdown2([0, ypos+=40, 0], 0);
     // CreateDropdown2InSection([0, ypos+=40, 0], 0);
     // CreateDropdown3([0, ypos+=40, 0], 0);
@@ -366,17 +364,17 @@ export function TestWidgetsGeneric(scene) {
 
     // PARTICLES
     {
-        // const particle_system_idx5 = Particle_system_create_emitter(ORANGEL[9], [10,140,10], [16,16], .1, 2, 'Test Particle System3');
-        // const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,110,10], [16,16], .1, 2, 'Test Particle System3');
-        // const particle_system_idx3 = Particle_system_create_emitter(PURPLER[9], [10,90,10], [14,14], .1, 2, 'Test Particle System3');
-        // const particle_system_idx2 = Particle_system_create_emitter(BLUEL[9], [10,60,10], [12,12], .1, 2, 'Test Particle System2');
+        // // const particle_system_idx5 = Particle_system_create_emitter(ORANGEL[9], [10,140,10], [16,16], .1, 2, 'Test Particle System3');
+        // // const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,110,10], [16,16], .1, 2, 'Test Particle System3');
+        // // const particle_system_idx3 = Particle_system_create_emitter(PURPLER[9], [10,90,10], [14,14], .1, 2, 'Test Particle System3');
+        // // const particle_system_idx2 = Particle_system_create_emitter(BLUEL[9], [10,60,10], [12,12], .1, 2, 'Test Particle System2');
         // const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
      
-        // const particle_system_idx5 = Particle_system_create_emitter(ORANGEL[9], [10,120,10], [10,10], .1, 2, 'Test Particle System3');
-        // const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,100,10], [10,10], .1, 2, 'Test Particle System3');
-        // const particle_system_idx3 = Particle_system_create_emitter(PURPLER[9], [10,80,10], [10,10], .1, 2, 'Test Particle System3');
-        // const particle_system_idx2 = Particle_system_create_emitter(BLUEL[9], [10,60,10], [10,10], .1, 2, 'Test Particle System2');
-        // const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
+        // // const particle_system_idx5 = Particle_system_create_emitter(ORANGEL[9], [10,120,10], [10,10], .1, 2, 'Test Particle System3');
+        // // const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,100,10], [10,10], .1, 2, 'Test Particle System3');
+        // // const particle_system_idx3 = Particle_system_create_emitter(PURPLER[9], [10,80,10], [10,10], .1, 2, 'Test Particle System3');
+        // // const particle_system_idx2 = Particle_system_create_emitter(BLUEL[9], [10,60,10], [10,10], .1, 2, 'Test Particle System2');
+        // // const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
         
         
         
@@ -384,7 +382,8 @@ export function TestWidgetsGeneric(scene) {
         // btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         // btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-        // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx, particle_system_idx2, particle_system_idx3, particle_system_idx4, particle_system_idx5] }, MESH_STATE.IS_HOLD_CLICK)
+        // // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx, particle_system_idx2, particle_system_idx3, particle_system_idx4, particle_system_idx5] }, MESH_STATE.IS_HOLD_CLICK)
+        // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx] }, MESH_STATE.IS_HOLD_CLICK)
         
         // btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         // btn.Render();
@@ -1163,7 +1162,7 @@ function CreateDropdown2InSection(pos, id) {
 
 //     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
 //     View_build_group_from_root_mesh(section);
-//     // View_set_view_start_vb_index(section.group_bufferidxs, section.gfx.vb.start);
+//     // View_set_view_vb_start(section.group_bufferidxs, section.gfx.vb.start);
 // }
 
 
@@ -1172,8 +1171,9 @@ function CreateDropdown2InSection(pos, id) {
 function CreateSceneMenuBar() {
 
     const pos = [0, 0, 0]
+    const margin = [6,6];
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [VIEWPORT.WIDTH/2, 100], TRANSPARENCY(GREY[1], .4))
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6,6], pos, [VIEWPORT.WIDTH/2 - margin[0], 100], TRANSPARENCY(GREY[1], .4))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.SetName('Main Window')
@@ -1199,23 +1199,47 @@ function CreateSceneMenuBar() {
     menu.options = SECTION.HORIZONTAL | SECTION.EXPAND;
 
 
-    const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
-    dp.CreateClickEvent();
-    dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-    Dropdown_roots_set_root(dp, dp);
-    section.AddItem(dp);
-
+    // Create a dropdown in the windows area
     {
-    const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-    dp.AddToMenu(switch1);
+        const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
+        dp.CreateClickEvent();
+        dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+        Dropdown_roots_set_root(dp, dp);
+        section.AddItem(dp);
+    
+        {
+        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+        dp.AddToMenu(switch1);
+        }
+        {
+        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+        dp.AddToMenu(switch1);
+        }
+        {
+        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+        dp.AddToMenu(switch1);
+        }
     }
+    // Create Second dropdown in the windows area
     {
-    const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-    dp.AddToMenu(switch1);
-    }
-    {
-    const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-    dp.AddToMenu(switch1);
+        const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
+        dp.CreateClickEvent();
+        dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+        Dropdown_roots_set_root(dp, dp);
+        section.AddItem(dp);
+    
+        {
+        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+        dp.AddToMenu(switch1);
+        }
+        {
+        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+        dp.AddToMenu(switch1);
+        }
+        {
+        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+        dp.AddToMenu(switch1);
+        }
     }
 
 
@@ -1231,13 +1255,13 @@ function CreateSceneMenuBar() {
     
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(section);
-    // View_set_view_start_vb_index(section.group_bufferidxs, section.gfx.vb.start);
+    // View_set_view_vb_start(section.group_bufferidxs, section.gfx.vb.start);
 
 
     /** Create Test Animations */
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, dp, .03, 0., 1.)
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, statistics, .01, 0., .4)
-    const btn = statistics.children.buffer[0]
+    // const btn = statistics.children.buffer[0]
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn.text_mesh, .01, 0.1, .9)
 }
 
@@ -1410,7 +1434,7 @@ function  CreateWindowWithMenu() {
     
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(section);
-    // View_set_view_start_vb_index(section.group_bufferidxs, section.gfx.vb.start);
+    // View_set_view_vb_start(section.group_bufferidxs, section.gfx.vb.start);
 }
 
 
@@ -1729,7 +1753,7 @@ function CreateScroller(scene) {
 
     scroller.Render();
 
-    View_set_view_start_vb_index(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
+    View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
 
     scroller.ConstructListeners();
 
@@ -1820,7 +1844,7 @@ function CreateScrollerClampAlphaTest(scene) {
 
 
     // Create scroller for the ui-mesh info widget
-    const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [100, 140]);
+    const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [100, 90]);
     scroller.StateEnable(MESH_STATE.ACTIVE);
     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -1845,7 +1869,7 @@ function CreateScrollerClampAlphaTest(scene) {
 
     scroller.Render();
 
-    View_set_view_start_vb_index(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
+    View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
 
     scroller.ConstructListeners();
 
@@ -1956,7 +1980,7 @@ function CreateScrollerDp(scene) {
 
     scroller.Render();
 
-    View_set_view_start_vb_index(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
+    View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
 
     scroller.ConstructListeners();
 

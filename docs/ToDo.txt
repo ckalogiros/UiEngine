@@ -87,7 +87,6 @@ so that each vertex the index gets to the next color attribute(R->G->B ....)
 --------------------------------------------------- IMIDIATE!
 . Implement destruction of gfx buffers and gl program.
   (Also make sure all suposed private buffers are set private).
-. slider as child of a section, does not move to the correct position, only the gfx, the mesh moves
 . IMPLEMENT: Destroy from widget root
 --------------------------------------------------- IMIDIATE!
 
@@ -99,6 +98,19 @@ so that each vertex the index gets to the next color attribute(R->G->B ....)
   Also instead of reallocating the buffer, check if an avaliable buffer exists in pool and switch.
   More over, regular checks may take place to check if any vertex buffer is too large for the attribs count it store and switch with a smaller from the pool 
 --------------------------------------------------- TODO!
+
+
+--------------------------------------------------- ISSUES!
+. Currently the View-Group does not work for reseting/removing the group from the vertex buffers,
+  unless the group is the last element of the rrot widget.
+  For example, it works fine with scrollers, since the scrolled mesh is the last mesh of the scroller root mesh.
+  What we need is a way of to REMOVE a groups geometry from the vertex buffers
+  That is:
+    1. Either reseting the all the vertex buffers and rebuilding them fro scratch
+    2. reseting to an index and rebulding from that point, independend if the rest of the build belongs to the group
+      In this case we need to rebult from the parent tree recursive, that has all the info of the group plus any meshes that are afters the group
+    3. Use the clasic remove and SHIFT approach 
+--------------------------------------------------- ISSUES!
 
 
 
@@ -320,13 +332,6 @@ to have a clear understanding of the system in order to find a solution as to ho
 
 --------------------------------------------------- CONTINUE
 
-* Fix the loop start and end -2 +2, for accessing only the scroll section children
-
-DONE! * Set the CreateScroller() test to use the old system of clamp, to compare it with the new
-
-* Implement a more efficient TEMP_RERENDER. A batch kind I assume to re-render to gfx
-
-* Implement all move recursive functions with loops: (Recurse_reset_gfxbuffers_from_mesh_tree())
 
 --------------------------------------------------- CONTINUE
 

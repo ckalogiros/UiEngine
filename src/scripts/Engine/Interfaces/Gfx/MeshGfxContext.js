@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { Vertex_buffer_group_state_enable, Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_state_enable, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_state_enable, Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_state_enable, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_store_vertex_buffer_group_idx, Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
@@ -11,7 +11,7 @@ import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout, Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform, Uniforms_buffer_find_ubidx_from_name } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
-import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_set_from_existing_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
 import { New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 
@@ -227,7 +227,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    let vb_groupidx = INT_NULL;
    
    
-   if(specific_vb_groupidx !== INT_NULL) { // Get the vbidxs if an apropriate vb group is found
+   if(specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
       vbidxs = Vertex_buffer_group_get_vbidxs(specific_vb_groupidx);
       progidx = Vertex_buffer_group_get_progidx(specific_vb_groupidx);
       vb_groupidx = specific_vb_groupidx
@@ -235,10 +235,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    else{
       // Check buffers validity, or find buffers based on Flags
       vb_groupidx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, specific_vb_groupidx);
-      
-if(vb_groupidx===1)
-   console.log()
-
    }
 
 
@@ -311,8 +307,19 @@ if(vb_groupidx===1)
          // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
          Mesh_per_vb_create_vb(vb_groupidx);
 
+         
+         const root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
+         mesh.root_posidx = root_posidx;
+         if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
+
          is_vertex_buffer_created = true;
 
+      }
+      else{
+
+         // Get the unif wpos that is already created for this vb
+         Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
+ 
       }
 
    }
@@ -349,13 +356,6 @@ if(vb_groupidx===1)
       
       Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs);
       Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
-
-
-      // UNNECESSARY: For all vb except the widget root. All the root wpos are set from a function call, based on the root root_wpos 
-
-      const root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
-      mesh.root_posidx = root_posidx;
-      if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
 
 
       /**
@@ -396,7 +396,7 @@ if(vb_groupidx===1)
 
 
 
-export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool_request) {
+export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool_request, specific_vb_groupidx = INT_NULL) {
 
 
    // Cash
@@ -406,10 +406,20 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
 
 
    let progidx = INT_NULL;
-   let vbidx = INT_NULL;
    let ibidx = INT_NULL;
+   let vb_group = null;
+   let vbidxs = null;
+   let vb_groupidx = INT_NULL;
 
-
+   if(specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(emitter.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
+      vbidxs = Vertex_buffer_group_get_vbidxs(specific_vb_groupidx);
+      progidx = Vertex_buffer_group_get_progidx(specific_vb_groupidx);
+      vb_groupidx = specific_vb_groupidx
+   }
+   // else{
+   //    // Check buffers validity, or find buffers based on Flags
+   //    vb_groupidx = Find_gfx_match_from_mesh_tree(FLAGS, emitter, null);
+   // }
 
 
    /*******************************************************************************************************************/
@@ -457,29 +467,66 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
 
    const pool_request_flags = gfx_pool_request;
 
-   if (vbidx === INT_NULL) {
+   if (vb_groupidx === INT_NULL) {
 
-      // First look at the gfx pool for any matching vertex buffer
-      vbidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags);
+            // First look the gfx pool for any matching vertex buffer
+            vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags);
 
-      if (vbidx === INT_NULL) {
+            if (vb_groupidx === INT_NULL) {
+      
+               vb_group = Vertex_buffer_create(sid, _, progidx); 
+               vb_groupidx = vb_group.idx;
+               vbidxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
+      
+      
+               // Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_PRIVATE);
+               if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidxs);
+      
+               // Program_store_vertex_buffer_group_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array  
+      
+               // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
+               Mesh_per_vb_create_vb(vb_groupidx);
+      
+               
+               // const root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, emitter.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
+               // mesh.root_posidx = root_posidx;
+               // if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
+               // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vb_groupidx);
+               // emitter.root_posidx = root_posidx;
+      
+               is_vertex_buffer_created = true;
+      
+            }
+            else{
+      
+               // Get the unif wpos that is already created for this vb
+               // Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, emitter.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
+               // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vb_groupidx);
+               // emitter.root_posidx = root_posidx;
+       
+            }
 
-         const vb_info = Vertex_buffer_create(sid, _, progidx);
-         vbidx = vb_info.vbidx;
+      // // First look at the gfx pool for any matching vertex buffer
+      // vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags);
+
+      // if (vb_groupidx === INT_NULL) {
+
+      //    const vb_info = Vertex_buffer_create(sid, _, progidx);
+      //    vb_groupidx = vb_info.vb_groupidx;
 
 
-         // Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE | BUFFER_STATE.SHOW);
-         // Vertex_buffer_state_enable(vbidx, BUFFER_STATE.IS_PRIVATE);
-         if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidx);
+      //    // Vertex_buffer_state_enable(vb_groupidx, BUFFER_STATE.IS_PRIVATE | BUFFER_STATE.SHOW);
+      //    // Vertex_buffer_state_enable(vb_groupidx, BUFFER_STATE.IS_PRIVATE);
+      //    if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vb_groupidx);
 
-         Program_store_vertex_buffer_group_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
+      //    Program_store_vertex_buffer_group_idx(progidx, vb_groupidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array
 
-         // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
-         Mesh_per_vb_create_vb(vbidx);
+      //    // Create Gfx Buffer buffer. It will be created at the 'vb_groupidx' index.
+      //    Mesh_per_vb_create_vb(vb_groupidx);
 
-         is_vertex_buffer_created = true;
+      //    is_vertex_buffer_created = true;
 
-      }
+      // }
 
    }
 
@@ -534,18 +581,18 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
 
       }
 
-      if (root_posidx !== vbidx) alert('root_posidx is NOT equal to vbidx');
+      if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vb_groupidx');
    }
 
 
 
 
    // Store the root pos in each mesh. Assuumes the indexing of root_wpos and vbs are 1-1.
-   emitter.root_posidx = vbidx;
+   emitter.root_posidx = vb_groupidx;
 
 
 
-   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vbidx, ibidx);
+   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx);
 
    return gfx;
 

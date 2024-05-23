@@ -306,7 +306,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		for (let i = 0; i <= this.children.boundary; i++) {
 
 			const child = this.children.buffer[i];
-			console.log('',vb_groupidx, child.GetName())
+			// console.log('',vb_groupidx, child.GetName())
 			// if (child) child.gfx = child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx); // Pass the already exixting gfx buffers for use
 			if (child) child.gfx = child.GenGfxCtx(FLAGS, vb_groupidx); // Pass the already exixting gfx buffers for use
 

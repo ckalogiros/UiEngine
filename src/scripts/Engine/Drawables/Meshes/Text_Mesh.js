@@ -373,7 +373,9 @@ export class Text_Mesh extends Mesh {
    RenderText() {
       // console.error('This functions is not implemented for instancing\nAt RenderText()\n At Text_Mesh.js')
 
-      const store_start = this.gfx.vb.starts.buffer[0]
+      if(!this.gfx)
+         console.log
+      const store_start = this.gfx.vb.starts.buffer[0];
 
       // TODO: Remove arrays, substitute with variables
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
@@ -440,7 +442,7 @@ export class Text_Mesh extends Mesh {
 
       // // Make a copy to not change the default .start value of the first char(face).
       // const gfx_copy = {
-      //    vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
+      //    vb: { idx: this.gfx.vb.groupidx, start: this.gfx.vb.start, count: this.gfx.vb.count },
       //    prog: { attribsidx: this.gfx.prog.attribsidx },
       //    vertsPerRect: this.gfx.vertsPerRect,
       //    attribsPerVertex: this.gfx.attribsPerVertex,

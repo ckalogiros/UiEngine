@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_update_vertices, Vertex_buffer_update_vertices_Expicit_Params } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_state_enable, Vertex_buffer_update_vertices, Vertex_buffer_update_vertices_explicit_Params } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set, Gl_particles_batch_set_col4_wpos4_pos2_style3 } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomColor, GetRandomInt } from "../../Helpers/Helpers.js";
 import { CopyArr3 } from "../../Helpers/Math/MathOperations.js";
@@ -37,11 +37,11 @@ const dir_factor = .6
 
 
 let yy = .1
-let speed = .05;
-// let accel = .1;
-let accel = 2.;
+let speed = .06;
+let accel = 4.;
+let deccel = .985;
 let max = 100;
-let gravity = 1.02;
+let gravity = 1.04;
 // let gravity = 1.06;
 // let gravity = 1.3;
 
@@ -114,18 +114,13 @@ class Emitter {
       
       this.particles_buffer = New_generic_buffer();
       this.free_particles_idxs_buffer = New_int16_buffer();
-      /** 
-             this.sid.shad |= SID.SHAD.PRE_MULTIPLIED_ALPHA; // E
-            this.sid.attr |= SID.ATTR.TEX2 | SID.ATTR.MSDF; // 
-            // SID.ATTR.COL4
-       */
+
 
       this.sid = {
          shad: SID.SHAD.INDEXED,
          attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4,
          unif: 0x0,
          pass: SID.PASS.COL4,
-         // gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
       };
 
       this.style = [0, 40, 1.5]
@@ -154,38 +149,32 @@ class Emitter {
          col: this.particles_buffer.buffer[particle_idx].col,
          style: this.style,
       };
-      // const mat = null;
-      // const progidx = this.gfx.prog.idx; 
-      // const vbidx = this.gfx.vb.idx; 
-      // const start = this.particles_buffer.buffer[particle_idx].start; 
+
       const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, mat);
-      // console.log('1. start', start, 'particle_idx', particle_idx)
-      
       this.particles_buffer.buffer[particle_idx].SetGfxStart(start);
       
       
       return start;
    }
    
-   ParticleUpdateGfx(particle_idx) {
+   // ParticleUpdateGfx(particle_idx) {
       
-      // Must create geom struct to pass to the GlAdd...() fuunction
-      const geom = {
-         pos: this.particles_buffer.buffer[particle_idx].pos,
-         dim: this.particles_buffer.buffer[particle_idx].dim,
-      }
+   //    // Must create geom struct to pass to the GlAdd...() fuunction
+   //    const geom = {
+   //       pos: this.particles_buffer.buffer[particle_idx].pos,
+   //       dim: this.particles_buffer.buffer[particle_idx].dim,
+   //    }
       
-      const mat = {
-         col: this.particles_buffer.buffer[particle_idx].col,
-         style: this.style,
-      };
+   //    const mat = {
+   //       col: this.particles_buffer.buffer[particle_idx].col,
+   //       style: this.style,
+   //    };
       
-      const progidx = this.gfx.prog.idx; 
-      const vbidx = this.gfx.vb.idx; 
-      const start = this.particles_buffer.buffer[particle_idx].start; 
-      Vertex_buffer_update_vertices_Expicit_Params(progidx, vbidx, start, geom, mat);
+   //    const vbidx = this.gfx.vb.groupidx; 
+   //    const start = this.particles_buffer.buffer[particle_idx].start; 
+   //    Vertex_buffer_update_vertices_explicit_Params(vbidx, start, geom, mat);
 
-   }
+   // }
 
    EnableGfxAttributes(which, params) {
 
@@ -278,7 +267,7 @@ export function Particle_system_create_emitter(col, pos, dim, t_step, life_time,
 
 
    const FLAGS = GFX_CTX_FLAGS.PRIVATE;
-   emitter.gfx = TEMP_Gfx_generate_context_for_particles(FLAGS, emitter);
+   emitter.gfx = TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, _,  );
 
 
    const idx = _emitters.Add(emitter);
@@ -348,18 +337,16 @@ export function Particle_system_update() {
             particle.pos[0] += speed * particle.accel * particle.dirx;
             particle.pos[1] += speed * particle.accel * particle.diry * particle.grav;
             // particle.pos[1] += speed  * particle.diry * particle.grav;
-            if(particle.accel>1) particle.accel *= .99
+            if(particle.accel>1) particle.accel *= deccel
             particle.grav *= gravity;
 
             
             
             // Updtate Gfx Buffers
-            // Gl_particles_batch_set(emitter.gfx.vb.idx, particle.start, particle.col, particle.pos, particle.dim)
-            Gl_particles_batch_set_col4_wpos4_pos2_style3(emitter.gfx.vb.idx, particle.start, particle.col, particle.pos, particle.dim)
+            Gl_particles_batch_set_col4_wpos4_pos2_style3(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.dim)
             
             particle.t += .003;
             if(particle.t >= 1){
-               // console.log('Reset', particle.start, 'particle_idx', j)
                
                // Reset particle for reuse
                particle.is_alive = false;
@@ -379,7 +366,9 @@ export function Particle_system_update() {
             }
          }
       }
+      Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
    }
+
 }
 
 

@@ -152,6 +152,10 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
 
    LISTENERS_FLAGS[TYPE_IDX] = true;
 
+   // return {
+   //    event_idx,
+   //    event_idx:event_idx.parent_idx,
+   // }
    return event_idx;
 }
 
@@ -177,6 +181,7 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
 
    const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
 
+
    // If event is root, has no 'parent_idx', then destroy its children from the view storage buffer
    if (event.parent_idx === INT_NULL) {
 
@@ -196,6 +201,9 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
 
       const view_idx = event.view_idx
       parent.view.children.RemoveByIdx(view_idx);
+
+
+
       if (parent.view.children.boundary === parent.view.children.active_count && parent.view.children.active_count === 0)
          console.log(view_idx, parent.view.children)
 
@@ -312,6 +320,30 @@ export function Listener_batch_destroy_run(){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************************************************/
+/**********************************************************************************************************************************************************/
+/**********************************************************************************************************************************************************/
+// FUNCTIONALITY
+/**********************************************************************************************************************************************************/
+/**********************************************************************************************************************************************************/
+/**********************************************************************************************************************************************************/
 
 
 
@@ -699,7 +731,7 @@ export function Listener_set_root_mesh_priority() {
    
          const mesh = Mesh_buffer_get_mesh_byidx(view_buffer.meshidx);
    
-         Renderqueue_set_priority_by_vb(FIRST, mesh.gfx.vb.idx);
+         Renderqueue_set_priority_by_vb(FIRST, mesh.gfx.vb.groupidx);
       }
    }
 
@@ -759,86 +791,86 @@ export function Listener_set_root_mesh_priority() {
 
 
 
-export function Listener_remove_child_event_from_parent(TYPE_IDX, evt) {
+// export function Listener_remove_child_event_from_parent(TYPE_IDX, evt) {
 
-   // Remove child events requires the parent to remove the child event from 
-   evt.parent_evt.children.RemoveByIdx(evt.evt_idx);
+//    // Remove child events requires the parent to remove the child event from 
+//    evt.parent_evt.children.RemoveByIdx(evt.evt_idx);
 
-   if (view_buffer.buffer[TYPE_IDX].active_count === 0)
-      LISTENERS_FLAGS[TYPE_IDX] = false;
-}
-
-
-
-
-export function Listener_destroy_children_buffer(TYPE_IDX, event_idx) {
-   view_buffer.buffer[TYPE_IDX].buffer[event_idx].children = null;
-}
+//    if (view_buffer.buffer[TYPE_IDX].active_count === 0)
+//       LISTENERS_FLAGS[TYPE_IDX] = false;
+// }
 
 
 
 
-export function Listener_recover_children_buffer(TYPE_IDX, event_idx, children_buffer) {
-   view_buffer.buffer[TYPE_IDX].buffer[event_idx].children = children_buffer;
-   view_buffer.buffer[TYPE_IDX].buffer[event_idx].has_child_events = true;
-}
+// export function Listener_destroy_children_buffer(TYPE_IDX, event_idx) {
+//    view_buffer.buffer[TYPE_IDX].buffer[event_idx].children = null;
+// }
 
 
 
 
-export function Listener_events_set_mesh_events_active(FLAGS, mesh_listeners, bool_activate) {
-
-   if ((FLAGS & LISTENERS_FLAGS.HOVER) || (FLAGS & LISTENERS_FLAGS.ALL)) {
-
-      if (mesh_listeners.buffer[E.H]) {
-         view_buffer.buffer[E.H].buffer[mesh_listeners.buffer[E.H].idx].isActive = bool_activate;
-      }
-   }
-
-   if ((FLAGS & LISTENERS_FLAGS.CLICK) || (FLAGS & LISTENERS_FLAGS.ALL)) {
-
-      if (mesh_listeners.buffer[E.C]) {
-         /**DEBUG ERROR*/ if (view_buffer.buffer[E.C].buffer[mesh_listeners.buffer[E.C].idx] === undefined)
-            console.error('Undefined listen event:', mesh_listeners.buffer[E.C].idx, ' type:', E.C)
-
-         view_buffer.buffer[E.C].buffer[mesh_listeners.buffer[E.C].idx].isActive = bool_activate;
-      }
-   }
-}
+// export function Listener_recover_children_buffer(TYPE_IDX, event_idx, children_buffer) {
+//    view_buffer.buffer[TYPE_IDX].buffer[event_idx].children = children_buffer;
+//    view_buffer.buffer[TYPE_IDX].buffer[event_idx].has_child_events = true;
+// }
 
 
 
 
-export function Listener_set_event_active_by_idx(TYPE_IDX, root, childs_evt_idx) {
-   // SEE ### docs/ScemeDraws/HoveListenEvents.drawio
+// export function Listener_events_set_mesh_events_active(FLAGS, mesh_listeners, bool_activate) {
 
-   const parent_event_idx = root.listeners.buffer[TYPE_IDX].idx; // Get the parents event from the EventListener's buffer
-   if (parent_event_idx === INT_NULL) alert('Root does not have a FAKE event')
+//    if ((FLAGS & LISTENERS_FLAGS.HOVER) || (FLAGS & LISTENERS_FLAGS.ALL)) {
 
-   // Get the root's event.
-   const evt = view_buffer.buffer[TYPE_IDX].buffer[parent_event_idx];
+//       if (mesh_listeners.buffer[E.H]) {
+//          view_buffer.buffer[E.H].buffer[mesh_listeners.buffer[E.H].idx].isActive = bool_activate;
+//       }
+//    }
 
-   if (evt === null) {
+//    if ((FLAGS & LISTENERS_FLAGS.CLICK) || (FLAGS & LISTENERS_FLAGS.ALL)) {
 
-      console.error('evt is null');
-      return;
-   }
+//       if (mesh_listeners.buffer[E.C]) {
+//          /**DEBUG ERROR*/ if (view_buffer.buffer[E.C].buffer[mesh_listeners.buffer[E.C].idx] === undefined)
+//             console.error('Undefined listen event:', mesh_listeners.buffer[E.C].idx, ' type:', E.C)
 
-   if (evt.children === null) {
+//          view_buffer.buffer[E.C].buffer[mesh_listeners.buffer[E.C].idx].isActive = bool_activate;
+//       }
+//    }
+// }
 
-      evt.children = New_generic_buffer(_, 'Child Event Listeners buffer 3'); // Create new buffer as a children's events buffer
-      evt.has_child_events = true;
-   }
 
-   // Copy the child's event params 
-   const event_params = view_buffer.buffer[TYPE_IDX].buffer[childs_evt_idx];
 
-   view_buffer.buffer[TYPE_IDX].RemoveByIdx(childs_evt_idx); // Remove the child's event from the root eventListeners buffer
-   // Store them to the parents children event buffer
-   const idx = evt.children.Add(event_params);
 
-   return idx;
-}
+// export function Listener_set_event_active_by_idx(TYPE_IDX, root, childs_evt_idx) {
+//    // SEE ### docs/ScemeDraws/HoveListenEvents.drawio
+
+//    const parent_event_idx = root.listeners.buffer[TYPE_IDX].idx; // Get the parents event from the EventListener's buffer
+//    if (parent_event_idx === INT_NULL) alert('Root does not have a FAKE event')
+
+//    // Get the root's event.
+//    const evt = view_buffer.buffer[TYPE_IDX].buffer[parent_event_idx];
+
+//    if (evt === null) {
+
+//       console.error('evt is null');
+//       return;
+//    }
+
+//    if (evt.children === null) {
+
+//       evt.children = New_generic_buffer(_, 'Child Event Listeners buffer 3'); // Create new buffer as a children's events buffer
+//       evt.has_child_events = true;
+//    }
+
+//    // Copy the child's event params 
+//    const event_params = view_buffer.buffer[TYPE_IDX].buffer[childs_evt_idx];
+
+//    view_buffer.buffer[TYPE_IDX].RemoveByIdx(childs_evt_idx); // Remove the child's event from the root eventListeners buffer
+//    // Store them to the parents children event buffer
+//    const idx = evt.children.Add(event_params);
+
+//    return idx;
+// }
 
 
 
@@ -870,6 +902,17 @@ export function Listeners_debug_info_create(scene) {
    Info_listener_create_event(INFO_LISTEN_EVENT_TYPE.LISTENERS, Listeners_debug_info_update, dropdown, null);
 }
 
+
+
+
+/**************************************************************************************************************************/
+// Debug Info Getters
+export function Listeners_get_count()        { return _listeners_buffer_storage.active_count; }
+export function Listeners_get_size()         { return _listeners_buffer_storage.size; }
+export function Listeners_hover_get_count()  { return _listeners_buffer_storage.buffer[E.H].active_count; }
+export function Listeners_hover_get_size()   { return _listeners_buffer_storage.buffer[E.H].size; }
+export function Listeners_click_get_count()  { return _listeners_buffer_storage.buffer[E.C].active_count; }
+export function Listeners_click_get_size()   { return _listeners_buffer_storage.buffer[E.C].size; }
 
 
 

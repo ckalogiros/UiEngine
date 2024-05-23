@@ -1267,26 +1267,33 @@ export function Gl_set_uv(gfxInfo, uvs, num_faces = 1) {
 // Add, Remove, Shift Attribs - Vertex Buffer Functions
 /**************************************************************************************************************************************/
 
-
+// TODO: We get the vb_infohere and in 'Vertex_buffer_remove_geometry()'
 export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0, debug_mesh = null) {
 
-   const temp_vb = Vertex_buffer_get_by_vbidx(gfx.vb.idx);
-   const vb_info = Vertex_buffer_group_get_byidx(gfx.vb.idx);
+   // const vb_info = Vertex_buffer_group_get_byidx(gfx.vb.groupidx);
 
-   const start = (start_index) ? start_index : gfx.vb.start;
+   // const start = (start_index) ? start_index : gfx.vb.start;
 
    // Structure to use for updating a removed mesh's start index pointing to it's location in the vertex buffer..
-   const ret = {
-      counts: [0, 0], // 0:vb, 1:ib
-      start: start,
-      // is_last: (start + gfx.vb.count * num_faces >= vb_info.count) ? true : false,
-      is_last: (start + gfx.vb.count * num_faces === vb_info.count) ? true : false,
-      empty: false, // Is the buffer is empty?
-   };
-
-
-   ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last, debug_mesh);
-   return ret;
+   // const ret = {
+   //    counts: [0, 0], // 0:vb, 1:ib
+   //    start: start,
+   //    // is_last: (start + gfx.vb.count * num_faces >= vb_info.count) ? true : false,
+   //    is_last: (start + gfx.vb.count * num_faces === vb_info.count) ? true : false,
+   //    empty: false, // Is the buffer is empty?
+   // };
+   // const ret = {
+   //    counts: [0, 0], // 0:vb, 1:ib
+   //    start: start,
+   //    // is_last: (start + gfx.vb.count * num_faces >= vb_info.count) ? true : false,
+   //    is_last: (start + gfx.vb.count * num_faces === vb_info.count) ? true : false,
+   //    empty: false, // Is the buffer is empty?
+   // };
+   
+   Vertex_buffer_remove_geometry(gfx, num_faces);
+   
+   // ret.counts[0] = Vertex_buffer_remove_geometry(gfx, num_faces, start, ret.is_last, debug_mesh, );
+   // return ret;
 }
 
 
@@ -2181,20 +2188,13 @@ export function Gl_particles_batch_set(vbidx, start, colors, positions, dimentio
 
 export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colors, positions, dimention) {
 
-   // const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
-   // const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.COL4);
-
-   // let stride = shader_attribs_info.attribs_per_vertex;
    
    let index = start;
-   // const len = colors.length;
    const len = 1;
 
    for (let i = 0; i < len; i++) {
 
-      // const col = colors[i];
-      // const pos = positions[i];
       const col = colors;
       const pos = positions;
       const dim = dimention;
@@ -2292,7 +2292,7 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colo
 
    }
 
-   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 

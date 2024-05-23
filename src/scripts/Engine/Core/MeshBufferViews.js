@@ -2,8 +2,8 @@
 
 import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
-import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer } from "./Buffers.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index } from "./MeshBuffer.js";
+import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index, Mesh_per_vb_remove_mesh } from "./MeshBuffer.js";
 
 
 /**
@@ -44,11 +44,11 @@ import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index } from ".
 
 _CNT = 0;
 export const VIEW_INFO = {
-   PROGIDX: _CNT++,
-   VBIDX: _CNT++,
-   IBIDX: _CNT++,
+   VB_GROUP_IDX: _CNT++,
    START: _CNT++,
    NUM_FACES: _CNT++,
+   // PROGIDX: _CNT++,
+   // IBIDX: _CNT++,
 
    SIZE: _CNT,
 };
@@ -65,14 +65,14 @@ export const VIEW_INFO = {
    view:[]
       .buffer[i]:       {vb:[]GenericBuffer} For all vb_groupidxs
          .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
-            .vb_info:    {num_faces:int, starts:[]},
+            .info:    {num_faces:int, starts:[]},
             .mesh_data:      meshidx
 
    OLD
    view:[]
       .buffer[i]:       {vb:[]GenericBuffer}
          .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
-            .info:      [PROGIDX, VBIDX, IBIDX, START, NUM_FACES],
+            .info:      [PROGIDX, VB_GROUP_IDX, IBIDX, START, NUM_FACES],
             .data:      meshidx
  */
 
@@ -89,6 +89,10 @@ class View {
 
 
 const _view_buffer = New_generic_buffer(_, 'Mesh buffer Views');
+
+
+
+export function View_get_count() { return _view_buffer.active_count; }
 
 
 
@@ -144,7 +148,7 @@ export function View_destroy_view(group_bufferidxs) {
 
 
 
-export function View_set_view_start_vb_index(group_bufferidxs, start) {
+export function View_set_view_vb_start(group_bufferidxs, start) {
    // TODO: Buffer Error Check
    _view_buffer.buffer[group_bufferidxs[0]].vb.buffer[group_bufferidxs[1]].info[VIEW_INFO.START] = start;
 }
@@ -169,7 +173,7 @@ function View_vb_exists(groupidx, vbidx) {
 
    for (let i = 0; i <= view.vb.boundary; i++) {
 
-      if (view.vb.buffer[i].info[VIEW_INFO.VBIDX] === vbidx)
+      if (view.vb.buffer[i].info[VIEW_INFO.VB_GROUP_IDX] === vbidx)
          return i;
    }
 
@@ -184,16 +188,16 @@ function View_add_mesh(groupidx, mesh) {
    const mesh_bufferidx = mesh.mesh_bufferidx;
    const num_faces = mesh.geom.num_faces;
    const start = mesh.gfx.vb.start;
-   const vbidx = mesh.gfx.vb.groupidx;
-   const ibidx = mesh.gfx.ib.idx;
-   const progidx = mesh.gfx.prog.idx;
+   const vb_groupidx = mesh.gfx.vb.groupidx;
+   // const ibidx = mesh.gfx.ib.idx;
+   // const progidx = mesh.gfx.prog.idx;
 
    const view = _view_buffer.buffer[groupidx];
    // TODO: Check for errors
 
 
-   // Find data for vertex buffer exists
-   const view_vbidx = View_vb_exists(groupidx, vbidx);
+   // Find data for vertex buffer, if exists
+   const view_vbidx = View_vb_exists(groupidx, vb_groupidx);
 
    if (view_vbidx !== INT_NULL) { // Vb buffer found
 
@@ -205,26 +209,33 @@ function View_add_mesh(groupidx, mesh) {
       view_vb_buffer.info[VIEW_INFO.NUM_FACES] += num_faces;
 
       // Update start if it is less than the stored
-      const group_start = view_vb_buffer.info.buffer[VIEW_INFO.START]
+      const group_start = view_vb_buffer.info[VIEW_INFO.START]
       if (start < group_start && start !== INT_NULL)
-         view_vb_buffer.info.buffer[VIEW_INFO.START] = start;
+         view_vb_buffer.info[VIEW_INFO.START] = start;
 
       return [groupidx, view_vbidx, mesh_groupidx]; // return the indexes
 
    }
-   else { // Not found, create new
-
-      const data = {
+   else { // Else if not found, create new View.
+      // .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
+      // .info:    {num_faces:int, vbidxs:[]},
+      // .mesh_data:      meshidx
+      const mesh_data = {
+         // info: {
+         //    num_faces: num_faces,
+         //    starts: New_int16_buffer(4),
+         //    vbidxs: New_int8_buffer(4), // Used for multiple 'Vertex Attribute Buffering'
+         // },
          info: new Int16Array(VIEW_INFO.SIZE),
-         data: New_int16_buffer(), // TODOD: widget root gfx already knows the number of meshes, so maybe have an aproximation of the mesh count(per vb buffer)
+         data: New_int16_buffer(), // TODO: widget root gfx already knows the number of meshes, so maybe have an aproximation of the mesh count(per vb buffer)
       };
 
-      const vb_bufferidx = view.vb.Add(data);
+      const vb_bufferidx = view.vb.Add(mesh_data);
       const mesh_groupidx = view.vb.buffer[vb_bufferidx].data.Add(mesh_bufferidx);
 
-      view.vb.buffer[vb_bufferidx].info[VIEW_INFO.PROGIDX] = progidx;
-      view.vb.buffer[vb_bufferidx].info[VIEW_INFO.VBIDX] = vbidx;
-      view.vb.buffer[vb_bufferidx].info[VIEW_INFO.IBIDX] = ibidx;
+      // view.vb.buffer[vb_bufferidx].info.starts.Add(start);
+      // view.vb.buffer[vb_bufferidx].info.vbidxs.Add(vbidx);
+      view.vb.buffer[vb_bufferidx].info[VIEW_INFO.VB_GROUP_IDX] = vb_groupidx;
       view.vb.buffer[vb_bufferidx].info[VIEW_INFO.START] = start;
       view.vb.buffer[vb_bufferidx].info[VIEW_INFO.NUM_FACES] = num_faces;
 
@@ -239,7 +250,7 @@ function View_add_mesh(groupidx, mesh) {
 
 function Build_per_gfx_view_group_from_root_mesh_recursive(mesh, groupidx) {
 
-   // 
+   // Connect the mesh with the View via indexes
    const info = View_add_mesh(groupidx, mesh);
    mesh.group_bufferidxs[0] = info[0]; // Groups buffer index.
    mesh.group_bufferidxs[1] = info[1]; // VB buffers index, which vb buffer the mesh belongs.
@@ -326,7 +337,7 @@ function Remove_tree_mesh_from_view_recursive(mesh) {
       if(sort_happend !== INT_NULL){
    
          // CAUTION: Because in the Int16Buffer the .RemoveByyIdx sorts the buffer by replacing the deleted element with the last active,
-         // we must update the mesh's index to the view's new elment location
+         // we must update the mesh's index to the view's new element index
          const replacer_idx = _view_buffer.buffer[text_groupidx].vb.buffer[text_group_vbidx].data.buffer[text_group_meshidx];
          const replacer_mesh = Mesh_buffer_get_mesh_byidx(replacer_idx);
          replacer_mesh.group_bufferidxs[2] = text_group_meshidx; // Update the mesh's group meshidx with the current removed mesh's group meshidx.
@@ -393,16 +404,55 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
 
    const view = _view_buffer.buffer[view_bufferidx];
 
+
    for (let i = 0; i <= view.vb.boundary; i++) {
 
       // const progidx = view.vb.buffer[i].info[VIEW_INFO.PROGIDX];
-      const vb_groupidx = view.vb.buffer[i].info[VIEW_INFO.VBIDX];
+      const vb_groupidx = view.vb.buffer[i].info[VIEW_INFO.VB_GROUP_IDX];
 
       const vb_start = view.vb.buffer[i].info[VIEW_INFO.START]; // We want the start of the root mesh of the group, not the start of the root widget
-      Vertex_buffer_reset_to_index(vb_groupidx, vb_start);
+
+      const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
+      const starts = mesh.gfx.vb.starts.buffer;
+      Vertex_buffer_reset_to_index(vb_groupidx, starts);
+      // Vertex_buffer_reset_to_index(vb_groupidx, vb_start);
 
       Mesh_per_vb_remove_all_from_index(vb_groupidx, view.vb.buffer[i].data.buffer[0]); // Pass the meshidx of the first mesh on the current accessed vb
    }
+
+}
+
+
+
+
+/** Render all group's meshes from all vertex buffers via AddToGfxFromReset()  */
+export function View_render_from_view_all_buffers(view_bufferidx, do_reconstruct_listeners=true) {
+
+   const view = _view_buffer.buffer[view_bufferidx];
+
+   for (let i = 0; i <= view.vb.boundary; i++){ // All vertex buffer groups
+      
+      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){ // Vertex Attribute Buffering.
+         
+         const meshidx = view.vb.buffer[i].data.buffer[j];
+         if(meshidx !== INT_NULL){
+
+            const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
+            if (mesh.state.mask & MESH_STATE.ACTIVE) { 
+   
+               mesh.AddToGfx(); 
+            }
+         }
+      }
+   }
+   
+   // Get the root mesh
+   const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
+   const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
+   Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2)
+   if(do_reconstruct_listeners) 
+   mesh.ConstructListeners(parent_events); 
+   const delta = Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2)
 
 }
 
@@ -414,9 +464,9 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
 
    const view = _view_buffer.buffer[view_bufferidx];
 
-   for (let i = 0; i <= view.vb.boundary; i++){
+   for (let i = 0; i <= view.vb.boundary; i++){ // All vertex buffer groups
       
-      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){
+      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){ // Vertex Attribute Buffering.
          
          const meshidx = view.vb.buffer[i].data.buffer[j];
          if(meshidx !== INT_NULL){
@@ -425,6 +475,13 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
             if (mesh.state.mask & MESH_STATE.ACTIVE) { 
    
                mesh.AddToGfxFromReset(); 
+               // if(mesh.is_gfx_inserted) mesh.AddToGfxFromReset(); 
+               // else {
+
+               //    if(mesh.gfx.vb.groupidx===1) 
+               //       console.log(mesh.GetName(), mesh.gfx.vb.starts.buffer[0])
+               //    mesh.AddToGfx(); 
+               // }
             }
          }
          // else console.log('INACTIVE', mesh.GetName())
@@ -522,8 +579,8 @@ export function View_buffer_print_loop() {
       for (let j = 0; j <= view.vb.boundary; j++) {
 
          console.log(' ', j,
-            `   progidx:${view.vb.buffer[j].info[VIEW_INFO.PROGIDX]}`,
-            `   vbidx:${view.vb.buffer[j].info[VIEW_INFO.VBIDX]}`,
+            // `   progidx:${view.vb.buffer[j].info[VIEW_INFO.PROGIDX]}`,
+            `   vbidx:${view.vb.buffer[j].info[VIEW_INFO.VB_GROUP_IDX]}`,
             `   num_faces:${view.vb.buffer[j].info[VIEW_INFO.NUM_FACES]}`,
             `   start:${view.vb.buffer[j].info[VIEW_INFO.START]}`,
             `   count:${view.vb.buffer[j].data.active_count}`,

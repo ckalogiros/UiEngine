@@ -32,8 +32,8 @@ export function Create_mesh_for_framebuffer(mesh, fb, pos, dim) {
    rect.Render();
 
    // Draw the framebuffer texture mesh first, and every other mesh on top.
-   // Renderqueue_set_priority_by_program(FIRST, rect.gfx.prog.idx, rect.gfx.vb.idx);
-   Renderqueue_set_priority_by_program(LAST,rect.gfx.prog.idx, rect.gfx.vb.idx);
+   // Renderqueue_set_priority_by_program(FIRST, rect.gfx.prog.idx, rect.gfx.vb.groupidx);
+   Renderqueue_set_priority_by_program(LAST,rect.gfx.prog.idx, rect.gfx.vb.groupidx);
  
    fb.render_area = rect; // Store a pointer to the mesh the renderbuffer will render to. 
    fb.render_widget = mesh; // Store a pointer to the mesh

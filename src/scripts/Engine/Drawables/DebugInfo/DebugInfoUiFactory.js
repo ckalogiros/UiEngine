@@ -1,17 +1,15 @@
 "use strict";
 
-import { Command_buffer_store } from "../../Core/Commandbuffer.js";
 import { Create_widget_label, Create_widget_section, Create_widget_switch_simple } from "../../Core/CreateWidget.js";
-import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp, Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
+import { Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 
 
 export function Dbg_ui_create2(name, fontsize, switch_size, switch_fn, callback_params, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex){
 
-   const section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zindex + 1], [0, 0], section_col, `DBG_UI ${name}`);
+   const style = [0, 4, 2];
+   const section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zindex + 1], [0, 0], section_col, `DBG_UI ${name}`, label_style);
    section.SetName(`DBG_UI ${name}`);
-   // section.options = SECTION.HORIZONTAL | SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.INHERIT;
    section.options = SECTION.HORIZONTAL | SECTION.EXPAND | SECTION.TOP_DOWN;
-   // section.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
    section.rel_comp = Relative_pos_comp_create_new_comp();
    
    const label = Create_widget_label(_, `${name}`, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, label_col, label_text_col, label_pad, _, label_style);

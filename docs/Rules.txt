@@ -9,3 +9,10 @@ The maximum instances are:
 attrib_divisor dictates how many times an attribute will be used for one instance.
 That means: We have attrib: color. If attrib_divisor is set to {2}, then the shader will run
 for each instance once, and use the same attribute twice.
+
+-Vertex Attribute Buffering-
+Is the term where different vertex buffers are used for attributes of one shader program
+
+
+-If weird things happen OR negative numbers appear-
+Check if the problem comes from a typed array and we overflow the max type it represents

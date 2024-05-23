@@ -1103,7 +1103,7 @@ const DEBUG_INFO = {
 		IS_ON: false,
 		IDX: INT_NULL,
 		MESH_BUFFER_IDX: INT_NULL,
-		POS: [300, 100, 10]
+		POS: [0, 0, 10]
 	},
 	UI_TIMERS: {
 		IS_ON: false,
@@ -1213,6 +1213,7 @@ const DEBUG_INFO_STRUCTS = {
 		// },
 	},
 };
+
 
 
 

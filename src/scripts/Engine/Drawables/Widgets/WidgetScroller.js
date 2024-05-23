@@ -7,9 +7,9 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/Tim
 import { Vertex_buffer_group_get_byidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Widget_root_add_mesh, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
-import { Clipy_from_group } from "../Operations/Clip.js";
+import { Clipy_from_group, Clipy_from_tree_recursive, TEMP_Clipy_from_group, temp_info } from "../Operations/Clip.js";
 import { BLUEL, GREY } from "../Material/Base/Colors.js";
-import { View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
+import { View_render_from_view_all_buffers, View_rerender_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Gl_set_dim_xy, Gl_set_dim_y, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
@@ -576,10 +576,24 @@ export class Widget_Scroller extends Section {
             const clip_right = scroller.geom.pos[0] + scroller.geom.dim[0] - (scroller.StylesGetMargin(STYLES.AXIS.X) + bar.geom.dim[0] * 2);
 
             Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+            // Clipy_from_tree_recursive(scroller.scrolled_section, clip_top, clip_bottom);
+            // TEMP_Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+
             // Clampx_from_group(scroller.scrolled_section.group_bufferidxs[0], 0, clip_right);
+
+            // Remove all listen events. To rebuild from scratch all items listen events after the clip
+            for (let i = 0; i <= scroller.scrolled_section.listeners.boundary; i++) {
+
+               if (scroller.scrolled_section.listeners.buffer[i] !== null && scroller.scrolled_section.listeners.buffer[i] !== INT_NULL) {
+
+                  Listener_remove_event_by_idx(i, scroller.scrolled_section.listeners.buffer[i])
+                  scroller.scrolled_section.listeners.buffer[i] = INT_NULL;
+               }
+            }
          }
 
-         View_rerender_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0], false);
+         // View_rerender_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0], false);
+         View_render_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0], true);
 
 
       }
@@ -803,7 +817,7 @@ export class Widget_Scroller extends Section {
       }
 
       const parent_events = [scroller.listeners.buffer[0], scroller.listeners.buffer[1]];
-      // HACK: We create all event listeners for scrolled section, so that on scrolling, any children events will be removed from the scroole section parent event 
+      // HACK: We create all event listeners for scrolled section, so that on scrolling, any children events will be removed from the scrolled section parent event 
       scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
       scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
       scrolled_section.ConstructListeners(parent_events);
@@ -916,7 +930,11 @@ function Scroller_on_move_clbk(params) {// Called by timeInterval as a callback 
 }
 
 
-
+/**
+ * // FIXME: Scroller ISSUE of scroll handle getting stuck at the bottom of the bar
+ * This is NOT occuring when the mouse grabs the handle at a low point.
+ * So it has to do with the difference of the mouse pointer and the handle with the bar-bottom
+ */
 export function Scroller_on_update_handle(_params) {
 
    const bar = _params.params;
@@ -964,6 +982,14 @@ export function Scroller_on_update_handle(_params) {
       clip_bottom = (scroller_top) + scroller.geom.dim[1] * 2;
 
    const changes_hapened = Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+   // const changes_hapened = Clipy_from_tree_recursive(scrolled_section, clip_top, clip_bottom);
+   // if(changes_hapened){
+   //    let a = temp_info;
+   //    console.log(temp_info)
+   //    a=[]
+      // console.log(a.info, a.mesh, a.meshidx)
+   // }
+   // const changes_hapened = TEMP_Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom, ydif<0);
 
    /**
     * HERE: // IMIDIATELY
@@ -986,7 +1012,8 @@ export function Scroller_on_update_handle(_params) {
 
 
 
-      View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
+      // View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
+      View_render_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
    }
 
    /**FOR FRAMEBUFFER. DO NOT DELETE */
@@ -1022,21 +1049,7 @@ function Scroller_move_handle(bar, handle) {
    const y = mouse_posy - bar_abs_pos;
    const bar_height = bar.geom.dim[1] * 2;
 
-
-   /**
-    * Case mouse click is inside the bar area but outside the handle area, make handle juump to mouse position.
-    * 
-    * :(handle.state.mask & MESH_STATE.IN_GRAB)===0
-    * This makes suure the handle is not already in scrolling
-    * 
-    * : mouse pos is in between handle top AND scroller top (y>0)
-    * (y < handle.geom.pos[1] && y > 0)
-    * 
-    * : mouse pos is in between handle bottom AND bar bottom
-    * (y > handle.geom.pos[1]+handle.geom.dim[1]*2 && y < bar_height)
-    * 
-    * // BUG: there is a pad missing from the handle pos, and as a concequence the click below (visualy) the handle does not 'count'
-   */
+   // Case mouse click is inside the bar area but outside the handle area, make handle jump to mouse position.
    if ((handle.state.mask & MESH_STATE.IN_GRAB) === 0 && ((y < handle.geom.pos[1] && y > 0) || (y > handle.geom.pos[1] + handle.geom.dim[1] * 2 && y < bar_height))) {
       handle.geom.pos[1] = y
       handle.geom.SetPosY(handle.geom.pos[1], handle.gfx);
@@ -1046,28 +1059,30 @@ function Scroller_move_handle(bar, handle) {
    const handle_top = handle.geom.pos[1] - (handle_pad + marg);
    const handle_bottom = handle.geom.pos[1] + handle.geom.dim[1] * 2 - handle_pad;
 
+   if (handle_bottom-ydif < bar_height && handle_top-ydif > 0){ // Else the handle is not hitting any pos limits, so we can move it.
+
+      // Makes sure that the handle is not moving if the mouse is outside the bars area
+      // BUT also that the handle is moving despite the mouse pos being outside the handle's area (but inside bar's area in y axis)
+      if ((y < handle_bottom - handle_pad - 3 && y > handle_top + handle_pad + 3) || (handle_bottom < bar_height && handle_top > 0)) {
+         handle.geom.pos[1] -= ydif;
+         handle.geom.SetPosY(handle.geom.pos[1], handle.gfx);
+         handle.state.mask |= MESH_STATE.IN_GRAB;
+         return true
+      }
+   }
    if (handle_bottom - ydif > bar_height) { // Set handle's position bottom limit
 
       handle.geom.pos[1] = (bar_height + marg) - (handle.geom.dim[1] * 2 + handle_pad);
       handle.geom.SetPosY(handle.geom.pos[1], handle.gfx);
       return true;
    }
-   else if (handle_top - ydif < 0) { // Set handle's position top limit
+   if (handle_top - ydif < 0) { // Set handle's position top limit
 
       handle.geom.pos[1] = marg + handle_pad;
       handle.geom.SetPosY(handle.geom.pos[1], handle.gfx)
       return true;
    }
-   else { // Else the handle is not hitting any pos limits, so we can move it.
 
-      // Makes sure that the handle is not moving if the mouse is outside the bars area
-      // BUT also that the handle is moving despite the mouse pos being ouutside the handle's area (buut inside bar's area)
-      if ((y < handle_bottom - handle_pad - 3 && y > handle_top + handle_pad + 3) || (handle_bottom < bar_height && handle_top > 0)) {
-         handle.geom.pos[1] -= ydif;
-         handle.geom.SetPosY(handle.geom.pos[1], handle.gfx);
-         handle.state.mask |= MESH_STATE.IN_GRAB;
-      }
-   }
 }
 
 

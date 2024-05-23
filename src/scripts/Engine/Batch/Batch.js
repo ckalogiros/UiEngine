@@ -107,7 +107,7 @@ export function Batch_store(mesh, first_attrib_offset, update_data=null, num_fac
       const data = {
          fnidx : mesh.batch_fnidx,
          progidx : mesh.gfx.prog.idx, 
-         vbidx : mesh.gfx.vb.idx,
+         vbidx : mesh.gfx.vb.groupidx,
          start : (start!==INT_NULL) ? start : mesh.gfx.vb.start, 
          vertsPerRect : mesh.gfx.vertsPerRect, 
          num_faces : (num_faces) ? num_faces : mesh.geom.num_faces, 

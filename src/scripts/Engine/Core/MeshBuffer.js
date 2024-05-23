@@ -121,8 +121,8 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
    }
    else { // ...remove element, BUT the removed mesh may be root of a batch-vb or group-groupdata-vb
 
-      if (mesh.batch_buffer_vbidx !== INT_NULL)
-         Widget_root_remove_element_byidx(mesh.root_bufferidx, mesh.batch_buffer_vbidx, mesh_bufferidx, mesh.geom.num_faces);
+      // if (mesh.batch_buffer_vbidx !== INT_NULL)
+      //    Widget_root_remove_element_byidx(mesh.root_bufferidx, mesh.batch_buffer_vbidx, mesh_bufferidx, mesh.geom.num_faces);
 
    }
 
@@ -223,20 +223,20 @@ export function Mesh_per_vb_get_size() { return _mesh_per_vertex_buffer.size; }
 
 
 
-export function Mesh_per_vb_get_vb_byidx(vbidx) { return _mesh_per_vertex_buffer.buffer[vbidx]; }
+export function Mesh_per_vb_get_vb_byidx(vb_groupidx) { return _mesh_per_vertex_buffer.buffer[vb_groupidx]; }
 
 
 
-export function Mesh_per_vb_get_mesh(vbidx, per_vb_bufferidx) { return _mesh_per_vertex_buffer.buffer[vbidx][per_vb_bufferidx]; }
+export function Mesh_per_vb_get_mesh(vb_groupidx, per_vb_bufferidx) { return _mesh_per_vertex_buffer.buffer[vb_groupidx][per_vb_bufferidx]; }
 
 
 
-export function Mesh_per_vb_create_vb(vbidx) {
+export function Mesh_per_vb_create_vb(vb_groupidx) {
 
-   _mesh_per_vertex_buffer.AddAtIndex(vbidx, New_int16_buffer(GFX_VIEW_MESH_DEFAULT_COUNT));
+   _mesh_per_vertex_buffer.AddAtIndex(vb_groupidx, New_int16_buffer(GFX_VIEW_MESH_DEFAULT_COUNT));
 
    if (NOTIFICATIONS_ON)
-      Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, vbidx);
+      Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, vb_groupidx);
 }
 
 
@@ -248,22 +248,22 @@ export function Mesh_per_vb_store_mesh(vb_groupidx, mesh_bufferidx) {
 
 
 
-export function Mesh_per_vb_reset_buffer(vbidx) {
+export function Mesh_per_vb_reset_buffer(vb_groupidx) {
 
-   return _mesh_per_vertex_buffer.buffer[vbidx].Reset();
+   return _mesh_per_vertex_buffer.buffer[vb_groupidx].Reset();
 }
 
 
 
-export function Mesh_per_vb_remove_mesh(vbidx, per_vb_bufferidx) {
+export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
 
    if (per_vb_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
 
 
-   _mesh_per_vertex_buffer.buffer[vbidx].RemoveByIdxSortedVersion(per_vb_bufferidx);
+   _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxSortedVersion(per_vb_bufferidx);
 
    // Update the per_vb_bufferidx of the swaped mesh that repalaced the removed mesh
-   const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vbidx].buffer[per_vb_bufferidx]];
+   const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[per_vb_bufferidx]];
 
 
    if (mesh && (mesh.state.mask & MESH_STATE.ACTIVE)) { // Case the removed mesh is last in the _mesh_per_vertex_buffer, then there is no replacement and no need for setting the 'mesh.per_vb_bufferidx'
@@ -309,7 +309,11 @@ export function Mesh_per_vb_update_mesh_gfx_start(vb_groupidx, start, num_faces)
 }
 
 
+/***********************************************************************************************************************/
+// Debug Info Getters
 
+
+export function Mesh_per_vb_get_mesh_count(vb_groupidx) { return _mesh_per_vertex_buffer.buffer[vb_groupidx].active_count; }
 
 
 
@@ -365,6 +369,10 @@ export function Widget_root_buffer_get_root_unif_wpos(idx) {
 
 
 export function Widget_root_buffer_get_byidx(idx) { return _widget_root_buffer.buffer[idx]; }
+
+
+
+export function Widget_root_buffer_get_count() { return _widget_root_buffer.active_count; }
 
 
 
@@ -705,7 +713,7 @@ export function Widget_root_batch_update_increment_accumulator(root_bufferidx, b
 export function Widget_root_batch_update_decrement_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces) {
 
    if (root_bufferidx === INT_NULL)
-      alert()
+      alert('55555')
    const batch_vb = _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx];
    if (batch_vb === _ || !batch_vb)
       console.error('batch_vb NULL', 'root_bufferidx', root_bufferidx, 'batch_buffer_vbidx', batch_buffer_vbidx, '_root_batch_buffer', _root_batch_buffer)
@@ -1272,9 +1280,9 @@ export function Widget_root_set_render_queue_flags(root_bufferidx, flags) {
    const len = vb_mesh_roots.length;
 
    for (let i = 0; i < len; i++) {
-
+      
       const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
-      Renderqueue_set_flags(gfx.vb.idxs.buffer[i], flags)
+      Renderqueue_set_flags(gfx.vb.groupidx, flags)
    }
 
 }

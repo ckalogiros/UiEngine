@@ -23,6 +23,11 @@ _str_buffer.Add(''); // Empty string
 
 
 
+export function Str_buffer_get_count() { return _str_buffer.active_count; }
+export function Str_buffer_get_size() { return _str_buffer.size; }
+
+
+
 export function Str_buffer_get_DEBUG() {
    return _str_buffer;
 }
@@ -79,6 +84,10 @@ const _str_buffer_mesh_names = New_generic_buffer(_, 'String buffer names');
 // Usage of indices buffer to string names buffer: We need a connection back to the mesh, so we can change any mesh's name on the sorted buffers. 
 const _str_buffer_mesh_names_index_buffer = New_int16_buffer(512);
 
+
+
+export function Str_buffer_mesh_names_get_count() { return _str_buffer_mesh_names.active_count; }
+export function Str_buffer_mesh_names_get_size() { return _str_buffer_mesh_names.size; }
 
 
 

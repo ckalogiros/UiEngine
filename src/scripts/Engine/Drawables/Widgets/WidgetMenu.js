@@ -273,7 +273,7 @@ export class Widget_Menu_Bar extends Section {
       const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, _, false); // For the menu meshes
 
       const rect_specific_vb_groupidx = this.gfx.vb.groupidx;
-      // const text_igfx = [this.label.text_mesh.gfx.prog.idx, this.label.text_mesh.gfx.vb.idx];
+      // const text_igfx = this.label.text_mesh.gfx.vb.groupidx;
 
       for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
          const child = this.children.buffer[i];

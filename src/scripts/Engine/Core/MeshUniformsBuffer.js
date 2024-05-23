@@ -25,8 +25,14 @@ import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer";
 const _per_vb_mesh_unif_wpos = New_generic_buffer(_, '_per_vb_mesh_unif_wpos');
 const _debug_names_per_vb_mesh_unif_wpos = New_generic_buffer(_, '_debug_names_per_vb_mesh_unif_wpos');
 
-// IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 
+
+export function Mesh_unif_wpos_get_count() { return _per_vb_mesh_unif_wpos.active_count; }
+export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; }
+
+
+
+   // IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
 export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vb_groupidx) {
 
@@ -97,10 +103,82 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
 
    const idx = _per_vb_mesh_unif_wpos.Add(entry);
-   console.log('ROOT POSITIONS BUFFER', _per_vb_mesh_unif_wpos.buffer, entry)
+   // console.log('ROOT POSITIONS BUFFER', _per_vb_mesh_unif_wpos.buffer, entry)
    return idx;
 }
 
+
+
+export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, vb_groupidx) {
+   // TODO: check NULL object
+
+   // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
+   let meshidx = mesh_bufferidx;
+   let parent_posidx = INT_NULL
+   /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
+   const wpos = [0, 0];
+
+   wpos[0] = mesh_pos[0];
+   wpos[1] = mesh_pos[1];
+ 
+
+   if (mesh_parent !== null && mesh_parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
+
+
+      parent_meshidx = mesh_parent.mesh_bufferidx;
+      parent_posidx = mesh_parent.root_posidx;
+
+   }
+
+   // If the mesh is a text mesh, we want to connect it(take its wpos offset) from any 'root wpos' that the parent of the text mesh takes its offset position.
+   // See code below for explanation
+   if (mesh_parent !== null && mesh_type & MESH_TYPE.TEXT_MESH) {
+
+      const root_posidx = mesh_parent.root_posidx;
+
+      // Here we want to get the 'root wpos' of the 'root wpos' that the text mesh's parent its connected to.
+      /**
+       * For Example: there are 3 meshes:{rect, label and label text}. 
+       * What we want for the label text is to have as a parent 'root wpos' the parent 'root wpos' of the label. 
+       * That is the rect's 'root wpos' in this example.  
+       * Other wise the text will draw its offset pos from label, which in its turn will draw its offset pos from the rect.
+       * The correct is both label and text have offset positions to rect.
+       */
+      let parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
+      if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
+         parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_wpos.parent_posidx];
+      }
+      
+      // Now, because we are gonna need the 'mesh_bufferidx' of the 'root wpos', we need to get the mesh from the mesh buffer.
+      const mesh_that_has_the_root_wpos = Mesh_buffer_get_mesh_byidx(parent_root_wpos.meshidx);
+      // const mesh_that_has_the_root_wpos = _mesh_buffer.buffer[parent_root_wpos.meshidx];
+      parent_meshidx = mesh_that_has_the_root_wpos.mesh_bufferidx;
+      parent_posidx = mesh_that_has_the_root_wpos.root_posidx;
+
+      // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
+      wpos[0] = 0;
+      wpos[1] = 0;
+   }
+   else{
+
+      mesh_pos[0] = 0;
+      mesh_pos[1] = 0;
+   }
+
+   const unif_wpos = _per_vb_mesh_unif_wpos.buffer[vb_groupidx];
+   unif_wpos.wpos[0] = wpos[0];
+   unif_wpos.wpos[1] = wpos[1];
+   unif_wpos.meshidx = meshidx;
+   unif_wpos.parent_posidx = parent_posidx;
+   unif_wpos.debug_vb_groupidx = vb_groupidx;
+
+
+   const dbg_for_unifwpos = _debug_names_per_vb_mesh_unif_wpos.buffer[vb_groupidx];
+   dbg_for_unifwpos.nameidx = mesh_nameidx;
+   dbg_for_unifwpos.parent_meshidx = parent_meshidx;
+   dbg_for_unifwpos.vbidx = vb_groupidx;
+   // _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
+}
 
 
 export function Mesh_unif_store_vb_root_wpos(vbgroupidx, pos) {
@@ -243,6 +321,14 @@ export function Mesh_unif_add_vb_root_wposy(idx, pos) {
 // per_vb_mesh_unif_#type
 
 const _per_vb_mesh_unif_col = New_generic_buffer(_, '_per_vb_mesh_unif_col');
+
+
+
+export function Mesh_unif_col_get_count() { return _per_vb_mesh_unif_col.active_count; }
+export function Mesh_unif_col_get_size() { return _per_vb_mesh_unif_col.size; }
+
+
+
 // const _debug_names_per_vb_mesh_unif_col = New_generic_buffer(_, '_debug_names_per_vb_mesh_unif_col');
 
 // Each element(uniform color) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_col'. 
@@ -261,7 +347,7 @@ export function Mesh_unif_create_vb_root_col(mesh_col) {
    // _debug_names_per_vb_mesh_unif_col.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vbidx });
 
    const idx = _per_vb_mesh_unif_col.Add(entry);
-   console.log('ROOT PER VB MESH UNIFORM COLOR BUFFER', _per_vb_mesh_unif_col.buffer, entry)
+   // console.log('ROOT PER VB MESH UNIFORM COLOR BUFFER', _per_vb_mesh_unif_col.buffer, entry)
    return idx;
 }
 

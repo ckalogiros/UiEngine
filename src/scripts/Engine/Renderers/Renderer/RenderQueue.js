@@ -26,7 +26,7 @@ class RenderQueueData {
       this.vb_groupidx = elem.vb_groupidx,
       this.ibidx = elem.ibidx;
       this.queueIdx = elem.queueIdx;
-      this.flags = 0x0;
+      this.flags = elem.flags;
       if (elem.isActive) this.flags |= RENDER_QUEUE_FLAGS.IS_ACTIVE;
    }
 
@@ -36,6 +36,7 @@ class RenderQueueData {
       this.vb_groupidx = INT_NULL;
       this.ibidx = INT_NULL;
       this.queueIdx = INT_NULL;
+      this.isActive = false;
       this.flags = 0x0;
    }
 
@@ -75,6 +76,7 @@ class RenderQueue {
          this.RebuildActiveQueue();
 
          Vertex_buffer_group_set_render_queueidx(vb_groupidx, INT_NULL);
+         console.error('0000000000000000000000000000000000000');
       }
    }
 
@@ -157,40 +159,6 @@ class RenderQueue {
    }
 
 
-   // SetPriorityAll(flag, progidx) {
-   //    // TODO: IMPLEMENT
-
-   //    const idxs = this.FindAllBuffersFromProgram(progidx);
-
-   //    for (let k = 0; k < idxs.length; k++) {
-
-   //       if (flag === FIRST && idxs[k] > 0) {
-
-   //          // Move all elements to the right
-   //          for (let i = idxs[k]; i > 0; i--) {
-   //             this.buffer[i].Set(this.buffer[i - 1]);
-   //          }
-   //          // Store back prioritized element
-   //          this.buffer[0].Set(temp);
-   //       }
-   //       else if (flag === LAST && idxs[k] < this.count - 1) {
-
-   //          // Move all elements to the left
-   //          for (let i = idxs[k]; i < this.count; i++) {
-
-   //             this.buffer[i].Set(this.buffer[i + 1]);
-   //             Vertex_buffer_group_set_render_queueidx(this.buffer[i].vb_groupidx, i + 1);
-   //          }
-
-   //          // Store back prioritized element
-   //          this.buffer[this.count - 1].Set(temp);
-   //          Vertex_buffer_group_set_render_queueidx(this.buffer[this.count - 1].vb_groupidx, this.count - 1);
-   //       }
-   //    }
-
-   // }
-
-
    SetPriority(flag, vb_groupidx) {
 
       const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
@@ -270,7 +238,16 @@ class RenderQueue {
 
 const _render_queue = new RenderQueue;
 
+
+
 export function Renderqueue_get() { return _render_queue; }
+
+
+
+export function Renderqueue_get_count() { return _render_queue.activeCount; }
+export function Renderqueue_get_size() { return _render_queue.size; }
+export function Renderqueue_active_get_count() { return _render_queue.activeCount; }
+// export function Renderqueue_active_get_size() { return _render_queue.active.size; }
 
 
 
@@ -278,19 +255,7 @@ export function Renderqueue_get_byidx(idx) { return _render_queue.buffer[idx]; }
 
 
 
-export function Renderqueue_get_count() { return _render_queue.count; }
-
-
-
-export function Renderqueue_get_size() { return _render_queue.size; }
-
-
-
 export function Renderqueue_get_active() { return _render_queue.active; }
-
-
-
-export function Renderqueue_active_get_count() { return _render_queue.activeCount; }
 
 
 
@@ -328,6 +293,7 @@ export function Renderqueue_set_active(vb_groupidx, isActive) {
       // IMPORTANT: Rebuild the queue once, if this function is called at least once
       _render_queue.RebuildActiveQueue(); // Create a new active buffer from the updated queue
    }
+
 }
 
 
