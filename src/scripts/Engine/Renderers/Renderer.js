@@ -45,7 +45,7 @@ export class Renderer {
 
       this.canvas = document.getElementById("canvas");
 
-      this.canvas.width  = VIEWPORT.WIDTH;
+      this.canvas.width = VIEWPORT.WIDTH;
       this.canvas.height = VIEWPORT.HEIGHT;
 
       const ctx = Renderer_create_webgl_context(this.canvas);
@@ -53,16 +53,16 @@ export class Renderer {
       this.extensions = ctx.extensions;
 
       this.scene = scene;
-      
+
       scene.SetCamera(camera);
       camera.Init(VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
       this.camera = camera;
 
    }
-   
-   SetCanvasSize(width, height){
 
-      this.canvas.width  = width;
+   SetCanvasSize(width, height) {
+
+      this.canvas.width = width;
       this.canvas.height = height;
    }
 
@@ -80,7 +80,7 @@ export class Renderer {
          TimersUpdateTimers();
          // TimersUpdateStepTimers();
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
-         
+
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Animations);
          Animations_run();
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Animations);
@@ -89,7 +89,7 @@ export class Renderer {
          this.scene.OnUpdate();
 
          Batch_update()
-         
+
          Notifications_update();
 
          Command_buffer_run()
@@ -106,9 +106,9 @@ export class Renderer {
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
          Gl_draw(this.gfxctx); // REIMPLEMENT: Draw should be independed of graphics platform
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)
-         
+
          Input_reset();
-         
+
 
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
 
@@ -129,16 +129,17 @@ export class Renderer {
 
 
 
-export function Renderer_set_canvas_size(width, height){
+export function Renderer_set_canvas_size(width, height) {
 
    _renderer.SetCanvasSize(width, height);
    _renderer.camera.Set(width, height); // Set the new camera projection matrix
    Scene_set_projection_matrix(_renderer.scene.sceneidx); // update camera's projection matrix
    Scene_set_screen_res_uniform(); // Update screen dimentions uniform
+   gfxCtx.gl.viewport(0, 0, width, height);
 }
 
 
-function Renderer_create_webgl_context(canvas){
+function Renderer_create_webgl_context(canvas) {
 
    console.log('Initializing Graphics.')
 
@@ -157,6 +158,7 @@ function Renderer_create_webgl_context(canvas){
    console.log('WebGl version: ', gfxctx.getParameter(gfxctx.SHADING_LANGUAGE_VERSION));
    console.log('WebGl renderer info: ', gfxctx.getParameter(gfxctx.RENDERER));
 
+   console.log('Suported line widths:', gfxctx.getParameter(gfxctx.ALIASED_LINE_WIDTH_RANGE))
 
    const extensions = gfxctx.getSupportedExtensions();
    // gfxctx.getExtension('OES_standard_derivatives');
@@ -202,6 +204,19 @@ function Renderer_create_webgl_context(canvas){
       // gfxctx.sampleCoverage(2.2, false);
    }
 
+   console.error(gfxctx.isContextLost());
+
+   canvas.addEventListener('webglcontextlost', function (event) {
+      event.preventDefault();
+      // Handle context loss
+      console.error("WebGL context lost");
+   });
+
+   canvas.addEventListener('webglcontextrestored', function (event) {
+      // Reinitialize your WebGL resources here
+      console.error("WebGL context restored");
+   });
+
 
    gfxCtx.gl = gfxctx;
    gfxCtx.ext = extensions;
@@ -214,7 +229,7 @@ function Renderer_create_webgl_context(canvas){
    var maxTextureSize = gfxctx.getParameter(gfxctx.MAX_TEXTURE_SIZE);
    console.log("Maximum Texture Size: " + maxTextureSize);
 
-   return {gfxctx:gfxctx, extensions:extensions};
+   return { gfxctx: gfxctx, extensions: extensions };
 }
 
 

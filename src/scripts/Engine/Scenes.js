@@ -1,5 +1,5 @@
 "use strict";
-import { Uniforms_block_set_uniform, Uniforms_block_bind_uniform_layout } from '../Graphics/Buffers/UniformBuffers.js';
+import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name } from '../Graphics/Buffers/UniformBuffers.js';
 import { M_Buffer } from './Core/Buffers.js';
 import { HandleEvents } from './Events/Events.js';
 
@@ -82,7 +82,8 @@ export function Scenes_get_count() { return _scenes.active_count; }
 
 export function Scene_set_projection_matrix(sceneidx) {
 
-    const unifidx = Uniforms_block_bind_uniform_layout('u_projection');
+    const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
+    // console.log('Screen Res:', _scenes.buffer[sceneidx].camera.matrix);
     Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
 }
 
@@ -90,8 +91,27 @@ export function Scene_set_projection_matrix(sceneidx) {
 
 export function Scene_set_screen_res_uniform() {
 
-    const unifidx = Uniforms_block_bind_uniform_layout('u_screen_res');
+    const unifidx = Uniforms_block_get_uniform_by_name('u_screen_res');
+    console.log('Screen Res:', VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
     Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
+}
+
+
+export function Scene_camera_zoom(sceneidx, value){
+
+    _scenes.buffer[sceneidx].camera.Zoom(value);
+
+        const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
+    Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
+}
+
+
+export function Scene_camera_scroll(sceneidx, value){
+
+    _scenes.buffer[sceneidx].camera.Scroll(value);
+
+    const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
+    Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
 }
 
 

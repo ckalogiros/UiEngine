@@ -105,8 +105,7 @@ function Resolve_uniforms_from_sid(_uniforms_info){
    if(block_created) uniforms_code += '};\n';
    
 
-   // TODO: For the time being despite the fact that a uniform is categorized as "IN_VS", the "uniforms_code += " will ad it to any shader called this function.
-   // CORRECT IT.
+   // TODO: For the time being despite the fact that a uniform is categorized as "IN_VS", the "uniforms_code += " will ad it to any shader called by this function. CORRECT IT.
    for(let i=0; i< len; i++){
       // if((_uniforms_info[i].shader & UNIFORM.IN_VS) && UNIFORM.IN_VS === unif_shader_type){
       if((_uniforms_info[i].shader & UNIFORM.IN_VS) ){
@@ -217,13 +216,13 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
          ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') 
          : '', 
       (sid.pass & SID.PASS.DIM2) ? '  v_dim = abs(a_pos);' : '',
-      (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS4)) ? '  v_wpos = vec2(a_wpos_time.x + u_wposxy.x, a_wpos_time.y + u_wposxy.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
+      (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS4)) ? '  v_wpos = vec2(a_wpos_time.x + wpos.x, a_wpos_time.y + wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
       (sid.attr & SID.ATTR.BORDER) ? '  v_border_width = a_params1.x;' : '',
       (sid.attr & SID.ATTR.R_CORNERS) ? '  v_rCorners = a_params1.y;' : '',
       (sid.attr & SID.ATTR.FEATHER) ? '  v_border_feather = a_params1.z;' : '',
-      // (true) ? '   gl_PointSize = 10.0;' : '',
+      (true) ? '   gl_PointSize = 10.0;' : '',
       '}',
 
    ];

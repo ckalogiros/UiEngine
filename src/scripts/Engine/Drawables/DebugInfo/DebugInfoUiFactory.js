@@ -15,7 +15,7 @@ export function Dbg_ui_create2(name, fontsize, switch_size, switch_fn, callback_
    const label = Create_widget_label(_, `${name}`, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zindex + 2], fontsize, label_col, label_text_col, label_pad, _, label_style);
    section.AddItem(label);
    
-   const ui_switch = Create_widget_switch_simple(_, [0, 0, zindex + 2], switch_size, switch_col, switch_col2, switch_pad);
+   const ui_switch = Create_widget_switch_simple(_, [0, 0, zindex + 2], switch_size, switch_col, switch_col2, switch_pad, _, [6, 14, 2]);
    ui_switch.SetName(`DBG_UI ${name} switch`);
    
    // const callback_params = null; // Pass any params for the callback and get them at 'switch_fn' site

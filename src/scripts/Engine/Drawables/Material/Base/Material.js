@@ -1,11 +1,10 @@
 "use strict";
 
 import * as math from '../../../../Helpers/Math/MathOperations.js'
-import { Gl_set_rgba, Gl_set_alpha, Gl_set_RGBA_per_vertex } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
-import { CharBuffer } from '../../../Core/Buffers.js';
+import { New_generic_char_buffer } from '../../../Core/Buffers.js';
 import { BLUEL, PURPLER } from './Colors.js';
-import { Uniforms_buffer_set_uniform } from '../../../../Graphics/Buffers/UniformBuffers.js';
 
 
 
@@ -106,7 +105,7 @@ export class FontMaterial extends Material {
       super(col, texidx);
 
       const len = text.length;
-      this.char_buffer = new CharBuffer();
+      this.char_buffer = New_generic_char_buffer(_, `Material - ${text}`);
       this.char_buffer.Init(len, text);
 
       this.temp_max_chars_inserted_in_gfx = 0;

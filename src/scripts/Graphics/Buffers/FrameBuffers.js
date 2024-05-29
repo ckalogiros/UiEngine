@@ -255,11 +255,11 @@ export function FramebufferSetUpdate(fbidx) {
 export function Gl_framebuffer_render(gl, framebuffer, gfx_queue) { // Renders geometry(from gfx buffers) to a spesific framebuffer target(to texture or to renderbuffer)
    // _pt_framebuffer_rendering.timer.Start();
    // Testing Rotation
-   // setInterval(()=>{GlRotateZ2D(mesh.gfx, mesh.geom.dim, TimerGetGlobalTimer()*.55)}, 10)
-   // if(framebuffer.name === 0) GlRotateZ2D(framebuffer.render_area.gfx, framebuffer.render_area.geom.dim, TimerGetGlobalTimer()*TimerGetGlobalTimer()*.55)
-   // GlRotateZ2D(framebuffer.render_area.gfx, framebuffer.render_area.geom.dim, TimerGetGlobalTimer()*502.65)
+   // setInterval(()=>{GlRotateZ2D(mesh.gfx, mesh.geom.dim, Timer_get_global_timer()*.55)}, 10)
+   // if(framebuffer.name === 0) GlRotateZ2D(framebuffer.render_area.gfx, framebuffer.render_area.geom.dim, Timer_get_global_timer()*Timer_get_global_timer()*.55)
+   // GlRotateZ2D(framebuffer.render_area.gfx, framebuffer.render_area.geom.dim, Timer_get_global_timer()*502.65)
    // GlRotateZ2D(framebuffer.render_area.gfx, framebuffer.render_area.geom.dim, 1.2)
-   // GlRotateZ2D(framebuffer.render_area.gfx, framebuffer.render_area.geom.dim, TimerGetGlobalTimer()*TimerGetGlobalTimer())
+   // GlRotateZ2D(framebuffer.render_area.gfx, framebuffer.render_area.geom.dim, Timer_get_global_timer()*Timer_get_global_timer())
 
    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.fbo);
    Gl_draw_specific(gl, gfx_queue); // Render to framebuffer

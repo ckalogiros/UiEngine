@@ -37,7 +37,7 @@ export class Widget_Menu_Bar extends Section {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [2, 5, 2], is_debug_mesh) {
 
-      const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, GREY[1], _, _, _, _, _, is_debug_mesh);
+      const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, col, text_col, _, _, _, _, is_debug_mesh);
 
 
       const dim = [label.GetMaxWidth(), 10];
@@ -79,11 +79,12 @@ export class Widget_Menu_Bar extends Section {
       // Use only the top-down pad
       const pad = [0, 0]; // IMPORTANT: If we are to set the dim of the close_btn's to a 'y padding', we better set the close_btn.pad[1] to 0
 
-      temp_close_minim_style[2] = this.mat.style[2]; // Make the button to feather on hover.
+      // temp_close_minim_style[2] = this.mat.style[2]; // Make the button to feather on hover.
 
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
-      const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.), text_col, pad, bold, temp_close_minim_style, font);
+      // const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, temp_close_minim_style, font);
+      const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, style, font);
       close_btn.SetName('close_btn');
 
 
@@ -130,7 +131,7 @@ export class Widget_Menu_Bar extends Section {
       // pad[0] = this.label.StylesGetPad(STYLES.AXIS.Y) + 1;
       // pad[1] = pad[0]-2;
 
-      temp_close_minim_style[2] = this.mat.style[2]; // Make the button to feather on hover.
+      // temp_close_minim_style[2] = this.mat.style[2]; // Make the button to feather on hover.
 
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
@@ -139,7 +140,8 @@ export class Widget_Menu_Bar extends Section {
          return;
       }
 
-      const minimize_btn = Create_widget_minimize_btn(ROOT_WIDGET_FLAGS, root, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, .9), text_col, pad, bold, temp_close_minim_style);
+      // const minimize_btn = Create_widget_minimize_btn(ROOT_WIDGET_FLAGS, root, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, temp_close_minim_style);
+      const minimize_btn = Create_widget_minimize_btn(ROOT_WIDGET_FLAGS, root, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, style);
       minimize_btn.SetName('minimize_btn');
 
 

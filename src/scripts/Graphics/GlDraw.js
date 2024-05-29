@@ -2,7 +2,7 @@ import { Texture_get_texture_byidx } from '../Engine/Loaders/Textures/Texture.js
 import { Renderqueue_get_active, Renderqueue_active_get_count } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
-import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx } from './Buffers/VertexBuffers.js';
+import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniform } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from './Buffers/UniformBuffers.js';
 import { Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
@@ -18,7 +18,7 @@ export function Gl_draw(gl) {
 
     gl.clearColor(0.18, 0.18, 0.18, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+    // gl.disable(gl.SCISSOR_TEST);
 
 
     for (let i = 0; i < drawQueueCount; i++) {
@@ -46,18 +46,29 @@ export function Gl_draw(gl) {
             GL.BOUND_VAO = vb_group.vao;
         }
 
+        // Uniforms - wpos per vertex buffer uniform
+        for(let k=0; k <= progs.buffer[progidx].ubidxs.boundary; k++){
+            
+            const ubidx = progs.buffer[progidx].ubidxs.buffer[k];
+            // Uniforms_buffer_set_and_update_uniform(ubidx);
+            // const pos = Mesh_unif_get_vb_root_wpos(vb_groupidx);
+            // Uniforms_buffer_set_uniform(ubidx, pos);
+            // Uniforms_buffer_update_uniform(ubidx);
+
+            // If the vb group has a uniform callback AND the uniform is differet/separate from other vb's of the same program, Update uniform.
+            // The unifor value should be set some place else
+            // If we have per vb uniforms, the update must happen, because of the different values of the same uniform 
+
+            Vertex_buffer_set_and_update_uniform(vb_groupidx);
+        }
+
+
 
         if (GL.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
             const texture = Texture_get_texture_byidx(vb_group.texidx);
             Gl_texture_unit_bind(gl, texture);
             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
         }
-
-        // Uniforms - wpos per vertex buffer uniform
-        const pos = Mesh_unif_get_vb_root_wpos(vb_groupidx);
-        const ubidx = progs.buffer[progidx].ubidxs.buffer[0];
-        Uniforms_buffer_set_uniform(ubidx, pos);
-        Uniforms_buffer_update_uniform(ubidx);
         
         if(vb_group.needs_any_update)
         {
@@ -90,6 +101,8 @@ export function Gl_draw(gl) {
         }
         
         // gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, 1)
+        // gl.drawElementsInstanced(gl.LINES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
+        // gl.drawElementsInstanced(gl.POINTS, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
         gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
         // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, 4)
         // gl.drawElements(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0);

@@ -55,7 +55,7 @@ export class Rect extends Mesh {
    }
 
 
-   RemoveFromGfxBuffer() {
+   RemoveFromMeshPerVbBuffer() {
       Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
    }
 

@@ -4,6 +4,7 @@ import { GetSign } from "../../../Helpers/Helpers.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Info_listener_dispatch_event } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { RegisterEvent } from "../../Events/Events.js";
+import { Scene_camera_scroll, Scene_camera_zoom } from "../../Scenes.js";
 
 
 const mouse = {
@@ -265,6 +266,9 @@ export function OnMouseWheel(e){
    mouse.wheel.x = e.clientX;
    mouse.wheel.x =  e.clientY;
    mouse.wheel.delta = GetSign(e.wheelDelta);
+
+   // Scene_camera_scroll(STATE.scene.active_idx, mouse.wheel.delta)
+   Scene_camera_scroll(STATE.scene.active_idx, mouse.wheel.delta*.01)
 
    // console.log(`MOUSE WHEEL: pos: ${e.x} ${e.y}, delta: ${e.wheelDelta}`)
 }

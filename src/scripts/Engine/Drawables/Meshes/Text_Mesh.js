@@ -56,7 +56,7 @@ export class Text_Mesh extends Mesh {
    }
 
 
-   RemoveFromGfxBuffer() {
+   RemoveFromMeshPerVbBuffer() {
       Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
    }
 
@@ -179,6 +179,7 @@ export class Text_Mesh extends Mesh {
    ResetText(new_text) {
 
       const len = new_text.length;
+      if(len > this.mat.char_buffer.size) alert('[][][]]sdklljsdm')
       for (let i = 0; i < len; i++) {
          this.mat.char_buffer.buffer[i] = new_text[i];
       }

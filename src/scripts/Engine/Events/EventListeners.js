@@ -2,7 +2,7 @@
 
 import { Intersection_point_rect } from "../Drawables/Operations/Collisions.js";
 import { MouseGetPos } from "../Controls/Input/Mouse.js";
-import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
+import { Free_generic_buffer, New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
 import { Info_listener_create_event } from "../Drawables/DebugInfo/InfoListeners.js";
@@ -65,8 +65,8 @@ import { Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueu
 /**
  * We use two separate storage buffers for smaller memory footprint (faster) for listen events access
  */
-const _listeners_buffer_storage = New_generic_buffer();
-const _listeners_buffer_view_storage = New_generic_buffer();
+const _listeners_buffer_storage = New_generic_buffer(_, '_listeners_buffer_storage');
+const _listeners_buffer_view_storage = New_generic_buffer(_, '_listeners_buffer_view_storage');
 
 
 
@@ -91,8 +91,8 @@ export function Listener_get_parent_event_meshidx(TYPE_IDX, idx) {
 export function Listener_init_event_storage_buffers() {
 
    for (let i = 0; i < LISTEN_EVENT_TYPES_INDEX.SIZE; i++) {
-      _listeners_buffer_storage.Add(New_generic_buffer(_, '_listeners_buffer_storage'));
-      _listeners_buffer_view_storage.Add(New_generic_buffer(_, '_listeners_buffer_view_storage'));
+      _listeners_buffer_storage.Add(New_generic_buffer(_, '_listeners_buffer_storage - Hover'));
+      _listeners_buffer_view_storage.Add(New_generic_buffer(_, '_listeners_buffer_view_storage - Click'));
    }
 }
 
@@ -121,7 +121,7 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
       const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_event_idx];
 
       if (parent_event.view && !parent_event.view.children) {
-         parent_event.view.children = New_generic_buffer(_, 'parent_event.children');
+         parent_event.view.children = New_generic_buffer(_, `Listeners->parent_event.view.children:${parent_event.name}`);
       }
 
       // Store the new event as a child to the parent in the listeners VIEW storage buffer.
@@ -179,7 +179,7 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
 
    const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
 
-   const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
+   // const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
 
 
    // If event is root, has no 'parent_idx', then destroy its children from the view storage buffer
@@ -215,35 +215,45 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
 
    event.view = null;
    _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(event_idx)
-   mesh.listeners.buffer[TYPE_IDX] = INT_NULL
+   // mesh.listeners.buffer[TYPE_IDX] = INT_NULL
 
    if (_listeners_buffer_storage.buffer[TYPE_IDX].active_count === 0)
       LISTENERS_FLAGS[TYPE_IDX] = false;
 
 }
 
-
+/**
+ * {
+      idx: event_idx,
+      meshidx: meshidx,
+      children: null,
+   }
+ */
 
 
 function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
 
    for (let i = 0; i <= view.boundary; i++) {
 
-      // if(view.buffer[i]===null)
-      // console.log()
 
       if (view.buffer[i] !== null) {
 
          if (view.buffer[i].children) {
             Listener_remove_all_children_events_from_view(TYPE_IDX, view.buffer[i].children);
          }
-         _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view.buffer[i].idx].view = null;
-         _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(view.buffer[i].idx);
+         _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view.buffer[i].idx].view = null; // Set null the 'view' var of this listener, in the listeners buffer
+         _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(view.buffer[i].idx); // Remover this listener from the listeners buffer
 
          const mesh = Mesh_buffer_get_mesh_byidx(view.buffer[i].meshidx);
          mesh.listeners.buffer[TYPE_IDX] = INT_NULL
       }
    }
+
+   // Free the memory of this view.buffer after we have removed all elements in the loop above.
+   // This is only to set the 'DEBUG_INFO_STRUCTS.BUFFER.GENERIC.COUNTER'.
+   // The actual view is removed-destroyed from it's parent, in the caller function
+   // console.log()
+   Free_generic_buffer(view)
 }
 
 
@@ -263,7 +273,7 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
 
 // Batch Destroy
 
-const _batch_destroy_storage = New_generic_buffer();
+const _batch_destroy_storage = New_generic_buffer(_, 'Listeners Buffer - _batch_destroy_storage');
 _batch_destroy_storage.Add(New_int16_buffer()); // Add for starters one listeners buffer. Maybe we could add via SIZE of LISTEN_EVENT_TYPE
 
 
@@ -663,10 +673,10 @@ function Check_child_events_recursive(view_children, point) {
       const child_evt = view_children.buffer[i];
       if (child_evt) {
 
-         const bounding_box = Mesh_buffer_get_mesh_bounding_box(child_evt.meshidx);
-
          const name = Mesh_buffer_get_mesh_name_byidx(child_evt.meshidx)
          const mesh = Mesh_buffer_get_mesh_byidx(child_evt.meshidx)
+
+         const bounding_box = Mesh_buffer_get_mesh_bounding_box(child_evt.meshidx);
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          const intersects = Intersection_point_rect(point, bounding_box);

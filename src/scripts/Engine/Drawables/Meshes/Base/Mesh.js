@@ -1,17 +1,17 @@
 "use strict";
-import { TimerGetGlobalTimer } from "../../../Timers/Timers.js";
+import { Timer_get_global_timer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
-import { Free_generic_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
+import { Free_generic_buffer, Free_generic_char_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
-import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh, Mesh_per_vb_update_mesh_gfx_start, Widgetroot_buffer_print_w1 } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
-import { Styles_batch_destroy_run, Styles_batch_destroy_store, Styles_create, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
+import { Styles_create, Styles_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
-import { Command_buffer_store } from "../../../Core/Commandbuffer.js";
-import { Set_color_a, Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../../Operations/MeshAttributesFunctions.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from "../../../Core/MeshUniformsBuffer.js";
+import { Vertex_buffer_set_uniform_value_callback } from "../../../../Graphics/Buffers/VertexBuffers.js";
+
 
 
 const NOTIFICATIONS_ON = true;
@@ -124,6 +124,12 @@ export class Mesh {
         this.uniforms = [];
         if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
             this.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+        
+        
+        if (APP.ENABLE_SHADER_WPOS_UNIFORM)
+            this.EnableGfxUniforms(SID.UNIF.WPOS4, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+
 
 
         this.type = MESH_TYPE.MESH;
@@ -183,7 +189,6 @@ export class Mesh {
             evtidx: INT_NULL, // Stores the index of the events in the Info_Listeners buffer.
         };
 
-        this.EnableGfxUniforms(SID.UNIF.WPOS4, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
         /** Debug  properties */
         if (DEBUG.MESH) {
@@ -236,7 +241,7 @@ export class Mesh {
             }
         }
 
-        Styles_batch_destroy_store(this.styles);
+        // Styles_batch_destroy_store(this.styles);
         // BUG: There seems to be a bug in the removal of the styles from the M_Buffer, so as to the '.active_count' isn't incremented/Decremented correctly
         // Command_buffer_store(Styles_batch_destroy_run, null, COMMANDS.ID.STYLE_BATCH_DESTROY); // Store the 'destroy styles' as a command to be executed later(once per frame)
 
@@ -254,27 +259,24 @@ export class Mesh {
 
             if (this.type & (MESH_TYPE.WIDGET_TEXT | MESH_TYPE.WIDGET_TEXT_DYNAMIC | MESH_TYPE.TEXT_MESH)) { // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
 
-                console.log('Destroy1:', this.name, this.gfx.vb.groupidx, this.geom.num_faces, this.mat.temp_max_chars_inserted_in_gfx)
-                // Widgetroot_buffer_print_w1()
+                // console.log('Destroy1:', this.name, this.gfx.vb.groupidx, this.geom.num_faces, this.mat.temp_max_chars_inserted_in_gfx)
                 const ret = Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
-                // if (!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.groupidx, ret.start, this.mat.temp_max_chars_inserted_in_gfx)
-                    // Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-                // console.log(this.mesh_bufferidx, this.GetName())
             }
             else {
                 
-                console.log('Destroy:', this.name, this.gfx.vb.groupidx, this.geom.num_faces)
+                // console.log('Destroy:', this.name, this.gfx.vb.groupidx, this.geom.num_faces)
                 const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
-                // if (!ret.is_last) Mesh_per_vb_update_mesh_gfx_start(this.gfx.vb.groupidx, ret.start, this.geom.num_faces)
-                // Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-                // console.log(this.mesh_bufferidx, this.GetName())
             }
 
         }
 
 
-        let shift_children = false; // A way to store and return if this was removed from paren's children so that the caller will reduce the i from the loop by 1.
-        // Remove from parent's children buffer
+        // Case 'this' is a child, remove it from parent's children buffer.
+        /**
+         * Because this function probably is called by the parent's 'Destroy()' function, 
+         * if we remove the 'this' in here, the we must notify parent so as not to reduce it's children count.
+         */
+        let shift_children = false; // The caller will reduce the i from the loop by 1.
         if (this.parent && this.parent !== NO_MESH_PARENT && this.idx !== INT_NULL) {
 
             shift_children = this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
@@ -289,6 +291,13 @@ export class Mesh {
         // Command_buffer_store(Mesh_buffer_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
         Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
 
+        // Destroy Generic Buffers
+        Free_generic_buffer(this.eventCallbacks);
+        Free_generic_buffer(this.timedEvents);
+        Free_generic_buffer(this.children);
+        Styles_destroy(this.styles);
+
+        if(this.type & MESH_TYPE.FONT_MATERIAL) Free_generic_char_buffer(this.mat.char_buffer)
 
 
 
@@ -361,7 +370,7 @@ export class Mesh {
 
             // HERE: The construction of the listeners is been set 3 times. Make it one time in one place
             if (!this.listeners) {
-                this.listeners = New_generic_buffer();
+                this.listeners = New_generic_buffer(_, 'Mesh-Listeners buffer');
                 this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
             }
 
@@ -376,7 +385,7 @@ export class Mesh {
         else if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
 
             if (!this.listeners) {
-                this.listeners = New_generic_buffer();
+                this.listeners = New_generic_buffer(_, 'Mesh-Listeners buffer - Click');
                 this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
             }
 
@@ -391,7 +400,7 @@ export class Mesh {
         else if (etype & LISTEN_EVENT_TYPES.MOVE) {
 
             if (!this.listeners) {
-                this.listeners = New_generic_buffer();
+                this.listeners = New_generic_buffer(_, 'Mesh-Listeners buffer - Move');
                 this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
             }
 
@@ -423,7 +432,7 @@ export class Mesh {
 
         if (!this.listeners) return;
 
-        console.log('Removing listen events of', this.GetName())
+        // console.log('Removing listen events of', this.GetName())
         for (let i = 0; i <= this.listeners.boundary; i++) {
 
             if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
@@ -442,7 +451,7 @@ export class Mesh {
 
         if (!this.listeners) return;
 
-        console.log('Removing listen events of', this.GetName())
+        console.log('Removing listen events NotSelf of', this.GetName())
         for (let i = 0; i <= this.listeners.boundary; i++) {
 
             if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
@@ -552,7 +561,7 @@ export class Mesh {
 
     SetAttrTime() {
         if (this.sid.attr & SID.ATTR.TIME) {
-            this.geom.timer = TimerGetGlobalTimer();
+            this.geom.timer = Timer_get_global_timer();
             Gl_set_wpos_time(this.gfx, this.geom.timer);
         }
     }
@@ -677,7 +686,33 @@ export class Mesh {
     }
 
 
+    GfxUniformsSetClbk(unif_name, Clbk, clbk_params){
 
+        // Find uniform
+        const len = this.uniforms.length;
+        let found_idx = INT_NULL;
+        for (let i = 0; i < len; i++) {
+            if (this.uniforms[i].name === unif_name){
+                found_idx = i;
+                break;
+            }
+        }
+
+        if(found_idx !== INT_NULL){
+            // console.log('{}{}{}{} ubidx', this.uniforms[found_idx].ubidx, this.uniforms[found_idx].name, 'prog', this.gfx.prog.idx, 'vb', this.gfx.vb.groupidx)
+
+            // HACK: We need different params for each vb group, but we only call once with one param. How to FIX???
+            if(unif_name === 'u_wposxy'){
+                
+                clbk_params = this.gfx.vb.groupidx;
+            }
+            Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
+            return;
+        }
+
+        alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js')
+
+    }
 
 }
 

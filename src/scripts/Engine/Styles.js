@@ -1,6 +1,6 @@
 "use strict";
 
-import { New_generic_buffer, New_int16_buffer } from "./Core/Buffers.js";
+import { Free_generic_buffer, New_generic_buffer, New_int16_buffer } from "./Core/Buffers.js";
 
 
 
@@ -141,6 +141,10 @@ export function Styles_destroy(idx){
    _margin_buffer.RemoveByIdx(idx);
    _hover_margin_buffer.RemoveByIdx(idx);
    _pad_buffer.RemoveByIdx(idx);
+
+   // Free_generic_buffer(_margin_buffer)
+   // Free_generic_buffer(_hover_margin_buffer)
+   // Free_generic_buffer(_pad_buffer)
 }
 
 

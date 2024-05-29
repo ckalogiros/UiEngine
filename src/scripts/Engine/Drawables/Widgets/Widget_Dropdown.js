@@ -7,7 +7,7 @@ import { TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Listener_get_parent_event } from "../../Events/EventListeners.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_buffer_get_root_meshidx, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
 import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Calculate_sizes_recursive, Expand, Section } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
@@ -15,6 +15,7 @@ import { View_add_to_group, View_get_view_vb_root_meshidx, View_remove_from_grou
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { TEMP_Scroller_calc_handle } from "./WidgetScroller.js";
 
 
 
@@ -352,6 +353,10 @@ export class Widget_Dropdown extends Section {
       this.state.mask |= bit;
       const btn = this.children.buffer[0];
       btn.StateEnable(bit & MESH_STATE.ACTIVE); // POTENTIAL_BUG: The button state should only inherit 'ACTIVE' and not any 'MOVABLE' etc 
+
+      if(this.isOn & DP_MENU_STATE.ON){
+         this.menu.StateEnable(bit)
+      }
    }
 
 
@@ -498,8 +503,6 @@ export class Widget_Dropdown extends Section {
             // EFFICIENCY: Allocations happen in this function
             item.ConstructListeners([menu.listeners.buffer[0], menu.listeners.buffer[1]]);
          }
-
-
       }
    }
 
@@ -530,7 +533,7 @@ export class Widget_Dropdown extends Section {
             // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
             if (item.type & MESH_TYPE.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
 
-               item.RemoveFromGfxBuffer();
+               item.RemoveFromMeshPerVbBuffer();
                item.Deactivate();
                item.SetIsGfxInserted(false);
 
@@ -542,7 +545,7 @@ export class Widget_Dropdown extends Section {
             else {
                if (item.gfx && item.is_gfx_inserted) {
                   
-                  item.RemoveFromGfxBuffer();
+                  item.RemoveFromMeshPerVbBuffer();
                   item.Deactivate();
                   item.SetIsGfxInserted(false);
                   
@@ -556,7 +559,7 @@ export class Widget_Dropdown extends Section {
             menu.state.mask &= ~MESH_STATE.ACTIVE;
 
             // Mesh_per_vb_remove_mesh(menu.gfx.vb.groupidx, menu.per_vb_bufferidx);
-            menu.RemoveFromGfxBuffer();
+            menu.RemoveFromMeshPerVbBuffer();
 
             // Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
             menu.is_gfx_inserted = false;
@@ -616,13 +619,23 @@ export class Widget_Dropdown extends Section {
          clip_top = group_root_mesh.GetPosY();
          clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
       }
-      // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-      Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
+
+      // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
+      Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+      // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
       // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
 
       // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
       View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
+
+      
+      
+
+      // HACK: We want to update the handles size and pos after dp activation
+      const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)
+      const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshidx)
+      if(root_mesh.type & MESH_TYPE.WIDGET_SCROLLER) TEMP_Scroller_calc_handle(root_mesh)
 
    }
 
@@ -707,7 +720,6 @@ export class Widget_Dropdown extends Section {
 
 
 
-
       if((this.options & SECTION.INDEPENDENT)===0){
 
          // Get the group root mesh to Recalc position/dimentions 
@@ -727,8 +739,7 @@ export class Widget_Dropdown extends Section {
 
          Clipy_from_group(group_root_mesh.group_bufferidxs[0], clip_top, clip_bottom);
 
-         this.ConstructListenersForMenu(menu); // Create listeners, as children of menu listeners.
-
+         
          // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
          // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
          
@@ -737,9 +748,21 @@ export class Widget_Dropdown extends Section {
          //    Clipy_from_tree_recursive(root, clip_top, clip_bottom);
          // }
          // else{
-         //    Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-         // }
-      }
+            //    Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+            // }
+            
+            
+         }
+         
+         
+         this.ConstructListenersForMenu(menu); // Create listeners, as children of menu listeners.
+
+      // HACK: We want to update the handles size and pos after dp activation
+      const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)
+      const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshidx)
+      if(root_mesh.type & MESH_TYPE.WIDGET_SCROLLER) TEMP_Scroller_calc_handle(root_mesh)
+
+
 
       // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
       // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
@@ -748,11 +771,11 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   ClipY(limit){
+   // ClipY(limit){
 
-      const btn = this.children.buffer[0];
-      btn.ClipY()
-   }
+   //    const btn = this.children.buffer[0];
+   //    btn.ClipY()
+   // }
 
 
 
@@ -920,6 +943,7 @@ export class Widget_Dropdown extends Section {
       }
    }
 
+
    SetType(type_flag) {
 
       this.type |= type_flag;
@@ -940,6 +964,30 @@ export class Widget_Dropdown extends Section {
       if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
       const btn = this.children.buffer[0];
       btn.SetIsGfxInserted(flag);
+   }
+
+
+   /** Must run for every mesh */
+   GfxUniformsEnable(flags, name, type, shader_flags) {
+
+      super.EnableGfxUniforms(flags, name, type, shader_flags);
+
+      const btn = this.children.buffer[0];
+      btn.EnableGfxUniforms(flags, name, type, shader_flags);
+      
+      this.menu.GfxUniformsEnable(flags, name, type, shader_flags);
+      
+   }
+
+  
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params){
+
+      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+
+      // And we set one of the text meshes, since we know all other text meshes belong to the same vb
+      const btn = this.children.buffer[0];
+      btn.text_mesh.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
    }
 
 
@@ -1048,10 +1096,10 @@ export class Widget_Dropdown extends Section {
 function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
 
    const parent = dp.parent;
-   const is_scroller = (parent && parent.parent) ? (parent.parent.type & MESH_TYPE.WIDGET_SCROLLER) : 0;
-
    // Calculate sizes bottom-up the tree with this 'dp' being the root...  
    const dif = Calculate_sizes_recursive(dp, dp.options, target_child_idx);
+
+   // let TEMP_scroller = null; // HACK: If there is a scroller 
 
    // ... And then go up the tree, from this 'dp' to the actual root, to add the dimention difference that was calculated erlier.
    // NOTE: This is done so that we skip calculating all children from the root. Insted we calculate from this dp and all its children , and we propagate the size difference up to any 'Section' parents.   
@@ -1061,9 +1109,10 @@ function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
       // if(p && (p.type & MESH_TYPE.SECTION_MESH) &&  (parent.parent.type & MESH_TYPE.WIDGET_SCROLLER)===0){
       if(p && (p.type & MESH_TYPE.SECTION_MESH)){
 
-         // console.log(p.name, dif)
-
-         if(p.type & MESH_TYPE.WIDGET_SCROLLER || p.type & MESH_TYPE.WIDGET_MENU_BAR || p.type & MESH_TYPE.WIDGET_WINDOW) break;
+         
+         if(p.type & MESH_TYPE.WIDGET_SCROLLER || p.type & MESH_TYPE.WIDGET_MENU_BAR || p.type & MESH_TYPE.WIDGET_WINDOW) {
+            break;
+         }
 
          if(p.options & SECTION.VERTICAL){
 
@@ -1125,6 +1174,24 @@ function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
    //    Calculate_sizes_recursive(dp, dp.options, target_child_idx);
    // }
 
+}
+
+
+export function TEMP_DP_STEAL_THE_DP_RECALC(dp){
+   
+   // Calculate_sizes_recursive(parent, parent.options, dp.idx);
+   Expand(dp, dp.options)
+   temp_dp_calc_sizes(dp, _, dp.options & SECTION.INDEPENDENT);
+
+      
+   dp.geom.dim[0] = dp.max_size[0] + dp.StylesGetMargin(STYLES.AXIS.X);
+   dp.geom.dim[1] = dp.max_size[1] + dp.StylesGetMargin(STYLES.AXIS.Y);
+   
+
+   const cur_pos = [0,0];
+   cur_pos[0] = dp.geom.pos[0]; 
+   cur_pos[1] = dp.geom.pos[1]; 
+   tu(dp, dp.options, cur_pos, _, _, dp.options & SECTION.INDEPENDENT);
 }
 
 function tu(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0){

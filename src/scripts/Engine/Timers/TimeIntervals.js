@@ -1,6 +1,6 @@
 "use strict";
 
-import { Str_buffer_store, Str_buffer_get_by_idx } from "../Core/StringBuffer.js";
+import { Str_buffer_store, Str_buffer_get_by_idx, Str_buffer_destroy } from "../Core/StringBuffer.js";
 import { TimeGet } from "./Time.js";
 
 
@@ -205,6 +205,8 @@ class TimeIntervals {
       this.ti[idx].repeat = INT_NULL;
       this.ti[idx].isActive = false;
       this.ti[idx].idx = INT_NULL;
+      Str_buffer_destroy(this.ti[idx].nameidx);
+      this.ti[idx].nameidx;
    }
 
 
@@ -223,7 +225,7 @@ class TimeIntervals {
             return i;
          }
       }
-      alert('Buffer Overflow. At Time.js-class TimeIntervals. size:', this.size)
+      alert('Not enough space in buffer:TimeIntervals\nAt TimeIntervals.js\nGetNextFree()')
       return null;
    }
 

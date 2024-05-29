@@ -72,70 +72,141 @@ export const frag_round_corners = '\
 vec2 pos = vec2(.0);                                              \n\
 float ScreenH;                                                    \n\
 float AA;                                                         \n\
-float sdRoundBox( vec2 p, in vec4 r, vec2 dim ) {                   \n\
-    vec2 q = abs(p) - abs(dim) + r.x;\n\
-    return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r.x;\n\
+\n\
+float sdRoundBox( vec2 p, in vec2 dist, vec2 dim, vec2 wpos) {                   \n\
+    \n\
+    vec2 q = (abs(p) - (dim)) + dist.x;\n\
+    float d = length(max(q, 0.0)) - dist.x;\n\
+    // float d = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - rr;\n\
+    return d;\n\
+    \n\
 }\n\
-\n\
-\n\
 \n\
 vec4 Stylize()                                                    \n\
 {                                                                 \n\
     // Radius(From 0.01 to 0.35 good values) for rounding corners   \n\
-    float rCorners = v_rCorners;                                    \n\
+    float y = u_projection[3].y;                                    \n\
+    float border_width = v_border_width;                                    \n\
+    vec2 rCorners = vec2(v_rCorners);                                    \n\
     float feather = v_border_feather;                               \n\
-    vec2 blur = vec2(0.0, feather * .001);                          \n\
-    \n\
-    \n\
-    \n\
+    vec2 blur = vec2(0.0, feather);                          \n\
     vec2 res = u_screen_res;    \n\
-    // vec2 res2 = u_screen_res;    \n\
-    // float ratio =  min(res.x, res.y) / max(res.x, res.y);           \n\
-    // // res2.x *= ratio;                                  \n\
-    // if(res2.x < res2.y) {\n\
-    //     // float ratio =  min(res2.x, res2.y) / max(res2.x, res2.y);           \n\
-    //     res2.y *= ratio;                                  \n\
-    // }\n\
-    // else if(res2.x > res2.y){ \n\
-    //     // float ratio =  max(res2.x, res2.y) / min(res2.x, res2.y);           \n\
-    //     res2.x *= ratio;                                  \n\
-    // }\n\
-    vec2 uv = gl_FragCoord.xy/res;                                  \n\
-    // uv -= vec2((v_wpos.x/res.x), 1.-(v_wpos.y/res.y));                \n\
-    uv -= vec2((v_wpos.x/u_screen_res.x), 1.-(v_wpos.y/u_screen_res.y));                \n\
-    pos = uv;                                                       \n\
-    // vec2 dim = vec2(v_dim.x/res.x, v_dim.y/res.y);                  \n\
-    vec2 dim = vec2(v_dim.x/u_screen_res.x, v_dim.y/u_screen_res.y);                  \n\
-    vec4 ra = vec4(rCorners/u_screen_res.x, rCorners/u_screen_res.x, rCorners/u_screen_res.y, rCorners/u_screen_res.y);\n\
     \n\
     \n\
+    vec2 uv = gl_FragCoord.xy;                                  \n\
+    vec2 dim = v_dim;\n\
+    vec2 wpos = v_wpos;\n\
+    wpos.y = res.y - v_wpos.y;\n\
     \n\
-    // vec4 ra = vec4(rCorners/res.x,rCorners/res.x,rCorners/res.y,rCorners/res.y);\n\
-    ra = min(ra, min(dim.x, dim.y));\n\
-    float d = sdRoundBox(pos, ra, dim);     \n\
+    uv -= wpos;\n\
+    y *= res.y;\n\
+    // uv.y += (1.-y)/2.;\n\
+    \n\
+    float d = sdRoundBox(uv, rCorners, dim, wpos);     \n\
     \n\
     \n\
     vec4 src = v_col;                                               \n\
+    // vec3 color = vec3(0.0, .03, .06);                                         \n\
     vec3 color = vec3(0.0);                                         \n\
     \n\
     \n\
-    \n\
-    // Calculate alpha (for rounding corners)                       \n\
     float dd = d - blur.x;                                          \n\
     float wa = 1.;                                                  \n\
     float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);               \n\
     float alpha = src.a * (wa * wb);                                \n\
-    //   color += color * (1.0 - alpha) + src.rgb * alpha;               \n\
     color += color + src.rgb * alpha;               \n\
-    float s = min(dim.x, dim.y); // Whole screen res gives max value of:0.5\n\
-    float wide = 4.; \n\
-    float strength = 1.2; \n\
-    color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, .05, abs(d)*wide) );                     \n\
-    \n\
-    \n\
+    float strength = 1.4; \n\
+    // float s = clamp(min(dim.x, dim.y)*.005, 1., 2.); \n\
+    color = mix( pow(color, vec3(strength)), color, smoothstep(0.0, border_width, abs(d)) ); \n\
     return vec4(color, alpha);                                       \n\
 } \n\
 ';
+/**SAVE */
+// export const frag_round_corners = '\
+// vec2 pos = vec2(.0);                                              \n\
+// float ScreenH;                                                    \n\
+// float AA;                                                         \n\
+// float sdRoundBox( vec2 p, in vec2 r, vec2 dim, float y, float ratio) {                   \n\
+//     p.y += (1.-y)/2.;    // Add any move from the projection matrix\n\
+//     float rr = .01;\n\
+//     vec2 q = (abs(p) - (dim)) + rr;\n\
+//     return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - rr;\n\
+//     // return (length(vec2(q.x, q.y)) - rr);\n\
+//     // return (length(vec2(q.x/ratio, q.y/ratio)) - rr/ratio);\n\
+//     // return (length(vec2(q.x, q.y)) - rr/ratio);\n\
+//     // return (length(vec2(q.x, q.y)) - rr);\n\
+// }\n\
+// \n\
+// \n\
+// vec4 Stylize()                                                    \n\
+// {                                                                 \n\
+//     // Radius(From 0.01 to 0.35 good values) for rounding corners   \n\
+//     float y = u_projection[3].y;                                    \n\
+//     // float y = 0.;                                    \n\
+//     float rCorners = v_rCorners;                                    \n\
+//     float feather = v_border_feather;                               \n\
+//     vec2 blur = vec2(0.0, feather * .001);                          \n\
+//     vec2 res = u_screen_res;    \n\
+//     \n\
+//     \n\
+//     vec2 uv2 = gl_FragCoord.xy/res;                                  \n\
+//     vec2 uv = gl_FragCoord.xy/res;                                  \n\
+//     uv -= vec2((v_wpos.x/res.x), 1.-(v_wpos.y/res.y));                \n\
+//     vec2 dim = v_dim;                  \n\
+//     \n\
+//     \n\
+//     float rr = .04;\n\
+//     // vec4 rad = vec4(rr);\n\
+//     vec2 rad = vec2(rr);\n\
+//     // vec2 rad = vec2(rCorners/res.y, rCorners/res.y);\n\
+//     float ratio = res.x / res.y;\n\
+//     // float d = sdRoundBox(uv, rad, dim/res, y, ratio)/ ratio;     \n\
+//     float d = sdRoundBox(uv, rad, dim/res, y, ratio);     \n\
+//     \n\
+//     \n\
+//     vec4 src = v_col;                                               \n\
+//     vec3 color = vec3(0.0, .03, .06);                                         \n\
+//     // vec3 color = vec3(.0);                                         \n\
+//     \n\
+//     \n\
+//     //////////////////////////// New Test: Circle FX\n\
+//     // float t = .03;\n\
+//     // // float t = .0001;\n\
+//     // // float len = length(uv);\n\
+//     // // float len = length(gl_FragCoord.xy-20.5)-800.;\n\
+//     // // float len = length(gl_FragCoord.xy/res)*80.-60.;\n\
+//     // float len = length(uv)*100.-11.;\n\
+//     // float ringDiameter = 80.2; // The smaller the value, the smaller the explosion ring.\n\
+//     // float ring = abs(len * 1.- (t*ringDiameter));\n\
+//     // float centerFlash = 1.1; // The Smaller the value, the greater the flash in the center ring\n\
+//     // float ex = abs(len * fract(t) * centerFlash); // GOOD!\n\
+//     // vec3 c = vec3(.4) / min(ring*.1, ex*1.5);\n\
+//     // color.rgb *= c;\n\
+//     \n\
+//     \n\
+//     \n\
+//     \n\
+//     // Calculate alpha (for rounding corners)                       \n\
+//     float dd = d - blur.x;                                          \n\
+//     // float dd = d;                                          \n\
+//     float wa = 1.;                                                  \n\
+//     float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);               \n\
+//     float alpha = src.a * (wa * wb);                                \n\
+//     // float alpha = d;                                \n\
+//     //   color += color * (1.0 - alpha) + src.rgb * alpha;               \n\
+//     color += color + src.rgb * alpha;               \n\
+//     // float s = min(dim.x, dim.y); // Whole screen res gives max value of:0.5\n\
+//     float wide = 4.5; \n\
+//     float strength = 1.4; \n\
+//     // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, .05, abs(d)*wide) );                     \n\
+//     // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, .5, c) );                     \n\
+//     // color = mix( color, pow(c, vec3(strength)), 1.0-smoothstep(0.0, .9, c));                     \n\
+//     // color = pow(color, vec3(1.4));                     \n\
+//     \n\
+//     \n\
+//     return vec4(color, alpha);                                       \n\
+// } \n\
+// ';
 
 /** SAVE */
 // export const frag_round_corners = '\

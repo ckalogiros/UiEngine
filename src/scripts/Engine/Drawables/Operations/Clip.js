@@ -138,6 +138,7 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
       for(let j=0; j <= meshshes_idx.boundary; j++){
          
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+
          const top      = root_wposy + mesh.geom.pos[1];
          const bottom   = top + mesh.geom.dim[1]*2;
 
@@ -147,17 +148,8 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
             // if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
             if(mesh.state.mask & MESH_STATE.ACTIVE){
 
-               // mesh.state.mask &= ~MESH_STATE.ACTIVE;
-               // mesh.state.mask |= MESH_STATE.CLIPED_Y;
                mesh.StateDisable(MESH_STATE.ACTIVE);
                mesh.StateEnable(MESH_STATE.CLIPED_Y);
-
-               // mesh.RemoveAllListenEvents();
-               // mesh.RemoveAllListenEventsNotSelf_RenameMe();
-
-               console.log(mesh.GetName())
-               // console.log
-               
                changes_hapened = true;
             }
          }
@@ -168,10 +160,6 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
                
                mesh.StateEnable(MESH_STATE.ACTIVE);
                mesh.StateDisable(MESH_STATE.CLIPED_Y);
-               
-               // if(mesh.ConstructListeners) 
-               //    mesh.ConstructListeners(mesh.parent_event_idx);
-
                changes_hapened = true;
             }
          }
@@ -577,25 +565,25 @@ export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=
    
             changes_hapened = Clipy_from_tree_recursive(child, clip_top, clip_bottom);
    
-            // This is the return point of an 
-            if(changes_hapened){
+            // // This is the return point of an 
+            // if(changes_hapened){
    
-               if(mesh.state.mask & MESH_STATE.ACTIVE){
+            //    if(mesh.state.mask & MESH_STATE.ACTIVE){
    
-                  temp_info.push({
-                     info:'Activate',
-                     mesh: mesh.GetName(),
-                     meshidx: mesh.mesh_bufferidx,
-                  });
-               }
-               else{
-                  temp_info.push({
-                     info:'Deactivate',
-                     mesh: mesh.GetName(),
-                     meshidx: mesh.mesh_bufferidx,
-                  });
-               }
-            }
+            //       temp_info.push({
+            //          info:'Activate',
+            //          mesh: mesh.GetName(),
+            //          meshidx: mesh.mesh_bufferidx,
+            //       });
+            //    }
+            //    else{
+            //       temp_info.push({
+            //          info:'Deactivate',
+            //          mesh: mesh.GetName(),
+            //          meshidx: mesh.mesh_bufferidx,
+            //       });
+            //    }
+            // }
          }
       // }
    }

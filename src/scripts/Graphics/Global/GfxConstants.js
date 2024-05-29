@@ -111,11 +111,12 @@ const SID = {
         BORDER: BIT2 <<= 1,
         R_CORNERS: BIT2 <<= 1,
         FEATHER: BIT2 <<= 1,
-        POS3: BIT2 <<= 1,
-        SCALE3: BIT2 <<= 1,
+        // POS3: BIT2 <<= 1,
+        // SCALE3: BIT2 <<= 1,
         COL4_PER_VERTEX: BIT2 <<= 1,
         EMPTY: BIT2 <<= 1,
-        PLAY_ARROUND1: BIT2 <<= 1,
+        TEST_MULTI_VERTEX: BIT2 <<= 1,
+        // PLAY_ARROUND1: BIT2 <<= 1,
     },
 
     INST:{
@@ -198,6 +199,10 @@ const SID = {
         // For individual uniforms we must include for the match, since a Program's shaders may be compiled before the creation of other meshes with the same sid except an extra uniform
         const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
         const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
+        // const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION|this.UNIF.TIME)
+        // const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION|this.UNIF.TIME)
+        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX)
+        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX)
         /**
          * // TODO:
          * I have deactivated the 'gfx_group' check.
@@ -205,7 +210,8 @@ const SID = {
          */
         if (
             sid1.shad === sid2.shad &&
-            sid1.attr === sid2.attr &&
+            // sid1.attr === sid2.attr &&
+            attr1 === attr2 &&
             unif1 === unif2 && 
             sid1.pass === sid2.pass
         ) {
@@ -460,12 +466,8 @@ const UNIFORM = {
 
 
 
-const TEMP_UNIFORM_BUFFER_INDEXES = {
-    U_WPOS: INT_NULL, // Stores the index of the wpos uniform of theWill be set by the Program, wwhen the uniform
-}
-// _CNT = 0;
-// const UNIFORM_BUFFER_INDEXES = {
-//     U_WPOS: INT_NULL, // Stores the index of the wpos uniform of theWill be set by the Program, wwhen the uniform 
+// const TEMP_UNIFORM_BUFFER_INDEXES = {
+//     U_WPOS: INT_NULL, // Stores the index of the wpos uniform of theWill be set by the Program, wwhen the uniform
 // }
 
 

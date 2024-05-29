@@ -8,16 +8,18 @@ import { Str_buffer_store } from "../Core/StringBuffer.js";
  * Generic Timers
  */
 
-let g_timer = 0;
-export function TimerUpdateGlobalTimer(){  g_timer += .01; }  // HOT-PATH
+let g_timer_linear = 0;
+
+
+export function Timer_update_global_timer(){  g_timer_linear += .01; }  // HOT-PATH
 
 
 
-export function TimerGetGlobalTimer(){ return g_timer; }
+export function Timer_get_global_timer(){ return g_timer_linear; }
 
 
 
-export function TimerResetGlobalTimer(){ g_timer = 0.0; }
+export function Timer_reset_global_timer(){ g_timer_linear = 0.0; }
 
 
 
@@ -27,7 +29,7 @@ let g_timer_cycle_lower_limit = .1;
 let g_timer_cycle = g_timer_cycle_lower_limit;
 let g_timer_cycle_rate = 0.01;
 
-export function TimerUpdateGlobalTimerCycle(){  // HOT-PATH
+export function Timer_update_global_timer_cycle(){  // HOT-PATH
 
     if(g_timer_cycle > g_timer_cycle_upper_limit)
         g_timer_cycle_rate  =  -0.01;
@@ -45,9 +47,23 @@ export function TimerGetGlobalTimerCycle(){
 
 
 export function TimersUpdateGlobalTimer(){
-    TimerUpdateGlobalTimer();
-    TimerUpdateGlobalTimerCycle();
+    Timer_update_global_timer();
+    Timer_update_global_timer_cycle();
+    Timer_update_global_timer_sine();
+    Timer_update_global_timer_cosine();
 }
+
+
+
+let g_timer_sine = 0;
+export function Timer_get_global_timer_sine(){ return g_timer_sine; }
+export function Timer_update_global_timer_sine(){ g_timer_sine = Math.sin(g_timer_linear*4); }
+
+
+
+let g_timer_cosine = 0;
+export function Timer_get_global_timer_cosine(){ return g_timer_cosine; }
+export function Timer_update_global_timer_cosine(){ g_timer_cosine = Math.cos(g_timer_linear*4);}
 
 
 

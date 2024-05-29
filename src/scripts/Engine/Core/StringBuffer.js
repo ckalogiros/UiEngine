@@ -67,6 +67,15 @@ export function Str_buffer_change(nameidx, new_name) {
 
 
 
+export function Str_buffer_destroy(nameidx) {
+   _str_buffer.RemoveByIdx(nameidx);
+   // const idx = _str_buffer.Add(new_name);
+   // return idx;
+}
+
+
+
+
 
 
 /****************************************************************************************************************************************************/

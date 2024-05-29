@@ -31,7 +31,7 @@ export class Info_Listeners {
    }
 
 
-   DestroyEvent(idx) {
+   RemoveEvent(idx) {
 
       this.events.RemoveByIdx(idx);
    }
@@ -92,12 +92,12 @@ export function Info_listener_dispatch_event(TYPE_IDX, trigger_params) {
 
 
 
-export function Info_listener_destroy_event(event_idx) {
+export function Info_listener_remove_event(event_idx) {
    if (event_idx === INT_NULL) {
-      console.error('Info_listener_destroy_event is NULL. event_idx:', event_idx);
+      console.error('Info_listener_remove_event is NULL. event_idx:', event_idx);
       return;
    }
-   _info_listeners.DestroyEvent(event_idx);
+   _info_listeners.RemoveEvent(event_idx);
 }
 
 

@@ -1,7 +1,7 @@
 "use strict";
 import { Scene_set_projection_matrix, Scenes_create_scene } from '../Engine/Scenes.js'
 import { Renderqueue_init } from '../Engine/Renderers/Renderer/RenderQueue.js';
-import { Renderer_create_renderer, Renderer_set_canvas_size } from '../Engine/Renderers/Renderer.js';
+import { Renderer_create_renderer } from '../Engine/Renderers/Renderer.js';
 import { CameraOrthographic } from '../Engine/Renderers/Renderer/Camera.js';
 import { Texture_init_texture_storage_buffer } from '../Engine/Loaders/Textures/Texture.js';
 

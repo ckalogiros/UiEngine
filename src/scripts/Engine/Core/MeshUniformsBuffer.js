@@ -7,9 +7,9 @@
 
 "use strict";
 
-import { New_generic_buffer } from "./Buffers";
-import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer";
-import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer";
+import { New_generic_buffer } from "./Buffers.js";
+import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
+import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer.js";
 
 
 
@@ -269,8 +269,47 @@ export function Mesh_unif_set_vb_root_wpos(idx, x, y) {
 
 
 
+export function Mesh_unif_set_vb_root_wpos_all_siblings(idx, x, y){
+
+   _per_vb_mesh_unif_wpos.buffer[idx].wpos[0] = x;
+   _per_vb_mesh_unif_wpos.buffer[idx].wpos[1] = y;
+
+   const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[idx].parent_posidx;
+   // Run from parent idx to the end of buffer, and add the pos to any elem that is a sibling(same parent)
+   // BUG: Assuming the parent always is before any children, which probably it is not the case when root wpos's are removed and new are replacing existing elements
+   for(let i=parent_rootidx+1; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+      
+      const elem = _per_vb_mesh_unif_wpos.buffer[i];
+      if(elem.parent_posidx === parent_rootidx){
+         _per_vb_mesh_unif_wpos.buffer[i].wpos[0] = x;
+         _per_vb_mesh_unif_wpos.buffer[i].wpos[1] = y;
+      }
+   }
+}
+
+
+
 export function Mesh_unif_set_vb_root_wposx(idx, pos) {
    _per_vb_mesh_unif_wpos.buffer[idx].wpos[0] = pos;
+}
+
+
+
+/** Set wpos for all roots with the same parent */
+export function Mesh_unif_set_vb_root_wposx_all_siblings(idx, pos) {
+   
+   _per_vb_mesh_unif_wpos.buffer[idx].wpos[0] = pos;
+
+   const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[idx].parent_posidx;
+   // Run from parent idx to the end of buffer, and add the pos to any elem that is a sibling(same parent)
+   // BUG: Assuming the parent always is before any children, which probably it is not the case when root wpos's are removed and new are replacing existing elements
+   for(let i=parent_rootidx+1; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+      
+      const elem = _per_vb_mesh_unif_wpos.buffer[i];
+      if(elem.parent_posidx === parent_rootidx){
+         _per_vb_mesh_unif_wpos.buffer[i].wpos[0] = pos;
+      }
+   }
 }
 
 

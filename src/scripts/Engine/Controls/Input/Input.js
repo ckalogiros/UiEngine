@@ -47,7 +47,7 @@ export function On_window_resize() {
   gfxCtx.gl.viewport(0, 0, VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
 
   Renderer_set_canvas_size(DEVICE.width, DEVICE.height);
-  console.log('RESIZE CANVAS')
+  // console.log('RESIZE CANVAS')
 }
 
 export function Input_create_user_input_listeners() {

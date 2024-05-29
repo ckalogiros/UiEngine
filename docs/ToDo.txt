@@ -1,30 +1,34 @@
 --------------------------------------------------- Milestones!
--Convert all mesh attribs to indexes in a vertex buffer ???
 +Resizing
--Horizontal scrolling
 +Set Focused and enable order drawing
++Animations
++Animation per vertex in CPU
++Android Phone
++Instancing and gl_VertexID, gl_InstanceID, gl_DrawID: SEE https://www.khronos.org/opengl/wiki/Vertex_Shader/Defined_Inputs
+
+-Convert all mesh attribs to indexes in a vertex buffer ???
+-Horizontal scrolling
 -Set draw STATIC/DYNAMIC for vertex buffers
 -Set draw STATIC/DYNAMIC for meshes through frame buffers
 -Dynamic Creation and Connection of sliders to utilities
 -DragNdrop
 -A quick type of drawing with out necessarely creating all the boiler plate of mesh creation. Create once and render. Destroy on event.
--Animations
 -Save 
 -Undo
 -Implement shaders with INT attributes: Color, wposition
 -3D
--Android Phone
 -Pass font texture via Uniform Shared Block
 
 -Depth Buffer
--Instancing and gl_VertexID, gl_InstanceID, gl_DrawID: SEE https://www.khronos.org/opengl/wiki/Vertex_Shader/Defined_Inputs
 -REDUCE THE ATTRIBUTES AND ALSO THE TYPE BITS
 
+-New fonts
+-New UI images in the font texture map(close btn, minimize, etc)
+
 -Animation Shaders (per vertex, for grass...)
--Animation per vertex in CPU
 -Create components for col, pos, etc,
   -Saved to a color buffer, get the colors as refferences
-  -Create classe for Arr4, Arr3, Mat4(for per vertex color), to handle the Set,Copy correctly:E.x. Set the alpha for a per vertex color Mat4, needs to copy the alpha to all collumns of index [3]
+  -Create classes for Arr4, Arr3, Mat4(for per vertex color), to handle the Set,Copy correctly:E.x. Set the alpha for a per vertex color Mat4, needs to copy the alpha to all collumns of index [3]
 --------------------------------------------------- Milestones!
 
 
@@ -88,6 +92,7 @@ so that each vertex the index gets to the next color attribute(R->G->B ....)
 . Implement destruction of gfx buffers and gl program.
   (Also make sure all suposed private buffers are set private).
 . IMPLEMENT: Destroy from widget root
+. Updating text with RenderText() calls 3 functions(Set:uv,apos,dim) instead of one for all three
 --------------------------------------------------- IMIDIATE!
 
 
@@ -97,6 +102,7 @@ so that each vertex the index gets to the next color attribute(R->G->B ....)
 . The vertex buffer pooling must be based on size, always choose the smaller fitting one.
   Also instead of reallocating the buffer, check if an avaliable buffer exists in pool and switch.
   More over, regular checks may take place to check if any vertex buffer is too large for the attribs count it store and switch with a smaller from the pool 
+. A lot of buffers creations aren't been destroyed/deallocated on destroy. SEE Statistics-stats info UI
 --------------------------------------------------- TODO!
 
 

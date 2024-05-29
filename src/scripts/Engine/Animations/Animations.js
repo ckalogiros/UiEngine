@@ -1,8 +1,17 @@
 "use strict";
 
-import { Gl_batch_set_RGBA, Gl_batch_set_pos_xy } from "../../Graphics/Buffers/VertexBuffersOps";
-import { New_generic_buffer } from "../Core/Buffers";
-import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer";
+import { Vertex_buffer_group_get_byidx, Vertex_buffer_state_enable } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Gl_batch_set_RGBA, Gl_batch_set_pos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { New_generic_buffer } from "../Core/Buffers.js";
+import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
+import { Timer_get_global_timer, Timer_get_global_timer_cosine, Timer_get_global_timer_sine } from "../Timers/Timers.js";
+
+
+/**
+ * // TODO: Either we capture a pointer to the mesh attribute(color), so we store the changes, or we need to update the meshes attribute
+ */
+
+
 
 
 const MASKS = [
@@ -19,6 +28,9 @@ const ANIM_DATA = {
     MIN: 2,
     MAX: 3,
 };
+
+
+// const HAS_START_VALUE = 0x0
 
 
 
@@ -70,38 +82,10 @@ function Animations_get_value_offset(anim_type_flag, anim_data_type){
         
         if(anim_data_type & ANIMATIONS.DATA.POS.X)  offsets.push(0);
         if(anim_data_type & ANIMATIONS.DATA.POS.Y)  offsets.push(1);
-        if(anim_data_type & ANIMATIONS.DATA.POS.XY) offsets.push(0);
+        // if(anim_data_type & ANIMATIONS.DATA.POS.XY) offsets.push(0);
         return offsets;
     }
 }
-// function Animations_get_value_offset(anim_type_flag, anim_data_type){
-//     // if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
-
-//     //     if(anim_data_type & ANIMATIONS.DATA.COLOR.R) return 0;
-//     //     if(anim_data_type & ANIMATIONS.DATA.COLOR.G) return 1;
-//     //     if(anim_data_type & ANIMATIONS.DATA.COLOR.B) return 2;
-//     //     if(anim_data_type & ANIMATIONS.DATA.COLOR.A) return 3;
-//     //     if(anim_data_type & ANIMATIONS.DATA.COLOR.RG) return 0;
-//     //     if(anim_data_type & ANIMATIONS.DATA.COLOR.RGB) return 0;
-//     //     if(anim_data_type & ANIMATIONS.DATA.COLOR.RGBA) return 0;
-//     //     alert('No apropriate size found for Animations color offset size\nAnimations.js')
-//     // }
-//     if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
-
-//         if(anim_data_type & ANIMATIONS.DATA.COLOR.R) return 0;
-//         if(anim_data_type & ANIMATIONS.DATA.COLOR.G) return 1;
-//         if(anim_data_type & ANIMATIONS.DATA.COLOR.B) return 2;
-//         if(anim_data_type & ANIMATIONS.DATA.COLOR.A) return 3;
-//         alert('No apropriate size found for Animations color offset size\nAnimations.js')
-//     }
-//     else if(anim_type_flag & ANIMATIONS.TYPE.WPOS){
-        
-//         if(anim_data_type & ANIMATIONS.DATA.POS.X) return 0;
-//         if(anim_data_type & ANIMATIONS.DATA.POS.Y) return 1;
-//         if(anim_data_type & ANIMATIONS.DATA.POS.XY) return 0;
-//         alert('No apropriate size found for Animations wpos offset size\nAnimations.js')
-//     }
-// }
 
 
 
@@ -127,6 +111,9 @@ class VB_DATA {
         this.values_len = values_len;
         this.data = {
             starts: [],
+            counts: null,
+            which_vb: null,
+            verts_per_rect: 0,
             values: [],
             values_indices: [],
             num_faces: [],
@@ -135,42 +122,22 @@ class VB_DATA {
         this.data_count = 0;
     }
 
-    SetData(start, values, num_faces, anim_type_flag, anim_data_type){
+    SetData(starts, values, num_faces, anim_type_flag, anim_data_type, which_vb, counts, verts_per_rect, start_val=0, has_start_value=false){
         if(values.constructor !== Array) alert('values should be an array\nAnimations.js')
         
 
-        this.data.starts.push(start);
+        this.data.starts.push(starts);
         this.data.num_faces.push(num_faces);
+        this.data.counts = counts;
+        this.data.which_vb = which_vb;
+        this.data.verts_per_rect = verts_per_rect;
         
         
         this.data.offsets = Animations_get_value_offset(anim_type_flag, anim_data_type);
         for(let i=0; i < this.values_len; i++){
             
-            this.data.values[this.data_count] = values[i];
-
-            const mask = 0x1111
-            // this.data.offsets[this.data_count] = Animations_get_value_offset(anim_type_flag, anim_data_type<<i+1);
-            // this.data.offsets[this.data_count] = Animations_get_value_offset(anim_type_flag, anim_data_type & (mask<<0));
-            // console.log(
-            //     'anim_data_type', anim_data_type,
-            //     '\ni', i,
-            //     '\n(mask<<i)', (mask<<i),
-            //     '\nmask<<i', anim_data_type & (mask<<i),
-            // )
-            // console.log(
-            //     'anim_data_type', anim_data_type,
-            //     '\n<<0', anim_data_type & (mask<<0),
-            //     '\n<<1', anim_data_type & (mask<<1),
-            //     '\n<<2', anim_data_type & (mask<<2),
-            //     '\n&0x1', anim_data_type & 0x1,
-            //     '\n&0x2', anim_data_type & 0x2,
-            //     '\n&0x3', anim_data_type & 0x3,
-            //     '\n&i', anim_data_type & MASKS[i],
-            //     '\nR', ANIMATIONS.DATA.COLOR.R,
-            //     '\nG', ANIMATIONS.DATA.COLOR.G,
-            //     '\nB', ANIMATIONS.DATA.COLOR.B,
-            //     '\nA', ANIMATIONS.DATA.COLOR.A,
-            // )
+            if(!has_start_value) this.data.values[this.data_count] = values[i];
+            else this.data.values[this.data_count] = start_val;
             this.data_count++;
         }
         
@@ -230,7 +197,7 @@ export class Animation{
 
 
 // const _animations = new Animations;
-const _animations = New_generic_buffer();
+const _animations = New_generic_buffer(_, 'Animations Buffer');
 
 
 
@@ -255,47 +222,62 @@ function Analyze_flag(anim_type_flag, flag){
 
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
         
-        if(flag & ANIMATIONS.DATA.COLOR.R) return ANIMATIONS.DATA.COLOR.R;
-        if(flag & ANIMATIONS.DATA.COLOR.G) return ANIMATIONS.DATA.COLOR.G;
-        if(flag & ANIMATIONS.DATA.COLOR.B) return ANIMATIONS.DATA.COLOR.B;
-        if(flag & ANIMATIONS.DATA.COLOR.A) return ANIMATIONS.DATA.COLOR.A;
-
-        if(flag & ANIMATIONS.DATA.COLOR.RG) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.G);
-        if(flag & ANIMATIONS.DATA.COLOR.RB) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.B);
-        if(flag & ANIMATIONS.DATA.COLOR.RA) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.A);
-
-        if(flag & ANIMATIONS.DATA.COLOR.GB) return (ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.B);
-        if(flag & ANIMATIONS.DATA.COLOR.GA) return (ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.A);
         
-        if(flag & ANIMATIONS.DATA.COLOR.BA) return (ANIMATIONS.DATA.COLOR.B|ANIMATIONS.DATA.COLOR.A);
-
+        if(flag & ANIMATIONS.DATA.COLOR.RGBA) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.B|ANIMATIONS.DATA.COLOR.A);
+        
         if(flag & ANIMATIONS.DATA.COLOR.RGB) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.B);
         if(flag & ANIMATIONS.DATA.COLOR.RGA) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.B);
         if(flag & ANIMATIONS.DATA.COLOR.RBA) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.B);
         if(flag & ANIMATIONS.DATA.COLOR.GBA) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.B);
-
-        if(flag & ANIMATIONS.DATA.COLOR.RGBA) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.B|ANIMATIONS.DATA.COLOR.B);
+        
+        if(flag & ANIMATIONS.DATA.COLOR.BA) return (ANIMATIONS.DATA.COLOR.B|ANIMATIONS.DATA.COLOR.A);
+        if(flag & ANIMATIONS.DATA.COLOR.GB) return (ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.B);
+        if(flag & ANIMATIONS.DATA.COLOR.GA) return (ANIMATIONS.DATA.COLOR.G|ANIMATIONS.DATA.COLOR.A);
+        if(flag & ANIMATIONS.DATA.COLOR.RG) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.G);
+        if(flag & ANIMATIONS.DATA.COLOR.RB) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.B);
+        if(flag & ANIMATIONS.DATA.COLOR.RA) return (ANIMATIONS.DATA.COLOR.R|ANIMATIONS.DATA.COLOR.A);
+        
+        if(flag & ANIMATIONS.DATA.COLOR.R) return ANIMATIONS.DATA.COLOR.R;
+        if(flag & ANIMATIONS.DATA.COLOR.G) return ANIMATIONS.DATA.COLOR.G;
+        if(flag & ANIMATIONS.DATA.COLOR.B) return ANIMATIONS.DATA.COLOR.B;
+        
+        if(flag & ANIMATIONS.DATA.COLOR.A) return ANIMATIONS.DATA.COLOR.A;
     }
     else if(anim_type_flag & ANIMATIONS.TYPE.WPOS){
-        alert('IMPLEMET FOR WPOS\nEEE\nAnimations.js')
-        if(flag & ANIMATIONS.DATA.POS.XY) return 2;
-        if(flag & ANIMATIONS.DATA.POS.X) return 1;
-        if(flag & ANIMATIONS.DATA.POS.Y) return 1;
+        // alert('IMPLEMET FOR WPOS\nEEE\nAnimations.js')
+        if(flag & ANIMATIONS.DATA.POS.XY) return (ANIMATIONS.DATA.POS.X|ANIMATIONS.DATA.POS.Y);
+        if(flag & ANIMATIONS.DATA.POS.X) return ANIMATIONS.DATA.POS.X;
+        if(flag & ANIMATIONS.DATA.POS.Y) return ANIMATIONS.DATA.POS.Y;
     }
     alert('No apropriate size found for Animations value data size\nAnimations.js')
 }
 
-// export function Animations_create(animationClbk, stopAnimationClbk, params, name){
-// export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh_data=null, step=0, min=0, max=0){
-export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=null, step=0, min=0, max=0){
+
+/**
+ * 
+ * @param {*} anim_type_flag    type of: "ANIMATIONS.TYPE."
+ * @param {*} values_len_flag   type of: "ANIMATIONS.DATA."
+ * @param {*} mesh 
+ * @param {*} step      The step in wich the values will be transformed
+ * @param {*} min       min time (in case of cyclical animation)
+ * @param {*} max       max time
+ * @param {*} start_t   Starting time
+ * @param {*} start_v   The starting value
+ * @param {*} has_start_value   We need a separate bool in order to set as the start value the 0
+ */
+export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=null, step=0, min=0, max=0, start_t=0, start_v=0, has_start_value=false){
         
+    // const vb_group = Vertex_buffer_group_get_byidx(vbidx);
+    // const verts_per_rect = (mesh.gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
 
     const vbidx = mesh.gfx.vb.groupidx;
-    const starts = mesh.gfx.vb.start;
-    const attribs_per_vertex = mesh.gfx.attribsPerVertex;
+    const starts = mesh.gfx.vb.starts.buffer;
+    const counts = mesh.gfx.vb.counts.buffer;
+    const which_vb = mesh.gfx.vb.which_vb;
+    const verts_per_rect = (mesh.gfx.vb.counts.active_count > 1) ? 1 : VERTS_PER_RECT_INDEXED; // For instanced meshes that have per instance data, the number of times run must be 1 and not 4(per vertex)
     const attribsidx = mesh.gfx.prog.attribsidx;
     const num_faces = mesh.geom.num_faces;
-    const values = mesh.mat.col;
+    let values = [];
 
 
     const vals_len_flag = Analyze_flag(anim_type_flag, values_len_flag)
@@ -303,33 +285,47 @@ export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=
     
     // Create animation type, if does not exist 
     let anim = null
-    if(ANIMATIONS.INDEX.COLOR !== INT_NULL){
-        anim = _animations.buffer[ANIMATIONS.INDEX.COLOR];
-    }
-    else {
+    let anim_type_idx = INT_NULL;
+    if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
         
-        anim = new Animation(anim_type_flag);
-        const idx = _animations.Add(anim);
-        ANIMATIONS.INDEX.COLOR = idx;
+        if(ANIMATIONS.INDEX.COLOR !== INT_NULL){
+            anim_type_idx = ANIMATIONS.INDEX.COLOR;
+            anim = _animations.buffer[anim_type_idx];
+        }
+        else {
+            
+            anim = new Animation(anim_type_flag);
+            anim_type_idx = _animations.Add(anim);
+            ANIMATIONS.INDEX.COLOR = anim_type_idx;
+            
+        }
+        
+        values = mesh.mat.col;
+        
+    }
+    else if(anim_type_flag & ANIMATIONS.TYPE.WPOS){
+        
+        if(ANIMATIONS.INDEX.WPOS !== INT_NULL){
+            anim_type_idx = ANIMATIONS.INDEX.WPOS;
+            anim = _animations.buffer[anim_type_idx];
+        }
+        else {
+            
+            anim = new Animation(anim_type_flag);
+            anim_type_idx = _animations.Add(anim);
+            ANIMATIONS.INDEX.WPOS = anim_type_idx;
+        }
+        values = mesh.geom.pos;
     }
 
 
-    const anim_type_idx = ANIMATIONS.INDEX.COLOR;
-
-    // const vbidx = mesh_data.vbidx;
-    // const attribsidx = mesh_data.attribsidx;
-    // const anim_data_size_len = ANIMATIONS.DATA.COLOR.RGBA;
-    // const anim_data_size_len = ANIMATIONS.DATA.POS.X;
     const vals_len = Animations_get_value_size(anim_type_flag, values_len_flag)
     
-    // const starts = mesh_data.start;
-    // const values = mesh_data.values;
-    // const num_faces = mesh_data.num_faces;
     
-    const t = 0;
+    const t = start_t ? start_t : min;
     const t_step = step;
 
-    // Create vb data, if does't existt
+    // Create vb data, if does't exist
     let vb_data_idx = Vb_data_exist(anim_type_idx, vbidx)
     if(vb_data_idx === INT_NULL){
 
@@ -342,7 +338,7 @@ export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=
     }
 
     // Finally, after type and vb are set, create the animation data for the mesh
-    anim.vb_data[vb_data_idx].SetData(starts, values, num_faces, anim_type_flag, vals_len_flag)
+    anim.vb_data[vb_data_idx].SetData(starts, values, num_faces, anim_type_flag, vals_len_flag, which_vb, counts, verts_per_rect, start_v, has_start_value)
     anim.anim_data[vb_data_idx].SetData(t, t_step, min, max)
 
     // Set apropriate callback
@@ -357,55 +353,46 @@ export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=
 
 
 
-// function Min_max(value, anim_data, flags){
-
-//     const step = anim_data[ANIM_DATA.STEP], min = anim_data[ANIM_DATA.MIN], max = anim_data[ANIM_DATA.MAX];
-
-
-//     if(value+step > max || value+step < min) {
-
-//         if(flags & ANIMATIONS.TYPE.CYCLICAL){
-//             // continue in the oposite direction
-//             anim_data[ANIM_DATA.STEP] *= -1;
-
-//         }
-//         else{
-
-//             // Stop animation
-//             // If no Stop() callback is stored, just remove anim_data and values_data 
-//         }
-//     };
-
-//     value += step;
-            
-//     // console.log(step)
-//     return value;
-
-// }
-
-
 function Min_max(values, anim_data, flags, values_len){
 
-    const step = anim_data[ANIM_DATA.STEP], min = anim_data[ANIM_DATA.MIN], max = anim_data[ANIM_DATA.MAX];
+    // const step = anim_data[ANIM_DATA.STEP], 
+    const min = anim_data[ANIM_DATA.MIN], max = anim_data[ANIM_DATA.MAX];
+
 
     for(let i=0; i < values_len; i++){
 
-        if(values[i]+step > max || values[i]+step < min) {
-    
-            if(flags & ANIMATIONS.TYPE.CYCLICAL){
-                // continue in the oposite direction
+                
+        // if(i==0)console.log(values[i], anim_data[ANIM_DATA.STEP])
+        // console.log(i)
+        if(flags & ANIMATIONS.TYPE.CYCLICAL){
+            // continue in the oposite direction
+            if(values[i] < min && anim_data[ANIM_DATA.STEP] < 0) {
                 anim_data[ANIM_DATA.STEP] *= -1;
-    
+                // console.log('min', min, )
             }
-            else{
-    
-                // Stop animation
-                // If no Stop() callback is stored, just remove anim_data and values_data 
+            else if(values[i] > max && anim_data[ANIM_DATA.STEP] > 0) {
+                anim_data[ANIM_DATA.STEP] *= -1;
+                // console.log('max', max, )
             }
-        };
+            
+            // console.log(values[i], anim_data[ANIM_DATA.STEP])
+        }
+        else{
+            
+            // Stop animation
+            // If no Stop() callback is stored, just remove anim_data and values_data 
+        }
+        
+        // values[i] += anim_data[ANIM_DATA.STEP];
+        // if(i===0)values[i] += Timer_get_global_timer_sine()*4;
+        // else values[i] += Timer_get_global_timer_cosine()*4;
+
+        const speed = 8
+        if(i===0)values[i] += Math.sin(Timer_get_global_timer()*speed)*speed;
+        else values[i] += Math.cos(Timer_get_global_timer()*speed)*speed;
+
+        let x=0;
     
-        // console.log(step)
-        values[i] += step;
     }
 }
 
@@ -428,15 +415,11 @@ export function Animations_run(){
                     const anim_data = _animations.buffer[i].anim_data[j].data;
                     Min_max(vb_data.data.values, anim_data, _animations.buffer[i].anim_type_flag, vb_data.values_len)
                     
-                    // vb_data.data.values[0] = Min_max(vb_data.data.values[0], anim_data, _animations.buffer[i].anim_type_flag)
-                    // vb_data.data.values[1] = Min_max(vb_data.data.values[1], anim_data, _animations.buffer[i].anim_type_flag)
-                    
-                    // vb_data.data.values[2] = Min_max(vb_data.data.values[2], anim_data, _animations.buffer[i].anim_type_flag)
-                    // console.log(vb_data.data.values[0])
-                    // console.log(vb_data.data.values[0])
-                    
-                    _animations.buffer[i].UpdateClbk(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, vb_data.data.values_indices, vb_data.values_len, vb_data.attribsidx, vb_data.data.num_faces, vb_data.data.offsets);
-                    // Gl_batch_set_RGBA(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, vb_data.data.values_indices, vb_data.values_len, vb_data.attribsidx, vb_data.data.num_faces);
+                    _animations.buffer[i].UpdateClbk(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, 
+                                                     vb_data.data.values_indices, vb_data.values_len, vb_data.attribsidx, 
+                                                     vb_data.data.num_faces, vb_data.data.offsets, vb_data.data.which_vb, vb_data.data.counts, vb_data.data.num_faces[0]);
+
+
                 }
                 
 

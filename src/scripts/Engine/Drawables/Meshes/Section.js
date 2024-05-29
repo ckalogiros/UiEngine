@@ -5,24 +5,18 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect } from "./Rect_Mesh.js";
-import { Widget_root_create_root, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_reset_gfx, Widget_root_resize_and_rerender, Widget_root_gfx_reset_mesh_per_vb_buffer } from "../../Core/MeshBuffer.js";
+import { Widget_root_create_root, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_reset_gfx, Widget_root_resize_and_rerender, Widget_root_gfx_reset_mesh_per_vb_buffer, Widget_root_rerender } from "../../Core/MeshBuffer.js";
 import { Batch_store } from "../../Batch/Batch.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
-import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_add_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposx_all_siblings, Mesh_unif_set_vb_root_wpos_all_siblings, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 
 
 
 
-
-
-
-const temp_parent_listeners = New_generic_buffer();
-temp_parent_listeners.Add(INT_NULL);
-temp_parent_listeners.Add(INT_NULL);
 
 
 
@@ -35,7 +29,7 @@ export class Section extends Rect {
    // total_margin
 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin = [4, 4], pos = [200, 400, 0], dim = [40, 40], col = TRANSPARENCY(BLUE, .6), name = 'SECTION UNAMED', style = [0, 3.5, 2.], is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin = [4, 4], pos = [200, 400, 0], dim = [40, 40], col = TRANSPARENCY(BLUE, .6), name = 'SECTION UNAMED', style = [10, 6, 2.], is_debug_mesh) {
 
       super(pos, dim, col, is_debug_mesh);
 
@@ -427,7 +421,8 @@ export class Section extends Rect {
    SetPosXNoGfxUpdate(x) {
 
       if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
+         // Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
+         Mesh_unif_set_vb_root_wposx_all_siblings(this.root_posidx, x); // TODO: Do this in all SetPos...NoGfxUpdate functions in all classes
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
          this.geom.pos[0] = x;
@@ -457,7 +452,8 @@ export class Section extends Rect {
    SetPosXYNoGfxUpdate(x, y) {
 
       if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
+         // Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
+         Mesh_unif_set_vb_root_wpos_all_siblings(this.root_posidx, x, y);
       }
       else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
          this.geom.pos[0] = x;
@@ -466,6 +462,28 @@ export class Section extends Rect {
             const child = this.children.buffer[i];
             if (child) child.SetPosXYNoGfxUpdate(x, y);
          }
+      }
+   }
+
+   /** Must run for every mesh */
+   GfxUniformsEnable(flags, name, type, shader_flags) {
+
+      super.EnableGfxUniforms(flags, name, type, shader_flags);
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) child.GfxUniformsEnable(flags, name, type, shader_flags);
+      }
+ 
+   }
+ 
+ 
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+
+      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
       }
    }
 
@@ -553,67 +571,59 @@ export class Section extends Rect {
          return;
       }
 
-      const mouse_dif = MouseGetPosDif();
+      const mouse_pos = MouseGetPos();
 
 
-      // TODO: We can set all positions and dimentions and call 'Gl_set_pos_dim' for all meshes of the root
-      if ((root.state.mask & MESH_STATE.IS_RESIZEABLE) && (mouse_dif.x !== 0 || mouse_dif.y !== 0)) {
+      // Set min dimentions. // TODO: Who decides for the minimum dimentions??????
+      const pos = root.GetPosXY();
+      const min_sizex = pos[0] + 80;
+      const min_sizey = pos[1] + 80;
+      let changes_hapened = false;
 
-         const dif = {x:mouse_dif.x / 2, y: -mouse_dif.y / 2};         
+      
+      
+      if (mouse_pos[0] > min_sizex){
          
-         // Set min dimentions. // TODO: Who decides for the minimum dimentions??????
-         const pos = root.GetPosXY();
-         const min_width = pos[0] + 200;
-         const min_height = pos[1] + 200;
-         // Cache
-         const r = pos[0]+root.geom.dim[0]*2;
-         const b = pos[1]+root.geom.dim[1]*2;
-
-         let changes_hapened = false;
-
-         if (dif.x > POSSITIVE || (dif.x < NEGATIVE &&  r + dif.x > min_width)) {
-            changes_hapened = true;
-         }
-         else {
-            if(dif.x !== 0 && r > min_width) dif.x = r - min_width; // Smooths the resize transition
-            else dif.x = 0;
-         }
-
-
-         if (dif.y > POSSITIVE || (dif.y < NEGATIVE && b + dif.y > min_height)) {
-            changes_hapened = true;
-         }
-         else {
-            if(dif.y !== 0 && b > min_height) dif.y = b - min_height; // Smooths the resize transition
-            else dif.y = 0;
-         }
-
-
-         if (changes_hapened) {
-
-
-            Widget_root_reset_gfx(root.root_bufferidx)
-
-            const root_pos = root.GetPosXY();
-            const clip_top = root_pos[1];
-            const clip_bottom = root_pos[1] + root.geom.dim[1]*2;
-            const clip_right = root_pos[0] + root.geom.dim[0]*2;
-
-            // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-            for(let i=0; i <= root.children.boundary; i++){
-
-               Clipy_from_tree_recursive(root.children.buffer[i], clip_top, clip_bottom);
-            }
-            // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
-
-            // First reset the buffer that holds all meshes(per vertex buffer), because the 'AddFromGfx' is gonna populate the buuffer with the added mesh
-            Widget_root_gfx_reset_mesh_per_vb_buffer(root.root_bufferidx);
-            Widget_root_resize_and_rerender(root.root_bufferidx, dif.x, dif.y, true);
-         }
-
-
+         const sizex = mouse_pos[0] - pos[0];
+         root.geom.dim[0] = sizex/2;
+         changes_hapened = true;
+      }
+      
+      if (mouse_pos[1] > min_sizey){
+         
+         const sizey = mouse_pos[1] - pos[1];
+         root.geom.dim[1] = sizey/2;
+         changes_hapened = true;
       }
 
+       
+
+      if (changes_hapened) {
+
+
+         Widget_root_reset_gfx(root.root_bufferidx)
+
+         const root_pos = root.GetPosXY();
+         const clip_top = root_pos[1];
+         const clip_bottom = root_pos[1] + root.geom.dim[1]*2;
+         const clip_right = root_pos[0] + root.geom.dim[0]*2;
+
+         // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+         for(let i=0; i <= root.children.boundary; i++){
+
+            Clipy_from_tree_recursive(root.children.buffer[i], clip_top, clip_bottom);
+         }
+         // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
+
+         // First reset the buffer that holds all meshes(per vertex buffer), because the 'AddFromGfx' is gonna populate the buuffer with the added mesh
+         Widget_root_gfx_reset_mesh_per_vb_buffer(root.root_bufferidx);
+         
+         
+         const mouse_dif = MouseGetPosDif()
+         const dif = {x:mouse_dif.x / 2, y: -mouse_dif.y / 2};  
+         Widget_root_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
+         // Widget_root_rerender(root.root_bufferidx);
+      }
    }
 
 
@@ -670,6 +680,19 @@ export class Section extends Rect {
          }
       }
    }
+
+
+   // DestroyListeners(){
+
+   //    this.RemoveAllListenEvents();
+
+   //    for (let i=0; i <= this.children.boundary; i++){
+
+   //       const child = this.children.buffer[i];
+   //       child.RemoveAllListenEvents();
+   //       child.DestroyListeners();
+   //    }
+   // }
 
 
 

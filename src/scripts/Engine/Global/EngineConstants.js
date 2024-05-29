@@ -61,6 +61,7 @@ const RESERVED_MESH = true; // Just for check in Str_buffer. The Create_widget..
 
 const APP = {
 	ENABLE_SHADER_PROJECTION_MATRIX: true, // The block uniform 'u_projection_matrix' must be enabled for all app's shader programs.
+	ENABLE_SHADER_WPOS_UNIFORM: true, // The block uniform 'u_projection_matrix' must be enabled for all app's shader programs.
 }
 
 
@@ -812,6 +813,7 @@ const ANIMATIONS = {
 	},
 	INDEX: {
 		COLOR: INT_NULL,
+		WPOS: INT_NULL,
 	},
 	DATA: {
 		COLOR: {
@@ -833,8 +835,8 @@ const ANIMATIONS = {
 		},
 		POS: {
 			XY: cnt3,
-			X: cnt3 << 0x1,
-			Y: cnt3 << 0x1,
+			X: cnt3 <<= 0x1,
+			Y: cnt3 <<= 0x1,
 		},
 	},
 };
@@ -1194,23 +1196,21 @@ const DEBUG_INFO_STRUCTS = {
 
 	BUFFER: {
 		GENERIC: {
-			COUNTER: 0, // Count how many instantiations of Generic_Buffer class
-			SIZE: 0,
+			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
+			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
+			TOTAL_ELEM_SIZE: 0, // The total ammount of all buffers size. 
 		},
 		INT8: {
-			COUNTER: 0, // Count how many instantiations of Generic_Buffer class
-			SIZE: 0,
+			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
+			TOTAL_ELEM_SIZE: 0,
 		},
 		INT16: {
-			COUNTER: 0, // Count how many instantiations of Generic_Buffer class
-			SIZE: 0,
+			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
+			TOTAL_ELEM_SIZE: 0,
 		},
-		// UINT8:{
-		// 	COUNTER:0, // Count how many instantiations of Generic_Buffer class
-		// },
-		// UINT16:{
-		// 	COUNTER:0, // Count how many instantiations of Generic_Buffer class
-		// },
+
 	},
 };
 

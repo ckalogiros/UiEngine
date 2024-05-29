@@ -92,6 +92,10 @@ const _view_buffer = New_generic_buffer(_, 'Mesh buffer Views');
 
 
 
+export function View_destroy_vb_from_view() { /*// TODO: IMPLEMENT: Destroy the M_Buffer */ }
+export function View_destroy_view() { /*// TODO: IMPLEMENT: Destroy the M_Buffer */ }
+
+
 export function View_get_count() { return _view_buffer.active_count; }
 
 
@@ -141,7 +145,7 @@ export function View_get_view_vb_mesh_meshidx(group_bufferidxs) {
 
 
 
-export function View_destroy_view(group_bufferidxs) {
+export function View_remove_view(group_bufferidxs) {
    // TODO: Buffer Error Check
    _view_buffer.RemoveByIdx(group_bufferidxs[0]);
 }
@@ -204,6 +208,8 @@ function View_add_mesh(groupidx, mesh) {
       const view_vb_buffer = view.vb.buffer[view_vbidx];
 
       const mesh_groupidx = view_vb_buffer.data.Add(mesh_bufferidx);
+if(view_vb_buffer.data.buffer[mesh_groupidx-1]===INT_NULL)
+   console.log()
 
       // update num_faces
       view_vb_buffer.info[VIEW_INFO.NUM_FACES] += num_faces;
@@ -277,7 +283,7 @@ function Build_per_gfx_view_group_from_root_mesh_recursive(mesh, groupidx) {
 
 
 
-function Remove_tree_mesh_from_view_recursive(mesh) {
+function Remove_vb_data_from_view_recursive(mesh) {
 
    // TODO: check error for wrong 'group_bufferidxs[0]' index. Make sure the group exists
 
@@ -286,7 +292,7 @@ function Remove_tree_mesh_from_view_recursive(mesh) {
 
       const child = mesh.children.buffer[i];
       if (child) {
-         Remove_tree_mesh_from_view_recursive(child)
+         Remove_vb_data_from_view_recursive(child)
       }
    }
 
@@ -379,7 +385,7 @@ export function View_remove_from_group(mesh) {
 
    // TODO: check error for wrong 'group_bufferidxs[0]' index. Make sure the group exists
 
-   Remove_tree_mesh_from_view_recursive(mesh);
+   Remove_vb_data_from_view_recursive(mesh);
 
 }
 

@@ -408,7 +408,7 @@ function Widget_root_remove_root_byidx(root_bufferidx) {
 
       Widget_root_batch_remove_byidx(root_bufferidx);
       Widget_root_gfx_remove_byidx(root_bufferidx)
-      console.error('Removing widget root:', root_bufferidx, _widget_root_buffer.buffer[root_bufferidx]);
+      // console.error('Removing widget root:', root_bufferidx, _widget_root_buffer.buffer[root_bufferidx]);
       _widget_root_buffer.RemoveByIdx(root_bufferidx);
    }
 }
@@ -614,7 +614,6 @@ function Widget_root_batch_create_root(root_bufferidx, mesh_bufferidx) {
       vb: [], // To store the mesh_bufferidx of the first mesh of the batch, as well as the number of faces of all the meshes in one batch(1 face = 4 vertices)
    };
 
-   // const idx = _root_batch_buffer.push(root_batch_vb);
    const idx = _root_batch_buffer.Add(root_batch_vb);
 
    if (root_bufferidx !== idx) alert('Widget root batch buffer not the same with the Widget root buffer');
@@ -642,7 +641,6 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
    if (root_bufferidx === INT_NULL) return;
 
    const gfxidxs = Widget_root_gfx_get_all_vb_groupidx(root_bufferidx);
-   const len = gfxidxs.vbidxs;
 
    let stored = false;
    for (let i = 0; i <=  gfxidxs.vbidxs.boundary; i++) {
@@ -687,47 +685,47 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
  * Usualy to re-run the  'Widget_root_batch_create_from_root_children()' 
  * in the case new meshes have been added to the root widget during run time.
  */
-export function Widget_root_batch_reset_accumulator(root_bufferidx) {
+// export function Widget_root_batch_reset_accumulator(root_bufferidx) {
 
-   const root_batch = _root_batch_buffer.buffer[root_bufferidx];
+//    const root_batch = _root_batch_buffer.buffer[root_bufferidx];
 
-   const len = root_batch.vb.length;
-   for (let i = 0; i < len; i++) {
+//    const len = root_batch.vb.length;
+//    for (let i = 0; i < len; i++) {
 
-      // Get the first mesh, just to extract the num_faces
-      const mesh = Mesh_buffer_get_mesh_byidx(root_batch.vb[i].meshidx);
-      root_batch.vb[i].num_faces = mesh.geom.num_faces; // Leave the faces count for the first mesh of all vbs 
-   }
+//       // Get the first mesh, just to extract the num_faces
+//       const mesh = Mesh_buffer_get_mesh_byidx(root_batch.vb[i].meshidx);
+//       root_batch.vb[i].num_faces = mesh.geom.num_faces; // Leave the faces count for the first mesh of all vbs 
+//    }
 
-}
-
-
-
-export function Widget_root_batch_update_increment_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces) {
-
-   _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].num_faces += num_faces;
-}
+// }
 
 
 
-export function Widget_root_batch_update_decrement_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces) {
+// export function Widget_root_batch_update_increment_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces) {
 
-   if (root_bufferidx === INT_NULL)
-      alert('55555')
-   const batch_vb = _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx];
-   if (batch_vb === _ || !batch_vb)
-      console.error('batch_vb NULL', 'root_bufferidx', root_bufferidx, 'batch_buffer_vbidx', batch_buffer_vbidx, '_root_batch_buffer', _root_batch_buffer)
+//    _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].num_faces += num_faces;
+// }
 
-   batch_vb.num_faces -= num_faces;
 
-   if (batch_vb.num_faces < 0) {
-      console.error('Root Batch num_faces negative. root_bufferidx:', root_bufferidx, 'batchidx', batch_buffer_vbidx, 'num_faces', batch_vb.num_faces);
-   }
 
-   if (batch_vb.num_faces === 0) return true
+// export function Widget_root_batch_update_decrement_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces) {
 
-   return false;
-}
+//    if (root_bufferidx === INT_NULL)
+//       alert('55555')
+//    const batch_vb = _root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx];
+//    if (batch_vb === _ || !batch_vb)
+//       console.error('batch_vb NULL', 'root_bufferidx', root_bufferidx, 'batch_buffer_vbidx', batch_buffer_vbidx, '_root_batch_buffer', _root_batch_buffer)
+
+//    batch_vb.num_faces -= num_faces;
+
+//    if (batch_vb.num_faces < 0) {
+//       console.error('Root Batch num_faces negative. root_bufferidx:', root_bufferidx, 'batchidx', batch_buffer_vbidx, 'num_faces', batch_vb.num_faces);
+//    }
+
+//    if (batch_vb.num_faces === 0) return true
+
+//    return false;
+// }
 
 
 
@@ -957,200 +955,6 @@ export function Widget_root_gfx_reset_mesh_per_vb_buffer(root_bufferidx) {
 /*******************************************************************************************************************************************************************************/
 
 
-// TODO: 
-// UNNECESSARY: we do not use move in that way anymore
-export function Widget_movexy(params) {
-
-   const root = params.params;
-
-   // Destroy the time interval calling this function if the mesh is not grabed.
-   if (root.StateCheck(MESH_STATE.IN_GRAB) === 0 && root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
-
-      const intervalIdx = root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-      TimeIntervalsDestroyByIdx(intervalIdx);
-      root.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
-      return;
-   }
-
-   // Move the mesh
-   const rootidx = root.root_bufferidx;
-   const widget_buffer = _widget_root_buffer.buffer[rootidx];
-
-   if (!widget_buffer) return
-
-   const pos = MouseGetPosDif();
-
-   if (pos.x === 0 && pos.y === 0) return;
-
-   for (let i = 0; i <= widget_buffer.boundary; i++) {
-
-      const mesh = _mesh_buffer.buffer[widget_buffer.buffer[i]];
-      // if (mesh.state.mask & MESH_STATE.ACTIVE && mesh.gfx) {
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
-         if (!mesh.gfx)
-            console.error(mesh.GetName())
-         mesh.geom.MoveXY(pos.x, -pos.y, mesh.gfx)
-      }
-
-   }
-}
-
-
-
-// TODO: 
-// UNNECESSARY: we do not use move in that way anymore
-export function Widget_root_batch_move_from_batch_buffer(root_bufferidx, x, y) {
-
-   // for (let i = 0; i <= _widget_root_buffer.buffer[root_bufferidx].boundary; i++) {
-   //    // Increment each mesh, that is part of this widget_root
-   //    _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[0] += x;
-   //    _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.pos[1] += y;
-
-   //    // Update default position
-   //    _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[0] += x;
-   //    _mesh_buffer.buffer[_widget_root_buffer.buffer[root_bufferidx].buffer[i]].geom.defPos[1] += y;
-
-   // }
-
-   const len = _root_batch_buffer.buffer[root_bufferidx].vb.length
-   for (let i = 0; i < len; i++) {
-
-      // Get the batch's root mesh for each vb gfx buffers
-      const mesh = _mesh_buffer.buffer[_root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx];
-
-      if (mesh) {
-
-         // console.log(mesh.geom.pos, mesh.GetName())
-
-         mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-
-         const update_data = {
-            sizes: [2],
-            data: [x, y],
-         };
-
-         // The batch_store needs the number of meshes to update as well as the move value
-         // Batch_store(mesh,
-         //    SHADER_ATTRIBUTES.WPOS_TIME4,
-         //    update_data,
-         //    _root_batch_buffer.buffer[root_bufferidx].vb[i].num_faces);
-      }
-
-   }
-
-}
-
-
-
-export function TEMP_REMOVE_CHILDREN(root, firstidx, lastidx) {
-
-   let toidx = 0;
-   let start = 0;
-   const len = root.children.boundary;
-
-   if (lastidx >= len - 1) {
-      start = 0;
-      toidx = firstidx
-      last = firstidx
-   }
-   else {
-      start = lastidx
-      toidx =
-         first = lastidx;
-   }
-
-   console.log(`root:${root.GetName()} firstidx:${firstidx} lastidx:${lastidx} first:${first} last:${last} toidx:${toidx}`)
-
-   const new_children_buffer = New_generic_buffer(_, 'From TEMP_REMOVE_CHILDREN');
-   new_children_buffer.Init(firstidx);
-
-
-   if (!(firstidx > 0 && lastidx < len)) {
-      for (let i = start; i < toidx; i++) {
-         new_children_buffer.Add(root.children.buffer[i]);
-      }
-   }
-   for (let i = 0; i < len; i++) {
-
-      if (i < firstidx || i > lastidx) {
-         new_children_buffer.Add(root.children.buffer[i]);
-      }
-   }
-
-   root.children = new_children_buffer;
-
-}
-
-
-
-
-export function TEMP_REMOVE_CHILDREN_CENTER(root, firstidx, lastidx) {
-
-   console.log(`root:${root.GetName()} firstidx:${firstidx} lastidx:${lastidx} first:${first} last:${last} toidx:${toidx}`)
-
-   const new_children_buffer = New_generic_buffer(_, 'From TEMP_REMOVE_CHILDREN_CENTER');
-   new_children_buffer.Init(firstidx);
-   for (let i = 0; i <= root.children.boundary; i++) {
-
-      if (i < firstidx || i > lastidx) {
-         new_children_buffer.Add(root.children.buffer[i]);
-      }
-   }
-
-   root.children = new_children_buffer;
-
-}
-
-
-
-// TODO: 
-// UNNECESSARY: we do not use move in that way anymore
-export function Movey_from_widget_root_buffer(mesh, ydif) {
-
-   const widget_root_buffer = Widget_root_buffer_get_byidx(mesh.root_bufferidx);
-   // console.log('----------------------')
-   for (let i = 3; i <= widget_root_buffer.boundary; i++) {
-
-      // EFFICIENCY: Maybe its better to access the _mesh_buffer directly from the MeshBuffer.js file. Also later we use 'Widget_root_batch_get'
-      const mesh = Mesh_buffer_get_mesh_byidx(widget_root_buffer.buffer[i]);
-      mesh.geom.pos[1] += ydif;
-      // mesh.geom.MoveY(ydif, mesh.gfx);
-   }
-}
-
-
-// TODO: 
-// UNNECESSARY: we do not use move in that way anymore
-export function Movey_from_widget_root_buffer_and_batch_update(mesh, ydif) {
-
-   const widget_root_buffer = Widget_root_buffer_get_byidx(mesh.root_bufferidx);
-   // console.log('----------------------')
-   for (let i = 3; i <= widget_root_buffer.boundary; i++) {
-
-      // EFFICIENCY: Maybe its better to access the _mesh_buffer directly from the MeshBuffer.js file. Also later we use 'Widget_root_batch_get'
-      const mesh = Mesh_buffer_get_mesh_byidx(widget_root_buffer.buffer[i]);
-      mesh.geom.pos[1] += ydif;
-      // mesh.geom.MoveY(ydif, mesh.gfx);
-   }
-
-   /** UPDATE VIA GROUPS BUFFER */
-   const group_batch_buffer = Widget_group_get(mesh.group_bufferidxs[0]);
-
-   const len = group_batch_buffer.group_data.length
-   for (let i = 0; i < len; i++) {
-
-      const mesh = Mesh_buffer_get_mesh_byidx(group_batch_buffer.group_data[i].meshidx);
-
-      mesh.batch_fnidx = BATCH_FN_IDX.ADD_WPOS4;
-      const update_data = {
-         sizes: [2],
-         data: [0, ydif],
-      };
-      Batch_store(mesh, SHADER_ATTRIBUTES.WPOS_TIME4, update_data, group_batch_buffer.group_data[i].num_faces, group_batch_buffer.group_data[i].start); // The batch_store needs the number of meshes to update as well as the move value
-   }
-}
-
-
 
 /** Reset all gfx buffers, from start index 0, for the widget_root buffer, via it's widget_root_gfx buffer */
 export function Widget_root_reset_gfx(root_bufferidx) {
@@ -1208,7 +1012,6 @@ export function Widget_root_rerender_from_root_all_buffers(root_bufferidx, do_re
 export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconstruct_listeners = true) {
 
    const root = _widget_root_buffer.buffer[root_bufferidx];
-   // console.log(root)
 
    // Do for root
    // Resize: Only to Section meshes that have the option:EXPAND
@@ -1219,7 +1022,6 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
    // Rerender
    root_mesh.AddToGfxFromReset();
 
-   // console.log('---------------------')
    // Do children
    for (let i = 1; i <= root.boundary; i++) {
 
@@ -1240,17 +1042,34 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
          // Rerender
          mesh.AddToGfxFromReset();
       }
-      // else console.log('INACTIVE', mesh.GetName())
    }
+}
+export function Widget_root_rerender(root_bufferidx) {
 
-   // Reconstruct all listeners(from root, recursive(SLOW))
-   // if(do_reconstruct_listeners) {
+   const root = _widget_root_buffer.buffer[root_bufferidx];
 
-   //    // Get the root mesh
-   //    const parent_events = root_mesh.parent ? [root_mesh.parent.listeners.buffer[0], root_mesh.parent.listeners.buffer[1]] : [null, null];
-   //    root_mesh.ConstructListeners(parent_events); 
-   // }
+   // Do for root
+   // Resize: Only to Section meshes that have the option:EXPAND
+   const root_mesh = Mesh_buffer_get_mesh_byidx(root.buffer[0]);
 
+   // Rerender
+   root_mesh.AddToGfxFromReset();
+
+   // Do children
+   for (let i = 1; i <= root.boundary; i++) {
+
+      const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
+      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+
+         // // Do: meshes with rel_comp. Move the children positioned relative right
+         // if (mesh.rel_comp) {
+         //    Relative_pos_comp_move_right_buffer(REL_POS.RIGHT, mesh, x * 2)
+         // }
+
+         // Rerender
+         mesh.AddToGfxFromReset();
+      }
+   }
 }
 
 
@@ -1514,7 +1333,7 @@ export function Widgetroot_buffer_print_w1() {
                   'root_pos', mesh.root_posidx,
                   'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
                   'state', mesh.state.mask,
-                  'start', mesh.gfx.vb.start,
+                  'start', mesh.gfx.vb.starts.buffer[0],
                   // 'pos', mesh.GetPosXY(),
                   'dim', mesh.geom.dim,
                   'rel pos', mesh.geom.pos, mesh.GetName());

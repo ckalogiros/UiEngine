@@ -156,6 +156,8 @@ class Index_Buffer_Info {
 
       let k = this.vCount;
       for (let i = 0; i < num_faces; ++i) {
+         // if(k-2 > 0) 
+         //    k-=2;
 
          for (let j = 0; j < 2; j++) {
 
@@ -173,6 +175,36 @@ class Index_Buffer_Info {
       this.state.mask |= BUFFER_STATE.NEEDS_UPDATE; // Make sure that we update GL bufferData 
 
    }
+
+
+   // Add(num_faces) {
+
+   //    const offset = VERTS_PER_RECT_INDEXED;
+
+   //    const data = _index_buffers.buffer[this.ibidx];
+
+   //    if ((this.vCount % 1) !== 0)
+   //       console.error('index buffer count mismatch')
+
+   //    let k = this.vCount;
+   //    for (let i = 0; i < num_faces; ++i) {
+
+   //       for (let j = 0; j < 2; j++) {
+
+   //          data[this.count++] = k + j;
+   //          data[this.count++] = k + j + 1;
+   //          data[this.count++] = k + j + 2;
+   //       }
+
+   //       k += offset;
+   //       this.vCount += offset;
+   //    }
+   //    if ((this.vCount % 1) !== 0)
+   //       console.error('index buffer count mismatch')
+
+   //    this.state.mask |= BUFFER_STATE.NEEDS_UPDATE; // Make sure that we update GL bufferData 
+
+   // }
 
 
 

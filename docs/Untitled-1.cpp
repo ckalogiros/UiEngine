@@ -76,7 +76,7 @@ line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
                Uniforms_buffer_update_uniform(ubidx);
             }
             Scene_set_projection_matrix(sceneidx)
-            Uniforms_block_bind_uniform_layout('u_screen_res')
+            Uniforms_block_get_uniform_by_name('u_screen_res')
             Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT])
             // Vertex buffer
             Vertex_buffer_create(sid, _, progidx)

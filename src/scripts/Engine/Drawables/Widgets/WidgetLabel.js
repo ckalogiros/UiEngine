@@ -50,6 +50,7 @@ export class Widget_Label extends Rect {
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
         this.SetName(`[${this.mesh_bufferidx}]{${text}}-LABEL`);
         this.StylesSetPad(pad);
+        this.SetStyle(style)
 
         this.text_mesh = text_mesh;
 
@@ -145,7 +146,7 @@ export class Widget_Label extends Rect {
     GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_specific_vb_groupidx = INT_NULL, text_specific_vb_groupidx = INT_NULL) {
 
         this.gfx = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
-        if (text_specific_vb_groupidx===INT_NULL)
+        if (text_specific_vb_groupidx === INT_NULL)
             this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, this.text_mesh);
         else
             this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
@@ -205,6 +206,22 @@ export class Widget_Label extends Rect {
         this.text_mesh.isFramebufferRendered = fbidx;
     }
 
+
+    /** Must run for every mesh */
+    GfxUniformsEnable(flags, name, type, shader_flags) {
+
+        super.EnableGfxUniforms(flags, name, type, shader_flags);
+        this.text_mesh.GfxUniformsEnable(flags, name, type, shader_flags);
+
+    }
+
+
+    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+
+        // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+        super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+        this.text_mesh.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+    }
 
 
 
@@ -389,7 +406,7 @@ export class Widget_Label extends Rect {
     /*******************************************************************************************************************************************************/
 
 
-    RemoveFromGfxBuffer() {
+    RemoveFromMeshPerVbBuffer() {
         Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
         Mesh_per_vb_remove_mesh(this.text_mesh.gfx.vb.groupidx, this.text_mesh.per_vb_bufferidx);
     }

@@ -8,7 +8,7 @@ import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilde
 
 const DISABLE_DEBUG = true;
 
-const _debug_programidx_per_uniform = []
+// const _debug_programidx_per_uniform = []
 
 
 
@@ -63,19 +63,23 @@ function SetValueV4ui(gl, loc, val) { gl.uniform4uiv(loc, val); }
 class Uniform {
 
 
-   constructor(gl = null, shader_program = null, type = INT_NULL, name = '') {
+   constructor(gl = null, shader_program = null, type = INT_NULL, name = '', progidx=INT_NULL) {
 
       // const uniformInfo = gfxCtx.gl.getActiveUniform(this.shader_program, idx);
       const loc = gl.getUniformLocation(shader_program, name);
+      // console.log('---------loc-----------', loc)
       /**DEBUG */if (loc > 0xffff) alert('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.');
       // const type = gl.getActiveUniform(shader_program, 0)
 
 
       this.val = 0;// Uniform value
       this.loc = loc; // Uniform location
+      this.progidx = progidx; // The index of the program
       this.name = name; // Uniform name
       this.needsUpdate = false;
       this.UpdateUniform = null; // Gl specific type function for updating the uniform.
+      // this.GetValClbk = null; // Function to call for getting the uniform value.
+      // this.clbk_params = null; // Function to call for getting the uniform value.
 
       this.is_bound = false;
 
@@ -128,15 +132,21 @@ const _uniforms_buffer = New_generic_buffer(_, 'GFX Uniforms');
 
 
 
-export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, debug_progidx) {
+export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, progidx) {
 
-   const uniform = new Uniform(gl, shader_program, type, name);
-   const idx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
-   console.warn('1111111 Uniform Created at index:', idx, _uniforms_buffer)
+   let ubidx = Uniforms_buffer_find_ubidx_from_name(name, progidx);
 
-   _debug_programidx_per_uniform[idx] = debug_progidx
+   if(ubidx === INT_NULL){
 
-   return idx
+      const uniform = new Uniform(gl, shader_program, type, name, progidx);
+      ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
+      console.warn('1111111 Uniform Created at index:', ubidx, _uniforms_buffer)
+   
+      // _debug_programidx_per_uniform[ubidx] = progidx
+   }
+
+
+   return ubidx;
 }
 
 
@@ -162,6 +172,20 @@ export function Uniforms_buffer_update_uniform(ubidx) {
 
 
 
+// export function Uniforms_buffer_set_and_update_uniform(ubidx) {
+//    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
+
+//    if(_uniforms_buffer.buffer[ubidx].GetValClbk === null) { 
+//       console.error('Forgot to set uniform value Callback?'); return; }
+
+//    const params = _uniforms_buffer.buffer[ubidx].clbk_params;
+//    const val = _uniforms_buffer.buffer[ubidx].GetValClbk(params);
+//    _uniforms_buffer.buffer[ubidx].Set(val);
+//    _uniforms_buffer.buffer[ubidx].Update();
+// }
+
+
+
 export function Uniforms_buffer_update_uniforms_all() {
 
    for(let i=0; i <= _uniforms_buffer.boundary; i++){
@@ -171,66 +195,24 @@ export function Uniforms_buffer_update_uniforms_all() {
 
 
 
-/** 'functions' MUST HAVE .Set and .Update fields, so they can be bound to the uniforms Set() and Update(). */
-// export function Uniforms_buffer_bind_uniform_functions(functions, unif_name = '') {
-
-//    let ubidx = INT_NULL;
-
-//    // Find uniform by name
-//    for (let i = 0; i <= _uniforms_buffer.boundary; i++) {
-
-//       const unif = _uniforms_buffer.buffer[i];
-      
-//       if (unif.name === unif_name) {
-
-//          // /**DEBUG*/if (unif.is_bound) 
-//          //    alert('Uniform function \'Set\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
-//          // /**DEBUG*/if (unif.is_update_bound) 
-//          //    alert('Uniform function \'Update\' is already bound.\nSee Uniforms_buffer_bind_uniform_functions().');
-
-//          // Set the 'Set' and 'Update' 
-//          if (!unif.is_bound) {
-
-//             // functions.Set = unif.Set.bind(unif);
-//             unif.is_bound = true;
-//             ubidx = i;
-//             console.log('UNIFORM SET', unif);
-//          }
-//          if (!unif.is_update_bound) {
-            
-//             // functions.Update = unif.Update.bind(unif);
-//             unif.is_update_bound = true;
-//             ubidx = i;
-//             console.log('UNIFORM UPDATE', unif)
-//          }
-
-//          if(ubidx !== INT_NULL) return ubidx;
-//       }
-//    }
-
-
-//    // TODO: 
-//    // Create an 'export function Uniforms_invalidate_uniform_bind()', for the caller to voluntarily unbind from the uniform
-//    // What happens if the uniform gets invalidated by deleting the program????
-//    // Solutions: 
-//    //    1. Pass a third function callback, to call uppon invalidation and unbind the 'Set' and 'Update' function at caller site 
-//    //       That means to have a buffer of invalidation callback functions.
-
-// }
-export function Uniforms_buffer_find_ubidx_from_name(unif_name = '') {
+export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', progidx) {
 
    // Find uniform by name
    for (let i = 0; i <= _uniforms_buffer.boundary; i++) {
 
       const unif = _uniforms_buffer.buffer[i];
 
-      if (unif.name === unif_name && unif.is_bound === false){
+      // if (unif.name === unif_name && unif.is_bound === false){
+      if (unif.name === unif_name && unif.progidx === progidx){
+      // if (unif.name === unif_name){
          // Since different program uniforms use the same name, we use the flag 'unif.is_bound = true' 
          // to differintiate uniforms that have alredy be bound to a program
-         unif.is_bound = true;
+         // unif.is_bound = true;
          return i;
       }
    }
+
+   return INT_NULL;
 
    console.error('NO uniform with name found\n', unif_name)
    alert('NO uniform with name found\nSEE CONSOLE ERROR')
@@ -494,7 +476,7 @@ export function Uniforms_block_buffer_create(sid, program, uniforms) {
 
 
 /** The binding happens with an index to the uniform's layout of the '_uniform_blocks' buffer */
-export function Uniforms_block_bind_uniform_layout(unif_name = '') {
+export function Uniforms_block_get_uniform_by_name(unif_name = '') {
 
    // Find matching uniform layout by uniform name
    for (let i = 0; i <= _uniform_blocks.boundary; i++) {
@@ -598,12 +580,13 @@ export function Uniforms_buffer_block_print() {
 // this.is_update_bound = false;
 
 export function Uniforms_buffer_print() {
-   console.log('_uniforms_buffer:');
+   console.log('_uniforms_buffer\ncount:', _uniforms_buffer.active_count,);
    for(let i=0; i <= _uniforms_buffer.boundary; i++){
-      console.log('count', _uniforms_buffer.active_count,
+      console.log(
+         'ubidx', i,
          'name', _uniforms_buffer.buffer[i].name,
          'val', _uniforms_buffer.buffer[i].val,
-         'progidx', _debug_programidx_per_uniform[i],
+         'progidx', _uniforms_buffer.buffer[i].progidx,
       );
    }
 }

@@ -758,47 +758,79 @@ class Matrix4 {
 
 
 
-	makePerspective( left, right, top, bottom, near, far ) {
+	makePerspective(left, right, top, bottom, near, far) {
 
 		const te = this.matrix;
-		const x = 2 * near / ( right - left );
-		const y = 2 * near / ( top - bottom );
+		const x = 2 * near / (right - left);
+		const y = 2 * near / (top - bottom);
 
-		const a = ( right + left ) / ( right - left );
-		const b = ( top + bottom ) / ( top - bottom );
-		const c = - ( far + near ) / ( far - near );
-		const d = - 2 * far * near / ( far - near );
+		const a = (right + left) / (right - left);
+		const b = (top + bottom) / (top - bottom);
+		const c = - (far + near) / (far - near);
+		const d = - 2 * far * near / (far - near);
 
-		te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	te[ 12 ] = 0;
-		te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	te[ 13 ] = 0;
-		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	te[ 14 ] = d;
-		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
+		te[0] = x; te[4] = 0; te[8] = a; te[12] = 0;
+		te[1] = 0; te[5] = y; te[9] = b; te[13] = 0;
+		te[2] = 0; te[6] = 0; te[10] = c; te[14] = d;
+		te[3] = 0; te[7] = 0; te[11] = - 1; te[15] = 0;
 
 		return this;
 
 	}
 
+
+
+	/**
+ * function createOrthographicMatrix(left, right, bottom, top, near, far) {
+	return new Float32Array([
+			2 / (right - left), 0, 0, 0,
+			0, 2 / (top - bottom), 0, 0,
+			0, 0, -2 / (far - near), 0,
+			-(right + left) / (right - left), -(top + bottom) / (top - bottom), -(far + near) / (far - near), 1
+		]);
+	}
+
+		const uProjectionLocation = gl.getUniformLocation(program, "u_projection");
+		const projectionMatrix = createOrthographicMatrix(left, right, bottom, top, near, far);
+		gl.uniformMatrix4fv(uProjectionLocation, false, projectionMatrix);
+
+ */
+
+	// makeOrthographic(left, right, top, bottom, near, far) {
+
+	// 	const te = this.matrix;
+	// 	const w = 1.0 / (right - left);
+	// 	const h = 1.0 / (top - bottom);
+	// 	const p = 1.0 / (far - near);
+
+	// 	const x = (right + left) * w;
+	// 	const y = (top + bottom) * h;
+	// 	const z = (far + near) * p;
+
+	// 	/**
+	// 	 	2w  0  0   0
+	// 		 0 2h  0   0
+	// 		 0  0 -2p  0
+	// 		-x -y -z   1
+	// 	 */
+	// 	te[0] = 2*w; te[4] = 0;   te[8] = 0; 	  te[12] = -x;
+	// 	te[1] = 0;	 te[5] = 2*h; te[9] = 0; 	  te[13] = -y;
+	// 	te[2] = 0;	 te[6] = 0;   te[10] = -2*p; te[14] = -z+1;
+	// 	te[3] = 0;	 te[7] = 0;   te[11] = 0; 	  te[15] = 1;
+
+	// 	return this;
+
+	// }
 	makeOrthographic(left, right, top, bottom, near, far) {
 
-		const te = this.matrix;
-		const w = 1.0 / (right - left);
-		const h = 1.0 / (top - bottom);
-		const p = 1.0 / (far - near);
+		// const m = this.matrix;
 
-		const x = (right + left) * w;
-		const y = (top + bottom) * h;
-		const z = (far + near) * p;
-
-		/**
-		 	2w  0  0   0
-			 0 2h  0   0
-			 0  0 -2p  0
-			-x -y -z   1
-		 */
-		te[0] = 2*w; te[4] = 0;   te[8] = 0; 	  te[12] = -x;
-		te[1] = 0;	 te[5] = 2*h; te[9] = 0; 	  te[13] = -y;
-		te[2] = 0;	 te[6] = 0;   te[10] = -2*p; te[14] = -z+1;
-		te[3] = 0;	 te[7] = 0;   te[11] = 0; 	  te[15] = 1;
+		this.matrix = new Float32Array([
+			2 / (right - left), 0, 0, 0,
+			0, 2 / (top - bottom), 0, 0,
+			0, 0, -2 / (far - near), 0,
+			-(right + left) / (right - left), -(top + bottom) / (top - bottom), -(far + near) / (far - near), 1
+		]);
 
 		return this;
 

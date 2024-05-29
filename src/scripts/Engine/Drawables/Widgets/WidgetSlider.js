@@ -773,6 +773,34 @@ export class Widget_Slider extends Rect {
       value_text.isFramebufferRendered = fbidx;
    }
 
+   GfxUniformsEnable(flags, name, type, shader_flags) {
+
+      super.EnableGfxUniforms(flags, name, type, shader_flags);
+
+      const name_text = this.text_mesh;
+      name_text.EnableGfxUniforms(flags, name, type, shader_flags);
+      
+      const bar = this.children.buffer[SLIDER_BAR_IDX];
+      bar.EnableGfxUniforms(flags, name, type, shader_flags);
+      
+      const handle = bar.children.buffer[0];
+      handle.EnableGfxUniforms(flags, name, type, shader_flags);
+      
+      const value_text = bar.children.buffer[1];
+      value_text.EnableGfxUniforms(flags, name, type, shader_flags);
+
+  }
+
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params){
+
+      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+
+      // And we set one of the text meshes, since we know all other text meshes belong to the same vb
+      const name_text = this.text_mesh;
+      name_text.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+   }
+
 
 
 
@@ -820,51 +848,73 @@ export class Widget_Slider extends Rect {
 
 }
 
-export function Slider_connect(_params) {
+export function Slider_connect(slider, Clbk, clbk_params) {
 
-   const sliderBar = _params.self_mesh.children.buffer[SLIDER_BAR_IDX];
-   const target = _params.target_mesh;
-   const Binding_function = _params.targetBindingFunctions;
+   const sliderBar = slider.children.buffer[SLIDER_BAR_IDX];
 
-   /*FOR DEBUG*/const clicked_mesh = _params.clicked_mesh
-
-   // Check if the connection already exists
-   for (let i = 0; i < sliderBar.eventCallbacks.count; i++) {
-
-      if (sliderBar.eventCallbacks.buffer[i] !== null) {
-
-         var newTargetId = _params.target_mesh.id;
-         var existingTargetId = sliderBar.eventCallbacks.buffer[i].target.id;
-
-         // The connection already exists
-         if (newTargetId === existingTargetId) {
-
-            console.log('Disconnecting target:', sliderBar.eventCallbacks.buffer[i].target.GetName(), ' clicked:', STATE.mesh.clickedId);
-            /*FOR DEBUG*/Set_color_rgba(clicked_mesh, REDL[7]);
-
-            // Disconnect
-            sliderBar.eventCallbacks.RemoveByIdx(i);
-            return;
-         }
-      }
-
-   }
-
-   console.log('Connecting target:', target.GetName(), ' clicked:', STATE.mesh.clickedId);
-   /*FOR DEBUG*/Set_color_rgba(clicked_mesh, GREEN);
 
    const params = {
-      target: target,
-      Clbk: Binding_function,
+      Clbk: Clbk,
+      clbk_params: clbk_params,
    }
    // sliderBar.eventCallbacks.Add(params);
    sliderBar.CreateEventCallback(params);
 
 }
+/**OLD */
+// export function Slider_connect(_params) {
+//    /**
+//          const evt_params = {
+//          targetBindingFunctions: params.evt_params.targetBindingFunctions,
+//          self_mesh: params.evt_params.clicked_mesh,
+//          target_mesh: params.evt_params.target_mesh,
+//          event_type: params.event_type,
+//          clicked_mesh: mesh,
+//       }
+//     */
+//    const sliderBar = _params.self_mesh.children.buffer[SLIDER_BAR_IDX];
+//    const target = _params.target_mesh;
+//    const Binding_function = _params.targetBindingFunctions;
+
+//    /*FOR DEBUG*/const clicked_mesh = _params.clicked_mesh
+
+//    // Check if the connection already exists
+//    for (let i = 0; i < sliderBar.eventCallbacks.count; i++) {
+
+//       if (sliderBar.eventCallbacks.buffer[i] !== null) {
+
+//          var newTargetId = _params.target_mesh.id;
+//          var existingTargetId = sliderBar.eventCallbacks.buffer[i].target.id;
+
+//          // The connection already exists
+//          if (newTargetId === existingTargetId) {
+
+//             console.log('Disconnecting target:', sliderBar.eventCallbacks.buffer[i].target.GetName(), ' clicked:', STATE.mesh.clickedId);
+//             // /*FOR DEBUG*/Set_color_rgba(clicked_mesh, REDL[7]);
+
+//             // Disconnect
+//             sliderBar.eventCallbacks.RemoveByIdx(i);
+//             return;
+//          }
+//       }
+
+//    }
+
+//    // console.log('Connecting target:', target.GetName(), ' clicked:', STATE.mesh.clickedId);
+//    // /*FOR DEBUG*/Set_color_rgba(clicked_mesh, GREEN);
+
+//    const params = {
+//       target: target,
+//       Clbk: Binding_function,
+//    }
+//    // sliderBar.eventCallbacks.Add(params);
+//    sliderBar.CreateEventCallback(params);
+
+// }
 
 
 
-export function Slider_bind_on_value_change(sliderBar, target, Clbk) {
+export function Slider_bind_on_value_change(sliderBar, target) {
 
    const params = {
       target: target,
@@ -908,17 +958,17 @@ export function Slider_on_update_handle(_params) {
    slider_val.RenderTextFromNumber(val); // Change the text mesh to the current slider's value
 
    /**
-    * Dispatch all callbacks for all targets, that is
-    * found on every eventCallbacks[] buffer.  
+    * Dispatch all callbacks for all targets, that are
+    * stored in eventCallbacks[] buffer.  
     */
-   if (bar.eventCallbacks.count) {
-      for (let i = 0; i < bar.eventCallbacks.count; i++) {
+   if (bar.eventCallbacks) {
+      for (let i = 0; i <= bar.eventCallbacks.boundary; i++) {
 
          if (bar.eventCallbacks.buffer[i] !== null) {
 
-            const target = bar.eventCallbacks.buffer[i].target;
-            const TargetClbk = bar.eventCallbacks.buffer[i].Clbk;
-            TargetClbk(target, val, 100);
+            const params = bar.eventCallbacks.buffer[i].clbk_params;
+            const Clbk = bar.eventCallbacks.buffer[i].Clbk;
+            Clbk(params);
          }
       }
    }

@@ -1,12 +1,32 @@
 /**
  * Uniforms
  *
- * UniformsBuffer
- * It is dificult to know the size of the Float32Array uniforms buffer
- * for the initialization, cause meshes could and should add uniforms
- * to the uniformsBuffer when ever is needed. So we need to have a big
- * enough uniformsBuffer Float32Array.
- * On the contrary, in the glsl shader code,
+ * --{UniformsBuffer}--
+ * 
+ *    -Set Up: How to set up a uniform (per shder program) 
+ *    
+ *    # Enable unifom. The name of the uniform, as until now, must already exist in 'ShaderChunks' and 'ShaderBuilder' files.
+ *    # There is the option to pass the uniform in vertex shader:UNIFORM.IN_VS or in fragment shader:UNIFORM.IN_FS.
+ *    1. mesh.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
+ *    # Bind a callback function to be called for getting the uniforms value.
+ *    2. line.GfxUniformsSetClbk('u_wposxy', CALLBACK, CALLBACK_PARAMS)
+ *    # The Set and Update of a uniform should be handled only via its index of the Uniforms Buffer structure.
+ *    # Both meshes and Gl Programs have these indexes stored in a buffer:ubidxs.
+ * 
+ * 
+ * 
+ * --{UniformsBlock}--
+ * 
+ *    Set Up: How to set up a uniform block 
+ *    
+ *    # Enable unifom. The name of the uniform, as until now, must already exist in 'ShaderChunks' and 'ShaderBuilder' files.
+ *    # Important: In order to create a uniform across all shader programs, we must specify: UNIFORM.IS_SHARED.
+ *       otherwise the uniform will be set as an individual uniform for a specific program, in the uniforms buffer.
+ *    1. this.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+ *    # Find the uniforms index 
+ *    2. const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
+ *    # Set the uniforms value
+ *    3. Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
  */
 
 /**

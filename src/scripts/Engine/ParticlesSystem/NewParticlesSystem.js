@@ -7,7 +7,7 @@ import { CopyArr3 } from "../../Helpers/Math/MathOperations.js";
 import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
 import { TEMP_Gfx_generate_context_for_particles } from "../Interfaces/Gfx/MeshGfxContext.js";
-import { TimerGetGlobalTimer } from "../Timers/Timers.js";
+import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 
 
@@ -112,7 +112,7 @@ class Emitter {
       this.type = MESH_TYPE.PARTICLES;
       this.nameidx = Str_buffer_store(name);
       
-      this.particles_buffer = New_generic_buffer();
+      this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
       this.free_particles_idxs_buffer = New_int16_buffer();
 
 
@@ -319,7 +319,7 @@ export function Particle_system_update() {
 
    if(_emitters.active_count===0) return;
 
-   const t = TimerGetGlobalTimer();
+   const t = Timer_get_global_timer();
    // console.log('---------------------')
 
    for(let i=0; i <= _emitters.boundary; i++){
