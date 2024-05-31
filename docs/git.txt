@@ -133,3 +133,12 @@ git commit -m '#number of the branch and title. Save before any changes'
 // Go back to main, and save all changes there
 git switch main
 // So that way there is a roll back to pre-changes state, with the name of the purpose of the changes
+
+
+
+
+/***************************
+merge
+go to 'master' branch, or the branch that will accept the merge
+and then:
+$ git merge 'name of the branch that will be merged with current branch'

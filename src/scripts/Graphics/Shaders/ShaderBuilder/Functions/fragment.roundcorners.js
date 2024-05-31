@@ -71,13 +71,14 @@ export const frag_round_corners_call = '   color = Stylize();';
 export const frag_round_corners = '\
 vec2 pos = vec2(.0);                                              \n\
 float ScreenH;                                                    \n\
-float AA;                                                         \n\
+float AA;                                                          \n\
+vec4 c1 = vec4(.6, .4, .1, 1.);\n\
+vec3 c2 = vec3(.6, .4, .1);\n\
 \n\
-float sdRoundBox( vec2 p, in vec2 dist, vec2 dim, vec2 wpos, float y) {                   \n\
-    \n\
-    vec2 q = (abs(p) - (dim)) + dist.x;\n\
+float sdRoundBox( vec2 p, in vec2 dist, vec2 dim) {                   \n\
+    vec2 q = (abs(p) - dim) + dist.x;\n\
     float d = length(max(q, 0.0)) - dist.x;\n\
-    // float d = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - rr;\n\
+    // float d = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - dist.x;\n\
     return d;\n\
     \n\
 }\n\
@@ -93,20 +94,30 @@ vec4 Stylize()                                                    \n\
     vec2 res = u_screen_res;    \n\
     \n\
     \n\
-    vec2 uv = gl_FragCoord.xy;                                  \n\
+    \n\
+    float ratio = res.x/res.y;                                  \n\
+    // float ratio = res.y/res.x;                                  \n\
+    vec2 uv = (gl_FragCoord.xy-(res*.5));                                  \n\
     vec2 dim = v_dim;\n\
+    dim.x -= v_dim.x*.5;\n\
     vec2 wpos = v_wpos;\n\
-    wpos.y = res.y - v_wpos.y;\n\
+    uv.x -= wpos.x; // To move with mesh position\n\
+    uv.y += wpos.y; // To move with mesh position\n\
     \n\
-    uv -= wpos;\n\
-    y *= res.y;\n\
-    uv.y += (res.y-y)/2.;\n\
+    vec2 fake_dim = vec2(300., 200.);\n\
+    uv.x += (res.x*.5); //- rCorners.x;\n\
+    uv.y -= (res.y*.5); // Center mesh to screen\n\
+    uv.x -= fake_dim.x; // I believe this has to be the dim.x\n\
+    uv.y += fake_dim.y; // Subtract dimention\n\
     \n\
-    float d = sdRoundBox(uv, rCorners, dim, wpos, y);     \n\
+    // vec2 qq = (abs(uv) - dim) + rCorners.x;\n\
+    vec2 q = (abs(uv) - fake_dim) + rCorners.x;\n\
+    float d = length(max(q, 0.0)) - rCorners.x;\n\
+    // return vec4(c2, q);\n\
+    // float d = sdRoundBox(uv, rCorners, dim);     \n\
     \n\
     \n\
     vec4 src = v_col;                                               \n\
-    // vec3 color = vec3(0.0, .03, .06);                                         \n\
     vec3 color = vec3(0.0);                                         \n\
     \n\
     \n\
@@ -114,13 +125,154 @@ vec4 Stylize()                                                    \n\
     float wa = 1.;                                                  \n\
     float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);               \n\
     float alpha = src.a * (wa * wb);                                \n\
+    // float alpha = d > .0 ? d : 0.;                                \n\
+    // color += color + src.rgb;               \n\
     color += color + src.rgb * alpha;               \n\
-    float strength = 1.4; \n\
-    // float s = clamp(min(dim.x, dim.y)*.005, 1., 2.); \n\
-    color = mix( pow(color, vec3(strength)), color, smoothstep(0.0, border_width, abs(d)) ); \n\
     return vec4(color, alpha);                                       \n\
 } \n\
 ';
+/** */
+// export const frag_round_corners = '\
+// vec2 pos = vec2(.0);                                              \n\
+// float ScreenH;                                                    \n\
+// float AA;                                                         \n\
+// \n\
+// float sdRoundBox( vec2 p, in vec2 dist, vec2 dim) {                   \n\
+//     \n\
+//     // vec2 q = (abs(p) - (dim)) + dist.x;\n\
+//     // // vec2 q = ((p) - (dim)) + dist.x;\n\
+//     // float d = length(max(q, 0.0)) - dist.x;\n\
+//     // // float d = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - rr;\n\
+//     // return d;\n\
+//     \n\
+//     \n\
+//     vec2 q = (abs(p) - dim) + dist.x;\n\
+//     float d = length(max(q, 0.0)) - dist.x;\n\
+//     return d;\n\
+//     \n\
+// }\n\
+// \n\
+// vec4 Stylize()                                                    \n\
+// {                                                                 \n\
+//     // Radius(From 0.01 to 0.35 good values) for rounding corners   \n\
+//     float y = u_projection[3].y;                                    \n\
+//     float border_width = v_border_width;                                    \n\
+//     vec2 rCorners = vec2(v_rCorners);                                    \n\
+//     float feather = v_border_feather;                               \n\
+//     vec2 blur = vec2(0.0, feather);                          \n\
+//     vec2 res = u_screen_res;    \n\
+//     \n\
+//     \n\
+//     \n\
+//     vec2 uv = gl_FragCoord.xy;                                  \n\
+//     // INFO: v_dim gets values from 0-dim\n\
+//     vec2 dim = v_dim;\n\
+//     if(uv.x > 10.) return vec4(1.,0.,0.,1.);\n\
+//     uv -= dim *.5;\n\
+//     // if(dim.x > -40.) return vec4(1.,0.,0.,1.);\n\
+//     vec2 wpos = v_wpos;\n\
+//     y *= res.y;\n\
+//     uv.y += (res.y-y)/2.;\n\
+//     uv -= wpos;\n\
+//     // if(uv.x > 20.) return vec4(1.,0.,0.,1.);\n\
+//     wpos.y = res.y - v_wpos.y; // correct height from bottom 0 to top 0\n\
+//     \n\
+//     // INFO: After the wpos subtraction, the uv spans from 0-dim, both x-y coords\n\
+//     \n\
+//     float d = sdRoundBox(uv, rCorners, dim);     \n\
+//     \n\
+//     \n\
+//     vec4 src = v_col;                                               \n\
+//     vec3 color = vec3(0.0);                                         \n\
+//     \n\
+//     \n\
+//     float dd = d - blur.x;                                          \n\
+//     float wa = 1.;                                                  \n\
+//     float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);               \n\
+//     float alpha = src.a * (wa * wb);                                \n\
+//     // float alpha = d > .0 ? d : 0.;                                \n\
+//     // float alpha = d;                                \n\
+//     color += color + src.rgb;               \n\
+//     // color += (color + src.rgb) * alpha;               \n\
+//     float strength = 1.4; \n\
+//     // float s = clamp(min(dim.x, dim.y)*.005, 1., 2.); \n\
+//     color = mix( pow(color, vec3(strength)), color, smoothstep(0.0, border_width, abs(d)) ); \n\
+//     return vec4(color, alpha);                                       \n\
+// } \n\
+// ';
+/**SAVE needs uncomment correction */
+// export const frag_round_corners = '\
+// vec2 pos = vec2(.0);                                              \n\
+// float ScreenH;                                                    \n\
+// float AA;                                                         \n\
+// \n\
+// float sdRoundBox( vec2 p, in vec2 dist, vec2 dim, vec2 wpos) {                   \n\
+//     \n\
+//     // vec2 q = (abs(p) - (dim)) + dist.x;\n\
+//     // // vec2 q = ((p) - (dim)) + dist.x;\n\
+//     // float d = length(max(q, 0.0)) - dist.x;\n\
+//     // // float d = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - rr;\n\
+//     // return d;\n\
+// \n\
+// \n\
+//     vec2 q = (abs(p) - (dim)) + dist.x;\n\
+//     // vec2 q = (abs(p) - 100.) + dist.x;\n\
+//     float d = length(max(q, 0.0)) - dist.x;\n\
+//     return d;\n\
+//     \n\
+// }\n\
+// \n\
+// vec4 Stylize()                                                    \n\
+// {                                                                 \n\
+//     // Radius(From 0.01 to 0.35 good values) for rounding corners   \n\
+//     float y = u_projection[3].y;                                    \n\
+//     float border_width = v_border_width;                                    \n\
+//     vec2 rCorners = vec2(v_rCorners);                                    \n\
+//     float feather = v_border_feather;                               \n\
+//     vec2 blur = vec2(0.0, feather);                          \n\
+//     vec2 res = u_screen_res;    \n\
+//     \n\
+//     \n\
+//     \n\
+//     vec2 uv = gl_FragCoord.xy;                                  \n\
+//     // INFO: v_dim gets values from 0-dim\n\
+//     vec2 dim = v_dim;\n\
+//     // dim *= .5;\n\
+//     // uv -= dim;\n\
+//     // uv *= .5;\n\
+//     uv -= dim *.5;\n\
+//     if(uv.x > 121.) return vec4(1.,0.,0.,1.);\n\
+//     vec2 wpos = v_wpos;\n\
+//     uv -= wpos;\n\
+//     wpos.y = res.y - v_wpos.y; // correct height from bottom 0 to top 0\n\
+//     \n\
+//     // INFO: After the wpos subtraction, the uv spans from 0-dim, both x-y coords\n\
+//     y *= res.y;\n\
+//     uv.y += (res.y-y)/2.;\n\
+//     \n\
+//     float d = sdRoundBox(uv, rCorners, dim, wpos);     \n\
+//     \n\
+//     \n\
+//     vec4 src = v_col;                                               \n\
+//     // vec3 color = vec3(0.0, .03, .06);                                         \n\
+//     vec3 color = vec3(0.0);                                         \n\
+//     // return vec4(src.rgb, 1.);\n\
+//     \n\
+//     \n\
+//     float dd = d - blur.x;                                          \n\
+//     float wa = 1.;                                                  \n\
+//     float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);               \n\
+//     float alpha = src.a * (wa * wb);                                \n\
+//     // float alpha = d > .0 ? d : 0.;                                \n\
+//     // float alpha = d;                                \n\
+//     // color += color + src.rgb;               \n\
+//     color += (color + src.rgb) * alpha;               \n\
+//     float strength = 1.4; \n\
+//     // float s = clamp(min(dim.x, dim.y)*.005, 1., 2.); \n\
+//     color = mix( pow(color, vec3(strength)), color, smoothstep(0.0, border_width, abs(d)) ); \n\
+//     return vec4(color, alpha);                                       \n\
+// } \n\
+// ';
 /**SAVE */
 // export const frag_round_corners = '\
 // vec2 pos = vec2(.0);                                              \n\

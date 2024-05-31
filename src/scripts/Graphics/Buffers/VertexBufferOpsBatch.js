@@ -131,7 +131,7 @@ function SET_WPOS4_POS2(vbidx, start, attrib_offset, verts_per_rect, attribs_per
       index++;
       index++;
       // params1: style
-      index+=V_PARAMS1_COUNT;
+      index+=V_GENERIC_ATTR1_VEC4_COUNT;
       // pos
       vb_data[index++] = -update_data.data[cnt++];
       vb_data[index++] = update_data.data[cnt++];
@@ -145,7 +145,7 @@ function SET_WPOS4_POS2(vbidx, start, attrib_offset, verts_per_rect, attribs_per
       index++;
       index++;
       // params1: style
-      index+=V_PARAMS1_COUNT;
+      index+=V_GENERIC_ATTR1_VEC4_COUNT;
       // pos
       vb_data[index++] = -update_data.data[cnt++];
       vb_data[index++] = -update_data.data[cnt++];
@@ -160,7 +160,7 @@ function SET_WPOS4_POS2(vbidx, start, attrib_offset, verts_per_rect, attribs_per
       index++;
       index++;
       // params1: style
-      index+=V_PARAMS1_COUNT;
+      index+=V_GENERIC_ATTR1_VEC4_COUNT;
       // pos
       vb_data[index++] = update_data.data[cnt++];
       vb_data[index++] = update_data.data[cnt++];
@@ -175,7 +175,7 @@ function SET_WPOS4_POS2(vbidx, start, attrib_offset, verts_per_rect, attribs_per
       index++;
       index++;
       // params1: style
-      index+=V_PARAMS1_COUNT;
+      index+=V_GENERIC_ATTR1_VEC4_COUNT;
       // pos
       vb_data[index++] = update_data.data[cnt++];
       vb_data[index++] = -update_data.data[cnt++];

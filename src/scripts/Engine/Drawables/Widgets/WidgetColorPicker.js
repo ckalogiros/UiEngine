@@ -1,6 +1,6 @@
 "use strict"
 
-import { GREY } from "../Material/Base/Colors";
+import { BLUEL, GREEN, PURPLER, REDL, WHITE, YELLOW, YELLOWL } from "../Material/Base/Colors";
 import { Section } from "../Meshes/Section";
 
 
@@ -13,13 +13,14 @@ export class Widget_Color_Picker extends Section{
 
 
       // Multi color vertex
+      // this.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
       this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-      // this.menu.mat.col = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
-      // this.menu.mat.defCol = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
-      // this.menu.mat.col[1][3] = .5;
-      // this.menu.mat.col[1][7] = .5;
-      // this.menu.mat.col[1][11] = .5;
-      // this.menu.mat.col[1][15] = .6;
+      // this.mat.col = [YELLOW[9], REDL[9], GREEN[9], BLUEL[9]];
+      // this.mat.col = [BLUEL[9], REDL[9], REDL[9], BLUEL[9]];
+      // this.mat.col = [REDL[9], BLUEL[9],  BLUEL[9], REDL[9]];
+      
+      // this.mat.col = [REDL[9], REDL[9],  BLUEL[9], BLUEL[9]];
+      this.mat.col = [BLUEL[9], PURPLER[9], BLUEL[9], PURPLER[9]];
 
    }
 }

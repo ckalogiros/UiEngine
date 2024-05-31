@@ -167,7 +167,7 @@ export function Shader_attributes_create(sid, shader_program) {
       if (attrib_info.name === 'a_col') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.COL4;
       else if (attrib_info.name === 'a_wpos_time') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.WPOS_TIME4;
       else if (attrib_info.name === 'a_pos') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.POS2;
-      else if (attrib_info.name === 'a_params1') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.PARAMS1;
+      else if (attrib_info.name === 'a_params1') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4;
       else if (attrib_info.name === 'a_tex') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.TEX2;
 
    }
@@ -264,7 +264,7 @@ export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, s
       locs: [],
       offsets: [],
       sizes: [],
-      // nameids: [],
+      nameids: [],
       // types: [],
    }
 

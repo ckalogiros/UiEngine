@@ -169,11 +169,11 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
       else gfx_ctx.vb.is_per_vertex.Add(false);
 
       // Here we assign the correct vertex buffer index to the mesh attributes(COL,WPOS,DIM, etc)
-      if((vb_info.sid & (SID.ATTR.COL4|SID.ATTR.COL4_PER_VERTEX))) { gfx_ctx.vb.which_vb.col_buf = i; }
-      if((vb_info.sid & SID.ATTR.WPOS_TIME4)) { gfx_ctx.vb.which_vb.wpos_buf = i; }
-      if((vb_info.sid & SID.ATTR.PARAMS1)) { gfx_ctx.vb.which_vb.params1_buf = i; }
-      if((vb_info.sid & SID.ATTR.POS2)) { gfx_ctx.vb.which_vb.dim_buf = i; }
-      if((vb_info.sid & SID.ATTR.TEX2)) { gfx_ctx.vb.which_vb.tex_buf = i; }
+      if(vb_info.sid & SID.ATTR.COL4) { gfx_ctx.vb.which_vb.col_buf = i; }
+      if(vb_info.sid & SID.ATTR.WPOS_TIME4) { gfx_ctx.vb.which_vb.wpos_buf = i; }
+      if(vb_info.sid & SID.ATTR.PARAMS1) { gfx_ctx.vb.which_vb.params1_buf = i; }
+      if(vb_info.sid & SID.ATTR.POS2) { gfx_ctx.vb.which_vb.dim_buf = i; }
+      if(vb_info.sid & SID.ATTR.TEX2) { gfx_ctx.vb.which_vb.tex_buf = i; }
 
 
    } 

@@ -216,7 +216,8 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       // mat4 rot = mat4(  cos(t), -sin(t), 0., 0.,     sin(t), cos(t), 0., 0., 0.,    0, 0, 1.,      0., 0., 0., 1.);\n\
       // vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);\n\
       // vec4 p = vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);\n\
-      // gl_Position = u_projection * p * rot;\n\
+      // // gl_Position = u_projection * p * rot;\n\
+      // gl_Position = u_projection *rot* p;\n\
       // \n\
       // `,
 

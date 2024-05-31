@@ -1,0 +1,1484 @@
+"use strict"
+
+import { Timer_get_global_timer_cosine, Timer_get_global_timer_sine } from "../../Engine/Timers/Timers.js";
+import { Shader_attributes_get_attribs } from "../ShaderAttributes.js";
+
+
+
+
+
+
+
+/**************************************************************************************************************************************/
+// Function Selector
+/**************************************************************************************************************************************/
+
+_CNT = 0;
+const FUNCTION_TABLE_IDXS = {
+   COL4_WPOS4_GENATTR1_POS2: INT_NULL,
+   COL4PERVERTEX_WPOS4_GENATTR1_POS2: INT_NULL,
+   COL4PERVERTEX_WPOS4_POS2: INT_NULL,
+   COL4_WPOS4_POS2_TEX2: INT_NULL,
+   COL4_WPOS4_TEX2: INT_NULL,
+   COL4_WPOS4_POS2: INT_NULL,
+   WPOS4_GENATTR1_POS2: INT_NULL,
+   WPOS4_POS2: INT_NULL,
+   GENATTR1_POS2: INT_NULL,
+   POS2: INT_NULL,
+   POS2_TEX2: INT_NULL,
+   // Instaned Geometry
+   INST_COL4_WPOS4_GENATTR1: INT_NULL,
+   INST_COL4_WPOS4_POS2: INT_NULL,
+   INST_COL4_WPOS4: INT_NULL,
+   INST_POS2_TEX2: INT_NULL,
+   INST_COL4_WPOS4_TEX2: INT_NULL,
+   // TESTS
+   TEST_COL4_WPOS4_GENATTR1_POS2: INT_NULL,
+
+   SIZE: INT_NULL,
+};
+
+
+
+
+const Vertex_buffer_fn_table_operation_add = [
+   FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_FN0,
+   FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_GENATTR1_POS2,
+   FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_POS2,
+   FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1,
+   FILL_VERTEX_BUFFER_COL4_WPOS4_TEX2,
+   FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2,
+   FILL_VERTEX_BUFFER_WPOS4_GENATTR1_POS2_FN3,
+   FILL_VERTEX_BUFFER_WPOS4_POS2_FN4,
+   FILL_VERTEX_BUFFER_GENATTR1_POS2_FN5,
+   FILL_VERTEX_BUFFER_POS2_FN6,
+   FILL_VERTEX_BUFFER_POS2_TEX2,
+   // Instanced Geometry
+   INST_FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_FN0,
+   INST_FILL_VERTEX_BUFFER_COL4_WPOS4_POS2,
+   INST_FILL_VERTEX_BUFFER_COL4_WPOS4_FN1,
+   INST_FILL_VERTEX_BUFFER_POS2_FN2,
+   INST_FILL_VERTEX_BUFFER_COL4_WPOS4_TEX2,
+
+   //TESTS
+   TEST_MULTI_VERTEX_FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_FN0,
+];
+
+
+function Set_up_fn_table() {
+
+   const len = Vertex_buffer_fn_table_operation_add.length;
+   for (let i = 0; i < len; i++) {
+
+      if      (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_FN0) FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_GENATTR1_POS2) FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS4_GENATTR1_POS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_POS2) FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS4_POS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1) FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2_TEX2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS4_TEX2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2) FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_WPOS4_GENATTR1_POS2_FN3) FUNCTION_TABLE_IDXS.WPOS4_GENATTR1_POS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_WPOS4_POS2_FN4) FUNCTION_TABLE_IDXS.WPOS4_POS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_GENATTR1_POS2_FN5) FUNCTION_TABLE_IDXS.GENATTR1_POS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_POS2_FN6) FUNCTION_TABLE_IDXS.POS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_POS2_TEX2) FUNCTION_TABLE_IDXS.POS2_TEX2 = i;
+      // Instanced Geometry
+      else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_FN0) FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_GENATTR1 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_COL4_WPOS4_POS2) FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_POS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_COL4_WPOS4_FN1) FUNCTION_TABLE_IDXS.INST_COL4_WPOS4 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_POS2_FN2) FUNCTION_TABLE_IDXS.INST_POS2_TEX2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_COL4_WPOS4_TEX2) FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_TEX2 = i;
+      //TESTS
+      else if (Vertex_buffer_fn_table_operation_add[i] === TEST_MULTI_VERTEX_FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_FN0) FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_TEX2 = i;
+   }
+
+   FUNCTION_TABLE_IDXS.SIZE = len;
+}
+
+Set_up_fn_table();
+
+
+
+/**
+ * If the sid of the mesh, passed to the vertex buffer creation, has any flag(!0x0),
+ * then a function for that specific implementation of the vertex buffer will be chosen.
+ */
+export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
+
+   const shader_attribs = Shader_attributes_get_attribs(attribsidx);
+   const names = shader_attribs.names;
+
+
+   if(inst){
+
+      let clean_attr = 0x0;
+      if(inst & SHADER_ATTRIBUTES.COL4) clean_attr |= SHADER_ATTRIBUTES.COL4;
+      if(inst & SHADER_ATTRIBUTES.WPOS_TIME4) clean_attr |= SHADER_ATTRIBUTES.WPOS_TIME4;
+      if(inst & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) clean_attr |= SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4;
+      if(inst & SHADER_ATTRIBUTES.POS2) clean_attr |= SHADER_ATTRIBUTES.POS2;
+      if(inst & SHADER_ATTRIBUTES.TEX2) clean_attr |= SHADER_ATTRIBUTES.TEX2;
+
+      if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_GENATTR1;
+      if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_TEX2;
+      if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_POS2;
+      if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+      if (clean_attr === (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_POS2_TEX2;
+   }
+   else { 
+
+      let clean_attr = 0x0;
+      if(attr & SHADER_ATTRIBUTES.COL4) {
+         if(attr & SHADER_ATTRIBUTES.COL4_PER_VERTEX) clean_attr |= SHADER_ATTRIBUTES.COL4_PER_VERTEX;
+         else clean_attr |= SHADER_ATTRIBUTES.COL4;
+      }
+      if(attr & SHADER_ATTRIBUTES.COL4_PER_VERTEX) clean_attr |= SHADER_ATTRIBUTES.COL4_PER_VERTEX;
+      if(attr & SHADER_ATTRIBUTES.WPOS_TIME4) clean_attr |= SHADER_ATTRIBUTES.WPOS_TIME4;
+      if(attr & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) clean_attr |= SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4;
+      if(attr & SHADER_ATTRIBUTES.POS2) clean_attr |= SHADER_ATTRIBUTES.POS2;
+      if(attr & SHADER_ATTRIBUTES.TEX2) clean_attr |= SHADER_ATTRIBUTES.TEX2;
+
+
+      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS4_GENATTR1_POS2;
+      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS4_POS2;
+      if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2;
+      if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2_TEX2;
+      if (clean_attr === (SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.WPOS4_GENATTR1_POS2;
+      if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2;
+      if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_TEX2;
+      if (clean_attr === (SID.ATTR.POS2|SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.GENATTR1_POS2;
+      if (clean_attr === (SID.ATTR.WPOS_TIME4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.WPOS4_POS2;
+      if (clean_attr === (SID.ATTR.POS2|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.POS2_TEX2;
+      if (clean_attr === (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
+   }
+
+   // if ((attr & SID.ATTR.TEST_MULTI_VERTEX))
+   //    return FUNCTION_TABLE_IDXS.TEST_COL4_WPOS4_GENATTR1_POS2
+
+
+   console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names, shader_attribs.nameids, SHADER_ATTRIBUTES);
+   // alert('SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:')
+   alert(`${inst} SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:`)
+   return -1;
+}
+/** SAVE-CHECK */
+// else if (attr === (SHADER_ATTRIBUTES.COL4 | SHADER_ATTRIBUTES.WPOS_TIME4 | SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4 | SHADER_ATTRIBUTES.POS2)) {
+//    // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
+//    // if(inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_GENATTR1;
+//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+
+//    else {
+//       // if ((attr & SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.GENERIC_ATTR1_VEC4) && (attr & SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2;
+//       if (attr & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2;
+//       if (attr & (SID.ATTR.POS2|SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.GENATTR1_POS2;
+//       if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
+//    }
+// }
+
+
+// else if (attr === (SHADER_ATTRIBUTES.COL4 | SHADER_ATTRIBUTES.WPOS_TIME4 | SHADER_ATTRIBUTES.POS2 | SHADER_ATTRIBUTES.TEX2)) {
+//    // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
+//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_TEX2;
+//    if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+//    // else if(inst & SID.ATTR.POS2) return FUNCTION_TABLE_IDXS.INST_POS2_POS2;
+
+//    else {
+//       if (attr & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2_TEX2;
+//       if (attr & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+//       if (attr & (SID.ATTR.POS2|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.POS2_TEX2;
+//       if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
+//    }
+// }
+
+
+// else if (attr === (SHADER_ATTRIBUTES.COL4 | SHADER_ATTRIBUTES.WPOS_TIME4 | SHADER_ATTRIBUTES.POS2)) {
+//    // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
+//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_POS2;
+//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+//    if (inst & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_POS2_POS2;
+
+//    else {
+//       if (attr & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2;
+//       if ((attr & SID.ATTR.POS2|SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.GENATTR1_POS2;
+//       if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
+//    }
+// }
+/** SAVE-OLD */
+// export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
+
+//    const shader_attribs = Shader_attributes_get_attribs(attribsidx);
+//    const names = shader_attribs.names;
+
+//    if ((attr & SID.ATTR.TEST_MULTI_VERTEX))
+//       return FUNCTION_TABLE_IDXS.TEST_COL4_WPOS4_GENATTR1_POS2
+
+
+//    if ((shader_attribs.nameids[0] & SHADER_ATTRIBUTES.COL4) &&
+//       (shader_attribs.nameids[1] & SHADER_ATTRIBUTES.WPOS_TIME4) &&
+//       (shader_attribs.nameids[2] & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) &&
+//       (shader_attribs.nameids[3] & SHADER_ATTRIBUTES.POS2)) {
+//       // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
+//       // if(inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4) && (inst & SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_GENATTR1;
+//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+
+//       else {
+//          if ((attr & SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.GENERIC_ATTR1_VEC4) && (attr & SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2;
+//          if ((attr & SID.ATTR.POS2) && (attr & SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.GENATTR1_POS2;
+//          if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
+//       }
+//    }
+
+
+//    else if ((shader_attribs.nameids[0] & SHADER_ATTRIBUTES.COL4) &&
+//       (shader_attribs.nameids[1] & SHADER_ATTRIBUTES.WPOS_TIME4) &&
+//       (shader_attribs.nameids[2] & SHADER_ATTRIBUTES.POS2) &&
+//       (shader_attribs.nameids[3] & SHADER_ATTRIBUTES.TEX2)) {
+//       // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
+//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4) && (inst & SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_TEX2;
+//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+//       // else if(inst & SID.ATTR.POS2) return FUNCTION_TABLE_IDXS.INST_POS2_POS2;
+
+//       else {
+//          if (attr & (SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.POS2) && (attr & SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2_TEX2;
+//          if (attr & (SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+//          if ((attr & SID.ATTR.POS2) && (attr & SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.POS2_TEX2;
+//          if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
+//       }
+//    }
+
+
+//    else if ((shader_attribs.nameids[0] & SHADER_ATTRIBUTES.COL4) &&
+//       (shader_attribs.nameids[1] & SHADER_ATTRIBUTES.WPOS_TIME4) &&
+//       (shader_attribs.nameids[2] & SHADER_ATTRIBUTES.POS2)) {
+//       // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
+//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4) && (inst & SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_POS2;
+//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
+//       if (inst & SID.ATTR.POS2) return FUNCTION_TABLE_IDXS.INST_POS2_POS2;
+
+//       else {
+//          if (attr & (SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2;
+//          // if(attr & (SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.COL4_WPOS4;
+//          if ((attr & SID.ATTR.POS2) && (attr & SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.GENATTR1_POS2;
+//          if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
+//       }
+//    }
+
+//    console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names, shader_attribs.nameids, SHADER_ATTRIBUTES);
+//    // alert('SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:')
+//    alert(`${inst} SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:`)
+//    return -1;
+// }
+
+
+
+
+
+export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, stride) {
+   const vb_info_count = Vertex_buffer_fn_table_operation_add[fnidx](vb_data, geom, mat, start, num_faces, stride);
+   // console.log('-----------------------\n', vb_info_count, 'fnidx', fnidx)
+   return vb_info_count;
+}
+
+
+
+
+
+
+/**************************************************************************************************************************************/
+// Fill - Vertex Buffer Functions
+/**************************************************************************************************************************************/
+
+
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_POS2(vb_data, geom, mat, start, num_faces, stride) {
+   
+   
+   let attribs_count = 0;
+   let index = start;
+   let k=0;
+   
+   for (let i = 0; i < num_faces; i++) {
+
+      const col = mat.col;
+      // V1
+      vb_data[index++] = col[k][0];
+      vb_data[index++] = col[k][1];
+      vb_data[index++] = col[k][2];
+      vb_data[index++] = col[k][3];
+
+      vb_data[index++] = geom.pos[0];
+      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = 0;
+      vb_data[index++] = geom.dim[1]*2;
+
+
+      // V2
+      k++; // Switch to the next color for this vertex
+      vb_data[index++] = col[k][0];
+      vb_data[index++] = col[k][1];
+      vb_data[index++] = col[k][2];
+      vb_data[index++] = col[k][3];
+
+      vb_data[index++] = geom.pos[0];
+      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = 0;
+      vb_data[index++] = 0;
+
+
+      // V3
+      k++; // Switch to the next color for this vertex
+      vb_data[index++] = col[k][0];
+      vb_data[index++] = col[k][1];
+      vb_data[index++] = col[k][2];
+      vb_data[index++] = col[k][3];
+
+      vb_data[index++] = geom.pos[0];
+      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0]*2;
+      vb_data[index++] = geom.dim[1]*2;
+
+
+      // V4
+      k++; // Switch to the next color for this vertex
+      vb_data[index++] = col[k][0];
+      vb_data[index++] = col[k][1];
+      vb_data[index++] = col[k][2];
+      vb_data[index++] = col[k][3];
+
+      vb_data[index++] = geom.pos[0];
+      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0]*2;
+      vb_data[index++] = 0;
+
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_GENATTR1_POS2(vb_data, geom, mat, start, num_faces, stride) {
+   
+   
+   let attribs_count = 0;
+   let index = start;
+   let k=0;
+   
+   for (let i = 0; i < num_faces; i++) {
+
+      const col = mat.col;
+      // V1
+      vb_data[index++] = col[k][0];
+      vb_data[index++] = col[k][1];
+      vb_data[index++] = col[k][2];
+      vb_data[index++] = col[k][3];
+
+      vb_data[index++] = geom.pos[0];
+      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = 0;
+      vb_data[index++] = geom.dim[1]*2;
+
+
+      // V2
+      k++; // Switch to the next color for this vertex
+      vb_data[index++] = col[k][0];
+      vb_data[index++] = col[k][1];
+      vb_data[index++] = col[k][2];
+      vb_data[index++] = col[k][3];
+
+      vb_data[index++] = geom.pos[0];
+      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = 0;
+      vb_data[index++] = 0;
+
+
+      // V3
+      k++; // Switch to the next color for this vertex
+      vb_data[index++] = col[k][0];
+      vb_data[index++] = col[k][1];
+      vb_data[index++] = col[k][2];
+      vb_data[index++] = col[k][3];
+
+      vb_data[index++] = geom.pos[0];
+      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0]*2;
+      vb_data[index++] = geom.dim[1]*2;
+
+
+      // V4
+      k++; // Switch to the next color for this vertex
+      vb_data[index++] = col[k][0];
+      vb_data[index++] = col[k][1];
+      vb_data[index++] = col[k][2];
+      vb_data[index++] = col[k][3];
+
+      vb_data[index++] = geom.pos[0];
+      vb_data[index++] = geom.pos[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0]*2;
+      vb_data[index++] = 0;
+
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
+// function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_GENATTR1_POS2(vb_data, geom, mat, start, num_faces, stride) {
+   
+   
+//    let attribs_count = 0;
+//    let index = start;
+//    let k=0;
+   
+//    for (let i = 0; i < num_faces; i++) {
+
+//       const col = mat.col;
+//       // V1
+//       vb_data[index++] = col[k][0];
+//       vb_data[index++] = col[k][1];
+//       vb_data[index++] = col[k][2];
+//       vb_data[index++] = col[k][3];
+
+//       vb_data[index++] = geom.pos[0] + geom.dim[0];
+//       vb_data[index++] = geom.pos[1] + geom.dim[1];
+//       vb_data[index++] = geom.pos[2];
+//       index++; // For WPOS4
+
+//       vb_data[index++] = mat.style[0];
+//       vb_data[index++] = mat.style[1];
+//       vb_data[index++] = mat.style[2];
+//       index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+//       vb_data[index++] = -geom.dim[0];
+//       vb_data[index++] = geom.dim[1];
+
+
+//       // V2
+//       k++; // Switch to the next color for this vertex
+//       vb_data[index++] = col[k][0];
+//       vb_data[index++] = col[k][1];
+//       vb_data[index++] = col[k][2];
+//       vb_data[index++] = col[k][3];
+
+//       vb_data[index++] = geom.pos[0] + geom.dim[0];
+//       vb_data[index++] = geom.pos[1] + geom.dim[1];
+//       vb_data[index++] = geom.pos[2];
+//       index++; // For WPOS4
+
+//       vb_data[index++] = mat.style[0];
+//       vb_data[index++] = mat.style[1];
+//       vb_data[index++] = mat.style[2];
+//       index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+//       vb_data[index++] = -geom.dim[0];
+//       vb_data[index++] = -geom.dim[1];
+
+
+//       // V3
+//       k++; // Switch to the next color for this vertex
+//       vb_data[index++] = col[k][0];
+//       vb_data[index++] = col[k][1];
+//       vb_data[index++] = col[k][2];
+//       vb_data[index++] = col[k][3];
+
+//       vb_data[index++] = geom.pos[0] + geom.dim[0];
+//       vb_data[index++] = geom.pos[1] + geom.dim[1];
+//       vb_data[index++] = geom.pos[2];
+//       index++; // For WPOS4
+
+//       vb_data[index++] = mat.style[0];
+//       vb_data[index++] = mat.style[1];
+//       vb_data[index++] = mat.style[2];
+//       index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+//       vb_data[index++] = geom.dim[0];
+//       vb_data[index++] = geom.dim[1];
+
+
+//       // V4
+//       k++; // Switch to the next color for this vertex
+//       vb_data[index++] = col[k][0];
+//       vb_data[index++] = col[k][1];
+//       vb_data[index++] = col[k][2];
+//       vb_data[index++] = col[k][3];
+
+//       vb_data[index++] = geom.pos[0] + geom.dim[0];
+//       vb_data[index++] = geom.pos[1] + geom.dim[1];
+//       vb_data[index++] = geom.pos[2];
+//       index++; // For WPOS4
+
+//       vb_data[index++] = mat.style[0];
+//       vb_data[index++] = mat.style[1];
+//       vb_data[index++] = mat.style[2];
+//       index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+//       vb_data[index++] = geom.dim[0];
+//       vb_data[index++] = -geom.dim[1];
+
+//       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+//    }
+
+//    return attribs_count;
+// }
+
+
+function FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_FN0(vb_data, geom, mat, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+
+   const sin = Timer_get_global_timer_sine();
+   const cos = Timer_get_global_timer_cosine();
+   /*
+         c, -s, 0, 0,
+         s,  c, 0, 0,
+         0,  0, 1, 0,
+         0,  0, 0, 1
+   */
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      // vb_data[index++] = (geom.pos[0] + geom.dim[0]) * cos;
+      // vb_data[index++] = (geom.pos[1] + geom.dim[1]) * cos;
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      // vb_data[index++] = (geom.pos[0] + geom.dim[0]) * -sin;
+      // vb_data[index++] = (geom.pos[1] + geom.dim[1]) * -sin;
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      // vb_data[index++] = (geom.pos[0] + geom.dim[0]) * sin;
+      // vb_data[index++] = (geom.pos[1] + geom.dim[1]) * sin;
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      // vb_data[index++] = (geom.pos[0] + geom.dim[0]) * cos;
+      // vb_data[index++] = (geom.pos[1] + geom.dim[1]) * cos;
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
+
+let temp_test = true
+function TEST_MULTI_VERTEX_FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_FN0(vb_data, geom, mat, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+
+   if (temp_test) {
+      for (let i = 0; i < num_faces; i++) {
+
+         // V1
+         vb_data[index++] = mat.col[0];
+         vb_data[index++] = mat.col[1];
+         vb_data[index++] = mat.col[2];
+         vb_data[index++] = mat.col[3];
+
+         vb_data[index++] = geom.pos[0] + geom.dim[0];
+         vb_data[index++] = geom.pos[1] + geom.dim[1];
+         vb_data[index++] = geom.pos[2];
+         index++; // For WPOS4
+
+         vb_data[index++] = mat.style[0];
+         vb_data[index++] = mat.style[1];
+         vb_data[index++] = mat.style[2];
+         index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+         vb_data[index++] = -geom.dim[0];
+         vb_data[index++] = geom.dim[1];
+
+
+         // V2
+         vb_data[index++] = mat.col[0];
+         vb_data[index++] = mat.col[1];
+         vb_data[index++] = mat.col[2];
+         vb_data[index++] = mat.col[3];
+
+         vb_data[index++] = geom.pos[0] + geom.dim[0];
+         vb_data[index++] = geom.pos[1] + geom.dim[1];
+         vb_data[index++] = geom.pos[2];
+         index++; // For WPOS4
+
+         vb_data[index++] = mat.style[0];
+         vb_data[index++] = mat.style[1];
+         vb_data[index++] = mat.style[2];
+         index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+         vb_data[index++] = -geom.dim[0];
+         vb_data[index++] = -geom.dim[1];
+
+
+         // V3
+         vb_data[index++] = mat.col[0];
+         vb_data[index++] = mat.col[1];
+         vb_data[index++] = mat.col[2];
+         vb_data[index++] = mat.col[3];
+
+         vb_data[index++] = geom.pos[0] + geom.dim[0];
+         vb_data[index++] = geom.pos[1] + geom.dim[1];
+         vb_data[index++] = geom.pos[2];
+         index++; // For WPOS4
+
+         vb_data[index++] = mat.style[0];
+         vb_data[index++] = mat.style[1];
+         vb_data[index++] = mat.style[2];
+         index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+         vb_data[index++] = geom.dim[0];
+         vb_data[index++] = geom.dim[1];
+
+
+         // V4
+         vb_data[index++] = mat.col[0];
+         vb_data[index++] = mat.col[1];
+         vb_data[index++] = mat.col[2];
+         vb_data[index++] = mat.col[3];
+
+         vb_data[index++] = geom.pos[0] + geom.dim[0];
+         vb_data[index++] = geom.pos[1] + geom.dim[1];
+         vb_data[index++] = geom.pos[2];
+         index++; // For WPOS4
+
+         vb_data[index++] = mat.style[0];
+         vb_data[index++] = mat.style[1];
+         vb_data[index++] = mat.style[2];
+         index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+         vb_data[index++] = geom.dim[0];
+         vb_data[index++] = -geom.dim[1];
+
+         attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+      }
+      temp_test = false
+   }
+
+   else {
+
+      for (let i = 0; i < num_faces; i++) {
+
+         // V1
+         vb_data[index++] = mat.col[0];
+         vb_data[index++] = mat.col[1];
+         vb_data[index++] = mat.col[2];
+         vb_data[index++] = mat.col[3];
+
+         vb_data[index++] = geom.pos[0] + geom.dim[0];
+         vb_data[index++] = geom.pos[1] + geom.dim[1];
+         vb_data[index++] = geom.pos[2];
+         index++; // For WPOS4
+
+         vb_data[index++] = mat.style[0];
+         vb_data[index++] = mat.style[1];
+         vb_data[index++] = mat.style[2];
+         index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+         vb_data[index++] = geom.dim[0];
+         vb_data[index++] = geom.dim[1];
+
+
+         // V2
+         vb_data[index++] = mat.col[0];
+         vb_data[index++] = mat.col[1];
+         vb_data[index++] = mat.col[2];
+         vb_data[index++] = mat.col[3];
+
+         vb_data[index++] = geom.pos[0] + geom.dim[0];
+         vb_data[index++] = geom.pos[1] + geom.dim[1];
+         vb_data[index++] = geom.pos[2];
+         index++; // For WPOS4
+
+         vb_data[index++] = mat.style[0];
+         vb_data[index++] = mat.style[1];
+         vb_data[index++] = mat.style[2];
+         index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+         vb_data[index++] = geom.dim[0];
+         vb_data[index++] = -geom.dim[1];
+
+         attribs_count += stride / 2; // TODO: Store Vertices_per_rect in shder_attribs?????
+
+      }
+   }
+
+
+   return attribs_count;
+}
+
+
+
+function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+   // const end = start + (count * num_faces);
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V2
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      vb_data[index++] = mat.uv[0];
+      vb_data[index++] = mat.uv[3];
+
+
+      // V2
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      vb_data[index++] = mat.uv[0];
+      vb_data[index++] = mat.uv[2];
+
+
+      // V3
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+      vb_data[index++] = mat.uv[1];
+      vb_data[index++] = mat.uv[3];
+
+
+      // V4
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      vb_data[index++] = mat.uv[1];
+      vb_data[index++] = mat.uv[2];
+
+      attribs_count += stride;
+   }
+
+   return attribs_count;
+}
+
+
+
+function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2(vb_data, geom, mat, start, num_faces, stride) {
+
+   let index = start;
+   let attribs_count = 0;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
+
+
+function FILL_VERTEX_BUFFER_WPOS4_GENATTR1_POS2_FN3(vb_data, geom, mat, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shader_attribs?????
+   }
+
+   return attribs_count;
+}
+
+
+function FILL_VERTEX_BUFFER_WPOS4_POS2_FN4(vb_data, geom, mat, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
+
+
+function FILL_VERTEX_BUFFER_GENATTR1_POS2_FN5(vb_data, geom, mat, start, num_faces, stride) {
+
+
+   let attribs_count = 0;
+   let index = start;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
+
+function FILL_VERTEX_BUFFER_POS2_FN6(vb_data, geom, mat, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // V3
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+      // V4
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+}
+
+function FILL_VERTEX_BUFFER_COL4_WPOS4_TEX2() {
+   let attribs_count = 0;
+   let index = start;
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      index++;
+      index++;
+
+
+      vb_data[index++] = mat.uv[0];
+      vb_data[index++] = mat.uv[3];
+
+   }
+
+   return attribs_count;
+}
+
+function FILL_VERTEX_BUFFER_POS2_TEX2(vb_data, geom, mat, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      vb_data[index++] = mat.uv[0];
+      vb_data[index++] = mat.uv[3];
+
+
+      // V2
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      vb_data[index++] = mat.uv[0];
+      vb_data[index++] = mat.uv[2];
+
+
+      // V3
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+      vb_data[index++] = mat.uv[1];
+      vb_data[index++] = mat.uv[3];
+
+
+      // V4
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      vb_data[index++] = mat.uv[1];
+      vb_data[index++] = mat.uv[2];
+
+      attribs_count += stride;
+   }
+
+   return attribs_count;
+}
+
+
+/**************************************************************************************************************************************/
+// Fill - Instanced Attributes - Vertex Buffer Functions
+/**************************************************************************************************************************************/
+
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_FN0(vb_data, geom, start, num_faces, stride) {
+   alert('Create stride\nFILL_VERTEX_BUFFER')
+   // for (let i = 0; i < num_faces; i++) {
+   //    // V1
+   //    vb_data[index++] = mat.col[0];
+   //    vb_data[index++] = mat.col[1];
+   //    vb_data[index++] = mat.col[2];
+   //    vb_data[index++] = mat.col[3];
+
+   //    vb_data[index++] = geom.pos[0] + geom.dim[0];
+   //    vb_data[index++] = geom.pos[1] + geom.dim[1];
+   //    vb_data[index++] = geom.pos[2];
+   //    index++; // For WPOS4
+
+   //    vb_data[index++] = mat.style[0];
+   //    vb_data[index++] = mat.style[1];
+   //    vb_data[index++] = mat.style[2];
+   //    index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+   //    attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+   // }
+}
+
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS4_POS2(vb_data, geom, start, num_faces, stride) {
+
+   let attribs_count = 0;
+   let index = start;
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      vb_data[index++] = 0;
+      // index++; // For WPOS4
+      attribs_count += stride;
+   }
+
+   return attribs_count;
+}
+
+
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS4_FN1(vb_data, geom, mat, start, num_faces, stride = 0) {
+   // alert('Create stride\nFILL_VERTEX_BUFFER')
+
+   let attribs_count = 0;
+   let index = start;
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      vb_data[index++] = 0;
+
+      attribs_count += stride;
+   }
+
+   return attribs_count;
+}
+function INST_FILL_VERTEX_BUFFER_POS2_FN2(vb_data, geom, mat, start, num_faces, stride = 0) {
+   alert('Create stride\nFILL_VERTEX_BUFFER')
+
+   let attribs_count = 0;
+   let index = start;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+      // V2
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // V3
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+      // V4
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride;
+   }
+
+   return attribs_count;
+}
+
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS4_TEX2(vb_data, geom, mat, start, num_faces, stride = 0) {
+   alert('kkla')
+}
+
+
+/**************************************************************************************************************************************/
+// Fill - Multi Triangle Mesh
+
+function TEMP_FILL_MULTI_VERTEX_MESH(vb_data, geom, mat, start, num_faces, stride = 0) {
+
+   let attribs_count = 0;
+   let index = start;
+
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // V1
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V2
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = -geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+
+      // V3
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+
+
+      // V4
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      index++; // For WPOS4
+
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style[2];
+      index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = -geom.dim[1];
+
+      // index += stride;
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+   }
+
+   return attribs_count;
+
+}

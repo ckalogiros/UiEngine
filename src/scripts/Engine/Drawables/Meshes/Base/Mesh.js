@@ -621,7 +621,7 @@ export class Mesh {
 
             case MESH_ENABLE.GFX.ATTR_STYLE: {
 
-                this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.PARAMS1 | SID.ATTR.EMPTY;
+                this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY;
                 this.sid.pass |= SID.PASS.WPOS2 | SID.PASS.DIM2;
                 if (!(params === null || params === undefined)) {
                     this.mat.style = params.style;

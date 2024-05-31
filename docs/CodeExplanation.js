@@ -36,7 +36,7 @@
  * 1. Set the Material's class function @mat.SetStyle(60, 30, 20)
  *    with the border-width, feather and round-corners as parameters.
  * 2. At @Matterial class set the curents material @sid.attr with the SID.ATTR.Border, ... for the rest styles,
- *    + the SID.ATTR.PARAMS1 to enable the construction of the @a_params1 attribute in the vertex shader.
+ *    + the SID.ATTR.GENERIC_ATTR1_VEC4 to enable the construction of the @a_params1 attribute in the vertex shader.
  * 3. The @CreateShader() will contruct the rest of the vertex shader code, with the check in the sid.attr.'styles'.
  *    1 'in' float, 1 'out' float and 1 assigment statement for each of the styles are added to the vertex shader.
  * 4. At the frament shader the apropriate 'in' floats are constructed and then used for the final result

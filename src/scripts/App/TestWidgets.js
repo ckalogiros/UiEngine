@@ -281,7 +281,7 @@ export function TestWidgetsGeneric(scene) {
         //     line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         
-        //     // line.sid.attr &= ~SID.ATTR.PARAMS1;
+        //     // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
         //     line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
         //     // line.sid.attr &= ~SID.ATTR.COL4;
         
@@ -1338,8 +1338,9 @@ function CreateDropdown2InSection(pos, id) {
 
 function CreateColorPicker(){
 
-    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [200, 400, 0], [100, 100], GREY[3], );
+    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [0, 0, 0], [400, 400], GREY[3], _, [0, 50, 4]);
     picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
 
     picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
     

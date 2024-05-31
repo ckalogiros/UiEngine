@@ -93,7 +93,6 @@ const SID = {
 
     SHAD: {
         INDEXED: BIT1,
-        TEXT_SDF: BIT1 <<= 1,
         PRE_MULTIPLIED_ALPHA: BIT1 <<= 1,
     },
 
@@ -106,17 +105,14 @@ const SID = {
         TIME: BIT2 <<= 1,
         SDF: BIT2 <<= 1,
         MSDF: BIT2 <<= 1,
-        PARAMS1: BIT2 <<= 1,
+        GENERIC_ATTR1_VEC4: BIT2 <<= 1,
         STYLE: BIT2 <<= 1,
         BORDER: BIT2 <<= 1,
         R_CORNERS: BIT2 <<= 1,
         FEATHER: BIT2 <<= 1,
-        // POS3: BIT2 <<= 1,
-        // SCALE3: BIT2 <<= 1,
         COL4_PER_VERTEX: BIT2 <<= 1,
         EMPTY: BIT2 <<= 1,
         TEST_MULTI_VERTEX: BIT2 <<= 1,
-        // PLAY_ARROUND1: BIT2 <<= 1,
     },
 
     INST:{
@@ -127,7 +123,7 @@ const SID = {
         TIME: BIT3 <<= 1,
         SDF: BIT3 <<= 1,
         MSDF: BIT3 <<= 1,
-        PARAMS1: BIT3 <<= 1,
+        GENERIC_ATTR1_VEC4: BIT3 <<= 1,
         STYLE: BIT3 <<= 1,
         POS3: BIT3 <<= 1,
         COL4_PER_VERTEX: BIT3 <<= 1,
@@ -161,7 +157,7 @@ const SID = {
         RES2: BIT4 <<= 1,
         STYLE3: BIT4 <<= 1,
         SDF2: BIT4 <<= 1,
-        PARAMS1: BIT4 <<= 1,
+        GENERIC_ATTR1_VEC4: BIT4 <<= 1,
     },
 
     // FX
@@ -184,7 +180,7 @@ const SID = {
     // },
 
 
-    DEBUG: false,
+    // DEBUG: false,
 
 
     // This function is used only to be able to reason of which mesh inherits from which mesh
@@ -260,7 +256,7 @@ const GRAPHICS_LAYOUT = {
     ATTR_SIZES: {
         COL4: 4,
         WPOS4: 4,
-        PARAMS1: 4,
+        GENERIC_ATTR1_VEC4: 4,
         POS2: 2,
         TEX2: 2,
         XY: 2,
@@ -298,7 +294,7 @@ const V_WPOS_TIME_COUNT = 4; // Use the 4th element for the time attribute
 const V_STYLE_COUNT = 3;
 const V_BORDER_WIDTH = 1, V_BORDER_FEATHER = 1, V_ROUND_CORNERS = 1;
 const V_TIME_COUNT = 1;
-const V_PARAMS1_COUNT = 4;
+const V_GENERIC_ATTR1_VEC4_COUNT = 4;
 const V_SDF_COUNT = 2;
 
 // The style's buffer attribute strides(buffer indexes) 

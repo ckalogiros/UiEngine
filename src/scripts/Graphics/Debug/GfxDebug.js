@@ -27,6 +27,7 @@ export function GetShaderTypeId(sid) {
 
     if (sid.attr) str += 'Attribs:'
     if (sid.attr & SID.ATTR.COL4) str += 'col4, '
+    if (sid.attr & SID.ATTR.COL4_PER_VERTEX) str += 'col4 per vertex, '
     if (sid.attr & SID.ATTR.POS2) str += 'pos2, '
     if (sid.attr & SID.ATTR.SCALE2) str += 'scale2, '
     if (sid.attr & SID.ATTR.TEX2) str += 'tex2, '

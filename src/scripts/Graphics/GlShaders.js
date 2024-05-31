@@ -46,7 +46,7 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 
 	let loc = 0;
 
-	if(sid.attr & SID.ATTR.COL4){ 
+	if(sid.attr & (SID.ATTR.COL4)){ 
 		gl.bindAttribLocation(shader_program, loc, 'a_col');
 		loc++;
 	}
@@ -54,7 +54,7 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 		gl.bindAttribLocation(shader_program, loc, 'a_wpos_time');
 		loc++;
 	}
-	if(sid.attr & SID.ATTR.PARAMS1){
+	if(sid.attr & SID.ATTR.GENERIC_ATTR1_VEC4){
 		gl.bindAttribLocation(shader_program, loc, 'a_params1');
 		loc++;
 	}
@@ -73,7 +73,6 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 function Load_shaders(gl, shader, sid) {
 
 	const vShader = Load_shader(gl, gl.VERTEX_SHADER, shader.vShader, 'Vertex');
-	console.log('Load_shaders', shader.vShader)
 	const fShader = Load_shader(gl, gl.FRAGMENT_SHADER, shader.fShader, 'Fragment');
 
 	const shader_program = gl.createProgram();
@@ -85,13 +84,8 @@ function Load_shaders(gl, shader, sid) {
 	const msg = (success === undefined) ? 'Success!' : success;
 	console.log('Validate program', msg);
 	
-	// // FOR ANDROID
-	// // Bind attribute locations before linking the program
+	// Bind attribute locations before linking the program
 	Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid);
-	// gl.bindAttribLocation(shader_program, 0, 'a_col');
-	// gl.bindAttribLocation(shader_program, 1, 'a_wpos_time');
-	// gl.bindAttribLocation(shader_program, 2, 'a_pos');
-	// gl.bindAttribLocation(shader_program, 3, 'a_tex');
 
 	gl.linkProgram(shader_program);
 
@@ -118,7 +112,7 @@ function Load_shader(gl, shaderType, source, type) {
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
 
-	console.log('Load_shader', source)
+	// console.log('Load_shader', source)
 
 	const status = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
 	if (!status) {
