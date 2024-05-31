@@ -151,18 +151,24 @@ export function Shader_attributes_create(sid, shader_program) {
 
       const attrib_info = gfxCtx.gl.getActiveAttrib(shader_program, i);
       if (!attrib_info) break;
-      shader_attribs.names[i] = Str_buffer_store(attrib_info.name);
-      shader_attribs.types[i] = attrib_info.type; // SEE: GL_TYPES
+
+
+      const loc = gfxCtx.gl.getAttribLocation(shader_program, attrib_info.name);
+
+      shader_attribs.names[loc] = Str_buffer_store(attrib_info.name);
+      shader_attribs.types[loc] = attrib_info.type; // SEE: GL_TYPES
+
+      console.log('gl.getActiveAttrib:attrib_info', attrib_info)
       /** DO NOT DELETE */ // const attr_size = a.size; // This probably computes the size of array attributes, because for vec4 and vec2 the size is 1.
 
-      shader_attribs.locs[i] = i; // Seems redundant because the index and its value are the same, but that does not happen with sizes and offsets.
-      shader_attribs.sizes[i] = Calc_size_in_bytes_from_attribs_type(shader_attribs.types[i]); // TODO: May extend for .COL3 or any other case
+      shader_attribs.locs[loc] = loc; // Seems redundant because the index and its value are the same, but that does not happen with sizes and offsets.
+      shader_attribs.sizes[loc] = Calc_size_in_bytes_from_attribs_type(shader_attribs.types[loc]); // TODO: May extend for .COL3 or any other case
 
-      if (attrib_info.name === 'a_col') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.COL4;
-      else if (attrib_info.name === 'a_wpos_time') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.WPOS_TIME4;
-      else if (attrib_info.name === 'a_pos') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.POS2;
-      else if (attrib_info.name === 'a_params1') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.PARAMS1;
-      else if (attrib_info.name === 'a_tex') shader_attribs.nameids[i] = SHADER_ATTRIBUTES.TEX2;
+      if (attrib_info.name === 'a_col') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.COL4;
+      else if (attrib_info.name === 'a_wpos_time') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.WPOS_TIME4;
+      else if (attrib_info.name === 'a_pos') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.POS2;
+      else if (attrib_info.name === 'a_params1') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.PARAMS1;
+      else if (attrib_info.name === 'a_tex') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.TEX2;
 
    }
 
@@ -189,7 +195,7 @@ export function Shader_attributes_create(sid, shader_program) {
       sizes: new Uint8Array(attributes_count),
       offsets: new Uint8Array(attributes_count),
       types: new Uint16Array(attributes_count),
-      nameids: new Uint16Array(attributes_count),
+      nameids: new Uint16Array(attributes_count), // Needs to be Uint16 because its a bitfield
       names: new Uint16Array(attributes_count),
       attribs_per_vertex: size,
    }

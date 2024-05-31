@@ -11,6 +11,7 @@ import { Text_Mesh } from "../Drawables/Meshes/Text_Mesh.js";
 import { Close_Button, Widget_Menu_Bar, Widget_Minimize } from "../Drawables/Widgets/WidgetMenu.js";
 import { Widget_Switch_Simple } from "../Drawables/Widgets/WidgetSwitch.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
+import { Widget_Color_Picker } from "../Drawables/Widgets/WidgetColorPicker.js";
 
 /**
  * All Functions to create widgets.
@@ -256,11 +257,11 @@ export function Create_widget_close_btn(ROOT_WIDGET_FLAGS=0x0, root, text, pos, 
 
 
 export function Create_widget_minimize_btn(ROOT_WIDGET_FLAGS=0x0, root, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh=0x0) {
-
+   
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Minimize(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh));
-         
+   
    if(NOTIFICATIONS_ON && !is_debug_mesh) 
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
    
@@ -272,19 +273,33 @@ export function Create_widget_minimize_btn(ROOT_WIDGET_FLAGS=0x0, root, pos, fon
 
 // It does not store mesh's name to str_buffer
 export function Create_widget_text_for_debug_ui_only(ROOT_WIDGET_FLAGS=0x0, text, pos, fontSize, col, bold, pad, is_debug_mesh=0x0) {
-
+   
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
    const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, fontSize, col, bold, pad));
-
+   
    
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
    _mesh_buffer.buffer[mesh_bufferidx].name = `[${mesh_bufferidx}]{${text}}-WIDGET_TEXT`;
+   
+   
+   if(NOTIFICATIONS_ON && !is_debug_mesh) 
+      Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
+   
+   return _mesh_buffer.buffer[mesh_bufferidx];
+}
 
+
+
+export function Create_widget_color_picker(ROOT_WIDGET_FLAGS=0x0, options, margin, pos, dim, col, name, style, is_debug_mesh=0x0) {
+
+   const _mesh_buffer = Mesh_buffer_get();
+   const mesh_bufferidx = _mesh_buffer.Reserve();
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Color_Picker(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, margin, pos, dim, col, name, style, is_debug_mesh));
          
    if(NOTIFICATIONS_ON && !is_debug_mesh) 
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
-
+   
    return _mesh_buffer.buffer[mesh_bufferidx];
 }

@@ -1,6 +1,8 @@
 "use strict";
 import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name } from '../Graphics/Buffers/UniformBuffers.js';
+import { Matrix4_mult_vec2, Matrix4_mult_vec4 } from '../Helpers/Math/Matrix.js';
 import { M_Buffer } from './Core/Buffers.js';
+import { Screen_wpos_add_y } from './Core/MeshUniformsBuffer.js';
 import { HandleEvents } from './Events/Events.js';
 
 
@@ -97,21 +99,35 @@ export function Scene_set_screen_res_uniform() {
 }
 
 
-export function Scene_camera_zoom(sceneidx, value){
+export function Scene_camera_zoom(sceneidx, value) {
 
     _scenes.buffer[sceneidx].camera.Zoom(value);
 
-        const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
+    const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
     Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
 }
 
 
-export function Scene_camera_scroll(sceneidx, value){
+let cnt = 0;
 
-    _scenes.buffer[sceneidx].camera.Scroll(value);
+export function Scene_camera_scroll(sceneidx, sign) {
 
-    const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
-    Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
+    // Create a scroll value from the sign
+    const value = -sign * 10;
+
+    // Transform to projection 
+    // const projections_value = value;
+    // _scenes.buffer[sceneidx].camera.Scroll(projections_value);
+    // // Update the projection matrix
+    // const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
+    // Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
+    // const matrix_y_pos = _scenes.buffer[sceneidx].camera.matrix[13];
+
+    // Set the screen wpos
+    let screen_wpos_val = value;
+    Screen_wpos_add_y(-screen_wpos_val);
+
+    // console.log(cnt, 'matrix_y_pos', matrix_y_pos, 'val', value, 'proj val:', projections_value, 'screen wpos val', screen_wpos_val)
 }
 
 

@@ -58,12 +58,6 @@ export class Material {
    }
 
 
-   // SetColorAlpha(alpha, gfx, num_faces) {
-   //    this.col[3] = alpha;
-   //    Gl_set_alpha(gfx, this.col[3], num_faces);
-   // }
-
-
    SetStyle(style) {
       if (!Array.isArray(style)) console.error
       math.CopyArr3(this.style, style);

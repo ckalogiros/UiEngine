@@ -232,6 +232,7 @@ class Vertex_Buffer_Info {
 
     SetAddFn(attribsidx, attr, inst) {
         this.add_to_vb_fnidx = Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst);
+        // alert(`${this.add_to_vb_fnidx} \n0000`)
     }
 
 

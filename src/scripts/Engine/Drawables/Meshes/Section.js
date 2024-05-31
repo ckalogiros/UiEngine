@@ -13,6 +13,7 @@ import { Find_parent_listen_event } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_add_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposx_all_siblings, Mesh_unif_set_vb_root_wpos_all_siblings, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
+import { BLUEL } from "../Material/Base/Colors.js";
 
 
 
@@ -29,7 +30,7 @@ export class Section extends Rect {
    // total_margin
 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin = [4, 4], pos = [200, 400, 0], dim = [40, 40], col = TRANSPARENCY(BLUE, .6), name = 'SECTION UNAMED', style = [10, 6, 2.], is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin = [4, 4], pos = [200, 400, 0], dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = [10, 6, 2.], is_debug_mesh) {
 
       super(pos, dim, col, is_debug_mesh);
 

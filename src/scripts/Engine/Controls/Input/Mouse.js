@@ -267,8 +267,7 @@ export function OnMouseWheel(e){
    mouse.wheel.x =  e.clientY;
    mouse.wheel.delta = GetSign(e.wheelDelta);
 
-   // Scene_camera_scroll(STATE.scene.active_idx, mouse.wheel.delta)
-   Scene_camera_scroll(STATE.scene.active_idx, mouse.wheel.delta*.01)
+   Scene_camera_scroll(STATE.scene.active_idx, mouse.wheel.delta)
 
    // console.log(`MOUSE WHEEL: pos: ${e.x} ${e.y}, delta: ${e.wheelDelta}`)
 }
@@ -355,7 +354,7 @@ export function OnTouchStart(e) {
 
    
    const params = {
-      mouseButton: mouse.click.down,
+      mouseButton: mouse.click.down.btn,
    };
    
    RegisterEvent('mouse-click-down', params);
@@ -372,12 +371,12 @@ export function OnTouchEnd(e) {
    const x = e.changedTouches[0].clientX;
    const y = e.changedTouches[0].clientY;
    MouseSetCoords([x,y]);
-   console.log('OnTouchEnd:',[x, y]);
+   // console.log('OnTouchEnd:',[x, y]);
 
    mouse.click.down.Set(MOUSE.BTN_ID.LEFT);
 
    const params = {
-      mouseButton: mouse.click.down,
+      mouseButton: mouse.click.down.btn,
    };
    
    RegisterEvent('mouse-click-up', params);

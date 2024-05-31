@@ -25,7 +25,11 @@ export function Shaders_load(gl, sid, uniforms_info) {
 		vShader: Shaders_build_vertex_shader(sid, uniforms_info),
 		fShader: Shaders_build_fragment_shader(sid, uniforms_info),
 	};
-	const shader_program = Load_shaders(gl, shader);
+
+
+
+
+	const shader_program = Load_shaders(gl, shader, sid);
 	if (shader_program) {
 		if (dbg.GL_DEBUG_SHADERS) console.log('Shader Program Created Successfully!\nShader Type ID: ', dbg.GetShaderTypeId(sid));
 	} 
@@ -38,9 +42,38 @@ export function Shaders_load(gl, sid, uniforms_info) {
 
 
 
-function Load_shaders(gl, shader) {
+function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid){
+
+	let loc = 0;
+
+	if(sid.attr & SID.ATTR.COL4){ 
+		gl.bindAttribLocation(shader_program, loc, 'a_col');
+		loc++;
+	}
+	if(sid.attr & SID.ATTR.WPOS_TIME4){
+		gl.bindAttribLocation(shader_program, loc, 'a_wpos_time');
+		loc++;
+	}
+	if(sid.attr & SID.ATTR.PARAMS1){
+		gl.bindAttribLocation(shader_program, loc, 'a_params1');
+		loc++;
+	}
+	if(sid.attr & SID.ATTR.POS2){
+		gl.bindAttribLocation(shader_program, loc, 'a_pos');
+		loc++;
+	}
+	if(sid.attr & SID.ATTR.TEX2){
+		gl.bindAttribLocation(shader_program, loc, 'a_tex');
+		loc++;
+	}
+}
+
+
+
+function Load_shaders(gl, shader, sid) {
 
 	const vShader = Load_shader(gl, gl.VERTEX_SHADER, shader.vShader, 'Vertex');
+	console.log('Load_shaders', shader.vShader)
 	const fShader = Load_shader(gl, gl.FRAGMENT_SHADER, shader.fShader, 'Fragment');
 
 	const shader_program = gl.createProgram();
@@ -52,6 +85,14 @@ function Load_shaders(gl, shader) {
 	const msg = (success === undefined) ? 'Success!' : success;
 	console.log('Validate program', msg);
 	
+	// // FOR ANDROID
+	// // Bind attribute locations before linking the program
+	Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid);
+	// gl.bindAttribLocation(shader_program, 0, 'a_col');
+	// gl.bindAttribLocation(shader_program, 1, 'a_wpos_time');
+	// gl.bindAttribLocation(shader_program, 2, 'a_pos');
+	// gl.bindAttribLocation(shader_program, 3, 'a_tex');
+
 	gl.linkProgram(shader_program);
 
 	const status = gl.getProgramParameter(shader_program, gl.LINK_STATUS);
@@ -76,6 +117,8 @@ function Load_shader(gl, shaderType, source, type) {
 
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
+
+	console.log('Load_shader', source)
 
 	const status = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
 	if (!status) {

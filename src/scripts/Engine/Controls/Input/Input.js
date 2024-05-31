@@ -2,7 +2,7 @@
 "use strict";
 
 
-import { OnMouseMove_Android, OnTouchStart, OnTouchEnd, OnTouchCancel, OnTouchMove, MouseResetDif, MouseResetWheel } from "../Input/Mouse.js";
+import { OnTouchStart, OnTouchEnd, OnTouchCancel, OnTouchMove, MouseResetDif, MouseResetWheel } from "../Input/Mouse.js";
 import { OnMouseMove, OnMouseDown, OnMouseUp, OnMouseOut, OnMouseWheel } from "./Mouse.js";
 import { OnKeyDown, OnKeyUp } from "./Keyboard.js";
 import { Renderer_set_canvas_size } from "../../Renderers/Renderer.js";
@@ -52,30 +52,57 @@ export function On_window_resize() {
 
 export function Input_create_user_input_listeners() {
 
+  const canvas = document.getElementById('canvas');
+
+
+
   if (PLATFORM.ANDROID_IMPL) {
 
-    // document.addEventListener('mousemove', OnMouseMove_Android, false);
+    // Firefox
+    if (canvas.mozRequestFullScreen) canvas.mozRequestFullScreen();
+    // Chrome, Safari, and Opera
+    else if (canvas.webkitRequestFullscreen) canvas.webkitRequestFullscreen();
+    // IE/Edge
+    else if (canvas.msRequestFullscreen) canvas.msRequestFullscreen();
+
     // Touch screen events
-    document.addEventListener("touchstart", OnTouchStart, false);
-    document.addEventListener("touchend", OnTouchEnd);
-    document.addEventListener("touchcancel", OnTouchCancel);
-    // document.addEventListener("touchmove", OnTouchMove,  {passive:false});
-    document.addEventListener("touchmove", OnTouchMove, false);
+    canvas.addEventListener("touchstart", OnTouchStart, { passive: false });
+    canvas.addEventListener("touchend", OnTouchEnd, { passive: false });
+    canvas.addEventListener("touchcancel", OnTouchCancel, { passive: false });
+    canvas.addEventListener("touchmove", OnTouchMove, { passive: false });
+
+    canvas.addEventListener('gesturestart', function (event) {
+      event.preventDefault();
+      console.warn('Android Listener: gesturestart. ', event)
+    }, { passive: false });
+
+    canvas.addEventListener('gesturechange', function (event) {
+      event.preventDefault();
+      console.warn('Android Listener: gesturechange. ', event)
+    }, { passive: false });
+
+    canvas.addEventListener('gestureend', function (event) {
+      event.preventDefault();
+      console.warn('Android Listener: gestureend. ', event)
+    }, { passive: false });
+
+
+    if (canvas.requestFullscreen) canvas.requestFullscreen();
   }
   else {
 
-    document.addEventListener('mousemove', OnMouseMove, false);
-    document.addEventListener('mouseout', OnMouseOut, false);
-    document.addEventListener('wheel', OnMouseWheel, false);
+    canvas.addEventListener('mousemove', OnMouseMove, false);
+    canvas.addEventListener('mouseout', OnMouseOut, false);
+    canvas.addEventListener('wheel', OnMouseWheel, false);
+
   }
 
-  document.addEventListener('mousedown', OnMouseDown, false);
-  document.addEventListener('mouseup', OnMouseUp, false);
+  canvas.addEventListener('mousedown', OnMouseDown, false);
+  canvas.addEventListener('mouseup', OnMouseUp, false);
   window.addEventListener("resize", OnWindowResize, false);
-  //    document.addEventListener("resize", OnWindowResize);
 
   // Disabling the context menu on long taps on Android. 
-  document.oncontextmenu = function (event) {
+  canvas.oncontextmenu = function (event) {
 
     event.preventDefault();
     event.stopPropagation();

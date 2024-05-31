@@ -107,7 +107,7 @@ export class Camera extends Matrix4 {
 	Scroll(value) {
 		// const mouseWheel = MouseGetWheel();
 		this.Translate(0, value, 0);
-		console.log(value, this.matrix[13])
+		// console.log(value, this.matrix[13])
 	}
 
 

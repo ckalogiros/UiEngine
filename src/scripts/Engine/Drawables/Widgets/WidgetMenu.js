@@ -41,7 +41,7 @@ export class Widget_Menu_Bar extends Section {
 
 
       const dim = [label.GetMaxWidth(), 10];
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [0, 0], [0, 0, pos[2]], dim, col, _, style, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [5, 5], [0, 0, pos[2]], dim, col, _, style, is_debug_mesh);
 
       Styles_pad_set(this.styles, pad)
       Styles_pad_set(label.styles, pad)

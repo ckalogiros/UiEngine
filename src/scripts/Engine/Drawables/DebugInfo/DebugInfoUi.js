@@ -41,7 +41,7 @@ export function Debug_info_ui(is_root_widget = undefined) {
    // const label_style = [0, 3.5, 2.];
    const label_style = [8, 5, 3];
    const label_pad = [5, 4];
-   const label_col = TRANSPARENCY(GREY[0], 1.0);
+   const label_col = TRANSPARENCY(GREY[0], .0);
    const label_text_col = BLUEL[9];
 
    // Style for the switch widgets
@@ -51,7 +51,7 @@ export function Debug_info_ui(is_root_widget = undefined) {
    const switch_col2 = TRANSPARENCY(BLUEL[5], .9);
 
    // const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [VIEWPORT.RIGHT-280, 30, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
-   const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [0, 0, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
+   const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [0, 0, 0], TRANSPARENCY(GREY[0], .1), GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);

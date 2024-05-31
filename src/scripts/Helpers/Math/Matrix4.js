@@ -558,6 +558,7 @@ class Matrix4 {
 		return this;
 
 	}
+	
 	Translate(x, y, z) {
 		/**
 			1, 0, 0, x,
@@ -611,10 +612,10 @@ class Matrix4 {
 
 		this.set(
 
-			c, - s, 0, 0,
-			s, c, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
+			c, -s, 0, 0,
+			s,  c, 0, 0,
+			0,  0, 1, 0,
+			0,  0, 0, 1
 
 		);
 
@@ -828,7 +829,7 @@ class Matrix4 {
 		this.matrix = new Float32Array([
 			2 / (right - left), 0, 0, 0,
 			0, 2 / (top - bottom), 0, 0,
-			0, 0, -2 / (far - near), 0,
+			0, 0, -2 / (far - near),  0,
 			-(right + left) / (right - left), -(top + bottom) / (top - bottom), -(far + near) / (far - near), 1
 		]);
 

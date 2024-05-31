@@ -15,7 +15,7 @@ import { Debug_info_ui } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Widget_Scroller } from '../Engine/Drawables/Widgets/WidgetScroller.js';
 import { GetRandomColor, GetSequencedColor } from '../Helpers/Helpers.js';
 import { Textured_Mesh } from '../Engine/Drawables/Meshes/Textured_Mesh.js';
-import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
+import { Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 import { Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
 import { BLACK, BLUEL, BLUER, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
@@ -34,7 +34,8 @@ import { Set_color_rgb } from '../Engine/Drawables/Operations/MeshAttributesFunc
 import { Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
 
 import { Slider_connect } from '../Engine/Drawables/Widgets/WidgetSlider.js';
-import { TimerGetGlobalTimerCycle } from '../Engine/Timers/Timers.js';
+import { TimerGetGlobalTimerCycle, Timer_get_global_timer, Timer_get_global_timer_cosine, Timer_get_global_timer_sine } from '../Engine/Timers/Timers.js';
+import { VBI_get_byidx, Vertex_buffer_get_by_vbidx } from '../Graphics/Buffers/VertexBuffers.js';
 
 // var osu = require('node-os-utils')
 // import {osu} from 'node-os-utils'
@@ -65,6 +66,14 @@ import { TimerGetGlobalTimerCycle } from '../Engine/Timers/Timers.js';
  *
  * reorganize the functions in GlVuffers.js 
  */
+
+
+// function GlRotateZ2D(gfx, dim, val){
+
+
+// }
+
+
 
 const _fontsize = 10;
 
@@ -228,7 +237,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
+    // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
     // UserCreateRect()
 
     // uidbg.RotateZ(5.5);
@@ -253,8 +262,9 @@ export function TestWidgetsGeneric(scene) {
     // obj.Update();
 
 
-    const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
-    Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0)
+    // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
+    const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
+    // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0)
     // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.X, line, .5, -5., 5., 0)
     // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.Y, line, .5, -5., 5., 0)
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .1, .0, 1.,)
@@ -266,17 +276,19 @@ export function TestWidgetsGeneric(scene) {
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .001, .2, 1.4, _, .4, true)
     { // Test sdf lines
         // {
-        //     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 200, 0], [100, 20], TRANSPARENCY(GREEN[2], .1), 'sdf linem2');
+        //     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [VIEWPORT.WIDTH/2, VIEWPORT.HEIGHT/2, 0], [100, 20], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
         //     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
         //     line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         
-        //     // line.sid.unif |= SID.UNIF.TIME;
-        //     // line.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
+        //     // line.sid.attr &= ~SID.ATTR.PARAMS1;
+        //     line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
         //     // line.sid.attr &= ~SID.ATTR.COL4;
         
         //     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         //     line.Render();
+        //     line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx)
+        //     line.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
         //     line.ConstructListeners();
         // }
         // {
@@ -319,6 +331,8 @@ export function TestWidgetsGeneric(scene) {
     /** Misc widgets */
 
     // SectionResizable()
+
+    CreateColorPicker()
 
     // Test_widgets(ypos);
 
@@ -644,11 +658,19 @@ function SectionResizable() {
     grey.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     grey.StateEnable(MESH_STATE.IS_RESIZEABLE);
     grey.SetName(`grey${grey_cnt++}`);
+
+    grey.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
     
+
+    // grey.geom.dim[0] *= sin;
+    // grey.geom.dim[1] *= cos;
+
+
     grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
     // grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     grey.Render();
     grey.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, grey.gfx.vb.groupidx)
+    grey.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
     grey.ConstructListeners();
 
     return grey;
@@ -695,7 +717,7 @@ function CreateButton() {
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-    btn.sid.inst |= SID.ATTR.COL4|SID.ATTR.WPOS_TIME4
+    // btn.sid.inst |= SID.ATTR.COL4|SID.ATTR.WPOS_TIME4
 
     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     btn.Render();
@@ -849,9 +871,12 @@ function SdfLine(col, pos, dim, render_instanced_flags=0x0) {
     line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx)
     line.ConstructListeners();
 
+    const vb_info = VBI_get_byidx(line.gfx.vb.groupidx)
+    const vb_data = Vertex_buffer_get_by_vbidx(line.gfx.vb.idxs[0])
 
-    setInterval(()=>{GlRotateZ2D(line.gfx, line.geom.dim, Timer_get_global_timer()*.55)}, 16)
-    GlRotateZ2D(line.gfx, line.geom.dim, 1.23)
+
+    // setInterval(()=>{GlRotateZ2D(line.gfx, line.geom.dim, Timer_get_global_timer()*.55)}, 16)
+    // GlRotateZ2D(line.gfx, line.geom.dim, 1.23)
 
     // gfx_idxs[0] = mesh.gfx.prog.idx;
     // gfx_idxs[1] = mesh.gfx.vb.idx;
@@ -1311,7 +1336,19 @@ function CreateDropdown2InSection(pos, id) {
 //     // View_set_view_vb_start(section.group_bufferidxs, section.gfx.vb.start);
 // }
 
+function CreateColorPicker(){
 
+    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [200, 400, 0], [100, 100], GREY[3], );
+    picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+
+    picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    
+    picker.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
+    picker.Calc_no_gfx_update();
+    picker.Render();
+    picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
+    picker.ConstructListeners();
+}
 
 
 function CreateSceneMenuBar() {

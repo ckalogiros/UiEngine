@@ -1,14 +1,11 @@
 "use strict";
 
-import { Vertex_buffer_group_get_vbidxs, Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
-import { MouseGetPosDif } from "../Controls/Input/Mouse.js";
-import { TimeIntervalsDestroyByIdx } from "../Timers/TimeIntervals.js";
+import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
 import { New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
 import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
-import { Batch_store } from "../Batch/Batch.js";
-import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
+import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 import { REL_POS, Relative_pos_comp_move_right_buffer } from "../Drawables/Operations/RelativePosComponent.js";
@@ -17,16 +14,6 @@ import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "./MeshUn
 
 
 const NOTIFICATIONS_ON = true;
-
-
-
-
-/**
- * DECISSION:
- * 1. On widget root element remove: Should we sort the buffers?????
- */
-
-
 
 
 const _mesh_buffer = New_generic_buffer(_, 'Mesh Buffer');
@@ -43,11 +30,6 @@ const _widget_root_gfx = New_generic_buffer(_, 'Root gfx');
 /*******************************************************************************************************************************************************************************/
 // Mesh buffer: Stores all meshes of the application
 /*******************************************************************************************************************************************************************************/
-
-
-/**
- * Widget root: [Widgets]
- */
 
 _mesh_buffer.Init(16);
 
@@ -311,8 +293,6 @@ export function Mesh_per_vb_update_mesh_gfx_start(vb_groupidx, start, num_faces)
 
 /***********************************************************************************************************************/
 // Debug Info Getters
-
-
 export function Mesh_per_vb_get_mesh_count(vb_groupidx) { return _mesh_per_vertex_buffer.buffer[vb_groupidx].active_count; }
 
 
@@ -1044,6 +1024,10 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
       }
    }
 }
+
+
+
+
 export function Widget_root_rerender(root_bufferidx) {
 
    const root = _widget_root_buffer.buffer[root_bufferidx];

@@ -13,6 +13,34 @@ import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer.js";
 
 
 
+/*******************************************************************************************************************************************************************************/
+// Screen World Position:
+// The position of the screen, starting at top=0, left=0
+// Used for screen scrolling
+// All other positions draw from the screen position to calculate their position 
+/*******************************************************************************************************************************************************************************/
+
+const _screen_wpos = new Int16Array([0, 0]);
+
+export function Screen_wpos_get() { return _screen_wpos; }
+
+
+export function Screen_wpos_get_x() { return _screen_wpos[0]; }
+
+
+export function Screen_wpos_get_y() { return _screen_wpos[1]; }
+
+
+export function Screen_wpos_add_y(y) { _screen_wpos[1] += y; }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -210,13 +238,19 @@ export function Mesh_unif_get_vb_root_wpos_meshidx(vbgroupidx) {
 
 
 export function Mesh_unif_get_vb_root_wpos(vbgroupidx) {
+   const pos = Mesh_unif_get_vb_root_wpos_recursive(vbgroupidx);
+   pos[0] += _screen_wpos[0];
+   pos[1] += _screen_wpos[1];
+   return pos;
+}
+function Mesh_unif_get_vb_root_wpos_recursive(vbgroupidx) {
 
    const _this = _per_vb_mesh_unif_wpos.buffer[vbgroupidx];
    let pos = [_this.wpos[0], _this.wpos[1]];
 
    // If this relative position has a parent position, add it
    if (_this.parent_posidx !== INT_NULL) {
-      const p = Mesh_unif_get_vb_root_wpos(_this.parent_posidx);
+      const p = Mesh_unif_get_vb_root_wpos_recursive(_this.parent_posidx);
       pos[0] += p[0];
       pos[1] += p[1];
    }
@@ -227,13 +261,17 @@ export function Mesh_unif_get_vb_root_wpos(vbgroupidx) {
 
 
 export function Mesh_unif_get_vb_root_wposx(vbgroupidx) {
+   const pos = Mesh_unif_get_vb_root_wposx_recursive(vbgroupidx);
+   return pos + _screen_wpos[0]
+}
+function Mesh_unif_get_vb_root_wposx_recursive(vbgroupidx) {
 
    const _this = _per_vb_mesh_unif_wpos.buffer[vbgroupidx];
    let pos = _this.wpos[0];
 
    // If this relative position has a parent position, add it
    if (_this.parent_posidx !== INT_NULL) {
-      const p = Mesh_unif_get_vb_root_wposx(_this.parent_posidx);
+      const p = Mesh_unif_get_vb_root_wposx_recursive(_this.parent_posidx);
       pos += p;
    }
 
@@ -243,13 +281,18 @@ export function Mesh_unif_get_vb_root_wposx(vbgroupidx) {
 
 
 export function Mesh_unif_get_vb_root_wposy(vbgroupidx) {
+   const pos = Mesh_unif_get_vb_root_wposy_recursive(vbgroupidx);
+   // return pos + _screen_wpos[1];
+   return pos;
+}
+function Mesh_unif_get_vb_root_wposy_recursive(vbgroupidx) {
 
    const _this = _per_vb_mesh_unif_wpos.buffer[vbgroupidx];
    let pos = _this.wpos[1];
 
    // If this relative position has a parent position, add it
    if (_this.parent_posidx !== INT_NULL) {
-      const p = Mesh_unif_get_vb_root_wposy(_this.parent_posidx);
+      const p = Mesh_unif_get_vb_root_wposy_recursive(_this.parent_posidx);
       pos += p;
    }
 

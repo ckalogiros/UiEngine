@@ -73,7 +73,7 @@ vec2 pos = vec2(.0);                                              \n\
 float ScreenH;                                                    \n\
 float AA;                                                         \n\
 \n\
-float sdRoundBox( vec2 p, in vec2 dist, vec2 dim, vec2 wpos) {                   \n\
+float sdRoundBox( vec2 p, in vec2 dist, vec2 dim, vec2 wpos, float y) {                   \n\
     \n\
     vec2 q = (abs(p) - (dim)) + dist.x;\n\
     float d = length(max(q, 0.0)) - dist.x;\n\
@@ -100,9 +100,9 @@ vec4 Stylize()                                                    \n\
     \n\
     uv -= wpos;\n\
     y *= res.y;\n\
-    // uv.y += (1.-y)/2.;\n\
+    uv.y += (res.y-y)/2.;\n\
     \n\
-    float d = sdRoundBox(uv, rCorners, dim, wpos);     \n\
+    float d = sdRoundBox(uv, rCorners, dim, wpos, y);     \n\
     \n\
     \n\
     vec4 src = v_col;                                               \n\

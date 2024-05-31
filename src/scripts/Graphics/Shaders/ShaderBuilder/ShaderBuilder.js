@@ -201,14 +201,40 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       'void main(void) ',
       '{',
+      
+      
+      
+
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // TEMPORARY CODE FOR QUICK ROTATIONS IMPLEMENTATION
+      // `\
+      // // float t = u_time*2.1;\n\
+      // float t = .1;\n\
+      // // mat2 rot = mat2(cos(t),-sin(t), sin(t),cos(t));\n\
+      // // mat3 rot = mat3(cos(t), -sin(t), 0, sin(t),cos(t), 0, 0, 0, 1);\n\
+      // mat4 rot = mat4(  cos(t), -sin(t), 0., 0.,     sin(t), cos(t), 0., 0., 0.,    0, 0, 1.,      0., 0., 0., 1.);\n\
+      // vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);\n\
+      // vec4 p = vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);\n\
+      // gl_Position = u_projection * p * rot;\n\
+      // \n\
+      // `,
+
+
+
+
       (sid.unif & SID.UNIF.WPOS4) ? '  vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-         ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);' 
+      ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);' 
          : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
 
       // true ? 'vec4 p = a_wpos_time;' : '',
       // true ? 'gl_Position = vec4(a_pos.x, a_pos.y, 1., 1.0);' : '',
       // (sid.unif & SID.UNIF.COL4) ? '  v_col = a_col;' : '',
+
+
+
+
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // ASSIGNMENTS
@@ -243,6 +269,14 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
    in vec2 gl_PointCoord;
 
  */
+
+const temp_vertex_shader_rotate_z_function = `\
+void Rotate(float t)\n\
+\n\
+\n\
+\n\
+\n\
+`;
 
 export function Shaders_build_fragment_shader(sid, uniforms_info){
 
@@ -298,9 +332,9 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
             : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call  // ELSE If TEX2 and MSDF, build for msdf
          : frag_tex // ELSE If only TEX2, build for simple texture
       : '', // ELSE null
-      
-      
-      
+
+
+
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // Color fragment
       true ? '  frag_color = color;' : '',
@@ -309,7 +343,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // TESTS
-      (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
+      // (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
+      (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz;' : '',
 
       // true ? 'frag_color = vec4(1.);' : '',
       
