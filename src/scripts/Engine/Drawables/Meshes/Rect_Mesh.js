@@ -251,8 +251,8 @@ export class Rect extends Mesh {
 
    
    SetMargin() {
-      this.geom.dim[0] += this.StylesGetMargin(STYLES.AXIS.X);
-      this.geom.dim[1] += this.StylesGetMargin(STYLES.AXIS.Y);
+      // this.geom.dim[0] += this.StylesGetMargin(STYLES.AXIS.X);
+      // this.geom.dim[1] += this.StylesGetMargin(STYLES.AXIS.Y);
    }
 
 

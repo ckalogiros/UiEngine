@@ -1,7 +1,7 @@
 "use strict"
 
 import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps";
-import { Floor, Mix_vec4, Mult_arr4_scalar } from "../../../Helpers/Math/MathOperations";
+import { Floor, Mix_vec3, Mix_vec4, Mult_arr4_scalar } from "../../../Helpers/Math/MathOperations";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse";
 import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_slider_simple } from "../../Core/CreateWidget";
 import { Widget_root_set_in_focus } from "../../Core/MeshBuffer";
@@ -107,6 +107,7 @@ export class Widget_Color_Picker extends Section{
       panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       panel2.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       panel2.EnableGfxUniforms(SID.UNIF.TIME, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // panel2.StylesSetPad([20,20]);
       panel2.mat.col = [
          BLACK, BLACK, // v1-v2
          BLACK, BLACK, // v3-v4
@@ -215,6 +216,7 @@ export class Widget_Color_Picker extends Section{
       slider_tran.GfxUniformsEnable(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
       slider_tran.GfxUniformsEnable(SID.UNIF.TIME, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS)
       slider_tran.SetStyle(style);
+      slider_tran.StylesSetPad([20,20]);
 
       slider_tran.mat.col = [
          [0.3,0.3,0.3,.3],
@@ -612,9 +614,14 @@ export class Widget_Color_Picker extends Section{
       // TODO: We need to update only the top-right vertex color, NOT all vertices colors
       const percentagex = (xx / color_pick_mesh.geom.dim[0]/2); // Calc the percentage, x coord
       const percentagey = 1 - (y / color_pick_mesh.geom.dim[1]/2); // Calc the percentage, y coord
-      const hue = Mix_vec4( WHITE, c, percentagex );
-      const intensity = Mix_vec4( BLACK, hue, percentagey );
-      Gl_set_rgba(color_present_mesh.gfx, intensity, color_present_mesh.geom.num_faces); 
+      const hue = Mix_vec3( WHITE, c, percentagex );
+      const intensity = Mix_vec3( BLACK, hue, percentagey );
+
+      // Check if mesh has color per vertex, and get the alpha from any vertex 
+      const alpha = (Array.isArray(color_present_mesh.mat.col[0])) ? color_present_mesh.mat.col[0][3] : color_present_mesh.mat.col[3];
+      // Contruct the final color
+      const final_color = [intensity[0], intensity[1], intensity[2], alpha];
+      Gl_set_rgba(color_present_mesh.gfx, final_color, color_present_mesh.geom.num_faces); 
 
 
 
@@ -637,7 +644,7 @@ export class Widget_Color_Picker extends Section{
       widget.label_r.text_mesh.RenderTextFromNumber(c[0])
       widget.label_g.text_mesh.RenderTextFromNumber(c[1])
       widget.label_b.text_mesh.RenderTextFromNumber(c[2])
-      // widget.label_a.text_mesh.RenderTextFromNumber(c[3])
+      widget.label_a.text_mesh.RenderTextFromNumber(c[3])
 
    }
 
@@ -685,6 +692,14 @@ export class Widget_Color_Picker extends Section{
       // const hue = Mix_vec4( WHITE, c, percentagex );
       // const intensity = Mix_vec4( BLACK, hue, percentagey );
       // Gl_set_rgba(color_present_mesh.gfx, intensity, color_present_mesh.geom.num_faces); 
+
+      if(Array.isArray(color_present_mesh.mat.col[0])){
+
+         for(let i=0; i < color_present_mesh.mat.col.length; i++)
+            color_present_mesh.mat.col[i][alphaidx] = slider_val;
+      }
+      else  color_present_mesh.mat.col[alphaidx] = slider_val;
+      
       const vertex_idx = 0, vcount = 4;
       Gl_set_rgba_specify_attribute(color_present_mesh.gfx, slider_val, num_faces, vertex_idx, vcount, alphaidx)
       
@@ -695,7 +710,7 @@ export class Widget_Color_Picker extends Section{
       /*****************************************************************************************************/
       // Update the labels
 
-      // widget.label_a.text_mesh.RenderTextFromNumber(slider_val)
+      widget.label_a.text_mesh.RenderTextFromNumber(slider_val)
    }
 
 

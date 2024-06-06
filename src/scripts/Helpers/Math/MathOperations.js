@@ -325,3 +325,15 @@ export function Mix_vec4( vec1, vec2, ratio ) {
 
 	return res;
 }
+
+
+export function Mix_vec3( vec1, vec2, ratio ) {
+
+    const res = [
+        Lerp(vec1[0], vec2[0], ratio),
+        Lerp(vec1[1], vec2[1], ratio),
+        Lerp(vec1[2], vec2[2], ratio),
+    ];
+
+	return res;
+}

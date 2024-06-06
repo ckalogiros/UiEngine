@@ -1029,7 +1029,7 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
 
       const mesh = parent.children.buffer[i];
       const pad = mesh.StylesGetPad();
-      console.log('NNNN', mesh.GetName())
+      // console.log(mesh.GetName(), pad)
 
       let cur_align = 0x0
 
@@ -1061,10 +1061,10 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
          if (opt & SECTION.VERTICAL) {
             if ((parent.options & SECTION.FIXED_W)===0 && parent.max_size[0] < mesh.geom.dim[0])
                parent.max_size[0] = mesh.geom.dim[0]
-            if((parent.options & SECTION.FIXED_H)===0) parent.max_size[1] += mesh.geom.dim[1]
+            if((parent.options & SECTION.FIXED_H)===0) parent.max_size[1] += mesh.geom.dim[1] + pad[1];
          }
          else if (opt & SECTION.HORIZONTAL) {
-            if((parent.options & SECTION.FIXED_W)===0) parent.max_size[0] += mesh.geom.dim[0]
+            if((parent.options & SECTION.FIXED_W)===0) parent.max_size[0] += mesh.geom.dim[0] + pad[0];
             if ((parent.options & SECTION.FIXED_H)===0 && parent.max_size[1] < mesh.geom.dim[1]) parent.max_size[1] = mesh.geom.dim[1]
          }
 
@@ -1079,8 +1079,8 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
                parent.max_size[1] += mesh.GetTotalHeight();
             }
             else {
-               accum_size_per_section[1] += mesh.geom.dim[1];
-               parent.max_size[1] += mesh.geom.dim[1];
+               accum_size_per_section[1] += mesh.geom.dim[1] + pad[1];
+               parent.max_size[1] += mesh.geom.dim[1] + pad[1];
             }
 
             accum_size_per_section[0] = mesh.GetMaxWidth();
@@ -1100,66 +1100,36 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
       }
       else { // Case the current item is not a section either a text, accumulate its size
          
-                 
-         // if(mesh.temp_align & SECTION.HORIZONTAL){
-         //    // if((parent.options & SECTION.FIXED_W)===0 && parent.max_size[0] < mesh.geom.dim[0]) 
-         //    // if((parent.options & SECTION.FIXED_W)===0 && accum_size_per_section[0]+mesh.geom.dim[0] < parent.max_size[0]) 
-         //    // if((parent.options & SECTION.FIXED_W)===0 && parent.max_size[0]+mesh.geom.dim[0] > accum_size_per_section[0]) 
-         //    // if((parent.options & SECTION.FIXED_W)===0 && parent.max_size[0] < accum_size_per_section[0]+mesh.geom.dim[0]) 
-         //    console.log('00000000000000000000000000000000000000000', parent.max_size[0],  accum_size_per_section[0], children_max_size[0])
-         //    if((parent.options & SECTION.FIXED_W)===0 && parent.max_size[0] < accum_size_per_section[0]) 
-         //       parent.max_size[0] += mesh.geom.dim[0]
-         //    if ((parent.options & SECTION.FIXED_H)===0 && parent.max_size[1] < mesh.geom.dim[1]) 
-         //       parent.max_size[1] = mesh.geom.dim[1]
-
-         //    children_max_size[0] += mesh.geom.dim[0];
-         //    children_max_size[1] = 0;
-         // }
-         // else if(mesh.temp_align & SECTION.VERTICAL){
-         //    if ((parent.options & SECTION.FIXED_W)===0 && parent.max_size[0] < mesh.geom.dim[0])
-         //       parent.max_size[0] = mesh.geom.dim[0]
-         //    // if((parent.options & SECTION.FIXED_H)===0 ) 
-         //    if((parent.options & SECTION.FIXED_H)===0 && parent.max_size[1]+mesh.geom.dim[1] > accum_size_per_section[1]) 
-         //       parent.max_size[1] += mesh.geom.dim[1]
-
-         //    children_max_size[0] = 0;
-         //    children_max_size[1] += mesh.geom.dim[1];
-         // }  
          if(mesh.temp_align & SECTION.HORIZONTAL){
-            // console.log('00000000000000000000000000000000000000000', parent.max_size[0],  accum_size_per_section[0], child_accum_size[0])
-            console.log('00000000000000000000000000000000000000000', mesh.GetName(), parent.max_size[0],  child_accum_size[0])
             
             cur_align = SECTION.HORIZONTAL
-            child_accum_size[0] += mesh.geom.dim[0];
+            child_accum_size[0] += mesh.geom.dim[0] + pad[0];
             
-            if(prev_align === cur_align && parent.max_size[0] < child_accum_size[0]) {
+            if(parent.max_size[0] < child_accum_size[0]) {
                parent.max_size[0] = child_accum_size[0];
-               // console.log('00000000000000000000000000000000000000000', mesh.GetName(), parent.max_size[0],  child_accum_size[0])
             }
-            // if (prev_align !== cur_align && parent.max_size[1] < child_accum_size[1]) {
-            // if (prev_align !== cur_align) {
-            //    parent.max_size[1] += mesh.geom.dim[1];
-            //    child_accum_size[1] += mesh.geom.dim[1];
-            //    // parent.max_size[0] += mesh.geom.dim[0];
-            // }
-
+            
+            if(parent.max_size[1] < accum_size_per_section[1]) {
+               parent.max_size[1] = accum_size_per_section[1]
+            }
+                  
             prev_align = SECTION.HORIZONTAL
             child_accum_size[1] = 0;
          }
          else if(mesh.temp_align & SECTION.VERTICAL){
-
+               
             cur_align = SECTION.VERTICAL
-
-            // if (prev_align !== cur_align && parent.max_size[0] < child_accum_size[0]){
-            //    parent.max_size[0] = child_accum_size[0];
-            // }
-            if(prev_align === cur_align && parent.max_size[1] < child_accum_size[1]) {
-               parent.max_size[1] = child_accum_size[1];
-               // parent.max_size[1] += mesh.geom.dim[1]/2;
+            child_accum_size[0] = 0;
+            
+            accum_size_per_section[1] += mesh.geom.dim[1] + pad[1];
+            
+            if (prev_align !== cur_align){
+               child_accum_size[0] += mesh.geom.dim[0];
             }
 
+            parent.max_size[1] += mesh.geom.dim[1] + pad[1];
+
             prev_align = SECTION.VERTICAL;
-            // child_accum_size[0] = 0;
          }  
          else if (opt & SECTION.VERTICAL) {
 
@@ -1167,13 +1137,9 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
             accum_size_per_section[0] = mesh.geom.dim[0];
 
             if ((parent.options & SECTION.FIXED_H)===0) {
-               parent.max_size[1] += mesh.geom.dim[1];
+               parent.max_size[1] += mesh.geom.dim[1] + pad[1];
             }
             
-            if (parent.max_size[0] < accum_size_per_section[0])
-               parent.max_size[0] = mesh.geom.dim[0] ; // For horizontal, grow to the max width of all meshes
-
-
             if ((parent.options & SECTION.FIXED_W)===0 && parent.max_size[0] <= accum_size_per_section[0])
                parent.max_size[0] = mesh.geom.dim[0] ; // For horizontal, grow to the max width of all meshes
 
@@ -1214,7 +1180,6 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
 
 export function Calculate_positions_recursive(parent, options) {
 
-   const pad = [0, 0]
 
    const root = Widget_root_buffer_get_mesh_by_rootidx(parent.root_bufferidx);
    const pos = root.GetPosXYZ(); 
@@ -1231,6 +1196,7 @@ export function Calculate_positions_recursive(parent, options) {
    for (let i = 0; i <= parent.children.boundary; i++) {
       
       const mesh = parent.children.buffer[i];
+      const pad = mesh.StylesGetPad(); // TODO: Implement padding
       let continue_recur = true;
       let opt = options
       
@@ -1283,13 +1249,11 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
 
    
    const cur_pos = [
-      // curr[0] + parent.StylesGetMargin(STYLES.AXIS.X) + line_pos[0], 
       curr[0] + parent.StylesGetMargin(STYLES.AXIS.X), 
       curr[1] + parent.StylesGetMargin(STYLES.AXIS.Y),
    ];
 
    const start_posx = cur_pos[0];
-   // const start_posy = cur_pos[1];
    
    
    const target_idx = (target_child_idx != undefined) ? (target_child_idx >= 0) ? target_child_idx : 0 : 0;
@@ -1297,12 +1261,17 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
    for (let i = target_idx; i <= parent.children.boundary; i++) {
       
       const mesh = parent.children.buffer[i];
+      const pad = mesh.StylesGetPad();
       let continue_recur = true;
       let opt = options
 
+      console.log(mesh.GetName(), pad)
 
       if (options & SECTION.INHERIT) opt = parent.options
 
+
+      cur_pos[0]+=pad[0]; 
+      cur_pos[1]+=pad[1];
 
       const rel_pos = [cur_pos[0], cur_pos[1]];
       
@@ -1318,7 +1287,6 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
       }
       else if(mesh.type & MESH_TYPE.WIDGET_DROP_DOWN){
 
-         // mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
          mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
          continue_recur = false;
       }
@@ -1336,12 +1304,13 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
       }
       else{
 
-         // mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
          mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
 
          if(mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
          if(mesh.text_mesh) continue_recur = false;
       }
+
+      // cur_pos[1]-=pad[1];
 
 
       if(parent.rel_comp){
@@ -1353,6 +1322,8 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
          Calculate_positions_no_gfx_update_recursive(mesh, opt, cur_pos, _);
       }
 
+      cur_pos[0]-=pad[0]; 
+      cur_pos[1]-=pad[1];
 
       const next_mesh = parent.children.buffer[i+1]
 
