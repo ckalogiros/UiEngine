@@ -35,7 +35,6 @@ const NOTIFICATIONS_ON = true;
 
 
 
-let _meshId = 0;
 export class Mesh {
 
     /**
@@ -49,7 +48,7 @@ export class Mesh {
     type;       // BitField: All different class types of this mesh. 
     state;      // BitField: Mesh state. 
     event_flags;// Bitfield: Event flags
-    alignment;  // BitField: Control this mesh's children alignment.
+    // alignment;  // BitField: Control this mesh's children alignment.
     gfx_pool_request;     // BitField: 
 
 
@@ -88,7 +87,6 @@ export class Mesh {
 
     listeners;      // Buffer: Indexes to the EventListeners class.
     eventCallbacks; // Buffer: A buffer to store all callbacks, for any event enabled for the mesh.
-    timedEvents;    // Buffer: A buffer to set a one time event that is triggered by another event. E.x. When we need to set the mesh priority in the renderQueue and the mesh does not have a gfx yet. 
     timeIntervalsIdxBuffer; // Buffer: This buffer stores indexes of the timeIntervals this mesh is using.
 
     rel_comp; // A component to position this mesh's children relative to the position of one of 'LEFT-CENTER-RIGHT' and relative all other children's position
@@ -104,7 +102,12 @@ export class Mesh {
     nameidx; // Index to Str buffer:
 
 
+    temp_align;
+
+
     constructor(geom = null, mat = null) {
+
+        this.temp_align = 0x0;
 
         this.geom = geom;
         this.mat = mat;
@@ -124,8 +127,8 @@ export class Mesh {
         this.uniforms = [];
         if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
             this.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
-        
-        
+
+
         if (APP.ENABLE_SHADER_WPOS_UNIFORM)
             this.EnableGfxUniforms(SID.UNIF.WPOS4, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -135,7 +138,6 @@ export class Mesh {
         this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
         // this.state = { mask: 0x0 }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
-        this.alignment = 0x0;
         this.gfx_pool_request = GFX_POOL_REQUESTS.ANY;
 
 
@@ -161,12 +163,10 @@ export class Mesh {
         this.parent_event_idx = INT_NULL; // An index to the Listeners Buffer Struct. In many cases the parent event is not the mesh's parent, to avoid any annecessary listen events creation.
 
         this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
-        this.timedEvents = New_generic_buffer(_, 'Mesh timedEvents');
         this.children = New_generic_buffer(_, 'Mesh children');
         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE);
 
         this.rel_comp = null;
-
         this.root_posidx = INT_NULL;
 
 
@@ -180,7 +180,6 @@ export class Mesh {
             Clbk: null,
             idx: INT_NULL,
         };
-        this.minimized = null; // Pointer to store the minimized mesh version of 'this'. 
 
         // IMIDIATELY: the .data is used only 3 times by DebugInfoUi.js. Same with .evtidx field. So maybe those 2 are separated to the DebugInfoUi.js file
         this.debug_info = {
@@ -189,11 +188,6 @@ export class Mesh {
             evtidx: INT_NULL, // Stores the index of the events in the Info_Listeners buffer.
         };
 
-
-        /** Debug  properties */
-        if (DEBUG.MESH) {
-            Object.defineProperty(this, 'id', { value: _meshId++ });
-        }
     }
 
 
@@ -263,7 +257,7 @@ export class Mesh {
                 const ret = Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
             }
             else {
-                
+
                 // console.log('Destroy:', this.name, this.gfx.vb.groupidx, this.geom.num_faces)
                 const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
             }
@@ -293,11 +287,10 @@ export class Mesh {
 
         // Destroy Generic Buffers
         Free_generic_buffer(this.eventCallbacks);
-        Free_generic_buffer(this.timedEvents);
         Free_generic_buffer(this.children);
         Styles_destroy(this.styles);
 
-        if(this.type & MESH_TYPE.FONT_MATERIAL) Free_generic_char_buffer(this.mat.char_buffer)
+        if (this.type & MESH_TYPE.FONT_MATERIAL) Free_generic_char_buffer(this.mat.char_buffer)
 
 
 
@@ -334,22 +327,6 @@ export class Mesh {
             }
         }
     }
-
-
-
-    /*******************************************************************************************************************************************************/
-    // Graphics
-    /*******************************************************************************************************************************************************/
-
-
-
-
-
-
-
-    /*******************************************************************************************************************************************************/
-    // Mesh State.
-    /*******************************************************************************************************************************************************/
 
 
     StateCheck(bit) { return this.state.mask & bit; }
@@ -621,8 +598,9 @@ export class Mesh {
 
             case MESH_ENABLE.GFX.ATTR_STYLE: {
 
-                this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY;
+                this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
                 this.sid.pass |= SID.PASS.WPOS2 | SID.PASS.DIM2;
+                // this.sid.pass |= SID.PASS.WPOS2;
                 if (!(params === null || params === undefined)) {
                     this.mat.style = params.style;
                 }
@@ -631,6 +609,17 @@ export class Mesh {
             case MESH_ENABLE.GFX.ATTR_TIME: {
 
                 this.sid.attr |= SID.ATTR.TIME;
+                break;
+            }
+            case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
+
+                this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
+                break;
+            }
+            case MESH_ENABLE.GFX.ATTR_DIM2: {
+
+                this.sid.attr |= SID.ATTR.DIM2;
+                this.sid.pass |= SID.PASS.DIM2; // TODO: Do we set the passing of dim to fargment shader automaticaly????
                 break;
             }
 
@@ -691,24 +680,24 @@ export class Mesh {
     }
 
 
-    GfxUniformsSetClbk(unif_name, Clbk, clbk_params){
+    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
         // Find uniform
         const len = this.uniforms.length;
         let found_idx = INT_NULL;
         for (let i = 0; i < len; i++) {
-            if (this.uniforms[i].name === unif_name){
+            if (this.uniforms[i].name === unif_name) {
                 found_idx = i;
                 break;
             }
         }
 
-        if(found_idx !== INT_NULL){
+        if (found_idx !== INT_NULL) {
             // console.log('{}{}{}{} ubidx', this.uniforms[found_idx].ubidx, this.uniforms[found_idx].name, 'prog', this.gfx.prog.idx, 'vb', this.gfx.vb.groupidx)
 
             // HACK: We need different params for each vb group, but we only call once with one param. How to FIX???
-            if(unif_name === 'u_wposxy'){
-                
+            if (unif_name === 'u_wposxy') {
+
                 clbk_params = this.gfx.vb.groupidx;
             }
             Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);

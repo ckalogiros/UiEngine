@@ -29,8 +29,20 @@ export class Textured_Mesh extends Mesh {
 
 
 
+
+   
+
+   SetTypeDebug() {
+      this.type |= MESH_TYPE.DEBUG_MESH;
+   }
+
+
+
+
+   
    /*******************************************************************************************************************************************************/
    // Graphics
+   /*******************************************************************************************************************************************************/
 
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
@@ -44,7 +56,7 @@ export class Textured_Mesh extends Mesh {
    AddToGfx() { // TODO: Should be named 'AddToGfx' like Rect_Mesh and Text_Mesh
 
       // Get the starting index of the text in the vertex buffer.
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
       this.is_gfx_inserted = true;
 
 
@@ -64,7 +76,7 @@ export class Textured_Mesh extends Mesh {
 
    AddToGfxFromReset() {
 
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName());
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
       this.StateEnable(MESH_STATE.ACTIVE);
       this.is_gfx_inserted = true;
 
@@ -90,7 +102,10 @@ export class Textured_Mesh extends Mesh {
 
 
 
-   /********************************************************************************************************************************************************************** */
+
+   /*******************************************************************************************************************************************************/
+   // Listeners
+   /*******************************************************************************************************************************************************/
    // TODO: The: ConstructListeners(), OnClick() and OnMove(), belong to a widget rather than a _Mesh. Neither Text_Mesh or Rect_Mesh have these functions. Maybe create the apropriate widget for the Textured_mesh too.
    // SEE ### Construct Listeners
 
@@ -217,15 +232,14 @@ export class Textured_Mesh extends Mesh {
    }
 
 
-   SetTypeDebug() {
-      this.type |= MESH_TYPE.DEBUG_MESH;
-   }
 
 
 
-   /*******************************************************************************************************************************************************/
-   // Alignment
 
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // UNIQUE METHODS
+   /****************************************************************************************************************************************************/
 }
 
 

@@ -119,12 +119,12 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags) 
 
 
 
-export function Gfx_pool_find_ib_notActive(PATTERN) {
+export function Gfx_pool_find_ib_notActive(shad) {
 
    const ib_buffer = Index_buffer_info_get();
    for (let i = 0; i <= ib_buffer.boundary; i++) {
 
-      if(ib_buffer.buffer[i].temp_pattern & PATTERN){
+      if(shad === ib_buffer.buffer[i].sid.shad){
 
          ib_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
          return i;

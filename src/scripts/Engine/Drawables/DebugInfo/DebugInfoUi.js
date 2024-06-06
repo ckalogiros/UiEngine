@@ -2,7 +2,7 @@
 
 import { Dropdown_roots_set_root, TEMP_DP_STEAL_THE_DP_RECALC } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
-import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
+// import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
 import { Create_widget_dropdown, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_mesh_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_buffer_get_count, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals.js";
@@ -14,10 +14,11 @@ import { Clipy_one_mesh } from "../Operations/Clip.js";
 import { VBI_get_byidx, Vertex_buffer_get_Active_count, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_count, Vertex_buffer_group_get_size } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Str_buffer_get_count, Str_buffer_get_size, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_get_count, Str_buffer_mesh_names_get_size } from "../../Core/StringBuffer.js";
 import { GetRandomColor } from "../../../Helpers/Helpers.js";
-import { Get_generic_buffers_container_get_total_allocations, New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
+import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Renderqueue_active_get_count, Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
 import { Mesh_unif_col_get_count, Mesh_unif_col_get_size, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_wpos_get_count, Mesh_unif_wpos_get_size } from "../../Core/MeshUniformsBuffer.js";
 import { Listeners_click_get_count, Listeners_hover_get_count } from "../../Events/EventListeners.js";
+import { Info_listener_create_event } from "./InfoListeners.js";
 
 
 
@@ -51,7 +52,7 @@ export function Debug_info_ui(is_root_widget = undefined) {
    const switch_col2 = TRANSPARENCY(BLUEL[5], .9);
 
    // const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [VIEWPORT.RIGHT-280, 30, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
-   const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [0, 0, 0], TRANSPARENCY(GREY[0], .1), GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
+   const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [600, 0, 0], TRANSPARENCY(GREY[0], .1), GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
@@ -940,7 +941,7 @@ function Debug_info_create_ui_mouse() {
 
       const section = Mesh_buffer_get_mesh_byidx(DEBUG_INFO.UI_MOUSE.MESH_BUFFER_IDX);
 
-      Info_listener_remove_event(section.debug_info.evtidx);
+      // Info_listener_remove_event(section.debug_info.evtidx);
 
       const pos = Mesh_unif_get_vb_root_wpos(section.root_posidx);
       DEBUG_INFO.UI_MOUSE.POS = [pos[0], pos[1], section.geom.pos[2]]; // Remember the info's position.
@@ -1188,7 +1189,7 @@ function Debug_info_mesh_update(params) {
 
       if (!root_info_dp.menu.gfx) { // GFX must exist.
 
-         console.error('Menu is OFF:', root_info_dp.id, ' added_mesh_gfx', added_mesh_gfx)
+         console.error('Menu is OFF:', root_info_dp.mesh_bufferidx, ' added_mesh_gfx', added_mesh_gfx)
          return;
       }
 

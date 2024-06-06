@@ -97,8 +97,8 @@ export function Input_create_user_input_listeners() {
 
   }
 
-  canvas.addEventListener('mousedown', OnMouseDown, false);
-  canvas.addEventListener('mouseup', OnMouseUp, false);
+  window.addEventListener('mousedown', OnMouseDown, false);
+  window.addEventListener('mouseup', OnMouseUp, false);
   window.addEventListener("resize", OnWindowResize, false);
 
   // Disabling the context menu on long taps on Android. 
@@ -145,9 +145,6 @@ export function Device_set_up() {
 
   VIEWPORT.MARGIN.LEFT = (window.innerWidth - VIEWPORT.WIDTH) / 2;
   VIEWPORT.MARGIN.TOP = (window.innerHeight - VIEWPORT.HEIGHT) / 2
-  // VIEWPORT.MARGIN.LEFT = (window.outerWidth - (window.innerWidth - VIEWPORT.WIDTH))/2;
-  // VIEWPORT.MARGIN.LEFT = ((window.innerWidth - VIEWPORT.WIDTH));
-  // VIEWPORT.MARGIN.TOP = (window.innerHeight - VIEWPORT.HEIGHT)
 
   POSITION_CENTER[0] = VIEWPORT.WIDTH / 2;
   POSITION_CENTER[1] = VIEWPORT.HEIGHT / 2;

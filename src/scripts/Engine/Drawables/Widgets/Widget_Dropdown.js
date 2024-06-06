@@ -69,7 +69,7 @@ function Dropdown_roots_destroy_byidx(rootidx, caller_mesh_bufferidx) {
 /**Debug-Print */
 export function Dropdown_roots_print_root_buffer() {
    for (let i = 0; i <= _root_dropdown.boundary; i++) {
-      console.log('id:', _root_dropdown.buffer[i].id, ' name:', _root_dropdown.buffer[i].GetName(), ' pos:', _root_dropdown.buffer[i].geom.pos);
+      console.log('id:', _root_dropdown.buffer[i].mesh_bufferidx, ' name:', _root_dropdown.buffer[i].GetName(), ' pos:', _root_dropdown.buffer[i].geom.pos);
    }
 }
 
@@ -113,7 +113,7 @@ export class Widget_Dropdown extends Section {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col_menu = PURPLER[7], text_col = WHITE, btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, style = [2, 5, 2], margin = [10, 10], is_debug_mesh) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, margin, pos, [10, 10], col1, null, style, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, margin, pos, [10, 10], col1, _, style, _, is_debug_mesh);
 
       // NOTE: The mesh_bufferidx and the root_bufferidx as the root creation, happen in the Section from super(). 
 
@@ -131,15 +131,6 @@ export class Widget_Dropdown extends Section {
       this.menu.parent = this;
       AddArr2(this.menu.total_margin, this.menu.StylesGetMargin());
       AddArr2(this.menu.total_margin, this.StylesGetMargin());
-      { // Multi color vertex
-         // this.menu.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-         // this.menu.mat.col = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
-         // this.menu.mat.defCol = [WHITE, REDL[7], GREEN[7], BLUEL[7]];
-         // this.menu.mat.col[1][3] = .5;
-         // this.menu.mat.col[1][7] = .5;
-         // this.menu.mat.col[1][11] = .5;
-         // this.menu.mat.col[1][15] = .6;
-      }
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
 
       this.dp_symbols = ['+', '-'];
@@ -160,6 +151,100 @@ export class Widget_Dropdown extends Section {
 
    }
 
+
+
+
+   
+
+    Activate() {
+
+      this.state.mask |= MESH_STATE.ACTIVE;
+      this.children.buffer[0].Activate(); // Button
+      if(this.isOn & DP_MENU_STATE.ON){
+         this.menu.Activate(); // Button
+      }
+   }
+
+
+   Deactivate() {
+
+      this.state.mask &= ~MESH_STATE.ACTIVE;
+      this.children.buffer[0].Deactivate(); // Button
+      if(this.isOn & DP_MENU_STATE.ON){
+         this.menu.Deactivate(); // Button
+      }
+   }
+
+
+   StateEnable(MASK = 0x0) {
+
+      this.state.mask |= MASK;
+      this.children.buffer[0].StateEnable(MASK); // Button
+      if (this.isOn & DP_MENU_STATE.ON) {
+         this.menu.StateEnable(MASK); // Active Menu
+      }
+   }
+
+
+   StateDisable(MASK = 0x0) {
+
+      this.state.mask &= ~MASK;
+      this.children.buffer[0].StateDisable(MASK); // Button
+      if (this.isOn & DP_MENU_STATE.ON) {
+         this.menu.StateDisable(MASK); // Active Menu
+      }
+   }
+
+
+   SetTypeDebug() {
+
+      this.type |= MESH_TYPE.DEBUG_MESH;
+
+      this.children.buffer[0].SetTypeDebug();
+
+      this.menu.type |= MESH_TYPE.DEBUG_MESH;
+   }
+
+
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // INHERITED METHODS
+   /****************************************************************************************************************************************************/
+
+
+   Destroy() {
+
+      const btn = this.children.buffer[0];
+      btn.Destroy();
+
+      this.menu.Destroy();
+
+      Dropdown_roots_destroy_byidx(this.rootidx);
+
+      return super.Destroy();
+
+   }
+   
+   
+   AddToWidgetRootBuffer(root_bufferidx) {
+      
+      this.root_bufferidx = root_bufferidx;
+      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      
+      const btn = this.children.buffer[0];
+      btn.AddToWidgetRootBuffer(root_bufferidx);
+      
+      this.menu.AddToWidgetRootBuffer(root_bufferidx);
+   }
+   
+
+   SetGfxEnableAttributes(which, params) {
+      alert('777\nSetGfxEnableAttributes\nWidgetDropdown')
+   }
 
    AddToMenu(mesh) {
 
@@ -205,57 +290,6 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   AddToWidgetRootBuffer(root_bufferidx) {
-
-      this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
-
-      const btn = this.children.buffer[0];
-      btn.AddToWidgetRootBuffer(root_bufferidx);
-
-      this.menu.AddToWidgetRootBuffer(root_bufferidx);
-   }
-
-
-   Activate() {
-
-      this.state.mask |= MESH_STATE.ACTIVE;
-      this.children.buffer[0].Activate(); // Button
-      if(this.isOn & DP_MENU_STATE.ON){
-         this.menu.Activate(); // Button
-      }
-   }
-
-
-   Deactivate() {
-
-      this.state.mask &= ~MESH_STATE.ACTIVE;
-      this.children.buffer[0].Deactivate(); // Button
-      if(this.isOn & DP_MENU_STATE.ON){
-         this.menu.Deactivate(); // Button
-      }
-   }
-
-
-   StateEnable(MASK = 0x0) {
-
-      this.state.mask |= MASK;
-      this.children.buffer[0].StateEnable(MASK); // Button
-      if (this.isOn & DP_MENU_STATE.ON) {
-         this.menu.StateEnable(MASK); // Active Menu
-      }
-   }
-
-
-   StateDisable(MASK = 0x0) {
-
-      this.state.mask &= ~MASK;
-      this.children.buffer[0].StateDisable(MASK); // Button
-      if (this.isOn & DP_MENU_STATE.ON) {
-         this.menu.StateDisable(MASK); // Active Menu
-      }
-   }
-
 
    OptionsEnable(MASK=0x0){
 
@@ -269,17 +303,9 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   SetTypeDebug() {
-
-      this.type |= MESH_TYPE.DEBUG_MESH;
-
-      this.children.buffer[0].SetTypeDebug();
-
-      this.menu.type |= MESH_TYPE.DEBUG_MESH;
-   }
 
 
-
+   
    /*******************************************************************************************************************************************************/
    // Graphics
    /*******************************************************************************************************************************************************/
@@ -329,40 +355,12 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   Destroy() {
-
-      const btn = this.children.buffer[0];
-      btn.Destroy();
-
-      this.menu.Destroy();
-
-      Dropdown_roots_destroy_byidx(this.rootidx);
-
-      return super.Destroy();
-
-   }
 
 
 
 
    /*******************************************************************************************************************************************************/
-   // State
-   /*******************************************************************************************************************************************************/
-
-   StateEnable(bit) {
-      this.state.mask |= bit;
-      const btn = this.children.buffer[0];
-      btn.StateEnable(bit & MESH_STATE.ACTIVE); // POTENTIAL_BUG: The button state should only inherit 'ACTIVE' and not any 'MOVABLE' etc 
-
-      if(this.isOn & DP_MENU_STATE.ON){
-         this.menu.StateEnable(bit)
-      }
-   }
-
-
-
-   /*******************************************************************************************************************************************************/
-   // Events Listeners
+   // Listeners
    /*******************************************************************************************************************************************************/
 
    ConstructListeners(parent_listeners = null) {
@@ -466,7 +464,6 @@ export class Widget_Dropdown extends Section {
    }
 
 
-
    ConstructListenersForMenu(dp_menu) { // Handle the dropdown's menu listen events creation. (if any of the items has listen events)
 
       const menu = dp_menu;
@@ -504,6 +501,72 @@ export class Widget_Dropdown extends Section {
             item.ConstructListeners([menu.listeners.buffer[0], menu.listeners.buffer[1]]);
          }
       }
+   }
+   
+
+   // SEE: ## OnClick()
+   OnClick(params) {
+
+      const dp = params.evt_params.drop_down;
+
+      /*DEBUG*/if (!params.evt_params) { console.error('Target_params.params is null, in a OnClick() event. evt_params:', params.evt_params); return; }
+      /*DEBUG*/if (dp.rootidx === INT_NULL) { alert('Root for dropdown must be set. ', dp.GetName()); return; }
+
+      const btn = dp.children.buffer[0];
+      Dropdown_roots_get_root_by_idx(dp.rootidx);
+
+      if (dp.isOn & DP_MENU_STATE.OFF) { // Case: Activate Menu 
+
+         dp.DpActivateMenu();
+
+         btn.text_mesh.UpdateTextCharacter(dp.dp_symbols[1], 0); // Update the symbol text.
+         dp.isOn = DP_MENU_STATE.ON;
+
+      }
+      else {  // Case: Deactivete Menu 
+
+         btn.text_mesh.UpdateTextCharacter(dp.dp_symbols[0], 0);
+
+         /* Need to update the symbol of the text(not only the gfx buffers), 
+            because when the btn will be activated it will be re-inserted in the gfx buffers 
+            and it will use the text_mesh's  string (wich is currently the '-' synmbol). */
+         btn.text_mesh.SliceText(0, 1);
+         btn.text_mesh.SetTextAtIndex(dp.dp_symbols[1], 0);
+
+         dp.DpDeactivateMenu();
+
+         dp.isOn |= DP_MENU_STATE.OFF;
+      }
+
+      STATE.mesh.SetClicked(btn);
+
+      return true;
+   }
+
+
+   // SEE ### OnMove Events Implementation Logic
+   OnMove(params) {
+
+      /** The function is called by the timeInterval.
+       *  The timeInterval has been set by the 'OnClick' event.
+       */
+
+      const mesh = params.params;
+
+      // Destroy the time interval calling this function if the mesh is not grabed.
+      if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+
+         const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+         TimeIntervalsDestroyByIdx(intervalIdx);
+         mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+
+         return;
+      }
+
+      // Move the mesh
+      const mouse_pos = MouseGetPosDif();
+      mesh.Move(mouse_pos.x, -mouse_pos.y);
+
    }
 
 
@@ -810,71 +873,6 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   // SEE: ## OnClick()
-   OnClick(params) {
-
-      const dp = params.evt_params.drop_down;
-
-      /*DEBUG*/if (!params.evt_params) { console.error('Target_params.params is null, in a OnClick() event. evt_params:', params.evt_params); return; }
-      /*DEBUG*/if (dp.rootidx === INT_NULL) { alert('Root for dropdown must be set. ', dp.GetName()); return; }
-
-      const btn = dp.children.buffer[0];
-      Dropdown_roots_get_root_by_idx(dp.rootidx);
-
-      if (dp.isOn & DP_MENU_STATE.OFF) { // Case: Activate Menu 
-
-         dp.DpActivateMenu();
-
-         btn.text_mesh.UpdateTextCharacter(dp.dp_symbols[1], 0); // Update the symbol text.
-         dp.isOn = DP_MENU_STATE.ON;
-
-      }
-      else {  // Case: Deactivete Menu 
-
-         btn.text_mesh.UpdateTextCharacter(dp.dp_symbols[0], 0);
-
-         /* Need to update the symbol of the text(not only the gfx buffers), 
-            because when the btn will be activated it will be re-inserted in the gfx buffers 
-            and it will use the text_mesh's  string (wich is currently the '-' synmbol). */
-         btn.text_mesh.SliceText(0, 1);
-         btn.text_mesh.SetTextAtIndex(dp.dp_symbols[1], 0);
-
-         dp.DpDeactivateMenu();
-
-         dp.isOn |= DP_MENU_STATE.OFF;
-      }
-
-      STATE.mesh.SetClicked(btn);
-
-      return true;
-   }
-
-
-   // SEE ### OnMove Events Implementation Logic
-   OnMove(params) {
-
-      /** The function is called by the timeInterval.
-       *  The timeInterval has been set by the 'OnClick' event.
-       */
-
-      const mesh = params.params;
-
-      // Destroy the time interval calling this function if the mesh is not grabed.
-      if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
-
-         const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-         TimeIntervalsDestroyByIdx(intervalIdx);
-         mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
-
-         return;
-      }
-
-      // Move the mesh
-      const mouse_pos = MouseGetPosDif();
-      mesh.Move(mouse_pos.x, -mouse_pos.y);
-
-   }
-
 
 
 
@@ -990,6 +988,15 @@ export class Widget_Dropdown extends Section {
       btn.text_mesh.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
    }
 
+
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // UNIQUE METHODS
+   /****************************************************************************************************************************************************/
 
 }
 /**SAVE: Try to clac the size of the activated dp, and update all the parents up the tree */

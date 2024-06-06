@@ -70,10 +70,12 @@ export function Gl_draw(gl) {
             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
         }
         
+
+        // IMPORTANT: HERE!: Why check every frame and not update the vb AND ib at the location of the buffer data update??????
         if(vb_group.needs_any_update)
         {
             for(let j=0; j <= vb_group.vb_idxs.boundary; j++){
-                
+                        
                 const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[j]);
                 if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
                     
@@ -93,19 +95,31 @@ export function Gl_draw(gl) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_info.ibo);
         if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) 
         {
-            const ib = Index_buffer_get_by_ibidx(ib_info.ibidx);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib, gl.STATIC_DRAW, 0);
+            const ib_data = Index_buffer_get_by_ibidx(ib_info.ibidx);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib_data, gl.STATIC_DRAW, 0);
             ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
             GL.BOUND_IBO = ib_info.ibo;
             GL.BOUND_IBIDX = ib_info.ibidx;
         }
+
+
+        /** The last param is the instance count.
+         * That means: draw from the vertex buffer of the instanced geometry,
+         * If instance count is 1, draw the first instanced geometry attributes. 
+         * If instance count is 2, draw the first instanced geometry attributes for the first instance and the second for the second. etc
+         * So in order to use more than one meshe's attributes from any instanced buffer, the instance count is responsible 
+         */
         
+        // gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
         // gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, 1)
         // gl.drawElementsInstanced(gl.LINES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
         // gl.drawElementsInstanced(gl.POINTS, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
-        gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
         // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, 4)
         // gl.drawElements(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0);
+        
+        gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
+        // if(i === 0) gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 5)
+        // else gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
 
     }
 

@@ -40,7 +40,7 @@ export function Mult_arr4_scalar(arr, scalar){
     arr[1] *=  scalar;
     arr[2] *=  scalar;
     arr[3] *=  scalar;
-
+    return arr;
 }
 export function Mult_mat4_scalar2(mat, scalar){
     return[
@@ -311,4 +311,17 @@ export function Smootherstep( x, min, max ) {
 	x = ( x - min ) / ( max - min );
 
 	return x * x * x * ( x * ( x * 6 - 15 ) + 10 );
+}
+
+
+export function Mix_vec4( vec1, vec2, ratio ) {
+
+    const res = [
+        Lerp(vec1[0], vec2[0], ratio),
+        Lerp(vec1[1], vec2[1], ratio),
+        Lerp(vec1[2], vec2[2], ratio),
+        Lerp(vec1[3], vec2[3], ratio),
+    ];
+
+	return res;
 }

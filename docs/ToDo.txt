@@ -25,10 +25,19 @@
 -New fonts
 -New UI images in the font texture map(close btn, minimize, etc)
 
+-Lines, Connect widgets with Lines
+-Selection tool
+
+-Draw 
+
 -Animation Shaders (per vertex, for grass...)
 -Create components for col, pos, etc,
   -Saved to a color buffer, get the colors as refferences
   -Create classes for Arr4, Arr3, Mat4(for per vertex color), to handle the Set,Copy correctly:E.x. Set the alpha for a per vertex color Mat4, needs to copy the alpha to all collumns of index [3]
+--------------------------------------------------- Milestones!
+- Create color Widget
+- Create pop up messages. On a temp generic use buffer
+- Fix the menu widget options dp
 --------------------------------------------------- Milestones!
 
 
@@ -82,7 +91,6 @@ so that each vertex the index gets to the next color attribute(R->G->B ....)
 . Implement set render queue priority for meshes inside a vb.
 . Renderqueue
 . Listeners. When section has hover, children are not set as child events
-. Minimizer. Does not move children when minimized.
 . On collapsing an inner dropdown, the listeners are still there.
 --------------------------------------------------- CHECK!
 

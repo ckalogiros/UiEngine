@@ -32,7 +32,8 @@ export class Material {
    constructor(col = [1, 1, 1, 1]) {
 
       this.sid = {
-         shad: 0,
+         // shad:  SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
+         shad:  SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          attr: SID.ATTR.COL4,
          // inst: SID.ATTR.COL4,
          inst: 0x0,
@@ -98,18 +99,20 @@ export class FontMaterial extends Material {
 
       super(col, texidx);
 
+      
       const len = text.length;
       this.char_buffer = New_generic_char_buffer(_, `Material - ${text}`);
       this.char_buffer.Init(len, text);
-
+      
       this.temp_max_chars_inserted_in_gfx = 0;
-
-
+      
+      
       this.text = text;
       this.sdf_params = [0, 0];
       math.CopyArr2(this.sdf_params, sdf_params);
       this.texidx = texidx;
-
+      
+      this.sid.shad &= ~SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X
       this.sid.shad |= SID.SHAD.PRE_MULTIPLIED_ALPHA; // E
       this.sid.attr |= SID.ATTR.TEX2 | SID.ATTR.MSDF; // 
       this.type |= MESH_TYPE.FONT_MATERIAL;

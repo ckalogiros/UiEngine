@@ -5,7 +5,7 @@ import { MouseGetPos } from "../Controls/Input/Mouse.js";
 import { Free_generic_buffer, New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
-import { Info_listener_create_event } from "../Drawables/DebugInfo/InfoListeners.js";
+// import { Info_listener_create_event } from "../Drawables/DebugInfo/InfoListeners.js";
 import { GREY } from "../Drawables/Material/Base/Colors.js";
 import { Mesh_buffer_get_mesh_bounding_box, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_name_byidx } from "../Core/MeshBuffer.js";
 import { Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
@@ -548,6 +548,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                   evt_params: event.evt_params,
                   trigger_params: trigger_params,
                   event_type: TYPE_IDX,
+                  click_pos: point,
                }
 
                if (event.Clbk) {
@@ -570,6 +571,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                evt_params: event.evt_params,
                trigger_params: trigger_params,
                event_type: TYPE_IDX,
+               click_pos: point,
             }
 
             Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
@@ -614,6 +616,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                      evt_params: e.evt_params,
                      trigger_params: trigger_params,
                      event_type: TYPE_IDX,
+                     click_pos: point,
                   }
 
                   if (e.Clbk) {
@@ -637,6 +640,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                   evt_params: event.evt_params,
                   trigger_params: trigger_params,
                   event_type: TYPE_IDX,
+                  click_pos: point,
                }
 
                Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
@@ -909,7 +913,7 @@ export function Listeners_debug_info_create(scene) {
    dropdown.Render();
    dropdown.ConstructListeners();
 
-   Info_listener_create_event(INFO_LISTEN_EVENT_TYPE.LISTENERS, Listeners_debug_info_update, dropdown, null);
+   // Info_listener_create_event(INFO_LISTEN_EVENT_TYPE.LISTENERS, Listeners_debug_info_update, dropdown, null);
 }
 
 

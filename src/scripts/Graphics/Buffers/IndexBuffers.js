@@ -124,7 +124,7 @@ export function Index_buffer_state_disable(ibidx, STATE_FLAG) {
 
 class Index_Buffer_Info {
 
-   constructor(size, sid, ibidx, ibo, type, PATTERN) {
+   constructor(size, sid, ibidx, ibo, type) {
 
       this.size = size;
       this.count = 0;
@@ -138,7 +138,16 @@ class Index_Buffer_Info {
       this.state = { mask: 0x0 }; // Gather the state of the vertex buffer info into a bit field
       this.sid = sid;             // Bit field: Shader ID
 
-      this.temp_pattern = PATTERN; // Temporary identification of the this index buffer pattern type.
+      // this.temp_pattern = PATTERN; // Temporary identification of the this index buffer pattern type.
+
+      this.discontinue_offset = 0; // An offset where the break of the indices happen. Used for connected vertices
+      if(sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_4) this.discontinue_offset = 4; // Break vertex connection every 4 vertices, for a type of geometry with 4 vertices per face
+      else if(sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_6) this.discontinue_offset = 6; // Break vertex connection every 4 vertices, for a type of geometry with 6 vertices per face
+      
+      this.connect_offset = 0; // An offset of the vertex index at which the next face will be connected to
+      if(sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) this.connect_offset = 2; // Connect to the second previous index 
+
+      console.log('##### INDEX BUFFER:', ibidx, 'connect_offset:', this.connect_offset)
 
       this.indices_per_face = INDICES_PER_RECT; // HACK: In the future this must be set acording to vertex buffer architecture (???????)
 
@@ -147,18 +156,13 @@ class Index_Buffer_Info {
 
    Add(num_faces) {
 
-      const offset = VERTS_PER_RECT_INDEXED;
-
       const data = _index_buffers.buffer[this.ibidx];
 
-      if ((this.vCount % 1) !== 0)
-         console.error('index buffer count mismatch')
+      if ((this.vCount % 1) !== 0) console.error('index buffer count mismatch')
 
       let k = this.vCount;
       for (let i = 0; i < num_faces; ++i) {
-         // if(k-2 > 0) 
-         //    k-=2;
-
+         
          for (let j = 0; j < 2; j++) {
 
             data[this.count++] = k + j;
@@ -166,46 +170,22 @@ class Index_Buffer_Info {
             data[this.count++] = k + j + 2;
          }
 
-         k += offset;
-         this.vCount += offset;
+         k += this.discontinue_offset;
+         this.vCount += this.discontinue_offset;
+
+         k-=this.connect_offset;
+         this.vCount -= this.connect_offset;
       }
-      if ((this.vCount % 1) !== 0)
-         console.error('index buffer count mismatch')
+      
+      k+=this.connect_offset;
+      this.vCount += this.connect_offset;
+      
+
+      if ((this.vCount % 1) !== 0) console.error('index buffer count mismatch')
 
       this.state.mask |= BUFFER_STATE.NEEDS_UPDATE; // Make sure that we update GL bufferData 
 
    }
-
-
-   // Add(num_faces) {
-
-   //    const offset = VERTS_PER_RECT_INDEXED;
-
-   //    const data = _index_buffers.buffer[this.ibidx];
-
-   //    if ((this.vCount % 1) !== 0)
-   //       console.error('index buffer count mismatch')
-
-   //    let k = this.vCount;
-   //    for (let i = 0; i < num_faces; ++i) {
-
-   //       for (let j = 0; j < 2; j++) {
-
-   //          data[this.count++] = k + j;
-   //          data[this.count++] = k + j + 1;
-   //          data[this.count++] = k + j + 2;
-   //       }
-
-   //       k += offset;
-   //       this.vCount += offset;
-   //    }
-   //    if ((this.vCount % 1) !== 0)
-   //       console.error('index buffer count mismatch')
-
-   //    this.state.mask |= BUFFER_STATE.NEEDS_UPDATE; // Make sure that we update GL bufferData 
-
-   // }
-
 
 
    Realloc(extra_size = 0) {
@@ -261,8 +241,8 @@ export function Index_buffer_info_get_indices_per_face(ibidx) {
 
 
 
-export function Index_buffer_info_create(sid = 0, size = 6, PATTERN=INT_NULL) {
-   /**ERROR */ if(PATTERN===INT_NULL) alert('PATTERN should be passed as param from caller')
+
+export function Index_buffer_info_create(sid = 0, size = 6) {
 
    /***********************************************************************************************/
    // Create index buffer
@@ -271,7 +251,7 @@ export function Index_buffer_info_create(sid = 0, size = 6, PATTERN=INT_NULL) {
 
    const ret = Index_buffer_create(type, size, sid);
 
-   const ib_info = new Index_Buffer_Info(size, sid, ret.ibidx, ret.ibo, type, PATTERN);
+   const ib_info = new Index_Buffer_Info(size, sid, ret.ibidx, ret.ibo, type);
 
    _index_buffers_info.Add(ib_info);
 
@@ -291,20 +271,8 @@ function Index_buffer_add_indices(ibidx, num_faces) {
 
    const ib_info = _index_buffers_info.buffer[ibidx];  
 
-   // Check for buffer realloc
-   if (ib_info.count + num_faces * INDICES_PER_RECT > ib_info.size) {
-      ib_info.Realloc();
-   }
-
-   // const start = ib_info.count;
-   // ib_info.start = start;
    ib_info.Add(num_faces)
-   ib_info.count = ib_info.count;
-
-
    ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-
-   // return start;
 }
 
 
@@ -316,17 +284,31 @@ export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, nu
    const total_draw_count = draw_count + (num_faces_to_insert * ib_info.indices_per_face);
 
    
-   if(total_draw_count >= ib_info.count){
+   if(total_draw_count > ib_info.count){
 
       // Check for buffer realloc
       if (total_draw_count > ib_info.size) {
          ib_info.Realloc();
       }
 
-      Index_buffer_add_indices(ibidx, (num_faces_to_insert * ib_info.indices_per_face));
+      Index_buffer_add_indices(ibidx, num_faces_to_insert);
+
+      ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+      // ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+      // console.log('iskjds')
    }
 }
 
+
+export function Index_buffer_reset(ibidx){
+   
+   const ib_info = _index_buffers_info.buffer[ibidx];
+
+   ib_info.count = 0;
+   ib_info.vCount = 0;
+   
+
+}
 
 
 

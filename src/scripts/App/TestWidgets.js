@@ -15,7 +15,7 @@ import { Debug_info_ui } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Widget_Scroller } from '../Engine/Drawables/Widgets/WidgetScroller.js';
 import { GetRandomColor, GetSequencedColor } from '../Helpers/Helpers.js';
 import { Textured_Mesh } from '../Engine/Drawables/Meshes/Textured_Mesh.js';
-import { Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
+import { Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 import { Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
 import { BLACK, BLUEL, BLUER, BLUE_10_120_220, GREEN, GREY, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
@@ -202,6 +202,13 @@ function TEMP_SET_U_TIME(){
 
 
 
+function TEMP_GET_MESH_DIM_FOR_UNIFORM_UPDATE(dim){
+    return dim;
+}
+
+
+
+
 
 
 export function TestWidgetsGeneric(scene) {
@@ -237,7 +244,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
+    const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
     // UserCreateRect()
 
     // uidbg.RotateZ(5.5);
@@ -263,7 +270,7 @@ export function TestWidgetsGeneric(scene) {
 
 
     // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
-    const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
+    // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
     // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0)
     // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.X, line, .5, -5., 5., 0)
     // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.Y, line, .5, -5., 5., 0)
@@ -332,7 +339,12 @@ export function TestWidgetsGeneric(scene) {
 
     // SectionResizable()
 
+    // CreateColorPicker(SID.ATTR.WPOS_TIME4|SID.ATTR.DIM2)
+    // CreateColorPicker(SID.ATTR.DIM2)
     CreateColorPicker()
+
+    // CreateSliderSimple();
+    // CreateSlider();
 
     // Test_widgets(ypos);
 
@@ -783,18 +795,42 @@ function CreateSwitch() {
     return switch1;
 }
 
-function CreateSlider() {
+function CreateSliderSimple() {
 
-    const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 300, 0], [150, 10]);
+    const slider = Create_widget_slider_simple(ROOT_WIDGETS.CREATE_ROOT, [200, 500, 0], [150, 2]);
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-    // slider.CreateSliderHandleEvent();
+    // slider.CreateSlierHandleEvent();
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
     slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     slider.Render();
+    slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
     slider.ConstructListeners();
 
+
+}
+
+function CreateSlider() {
+
+    const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 450, 0], [250, 10]);
+    slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    // slider.CreateSlierHandleEvent();
+    slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+
+    slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+
+    // const pad = 5
+    // const bar = slider.children.buffer[1];
+    // bar.geom.pos[0] += slider.GetPosX() + slider.geom.dim[0]*2 - bar.geom.dim[0]*2;
+    // bar.geom.pos[1] += slider.GetPosY() + slider.geom.dim[1]*2 - bar.geom.dim[1]*2 - pad;
+    // const handle = bar.children.buffer[0];
+    // handle.geom.pos[0] = bar.geom.pos[0];
+    // handle.geom.pos[1] = bar.geom.pos[1];
+
+    slider.Render();
     slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+    slider.ConstructListeners();
+
 
 }
 
@@ -850,8 +886,8 @@ function SdfLine(col, pos, dim, render_instanced_flags=0x0) {
     line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
 
-    // line.sid.inst = 0x0;
-    line.sid.inst = render_instanced_flags;
+    line.sid.inst = 0x0;
+    // line.sid.inst = render_instanced_flags;
 
 
     // const line1 = Create_widget_section(_, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(GREEN[7], 1.5));
@@ -1055,6 +1091,8 @@ function CreateDropdown(pos, id) {
     dp.Calc_no_gfx_update();
     
     dp.Render()
+
+    dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
     
     dp.ConstructListeners();
 
@@ -1102,6 +1140,7 @@ function CreateDropdown3(pos, dim) {
     dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
     dp.Calc_no_gfx_update();
     dp.Render()
+    dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
     dp.ConstructListeners();
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
@@ -1158,6 +1197,7 @@ function CreateDropdown2(pos, id, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
         dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
         dp.Calc_no_gfx_update();
         dp.Render()
+        dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
         dp.ConstructListeners();
         
         // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
@@ -1272,6 +1312,7 @@ function CreateDropdown2InSection(pos, id) {
 
 
     section.Render()
+    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
 
     View_build_group_from_root_mesh(section)
 
@@ -1336,19 +1377,28 @@ function CreateDropdown2InSection(pos, id) {
 //     // View_set_view_vb_start(section.group_bufferidxs, section.gfx.vb.start);
 // }
 
-function CreateColorPicker(){
+function CreateColorPicker(render_instanced_flags=0x0){
 
-    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [0, 0, 0], [400, 400], GREY[3], _, [0, 50, 4]);
-    picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [0, 40, 0], [300, 200], GREY[3], _, [0, 35, 2]);
+    // picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
+
+    picker.sid.inst = render_instanced_flags;
+
+    picker.EnableGfxUniforms(SID.UNIF.TIME, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
     picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
     
-    picker.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
+    // picker.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
     picker.Calc_no_gfx_update();
     picker.Render();
     picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
+    // picker.GfxUniformsSetClbk('u_dim', TEMP_GET_MESH_DIM_FOR_UNIFORM_UPDATE, picker.geom.dim)
+    // picker.children.buffer[0].GfxUniformsSetClbk('u_dim', TEMP_GET_MESH_DIM_FOR_UNIFORM_UPDATE, picker.geom.dim)
     picker.ConstructListeners();
+
+    // CreateSlider();
+
 }
 
 
@@ -1798,6 +1848,7 @@ function CreateManySections(scene) {
     blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
     blu.Calc_no_gfx_update();
     blu.Render();
+    blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
     blu.ConstructListeners();
 
     return blu;
@@ -2024,7 +2075,7 @@ function CreateScrollerClampAlphaTest(scene) {
         // const label = Create_widget_text(_, `${i}`, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], .7), WHITE)
         const label = Create_widget_label(_, `${i}`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6,4])
 
-        label.SetName(`${label.id}`);
+        label.SetName(`${i}`);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
         section.AddItem(label);
     }
@@ -2142,7 +2193,7 @@ function CreateScrollerDp(scene) {
         // const label = Create_widget_text(_, `${i}`, [100, 100, 2], fontsize, TRANSPARENCY(colors[i], .7), WHITE)
         const label = Create_widget_label(_, `${i} THIS IS A LARGE TEXT FOR TESTING`, ALIGN.HOR_CENTER, [100, 100, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE)
 
-        label.SetName(`${label.id}`);
+        label.SetName(`${i}`);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
         // section.AddItem(label);
         section.AddToMenu(label);
@@ -2461,18 +2512,18 @@ function MeshInfoUpdate(params) {
 
                 const text_num_faces = (child.text_mesh) ? child.text_mesh.geom.num_faces : child.geom.num_faces; // If child is of type label and has 'text_mesh' else is plain text.
 
-                msgs.push(`Plain Text:${child.GetName()}, dim: ${child.id}`);
+                msgs.push(`Plain Text:${child.GetName()}, dim: ${child.mesh_bufferidx}`);
                 msgs.push(`{pos:[${FloorArr3(child.geom.pos)}]} {dim:[${child.geom.dim}]}, {alpha:${child.mat.col[3]}}`);
                 msgs.push(`1gfx: prog:${child.gfx.prog.idx}, vb:${child.gfx.vb.idx}, start:${child.gfx.vb.start}, faces:${text_num_faces}`);
             }
             else if (child.text_mesh) { // Text in label or any other mesh that has text_mesh
-                msgs.push(`Text_mesh: id:${child.text_mesh.id}, name:${child.text_mesh.GetName()},`);
+                msgs.push(`Text_mesh: id:${child.text_mesh.mesh_bufferidx}, name:${child.text_mesh.GetName()},`);
                 msgs.push(`{pos:[${FloorArr3(child.text_mesh.geom.pos)}]}, {dim: [${child.text_mesh.geom.dim}]}, {alpha:${child.text_mesh.mat.col[3]}}`);
                 msgs.push(`2gfx: {prog:${child.text_mesh.gfx.prog.idx}}, {vb:${child.text_mesh.gfx.vb.idx}}, {start:${child.text_mesh.gfx.vb.start}}, {faces:${child.text_mesh.geom.num_faces}}`);
             }
         }
         else if (infoMesh.text_mesh) {
-            msgs.push(`Text_mesh: id:${infoMesh.text_mesh.id}, name:${infoMesh.text_mesh.GetName()},`);
+            msgs.push(`Text_mesh: id:${infoMesh.text_mesh.mesh_bufferidx}, name:${infoMesh.text_mesh.GetName()},`);
             msgs.push(`pos:[${FloorArr3(infoMesh.text_mesh.geom.pos)}], dim: [${FloorArr2(infoMesh.text_mesh.geom.dim)}], alpha:${infoMesh.text_mesh.mat.col[3]}`);
             msgs.push(`3gfx: prog:${infoMesh.text_mesh.gfx.prog.idx}, vb:${infoMesh.text_mesh.gfx.vb.idx}, start:${infoMesh.text_mesh.gfx.vb.start}, faces:${infoMesh.text_mesh.geom.num_faces}`);
         }

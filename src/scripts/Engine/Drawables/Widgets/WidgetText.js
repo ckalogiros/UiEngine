@@ -37,9 +37,7 @@ export class Widget_Text extends Text_Mesh {
 
 		// if(ROOT_WIDGET_FLAGS !== undefined) this.root_bufferidx = 
 
-		// this.pad = [0, 0];
 		this.StylesSetPad(pad);
-		// AddArr2(this.pad, pad);
 	}
 
 

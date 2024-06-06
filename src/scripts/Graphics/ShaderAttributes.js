@@ -167,6 +167,7 @@ export function Shader_attributes_create(sid, shader_program) {
       if (attrib_info.name === 'a_col') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.COL4;
       else if (attrib_info.name === 'a_wpos_time') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.WPOS_TIME4;
       else if (attrib_info.name === 'a_pos') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.POS2;
+      else if (attrib_info.name === 'a_dim') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.DIM2;
       else if (attrib_info.name === 'a_params1') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4;
       else if (attrib_info.name === 'a_tex') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.TEX2;
 
@@ -238,12 +239,19 @@ export function Shader_attributes_enable(attribsidx, vb_attribs) {
    const len = vb_attribs.locs.length;
    for (let i = 0; i < len; i++) {
 
+      /** The attrib divisor is denotes the frequency at wich the different meshes will be drawn out of the vertex buffer.
+       * For example: An intanced vb has 4 wpos. If we set divisor to 1, then each instanced geometry will use 1 wpos.
+       * If the divisor is set to 2, then 2 instanced geometries will use 1 wpos.
+       * So if we draw 8 instances of a mesh and we need lets sy 4 wpos, 
+       * then we set the divisor to 2, so that 2 meshes will consume 1 wpo => 8/4=2(divisor)
+       */
+
       gfxCtx.gl.enableVertexAttribArray(vb_attribs.locs[i]);
       gfxCtx.gl.vertexAttribPointer(vb_attribs.locs[i], vb_attribs.sizes[i], gl_type, false, vb_attribs.count * FLOAT32_BYTE_SIZE, vb_attribs.offsets[i] * FLOAT32_BYTE_SIZE);
       gfxCtx.gl.vertexAttribDivisor(vb_attribs.locs[i], vb_attribs.attrib_divisor);
-      // if(vb_attribs.count===8 && vb_attribs.attrib_divisor===1) 
+      // if(i===0) 
       //    gfxCtx.gl.vertexAttribDivisor(vb_attribs.locs[i], 1);
-      // else gfxCtx.gl.vertexAttribDivisor(vb_attribs.locs[i], vb_attribs.attrib_divisor);
+      // else gfxCtx.gl.vertexAttribDivisor(vb_attribs.locs[i], 0);
 
    }
 }

@@ -193,8 +193,6 @@ function View_add_mesh(groupidx, mesh) {
    const num_faces = mesh.geom.num_faces;
    const start = mesh.gfx.vb.start;
    const vb_groupidx = mesh.gfx.vb.groupidx;
-   // const ibidx = mesh.gfx.ib.idx;
-   // const progidx = mesh.gfx.prog.idx;
 
    const view = _view_buffer.buffer[groupidx];
    // TODO: Check for errors
@@ -208,8 +206,6 @@ function View_add_mesh(groupidx, mesh) {
       const view_vb_buffer = view.vb.buffer[view_vbidx];
 
       const mesh_groupidx = view_vb_buffer.data.Add(mesh_bufferidx);
-if(view_vb_buffer.data.buffer[mesh_groupidx-1]===INT_NULL)
-   console.log()
 
       // update num_faces
       view_vb_buffer.info[VIEW_INFO.NUM_FACES] += num_faces;
@@ -223,15 +219,8 @@ if(view_vb_buffer.data.buffer[mesh_groupidx-1]===INT_NULL)
 
    }
    else { // Else if not found, create new View.
-      // .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
-      // .info:    {num_faces:int, vbidxs:[]},
-      // .mesh_data:      meshidx
+
       const mesh_data = {
-         // info: {
-         //    num_faces: num_faces,
-         //    starts: New_int16_buffer(4),
-         //    vbidxs: New_int8_buffer(4), // Used for multiple 'Vertex Attribute Buffering'
-         // },
          info: new Int16Array(VIEW_INFO.SIZE),
          data: New_int16_buffer(), // TODO: widget root gfx already knows the number of meshes, so maybe have an aproximation of the mesh count(per vb buffer)
       };
@@ -239,8 +228,6 @@ if(view_vb_buffer.data.buffer[mesh_groupidx-1]===INT_NULL)
       const vb_bufferidx = view.vb.Add(mesh_data);
       const mesh_groupidx = view.vb.buffer[vb_bufferidx].data.Add(mesh_bufferidx);
 
-      // view.vb.buffer[vb_bufferidx].info.starts.Add(start);
-      // view.vb.buffer[vb_bufferidx].info.vbidxs.Add(vbidx);
       view.vb.buffer[vb_bufferidx].info[VIEW_INFO.VB_GROUP_IDX] = vb_groupidx;
       view.vb.buffer[vb_bufferidx].info[VIEW_INFO.START] = start;
       view.vb.buffer[vb_bufferidx].info[VIEW_INFO.NUM_FACES] = num_faces;

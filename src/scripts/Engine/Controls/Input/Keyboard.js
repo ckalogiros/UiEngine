@@ -5,7 +5,6 @@ import { Renderqueue_get } from "../../Renderers/Renderer/RenderQueue.js";
 import { TimeIntervalsPrintAll } from "../../Timers/TimeIntervals.js";
 import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
-import { Info_listener_print_buffer } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { Mesh_buffer_print, Mesh_buffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widgetroot_buffer_print_w6, Mesh_per_vb_print, Gfx_buffer_print_loop } from "../../Core/MeshBuffer.js";
 import { Str_buffer_print, Str_buffer_mesh_names_print, Str_buffer_mesh_names_print_loop, Str_buffer_print_loop } from "../../Core/StringBuffer.js";
 import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
@@ -39,7 +38,7 @@ const s2 = _CNT++;
 const s3 = _CNT++;
 const s4 = _CNT++;
 const dp = _CNT++;
-const il = _CNT++;
+// const il = _CNT++;
 const m1 = _CNT++;
 const m2 = _CNT++;
 const w1 = _CNT++;
@@ -218,14 +217,14 @@ export const DEBUG_PRINT_KEYS = [
          Dropdown_roots_print_root_buffer();
       },
    },
-   {
-      key: 'il',
-      discr: 'Info_listener_print_buffer',
-      func: (e)=>{
-         console.log('------------------ Info_listener_print_buffer() ------------------');
-         Info_listener_print_buffer();
-      },
-   },
+   // {
+   //    key: 'il',
+   //    discr: 'Info_listener_print_buffer',
+   //    func: (e)=>{
+   //       console.log('------------------ Info_listener_print_buffer() ------------------');
+   //       Info_listener_print_buffer();
+   //    },
+   // },
    {
       key: 'm1',
       discr: 'Mesh_buffer_print',
@@ -556,9 +555,9 @@ export function OnKeyUp(e){
       else if  (_keys_buffer[0].key === 'd' && _keys_buffer[1].key === 'p') { 
          DEBUG_PRINT_KEYS[dp].func(e);  
       }
-      else if  (_keys_buffer[0].key === 'i' && _keys_buffer[1].key === 'l') { 
-         DEBUG_PRINT_KEYS[il].func(e);  
-      }
+      // else if  (_keys_buffer[0].key === 'i' && _keys_buffer[1].key === 'l') { 
+      //    DEBUG_PRINT_KEYS[il].func(e);  
+      // }
       else if  (_keys_buffer[0].key === 'w') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[w1].func(e);  
          else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[w2].func(e);  

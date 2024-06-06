@@ -2,7 +2,7 @@
 
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_create_root } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { BLUE, BLUEL, GREEN, GREY } from "../Material/Base/Colors.js";
 import { Rect } from "../Meshes/Rect_Mesh.js";
@@ -20,12 +20,10 @@ export class Widget_Switch_Simple extends Rect {
    color_active;
    pad; // int, not array for x-y pad
 
-   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize = 5, col = GREY[1], text_col = WHITE, pad = [fontsize, fontsize], bold, style = [3, 6, 2], font) {
-   // constructor(col = GREY[1], pos, size=20, bold, style = [3, 6, 2]) {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], pad = 2, bold, style = [0, 15, 2.], is_debug_mesh) {
 
       const switch_dim = [size * 2, size]
-      super(pos, switch_dim, col, is_debug_mesh)
+      super(pos, switch_dim, col, _, is_debug_mesh)
 
       this.color_active = [0, 0, 0, 0];
       CopyArr4(this.color_active, col2);
@@ -47,10 +45,9 @@ export class Widget_Switch_Simple extends Rect {
       
       // const switch_pos = [pos[0] - size, pos[1], pos[2] + 1];
       const switch_pos = [pad, pad, pos[2] + 1];
-      const switch0 = Create_rect_mesh(switch_pos, [size - pad, size - pad], GREY[9], is_debug_mesh);
-      // const switch0 = Create_rect_mesh(switch_pos, [size - pad, size - pad], BLUEL[9], is_debug_mesh);
+      const switch0 = Create_rect_mesh(_, switch_pos, [size - pad, size - pad], GREY[9], _, _, _, _, is_debug_mesh);
+      // const switch0 = Create_rect_mesh(switch_pos, [size - pad, size - pad], BLUEL[9], _, is_debug_mesh);
       this.AddChild(switch0);
-      switch0.sid.gfx_group = this.sid.gfx_group;
       switch0.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       switch0.SetStyle([2, 10, 2]);
       // switch0.SetStyle(style);
@@ -74,7 +71,22 @@ export class Widget_Switch_Simple extends Rect {
 
    }
 
-   
+
+
+
+   Activate() {
+
+      this.state.mask |= MESH_STATE.ACTIVE;
+      this.children.buffer[0].state.mask |= MESH_STATE.ACTIVE;
+   }
+
+
+   Deactivate() {
+
+      this.state.mask &= ~MESH_STATE.ACTIVE;
+      this.children.buffer[0].state.mask &= ~MESH_STATE.ACTIVE;
+   }
+
    StateEnable(MASK = 0x0) {
 
       this.state.mask |= MASK;
@@ -89,6 +101,53 @@ export class Widget_Switch_Simple extends Rect {
    }
 
 
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // INHERITED METHODS
+   /****************************************************************************************************************************************************/
+   
+
+   
+
+   AddToWidgetRootBuffer(root_bufferidx) {
+
+      this.root_bufferidx = root_bufferidx;
+      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      this.children.buffer[0].root_bufferidx = root_bufferidx;
+      Widget_root_add_mesh(this.children.buffer[0].root_bufferidx, this.children.buffer[0].mesh_bufferidx);
+   }
+
+
+   SetGfxEnableAttributes(which, params) {
+      alert('777\nSetGfxEnableAttributes\WidgetSwitch')
+   }
+
+
+   /** Must run for every mesh */
+   GfxUniformsEnable(flags, name, type, shader_flags) {
+
+      super.EnableGfxUniforms(flags, name, type, shader_flags);
+      this.children.buffer[0].GfxUniformsEnable(flags, name, type, shader_flags);
+
+   }
+
+
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+
+      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+   }
+
+
+
+
+   
+   /*******************************************************************************************************************************************************/
+   // Graphics
+   /*******************************************************************************************************************************************************/
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL, params = null) {
 
       const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, params);
@@ -110,37 +169,11 @@ export class Widget_Switch_Simple extends Rect {
 
    Rerender() {
 
-      // if (this.state.mask & MESH_STATE.ACTIVE) {
       super.AddToGfxFromReset();
       this.children.buffer[0].AddToGfxFromReset();
-      // }
-
    }
 
 
-   AddToGfxFromReset() {
-
-      if (this.state.mask & MESH_STATE.ACTIVE) {
-         super.AddToGfxFromReset();
-         // console.log('2', this.children.buffer[0].geom.pos,this.GetName())
-         this.children.buffer[0].AddToGfxFromReset();
-      }
-
-   }
-
-
-   Activate() {
-
-      this.state.mask |= MESH_STATE.ACTIVE;
-      this.children.buffer[0].state.mask |= MESH_STATE.ACTIVE;
-   }
-
-
-   Deactivate() {
-
-      this.state.mask &= ~MESH_STATE.ACTIVE;
-      this.children.buffer[0].state.mask &= ~MESH_STATE.ACTIVE;
-   }
 
 
 
@@ -224,26 +257,43 @@ export class Widget_Switch_Simple extends Rect {
       // console.log('1', this.children.buffer[0].geom.pos,this.GetName())
    }
 
+   SetHoverColor() { this.SetUpdateFrameBuffer(); Set_hover_color_rgba(this.children.buffer[0]); }
+
+   SetHoverColorDefault() { this.SetUpdateFrameBuffer(); Set_default_color_rgba(this.children.buffer[0]); }
 
 
-   /** Must run for every mesh */
-   GfxUniformsEnable(flags, name, type, shader_flags) {
-
-      super.EnableGfxUniforms(flags, name, type, shader_flags);
-      this.children.buffer[0].GfxUniformsEnable(flags, name, type, shader_flags);
-
-   }
 
 
-   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
-      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-   }
 
    /*******************************************************************************************************************************************************/
-   // Events Handling
+   // Listeners
+   /*******************************************************************************************************************************************************/
 
+
+   ConstructListeners(parent_listeners = null) {
+
+      const mesh = this; // If in recursion, use as the current mesh the passed param. 
+
+      for (let i = 0; i <= mesh.listeners.boundary; i++) {
+
+         if (mesh.listeners.buffer[i]) {
+
+            if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+               parent_listeners = [null, null];
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+            else if (parent_listeners[i] === null) {
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+
+
+            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
+         }
+      }
+   }
+
+   
    OnClick(params) {
 
       const mesh = Mesh_buffer_get_mesh_byidx(params.meshidx);
@@ -277,12 +327,14 @@ export class Widget_Switch_Simple extends Rect {
    }
 
 
-   SetHoverColor() { this.SetUpdateFrameBuffer(); Set_hover_color_rgba(this.children.buffer[0]); }
 
-   SetHoverColorDefault() { this.SetUpdateFrameBuffer(); Set_default_color_rgba(this.children.buffer[0]); }
 
-   /*******************************************************************************************************************************************************/
-   // Misc
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // UNIQUE METHODS
+   /****************************************************************************************************************************************************/
+
    Bind(EventClbk = null, targetBindingFunctions = _, params) {
 
       if (!EventClbk) { EventClbk = Switch_click_default_callback; params = 'Switch'; }
@@ -295,47 +347,6 @@ export class Widget_Switch_Simple extends Rect {
          params: params,
       };
    }
-
-
-   // SEE ### Construct Listeners
-   // ConstructListeners(parent_listeners = null) {
-
-   //    const mesh = this; // If in recursion, use as the current mesh the passed param. 
-
-   //    for (let i = 0; i <= mesh.listeners.boundary; i++) {
-
-   //       const evt = mesh.listeners.buffer[i];
-   //       if (evt) {
-   //          mesh.AddListenEvent(i, mesh.OnClick, this.evt_params, parent_listeners[i]);
-   //       }
-   //    }
-
-   // }
-
-
-   // SEE ### Construct Listeners
-   ConstructListeners(parent_listeners = null) {
-
-      const mesh = this; // If in recursion, use as the current mesh the passed param. 
-
-      for (let i = 0; i <= mesh.listeners.boundary; i++) {
-
-         if (mesh.listeners.buffer[i]) {
-
-            if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-               parent_listeners = [null, null];
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
-            }
-            else if (parent_listeners[i] === null) {
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
-            }
-
-
-            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
-         }
-      }
-   }
-
 }
 
 

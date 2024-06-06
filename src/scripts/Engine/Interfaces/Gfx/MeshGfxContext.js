@@ -44,7 +44,8 @@ export class GfxInfoMesh {
       this.attribsPerVertex = 0;
       this.meshIdx = INT_NULL; // The index of the current mesh from scene's mesh buffer.
       this.vao = null;
-      // this.update_fn_idx = INT_NULL;
+      
+      this.verts_per_face = New_int8_buffer(1);
 
       this.prog = {
          idx: INT_NULL,
@@ -63,7 +64,7 @@ export class GfxInfoMesh {
          which_vb: { // If this gfx has attributes scattered between vertex buffers, we need to specify which attribute belongs to which vertex buffer
             col_buf: INT_NULL,   // The index of the vertex buffer the color attribute is stored to
             wpos_buf: INT_NULL,  // The index of the vertex buffer the wpos attribute is stored to
-            params1_buf: INT_NULL,  // The index of the vertex buffer the wpos attribute is stored to
+            generic_attr1_buf: INT_NULL,  // The index of the vertex buffer the wpos attribute is stored to
             dim_buf: INT_NULL,   // The index of the vertex buffer the vertex pos attribute is stored to
             tex_buf: INT_NULL,   // The index of the vertex buffer the texture attribute is stored to
          },
@@ -103,7 +104,7 @@ export class GfxInfoMesh {
          which_vb: {       
             col_buf: this.vb.which_vb.col_buf,
             wpos_buf: this.vb.which_vb.wpos_buf,
-            params1_buf: this.vb.which_vb.params1_buf,
+            generic_attr1_buf: this.vb.which_vb.generic_attr1_buf,
             dim_buf: this.vb.which_vb.dim_buf,
             tex_buf: this.vb.which_vb.tex_buf,
          },
@@ -152,48 +153,67 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
 
    gfx_ctx.vb.groupidx = vb_groupidx;
 
-   const prog_attribs = Shader_attributes_get_attribs(prog.attribsidx)
+
+
+   /********************************************************************/
+   // Set the vertices per face buffer
+   gfx_ctx.verts_per_face[0] = VERTS_PER_RECT_INDEXED; // HACK
+   // if(the type is of type connected vertex faces)
+   const face_type = 'connected'; // TODO: this must be a flag 
+   for (let i=1; i < num_faces; i++){
+      if(face_type === 'connected'){
+         gfx_ctx.verts_per_face[i] = 2; // HACK
+      }
+      else {
+         gfx_ctx.verts_per_face[i] = 4; // HACK
+      }
+   }
+
+
+
    
+   /********************************************************************/
+   // Set info for each instanced vertex buffer 
    for(let i=0; i <= vb_group.vb_idxs.boundary; i++){
       
-      
       const vbidx = vb_group.vb_idxs.buffer[i];
-      const idx = gfx_ctx.vb.idxs.Add(vbidx);
+      gfx_ctx.vb.idxs.Add(vbidx);
       gfx_ctx.vb.starts.Add(0);
       gfx_ctx.vb.counts.Add(0);
-
+      
       const vb_info = VBI_get_byidx(vbidx);
-
+      
       // Set bool is instanced or is per_vertex. If the vb's sid isn't included in the mesh's sid.intstanced, then it is per_vertex
       if((vb_group.sid.inst & vb_info.sid)===0) gfx_ctx.vb.is_per_vertex.Add(true);
       else gfx_ctx.vb.is_per_vertex.Add(false);
-
+      
       // Here we assign the correct vertex buffer index to the mesh attributes(COL,WPOS,DIM, etc)
       if(vb_info.sid & SID.ATTR.COL4) { gfx_ctx.vb.which_vb.col_buf = i; }
       if(vb_info.sid & SID.ATTR.WPOS_TIME4) { gfx_ctx.vb.which_vb.wpos_buf = i; }
-      if(vb_info.sid & SID.ATTR.PARAMS1) { gfx_ctx.vb.which_vb.params1_buf = i; }
+      if(vb_info.sid & SID.ATTR.GENERIC_ATTR1_VEC4) { gfx_ctx.vb.which_vb.generic_attr1_buf = i; }
       if(vb_info.sid & SID.ATTR.POS2) { gfx_ctx.vb.which_vb.dim_buf = i; }
       if(vb_info.sid & SID.ATTR.TEX2) { gfx_ctx.vb.which_vb.tex_buf = i; }
-
-
+      
+      
    } 
+   
 
+
+   /********************************************************************/
+   // Set attributes info for vertex buffer
+   const prog_attribs = Shader_attributes_get_attribs(prog.attribsidx)
    const len = prog_attribs.nameids.length;
    for(let i=0; i < len; i++){
       
       if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i; 
       if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS_TIME4) gfx_ctx.vb.which_attrib.wpos_idx = i; 
-      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.PARAMS1) gfx_ctx.vb.which_attrib.params1_idx = i; 
+      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) gfx_ctx.vb.which_attrib.params1_idx = i; 
       if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.POS2) gfx_ctx.vb.which_attrib.dim_idx = i; 
       if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i; 
    }
 
-   // console.log('gfx_ctx.vb:\n  ', gfx_ctx.vb)
-
    gfx_ctx.ib.idx = ibidx; // Stores the programs index for the indexbuffer.
    gfx_ctx.ib.count = ib.count;
-
-   // gfx_ctx.update_fn_idx = INT_NULL;
 
 
    return gfx_ctx;
@@ -315,12 +335,12 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
    if (sid.shad & SID.SHAD.INDEXED) {
 
-      // IMPORTANT: WHO IS RESPONSIBLE OF DECIDING THE INDEX BUFFER PATTERN ?????????????
-      ibidx = Gfx_pool_find_ib_notActive(TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN.rect_123_234); // HACK: At this point we just pass the only usable of the app, index buffer pattern
+      // BUG: Can we use same index buffer for different vertex buffers? No, cause the geometry may have different vertex index break points. Yes, if the geometries do not use connected vertices
+      ibidx = Gfx_pool_find_ib_notActive(sid.shad);
 
       if (ibidx === INT_NULL) { // Create new index buffer
 
-         const ib_info = Index_buffer_info_create(sid, _, TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN.rect_123_234);
+         const ib_info = Index_buffer_info_create(sid, _);
          ibidx = ib_info.ibidx;
 
          Program_store_index_buffer_idx(progidx, ibidx); // Store the indexbuffer index to the programs ib array

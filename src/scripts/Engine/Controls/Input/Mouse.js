@@ -2,7 +2,6 @@
 
 import { GetSign } from "../../../Helpers/Helpers.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
-import { Info_listener_dispatch_event } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { RegisterEvent } from "../../Events/Events.js";
 import { Scene_camera_scroll, Scene_camera_zoom } from "../../Scenes.js";
 
@@ -239,8 +238,6 @@ export function OnMouseMove(e) {
    RegisterEvent('mouse-move', null);
 
    // console.log(mouse.pos.x, mouse.pos.y)
-
-   Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.MOUSE, { mouse: mouse });
 }
 
 

@@ -218,55 +218,44 @@ const STATE = {
 
 	mesh: {
 		hovered: null,
-		hoveredId: INT_NULL,
 		hoveredIdx: INT_NULL,
 
 		clicked: null,
-		clickedId: INT_NULL,
 		clickedIdx: INT_NULL,
 
 		grabed: null,
-		grabedId: INT_NULL,
 		grabedIdx: INT_NULL,
 
 		focused: null,
-		focusedId: INT_NULL,
 		focusedIdx: INT_NULL,
 
 		click_hold: null,
-		click_holdid: INT_NULL,
 		click_holdidx: INT_NULL,
 
 		SetHovered(mesh) {
 			this.hovered = mesh;
 			if (!mesh) {
-				this.hoveredId = INT_NULL;
 				this.hoveredIdx = INT_NULL;
 			}
 			else {
-				this.hoveredId = mesh.id;
 				this.hoveredIdx = mesh.mesh_bufferidx;
 			}
 		},
 		SetGrabed(mesh) {
 			this.grabed = mesh;
 			if (!mesh) {
-				this.grabedId = INT_NULL;
 				this.grabedIdx = INT_NULL;
 			}
 			else {
-				this.grabedId = mesh.id;
 				this.grabedIdx = mesh.mesh_bufferidx;
 			}
 		},
 		SetClicked(mesh) {
 			this.clicked = mesh;
 			if (!mesh) {
-				this.clickedId = INT_NULL;
 				this.clickedIdx = INT_NULL;
 			}
 			else {
-				this.clickedId = mesh.id;
 				this.clickedIdx = mesh.mesh_bufferidx;
 			}
 		},
@@ -274,11 +263,9 @@ const STATE = {
 
 			this.focused = mesh;
 			if (!mesh) {
-				this.focusedId = INT_NULL;
 				this.focusedIdx = INT_NULL;
 			}
 			else {
-				this.focusedId = mesh.id;
 				this.focusedIdx = mesh.mesh_bufferidx;
 			}
 		},
@@ -286,33 +273,27 @@ const STATE = {
 
 			this.click_hold = mesh;
 			if (!mesh) {
-				this.click_holdid = INT_NULL;
 				this.click_holdidx = INT_NULL;
 			}
 			else {
-				this.click_holdid = mesh.id;
 				this.click_holdidx = mesh.mesh_bufferidx;
 			}
 		},
 		CheckAllAndRemove(mesh) {
 			if (mesh === this.hovered) {
 				this.hovered = null;
-				this.hoveredId = INT_NULL;
 				this.hoveredIdx = INT_NULL;
 			}
 			if (mesh === this.clicked) {
 				this.clicked = null;
-				this.grabedId = INT_NULL;
 				this.grabedIdx = INT_NULL;
 			}
 			if (mesh === this.grabed) {
 				this.grabed = null;
-				this.clickedId = INT_NULL;
 				this.clickedIdx = INT_NULL;
 			}
 			if (mesh === this.focused) {
 				this.focused = null;
-				this.focusedId = INT_NULL;
 				this.focusedIdx = INT_NULL;
 			}
 		}

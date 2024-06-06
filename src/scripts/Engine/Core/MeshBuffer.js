@@ -10,6 +10,7 @@ import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/De
 import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 import { REL_POS, Relative_pos_comp_move_right_buffer } from "../Drawables/Operations/RelativePosComponent.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "./MeshUniformsBuffer.js";
+import { Index_buffer_reset } from "../../Graphics/Buffers/IndexBuffers.js";
 
 
 
@@ -53,9 +54,9 @@ export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
 
    const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
    temp_no_allocation_buffer[0][0] = pos[0];
-   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
+   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
    temp_no_allocation_buffer[1][0] = pos[1];
-   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
 
    return temp_no_allocation_buffer;
 }
@@ -947,6 +948,7 @@ export function Widget_root_reset_gfx(root_bufferidx) {
       const mesh = _mesh_buffer.buffer[root_mesh_per_vb_idx];
 
       Vertex_buffer_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer);
+      Index_buffer_reset(mesh.gfx.ib.idx);
    }
 }
 
@@ -1217,7 +1219,6 @@ export function Mesh_buffer_print_loop() {
       if (_mesh_buffer.buffer[i]) {
 
          console.log(i,
-            // 'id:', _mesh_buffer.buffer[i].id,
             'mbidx:', _mesh_buffer.buffer[i].mesh_bufferidx,
             'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
             'gfxidx', _mesh_buffer.buffer[i].per_vb_bufferidx,

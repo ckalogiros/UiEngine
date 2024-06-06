@@ -1830,8 +1830,6 @@ function CreateScrollerClampAlphaTest(scene) {
     // const count = colors.length;
     const count = 16;
     for (let i = 0; i < count; i++) {
-        // const label = Create_widget_section(_, _, _, [0, 0, 0], [20,20], TRANSPARENCY(colors[i], .7), `Section${i + 1}`)
-        // const label = Create_widget_text(_, `${i}`, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], .7), WHITE)
         const label = Create_widget_label(_, `${i}`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6,4])
 
         label.SetName(`${label.id}`);

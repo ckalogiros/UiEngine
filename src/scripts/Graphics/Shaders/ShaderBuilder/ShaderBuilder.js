@@ -171,9 +171,9 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.WPOS_TIME4) ? 'in vec4 a_wpos_time;' : '',
       (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? '#include <in_a_vec4_params1>' : '',
       (sid.attr & SID.ATTR.POS2) ? 'in vec2 a_pos;' : '',
+      (sid.attr & SID.ATTR.DIM2) ? 'in vec2 a_dim;' : '',
       (sid.attr & SID.ATTR.TEX2) ? 'in vec2 a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <in_attr_sdf2>' : '',
-      (sid.attr & SID.ATTR.POS3) ? 'in vec3 a_pos;' : '',
       '\n',
       
 
@@ -186,7 +186,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // OUTS
       (sid.pass & SID.PASS.COL4) ? 'out vec4 v_col; ' : '',
-      (sid.pass & SID.PASS.DIM2) ? 'out vec2 v_dim;' : '',
+      (sid.pass & SID.PASS.DIM2) ? 'out vec2 v_dim;' : (sid.pass & SID.ATTR.DIM2) ? 'out vec2 v_dim;' :'',
       (sid.pass & SID.PASS.WPOS2) ? 'out vec2 v_wpos;' : '',
       (sid.attr & SID.ATTR.TEX2) ? 'out vec2 v_tex_coord;' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <out_attr_sdf2>' : '',
@@ -242,7 +242,8 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.pass & SID.PASS.COL4) 
          ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') 
          : '', 
-      (sid.pass & SID.PASS.DIM2) ? '  v_dim = abs(a_pos);' : '',
+      // (sid.pass & SID.PASS.DIM2) ? '  v_dim = abs(a_pos);' : '',
+      (sid.pass & SID.PASS.DIM2) ? '  v_dim = a_dim;' : (sid.pass & SID.ATTR.DIM2) ? '  v_dim = a_dim;' : '', // TODO: If we have created an attribute a_dim, we have to use it, else the attribs buffering is gonna be wrong
       (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS4)) ? '  v_wpos = vec2(a_wpos_time.x + wpos.x, a_wpos_time.y + wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',

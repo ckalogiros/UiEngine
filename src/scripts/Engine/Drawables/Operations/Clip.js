@@ -138,7 +138,8 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
       for(let j=0; j <= meshshes_idx.boundary; j++){
          
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-
+if(mesh===_)
+console.log()
          const top      = root_wposy + mesh.geom.pos[1];
          const bottom   = top + mesh.geom.dim[1]*2;
 

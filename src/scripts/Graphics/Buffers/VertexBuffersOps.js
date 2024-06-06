@@ -74,10 +74,84 @@ export function Gl_set_rgba_per_vertex(gfxInfo, color, num_faces = 1) {
 
       vb_data[index++] = color[k][0];
       vb_data[index++] = color[k][1];
-      vb_data[index++] = color[k][0];
+      vb_data[index++] = color[k][2];
       vb_data[index++] = color[k][3];
 
       index += stride; // Go to next vertice's col.
+      loop_count--;
+      k++;
+
+   }
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
+}
+
+
+
+export function Gl_set_rgba_per_vertex_specify_vertex(gfxInfo, color, num_faces = 1, vertex_idx, vertex_count) {
+
+   /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_rgba_per_vertex()'); }
+
+   const vbidx = gfxInfo.vb.which_vb.col_buf;
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+   let stride = vb_info.attribs_info.count;
+   // let index = (gfxInfo.vb.starts.buffer[vbidx] + (face_idx * stride * vertex_idx)) + vb_info.attribs_info.offsets[vbidx];
+   let index = (gfxInfo.vb.starts.buffer[vbidx] + (vertex_idx * vb_info.attribs_info.count)) + vb_info.attribs_info.offsets[vbidx];
+   let loop_count = num_faces * vertex_count;
+   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   
+   // TODO: In case we want to update a specific vertex (vertex top-right) in a mesh with more than one face, 
+   // TODO: we need a second loop and a stride, to reach the next equivalent vertex in the next mesh's face
+   
+   let k = 0;
+
+   while (loop_count) {
+
+      vb_data[index+0] = color[0]; 
+      vb_data[index+1] = color[1];
+      vb_data[index+2] = color[2];
+      vb_data[index+3] = color[3];
+
+      index += stride; // Go to next vertex color attribute.
+      loop_count--;
+      k++;
+
+   }
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
+}
+
+
+
+export function Gl_set_rgba_specify_attribute(gfxInfo, value, num_faces = 1, vertex_idx, vertex_count, attribidx) {
+
+   /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_rgba_per_vertex()'); }
+
+   const vbidx = gfxInfo.vb.which_vb.col_buf;
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+   let stride = vb_info.attribs_info.count;
+   // let index = (gfxInfo.vb.starts.buffer[vbidx] + (face_idx * stride * vertex_idx)) + vb_info.attribs_info.offsets[vbidx];
+   let index = (gfxInfo.vb.starts.buffer[vbidx] + (vertex_idx * vb_info.attribs_info.count)) + vb_info.attribs_info.offsets[vbidx];
+   let loop_count = num_faces * vertex_count;
+   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   
+   // TODO: In case we want to update a specific vertex (vertex top-right) in a mesh with more than one face, 
+   // TODO: we need a second loop and a stride, to reach the next equivalent vertex in the next mesh's face
+   
+   let k = 0;
+
+   while (loop_count) {
+
+      vb_data[index+attribidx] = value; 
+      // vb_data[index+1] = color[1];
+      // vb_data[index+2] = color[2];
+      // vb_data[index+3] = color[3];
+
+      index += stride; // Go to next vertex color attribute.
       loop_count--;
       k++;
 
@@ -285,15 +359,26 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
    let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[dimidx];
    // let stride = vb_info.attribs_info.count - 1; 
 
+   x*=2; y*=2;
+
+
+   //    -x;
+   //     y;
+   //    -x;
+   //    -y;
+   //     x;
+   //     y;
+   //     x;
+   //    -y;
 
    while (loop_count) {
 
-      vb_data[index++] = -x;
+      vb_data[index++] = 0;
       vb_data[index++] = y;
       index += stride;
 
-      vb_data[index++] = -x;
-      vb_data[index++] = -y;
+      vb_data[index++] = 0;
+      vb_data[index++] = 0;
       index += stride;
 
       vb_data[index++] = x;
@@ -301,11 +386,12 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
       index += stride;
 
       vb_data[index++] = x;
-      vb_data[index++] = -y;
+      vb_data[index++] = 0;
       index += stride;
 
       loop_count--;
    }
+
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -325,13 +411,14 @@ export function Gl_set_dim_x(gfxInfo, x, num_faces = 1) {
    // let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[dimidx];
    let stride = vb_info.attribs_info.count - 1;
 
+   x*=2
 
    while (loop_count) {
 
-      vb_data[index++] = -x;
+      vb_data[index++] = 0;
       index += stride;
 
-      vb_data[index++] = -x;
+      vb_data[index++] = 0;
       index += stride;
 
       vb_data[index++] = x;
@@ -361,23 +448,20 @@ export function Gl_set_dim_y(gfxInfo, y, num_faces = 1) {
    // let stride = vb_info.attribs_info.count - (vb_info.attribs_info.sizes[dimidx]-1);
    let stride = vb_info.attribs_info.count - 1;
 
+   y*=2;
 
    while (loop_count) {
 
-      // vb_data[index++] = -dim[0];
       vb_data[index++] = y;
       index += stride;
 
-      // vb_data[index++] = -dim[0];
-      vb_data[index++] = -y;
+      vb_data[index++] = 0;
       index += stride;
 
-      // vb_data[index++] = dim[0];
       vb_data[index++] = y;
       index += stride;
 
-      // vb_data[index++] = dim[0];
-      vb_data[index++] = -y;
+      vb_data[index++] = 0;
       index += stride;
 
       loop_count--;

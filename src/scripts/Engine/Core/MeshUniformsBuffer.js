@@ -60,7 +60,7 @@ export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; 
 
 
 
-   // IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
+// IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
 export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vb_groupidx) {
 
@@ -75,7 +75,8 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    wpos[1] = mesh_pos[1];
  
 
-   if (mesh_parent !== null && mesh_parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
+   // if (mesh_parent !== null && mesh_parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
+   if (mesh_parent !== null){
 
 
       parent_meshidx = mesh_parent.mesh_bufferidx;
@@ -207,6 +208,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    dbg_for_unifwpos.vbidx = vb_groupidx;
    // _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
 }
+
 
 
 export function Mesh_unif_store_vb_root_wpos(vbgroupidx, pos) {

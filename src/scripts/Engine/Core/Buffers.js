@@ -123,7 +123,7 @@ export class M_Buffer {
    ResetFull() {
       DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT -= this.active_count-1;
 
-      this.size = 1;
+      // this.size = 1;
       this.boundary = -1;
       this.active_count = 0;
       this.buffer = [];
@@ -136,7 +136,7 @@ export class M_Buffer {
 
    Reset() {
       DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT -= this.active_count;
-
+      // this.size = 1;
       // console.log('0000-reset', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT, DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE)
       this.boundary = -1;
       this.active_count = 0;
@@ -649,10 +649,10 @@ export class ArrayBufferInterface {
       }
    }
 
-
    Reset() {
       DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_ELEM_SIZE -= this.size-1;
-      this.size = 1;
+      // this.size = 0;
+      // INFO: Size is responsible for reallocation, so it shouldn't be reseted
       this.boundary = -1;
       this.active_count = 0;
       this.buffer[0] = INT_NULL;

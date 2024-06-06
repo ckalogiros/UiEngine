@@ -23,11 +23,9 @@ import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 
 export class Widget_Label extends Rect {
 
-    text_mesh;
-    // pad = [0, 0];
+    // text_mesh;
 
     constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
-        // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.BOTTOM), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = [0, 4, 2], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -46,9 +44,8 @@ export class Widget_Label extends Rect {
         ];
 
 
-        super(_pos, dim, col);
+        super(_pos, dim, col, _);
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
-        this.SetName(`[${this.mesh_bufferidx}]{${text}}-LABEL`);
         this.StylesSetPad(pad);
         this.SetStyle(style)
 
@@ -64,7 +61,6 @@ export class Widget_Label extends Rect {
 
         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
 
-        // this.SetStyle(style);
 
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
         this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -83,25 +79,6 @@ export class Widget_Label extends Rect {
 
     }
 
-
-    Destroy() {
-
-        // Label's text destruction
-        this.text_mesh.Destroy();
-        this.text_mesh = null;
-
-        // Label's rect_area destruction
-        return super.Destroy();
-    }
-
-
-    AddToWidgetRootBuffer(root_bufferidx) {
-
-        this.root_bufferidx = root_bufferidx;
-        Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
-        this.text_mesh.root_bufferidx = root_bufferidx;
-        Widget_root_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
-    }
 
 
     Activate() {
@@ -138,11 +115,65 @@ export class Widget_Label extends Rect {
     }
 
 
+    StateEnable(bit) { this.state.mask |= bit; this.text_mesh.state.mask |= bit; }
+
+
+    StateDisable(bit) { this.state.mask &= ~bit; this.text_mesh.state.mask &= ~bit; }
+
+
+
+
+    /****************************************************************************************************************************************************/
+    /****************************************************************************************************************************************************/
+    // INHERITED METHODS
+    /****************************************************************************************************************************************************/
+
+
+    Destroy() {
+
+        this.text_mesh.Destroy();
+        this.text_mesh = null;
+        return super.Destroy();
+    }
+
+
+    AddToWidgetRootBuffer(root_bufferidx) {
+
+        this.root_bufferidx = root_bufferidx;
+        Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+        this.text_mesh.root_bufferidx = root_bufferidx;
+        Widget_root_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+    }
+
+
+    SetGfxEnableAttributes(which, params) {
+        alert('777\nSetGfxEnableAttributes\nWidgetLabel')
+    }
+
+
+    /** Must run for every mesh */
+    GfxUniformsEnable(flags, name, type, shader_flags) {
+
+        super.EnableGfxUniforms(flags, name, type, shader_flags);
+        this.text_mesh.EnableGfxUniforms(flags, name, type, shader_flags);
+
+    }
+
+
+    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+
+        // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+        super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+        this.text_mesh.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+    }
+
+
+
+
+
     /*******************************************************************************************************************************************************/
     // Graphics
     /*******************************************************************************************************************************************************/
-
-    // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_gfx_specific = [INT_NULL, INT_NULL], text_gfx_specific = [INT_NULL, INT_NULL]) {
     GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_specific_vb_groupidx = INT_NULL, text_specific_vb_groupidx = INT_NULL) {
 
         this.gfx = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
@@ -180,15 +211,6 @@ export class Widget_Label extends Rect {
 
 
 
-    /*******************************************************************************************************************************************************/
-    // State
-    /*******************************************************************************************************************************************************/
-
-    StateEnable(bit) { this.state.mask |= bit; this.text_mesh.state.mask |= bit; }
-
-
-    StateDisable(bit) { this.state.mask &= ~bit; this.text_mesh.state.mask &= ~bit; }
-
 
 
     /*******************************************************************************************************************************************************/
@@ -206,22 +228,6 @@ export class Widget_Label extends Rect {
         this.text_mesh.isFramebufferRendered = fbidx;
     }
 
-
-    /** Must run for every mesh */
-    GfxUniformsEnable(flags, name, type, shader_flags) {
-
-        super.EnableGfxUniforms(flags, name, type, shader_flags);
-        this.text_mesh.GfxUniformsEnable(flags, name, type, shader_flags);
-
-    }
-
-
-    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
-
-        // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-        super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-        this.text_mesh.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-    }
 
 
 
@@ -286,6 +292,7 @@ export class Widget_Label extends Rect {
         this.text_mesh.geom.pos[0] = x + dx;
         this.text_mesh.geom.pos[1] = y + dy;
     }
+    
 
     TEMP_recalc_x(x) {
 
@@ -413,11 +420,12 @@ export class Widget_Label extends Rect {
 
 
 
+
+
     /*******************************************************************************************************************************************************/
-    // Events Handling
+    // Listeners
     /*******************************************************************************************************************************************************/
 
-    // SEE ### Construct Listeners
     ConstructListeners(parent_listeners = null) {
 
         const mesh = this; // If in recursion, use as the current mesh the passed param. 
@@ -601,10 +609,33 @@ export class Widget_Label_Text_Mesh_Menu_Options extends Widget_Label {
     }
 
 
+
+
+
+
+
+    /****************************************************************************************************************************************************/
+    /****************************************************************************************************************************************************/
+    // INHERITED METHODS
+    /****************************************************************************************************************************************************/
+
+
+    SetGfxEnableAttributes(which, params) {
+        alert('777\nSetGfxEnableAttributes\nWidgetSlider')
+    }
+
+
     SetPos(pos) {
         super.SetPos(pos)
     }
 
+
+
+
+
+    /*******************************************************************************************************************************************************/
+    // Listeners
+    /*******************************************************************************************************************************************************/
 
     OnClick(params) {
 
@@ -632,9 +663,7 @@ export class Widget_Label_Text_Mesh_Menu_Options extends Widget_Label {
                     /*FOR DEBUG*/clicked_mesh: mesh,
                 }
                 const EventClbk = params.evt_params.EventClbk;
-                console.log('OnClick callback IN. meshId ', mesh.id)
                 EventClbk(evt_params);
-                console.log('OnClick callback OUT. meshId ', mesh.id)
             }
 
             return true;
@@ -643,5 +672,14 @@ export class Widget_Label_Text_Mesh_Menu_Options extends Widget_Label {
         return false;
     }
 
+
+
+
+
+
+    /****************************************************************************************************************************************************/
+    /****************************************************************************************************************************************************/
+    // UNIQUE METHODS
+    /****************************************************************************************************************************************************/
 
 }

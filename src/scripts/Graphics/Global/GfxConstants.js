@@ -93,12 +93,16 @@ const SID = {
 
     SHAD: {
         INDEXED: BIT1,
+        INDEXED_PATT_CONNECTED_FACES_X: BIT1 <<= 1,
+        INDEXED_PATT_DISCONTINUE_4: BIT1 <<= 1, // Break vertex indices
+        INDEXED_PATT_DISCONTINUE_6: BIT1 <<= 1, // Break vertex indices
         PRE_MULTIPLIED_ALPHA: BIT1 <<= 1,
     },
 
     ATTR: {
         COL4: BIT2,
         POS2: BIT2 <<= 1,
+        DIM2: BIT2 <<= 1,
         SCALE2: BIT2 <<= 1,
         TEX2: BIT2 <<= 1,
         WPOS_TIME4: BIT2 <<= 1,
@@ -195,10 +199,8 @@ const SID = {
         // For individual uniforms we must include for the match, since a Program's shaders may be compiled before the creation of other meshes with the same sid except an extra uniform
         const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
         const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
-        // const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION|this.UNIF.TIME)
-        // const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION|this.UNIF.TIME)
-        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX)
-        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX)
+        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
+        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
         /**
          * // TODO:
          * I have deactivated the 'gfx_group' check.
@@ -227,7 +229,7 @@ const SID = {
     },
 
     ToString(sid){
-        return `shad:${sid.shad} attr:${sid.attr} unif:${sid.unif} pass:${sid.pass} group:${sid.gfx_group}`
+        return `shad:${sid.shad} attr:${sid.attr} unif:${sid.unif} pass:${sid.pass}`
     },
 
 };
@@ -284,6 +286,7 @@ const MAX_INDEX_BUFFER_SIZE = 64;
 const INDICES_PER_RECT = 6;
 const VERTS_PER_RECT = 6;
 const VERTS_PER_RECT_INDEXED = 4;
+// const INDEX_BUFFER_TRIANGLE_INDICES = 4;
 
 const V_COL_COUNT = 4; // Number of floats for vertex buffer's attribute
 const V_POS_COUNT = 2;
@@ -317,8 +320,10 @@ const MESH_ENABLE = {
         UNIF_RESOLUTION: 1,
         UNIFORM: _CNT <<= 1,
         UNIF_TIMER: _CNT <<= 1,
+        ATTR_DIM2: _CNT <<= 1,
         ATTR_TIME: _CNT <<= 1,
         ATTR_STYLE: _CNT <<= 1,
+        ATTR_COL4_PER_VERTEX: _CNT <<= 1,
 
         // Pass from vertex to fragment shader
         PASS_COL4: _CNT <<= 1,

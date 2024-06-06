@@ -26,7 +26,6 @@ import { View_get_view_vb_root_meshidx } from "../../Core/MeshBufferViews.js";
 
 
 const _fontsize = 8.5;
-const temp_close_minim_style = [0, 0, 0];
 
 
 export class Widget_Menu_Bar extends Section {
@@ -35,13 +34,13 @@ export class Widget_Menu_Bar extends Section {
    close_btn_idx;
    minimize_btn_idx;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [2, 5, 2], is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [2, 5, 2], num_faces, is_debug_mesh) {
 
       const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, col, text_col, _, _, _, _, is_debug_mesh);
 
 
       const dim = [label.GetMaxWidth(), 10];
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [5, 5], [0, 0, pos[2]], dim, col, _, style, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [5, 5], [0, 0, pos[2]], dim, col, _, style, num_faces, is_debug_mesh);
 
       Styles_pad_set(this.styles, pad)
       Styles_pad_set(label.styles, pad)
@@ -71,6 +70,56 @@ export class Widget_Menu_Bar extends Section {
 
    }
 
+
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // INHERITED METHODS
+   /****************************************************************************************************************************************************/
+
+
+   Destroy(_this) {
+
+      // Menu's children(close/minimize etc) destruction
+      for (let i = 0; i <= _this.children.boundary; i++) {
+
+         const child = _this.children.buffer[i];
+         child.Destroy();
+      }
+
+      _this.label.Destroy();
+
+      // Menus's destruction
+      return super.Destroy();
+   }
+
+
+   AddToWidgetRootBuffer(root_bufferidx) {
+
+      this.root_bufferidx = root_bufferidx;
+      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+
+      this.label.AddToWidgetRootBuffer(root_bufferidx);
+
+      if (this.close_btn_idx !== INT_NULL) {
+
+         const close_btn = this.children.buffer[this.close_btn_idx];
+         close_btn.AddToWidgetRootBuffer(root_bufferidx)
+      }
+
+      if (this.minimize_btn_idx !== INT_NULL) {
+
+         const minimize_btn = this.children.buffer[this.minimize_btn_idx];
+         minimize_btn.AddToWidgetRootBuffer(root_bufferidx)
+      }
+   }
+
+   SetGfxEnableAttributes(which, params) {
+      alert('777\nSetGfxEnableAttributes\nWidgetMenu')
+   }
 
    AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = [2, 5, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
@@ -231,45 +280,12 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
-   Destroy(_this) {
-
-      // Menu's children(close/minimize etc) destruction
-      for (let i = 0; i <= _this.children.boundary; i++) {
-
-         const child = _this.children.buffer[i];
-         child.Destroy();
-      }
-
-      _this.label.Destroy();
-
-      // Menus's destruction
-      return super.Destroy();
-   }
 
 
-   AddToWidgetRootBuffer(root_bufferidx) {
-
-      this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
-
-      this.label.AddToWidgetRootBuffer(root_bufferidx);
-
-      if (this.close_btn_idx !== INT_NULL) {
-
-         const close_btn = this.children.buffer[this.close_btn_idx];
-         close_btn.AddToWidgetRootBuffer(root_bufferidx)
-      }
-
-      if (this.minimize_btn_idx !== INT_NULL) {
-
-         const minimize_btn = this.children.buffer[this.minimize_btn_idx];
-         minimize_btn.AddToWidgetRootBuffer(root_bufferidx)
-      }
-   }
-
-
+   
    /*******************************************************************************************************************************************************/
    // Graphics
+   /*******************************************************************************************************************************************************/
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
       const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, _, false); // For the menu meshes
@@ -310,6 +326,13 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
+
+
+
+   /*******************************************************************************************************************************************************/
+   // Listeners
+   /*******************************************************************************************************************************************************/
+
    // SEE ### Construct Listeners
    ConstructListeners(parent_listeners = null) {
 
@@ -328,12 +351,22 @@ export class Widget_Menu_Bar extends Section {
       // Relative_pos_comp_recalc_right(this);
    }
 
+
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // UNIQUE METHODS
+   /****************************************************************************************************************************************************/
 }
 
 
 export class Close_Button extends Widget_Button {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE, pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE, 
+               pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
 
@@ -352,8 +385,11 @@ export class Close_Button extends Widget_Button {
 
 
 
+
+
    /*******************************************************************************************************************************************************/
-   // Events handling
+   // Listeners
+   /*******************************************************************************************************************************************************/
 
    OnClick(params) {
 
@@ -362,6 +398,15 @@ export class Close_Button extends Widget_Button {
       return true; // Needed for the listen event not to propagate further, after widget destruction
    }
 
+
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // UNIQUE METHODS
+   /****************************************************************************************************************************************************/
 
    OnClose() {
 
@@ -411,6 +456,13 @@ export class Widget_Minimize extends Widget_Button {
    }
 
 
+
+
+
+   /*******************************************************************************************************************************************************/
+   // Listeners
+   /*******************************************************************************************************************************************************/
+
    OnClick(_params) {
 
       const widget_minimize_btn = _params.evt_params.target_mesh;
@@ -419,6 +471,15 @@ export class Widget_Minimize extends Widget_Button {
       return true; // Needed for the listen event not to propagate further, after widget destruction
    }
 
+
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // UNIQUE METHODS
+   /****************************************************************************************************************************************************/
 
    OnMinimize(params) {
 

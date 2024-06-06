@@ -24,8 +24,51 @@ export class Widget_Button extends Widget_Label {
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    }
 
-      /*******************************************************************************************************************************************************/
-   // Events Handling
+
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // INHERITED METHODS
+   /****************************************************************************************************************************************************/
+
+
+   SetGfxEnableAttributes(which, params) {
+      alert('777\nSetGfxEnableAttributes\nWidgeButton')
+   }
+
+
+
+
+
+   /*******************************************************************************************************************************************************/
+   // Listeners
+   /*******************************************************************************************************************************************************/
+   ConstructListeners(parent_listeners = null) {
+
+      const mesh = this; // If in recursion, use as the current mesh the passed param. 
+
+      for (let i = 0; i <= mesh.listeners.boundary; i++) {
+
+         if (mesh.listeners.buffer[i]) { 
+
+            if(parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+               parent_listeners = [null, null];
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+            else if(parent_listeners[i] === null){
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+
+
+            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
+         }
+      }
+   }
+
+   
 
    OnClick(params) {
 
@@ -67,8 +110,21 @@ export class Widget_Button extends Widget_Label {
    }
 
 
-   /*******************************************************************************************************************************************************/
-   // Misc
+   RemoveTimeInterval(idx){
+      const intervalIdx = this.timeIntervalsIdxBuffer.buffer[idx];
+      TimeIntervalsDestroyByIdx(intervalIdx);
+      this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(idx);
+   }
+
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // UNIQUE METHODS
+   /****************************************************************************************************************************************************/
+
    Bind(EventClbk=null, targetBindingFunctions=_, params, click_flags) {
 
       if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
@@ -83,37 +139,6 @@ export class Widget_Button extends Widget_Label {
 
       if(click_flags) this.state.mask |= click_flags;
 
-   }
-
-
-   // SEE ### Construct Listeners
-   ConstructListeners(parent_listeners = null) {
-
-      const mesh = this; // If in recursion, use as the current mesh the passed param. 
-
-      for (let i = 0; i <= mesh.listeners.boundary; i++) {
-
-         if (mesh.listeners.buffer[i]) { 
-
-            if(parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-               parent_listeners = [null, null];
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
-            }
-            else if(parent_listeners[i] === null){
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
-            }
-
-
-            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
-         }
-      }
-   }
-
-
-   RemoveTimeInterval(idx){
-      const intervalIdx = this.timeIntervalsIdxBuffer.buffer[idx];
-      TimeIntervalsDestroyByIdx(intervalIdx);
-      this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(idx);
    }
 }
 
@@ -143,8 +168,48 @@ export class Widget_Switch extends Widget_Button {
    }
 
 
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // INHERITED METHODS
+   /****************************************************************************************************************************************************/
+
+
+   SetGfxEnableAttributes(which, params) {
+      alert('777\nSetGfxEnableAttributes\nWidgetSwitch')
+   }
+
+
+
+
+
    /*******************************************************************************************************************************************************/
-   // Events Handling
+   // Listeners
+   /*******************************************************************************************************************************************************/
+   ConstructListeners(parent_listeners = null) {
+
+      const mesh = this; // If in recursion, use as the current mesh the passed param. 
+
+      for (let i = 0; i <= mesh.listeners.boundary; i++) {
+
+         if (mesh.listeners.buffer[i]) { // If there is an event to be created
+
+            if(parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+               parent_listeners = [null, null];
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+            else if(parent_listeners[i] === null){
+               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            }
+            
+            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
+         }
+      }
+   }
+
 
    OnClick(params) {
 
@@ -173,42 +238,28 @@ export class Widget_Switch extends Widget_Button {
    }
 
 
-   /*******************************************************************************************************************************************************/
-   // Misc
-   Bind(EventClbk=null, targetBindingFunctions=_, params) {
 
-      if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Switch'; }
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // UNIQUE METHODS
+   /****************************************************************************************************************************************************/
+
+   Bind(EventClbk=null, targetBindingFunctions=_, params, click_flags) {
+
+      if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
       
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      this.evt_params = { // Create the parameters to pass for the switch's click event. 
+      this.evt_params = { // Create the parameters to pass for the button's click event. 
          EventClbk: EventClbk,
          targetBindingFunctions: targetBindingFunctions,
          target_mesh: this,
          params: params,
       };
-   }
 
+      if(click_flags) this.state.mask |= click_flags;
 
-   // SEE ### Construct Listeners
-   ConstructListeners(parent_listeners = null) {
-
-      const mesh = this; // If in recursion, use as the current mesh the passed param. 
-
-      for (let i = 0; i <= mesh.listeners.boundary; i++) {
-
-         if (mesh.listeners.buffer[i]) { // If there is an event to be created
-
-            if(parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-               parent_listeners = [null, null];
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
-            }
-            else if(parent_listeners[i] === null){
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
-            }
-            
-            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
-         }
-      }
    }
 
 }

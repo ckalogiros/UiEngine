@@ -450,6 +450,7 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
         const ubidx = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
     
         Uniforms_buffer_set_uniform(ubidx, val)
+        // console.log(i, val)
         Uniforms_buffer_update_uniform(ubidx)
     }
 }
@@ -615,7 +616,7 @@ function temp_check_nan_rename_me(arr) {
  * as to how the attributes of a mesh(pos, dim, ...)
  * are gonna be stored inside the veertex buffer.
  */
-export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
+export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces=0, dbg_mesh_name) {
 
 
     // console.log(meshidx, dbg_mesh_name)
@@ -631,7 +632,8 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     const prog = Progarm_get_program(progidx);
     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
 
-    const num_faces = 1; // Even for text rendering, the loop for all text faces is the caller, so no need to have num_faces. num_faces currently are working for vertex buffer updates 
+    // const num_faces = 1; // Even for text rendering, the loop for all text faces is the caller, so no need to have num_faces. num_faces currently are working for vertex buffer updates 
+    const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
 
     // Run for every vertex buffer of the group.
     for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
@@ -640,19 +642,20 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
 
         const start = vb_info.count;
         gfx.vb.starts.buffer[i] = start;
-        vb_info.vCount += VERTS_PER_RECT_INDEXED * num_faces;
-
+        
         // Reallocate vertex buffer if it has no more space
         const verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
         const meshSize = vb_info.attribs_info.count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for intanced geom. Better use the gfx.vb.counts 
         if (vb_info.count + meshSize >= vb_info.size) vb_info.Realloc(meshSize);
-
+        
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-
-        const stride = vb_info.attribs_info.count * verts_per_rect;
+        
+        // const stride = vb_info.attribs_info.count * verts_per_rect;
+        const stride = vb_info.attribs_info.count;
         vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
+        vb_info.vCount = vb_info.count / stride;
         // if (vb_groupidx>=2) console.log(vb_groupidx, vb_info.count)
-
+        // vb_info.attribs_info.attrib_divisor++;
 
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
@@ -668,22 +671,23 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, dbg_mesh_name) {
     }
 
     // Update the draw count
-    let draw_count = vb_group.vCount; // This is seting draw_count without 'INDEXED' vertex shader 
+    // let draw_count = vb_group.vCount; // This is seting draw_count without 'INDEXED' vertex shader 
+    let indices_count = 0; // This is seting draw_count without 'INDEXED' vertex shader 
     if (vb_group.sid.shad & SID.SHAD.INDEXED) { // If vertex shader is 'INDEXED', then re-assign the draw_count
 
-        draw_count = num_faces * INDICES_PER_RECT; // HACK: Later the 'INDICES_PER_RECT' must be abstracted in the vertex buffer OR the program.
+        indices_count = num_faces * INDICES_PER_RECT; // HACK: Later the 'INDICES_PER_RECT' must be abstracted in the vertex buffer OR the program.
 
         // Check if index buffer has enough indices to cover the max of any vertex buffer that it represents.
         Index_buffer_info_check_has_enough_indices(gfx.ib.idx, vb_group.draw_count, num_faces);
     }
 
-    vb_group.draw_count += draw_count;
+    vb_group.draw_count += indices_count;
 
-
+    // console.log(vb_groupidx, vb_group.draw_count)
     // return start;
 }
 
-export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat) {
+export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces=0) {
 
 
     const progidx = gfx.prog.idx;
@@ -691,7 +695,7 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat) {
     const prog = Progarm_get_program(progidx);
     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
 
-    const num_faces = 1;
+    const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
 
 
     let start = 0;
@@ -712,7 +716,8 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat) {
 
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
-        const stride = vb_info.attribs_info.count * verts_per_rect;
+        // const stride = vb_info.attribs_info.count * verts_per_rect;
+        const stride = vb_info.attribs_info.count;
         // Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
         vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
 
@@ -740,7 +745,7 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat) {
     }
     vb_group.draw_count += draw_count;
 
-    // console.log(start)
+    // console.log(vb_groupidx, vb_group.draw_count)
     return start
 }
 
@@ -780,30 +785,8 @@ export function Vertex_buffer_update_vertices(gfx, geom, mat, dbg_mesh_name) {
         // vb_group.needs_any_update = true;
         Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 
-
     }
-    // // const progidx = gfx.prog.idx;
-    // const vbidx = gfx.vb.groupidx;
-    // // const prog = Progarm_get_program(progidx);
-    // const vb_info = Vertex_buffer_group_get_byidx(vbidx);
-
-    // const num_faces = 1;
-    // const start = gfx.vb.start;
-
-    // if ((vb_info.vCount % 1) !== 0)
-    //     console.error('index buffer count mismatch')
-
-
-    // // const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
-    // const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-
-    // const verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
-    // const stride = vb_info.attribs_info.count * verts_per_rect;
-    // Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
-
-    // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE)
-    // vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-    // // vb_group.needs_any_update = true;
+    
 
 }
 

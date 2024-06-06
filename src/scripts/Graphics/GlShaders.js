@@ -62,6 +62,10 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 		gl.bindAttribLocation(shader_program, loc, 'a_pos');
 		loc++;
 	}
+	if(sid.attr & SID.ATTR.DIM2){
+		gl.bindAttribLocation(shader_program, loc, 'a_dim');
+		loc++;
+	}
 	if(sid.attr & SID.ATTR.TEX2){
 		gl.bindAttribLocation(shader_program, loc, 'a_tex');
 		loc++;

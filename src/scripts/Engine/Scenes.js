@@ -94,7 +94,7 @@ export function Scene_set_projection_matrix(sceneidx) {
 export function Scene_set_screen_res_uniform() {
 
     const unifidx = Uniforms_block_get_uniform_by_name('u_screen_res');
-    console.log('Screen Res:', VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
+    // console.log('Screen Res:', VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
     Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
 }
 

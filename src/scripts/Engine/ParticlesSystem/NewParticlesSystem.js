@@ -150,7 +150,7 @@ class Emitter {
          style: this.style,
       };
 
-      const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, mat);
+      const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, mat, _);
       this.particles_buffer.buffer[particle_idx].SetGfxStart(start);
       
       

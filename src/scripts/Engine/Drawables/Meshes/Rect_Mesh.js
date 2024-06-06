@@ -4,8 +4,6 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
-import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
-import { Batch_store } from "../../Batch/Batch.js";
 import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
@@ -14,9 +12,9 @@ import { Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_
 
 export class Rect extends Mesh {
 
-   constructor(pos = POSITION_CENTER, dim = [10, 10], col = BLUER3, is_debug_mesh = 0x0) {
+   constructor(pos = POSITION_CENTER, dim = [10, 10], col, num_faces, is_debug_mesh = 0x0) {
 
-      const geom = new Geometry2D(pos, dim);
+      const geom = new Geometry2D(pos, dim, _, num_faces);
       const mat = new Material(col);
 
       super(geom, mat);
@@ -26,39 +24,8 @@ export class Rect extends Mesh {
    }
 
 
-   AddChild(mesh) {
 
-      mesh.idx = this.children.Add(mesh);
-
-      mesh.parent = this;
-
-      return mesh.idx;
-   }
-
-
-   AddToWidgetRootBuffer(root_bufferidx) {
-
-      this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
-
-      for (let i = 0; i <= this.children.boundary; i++) {
-
-         const child = this.children.buffer[i];
-
-         /**CATCH ERROR - INFINITE LOOP */
-         if (child.type & MESH_TYPE.RECT_MESH) {
-            console.warn('RECT_MESH. Recursive call on AddToWidgetRootBuffer().\nSee for infinite loop', '\nchild:', child.constructor.name, 'name:', child.GetName());
-         }
-         child.AddToWidgetRootBuffer(root_bufferidx);
-      }
-
-   }
-
-
-   RemoveFromMeshPerVbBuffer() {
-      Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-   }
-
+   
 
    Activate() {
 
@@ -91,8 +58,43 @@ export class Rect extends Mesh {
 
 
 
+   
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // OVERIDEN METHODS
+   /****************************************************************************************************************************************************/
+
+   
+   AddToWidgetRootBuffer(root_bufferidx) {
+
+      this.root_bufferidx = root_bufferidx;
+      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+
+   }
+
+
+   AddChild(mesh) {
+
+      mesh.idx = this.children.Add(mesh);
+
+      mesh.parent = this;
+
+      return mesh.idx;
+   }
+
+
+
+   RemoveFromMeshPerVbBuffer() {
+      Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
+   }
+
+
+
+
+   
    /*******************************************************************************************************************************************************/
    // Graphics
+   /*******************************************************************************************************************************************************/
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
@@ -104,7 +106,7 @@ export class Rect extends Mesh {
 
    AddToGfx() {
 
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
@@ -117,8 +119,7 @@ export class Rect extends Mesh {
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
-      // Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName())
-      Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, this.GetName())
+      Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, this.GetName())
 
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       this.is_gfx_inserted = true;
@@ -137,22 +138,20 @@ export class Rect extends Mesh {
       if (this.is_gfx_inserted)
          Vertex_buffer_update_vertices(this.gfx, this.geom, this.mat, this.GetName())
       else {
-         Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
+         Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
          this.is_gfx_inserted = true;
       }
 
       return this.gfx.vb.start;
    }
 
-   /*******************************************************************************************************************************************************/
-   // Alignment
 
 
 
-
-
+   
    /*******************************************************************************************************************************************************/
    // Setters-Getters
+   /*******************************************************************************************************************************************************/
 
    GetMaxWidth() { return this.geom.dim[0]; }
 
@@ -250,7 +249,74 @@ export class Rect extends Mesh {
       this.geom.pos[1] = y;
    }
 
-   // SEE ### Construct Listeners
+   
+   SetMargin() {
+      this.geom.dim[0] += this.StylesGetMargin(STYLES.AXIS.X);
+      this.geom.dim[1] += this.StylesGetMargin(STYLES.AXIS.Y);
+   }
+
+
+
+}
+
+
+
+export class Rect_Mesh extends Rect {
+   
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS,  
+               pos = [200, 400, 0], dim = [40, 40],
+               col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', 
+               style = [10, 6, 2.], margin = [4, 4], num_faces=1, is_debug_mesh)
+   {
+
+      super(pos, dim, col, num_faces, is_debug_mesh);
+
+      this.mesh_bufferidx = mesh_bufferidx;
+
+      this.SetStyle(style)
+
+   }
+
+
+   Destroy() {
+
+      return super.Destroy();
+   }
+
+
+
+
+   
+   /*******************************************************************************************************************************************************/
+   // Graphics
+   /*******************************************************************************************************************************************************/
+
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
+
+      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
+      return gfx;
+   }
+
+
+   Render() {
+
+      if (this.state.mask & MESH_STATE.ACTIVE) super.AddToGfx();
+   }
+
+
+   Rerender() {
+
+      super.AddToGfxFromReset();
+   }
+
+
+
+
+   
+   /*******************************************************************************************************************************************************/
+   // Listeners
+   /*******************************************************************************************************************************************************/
+   
    ConstructListeners(parent_listeners = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
@@ -269,5 +335,4 @@ export class Rect extends Mesh {
          }
       }
    }
-
 }

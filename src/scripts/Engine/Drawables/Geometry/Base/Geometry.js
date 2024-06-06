@@ -13,7 +13,7 @@ import * as glBufferOps from '../../../../Graphics/Buffers/VertexBuffersOps.js'
 
 export class Geometry2D {
 
-    constructor(pos = [0, 0, 0], dim = [0, 0], scale = [1, 1]) {
+    constructor(pos = [0, 0, 0], dim = [0, 0], scale = [1, 1], num_faces=1) {
 
         this.pos = [0, 0, 0];
         this.dim = [0, 0];
@@ -25,7 +25,8 @@ export class Geometry2D {
 
         
         this.sid = {
-            shad: 0,
+            shad: SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
+            // attr: (SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4 | SID.ATTR.DIM2),
             attr: (SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4),
             // inst: SID.ATTR.WPOS_TIME4,
             inst: 0x0,
@@ -33,24 +34,24 @@ export class Geometry2D {
             pass: 0,
         };
 
+        const dim1 = dim;
+        
+        if(num_faces>1) dim1[0] = dim[0]/num_faces
 
         math.CopyArr3(this.pos, pos);
-        math.CopyArr2(this.dim, dim);
+        math.CopyArr2(this.dim, dim1);
         math.CopyArr2(this.scale, scale);
 
 
         // Keep a copy of the starting dimention and position
-        math.CopyArr2(this.defDim, dim);
+        math.CopyArr2(this.defDim, dim1);
         math.CopyArr2(this.defScale, scale);
         math.CopyArr3(this.defPos, pos);
 
-        this.num_faces = 1;
+        this.num_faces = num_faces;
         this.type |= MESH_TYPE.GEOMETRY2D;
 
     }
-
-    /*******************************************************************************************************************************************************/
-    // Graphics
 
     SetPosXYZ(pos, gfx, numFaces)   { glBufferOps.Gl_set_wpos_XYZ   (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1], pos[2], numFaces); }
     SetPosXY(pos, gfx)              { glBufferOps.Gl_set_wpos_xy    (gfx, pos[0] + this.dim[0], pos[1] + this.dim[1]); }
