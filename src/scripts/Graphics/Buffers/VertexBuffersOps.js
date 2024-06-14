@@ -1439,101 +1439,7 @@ export function Gl_set_wpos_time(gfxInfo, val) {
 
 /**************************************************************************************************************/
 // Particle System: Batch Update Particles
-export function Gl_particles_batch_set(vbidx, start, colors, positions, dimention) {
 
-   // const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
-   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
-   // const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.COL4);
-
-   // let stride = shader_attribs_info.attribs_per_vertex;
-
-   let index = start;
-   // const len = colors.length;
-   const len = 1;
-
-   for (let i = 0; i < len; i++) {
-
-      // const col = colors[i];
-      // const pos = positions[i];
-      const col = colors;
-      const pos = positions;
-      const dim = dimention;
-
-      // V1
-      vb_data[index++] = col[0];
-      vb_data[index++] = col[1];
-      vb_data[index++] = col[2];
-      vb_data[index++] = col[3];
-
-      vb_data[index++] = pos[0];
-      vb_data[index++] = pos[1];
-      vb_data[index++] = pos[2];
-      // vb_data[index++] = pos[3]; // Timer t
-      index++;
-
-      index++;
-      index++;
-      // vb_data[index++] = -dim[0];
-      // vb_data[index++] = dim[1];
-
-
-      // V2
-      vb_data[index++] = col[0];
-      vb_data[index++] = col[1];
-      vb_data[index++] = col[2];
-      vb_data[index++] = col[3];
-
-      vb_data[index++] = pos[0];
-      vb_data[index++] = pos[1];
-      vb_data[index++] = pos[2];
-      // vb_data[index++] = pos[3]; // Timer t
-      index++;
-
-      index++;
-      index++;
-      // vb_data[index++] = -dim[0];
-      // vb_data[index++] = -dim[1];
-
-
-      // V3
-      vb_data[index++] = col[0];
-      vb_data[index++] = col[1];
-      vb_data[index++] = col[2];
-      vb_data[index++] = col[3];
-
-      vb_data[index++] = pos[0];
-      vb_data[index++] = pos[1];
-      vb_data[index++] = pos[2];
-      // vb_data[index++] = pos[3]; // Timer t
-      index++;
-
-      index++;
-      index++;
-      // vb_data[index++] = dim[0];
-      // vb_data[index++] = dim[1];
-
-
-      // V4
-      vb_data[index++] = col[0];
-      vb_data[index++] = col[1];
-      vb_data[index++] = col[2];
-      vb_data[index++] = col[3];
-
-      vb_data[index++] = pos[0];
-      vb_data[index++] = pos[1];
-      vb_data[index++] = pos[2];
-      // vb_data[index++] = pos[3]; // Timer t
-      index++;
-
-      index++;
-      index++;
-      // vb_data[index++] = dim[0];
-      // vb_data[index++] = -dim[1];
-
-   }
-
-   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
-}
 
 export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colors, positions, dimention) {
 
@@ -1567,6 +1473,9 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colo
 
       index++;
       index++;
+
+      index++;
+      index++;
       // vb_data[index++] = -dim[0];
       // vb_data[index++] = dim[1];
 
@@ -1585,6 +1494,9 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colo
 
       index++;
       index++;
+      index++;
+      index++;
+
       index++;
       index++;
 
@@ -1613,6 +1525,9 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colo
 
       index++;
       index++;
+
+      index++;
+      index++;
       // vb_data[index++] = dim[0];
       // vb_data[index++] = dim[1];
 
@@ -1631,6 +1546,9 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colo
 
       index++;
       index++;
+      index++;
+      index++;
+
       index++;
       index++;
 

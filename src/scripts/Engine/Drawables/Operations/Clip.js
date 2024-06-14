@@ -138,8 +138,6 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
       for(let j=0; j <= meshshes_idx.boundary; j++){
          
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-if(mesh===_)
-console.log()
          const top      = root_wposy + mesh.geom.pos[1];
          const bottom   = top + mesh.geom.dim[1]*2;
 
@@ -544,7 +542,7 @@ export function TEMP_Clipy_from_group(group_bufferidx=null, clip_top=null, clip_
 export var temp_info = []
 
 export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=null) {
-   temp_info = []
+   // temp_info = []
    if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
 
    let changes_hapened = false;
@@ -556,45 +554,15 @@ export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=
 
    if((bot >= limit.up && top < limit.up) || (bot > limit.down && top < limit.down)){
       
-      // if(mesh.ClipY) mesh.clipY(limit);
 
+      for(let i=0; i <= mesh.children.boundary; i++){
+         const child = mesh.children.buffer[i];
 
-      // else{
+         changes_hapened = Clipy_from_tree_recursive(child, clip_top, clip_bottom);
 
-         for(let i=0; i <= mesh.children.boundary; i++){
-            const child = mesh.children.buffer[i];
-   
-            changes_hapened = Clipy_from_tree_recursive(child, clip_top, clip_bottom);
-   
-            // // This is the return point of an 
-            // if(changes_hapened){
-   
-            //    if(mesh.state.mask & MESH_STATE.ACTIVE){
-   
-            //       temp_info.push({
-            //          info:'Activate',
-            //          mesh: mesh.GetName(),
-            //          meshidx: mesh.mesh_bufferidx,
-            //       });
-            //    }
-            //    else{
-            //       temp_info.push({
-            //          info:'Deactivate',
-            //          mesh: mesh.GetName(),
-            //          meshidx: mesh.mesh_bufferidx,
-            //       });
-            //    }
-            // }
-         }
-      // }
+      }
    }
-   // if((bot <= limit.down && bot > limit.up) || (top >= limit.up && top < limit.down)){
-   //    // Clip for any children. Only if this mesh is active, else skip
-   //    for(let i=0; i <= mesh.children.boundary; i++){
-   //       const child = mesh.children.buffer[i];
-   //       Clipy_from_tree_recursive(child, clip_top, clip_bottom);
-   //    }
-   // }
+
 
    if(bot < limit.up || top > limit.down){
       
@@ -602,17 +570,18 @@ export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=
    
          mesh.StateDisable(MESH_STATE.ACTIVE);
          mesh.StateEnable(MESH_STATE.CLIPED_Y);
-         console.log('Deactivate', mesh.GetName())
+         // console.log('Deactivate', mesh.GetName())
          changes_hapened = true;
       }
    }
    else{
       
-      if(mesh.state.mask & MESH_STATE.CLIPED_Y){
+      if(mesh.state.mask & MESH_STATE.CLIPED_Y)
+      {
 
          mesh.StateEnable(MESH_STATE.ACTIVE);
          mesh.StateDisable(MESH_STATE.CLIPED_Y);
-         console.log('Activate', mesh.GetName())
+         // console.log('Activate', mesh.GetName())
          changes_hapened = true;
       }
    }

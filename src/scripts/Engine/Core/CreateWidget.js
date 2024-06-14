@@ -97,11 +97,11 @@ export function Create_text_mesh(text, pos, fontsize, col, bold, font, is_debug_
 
 
 
-export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, margin, pos, dim, col, name, style, is_debug_mesh=0x0, num_faces) {
+export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, dim, col, name, style, is_debug_mesh=0x0, num_faces) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, margin, pos, dim, col, name, style, num_faces, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, pad, pos, dim, col, name, style, num_faces, is_debug_mesh));
    
    if(NOTIFICATIONS_ON && !is_debug_mesh) 
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -120,7 +120,7 @@ export function Create_widget_text(ROOT_WIDGET_FLAGS=0x0, text, pos, fontSize, c
    
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-   _mesh_buffer.buffer[mesh_bufferidx].SetName(`[${mesh_bufferidx}]{${text}}-WIDGET_TEXT`);
+   _mesh_buffer.buffer[mesh_bufferidx].SetName(`WidgetText[${mesh_bufferidx}]{${text}}`);
       
    if(NOTIFICATIONS_ON && !is_debug_mesh) 
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -262,11 +262,12 @@ export function Create_widget_dropdown(ROOT_WIDGET_FLAGS=0x0, text, pos, col1, c
 
 
 
-export function Create_widget_menubar(ROOT_WIDGET_FLAGS=0x0, pos, col, text_col, text, btn_pad, bold, style, is_debug_mesh=0x0) {
+export function Create_widget_menubar(ROOT_WIDGET_FLAGS=0x0, pos, dim, col, text_col, text, btn_pad, bold, style, is_debug_mesh=0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
-   const mesh_bufferidx = _mesh_buffer.Reserve(); //                                                     pos, col = GREY[3], text_col = WHITE, name, pad = [14, 6], bold = .4, style = [2, 5, 2]
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Menu_Bar(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, col, text_col, text, btn_pad, bold, style, is_debug_mesh));
+   const mesh_bufferidx = _mesh_buffer.Reserve();
+   // TODO: num_faces should pass as parameter
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Menu_Bar(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, text_col, text, btn_pad, bold, style, 1, is_debug_mesh));
          
    if(NOTIFICATIONS_ON && !is_debug_mesh) 
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);

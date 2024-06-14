@@ -288,12 +288,29 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 	}
 
+   
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent){
+// alert('-1 -1 -1 -1 -1')
+	
+	if(!this.gfx_ctx_parent) {
+		this.gfx_ctx_flags = FLAGS;
+		this.gfx_ctx_parent = gfx_ctx_parent;
+		for (let i = 0; i <= this.children.boundary; i++) {
+			this.children.buffer[i].gfx_ctx_flags = FLAGS;
+			this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
+		}   
+	}
+
+	}
+
+
+
 
 
 	/*******************************************************************************************************************************************************/
 	// GFX
 
-	GenGfxCtx(FLAGS, specific_vb_groupidx=null) {
+	GenGfxCtx(FLAGS, specific_vb_groupidx=INT_NULL) {
 
 		super.GenGfxCtx(FLAGS, specific_vb_groupidx);
 

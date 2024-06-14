@@ -49,7 +49,11 @@ export class Mesh {
     state;      // BitField: Mesh state. 
     event_flags;// Bitfield: Event flags
     // alignment;  // BitField: Control this mesh's children alignment.
-    gfx_pool_request;     // BitField: 
+    gfx_pool_request;  // BitField: 
+
+    gfx_ctx_flags;     // BitField: Help on chosing the gfx buffers conditionaly 
+    gfx_ctx_parent;     // Value: The index of the parent from which to start search mesh tree for finding gfx context 
+
 
 
     hover_margin; // Value: A margin to be set for hovering. // TODO: Abstract to a struct.
@@ -123,6 +127,10 @@ export class Mesh {
         };
 
 
+        this.gfx_ctx_flags = 0x0;
+        this.gfx_ctx_parent = null;
+
+        
 
         this.uniforms = [];
         if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
@@ -343,13 +351,12 @@ export class Mesh {
 
     CreateListenEvent(etype, is_fake_event = false) {
 
-        if (etype & LISTEN_EVENT_TYPES.HOVER) {
+        if (!this.listeners) {
+            this.listeners = New_generic_buffer(_, 'Mesh-Listeners');
+            this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
+        }
 
-            // HERE: The construction of the listeners is been set 3 times. Make it one time in one place
-            if (!this.listeners) {
-                this.listeners = New_generic_buffer(_, 'Mesh-Listeners buffer');
-                this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
-            }
+        if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
             this.listeners.AddAtIndex(E.H, INT_NULL);
 
@@ -361,11 +368,6 @@ export class Mesh {
         }
         else if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
 
-            if (!this.listeners) {
-                this.listeners = New_generic_buffer(_, 'Mesh-Listeners buffer - Click');
-                this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
-            }
-
             this.listeners.AddAtIndex(E.C, INT_NULL)
 
             this.state.mask |= (MESH_STATE.IS_CLICKABLE);
@@ -375,11 +377,6 @@ export class Mesh {
 
         }
         else if (etype & LISTEN_EVENT_TYPES.MOVE) {
-
-            if (!this.listeners) {
-                this.listeners = New_generic_buffer(_, 'Mesh-Listeners buffer - Move');
-                this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
-            }
 
             this.listeners.AddAtIndex(E.C, INT_NULL);
 
@@ -396,11 +393,13 @@ export class Mesh {
     // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
     AddListenEvent(etypeidx, Clbk = null, params = null, parent_event_idx = null) {
 
+        if(this.listeners.buffer[etypeidx] !== INT_NULL) return;
+
         if (this.state.mask & MESH_STATE.ACTIVE) { // HERE: see if can remove check
+
             this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, parent_event_idx);
             this.parent_event_idx = (parent_event_idx) ? parent_event_idx : INT_NULL;
         }
-        // else console.error('{{{{{{{{{{{{{{{{{{{{{{{{{{{')
     }
 
 
@@ -622,7 +621,6 @@ export class Mesh {
                 this.sid.pass |= SID.PASS.DIM2; // TODO: Do we set the passing of dim to fargment shader automaticaly????
                 break;
             }
-
             case MESH_ENABLE.GFX.PASS_COL4: { this.sid.pass |= SID.PASS.COL4; break; }
             case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS2; break; }
             case MESH_ENABLE.GFX.PASS_DIM2: { this.sid.pass |= SID.PASS.DIM2; break; }

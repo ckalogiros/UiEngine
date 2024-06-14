@@ -365,7 +365,7 @@ export function TestWidgetsGeneric(scene) {
         // // const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,110,10], [16,16], .1, 2, 'Test Particle System3');
         // // const particle_system_idx3 = Particle_system_create_emitter(PURPLER[9], [10,90,10], [14,14], .1, 2, 'Test Particle System3');
         // // const particle_system_idx2 = Particle_system_create_emitter(BLUEL[9], [10,60,10], [12,12], .1, 2, 'Test Particle System2');
-        // const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
+        const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
      
         // // const particle_system_idx5 = Particle_system_create_emitter(ORANGEL[9], [10,120,10], [10,10], .1, 2, 'Test Particle System3');
         // // const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,100,10], [10,10], .1, 2, 'Test Particle System3');
@@ -375,16 +375,16 @@ export function TestWidgetsGeneric(scene) {
         
         
         
-        // const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 260, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
-        // btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        // btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 260, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
+        btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-        // // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx, particle_system_idx2, particle_system_idx3, particle_system_idx4, particle_system_idx5] }, MESH_STATE.IS_HOLD_CLICK)
-        // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx] }, MESH_STATE.IS_HOLD_CLICK)
+        // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx, particle_system_idx2, particle_system_idx3, particle_system_idx4, particle_system_idx5] }, MESH_STATE.IS_HOLD_CLICK)
+        btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx] }, MESH_STATE.IS_HOLD_CLICK)
         
-        // btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        // btn.Render();
-        // btn.ConstructListeners();
+        btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        btn.Render();
+        btn.ConstructListeners();
     }
 
 
@@ -1177,7 +1177,7 @@ function CreateSceneMenuBar() {
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
     
-    const menu = Create_widget_menubar(_, [0,0,pos[2]+1], TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
+    const menu = Create_widget_menubar(_, [0,0,pos[2]+1], _, TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
     section.AddItem(menu);
     
 
@@ -1274,7 +1274,7 @@ function  CreateWindowWithMenu() {
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
     
-    const menu = Create_widget_menubar(_, [0,0,pos[2]], TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
+    const menu = Create_widget_menubar(_, [0,0,pos[2]], _, TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
     section.AddItem(menu);
     
 
@@ -1434,31 +1434,6 @@ function  CreateWindowWithMenu() {
     // View_set_view_vb_start(section.group_bufferidxs, section.gfx.vb.start);
 }
 
-
-
-
-
-
-
-function CreateMenuBarSectioned(count) {
-
-    const h = 40;
-    let cnt = 1;
-    let posy = VIEWPORT.BOTTOM - h, fontSize = 10;
-
-    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [10, 10], ORANGE[8]);
-
-    for (let i = 0; i < count; i++) {
-        const menu_bar = Create_widget_menubar(_, `Menu ${cnt}`, ALIGN.LEFT, [120, posy, 0], [60, 20], BLUE_10_120_220, WHITE, [2, 2], .3);
-        menu_bar.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-        menu_bar.SetName(`Menu ${cnt}`)
-        menu_bar.AddCloseButton(_, menu_bar, 'x', [120, posy, 0], 6, GREY[1], WHITE, [6, 4], .8, _, [1, 4, 2]);
-        section.AddItem(menu_bar)
-        posy -= h; cnt++;
-    }
-
-    return section;
-}
 
 
 
@@ -2180,7 +2155,7 @@ function MeshInfo(scene) {
 
     /********************************************************************************************************************************************************/
     // Menu bar and Minimizer
-    const menu = Create_widget_menubar(_, pos, TRANSPARENCY(GREY[4], .7), WHITE, 'Info tip', [10, 6]);
+    const menu = Create_widget_menubar(_, pos, _, TRANSPARENCY(GREY[4], .7), WHITE, 'Info tip', [10, 6]);
     menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     menu.AddMinimizeButton(_, section);
     menu.options = SECTION.HORIZONTAL | SECTION.INHERIT;

@@ -5,7 +5,7 @@ import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { Rect } from "../Meshes/Rect_Mesh.js";
+import { Rect, Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
@@ -21,7 +21,8 @@ import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 
 
 
-export class Widget_Label extends Rect {
+// export class Widget_Label extends Rect {
+export class Widget_Label extends Rect_Mesh {
 
     // text_mesh;
 
@@ -44,7 +45,8 @@ export class Widget_Label extends Rect {
         ];
 
 
-        super(_pos, dim, col, _);
+        super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col, _, style, pad, 1, is_debug_mesh);
+        // super(_pos, dim, col, 1, _,);
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
         this.StylesSetPad(pad);
         this.SetStyle(style)
@@ -80,6 +82,11 @@ export class Widget_Label extends Rect {
     }
 
 
+
+    /****************************************************************************************************************************************************/
+    /****************************************************************************************************************************************************/
+    // INHERITED METHODS
+    /****************************************************************************************************************************************************/
 
     Activate() {
 
@@ -122,13 +129,6 @@ export class Widget_Label extends Rect {
 
 
 
-
-    /****************************************************************************************************************************************************/
-    /****************************************************************************************************************************************************/
-    // INHERITED METHODS
-    /****************************************************************************************************************************************************/
-
-
     Destroy() {
 
         this.text_mesh.Destroy();
@@ -168,6 +168,18 @@ export class Widget_Label extends Rect {
     }
 
 
+    GfxCtxSetFlag(FLAGS, gfx_ctx_parent){
+
+        if(!this.gfx_ctx_parent) {
+
+            this.gfx_ctx_flags = FLAGS;
+            this.gfx_ctx_parent = gfx_ctx_parent;
+            this.text_mesh.gfx_ctx_flags = FLAGS;
+            this.text_mesh.gfx_ctx_parent = gfx_ctx_parent;
+        }
+    }
+
+
 
 
 
@@ -176,9 +188,13 @@ export class Widget_Label extends Rect {
     /*******************************************************************************************************************************************************/
     GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_specific_vb_groupidx = INT_NULL, text_specific_vb_groupidx = INT_NULL) {
 
+        if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+
         this.gfx = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
         if (text_specific_vb_groupidx === INT_NULL)
-            this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, this.text_mesh);
+            // this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, this.text_mesh);
+            // this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, this.text_mesh);
+            this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh);
         else
             this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
 
@@ -458,8 +474,7 @@ export class Widget_Label extends Rect {
 
 
         STATE.mesh.SetClicked(mesh);
-        // STATE.mesh.SetFocused(mesh);
-        // console.log('Clicked:', mesh.GetName())
+        STATE.mesh.SetFocused(mesh);
 
         // IMPORTANT: We use the 'INTERVALS.MOVE' index for the 'timeIntervalsIdxBuffer' element, to store the interval for the move OR the resize event, since resize and move (intervals) cannot co-exist.
         if (mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
@@ -515,9 +530,6 @@ export class Widget_Label extends Rect {
 
                 STATE.mesh.SetGrabed(mesh);
                 mesh.StateEnable(MESH_STATE.IN_GRAB);
-                // STATE.mesh.SetFocused(mesh);
-                // mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-                // Widget_root_set_in_focus(mesh.root_bufferidx);
             }
 
         }

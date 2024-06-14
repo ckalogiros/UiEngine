@@ -189,124 +189,13 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
       if (clean_attr === (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
    }
 
-   // if ((attr & SID.ATTR.TEST_MULTI_VERTEX))
-   //    return FUNCTION_TABLE_IDXS.TEST_COL4_WPOS4_GENATTR1_POS2
-
 
    console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names, shader_attribs.nameids, SHADER_ATTRIBUTES);
    // alert('SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:')
    alert(`${inst} SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:`)
    return -1;
 }
-/** SAVE-CHECK */
-// else if (attr === (SHADER_ATTRIBUTES.COL4 | SHADER_ATTRIBUTES.WPOS_TIME4 | SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4 | SHADER_ATTRIBUTES.POS2)) {
-//    // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
-//    // if(inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
-//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_GENATTR1;
-//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
 
-//    else {
-//       // if ((attr & SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.GENERIC_ATTR1_VEC4) && (attr & SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2;
-//       if (attr & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2;
-//       if (attr & (SID.ATTR.POS2|SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.GENATTR1_POS2;
-//       if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
-//    }
-// }
-
-
-// else if (attr === (SHADER_ATTRIBUTES.COL4 | SHADER_ATTRIBUTES.WPOS_TIME4 | SHADER_ATTRIBUTES.POS2 | SHADER_ATTRIBUTES.TEX2)) {
-//    // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
-//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_TEX2;
-//    if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
-//    // else if(inst & SID.ATTR.POS2) return FUNCTION_TABLE_IDXS.INST_POS2_POS2;
-
-//    else {
-//       if (attr & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2_TEX2;
-//       if (attr & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
-//       if (attr & (SID.ATTR.POS2|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.POS2_TEX2;
-//       if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
-//    }
-// }
-
-
-// else if (attr === (SHADER_ATTRIBUTES.COL4 | SHADER_ATTRIBUTES.WPOS_TIME4 | SHADER_ATTRIBUTES.POS2)) {
-//    // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
-//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_POS2;
-//    if (inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
-//    if (inst & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_POS2_POS2;
-
-//    else {
-//       if (attr & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2;
-//       if ((attr & SID.ATTR.POS2|SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.GENATTR1_POS2;
-//       if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
-//    }
-// }
-/** SAVE-OLD */
-// export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
-
-//    const shader_attribs = Shader_attributes_get_attribs(attribsidx);
-//    const names = shader_attribs.names;
-
-//    if ((attr & SID.ATTR.TEST_MULTI_VERTEX))
-//       return FUNCTION_TABLE_IDXS.TEST_COL4_WPOS4_GENATTR1_POS2
-
-
-//    if ((shader_attribs.nameids[0] & SHADER_ATTRIBUTES.COL4) &&
-//       (shader_attribs.nameids[1] & SHADER_ATTRIBUTES.WPOS_TIME4) &&
-//       (shader_attribs.nameids[2] & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) &&
-//       (shader_attribs.nameids[3] & SHADER_ATTRIBUTES.POS2)) {
-//       // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
-//       // if(inst & (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
-//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4) && (inst & SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_GENATTR1;
-//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
-
-//       else {
-//          if ((attr & SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.GENERIC_ATTR1_VEC4) && (attr & SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2;
-//          if ((attr & SID.ATTR.POS2) && (attr & SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.GENATTR1_POS2;
-//          if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
-//       }
-//    }
-
-
-//    else if ((shader_attribs.nameids[0] & SHADER_ATTRIBUTES.COL4) &&
-//       (shader_attribs.nameids[1] & SHADER_ATTRIBUTES.WPOS_TIME4) &&
-//       (shader_attribs.nameids[2] & SHADER_ATTRIBUTES.POS2) &&
-//       (shader_attribs.nameids[3] & SHADER_ATTRIBUTES.TEX2)) {
-//       // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
-//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4) && (inst & SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_TEX2;
-//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
-//       // else if(inst & SID.ATTR.POS2) return FUNCTION_TABLE_IDXS.INST_POS2_POS2;
-
-//       else {
-//          if (attr & (SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.POS2) && (attr & SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2_TEX2;
-//          if (attr & (SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
-//          if ((attr & SID.ATTR.POS2) && (attr & SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.POS2_TEX2;
-//          if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
-//       }
-//    }
-
-
-//    else if ((shader_attribs.nameids[0] & SHADER_ATTRIBUTES.COL4) &&
-//       (shader_attribs.nameids[1] & SHADER_ATTRIBUTES.WPOS_TIME4) &&
-//       (shader_attribs.nameids[2] & SHADER_ATTRIBUTES.POS2)) {
-//       // Case we have multiple vertex buffers per shader instance, (Instanced geometry, not interleaved geometry)
-//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4) && (inst & SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_POS2;
-//       if (inst & (SID.ATTR.COL4) && (inst & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
-//       if (inst & SID.ATTR.POS2) return FUNCTION_TABLE_IDXS.INST_POS2_POS2;
-
-//       else {
-//          if (attr & (SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4) && (attr & SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2;
-//          // if(attr & (SID.ATTR.COL4) && (attr & SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.COL4_WPOS4;
-//          if ((attr & SID.ATTR.POS2) && (attr & SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.GENATTR1_POS2;
-//          if (attr & (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
-//       }
-//    }
-
-//    console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names, shader_attribs.nameids, SHADER_ATTRIBUTES);
-//    // alert('SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:')
-//    alert(`${inst} SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:`)
-//    return -1;
-// }
 
 
 
@@ -522,7 +411,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_GENATTR1_POS2_DIM2(vb_data, geom
             // console.log('dimy', 0)
          }
          
-         vb_data[index++] = geom.dim[0] * geom.num_faces;
+         vb_data[index++] = geom.dim[0] * num_faces;
          vb_data[index++] = geom.dim[1];
          
          k++; // Switch to the next color for this vertex
@@ -785,7 +674,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2(vb_data, geom, mat, st
          if(j===1) vb_data[index++] = 0;
          
          // DIMENTIONS
-         vb_data[index++] = geom.dim[0] * geom.num_faces;
+         vb_data[index++] = geom.dim[0] * num_faces;
          vb_data[index++] = geom.dim[1];
          
          attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
@@ -1621,8 +1510,8 @@ function INST_FILL_VERTEX_BUFFER_DIM2(vb_data, geom, mat, start, num_faces, stri
    for (let i = 0; i < num_faces; i++) {
 
       // V1
-      vb_data[index++] = geom.dim[0] * geom.num_faces;
-      vb_data[index++] = geom.dim[1] * geom.num_faces;
+      vb_data[index++] = geom.dim[0] * num_faces;
+      vb_data[index++] = geom.dim[1] * num_faces;
 
       attribs_count += stride;
    }
@@ -1644,8 +1533,8 @@ function INST_FILL_VERTEX_BUFFER_WPOS4_DIM2(vb_data, geom, mat, start, num_faces
       vb_data[index++] = geom.pos[2];
       vb_data[index++] = 0;
 
-      vb_data[index++] = geom.dim[0] * geom.num_faces;
-      vb_data[index++] = geom.dim[1] * geom.num_faces;
+      vb_data[index++] = geom.dim[0] * num_faces;
+      vb_data[index++] = geom.dim[1] * num_faces;
 
       attribs_count += stride;
    }

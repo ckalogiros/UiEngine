@@ -34,12 +34,12 @@ export class Widget_Menu_Bar extends Section {
    close_btn_idx;
    minimize_btn_idx;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [2, 5, 2], num_faces, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [2, 5, 2], num_faces, is_debug_mesh) {
 
       const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, col, text_col, _, _, _, _, is_debug_mesh);
 
 
-      const dim = [label.GetMaxWidth(), 10];
+      // const dim = [label.GetMaxWidth(), 10];
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [5, 5], [0, 0, pos[2]], dim, col, _, style, num_faces, is_debug_mesh);
 
       Styles_pad_set(this.styles, pad)
@@ -117,10 +117,107 @@ export class Widget_Menu_Bar extends Section {
       }
    }
 
+
    SetGfxEnableAttributes(which, params) {
       alert('777\nSetGfxEnableAttributes\nWidgetMenu')
    }
 
+
+   // GfxCtxSetFlag(FLAGS){
+   //    // alert('-1 MENU')
+      
+   //    this.gfx_ctx_flags = FLAGS;
+   //    if(!this.gfx_ctx_parent) this.gfx_ctx_parent = gfx_ctx_parent;
+   //    for (let i = 0; i <= this.children.boundary; i++) {
+   //       this.children.buffer[i].GfxCtxSetFlag(FLAGS,gfx_ctx_parent);
+   //    }
+   // }
+
+
+
+
+   
+   /*******************************************************************************************************************************************************/
+   // Graphics
+   /*******************************************************************************************************************************************************/
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
+      
+      if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+
+      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, _, false); // For the menu meshes
+
+      const rect_specific_vb_groupidx = this.gfx.vb.groupidx;
+      // const text_igfx = this.label.text_mesh.gfx.vb.groupidx;
+
+      for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
+         const child = this.children.buffer[i];
+         // child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, rect_igfx, text_igfx)
+         child.GenGfxCtx(FLAGS, rect_specific_vb_groupidx)
+      }
+      return gfx;
+   }
+
+
+   Render() {
+
+      super.Render(false); // For the menu meshes
+
+      for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
+
+         const child = this.children.buffer[i];
+         child.Render();
+      }
+   }
+
+
+   Rerender() {
+
+      super.AddToGfxFromReset();
+
+      for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
+
+         const child = this.children.buffer[i];
+         child.Rerender();
+      }
+   }
+
+
+
+
+
+   /*******************************************************************************************************************************************************/
+   // Listeners
+   /*******************************************************************************************************************************************************/
+
+   // SEE ### Construct Listeners
+   ConstructListeners(parent_listeners = null) {
+
+      // const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
+      super.ConstructListeners(parent_listeners);
+
+   }
+
+
+   // Resize menu bar. Keep the menu elements to their relative positions 
+   Resize(x) {
+
+      // this.geom.pos[0] += x;
+      this.geom.dim[0] += x;
+
+      // Relative_pos_comp_recalc_right(this);
+   }
+
+
+
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // UNIQUE METHODS
+   /****************************************************************************************************************************************************/
+   
+   
    AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = [2, 5, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
@@ -278,88 +375,6 @@ export class Widget_Menu_Bar extends Section {
       if (RelPosAlign & REL_POS.RIGHT) Relative_pos_comp_add_child_to_comp(align_item_flag, this, mesh.idx);
 
    }
-
-
-
-
-   
-   /*******************************************************************************************************************************************************/
-   // Graphics
-   /*******************************************************************************************************************************************************/
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
-
-      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, _, false); // For the menu meshes
-
-      const rect_specific_vb_groupidx = this.gfx.vb.groupidx;
-      // const text_igfx = this.label.text_mesh.gfx.vb.groupidx;
-
-      for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
-         const child = this.children.buffer[i];
-         // child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, rect_igfx, text_igfx)
-         child.GenGfxCtx(FLAGS, rect_specific_vb_groupidx)
-      }
-      return gfx;
-   }
-
-
-   Render() {
-
-      super.Render(false); // For the menu meshes
-
-      for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
-
-         const child = this.children.buffer[i];
-         child.Render();
-      }
-   }
-
-
-   Rerender() {
-
-      super.AddToGfxFromReset();
-
-      for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
-
-         const child = this.children.buffer[i];
-         child.Rerender();
-      }
-   }
-
-
-
-
-
-   /*******************************************************************************************************************************************************/
-   // Listeners
-   /*******************************************************************************************************************************************************/
-
-   // SEE ### Construct Listeners
-   ConstructListeners(parent_listeners = null) {
-
-      // const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-      super.ConstructListeners(parent_listeners);
-
-   }
-
-
-   // Resize menu bar. Keep the menu elements to their relative positions 
-   Resize(x) {
-
-      // this.geom.pos[0] += x;
-      this.geom.dim[0] += x;
-
-      // Relative_pos_comp_recalc_right(this);
-   }
-
-
-
-
-
-
-   /****************************************************************************************************************************************************/
-   /****************************************************************************************************************************************************/
-   // UNIQUE METHODS
-   /****************************************************************************************************************************************************/
 }
 
 
@@ -491,7 +506,7 @@ export class Widget_Minimize extends Widget_Button {
 
       if (root) {
 
-         if (!minim_mesh.toggle) {  // Maximize - toggle on
+         if (!minim_mesh.toggle) {  // Minimize - toggle off
 
             // Copy root's children to a buffer
             minim_mesh.stored_children_meshes = New_generic_buffer(root.children, 'minim_mesh.stored_children_meshes'); // TODO: Maybe copying all children is not efficient. Just get the pointer and use it later on maximize
@@ -532,7 +547,7 @@ export class Widget_Minimize extends Widget_Button {
             minim_mesh.toggle = true;
 
          }
-         else { // Maximize - toggle off
+         else { // Maximize - toggle on
 
             // Gfx_deactivate_no_listeners_touch(root);
             Widget_root_reset_gfx(root.root_bufferidx)
@@ -542,7 +557,7 @@ export class Widget_Minimize extends Widget_Button {
 
             // Re-Activate all children, except the menu bar, so they are gonna be drawn to the vertex buffer on re-render 
             for (let i = root.children.buffer[0].idx + 1; i <= root.children.boundary; i++) {
-               root.children.buffer[i].Activate()
+               root.children.buffer[i].Activate();
             }
 
 

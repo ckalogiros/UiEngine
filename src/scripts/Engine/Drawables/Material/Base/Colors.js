@@ -180,22 +180,22 @@ const PURPLE5 = [0.6, 0.0, 0.6, 1.0];
 const PURPLE6 = [0.7, 0.0, 0.7, 1.0];
 const PURPLE7 = [0.8, 0.0, 0.8, 1.0];
 const PURPLE8 = [0.9, 0.0, 0.9, 1.0];
-const PURPLE9 = [0.0, 0.0, 0.0, 1.0];
+const PURPLE9 = [1.0, 0.0, 1.0, 1.0];
 export const PURPLE = [ PURPLE0, PURPLE1, PURPLE2, PURPLE3, PURPLE4, PURPLE5, PURPLE6, PURPLE7, PURPLE8, PURPLE9, ];
 
 const PURPLEB0 = [0.05, 0.0, 0.1, 1.0];
-const PURPLEB1 = [0.1, 0.0, 0.2, 1.0];
+const PURPLEB1 = [0.1 , 0.0, 0.2, 1.0];
 const PURPLEB2 = [0.15, 0.0, 0.3, 1.0];
-const PURPLEB3 = [0.2, 0.0, 0.4, 1.0];
+const PURPLEB3 = [0.2 , 0.0, 0.4, 1.0];
 const PURPLEB4 = [0.25, 0.0, 0.5, 1.0];
-const PURPLEB5 = [0.3, 0.0, 0.6, 1.0];
+const PURPLEB5 = [0.3 , 0.0, 0.6, 1.0];
 const PURPLEB6 = [0.35, 0.0, 0.7, 1.0];
-const PURPLEB7 = [0.4, 0.0, 0.8, 1.0];
+const PURPLEB7 = [0.4 , 0.0, 0.8, 1.0];
 const PURPLEB8 = [0.45, 0.0, 0.9, 1.0];
-const PURPLEB9 = [0.5, 0.0, 0.0, 1.0];
+const PURPLEB9 = [0.5 , 0.0, 1.0, 1.0];
 export const PURPLEB = [ PURPLEB0, PURPLEB1, PURPLEB2, PURPLEB3, PURPLEB4, PURPLEB5, PURPLEB6, PURPLEB7, PURPLEB8, PURPLEB9, ];
 
-const PURPLER0 = [0.1, 0.0, 0.05 , 1.0];
+const PURPLER0 = [0.1, 0.0, 0.05, 1.0];
 const PURPLER1 = [0.2, 0.0, 0.1 , 1.0];
 const PURPLER2 = [0.3, 0.0, 0.15, 1.0];
 const PURPLER3 = [0.4, 0.0, 0.2 , 1.0];
@@ -210,7 +210,7 @@ export const PURPLER = [ PURPLER0, PURPLER1, PURPLER2, PURPLER3, PURPLER4, PURPL
 
 export const COLOR_ARRAY3 = [
 	YELLOWL,
-	GREY,
+	// GREY,
 	PURPLE,
 	PURPLEB,
 	PURPLER,

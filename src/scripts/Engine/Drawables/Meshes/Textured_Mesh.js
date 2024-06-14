@@ -81,7 +81,7 @@ export class Textured_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
    }
 
@@ -139,7 +139,6 @@ export class Textured_Mesh extends Mesh {
       if (Check_intersection_point_rect(g.pos, g.dim, point, [0, 8])) {
 
          STATE.mesh.SetClicked(mesh);
-         // STATE.mesh.SetFocused(mesh);
          console.log('Clicked:', mesh.GetName())
 
          if (mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {

@@ -209,26 +209,15 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
 
    }
 
-   // Listener_debug_print_view_recursive()
 
    // HERE: We need to run a recursive loop in view storage buffer, to remove all childs from the events storage buffer
-
    event.view = null;
    _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(event_idx)
-   // mesh.listeners.buffer[TYPE_IDX] = INT_NULL
 
    if (_listeners_buffer_storage.buffer[TYPE_IDX].active_count === 0)
       LISTENERS_FLAGS[TYPE_IDX] = false;
 
 }
-
-/**
- * {
-      idx: event_idx,
-      meshidx: meshidx,
-      children: null,
-   }
- */
 
 
 function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
@@ -252,7 +241,6 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
    // Free the memory of this view.buffer after we have removed all elements in the loop above.
    // This is only to set the 'DEBUG_INFO_STRUCTS.BUFFER.GENERIC.COUNTER'.
    // The actual view is removed-destroyed from it's parent, in the caller function
-   // console.log()
    Free_generic_buffer(view)
 }
 
@@ -556,8 +544,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                   Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
                   event.Clbk(dispatch_params);
 
-                  // const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
-                  // STATE.mesh.SetFocused(mesh);
                   return; // Return if at least one event is handled. Also return so that any event of the main event will not run.
                }
             }
@@ -576,9 +562,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
             Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
             event.Clbk(dispatch_params); // Call the event
-
-            // const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
-            // STATE.mesh.SetFocused(mesh);
 
          } 
          return;
@@ -624,8 +607,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                      Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
                      e.Clbk(dispatch_params);
 
-                     // const mesh = Mesh_buffer_get_mesh_byidx(dispatch_params.meshidx);
-                     // STATE.mesh.SetFocused(mesh);
                      return; // Return if at least one event is handled. Also return so that any event of the main event will not run.
                   }
                }
@@ -645,9 +626,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
                Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
                event.Clbk(dispatch_params); // Call the event
-
-               // const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
-               // STATE.mesh.SetFocused(mesh);
 
                return;
             }

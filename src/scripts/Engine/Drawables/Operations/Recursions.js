@@ -21,7 +21,7 @@ export function Find_parent_listen_event(EVENT_TYPE_IDX, mesh){
 
 
    // If no parent listener is found:
-   // 1. If mesh parent is of type section, cretae FAKE event listener
+   // 1. If mesh parent is of type section, create FAKE event listener
    // 2. Else create FAKE event listener at widget root
 
    if(mesh.parent && (mesh.parent.type & MESH_TYPE.SECTION_MESH)){

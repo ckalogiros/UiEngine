@@ -255,4 +255,17 @@
                   |          |------>Lower limit: clamp y down + threshold
 
 
+/** ### GfxCtxSetFlag : 'GfxCtxSetFlag(FLAGS, gfx_ctx_parent)'
+   Create a searching pattern for aquiring gfx context(gfx buffers).
+   In case we need to search (for gfx buffers) from a specific
+   mesh in the mesh tree struct, so that we avoid finding any 
+   match upper from that mesh.
+
+   There are 2 variables:
+      gfx_ctx_flags: Type: GFX_CTX_FLAGS. 
+         The flags will set the conditional 'if' statement to be followed in 'Find_gfx_match_from_mesh_tree()'
+      gfx_ctx_parent: Type: index OR refference???
+         The mesh which will be set as the parent mesh and from which to run the searching algo for gfx buffers find.
+
+   Usage: Pass flags flags as 'GFX_CTX_FLAGS.FROM_PARENT_DSC' and give a 'parent' mesh as the second param.
  */

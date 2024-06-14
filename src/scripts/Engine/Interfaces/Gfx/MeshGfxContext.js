@@ -5,7 +5,7 @@ import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_grou
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
-import { Mesh_per_vb_create_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_create_vb, Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name, Uniforms_buffer_find_ubidx_from_name } from "../../../Graphics/Buffers/UniformBuffers.js";
@@ -44,7 +44,7 @@ export class GfxInfoMesh {
       this.attribsPerVertex = 0;
       this.meshIdx = INT_NULL; // The index of the current mesh from scene's mesh buffer.
       this.vao = null;
-      
+
       this.verts_per_face = New_int8_buffer(1);
 
       this.prog = {
@@ -55,12 +55,12 @@ export class GfxInfoMesh {
       };
 
       this.vb = { // The vertex buffer info the mesh belongs to
-         
+
          groupidx: INT_NULL,	// 
          idxs: New_int8_buffer(),	// The vertex buffer (float*) idx that this Mesh is stored to.
          starts: New_int16_buffer(),		// The current meshe's starting index in vertex buffer. 
          counts: New_int16_buffer(),		// Current size of the float buffer (in floats)
-         
+
          which_vb: { // If this gfx has attributes scattered between vertex buffers, we need to specify which attribute belongs to which vertex buffer
             col_buf: INT_NULL,   // The index of the vertex buffer the color attribute is stored to
             wpos_buf: INT_NULL,  // The index of the vertex buffer the wpos attribute is stored to
@@ -70,7 +70,7 @@ export class GfxInfoMesh {
          },
          // WRONG:If this gfx has attributes scattered between vertex buffers, we need the index of the buffer for each attribute(index to:{idxs,starts,counts,...})
          // Specifies the sequence of attributes, start fro 0 the first one, and add 1 for each next.
-         which_attrib: { 
+         which_attrib: {
             col_idx: INT_NULL,   // The index of the color attribute
             wpos_idx: INT_NULL,  // The index of the wpos attribute
             params1_idx: INT_NULL,  // The index of the wpos attribute
@@ -92,23 +92,23 @@ export class GfxInfoMesh {
 
    }
 
-   CopyVb(){
+   CopyVb() {
 
-      const gfx = { 
-         
+      const gfx = {
+
          groupidx: this.vb.groupidx,
          idxs: this.vb.idxs,
          starts: this.vb.starts,
          counts: this.vb.counts,
-         
-         which_vb: {       
+
+         which_vb: {
             col_buf: this.vb.which_vb.col_buf,
             wpos_buf: this.vb.which_vb.wpos_buf,
             generic_attr1_buf: this.vb.which_vb.generic_attr1_buf,
             dim_buf: this.vb.which_vb.dim_buf,
             tex_buf: this.vb.which_vb.tex_buf,
          },
-         which_attrib: { 
+         which_attrib: {
             col_idx: this.vb.which_attrib.col_idx,
             wpos_idx: this.vb.which_attrib.wpos_idx,
             params1_idx: this.vb.which_attrib.params1_idx,
@@ -160,8 +160,8 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
    gfx_ctx.verts_per_face[0] = VERTS_PER_RECT_INDEXED; // HACK
    // if(the type is of type connected vertex faces)
    const face_type = 'connected'; // TODO: this must be a flag 
-   for (let i=1; i < num_faces; i++){
-      if(face_type === 'connected'){
+   for (let i = 1; i < num_faces; i++) {
+      if (face_type === 'connected') {
          gfx_ctx.verts_per_face[i] = 2; // HACK
       }
       else {
@@ -171,45 +171,45 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
 
 
 
-   
+
    /********************************************************************/
    // Set info for each instanced vertex buffer 
-   for(let i=0; i <= vb_group.vb_idxs.boundary; i++){
-      
+   for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
+
       const vbidx = vb_group.vb_idxs.buffer[i];
       gfx_ctx.vb.idxs.Add(vbidx);
       gfx_ctx.vb.starts.Add(0);
       gfx_ctx.vb.counts.Add(0);
-      
+
       const vb_info = VBI_get_byidx(vbidx);
-      
+
       // Set bool is instanced or is per_vertex. If the vb's sid isn't included in the mesh's sid.intstanced, then it is per_vertex
-      if((vb_group.sid.inst & vb_info.sid)===0) gfx_ctx.vb.is_per_vertex.Add(true);
+      if ((vb_group.sid.inst & vb_info.sid) === 0) gfx_ctx.vb.is_per_vertex.Add(true);
       else gfx_ctx.vb.is_per_vertex.Add(false);
-      
+
       // Here we assign the correct vertex buffer index to the mesh attributes(COL,WPOS,DIM, etc)
-      if(vb_info.sid & SID.ATTR.COL4) { gfx_ctx.vb.which_vb.col_buf = i; }
-      if(vb_info.sid & SID.ATTR.WPOS_TIME4) { gfx_ctx.vb.which_vb.wpos_buf = i; }
-      if(vb_info.sid & SID.ATTR.GENERIC_ATTR1_VEC4) { gfx_ctx.vb.which_vb.generic_attr1_buf = i; }
-      if(vb_info.sid & SID.ATTR.POS2) { gfx_ctx.vb.which_vb.dim_buf = i; }
-      if(vb_info.sid & SID.ATTR.TEX2) { gfx_ctx.vb.which_vb.tex_buf = i; }
-      
-      
-   } 
-   
+      if (vb_info.sid & SID.ATTR.COL4) { gfx_ctx.vb.which_vb.col_buf = i; }
+      if (vb_info.sid & SID.ATTR.WPOS_TIME4) { gfx_ctx.vb.which_vb.wpos_buf = i; }
+      if (vb_info.sid & SID.ATTR.GENERIC_ATTR1_VEC4) { gfx_ctx.vb.which_vb.generic_attr1_buf = i; }
+      if (vb_info.sid & SID.ATTR.POS2) { gfx_ctx.vb.which_vb.dim_buf = i; }
+      if (vb_info.sid & SID.ATTR.TEX2) { gfx_ctx.vb.which_vb.tex_buf = i; }
+
+
+   }
+
 
 
    /********************************************************************/
    // Set attributes info for vertex buffer
    const prog_attribs = Shader_attributes_get_attribs(prog.attribsidx)
    const len = prog_attribs.nameids.length;
-   for(let i=0; i < len; i++){
-      
-      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i; 
-      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS_TIME4) gfx_ctx.vb.which_attrib.wpos_idx = i; 
-      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) gfx_ctx.vb.which_attrib.params1_idx = i; 
-      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.POS2) gfx_ctx.vb.which_attrib.dim_idx = i; 
-      if(prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i; 
+   for (let i = 0; i < len; i++) {
+
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS_TIME4) gfx_ctx.vb.which_attrib.wpos_idx = i;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) gfx_ctx.vb.which_attrib.params1_idx = i;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.POS2) gfx_ctx.vb.which_attrib.dim_idx = i;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i;
    }
 
    gfx_ctx.ib.idx = ibidx; // Stores the programs index for the indexbuffer.
@@ -247,14 +247,15 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    let vb_group = null;
    let vbidxs = null;
    let vb_groupidx = INT_NULL;
-   
-   
-   if(specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
+
+
+   // if((FLAGS & GFX_CTX_FLAGS.PRIVATE)===0 && specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
+   if (specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
       vbidxs = Vertex_buffer_group_get_vbidxs(specific_vb_groupidx);
       progidx = Vertex_buffer_group_get_progidx(specific_vb_groupidx);
       vb_groupidx = specific_vb_groupidx
    }
-   else{
+   else {
       // Check buffers validity, or find buffers based on Flags
       vb_groupidx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, specific_vb_groupidx);
    }
@@ -297,7 +298,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       if (vb_groupidx === INT_NULL) {
 
-         vb_group = Vertex_buffer_create(sid, _, progidx); 
+         vb_group = Vertex_buffer_create(sid, _, progidx);
          vb_groupidx = vb_group.idx;
          vbidxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
 
@@ -311,7 +312,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          Mesh_per_vb_create_vb(vb_groupidx);
 
          // this.EnableGfxUniforms(SID.UNIF.WPOS4, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         
+
          const root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
          mesh.root_posidx = root_posidx;
          if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
@@ -319,11 +320,12 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          is_vertex_buffer_created = true;
 
       }
-      else{
+      else {
 
          // Get the unif wpos that is already created for this vb
          Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
- 
+         // is_vertex_buffer_created = true;
+
       }
 
    }
@@ -351,14 +353,14 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
    /**
-    * Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms buffer.
+    * Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms block buffer.
     */
    for (let i = 0; i < uniforms.length; i++) {
 
       if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
 
          const ubidx = Uniforms_buffer_find_ubidx_from_name(uniforms[i].name, progidx);
-         if(ubidx !== INT_NULL) Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, uniforms[i].name);
+         if (ubidx !== INT_NULL) Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, uniforms[i].name);
       }
    }
 
@@ -367,10 +369,11 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
+      // TODO: Set active on Add function
       Renderqueue_set_active(vb_groupidx, true); // Update the draw buffer
 
 
-      
+      // POTENTIAL_BUG: In case we reuse a created VB from gfx Pool, we need to insert it to the new widget root gfx buffer.
       Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs);
       Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
 
@@ -390,13 +393,11 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       }
 
-
-
    }
 
    // TODO: Implement
-   // // Add mesh to the root batch buffer for batch update
-   // Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vbidx, mesh_count);
+   // Add mesh to the root batch buffer for batch update
+   Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, mesh_count);
 
 
    // Store the root pos in each mesh. Assuumes the indexing of root_wpos and vbs are 1-1.
@@ -428,7 +429,7 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
    let vbidxs = null;
    let vb_groupidx = INT_NULL;
 
-   if(specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(emitter.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
+   if (specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(emitter.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
       vbidxs = Vertex_buffer_group_get_vbidxs(specific_vb_groupidx);
       progidx = Vertex_buffer_group_get_progidx(specific_vb_groupidx);
       vb_groupidx = specific_vb_groupidx
@@ -473,7 +474,7 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
 
       if (vb_groupidx === INT_NULL) {
 
-         vb_group = Vertex_buffer_create(sid, _, progidx); 
+         vb_group = Vertex_buffer_create(sid, _, progidx);
          vb_groupidx = vb_group.idx;
          vbidxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
 
@@ -490,15 +491,9 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
          is_vertex_buffer_created = true;
 
       }
-      else{
 
-         // Get the unif wpos that is already created for this vb
-         // Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, emitter.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
-         // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vb_groupidx);
-         // emitter.root_posidx = root_posidx;
-   
-      }
    }
+
 
 
 
@@ -509,11 +504,12 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
 
    if (sid.shad & SID.SHAD.INDEXED) {
 
-      ibidx = Gfx_pool_find_ib_notActive(TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN.rect_123_234);
+      // BUG: Can we use same index buffer for different vertex buffers? No, cause the geometry may have different vertex index break points. Yes, if the geometries do not use connected vertices
+      ibidx = Gfx_pool_find_ib_notActive(sid.shad);
 
       if (ibidx === INT_NULL) { // Create new index buffer
 
-         const ib_info = Index_buffer_info_create(sid, _, TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN.rect_123_234);
+         const ib_info = Index_buffer_info_create(sid, _);
          ibidx = ib_info.ibidx;
 
          Program_store_index_buffer_idx(progidx, ibidx); // Store the indexbuffer index to the programs ib array
@@ -523,35 +519,78 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
    }
 
 
+   /**
+    * Here we connect each emitter uniform index 'ubidx', with the ubidx from the uniforms buffer.
+    */
+   for (let i = 0; i < uniforms.length; i++) {
+
+      if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
+
+         const ubidx = Uniforms_buffer_find_ubidx_from_name(uniforms[i].name, progidx);
+         if (ubidx !== INT_NULL) Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, uniforms[i].name);
+      }
+   }
+
+
    if (is_vertex_buffer_created) {
 
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
       Renderqueue_set_active(vb_groupidx, true); // Update the draw buffer
 
+
+      // Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs);
       Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
 
-      // mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vbidx
       const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vb_groupidx);
       emitter.root_posidx = root_posidx;
 
-      
       /**
-       * Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms buffer.
+       * Here we connect each emitter uniform index 'ubidx', with the ubidx from the uniforms buffer.
        */
       for (let i = 0; i < uniforms.length; i++) {
 
          if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
 
             const ubidx = uniforms[i].ubidx
-            // if has unif u_col, create unif col root
+            // if has unif u_col, create uunif col root
             Mesh_unif_create_vb_root_col(emitter.col)
          }
 
       }
 
-      if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vb_groupidx');
    }
+
+
+   // if (is_vertex_buffer_created) {
+
+   //    // Add the new vertexBuffer to the render queue
+   //    Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
+   //    Renderqueue_set_active(vb_groupidx, true); // Update the draw buffer
+
+   //    Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
+
+   //    // mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vbidx
+   //    const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vb_groupidx);
+   //    emitter.root_posidx = root_posidx;
+
+
+   //    /**
+   //     * Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms buffer.
+   //     */
+   //    for (let i = 0; i < uniforms.length; i++) {
+
+   //       if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
+
+   //          const ubidx = uniforms[i].ubidx
+   //          // if has unif u_col, create unif col root
+   //          Mesh_unif_create_vb_root_col(emitter.col)
+   //       }
+
+   //    }
+
+   //    if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vb_groupidx');
+   // }
 
 
 

@@ -1,6 +1,6 @@
 "use strict";
 
-import { Rect } from '../Meshes/Rect_Mesh.js';
+import { Rect, Rect_Mesh } from '../Meshes/Rect_Mesh.js';
 import { MouseGetPos, MouseGetPosDif } from '../../Controls/Input/Mouse.js';
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/TimeIntervals.js';
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
@@ -8,7 +8,7 @@ import { AddArr2, Min } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } from '../../Core/CreateWidget.js';
 import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
-import { BLUEL, BLUE_10_120_220, GREY, REDL, WHITE } from '../Material/Base/Colors.js';
+import { GREY, WHITE } from '../Material/Base/Colors.js';
 import { Find_parent_listen_event } from '../Operations/Recursions.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
@@ -17,13 +17,14 @@ import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 
 
 
-export class Widget_Slider_Simple extends Rect {
+// export class Widget_Slider_Simple extends Rect {
+export class Widget_Slider_Simple extends Rect_Mesh {
 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[8], hover_margin = [0, 0], handle_dim=[10,10], faces=1, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[8], hover_margin = [0, 0], handle_dim=[10,10], num_faces=1, is_debug_mesh) {
 
-
-      super(pos, dim, col, faces, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, _, _, _, num_faces, is_debug_mesh);
+      // super(pos, dim, col, faces, is_debug_mesh);
 
       this.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       this.mesh_bufferidx = mesh_bufferidx;
@@ -44,7 +45,8 @@ export class Widget_Slider_Simple extends Rect {
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       // handle.SetStyle([5, handle_dim[1], 1.5]);
-      handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 1.5]);
+      // handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 1.5]);
+      handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 2.5]);
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
       // HACK:
@@ -98,7 +100,10 @@ export class Widget_Slider_Simple extends Rect {
 
 
    SetGfxEnableAttributes(which, params) {
-      alert('777\nSetGfxEnableAttributes\nWidgetSlider')
+      
+      this.SetGfxEnableAttributes(which, params);
+      const handle = this.children.buffer[0];
+      handle.SetGfxEnableAttributes(which, params);
    }
 
 
@@ -151,6 +156,7 @@ export class Widget_Slider_Simple extends Rect {
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
+      if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
       const rect_igfx = this.gfx.vb.groupidx; // Copy the gfx from the scroller area.
@@ -295,23 +301,7 @@ export class Widget_Slider_Simple extends Rect {
 
          return true;
       }
-      // else { // Else Move Widget Slider 
 
-      //    STATE.mesh.SetClicked(bar);
-
-      //    if ((bar.type & MESH_TYPE.WIDGET_SLIDER) && bar.StateCheck(MESH_STATE.IS_GRABABLE) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
-
-      //       const idx = TimeIntervalsCreate(10, 'Move Slider', TIME_INTERVAL_REPEAT_ALWAYS, bar.OnMove, bar);
-      //       bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
-
-      //       STATE.mesh.SetGrabed(bar);
-      //       STATE.mesh.SetFocused(bar);
-      //       bar.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-      //       Widget_root_set_in_focus(bar.root_bufferidx);
-      //    }
-
-      //    return true;
-      // }
    }
 
 
@@ -653,7 +643,8 @@ export function Slider_bind_on_value_change(sliderBar, target) {
 
 
 
-export class Widget_Slider_XX1 extends Rect {
+// export class Widget_Slider_XX1 extends Rect {
+export class Widget_Slider_XX1 extends Rect_Mesh {
 
    name_text; // Slider's name text mesh
    value_text_idx; // Slider's value text mesh index in children buffer
@@ -679,7 +670,8 @@ export class Widget_Slider_XX1 extends Rect {
       const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, 'Slider', pos, fontSize, WHITE, .4, is_debug_mesh);
 
       /** Label area mesh */
-      super(pos, dim, col, 1, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col, _, _, [pad,pad], 1, is_debug_mesh);
+      // super(pos, dim, col, 1, is_debug_mesh);
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
@@ -803,20 +795,17 @@ export class Widget_Slider_XX1 extends Rect {
 
    }
 
-   SetGfxEnableAttributes(which, params) {
-      alert('777\nSetGfxEnableAttributes\nWidgetSlider')
-   }
-
    
    SetGfxEnableAttributes(which, params) {
+      // alert('777\nSetGfxEnableAttributes\nWidgetSlider')
 
       this.EnableGfxAttributes(which, params);
 
       const bar = this.children.buffer[this.bar_idx];
       bar.EnableGfxAttributes(which, params);
 
-      const handle = bar.children.buffer[0];
-      handle.EnableGfxAttributes(which, params);
+      // const handle = bar.children.buffer[0];
+      // handle.EnableGfxAttributes(which, params);
    }
 
    
@@ -923,6 +912,24 @@ export class Widget_Slider_XX1 extends Rect {
    }
 
 
+   GfxCtxSetFlag(FLAGS){
+
+      this.gfx_ctx_flags = FLAGS;
+
+      const bar = this.children.buffer[this.bar_idx];
+      bar.gfx_ctx_flags = FLAGS;
+
+      const name_text = this.text_mesh;
+      name_text.gfx_ctx_flags = FLAGS;
+
+      const handle = bar.children.buffer[0];
+      handle.gfx_ctx_flags = FLAGS;
+
+      const value_text = this.children.buffer[this.value_text_idx];
+      value_text.gfx_ctx_flags = FLAGS;
+   }
+
+
 
 
    
@@ -932,6 +939,7 @@ export class Widget_Slider_XX1 extends Rect {
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
+      if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
       const rect_igfx = this.gfx.vb.groupidx; // Copy the gfx from the scroller area.
@@ -1094,7 +1102,6 @@ export class Widget_Slider_XX1 extends Rect {
 
 
          STATE.mesh.SetClicked(bar);
-         // STATE.mesh.SetFocused(mesh);
 
          if ((bar.type & MESH_TYPE.WIDGET_SLIDER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
@@ -1114,7 +1121,6 @@ export class Widget_Slider_XX1 extends Rect {
       else { // Else Move Widget Slider 
 
          STATE.mesh.SetClicked(bar);
-         // STATE.mesh.SetFocused(mesh);
 
          if ((mesh.type & MESH_TYPE.WIDGET_SLIDER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 

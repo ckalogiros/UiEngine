@@ -48,7 +48,7 @@ export function Screen_wpos_add_y(y) { _screen_wpos[1] += y; }
 
 
 /*******************************************************************************************************************************************************************************/
-// World Root Positions as uniforms per vertex buffer 
+// Widget Root Positions as uniforms per vertex buffer 
 /*******************************************************************************************************************************************************************************/
 const _per_vb_mesh_unif_wpos = New_generic_buffer(_, '_per_vb_mesh_unif_wpos');
 const _debug_names_per_vb_mesh_unif_wpos = New_generic_buffer(_, '_debug_names_per_vb_mesh_unif_wpos');
@@ -73,7 +73,8 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
    wpos[0] = mesh_pos[0];
    wpos[1] = mesh_pos[1];
- 
+   if(debug_vb_groupidx===3)
+      console.log 
 
    // if (mesh_parent !== null && mesh_parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
    if (mesh_parent !== null){
@@ -99,9 +100,9 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
        * The correct is both label and text have offset positions to rect.
        */
       let parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
-      if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
-         parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_wpos.parent_posidx];
-      }
+      // if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
+      //    parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_wpos.parent_posidx];
+      // }
       
       // Now, because we are gonna need the 'mesh_bufferidx' of the 'root wpos', we need to get the mesh from the mesh buffer.
       const mesh_that_has_the_root_wpos = Mesh_buffer_get_mesh_byidx(parent_root_wpos.meshidx);
@@ -174,9 +175,9 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
        * The correct is both label and text have offset positions to rect.
        */
       let parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
-      if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
-         parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_wpos.parent_posidx];
-      }
+      // if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
+      //    parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_wpos.parent_posidx];
+      // }
       
       // Now, because we are gonna need the 'mesh_bufferidx' of the 'root wpos', we need to get the mesh from the mesh buffer.
       const mesh_that_has_the_root_wpos = Mesh_buffer_get_mesh_byidx(parent_root_wpos.meshidx);
@@ -316,8 +317,8 @@ export function Mesh_unif_set_vb_root_wpos(idx, x, y) {
 
 export function Mesh_unif_set_vb_root_wpos_all_siblings(idx, x, y){
 
-   _per_vb_mesh_unif_wpos.buffer[idx].wpos[0] = x;
-   _per_vb_mesh_unif_wpos.buffer[idx].wpos[1] = y;
+   // _per_vb_mesh_unif_wpos.buffer[idx].wpos[0] = x;
+   // _per_vb_mesh_unif_wpos.buffer[idx].wpos[1] = y;
 
    const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[idx].parent_posidx;
    // Run from parent idx to the end of buffer, and add the pos to any elem that is a sibling(same parent)
@@ -372,6 +373,26 @@ export function Mesh_unif_add_vb_root_wpos(idx, pos) {
 
 
 
+export function Mesh_unif_add_vb_root_wpos_all_siblings(idx, x, y){
+
+   const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[idx].parent_posidx;
+   
+   // Run from parent idx to the end of buffer, and add the pos to any elem that is a sibling(same parent)
+   // BUG: Assuming the parent always is before any children, which probably it is not the case when root wpos's are removed and new are replacing existing elements
+   
+   // for(let i=parent_rootidx+1; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+   for(let i=idx; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+      
+      const elem = _per_vb_mesh_unif_wpos.buffer[i];
+      if(elem.parent_posidx === parent_rootidx){
+         _per_vb_mesh_unif_wpos.buffer[i].wpos[0] += x;
+         _per_vb_mesh_unif_wpos.buffer[i].wpos[1] += y;
+      }
+   }
+}
+
+
+
 export function Mesh_unif_add_vb_root_wposx(idx, pos) {
    _per_vb_mesh_unif_wpos.buffer[idx].wpos[0] += pos;
 }
@@ -399,7 +420,7 @@ export function Mesh_unif_add_vb_root_wposy(idx, pos) {
 
 
 /*******************************************************************************************************************************************************************************/
-// World Root Positions as uniforms per vertex buffer 
+// Widget Root Colors as uniforms per vertex buffer 
 /*******************************************************************************************************************************************************************************/
 
 // per_vb_mesh_unif_#type

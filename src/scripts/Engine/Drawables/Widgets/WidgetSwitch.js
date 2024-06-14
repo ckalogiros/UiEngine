@@ -5,7 +5,7 @@ import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { BLUE, BLUEL, GREEN, GREY } from "../Material/Base/Colors.js";
-import { Rect } from "../Meshes/Rect_Mesh.js";
+import { Rect, Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 
@@ -13,7 +13,8 @@ import { Find_parent_listen_event } from "../Operations/Recursions.js";
 
 
 
-export class Widget_Switch_Simple extends Rect {
+// export class Widget_Switch_Simple extends Rect {
+export class Widget_Switch_Simple extends Rect_Mesh {
 
    isOn;
    evt_params;
@@ -23,7 +24,8 @@ export class Widget_Switch_Simple extends Rect {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], pad = 2, bold, style = [0, 15, 2.], is_debug_mesh) {
 
       const switch_dim = [size * 2, size]
-      super(pos, switch_dim, col, _, is_debug_mesh)
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, switch_dim, col, _, style, pad, 1, is_debug_mesh)
+      // super(pos, switch_dim, col, _, is_debug_mesh)
 
       this.color_active = [0, 0, 0, 0];
       CopyArr4(this.color_active, col2);
@@ -141,6 +143,17 @@ export class Widget_Switch_Simple extends Rect {
       super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
    }
 
+   
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent){
+      
+      if(!this.gfx_ctx_parent) {
+         
+         this.gfx_ctx_flags = FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+         this.children.buffer[i].gfx_ctx_flags = FLAGS;
+         this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
+      }
+   }
 
 
 
@@ -150,6 +163,8 @@ export class Widget_Switch_Simple extends Rect {
    /*******************************************************************************************************************************************************/
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL, params = null) {
 
+      if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+      
       const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, params);
       this.children.buffer[0].GenGfxCtx(FLAGS, specific_vb_groupidx, params);
 

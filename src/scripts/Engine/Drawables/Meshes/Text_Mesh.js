@@ -112,7 +112,7 @@ export class Text_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
    }
 
@@ -383,6 +383,7 @@ export class Text_Mesh extends Mesh {
     */
    RenderTextFromNumber(value) {
       if (value.constructor === Number) {
+         // console.log(value, `${value}`)
          this.SetText(`${value}`)
          this.RenderText();
       }

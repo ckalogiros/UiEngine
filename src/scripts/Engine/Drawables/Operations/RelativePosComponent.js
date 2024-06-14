@@ -220,5 +220,6 @@ export function Relative_pos_comp_move_right_buffer(whereidx, parent, x){
 
       // If elem is a synthesized mesh (widget), move elem and all its children
       elem.MoveXNoGfxUpdate(x)
+      // elem.SetPosXNoGfxUpdate(x*2)
    }
 }

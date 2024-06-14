@@ -8,12 +8,14 @@ import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Widget_root_add_mesh }
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Mesh_unif_is_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { BLUEL } from "../Material/Base/Colors.js";
 
 
 export class Rect extends Mesh {
 
    constructor(pos = POSITION_CENTER, dim = [10, 10], col, num_faces, is_debug_mesh = 0x0) {
 
+      // num_faces = 1
       const geom = new Geometry2D(pos, dim, _, num_faces);
       const mat = new Material(col);
 
@@ -25,8 +27,12 @@ export class Rect extends Mesh {
 
 
 
-   
 
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // OVERIDEN METHODS
+   /****************************************************************************************************************************************************/
    Activate() {
 
       this.state.mask |= MESH_STATE.ACTIVE;
@@ -54,17 +60,8 @@ export class Rect extends Mesh {
    SetTypeDebug() {
       this.type |= MESH_TYPE.DEBUG_MESH;
    }
-
-
-
-
    
-   /****************************************************************************************************************************************************/
-   /****************************************************************************************************************************************************/
-   // OVERIDEN METHODS
-   /****************************************************************************************************************************************************/
 
-   
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
@@ -91,12 +88,14 @@ export class Rect extends Mesh {
 
 
 
-   
+
    /*******************************************************************************************************************************************************/
    // Graphics
    /*******************************************************************************************************************************************************/
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
+
+      // if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
@@ -124,9 +123,8 @@ export class Rect extends Mesh {
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       this.is_gfx_inserted = true;
 
-
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }
@@ -148,7 +146,7 @@ export class Rect extends Mesh {
 
 
 
-   
+
    /*******************************************************************************************************************************************************/
    // Setters-Getters
    /*******************************************************************************************************************************************************/
@@ -249,11 +247,11 @@ export class Rect extends Mesh {
       this.geom.pos[1] = y;
    }
 
-   
-   SetMargin() {
-      // this.geom.dim[0] += this.StylesGetMargin(STYLES.AXIS.X);
-      // this.geom.dim[1] += this.StylesGetMargin(STYLES.AXIS.Y);
-   }
+
+   // SetMargin() {
+   //    this.geom.dim[0] += this.StylesGetMargin(STYLES.AXIS.X);
+   //    this.geom.dim[1] += this.StylesGetMargin(STYLES.AXIS.Y);
+   // }
 
 
 
@@ -261,13 +259,13 @@ export class Rect extends Mesh {
 
 
 
+// TODO: IMPLEMENT
 export class Rect_Mesh extends Rect {
-   
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS,  
-               pos = [200, 400, 0], dim = [40, 40],
-               col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', 
-               style = [10, 6, 2.], margin = [4, 4], num_faces=1, is_debug_mesh)
-   {
+
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS,
+      pos = [0, 0, 0], dim = [10, 10],
+      col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED',
+      style = [10, 6, 2.], pad = [4, 4], num_faces = 1, is_debug_mesh) {
 
       super(pos, dim, col, num_faces, is_debug_mesh);
 
@@ -278,20 +276,69 @@ export class Rect_Mesh extends Rect {
    }
 
 
+
+
+
+   /****************************************************************************************************************************************************/
+   /****************************************************************************************************************************************************/
+   // OVERIDEN METHODS
+   /****************************************************************************************************************************************************/
+
+
    Destroy() {
 
       return super.Destroy();
    }
 
 
+   Activate() {
+
+      this.state.mask |= MESH_STATE.ACTIVE;
+      for (let i = 0; i <= this.children.boundary; i++) {
+         this.children.buffer[i].Activate();
+      }
+   }
 
 
-   
+   Deactivate() {
+
+      this.state.mask &= ~MESH_STATE.ACTIVE;
+      for (let i = 0; i <= this.children.boundary; i++) {
+         this.children.buffer[i].Deactivate();
+      }
+   }
+
+   AddToWidgetRootBuffer(root_bufferidx) {
+
+      this.root_bufferidx = root_bufferidx;
+      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+
+      for (let i = 0; i <= this.children.boundary; i++) {
+
+         const child = this.children.buffer[i];
+         child.AddToWidgetRootBuffer(root_bufferidx);
+      }
+
+   }
+
+// TODO: This is wrong, cause we assume the children are NOT widgets with more children/meshes in them
+   GfxCtxSetFlag(FLAGS){
+
+      this.gfx_ctx_flags = FLAGS;
+      for (let i = 0; i <= this.children.boundary; i++) {
+         this.children.buffer[i].gfx_ctx_flags = FLAGS;
+      }
+   }
+
+
+
    /*******************************************************************************************************************************************************/
    // Graphics
    /*******************************************************************************************************************************************************/
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
+
+      // if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
       return gfx;
@@ -312,11 +359,11 @@ export class Rect_Mesh extends Rect {
 
 
 
-   
+
    /*******************************************************************************************************************************************************/
    // Listeners
    /*******************************************************************************************************************************************************/
-   
+
    ConstructListeners(parent_listeners = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 

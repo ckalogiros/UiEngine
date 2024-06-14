@@ -467,11 +467,7 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
 
 
 /*************************************************************************************************************************/
-// export function Vertex_buffer_group_get_vbs(vb_groupidx) {
-//     alert()
-//     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
-//     return _vertex_buffer_groups.buffer[vb_groupidx].vbs;
-// }
+
 export function Vertex_buffer_group_get_vb(vb_groupidx, vbidx) {
     alert()
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
@@ -552,6 +548,7 @@ export function Vertex_buffer_exists_from_index(vbidx) {
 
 
 
+/** Reset Vertex Buffer to specific mesh start index */
 export function Vertex_buffer_reset_to_index(vb_groupidx, starts) {
     // if (!DISABLE_DEBUG) (_vertex_buffer_groups, progidx, new Error().lineNumber);
 
@@ -586,6 +583,47 @@ export function Vertex_buffer_reset_to_index(vb_groupidx, starts) {
 
     const indices_per_face = Index_buffer_info_get_indices_per_face(vb_group.ibidx);
     vb_group.draw_count = num_faces * indices_per_face;
+
+    vb_group.needs_any_update = true;
+
+}
+
+
+/** Reset Vertex Buffer to 0 */
+export function Vertex_buffer_reset(vb_groupidx, starts) {
+    // if (!DISABLE_DEBUG) (_vertex_buffer_groups, progidx, new Error().lineNumber);
+
+
+    const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
+
+    let num_faces = 0;
+
+    for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
+        /**
+         * // TODO: Check If the view has meshes to its right inside the current vertexbuffer,
+         * If num_faces + start is less than vertex buffers count, the it has, so we need to remove the attributes from the vertex buffer  
+         */
+
+        const vbidx = vb_group.vb_idxs.buffer[i]
+
+        const vb_info = _vertex_buffer_infos.buffer[vbidx];
+        if (starts[i] < 0 || starts[i] > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js, ');
+
+        const attribsidx = Program_get_shader_attributes_index(vb_group.progidx);
+        const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
+
+        vb_info.count = 0;
+        vb_info.vCount = 0;
+        vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+
+        // num_faces += vb_info.count / (vb_group.vertices_per_face * attribs_per_vertex);
+        vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+    }
+
+
+    const indices_per_face = Index_buffer_info_get_indices_per_face(vb_group.ibidx);
+    // vb_group.draw_count = num_faces * indices_per_face;
+    vb_group.draw_count = 0;
 
     vb_group.needs_any_update = true;
 
@@ -746,6 +784,7 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces
     vb_group.draw_count += draw_count;
 
     // console.log(vb_groupidx, vb_group.draw_count)
+
     return start
 }
 

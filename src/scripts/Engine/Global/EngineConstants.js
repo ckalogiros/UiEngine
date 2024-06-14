@@ -469,7 +469,7 @@ const ALIGN = {
 
 
 const POSITION_CENTER = [0, 0, 0];
-const TEMP_RESIZE_MARGIN = [10, 10];
+const TEMP_RESIZE_MARGIN = [15, 15];
 const POSSITIVE = 0;
 const NEGATIVE = 0;
 
@@ -997,6 +997,7 @@ const INFO_LISTEN_EVENT_TYPE = {
 
 	UI_INFO_MESH: _CNT <<= 0x1,
 	UI_INFO_GFX: _CNT <<= 0x1,
+	UI_INFO_FOCUSED: _CNT <<= 0x1,
 
 	LISTENERS: _CNT <<= 0x1,
 	MOUSE: _CNT <<= 0x1,
@@ -1107,6 +1108,12 @@ const DEBUG_INFO = {
 		POS: [400, 300, 10]
 	},
 	UI_MESH: {
+		IS_ON: false,
+		ROOT_IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [530, 50, 10]
+	},
+	UI_FOCUSED: {
 		IS_ON: false,
 		ROOT_IDX: INT_NULL,
 		MESH_BUFFER_IDX: INT_NULL,

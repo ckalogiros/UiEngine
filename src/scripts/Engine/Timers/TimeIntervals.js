@@ -73,7 +73,7 @@ class Interval {
 
          if (this.t >= this.interval) {
 
-            // HERE // TODO: set berak point and llok for performance timers debug ui. All the callbacks are stored to a buffer, but there are duplicate function pointers. See if we cal optimize by storing unique functions only
+            // HERE // TODO: set break point and look for performance timers debug ui. All the callbacks are stored to a buffer, but there are duplicate function pointers. See if we cal optimize by storing unique functions only
             if (this.clbk) this.clbk(this.clbkParams); // Call the callback, if exists.
             // console.log(this.GetName())
             this.t = 0; // Reset interval timer

@@ -220,7 +220,6 @@ export class Widget_Switch extends Widget_Button {
       text_mesh.RenderTextFromString(mesh.state_text[mesh.isOn]);
       mesh.SetUpdateFrameBuffer();
       STATE.mesh.SetClicked(mesh);
-      // STATE.mesh.SetFocused(mesh);
 
       /**
        * For popup menu options and slider connections.

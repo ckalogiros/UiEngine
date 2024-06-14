@@ -291,7 +291,7 @@ function Remove_vb_data_from_view_recursive(mesh) {
    /**DEBUG*/ if(groupidx===INT_NULL || group_vbidx===INT_NULL || group_meshidx===INT_NULL) console.error('MESH HAS NULL GROUP:', mesh.GetName(), ' mesh group idxs',  mesh.group_bufferidxs)
 
    // If the last element is removed from .data buffer, the sort_happened is -1, meaning there was no element swap (sorting)
-   const sort_happend = _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data.RemoveByIdxSortedVersion(group_meshidx);
+   const sort_happend = _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data.RemoveByIdxSortedVersion(group_meshidx, mesh.mesh_bufferidx, 'Remove_vb_data_from_view_recursive1');
    
    // Update group's num_faces.
    _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].info[VIEW_INFO.NUM_FACES] -= mesh.geom.num_faces;
@@ -321,7 +321,7 @@ function Remove_vb_data_from_view_recursive(mesh) {
       /**DEBUG*/ if(text_groupidx===INT_NULL || text_group_vbidx===INT_NULL || text_group_meshidx===INT_NULL) console.error('MESH HAS NULL GROUP:', mesh.text_mesh.GetName(), ' mesh group idxs',  mesh.text_mesh.group_bufferidxs)
      
       // If the last element is removed from .data buffer, the sort_happened is -1, meaning there was no element swap (sorting)
-      const sort_happend = _view_buffer.buffer[text_groupidx].vb.buffer[text_group_vbidx].data.RemoveByIdxSortedVersion(text_group_meshidx);
+      const sort_happend = _view_buffer.buffer[text_groupidx].vb.buffer[text_group_vbidx].data.RemoveByIdxSortedVersion(text_group_meshidx, mesh.mesh_bufferidx, 'Remove_vb_data_from_view_recursive2');
       
       // Update group's num_faces.
       _view_buffer.buffer[text_groupidx].vb.buffer[text_group_vbidx].info[VIEW_INFO.NUM_FACES] -= mesh.text_mesh.geom.num_faces;
@@ -393,6 +393,7 @@ export function View_remove_from_group(mesh) {
 // Functionality
 /*****************************************************************************************************************************/
 // HERE: must add multi vbidx for the Views
+/** THIS FUNCTION MAY NOT REMOVEE ANY 'mesh_per_vb', because of the 'Dropdown' removal by inactive item */
 export function View_reset_from_view_all_buffers(view_bufferidx) {
 
    const view = _view_buffer.buffer[view_bufferidx];
@@ -403,14 +404,14 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
       // const progidx = view.vb.buffer[i].info[VIEW_INFO.PROGIDX];
       const vb_groupidx = view.vb.buffer[i].info[VIEW_INFO.VB_GROUP_IDX];
 
-      const vb_start = view.vb.buffer[i].info[VIEW_INFO.START]; // We want the start of the root mesh of the group, not the start of the root widget
+      // const vb_start = view.vb.buffer[i].info[VIEW_INFO.START]; // We want the start of the root mesh of the group, not the start of the root widget
 
       const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
       const starts = mesh.gfx.vb.starts.buffer;
       Vertex_buffer_reset_to_index(vb_groupidx, starts);
       // Vertex_buffer_reset_to_index(vb_groupidx, vb_start);
 
-      Mesh_per_vb_remove_all_from_index(vb_groupidx, view.vb.buffer[i].data.buffer[0]); // Pass the meshidx of the first mesh on the current accessed vb
+      // Mesh_per_vb_remove_all_from_index(vb_groupidx, view.vb.buffer[i].data.buffer[0]); // Pass the meshidx of the first mesh on the current accessed vb
    }
 
 }
@@ -440,12 +441,12 @@ export function View_render_from_view_all_buffers(view_bufferidx, do_reconstruct
    }
    
    // Get the root mesh
-   const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
-   const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
-   Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2)
-   if(do_reconstruct_listeners) 
-   mesh.ConstructListeners(parent_events); 
-   const delta = Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2)
+   // const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
+   // const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
+   // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2)
+   // if(do_reconstruct_listeners) 
+   // mesh.ConstructListeners(parent_events); 
+   // const delta = Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2)
 
 }
 

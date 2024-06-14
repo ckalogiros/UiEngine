@@ -142,7 +142,7 @@ class Index_Buffer_Info {
 
       this.discontinue_offset = 0; // An offset where the break of the indices happen. Used for connected vertices
       if(sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_4) this.discontinue_offset = 4; // Break vertex connection every 4 vertices, for a type of geometry with 4 vertices per face
-      else if(sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_6) this.discontinue_offset = 6; // Break vertex connection every 4 vertices, for a type of geometry with 6 vertices per face
+      else if(sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_6) this.discontinue_offset = 6; // Break vertex connection every 6 vertices, for a type of geometry with 6 vertices per face
       
       this.connect_offset = 0; // An offset of the vertex index at which the next face will be connected to
       if(sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) this.connect_offset = 2; // Connect to the second previous index 

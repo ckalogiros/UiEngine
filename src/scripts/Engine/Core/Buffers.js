@@ -60,7 +60,7 @@ export class M_Buffer {
       this.buffer[idx] = elem;
       this.active_count++;
       DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT++;
-      // console.log('0000', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT, DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE)
+      // console.log('0000', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT, DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE, this.buffer[idx])
       return idx;
    }
 
@@ -285,7 +285,7 @@ export class M_Buffer {
    /*********************************************************************************************************************/
    // TEMP-TEST
    /*********************************************************************************************************************/
-   RemoveByIdxSortedVersion(idx) {
+   RemoveByIdxSortedVersion(idx, debug_id, debug_name) {
 
       if (this.buffer[idx] !== null) {
 
@@ -294,8 +294,10 @@ export class M_Buffer {
          // const replacer_idx = this.#ShortReplaceWithLast(idx);
          this.#ShortReplaceWithLast(idx);
 
-         if (this.active_count <= INT_NULL)
+         if (this.active_count <= INT_NULL){
+            console.error(idx, debug_id, debug_name, this)
             alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nM_Buffer active_count <= -1');
+         }
 
          return true;
 
@@ -347,7 +349,7 @@ export function New_generic_buffer(obj, name = 'UNAMED BUFFER') {
    });
    
    DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE+=buffer.size;
-   // console.log('MemAlloc idx', buffer.buffer_container_idx, 'size', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE, buffer.size)
+   // console.log('MemAlloc idx', buffer.buffer_container_idx, 'size', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE, buffer.size, name)
 
    return buffer;
 }
@@ -358,16 +360,19 @@ export function Free_generic_buffer(buffer) {
    DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE -= buffer.size; // Remove from the total allocations size the size of the buffer that is destroyed
    DEBUG_INFO_STRUCTS.BUFFER.GENERIC.BUFFER_COUNT--;
 
+   // console.log('Mem-DE-Alloc',  'idx', buffer.buffer_container_idx, 'size', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE, buffer.size,_generic_buffers_container.buffer[buffer.buffer_container_idx].name)
    // console.log(_generic_buffers_container.buffer[buffer.buffer_container_idx])
    _generic_buffers_container.RemoveByIdx(buffer.buffer_container_idx);
    // console.log('_generic_buffers_container', 'count', _generic_buffers_container.active_count, 'size', _generic_buffers_container.size, )
 
    let total_sizes = 0;
    for (let i = 0; i <= _generic_buffers_container.boundary; i++) {
-      if (_generic_buffers_container.buffer[i])
+      if (_generic_buffers_container.buffer[i]){
+
+         // console.log('Mem-DE-Alloc',  'idx', buffer.buffer_container_idx, 'size', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE, buffer.size)
          total_sizes += _generic_buffers_container.buffer[i].buffer.size;
+      }
    }
-   // console.log('Mem-DE-Alloc',  'idx', buffer.buffer_container_idx, 'size', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_SIZE, buffer.size)
 
    buffer = null;
 }
@@ -720,7 +725,7 @@ export class Int8Buffer extends ArrayBufferInterface {
    }
 
 
-   RemoveByIdxSortedVersion(idx, TEST = false) {
+   RemoveByIdxSortedVersion(idx, debug_id, debug_name) {
 
       if (this.buffer[idx] !== INT_NULL) {
 
@@ -730,8 +735,10 @@ export class Int8Buffer extends ArrayBufferInterface {
          const replacer_data = this.#ShortReplaceWithLast(idx);
          // this.#ShortReplaceWithLast(idx);
 
-         if (this.active_count <= INT_NULL)
-            alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nM_Buffer active_count <= -1');
+         if (this.active_count <= INT_NULL){
+            console.error(idx, debug_id, debug_name, this)
+            alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nInt8Buffer active_count <= -1');
+         }
 
          return replacer_data;
          // return idx;
@@ -866,7 +873,7 @@ export class Int16Buffer extends ArrayBufferInterface {
    }
 
 
-   RemoveByIdxSortedVersion(idx, TEST = false) {
+   RemoveByIdxSortedVersion(idx, debug_id, debug_name) {
 
       if (this.buffer[idx] !== INT_NULL) {
 
@@ -876,8 +883,10 @@ export class Int16Buffer extends ArrayBufferInterface {
          const replacer_data = this.#ShortReplaceWithLast(idx);
          // this.#ShortReplaceWithLast(idx);
 
-         if (this.active_count <= INT_NULL)
-            alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nM_Buffer active_count <= -1');
+         if (this.active_count <= INT_NULL){
+            console.error(idx, debug_id, debug_name, this)
+            alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nInt16Buffer active_count <= -1');
+         }
 
          return replacer_data;
          // return idx;
@@ -913,7 +922,7 @@ export class Int16Buffer extends ArrayBufferInterface {
 
 export function New_int16_buffer(size=1) {
 
-   DEBUG_INFO_STRUCTS.BUFFER.INT16.BUFFER_COUNT++;
+DEBUG_INFO_STRUCTS.BUFFER.INT16.BUFFER_COUNT++;
    DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_ELEM_SIZE+=size;
    return new Int16Buffer(size);
 }

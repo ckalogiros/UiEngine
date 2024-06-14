@@ -22,6 +22,9 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
 
    let vb_groupidx = INT_NULL;
 
+   // If a parent is set, use gfx_ctx_parent as parent
+   const parent = (mesh.gfx_ctx_parent) ? mesh.gfx_ctx_parent : mesh.parent;
+
 
    // If 'PRIVATE' then one of the folowing FLAGS shouuld be also present
    if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
@@ -31,11 +34,11 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
       }
       else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC) {
 
-      if (mesh.parent === null) {
-         console.warn(mesh.parent)
-         if(GFX_CONEXT_DEBUG) console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', mesh.GetName(), mesh);
-      
-         // Case the mesh is a text mesh, and there is a gfx buffer to be found, then because we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
+         if (parent === null) {
+            console.warn(parent)
+            if(GFX_CONEXT_DEBUG) console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', mesh.GetName(), mesh);
+         
+            // Case the mesh is a text mesh, and there is a gfx buffer to be found, then because we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
             if (mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH) {
                vb_groupidx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid);
             }
@@ -48,6 +51,9 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
                vb_groupidx = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
             }
          }
+      }
+      else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_DSC) {
+         vb_groupidx = Find_match_gfx_from_parent_descending_search_all(mesh, parent)
       }
       else {
          // console.warn(mesh.parent.GetName())
@@ -249,6 +255,25 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
       }
    }
 
+   return ret.vb_groupidx;
+}
+
+
+
+function Find_match_gfx_from_parent_descending_search_all(mesh, parent) {
+
+   // If the mesh match the parent sid, use parent's gfx buffer
+   if (SID.CheckSidMatch(mesh.sid, parent.sid)) {
+
+      // In case mesh is the parent mesh, obviusly we haven't created yet any gfx, so return -1 in order to create new vertex buffer
+      if(mesh === parent) return INT_NULL;
+
+      let vb_groupidx = parent.gfx.vb.groupidx;
+      return vb_groupidx;
+   }
+
+   // Else search in parent's children recursively
+   let ret = Find_match_from_children(mesh, parent);
    return ret.vb_groupidx;
 }
 
