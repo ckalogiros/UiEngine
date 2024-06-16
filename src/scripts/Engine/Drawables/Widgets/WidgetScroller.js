@@ -223,7 +223,7 @@ export class Widget_Scroller extends Section {
 
 
    AddToWidgetRootBuffer(root_bufferidx, ROOT_WIDGET_FLAGS) {
-// alert('88712')
+      // alert('88712')
       this.root_bufferidx = root_bufferidx;
       Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
@@ -274,14 +274,14 @@ export class Widget_Scroller extends Section {
    }
 
 
-   GfxCtxSetFlag(FLAGS, gfx_ctx_parent){
-      
-      if(!this.gfx_ctx_parent) {
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent) {
+
+      if (!this.gfx_ctx_parent) {
          this.gfx_ctx_flags = FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
-   
+
          this.scroll_bar.GfxCtxSetFlag(FLAGS, gfx_ctx_parent);
-   
+
          this.scrolled_section.GfxCtxSetFlag(FLAGS, gfx_ctx_parent)
       }
 
@@ -298,7 +298,7 @@ export class Widget_Scroller extends Section {
    // For scrollers we always create a separate vertex buffer, so it will be easier to handle the clipping of the scrolled section
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+      if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
@@ -315,7 +315,7 @@ export class Widget_Scroller extends Section {
       this.is_scrolled_section_private = true; // HACK: This is just a Temp, move it.
 
       // Render the scrolled section and all it's meshes to it's own separate gfx buffer
-      if(this.scrolled_section.gfx_ctx_flags) {
+      if (this.scrolled_section.gfx_ctx_flags) {
          this.scrolled_section.gfx = Gfx_generate_context(this.scrolled_section.gfx_ctx_flags, this.scrolled_section);
       }
       else if (this.is_scrolled_section_private) {
@@ -376,7 +376,7 @@ export class Widget_Scroller extends Section {
       for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
 
          const child = this.scrolled_section.children.buffer[i];
-         if (child.state.mask & MESH_STATE.ACTIVE) {
+         if (child && child.state.mask & MESH_STATE.ACTIVE) {
 
             child.Rerender()
             // console.log(child.GetName())
@@ -719,7 +719,7 @@ export class Widget_Scroller extends Section {
          //    const clip_bottom = clip_top + scroller.geom.dim[1] * 2;
          //    const clip_left = scroller.geom.pos[0] - scroller.geom.dim[0];
          //    const clip_right = scroller.geom.pos[0] + scroller.geom.dim[0] - (scroller.StylesGetMargin(STYLES.AXIS.X) + bar.geom.dim[0] * 2);
-            
+
          //    Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
          // }
 
@@ -967,7 +967,6 @@ export class Widget_Scroller extends Section {
       handle.geom.dim[1] = h;
       const handle_pad = handle.StylesGetPad();
       handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
-      console.log(handle.geom.pos[1])
       handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
 
 
@@ -1076,12 +1075,12 @@ export function Scroller_on_update_handle(_params) {
     * UPDATE ONLY THE SCROLL HANDLE
    */
    // if (changes_hapened) 
-      {
+   {
 
       // View_reset_from_view_all_buffers(scrolled_section.group_bufferidxs[0]);
       Widget_root_reset_gfx(scroller.root_bufferidx);
-      
-      
+
+
       // Remove all listen events. To rebuild from scratch all items listen events after the clip
       for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
          if (scrolled_section.listeners.buffer[i] !== null && scrolled_section.listeners.buffer[i] !== INT_NULL) {
@@ -1089,7 +1088,7 @@ export function Scroller_on_update_handle(_params) {
             // scrolled_section.listeners.buffer[i] = INT_NULL;
          }
       }
-      
+
       // View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
       Widget_root_rerender(scroller.root_bufferidx);
    }
@@ -1147,8 +1146,8 @@ function Scroller_move_handle(bar, handle) {
    if (y === 0) return;
 
    const bar_length = bar.geom.dim[1] * 2 * bar.geom.num_faces;
-   if (  handle.geom.pos[1] - handle_marg*2 + y >= bar.geom.pos[1] && 
-         handle.geom.pos[1] + handle.geom.dim[1] * 2 + handle_marg*2 + y <= bar.geom.pos[1] + bar_length) {
+   if (handle.geom.pos[1] - handle_marg * 2 + y >= bar.geom.pos[1] &&
+      handle.geom.pos[1] + handle.geom.dim[1] * 2 + handle_marg * 2 + y <= bar.geom.pos[1] + bar_length) {
       handle.geom.pos[1] += y;
       handle.geom.MoveY(y, handle.gfx);
    }
@@ -1166,7 +1165,7 @@ function Scroller_move_handle(bar, handle) {
    //          return true
    //       }
    //       else if (handle_bot - ydif > bar_height - handle_marg) {
-            
+
    //          handle.geom.pos[1] = bar_height - handle.geom.dim[1] * 2 + handle_marg * 2;
    //          handle.geom.SetPosY(handle.geom.pos[1], handle.gfx);
    //       }
@@ -1175,9 +1174,9 @@ function Scroller_move_handle(bar, handle) {
    // else if (go_up){
 
    //    if (mouse_posy < grabbed_point) {
-         
+
    //       if (handle_top - ydif > (handle_marg + pad) ) {
-      
+
    //          handle.geom.pos[1] -= ydif;
    //          grabbed_point -= ydif;
    //          handle.geom.SetPosY(handle.geom.pos[1], handle.gfx);
@@ -1185,7 +1184,7 @@ function Scroller_move_handle(bar, handle) {
    //          return true
    //       }
    //       else if (handle_top - ydif < (handle_marg + pad) ) {
-            
+
    //          handle.geom.pos[1] = bar_abs_pos + handle_marg; // - handle.geom.dim[1] * 2 + handle_marg * 2;
    //          handle.geom.SetPosY(handle.geom.pos[1], handle.gfx);
    //       }

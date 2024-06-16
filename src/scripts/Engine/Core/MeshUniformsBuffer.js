@@ -92,6 +92,8 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
       const root_posidx = mesh_parent.root_posidx;
 
       // Here we want to get the 'root wpos' of the 'root wpos' that the text mesh's parent its connected to.
+      let parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
+
       /**
        * For Example: there are 3 meshes:{rect, label and label text}. 
        * What we want for the label text is to have as a parent 'root wpos' the parent 'root wpos' of the label. 
@@ -99,7 +101,6 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
        * Other wise the text will draw its offset pos from label, which in its turn will draw its offset pos from the rect.
        * The correct is both label and text have offset positions to rect.
        */
-      let parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
       // if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
       //    parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_wpos.parent_posidx];
       // }
@@ -133,7 +134,6 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
 
    const idx = _per_vb_mesh_unif_wpos.Add(entry);
-   // console.log('ROOT POSITIONS BUFFER', _per_vb_mesh_unif_wpos.buffer, entry)
    return idx;
 }
 
@@ -167,13 +167,6 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
       const root_posidx = mesh_parent.root_posidx;
 
       // Here we want to get the 'root wpos' of the 'root wpos' that the text mesh's parent its connected to.
-      /**
-       * For Example: there are 3 meshes:{rect, label and label text}. 
-       * What we want for the label text is to have as a parent 'root wpos' the parent 'root wpos' of the label. 
-       * That is the rect's 'root wpos' in this example.  
-       * Other wise the text will draw its offset pos from label, which in its turn will draw its offset pos from the rect.
-       * The correct is both label and text have offset positions to rect.
-       */
       let parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
       // if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
       //    parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_wpos.parent_posidx];
@@ -285,7 +278,6 @@ function Mesh_unif_get_vb_root_wposx_recursive(vbgroupidx) {
 
 export function Mesh_unif_get_vb_root_wposy(vbgroupidx) {
    const pos = Mesh_unif_get_vb_root_wposy_recursive(vbgroupidx);
-   // return pos + _screen_wpos[1];
    return pos;
 }
 function Mesh_unif_get_vb_root_wposy_recursive(vbgroupidx) {
@@ -316,9 +308,6 @@ export function Mesh_unif_set_vb_root_wpos(idx, x, y) {
 
 
 export function Mesh_unif_set_vb_root_wpos_all_siblings(idx, x, y){
-
-   // _per_vb_mesh_unif_wpos.buffer[idx].wpos[0] = x;
-   // _per_vb_mesh_unif_wpos.buffer[idx].wpos[1] = y;
 
    const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[idx].parent_posidx;
    // Run from parent idx to the end of buffer, and add the pos to any elem that is a sibling(same parent)

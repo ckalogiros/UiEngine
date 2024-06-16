@@ -1,16 +1,20 @@
 "use strict";
 
-import { Vertex_buffer_reset, Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
-import { New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
+import { Vertex_buffer_reset } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
 import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_set_flags } from "../Renderers/Renderer/RenderQueue.js";
 import { REL_POS, Relative_pos_comp_move_right_buffer } from "../Drawables/Operations/RelativePosComponent.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "./MeshUniformsBuffer.js";
 import { Index_buffer_reset } from "../../Graphics/Buffers/IndexBuffers.js";
+
+
+
+
 
 
 
@@ -81,12 +85,14 @@ export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferi
 }
 
 
-export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
+export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx, root_bufferidx) {
 
    const mesh = _mesh_buffer.buffer[mesh_bufferidx];
    if (!mesh || mesh === _) {
       console.error('Mesh is NULL.\n@ Mesh_buffer_remove_mesh_byidx(). mesh_bufferidx:',
          mesh_bufferidx, _mesh_buffer,
+         'elem', _mesh_buffer.buffer[mesh_bufferidx],
+         'root_bufferidx', root_bufferidx,
          '_widget_root_buffer', _widget_root_buffer,
       );
 
@@ -121,7 +127,7 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx) {
 /****************************************************/
 // Batch Destroy
 
-const _batch_destroy_storage = New_int16_buffer();
+const _batch_destroy_storage = New_int16_buffer(_, 'WidgetRootBatch-destroy_storage-NOT_USED PROBABLY');
 
 
 
@@ -217,7 +223,7 @@ export function Mesh_per_vb_get_mesh(vb_groupidx, per_vb_bufferidx) { return _me
 
 export function Mesh_per_vb_create_vb(vb_groupidx) {
 
-   _mesh_per_vertex_buffer.AddAtIndex(vb_groupidx, New_int16_buffer(GFX_VIEW_MESH_DEFAULT_COUNT));
+   _mesh_per_vertex_buffer.AddAtIndex(vb_groupidx, New_int16_buffer(GFX_VIEW_MESH_DEFAULT_COUNT, 'MeshPerVB buffer'));
 
    if (NOTIFICATIONS_ON)
       Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, vb_groupidx);
@@ -226,7 +232,6 @@ export function Mesh_per_vb_create_vb(vb_groupidx) {
 
 
 export function Mesh_per_vb_store_mesh(vb_groupidx, mesh_bufferidx) {
-// console.log(_mesh_per_vertex_buffer.boundary)
    return _mesh_per_vertex_buffer.buffer[vb_groupidx].Add(mesh_bufferidx);
 }
 
@@ -379,7 +384,7 @@ export function Widget_root_buffer_get_mesh_by_rootidx(idx) {
 
 export function Widget_root_create_root(mesh_bufferidx) {
 
-   const root_idx = _widget_root_buffer.Add(New_int16_buffer(6));
+   const root_idx = _widget_root_buffer.Add(New_int16_buffer(6, 'WidgetRoot buffer'));
 
    _widget_root_buffer.buffer[root_idx].Add(mesh_bufferidx);
 
@@ -404,21 +409,6 @@ function Widget_root_remove_root_byidx(root_bufferidx) {
 
 
 
-// function Widget_root_remove_element_byidx(root_bufferidx, mesh_bufferidx) {
-
-//    if (_widget_root_buffer.buffer[root_bufferidx] !== INT_NULL) {
-
-//       const elem_found = Widget_root_find_element_byidx(root_bufferidx, mesh_bufferidx);
-
-//       if (elem_found !== INT_NULL) {
-
-//          _widget_root_buffer.buffer[root_bufferidx].RemoveByIdxSortedVersion(elem_found, root_bufferidx, 'Widget_root_remove_element_byidx');
-
-//       }
-//       else console.error('Widget root FAILED to remove element. root idx:', root_bufferidx, 'mesh_bufferidx', mesh_bufferidx, ' element idx:', elem_found,);
-
-//    }
-// }
 /** SAVE-DO NOT DELETE-remove widget_root with bach removal */
 function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, mesh_bufferidx, num_faces) {
 
@@ -767,6 +757,7 @@ export function Widget_root_gfx_get(root_bufferidx) {
 
 export function Widget_root_gfx_remove_byidx(root_bufferidx) {
    console.warn('Removing widget root:', _widget_root_gfx.buffer[root_bufferidx]);
+   Free_int8_buffer(_widget_root_gfx.buffer[root_bufferidx]);
    return _widget_root_gfx.RemoveByIdx(root_bufferidx);
 }
 
@@ -774,20 +765,10 @@ export function Widget_root_gfx_remove_byidx(root_bufferidx) {
 
 function Widget_root_gfx_create(root_bufferidx) {
 
-   // const a = New_generic_buffer(); 
-   // const idx1 = _widget_root_gfx.Add(a); 
+   const idx = _widget_root_gfx.Add(New_int8_buffer(_, 'NEW _widget_root_gfx')); 
 
-   // const gfx_idxs = {
-   //    progidx: INT_NULL,
-   //    vb_groupidx: INT_NULL,
-   //    vbidxs: New_int8_buffer(1),
-   // }; 
-   // const idx = _widget_root_gfx.buffer[idx1].Add(gfx_idxs); 
-   
-   // const vb_groupidx = INT_NULL;
-   const idx = _widget_root_gfx.Add(New_int8_buffer()); 
-
-   if (root_bufferidx !== idx) alert('Widget root gfx buffer not the same with the Widget root buffer');
+   if (root_bufferidx !== idx) 
+      alert('Widget root gfx buffer not the same with the Widget root buffer');
 }
 
 
@@ -997,12 +978,6 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
    // Do for root
    // Resize: Only to Section meshes that have the option:EXPAND
    const root_mesh = Mesh_buffer_get_mesh_byidx(root.buffer[0]);
-   // root_mesh.geom.dim[0] += x/2;
-   // root_mesh.geom.dim[1] += y/2;
-   // root_mesh.geom.dim[0] = x;
-   // root_mesh.geom.dim[1] = y;
-   // root_mesh.geom.dim[0] += x;
-   // root_mesh.geom.dim[1] += y;
 
    // Rerender
    root_mesh.AddToGfxFromReset();
@@ -1016,14 +991,11 @@ export function Widget_root_resize_and_rerender(root_bufferidx, x, y, do_reconst
          // Resize: Only to Menu_Bar meshes that have the option:EXPAND
          if (mesh.type & MESH_TYPE.WIDGET_MENU_BAR && mesh.options & SECTION.EXPAND) {
             mesh.geom.dim[0] += x;
-            // mesh.geom.dim[0] = x - mesh.StylesGetPad(STYLES.AXIS.X);
-            // mesh.geom.dim[1] += y; // TODO: Deal with y resize. Most of meshes should be resized in x only. 
          }
 
          // Do: meshes with rel_comp. Move the children positioned relative right
          if (mesh.rel_comp) {
             Relative_pos_comp_move_right_buffer(REL_POS.RIGHT, mesh, x * 2)
-            // Relative_pos_comp_move_right_buffer(REL_POS.RIGHT, mesh, x)
          }
 
          // Rerender
@@ -1045,7 +1017,7 @@ export function Widget_root_set_in_focus(root_bufferidx) {
    for (let i = 0; i < len; i++) {
 
       const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
-      Renderqueue_set_priority_by_vb(LAST, gfx.vb.groupidx);
+      // Renderqueue_set_priority_by_vb(LAST, gfx.vb.groupidx);
    }
 
 }

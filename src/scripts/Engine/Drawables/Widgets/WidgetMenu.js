@@ -87,7 +87,7 @@ export class Widget_Menu_Bar extends Section {
       for (let i = 0; i <= _this.children.boundary; i++) {
 
          const child = _this.children.buffer[i];
-         child.Destroy();
+         if (child) child.Destroy();
       }
 
       _this.label.Destroy();
@@ -125,7 +125,7 @@ export class Widget_Menu_Bar extends Section {
 
    // GfxCtxSetFlag(FLAGS){
    //    // alert('-1 MENU')
-      
+
    //    this.gfx_ctx_flags = FLAGS;
    //    if(!this.gfx_ctx_parent) this.gfx_ctx_parent = gfx_ctx_parent;
    //    for (let i = 0; i <= this.children.boundary; i++) {
@@ -136,13 +136,13 @@ export class Widget_Menu_Bar extends Section {
 
 
 
-   
+
    /*******************************************************************************************************************************************************/
    // Graphics
    /*******************************************************************************************************************************************************/
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
-      
-      if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+
+      if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, _, false); // For the menu meshes
 
@@ -152,7 +152,7 @@ export class Widget_Menu_Bar extends Section {
       for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
          const child = this.children.buffer[i];
          // child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, rect_igfx, text_igfx)
-         child.GenGfxCtx(FLAGS, rect_specific_vb_groupidx)
+         if (child) child.GenGfxCtx(FLAGS, rect_specific_vb_groupidx)
       }
       return gfx;
    }
@@ -165,7 +165,7 @@ export class Widget_Menu_Bar extends Section {
       for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
 
          const child = this.children.buffer[i];
-         child.Render();
+         if (child) child.Render();
       }
    }
 
@@ -177,7 +177,7 @@ export class Widget_Menu_Bar extends Section {
       for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
 
          const child = this.children.buffer[i];
-         child.Rerender();
+         if (child) child.Rerender();
       }
    }
 
@@ -216,8 +216,8 @@ export class Widget_Menu_Bar extends Section {
    /****************************************************************************************************************************************************/
    // UNIQUE METHODS
    /****************************************************************************************************************************************************/
-   
-   
+
+
    AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = [2, 5, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
 
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
@@ -244,11 +244,14 @@ export class Widget_Menu_Bar extends Section {
          if (this.children.active_count) {
             for (let i = 0; i <= this.children.boundary; i++) {
                const child = this.children.buffer[i];
-               child.geom.dim[1] = this.geom.dim[1];
-               child.geom.dim[0] = this.geom.dim[1];
+               if (child) {
 
-               // Because we changed the size of the button, we need to realign the text
-               Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+                  child.geom.dim[1] = this.geom.dim[1];
+                  child.geom.dim[0] = this.geom.dim[1];
+
+                  // Because we changed the size of the button, we need to realign the text
+                  Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+               }
             }
          }
       }
@@ -300,13 +303,17 @@ export class Widget_Menu_Bar extends Section {
          // Update the max height of the rest of menu's items
          if (this.children.active_count) {
             for (let i = 0; i <= this.children.boundary; i++) {
-               const child = this.children.buffer[i];
-               child.geom.dim[1] = this.geom.dim[1];
-               child.geom.dim[0] = this.geom.dim[1];
+
+               if (child) {
+
+                  const child = this.children.buffer[i];
+                  child.geom.dim[1] = this.geom.dim[1];
+                  child.geom.dim[0] = this.geom.dim[1];
 
 
-               // Because we changed the size of the button, we need to realign the text
-               Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+                  // Because we changed the size of the button, we need to realign the text
+                  Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+               }
             }
          }
       }
@@ -350,12 +357,16 @@ export class Widget_Menu_Bar extends Section {
          // Update the max height of the rest of menu's items
          if (this.children.active_count) {
             for (let i = 0; i <= this.children.boundary; i++) {
-               const child = this.children.buffer[i];
-               child.geom.dim[1] = this.geom.dim[1];
-               // child.geom.dim[0] = child.geom.dim[1];
 
-               // Because we changed the size of the button, we need to realign the text
-               Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+               if (child) {
+
+                  const child = this.children.buffer[i];
+                  child.geom.dim[1] = this.geom.dim[1];
+                  // child.geom.dim[0] = child.geom.dim[1];
+
+                  // Because we changed the size of the button, we need to realign the text
+                  Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+               }
             }
          }
       }
@@ -380,8 +391,8 @@ export class Widget_Menu_Bar extends Section {
 
 export class Close_Button extends Widget_Button {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE, 
-               pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE,
+      pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
 
@@ -523,7 +534,7 @@ export class Widget_Minimize extends Widget_Button {
 
             // Deactivate all children, except the menu bar, so they are not gonna be drawn to the vertex buffer on any re-render 
             for (let i = menu_bar.idx + 1; i <= root.children.boundary; i++) {
-               root.children.buffer[i].Deactivate()
+               if (root.children.buffer[i]) root.children.buffer[i].Deactivate()
             }
 
             root.children.ResetFull(); // Reset the children's buffer and allocate new array
@@ -557,7 +568,7 @@ export class Widget_Minimize extends Widget_Button {
 
             // Re-Activate all children, except the menu bar, so they are gonna be drawn to the vertex buffer on re-render 
             for (let i = root.children.buffer[0].idx + 1; i <= root.children.boundary; i++) {
-               root.children.buffer[i].Activate();
+               if (root.children.buffer[i]) root.children.buffer[i].Activate();
             }
 
 

@@ -69,8 +69,6 @@ export function Str_buffer_change(nameidx, new_name) {
 
 export function Str_buffer_destroy(nameidx) {
    _str_buffer.RemoveByIdx(nameidx);
-   // const idx = _str_buffer.Add(new_name);
-   // return idx;
 }
 
 
@@ -91,7 +89,7 @@ const _str_buffer_mesh_names = New_generic_buffer(_, 'String buffer names');
 // A buffer to index the string buffer. Stores the mesh's idx (mesh_bufferidx).
 // These 2 buffers must be 1to1. If a mesh name is stored at inde 3, then the '_str_buffer_mesh_names_index_buffer' must have the meshe's 'mesh_bufferidx' at index 3 also.
 // Usage of indices buffer to string names buffer: We need a connection back to the mesh, so we can change any mesh's name on the sorted buffers. 
-const _str_buffer_mesh_names_index_buffer = New_int16_buffer(512);
+const _str_buffer_mesh_names_index_buffer = New_int16_buffer(512, 'StringBuffer-mesh names buffer');
 
 
 
@@ -170,6 +168,8 @@ export function Str_buffer_mesh_names_remove_by_idx(nameidx) {
       // const mesh = Mesh_buffer_get_mesh_byidx(replacer_meshidx);
       // console.log('mesh nameidx:', nameidx, 'meshidx:', _str_buffer_mesh_names_index_buffer.buffer[nameidx], 'name', _str_buffer_mesh_names.buffer[nameidx])
    }
+
+   // console.log('STRING_BUFFER_REMOVE', nameidx)
 
    if(NOTIFICATIONS_ON) 
       Notifications_send(NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, _str_buffer_mesh_names_index_buffer.buffer[nameidx]);

@@ -252,9 +252,7 @@ export class Widget_Dropdown extends Section {
       // NOTE: If the dp is Root, it has been set to widget root buffer from super. If not, there is no purpose of doing anything to the dp.
       // NOTE: The dp's button is inserted to the widget root buffer by the constructor:  'this.AddItem(btn)'
 
-      // if(this.isOn & DP_MENU_STATE.OFF){
       if ((this.isOn & DP_MENU_STATE.ON) === 0) {
-         // this.StateDisable(MESH_STATE.ACTIVE)
          mesh.StateDisable(MESH_STATE.ACTIVE)
       }
 
@@ -299,7 +297,7 @@ export class Widget_Dropdown extends Section {
       for(let i=0; i <= this.menu.children.boundary; i++){
       
          const child = this.menu.children.buffer[i];
-         if(child.options) child.OptionsEnable(MASK);
+         if(child && child.options) child.OptionsEnable(MASK);
       }
    }
 
@@ -341,7 +339,7 @@ export class Widget_Dropdown extends Section {
 
       if (this.isOn & DP_MENU_STATE.ON) {
          for (let i = 0; i <= this.children.boundary; i++) {
-            this.children.buffer[i].Render();
+            if(this.children.buffer[i]) this.children.buffer[i].Render();
          }
       }
 
@@ -480,36 +478,39 @@ export class Widget_Dropdown extends Section {
 
          const item = menu.children.buffer[i];
 
-         if(this.options & SECTION.INDEPENDENT) { 
-            item.ConstructListeners([null, null]);
-            // console.log('1EVENT', item.GetName());
-         }
-         else{
+         if(item){
 
-            for (let j = 0; j <= LISTEN_EVENT_TYPES_INDEX.SIZE; j++) {
+            if(this.options & SECTION.INDEPENDENT) { 
+               item.ConstructListeners([null, null]);
+               // console.log('1EVENT', item.GetName());
+            }
+            else{
    
-               // If no listeners, create Fake
-               if (((menu.listeners === null || menu.listeners.buffer[j] === null) || menu.listeners.buffer[j] === INT_NULL)) {
-   
-                  menu.CreateListenEvent(Listen_event_types_get_type_from_index(j), FAKE_LISTEN_EVENT);
-   
-                  if (this.children.buffer[0].listeners.buffer[j] === null || this.children.buffer[0].listeners.buffer[j] === INT_NULL) {
-                     const parent_event_idx = Find_parent_listen_event(j, menu)
-                     menu.AddListenEvent(j, null, null, parent_event_idx);
-                     // console.log('2EVENT', item.GetName());
-                  }
-                  else {
-   
-                     const parent_event_idx = Listener_get_parent_event(j, this.children.buffer[0].listeners.buffer[j]);
-                     menu.AddListenEvent(j, null, null, parent_event_idx);
-                     // console.log('3EVENT', item.GetName());
+               for (let j = 0; j <= LISTEN_EVENT_TYPES_INDEX.SIZE; j++) {
+      
+                  // If no listeners, create Fake
+                  if (((menu.listeners === null || menu.listeners.buffer[j] === null) || menu.listeners.buffer[j] === INT_NULL)) {
+      
+                     menu.CreateListenEvent(Listen_event_types_get_type_from_index(j), FAKE_LISTEN_EVENT);
+      
+                     if (this.children.buffer[0].listeners.buffer[j] === null || this.children.buffer[0].listeners.buffer[j] === INT_NULL) {
+                        const parent_event_idx = Find_parent_listen_event(j, menu)
+                        menu.AddListenEvent(j, null, null, parent_event_idx);
+                        // console.log('2EVENT', item.GetName());
+                     }
+                     else {
+      
+                        const parent_event_idx = Listener_get_parent_event(j, this.children.buffer[0].listeners.buffer[j]);
+                        menu.AddListenEvent(j, null, null, parent_event_idx);
+                        // console.log('3EVENT', item.GetName());
+                     }
                   }
                }
+      
+               // EFFICIENCY: Allocations happen in this function
+               item.ConstructListeners([menu.listeners.buffer[0], menu.listeners.buffer[1]]);
+               // console.log('4EVENT', item.GetName());
             }
-   
-            // EFFICIENCY: Allocations happen in this function
-            item.ConstructListeners([menu.listeners.buffer[0], menu.listeners.buffer[1]]);
-            // console.log('4EVENT', item.GetName());
          }
       }
    }
@@ -635,6 +636,22 @@ export class Widget_Dropdown extends Section {
       }
    }
 
+   // TEMP_TO_RECALC_FOR_DP_MENU(){
+   //    Expand(this, this.options)
+   //    temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
+
+         
+   //    this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
+   //    this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
+      
+
+   //    const cur_pos = [0,0];
+   //    cur_pos[0] = this.geom.pos[0]; 
+   //    cur_pos[1] = this.geom.pos[1]; 
+
+   //    // Calculate_positions_no_gfx_update_recursive(this, this.options, cur_pos, _);
+   //    tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+   // }
 
    TEMP_recalc(x, y) {
 
@@ -648,6 +665,11 @@ export class Widget_Dropdown extends Section {
 
       const pad = this.StylesGetPad();
       btn.TEMP_recalc(x + dx + pad[0], y + dy + pad[1]);
+
+      // if(this.isOn & DP_MENU_STATE.ON){
+      //    // HACK
+      //    this.menu.TEMP_TO_RECALC_FOR_DP_MENU();
+      // }
    }
 
 
@@ -750,27 +772,29 @@ export class Widget_Dropdown extends Section {
 
             const item = menu.children.buffer[j]; 
 
+            if(item){
 
-            // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
-            if (item.type & MESH_TYPE.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
-
-               item.RemoveFromMeshPerVbBuffer();
-               item.Deactivate();
-               item.SetIsGfxInserted(false);
-
-               item.RemoveAllListenEvents();
-               
-               
-               if (item.isOn & DP_MENU_STATE.ON) this.#DeactivateMenu(item); // Run recursive for every dropdown in every menu
-            }
-            else {
-               if (item.gfx && item.is_gfx_inserted) {
-                  
+               // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
+               if (item.type & MESH_TYPE.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
+   
                   item.RemoveFromMeshPerVbBuffer();
                   item.Deactivate();
                   item.SetIsGfxInserted(false);
-                  
+   
                   item.RemoveAllListenEvents();
+                  
+                  
+                  if (item.isOn & DP_MENU_STATE.ON) this.#DeactivateMenu(item); // Run recursive for every dropdown in every menu
+               }
+               else {
+                  if (item.gfx && item.is_gfx_inserted) {
+                     
+                     item.RemoveFromMeshPerVbBuffer();
+                     item.Deactivate();
+                     item.SetIsGfxInserted(false);
+                     
+                     item.RemoveAllListenEvents();
+                  }
                }
             }
          }
@@ -874,21 +898,21 @@ export class Widget_Dropdown extends Section {
 
          const item = menu.children.buffer[i];
 
-         item.Activate();
+         if(item){
 
-
-         if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
-
-            // if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
-            if (item.menu_active) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
-
-               // If the menu was deactivated while open, then on activation keep its '-' symbol
-               const btn = item.children.buffer[0];
-               btn.text_mesh.SliceText(0, 1);
-               btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
-               item.#ActivateMenu(root);
+            item.Activate();
+            if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
+   
+               // if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
+               if (item.menu_active) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
+   
+                  // If the menu was deactivated while open, then on activation keep its '-' symbol
+                  const btn = item.children.buffer[0];
+                  btn.text_mesh.SliceText(0, 1);
+                  btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
+                  item.#ActivateMenu(root);
+               }
             }
-
          }
       }
 
@@ -997,7 +1021,6 @@ export class Widget_Dropdown extends Section {
 
 
 function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
-console.log('-----------------------')
    const parent = dp.parent;
    // Calculate sizes bottom-up the tree with this 'dp' being the root...  
    const dif = Calculate_sizes_recursive(dp, dp.options, target_child_idx);
@@ -1006,7 +1029,6 @@ console.log('-----------------------')
    const max = dp.max_size;
    const pad = [0,0];
    
-   console.log('dim[0]', dim[0], 'max', dp.max_size[0], 'difx', dif[0]);
 
    // ... And then go up the tree, from this 'dp' to the actual root, to add the dimention difference that was calculated erlier.
    // NOTE: This is done so that we skip calculating all children from the root. Instead we calculate from this dp and all its children , and we propagate the size difference up to any 'Section' parents.   
@@ -1030,7 +1052,7 @@ console.log('-----------------------')
          if(p.options & SECTION.VERTICAL){
 
             if(dif[0] > POSSITIVE && p.geom.dim[0] < max[0]){
-               console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
+               // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
 
                // const a = dim[0] + pad[0];
                const a = dim[0];
@@ -1041,7 +1063,7 @@ console.log('-----------------------')
             }
             // else if(dif[0] < POSSITIVE && p.geom.dim[0] > max[0]){
             else if(dif[0] < POSSITIVE && p.geom.dim[0] > max[0]){
-               console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
+               // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
 
                const a = dim[0] + pad[0];
                const b = p.geom.dim[0] - a;
@@ -1204,75 +1226,81 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
    for (let i = target_idx; i <= parent.children.boundary; i++) {
       
       const mesh = parent.children.buffer[i];
-      let continue_recur = true;
-      let opt = options
 
-      // console.log('  RecalcPos', mesh.GetName())
+      if(mesh){
 
-      if (options & SECTION.INHERIT) opt = parent.options
-      
-      // const padd = mesh.StylesGetPad();
-      const padd = [0,0,];
-      if(padd){
-         pad[0] += padd[0];
-         pad[1] += padd[1];
-      }
-
-      // cur_pos[0] += pad[0];
-      // cur_pos[1] += pad[1];
-      
-      const rel_pos = [cur_pos[0], cur_pos[1]];
-      
-      if(mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC){
+         let continue_recur = true;
+         let opt = options
+   
+         // console.log('  RecalcPos', mesh.GetName())
+   
+         if (options & SECTION.INHERIT) opt = parent.options
          
-         mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
-         continue_recur = false;
-      }
-      else if(mesh.type & MESH_TYPE.WIDGET_SLIDER){
-
-         mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-         continue_recur = false;
-      }
-      else if (mesh.type & MESH_TYPE.SECTION_MESH) 
-      { // For meshes with a parent of type Section
-
-         // mesh.geom.pos[0] = rel_pos[0] + pad[0]; 
-         // mesh.geom.pos[1] = rel_pos[1] + pad[1];
-         mesh.geom.pos[0] = rel_pos[0]; 
-         mesh.geom.pos[1] = rel_pos[1];
-         
-         // Case of menu bar, that has text directly as a child
-         if(mesh.text_mesh){
-            mesh.text_mesh.geom.pos[0] = rel_pos[0] + pad[0];
-            mesh.text_mesh.geom.pos[1] = rel_pos[1] + pad[1];
+         // const padd = mesh.StylesGetPad();
+         const padd = [0,0,];
+         if(padd){
+            pad[0] += padd[0];
+            pad[1] += padd[1];
          }
-      }
-      else{
-
-         mesh.TEMP_recalc(rel_pos[0] + pad[0], rel_pos[1] + pad[1]);
-
-         if(mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
-         if(mesh.text_mesh) continue_recur = false;
-      }
-
-
-      if(parent.rel_comp){
-         Relative_pos_comp_recalc_all(parent);
-         continue_recur = false;
-      }
-
-      if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
-         Temp_dp_calculate_positions(mesh, opt, cur_pos, _, _);
-         // console.log('   RecalcPos', mesh.GetName())
-      }
-
-
-      // Increment current position tracker
-      if (parent.options & SECTION.VERTICAL) {
-         cur_pos[1] += mesh.geom.dim[1] * 2;
-      }
-      else if (parent.options & SECTION.HORIZONTAL) {
-         cur_pos[0] += mesh.geom.dim[0] * 2;
+   
+         // cur_pos[0] += pad[0];
+         // cur_pos[1] += pad[1];
+         
+         const rel_pos = [cur_pos[0], cur_pos[1]];
+         
+         if(mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC){
+            
+            mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
+            continue_recur = false;
+         }
+         else if(mesh.type & MESH_TYPE.WIDGET_SLIDER){
+   
+            mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
+            continue_recur = false;
+         }
+         else if (mesh.type & MESH_TYPE.SECTION_MESH) 
+         { // For meshes with a parent of type Section
+   
+            // mesh.geom.pos[0] = rel_pos[0] + pad[0]; 
+            // mesh.geom.pos[1] = rel_pos[1] + pad[1];
+            mesh.geom.pos[0] = rel_pos[0]; 
+            mesh.geom.pos[1] = rel_pos[1];
+            
+            // Case of menu bar, that has text directly as a child
+            if(mesh.text_mesh){
+               mesh.text_mesh.geom.pos[0] = rel_pos[0] + pad[0];
+               mesh.text_mesh.geom.pos[1] = rel_pos[1] + pad[1];
+            }
+         }
+         else{
+   
+            mesh.TEMP_recalc(rel_pos[0] + pad[0], rel_pos[1] + pad[1]);
+   
+            if(mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
+            if(mesh.text_mesh) continue_recur = false;
+         }
+   
+   
+         if(parent.rel_comp){
+            Relative_pos_comp_recalc_all(parent);
+            continue_recur = false;
+         }
+   
+         if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
+            Temp_dp_calculate_positions(mesh, opt, cur_pos, _, _);
+            // console.log('   RecalcPos', mesh.GetName())
+         }
+   
+   
+         // Increment current position tracker
+         if (parent.options & SECTION.VERTICAL) {
+            cur_pos[1] += mesh.geom.dim[1] * 2;
+            parent.last_pos[1] = cur_pos[1];
+         }
+         else if (parent.options & SECTION.HORIZONTAL) {
+            cur_pos[0] += mesh.geom.dim[0] * 2;
+            parent.last_pos[0] = cur_pos[0];
+         }
       }
 
    }

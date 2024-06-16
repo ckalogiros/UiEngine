@@ -13,7 +13,7 @@ import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private } fr
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
 import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_set_from_existing_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
-import { New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
+import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 
 
 // const Table_combi_look_up_wich_attrib_to_wich_vb = [
@@ -45,7 +45,7 @@ export class GfxInfoMesh {
       this.meshIdx = INT_NULL; // The index of the current mesh from scene's mesh buffer.
       this.vao = null;
 
-      this.verts_per_face = New_int8_buffer(1);
+      this.verts_per_face = New_int8_buffer(1, 'NEW GfxInfo-verts_per_face');
 
       this.prog = {
          idx: INT_NULL,
@@ -57,9 +57,9 @@ export class GfxInfoMesh {
       this.vb = { // The vertex buffer info the mesh belongs to
 
          groupidx: INT_NULL,	// 
-         idxs: New_int8_buffer(),	// The vertex buffer (float*) idx that this Mesh is stored to.
-         starts: New_int16_buffer(),		// The current meshe's starting index in vertex buffer. 
-         counts: New_int16_buffer(),		// Current size of the float buffer (in floats)
+         idxs: New_int8_buffer(_, 'NEW GfxInfo-vbidxs'),	// The vertex buffer (float*) idx that this Mesh is stored to.
+         starts: New_int16_buffer(_, 'GfxInfo-vb starts'),		// The current meshe's starting index in vertex buffer. 
+         counts: New_int16_buffer(_, 'GfxInfo-vb counts'),		// Current size of the float buffer (in floats)
 
          which_vb: { // If this gfx has attributes scattered between vertex buffers, we need to specify which attribute belongs to which vertex buffer
             col_buf: INT_NULL,   // The index of the vertex buffer the color attribute is stored to
@@ -77,7 +77,7 @@ export class GfxInfoMesh {
             dim_idx: INT_NULL,   // The index of the vertex pos attribute
             tex_idx: INT_NULL,   // The index of the texture attribute
          },
-         is_per_vertex: New_int8_buffer(), // 
+         is_per_vertex: New_int8_buffer(_, 'NEW GfxInfo-is_vertex_buffer'), // 
       };
 
       this.ib = { // The vertex buffer info the mesh belongs to
@@ -90,6 +90,15 @@ export class GfxInfoMesh {
          idx: INT_NULL,
       };
 
+   }
+
+   Destroy(){
+      Free_int8_buffer(this.verts_per_face);
+      Free_int8_buffer(this.vb.idxs);
+      Free_int8_buffer(this.vb.is_per_vertex);
+
+      Free_int16_buffer(this.vb.starts);
+      Free_int16_buffer(this.vb.counts);
    }
 
    CopyVb() {
@@ -115,7 +124,7 @@ export class GfxInfoMesh {
             dim_idx: this.vb.which_attrib.dim_idx,
             tex_idx: this.vb.which_attrib.tex_idx,
          },
-         is_per_vertex: New_int8_buffer(), // 
+         is_per_vertex: New_int8_buffer(_, 'NEW GfxInfo-Copy-is_vertex_buffer'), // 
       };
 
       return gfx;
@@ -398,6 +407,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    // TODO: Implement
    // Add mesh to the root batch buffer for batch update
    Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, mesh_count);
+   // console.log('()()()', Mesh_buffer_get_mesh_byidx(mesh.mesh_bufferidx).batch_buffer_vbidx,  Mesh_buffer_get_mesh_byidx(mesh.mesh_bufferidx).GetName())
+   // console.log('[][][][]', mesh.batch_buffer_vbidx,  mesh.GetName())
 
 
    // Store the root pos in each mesh. Assuumes the indexing of root_wpos and vbs are 1-1.

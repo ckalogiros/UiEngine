@@ -145,10 +145,6 @@ const SID = {
         WPOS4: BIT5 <<= 0x1,
         COL4: BIT5 <<= 0x1,
 
-        // Extension:
-        // IS_PROJECTION_MATRIX_BUFFERED: BIT5 <<= 0x1,
-        // IS_SCREEN_RESOLUTION_BUFFERED: BIT5 <<= 0x1,
-
     },
 
     PASS: {
@@ -231,6 +227,84 @@ const SID = {
     ToString(sid){
         return `shad:${sid.shad} attr:${sid.attr} unif:${sid.unif} pass:${sid.pass}`
     },
+
+    GetTypeToString(sid){
+
+        let str = ['','','',''];
+        let k = 0;
+
+        if (sid.shad) str[k] += 'ShaderProperties:'
+        if (sid.shad & SID.SHAD.INDEXED) str[k] += 'IndexedGeometry, '
+        if (sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) str[k] += 'ConectedFaces, '
+        if (sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_4) str[k] += 'VertexBreak-4, '
+        if (sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_6) str[k] += 'VertexBreak-, '
+        if (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) str[k] += 'Premultiplied Alpha, '
+        // if (sid.shad) str[k] += '\n'
+    
+        k++;
+        if (sid.attr) str[k] += 'Attribs:'
+        if (sid.attr & SID.ATTR.COL4) str[k] += 'col4, '
+        if (sid.attr & SID.ATTR.COL4_PER_VERTEX) str[k] += 'col4_per_vertex, '
+        if (sid.attr & SID.ATTR.POS2) str[k] += 'pos2, '
+        if (sid.attr & SID.ATTR.DIM2) str[k] += 'dim2, '
+        if (sid.attr & SID.ATTR.SCALE2) str[k] += 'scale2, '
+        if (sid.attr & SID.ATTR.TEX2) str[k] += 'tex2, '
+        if (sid.attr & SID.ATTR.WPOS_TIME4) str[k] += 'wpos4, '
+        if (sid.attr & SID.ATTR.TIME) str[k] += 'time, '
+        if (sid.attr & SID.ATTR.SDF) str[k] += 'Sdf, '
+        if (sid.attr & SID.ATTR.MSDF) str[k] += 'Msdf, '
+        if (sid.attr & SID.ATTR.GENERIC_ATTR1_VEC4) {
+            str[k] += 'generir_attribs1, ';
+            if (sid.attr & (SID.ATTR.STYLE)) str[k] += 'style, ';
+            if (sid.attr & (SID.ATTR.BORDER & SID.ATTR.FEATHER & SID.ATTR.R_CORNERS)) str[k] += '[round corners, border width, border feather], ';
+            if (sid.attr & (SID.ATTR.EMPTY)) str[k] += 'empty, ';
+        }
+        // if (sid.attr) str[k] += '\n'
+    
+        k++;
+        if (sid.inst) str[k] += 'InstancedGeometry:'
+        if (sid.inst & SID.INST.COL4) str[k] += 'cal4, '
+        if (sid.inst & SID.INST.POS2) str[k] += 'pos2, '
+        if (sid.inst & SID.INST.TEX2) str[k] += 'tex2, '
+        if (sid.inst & SID.INST.WPOS_TIME4) str[k] += 'wpos4, '
+        if (sid.inst & SID.INST.TIME) str[k] += 'time, '
+        if (sid.inst & SID.INST.SDF) str[k] += 'sdf, '
+        if (sid.inst & SID.INST.MSDF) str[k] += 'msdf, '
+        if (sid.inst & SID.INST.GENERIC_ATTR1_VEC4) {
+            str[k] += 'generir_attribs1, ';
+            if (sid.attr & (SID.ATTR.STYLE)) str[k] += 'style, ';
+            if (sid.attr & (SID.ATTR.BORDER & SID.ATTR.FEATHER & SID.ATTR.R_CORNERS)) str[k] += '[round corners, border width, border feather], ';
+            if (sid.attr & (SID.ATTR.EMPTY)) str[k] += 'empty, ';
+        }
+        if (sid.inst & SID.INST.POS3) str[k] += 'pos3, '
+        if (sid.inst & SID.INST.COL4_PER_VERTEX) str[k] += 'col4_per_vertex, '
+        if (sid.inst & SID.INST.EMPTY) str[k] += 'empty, '
+        // if (sid.inst) str[k] += '\n'
+
+        k++;
+        if (sid.unif) str[k] += 'Uniforms:'
+        if (sid.unif & SID.UNIF.PROJECTION) str[k] += 'projection_matrix, '
+        if (sid.unif & SID.UNIF.SCREEN_RESOLUTION) str[k] += 'screen_resolution, '
+        if (sid.unif & SID.UNIF.WPOS4) str[k] += 'wpo4, '
+        if (sid.unif & SID.UNIF.TIME) str[k] += 'time, '
+        if (sid.unif & SID.UNIF.COL4) str[k] += 'col4, '
+        // if (sid.unif) str[k] += '\n'
+    
+        k++;
+        if (sid.pass) str[k] += 'Passes:'
+        if (sid.pass & SID.PASS.COL4) str[k] += 'col4, '
+        if (sid.pass & SID.PASS.POS2) str[k] += 'pos2, '
+        if (sid.pass & SID.PASS.DIM2) str[k] += 'dim2, '
+        if (sid.pass & SID.PASS.WPOS2) str[k] += 'wpos2, '
+        if (sid.pass & SID.PASS.TEX2) str[k] += 'tex2, '
+        if (sid.pass & SID.PASS.TIME1) str[k] += 'time1, '
+        if (sid.pass & SID.PASS.style3) str[k] += 'style3, '
+        if (sid.pass & SID.PASS.SDF2) str[k] += 'sdf2'
+        if (sid.pass & SID.PASS.GENERIC_ATTR1_VEC4) str[k] += 'generir_attribs1'
+        // if (sid.pass) str[k] += '\n'
+    
+        return str;
+    }
 
 };
 

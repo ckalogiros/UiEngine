@@ -197,9 +197,9 @@ class Gl_Program {
 
 		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
 
-		this.vb_group = New_int8_buffer(1); // Array of indexes to all vertex buffers in '_vertex_buffer_groups' buffer. 
+		this.vb_group = New_int8_buffer(1, 'NEW GlProgram-VBGROUP'); // Array of indexes to all vertex buffers in '_vertex_buffer_groups' buffer. 
 
-		this.ib = New_int8_buffer(1); // Array of indexes to all index buffers in '_index_buffers_info' buffer. 
+		this.ib = New_int8_buffer(1, 'NEW GlProgram-ib'); // Array of indexes to all index buffers in '_index_buffers_info' buffer. 
 
 		this.vao = null;
 		this.vaoidx = INT_NULL;

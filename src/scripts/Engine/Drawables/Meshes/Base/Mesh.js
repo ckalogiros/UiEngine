@@ -1,13 +1,13 @@
 "use strict";
 import { Timer_get_global_timer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
-import { Free_generic_buffer, Free_generic_char_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
+import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
-import { Styles_create, Styles_destroy, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
+import { Styles_create, Styles_remove_byidx, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy, Screen_wpos_get, Screen_wpos_get_x, Screen_wpos_get_y } from "../../../Core/MeshUniformsBuffer.js";
 import { Vertex_buffer_set_uniform_value_callback } from "../../../../Graphics/Buffers/VertexBuffers.js";
@@ -130,7 +130,7 @@ export class Mesh {
         this.gfx_ctx_flags = 0x0;
         this.gfx_ctx_parent = null;
 
-        
+
 
         this.uniforms = [];
         if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
@@ -170,9 +170,10 @@ export class Mesh {
         this.listeners = null;
         this.parent_event_idx = INT_NULL; // An index to the Listeners Buffer Struct. In many cases the parent event is not the mesh's parent, to avoid any annecessary listen events creation.
 
-        this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
+        // this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
+        this.eventCallbacks = null;
         this.children = New_generic_buffer(_, 'Mesh children');
-        this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE);
+        this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'NEW time_intervals');
 
         this.rel_comp = null;
         this.root_posidx = INT_NULL;
@@ -212,12 +213,24 @@ export class Mesh {
     RemoveChildByIdx(idx) {
 
         this.children.RemoveByIdx(idx);
-        return this.children.ShiftElementOnDestroy(idx);
+        const ret = this.children.ShiftElementOnDestroy(idx);
+
+        let msg = `remove index: ${idx}. empty children:`;
+        let print_res = false;
+        for (let i = 0; i < this.children.boundary; i++) {
+            if (this.children.buffer[i] === null) {
+                msg += `${i},`
+                print_res = true
+            }
+        }
+
+        if (print_res) console.log('sooadoasdlkls,d', msg)
+        return ret
     }
 
 
     Destroy() {
-
+        // console.log('DSTROY-Mesh class:', this.GetName())
 
         /*************************************************************************************/
         // Remove event listeners
@@ -246,7 +259,6 @@ export class Mesh {
         // Styles_batch_destroy_store(this.styles);
         // BUG: There seems to be a bug in the removal of the styles from the M_Buffer, so as to the '.active_count' isn't incremented/Decremented correctly
         // Command_buffer_store(Styles_batch_destroy_run, null, COMMANDS.ID.STYLE_BATCH_DESTROY); // Store the 'destroy styles' as a command to be executed later(once per frame)
-
         if (NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH) === 0)
             Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, this.mesh_bufferidx);
 
@@ -272,16 +284,18 @@ export class Mesh {
 
         }
 
-
         // Case 'this' is a child, remove it from parent's children buffer.
         /**
          * Because this function probably is called by the parent's 'Destroy()' function, 
-         * if we remove the 'this' in here, the we must notify parent so as not to reduce it's children count.
+         * if we remove the 'this' in here, then we must notify parent so as not to reduce it's children count.
          */
+
+
         let shift_children = false; // The caller will reduce the i from the loop by 1.
         if (this.parent && this.parent !== NO_MESH_PARENT && this.idx !== INT_NULL) {
 
             shift_children = this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
+
         }
 
 
@@ -291,14 +305,17 @@ export class Mesh {
         // Remove from widget root buffer.
         // Mesh_buffer_batch_destroy_store(this.mesh_bufferidx);
         // Command_buffer_store(Mesh_buffer_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
-        Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx);
+        Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
 
         // Destroy Generic Buffers
-        Free_generic_buffer(this.eventCallbacks);
+        if (this.eventCallbacks) Free_generic_buffer(this.eventCallbacks);
         Free_generic_buffer(this.children);
-        Styles_destroy(this.styles);
+        Free_int8_buffer(this.timeIntervalsIdxBuffer);
+        Styles_remove_byidx(this.styles);
+        this.gfx.Destroy();
+        if (this.rel_comp) this.rel_comp.Destroy();
 
-        if (this.type & MESH_TYPE.FONT_MATERIAL) Free_generic_char_buffer(this.mat.char_buffer)
+        if (this.mat.char_buffer) Free_generic_char_buffer(this.mat.char_buffer)
 
 
 
@@ -315,7 +332,7 @@ export class Mesh {
         this.state.mask |= MESH_STATE.ACTIVE;
         for (let i = 0; i <= this.children.boundary; i++) {
             const child = this.children.buffer[i];
-            child.state.mask |= MESH_STATE.ACTIVE;
+            if (child) child.state.mask |= MESH_STATE.ACTIVE;
         }
     }
 
@@ -325,13 +342,16 @@ export class Mesh {
         for (let i = 0; i <= this.children.boundary; i++) {
 
             const child = this.children.buffer[i];
-            child.StateEnable(MESH_STATE.ACTIVE);
-            // child.state.mask |= MESH_STATE.ACTIVE;
+            if (child) {
 
-            if (child.children.boundary) {
-                child.ActivateAndChildrenRecursive()
-                if (child.text_mesh)
-                    child.text_mesh.state.mask |= MESH_STATE.ACTIVE;
+                child.StateEnable(MESH_STATE.ACTIVE);
+                // child.state.mask |= MESH_STATE.ACTIVE;
+
+                if (child.children.boundary) {
+                    child.ActivateAndChildrenRecursive()
+                    if (child.text_mesh)
+                        child.text_mesh.state.mask |= MESH_STATE.ACTIVE;
+                }
             }
         }
     }
@@ -393,7 +413,7 @@ export class Mesh {
     // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
     AddListenEvent(etypeidx, Clbk = null, params = null, parent_event_idx = null) {
 
-        if(this.listeners.buffer[etypeidx] !== INT_NULL) return;
+        if (this.listeners.buffer[etypeidx] !== INT_NULL) return;
 
         if (this.state.mask & MESH_STATE.ACTIVE) { // HERE: see if can remove check
 
@@ -441,7 +461,7 @@ export class Mesh {
     CreateEventCallback(params = null) {
 
         if (!params) alert('CreateEventCallback(params = null). @ Mesh.js')
-        if (!this.eventCallbacks) New_generic_buffer(_, 'Mesh eventCallbacks');
+        if (this.eventCallbacks === null) this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
         const eventIdx = this.eventCallbacks.Add(params);
         return eventIdx;
     }

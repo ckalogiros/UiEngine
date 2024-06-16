@@ -14,15 +14,15 @@ import * as glBufferOps from '../../../../Graphics/Buffers/VertexBuffersOps.js'
 export class Geometry2D {
 
     constructor(pos = [0, 0, 0], dim = [0, 0], scale = [1, 1], num_faces=1) {
-if(num_faces===0)
-alert('09116')
+
         this.pos = [0, 0, 0];
         this.dim = [0, 0];
         this.scale = [0, 0];
         this.defPos = [0, 0, 0];
         this.defDim = [0, 0];
         this.defScale = [0, 0];
-
+        this.num_faces = num_faces;
+        this.type = MESH_TYPE.GEOMETRY2D;
 
         
         this.sid = {
@@ -49,8 +49,6 @@ alert('09116')
         math.CopyArr2(this.defScale, scale);
         math.CopyArr3(this.defPos, pos);
 
-        this.num_faces = num_faces;
-        this.type |= MESH_TYPE.GEOMETRY2D;
 
     }
 

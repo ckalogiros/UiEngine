@@ -839,7 +839,7 @@ export function Gl_batch_set_RGBA(vb_groupidx, starts, colors, color_indices, co
 
    // let stride = shader_attribs_info.attribs_per_vertex - colors_len;
    // let stride = shader_attribs_info.attribs_per_vertex;
-   let stride = counts[which_attr_vb.col_buf];
+   let stride = counts[which_attr_vb.col_buf]/vertices_per_rect;
 
    const color_indices_len = color_indices.length;
    for (let i = 0; i < color_indices_len; i++) {
@@ -863,14 +863,15 @@ export function Gl_batch_set_RGBA(vb_groupidx, starts, colors, color_indices, co
 
 
 /** 'starts' and 'color_indices' should be of the same element couunt arrays */
-export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_len, attribsidx, num_faces, pos_offsets, which_attr_vb = null, counts, vertices_per_rect = 4) {
+export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_len, attribsidx, num_faces, 
+                                    pos_offsets, which_attr_vb = null, counts, vertices_per_rect = 4) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(vb_groupidx);
    const shader_attribs_info = Shader_attributes_get_attribs_offset_size_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.WPOS_TIME4);
 
    // let stride = shader_attribs_info.attribs_per_vertex - (shader_attribs_info.size - 3);
    // let stride = shader_attribs_info.attribs_per_vertex;
-   let stride = counts[which_attr_vb.wpos_buf];
+   let stride = counts[which_attr_vb.wpos_buf]/vertices_per_rect;
 
    const pos_indices_len = pos_indices.length;
    for (let i = 0; i < pos_indices_len; i++) {
@@ -879,8 +880,12 @@ export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_l
       const verts_len = vertices_per_rect * num_faces[i]
       for (let j = 0; j < verts_len; j++) {
 
+         let advance = 0;
+         const pos_offsets_len = pos_offsets.length;
          for (let k = 0; k < pos_len; k++) {
-            vb_data[index + pos_offsets[k]] = pos[pos_indices[i] + k];
+            vb_data[index + pos_offsets[advance] + k] = pos[pos_indices[i] + k];
+            advance++;
+            if(advance >= pos_offsets_len-1) advance = 0;
          }
 
          index += stride;

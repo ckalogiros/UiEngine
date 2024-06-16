@@ -135,7 +135,7 @@ export function Styles_pad_set(idx, pad){
 /*******************************************************************************************************************************************/
 // DESTROY
 
-export function Styles_destroy(idx){
+export function Styles_remove_byidx(idx){
    // TODOD: DEBUG the idx if exists and in boundaries
 
    _margin_buffer.RemoveByIdx(idx);
@@ -154,7 +154,7 @@ export function Styles_destroy(idx){
 /****************************************************/
 // Batch Destroy
 
-const _batch_destroy_storage = New_int16_buffer();
+const _batch_destroy_storage = New_int16_buffer(_, 'Styles-BatchDestroy');
 
 
 

@@ -815,7 +815,8 @@ const ANIMATIONS = {
 			RGBA: cnt2 <<= 0x1,
 		},
 		POS: {
-			XY: cnt3,
+			ROT: cnt3,
+			XY: cnt3 <<= 0x1,
 			X: cnt3 <<= 0x1,
 			Y: cnt3 <<= 0x1,
 		},
@@ -839,9 +840,9 @@ _CNT = 0x1;
 // TODO: Not enough space for all types. Re-organize and re-implement
 const MESH_TYPE = {
 
-	DEBUG_MESH: _CNT <<= 1,
+	DEBUG_MESH: _CNT,
 
-	GEOMETRY2D: _CNT,
+	GEOMETRY2D: _CNT <<= 1,
 	TEXT_GEOMETRY2D: _CNT <<= 1,
 	GEOMETRY3D: _CNT <<= 1,
 	CUBE_GEOMETRY: _CNT <<= 1,
@@ -1185,18 +1186,18 @@ const DEBUG_INFO_STRUCTS = {
 	BUFFER: {
 		GENERIC: {
 			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
+			TOTAL_BUFFER_SIZE: 0, // The total ammount of all buffers size. 
 			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
-			TOTAL_ELEM_SIZE: 0, // The total ammount of all buffers size. 
 		},
 		INT8: {
 			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
 			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
-			TOTAL_ELEM_SIZE: 0,
 		},
 		INT16: {
 			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
 			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
-			TOTAL_ELEM_SIZE: 0,
 		},
 
 	},

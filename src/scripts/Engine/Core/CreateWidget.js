@@ -156,7 +156,7 @@ export function Create_widget_multi_text(ROOT_WIDGET_FLAGS=0x0, text, ALIGNMENT,
       
       _mesh_buffer.buffer[mesh_bufferidx].SetName(`LABEL[${mesh_bufferidx}]{${text}}`); // Set name after mesh_bufferidx is created
 
-   if(NOTIFICATIONS_ON && !is_debug_mesh) 
+   if(NOTIFICATIONS_ON && is_debug_mesh===0x0) 
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
    return _mesh_buffer.buffer[mesh_bufferidx];

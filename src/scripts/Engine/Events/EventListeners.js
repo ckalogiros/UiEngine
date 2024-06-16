@@ -123,7 +123,8 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
       if (parent_event.view && !parent_event.view.children) {
          parent_event.view.children = New_generic_buffer(_, `Listeners->parent_event.view.children:${parent_event.name}`);
       }
-
+if(!parent_event.view)
+console.log()
       // Store the new event as a child to the parent in the listeners VIEW storage buffer.
       const view_idx = parent_event.view.children.Add({
          idx: event_idx,
@@ -262,7 +263,7 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
 // Batch Destroy
 
 const _batch_destroy_storage = New_generic_buffer(_, 'Listeners Buffer - _batch_destroy_storage');
-_batch_destroy_storage.Add(New_int16_buffer()); // Add for starters one listeners buffer. Maybe we could add via SIZE of LISTEN_EVENT_TYPE
+_batch_destroy_storage.Add(New_int16_buffer(_, 'EventListeners-batch destroy storage buffer1')); // Add for starters one listeners buffer. Maybe we could add via SIZE of LISTEN_EVENT_TYPE
 
 
 
@@ -271,7 +272,7 @@ export function Listener_batch_destroy_store(TYPE_IDX, idx){
    // TODOD: DEBUG the idx if exists and in boundaries
 
    if(_batch_destroy_storage.buffer[TYPE_IDX] === undefined){
-      _batch_destroy_storage.Add(New_int16_buffer()); // If the buffer of the listener type does not exist, create one
+      _batch_destroy_storage.Add(New_int16_buffer(_, 'EventListeners-batch destroy storage buffer2')); // If the buffer of the listener type does not exist, create one
    }
    // console.log('oooooo', TYPE_IDX, idx,_listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].meshidx)
 
@@ -673,7 +674,8 @@ function Check_child_events_recursive(view_children, point) {
                   
                   // Get the the event (which has all the event data) from the listeners storage buffer
                   const e = _listeners_buffer_storage.buffer[E.C].buffer[ret.idx];
-                  // console.log(e.Clbk)
+if(!e.Clbk)
+console.log(e.Clbk)
    
                   // Because its a recursive procedure, when the mesh is found we must return it recursively immidiately after the return of the each recursion.
                   if (ret && e.Clbk) return ret; // I has Callback then it is not a FAKE event, so its ok to return the event

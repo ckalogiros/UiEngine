@@ -340,7 +340,7 @@ class Vertex_Buffer_Group {
 
         this.render_queueidx = INT_NULL; // index to the Render queue buffer of the current vb 
 
-        this.vb_idxs = New_int8_buffer();
+        this.vb_idxs = New_int8_buffer(_, 'NEW VertexBufferGroup-VBIDXS');
 
         // TODO: Create a more apropriate struct for uniform callbacks
         this.Unif_set_val_clbk = []; // Function to call for getting the uniform value.
@@ -868,7 +868,7 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces) {
         let start = gfx.vb.starts.buffer[i];
         const end = start + removed_attribs;
 
-        // console.log('Remove:', gfx.vb.groupidx, vb_info.count)
+        // console.log('Remove:', gfx.vb.groupidx, 'removed_attribs', removed_attribs, 'counts', gfx.vb.counts.buffer[i], 'num_faces', num_faces, 'vbcount', vb_info.count)
 
 
         // Shift all attributes left to fil the gap of the removed attributes. 
@@ -880,9 +880,6 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces) {
         vb_info.count -= removed_attribs;
         const vCount = removed_attribs / gfx.vb.counts.buffer[i];
         vb_info.vCount -= vCount;
-
-        if (gfx.vb.groupidx === 3)
-            console.log('vb count:', vb_info.count)
 
         if (vb_info.count < 0) {
 

@@ -411,7 +411,7 @@ export function TestWidgetsGeneric(scene) {
 
 
     // Debug_focused_mesh();
-    Debug_info_create_ui_focused();
+    // Debug_info_create_ui_focused();
 
 
 
@@ -427,7 +427,7 @@ export function TestWidgetsGeneric(scene) {
 
 
     // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
-    // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
+    const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
     // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0)
     // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.X, line, .5, -5., 5., 0)
     // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.Y, line, .5, -5., 5., 0)
@@ -436,24 +436,28 @@ export function TestWidgetsGeneric(scene) {
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .0025, .2, .8, .2)
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RG, line, .01, .2, .8, _, .2, false)
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, line, .01, .1, .1, _, .5, true)
+    Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .01, .1, 1., _, .5, false)
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .001, .2, 1.4, _, .4, true)
     // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .001, .2, 1.4, _, .4, true)
     { // Test sdf lines
         // {
-        //     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [VIEWPORT.WIDTH/2, VIEWPORT.HEIGHT/2, 0], [100, 20], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
-        //     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-        //     line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+            // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [VIEWPORT.WIDTH/2, VIEWPORT.HEIGHT/2, 0], [100, 20], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
+            // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+            // line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         
-        //     // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
-        //     line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
-        //     // line.sid.attr &= ~SID.ATTR.COL4;
+            // // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
+            // line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
+            // // line.sid.attr &= ~SID.ATTR.COL4;
         
-        //     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        //     line.Render();
-        //     line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx)
-        //     line.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
-        //     line.ConstructListeners();
+            // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+            // line.Render();
+            // line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx)
+            // line.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
+            // line.ConstructListeners();
+
+            // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .01, .2, 1.4, _, .4, true);
+            // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0);
         // }
         // {
         //     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 270, 0], [100, 20], TRANSPARENCY(YELLOWR[7], 1), 'sdf linem2');
@@ -535,7 +539,7 @@ export function TestWidgetsGeneric(scene) {
     // CreateScrollerWithWidgets(scene);
 
 
-    const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
+    // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
     // SdfLine([500, TEST_CLIP_TOP, 10], [800, 10]);
 
 

@@ -211,8 +211,10 @@ export class Widget_Multi_Text extends Widget_Text {
 
 			if (this.children.buffer[i]) {
 
+				// this.children.buffer[i].Destroy();
 				const shift_children = this.children.buffer[i].Destroy();
 				if (shift_children) i--;
+				// console.log(i)
 			}
 		}
 
@@ -247,8 +249,11 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
-			child.root_bufferidx = root_bufferidx;
-			Widget_root_add_mesh(child.root_bufferidx, child.mesh_bufferidx);
+			if (child) {
+
+				child.root_bufferidx = root_bufferidx;
+				Widget_root_add_mesh(child.root_bufferidx, child.mesh_bufferidx);
+			}
 		}
 	}
 
@@ -257,7 +262,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		this.state.mask |= MESH_STATE.ACTIVE;
 		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].state.mask |= MESH_STATE.ACTIVE;
+			if (this.children.buffer[i]) this.children.buffer[i].state.mask |= MESH_STATE.ACTIVE;
 		}
 	}
 
@@ -266,7 +271,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		this.state.mask &= ~MESH_STATE.ACTIVE;
 		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].state.mask &= ~MESH_STATE.ACTIVE;
+			if (this.children.buffer[i]) this.children.buffer[i].state.mask &= ~MESH_STATE.ACTIVE;
 		}
 	}
 
@@ -275,7 +280,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		this.state.mask |= MASK;
 		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].state.mask |= MASK;
+			if (this.children.buffer[i]) this.children.buffer[i].state.mask |= MASK;
 		}
 	}
 
@@ -284,22 +289,25 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		this.state.mask &= ~MASK;
 		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].state.mask &= ~MASK;
+			if (this.children.buffer[i]) this.children.buffer[i].state.mask &= ~MASK;
 		}
 	}
 
-   
-   GfxCtxSetFlag(FLAGS, gfx_ctx_parent){
-// alert('-1 -1 -1 -1 -1')
-	
-	if(!this.gfx_ctx_parent) {
-		this.gfx_ctx_flags = FLAGS;
-		this.gfx_ctx_parent = gfx_ctx_parent;
-		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].gfx_ctx_flags = FLAGS;
-			this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
-		}   
-	}
+
+	GfxCtxSetFlag(FLAGS, gfx_ctx_parent) {
+		// alert('-1 -1 -1 -1 -1')
+
+		if (!this.gfx_ctx_parent) {
+			this.gfx_ctx_flags = FLAGS;
+			this.gfx_ctx_parent = gfx_ctx_parent;
+			for (let i = 0; i <= this.children.boundary; i++) {
+				if (this.children.buffer[i]) {
+
+					this.children.buffer[i].gfx_ctx_flags = FLAGS;
+					this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
+				}
+			}
+		}
 
 	}
 
@@ -310,7 +318,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	/*******************************************************************************************************************************************************/
 	// GFX
 
-	GenGfxCtx(FLAGS, specific_vb_groupidx=INT_NULL) {
+	GenGfxCtx(FLAGS, specific_vb_groupidx = INT_NULL) {
 
 		super.GenGfxCtx(FLAGS, specific_vb_groupidx);
 
@@ -323,10 +331,12 @@ export class Widget_Multi_Text extends Widget_Text {
 			const child = this.children.buffer[i];
 			// console.log('',vb_groupidx, child.GetName())
 			// if (child) child.gfx = child.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, igfx); // Pass the already exixting gfx buffers for use
-			if (child) child.gfx = child.GenGfxCtx(FLAGS, vb_groupidx); // Pass the already exixting gfx buffers for use
+			if (child) {
+				child.gfx = child.GenGfxCtx(FLAGS, vb_groupidx); // Pass the already exixting gfx buffers for use
 
-			// NOTE: The batch_buffer_vbidx for the parent text is created from the super.GenGfxCtx(). So we have to set it for all children from here.
-			child.batch_buffer_vbidx = this.batch_buffer_vbidx;
+				// NOTE: The batch_buffer_vbidx for the parent text is created from the super.GenGfxCtx(). So we have to set it for all children from here.
+				child.batch_buffer_vbidx = this.batch_buffer_vbidx;
+			}
 		}
 		return this.gfx;
 	}
@@ -366,15 +376,18 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
 			for (let i = 0; i <= this.children.boundary; i++) {
-				max_width += this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+				if (this.children.buffer[i]) max_width += this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 			}
 			return max_width;
 		}
 		else {
 			for (let i = 0; i <= this.children.boundary; i++) {
-				const w = this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
-				if (max_width < w)
-					max_width = w;
+				if (this.children.buffer[i]) {
+
+					const w = this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+					if (max_width < w)
+						max_width = w;
+				}
 			}
 			return max_width;
 		}
@@ -392,7 +405,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 		else { // Else calculate all the lines of the text meshes
 			for (let i = 0; i <= this.children.boundary; i++) {
-				max_height += this.children.buffer[i].geom.dim[1] + this.children.buffer[i].StylesGetPad(STYLES.AXIS.Y);
+				if (this.children.buffer[i]) max_height += this.children.buffer[i].geom.dim[1] + this.children.buffer[i].StylesGetPad(STYLES.AXIS.Y);
 			}
 			return max_height;
 		}
@@ -406,7 +419,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		Set_color_a(this, alpha);
 		for (let i = 0; i <= this.children.boundary; i++) {
 			// this.children.buffer[i].SetColorAlpha(alpha);
-			Set_color_a(this.children.buffer[i], alpha);
+			if (this.children.buffer[i]) Set_color_a(this.children.buffer[i], alpha);
 		}
 	}
 
@@ -415,7 +428,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
 
 		for (let i = 0; i <= this.children.boundary; i++) {
-			if (this.children.buffer[i].is_gfx_inserted !== flag) this.children.buffer[i].is_gfx_inserted = flag;
+			if (this.children.buffer[i] && this.children.buffer[i].is_gfx_inserted !== flag) this.children.buffer[i].is_gfx_inserted = flag;
 		}
 	}
 
@@ -637,10 +650,14 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.geom.pos[0] += x;
 		this.geom.pos[1] += y;
 		for (let i = 0; i <= this.children.boundary; i++) {
+
 			const child = this.children.buffer[i];
-			child.geom.pos[0] += x;
-			child.geom.pos[1] += y;
-			// if (child) child.MoveNoGfxUpdate(x, y);
+			if (child) {
+
+				child.geom.pos[0] += x;
+				child.geom.pos[1] += y;
+				// if (child) child.MoveNoGfxUpdate(x, y);
+			}
 		}
 
 	}
@@ -667,67 +684,67 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	}
 
-	
-   SetPosXYNoGfxUpdate(x, y) {
 
-		if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
-			for (let i = 0; i <= this.children.boundary; i++) {
-				console.log(Floor(this.children.buffer[i].geom.pos[0]),this.children.buffer[i].geom.pos[1], this.mat.text)
-			}
-      }
-		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+	SetPosXYNoGfxUpdate(x, y) {
+
+		if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+			Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
+		}
+		else { // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
 			this.geom.pos[0] = x;
 			this.geom.pos[1] = y;
 			for (let i = 0; i <= this.children.boundary; i++) {
-				this.children.buffer[i].geom.pos[0] = x;
-				this.children.buffer[i].geom.pos[1] = y;
+				if (this.children.buffer[i]) {
+
+					this.children.buffer[i].geom.pos[0] = x;
+					this.children.buffer[i].geom.pos[1] = y;
+				}
 			}
 		}
-   }
+	}
 
-   
-   SetPosXNoGfxUpdate(x) {
-		if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
-      }
-		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+
+	SetPosXNoGfxUpdate(x) {
+		if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+			Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
+		}
+		else { // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
 			for (let i = 0; i <= this.children.boundary; i++) {
-				this.children.buffer[i].geom.pos[0] = x;
+				if (this.children.buffer[i]) this.children.buffer[i].geom.pos[0] = x;
 			}
 		}
-   }
-   
-   
-   SetPosYNoGfxUpdate(y) {
-      this.geom.pos[1] = y;
-		if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
-         Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
-      }
-		else{ // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
+	}
+
+
+	SetPosYNoGfxUpdate(y) {
+		this.geom.pos[1] = y;
+		if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+			Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
+		}
+		else { // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update all offsets 
 			for (let i = 0; i <= this.children.boundary; i++) {
-				this.children.buffer[i].geom.pos[1] = y;
+				if (this.children.buffer[i]) this.children.buffer[i].geom.pos[1] = y;
 			}
 		}
-   }
+	}
 
-	
 
-   TEMP_recalc(x, y) {
-alert('IMPLEMENT ME\nTEMP_recalc\nWidget_Multi_Text')
-      // this.geom.pos[0] = x;
-      // this.geom.pos[1] = y;
-      // for (let i = 0; i <= this.children.boundary; i++) {
-      //    const child = this.children.buffer[i];
-      //    if (child) child.TEMP_recalc(x, y);
-      // }
-   }
 
-	
+	TEMP_recalc(x, y) {
+		alert('IMPLEMENT ME\nTEMP_recalc\nWidget_Multi_Text')
+		// this.geom.pos[0] = x;
+		// this.geom.pos[1] = y;
+		// for (let i = 0; i <= this.children.boundary; i++) {
+		//    const child = this.children.buffer[i];
+		//    if (child) child.TEMP_recalc(x, y);
+		// }
+	}
+
+
 	SetPosZNoGfxUpdate(z) {
 		this.geom.pos[2] = z;
 		for (let i = 0; i <= this.children.boundary; i++) {
-			this.children.buffer[i].geom.pos[2] = z;
+			if (this.children.buffer[i]) this.children.buffer[i].geom.pos[2] = z;
 		}
 	}
 
@@ -744,10 +761,14 @@ alert('IMPLEMENT ME\nTEMP_recalc\nWidget_Multi_Text')
 			for (let i = 0; i <= this.children.boundary; i++) {
 
 				const child = this.children.buffer[i];
-				pos[1] = ypos;
 
-				// child.geom.Reposition_pre(pos);
-				ypos += child.geom.dim[1] * 2;
+				if (child) {
+
+					pos[1] = ypos;
+
+					// child.geom.Reposition_pre(pos);
+					ypos += child.geom.dim[1] * 2;
+				}
 			}
 		}
 

@@ -14,13 +14,6 @@ import { Timer_get_global_timer, Timer_get_global_timer_cosine, Timer_get_global
 
 
 
-const MASKS = [
-    0x1,
-    0x2,
-    0x3,
-    0x4,
-];
-
 
 const ANIM_DATA = {
     T: 0,
@@ -29,8 +22,6 @@ const ANIM_DATA = {
     MAX: 3,
 };
 
-
-// const HAS_START_VALUE = 0x0
 
 
 
@@ -60,6 +51,7 @@ function Animations_get_value_size(anim_type_flag, anim_data_type){
         if(anim_data_type & ANIMATIONS.DATA.COLOR.RGBA) return 4;
     }
     else if(anim_type_flag & ANIMATIONS.TYPE.WPOS){
+        if(anim_data_type & ANIMATIONS.DATA.POS.ROT) return 8;
         if(anim_data_type & ANIMATIONS.DATA.POS.XY) return 2;
         if(anim_data_type & ANIMATIONS.DATA.POS.X) return 1;
         if(anim_data_type & ANIMATIONS.DATA.POS.Y) return 1;
@@ -80,9 +72,9 @@ function Animations_get_value_offset(anim_type_flag, anim_data_type){
     }
     else if(anim_type_flag & ANIMATIONS.TYPE.WPOS){
         
+        if(anim_data_type & ANIMATIONS.DATA.POS.ROT)  offsets.push(0);
         if(anim_data_type & ANIMATIONS.DATA.POS.X)  offsets.push(0);
         if(anim_data_type & ANIMATIONS.DATA.POS.Y)  offsets.push(1);
-        // if(anim_data_type & ANIMATIONS.DATA.POS.XY) offsets.push(0);
         return offsets;
     }
 }
@@ -101,11 +93,8 @@ function Choose_update_callback(anim_type_flag){
 
 class VB_DATA {
 
-    // constructor(vbidx, vb_offset, vb_attribs_count, values_len){
     constructor(vbidx, attribsidx, values_len){
 
-        // this.vb_offset = vb_offset;
-        // this.vb_attribs_count = vb_attribs_count;
         this.vbidx = vbidx;
         this.attribsidx = attribsidx;
         this.values_len = values_len;
@@ -164,14 +153,10 @@ class AnimationData {
 
 export class Animation{
 
-    // constructor(anim_type_flag, mesh_data, time_step, value_step, value_limits){
-    // constructor(animationClbk=null, stopAnimationClbk=null, vb_data=null, anim_data=null, anim_type_flag){
     constructor(anim_type_flag=0x0, anim_data_type){
         
         this.vb_data = []; 
         this.anim_data = [];
-        // this.animationClbk = animationClbk;
-        // this.stopAnimationClbk = stopAnimationClbk;
         this.UpdateClbk = null;
         this.is_active = false;
         this.in_animation = false;
@@ -196,7 +181,6 @@ export class Animation{
 
 
 
-// const _animations = new Animations;
 const _animations = New_generic_buffer(_, 'Animations Buffer');
 
 
@@ -209,11 +193,6 @@ function Vb_data_exist(anim_type_idx, vbidx){
     if(_animations.buffer[anim_type_idx].vb_data === null) return INT_NULL;
 
     if(_animations.buffer[anim_type_idx].vb_data.vbidx === vbidx) return anim_type_idx;
-    // const len = _animations.buffer[anim_type_idx].vb_data.length;
-    // for (let i=0; i < len; i++){
-
-    //     if(_animations.buffer[anim_type_idx].vb_data.vbidx === vbidx) return i;
-    // }
 
     return INT_NULL;
 }
@@ -245,6 +224,7 @@ function Analyze_flag(anim_type_flag, flag){
     }
     else if(anim_type_flag & ANIMATIONS.TYPE.WPOS){
         // alert('IMPLEMET FOR WPOS\nEEE\nAnimations.js')
+        if(flag & ANIMATIONS.DATA.POS.ROT) return (ANIMATIONS.DATA.POS.ROT);
         if(flag & ANIMATIONS.DATA.POS.XY) return (ANIMATIONS.DATA.POS.X|ANIMATIONS.DATA.POS.Y);
         if(flag & ANIMATIONS.DATA.POS.X) return ANIMATIONS.DATA.POS.X;
         if(flag & ANIMATIONS.DATA.POS.Y) return ANIMATIONS.DATA.POS.Y;
@@ -267,9 +247,6 @@ function Analyze_flag(anim_type_flag, flag){
  */
 export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=null, step=0, min=0, max=0, start_t=0, start_v=0, has_start_value=false){
         
-    // const vb_group = Vertex_buffer_group_get_byidx(vbidx);
-    // const verts_per_rect = (mesh.gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
-
     const vbidx = mesh.gfx.vb.groupidx;
     const starts = mesh.gfx.vb.starts.buffer;
     const counts = mesh.gfx.vb.counts.buffer;
@@ -347,35 +324,27 @@ export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=
     anim.is_active = true;
     anim.in_animation = true;
     
-    // return idx;
-
 }
 
 
 
 function Min_max(values, anim_data, flags, values_len){
 
-    // const step = anim_data[ANIM_DATA.STEP], 
     const min = anim_data[ANIM_DATA.MIN], max = anim_data[ANIM_DATA.MAX];
 
+    let switcher = 1;
 
     for(let i=0; i < values_len; i++){
 
                 
-        // if(i==0)console.log(values[i], anim_data[ANIM_DATA.STEP])
-        // console.log(i)
         if(flags & ANIMATIONS.TYPE.CYCLICAL){
             // continue in the oposite direction
             if(values[i] < min && anim_data[ANIM_DATA.STEP] < 0) {
                 anim_data[ANIM_DATA.STEP] *= -1;
-                // console.log('min', min, )
             }
             else if(values[i] > max && anim_data[ANIM_DATA.STEP] > 0) {
                 anim_data[ANIM_DATA.STEP] *= -1;
-                // console.log('max', max, )
             }
-            
-            // console.log(values[i], anim_data[ANIM_DATA.STEP])
         }
         else{
             
@@ -383,16 +352,17 @@ function Min_max(values, anim_data, flags, values_len){
             // If no Stop() callback is stored, just remove anim_data and values_data 
         }
         
-        // values[i] += anim_data[ANIM_DATA.STEP];
+        values[i] += anim_data[ANIM_DATA.STEP];
+        
         // if(i===0)values[i] += Timer_get_global_timer_sine()*4;
         // else values[i] += Timer_get_global_timer_cosine()*4;
 
-        const speed = 8
-        if(i===0)values[i] += Math.sin(Timer_get_global_timer()*speed)*speed;
-        else values[i] += Math.cos(Timer_get_global_timer()*speed)*speed;
+        // const speed = 8
+        // if(switcher > 0)values[i] += Math.sin(Timer_get_global_timer()*speed)*speed;
+        // else values[i] += Math.cos(Timer_get_global_timer()*speed)*speed;
 
-        let x=0;
     
+        switcher *= -1;
     }
 }
 
@@ -406,8 +376,6 @@ export function Animations_run(){
         if(_animations.buffer[i].is_active){
             if(_animations.buffer[i].in_animation){
                 
-                // _animations.buffer[i].in_animation = _animations.buffer[i].animationClbk(_animations.buffer[i].params);
-                
                 const len = _animations.buffer[i].vb_data.length;
                 for(let j=0; j < len; j++){
                     
@@ -417,7 +385,8 @@ export function Animations_run(){
                     
                     _animations.buffer[i].UpdateClbk(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, 
                                                      vb_data.data.values_indices, vb_data.values_len, vb_data.attribsidx, 
-                                                     vb_data.data.num_faces, vb_data.data.offsets, vb_data.data.which_vb, vb_data.data.counts, vb_data.data.num_faces[0]);
+                                                     vb_data.data.num_faces, vb_data.data.offsets, vb_data.data.which_vb, vb_data.data.counts);
+                                                    //  vb_data.data.num_faces, vb_data.data.offsets, vb_data.data.which_vb, vb_data.data.counts, vb_data.data.num_faces[0]);
 
 
                 }

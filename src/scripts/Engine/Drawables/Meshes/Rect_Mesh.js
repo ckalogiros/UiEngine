@@ -295,7 +295,7 @@ export class Rect_Mesh extends Rect {
 
       this.state.mask |= MESH_STATE.ACTIVE;
       for (let i = 0; i <= this.children.boundary; i++) {
-         this.children.buffer[i].Activate();
+         if(this.children.buffer[i]) this.children.buffer[i].Activate();
       }
    }
 
@@ -304,7 +304,7 @@ export class Rect_Mesh extends Rect {
 
       this.state.mask &= ~MESH_STATE.ACTIVE;
       for (let i = 0; i <= this.children.boundary; i++) {
-         this.children.buffer[i].Deactivate();
+         if(this.children.buffer[i]) this.children.buffer[i].Deactivate();
       }
    }
 
@@ -316,7 +316,7 @@ export class Rect_Mesh extends Rect {
       for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
-         child.AddToWidgetRootBuffer(root_bufferidx);
+         if(child) child.AddToWidgetRootBuffer(root_bufferidx);
       }
 
    }
@@ -326,7 +326,7 @@ export class Rect_Mesh extends Rect {
 
       this.gfx_ctx_flags = FLAGS;
       for (let i = 0; i <= this.children.boundary; i++) {
-         this.children.buffer[i].gfx_ctx_flags = FLAGS;
+         if(this.children.buffer[i]) this.children.buffer[i].gfx_ctx_flags = FLAGS;
       }
    }
 

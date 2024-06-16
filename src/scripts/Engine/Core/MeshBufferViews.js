@@ -2,8 +2,8 @@
 
 import { Vertex_buffer_reset_to_index } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
-import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index, Mesh_per_vb_remove_mesh } from "./MeshBuffer.js";
+import { New_generic_buffer, New_int16_buffer } from "./Buffers.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_mesh } from "./MeshBuffer.js";
 
 
 /**
@@ -185,8 +185,7 @@ function View_vb_exists(groupidx, vbidx) {
 }
 
 
-/** group.buffer[group_bufferidx].vb.buffer[group_vbidx].data.buffer[group_meshidx] */
-/** group.buffer[group_bufferidx].vb.buffer[group_vbidx].info.buffer[3] */
+
 function View_add_mesh(groupidx, mesh) {
 
    const mesh_bufferidx = mesh.mesh_bufferidx;
@@ -222,7 +221,7 @@ function View_add_mesh(groupidx, mesh) {
 
       const mesh_data = {
          info: new Int16Array(VIEW_INFO.SIZE),
-         data: New_int16_buffer(), // TODO: widget root gfx already knows the number of meshes, so maybe have an aproximation of the mesh count(per vb buffer)
+         data: New_int16_buffer(_, 'MeshBufferViews-mesh_data'), // TODO: widget root gfx already knows the number of meshes, so maybe have an aproximation of the mesh count(per vb buffer)
       };
 
       const vb_bufferidx = view.vb.Add(mesh_data);
@@ -401,15 +400,11 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
 
    for (let i = 0; i <= view.vb.boundary; i++) {
 
-      // const progidx = view.vb.buffer[i].info[VIEW_INFO.PROGIDX];
       const vb_groupidx = view.vb.buffer[i].info[VIEW_INFO.VB_GROUP_IDX];
-
-      // const vb_start = view.vb.buffer[i].info[VIEW_INFO.START]; // We want the start of the root mesh of the group, not the start of the root widget
 
       const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
       const starts = mesh.gfx.vb.starts.buffer;
       Vertex_buffer_reset_to_index(vb_groupidx, starts);
-      // Vertex_buffer_reset_to_index(vb_groupidx, vb_start);
 
       // Mesh_per_vb_remove_all_from_index(vb_groupidx, view.vb.buffer[i].data.buffer[0]); // Pass the meshidx of the first mesh on the current accessed vb
    }
@@ -469,16 +464,8 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
             if (mesh.state.mask & MESH_STATE.ACTIVE) { 
    
                mesh.AddToGfxFromReset(); 
-               // if(mesh.is_gfx_inserted) mesh.AddToGfxFromReset(); 
-               // else {
-
-               //    if(mesh.gfx.vb.groupidx===1) 
-               //       console.log(mesh.GetName(), mesh.gfx.vb.starts.buffer[0])
-               //    mesh.AddToGfx(); 
-               // }
             }
          }
-         // else console.log('INACTIVE', mesh.GetName())
       }
    }
    
@@ -489,7 +476,6 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
    if(do_reconstruct_listeners) 
    mesh.ConstructListeners(parent_events); 
    const delta = Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2)
-   // console.log(delta)
    // if(do_reconstruct_listeners) mesh.ConstructListeners(); 
 
 }

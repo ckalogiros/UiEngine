@@ -1,8 +1,15 @@
 "use strict";
 
-import { M_Buffer, New_int8_buffer } from "../../Core/Buffers.js";
+import { Free_int8_buffer, M_Buffer, New_int8_buffer } from "../../Core/Buffers.js";
 
-
+/**
+ * IMPLEMENTATION:
+ * Store indexes to 'children buffer' of a mesh, in order to reposition them according to some prerequisites.
+ * Uppon position update, the parent mesh must be passed(as a refference), so that the stored indexes in 'rel_comp.buffer' 
+ * can access the children meshes via the 'parent.children' buffer, and change any positions.
+ * 
+ * For now the rel_pos.buffer element is returned to any mesh as a refference, NOT as an index.
+ */
 
 _CNT = 0;
 export const REL_POS = {
@@ -28,8 +35,16 @@ class RelativePosition extends M_Buffer {
 
       super();
 
-      this.AddAtIndex(REL_POS.LEFT, New_int8_buffer());
-      this.AddAtIndex(REL_POS.RIGHT, New_int8_buffer());
+      this.AddAtIndex(REL_POS.LEFT, New_int8_buffer(_, 'NEW RelativePosition LEFT'));
+      this.AddAtIndex(REL_POS.RIGHT, New_int8_buffer(_, 'NEW RelativePosition RIGHT'));
+   }
+
+   Destroy(){
+
+      for(let i=0; i < REL_POS.SIZE; i++){
+         Free_int8_buffer(this.buffer[i]);
+      }
+      
    }
    
 } 
@@ -49,8 +64,6 @@ export function Relative_pos_comp_add_child_to_comp(whereidx, parent, childidx){
    const comp = parent.rel_comp;
    const idx = comp.buffer[whereidx].Add(childidx);
 
-   // if(childidx !== idx) console.error('Relative_pos_comp_add_child_to_comp\nYou are storing a child with idx different to the ');
-   
    Rel_pos_fn_ptr[whereidx](whereidx, parent, childidx);
    
    return idx;

@@ -63,7 +63,7 @@ export class Text_Mesh extends Mesh {
 
 
 
-   
+
    /*******************************************************************************************************************************************************/
    // Graphics
    /*******************************************************************************************************************************************************/
@@ -135,7 +135,7 @@ export class Text_Mesh extends Mesh {
 
 
 
-   
+
    /*******************************************************************************************************************************************************/
    // Transformations
    /*******************************************************************************************************************************************************/
@@ -289,7 +289,7 @@ export class Text_Mesh extends Mesh {
 
 
 
-   
+
    /*******************************************************************************************************************************************************/
    // Setters-Getters
    /*******************************************************************************************************************************************************/
@@ -402,13 +402,13 @@ export class Text_Mesh extends Mesh {
    RenderText() {
       // console.error('This functions is not implemented for instancing\nAt RenderText()\n At Text_Mesh.js')
 
-      if(!this.gfx)
+      if (!this.gfx)
          console.log
       const store_start = this.gfx.vb.starts.buffer[0];
 
       // TODO: Remove arrays, substitute with variables
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-         pos: [this.geom.pos[0]-this.geom.dim[0]*2, this.geom.pos[1], this.geom.pos[2]],
+         pos: [this.geom.pos[0] - this.geom.dim[0] * 2, this.geom.pos[1], this.geom.pos[2]],
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
@@ -511,14 +511,14 @@ export class Text_Mesh extends Mesh {
    ResetText(new_text) {
 
       const len = new_text.length;
-      if(len > this.mat.char_buffer.size) alert('[][][]]sdklljsdm')
+      if (len > this.mat.char_buffer.size) alert('[][][]]sdklljsdm')
       for (let i = 0; i < len; i++) {
          this.mat.char_buffer.buffer[i] = new_text[i];
       }
       this.geom.text = new_text;
       this.geom.num_faces = new_text.length;
    }
-      
+
 
    #TEMP() {
 

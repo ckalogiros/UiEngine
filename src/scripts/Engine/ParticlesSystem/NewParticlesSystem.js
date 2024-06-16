@@ -112,7 +112,7 @@ class Emitter {
       this.nameidx = Str_buffer_store(name);
 
       this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
-      this.free_particles_idxs_buffer = New_int16_buffer();
+      this.free_particles_idxs_buffer = New_int16_buffer(_, 'ParticlesSystem-free_particles_idxs_buffer');
 
 
       this.sid = {
@@ -262,6 +262,8 @@ class Emitter {
       }
 
    }
+
+   // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)
 }
 
 const _emitters = New_generic_buffer(_, 'Particle System: Emitter buffer');

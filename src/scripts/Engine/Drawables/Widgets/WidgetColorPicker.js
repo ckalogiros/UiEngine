@@ -8,6 +8,7 @@ import { Widget_root_set_in_focus } from "../../Core/MeshBuffer";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals";
+import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners";
 import { BLACK, BLUE, BLUEL, GREEN, GREY, PURPLEB, PURPLER, RED, REDL, TRANSPARENT, WHITE, YELLOW, YELLOWL } from "../Material/Base/Colors";
 import { Rect } from "../Meshes/Rect_Mesh";
 import { Section } from "../Meshes/Section";
@@ -267,7 +268,7 @@ export class Widget_Color_Picker extends Section {
          RED[9], RED[9],
       ];
 
-      const vertices_count = (HUE_COLOR.length / 2) -1;
+      const vertices_count = (HUE_COLOR.length / 2) - 1;
 
       const slider = Create_widget_slider_simple(_, [0, 0, 2], [250, 20], HUE_COLOR, [0, 0], [4, 20], vertices_count);
       slider.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
@@ -317,7 +318,7 @@ export class Widget_Color_Picker extends Section {
       this.state.mask |= MASK;
 
       for (let i = 0; i <= this.children.boundary; i++) {
-         this.children.buffer[i].StateEnable(MASK);
+         if (this.children.buffer[i]) this.children.buffer[i].StateEnable(MASK);
       }
    }
 
@@ -327,7 +328,7 @@ export class Widget_Color_Picker extends Section {
       this.state.mask &= ~MASK;
 
       for (let i = 0; i <= this.children.boundary; i++) {
-         this.children.buffer[i].StateDisable(MASK);
+         if (this.children.buffer[i]) this.children.buffer[i].StateDisable(MASK);
       }
    }
 
@@ -345,8 +346,8 @@ export class Widget_Color_Picker extends Section {
       super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
    }
 
-   
-   GfxCtxSetFlag(FLAGS){
+
+   GfxCtxSetFlag(FLAGS) {
       alert('-1 COLORPICKER')
    }
 
@@ -359,12 +360,12 @@ export class Widget_Color_Picker extends Section {
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL, params = null) {
 
-      if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
-      
+      if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
       for (let i = 0; i <= this.children.boundary; i++) {
-         this.children.buffer[i].GenGfxCtx(FLAGS, specific_vb_groupidx, params);
+         if (this.children.buffer[i]) this.children.buffer[i].GenGfxCtx(FLAGS, specific_vb_groupidx, params);
       }
    }
 
@@ -374,7 +375,7 @@ export class Widget_Color_Picker extends Section {
       if (this.state.mask & MESH_STATE.ACTIVE) {
          super.AddToGfx();
          for (let i = 0; i <= this.children.boundary; i++) {
-            this.children.buffer[i].Render();
+            if (this.children.buffer[i]) this.children.buffer[i].Render();
          }
       }
 
@@ -386,7 +387,7 @@ export class Widget_Color_Picker extends Section {
       super.AddToGfxFromReset();
 
       for (let i = 0; i <= this.children.boundary; i++) {
-         this.children.buffer[i].Rerender();
+         if (this.children.buffer[i]) this.children.buffer[i].Rerender();
       }
    }
 
@@ -521,6 +522,7 @@ export class Widget_Color_Picker extends Section {
 
             STATE.mesh.SetGrabed(widget);
             STATE.mesh.SetFocused(widget);
+            Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
             widget.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
             Widget_root_set_in_focus(widget.root_bufferidx);
          }
@@ -754,7 +756,7 @@ export class Widget_Color_Picker extends Section {
       // Set the new color picked in the color present panel of the widget
       const color_present_mesh = panel2.children.buffer[temp_color_present_idx];
       Gl_set_rgba(color_present_mesh.gfx, intensity, color_present_mesh.geom.num_faces);
-      
+
 
 
 

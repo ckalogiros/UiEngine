@@ -558,7 +558,7 @@ export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=
       for(let i=0; i <= mesh.children.boundary; i++){
          const child = mesh.children.buffer[i];
 
-         changes_hapened = Clipy_from_tree_recursive(child, clip_top, clip_bottom);
+         if (child) changes_hapened = Clipy_from_tree_recursive(child, clip_top, clip_bottom);
 
       }
    }
@@ -747,26 +747,30 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
          for (let i = first.idx; i <= mesh.children.boundary; i++) {
             
             const child = mesh.children.buffer[i];
-            const c_top = child.geom.pos[1] + child.geom.dim[1];
-            
-            if (c_top < clampY[CLAMP.Y_UP]) {  // Enable all meshes that are lower than the upper limit 
 
-               child.state.mask &= ~MESH_STATE.ACTIVE;
-               // Widget_group_update_decrement(child.group_bufferidxs, child.geom.num_faces);
-               if(DBG) console.log('REMOVE', child.mesh_bufferidx, child.GetName())
-               child.gfx.vb.start = INT_NULL;
-               changes_hapened = true;
+            if (child) {
 
-               if (child.children.boundary) { // Run for all children widgets recursively
-                  // Recurse_mesh_set_active(child, false); // Disable recursively
-                  child.StateDisable(MESH_STATE.ACTIVE);
+               const c_top = child.geom.pos[1] + child.geom.dim[1];
+               
+               if (c_top < clampY[CLAMP.Y_UP]) {  // Enable all meshes that are lower than the upper limit 
+   
+                  child.state.mask &= ~MESH_STATE.ACTIVE;
+                  // Widget_group_update_decrement(child.group_bufferidxs, child.geom.num_faces);
+                  if(DBG) console.log('REMOVE', child.mesh_bufferidx, child.GetName())
+                  child.gfx.vb.start = INT_NULL;
+                  changes_hapened = true;
+   
+                  if (child.children.boundary) { // Run for all children widgets recursively
+                     // Recurse_mesh_set_active(child, false); // Disable recursively
+                     child.StateDisable(MESH_STATE.ACTIVE);
+                  }
                }
-            }
-            else {
-               // The next time this function will run to calculate the clamp, we need the upper most active mesh to check for upper limit or clamp up, 
-               renderables.first = child.idx;  // The first child that hasn't been deactivated, set it as the new 'first' for the next call to this function.
-               if(renderables.last<=renderables.first) renderables.last = renderables.first-1;  // To avoid the last mesh is higher that the first rendered mesh
-               break;
+               else {
+                  // The next time this function will run to calculate the clamp, we need the upper most active mesh to check for upper limit or clamp up, 
+                  renderables.first = child.idx;  // The first child that hasn't been deactivated, set it as the new 'first' for the next call to this function.
+                  if(renderables.last<=renderables.first) renderables.last = renderables.first-1;  // To avoid the last mesh is higher that the first rendered mesh
+                  break;
+               }
             }
          }
       }
@@ -850,25 +854,29 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
 
       // If mesh's bottom side is above the clamp y down, activate all childrem from last to limit.down
       if (lower_bottom <= clampY[CLAMP.Y_DOWN]) {
+
          for (let i = lower_deactivated.idx; i <= mesh.children.boundary; i++) {
 
             const child = mesh.children.buffer[i];
-            const c_bottom = child.geom.pos[1] + child.geom.dim[1];
+            if (child) {
 
-               if (c_bottom < limit.down){ // Enable all meshes that are higher than the lower limit 
-               child.state.mask |= MESH_STATE.ACTIVE;
-
-               if(DBG)console.log('ADD', child.mesh_bufferidx, child.GetName())
-               changes_hapened = true;
-
-               // Run for all children widgets recursively
-               if (child.children.active_count) {
-                  // Disable recursively
-                  // Recurse_mesh_set_active(child, true);
-                  child.StateEnable(MESH_STATE.ACTIVE);
+               const c_bottom = child.geom.pos[1] + child.geom.dim[1];
+   
+                  if (c_bottom < limit.down){ // Enable all meshes that are higher than the lower limit 
+                  child.state.mask |= MESH_STATE.ACTIVE;
+   
+                  if(DBG)console.log('ADD', child.mesh_bufferidx, child.GetName())
+                  changes_hapened = true;
+   
+                  // Run for all children widgets recursively
+                  if (child.children.active_count) {
+                     // Disable recursively
+                     // Recurse_mesh_set_active(child, true);
+                     child.StateEnable(MESH_STATE.ACTIVE);
+                  }
+   
+                  renderables.last = child.idx;
                }
-
-               renderables.last = child.idx;
             }
          }
       }
@@ -932,42 +940,46 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top=null,
    for (let i = 0; i <= section.children.boundary; i++) {
 
       const child = section.children.buffer[i];
-      const top = child.geom.pos[1] - child.geom.dim[1];
-      const bottom = child.geom.pos[1] + child.geom.dim[1];
 
-      if (bottom <= clip_top) {
+      if (child) {
 
-         // child.Deactivate();
-         // child.state.mask |= MESH_STATE.CLIPED_Y
-         // child.StateDisable(MESH_STATE.ACTIVE|MESH_STATE.CLIPED_Y)
-         child.StateDisable(MESH_STATE.ACTIVE)
-         child.StateEnable(MESH_STATE.CLIPED_Y)
-         
-         if (firstupper === INT_NULL) firstupper = i;
-      }
-      else if (top >= clip_bottom) {
-         
-         // child.Deactivate();
-         // child.state.mask |= MESH_STATE.CLIPED_Y
-         // child.StateDisable(MESH_STATE.ACTIVE|MESH_STATE.CLIPED_Y)
-         child.StateDisable(MESH_STATE.ACTIVE)
-         child.StateEnable(MESH_STATE.CLIPED_Y)
-         
-         if (firstlower === INT_NULL) {
-            firstlower = i;
+         const top = child.geom.pos[1] - child.geom.dim[1];
+         const bottom = child.geom.pos[1] + child.geom.dim[1];
+   
+         if (bottom <= clip_top) {
+   
+            // child.Deactivate();
+            // child.state.mask |= MESH_STATE.CLIPED_Y
+            // child.StateDisable(MESH_STATE.ACTIVE|MESH_STATE.CLIPED_Y)
+            child.StateDisable(MESH_STATE.ACTIVE)
+            child.StateEnable(MESH_STATE.CLIPED_Y)
+            
+            if (firstupper === INT_NULL) firstupper = i;
          }
-      }
-      else { // The mesh is inside limits
-         
-         // child.Activate();
-         // child.state.mask &= ~MESH_STATE.CLIPED_Y
-         // child.StateEnable(MESH_STATE.ACTIVE|MESH_STATE.CLIPED_Y)
-         child.StateEnable(MESH_STATE.ACTIVE)
-         child.StateDisable(MESH_STATE.CLIPED_Y)
-         console.log(child.GetName(), child.state.mask)
-
-         if (lastupper === INT_NULL) {
-            lastupper = i;
+         else if (top >= clip_bottom) {
+            
+            // child.Deactivate();
+            // child.state.mask |= MESH_STATE.CLIPED_Y
+            // child.StateDisable(MESH_STATE.ACTIVE|MESH_STATE.CLIPED_Y)
+            child.StateDisable(MESH_STATE.ACTIVE)
+            child.StateEnable(MESH_STATE.CLIPED_Y)
+            
+            if (firstlower === INT_NULL) {
+               firstlower = i;
+            }
+         }
+         else { // The mesh is inside limits
+            
+            // child.Activate();
+            // child.state.mask &= ~MESH_STATE.CLIPED_Y
+            // child.StateEnable(MESH_STATE.ACTIVE|MESH_STATE.CLIPED_Y)
+            child.StateEnable(MESH_STATE.ACTIVE)
+            child.StateDisable(MESH_STATE.CLIPED_Y)
+            console.log(child.GetName(), child.state.mask)
+   
+            if (lastupper === INT_NULL) {
+               lastupper = i;
+            }
          }
       }
    }
