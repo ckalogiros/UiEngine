@@ -1,7 +1,6 @@
 "use strict";
 
 import { Gl_draw } from "../../Graphics/GlDraw.js";
-import { MouseResetDif, MouseResetWheel } from "../Controls/Input/Mouse.js";
 import { TimeSample, TimeUpdate } from "../Timers/Time.js";
 import { TimersUpdateGlobalTimer, TimersUpdateTimers } from "../Timers/Timers.js";
 import { TimeIntervalsUpdateAll } from "../Timers/TimeIntervals.js";
@@ -136,6 +135,7 @@ export function Renderer_set_canvas_size(width, height) {
    Scene_set_projection_matrix(_renderer.scene.sceneidx); // update camera's projection matrix
    Scene_set_screen_res_uniform(); // Update screen dimentions uniform
    gfxCtx.gl.viewport(0, 0, width, height);
+
 }
 
 

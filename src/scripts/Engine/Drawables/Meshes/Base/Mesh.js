@@ -2,7 +2,7 @@
 import { Timer_get_global_timer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
-import { Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { GlRotateZ2D, Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
@@ -646,6 +646,9 @@ export class Mesh {
             case MESH_ENABLE.GFX.PASS_DIM2: { this.sid.pass |= SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
             case MESH_ENABLE.GFX.PASS_TIME1: { this.sid.pass |= SID.PASS.TIME1; break; }
+            case MESH_ENABLE.GFX.FX_GLOW: { // Effects
+                this.sid.fx |= SID.FX.FS_GLOW; break; 
+             }
 
             default: console.error('Enable material\'s shader param failed. @ Material.js');
         }

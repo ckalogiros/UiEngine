@@ -4,6 +4,7 @@
 import { vertex_shader_chunks, fragment_shader_chunks } from './ShaderChunks/ShaderChunks.js'
 import { frag_round_corners_call, frag_round_corners } from './Functions/fragment.roundcorners.js'
 import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './Functions/fragment.texture.js'
+import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
 
 
 
@@ -195,6 +196,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.FEATHER) ? '#include <out_border_feather>' : '',
       (sid.pass & SID.PASS.TIME1) ? '#include <out_vtime1>' : '',
       (sid.pass & SID.PASS.RES2) ? '#include <out_vres2>' : '',
+      (sid.fx & SID.FX.FS_GLOW) ? 'out vec2 v_glow_params;' : '',
       '\n',
       
 
@@ -227,24 +229,27 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.unif & SID.UNIF.WPOS4) ? '  vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
       ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);' 
-         : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
-
+      : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
+      
       // true ? 'vec4 p = a_wpos_time;' : '',
       // true ? 'gl_Position = vec4(a_pos.x, a_pos.y, 1., 1.0);' : '',
       // (sid.unif & SID.UNIF.COL4) ? '  v_col = a_col;' : '',
-
-
-
-
-
+      
+      
+      
+      
+      
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // ASSIGNMENTS
+      (sid.fx & SID.FX.FS_GLOW) ? '  v_glow_params = u_glow_params;' : '',
       (sid.pass & SID.PASS.COL4) 
          ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') 
          : '', 
       // (sid.pass & SID.PASS.DIM2) ? '  v_dim = abs(a_pos);' : '',
       (sid.pass & SID.PASS.DIM2) ? '  v_dim = a_dim;' : (sid.pass & SID.ATTR.DIM2) ? '  v_dim = a_dim;' : '', // TODO: If we have created an attribute a_dim, we have to use it, else the attribs buffering is gonna be wrong
+      // (sid.pass & (SID.UNIF.COL4)) ? '  v_col4 = col4;' : '',
       (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS4)) ? '  v_wpos = vec2(a_wpos_time.x + wpos.x, a_wpos_time.y + wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
+      // (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS4)) ? '  v_wpos = vec2(a_pos.x*.9 + a_wpos_time.x + wpos.x, a_pos.y*.9 + a_wpos_time.y + wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
       (sid.attr & SID.ATTR.BORDER) ? '  v_border_width = a_params1.x;' : '',
@@ -272,13 +277,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
  */
 
-const temp_vertex_shader_rotate_z_function = `\
-void Rotate(float t)\n\
-\n\
-\n\
-\n\
-\n\
-`;
+
 
 export function Shaders_build_fragment_shader(sid, uniforms_info){
 
@@ -297,6 +296,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // In
       '\n',
+      (sid.fx & SID.FX.FS_GLOW) ? 'in vec2 v_glow_params;' : '',
       (sid.pass & SID.PASS.COL4) ? '#include <in_frag_col4>' : '',
       (sid.pass & SID.PASS.DIM2) ? '#include <in_frag_dim2>'   : '',
       (sid.pass & SID.PASS.WPOS2) ? '#include <in_frag_wpos2>' : '',
@@ -317,18 +317,23 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // Function definitions
       '\n',
-      (sid.attr & SID.ATTR.BORDER) ? frag_round_corners : '',
+      (sid.attr & SID.ATTR.STYLE) ? frag_round_corners : '',
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
       (sid.attr & SID.ATTR.MSDF) ? frag_msdf : '',
+      ////////////////////////////////////////////////////
+      // Fx shder functions
+      (sid.fx & SID.FX.FS_GLOW) ? frag_glow : '',
+
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // Main
       true ? 'void main(void) ' : '',
       true ? '{' : '',
-      true ? '#include <frag_color_create>' : '',
-      // (sid.attr & SID.ATTR.TEX2) ? Fragment_shader_includes_resolve(frag_tex) : '',
-      (sid.attr & SID.ATTR.BORDER) ? frag_round_corners_call : '',
+      true ? '#include <frag_color_create>' : '', // Creates the variable 'color' of the fragment shader color output.
       // (sid.attr & SID.ATTR.BORDER) ? Fragment_shader_includes_resolve(frag_round_corners_call) : '',
+      (sid.attr & SID.ATTR.STYLE) ? frag_round_corners_call : '', // TODO: Check either for .STYLE or .BORDER|.FEATHER|.RCORNERS
+      (sid.fx & SID.FX.FS_GLOW) ? '  float alpha = color.a;' : '',
+      (sid.fx & SID.FX.FS_GLOW) ? frag_glow_call : '',
       (sid.attr & SID.ATTR.TEX2 ) 
          ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call // If TEX2 and SDF, build for sdf
             : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call  // ELSE If TEX2 and MSDF, build for msdf

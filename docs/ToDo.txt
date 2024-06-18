@@ -5,6 +5,7 @@
 +Animation per vertex in CPU
 +Android Phone
 +Instancing and gl_VertexID, gl_InstanceID, gl_DrawID: SEE https://www.khronos.org/opengl/wiki/Vertex_Shader/Defined_Inputs
++ Create color Widget
 
 -Convert all mesh attribs to indexes in a vertex buffer ???
 -Horizontal scrolling
@@ -35,7 +36,6 @@
   -Saved to a color buffer, get the colors as refferences
   -Create classes for Arr4, Arr3, Mat4(for per vertex color), to handle the Set,Copy correctly:E.x. Set the alpha for a per vertex color Mat4, needs to copy the alpha to all collumns of index [3]
 --------------------------------------------------- Milestones!
-- Create color Widget
 - Create pop up messages. On a temp generic use buffer
 - Fix the menu widget options dp
 --------------------------------------------------- Milestones!
@@ -43,7 +43,7 @@
 
 
 --------------------------------------------------- Nice Animation Color Effect!
--If for ech vertex we animate a different color:
+-If for each vertex we animate a different color:
 v1:R
 v2:G
 v3:B

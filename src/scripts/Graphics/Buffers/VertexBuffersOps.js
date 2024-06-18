@@ -1650,17 +1650,48 @@ export function GlSetAttrParams1(gfxInfo, param, paramOffset) {
 
 
 
-export function GlRotateZ2D(gfxInfo, dim, angle) {
+export function GlRotateZ2D(gfxInfo, dim, angle, num_faces = 1) {
+// export function GlRotateZ2D(gfxInfo, dim, angle) {
 
-   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.groupidx);
-   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.POS2)
+   // const vbidx = gfxInfo.vb.which_vb.wpos_buf;
+   // const wposidx = gfxInfo.vb.which_attrib.wpos_idx; // An index to access the wpos elements
+   // const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   // const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
-   let index = gfxInfo.vb.start + offset;
-   let stride = gfxInfo.attribsPerVertex - V_POS_COUNT;
 
-   // const newPos = Rotate4x4(dim, angle)
+   // let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[wposidx];
+   // let loop_count = num_faces;
+   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   // let stride = vb_info.attribs_info.count - 2;
+
+   const vbidx = gfxInfo.vb.which_vb.dim_buf;
+   const dimidx = gfxInfo.vb.which_attrib.dim_idx; // An index to access the wpos elements
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+
+   let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[dimidx];
+   // let index = 12;
+   let loop_count = num_faces;
+   let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[dimidx];
+   // let stride = vb_info.attribs_info.count - 2;
+
+   // dim[0]*=2; dim[1]*=2;
+
    const newPos = RotateZ(dim, angle)
+   // index-=8
 
+
+   // let i = 0;
+   // while (loop_count) {
+
+   //    vb_data[index++] = newPos[i++];
+   //    vb_data[index++] = newPos[i++];
+      
+   //    index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+   //    loop_count--;
+   // }
+   
    vb_data[index++] = newPos[0];
    vb_data[index++] = newPos[1];
    index += stride;
@@ -1672,6 +1703,7 @@ export function GlRotateZ2D(gfxInfo, dim, angle) {
    index += stride;
    vb_data[index++] = newPos[6];
    vb_data[index++] = newPos[7];
-
+   
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 }
+

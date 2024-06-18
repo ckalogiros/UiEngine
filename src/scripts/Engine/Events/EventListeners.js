@@ -872,29 +872,6 @@ export function Listener_set_root_mesh_priority() {
 
 
 
-/**************************************************************************************************************************/
-// Debug Info Drop Down
-
-export function Listeners_debug_info_create(scene) {
-
-   const dp_btn_pad = [10, 2];
-
-   // Create the dropdown that will hold all listen events to display for debuging purposes.
-   const dropdown = new Widget_Dropdown('Info Ui Listeners Root-DP', [VIEWPORT.RIGHT - 140, 20, 0], GREY1, TRANSPARENCY(GREY[5], .8), WHITE, dp_btn_pad);
-   dropdown.CreateClickEvent();
-   dropdown.CreateMoveEvent();
-   Dropdown_roots_set_root(dropdown, dropdown);
-   dropdown.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS; // NOTE: Must set the specific type for the dropdown to avoid infinite looping
-   dropdown.menu.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS; // NOTE: Must set the specific type for the dp's menu to avoid infinite looping
-
-
-   dropdown.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-   dropdown.Calc();
-   dropdown.Render();
-   dropdown.ConstructListeners();
-
-   // Info_listener_create_event(INFO_LISTEN_EVENT_TYPE.LISTENERS, Listeners_debug_info_update, dropdown, null);
-}
 
 
 

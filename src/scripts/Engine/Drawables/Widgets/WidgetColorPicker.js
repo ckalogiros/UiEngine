@@ -1,16 +1,15 @@
 "use strict"
 
 import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps";
-import { Floor, Mix_vec3, Mix_vec4, Mult_arr4_scalar } from "../../../Helpers/Math/MathOperations";
-import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse";
-import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_slider_simple } from "../../Core/CreateWidget";
+import { Floor, Mix_vec3, Mix_vec4 } from "../../../Helpers/Math/MathOperations";
+import { MouseGetPosDif } from "../../Controls/Input/Mouse";
+import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_widget_slider_simple } from "../../Core/CreateWidget";
 import { Widget_root_set_in_focus } from "../../Core/MeshBuffer";
-import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer";
+import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners";
-import { BLACK, BLUE, BLUEL, GREEN, GREY, PURPLEB, PURPLER, RED, REDL, TRANSPARENT, WHITE, YELLOW, YELLOWL } from "../Material/Base/Colors";
-import { Rect } from "../Meshes/Rect_Mesh";
+import { BLACK, BLUE, BLUEL, GREEN, GREY, RED, REDL, WHITE, YELLOW } from "../Material/Base/Colors";
 import { Section } from "../Meshes/Section";
 import { Find_parent_listen_event } from "../Operations/Recursions";
 import { Slider_connect } from "./WidgetSlider";
@@ -223,8 +222,9 @@ export class Widget_Color_Picker extends Section {
       // Create the tranparency slider
 
       // const slider = Create_widget_slider_simple(_, [0, 0, 2], [250, 20], HUE_COLOR, [0, 0], [4, 20], HUE_COLOR.length-1);
-      const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12, 150], WHITE, [0, 0], [12, 4], 1);
+      const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12, 150], [WHITE, WHITE, WHITE, WHITE], [0, 0], [12, 4], 1);
       slider_tran.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
+      slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider_tran.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
       slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       slider_tran.GfxUniformsEnable(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
@@ -270,8 +270,10 @@ export class Widget_Color_Picker extends Section {
 
       const vertices_count = (HUE_COLOR.length / 2) - 1;
 
-      const slider = Create_widget_slider_simple(_, [0, 0, 2], [250, 20], HUE_COLOR, [0, 0], [4, 20], vertices_count);
+      const slider = Create_widget_slider_simple(_, [0, 0, 2], [250, 20], [WHITE, WHITE, WHITE, WHITE], [0, 0], [4, 20], vertices_count);
+      
       slider.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
+      slider.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       slider.GfxUniformsEnable(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)

@@ -17,16 +17,14 @@ import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 
 
 
-// export class Widget_Slider_Simple extends Rect {
 export class Widget_Slider_Simple extends Rect_Mesh {
 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[8], hover_margin = [0, 0], handle_dim=[10,10], num_faces=1, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, _, _, _, num_faces, is_debug_mesh);
-      // super(pos, dim, col, faces, is_debug_mesh);
 
-      this.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
+      // this.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER | MESH_TYPE.WIDGET_SLIDER_BAR | this.geom | this.mat;
       
@@ -38,20 +36,22 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
       
-      //ROOT_WIDGET_FLAGS=0x0, pos, dim, col, name, style, margin, num_faces, is_debug_mesh=0x0
-      // const handle = Create_rect_mesh(_,[0,0,pos[2]+1], handle_dim, WHITE, _, _, _, 1, is_debug_mesh);
-      const handle = Create_rect_mesh(_,[pos[0],pos[1],pos[2]+1], handle_dim, WHITE, _, _, _, 1, is_debug_mesh);
-      handle.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
+      this.slider_val = 0;
+
+      const handle = Create_rect_mesh(_,[0, 0, pos[2]+1], handle_dim, col, _, _, _, 1, is_debug_mesh);
+
+      // handle.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
+
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
+
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      // handle.SetStyle([5, handle_dim[1], 1.5]);
-      // handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 1.5]);
-      handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 2.5]);
+      handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 1.5]);
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
       // HACK:
       // FIXME: Handle should check if the tree mesh belongs to a vb with COL4 per vertex buffer
-      handle.mat.col = [handle.mat.col, handle.mat.col, handle.mat.col, handle.mat.col]
+      // if(this.parent && this.parent.sid.attr & SID.ATTR.COL4_PER_VERTEX)
+      // handle.mat.col = [handle.mat.col, handle.mat.col, handle.mat.col, handle.mat.col]
 
 
       // Make the vertical area of the bar larger for hover and handle moving.
@@ -344,6 +344,23 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    /****************************************************************************************************************************************************/
    // UNIQUE METHODS
    /****************************************************************************************************************************************************/
+
+   
+   // Bind(EventClbk=null, targetBindingFunctions=_, params, click_flags) {
+
+   //    if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
+      
+   //    // this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+   //    this.evt_params = { // Create the parameters to pass for the button's click event. 
+   //       EventClbk: EventClbk,
+   //       targetBindingFunctions: targetBindingFunctions,
+   //       target_mesh: this,
+   //       params: params,
+   //    };
+
+   //    if(click_flags) this.state.mask |= click_flags;
+
+   // }
 }
 
 
@@ -452,6 +469,7 @@ export function Slider_horizontal_on_update_handle(_params) {
    Slider_horizontal_move_handle(bar, handle);
 
    const val = Slider_horizontal_calculate_value(bar, handle); // Calculate slider's value based on the handles position.
+   bar.slider_val = val;
 
    // Do stuf with the slider handle value, based on the parent slider_widget
    if (bar.parent) {
@@ -469,7 +487,7 @@ export function Slider_horizontal_on_update_handle(_params) {
 
             const params = bar.eventCallbacks.buffer[i].clbk_params;
             const Clbk = bar.eventCallbacks.buffer[i].Clbk;
-            Clbk(params, val);
+            Clbk(params, val+.5);
          }
       }
    }
@@ -687,12 +705,8 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       // Slider Bar: Bar is child of the slider mesh
       // const bar = new Slider(mesh_bufferidx, _, [0, 40, 1], dim, GREY[0], hover_margin, is_debug_mesh);
       // const bar = Create_widget_slider_simple(_, [0, 0, 1], [dim[0], 2], GREY[8], hover_margin, [10, 10], 1, is_debug_mesh);
-      const bar = Create_widget_slider_simple(_, [pos[0], pos[1], 1], [dim[0], 2], GREY[8], hover_margin, [10, 10], 1, is_debug_mesh);
-
-      bar.geom.pos[0] = 0; 
-      bar.geom.pos[1] = 0; 
-
-
+      const bar = Create_widget_slider_simple(_, [0, 20, _pos[2]+1], [dim[0], 2], GREY[8], hover_margin, [10, 10], 1, is_debug_mesh);
+      
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Slider Handle: Handle is a child of the bar mesh
       const handle = bar.children.buffer[0];
@@ -703,7 +717,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       // Make the vertical area of the bar larger for hover and handle moving.
-      bar.hover_margin = [-handle.geom.dim[1] + 4, handle.geom.dim[1] + 4];
+      bar.hover_margin = [-handle.geom.dim[1] , handle.geom.dim[1] ];
 
 
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -828,31 +842,37 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    // }
 
 
-   // GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
-   //    // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-   //    super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
 
-   //    const name_text = this.text_mesh;
-   //    name_text.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-   // }
+      const name_text = this.text_mesh;
+      name_text.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      
+      const bar = this.children.buffer[this.bar_idx];
+      bar.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      
+      const handle = bar.children.buffer[0];
+      handle.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+   }
 
 
    Activate() {
 
       this.state.mask |= MESH_STATE.ACTIVE;
+      
+      const name_text = this.text_mesh;
+      name_text.state.mask |= MESH_STATE.ACTIVE;
+      
+      const value_text = this.children.buffer[this.value_text_idx];
+      value_text.state.mask |= MESH_STATE.ACTIVE;
 
       const bar = this.children.buffer[this.bar_idx];
       bar.state.mask |= MESH_STATE.ACTIVE;
-
-      const name_text = this.text_mesh;
-      name_text.state.mask |= MESH_STATE.ACTIVE;
-
+      
       const handle = bar.children.buffer[0];
       handle.state.mask |= MESH_STATE.ACTIVE;
-
-      const value_text = this.children.buffer[this.value_text_idx];
-      value_text.state.mask |= MESH_STATE.ACTIVE;
    }
 
 
@@ -1096,9 +1116,12 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       const bar = mesh.children.buffer[mesh.bar_idx];
       const sliderypos = mesh.geom.pos[1] - mesh.geom.dim[1]
 
-      if (point[1] > bar.GetPosY() - bar.hover_margin[1]) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
+      // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
+      if (point[1] > bar.GetPosY() - bar.hover_margin[1] && 
+          point[1] < bar.GetPosY() + bar.geom.dim[1]*2 +bar.hover_margin[1]) { 
+      // if (point[1] > bar.GetPosY() - bar.hover_margin[1]) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
 
-         console.log('mouse', point[1], 'bar ypos', bar.geom.pos[1] * 2, 'hover margin', bar.hover_margin[1], bar.geom.pos[1] * 2 + sliderypos, bar.GetPosY())
+         // console.log('mouse', point[1], 'bar ypos', bar.geom.pos[1] * 2, 'hover margin', bar.hover_margin[1], bar.geom.pos[1] * 2 + sliderypos, bar.GetPosY())
 
 
          STATE.mesh.SetClicked(bar);
@@ -1465,8 +1488,26 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    // UNIQUE METHODS
    /****************************************************************************************************************************************************/
 
+   // SliderConnect(EventClbk, targetBindingFunctions, params, click_flags) {
+   SliderConnect(Clbk, clbk_params) {
+   
+      const bar = this.children.buffer[this.bar_idx];
+      Slider_connect(bar, Clbk, clbk_params);
+   }
+   
+   // SliderGetSliderVal(){
+      
+   //    const bar = this.children.buffer[this.bar_idx];
+   //    return bar.slider_val;
+   // }
 }
+   
 
-
+export function Slider_get_slider_val(params){
+      
+   const slider = params.slider;
+   const bar = slider.children.buffer[slider.bar_idx];
+   return [bar.slider_val+.5, 2.];
+}
 
 

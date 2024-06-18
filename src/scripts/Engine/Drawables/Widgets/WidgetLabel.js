@@ -50,6 +50,7 @@ export class Widget_Label extends Rect_Mesh {
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
         this.StylesSetPad(pad);
         this.SetStyle(style)
+        this.SetName(_text)
 
         this.text_mesh = text_mesh;
 

@@ -68,15 +68,16 @@ class Uniform {
       // const uniformInfo = gfxCtx.gl.getActiveUniform(this.shader_program, idx);
       const loc = gl.getUniformLocation(shader_program, name);
       // console.log('---------loc-----------', loc)
-      /**DEBUG */if (loc > 0xffff) alert('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.');
-      // const type = gl.getActiveUniform(shader_program, 0)
+      // const t = gl.getActiveUniform(shader_program, 1)
+      /**DEBUG */if (loc > 0xffff || loc === null) 
+         alert('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.');
 
 
       this.val = 0;// Uniform value
       this.loc = loc; // Uniform location
       this.progidx = progidx; // The index of the program
       this.name = name; // Uniform name
-      this.needsUpdate = false;
+      this.needs_update = false;
       this.UpdateUniform = null; // Gl specific type function for updating the uniform.
       // this.GetValClbk = null; // Function to call for getting the uniform value.
       // this.clbk_params = null; // Function to call for getting the uniform value.
@@ -86,10 +87,10 @@ class Uniform {
 
       switch (type) {
          // From THREE.js
-         case UNIF_TYPE.FLOAT: { this.UpdateUniform = SetValueV1f; break; } // FLOAT
-         case UNIF_TYPE.FVEC2: { this.UpdateUniform = SetValueV2f; break; } // F_VEC2
-         case UNIF_TYPE.FVEC3: { this.UpdateUniform = SetValueV3f; break; } // F_VEC3
-         case UNIF_TYPE.FVEC4: { this.UpdateUniform = SetValueV4f; break; } // F_VEC4
+         case UNIF_TYPE.FLOAT: { this.UpdateUniform = SetValueV1f; this.val = 0; break; } // FLOAT
+         case UNIF_TYPE.FVEC2: { this.UpdateUniform = SetValueV2f; this.val = new Array(1.1,2); break; } // F_VEC2
+         case UNIF_TYPE.FVEC3: { this.UpdateUniform = SetValueV3f; this.val = new Array(0,0,0); break; } // F_VEC3
+         case UNIF_TYPE.FVEC4: { this.UpdateUniform = SetValueV4f; this.val = new Array(0,0,0,0); break; } // F_VEC4
 
          case UNIF_TYPE.MAT2: { this.UpdateUniform = SetValueM2; break; } // F_MAT2
          case UNIF_TYPE.MAT3: { this.UpdateUniform = SetValueM3; break; } // F_MAT3
@@ -113,37 +114,47 @@ class Uniform {
    }
 
 
+   SetFromIndex(val, idx) {
+      this.val[idx] = val;
+      this.needs_update = true;
+      any_needs_update = true;
+      // console.log('{$$$$$} UNIFORMS SET FROM INDEX', this.val, 'name:', this.name, 'progidx:', this.progidx)
+   }
+
+
    Set(val) {
       this.val = val;
-      this.needsUpdate = true;
-      // console.log('UNIFORMS SET', this.val, this.name, _uniforms_buffer)
+      this.needs_update = true;
+      any_needs_update = true;
+      // console.log('{$$$$$} UNIFORMS SET', this.val, 'name:', this.name, 'progidx:', this.progidx)
    }
 
 
    Update() {
       this.UpdateUniform(gfxCtx.gl, this.loc, this.val);
-      // console.log('UNIFORMS UPDATE', this.val, this.name)
-      this.needsUpdate = false;
+      this.needs_update = false;
+      console.log('{$$$$$} UNIFORMS UPDATE', this.val, 'name:', this.name, 'progidx:', this.progidx)
    }
 }
 
 
 const _uniforms_buffer = New_generic_buffer(_, 'GFX Uniforms');
-
+let any_needs_update = false; // 
 
 
 export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, progidx) {
 
-   let ubidx = Uniforms_buffer_find_ubidx_from_name(name, progidx);
+   // let ubidx = Uniforms_buffer_find_ubidx_from_name(name, progidx);
 
-   if(ubidx === INT_NULL){
+   // if(ubidx === INT_NULL)
+   // {
 
       const uniform = new Uniform(gl, shader_program, type, name, progidx);
-      ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
+      const ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
       console.warn('1111111 Uniform Created at index:', ubidx, _uniforms_buffer)
    
       // _debug_programidx_per_uniform[ubidx] = progidx
-   }
+   // }
 
 
    return ubidx;
@@ -165,8 +176,17 @@ export function Uniforms_buffer_set_uniform(ubidx, val) {
 
 
 
-export function Uniforms_buffer_update_uniform(ubidx) {
+/** Set one value form a uniform vector/array */
+export function Uniforms_buffer_set_uniform_val_from_index(ubidx, val, idx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
+   _uniforms_buffer.buffer[ubidx].SetFromIndex(val, idx);
+}
+
+
+
+export function Uniforms_buffer_update_uniform(ubidx) {
+   // if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
+   if(_uniforms_buffer.buffer[ubidx].needs_update === false) return;
    _uniforms_buffer.buffer[ubidx].Update();
 }
 
@@ -186,12 +206,18 @@ export function Uniforms_buffer_update_uniform(ubidx) {
 
 
 
-export function Uniforms_buffer_update_uniforms_all() {
+// export function Uniforms_buffer_update_uniforms_all() {
 
-   for(let i=0; i <= _uniforms_buffer.boundary; i++){
-      if(_uniforms_buffer.buffer[i].needsUpdate) _uniforms_buffer.buffer[i].Update();
-   }
-}
+//    if(!any_needs_update) return;
+
+//    for(let i=0; i <= _uniforms_buffer.boundary; i++){
+//       // if(_uniforms_buffer.buffer[i].needs_update) 
+//          _uniforms_buffer.buffer[i].Update();
+//    }
+
+//    // All uniforms have been updated
+//    any_needs_update = false;
+// }
 
 
 
@@ -269,11 +295,11 @@ export class UniformsBuffer {
    names; // A way to get a specific uniforms index.
    count;
    loc;
-   needsUpdate;
+   needs_update;
 
    constructor(gl, prog, size) {
 
-      this.needsUpdate = false;
+      this.needs_update = false;
       this.count = 0;
 
       Program_use_program(prog.shader_program, prog.idx)
@@ -300,13 +326,13 @@ export class UniformsBuffer {
 
    Set(value, index) {
       this.ub[index] = value;
-      this.needsUpdate = true;
+      this.needs_update = true;
    }
 
 
    Update(gl) {
       gl.uniform1fv(this.loc, this.ub); // And the shader decides the number of elements to draw from the buffer
-      this.needsUpdate = false;
+      this.needs_update = false;
    }
 
 }
@@ -370,7 +396,7 @@ class UniformsBlock {
          names: [],
       }
 
-      this.needsUpdate = false;
+      this.needs_update = false;
 
 
    }
@@ -498,14 +524,14 @@ export function Uniforms_block_get_uniform_by_name(unif_name = '') {
 
 export function Uniforms_block_set_uniform(uniform_locidx, val) {
    _uniform_blocks.buffer[0].SetVal(uniform_locidx, val);
-   _uniform_blocks.buffer[0].needsUpdate = true;
+   _uniform_blocks.buffer[0].needs_update = true;
 }
 
 
 
 export function Uniforms_block_update_uniform() { // HOT-PATH
 
-   if (!_uniform_blocks.buffer[0] || !_uniform_blocks.buffer[0].needsUpdate) return;
+   if (!_uniform_blocks.buffer[0] || !_uniform_blocks.buffer[0].needs_update) return;
 
 
    const gl = gfxCtx.gl;
@@ -516,7 +542,7 @@ export function Uniforms_block_update_uniform() { // HOT-PATH
    // gl.bufferSubData(gl.UNIFORM_BUFFER, 0, _uniform_blocks.buffer[0].buffer, offset, 0);
    gl.bufferData(gl.UNIFORM_BUFFER, _uniform_blocks.buffer[0].buffer, gl.DYNAMIC_DRAW);
 
-   _uniform_blocks.buffer[0].needsUpdate = false;
+   _uniform_blocks.buffer[0].needs_update = false;
 
 }
 
@@ -574,7 +600,7 @@ export function Uniforms_buffer_block_print() {
 // this.val = 0;// Uniform value
 // this.loc = loc; // Uniform location
 // this.name = name; // Uniform name
-// this.needsUpdate = false;
+// this.needs_update = false;
 // this.UpdateUniform = null; // Gl specific type function for updating the uniform.
 // this.is_bound = false;
 // this.is_update_bound = false;

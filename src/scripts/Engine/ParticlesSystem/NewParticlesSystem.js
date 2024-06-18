@@ -1,10 +1,12 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_state_enable } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Uniforms_buffer_set_uniform_val_from_index } from "../../Graphics/Buffers/UniformBuffers.js";
+import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos4_pos2_style3 } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt } from "../../Helpers/Helpers.js";
+import { Max } from "../../Helpers/Math/MathOperations.js";
 import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
-import {  Str_buffer_store } from "../Core/StringBuffer.js";
+import { Str_buffer_get_by_idx, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store, Str_buffer_store } from "../Core/StringBuffer.js";
 import { TEMP_Gfx_generate_context_for_particles } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 
@@ -36,11 +38,12 @@ const dir_factor = .6
 
 
 let yy = .1
-let speed = .06;
+let speed = .03;
 let accel = 4.;
 let deccel = .985;
 let max = 100;
-let gravity = 1.04;
+// let gravity = 1.04;
+let gravity = 1.01;
 // let gravity = 1.06;
 // let gravity = 1.3;
 
@@ -109,20 +112,21 @@ class Emitter {
       this.root_posidx = INT_NULL;
       this.gfx = null;
       this.type = MESH_TYPE.PARTICLES;
-      this.nameidx = Str_buffer_store(name);
+      this.nameidx = Str_buffer_mesh_names_store(name);
 
       this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
       this.free_particles_idxs_buffer = New_int16_buffer(_, 'ParticlesSystem-free_particles_idxs_buffer');
 
 
       this.sid = {
-         shad: SID.SHAD.INDEXED|SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
+         shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4,
          unif: 0x0,
          pass: SID.PASS.COL4,
+         fx: SID.FX.FS_GLOW,
       };
 
-      this.style = [0, 10, 1.5]
+      this.style = [0, Max(dim[0], dim[1]), 1.5]
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
 
 
@@ -134,9 +138,14 @@ class Emitter {
 
       this.EnableGfxUniforms(SID.UNIF.WPOS4, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
+      this.EnableGfxUniforms(SID.FX.FS_GLOW, 'u_glow_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      // this.GfxUniformsSetClbk('u_col4', null, this.gfx.vb.groupidx)
+
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2)
+      this.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW)
       // this.EnableGfxUniforms(SID.UNIF.COL4, 'u_col4', UNIF_TYPE.FVEC4, UNIFORM.IN_VS);
    }
+
 
    ParticleAddToGfx(particle_idx) {
 
@@ -158,24 +167,6 @@ class Emitter {
       return start;
    }
 
-   // ParticleUpdateGfx(particle_idx) {
-
-   //    // Must create geom struct to pass to the GlAdd...() fuunction
-   //    const geom = {
-   //       pos: this.particles_buffer.buffer[particle_idx].pos,
-   //       dim: this.particles_buffer.buffer[particle_idx].dim,
-   //    }
-
-   //    const mat = {
-   //       col: this.particles_buffer.buffer[particle_idx].col,
-   //       style: this.style,
-   //    };
-
-   //    const vbidx = this.gfx.vb.groupidx; 
-   //    const start = this.particles_buffer.buffer[particle_idx].start; 
-   //    Vertex_buffer_update_vertices_explicit_Params(vbidx, start, geom, mat);
-
-   // }
 
    EnableGfxAttributes(which, params) {
 
@@ -212,10 +203,14 @@ class Emitter {
          case MESH_ENABLE.GFX.PASS_DIM2: { this.sid.pass |= SID.PASS.DIM2; break; }
          case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
          case MESH_ENABLE.GFX.PASS_TIME1: { this.sid.pass |= SID.PASS.TIME1; break; }
+         case MESH_ENABLE.GFX.FX_GLOW: { // Effects
+            this.sid.fx |= SID.FX.FS_GLOW; break;
+         }
 
          default: console.error('Enable material\'s shader param failed. @ Material.js');
       }
    }
+
 
    EnableGfxUniforms(flags, name, type, shader_flags) {
 
@@ -263,7 +258,44 @@ class Emitter {
 
    }
 
+
+
+
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+
+      // Find uniform
+      const len = this.uniforms.length;
+      let found_idx = INT_NULL;
+      for (let i = 0; i < len; i++) {
+         if (this.uniforms[i].name === unif_name) {
+            found_idx = i;
+            break;
+         }
+      }
+
+      if (found_idx !== INT_NULL) {
+         // console.log('{}{}{}{} ubidx', this.uniforms[found_idx].ubidx, this.uniforms[found_idx].name, 'prog', this.gfx.prog.idx, 'vb', this.gfx.vb.groupidx)
+
+         // HACK: We need different params for each vb group, but we only call once with one param. How to FIX???
+         if (unif_name === 'u_wposxy') {
+            clbk_params = this.gfx.vb.groupidx;
+         }
+
+         Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
+         return;
+      }
+
+      alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js')
+
+   }
+
+
    // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)
+
+
+   GetName() {
+      return Str_buffer_mesh_names_get_by_idx(this.nameidx);
+   }
 }
 
 const _emitters = New_generic_buffer(_, 'Particle System: Emitter buffer');
@@ -335,29 +367,29 @@ export function Particle_system_update() {
 
       const emitter = _emitters.buffer[i];
       let needs_update = false;
-      
+
       for (let j = 0; j <= emitter.particles_buffer.boundary; j++) {
-         
+
          const particle = emitter.particles_buffer.buffer[j];
-         
+
          if (particle.is_alive) {
-            
+
             // Process particle physics
-            
+
             particle.pos[0] += speed * particle.accel * particle.dirx;
             particle.pos[1] += speed * particle.accel * particle.diry * particle.grav;
             // particle.pos[1] += speed  * particle.diry * particle.grav;
             if (particle.accel > 1) particle.accel *= deccel
             particle.grav *= gravity;
-            
-            
-            
+
+
+
             // Updtate Gfx Buffers
             Gl_particles_batch_set_col4_wpos4_pos2_style3(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.dim)
-            
+
             particle.t += .003;
             if (particle.t >= 1) {
-               
+
                // Reset particle for reuse
                particle.is_alive = false;
                particle.t = 0;
@@ -369,23 +401,41 @@ export function Particle_system_update() {
                particle.grav = yy;
                particle.pos[0] = 0
                particle.pos[1] = 1
-               
+
                emitter.free_particles_idxs_buffer.Add(j)
                // emitter.particles_buffer.RemoveByIdx(j);
-            
+
             }
-            
+
             needs_update = true;
          }
       }
 
-      if(needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
+      if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
    }
 
 }
 
+// function TEMP(params){
 
+//    const emitteridx = params;
+//    const emitter = _emitters.buffer[emitteridx];
+//    console.log('99999999999999999999999999999999999')
+// }
 
+export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, slider) {
+
+   const emitter = _emitters.buffer[emitteridx];
+   const clbk_params = {
+      slider:slider, 
+      vb_grouidx:emitter.gfx.vb.groupidx,
+   }
+   emitter.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+}
+
+export function TEMP_PARTICLES_UNIF_CLBK(params, val){
+   Uniforms_buffer_set_uniform_val_from_index(params.ubidx, val, params.val_idx)
+}
 // function TEMP_update_particles_vertex_buffer(vb_data, geom, mat, start, num_faces, stride){
 
 //    let attribs_count = 0;

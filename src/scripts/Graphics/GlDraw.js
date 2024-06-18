@@ -4,8 +4,7 @@ import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniform } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
-import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from './Buffers/UniformBuffers.js';
-import { Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
+import { Uniforms_buffer_update_uniform } from './Buffers/UniformBuffers.js';
 
 
 
@@ -50,16 +49,8 @@ export function Gl_draw(gl) {
         for(let k=0; k <= progs.buffer[progidx].ubidxs.boundary; k++){
             
             const ubidx = progs.buffer[progidx].ubidxs.buffer[k];
-            // Uniforms_buffer_set_and_update_uniform(ubidx);
-            // const pos = Mesh_unif_get_vb_root_wpos(vb_groupidx);
-            // Uniforms_buffer_set_uniform(ubidx, pos);
-            // Uniforms_buffer_update_uniform(ubidx);
-
-            // If the vb group has a uniform callback AND the uniform is differet/separate from other vb's of the same program, Update uniform.
-            // The unifor value should be set some place else
-            // If we have per vb uniforms, the update must happen, because of the different values of the same uniform 
-
-            Vertex_buffer_set_and_update_uniform(vb_groupidx);
+            Uniforms_buffer_update_uniform(ubidx)
+            // Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
         }
 
 

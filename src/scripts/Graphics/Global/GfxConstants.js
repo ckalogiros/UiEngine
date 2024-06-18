@@ -88,7 +88,7 @@ const GFX_GROUPS = {
  * Shader creation flags 
  */
 
-let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1;
+let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1;
 const SID = {
 
     SHAD: {
@@ -161,6 +161,9 @@ const SID = {
     },
 
     // FX
+    FX: {
+        FS_GLOW: BIT6,
+    },
     // FX: {
     //     FS_PARTICLES: BIT3,
     //     FS_FIRE: BIT3 <<= 1,
@@ -204,7 +207,6 @@ const SID = {
          */
         if (
             sid1.shad === sid2.shad &&
-            // sid1.attr === sid2.attr &&
             attr1 === attr2 &&
             unif1 === unif2 && 
             sid1.pass === sid2.pass
@@ -398,6 +400,8 @@ const MESH_ENABLE = {
         ATTR_TIME: _CNT <<= 1,
         ATTR_STYLE: _CNT <<= 1,
         ATTR_COL4_PER_VERTEX: _CNT <<= 1,
+        
+        FX_GLOW: _CNT <<= 1,
 
         // Pass from vertex to fragment shader
         PASS_COL4: _CNT <<= 1,

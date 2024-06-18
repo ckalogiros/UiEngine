@@ -452,6 +452,7 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
         Uniforms_buffer_set_uniform(ubidx, val)
         // console.log(i, val)
         Uniforms_buffer_update_uniform(ubidx)
+        
     }
 }
 

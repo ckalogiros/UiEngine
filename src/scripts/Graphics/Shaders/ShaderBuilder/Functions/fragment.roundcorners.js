@@ -79,12 +79,15 @@ vec4 Stylize()\n\
 {\n\
     // Radius(From 0.01 to 0.35 good values) for rounding corners\n\
     float border_width = v_border_width;\n\
-    vec2 rCorners = vec2(v_rCorners);\n\
+    // float smaller = .25;\n\
+    float smaller = 1.;\n\
+    float bigger_again = 1./smaller;\n\
+    vec2 rCorners = vec2(v_rCorners) * smaller;\n\
     float feather = v_border_feather;\n\
     vec2 blur = vec2(0.0, feather);\n\
     vec2 res = u_screen_res;\n\
     vec2 uv = (gl_FragCoord.xy-(res*.5));\n\
-    vec2 dim = v_dim; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos\n\
+    vec2 dim = v_dim * smaller; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos\n\
     \n\
     float clarity = 40.4;\n\
     ScreenH = min(res.x, res.y)*clarity;\n\
@@ -96,14 +99,16 @@ vec4 Stylize()\n\
     uv.y -= (res.y*.5); // Center mesh to screen\n\
     uv.x -= wpos.x; // To move with mesh position\n\
     uv.y += wpos.y; // To move with mesh position\n\
-    // if(dim.y > 10.) return vec4(c1);\n\
     \n\
-    uv.x -= dim.x; // Subtract constant dimention\n\
-    uv.y -= -dim.y; // Subtract constant dimention\n\
+    uv.x -= dim.x*bigger_again; // Subtract constant dimention\n\
+    uv.y -= -dim.y*bigger_again; // Subtract constant dimention\n\
     \n\
+    \n\
+    // vec2 q = (abs(uv) - dim) + smaller + rCorners.x; // Again Subtract constant dimention //THIS!!! \n\
     vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention\n\
     float d = length(max(q, 0.0)) - rCorners.x;\n\
     // float d = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - rCorners.x;\n\
+    \n\
     \n\
     vec4 src = v_col;\n\
     vec3 color = vec3(0.0);\n\
@@ -113,18 +118,19 @@ vec4 Stylize()\n\
     float wa = 1.;\n\
     float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);\n\
     float alpha = src.a * (wa * wb);\n\
+    // color += color + src.rgb * alpha;\n\
     color += color + src.rgb * alpha;\n\
     \n\
-    float wide = rCorners.x; \n\
-    float strength = 1.8; \n\
-    color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 5., abs(d)) );\n\
+    // float wide = rCorners.x; \n\
+    // float strength = 1.8; \n\
+    // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 5., abs(d)) );\n\
     // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 20., abs(d)*wide) );\n\
     \n\
     //   Border Width. It is 0.001 for every pixel\n\
-    float borderWidth = border_width;\n\
-    float bd = (abs(d)-borderWidth) - blur.x;\n\
-    wa = clamp(-bd * AA, 0.0, 1.0);\n\
-    wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);\n\
+    // float borderWidth = border_width;\n\
+    // float bd = (abs(d)-borderWidth) - blur.x;\n\
+    // wa = clamp(-bd * AA, 0.0, 1.0);\n\
+    // wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);\n\
     // color += color * vec3(abs(wa * wb));\n\
     // color +=  color * pow(vec3(abs(wa * wb)), vec3(4.4));\n\
     return vec4(color, alpha);\n\
