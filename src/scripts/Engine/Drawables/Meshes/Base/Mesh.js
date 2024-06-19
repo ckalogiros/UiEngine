@@ -134,11 +134,11 @@ export class Mesh {
 
         this.uniforms = [];
         if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
-            this.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+            this.EnableGfxUniforms({unif:SID.UNIF.PROJECTION_MATRIX}, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
 
 
-        if (APP.ENABLE_SHADER_WPOS_UNIFORM)
-            this.EnableGfxUniforms(SID.UNIF.WPOS4, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // if (APP.ENABLE_SHADER_WPOS_UNIFORM)
+        //     this.EnableGfxUniforms(SID.UNIF.ROOT_WPOS2, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
 
@@ -655,12 +655,17 @@ export class Mesh {
     }
 
 
-    EnableGfxUniforms(flags, name, type, shader_flags) {
+    EnableGfxUniforms(flags=0x0, name, type, shader_flags) {
 
         if (this.alreadyAdded === true) {
             console.error(`You are trying to enable ${which} but the shaders have been already created. Try Enable() before inserting the mesh to a Scene().`);
             alert('SEE console error');
         }
+
+        // if (flags.shad === undefined) alert('flags must have a .shad, but undefined  detected\nEnableGfxUniforms() @ Mesh class')
+        // if (flags.attr === undefined) alert('flags must have a .shad, but undefined  detected\nEnableGfxUniforms() @ Mesh class')
+        // if (flags.unif === undefined) alert('flags must have a .shad, but undefined  detected\nEnableGfxUniforms() @ Mesh class')
+        // if (flags.pass === undefined) alert('flags must have a .shad, but undefined  detected\nEnableGfxUniforms() @ Mesh class')
 
         /**
          * How to set up a uniform:
@@ -675,7 +680,8 @@ export class Mesh {
          *          this might lead to unwilingly updating same loc of another program's uniform. 
          */
 
-        this.sid.unif |= flags;
+        if(flags.unif) this.sid.unif |= flags.unif;
+        if(flags.pass) this.sid.pass |= flags.pass;
 
         // Avoid duplicates
         const len = this.uniforms.length;
@@ -701,7 +707,7 @@ export class Mesh {
     }
 
 
-    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+    SetClbkGfxUniforms(unif_name, Clbk, clbk_params) {
 
         // Find uniform
         const len = this.uniforms.length;
@@ -714,13 +720,7 @@ export class Mesh {
         }
 
         if (found_idx !== INT_NULL) {
-            // console.log('{}{}{}{} ubidx', this.uniforms[found_idx].ubidx, this.uniforms[found_idx].name, 'prog', this.gfx.prog.idx, 'vb', this.gfx.vb.groupidx)
 
-            // HACK: We need different params for each vb group, but we only call once with one param. How to FIX???
-            if (unif_name === 'u_wposxy') {
-
-                clbk_params = this.gfx.vb.groupidx;
-            }
             Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
             return;
         }

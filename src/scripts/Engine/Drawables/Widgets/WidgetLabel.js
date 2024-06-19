@@ -66,7 +66,7 @@ export class Widget_Label extends Rect_Mesh {
 
 
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-        this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+        this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
 
         // this.text_mesh.parent = NO_MESH_PARENT; // Use a special case for text meshes that are part of a widget without being in children's buffer.
@@ -164,8 +164,8 @@ export class Widget_Label extends Rect_Mesh {
     GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
         // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-        super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-        this.text_mesh.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+        this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+        this.text_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
     }
 
 

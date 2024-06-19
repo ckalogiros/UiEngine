@@ -738,11 +738,11 @@ export class Widget_Dropdown extends Section {
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params){
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
       // And we set one of the text meshes, since we know all other text meshes belong to the same vb
       const btn = this.children.buffer[0];
-      btn.text_mesh.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      btn.text_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
    }
 
 

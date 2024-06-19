@@ -1,7 +1,7 @@
 "use strict";
 
 import { Vertex_buffer_exists_from_index, Vertex_buffer_group_get_sid } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Widget_root_gfx_get_all_vb_groupidx } from "../../Core/MeshBuffer.js";
+import { Widget_root_gfx_get } from "../../Core/MeshBuffer.js";
 
 
 
@@ -118,7 +118,7 @@ function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid) {
    }
 
    // Find match from SID
-   const gfx_idxs = Widget_root_gfx_get_all_vb_groupidx(root_bufferidx);
+   const gfx_idxs = Widget_root_gfx_get(root_bufferidx);
 
    for (let i = 0; i <= gfx_idxs.boundary; i++) {
 

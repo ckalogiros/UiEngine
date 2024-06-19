@@ -39,7 +39,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.pad = pad;
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       // this.SetStyle([0, 15, 2.]);
       this.SetStyle(style);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);

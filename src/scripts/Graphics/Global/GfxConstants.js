@@ -142,7 +142,9 @@ const SID = {
 
         // Individual Uniforms
         TIME: BIT5 <<= 0x1,
-        WPOS4: BIT5 <<= 0x1,
+        DIM2: BIT5 <<= 0x1,
+        // WPOS4: BIT5 <<= 0x1,
+        ROOT_WPOS2: BIT5 <<= 0x1,
         COL4: BIT5 <<= 0x1,
 
     },
@@ -287,7 +289,7 @@ const SID = {
         if (sid.unif) str[k] += 'Uniforms:'
         if (sid.unif & SID.UNIF.PROJECTION) str[k] += 'projection_matrix, '
         if (sid.unif & SID.UNIF.SCREEN_RESOLUTION) str[k] += 'screen_resolution, '
-        if (sid.unif & SID.UNIF.WPOS4) str[k] += 'wpo4, '
+        if (sid.unif & SID.UNIF.ROOT_WPOS2) str[k] += 'ROOT_WPOS2, '
         if (sid.unif & SID.UNIF.TIME) str[k] += 'time, '
         if (sid.unif & SID.UNIF.COL4) str[k] += 'col4, '
         // if (sid.unif) str[k] += '\n'

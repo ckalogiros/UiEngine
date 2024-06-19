@@ -46,11 +46,27 @@ export function Gl_draw(gl) {
         }
 
         // Uniforms - wpos per vertex buffer uniform
-        for(let k=0; k <= progs.buffer[progidx].ubidxs.boundary; k++){
+        // const vb_info = Vertex_buffer_group_get_byidx(vb_groupidx);
+        // const uniforms = vb_info.uniforms;
+        // const unif_len = uniforms.length;
+        // for(let k=0; k < unif_len; k++){
             
-            const ubidx = progs.buffer[progidx].ubidxs.buffer[k];
-            Uniforms_buffer_update_uniform(ubidx)
-            // Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
+        //     // const ubidx = progs.buffer[progidx].ubidxs.buffer[k];
+        //     const ubidx = uniforms[k].ubidx;
+        //     if(ubidx !== INT_NULL) 
+        //         Uniforms_buffer_update_uniform(ubidx)
+        //     // Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
+        // }
+
+
+        // Uniforms - wpos per vertex buffer uniform
+        const unif_len = progs.buffer[progidx].uniforms.length;
+        // for(let k=0; k <= progs.buffer[progidx].ubidxs.boundary; k++){
+        for(let k=0; k < unif_len; k++){
+            
+            // if(ubidx !== INT_NULL) 
+            // TODO: Runs function call for every uniform, event the uniform block.
+            Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
         }
 
 

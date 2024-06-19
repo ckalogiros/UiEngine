@@ -627,7 +627,7 @@ export function Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bu
 
    if (root_bufferidx === INT_NULL) return;
 
-   const gfxidxs = Widget_root_gfx_get_all_vb_groupidx(root_bufferidx);
+   const gfxidxs = Widget_root_gfx_get(root_bufferidx);
 
    let stored = false;
    for (let i = 0; i <=  gfxidxs.boundary; i++) {
@@ -772,14 +772,8 @@ function Widget_root_gfx_create(root_bufferidx) {
 }
 
 
-// Create a stuctured representation of all widget root gfx buffers istead of the int8 array of triads of plain integers.
-export function Widget_root_gfx_get_all_vb_groupidx(root_bufferidx) {
 
-   return _widget_root_gfx.buffer[root_bufferidx];
-}
-
-
-
+// TODO: remove uneccessary params
 export function Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs) {
 
    if (root_bufferidx === INT_NULL) return; // Case there is no widget root creation.
@@ -886,7 +880,7 @@ export function Widget_root_gfx_reset_mesh_per_vb_buffer(root_bufferidx) {
 /** Reset all gfx buffers, from start index 0, for the widget_root buffer, via it's widget_root_gfx buffer */
 export function Widget_root_reset_gfx(root_bufferidx) {
 
-   const rootgfx = Widget_root_gfx_get_all_vb_groupidx(root_bufferidx);
+   const rootgfx = Widget_root_gfx_get(root_bufferidx);
    
    for (let i = 0; i <= rootgfx.boundary; i++) {
       
@@ -1025,6 +1019,19 @@ export function Widget_root_set_in_focus(root_bufferidx) {
 
 
 
+/** A function to call 'SetClbkGfxUniforms()@Mesh class', only once per vertex buffer, using the root mesh of each vb that belongs to this widget root */
+export function Widget_root_set_uniform_callback_per_gfx_root_mesh(root_bufferidx, unif_name, Clbk, clbk_params) {
+
+   // Call for each root mesh in every vertex buffer
+   const root_meshes= Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx);
+   const len = root_meshes.length;
+   for(let i=1; i < len; i++){
+
+      const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
+      root_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+
+   }
+}
 export function Widget_root_set_render_queue_flags(root_bufferidx, flags) {
 
 
@@ -1168,7 +1175,8 @@ export function Mesh_buffer_print_loop() {
          console.log(i,
             'mbidx:', _mesh_buffer.buffer[i].mesh_bufferidx,
             'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
-            'gfxidx', _mesh_buffer.buffer[i].per_vb_bufferidx,
+            'per_vb_idx', _mesh_buffer.buffer[i].per_vb_bufferidx,
+            // 'gfxidx', _widget_root_gfx.buffer[_mesh_buffer.buffer[i].root_bufferidx],
             'batchidx:', _mesh_buffer.buffer[i].batch_buffer_vbidx,
             'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1], _mesh_buffer.buffer[i].group_bufferidxs[2],
             'child idx:', _mesh_buffer.buffer[i].idx,

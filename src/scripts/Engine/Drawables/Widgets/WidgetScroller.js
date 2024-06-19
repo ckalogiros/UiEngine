@@ -62,7 +62,7 @@ export class Widget_Scroller extends Section {
 
 
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-      this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
 
       this.type |= MESH_TYPE.WIDGET_SCROLLER;
@@ -262,14 +262,14 @@ export class Widget_Scroller extends Section {
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-      this.scroll_bar.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      this.scroll_bar.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
       const handle = this.scroll_bar.children.buffer[0];
-      handle.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      handle.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-      this.scrolled_section.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      this.scrolled_section.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
    }
 

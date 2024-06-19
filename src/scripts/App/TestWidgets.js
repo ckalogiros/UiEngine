@@ -21,9 +21,10 @@ import { Particle_system_create_emitter, Particle_system_emitt, Particles_gfx_un
 import { Set_color_rgb } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
 import { Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
 
-import { TimerGetGlobalTimerCycle, Timer_get_global_timer } from '../Engine/Timers/Timers.js';
+import { TimerGetGlobalTimerCycle, Timer_get_global_timer, Timer_update_global_timer_cycle } from '../Engine/Timers/Timers.js';
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widgets/WidgetSlider.js';
+import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_value_from_callback, Uniforms_buffer_set_value_callback } from '../Graphics/Buffers/UniformBuffers.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -51,7 +52,10 @@ import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widge
 
 
 
-
+function CLBK_TIMER(){
+    return Timer_update_global_timer_cycle();
+    // return .5;
+}
 
 
 
@@ -141,20 +145,21 @@ export function TestWidgetsGeneric(scene) {
             // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
             // line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
-        
-            // // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
-            // line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
-            // // line.sid.attr &= ~SID.ATTR.COL4;
-        
+            // // // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
+            // // line.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
+            // // // line.sid.attr &= ~SID.ATTR.COL4;
+            // line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
             // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
             // line.Render();
-            // line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx)
-            // line.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
+            // // line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx)
+            // // line.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
             // line.ConstructListeners();
 
             // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .01, .2, 1.4, _, .4, true);
             // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0);
         // }
+
 
     }
 
@@ -164,14 +169,14 @@ export function TestWidgetsGeneric(scene) {
         // CreateColorPicker(SID.ATTR.WPOS_TIME4|SID.ATTR.DIM2)
         // CreateColorPicker(SID.ATTR.DIM2)
         // TODO: Enable multi vertex color in 'Widget_Slider_Simple' constructor
-        // CreateColorPicker();
+        CreateColorPicker();
     }
     
     
     { // Widget: Slider-switch
 
         // CreateSliderSimple();
-        CreateSlider();
+        // CreateSlider();
         // CreateChangeMeshColorFromSliders(ROOT_WIDGETS.CREATE_ROOT);
         
         // CreateSwitchSimple([0, ypos, 0]);
@@ -220,6 +225,7 @@ export function TestWidgetsGeneric(scene) {
         // const particle_system_idx2 = Particle_system_create_emitter(PURPLEB[5], [10,60,10], [45,45], .1, 2, 'Test Particle System2');
 
         
+        /*************************************************************************************************************** */
         // const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 260, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
         // btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         // btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -232,18 +238,33 @@ export function TestWidgetsGeneric(scene) {
         // btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
         // btn.ConstructListeners();
 
+        /*************************************************************************************************************** */
         // Create Sliders for manipulating variables of particles
-        const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 450, 0], [250, 10]);
+
+        const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 450, 0], [250, 10],);
         slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+        slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     
+        const flags = {
+            unif: SID.UNIF.ROOT_WPOS2,
+            pass: SID.PASS.WPOS2,
+        }
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        slider.GfxUniformsEnable({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
+
         slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         slider.Render();
         slider.ConstructListeners();
 
+        // const ubidx = Uniforms_buffer_find_ubidx_from_name('u_time', slider.gfx.prog.idx);
+        // TODO: This function must run for each vb of the slider widget. Also if we could pass the callback in the genGfxCtx where we run for every vb.
+        // Uniforms_buffer_set_value_callback(ubidx, Slider_get_slider_val, slider);
+        // Uniforms_buffer_set_uniform_value_from_callback(ubidx)
         
-        // slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx);
-        // slider.SliderConnect(function(params){ console.log('555555555555555555555555555'); }, null)
+        // Uniforms_buffer_set_value_callback(ubidx, CLBK_TIMER, null);
+        
+        slider.GfxUniformsSetClbk('u_time', Slider_get_slider_val, slider);
+        slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx);
 
         const clbk_params = {
             ubidx: 1,
@@ -578,7 +599,8 @@ function SectionResizable(pos) {
     grey.SetName(`grey${grey_cnt++}`);
     grey.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW)
 
-    grey.EnableGfxUniforms(SID.UNIF.TIME, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
+    grey.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    grey.EnableGfxUniforms({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
     
 
     // grey.geom.dim[0] *= sin;
@@ -588,8 +610,8 @@ function SectionResizable(pos) {
     grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
     // grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     grey.Render();
-    grey.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, grey.gfx.vb.groupidx)
-    grey.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
+    // grey.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, grey.gfx.vb.groupidx)
+    // grey.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
     grey.ConstructListeners();
 
     return grey;
@@ -607,6 +629,7 @@ function CreateLabel(name = 'Label ') {
     const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
 
     // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
@@ -614,7 +637,7 @@ function CreateLabel(name = 'Label ') {
     
     label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     label.Render()
-    label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
+    // label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
     label.ConstructListeners();
 
 
@@ -714,14 +737,14 @@ function CreateSwitch() {
 
 function CreateSliderSimple() {
 
+
     const slider = Create_widget_slider_simple(ROOT_WIDGETS.CREATE_ROOT, [200, 500, 0], [150, 2]);
-    slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-    // slider.CreateSlierHandleEvent();
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
     slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     slider.Render();
-    slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+    // slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
     slider.ConstructListeners();
 
 
@@ -734,6 +757,15 @@ function CreateSlider() {
     const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 450, 0], [250, 10]);
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+
+    slider.EnableGfxUniforms(SID.UNIF.ROOT_WPOS2, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    slider.text_mesh.EnableGfxUniforms(SID.UNIF.ROOT_WPOS2, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    slider.text_mesh.sid.unif |= SID.UNIF.ROOT_WPOS2;
+    slider.text_mesh.sid.pass |= SID.PASS.WPOS2;
+    const slider_text = slider.children.buffer[0];
+    slider_text.EnableGfxUniforms(SID.UNIF.ROOT_WPOS2, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    slider_text.sid.unif |= SID.UNIF.ROOT_WPOS2;
+    slider_text.sid.pass |= SID.PASS.WPOS2;
 
     slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     slider.Render();
@@ -1145,7 +1177,8 @@ function CreateColorPicker(render_instanced_flags=0x0){
 
     picker.sid.inst = render_instanced_flags;
 
-    picker.EnableGfxUniforms(SID.UNIF.TIME, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    picker.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // picker.EnableGfxUniforms({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
     picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
     

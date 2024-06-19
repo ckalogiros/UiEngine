@@ -71,6 +71,13 @@ export function Progarm_get_program(progidx) {
 
 
 
+export function Progarm_get_webgl_program_object(progidx) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber)
+	return _programs.buffer[progidx].shader_program;
+}
+
+
+
 export function Program_get_shader_attributes_index(progidx) {
 	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
 	return _programs.buffer[progidx].attribsidx;
@@ -150,15 +157,15 @@ function Create_program(sid, uniforms) {
 
 	/****************************************************************************************************/
 	// Individual uniforms
-	const len = uniforms.length;
-	for (let i = 0; i < len; i++) {
-		if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0){
+	// const len = uniforms.length;
+	// for (let i = 0; i < len; i++) {
+	// 	if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0){
 
-			const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name, progidx);
-			prog.ubidxs.Add(ubidx);
-			// TEMP_UNIFORM_BUFFER_INDEXES.U_WPOS = ubidx;
-		}
-	}
+	// 		const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name, progidx);
+	// 		prog.ubidxs.Add(ubidx);
+	// 		// TEMP_UNIFORM_BUFFER_INDEXES.U_WPOS = ubidx;
+	// 	}
+	// }
 
 	return progidx;
 
@@ -182,6 +189,31 @@ export function Program_create_program(sid, uniforms) {
 
 
 
+export function Program_assign_uniform_index(progidx, unif_name, ubidx) {
+
+	const prog = _programs.buffer[progidx];
+	const len = prog.uniforms.length;
+	for(let i=0; i < len; i++){
+		if(prog.uniforms[i].name === unif_name){
+			prog.uniforms[i].ubidx = ubidx;
+			break;
+		}
+	}
+}
+
+
+
+export function Program_get_uniform_by_name(progidx, unif_name) {
+
+	const prog = _programs.buffer[progidx];
+	const len = prog.uniforms.length;
+	for(let i=0; i < len; i++){
+		if(prog.uniforms[i].name === unif_name){
+			return prog.uniforms[i];
+		}
+	}
+}
+
 
 
 
@@ -194,6 +226,7 @@ class Gl_Program {
 
 		this.idx = INT_NULL; // Self index to the Programs buffer
 
+		this.uniforms = uniforms;
 
 		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
 
@@ -209,6 +242,7 @@ class Gl_Program {
 
 		this.attribsidx = Shader_attributes_create(sid, this.shader_program);
 		this.attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(this.attribsidx);
+
 
 
 		/****************************************************************************************************/

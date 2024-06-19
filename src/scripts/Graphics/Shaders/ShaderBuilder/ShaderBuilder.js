@@ -80,7 +80,7 @@ export const UNIFORM_BLOCK_SHARED_NAME = 'Uniform_block_generic';
  * . The 'Gfx_generate_context()' call, does not pass a 'uniform' param. 
  */
 
-function Resolve_uniforms_from_sid(_uniforms_info){
+function Resolve_uniforms_from_sid(_uniforms_info, which_shader){
 
    let uniforms_code = '';
    let block_created = false;
@@ -109,18 +109,32 @@ function Resolve_uniforms_from_sid(_uniforms_info){
    // TODO: For the time being despite the fact that a uniform is categorized as "IN_VS", the "uniforms_code += " will ad it to any shader called by this function. CORRECT IT.
    for(let i=0; i< len; i++){
       // if((_uniforms_info[i].shader & UNIFORM.IN_VS) && UNIFORM.IN_VS === unif_shader_type){
-      if((_uniforms_info[i].shader & UNIFORM.IN_VS) ){
+      if((_uniforms_info[i].shader & UNIFORM.IN_VS && (which_shader & UNIFORM.IN_VS)) ){
 
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
       }
       // else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && UNIFORM.IN_FS === unif_shader_type){
-      else if((_uniforms_info[i].shader & UNIFORM.IN_FS)){
+      else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && (which_shader & UNIFORM.IN_FS)){
 
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
       }
    }
+   // for(let i=0; i< len; i++){
+   //    // if((_uniforms_info[i].shader & UNIFORM.IN_VS) && UNIFORM.IN_VS === unif_shader_type){
+   //    if((_uniforms_info[i].shader & UNIFORM.IN_VS) ){
+
+   //       const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
+   //       uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
+   //    }
+   //    // else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && UNIFORM.IN_FS === unif_shader_type){
+   //    else if((_uniforms_info[i].shader & UNIFORM.IN_FS)){
+
+   //       const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
+   //       uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
+   //    }
+   // }
 
    return uniforms_code;
 
@@ -180,7 +194,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // UNIFORMS
-      Resolve_uniforms_from_sid(uniforms_info),
+      Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_VS),
       '\n',
       
 
@@ -226,9 +240,11 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
 
 
-      (sid.unif & SID.UNIF.WPOS4) ? '  vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
+      // (sid.pass & SID.PASS.WPOS2) ? '  vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
+      (sid.pass & SID.PASS.WPOS2) ? '  vec2 wpos = vec2(a_wpos_time.x+ u_wposxy.x, a_wpos_time.y+u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-      ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);' 
+      // ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);' 
+      ? '  gl_Position = u_projection * vec4(a_pos.x + wpos.x, a_pos.y + wpos.y, a_wpos_time.z, 1.0);' 
       : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
       
       // true ? 'vec4 p = a_wpos_time;' : '',
@@ -242,20 +258,16 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // ASSIGNMENTS
       (sid.fx & SID.FX.FS_GLOW) ? '  v_glow_params = u_glow_params;' : '',
-      (sid.pass & SID.PASS.COL4) 
-         ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') 
-         : '', 
-      // (sid.pass & SID.PASS.DIM2) ? '  v_dim = abs(a_pos);' : '',
+      (sid.pass & SID.PASS.COL4) ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') : '', 
       (sid.pass & SID.PASS.DIM2) ? '  v_dim = a_dim;' : (sid.pass & SID.ATTR.DIM2) ? '  v_dim = a_dim;' : '', // TODO: If we have created an attribute a_dim, we have to use it, else the attribs buffering is gonna be wrong
-      // (sid.pass & (SID.UNIF.COL4)) ? '  v_col4 = col4;' : '',
-      (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS4)) ? '  v_wpos = vec2(a_wpos_time.x + wpos.x, a_wpos_time.y + wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
-      // (sid.pass & (SID.PASS.WPOS2|SID.UNIF.WPOS4)) ? '  v_wpos = vec2(a_pos.x*.9 + a_wpos_time.x + wpos.x, a_pos.y*.9 + a_wpos_time.y + wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
+      // (sid.pass & (SID.PASS.WPOS2|SID.UNIF.ROOT_WPOS2)) ? '  v_wpos = vec2(a_wpos_time.x + wpos.x, a_wpos_time.y + wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
+      (sid.pass & (SID.PASS.WPOS2|SID.UNIF.ROOT_WPOS2)) ? '  v_wpos = vec2(wpos.x,wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
       (sid.attr & SID.ATTR.BORDER) ? '  v_border_width = a_params1.x;' : '',
       (sid.attr & SID.ATTR.R_CORNERS) ? '  v_rCorners = a_params1.y;' : '',
       (sid.attr & SID.ATTR.FEATHER) ? '  v_border_feather = a_params1.z;' : '',
-      (true) ? '   gl_PointSize = 10.0;' : '',
+      (true) ? '  gl_PointSize = 10.0;' : '',
       '}',
 
    ];
@@ -310,7 +322,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // UNIFORMS
       '\n',
-      Resolve_uniforms_from_sid(uniforms_info),
+      Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_FS),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
       
       
@@ -330,15 +342,10 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       true ? 'void main(void) ' : '',
       true ? '{' : '',
       true ? '#include <frag_color_create>' : '', // Creates the variable 'color' of the fragment shader color output.
-      // (sid.attr & SID.ATTR.BORDER) ? Fragment_shader_includes_resolve(frag_round_corners_call) : '',
       (sid.attr & SID.ATTR.STYLE) ? frag_round_corners_call : '', // TODO: Check either for .STYLE or .BORDER|.FEATHER|.RCORNERS
       (sid.fx & SID.FX.FS_GLOW) ? '  float alpha = color.a;' : '',
       (sid.fx & SID.FX.FS_GLOW) ? frag_glow_call : '',
-      (sid.attr & SID.ATTR.TEX2 ) 
-         ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call // If TEX2 and SDF, build for sdf
-            : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call  // ELSE If TEX2 and MSDF, build for msdf
-         : frag_tex // ELSE If only TEX2, build for simple texture
-      : '', // ELSE null
+      (sid.attr & SID.ATTR.TEX2 ) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '', 
 
 
 
@@ -350,9 +357,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // TESTS
-      // (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
-      (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz;' : '',
-
+      (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
       // true ? 'frag_color = vec4(1.);' : '',
       
       true ? '}' : '',

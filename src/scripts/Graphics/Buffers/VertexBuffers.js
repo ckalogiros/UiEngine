@@ -26,7 +26,7 @@ const DISABLE_DEBUG = true;
 
 
 
-export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx) {
+export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx, uniforms) {
 
     /***********************************************************************************************/
     // Create VAO
@@ -44,7 +44,7 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
     const attribsidx = Program_get_shader_attributes_index(progidx);
 
     // Create vertex buffer group
-    const vb_group = new Vertex_Buffer_Group(progidx, vaoidx, vao.vao, sid);
+    const vb_group = new Vertex_Buffer_Group(progidx, vaoidx, vao.vao, sid, uniforms);
 
     if (sid.inst) {
 
@@ -324,7 +324,7 @@ const _vertex_buffer_groups = New_generic_buffer(_, 'GFX Vertex Buffer Groups');
 
 class Vertex_Buffer_Group {
 
-    constructor(progidx, vaoidx, vao, sid) {
+    constructor(progidx, vaoidx, vao, sid, uniforms) {
 
         this.sid = sid;             // Bit field: Shader ID
         this.state = { mask: BUFFER_STATE.IS_ACTIVE };
@@ -338,10 +338,12 @@ class Vertex_Buffer_Group {
         this.idx = INT_NULL;        // Self index to the '_vertex_buffer_groups' buffer
         this.needs_any_update = false; // 
 
+        
         this.render_queueidx = INT_NULL; // index to the Render queue buffer of the current vb 
-
+        
         this.vb_idxs = New_int8_buffer(_, 'NEW VertexBufferGroup-VBIDXS');
-
+        
+        this.uniforms = uniforms;
         // TODO: Create a more apropriate struct for uniform callbacks
         this.Unif_set_val_clbk = []; // Function to call for getting the uniform value.
         this.unif_set_val_clbk_params = []; // The params of the above function callback.
@@ -450,10 +452,25 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
         const ubidx = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
     
         Uniforms_buffer_set_uniform(ubidx, val)
-        // console.log(i, val)
         Uniforms_buffer_update_uniform(ubidx)
         
     }
+}
+
+
+
+
+export function Vertex_buffer_group_assign_uniform_index(vb_groupidx, unif_name, ubidx) {
+
+	const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
+	const len = vb_group.uniforms.length;
+	for(let i=0; i < len; i++){
+		if(vb_group.uniforms[i].name === unif_name){
+			vb_group.uniforms[i].ubidx = ubidx;
+            console.log('<<<<<<<<<<<<<<<<<<<<<<<<<< ASIGN vbidx', vb_groupidx, ' ubidx:', ubidx, 'unif name:', vb_group.uniforms[i].name)
+			break;
+		}
+	}
 }
 
 

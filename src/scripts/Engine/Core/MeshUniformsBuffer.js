@@ -58,26 +58,52 @@ const _debug_names_per_vb_mesh_unif_wpos = New_generic_buffer(_, '_debug_names_p
 
 function Wpos_unif_set_unif_val(root_posidx){
 
-   {
-      const ubidx = _per_vb_mesh_unif_wpos_ubidxs.buffer[root_posidx];
-      const val = Mesh_unif_get_vb_root_wpos(root_posidx);
+   // {
+   //    const ubidx = _per_vb_mesh_unif_wpos_ubidxs.buffer[root_posidx];
+   //    const val = Mesh_unif_get_vb_root_wpos(root_posidx);
       
-      Uniforms_buffer_set_uniform(ubidx, val);
-   }
+   //    Uniforms_buffer_set_uniform(ubidx, val);
+   // }
    
-   {
-      const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[root_posidx].meshidx;
-      for(let i=root_posidx; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+   // {
+   //    // const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[root_posidx].meshidx;
+   //    for(let i=root_posidx; i <= _per_vb_mesh_unif_wpos.boundary; i++){
          
-         const elem = _per_vb_mesh_unif_wpos.buffer[i];
-         if(elem.parent_posidx === parent_rootidx){
-            const ubidx = _per_vb_mesh_unif_wpos_ubidxs.buffer[i];
-            const val = Mesh_unif_get_vb_root_wpos(i);
-            Uniforms_buffer_set_uniform(ubidx, val);
-         }
-      }
-   }
+   //       const elem = _per_vb_mesh_unif_wpos.buffer[i];
+   //       // if(elem.)
+   //       if(elem.parent_posidx === root_posidx){
+   //          const ubidx = _per_vb_mesh_unif_wpos_ubidxs.buffer[i];
+   //          const val = Mesh_unif_get_vb_root_wpos(i);
+   //          Uniforms_buffer_set_uniform(ubidx, val);
+
+   //       }
+   //    }
+   // }
 }
+
+
+// function Wpos_unif_set_unif_val(root_posidx){
+
+//    {
+//       const ubidx = _per_vb_mesh_unif_wpos_ubidxs.buffer[root_posidx];
+//       const val = Mesh_unif_get_vb_root_wpos(root_posidx);
+      
+//       Uniforms_buffer_set_uniform(ubidx, val);
+//    }
+   
+//    {
+//       // const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[root_posidx].meshidx;
+//       for(let i=root_posidx; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+         
+//          const elem = _per_vb_mesh_unif_wpos.buffer[i];
+//          if(elem.parent_posidx === root_posidx){
+//             const ubidx = _per_vb_mesh_unif_wpos_ubidxs.buffer[i];
+//             const val = Mesh_unif_get_vb_root_wpos(i);
+//             Uniforms_buffer_set_uniform(ubidx, val);
+//          }
+//       }
+//    }
+// }
 
 
 export function Mesh_unif_wpos_get_count() { return _per_vb_mesh_unif_wpos.active_count; }
@@ -292,7 +318,7 @@ function Mesh_unif_get_vb_root_wpos_recursive(root_posidx) {
 
 export function Mesh_unif_get_vb_root_wposx(root_posidx) {
    const pos = Mesh_unif_get_vb_root_wposx_recursive(root_posidx);
-   return pos + _screen_wpos[0]
+   return pos + _screen_wpos[0];
 }
 function Mesh_unif_get_vb_root_wposx_recursive(root_posidx) {
 

@@ -49,7 +49,7 @@ export class Section extends Rect_Mesh {
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-      this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
       // In order to provide more info about the current section mesh. The 'SECTION_MESH_ONLY' could be disabled by another widget that 
       // extends section class, in order to call it's classes methods instead of the mother class(the Section)
@@ -164,7 +164,7 @@ export class Section extends Rect_Mesh {
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
       for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);

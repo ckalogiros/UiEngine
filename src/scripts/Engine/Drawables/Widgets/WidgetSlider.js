@@ -1,17 +1,18 @@
 "use strict";
 
-import { Rect, Rect_Mesh } from '../Meshes/Rect_Mesh.js';
+import { Rect_Mesh } from '../Meshes/Rect_Mesh.js';
 import { MouseGetPos, MouseGetPosDif } from '../../Controls/Input/Mouse.js';
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/TimeIntervals.js';
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { AddArr2, Min } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } from '../../Core/CreateWidget.js';
-import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_set_in_focus } from '../../Core/MeshBuffer.js';
+import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Widget_root_add_mesh, Widget_root_batch_get_all_roots_by_vertex_buffer, Widget_root_buffer_get_byidx, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_create_root, Widget_root_gfx_get, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { GREY, WHITE } from '../Material/Base/Colors.js';
 import { Find_parent_listen_event } from '../Operations/Recursions.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
+import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_value_from_callback } from '../../../Graphics/Buffers/UniformBuffers.js';
 
 
 
@@ -22,7 +23,9 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[8], hover_margin = [0, 0], handle_dim=[10,10], num_faces=1, is_debug_mesh) {
 
+      
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, _, _, _, num_faces, is_debug_mesh);
+      
 
       // this.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       this.mesh_bufferidx = mesh_bufferidx;
@@ -38,11 +41,12 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       
       this.slider_val = 0;
 
-      const handle = Create_rect_mesh(_,[0, 0, pos[2]+1], handle_dim, col, _, _, _, 1, is_debug_mesh);
+      const handle = Create_rect_mesh(_,[0, pos[1]-handle_dim[1]+dim[1], pos[2]+1], handle_dim, col, _, _, _, 1, is_debug_mesh);
 
       // handle.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
 
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
+
 
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 1.5]);
@@ -58,10 +62,6 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       this.hover_margin = [0, handle.geom.dim[1] + 4];
 
 
-      handle.geom.pos[1] += (this.geom.pos[1] + this.geom.dim[1])- handle.geom.dim[1];
-      // handle.geom.pos[1] += (this.geom.dim[1])- handle.geom.dim[1];
-
-
       this.AddChild(handle)
 
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
@@ -73,6 +73,9 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
       handle.SetName('Slider handle');
       this.SetName('Slider Bar');
+
+      // It is enabled by the user, when a uniform is created for passing slider value to shaders
+      // this.slider_val_unif_ubidx = INT_NULL;
 
    }
 
@@ -117,23 +120,13 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    }
 
 
-   GfxUniformsEnable(flags, name, type, shader_flags) {
-
-      super.EnableGfxUniforms(flags, name, type, shader_flags);
-
-      const handle = this.children.buffer[0];
-      handle.EnableGfxUniforms(flags, name, type, shader_flags);
-
-   }
-
-
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
       const handle = this.children.buffer[0];
-      handle.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      handle.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
    }
 
 
@@ -487,10 +480,23 @@ export function Slider_horizontal_on_update_handle(_params) {
 
             const params = bar.eventCallbacks.buffer[i].clbk_params;
             const Clbk = bar.eventCallbacks.buffer[i].Clbk;
-            Clbk(params, val+.5);
+            Clbk(params, val);
          }
       }
    }
+
+   // TODO: Maybe we need a function to handle Widgets uniforms update callback for all widgets vbs
+   // TODO: How to check if : the widget has any uniform, and the uniform must be updated by this function
+   // const slider = bar.parent;
+   // const ubidx = Uniforms_buffer_find_ubidx_from_name('u_time', slider.gfx.prog.idx);
+   // if(ubidx !== INT_NULL)Uniforms_buffer_set_uniform_value_from_callback(ubidx)
+   
+   // const gfx = Widget_root_gfx_get(slider.root_bufferidx);
+   // for(let i=0; i <= gfx.boundary; i++){
+
+   //    const ubidx = Uniforms_buffer_find_ubidx_from_name('u_time', gfx.buffer[i]);
+   //    Uniforms_buffer_set_uniform_value_from_callback(ubidx)
+   // }
 
 }
 
@@ -687,9 +693,12 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
       const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, 'Slider', pos, fontSize, WHITE, .4, is_debug_mesh);
 
+
       /** Label area mesh */
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col, _, _, [pad,pad], 1, is_debug_mesh);
-      // super(pos, dim, col, 1, is_debug_mesh);
+
+
+
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
@@ -697,7 +706,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle([0, 6, 2]);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-      this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
 
 
@@ -705,7 +714,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       // Slider Bar: Bar is child of the slider mesh
       // const bar = new Slider(mesh_bufferidx, _, [0, 40, 1], dim, GREY[0], hover_margin, is_debug_mesh);
       // const bar = Create_widget_slider_simple(_, [0, 0, 1], [dim[0], 2], GREY[8], hover_margin, [10, 10], 1, is_debug_mesh);
-      const bar = Create_widget_slider_simple(_, [0, 20, _pos[2]+1], [dim[0], 2], GREY[8], hover_margin, [10, 10], 1, is_debug_mesh);
+      const bar = Create_widget_slider_simple(_, [0, dim[1]*4, _pos[2]+1], [dim[0], 2], GREY[8], hover_margin, [10, 10], 1, is_debug_mesh);
       
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Slider Handle: Handle is a child of the bar mesh
@@ -729,7 +738,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       value_text.geom.pos[0] = this.geom.dim[0] * 2 - (value_text.GetMaxWidth() * 2);
       value_text.geom.pos[1] = 4;
       value_text.geom.pos[2] = bar.geom.pos[2] + 1;
-      // value_text.parent = bar;
+
 
       name_text.geom.pos[0] = 0;
       name_text.geom.pos[1] = 4;
@@ -823,38 +832,32 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
    
-   // GfxUniformsEnable(flags, name, type, shader_flags) {
+   GfxUniformsEnable(flags, name, type, shader_flags) {
 
-   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
+      super.EnableGfxUniforms(flags, name, type, shader_flags);
+      this.text_mesh.EnableGfxUniforms(flags, name, type, shader_flags);
 
-   //    const name_text = this.text_mesh;
-   //    name_text.EnableGfxUniforms(flags, name, type, shader_flags);
+      const name_text = this.text_mesh;
+      name_text.EnableGfxUniforms(flags, name, type, shader_flags);
+   
+      const value_text = this.children.buffer[this.value_text_idx];
+      value_text.EnableGfxUniforms(flags, name, type, shader_flags);
 
-   //    const bar = this.children.buffer[this.bar_idx];
-   //    bar.EnableGfxUniforms(flags, name, type, shader_flags);
+      const bar = this.children.buffer[this.bar_idx];
+      bar.GfxUniformsEnable(flags, name, type, shader_flags);
 
-   //    const handle = bar.children.buffer[0];
-   //    handle.EnableGfxUniforms(flags, name, type, shader_flags);
 
-   //    const value_text = this.children.buffer[this.value_text_idx];
-   //    value_text.EnableGfxUniforms(flags, name, type, shader_flags);
-
-   // }
+   }
 
 
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-      const name_text = this.text_mesh;
-      name_text.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-      
-      const bar = this.children.buffer[this.bar_idx];
-      bar.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-      
-      const handle = bar.children.buffer[0];
-      handle.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      // Call for each root mesh in every vertex buffer
+      Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
+
    }
 
 
@@ -1505,9 +1508,11 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 export function Slider_get_slider_val(params){
       
-   const slider = params.slider;
+   // const slider = params.params;
+   const slider = params;
    const bar = slider.children.buffer[slider.bar_idx];
-   return [bar.slider_val+.5, 2.];
+   // return [bar.slider_val+.5, 2.];
+   return bar.slider_val;
 }
 
 

@@ -68,7 +68,7 @@ class Uniform {
       // const uniformInfo = gfxCtx.gl.getActiveUniform(this.shader_program, idx);
       const loc = gl.getUniformLocation(shader_program, name);
       // console.log('---------loc-----------', loc)
-      // const t = gl.getActiveUniform(shader_program, 1)
+      const t = gl.getActiveUniform(shader_program, 1)
       /**DEBUG */if (loc > 0xffff || loc === null) 
          alert('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.');
 
@@ -79,8 +79,8 @@ class Uniform {
       this.name = name; // Uniform name
       this.needs_update = false;
       this.UpdateUniform = null; // Gl specific type function for updating the uniform.
-      // this.GetValClbk = null; // Function to call for getting the uniform value.
-      // this.clbk_params = null; // Function to call for getting the uniform value.
+      this.GetValClbk = null; // Function callback for getting the uniform value.
+      this.clbk_params = null; // Params for the Get value callback
 
       this.is_bound = false;
 
@@ -133,7 +133,7 @@ class Uniform {
    Update() {
       this.UpdateUniform(gfxCtx.gl, this.loc, this.val);
       this.needs_update = false;
-      console.log('{$$$$$} UNIFORMS UPDATE', this.val, 'name:', this.name, 'progidx:', this.progidx)
+      // console.log('{$$$$$} UNIFORMS UPDATE', this.val, 'name:', this.name, 'progidx:', this.progidx)
    }
 }
 
@@ -151,7 +151,7 @@ export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, p
 
       const uniform = new Uniform(gl, shader_program, type, name, progidx);
       const ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
-      console.warn('1111111 Uniform Created at index:', ubidx, _uniforms_buffer)
+      console.error('1111111 Uniform Created at index:', ubidx, _uniforms_buffer)
    
       // _debug_programidx_per_uniform[ubidx] = progidx
    // }
@@ -184,10 +184,37 @@ export function Uniforms_buffer_set_uniform_val_from_index(ubidx, val, idx) {
 
 
 
+export function Uniforms_buffer_set_uniform_value_from_callback(ubidx) {
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
+   const clbk_params = _uniforms_buffer.buffer[ubidx].clbk_params;
+   const val = _uniforms_buffer.buffer[ubidx].GetValClbk(clbk_params);
+   _uniforms_buffer.buffer[ubidx].Set(val);
+}
+
+
+
+
 export function Uniforms_buffer_update_uniform(ubidx) {
    // if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
-   if(_uniforms_buffer.buffer[ubidx].needs_update === false) return;
+   // if(_uniforms_buffer.buffer[ubidx].needs_update === false) return;
    _uniforms_buffer.buffer[ubidx].Update();
+}
+
+
+
+export function Uniforms_buffer_set_value_callback(ubidx, Clbk, clbk_params) {
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
+
+   if(_uniforms_buffer.buffer[ubidx].GetValClbk !== null) { 
+      console.error('Set uniform value Callback already been set'); }
+
+   const params = {
+      ubidx:ubidx,
+      params:clbk_params
+   }
+
+   _uniforms_buffer.buffer[ubidx].GetValClbk = Clbk;
+   _uniforms_buffer.buffer[ubidx].clbk_params = params;
 }
 
 
@@ -238,10 +265,10 @@ export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', progidx) {
       }
    }
 
+   // console.error('NO uniform with name found\n', unif_name, 'in program:', progidx)
    return INT_NULL;
 
-   console.error('NO uniform with name found\n', unif_name)
-   alert('NO uniform with name found\nSEE CONSOLE ERROR')
+   alert('NO uniform with name found\nSEE CONSOLE ERROR\nMaybe forgot to Create the uniform with GfxUniformsEnable()')
 
 }
 
@@ -613,6 +640,8 @@ export function Uniforms_buffer_print() {
          'name', _uniforms_buffer.buffer[i].name,
          'val', _uniforms_buffer.buffer[i].val,
          'progidx', _uniforms_buffer.buffer[i].progidx,
+         'Clbk', _uniforms_buffer.buffer[i].GetValClbk,
+         'clbk_params', _uniforms_buffer.buffer[i].clbk_params,
       );
    }
 }

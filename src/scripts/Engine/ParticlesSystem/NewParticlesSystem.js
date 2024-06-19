@@ -132,13 +132,11 @@ class Emitter {
 
       this.uniforms = [];
       if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
-         this.EnableGfxUniforms(SID.UNIF.PROJECTION_MATRIX, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+         this.EnableGfxUniforms({unif:SID.UNIF.PROJECTION_MATRIX}, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
 
-      this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-
-      this.EnableGfxUniforms(SID.UNIF.WPOS4, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-      this.EnableGfxUniforms(SID.FX.FS_GLOW, 'u_glow_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      this.EnableGfxUniforms({unif:SID.FX.FS_GLOW}, 'u_glow_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       // this.GfxUniformsSetClbk('u_col4', null, this.gfx.vb.groupidx)
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2)
