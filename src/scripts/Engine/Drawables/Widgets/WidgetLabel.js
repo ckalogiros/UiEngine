@@ -657,6 +657,7 @@ export class Widget_Label_Text_Mesh_Menu_Options extends Widget_Label {
         const m = mesh.geom;
 
         // console.log('click')
+        // TODO: Isn't the mesh already been checked for collision??????
         if (Check_intersection_point_rect(m.pos, m.dim, point, [0, 0])) {
 
             console.log('Button Clicked! ', mesh.GetName())

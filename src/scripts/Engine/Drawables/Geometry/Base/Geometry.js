@@ -21,6 +21,7 @@ export class Geometry2D {
         this.defPos = [0, 0, 0];
         this.defDim = [0, 0];
         this.defScale = [0, 0];
+        this.time = 1;
         this.num_faces = num_faces;
         this.type = MESH_TYPE.GEOMETRY2D;
 
@@ -58,7 +59,7 @@ export class Geometry2D {
     // SetPosY(y, gfx, numFaces)       { glBufferOps.Gl_set_wpos_y     (gfx, y + this.dim[1], numFaces); }
     // SetDefaultPosXY(gfx)            { glBufferOps.Gl_set_wpos_xy    (gfx, this.pos[0] + this.dim[0], this.pos[1] + this.dim[1], this.pos[2]); }
     SetPosXYZ(pos, gfx, numFaces)   { glBufferOps.Gl_set_wpos_XYZ   (gfx, pos[0], pos[1], pos[2], numFaces); }
-    SetPosXY(pos, gfx)              { glBufferOps.Gl_set_wpos_xy    (gfx, pos[0], pos[1]); }
+    SetPosXY(x, y, gfx)              { glBufferOps.Gl_set_wpos_xy    (gfx, x, y); }
     SetPosX(x, gfx, numFaces)       { glBufferOps.Gl_set_wpos_x     (gfx, x, numFaces); }
     SetPosY(y, gfx, numFaces)       { glBufferOps.Gl_set_wpos_y     (gfx, y, numFaces); }
     SetDefaultPosXY(gfx)            { glBufferOps.Gl_set_wpos_xy    (gfx, this.pos[0], this.pos[1], this.pos[2]); }

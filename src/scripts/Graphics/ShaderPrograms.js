@@ -189,30 +189,30 @@ export function Program_create_program(sid, uniforms) {
 
 
 
-export function Program_assign_uniform_index(progidx, unif_name, ubidx) {
+// export function Program_assign_uniform_index(progidx, unif_name, ubidx) {
 
-	const prog = _programs.buffer[progidx];
-	const len = prog.uniforms.length;
-	for(let i=0; i < len; i++){
-		if(prog.uniforms[i].name === unif_name){
-			prog.uniforms[i].ubidx = ubidx;
-			break;
-		}
-	}
-}
+// 	const prog = _programs.buffer[progidx];
+// 	const len = prog.uniforms.length;
+// 	for(let i=0; i < len; i++){
+// 		if(prog.uniforms[i].name === unif_name){
+// 			prog.uniforms[i].ubidx = ubidx;
+// 			break;
+// 		}
+// 	}
+// }
 
 
 
-export function Program_get_uniform_by_name(progidx, unif_name) {
+// export function Program_get_uniform_by_name(progidx, unif_name) {
 
-	const prog = _programs.buffer[progidx];
-	const len = prog.uniforms.length;
-	for(let i=0; i < len; i++){
-		if(prog.uniforms[i].name === unif_name){
-			return prog.uniforms[i];
-		}
-	}
-}
+// 	const prog = _programs.buffer[progidx];
+// 	const len = prog.uniforms.length;
+// 	for(let i=0; i < len; i++){
+// 		if(prog.uniforms[i].name === unif_name){
+// 			return prog.uniforms[i];
+// 		}
+// 	}
+// }
 
 
 

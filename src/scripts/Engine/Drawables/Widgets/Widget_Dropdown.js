@@ -7,7 +7,7 @@ import { TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Listener_get_parent_event } from "../../Events/EventListeners.js";
 import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_buffer_get_root_meshidx, Widget_root_is_widget_root } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_buffer_get_root_meshidx, Widget_root_is_widget_root, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
 import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Calculate_positions_no_gfx_update_recursive, Calculate_sizes_recursive, Expand, Section } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
@@ -728,7 +728,7 @@ export class Widget_Dropdown extends Section {
       super.EnableGfxUniforms(flags, name, type, shader_flags);
 
       const btn = this.children.buffer[0];
-      btn.EnableGfxUniforms(flags, name, type, shader_flags);
+      btn.GfxUniformsEnable(flags, name, type, shader_flags);
       
       this.menu.GfxUniformsEnable(flags, name, type, shader_flags);
       
@@ -740,9 +740,14 @@ export class Widget_Dropdown extends Section {
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
+            
+      // Call for each root mesh in every vertex buffer
+      Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
+
       // And we set one of the text meshes, since we know all other text meshes belong to the same vb
-      const btn = this.children.buffer[0];
-      btn.text_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+      // const btn = this.children.buffer[0];
+      // btn.text_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+      // btn.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
    }
 
 

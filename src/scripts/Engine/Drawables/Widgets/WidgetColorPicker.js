@@ -16,7 +16,7 @@ import { Slider_connect } from "./WidgetSlider";
 
 
 
-
+// TODO: Deal with these global variables, especially if we need to cob=nstruct a second Colorpicker widget
 let temp_panel2_idx = INT_NULL;
 let temp_hue_pick_idx = INT_NULL;
 let temp_color_pick_idx = INT_NULL;
@@ -68,8 +68,8 @@ export class Widget_Color_Picker extends Section {
       panel.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
       panel.options |= SECTION.RESIZE_PARENT;
       panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      panel.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      panel.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // panel.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      // panel.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // panel.EnableGfxUniforms({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       panel.mat.col = [
          // YELLOWL[1], YELLOWL[2], YELLOWL[1], YELLOWL[2]
@@ -88,8 +88,8 @@ export class Widget_Color_Picker extends Section {
       color_pick.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       color_pick.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
       color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      color_pick.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      color_pick.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // color_pick.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      // color_pick.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // color_pick.EnableGfxUniforms({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       color_pick.mat.col = [
@@ -109,8 +109,8 @@ export class Widget_Color_Picker extends Section {
       panel2.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
       panel2.options |= SECTION.RESIZE_PARENT;
       panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      panel2.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      panel2.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // panel2.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      // panel2.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // panel2.EnableGfxUniforms({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       panel2.StylesSetMargin([10, 0]);
       panel2.mat.col = [
@@ -132,8 +132,8 @@ export class Widget_Color_Picker extends Section {
       color_present.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       color_present.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
       color_present.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      color_present.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      panel.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // color_present.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      // panel.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // color_present.EnableGfxUniforms({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       color_present.StylesSetMargin([0, 0]);
       color_present.mat.col = [
@@ -150,12 +150,10 @@ export class Widget_Color_Picker extends Section {
       {
          {
             const label = Create_widget_label(_, 'R', _, [0, 0, 3], 8, REDL[5], WHITE, _, _, style);
-            // label.sid.shad |= SID.SHAD.INDEXED_PATT_COvbNNECTED_FACES_X;
-            // label.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
             label.temp_align |= SECTION.VERTICAL;
             label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            label.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
-            label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            // label.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
+            // label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             // label.GfxUniformsEnable({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS)
             label.StylesSetMargin([5, 5]);
             panel2.AddItem(label);
@@ -163,8 +161,8 @@ export class Widget_Color_Picker extends Section {
             this.label_r = Create_widget_label(_, 'RRRRR', _, [0, 0, 3], 8, GREY[2], WHITE, _, _, style);
             this.label_r.temp_align |= SECTION.HORIZONTAL;
             this.label_r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            this.label_r.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
-            this.label_r.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            // this.label_r.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
+            // this.label_r.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             // this.label_r.GfxUniformsEnable({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS)
             this.label_r.StylesSetMargin([5, 0]);
             panel2.AddItem(this.label_r);
@@ -173,8 +171,8 @@ export class Widget_Color_Picker extends Section {
             const label = Create_widget_label(_, 'G', _, [0, 0, 3], 8, GREEN[4], WHITE, _, _, style);
             label.temp_align |= SECTION.VERTICAL;
             label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            label.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
-            label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            // label.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
+            // label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             // label.GfxUniformsEnable({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS)
             label.StylesSetMargin([5, 5]);
             panel2.AddItem(label);
@@ -182,8 +180,8 @@ export class Widget_Color_Picker extends Section {
             this.label_g = Create_widget_label(_, 'GGGGG', _, [0, 0, 3], 8, GREY[2], WHITE, _, _, style);
             this.label_g.temp_align |= SECTION.HORIZONTAL;
             this.label_g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            this.label_g.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
-            this.label_g.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            // this.label_g.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
+            // this.label_g.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             // this.label_g.GfxUniformsEnable({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS)
             this.label_g.StylesSetMargin([5, 0]);
             panel2.AddItem(this.label_g);
@@ -192,8 +190,8 @@ export class Widget_Color_Picker extends Section {
             const label = Create_widget_label(_, 'B', _, [0, 0, 3], 8, BLUEL[6], WHITE, _, _, style);
             label.temp_align |= SECTION.VERTICAL;
             label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            label.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
-            label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            // label.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
+            // label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             // label.GfxUniformsEnable({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             label.StylesSetMargin([5, 5]);
             panel2.AddItem(label);
@@ -201,8 +199,8 @@ export class Widget_Color_Picker extends Section {
             this.label_b = Create_widget_label(_, 'BBBBB', _, [0, 0, 3], 8, GREY[2], WHITE, _, _, style);
             this.label_b.temp_align |= SECTION.HORIZONTAL;
             this.label_b.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            this.label_b.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
-            this.label_b.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            // this.label_b.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
+            // this.label_b.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             // this.label_b.GfxUniformsEnable({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS)
             this.label_b.StylesSetMargin([5, 0]);
             panel2.AddItem(this.label_b);
@@ -239,8 +237,8 @@ export class Widget_Color_Picker extends Section {
       slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider_tran.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
       slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      slider_tran.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
-      slider_tran.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // slider_tran.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
+      // slider_tran.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // slider_tran.GfxUniformsEnable({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS)
       slider_tran.SetStyle(style);
       // slider_tran.StylesSetPad([20,20]);
@@ -289,8 +287,8 @@ export class Widget_Color_Picker extends Section {
       slider.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      slider.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
-      slider.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // slider.GfxUniformsEnable({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED)
+      // slider.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // slider.GfxUniformsEnable({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS)
       slider.StylesSetMargin([0, 20]);
       slider.SetStyle(style);
@@ -353,6 +351,12 @@ export class Widget_Color_Picker extends Section {
    GfxUniformsEnable(flags, name, type, shader_flags) {
       // alert('+++\nGfxUniformsEnable')
       super.EnableGfxUniforms(flags, name, type, shader_flags);
+      
+      for (let i = 0; i <= this.children.boundary; i++) {
+         if(this.children.buffer[i].GfxUniformsEnable === null)
+            console.log()
+         if (this.children.buffer[i]) this.children.buffer[i].GfxUniformsEnable(flags, name, type, shader_flags);
+      }
    }
 
 
@@ -607,8 +611,7 @@ export class Widget_Color_Picker extends Section {
 
       let c_idx = Math.ceil(part_ratio);
 
-      // Deal with parts from 0 to n-1
-      c_idx -= 1;
+      c_idx -= 1; // Deal with parts from 0 to n-1
       // Calulate the indices of the colors, that the left and right vertices (from the handles position) represent
       const color_indices = [(c_idx * 2), (c_idx * 2) + 2];
 
@@ -621,7 +624,6 @@ export class Widget_Color_Picker extends Section {
       const fract = part_ratio - Floor(part_ratio);
       const c = Mix_vec4(c1, c2, fract);
 
-      console.log(slider_val)
       // console.log((x/w)*parts, (slider_val*parts))
 
       const num_faces = color_pick_mesh.geom.num_faces; // Face Index:The first one

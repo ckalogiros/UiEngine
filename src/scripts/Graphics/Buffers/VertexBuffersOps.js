@@ -1446,7 +1446,7 @@ export function Gl_set_wpos_time(gfxInfo, val) {
 // Particle System: Batch Update Particles
 
 
-export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colors, positions, dimention) {
+export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colors, positions, dimentions, time) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
 
@@ -1457,7 +1457,8 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colo
 
       const col = colors;
       const pos = positions;
-      const dim = dimention;
+      const dim = dimentions;
+      const t = time;
 
       // V1
       vb_data[index++] = col[0];
@@ -1468,86 +1469,82 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colo
       vb_data[index++] = pos[0];
       vb_data[index++] = pos[1];
       vb_data[index++] = pos[2];
-      // vb_data[index++] = pos[3]; // Timer t
-      index++;
-
-      index++;
+      vb_data[index++] = t;
+      
       index++;
       index++;
       index++;
-
+      index++;
+      
       index++;
       index++;
-
+      
       index++;
       index++;
       // vb_data[index++] = -dim[0];
       // vb_data[index++] = dim[1];
-
-
+      
+      
       // V2
       vb_data[index++] = col[0];
       vb_data[index++] = col[1];
       vb_data[index++] = col[2];
       vb_data[index++] = col[3];
-
+      
       vb_data[index++] = pos[0];
       vb_data[index++] = pos[1];
       vb_data[index++] = pos[2];
-      // vb_data[index++] = pos[3]; // Timer t
-      index++;
-
-      index++;
+      vb_data[index++] = t;
+      
       index++;
       index++;
       index++;
-
+      index++;
+      
       index++;
       index++;
-
+      
       index++;
       index++;
       // vb_data[index++] = -dim[0];
       // vb_data[index++] = -dim[1];
-
-
+      
+      
       // V3
       vb_data[index++] = col[0];
       vb_data[index++] = col[1];
       vb_data[index++] = col[2];
       vb_data[index++] = col[3];
-
+      
       vb_data[index++] = pos[0];
       vb_data[index++] = pos[1];
       vb_data[index++] = pos[2];
-      // vb_data[index++] = pos[3]; // Timer t
-      index++;
-
-      index++;
+      vb_data[index++] = t;
+      
       index++;
       index++;
       index++;
-
+      index++;
+      
       index++;
       index++;
-
+      
       index++;
       index++;
       // vb_data[index++] = dim[0];
       // vb_data[index++] = dim[1];
-
-
+      
+      
       // V4
       vb_data[index++] = col[0];
       vb_data[index++] = col[1];
       vb_data[index++] = col[2];
       vb_data[index++] = col[3];
-
+      
       vb_data[index++] = pos[0];
       vb_data[index++] = pos[1];
       vb_data[index++] = pos[2];
-      // vb_data[index++] = pos[3]; // Timer t
-      index++;
+      vb_data[index++] = t;
 
       index++;
       index++;

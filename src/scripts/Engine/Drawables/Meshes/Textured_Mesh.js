@@ -136,6 +136,7 @@ export class Textured_Mesh extends Mesh {
 
       const point = MouseGetPos();
       const g = mesh.geom;
+      // TODO: Isn't the mesh already been checked for collision??????
       if (Check_intersection_point_rect(g.pos, g.dim, point, [0, 8])) {
 
          STATE.mesh.SetClicked(mesh);

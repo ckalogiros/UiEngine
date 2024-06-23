@@ -914,6 +914,21 @@ const BATCH_FN_IDX = {
 
 
 /*************************************************************************************************/
+//  Particle System  
+
+_CNT = 0x1;
+const PARTICLES = {
+   HAS_START_POS_VARIATION: _CNT,
+}
+
+
+
+
+
+
+
+
+/*************************************************************************************************/
 //  Events  
 _CNT = 0x1;
 const LISTENERS_FLAGS = {
@@ -1161,9 +1176,9 @@ function ERROR_NULL(obj) {
 
 _CNT = 0;
 const STYLES = { // Default access indices for style arrays
-	MARG: _CNT++,
-	PAD: _CNT++,
-	HOVER_MARG: _CNT++,
+	// MARG: _CNT++,
+	// PAD: _CNT++,
+	// HOVER_MARG: _CNT++,
 
 	AXIS: {
 		ALL: 0,

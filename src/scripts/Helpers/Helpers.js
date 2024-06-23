@@ -48,12 +48,19 @@ export function GetRandomColor(){
 
 let nextidx = 0;
 export function GetSequencedColor(){
-    if(nextidx >= COLOR_ARRAY2.length) nextidx = 0;
-    return COLOR_ARRAY2[nextidx++];
+    if(nextidx >= COLOR_ARRAY3.length) nextidx = 0;
+    return COLOR_ARRAY3[nextidx++][9];
+    // return COLOR_ARRAY3[nextidx++];
 }
 
 
 
+/**
+ * 
+ * @param {*} minPos : Array[x,y] 
+ * @param {*} maxPos : Array[x,y]
+ * @returns 
+ */
 export function GetRandomPos(minPos, maxPos){
     const posx = GetRandomInt(minPos[0], maxPos[0]);
     const posy = GetRandomInt(minPos[1], maxPos[1]);
@@ -119,9 +126,16 @@ export function CalculateSdfOuterFromDim(size){
 
 
 // Returns the sign (-1,+1) out of any number
-export function GetSign(val){
+export function GetSignInt(val){
     if(val === 0) return 0;
     return (2 * (val >> 31) + 1);
+}
+
+export function GetSign(val){
+        if (val<0) return -1;
+        if (val>0) return 1;
+        if (val===-0) return -1;
+        else return 0;
 }
 
 

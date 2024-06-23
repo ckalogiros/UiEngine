@@ -5,6 +5,7 @@ import { vertex_shader_chunks, fragment_shader_chunks } from './ShaderChunks/Sha
 import { frag_round_corners_call, frag_round_corners } from './Functions/fragment.roundcorners.js'
 import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './Functions/fragment.texture.js'
 import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
+import { frag_noise, frag_noise_call } from './Functions/fragment.noise.js';
 
 
 
@@ -108,33 +109,19 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader){
 
    // TODO: For the time being despite the fact that a uniform is categorized as "IN_VS", the "uniforms_code += " will ad it to any shader called by this function. CORRECT IT.
    for(let i=0; i< len; i++){
-      // if((_uniforms_info[i].shader & UNIFORM.IN_VS) && UNIFORM.IN_VS === unif_shader_type){
       if((_uniforms_info[i].shader & UNIFORM.IN_VS && (which_shader & UNIFORM.IN_VS)) ){
 
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
+         console.log('<<<<<<<<<<<<<<< VERTEX SHADER >>>>>>>>>>>>>>>\nUNIFORM ENABLE:', _uniforms_info[i].name)
       }
-      // else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && UNIFORM.IN_FS === unif_shader_type){
       else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && (which_shader & UNIFORM.IN_FS)){
-
+         
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
+         console.log('<<<<<<<<<<<<<<< FRAGMENT SHADER >>>>>>>>>>>>>>>\nUNIFORM ENABLE:', _uniforms_info[i].name)
       }
    }
-   // for(let i=0; i< len; i++){
-   //    // if((_uniforms_info[i].shader & UNIFORM.IN_VS) && UNIFORM.IN_VS === unif_shader_type){
-   //    if((_uniforms_info[i].shader & UNIFORM.IN_VS) ){
-
-   //       const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
-   //       uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
-   //    }
-   //    // else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && UNIFORM.IN_FS === unif_shader_type){
-   //    else if((_uniforms_info[i].shader & UNIFORM.IN_FS)){
-
-   //       const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
-   //       uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
-   //    }
-   // }
 
    return uniforms_code;
 
@@ -203,14 +190,14 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.pass & SID.PASS.COL4) ? 'out vec4 v_col; ' : '',
       (sid.pass & SID.PASS.DIM2) ? 'out vec2 v_dim;' : (sid.pass & SID.ATTR.DIM2) ? 'out vec2 v_dim;' :'',
       (sid.pass & SID.PASS.WPOS2) ? 'out vec2 v_wpos;' : '',
+      (sid.pass & SID.PASS.TIME1) ? '#include <out_vtime1>' : '',
+      (sid.pass & SID.PASS.RES2) ? '#include <out_vres2>' : '',
       (sid.attr & SID.ATTR.TEX2) ? 'out vec2 v_tex_coord;' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <out_attr_sdf2>' : '',
       (sid.attr & SID.ATTR.BORDER) ? '#include <out_border_width>' : '',
       (sid.attr & SID.ATTR.R_CORNERS) ? '#include <out_rCorners>' : '',
       (sid.attr & SID.ATTR.FEATHER) ? '#include <out_border_feather>' : '',
-      (sid.pass & SID.PASS.TIME1) ? '#include <out_vtime1>' : '',
-      (sid.pass & SID.PASS.RES2) ? '#include <out_vres2>' : '',
-      (sid.fx & SID.FX.FS_GLOW) ? 'out vec2 v_glow_params;' : '',
+      (sid.attr & SID.ATTR.TIME) ? 'out float v_time;' : '',
       '\n',
       
 
@@ -246,7 +233,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       // ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);' 
       ? '  gl_Position = u_projection * vec4(a_pos.x + wpos.x, a_pos.y + wpos.y, a_wpos_time.z, 1.0);' 
       : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
-      
       // true ? 'vec4 p = a_wpos_time;' : '',
       // true ? 'gl_Position = vec4(a_pos.x, a_pos.y, 1., 1.0);' : '',
       // (sid.unif & SID.UNIF.COL4) ? '  v_col = a_col;' : '',
@@ -257,7 +243,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // ASSIGNMENTS
-      (sid.fx & SID.FX.FS_GLOW) ? '  v_glow_params = u_glow_params;' : '',
+      // (sid.fx & SID.FX.FS_GLOW) ? '  v_glow_params = u_glow_params;' : '',
       (sid.pass & SID.PASS.COL4) ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') : '', 
       (sid.pass & SID.PASS.DIM2) ? '  v_dim = a_dim;' : (sid.pass & SID.ATTR.DIM2) ? '  v_dim = a_dim;' : '', // TODO: If we have created an attribute a_dim, we have to use it, else the attribs buffering is gonna be wrong
       // (sid.pass & (SID.PASS.WPOS2|SID.UNIF.ROOT_WPOS2)) ? '  v_wpos = vec2(a_wpos_time.x + wpos.x, a_wpos_time.y + wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
@@ -267,6 +253,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.BORDER) ? '  v_border_width = a_params1.x;' : '',
       (sid.attr & SID.ATTR.R_CORNERS) ? '  v_rCorners = a_params1.y;' : '',
       (sid.attr & SID.ATTR.FEATHER) ? '  v_border_feather = a_params1.z;' : '',
+      (sid.attr & SID.ATTR.TIME) ? '  v_time = a_wpos_time.w;' : '',
       (true) ? '  gl_PointSize = 10.0;' : '',
       '}',
 
@@ -304,11 +291,13 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       // true ? 'layout(origin_upper_left) in vec4 frag_color;' : '',
       true ? '#include <precision_medium>' : '',
       true ? '#include <out_frag_color>' : '',
+      (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
+      (sid.unif & SID.UNIF.UNIF_SPEED) ? '#define U_SPEED 1' : '',
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // In
       '\n',
-      (sid.fx & SID.FX.FS_GLOW) ? 'in vec2 v_glow_params;' : '',
+      // (sid.fx & SID.FX.FS_GLOW) ? 'in vec2 v_glow_params;' : '',
       (sid.pass & SID.PASS.COL4) ? '#include <in_frag_col4>' : '',
       (sid.pass & SID.PASS.DIM2) ? '#include <in_frag_dim2>'   : '',
       (sid.pass & SID.PASS.WPOS2) ? '#include <in_frag_wpos2>' : '',
@@ -317,6 +306,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.R_CORNERS) ? '#include <in_frag_rCorners>' : '',
       (sid.attr & SID.ATTR.FEATHER) ? '#include <in_frag_border_feather>' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <in_frag_sdf2>' : '',
+      (sid.attr & SID.ATTR.TIME) ? 'in float v_time;' : '',
 
       
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -324,6 +314,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       '\n',
       Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_FS),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
+
       
       
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -335,6 +326,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       ////////////////////////////////////////////////////
       // Fx shder functions
       (sid.fx & SID.FX.FS_GLOW) ? frag_glow : '',
+      (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
 
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -344,7 +336,9 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       true ? '#include <frag_color_create>' : '', // Creates the variable 'color' of the fragment shader color output.
       (sid.attr & SID.ATTR.STYLE) ? frag_round_corners_call : '', // TODO: Check either for .STYLE or .BORDER|.FEATHER|.RCORNERS
       (sid.fx & SID.FX.FS_GLOW) ? '  float alpha = color.a;' : '',
+      // (sid.fx & SID.FX.FS_GLOW) ? '  float alpha = v_col.a;' : '',
       (sid.fx & SID.FX.FS_GLOW) ? frag_glow_call : '',
+      (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
       (sid.attr & SID.ATTR.TEX2 ) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '', 
 
 
@@ -357,7 +351,10 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // TESTS
-      (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
+      (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', // HACK: prevent optimizer from removing the uniform u_scale2
+      (sid.unif & SID.UNIF.TIME) ? '  if(u_time == 0.) ;' : '',
+      // (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
+      // (sid.unif & SID.UNIF.SCALE2) ? '  frag_color.xyz *= u_scale2.x;' : '',
       // true ? 'frag_color = vec4(1.);' : '',
       
       true ? '}' : '',

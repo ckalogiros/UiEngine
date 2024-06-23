@@ -8,13 +8,24 @@ import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilde
 
 const DISABLE_DEBUG = true;
 
-// const _debug_programidx_per_uniform = []
+
+
 
 
 
 /*************************************************************************************************************************************/
 // 
 /*************************************************************************************************************************************/
+
+/**
+   uniform float v[10];
+
+   Then you can set their values using glUniform{1,2,3,4}{f,i}v
+
+   GLfloat v[10] = {...};
+   glUniform1fv(glGetUniformLocation(program, "v"), 10, v);
+   
+ */
 
 // Array of scalars
 // function SetValueV1f(gl, loc, val) { gl.uniform1fv(loc, val); }
@@ -65,10 +76,8 @@ class Uniform {
 
    constructor(gl = null, shader_program = null, type = INT_NULL, name = '', progidx=INT_NULL) {
 
-      // const uniformInfo = gfxCtx.gl.getActiveUniform(this.shader_program, idx);
       const loc = gl.getUniformLocation(shader_program, name);
-      // console.log('---------loc-----------', loc)
-      const t = gl.getActiveUniform(shader_program, 1)
+      // const t = gl.getActiveUniform(shader_program, 1)
       /**DEBUG */if (loc > 0xffff || loc === null) 
          alert('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.');
 
@@ -87,6 +96,7 @@ class Uniform {
 
       switch (type) {
          // From THREE.js
+         // TODO: Initialize the rest of the Arrays
          case UNIF_TYPE.FLOAT: { this.UpdateUniform = SetValueV1f; this.val = 0; break; } // FLOAT
          case UNIF_TYPE.FVEC2: { this.UpdateUniform = SetValueV2f; this.val = new Array(1.1,2); break; } // F_VEC2
          case UNIF_TYPE.FVEC3: { this.UpdateUniform = SetValueV3f; this.val = new Array(0,0,0); break; } // F_VEC3
@@ -114,8 +124,11 @@ class Uniform {
    }
 
 
-   SetFromIndex(val, idx) {
-      this.val[idx] = val;
+   SetFromIndex(val, idx=null) {
+
+      if(idx !== null) 
+         this.val[idx] = val;
+      else this.val = val;
       this.needs_update = true;
       any_needs_update = true;
       // console.log('{$$$$$} UNIFORMS SET FROM INDEX', this.val, 'name:', this.name, 'progidx:', this.progidx)
@@ -144,18 +157,9 @@ let any_needs_update = false; //
 
 export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, progidx) {
 
-   // let ubidx = Uniforms_buffer_find_ubidx_from_name(name, progidx);
-
-   // if(ubidx === INT_NULL)
-   // {
-
-      const uniform = new Uniform(gl, shader_program, type, name, progidx);
-      const ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
-      console.error('1111111 Uniform Created at index:', ubidx, _uniforms_buffer)
-   
-      // _debug_programidx_per_uniform[ubidx] = progidx
-   // }
-
+   const uniform = new Uniform(gl, shader_program, type, name, progidx);
+   const ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
+   console.error('1111111 Uniform Created at index:', ubidx, _uniforms_buffer)
 
    return ubidx;
 }
@@ -195,8 +199,7 @@ export function Uniforms_buffer_set_uniform_value_from_callback(ubidx) {
 
 
 export function Uniforms_buffer_update_uniform(ubidx) {
-   // if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
-   // if(_uniforms_buffer.buffer[ubidx].needs_update === false) return;
+   if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
    _uniforms_buffer.buffer[ubidx].Update();
 }
 
@@ -255,22 +258,18 @@ export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', progidx) {
 
       const unif = _uniforms_buffer.buffer[i];
 
-      // if (unif.name === unif_name && unif.is_bound === false){
       if (unif.name === unif_name && unif.progidx === progidx){
-      // if (unif.name === unif_name){
-         // Since different program uniforms use the same name, we use the flag 'unif.is_bound = true' 
-         // to differintiate uniforms that have alredy be bound to a program
-         // unif.is_bound = true;
          return i;
       }
    }
 
-   // console.error('NO uniform with name found\n', unif_name, 'in program:', progidx)
+   console.error('NO uniform with name found\n', unif_name, 'in program:', progidx)
    return INT_NULL;
 
    alert('NO uniform with name found\nSEE CONSOLE ERROR\nMaybe forgot to Create the uniform with GfxUniformsEnable()')
 
 }
+
 
 
 

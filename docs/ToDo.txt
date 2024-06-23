@@ -5,7 +5,7 @@
 +Animation per vertex in CPU
 +Android Phone
 +Instancing and gl_VertexID, gl_InstanceID, gl_DrawID: SEE https://www.khronos.org/opengl/wiki/Vertex_Shader/Defined_Inputs
-+ Create color Widget
++Create colorpicker Widget
 
 -Convert all mesh attribs to indexes in a vertex buffer ???
 -Horizontal scrolling
@@ -58,7 +58,7 @@ so that each vertex the index gets to the next color attribute(R->G->B ....)
   Get random pos (x,y)
         const x = GetRandomInt(1, 20);
         const y = GetRandomInt(1, 30);
-  Subtract the previous position. To sloaw down the giggle, multiply by a factor < 1
+  Subtract the previous position. To slow down the giggle, multiply by a factor < 1
         particle.pos[0] += (x-particle.pos[0])*.07;
         particle.pos[1] += (y-particle.pos[1])*.07;
   Also try mult the prev pos by factor <1

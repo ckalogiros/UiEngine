@@ -130,6 +130,8 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,0,0]) {
 
    if (is_root_widget !== undefined) {
 
+      dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
       dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
       dp.Calc_no_gfx_update();
@@ -450,7 +452,8 @@ function Debug_info_create_ui_stats() {
 
 
 
-
+   section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
 
    section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
@@ -860,10 +863,11 @@ function Debug_info_create_ui_performance_timers() {
       // }
    }
 
-
+   section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   
    section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
-
    section.Calc_no_gfx_update();
 
    const w = section.GetMaxWidth();
@@ -940,6 +944,8 @@ function Debug_info_create_ui_mouse() {
    infomesh.gfx_pool_request |= GFX_POOL_REQUESTS.SMALLEST; // Assign so the gfx pool requests the smalest buffers
    infomesh.gfx_pool_request &= ~GFX_POOL_REQUESTS.ANY; // Disable the default.
 
+   section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
    section.options |= SECTION.EXPAND | SECTION.INHERIT | SECTION.RESIZE_PARENT;
@@ -1059,8 +1065,10 @@ export function Debug_info_create_ui_focused() {
    // scroller.SetPosYNoGfxUpdate(200)
    // scroller.SetPosXNoGfxUpdate(100)
    
-       
+   scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   
    scroller.ScrollerAlign();
    
    View_build_group_from_root_mesh(scroller.scrolled_section);
@@ -1209,6 +1217,7 @@ function Debug_info_update_ui_focused(params) {
       const info_mesh = Create_widget_label(_, text_info, _, [0,0,1], 9, PURPLEB[9], _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
       scrolled.AddItem(info_mesh);
       info_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled);
+      info_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    }
    // {
@@ -1216,6 +1225,7 @@ function Debug_info_update_ui_focused(params) {
    //    const info_mesh = Create_widget_label(_, text_info, _, [0,0,1], 9, PURPLEB[9], _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
    //    scrolled.AddItem(info_mesh);
    //    info_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled);
+      // info_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    //    info_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    // }
    // {
@@ -1223,6 +1233,7 @@ function Debug_info_update_ui_focused(params) {
    //    const info_mesh = Create_widget_label(_, text_info, _, [0,0,1], 9, PURPLEB[9], _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
    //    scrolled.AddItem(info_mesh);
    //    info_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled);
+      // info_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    //    info_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    // }
 
@@ -1232,30 +1243,35 @@ function Debug_info_update_ui_focused(params) {
       const info_mesh = Create_widget_label(_, text_info, _, [0,0,1], 9, PURPLEB[9], _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
       scrolled.AddItem(info_mesh);
       info_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled);
+      info_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info_mesh.GenGfxCtx();
    }
    {
       const info_mesh = Ui_focused_create_info_geom(focused, zpos+1);
       scrolled.AddItem(info_mesh);
       info_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled);
+      info_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    }
    {
       const info_mesh = Ui_focused_create_info_mat(focused, zpos+1);
       scrolled.AddItem(info_mesh);
       info_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled);
+      info_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    }
    {
       const info_mesh = Ui_focused_create_info_gfx(focused, zpos+1);
       scrolled.AddItem(info_mesh);
       info_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled);
+      info_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    }
    {
       const info_mesh =Ui_focused_create_info_sid(focused, zpos+1);
       scrolled.AddItem(info_mesh);
       info_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled);
+      info_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    }
 
@@ -1346,6 +1362,7 @@ function Ui_focused_create_info_geom(mesh, zpos){
 }
 
 
+
 function Ui_focused_create_info_mat(mesh, zpos){
 
    // this.mat = {
@@ -1377,6 +1394,8 @@ function Ui_focused_create_info_mat(mesh, zpos){
    section.AddItem(info_text);
    return section;
 }
+
+
 
 function Ui_focused_create_info_gfx(mesh, zpos){
    /**
@@ -1565,10 +1584,12 @@ function Debug_info_create_mesh_info(params) {
       }
    }
 
-   scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-   scroller.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+   section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   
    // scroller.Calc_no_gfx_update();
+   scroller.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
    scroller.ScrollerAlign();
 
    scroller.Render();
@@ -1665,9 +1686,11 @@ function Debug_info_mesh_update(params) {
       dp_mesh.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
 
       const gfx_idxs = [root_info_dp.menu.gfx.prog.idx, root_info_dp.menu.gfx.vb.idx];
+      dp_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       dp_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, gfx_idxs);
       root_info_dp.Calc_no_gfx_update();
       dp_mesh.Render();
+      dp_mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp_mesh.gfx.vb.groupidx);
 
    }
    else { // Parent must exist. Catch the error if
@@ -1746,6 +1769,7 @@ function Debug_info_create_batch_info(params) {
    section.AddItem(info1);
    section.AddItem(info2);
 
+   section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
@@ -2052,9 +2076,11 @@ function Dbg_info_ui_create_ui(pos, name) {
 
    scroller.SetTypeDebug();
 
+   scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   
    scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-
    scroller.ScrollerAlign();
 
    scroller.Render();
@@ -2313,6 +2339,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
 
          /*********************************************************************************************************************************************/
          // Set up and Render new meshes
+         entry_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          entry_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
          if (root_dp.menu.is_gfx_inserted) {
 
@@ -2534,6 +2561,7 @@ function Dbg_ui_string_buffer_create_entry(params) {
 
          /*********************************************************************************************************************************************/
          // Set up and Render new meshes
+         entry_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          entry_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
          if (root_dp.menu.is_gfx_inserted) {
 
@@ -2743,6 +2771,7 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
 
          /*********************************************************************************************************************************************/
          // Set up and Render new meshes
+         entry_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          entry_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
          if (root_dp.menu.is_gfx_inserted) {
 
@@ -2975,6 +3004,7 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
 
          /*********************************************************************************************************************************************/
          // Set up and Render new meshes
+         entry_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          entry_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
          if (root_dp.menu.is_gfx_inserted) {
 
@@ -3157,6 +3187,7 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
 
          /*********************************************************************************************************************************************/
          // Set up and Render new meshes
+         entry_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          entry_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
          TEMP_DP_STEAL_THE_DP_RECALC(root_dp)
          if (root_dp.menu.is_gfx_inserted) {

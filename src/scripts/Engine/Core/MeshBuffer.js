@@ -56,11 +56,12 @@ export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.b
 
 export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
 
+   const hover_margin = _mesh_buffer.buffer[mesh_bufferidx].StylesGetHoverMargin();
    const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
-   temp_no_allocation_buffer[0][0] = pos[0];
-   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
-   temp_no_allocation_buffer[1][0] = pos[1];
-   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+   temp_no_allocation_buffer[0][0] = pos[0] - hover_margin[0];
+   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + hover_margin[0];
+   temp_no_allocation_buffer[1][0] = pos[1] - hover_margin[1];
+   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + hover_margin[1];
 
    return temp_no_allocation_buffer;
 }
@@ -1022,6 +1023,9 @@ export function Widget_root_set_in_focus(root_bufferidx) {
 /** A function to call 'SetClbkGfxUniforms()@Mesh class', only once per vertex buffer, using the root mesh of each vb that belongs to this widget root */
 export function Widget_root_set_uniform_callback_per_gfx_root_mesh(root_bufferidx, unif_name, Clbk, clbk_params) {
 
+   // IMPORTANT : If a slider, which we want to cascade set the unif clbk belongs to a mesh that is the widget root, 
+   // then it is not only the slider that are going to be effected rather all the meshes that belong to the widget root.
+   
    // Call for each root mesh in every vertex buffer
    const root_meshes= Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx);
    const len = root_meshes.length;

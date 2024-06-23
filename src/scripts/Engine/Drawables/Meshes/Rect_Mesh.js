@@ -339,6 +339,24 @@ export class Rect_Mesh extends Rect {
       }
    }
 
+   GfxUniformsEnable(flags, name, type, shader_flags) {
+
+      super.EnableGfxUniforms(flags, name, type, shader_flags);
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) child.EnableGfxUniforms(flags, name, type, shader_flags);
+      }
+
+   }
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+
+      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      }
+   }
 
 
    /*******************************************************************************************************************************************************/
@@ -391,4 +409,5 @@ export class Rect_Mesh extends Rect {
          }
       }
    }
+
 }

@@ -9,7 +9,7 @@ import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } f
 import { Floor } from "../../Helpers/Math/MathOperations.js";
 import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
+import { Uniforms_buffer_set_uniform, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
 import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBufferFillOps.js";
 
 
@@ -26,7 +26,7 @@ const DISABLE_DEBUG = true;
 
 
 
-export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx, uniforms) {
+export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx) {
 
     /***********************************************************************************************/
     // Create VAO
@@ -44,7 +44,7 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
     const attribsidx = Program_get_shader_attributes_index(progidx);
 
     // Create vertex buffer group
-    const vb_group = new Vertex_Buffer_Group(progidx, vaoidx, vao.vao, sid, uniforms);
+    const vb_group = new Vertex_Buffer_Group(progidx, vaoidx, vao.vao, sid);
 
     if (sid.inst) {
 
@@ -324,7 +324,7 @@ const _vertex_buffer_groups = New_generic_buffer(_, 'GFX Vertex Buffer Groups');
 
 class Vertex_Buffer_Group {
 
-    constructor(progidx, vaoidx, vao, sid, uniforms) {
+    constructor(progidx, vaoidx, vao, sid) {
 
         this.sid = sid;             // Bit field: Shader ID
         this.state = { mask: BUFFER_STATE.IS_ACTIVE };
@@ -343,7 +343,10 @@ class Vertex_Buffer_Group {
         
         this.vb_idxs = New_int8_buffer(_, 'NEW VertexBufferGroup-VBIDXS');
         
-        this.uniforms = uniforms;
+        // TODO: We probably need only the unif name and ubidx, not the whole uniforms. BUT if doing so, then on any uniform changes, we need to uupdate here too.
+        // this.uniforms = uniforms; // A refference to the mesh uniforms(stores from the first mesh to create the vertex buffer)
+        
+        
         // TODO: Create a more apropriate struct for uniform callbacks
         this.Unif_set_val_clbk = []; // Function to call for getting the uniform value.
         this.unif_set_val_clbk_params = []; // The params of the above function callback.
@@ -434,13 +437,16 @@ export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, para
     const len = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs.length;
     for(let i=0; i < len; i++){
         const ubidx1 = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
-        if(ubidx === ubidx1) return;
+        // if(ubidx === ubidx1) return;
+        console.error('Duplicate functions for ubidx:', ubidx, 'vb_groupidx', vb_groupidx, )
     }
 
     _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk.push(Clbk);
     _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params.push(params);
     _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs.push(ubidx);
 }
+
+
 
 export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
 
@@ -450,8 +456,11 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
         const params = _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[i];
         const val = _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk[i](params);
         const ubidx = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
+
+        const val_idx = params.val_idx;
     
-        Uniforms_buffer_set_uniform(ubidx, val)
+        // Uniforms_buffer_set_uniform(ubidx, val, val_idx)
+        Uniforms_buffer_set_uniform_val_from_index(ubidx, val, val_idx)
         Uniforms_buffer_update_uniform(ubidx)
         
     }
@@ -459,19 +468,18 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
 
 
 
+// export function Vertex_buffer_group_assign_uniform_index(vb_groupidx, unif_name, ubidx) {
 
-export function Vertex_buffer_group_assign_uniform_index(vb_groupidx, unif_name, ubidx) {
-
-	const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
-	const len = vb_group.uniforms.length;
-	for(let i=0; i < len; i++){
-		if(vb_group.uniforms[i].name === unif_name){
-			vb_group.uniforms[i].ubidx = ubidx;
-            console.log('<<<<<<<<<<<<<<<<<<<<<<<<<< ASIGN vbidx', vb_groupidx, ' ubidx:', ubidx, 'unif name:', vb_group.uniforms[i].name)
-			break;
-		}
-	}
-}
+// 	const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
+// 	const len = vb_group.uniforms.length;
+// 	for(let i=0; i < len; i++){
+// 		if(vb_group.uniforms[i].name === unif_name){
+// 			vb_group.uniforms[i].ubidx = ubidx;
+//             console.log('<<<<<<<<<<<<<<<<<<<<<<<<<< ASIGN vbidx', vb_groupidx, ' ubidx:', ubidx, 'unif name:', vb_group.uniforms[i].name)
+// 			break;
+// 		}
+// 	}
+// }
 
 
 

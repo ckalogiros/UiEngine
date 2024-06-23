@@ -144,7 +144,10 @@ const SID = {
         TIME: BIT5 <<= 0x1,
         DIM2: BIT5 <<= 0x1,
         // WPOS4: BIT5 <<= 0x1,
+        SCALE2: BIT5 <<= 0x1,
         ROOT_WPOS2: BIT5 <<= 0x1,
+        UNIF_GLOW2: BIT5 <<= 0x1,
+        UNIF_SPEED: BIT5 <<= 0x1,
         COL4: BIT5 <<= 0x1,
 
     },
@@ -165,6 +168,7 @@ const SID = {
     // FX
     FX: {
         FS_GLOW: BIT6,
+        FS_NOISE: BIT6<<=0x1,
     },
     // FX: {
     //     FS_PARTICLES: BIT3,
@@ -211,7 +215,8 @@ const SID = {
             sid1.shad === sid2.shad &&
             attr1 === attr2 &&
             unif1 === unif2 && 
-            sid1.pass === sid2.pass
+            sid1.pass === sid2.pass &&
+            sid1.fx === sid2.fx
         ) {
             return true;
         }
@@ -220,12 +225,12 @@ const SID = {
     },
 
     Copy(dst, src){
-        dst.shad = 0;        dst.shad |= src.shad;
-        dst.attr = 0;        dst.attr |= src.attr;
-        dst.attr = 0;        dst.attr |= src.attr;
-        dst.unif = 0;        dst.unif |= src.unif;
-        dst.pass = 0;        dst.pass |= src.pass;
-        dst.gfx_group = 0;
+        dst.shad = 0x0;        dst.shad |= src.shad;
+        dst.attr = 0x0;        dst.attr |= src.attr;
+        dst.attr = 0x0;        dst.attr |= src.attr;
+        dst.unif = 0x0;        dst.unif |= src.unif;
+        dst.pass = 0x0;        dst.pass |= src.pass;
+        dst.gfx_group = 0x0;
     },
 
     ToString(sid){
@@ -404,6 +409,7 @@ const MESH_ENABLE = {
         ATTR_COL4_PER_VERTEX: _CNT <<= 1,
         
         FX_GLOW: _CNT <<= 1,
+        FX_NOISE: _CNT <<= 1,
 
         // Pass from vertex to fragment shader
         PASS_COL4: _CNT <<= 1,

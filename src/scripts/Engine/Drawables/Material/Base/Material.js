@@ -112,8 +112,6 @@ export class FontMaterial extends Material {
       math.CopyArr2(this.sdf_params, sdf_params);
       this.texidx = texidx;
       
-      this.sid.shad &= ~SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X
-      this.sid.shad |= SID.SHAD.PRE_MULTIPLIED_ALPHA; // E
       this.sid.attr |= SID.ATTR.TEX2 | SID.ATTR.MSDF; // 
       this.type |= MESH_TYPE.FONT_MATERIAL;
 

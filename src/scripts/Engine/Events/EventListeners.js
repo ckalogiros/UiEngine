@@ -674,8 +674,7 @@ function Check_child_events_recursive(view_children, point) {
                   
                   // Get the the event (which has all the event data) from the listeners storage buffer
                   const e = _listeners_buffer_storage.buffer[E.C].buffer[ret.idx];
-if(!e.Clbk)
-console.log(e.Clbk)
+
    
                   // Because its a recursive procedure, when the mesh is found we must return it recursively immidiately after the return of the each recursion.
                   if (ret && e.Clbk) return ret; // I has Callback then it is not a FAKE event, so its ok to return the event

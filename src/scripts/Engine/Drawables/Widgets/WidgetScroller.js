@@ -5,7 +5,7 @@ import { MouseGetPos, MouseGetPosDif, MouseGetPosDifY } from "../../Controls/Inp
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Vertex_buffer_group_get_byidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Widget_root_add_mesh, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
+import { Widget_root_add_mesh, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { BLUEL, GREY } from "../Material/Base/Colors.js";
@@ -264,12 +264,17 @@ export class Widget_Scroller extends Section {
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-      this.scroll_bar.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+      
+      // Call for each root mesh in every vertex buffer
+      Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
 
-      const handle = this.scroll_bar.children.buffer[0];
-      handle.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-      this.scrolled_section.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+      // this.scroll_bar.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+
+      // const handle = this.scroll_bar.children.buffer[0];
+      // handle.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+
+      // this.scrolled_section.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
    }
 

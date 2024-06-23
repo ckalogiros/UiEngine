@@ -106,6 +106,10 @@ export class Mesh {
     nameidx; // Index to Str buffer:
 
 
+    // Array: A way to render a larger area in order to have space for rendering effects. The mesh dim remains the initial one.
+    gfx_scale; // The logic is to pass scaled dimentions to the vertex buffer, while keeping meshes original dimentions, and scale down at the fragment shader.
+
+
     temp_align;
 
 
@@ -182,6 +186,10 @@ export class Mesh {
         this.hover_margin = [0, 0];
         this.styles = Styles_create();
         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]]; // TODO: do the same for the clamx too
+
+
+        this.gfx_scale = [1, 1];
+        // this.EnableGfxUniforms({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
 
         this.menu_options_idx = INT_NULL;
@@ -625,16 +633,8 @@ export class Mesh {
                 }
                 break;
             }
-            case MESH_ENABLE.GFX.ATTR_TIME: {
-
-                this.sid.attr |= SID.ATTR.TIME;
-                break;
-            }
-            case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
-
-                this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-                break;
-            }
+            case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; break; }
+            case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; break; }
             case MESH_ENABLE.GFX.ATTR_DIM2: {
 
                 this.sid.attr |= SID.ATTR.DIM2;
@@ -646,9 +646,9 @@ export class Mesh {
             case MESH_ENABLE.GFX.PASS_DIM2: { this.sid.pass |= SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
             case MESH_ENABLE.GFX.PASS_TIME1: { this.sid.pass |= SID.PASS.TIME1; break; }
-            case MESH_ENABLE.GFX.FX_GLOW: { // Effects
-                this.sid.fx |= SID.FX.FS_GLOW; break; 
-             }
+            // Effect Shaders
+            case MESH_ENABLE.GFX.FX_GLOW: { this.sid.fx |= SID.FX.FS_GLOW; break; }
+            case MESH_ENABLE.GFX.FX_NOISE: { this.sid.fx |= SID.FX.FS_NOISE; break; }
 
             default: console.error('Enable material\'s shader param failed. @ Material.js');
         }
@@ -682,6 +682,7 @@ export class Mesh {
 
         if(flags.unif) this.sid.unif |= flags.unif;
         if(flags.pass) this.sid.pass |= flags.pass;
+        if(flags.fx) this.sid.fx |= flags.fx;
 
         // Avoid duplicates
         const len = this.uniforms.length;
@@ -721,6 +722,11 @@ export class Mesh {
 
         if (found_idx !== INT_NULL) {
 
+            if(this.uniforms[found_idx].ubidx === INT_NULL){
+
+                console.error('ubidx is INT_NULL. SEE if the uniform of this mesh has already been initialized for the vertex buffer.');
+                return;
+            }
             Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
             return;
         }

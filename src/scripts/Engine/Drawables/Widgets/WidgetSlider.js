@@ -6,13 +6,12 @@ import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/Tim
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { AddArr2, Min } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } from '../../Core/CreateWidget.js';
-import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Widget_root_add_mesh, Widget_root_batch_get_all_roots_by_vertex_buffer, Widget_root_buffer_get_byidx, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_create_root, Widget_root_gfx_get, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from '../../Core/MeshBuffer.js';
+import { Widget_root_add_mesh, Widget_root_create_root, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { GREY, WHITE } from '../Material/Base/Colors.js';
 import { Find_parent_listen_event } from '../Operations/Recursions.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
-import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_value_from_callback } from '../../../Graphics/Buffers/UniformBuffers.js';
 
 
 
@@ -27,7 +26,6 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, _, _, _, num_faces, is_debug_mesh);
       
 
-      // this.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER | MESH_TYPE.WIDGET_SLIDER_BAR | this.geom | this.mat;
       
@@ -41,25 +39,18 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       
       this.slider_val = 0;
 
+
       const handle = Create_rect_mesh(_,[0, pos[1]-handle_dim[1]+dim[1], pos[2]+1], handle_dim, col, _, _, _, 1, is_debug_mesh);
-
-      // handle.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
-
 
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 1.5]);
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
-      // HACK:
-      // FIXME: Handle should check if the tree mesh belongs to a vb with COL4 per vertex buffer
-      // if(this.parent && this.parent.sid.attr & SID.ATTR.COL4_PER_VERTEX)
-      // handle.mat.col = [handle.mat.col, handle.mat.col, handle.mat.col, handle.mat.col]
-
 
       // Make the vertical area of the bar larger for hover and handle moving.
-      this.hover_margin = [0, handle.geom.dim[1] + 4];
+      // this.hover_margin = [0, handle.geom.dim[1] + 4];
+      this.StylesSetHoverMargin([0, handle.geom.dim[1] + 4]);
 
 
       this.AddChild(handle)
@@ -73,6 +64,8 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
       handle.SetName('Slider handle');
       this.SetName('Slider Bar');
+
+      this.SetInitialValue(50)
 
       // It is enabled by the user, when a uniform is created for passing slider value to shaders
       // this.slider_val_unif_ubidx = INT_NULL;
@@ -125,8 +118,8 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-      const handle = this.children.buffer[0];
-      handle.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+      // const handle = this.children.buffer[0];
+      // handle.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
    }
 
 
@@ -263,36 +256,43 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    OnClick(params) {
 
       const bar = params.evt_params.target_mesh;
-      const point = MouseGetPos();
 
-      // Check if the click happened on bar for slide event
-      if (point[1] > bar.GetPosY() - bar.hover_margin[1]) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
+      STATE.mesh.SetClicked(bar);
 
-         STATE.mesh.SetClicked(bar);
+      if ((bar.type & MESH_TYPE.WIDGET_SLIDER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
-         if ((bar.type & MESH_TYPE.WIDGET_SLIDER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
+         // Assign apropriate callback based on the sliders axis Vertical/Horizontal
+         if(bar.geom.dim[0] > bar.geom.dim[1]){
 
-            // Assign apropriate callback based on the sliders axis Vertical/Horizontal
-            if(bar.geom.dim[0] > bar.geom.dim[1]){
+            const idx = TimeIntervalsCreate(10, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_horizontal_on_update_handle, bar);
+            bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+         }
+         else {
 
-               const idx = TimeIntervalsCreate(10, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_horizontal_on_update_handle, bar);
-               bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
-            }
-            else {
-
-               const idx = TimeIntervalsCreate(10, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_vertical_on_update_handle, bar);
-               bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
-            }
-
-            STATE.mesh.SetGrabed(bar);
-            STATE.mesh.SetFocused(bar);
-            bar.state.mask |= MESH_STATE.IN_FOCUS;
-            bar.state.mask |= MESH_STATE.IN_GRAB;
-            
-            Widget_root_set_in_focus(bar.root_bufferidx);
+            const idx = TimeIntervalsCreate(10, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_vertical_on_update_handle, bar);
+            bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
          }
 
-         return true;
+         STATE.mesh.SetGrabed(bar);
+         STATE.mesh.SetFocused(bar);
+         bar.state.mask |= MESH_STATE.IN_FOCUS;
+         bar.state.mask |= MESH_STATE.IN_GRAB;
+         
+         Widget_root_set_in_focus(bar.root_bufferidx);
+      }
+
+      return true;
+
+   }
+
+
+   SetPosXNoGfxUpdate(x) {
+      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+         Mesh_unif_set_vb_root_wposy(this.root_posidx, x);
+      }
+      else {
+         this.geom.pos[0] = x;
+         this.children.buffer[0].geom.pos[0] = x;
       }
 
    }
@@ -327,6 +327,30 @@ export class Widget_Slider_Simple extends Rect_Mesh {
          handle.geom.pos[1] = (this.geom.pos[1] + this.geom.dim[1])- handle.geom.dim[1];;
       }
    }
+
+   
+
+   MoveNoGfxUpdate(x, y) {
+
+      this.geom.pos[0] += x;
+      this.geom.pos[1] += y;
+      this.children.buffer[0].geom.pos[0] += x;
+      this.children.buffer[0].geom.pos[1] += y;
+   }
+   
+   
+   MoveYNoGfxUpdate(y) {
+      
+      this.geom.pos[1] += y;
+      this.children.buffer[0].geom.pos[1] += y;
+   }
+   
+   
+   MoveXNoGfxUpdate(x) {
+      
+      this.geom.pos[0] += x;
+      this.children.buffer[0].geom.pos[0] += x;
+   }
    
 
 
@@ -339,21 +363,18 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    /****************************************************************************************************************************************************/
 
    
-   // Bind(EventClbk=null, targetBindingFunctions=_, params, click_flags) {
+   /** Input values: from:0 to:100 */
+   SetInitialValue(val){
+      if(this.geom.dim[0] > this.geom.dim[1]){
 
-   //    if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
-      
-   //    // this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-   //    this.evt_params = { // Create the parameters to pass for the button's click event. 
-   //       EventClbk: EventClbk,
-   //       targetBindingFunctions: targetBindingFunctions,
-   //       target_mesh: this,
-   //       params: params,
-   //    };
-
-   //    if(click_flags) this.state.mask |= click_flags;
-
-   // }
+         const pos = ((this.geom.dim[0]*2)/100)*val;
+         this.children.buffer[0].geom.pos[0] = pos;
+         this.slider_val = (1/100)*val;
+      }
+      else {
+         alert('IMPLEMENT: Slider.SetInitialValue() for vertical sliders')
+      }
+   }
 }
 
 
@@ -428,9 +449,6 @@ function Slider_vertical_calculate_value(bar, handle) {
    // Interpolate pos to 0-1 
    const percentage = 1 - (y / bar_length); // Calc the percentage 
    
-   // console.log('ratio', percentage, y, barheight);
-   // console.log('y', y);
-
    return percentage;
 }
 
@@ -470,8 +488,8 @@ export function Slider_horizontal_on_update_handle(_params) {
    }
 
    /**
-    * Dispatch all callbacks for all targets, that are
-    * stored in eventCallbacks[] buffer.  
+    * Dispatch all callbacks for all targets, that are stored in eventCallbacks[] buffer.
+    * E.x. Slider binding callback on slider value change.
     */
    if (bar.eventCallbacks) {
       for (let i = 0; i <= bar.eventCallbacks.boundary; i++) {
@@ -484,19 +502,6 @@ export function Slider_horizontal_on_update_handle(_params) {
          }
       }
    }
-
-   // TODO: Maybe we need a function to handle Widgets uniforms update callback for all widgets vbs
-   // TODO: How to check if : the widget has any uniform, and the uniform must be updated by this function
-   // const slider = bar.parent;
-   // const ubidx = Uniforms_buffer_find_ubidx_from_name('u_time', slider.gfx.prog.idx);
-   // if(ubidx !== INT_NULL)Uniforms_buffer_set_uniform_value_from_callback(ubidx)
-   
-   // const gfx = Widget_root_gfx_get(slider.root_bufferidx);
-   // for(let i=0; i <= gfx.boundary; i++){
-
-   //    const ubidx = Uniforms_buffer_find_ubidx_from_name('u_time', gfx.buffer[i]);
-   //    Uniforms_buffer_set_uniform_value_from_callback(ubidx)
-   // }
 
 }
 
@@ -557,7 +562,7 @@ export function Slider_vertical_on_update_handle(_params) {
 
 export function Slider_connect(slider, Clbk, clbk_params) {
 
-   const bar = slider;
+   const bar = slider.children.buffer[slider.bar_idx];
 
 
    const params = {
@@ -567,56 +572,6 @@ export function Slider_connect(slider, Clbk, clbk_params) {
 
    bar.CreateEventCallback(params);
 
-   /**OLD */
-   // export function Slider_connect(_params) {
-   //    /**
-   //          const evt_params = {
-   //          targetBindingFunctions: params.evt_params.targetBindingFunctions,
-   //          self_mesh: params.evt_params.clicked_mesh,
-   //          target_mesh: params.evt_params.target_mesh,
-   //          event_type: params.event_type,
-   //          clicked_mesh: mesh,
-   //       }
-   //     */
-   //    const sliderBar = _params.self_mesh.children.buffer[this.bar_idx];
-   //    const target = _params.target_mesh;
-   //    const Binding_function = _params.targetBindingFunctions;
-
-   //    /*FOR DEBUG*/const clicked_mesh = _params.clicked_mesh
-
-   //    // Check if the connection already exists
-   //    for (let i = 0; i < sliderBar.eventCallbacks.count; i++) {
-
-   //       if (sliderBar.eventCallbacks.buffer[i] !== null) {
-
-   //          var newTargetId = _params.target_mesh.id;
-   //          var existingTargetId = sliderBar.eventCallbacks.buffer[i].target.id;
-
-   //          // The connection already exists
-   //          if (newTargetId === existingTargetId) {
-
-   //             console.log('Disconnecting target:', sliderBar.eventCallbacks.buffer[i].target.GetName(), ' clicked:', STATE.mesh.clickedId);
-   //             // /*FOR DEBUG*/Set_color_rgba(clicked_mesh, REDL[7]);
-
-   //             // Disconnect
-   //             sliderBar.eventCallbacks.RemoveByIdx(i);
-   //             return;
-   //          }
-   //       }
-
-   //    }
-
-   //    // console.log('Connecting target:', target.GetName(), ' clicked:', STATE.mesh.clickedId);
-   //    // /*FOR DEBUG*/Set_color_rgba(clicked_mesh, GREEN);
-
-   //    const params = {
-   //       target: target,
-   //       Clbk: Binding_function,
-   //    }
-   //    // sliderBar.eventCallbacks.Add(params);
-   //    sliderBar.CreateEventCallback(params);
-
-   // }
 }
 
 
@@ -674,7 +629,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    value_text_idx; // Slider's value text mesh index in children buffer
    bar_idx; // Slider's bar and handle mesh index in children buffer
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col = TRANSPARENCY(GREY[0], .6), hover_margin = [0, 0], is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col = TRANSPARENCY(GREY[0], .6), hover_margin = [14, 14], name='SLIDER UNAMED', is_debug_mesh) {
 
       // Calculate the bar's and handle's horizontal pading.
       const ratio = dim[0] / dim[1];
@@ -691,7 +646,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
-      const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, 'Slider', pos, fontSize, WHITE, .4, is_debug_mesh);
+      const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, name, pos, fontSize, WHITE, .4, is_debug_mesh);
 
 
       /** Label area mesh */
@@ -712,8 +667,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Slider Bar: Bar is child of the slider mesh
-      // const bar = new Slider(mesh_bufferidx, _, [0, 40, 1], dim, GREY[0], hover_margin, is_debug_mesh);
-      // const bar = Create_widget_slider_simple(_, [0, 0, 1], [dim[0], 2], GREY[8], hover_margin, [10, 10], 1, is_debug_mesh);
       const bar = Create_widget_slider_simple(_, [0, dim[1]*4, _pos[2]+1], [dim[0], 2], GREY[8], hover_margin, [10, 10], 1, is_debug_mesh);
       
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -726,7 +679,9 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       // Make the vertical area of the bar larger for hover and handle moving.
-      bar.hover_margin = [-handle.geom.dim[1] , handle.geom.dim[1] ];
+      // bar.hover_margin = [-handle.geom.dim[1] , handle.geom.dim[1] ];
+      bar.StylesSetHoverMargin([handle.geom.dim[1] , handle.geom.dim[1]] );
+      bar.MoveYNoGfxUpdate(-handle.geom.dim[0])
 
 
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -845,7 +800,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       const bar = this.children.buffer[this.bar_idx];
       bar.GfxUniformsEnable(flags, name, type, shader_flags);
-
 
    }
 
@@ -1113,19 +1067,11 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    OnClick(params) {
 
       const mesh = params.evt_params.target_mesh;
-      const point = MouseGetPos();
-
-      // Check if the click happened on bar for slide event
       const bar = mesh.children.buffer[mesh.bar_idx];
-      const sliderypos = mesh.geom.pos[1] - mesh.geom.dim[1]
-
-      // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
-      if (point[1] > bar.GetPosY() - bar.hover_margin[1] && 
-          point[1] < bar.GetPosY() + bar.geom.dim[1]*2 +bar.hover_margin[1]) { 
-      // if (point[1] > bar.GetPosY() - bar.hover_margin[1]) { // TODO!!! The only thing currently that seperates handle-move from widget-move is the fact that this if fails for 'hover_margin=0'. Create a more apropriate check.
-
-         // console.log('mouse', point[1], 'bar ypos', bar.geom.pos[1] * 2, 'hover margin', bar.hover_margin[1], bar.geom.pos[1] * 2 + sliderypos, bar.GetPosY())
-
+      
+      
+      // Check if the clicked mesh index is the bars...
+      if(params.meshidx === bar.mesh_bufferidx){
 
          STATE.mesh.SetClicked(bar);
 
@@ -1144,9 +1090,10 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
          return true;
       }
-      else { // Else Move Widget Slider 
+      else { // Else the clicked mesh is the slider
 
-         STATE.mesh.SetClicked(bar);
+         // STATE.mesh.SetClicked(bar);
+         STATE.mesh.SetClicked(mesh);
 
          if ((mesh.type & MESH_TYPE.WIDGET_SLIDER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
@@ -1491,28 +1438,40 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    // UNIQUE METHODS
    /****************************************************************************************************************************************************/
 
-   // SliderConnect(EventClbk, targetBindingFunctions, params, click_flags) {
    SliderConnect(Clbk, clbk_params) {
    
       const bar = this.children.buffer[this.bar_idx];
       Slider_connect(bar, Clbk, clbk_params);
    }
-   
-   // SliderGetSliderVal(){
+
+   SetInitialValue(val){
       
-   //    const bar = this.children.buffer[this.bar_idx];
-   //    return bar.slider_val;
-   // }
+      const bar = this.children.buffer[this.bar_idx];
+      bar.SetInitialValue(val);
+   }
+   
 }
    
 
 export function Slider_get_slider_val(params){
-      
-   // const slider = params.params;
-   const slider = params;
-   const bar = slider.children.buffer[slider.bar_idx];
-   // return [bar.slider_val+.5, 2.];
-   return bar.slider_val;
+   
+const slider = params.slider;
+const bar = slider.children.buffer[slider.bar_idx];
+
+
+const start = params.start_val ;
+const max = params.max;
+
+const res = bar.slider_val+start;
+
+return (res < max) ? res : max;
 }
+// export function Slider_get_slider_val(slider, ratio=1, start_val=0){
+      
+//    const slider = params.slider;
+//    const bar = slider.children.buffer[slider.bar_idx];
+
+//    return (bar.slider_val+start_val) * ratio;
+// }
 
 

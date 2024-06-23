@@ -25,7 +25,7 @@ export function Timer_reset_global_timer(){ g_timer_linear = 0.0; }
 
 
 let g_timer_cycle_upper_limit = .99;
-let g_timer_cycle_lower_limit = .1;
+let g_timer_cycle_lower_limit = .01;
 let g_timer_cycle = g_timer_cycle_lower_limit;
 let g_timer_cycle_rate = 0.01;
 

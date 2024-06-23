@@ -140,7 +140,8 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      // super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      super.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
    }
 
    

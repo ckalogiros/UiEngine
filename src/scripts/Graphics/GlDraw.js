@@ -4,7 +4,6 @@ import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniform } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
-import { Uniforms_buffer_update_uniform } from './Buffers/UniformBuffers.js';
 
 
 
@@ -46,28 +45,14 @@ export function Gl_draw(gl) {
         }
 
         // Uniforms - wpos per vertex buffer uniform
-        // const vb_info = Vertex_buffer_group_get_byidx(vb_groupidx);
-        // const uniforms = vb_info.uniforms;
-        // const unif_len = uniforms.length;
+        // const unif_len = progs.buffer[progidx].uniforms.length;
         // for(let k=0; k < unif_len; k++){
             
-        //     // const ubidx = progs.buffer[progidx].ubidxs.buffer[k];
-        //     const ubidx = uniforms[k].ubidx;
-        //     if(ubidx !== INT_NULL) 
-        //         Uniforms_buffer_update_uniform(ubidx)
-        //     // Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
+        //     // if(ubidx !== INT_NULL) 
+        //     // TODO: Runs function call for every uniform, event the uniform block.
+        //     Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
         // }
-
-
-        // Uniforms - wpos per vertex buffer uniform
-        const unif_len = progs.buffer[progidx].uniforms.length;
-        // for(let k=0; k <= progs.buffer[progidx].ubidxs.boundary; k++){
-        for(let k=0; k < unif_len; k++){
-            
-            // if(ubidx !== INT_NULL) 
-            // TODO: Runs function call for every uniform, event the uniform block.
-            Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
-        }
+        Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
 
 
 
