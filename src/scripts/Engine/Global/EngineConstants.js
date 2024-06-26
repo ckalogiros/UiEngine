@@ -678,7 +678,9 @@ const MAT_ENABLE = {
 
 
 function TRANSPARENCY(col, transparency) {
-	return [col[0], col[1], col[2], transparency]
+	// return [col[0], col[1], col[2], transparency]
+	col[3] = transparency;
+	return col;
 }
 
 

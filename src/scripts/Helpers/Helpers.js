@@ -1,5 +1,5 @@
 "use strict";
-import { COLOR_ARRAY, COLOR_ARRAY2, COLOR_ARRAY3 } from "../Engine/Drawables/Material/Base/Colors.js";
+import { COLOR_ARRAY3 } from "../Engine/Drawables/Material/Base/Colors.js";
 import { MapLinear } from "./Math/MathOperations.js";
 
 
@@ -241,3 +241,5 @@ export function SizeOfObject( object ) {
     }
     return bytes;
 }
+
+

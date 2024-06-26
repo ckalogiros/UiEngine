@@ -112,6 +112,7 @@ export function CopyArr(dst, src){
         console.error('src is null. @ MathOperations.js');
         return null;
     }
+    if(src[0] && src[0].constructor === Float32Array) alert('4478932')
     
     const len = src.length;
     let out = new Array(len);
@@ -235,6 +236,11 @@ export function InterpolateToRange01(value, max) {
 }
 
 
+export function Hash(a) {
+    let x = Math.sin(a) * 43758.5453123;
+    return (x - Math.trunc(x));
+}
+
 export function Hash11(seed){
 
     let x = Math.sin(seed*19287.8873)*28715.715; 
@@ -314,26 +320,26 @@ export function Smootherstep( x, min, max ) {
 }
 
 
-export function Mix_vec4( vec1, vec2, ratio ) {
+export function Mix_vec4_float32Array( vec1, vec2, ratio ) {
 
-    const res = [
+    const res = new Float32Array([
         Lerp(vec1[0], vec2[0], ratio),
         Lerp(vec1[1], vec2[1], ratio),
         Lerp(vec1[2], vec2[2], ratio),
         Lerp(vec1[3], vec2[3], ratio),
-    ];
+    ]);
 
 	return res;
 }
 
 
-export function Mix_vec3( vec1, vec2, ratio ) {
+export function Mix_vec3_float32Array( vec1, vec2, ratio ) {
 
-    const res = [
+    const res = new Float32Array([
         Lerp(vec1[0], vec2[0], ratio),
         Lerp(vec1[1], vec2[1], ratio),
         Lerp(vec1[2], vec2[2], ratio),
-    ];
+    ]);
 
 	return res;
 }

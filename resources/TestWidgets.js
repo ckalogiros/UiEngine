@@ -54,9 +54,6 @@ import { Set_color_rgb } from '../Engine/Drawables/Operations/MeshAttributesFunc
  * 3. Because we want to have a 'clean' 'GenerateGfxContext()', passing specific index for generating buffers,
  *      the only place to analyze the GFX_CTX_FLAGS is the GenGfxCtx method of each widget.
  * 
- * 4. Implement the switch's widget click listener to b automatic from the class.  
- *
- * reorganize the functions in GlVuffers.js 
  */
 
 const _fontsize = 10;

@@ -4,6 +4,8 @@ import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniform } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
+import { Hash } from '../Helpers/Math/MathOperations.js';
+import { TimerGetGlobalTimerCycle } from '../Engine/Timers/Timers.js';
 
 
 
@@ -12,6 +14,8 @@ export function Gl_draw(gl) {
 
     const drawQueue = Renderqueue_get_active();
     const drawQueueCount = Renderqueue_active_get_count();
+
+    // console.log(Hash(TimerGetGlobalTimerCycle()).toFixed(1))
 
 
     gl.clearColor(0.18, 0.18, 0.18, 1.0);

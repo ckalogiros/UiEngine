@@ -1346,7 +1346,8 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
          }
          else if (mesh.type & MESH_TYPE.WIDGET_SLIDER) {
 
-            mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
+            // mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
+            mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
             continue_recur = false;
          }
          else if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {

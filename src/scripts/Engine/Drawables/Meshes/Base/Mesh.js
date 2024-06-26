@@ -9,7 +9,7 @@ import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from ".
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_create, Styles_remove_byidx, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy, Screen_wpos_get, Screen_wpos_get_x, Screen_wpos_get_y } from "../../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy, Screen_wpos_get_y } from "../../../Core/MeshUniformsBuffer.js";
 import { Vertex_buffer_set_uniform_value_callback } from "../../../../Graphics/Buffers/VertexBuffers.js";
 
 
@@ -532,12 +532,9 @@ export class Mesh {
 
     GetPosXY() {
 
-        // const screen_wpos = Screen_wpos_get();
         const p = Mesh_unif_get_vb_root_wpos(this.root_posidx);
         let pos = [p[0], p[1], 0];
 
-        // pos[0] += this.geom.pos[0] + screen_wpos[0];
-        // pos[1] += this.geom.pos[1] + screen_wpos[1];
         pos[0] += this.geom.pos[0];
         pos[1] += this.geom.pos[1];
         return pos;
@@ -734,6 +731,11 @@ export class Mesh {
         alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js')
 
     }
+
+
+    // ReserveUnifWpos(){
+
+    // }
 
 }
 

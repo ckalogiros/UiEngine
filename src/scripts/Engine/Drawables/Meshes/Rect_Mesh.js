@@ -264,23 +264,18 @@ export class Rect_Mesh extends Rect {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS,
       pos = [0, 0, 0], dim = [10, 10],
-      col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED',
+      col = TRANSPARENCY(BLUEL[6], .6), name = 'Rect_Mesh UNNAMED',
       style = [10, 6, 2.], pad = [4, 4], num_faces = 1, is_debug_mesh) {
    
       super(pos, dim, col, num_faces, is_debug_mesh);
-
-      const unif = {
-         name: 'u_wposxy',
-         type: UNIF_TYPE.FVEC2,
-         which_shader: UNIFORM.IN_VS,
-      };
 
       this.sid.unif |= SID.UNIF.ROOT_WPOS2
       this.sid.pass |= SID.PASS.WPOS2
 
       this.mesh_bufferidx = mesh_bufferidx;
 
-      this.SetStyle(style)
+      this.SetStyle(style);
+      this.SetName(`[${this.mesh_bufferidx}]{${name}}-RECT_MESH`);
 
    }
 

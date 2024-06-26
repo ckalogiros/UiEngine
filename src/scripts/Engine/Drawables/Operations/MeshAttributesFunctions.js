@@ -3,7 +3,7 @@
 
 
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../../../Graphics/Buffers/UniformBuffers.js';
-import { Gl_set_rgba } from '../../../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_alpha, Gl_set_rgba } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
 
 

@@ -2,10 +2,10 @@
 
 import { CLBK_TIMER } from "../../App/TestWidgets.js";
 import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_particles_batch_set_col4_wpos4_pos2_style3 } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_update_vertices } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Gl_particles_batch_set_col4_wpos4_pos2, Gl_particles_batch_set_col4_wpos4_pos2_style3 } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
-import { Abs, Max } from "../../Helpers/Math/MathOperations.js";
+import { Abs, Hash, Max } from "../../Helpers/Math/MathOperations.js";
 import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../Core/StringBuffer.js";
@@ -41,13 +41,17 @@ const dir_factor = .6
 
 
 
-let yy = .1
+let yy = 0.
 // let speed = .01;
-const speed = 8;
-let accel = 6.;
+const speed = 4;
+let accel = 2.;
+// let deccel = .98;
+// let deccel = .7;
 let deccel = .98;
 // let gravity = 1.03;
-let gravity = 1.;
+let gravity = -.1;
+// let gravity = -1.1;
+// let gravity = 0.5;
 
 const speed_ratio = .01
 
@@ -70,8 +74,8 @@ class Particle {
       this.is_alive = false;
 
       // this.t = 0;
-      this.accel = accel;
-      this.grav = yy;
+      this.accel = emitter.accel;
+      this.grav = emitter.gravity;
 
 
       // Emitter variables
@@ -83,6 +87,8 @@ class Particle {
       
       // Copy the position of the emitter
       this.time = 0;
+      // this.time = Hash(Timer_get_global_timer());;
+      this.random_val = Hash(Timer_get_global_timer()); // This parameter is only for the Fragment Shader 
       this.pos[0] = emitter.pos[0];
       this.pos[1] = emitter.pos[1];
       this.pos[2] = emitter.pos[2];
@@ -97,10 +103,6 @@ class Particle {
       this.col[3] = emitter.col[3];
 
       if(emitter.flags & PARTICLES.HAS_START_POS_VARIATION){
-
-         
-         // this.dirx *= emitter.dir[0];
-         // this.diry *= emitter.dir[1];
 
          const minx = emitter.variation_emission.xdir_neg * max
          const maxx = emitter.variation_emission.xdir_pos * max
@@ -129,16 +131,26 @@ class Particle {
 
 class Emitter {
 
-   constructor(col, pos, dim, t_step=.1, life_time, name) {
+   constructor(name, col, pos, dim, t_step=.1, life_time, accel=1, deccel=0, gravity=0, max_speed=2) {
 
-      this.col = col; // a uniform color for the gfx
+      this.col = new Float32Array(col); // a uniform color for the gfx
       this.pos = [pos[0], pos[1], pos[2]];
       this.dim = dim;
       this.dir = [0, 0];
       this.t_step = t_step;
       this.life_time = life_time;
       this.speed = speed;
+
+      this.parent = null;
       
+      // For smoke effect
+      // this.accel = 2.;
+      // this.deccel = .98;
+      // this.gravity = -.1;
+      this.accel = accel;
+      this.max_speed = max_speed;
+      this.deccel = deccel;
+      this.gravity = gravity;
       
       this.sid = 0x0;
       this.sceneidx = STATE.scene.active_idx;
@@ -147,6 +159,8 @@ class Emitter {
       this.type = MESH_TYPE.PARTICLES;
       this.idx = INT_NULL;
       this.nameidx = Str_buffer_mesh_names_store(name);
+
+      this.UpdateGfxBuffersFn = null; // Function pointer to update the vertex buffer of the particle system
 
       // Set the cone of variation vector direction. Diagonals are -.5 and +.5 
       this.variation_emission = {
@@ -163,16 +177,12 @@ class Emitter {
       this.sid = {
          shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4 | SID.ATTR.DIM2,
-         // attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4,
          unif: 0x0,
-         pass: SID.PASS.COL4,
-         fx: SID.FX.FS_GLOW,
+         pass: SID.PASS.COL4|SID.PASS.DIM2,
+         fx: 0x0,
       };
 
       this.style = [0, Max(dim[0], dim[1]), 1.5]
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
-
 
 
       this.uniforms = [];
@@ -181,43 +191,15 @@ class Emitter {
 
       this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       this.EnableGfxUniforms({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      this.EnableGfxUniforms({unif:SID.UNIF.UNIF_GLOW2}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-      this.EnableGfxUniforms({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
 
-      // this.SetConeOfDirection(1, 1, -.5, .5)
-      // this.SetConeOfDirection(-1, 1, -1, 1)
-      // this.SetConeOfDirection(0, 1, 0, 1); // Default
+
    }
 
 
+
+
    ParticleAddToGfx(particle_idx) {
-
-      const prev = this.particles_buffer.buffer[particle_idx-1];
-      // if(prev){
-
-      //    if(Abs(prev.pos[0]) - Abs(this.particles_buffer.buffer[particle_idx].pos[0]) > 40. ||
-      //       Abs(prev.pos[1]) - Abs(this.particles_buffer.buffer[particle_idx].pos[1]) > 40.
-      //    ){
-
-      //       console.log('idx', particle_idx, this.particles_buffer.buffer[particle_idx].pos[0])
-      //       const geom = {
-      //          pos: this.particles_buffer.buffer[particle_idx].pos,
-      //          dim: this.particles_buffer.buffer[particle_idx].dim,
-      //          time: this.particles_buffer.buffer[particle_idx].time,
-      //       }
-      
-      //       const mat = {
-      //          col: this.particles_buffer.buffer[particle_idx].col,
-      //          style: this.style,
-      //       };
-      
-      
-      
-      //       const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, mat, _);
-      //       this.particles_buffer.buffer[particle_idx].SetGfxStart(start);
-      //    }
-      // }
 
       // Must create geom struct to pass to the GlAdd...() fuunction
       const geom = {
@@ -240,11 +222,13 @@ class Emitter {
       return start;
    }
 
+
    SetDir(xdir=0, ydir=0){
 
       if(xdir!==0) this.dir[0] = GetSign(xdir);
       if(ydir!==0) this.dir[1] = GetSign(ydir);
    }
+
 
    SetConeOfDirection(xdir_pos, xdir_neg, ydir_pos, ydir_neg){
 
@@ -289,13 +273,14 @@ class Emitter {
          // Effect Shaders
          case MESH_ENABLE.GFX.FX_GLOW: { this.sid.fx |= SID.FX.FS_GLOW; break; }
          case MESH_ENABLE.GFX.FX_NOISE: { this.sid.fx |= SID.FX.FS_NOISE; break; }
+         case MESH_ENABLE.GFX.FX_SMOKE: { this.sid.fx |= SID.FX.FS_SMOKE; break; }
 
          default: console.error('Enable material\'s shader param failed. @ Material.js');
      }
    }
 
 
-   EnableGfxUniforms(flags, name, type, shader_flags) {
+   EnableGfxUniforms(flags=0x0, name, type, shader_flags) {
 
       if (this.alreadyAdded === true) {
          console.error(`You are trying to enable ${which} but the shaders have been already created. Try Enable() before inserting the mesh to a Scene().`);
@@ -373,6 +358,7 @@ class Emitter {
    GetName() {
       return Str_buffer_mesh_names_get_by_idx(this.nameidx);
    }
+
 }
 
 const _emitters = New_generic_buffer(_, 'Particle System: Emitter buffer');
@@ -384,10 +370,50 @@ export function Particles_get_particle_system(idx){
 
 
 
-// TODO: pass an already created sid, for selecting from a gama of shader particles
-export function Particle_system_create_emitter(col, pos, dim, t_step, life_time, name) {
+/**
+ * 
+ * @param {*} emitteridx 
+ * @param {*} unif_name 
+ * @param {*} Clbk 
+ * @param {*} clbk_params : These are the parameters for the callback function
+ * @param {*} val_idx : The index of the uniform element to access. E.x. If uniform is vec3, then an index of 0 will access the first element
+ * @param {*} start_val : Set a start value from which the changes(from a slider) will take effect
+ * @param {*} max : Set the maximum value that the uniform value will take
+ */
+export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clbk_params, val_idx=null, start_val=0, max=1) {
 
-   const emitter = new Emitter(col, pos, dim, t_step, life_time, name);
+   const emitter = _emitters.buffer[emitteridx];
+   const params = {
+      slider:clbk_params, 
+      vb_grouidx:emitter.gfx.vb.groupidx,
+      val_idx:val_idx,
+      max:max,
+      start_val:start_val,
+   }
+   emitter.GfxUniformsSetClbk(unif_name, Clbk, params);
+}
+
+export function TEMP_PARTICLES_GEN_GFX(emitter, parent){
+
+   emitter.parent = parent;
+
+   const FLAGS = GFX_CTX_FLAGS.PRIVATE;
+   emitter.gfx = TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, _,);
+
+   emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
+
+      
+
+   // TODO: Temporary implementation of assigning the correct gfx update function pointer
+   if(emitter.sid.fx & SID.FX.FS_GLOW)
+      emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2_style3;
+   else emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2;
+}
+
+// TODO: pass an already created sid, for selecting from a gama of shader particles
+export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed) {
+
+   const emitter = new Emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed);
 
    const idx = _emitters.Add(emitter);
 
@@ -416,7 +442,6 @@ export function Particle_system_emitt(params) {
          particle.is_alive = true;
          // Push particle to the gfx buffers
          emitter.ParticleAddToGfx(particle_idx);
-         // console.log(particle)
       }
       else {
 
@@ -424,21 +449,19 @@ export function Particle_system_emitt(params) {
          const particle = emitter.particles_buffer.buffer[particle_idx];
          if (particle !== undefined) {
 
-            const prev = emitter.particles_buffer.buffer[particle_idx-1];
-            // if(prev){
-      
-            //    if(Abs(prev.pos[0]) - Abs(particle.pos[0]) > 10.)
-            //       console.log('idx', particle_idx, Abs(prev.pos[0]) - Abs(particle.pos[0]))
-            // }
-            // if(prev)console.log('idx', particle_idx, Abs(prev.pos[0]) - Abs(particle.pos[0]))
-
-
-
-
-
             particle.is_alive = true;
+            particle.random_val = Hash(Timer_get_global_timer());
+            particle.accel = emitter.accel;
+            particle.deccel = emitter.deccel;
+            particle.gravity = emitter.gravity;
+            // particle.time = Hash(Timer_get_global_timer());
             particle.pos[0] = emitter.pos[0];
             particle.pos[1] = emitter.pos[1];
+
+            particle.col[0] = emitter.col[0];
+            particle.col[1] = emitter.col[1];
+            particle.col[2] = emitter.col[2];
+            particle.col[3] = emitter.col[3];
 
 
             if(emitter.dir[0] !== 0 && GetSign(particle.dirx) !== emitter.dir[0]){
@@ -449,45 +472,23 @@ export function Particle_system_emitt(params) {
             if(emitter.dir[1] !== 0 && GetSign(particle.diry) !== emitter.dir[1]){
                particle.diry *=-1; 
                emitter.diry_change = false;
-
             }
 
+            if(emitter.flags & PARTICLES.HAS_START_POS_VARIATION){
 
-
-            
-            // if(prev){
-
-            //    if(Abs(prev.pos[0]) - Abs(particle.pos[0]) > 5. ||
-            //       Abs(prev.pos[1]) - Abs(particle.pos[1]) > 5.
-            //    ){
+               const minx = emitter.variation_emission.xdir_neg * max
+               const maxx = emitter.variation_emission.xdir_pos * max
+               const dx = GetRandomInt(minx, maxx);
+               particle.dirx = interpolate*dx;
+               
+               const miny = emitter.variation_emission.ydir_neg * max
+               const maxy = emitter.variation_emission.ydir_pos * max
+               const dy = GetRandomInt(miny, maxy);
+               particle.diry = interpolate*dy;
       
-                  // console.log('idx', particle_idx, emitter.particles_buffer.buffer[particle_idx].pos[0])
-                  // const geom = {
-                  //    pos: emitter.particles_buffer.buffer[particle_idx].pos,
-                  //    dim: emitter.particles_buffer.buffer[particle_idx].dim,
-                  //    time: emitter.particles_buffer.buffer[particle_idx].time,
-                  // }
-                  // geom.pos[0] += 10*particle.dirx;
-                  // geom.pos[1] += 10*particle.dirx;
-            
-                  // const mat = {
-                  //    col: emitter.particles_buffer.buffer[particle_idx].col,
-                  //    style: emitter.style,
-                  // };
-            
-            
-            
-                  // const start = Vertex_buffer_add_vertices_from_reset(emitter.gfx, geom, mat, _);
-                  // emitter.particles_buffer.buffer[particle_idx].SetGfxStart(start);
-            //    }
-            // }
-            
-            // console.log('emitter', emitter.dir)
-            // if(emitter.idx===1)
-            //    console.log('emitter', particle.diry)
+            }
             
             emitter.free_particles_idxs_buffer.RemoveByIdx(last_elem);
-            // console.log('USED ', 'idx', particle_idx, 'posx', emitter.particles_buffer.buffer[particle_idx].pos[0], 'start',emitter.particles_buffer.buffer[particle_idx].start)
          }
          else console.log('UNDEFINED')
       }
@@ -562,20 +563,37 @@ export function Particle_system_update() {
                // const y = GetRandomInt(-40, 40);
                // particle.pos[0] += (x)*.017;
                // particle.pos[1] += (y)*.017;
+               // const x = GetRandomInt(-2, 2);
+               // const y = GetRandomInt(-2, 2);
+               // particle.pos[0] += (x)*.6;
+               // particle.pos[1] += (y)*.09;
                
-               
-               // particle.pos[0] += speed * particle.accel * particle.dirx * 1.2;
-               // particle.pos[1] += speed * particle.accel * particle.diry * particle.grav * 1.0 ;
-               particle.pos[0] += emitter.speed * particle.dirx;
-               particle.pos[1] += emitter.speed * particle.diry;
-               
-               // particle.pos[1] += speed  * particle.diry * particle.grav;
-               if (particle.accel > 1) particle.accel *= deccel
-               particle.grav *= gravity;
-            }
+               const speed = emitter.speed * particle.accel;
+               particle.pos[0] += speed * particle.dirx;
+               particle.pos[1] += speed * particle.diry;
+               // particle.pos[0] += emitter.speed * particle.dirx;
 
+               particle.pos[1] += particle.grav* particle.accel;
+               particle.grav += emitter.gravity * emitter.deccel;
+               
+               // if (particle.accel > emitter.max_accel) {
+               if (speed > emitter.max_speed) {
+                  particle.accel *= emitter.deccel;
+                  // console.log('speed', speed,emitter.max_speed)
+               }
+            }
+            
             if(true){ // Fade away
-               particle.col[3] -= emitter.t_step*speed_ratio;
+               // const h=1.8, k=0, r=1.8*1.8; 
+               // const h=1, k=0, r=1; 
+               // const x = particle.time;
+               // let y = Math.sqrt((-(x-h)*(x-h)) + r) +k;
+               // y = 2 *(Math.sin((x*x*x)+Math.PI/2))-1;
+               // particle.col[3] -= emitter.t_step;
+               // particle.col[3] -= emitter.t_step*y;
+               // particle.col[3] *= y;
+               // if(i===0) console.log(y)
+               // if(i===0) console.log(particle.col[3])
             }
 
                // particle.pos[0] += speed * particle.accel * particle.dirx;
@@ -587,18 +605,23 @@ export function Particle_system_update() {
 
 
             // Updtate Gfx Buffers
-            Gl_particles_batch_set_col4_wpos4_pos2_style3(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.dim, particle.time);
+            // Must create geom struct to pass to the GlAdd...() fuunction
+
+            // Gl_particles_batch_set_col4_wpos4_pos2_style3(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time);
+            // Gl_particles_batch_set_col4_wpos4_pos2(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time);
+            emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time);
 
             // particle.time += .003;
             particle.time += emitter.t_step *speed_ratio;
+            
             // console.log(emitter.t_step)
             if (particle.time >= emitter.life_time) {
 
                // Reset particle for reuse
                particle.is_alive = false;
                particle.time = 0;
-               particle.accel = accel;
-               particle.grav = yy;
+               particle.accel = emitter.accel;
+               particle.grav = emitter.gravity;
                particle.pos[0] = 0
                particle.pos[1] = 0
                particle.col[3] = 1
@@ -618,35 +641,3 @@ export function Particle_system_update() {
 }
 
 
-// export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, slider) {
-export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clbk_params, val_idx=null, start_val=0, max=1) {
-
-   const emitter = _emitters.buffer[emitteridx];
-   const params = {
-      slider:clbk_params, 
-      vb_grouidx:emitter.gfx.vb.groupidx,
-      val_idx:val_idx,
-      max:max,
-      start_val:start_val,
-   }
-   emitter.GfxUniformsSetClbk(unif_name, Clbk, params);
-}
-
-export function TEMP_PARTICLES_GEN_GFX(emitter){
-
-   const FLAGS = GFX_CTX_FLAGS.PRIVATE;
-   emitter.gfx = TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, _,);
-
-   emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
-   
-   // emitter.GfxUniformsSetClbk('u_time', CLBK_TIMER, emitter.gfx.vb.groupidx);
-
-   const ubidx = Uniforms_buffer_find_ubidx_from_name('u_glow_params', emitter.gfx.prog.idx);
-   // Uniforms_buffer_set_uniform_val_from_index(ubidx, [.2, .9, .1]);
-   Uniforms_buffer_set_uniform_val_from_index(ubidx, [.0, .0, .04]);
-   Uniforms_buffer_update_uniform(ubidx);
-
-}
-export function TEMP_PARTICLES_UNIF_CLBK(params, val){
-   Uniforms_buffer_set_uniform_val_from_index(params.ubidx, val, params.val_idx)
-}

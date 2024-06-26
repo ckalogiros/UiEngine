@@ -6,6 +6,7 @@ import { frag_round_corners_call, frag_round_corners } from './Functions/fragmen
 import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './Functions/fragment.texture.js'
 import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
 import { frag_noise, frag_noise_call } from './Functions/fragment.noise.js';
+import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
 
 
 
@@ -227,15 +228,10 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
 
 
-      // (sid.pass & SID.PASS.WPOS2) ? '  vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
       (sid.pass & SID.PASS.WPOS2) ? '  vec2 wpos = vec2(a_wpos_time.x+ u_wposxy.x, a_wpos_time.y+u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-      // ? '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);' 
       ? '  gl_Position = u_projection * vec4(a_pos.x + wpos.x, a_pos.y + wpos.y, a_wpos_time.z, 1.0);' 
       : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
-      // true ? 'vec4 p = a_wpos_time;' : '',
-      // true ? 'gl_Position = vec4(a_pos.x, a_pos.y, 1., 1.0);' : '',
-      // (sid.unif & SID.UNIF.COL4) ? '  v_col = a_col;' : '',
       
       
       
@@ -243,10 +239,8 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // ASSIGNMENTS
-      // (sid.fx & SID.FX.FS_GLOW) ? '  v_glow_params = u_glow_params;' : '',
       (sid.pass & SID.PASS.COL4) ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') : '', 
       (sid.pass & SID.PASS.DIM2) ? '  v_dim = a_dim;' : (sid.pass & SID.ATTR.DIM2) ? '  v_dim = a_dim;' : '', // TODO: If we have created an attribute a_dim, we have to use it, else the attribs buffering is gonna be wrong
-      // (sid.pass & (SID.PASS.WPOS2|SID.UNIF.ROOT_WPOS2)) ? '  v_wpos = vec2(a_wpos_time.x + wpos.x, a_wpos_time.y + wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.pass & (SID.PASS.WPOS2|SID.UNIF.ROOT_WPOS2)) ? '  v_wpos = vec2(wpos.x,wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
@@ -292,12 +286,13 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       true ? '#include <precision_medium>' : '',
       true ? '#include <out_frag_color>' : '',
       (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
-      (sid.unif & SID.UNIF.UNIF_SPEED) ? '#define U_SPEED 1' : '',
+      (sid.fx & SID.FX.FS_GLOW) ? '#define U_GLOW_PARAMS 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
+      (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
+      // (sid.unif & SID.UNIF.UNIF_SPEED) ? '#define U_SPEED 1' : '',
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // In
       '\n',
-      // (sid.fx & SID.FX.FS_GLOW) ? 'in vec2 v_glow_params;' : '',
       (sid.pass & SID.PASS.COL4) ? '#include <in_frag_col4>' : '',
       (sid.pass & SID.PASS.DIM2) ? '#include <in_frag_dim2>'   : '',
       (sid.pass & SID.PASS.WPOS2) ? '#include <in_frag_wpos2>' : '',
@@ -327,6 +322,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       // Fx shder functions
       (sid.fx & SID.FX.FS_GLOW) ? frag_glow : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
+      (sid.fx & SID.FX.FS_SMOKE) ? frag_smoke : '',
 
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -336,9 +332,9 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       true ? '#include <frag_color_create>' : '', // Creates the variable 'color' of the fragment shader color output.
       (sid.attr & SID.ATTR.STYLE) ? frag_round_corners_call : '', // TODO: Check either for .STYLE or .BORDER|.FEATHER|.RCORNERS
       (sid.fx & SID.FX.FS_GLOW) ? '  float alpha = color.a;' : '',
-      // (sid.fx & SID.FX.FS_GLOW) ? '  float alpha = v_col.a;' : '',
       (sid.fx & SID.FX.FS_GLOW) ? frag_glow_call : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
+      (sid.fx & SID.FX.FS_SMOKE) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2 ) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '', 
 
 

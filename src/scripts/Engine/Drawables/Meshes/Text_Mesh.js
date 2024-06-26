@@ -402,8 +402,12 @@ export class Text_Mesh extends Mesh {
    RenderText() {
       // console.error('This functions is not implemented for instancing\nAt RenderText()\n At Text_Mesh.js')
 
-      if (!this.gfx)
-         console.log
+      if (!this.gfx) {
+         // alert('98776')
+         console.error('98776\nTrying to Render Text before vertex buffer creation\ntext:', this.mat.char_buffer.buffer);
+         return;
+
+      }
       const store_start = this.gfx.vb.starts.buffer[0];
 
       // TODO: Remove arrays, substitute with variables
@@ -431,8 +435,6 @@ export class Text_Mesh extends Mesh {
             Gl_set_dim_xy(this.gfx, geom_copy.dim[0], geom_copy.dim[1]);
 
             // Set character y position and advance.
-            // geom_copy.pos[0] += (advancex + plane_bounds.left) * 2 * this.fontsize;
-            // geom_copy.pos[1] += geom_copy.dim[1] + (plane_bounds.yoffset * this.fontsize);
             geom_copy.pos[0] += (advancex + plane_bounds.left) * 2 * this.fontsize;
             geom_copy.pos[1] += (plane_bounds.yoffset * this.fontsize);
             Gl_set_wpos_xy(this.gfx, geom_copy.pos[0], geom_copy.pos[1]);
@@ -529,7 +531,9 @@ export class Text_Mesh extends Mesh {
 
       const advancex = Font_get_font_advancex(this.mat.texidx); // Cash the space character
       this.gfx.tb.idx = this.mat.texidx;
-      const face_count = this.mat.char_buffer.active_count; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
+      // const face_count = this.mat.char_buffer.active_count; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
+      // Run for buffer size so that the vertex buffers have the neccessary space for the whole char_buffer.
+      const face_count = this.mat.char_buffer.size; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
       const space_char_uv = Font_get_char_uv_coords(this.mat.uvIdx, ' ');
 
       for (let i = 0; i < face_count; i++) {

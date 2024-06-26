@@ -78,8 +78,11 @@ class Uniform {
 
       const loc = gl.getUniformLocation(shader_program, name);
       // const t = gl.getActiveUniform(shader_program, 1)
-      /**DEBUG */if (loc > 0xffff || loc === null) 
+      /**DEBUG */if (loc > 0xffff || loc === null) {
+
+         console.error('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.\n', 'name', name, 'progidx', progidx);
          alert('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.');
+      }
 
 
       this.val = 0;// Uniform value
@@ -159,7 +162,7 @@ export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, p
 
    const uniform = new Uniform(gl, shader_program, type, name, progidx);
    const ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
-   console.error('1111111 Uniform Created at index:', ubidx, _uniforms_buffer)
+   console.info('UUUUUUUUUUUUUUUUUUUUUUUUUUUUU\nUniform Created at index:', ubidx, _uniforms_buffer);
 
    return ubidx;
 }

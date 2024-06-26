@@ -1,6 +1,6 @@
 "use strict";
 import { TimeIntervalsCreate, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
-import { FloorArr2, FloorArr3 } from '../Helpers/Math/MathOperations.js';
+import { CopyArr4, FloorArr2, FloorArr3, Hash, Pow } from '../Helpers/Math/MathOperations.js';
 
 
 import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
@@ -17,14 +17,16 @@ import { View_build_group_from_root_mesh, View_set_view_vb_start } from '../Engi
 import { MouseGetPos } from '../Engine/Controls/Input/Mouse.js';
 import { REL_POS } from '../Engine/Drawables/Operations/RelativePosComponent.js';
 import { Animations_create } from '../Engine/Animations/Animations.js';
-import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gfx_uniforms_set_clbk, TEMP_PARTICLES_GEN_GFX, TEMP_PARTICLES_UNIF_CLBK } from '../Engine/ParticlesSystem/NewParticlesSystem.js';
+import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gfx_uniforms_set_clbk, TEMP_PARTICLES_GEN_GFX } from '../Engine/ParticlesSystem/NewParticlesSystem.js';
 import { Set_color_rgb } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
-import { Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../Engine/Core/MeshUniformsBuffer.js';
 
 import { TimerGetGlobalTimerCycle, Timer_get_global_timer, Timer_update_global_timer_cycle } from '../Engine/Timers/Timers.js';
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_value_from_callback, Uniforms_buffer_set_value_callback } from '../Graphics/Buffers/UniformBuffers.js';
+import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
+import { Gl_set_rgba } from '../Graphics/Buffers/VertexBuffersOps.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -146,26 +148,28 @@ export function TestWidgetsGeneric(scene) {
     { // Test sdf lines
         // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 100, 0], [400, 400], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
         // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-        // line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+        // // line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
-        // // // // // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
-        // // // // // line.sid.attr &= ~SID.ATTR.COL4;
+        // // // // // // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
+        // // // // // // line.sid.attr &= ~SID.ATTR.COL4;
         // line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        // line.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        // line.GfxUniformsEnable({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
-        // line.sid.fx |= SID.FX.FS_NOISE;
-        // // // line.EnableGfxUniforms({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
+        // // line.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+        // // line.GfxUniformsEnable({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
+        // // line.sid.fx |= SID.FX.FS_NOISE;
+        // // // // line.EnableGfxUniforms({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
         // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         // line.Render();
         // line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx);
-        // line.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, line.gfx.vb.groupidx);
-        // line.GfxUniformsSetClbk('u_time', CLBK_TIMER, line.gfx.vb.groupidx);
-        // // // line.GfxUniformsSetClbk('u_time', CLBK_TIMER, _)
+        // // line.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, line.gfx.vb.groupidx);
+        // // line.GfxUniformsSetClbk('u_time', CLBK_TIMER, line.gfx.vb.groupidx);
+        // // // // line.GfxUniformsSetClbk('u_time', CLBK_TIMER, _)
         // line.ConstructListeners();
 
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .01, .2, 1.4, _, .4, true);
-        // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0);
+
+
+        // // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .01, .2, 1.4, _, .4, true);
+        // // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0);
 
     }
 
@@ -176,6 +180,19 @@ export function TestWidgetsGeneric(scene) {
         // CreateColorPicker(SID.ATTR.DIM2)
         // TODO: Enable multi vertex color in 'Widget_Slider_Simple' constructor
         // CreateColorPicker();
+        
+        
+        // Test change color of a mesh using the colorpicker
+        // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 600, 0], [200, 80], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
+        // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+        // line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        // line.Render();
+        // line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx);
+        // line.ConstructListeners();
+        // const picker = CreateColorPicker();
+        // picker.AssignTargetMesh(line);
+        
     }
     
     
@@ -228,12 +245,9 @@ export function TestWidgetsGeneric(scene) {
         /**************************/
         // CreateGlowParticles();
 
-        // CreateBallTailParticles(PURPLEB[3]);
+        // CreateBallTailParticles();
         
         CreateSmokeParticles();
-
-
-
 
     }
 
@@ -579,166 +593,315 @@ function SectionResizable(pos) {
 
 function CreateGlowParticles(){ // 3 control Sliders 
 
+    /**
+     * // TODO:
+     * // BUG: The settings dealt from a callback update the emitter's parameters, but the particles 
+     * themselfs are not being updated until the destruction and recreation of a new particle
+     */
+
     const scale_down = .2;
     
-    const emitter_idx1 = Particle_system_create_emitter(BLUEL[9], [300,300,10], [40,40], .6, 1, 'T1st Particle System');
+    const emitter_idx1 = Particle_system_create_emitter('T1st Particle System', BLUEL[9], [0,0,10], [40,40], .6, 1, 4, .98, .1, 4);
     const emitter = Particles_get_particle_system(emitter_idx1);
     emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
     
-    // emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
+    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
+    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+    emitter.EnableGfxUniforms({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+    emitter.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
     
     TEMP_PARTICLES_GEN_GFX(emitter);
     emitter.GfxUniformsSetClbk('u_scale2', function(){return [scale_down,1]}, emitter.gfx.vb.groupidx);
     
 
-    emitter.SetConeOfDirection(-1, 1, -.2, .2);
+    emitter.SetConeOfDirection(1, 1, .2, -.2);
     
     
     
     // Second Particle Emitter
-    const emitter_idx2 = Particle_system_create_emitter(PURPLER[5], [300,300,10], [40,40], .6, 1, 'Test Particle System2');
-    const emitter2 = Particles_get_particle_system(emitter_idx2);
-    emitter2.flags |= PARTICLES.HAS_START_POS_VARIATION;
+    // const emitter_idx2 = Particle_system_create_emitter('Test Particle System2', PURPLER[5], [300,300,10], [40,40], .6, 1, 4, .98, .1);
+    // const emitter2 = Particles_get_particle_system(emitter_idx2);
+    // emitter2.flags |= PARTICLES.HAS_START_POS_VARIATION;
     
-    // emitter2.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
+    // emitter2.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
+    // emitter2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+    // emitter2.EnableGfxUniforms({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+    // emitter2.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
     
-    TEMP_PARTICLES_GEN_GFX(emitter2);
-    emitter2.GfxUniformsSetClbk('u_scale2', function(){return [scale_down,1]}, emitter2.gfx.vb.groupidx);
+    // TEMP_PARTICLES_GEN_GFX(emitter2);
+    // emitter2.GfxUniformsSetClbk('u_scale2', function(){return [scale_down,1]}, emitter2.gfx.vb.groupidx);
     
-    // emitter2.SetDir(1,1); // Enable emitters direction. By default is [0,0].
-    emitter2.SetConeOfDirection(-.2, .2, -1, 1);
+    // // emitter2.SetDir(1,1); // Enable emitters direction. By default is [0,0].
+    // emitter2.SetConeOfDirection(-1, 1, -1, -1);
 
 
-    
     /*************************************************************************************************************** */
-    const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 160, 0], 20, BLUEL[6], WHITE, [5, 5], .5);
+    // Create Particles Control Panel
+
+    const slider_dim = [100, 10];
+
+
+    const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
+    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+    const flags = {
+        unif: SID.UNIF.ROOT_WPOS2,
+        pass: SID.PASS.WPOS2,
+    }
+
+
+    /****************************************************************************************************************/
+    // Create the emitter button, as well as a switch to auto-emitt particles
+    const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', _, [0, 0, 1], 20, BLUEL[6], WHITE, [5, 5], .5);
+    slider_section.AddItem(btn)
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    btn.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    btn.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-    btn.EnableGfxUniforms({unif:SID.UNIF.UNIF_GLOW2, fx:SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+    btn.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
-    btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1, emitter_idx2] }, MESH_STATE.IS_HOLD_CLICK)
+    // btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1, emitter_idx2] }, MESH_STATE.IS_HOLD_CLICK)
+    btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1] }, MESH_STATE.IS_HOLD_CLICK)
+
+    /****************************************************************************************************************/
+    // Create the switch to auto-emitt particles
+    const emitt_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
+    const evt_params = { target_params: [emitter_idx1] };
+    /**
+     * Pass the Emitt pareticles callback 'Particle_system_emitt' as the t'targetBindingFunctions' parameter, 
+     * so that the 'OnClick' of the switch widget will call the 'Switch_simple_time_interval_callback' 
+     * that will create the timeInterval passing the 'Particle_system_emitt' callback.
+     */
+    emitt_switch.Bind(Switch_simple_time_interval_callback, Particle_system_emitt, evt_params);
+    emitt_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
     
-    
-    btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    btn.Render();
-    btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx);
-    btn.GfxUniformsSetClbk('u_scale2', function(){return [1.,1]}, btn.gfx.vb.groupidx);
-    btn.SetClbkGfxUniforms('u_glow_params', function(){return [.9, .0, 1.3]}, btn.gfx.vb.groupidx);
-    btn.ConstructListeners();
-
-
-
 
     /*************************************************************************************************************** */
     // Create Sliders for manipulating variables of particles
 
+    slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+
+    slider_section.AddItem(emitt_switch)
+
+    /**
+     * NICE EFFECT:
+     * Distance:{.28}, Brighter:{1}, Intensity:{.05}, Gravity:{.53{=.03}}, Acceleration:{.22}
+     */
+
     {
-        const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 400, 0], [250, 10], _, _, 'Distance');
-        slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        
-        const flags = {
-            unif: SID.UNIF.ROOT_WPOS2,
-            pass: SID.PASS.WPOS2,
-        }
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(71);
         
         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        
-        slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        slider.Render();
-        slider.ConstructListeners();
-        
-        slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx);
-        slider.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, slider.gfx.vb.groupidx);
 
         Particles_gfx_uniforms_set_clbk(emitter_idx1, 'u_glow_params', Slider_get_slider_val, slider, 0)
-        Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 0)
+        // Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 0)
     }
     {
-        const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 450, 0], [250, 10], _, _, 'Brighter');
-        slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        slider.SetName('slider2 Inner');
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(62);
     
-        const flags = {
-            unif: SID.UNIF.ROOT_WPOS2,
-            pass: SID.PASS.WPOS2,
-        }
         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        // slider.GfxUniformsEnable({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
-        
-        slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        slider.Render();
-        slider.ConstructListeners();
-        
-        slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx);
-        slider.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, slider.gfx.vb.groupidx);
-        // slider.GfxUniformsSetClbk('u_time', Slider_get_slider_val, slider);
         
         Particles_gfx_uniforms_set_clbk(emitter_idx1, 'u_glow_params', Slider_get_slider_val, slider, 1)
-        Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 1)
+        // Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 1)
     }
     {
-        const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 500, 0], [250, 10], _, _, 'Intensity');
-        slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        slider.SetName('slider3 Intensity')
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(2);
         
-        const flags = {
-            unif: SID.UNIF.ROOT_WPOS2,
-            pass: SID.PASS.WPOS2,
-        }
         
         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
         
-        slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        slider.Render();
-        slider.ConstructListeners();
-        
-        slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx);
-        slider.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, slider.gfx.vb.groupidx);
-
         Particles_gfx_uniforms_set_clbk(emitter_idx1, 'u_glow_params', Slider_get_slider_val, slider, 2)
-        Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 2)
+        // Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 2)
     }
+    {
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Gravity');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(48);
+        
+        
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        Slider_connect(slider, (params, slider_val)=>{
+
+            // const slider_val = Slider_get_slider_val({slider:slider});
+
+            // Linear Interpolation
+            const max = 1, start=-.5;
+            const y = (slider_val * max) + start;
+            emitter.gravity = y;
+        }, _);
+    }
+    {
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Acceleration');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(59);
+        
+        
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        Slider_connect(slider, (params, slider_val)=>{
+
+            // const slider_val = Slider_get_slider_val({slider:slider});
+            emitter.accel = slider_val;
+
+            // Linear Interpolation
+            const max = 15, start=0;
+            const y = (slider_val * max) + start;
+            emitter.accel = y;
+            emitter.max_speed = 4;
+        }, _);
+    }
+    {
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Deccelerarion');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(19);
+        
+        
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        Slider_connect(slider, (params, slider_val)=>{
+
+            // const slider_val = Slider_get_slider_val({slider:slider});
+            /* Solve for y~={0.5, 1.0}  => {h:1, k:-2.0, r:1.2} */
+            /* Solve for y~={0.9, 1.0}  => {h:1, k:-4.0, r:5.0} */
+            
+            /* Solve for y~={0.86, 1.0} => {h:1, k:-2.8, r:3.8} */
+            const h=1, k=-2.8, r=3.8*3.8; 
+            const x = slider_val;
+            let y = 0;
+            y = Math.sqrt(-((x-h)*(x-h)) + r) +k;
+            emitter.deccel = y;
+           
+        }, _);
+    }
+    { // Set Emitter X Position
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Emitter Position X');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(8);
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        Slider_connect(slider, (params, slider_val)=>{
+
+            // const slider_val = Slider_get_slider_val({slider:slider});
+            const y = slider_val * VIEWPORT.WIDTH;
+            emitter.pos[0] = y;
+            // Mesh_unif_set_vb_root_wposx(emitter.root_posidx, y);
+        }, _);
+    }
+    { // Set Emitter Y Position
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Emitter Position Y');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(40);
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        Slider_connect(slider, (params, slider_val)=>{
+            
+            // const slider_val = Slider_get_slider_val({slider:slider});
+            const y = slider_val * VIEWPORT.HEIGHT;
+            emitter.pos[1] = y;
+            // Mesh_unif_set_vb_root_wposy(emitter.root_posidx, y);
+        }, _);
+    }
+    { // Set Emitter Y Position
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Direction Y Up ');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(10);
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        Slider_connect(slider, (params, slider_val)=>{
+            
+            // const slider_val = Slider_get_slider_val({slider:slider});
+            const max=-1, start=0;
+            const y = (slider_val * max) + start;
+            emitter.variation_emission.ydir_neg = y;
+            console.log(slider_val, y)
+        }, _);
+    }
+    { // Set Emitter Y Position
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Direction Y Down');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(10);
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        Slider_connect(slider, (params, slider_val)=>{
+            
+            // const slider_val = Slider_get_slider_val({slider:slider});
+            const max=1, start=0;
+            const y = (slider_val * max) + start;
+            emitter.variation_emission.ydir_pos = y;
+            console.log(slider_val, y)
+        }, _);
+    }
+    { // Set Emitter Y Position
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Direction X Left ');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(55);
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        Slider_connect(slider, (params, slider_val)=>{
+            
+            // const slider_val = Slider_get_slider_val({slider:slider});
+            let max=2, start=-1;
+            const y = (slider_val * max) + start;
+            emitter.variation_emission.xdir_pos = y;
+            emitter.variation_emission.xdir_neg = y;
+            console.log(slider_val, y)
+        }, _);
+    }
+
+
+    slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+    slider_section.Calc_no_gfx_update();
+    slider_section.Render();
+    slider_section.ConstructListeners();
+
+    slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
+
+
+
+    
+    
+    /***********************************************************************************************/
+    // Create Color Picker to change the particles color
+    const picker = CreateColorPicker();
+    picker.AssignTargetMeshClbk((params)=>{
+        const color = params;
+        Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+        CopyArr4(emitter.col, color);
+    });
 }
 
-function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball Tail
+/**
+ * // TODO:
+ * Create a gfxContext match for particle systems of same type
+ */
+
+function CreateBallTailParticles(num_balls=2){ // Particles Bouncing Ball Tail
 
     let balls_buffer = [];
     let dirs_buffer = [];
-    let particles_system_buffer = [];
-    let particle_system_idxs_buffer = [];
-    let particles_system_buffer2 = [];
+    let tail_particles_buffer = [];
+    let glow_particles_buffer = [];
 
             
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [100, 0], [0, 0, 0], [300, 300], TRANSPARENCY(GREY[3], .0), 'Particles Bouncing Ball Tail',)
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [100, 0], [0, 0, 0], [300, 300], TRANSPARENCY(GREY[3], 1.0), 'Particles Bouncing Ball Tail',)
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    
     section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    section.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
     
-    // let x=0, y=0;  
+
+
     let swap_dir = 1; // Create direction variation in case of rendering many balls 
     for(let i=0; i<num_balls; i++){
         
-        const dim = [10,10]
-        // const rand = GetRandomInt(10,20)
-        // const dim = [rand, rand]
-        
+        const dim = [15,15]
         const pos = GetRandomPos([0,0], [section.geom.dim[0], section.geom.dim[1]])
         
-        // const pos = [300,0]
-
         const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, WHITE, 'Ball', [0, dim[0], 2]);
         ball.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         ball.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        ball.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
         ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
         section.AddItem(ball);
 
@@ -748,49 +911,50 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
 
         const scale = 2.;
         const particles_dim = [dim[0]*scale, dim[1]*scale]
-        const particle_system_idx = Particle_system_create_emitter(color, [0, 0, 1], particles_dim, .7, 1, 'ParticleBallTail');
+        const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], particles_dim, .7, 1);
+        const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
         
-        const particle_system = Particles_get_particle_system(particle_system_idx);
-        
-        particle_system.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
-        particle_system.EnableGfxUniforms({unif:SID.UNIF.UNIF_SPEED}, 'u_speed', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-        
+
+        tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
+
+        tail_emitter.EnableGfxUniforms(0x0, 'u_noise_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+
 
 
 
 
         /**************************************************************************************************************************************/
-        // Scondary particles
-        const scale_down = .04;
+        // Secondary particles
         
-        const emitter_idx1 = Particle_system_create_emitter(color, [0,0,3], [40,40], 1, 1, 'T1st Particle System' );
-        const emitter = Particles_get_particle_system(emitter_idx1);
-        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', color, [0,0,3], [40,40], 1, 1, 2, .79, 0, 2);
+        const glow_emitter = Particles_get_particle_system(glow_emitter_idx);
+        glow_emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
         
-        // emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
+        glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
+        glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+        glow_emitter.EnableGfxUniforms({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+        glow_emitter.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
         
-        TEMP_PARTICLES_GEN_GFX(emitter);
-        // TODO: Create SetScale callback from within the particles calss, so we can moderate the scale with uniforms
-        emitter.GfxUniformsSetClbk('u_scale2', function(){return [scale_down,1]}, emitter.gfx.vb.groupidx);
-        emitter.SetDir(-1, -1);
-        emitter.SetConeOfDirection(-.1, .1, -.1, .1);
-        particles_system_buffer2[i] = emitter;
+        // TEMP_PARTICLES_GEN_GFX(glow_emitter);
+        // // TODO: Create SetScale callback from within the particles calss, so we can moderate the scale with uniforms
+        glow_emitter.SetDir(-1, -1);
+        glow_emitter.SetConeOfDirection(-.1, .1, .1, -.1);
+        glow_particles_buffer[i] = glow_emitter;
         
+                
         
         
 
         /**************************************************************************************************************************************/
         // Render Ball tail particles on top of the glow particles
-        TEMP_PARTICLES_GEN_GFX(particle_system);
+        // TEMP_PARTICLES_GEN_GFX(tail_emitter);
 
-        particle_system.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, particle_system.gfx.vb.groupidx);
-        // particle_system.GfxUniformsSetClbk('u_speed', function(){return 0;}, particle_system.gfx.vb.groupidx);
         
-        particle_system.SetDir(1, 1*swap_dir);
+        tail_emitter.SetDir(1, 1*swap_dir);
 
 
-        particles_system_buffer[i] = particle_system;
-        particle_system_idxs_buffer[i] = particle_system_idx;
+        tail_particles_buffer[i] = tail_emitter;
         dirs_buffer[i] = [1,1*swap_dir]
 
         swap_dir *= -1;
@@ -807,11 +971,25 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
     section.Render();
     
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-    section.GfxUniformsSetClbk('u_scale2', ()=>{return [1,1];}, section.gfx.vb.groupidx);
     
     section.ConstructListeners();
 
 
+    // IMPORTANT: Generate particles gfx after the generation of any parent mesh, so that the particles system unif_wpos has a parent root_posidx
+    for(let i=0; i<num_balls; i++){
+        
+        const scale_down = .04;
+        const glow_emitter = glow_particles_buffer[i];
+        TEMP_PARTICLES_GEN_GFX(glow_emitter, section);
+        // TODO: Create SetScale callback from within the particles class, so we can moderate the scale with uniforms
+        glow_emitter.GfxUniformsSetClbk('u_scale2', function(){return [scale_down,1]}, glow_emitter.gfx.vb.groupidx);
+        
+
+        // Render Ball tail particles on top of the glow particles
+        const tail_emitter = tail_particles_buffer[i];
+        TEMP_PARTICLES_GEN_GFX(tail_emitter, section);
+
+    }
 
 
 
@@ -819,7 +997,8 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
     /*************************************************************************************************************** */
     // Create Sliders for manipulating variables of particles
 
-    const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [200, 600, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
+    const slider_dim = [100, 10];
+    const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
     slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
            
@@ -827,185 +1006,108 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
         unif: SID.UNIF.ROOT_WPOS2,
         pass: SID.PASS.WPOS2,
     }
+
     slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    slider_section.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
-    { // Slider 1 contol
-        const slider = Create_widget_slider(_, [0, 0, 0], [250, 10], _, _,  'sliderControl 1');
-        slider.SetInitialValue(0);
-        
-        slider_section.AddItem(slider);
+    // Tail Particle System: Contol Sliders 
+    const tail_buffer_len = tail_particles_buffer.length;
+    { 
 
+        // const glow_emitter = tail_particles_buffer[i]
         
-        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        
-        const len = particles_system_buffer.length;
-        for(let i=0; i < len; i++){
-            Particles_gfx_uniforms_set_clbk(particles_system_buffer[i].idx, 'u_speed', Slider_get_slider_val, slider, 0)
+        { // Slider 1 contol
+            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Speed');
+            slider.SetInitialValue(0);
+            slider_section.AddItem(slider);
+            
+            
+            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            
+            
+            Slider_connect(slider, (params, slider_val)=>{
+                
+                // const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
+                
+                for(let i=0; i < tail_buffer_len; i++){
+
+                    const glow_emitter = tail_particles_buffer[i]
+                    let min = .8; // The min value gives the prolonged glow_emitter
+                    let max = 1.; // Calculate that the max value will be +1+min
+                    const rev_slider_val = 1-slider_val;
+                    glow_emitter.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
+                    glow_emitter.speed = (slider_val+1)*3;
+                }
+            }, _);
+            
         }
-        // Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 0)
-
-        Slider_connect(slider, ()=>{
-
-            const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
-
-            const len = particles_system_buffer.length;
-            for(let i=0; i < len; i++){
-
-                const tail = particles_system_buffer[i];
-                /**
-                 * The logic is to create a small value for time_step on max slider value and larger value when the slider is at min val,
-                 * so that the particles life time gets smaller with small slider values and bigger with larger slider values
-                 * The "(1-slider_val)" reverses the slider val to [1..0].
-                 * The "rev_slider_val+min)" creates the min result value, which is a smaller time step resulting in more prolonged tail
-                 * The "((max-slider_val)*(slider_val))" widens the min to max result. 
-                 *  The first part creates the maximum: Whatever the max value is set to, it gets up to +1+min(if max=1 => max=0+1+min)
-                 *  So for example, if max=-1 then max becomes -1+1+min
-                 *  The second part: if the slider val is 0 it cancels these 2 parts and the result is the minimum possible value.
-                 *                  if the slider val is > 0 then it creates the maximum value
-                 */
+        { // Slider 2 contol
+            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Intensity');
+            slider.SetInitialValue(0);
+            slider_section.AddItem(slider);
+            
+            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            
+            for (let i=0; i<tail_buffer_len; i++){
                 
-                let min = .8; // The min value gives the prolonged tail
-                let max = 1.; // Calculate that the max value will be +1+min
-                const rev_slider_val = 1-slider_val;
-                tail.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
-
-                // tail.speed = (slider_val+1)*4.5;
-                tail.speed = (slider_val+1)*3;
-                
-                
-                
-                // // Secondary particles
-                // min = .5; // The min value gives the prolonged tail
-                // max = .5; // Calculate that the max value will be 1+min
-                // const particles = particles_system_buffer2[i];
-                // particles.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
-                // particles.speed = (slider_val+1)*8;
-                // // console.log(particles.t_step)
+                const glow_emitter = tail_particles_buffer[i]
+                Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 1)
             }
-        }, _);
-
-    }
-    { // Slider 1 contol
-        const slider = Create_widget_slider(_, [0, 0, 0], [250, 10], _, _,  'sliderControl 2');
-        slider.SetInitialValue(0);
-
-        slider_section.AddItem(slider);
-        
-        const flags = {
-            unif: SID.UNIF.ROOT_WPOS2,
-            pass: SID.PASS.WPOS2,
+            
         }
-        
-        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        
-        const len = particles_system_buffer.length;
-        for(let i=0; i < len; i++){
-            Particles_gfx_uniforms_set_clbk(particles_system_buffer[i].idx, 'u_speed', Slider_get_slider_val, slider, 1)
-        }
-        // Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 0)
+        { // Slider 3 contol
+            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Tail: Fire Variation');
+            slider.SetInitialValue(0);
+            slider_section.AddItem(slider);
+            
+            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            
+            for (let i=0; i<tail_buffer_len; i++) {
 
-        // Slider_connect(slider, ()=>{
-
-        //     const slider_val = Slider_get_slider_val({slider:slider});
-
-        //     const len = particles_system_buffer.length;
-        //     for(let i=0; i < len; i++){
-
-        //         const tail = particles_system_buffer[i];
-        //         /**
-        //          * The logic is to create a small value for time_step on max slider value and larger value when the slider is at min val,
-        //          * so that the particles life time gets smaller with small slider values and bigger with larger slider values
-        //          * The "(1-slider_val)" reverses the slider val to [1..0].
-        //          * The "rev_slider_val+min)" creates the min result value, which is a smaller time step resulting in more prolonged tail
-        //          * The "((max-slider_val)*(slider_val))" widens the min to max result. 
-        //          *  The first part creates the maximum: Whatever the max value is set to, it gets up to +1+min(if max=1 => max=0+1+min)
-        //          *  So for example, if max=-1 then max becomes -1+1+min
-        //          *  The second part: if the slider val is 0 it cancels these 2 parts and the result is the minimum possible value.
-        //          *                  if the slider val is > 0 then it creates the maximum value
-        //          */
-        //         // let min = 0; // The min value gives the prolonged tail
-        //         // let max = 0; // Calculate that the max value will be +1+min
-        //         // const rev_slider_val = 1-slider_val;
-        //         // // tail.t_step = rev_slider_val+1 + ((max-slider_val)*(rev_slider_val)); 
-        //         // // tail.speed = (slider_val+1)*3;
-        //         // // // console.log(tail.t_step)
-                
-                
-                
-        //         // // // Secondary particles
-        //         // min = .5; // The min value gives the prolonged tail
-        //         // max = .5; // Calculate that the max value will be 1+min
-        //         // const particles = particles_system_buffer2[i];
-        //         // particles.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
-        //         // particles.speed = (slider_val+1)*8;
-        //         // // console.log(particles.t_step)
-        //     }
-        // }, _);
-
-    }
-    { // Slider 2 contol
-        const slider = Create_widget_slider(_, [0, 0, 0], [250, 10], _, _, 'sliderControl 3');
-        slider.SetInitialValue(0);
-
-        slider_section.AddItem(slider);
-        
-        const flags = {
-            unif: SID.UNIF.ROOT_WPOS2,
-            pass: SID.PASS.WPOS2,
-        }
-        
-        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        
-        // slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        // slider.Render();
-        // slider.ConstructListeners();
-        
-        // slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx);
-        // slider.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, slider.gfx.vb.groupidx);
-
-        const len = particles_system_buffer.length;
-        for(let i=0; i < len; i++){
-            Particles_gfx_uniforms_set_clbk(particles_system_buffer[i].idx, 'u_speed', Slider_get_slider_val, slider, 2)
-            Particles_gfx_uniforms_set_clbk(particles_system_buffer2[i].idx, 'u_glow_params', Slider_get_slider_val, slider, 0, .1, .9)
-        }
-        // Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 0)
-
-        Slider_connect(slider, (params)=>{
-
-            const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
-
-            const len = particles_system_buffer.length;
-            for(let i=0; i < len; i++){
-
-                const tail = particles_system_buffer[i];
-
-                let min = .9; // The min value gives the prolonged tail
-                let max = -.5; // Calculate that the max value will be +1+min
-                const rev_slider_val = 1-slider_val;
-                // tail.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
-                // tail.speed = (slider_val+1)*4.5;
-                
-                
-                
-                // // Secondary particles
-                // min = .5; // The min value gives the prolonged tail
-                // max = 1; // Calculate that the max value will be 1+min
-                const particles = particles_system_buffer2[i];
-                
-                // particles.t_step = rev_slider_val
-                // if(particles.t_step > max) particles.t_step = max-.01;
-                // else if(particles.t_step < min) particles.t_step = min+.01;
-                // particles.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
-                particles.speed = (slider_val+1)*8;
-                // console.log(particles.t_step, rev_slider_val)
+                const glow_emitter = tail_particles_buffer[i]
+                Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 0)
             }
-        }, _);
-
+        }
     }
+    
+    // Glow Particle System: Contol Sliders 
+    const glow_buffer_len = glow_particles_buffer.length;
+    for (let i=0; i<glow_buffer_len; i++) { 
+        
+        const glow_emitter = glow_particles_buffer[i]
+        /**
+         * NICE EFFECT:
+         * Distance:{.28}, Brighter:{1}, Intensity:{.05}, Gravity:{.53{=.03}}, Acceleration:{.22}
+         */
+
+        {
+            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
+            slider_section.AddItem(slider);
+            slider.SetInitialValue(0);
+            
+            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+            Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 0)
+        }
+        {
+            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
+            slider_section.AddItem(slider);
+            slider.SetInitialValue(100);
+        
+            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            
+            Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
+        }
+        {
+            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
+            slider_section.AddItem(slider);
+            slider.SetInitialValue(3);
+            
+            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            
+            Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
+        }
+    }
+    
     slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
     slider_section.Calc_no_gfx_update();
@@ -1013,7 +1115,6 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
     slider_section.ConstructListeners();
 
     slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
-    slider_section.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, slider_section.gfx.vb.groupidx);
 
 
 
@@ -1037,8 +1138,8 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
         for(let i=0; i<len; i++){
 
             const ball = params.params.ball[i];
-            const particle_system = params.params.particles_system_buffer[i];
-            const particle_system_idx = params.params.particle_system_idxs_buffer[i];
+            const tail_emitter = params.params.tail_particles_buffer[i];
+            const tail_emitter_idx = tail_emitter.idx;
             const dir = params.params.dir[i];
             
             // Secondary Particles
@@ -1046,25 +1147,25 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
     
 
 
-            // console.log(particle_system)
+            // console.log(tail_emitter)
             
             // Move the ball
             
             const speed = 3;
             const variation = TimerGetGlobalTimerCycle()*.3 + .5;
-            const x = 1 * dir[0] * particle_system.speed * variation * .5;
+            const x = 1 * dir[0] * tail_emitter.speed * variation * .5;
             // const x = 0;
-            const y = 1 * dir[1] * particle_system.speed * .5;
+            const y = 1 * dir[1] * tail_emitter.speed * .5;
             // const y = 0;
             
             ball.geom.MoveXY(x, y, ball.gfx);
-            // ball.MoveXY(x, y);
             ball.geom.pos[0] += x;
             ball.geom.pos[1] += y;
     
-            const pos = ball.GetPosXY();
-            particle_system.pos[0] = pos[0]+ball.geom.dim[0]-particle_system.dim[0]; 
-            particle_system.pos[1] = pos[1]+ball.geom.dim[1]-particle_system.dim[1]; 
+            // const pos = ball.GetPosXY();
+            const pos = [ball.geom.pos[0], ball.geom.pos[1]];
+            tail_emitter.pos[0] = pos[0]+ball.geom.dim[0]-tail_emitter.dim[0]; 
+            tail_emitter.pos[1] = pos[1]+ball.geom.dim[1]-tail_emitter.dim[1]; 
     
     
             // Check boundaries
@@ -1079,22 +1180,22 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
     
             if(ball_bot > bot_bound){
                 dir[1] *= -1;
-                particle_system.SetDir(0, dir[1])
+                tail_emitter.SetDir(0, dir[1])
                 small_particles.dir[1] = 1;
             }
             else if(ball_top < top_bound){
                 dir[1] *= -1;
-                particle_system.SetDir(0, dir[1])
+                tail_emitter.SetDir(0, dir[1])
                 small_particles.dir[1] = -1;
             }
             if(ball_right > right_bound){
                 dir[0] *= -1;
-                particle_system.SetDir(dir[0], 0)
+                tail_emitter.SetDir(dir[0], 0)
                 small_particles.dir[0] = 1;
             }
             else if(ball_left < left_bound){
                 dir[0] *= -1;
-                particle_system.SetDir(dir[0], 0)
+                tail_emitter.SetDir(dir[0], 0)
                 small_particles.dir[0] = -1; 
             }
     
@@ -1102,7 +1203,7 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
     
             const particles_params = {
                 params: {
-                    target_params:[particle_system_idx],
+                    target_params:[tail_emitter_idx],
                 }
             }
             Particle_system_emitt(particles_params);
@@ -1129,128 +1230,123 @@ function CreateBallTailParticles(color, num_balls=4){ // Particles Bouncing Ball
         section:section,
         ball:balls_buffer,
         dir: dirs_buffer,
-        particle_system_idxs_buffer:particle_system_idxs_buffer,
-        particles_system_buffer:particles_system_buffer,
-        small_particles: particles_system_buffer2,
+        tail_particles_buffer:tail_particles_buffer,
+        small_particles: glow_particles_buffer,
     }
 
     TimeIntervalsCreate(1, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, AnimateBall, params);
 
 
 
-    // let x = 0, y = 0;
-    // const slider_dim = [250,10];
-    // {
-    //     const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [x, y, 0], slider_dim,);
-    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     slider.SetName('slider1 Outer');
-    //     slider.SetInitialValue(27);
-        
-    //     y+=slider_dim[1]*4 +10;
-
-    //     const flags = {
-    //         unif: SID.UNIF.ROOT_WPOS2,
-    //         pass: SID.PASS.WPOS2,
-    //     }
-        
-    //     slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //     slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        
-    //     slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    //     slider.Render();
-    //     slider.ConstructListeners();
-        
-    //     slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx);
-    //     slider.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, slider.gfx.vb.groupidx);
-
-    //     Particles_gfx_uniforms_set_clbk(particle_system_idx, 'u_glow_params', Slider_get_slider_val, slider, 0)
-    // }
-    // {
-    //     const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [x, y, 0], slider_dim,);
-    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     slider.SetName('slider2 Inner');
-    //     slider.SetInitialValue(8);
-                    
-    //     y+=slider_dim[1]*4 +10;
-
-    //     const flags = {
-    //         unif: SID.UNIF.ROOT_WPOS2,
-    //         pass: SID.PASS.WPOS2,
-    //     }
-    //     slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //     slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-    //     // slider.GfxUniformsEnable({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
-        
-    //     slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    //     slider.Render();
-    //     slider.ConstructListeners();
-        
-    //     slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx);
-    //     slider.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, slider.gfx.vb.groupidx);
-    //     // slider.GfxUniformsSetClbk('u_time', Slider_get_slider_val, slider);
-        
-    //     Particles_gfx_uniforms_set_clbk(particle_system_idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
-    // }
-    // {
-    //     const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [x, y, 0], slider_dim,);
-    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     slider.SetName('slider3 Intensity');
-    //     slider.SetInitialValue(20);
-                        
-    //     y+=slider_dim[1]*4 +10;
-
-    //     const flags = {
-    //         unif: SID.UNIF.ROOT_WPOS2,
-    //         pass: SID.PASS.WPOS2,
-    //     }
-        
-    //     slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //     slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        
-    //     slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    //     slider.Render();
-    //     slider.ConstructListeners();
-        
-    //     slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx);
-    //     slider.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, slider.gfx.vb.groupidx);
-
-    //     Particles_gfx_uniforms_set_clbk(particle_system_idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
-    // }
+    
+    
+    /***********************************************************************************************/
+    // Create Color Picker to change the particles color
+    const picker = CreateColorPicker();
+    // picker.AssignTargetMesh();
+    picker.AssignTargetMeshClbk((params)=>{
+        const color = params;
+        Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+        // CopyArr4(tail_particles_buffer[0].col, color);
+        CopyArr4(glow_particles_buffer[0].col, color);
+    });
 
 }
 
-function CreateSmokeParticles(){
-    const scale_down = .2;
-    
-    const emitter_idx1 = Particle_system_create_emitter(BLUEL[9], [300,300,10], [40,40], .6, 1, 'T1st Particle System');
-    const emitter = Particles_get_particle_system(emitter_idx1);
-    emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
-    
-    // emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
-    
-    TEMP_PARTICLES_GEN_GFX(emitter);
-    emitter.GfxUniformsSetClbk('u_scale2', function(){return [scale_down,1]}, emitter.gfx.vb.groupidx);
-    
 
-    emitter.SetConeOfDirection(-1, 1, -.2, .2);
+
+function CreateSmokeParticles(){
+
+    /**
+     * // TODO: The "u_smoke_params" is one float instead of vec3 that we are passing 
+     */
+
+    const emitters = [];
+    const emitter_idxs = [];
+    const speed = 10;
+    let cnt = 0;
+    const dim = [150,150]
+
+    // Create Particle emitters
+    {
+        const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', PURPLEB[9], [-90,530,10], dim, 1.5, 1, 2, .98, -.1, 3);
+        const emitter = Particles_get_particle_system(emitter_idx);
+        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        emitter.speed = speed;
+        
+        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        emitter.EnableGfxUniforms({fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+
+        TEMP_PARTICLES_GEN_GFX(emitter);
+
+        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
+
     
+        emitter.SetConeOfDirection(1, 1, -.1, .2);
+
+        emitters[cnt] = emitter;
+        emitter_idxs[cnt] = emitter_idx;
+        cnt++
+    }
+    {
+        const emitter_idx = Particle_system_create_emitter('SmokeParticles 2', PURPLER[9], [-90,420,10], dim, .7, 1, 2, .98, -.1, 3 );
+        const emitter = Particles_get_particle_system(emitter_idx);
+        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        emitter.speed = speed;
+        
+        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        emitter.EnableGfxUniforms({unif:SID.UNIF.UNIF_SMOKE2, fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+        
+        TEMP_PARTICLES_GEN_GFX(emitter);
+
+        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
     
+        emitter.SetConeOfDirection(1, 1, -.1, .2);
+            
+        emitters[cnt] = emitter;
+        emitter_idxs[cnt] = emitter_idx;
+        cnt++
+    }
+    {
+        const emitter_idx = Particle_system_create_emitter('SmokeParticles 3', YELLOW[9], [-90,310,10], dim, 1.5, 1, 2, .98, -.1, 3);
+        const emitter = Particles_get_particle_system(emitter_idx);
+        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        emitter.speed = speed;
+        
+        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        emitter.EnableGfxUniforms({unif:SID.UNIF.UNIF_SMOKE2, fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+        
+        TEMP_PARTICLES_GEN_GFX(emitter);
+
+        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
     
-    // Second Particle Emitter
-    const emitter_idx2 = Particle_system_create_emitter(PURPLER[5], [300,300,10], [40,40], .6, 1, 'Test Particle System2');
-    const emitter2 = Particles_get_particle_system(emitter_idx2);
-    emitter2.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        emitter.SetConeOfDirection(1, 1, -.1, .2);
+
+        emitters[cnt] = emitter;
+        emitter_idxs[cnt] = emitter_idx;
+        cnt++
+    }
+    {
+        const emitter_idx = Particle_system_create_emitter('SmokeParticles 4', GREEN[9], [-90,200,10], dim, .7, 1, 2, .98, -.1, 3);
+        const emitter = Particles_get_particle_system(emitter_idx);
+        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        emitter.speed = speed;
+        
+        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        emitter.EnableGfxUniforms({unif:SID.UNIF.UNIF_SMOKE2, fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+        
+        TEMP_PARTICLES_GEN_GFX(emitter);
+
+        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
     
-    // emitter2.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
-    
-    TEMP_PARTICLES_GEN_GFX(emitter2);
-    emitter2.GfxUniformsSetClbk('u_scale2', function(){return [scale_down,1]}, emitter2.gfx.vb.groupidx);
-    
-    // emitter2.SetDir(1,1); // Enable emitters direction. By default is [0,0].
-    emitter2.SetConeOfDirection(-.2, .2, -1, 1);
+        emitter.SetConeOfDirection(1, 1, -.1, .2);
+            
+        emitters[cnt] = emitter;
+        emitter_idxs[cnt] = emitter_idx;
+        cnt++
+
+    }
+
 
 
     
@@ -1259,75 +1355,25 @@ function CreateSmokeParticles(){
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     btn.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    btn.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-    btn.EnableGfxUniforms({unif:SID.UNIF.UNIF_GLOW2, fx:SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
     
-    btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1, emitter_idx2] }, MESH_STATE.IS_HOLD_CLICK)
+    btn.Bind(Particle_system_emitt, _, { target_params: emitter_idxs }, MESH_STATE.IS_HOLD_CLICK)
     
     
     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     btn.Render();
     btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx);
-    btn.GfxUniformsSetClbk('u_scale2', function(){return [1.,1]}, btn.gfx.vb.groupidx);
-    btn.SetClbkGfxUniforms('u_glow_params', function(){return [.9, .0, 1.3]}, btn.gfx.vb.groupidx);
     btn.ConstructListeners();
 
 
-
-
-    /*************************************************************************************************************** */
-    // Create Sliders for manipulating variables of particles
-
-    const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [200, 600, 1], [0,0], GREY[0], 'SliderSection', [0,10,2], );
-    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-           
-    const flags = {
-        unif: SID.UNIF.ROOT_WPOS2,
-        pass: SID.PASS.WPOS2,
-    }
-    slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    slider_section.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-
-    {
-        const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 400, 0], [250, 10], BLUEL[5], _, 'Distance');
-        slider_section.AddItem(slider);
-        
-        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        
-        Particles_gfx_uniforms_set_clbk(emitter_idx1, 'u_glow_params', Slider_get_slider_val, slider, 0)
-        Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 0)
-    }
-    {
-        const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 450, 0], [250, 10], BLUEL[5], _, 'Brighter');
-        slider_section.AddItem(slider);
-        
-        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        
-        Particles_gfx_uniforms_set_clbk(emitter_idx1, 'u_glow_params', Slider_get_slider_val, slider, 1)
-        Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 1)
-    }
-    {
-        const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 500, 0], [250, 10], BLUEL[5], _, 'Intensity');
-        slider_section.AddItem(slider);
-        
-        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        slider.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        
-        Particles_gfx_uniforms_set_clbk(emitter_idx1, 'u_glow_params', Slider_get_slider_val, slider, 2)
-        Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 2)
-    }
-
-    slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-    slider_section.Calc_no_gfx_update();
-    slider_section.Render();
-    slider_section.ConstructListeners();
-
-    slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
-    slider_section.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, slider_section.gfx.vb.groupidx);
+    
+    /***********************************************************************************************/
+    // Create Color Picker to change the particles color
+    const picker = CreateColorPicker();
+    picker.AssignTargetMeshClbk((params)=>{
+        const color = params;
+        // Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+        CopyArr4(emitters[0].col, color);
+    });
 }
 
 
@@ -1335,11 +1381,11 @@ function CreateSmokeParticles(){
 let labelCount = 1;
 function CreateLabel(name = 'Label ') {
 
-    const pos = [100, 310 + (labelCount * 35), 2];
+    const pos = [400, 470 + (labelCount * 35), 2];
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.RIGHT | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.BOTTOM, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
-    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
+    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, fontsize, GREY[0], WHITE, [5, 5], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1877,7 +1923,7 @@ function CreateDropdown2InSection(pos, id) {
 
 function CreateColorPicker(render_instanced_flags=0x0){
 
-    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [0, 40, 0], [300, 200], GREY[3], _, [0, 35, 2]);
+    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [0, 40, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
     // picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
 
@@ -1893,6 +1939,8 @@ function CreateColorPicker(render_instanced_flags=0x0){
     picker.Render();
     picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
     picker.ConstructListeners();
+
+    return picker;
 
 }
 

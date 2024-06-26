@@ -143,8 +143,6 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    const wpos_ubidx_idx = _per_vb_mesh_unif_wpos_ubidxs.Add(ubidx);
    if(wpos_ubidx_idx !== idx) alert('unif wpos idx does not match the ubidx wpos idx');
 
-// if(idx===7)
-console.log(idx)
 
    return idx;
 }
@@ -244,7 +242,8 @@ export function Mesh_unif_get_vb_root_wpos_meshidx(root_posidx) {
    return _per_vb_mesh_unif_wpos.buffer[root_posidx].meshidx;
 }
 
-
+// TODO: 
+// EFFICIENCY: Pass a buffer to store the positions. Too much 'heat' of the js GarbageColector
 
 export function Mesh_unif_get_vb_root_wpos(root_posidx) {
    const pos = Mesh_unif_get_vb_root_wpos_recursive(root_posidx);

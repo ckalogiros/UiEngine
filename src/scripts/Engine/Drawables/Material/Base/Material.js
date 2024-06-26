@@ -4,14 +4,12 @@ import * as math from '../../../../Helpers/Math/MathOperations.js'
 import { Gl_set_rgba } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 import { New_generic_char_buffer } from '../../../Core/Buffers.js';
-import { BLUEL, PURPLER } from './Colors.js';
 
 
 
 
 
 
-const temp_vertex_color = [BLUEL[6], PURPLER[6], BLUEL[6], PURPLER[6]];
 
 export class Material {
 
@@ -32,24 +30,43 @@ export class Material {
    constructor(col = [1, 1, 1, 1]) {
 
       this.sid = {
-         // shad:  SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          shad:  SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          attr: SID.ATTR.COL4,
-         // inst: SID.ATTR.COL4,
          inst: 0x0,
          unif: 0,
          pass: 0,
       };
 
-      this.col = [0, 0, 0, 1];
-      math.CopyArr4(this.col, col);
-      this.defCol = [0, 0, 0, 0];
-      math.CopyArr4(this.defCol, col);
+      // this.col = [0, 0, 0, 1];
+      // math.CopyArr4(this.col, col);
+      // this.defCol = [0, 0, 0, 0];
+      // math.CopyArr4(this.defCol, col);
       this.type = MESH_TYPE.MATERIAL;
       this.style = [0, 0, 0]; // Initialize style: []
       this.uv = [0, 1, 0, 1];
       this.uvIdx = INT_NULL;
       this.texidx = INT_NULL;
+
+
+      // if (Array.isArray(col[0])) {
+      if (col[0].constructor === Float32Array) {
+
+         const len = col.length;
+         this.col = new Array(len);
+         this.defCol = new Array(len);
+
+
+         for (let i = 0; i < len; i++){
+            this.col[i] = new Float32Array(col[i]);
+            this.defCol[i] = new Float32Array(col[i]);
+         }
+
+         this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
+      }
+      else {
+         this.col = new Float32Array(col);
+         this.defCol = new Float32Array(col);
+      }
 
    }
 
@@ -64,9 +81,28 @@ export class Material {
       math.CopyArr3(this.style, style);
    }
 
+   SetCopyColor(col){
+
+      // if((this.sid.attr & SID.ATTR.COL4_PER_VERTEX) && !Array.isArray(col[0])){
+      if((this.sid.attr & SID.ATTR.COL4_PER_VERTEX) && !(col[0].constructor === Float32Array)){
+         alert('8816772');
+         return;
+      }
+
+      const len = this.col.length;
+      for (let i = 0; i < len; i++){
+         const len2 = this.col[i].length;
+         for (let j = 0; j < len2; j++){
+            this.col[i][j] = col[i][j];
+            this.defCol[i][j] = col[i][j];
+         }
+      }
+
+   }
+
 
    Copy(mat = {}) {
-
+alert('00188723')
       if (mat instanceof Material) {
 
          this.shad = mat.sid.shad;

@@ -385,19 +385,14 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_GENATTR1_POS2_DIM2(vb_data, geom
 
    for (let i = 0; i < num_faces+1; i++) {
       
-      // let vpos_y_factor = 1;
-      // let dim_y = 0;
-
-
-      // for (let j = 0; j <= verts_per_rect.boundary; j++) {
       for (let j = 0; j < 2; j++) {
 
-         const col = mat.col;
+         const col = (mat.col[k].constructor === Float32Array) ? mat.col[k] : mat.col;
          // V1
-         vb_data[index++] = col[k][0];
-         vb_data[index++] = col[k][1];
-         vb_data[index++] = col[k][2];
-         vb_data[index++] = col[k][3];
+         vb_data[index++] = col[0];
+         vb_data[index++] = col[1];
+         vb_data[index++] = col[2];
+         vb_data[index++] = col[3];
 
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
@@ -413,11 +408,9 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_GENATTR1_POS2_DIM2(vb_data, geom
 
          if(j===0){
             vb_data[index++] = geom.dim[1]*2;
-            // console.log('dimy', geom.dim[1]*2)
          }
          if(j===1){
             vb_data[index++] = 0;
-            // console.log('dimy', 0)
          }
          
          vb_data[index++] = geom.dim[0] * num_faces;
@@ -428,8 +421,6 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS4_GENATTR1_POS2_DIM2(vb_data, geom
       }
       
       vpos_x += geom.dim[0]*2; // Increment the vertex position for the next 2 verts (face)
-      // vpos_y_factor = 1
-      // dim_y = geom.dim[1]*2
    }
 
    return attribs_count;

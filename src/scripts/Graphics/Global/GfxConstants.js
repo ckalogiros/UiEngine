@@ -146,7 +146,9 @@ const SID = {
         // WPOS4: BIT5 <<= 0x1,
         SCALE2: BIT5 <<= 0x1,
         ROOT_WPOS2: BIT5 <<= 0x1,
-        UNIF_GLOW2: BIT5 <<= 0x1,
+        // UNIF_GLOW2: BIT5 <<= 0x1,
+        // UNIF_NOISE2: BIT5 <<= 0x1,
+        // UNIF_SMOKE2: BIT5 <<= 0x1,
         UNIF_SPEED: BIT5 <<= 0x1,
         COL4: BIT5 <<= 0x1,
 
@@ -169,6 +171,7 @@ const SID = {
     FX: {
         FS_GLOW: BIT6,
         FS_NOISE: BIT6<<=0x1,
+        FS_SMOKE: BIT6<<=0x1,
     },
     // FX: {
     //     FS_PARTICLES: BIT3,
@@ -410,6 +413,7 @@ const MESH_ENABLE = {
         
         FX_GLOW: _CNT <<= 1,
         FX_NOISE: _CNT <<= 1,
+        FX_SMOKE: _CNT <<= 1,
 
         // Pass from vertex to fragment shader
         PASS_COL4: _CNT <<= 1,

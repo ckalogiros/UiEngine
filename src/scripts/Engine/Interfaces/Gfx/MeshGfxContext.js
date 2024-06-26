@@ -502,7 +502,7 @@ export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool
 
                // HACK: The u_wposxy is a kind of generic uuuniform for all meshes, and is set up differently, so for convinience we set uup the callback here
                if(uniforms[i].name === 'u_wposxy'){
-                  const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vb_groupidx, ubidx);
+                  const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, ubidx);
                   emitter.root_posidx = root_posidx;
                   if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
                   

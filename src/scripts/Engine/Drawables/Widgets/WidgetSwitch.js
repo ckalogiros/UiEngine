@@ -4,6 +4,7 @@ import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
+import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { BLUE, BLUEL, GREEN, GREY } from "../Material/Base/Colors.js";
 import { Rect, Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
@@ -21,10 +22,15 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    color_active;
    pad; // int, not array for x-y pad
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], pad = 2, bold, style = [0, 15, 2.], is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = [0, 15, 2.], is_debug_mesh) {
 
+      const ratio = .2;
+      const pad = (_pad !== 0) ? _pad : size*ratio;
       const switch_dim = [size * 2, size]
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, switch_dim, col, _, style, pad, 1, is_debug_mesh)
+      // const style = [_style[0], size * (1-ratio), _style[2]]
+      style[1] = size;
+
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, switch_dim, col, _, style, _pad, 1, is_debug_mesh)
       // super(pos, switch_dim, col, _, is_debug_mesh)
 
       this.color_active = [0, 0, 0, 0];
@@ -38,20 +44,20 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.evt_params = null;
       this.pad = pad;
 
+
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      // this.SetStyle([0, 15, 2.]);
-      this.SetStyle(style);
+      // this.SetStyle(style[0], size, style[2]);
+      // this.SetStyle(style);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, true)
       
       // const switch_pos = [pos[0] - size, pos[1], pos[2] + 1];
       const switch_pos = [pad, pad, pos[2] + 1];
       const switch0 = Create_rect_mesh(_, switch_pos, [size - pad, size - pad], GREY[9], _, _, _, _, is_debug_mesh);
-      // const switch0 = Create_rect_mesh(switch_pos, [size - pad, size - pad], BLUEL[9], _, is_debug_mesh);
       this.AddChild(switch0);
       switch0.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      switch0.SetStyle([2, 10, 2]);
+      switch0.SetStyle([style[0], size * (1-ratio), style[2]]);
       // switch0.SetStyle(style);
       switch0.SetName('switch');
       switch0.state.mask &= ~MESH_STATE.ACTIVE;
@@ -312,6 +318,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    
    OnClick(params) {
 
+
       const mesh = Mesh_buffer_get_mesh_byidx(params.meshidx);
       const switch0 = mesh.children.buffer[0];
 
@@ -330,6 +337,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
          Set_default_color_rgba(mesh);
          switch0.geom.pos[0] -= mesh.geom.dim[0];
          switch0.geom.MoveX(-mesh.geom.dim[0], switch0.gfx);
+      }
+
+      
+      if (params===null || params.evt_params===null || params.evt_params.EventClbk===null){
+         console.error('No Callback function has been set for switch widget\nSet up one');
+         return;
       }
 
       if (params.evt_params.EventClbk) {
@@ -363,8 +376,36 @@ export class Widget_Switch_Simple extends Rect_Mesh {
          params: params,
       };
    }
+
+
 }
 
+
+
+   /** A callback function calls another callback that must be called via 'timeInterval'. 
+    * Is responsible for creation/destruction of the timeInterval that in its turn 
+    * will run automaticaly a callback from the application */
+   export function Switch_simple_time_interval_callback(params){
+
+      const this_switch = params.target_mesh;
+
+      if (this_switch.isOn === 0x0 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
+
+         const intervalIdx = this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+         TimeIntervalsDestroyByIdx(intervalIdx);
+         this_switch.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
+
+         return;
+      }
+
+      if (this_switch.isOn === 0x1 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
+
+         const Clbk = params.targetBindingFunctions;
+         // const idx = TimeIntervalsCreate(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, this.evt_params.EventClbk, this.evt_params.evt_params);
+         const idx = TimeIntervalsCreate(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, Clbk, params.params);
+         this_switch.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+      }
+   }
 
 
 function Switch_click_default_callback(params) {

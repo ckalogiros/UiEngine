@@ -20,7 +20,7 @@ import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 export class Widget_Slider_Simple extends Rect_Mesh {
 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[8], hover_margin = [0, 0], handle_dim=[10,10], num_faces=1, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[8], hover_margin = [0, 0], handle_dim=[10,10], handle_col=[1,1,1,1], num_faces=1, is_debug_mesh) {
 
       
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, _, _, _, num_faces, is_debug_mesh);
@@ -39,8 +39,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       
       this.slider_val = 0;
 
-
-      const handle = Create_rect_mesh(_,[0, pos[1]-handle_dim[1]+dim[1], pos[2]+1], handle_dim, col, _, _, _, 1, is_debug_mesh);
+      const handle = Create_rect_mesh(_,[pos[0]-handle_dim[0]+dim[0], pos[1]-handle_dim[1]+dim[1], pos[2]+1], handle_dim, handle_col, _, _, _, 1, is_debug_mesh);
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
 
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -65,7 +64,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       handle.SetName('Slider handle');
       this.SetName('Slider Bar');
 
-      this.SetInitialValue(50)
+      // this.SetInitialValue(50)
 
       // It is enabled by the user, when a uniform is created for passing slider value to shaders
       // this.slider_val_unif_ubidx = INT_NULL;
@@ -149,6 +148,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
       const handle = this.children.buffer[0];
       handle.gfx = Gfx_generate_context(FLAGS, handle, rect_igfx);
+      // handle.gfx = Gfx_generate_context(FLAGS, handle, INT_NULL);
 
       return this.gfx;
    }
@@ -324,7 +324,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
          this.geom.pos[0] = x;
          this.geom.pos[1] = y;
          handle.geom.pos[0] = x;
-         handle.geom.pos[1] = (this.geom.pos[1] + this.geom.dim[1])- handle.geom.dim[1];;
+         handle.geom.pos[1] = (this.geom.pos[1] + this.geom.dim[1])- handle.geom.dim[1];
       }
    }
 
@@ -365,14 +365,24 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    
    /** Input values: from:0 to:100 */
    SetInitialValue(val){
+
+      this.slider_val = (1/100)*val;
+      
       if(this.geom.dim[0] > this.geom.dim[1]){
 
-         const pos = ((this.geom.dim[0]*2)/100)*val;
-         this.children.buffer[0].geom.pos[0] = pos;
-         this.slider_val = (1/100)*val;
+         const pos = ( (this.geom.dim[0] * 2 * this.geom.num_faces ) /100) *val;
+         // const pos = (this.geom.dim[0] * 2 * this.geom.num_faces );
+         const handle = this.children.buffer[0];
+         handle.geom.pos[0] = pos -(handle.geom.dim[0] * 2 * this.slider_val); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
+         // handle.geom.pos[0] = pos-(handle.geom.dim[0] * 2 * this.geom.num_faces * val); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
+         console.log('==============================', pos, handle.geom.pos[1])
       }
       else {
-         alert('IMPLEMENT: Slider.SetInitialValue() for vertical sliders')
+         // const pos = ( (this.geom.dim[1] * 2 * this.geom.num_faces) /100) * (100-val);
+         const pos = ( (this.geom.dim[1] * 2 * this.geom.num_faces) /100) * (1 - this.slider_val);
+         const handle = this.children.buffer[0];
+         handle.geom.pos[1] = pos -( handle.geom.dim[1] * 2 * this.geom.num_faces * (1 - this.slider_val)); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
+         console.log('==============================', pos, handle.geom.pos[1])
       }
    }
 }
@@ -484,7 +494,7 @@ export function Slider_horizontal_on_update_handle(_params) {
 
    // Do stuf with the slider handle value, based on the parent slider_widget
    if (bar.parent) {
-      if (bar.parent.RENEMEME_SliderValue) bar.parent.RENEMEME_SliderValue(val);
+      if (bar.parent.SliderSetValueToInfoText) bar.parent.SliderSetValueToInfoText(val);
    }
 
    /**
@@ -496,7 +506,7 @@ export function Slider_horizontal_on_update_handle(_params) {
 
          if (bar.eventCallbacks.buffer[i] !== null) {
 
-            const params = bar.eventCallbacks.buffer[i].clbk_params;
+            const params = bar.eventCallbacks.buffer[i];
             const Clbk = bar.eventCallbacks.buffer[i].Clbk;
             Clbk(params, val);
          }
@@ -537,7 +547,7 @@ export function Slider_vertical_on_update_handle(_params) {
 
    // Do stuf with the slider handle value, based on the parent slider_widget
    if (bar.parent) {
-      if (bar.parent.RENEMEME_SliderValue) bar.parent.RENEMEME_SliderValue(val);
+      if (bar.parent.SliderSetValueToInfoText) bar.parent.SliderSetValueToInfoText(val);
    }
 
    /**
@@ -549,12 +559,33 @@ export function Slider_vertical_on_update_handle(_params) {
 
          if (bar.eventCallbacks.buffer[i] !== null) {
 
-            const params = bar.eventCallbacks.buffer[i].clbk_params;
+            // const params = bar.eventCallbacks.buffer[i].clbk_params;
+            const params = bar.eventCallbacks.buffer[i];
             const Clbk = bar.eventCallbacks.buffer[i].Clbk;
             Clbk(params, val);
          }
       }
    }
+
+}
+
+
+
+export function Slider_simple_connect(slider_bar, Clbk, clbk_params) {
+
+   const bar = slider_bar;
+
+
+   const params = {
+      Clbk: Clbk,
+      clbk_params: clbk_params,
+   }
+
+   // bar.CreateEventCallback(params);
+   bar.CreateEventCallback(params);
+
+   // Run the callback to set the sliders initial value.
+   Clbk(params, bar.slider_val);
 
 }
 
@@ -572,19 +603,12 @@ export function Slider_connect(slider, Clbk, clbk_params) {
 
    bar.CreateEventCallback(params);
 
-}
-
-
-
-export function Slider_bind_on_value_change(sliderBar, target) {
-
-   const params = {
-      target: target,
-      Clbk: Binding_function,
-   }
-   sliderBar.CreateEventCallback(params);
+   // Run the callback to set the sliders initial value.
+   Clbk(params, bar.slider_val);
 
 }
+
+
 
 
 
@@ -667,7 +691,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Slider Bar: Bar is child of the slider mesh
-      const bar = Create_widget_slider_simple(_, [0, dim[1]*4, _pos[2]+1], [dim[0], 2], GREY[8], hover_margin, [10, 10], 1, is_debug_mesh);
+      const bar = Create_widget_slider_simple(_, [0, dim[1]*4, _pos[2]+1], [dim[0], 2], GREY[8], hover_margin, [10, 10], _, 1, is_debug_mesh);
       
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Slider Handle: Handle is a child of the bar mesh
@@ -1423,9 +1447,11 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
 
-   RENEMEME_SliderValue(val) {
+   SliderSetValueToInfoText(val) {
+      // TODO: This is a HOT-PATH to do so many if statements
       const value_text = this.children.buffer[this.value_text_idx];
-      value_text.RenderTextFromNumber(val); // Change the text mesh to the current slider's value
+      if(this.gfx) value_text.RenderTextFromNumber(val); // Change the text mesh to the current slider's value
+      else value_text.SetText(`${val}`);
    }
 
 
@@ -1441,13 +1467,14 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    SliderConnect(Clbk, clbk_params) {
    
       const bar = this.children.buffer[this.bar_idx];
-      Slider_connect(bar, Clbk, clbk_params);
+      Slider_simple_connect(bar, Clbk, clbk_params);
    }
 
    SetInitialValue(val){
       
       const bar = this.children.buffer[this.bar_idx];
       bar.SetInitialValue(val);
+      this.SliderSetValueToInfoText(val);
    }
    
 }
@@ -1455,16 +1482,25 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 export function Slider_get_slider_val(params){
    
-const slider = params.slider;
-const bar = slider.children.buffer[slider.bar_idx];
+   const slider = params.slider;
+   const bar = slider.children.buffer[slider.bar_idx];
+   return bar.slider_val;
 
+   // const start = params.start_val ;
+   // const max = params.max;
 
-const start = params.start_val ;
-const max = params.max;
+   // if(bar.slider_val < .5 && max < 1){
+   // if(max < 1){
 
-const res = bar.slider_val+start;
-
-return (res < max) ? res : max;
+   //    // const res = (bar.slider_val * (1+max)) + start;
+   //    const res = (bar.slider_val * (1+max));
+   //    console.log('bar.slider_val', bar.slider_val, 'res', res)
+   //    return (res < max) ? res : max;
+   // }
+   // else {
+   //    const res = (bar.slider_val * max) + start;
+   //    return (res < max) ? res : max;
+   // }
 }
 // export function Slider_get_slider_val(slider, ratio=1, start_val=0){
       

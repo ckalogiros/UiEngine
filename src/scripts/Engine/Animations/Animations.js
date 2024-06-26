@@ -112,7 +112,7 @@ class VB_DATA {
     }
 
     SetData(starts, values, num_faces, anim_type_flag, anim_data_type, which_vb, counts, verts_per_rect, start_val=0, has_start_value=false){
-        if(values.constructor !== Array) alert('values should be an array\nAnimations.js')
+        if(values.constructor !== Float32Array) alert('values should be an array\nAnimations.js')
         
 
         this.data.starts.push(starts);

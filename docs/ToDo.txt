@@ -40,6 +40,12 @@
 - Fix the menu widget options dp
 --------------------------------------------------- Milestones!
 
+!!!!!!!!! TODO:
+  On text update, instead of remove and shift the vertex buffer elements
+  it would be great if we Rerendered the buffer FROM the point of text update.
+  That means the text meshes have a sequence or hierarchy
+!!!!!!!!! TODO:
+  Also we need to break up most of the core functionality, to take place in more than one time frame
 
 
 --------------------------------------------------- Nice Animation Color Effect!

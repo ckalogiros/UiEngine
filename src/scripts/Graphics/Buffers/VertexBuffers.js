@@ -437,9 +437,13 @@ export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, para
     const len = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs.length;
     for(let i=0; i < len; i++){
         const ubidx1 = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
-        // if(ubidx === ubidx1) return;
-        console.error('Duplicate functions for ubidx:', ubidx, 'vb_groupidx', vb_groupidx, )
+        if(ubidx === ubidx1) 
+        console.error('Duplicate functions for ubidx:', ubidx, 'vb_groupidx', vb_groupidx, 
+        '\nFound at ubidx:', i, '\nValue set at uniform index:', params.val_idx, 'Found uniform value index:', _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[i])
     }
+
+    if(ubidx===4)
+        console.log()
 
     _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk.push(Clbk);
     _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params.push(params);
@@ -457,12 +461,12 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
         const val = _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk[i](params);
         const ubidx = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
 
-        const val_idx = params.val_idx;
+        const val_idx = (params.val_idx !== undefined) ? params.val_idx : null;
     
         // Uniforms_buffer_set_uniform(ubidx, val, val_idx)
-        Uniforms_buffer_set_uniform_val_from_index(ubidx, val, val_idx)
-        Uniforms_buffer_update_uniform(ubidx)
-        
+        Uniforms_buffer_set_uniform_val_from_index(ubidx, val, val_idx);
+        Uniforms_buffer_update_uniform(ubidx);
+
     }
 }
 

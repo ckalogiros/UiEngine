@@ -12,21 +12,15 @@
  * and a 
  */
 
-export const frag_glow_call = `\
-   vec4 glowcol = Glow(alpha, v_col.a);
-   // glowcol.rgb *= (1.-alpha); // Disable the particle color. For mixing the two colors(particle and glow) producing a light bulb effect
-   glowcol.rgb *= v_col.a; // Disable the particle color. For mixing the two colors(particle and glow) producing a light bulb effect
-   color.rgb += glowcol.rgb;
-   // color.rgb += min(color.rgb, glowcol.rgb);
-   // color.rgb = max(color.rgb, glowcol.rgb);
-   // if(color.a < alpha) color.rgb = glowcol.rgb;
+export const frag_glow_call = `
 
-   
+    vec4 glowcol = Glow(color.a);
+    // Removes any previous functions calculations. Must be combined with:'color = glowcol'
+    // glowcol.rgb *= (1.-alpha); 
+    // color = glowcol;
+    color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
 
-   // color.rgb *= color.rgb; // Reduce the particle color effect
 
-   // color.a = glowcol.a;
-   // color = clamp(color, 0., 1.);
 `;
 
 export const frag_glow = `
@@ -35,11 +29,18 @@ export const frag_glow = `
    vec2 uv = vec2(0,0);
 #endif
 
-vec4 Glow(float alpha, float original_a)
+vec4 Glow(float alpha)
 {
-   float outer = u_glow_params.x+.4;
-   float inner = u_glow_params.y;
-   float intensity = u_glow_params.z;
+
+#ifdef U_GLOW_PARAMS
+    vec3 controls = u_glow_params;
+#else
+    vec3 controls = vec3(1.);
+#endif
+
+   float outer = controls.x+.4;
+   float inner = controls.y;
+   float intensity = controls.z;
    vec2 res = u_screen_res;
    vec2 dim = v_dim; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
    
@@ -59,20 +60,20 @@ vec4 Glow(float alpha, float original_a)
    
    
    
-   float r = dim.y*u_scale2.x;
-   // float d = smoothstep(dim.y, r,  length(uv));
-   float d = smoothstep(dim.y*outer, r*inner,  length(uv));
+    float r = dim.y*u_scale2.x;
+    // float d = smoothstep(dim.y, r,  length(uv));
+    float d = smoothstep(dim.y*outer, r*inner,  length(uv));
+
+    vec3 color = v_col.rgb*d*intensity;
+    // color.rgb *= d;
+    // color.rgb *= original_a;
+    // alpha *= original_a;
+    // vec3 color = vec3(d*intensity);
+    // vec3 color = min(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
+    // vec3 color = max(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
    
-   vec3 color = v_col.rgb*d*intensity;
-   // color.rgb *= d;
-   // color.rgb *= original_a;
-   // alpha *= original_a;
-   // vec3 color = vec3(d*intensity);
-   // vec3 color = min(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
-   // vec3 color = max(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
    
-   
-   return vec4(color, alpha);
-   // return vec4(color, d);
+    return vec4(color, alpha);
+    // return vec4(color, d);
 }
 `;
