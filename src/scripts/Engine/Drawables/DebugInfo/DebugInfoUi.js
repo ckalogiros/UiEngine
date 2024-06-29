@@ -26,6 +26,97 @@ import { Floor } from "../../../Helpers/Math/MathOperations.js";
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************************************************************************************/
+// Absolut Position Basic Info: {Fps, MeshCount, ...}
+/************************************************************************************************************************************************/
+export function Debug_info_ui_static(){
+
+   const transp = .5;
+   const zpos = 50;
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, zpos], [0, 0], TRANSPARENCY(GREY[1], transp), 'ui performance timers panel', [0, 10, 2]);
+   section.SetName('InfoUi-static');
+
+
+   const fontsize = 7;
+   const fontsizedynamic = 9;
+   let pad1 = [0, 1];
+   let pad2 = [4, 0];
+   const g_ms = 0;
+   let ms = 500;
+   const align = ALIGN.HORIZONTAL;
+
+   //TODO: Name all the timers correctly
+
+   // Use custom interval for all debug ui for efficiency
+   let generic_time_interval = INT_NULL;
+
+   { // FPS average 1 second
+      ms = (g_ms) ? g_ms : 1000;
+      const timer = Create_widget_multi_text(_, 'FPS:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
+      section.AddItem(timer);
+
+      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
+      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+
+      timer.CreateNewText('Meshes:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+      timer.CreateNewText('000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      timer.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_buffer_get_count, _, _, _); // idx param is for use in creating separate timer for each widget dynamic text.
+      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+      timer.CreateNewText('VertexBuffers:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Vertex_buffer_get_Active_count, _, _, generic_time_interval)
+   }
+
+
+
+   section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+   
+   section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+   // section.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT;
+   section.Calc_no_gfx_update();
+
+   section.Render()
+
+   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************************************************************************************/
+// Debug Info Ui Widget: A widget to open many different debuging info widgets
+/************************************************************************************************************************************************/
 const _font_size = 8.5;
 
 /** 'is_root_widget' can be two values: 1. ROOT_WIDGETS.CREATE_ROOT-which creates an independed widget, 2. undefined-which means that ths widget will belong to some parent structure */
@@ -54,9 +145,11 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,0,0]) {
 
    // const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [VIEWPORT.RIGHT-280, 30, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
    const dp = Create_widget_dropdown(is_root_widget, 'Statistics', pos, TRANSPARENCY(GREY[0], .1), GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
-   dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   dp.CreateMoveEvent();
+   // dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   // dp.CreateMoveEvent();
    Dropdown_roots_set_root(dp, dp);
+
+   // dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
 
@@ -124,9 +217,15 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,0,0]) {
 
 
 
-   dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENTY | SECTION.INHERIT;
+   // dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENTY | SECTION.INHERIT;
+   // dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENTX | SECTION.INHERIT;
+   dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT | SECTION.INHERIT;
+   // dp.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.EXPAND;
+   // dp.options = SECTION.VERTICAL | SECTION.INHERIT;
+   // dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT ;
 
    dp.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT; // Set menu to expand to the dropdown's width
+   // dp.menu.options = SECTION.VERTICAL ; // Set menu to expand to the dropdown's width
 
    if (is_root_widget !== undefined) {
 
@@ -237,7 +336,6 @@ function Debug_info_create_ui_stats() {
    { // Listen Events Buffer
       ms = (g_ms) ? g_ms : 500;
       const i1 = Create_widget_text(_, 'Listeners:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
-      // const i1 = Create_widget_multi_text(_, 'Listeners:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
       section.AddItem(i1);
 
       // Create info for Hover listeners
@@ -1115,7 +1213,8 @@ function Debug_info_update_ui_focused(params) {
       i = scrolled.children.boundary;
    }
 
-   const focused = params.trigger_params.focused.evt_params.target_mesh;
+   // const focused = params.trigger_params.focused.evt_params.target_mesh;
+   const focused = STATE.mesh.focused;
    const zpos = focused.geom.pos[2];
 
    /**
@@ -1210,7 +1309,8 @@ function Debug_info_update_ui_focused(params) {
         };
     */
 
-   console.log(SID.GetTypeToString(scroller.sid));
+   // console.log(SID.GetTypeToString(scroller.sid));
+   // console.log(focused.GetName());
 
    {
       const text_info = `Name:dim:${focused.GetName()}`
@@ -1401,7 +1501,6 @@ function Ui_focused_create_info_gfx(mesh, zpos){
    /**
       sid
       sceneidx
-      scene_mesh_in_gfx_idx
       isPrivate
       num_faces
       vertsPerRect

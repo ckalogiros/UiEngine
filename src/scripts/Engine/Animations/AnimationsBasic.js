@@ -3,7 +3,7 @@
 import { GlSetAttrSdfParamsOuter, Gl_set_wpos_x, Gl_set_dim_xy, Gl_set_rgba } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { CalculateSdfOuterFromDim } from "../../Helpers/Helpers.js";
 import { GfxInfoMesh } from "../Interfaces/Gfx/MeshGfxContext.js";
-import { AnimationsGet } from "./Animations.js";
+import { Mesh_animations_get } from "./MeshAnimations.js";
 
 
 
@@ -20,7 +20,7 @@ export function Animations_create_scale_up_down(params) {
    // if (!params.state.inHover && !params.state.inScale) {
    // if (!params.state.inScale) {
    if (!(params.state.mask & MESH_STATE.IN_SCALE)) {
-      const animations = AnimationsGet();
+      const animations = Mesh_animations_get();
       animations.Create(Animations_run_scale_up_start, Animations_run_scale_up_stop, params, 'button_scale_up_animation');
       params.state.inScale = true;
       params.StateEnable(MESH_STATE.IN_SCALE);
@@ -75,7 +75,7 @@ function Animations_run_scale_up_stop(mesh) {
 
 function Animations_create_scale_down_start(params) {
 
-   const animations = AnimationsGet();
+   const animations = Mesh_animations_get();
    animations.Create(Animations_run_scale_down_start, Animations_run_scale_down_stop, params, 'button_scale_down_animation');
 }
 
@@ -107,32 +107,6 @@ function Animations_run_scale_down_start(mesh) {
          
          Helper_scale_rect(mesh, scaleFactor);
       }
-      // /** Scale button's text meshes */                                          
-      // let accumTextWidth = 0;                                                 
-      // const textMesh = mesh.children.buffer[0];                                     
-      // const text = textMesh.mat.char_buffer;                                      
-      // const textLen = text.length;                                      
-
-      // textMesh.geom.dim[0] *= scaleFactor; // Update button's text dimentionsx                                                                        
-      // textMesh.geom.dim[1] *= scaleFactor; // Update button's text dimentions y                                                                       
-
-      // const faceHalfWidth = textMesh.geom.dim[0];                                                                       
-      // const extraWidth = (mesh.pad * 2) + faceHalfWidth;                                                                      
-      // const advance = textMesh.geom.dim[0] * 2;                                                                      
-
-      // _gfx.Copy(textMesh.gfx);                                                                        
-      // for (let i = 0; i < textLen; i++) {                                                                      
-
-      //    posx = (mesh.geom.pos[0] - mesh.geom.dim[0]) + extraWidth + accumTextWidth;
-      //    Gl_set_wpos_x(_gfx, posx);                                                                      
-      //    accumTextWidth += advance;                                                                      
-      //    Gl_set_dim_xy(_gfx, textMesh.geom.dim)                                                                        
-
-      //    const sdfOuter = CalculateSdfOuterFromDim(textMesh.geom.dim[0]);                                                                       
-      //    GlSetAttrSdfParamsOuter(_gfx, sdfOuter);                                                                                                           
-
-      //    _gfx.vb.start += _gfx.vb.count; // Update gfx info to point to the next text's face 
-      // }
 
    }
 
@@ -164,32 +138,6 @@ function Animations_run_scale_down_stop(mesh) {
          Helper_scale_rect(mesh, scaleFactor);
       }
 
-      // /** Set button's text meshes to default scale */
-      // let accumTextWidth = 0;
-      // let posx = mesh.geom.pos[0];
-      // const textMesh = mesh.children.buffer[0];
-      // const text = textMesh.mat.char_buffer;
-      // const textLen = text.length;
-      // const faceHalfWidth = textMesh.geom.defDim[0];
-      // const extraWidth = (mesh.pad * 2) + faceHalfWidth;
-      // const advance = textMesh.geom.defDim[0] * 2;
-
-      // textMesh.geom.dim[0] = textMesh.geom.defDim[0]; // Update button's text dimentions x
-      // textMesh.geom.dim[1] = textMesh.geom.defDim[1]; // Update button's text dimentions y
-
-      // _gfx.Copy(textMesh.gfx);
-      // for (let i = 0; i < textLen; i++) {
-
-      //    posx = (mesh.geom.pos[0] - mesh.geom.dim[0]) + extraWidth + accumTextWidth;
-      //    Gl_set_wpos_x(_gfx, posx);
-      //    accumTextWidth += advance;
-      //    Gl_set_dim_xy(_gfx, textMesh.geom.dim)
-
-      //    const sdfOuter = CalculateSdfOuterFromDim(textMesh.geom.dim[0]);
-      //    GlSetAttrSdfParamsOuter(_gfx, sdfOuter);
-
-      //    _gfx.vb.start += _gfx.vb.count; // Update gfx info to point to the next text's face
-      // }
    }
 
    mesh.state.inScale = false;
@@ -310,7 +258,7 @@ export function Animations_create_dim_color_rgb(mesh) {
    };
    params.maxcol = mesh.mat.col[params.maxcolidx];
 
-   const animations = AnimationsGet();
+   const animations = Mesh_animations_get();
    animations.Create(
       Animations_run_dim_color_rgb_start,
       Animations_run_dim_color_rgb_stop,
@@ -348,7 +296,7 @@ function Animations_run_dim_color_rgb_stop(params) {
 
 export function Animations_create_bright_color_rgb(params) {
 
-   const animations = AnimationsGet();
+   const animations = Mesh_animations_get();
    animations.Create(
       Animations_run_bright_color_rgb_start,
       Animations_run_bright_color_rgb_stop,

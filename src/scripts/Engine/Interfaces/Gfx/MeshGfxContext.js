@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_change_uniform_value_clbk_params } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object } from "../../../Graphics/ShaderPrograms.js";
@@ -37,11 +37,10 @@ export class GfxInfoMesh {
       // TODO: COMMENT, explain variables
       this.sid = INT_NULL;
       this.sceneidx = INT_NULL;
-      this.scene_mesh_in_gfx_idx = INT_NULL; // The index of the mesh inside the scenes gfx buffer.
       this.isPrivate = false;
       this.num_faces = 0;
       this.vertsPerRect = 0;
-      this.attribsPerVertex = 0;
+      this.attribsPerVertex = 0; // TODO: This value is wrong for meshes with instanced geometry in more than one vertex buffers 
       this.meshIdx = INT_NULL; // The index of the current mesh from scene's mesh buffer.
       this.vao = null;
 
@@ -60,6 +59,7 @@ export class GfxInfoMesh {
          idxs: New_int8_buffer(_, 'NEW GfxInfo-vbidxs'),	// The vertex buffer (float*) idx that this Mesh is stored to.
          starts: New_int16_buffer(_, 'GfxInfo-vb starts'),		// The current meshe's starting index in vertex buffer. 
          counts: New_int16_buffer(_, 'GfxInfo-vb counts'),		// Current size of the float buffer (in floats)
+         // vCount: New_int16_buffer(_, 'GfxInfo-vb counts'), // Total mesh vertices inserted in the vertex buffer
 
          which_vb: { // If this gfx has attributes scattered between vertex buffers, we need to specify which attribute belongs to which vertex buffer
             col_buf: INT_NULL,   // The index of the vertex buffer the color attribute is stored to
@@ -335,7 +335,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
                // HACK: The u_wposxy is a kind of generic uuuniform for all meshes, and is set up differently, so for convinience we set uup the callback here
                if(uniforms[i].name === 'u_wposxy'){
-                  const root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx, ubidx);
+
+                  const has_absolute_pos = FLAGS & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+                  const root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx, ubidx, has_absolute_pos);
                   mesh.root_posidx = root_posidx;
                   if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
                   
@@ -351,7 +353,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       else {
 
          // Get the unif wpos that is already created for this vb
-         Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
+         mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
+         Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, 'u_wposxy', mesh.root_posidx);
+
 
       }
 

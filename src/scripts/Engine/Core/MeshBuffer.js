@@ -1241,49 +1241,53 @@ export function Gfx_buffer_print_loop() {
 export function Widgetroot_buffer_print_w1() {
    for (let i = 0; i <= _widget_root_buffer.boundary; i++) {
 
-      const root_mesh = Mesh_buffer_get_mesh_byidx(_widget_root_buffer.buffer[i].buffer[0]); // 0-th element in each widget root buffer is the root mesh
+      if(_widget_root_buffer.buffer[i]){
 
-      console.log('root:', root_mesh.GetName(),
-         'size:', _widget_root_buffer.buffer[i].size,
-         'boun:', _widget_root_buffer.buffer[i].boundary,
-         'coun:', _widget_root_buffer.buffer[i].active_count,
-      );
-
-      for (let j = 0; j <= _widget_root_buffer.buffer[i].boundary; j++) {
-
-
-         if (_widget_root_buffer.buffer[i].buffer[j] !== INT_NULL) {
-            const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[i].buffer[j]];
-
-            if (!mesh.gfx) {
-               console.warn('   ', j,
-                  'ridx:', _widget_root_buffer.buffer[i].buffer[j],
-                  'batchidx', mesh.batch_buffer_vbidx,
-                  'gfxidx', mesh.per_vb_bufferidx,
-                  'msbidx', mesh.mesh_bufferidx,
-                  'state', mesh.state.mask,
-                  'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
-                  'root_pos', mesh.root_posidx,
-                  'pos', mesh.geom.pos, mesh.GetName());
+         const root_mesh = Mesh_buffer_get_mesh_byidx(_widget_root_buffer.buffer[i].buffer[0]); // 0-th element in each widget root buffer is the root mesh
+   
+         console.log('root:', root_mesh.GetName(),
+            'size:', _widget_root_buffer.buffer[i].size,
+            'boun:', _widget_root_buffer.buffer[i].boundary,
+            'coun:', _widget_root_buffer.buffer[i].active_count,
+         );
+   
+         for (let j = 0; j <= _widget_root_buffer.buffer[i].boundary; j++) {
+   
+   
+            if (_widget_root_buffer.buffer[i].buffer[j] !== INT_NULL) {
+               const mesh = _mesh_buffer.buffer[_widget_root_buffer.buffer[i].buffer[j]];
+   
+               if (!mesh.gfx) {
+                  console.warn('   ', j,
+                     'ridx:', _widget_root_buffer.buffer[i].buffer[j],
+                     'batchidx', mesh.batch_buffer_vbidx,
+                     'gfxidx', mesh.per_vb_bufferidx,
+                     'msbidx', mesh.mesh_bufferidx,
+                     'state', mesh.state.mask,
+                     'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
+                     'root_pos', mesh.root_posidx,
+                     'pos', mesh.geom.pos, mesh.GetName());
+                     // 'ubidxs', mesh.uniforms, mesh.GetName());
+                  }
+                  else {
+                     console.log('   ', j,
+                        'msbidx', mesh.mesh_bufferidx,
+                        'ridx:', mesh.root_bufferidx,
+                        'is_gfx_inserted:', mesh.is_gfx_inserted,
+                        // 'batchidx', mesh.batch_buffer_vbidx,
+                        // 'gfxidx', mesh.per_vb_bufferidx,
+                        'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.groupidx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
+                        'root_pos', mesh.root_posidx,
+                        // 'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
+                        'state', mesh.state.mask,
+                        'start', mesh.gfx.vb.starts.buffer[0],
+                        // 'pos', mesh.GetPosXY(),
+                        // 'dim', mesh.geom.dim,
+                        // 'rel pos', mesh.geom.pos, 
+                        mesh.GetName(),
+                  );
                   // 'ubidxs', mesh.uniforms, mesh.GetName());
                }
-               else {
-                  console.log('   ', j,
-                     'msbidx', mesh.mesh_bufferidx,
-                     'ridx:', mesh.root_bufferidx,
-                     'batchidx', mesh.batch_buffer_vbidx,
-                     // 'gfxidx', mesh.per_vb_bufferidx,
-                     'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.groupidx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
-                     'root_pos', mesh.root_posidx,
-                     // 'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
-                     'state', mesh.state.mask,
-                     'start', mesh.gfx.vb.starts.buffer[0],
-                     // 'pos', mesh.GetPosXY(),
-                     // 'dim', mesh.geom.dim,
-                     // 'rel pos', mesh.geom.pos, 
-                     mesh.GetName(),
-               );
-               // 'ubidxs', mesh.uniforms, mesh.GetName());
             }
          }
       }
@@ -1296,13 +1300,15 @@ export function Widgetroot_buffer_print_w1() {
 export function Widgetroot_buffer_print_w6() {
    for (let i = 0; i <= _widget_root_buffer.boundary; i++) {
 
-      const root_mesh = Mesh_buffer_get_mesh_byidx(_widget_root_buffer.buffer[i].buffer[0]); // 0-th element in each widget root buffer is the root mesh
-
-      console.log('mesh_bufferidx:', _widget_root_buffer.buffer[i].buffer[0], 'name:', root_mesh.GetName(),
-         'size:', _widget_root_buffer.buffer[i].size,
-         'boun:', _widget_root_buffer.buffer[i].boundary,
-         'coun:', _widget_root_buffer.buffer[i].active_count,
-      );
+      if(_widget_root_buffer.buffer[i]){
+         const root_mesh = Mesh_buffer_get_mesh_byidx(_widget_root_buffer.buffer[i].buffer[0]); // 0-th element in each widget root buffer is the root mesh
+   
+         console.log('mesh_bufferidx:', _widget_root_buffer.buffer[i].buffer[0], 'name:', root_mesh.GetName(),
+            'size:', _widget_root_buffer.buffer[i].size,
+            'boun:', _widget_root_buffer.buffer[i].boundary,
+            'coun:', _widget_root_buffer.buffer[i].active_count,
+         );
+      }
    }
 }
 
@@ -1313,13 +1319,16 @@ export function Widgetroot_gfx_print_loop_w2() {
 
    for (let i = 0; i <= _widget_root_buffer.boundary; i++) {
 
-      console.log('root idx:', _widget_root_buffer.buffer[i].buffer[0]);
-
-      const widget = _widget_root_gfx.buffer[i];
-      for (let j = 0; j <= widget.boundary; j++) {
-         console.log(
-            ' vb_group_idx:', widget.buffer[j],
-         );
+      
+      if(_widget_root_buffer.buffer[i]){
+         console.log('root idx:', _widget_root_buffer.buffer[i].buffer[0]);
+   
+         const widget = _widget_root_gfx.buffer[i];
+         for (let j = 0; j <= widget.boundary; j++) {
+            console.log(
+               ' vb_group_idx:', widget.buffer[j],
+            );
+         }
       }
    }
 }
@@ -1338,15 +1347,17 @@ export function Widget_root_batch_print_w4() {
 
    for (let i = 0; i <= _root_batch_buffer.boundary; i++) {
 
-      if (!_root_batch_buffer.buffer[i]) { console.log('EMPTY'); return };
-
-      const mesh = Mesh_buffer_get_mesh_byidx(_root_batch_buffer.buffer[i].meshidx)
-      console.log('mesh_bufferidx:', _root_batch_buffer.buffer[i].meshidx, 'root_bufferidx:', _root_batch_buffer.buffer[i].rootidx, 'mesh name', mesh.GetName())
-      for (let j = 0; j < _root_batch_buffer.buffer[i].vb.length; j++) {
-         console.log('  vb:', j,
-            'num_faces:', _root_batch_buffer.buffer[i].vb[j].num_faces,
-            'meshidx:', _root_batch_buffer.buffer[i].vb[j].meshidx,
-         );
+      if(_widget_root_buffer.buffer[i]){
+         if (!_root_batch_buffer.buffer[i]) { console.log('EMPTY'); return };
+   
+         const mesh = Mesh_buffer_get_mesh_byidx(_root_batch_buffer.buffer[i].meshidx)
+         console.log('mesh_bufferidx:', _root_batch_buffer.buffer[i].meshidx, 'root_bufferidx:', _root_batch_buffer.buffer[i].rootidx, 'mesh name', mesh.GetName())
+         for (let j = 0; j < _root_batch_buffer.buffer[i].vb.length; j++) {
+            console.log('  vb:', j,
+               'num_faces:', _root_batch_buffer.buffer[i].vb[j].num_faces,
+               'meshidx:', _root_batch_buffer.buffer[i].vb[j].meshidx,
+            );
+         }
       }
    }
 }
@@ -1355,7 +1366,7 @@ export function Widget_root_batch_print_w4() {
 
 // Print the widget groups buffer
 export function Widget_group_buffer_print_w5() {
-
+alert('6655187 \nImplement me')
    // console.log('Wole Group Buffer:', _widget_groups_buffer)
    // for (let i = 0; i <= _widget_groups_buffer.boundary; i++) {
 

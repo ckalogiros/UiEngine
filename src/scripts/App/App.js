@@ -12,6 +12,7 @@ import { Debug_info_ui_performance_set_initial_position_screen_right } from '../
 import { Performance_timers_init_all } from '../Engine/Timers/PerformanceTimers.js';
 import { Listener_init_event_storage_buffers } from '../Engine/Events/EventListeners.js';
 import { Notifications_initialize } from '../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js';
+import { Callback_animations_initialize } from '../Engine/Animations/CallbackAnimations.js';
 
 
 // var osu = require('node-os-utils')
@@ -62,6 +63,7 @@ export function AppInit() {
     Time_intervals_initialize();
     Listener_init_event_storage_buffers();
     Notifications_initialize();
+    Callback_animations_initialize();
     
     
     TestWidgetsGeneric(scene);

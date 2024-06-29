@@ -862,7 +862,7 @@ export class M_Buffer {
    }
 
 
-   // TODO: Call this on every Destroy, to have all M_Buffer elements not sparsed
+   // TODO: APPLIES ONLY FOR MESH TYPE ELEMENTS. Call this on every Destroy, to have all M_Buffer elements not sparsed
    ShiftElementOnDestroy(destroyed_idx) {
 
       if (destroyed_idx < this.boundary) {

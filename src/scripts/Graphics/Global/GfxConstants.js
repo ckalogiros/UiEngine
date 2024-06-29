@@ -451,6 +451,8 @@ const GFX_CTX_FLAGS = {
     FROM_PARENT_DSC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree descending.
     FROM_PARENT_CHLDREN_DESC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent children
 
+    ABSOLUTE_POSITION: _CNT <<= 0x1, // Any vertex buffer with a unif wposition will not draw from the scenen's position 
+
     // UNUSED
     // These are prioritized over all other above options.
     STATIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated rarely

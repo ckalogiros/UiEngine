@@ -555,10 +555,10 @@ export function Particle_system_update() {
             
             // TODO: For efficiency create 2 loops, and check which case the particles are and run the for without if statement
             if(emitter.flags & PARTICLES.HAS_START_POS_VARIATION){
-               const x = GetRandomInt(-4, 4);
-               const y = GetRandomInt(-4, 4);
-               particle.pos[0] += (x)*.17;
-               particle.pos[1] += (y)*.17;
+               // const x = GetRandomInt(-4, 4);
+               // const y = GetRandomInt(-4, 4);
+               // particle.pos[0] += (x)*.17;
+               // particle.pos[1] += (y)*.17;
                // const x = GetRandomInt(-40, 40);
                // const y = GetRandomInt(-40, 40);
                // particle.pos[0] += (x)*.017;
@@ -569,17 +569,16 @@ export function Particle_system_update() {
                // particle.pos[1] += (y)*.09;
                
                const speed = emitter.speed * particle.accel;
+               // particle.pos[0] += .1;
+               // particle.pos[1] = -200;
                particle.pos[0] += speed * particle.dirx;
                particle.pos[1] += speed * particle.diry;
-               // particle.pos[0] += emitter.speed * particle.dirx;
 
                particle.pos[1] += particle.grav* particle.accel;
                particle.grav += emitter.gravity * emitter.deccel;
                
-               // if (particle.accel > emitter.max_accel) {
                if (speed > emitter.max_speed) {
                   particle.accel *= emitter.deccel;
-                  // console.log('speed', speed,emitter.max_speed)
                }
             }
             
@@ -604,11 +603,7 @@ export function Particle_system_update() {
                // // particle.diry = GetRandomInt(5, max)*dir_factor;
 
 
-            // Updtate Gfx Buffers
-            // Must create geom struct to pass to the GlAdd...() fuunction
 
-            // Gl_particles_batch_set_col4_wpos4_pos2_style3(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time);
-            // Gl_particles_batch_set_col4_wpos4_pos2(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time);
             emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time);
 
             // particle.time += .003;

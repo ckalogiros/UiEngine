@@ -211,7 +211,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Listeners_debug_info_create(scene);
 
-    // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
+    const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT)
     // UserCreateRect()
 
     // uidbg.RotateZ(5.5);
@@ -295,7 +295,7 @@ export function TestWidgetsGeneric(scene) {
         //     attribsidx: line.gfx.prog.attribsidx,
         //     values: line.mat.col,
         // };
-        // Animations_create(ANIMATIONS.TYPE.COLOR, mesh_data, .1, )
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR, mesh_data, .1, )
     }
 
     // const fb = Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);
@@ -318,7 +318,7 @@ export function TestWidgetsGeneric(scene) {
     // const label = CreateLabel('ABCDEFGHIJKLM');
     // CreateLabel('\\/+0');
     // const label = CreateLabel('CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line););CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line');
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
 
 
     // CreateLabel('Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);');
@@ -362,7 +362,7 @@ export function TestWidgetsGeneric(scene) {
         // // const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,110,10], [16,16], .1, 2, 'Test Particle System3');
         // // const particle_system_idx3 = Particle_system_create_emitter(PURPLER[9], [10,90,10], [14,14], .1, 2, 'Test Particle System3');
         // // const particle_system_idx2 = Particle_system_create_emitter(BLUEL[9], [10,60,10], [12,12], .1, 2, 'Test Particle System2');
-        const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
+        // const particle_system_idx = Particle_system_create_emitter(YELLOWR[9], [10,40,10], [10,10], .1, 2, 'T1st Particle System');
      
         // // const particle_system_idx5 = Particle_system_create_emitter(ORANGEL[9], [10,120,10], [10,10], .1, 2, 'Test Particle System3');
         // // const particle_system_idx4 = Particle_system_create_emitter(GREEN[9], [10,100,10], [10,10], .1, 2, 'Test Particle System3');
@@ -372,16 +372,16 @@ export function TestWidgetsGeneric(scene) {
         
         
         
-        const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 260, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
-        btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        // const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 260, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
+        // btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        // btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-        // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx, particle_system_idx2, particle_system_idx3, particle_system_idx4, particle_system_idx5] }, MESH_STATE.IS_HOLD_CLICK)
-        btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx] }, MESH_STATE.IS_HOLD_CLICK)
+        // // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx, particle_system_idx2, particle_system_idx3, particle_system_idx4, particle_system_idx5] }, MESH_STATE.IS_HOLD_CLICK)
+        // btn.Bind(Particle_system_emitt, _, { target_params: [particle_system_idx] }, MESH_STATE.IS_HOLD_CLICK)
         
-        btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        btn.Render();
-        btn.ConstructListeners();
+        // btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        // btn.Render();
+        // btn.ConstructListeners();
     }
 
 
@@ -1253,10 +1253,10 @@ function CreateSceneMenuBar() {
 
 
     /** Create Test Animations */
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, dp, .03, 0., 1.)
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, statistics, .01, 0., .4)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, dp, .03, 0., 1.)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, statistics, .01, 0., .4)
     // const btn = statistics.children.buffer[0]
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn.text_mesh, .01, 0.1, .9)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn.text_mesh, .01, 0.1, .9)
 }
 
 

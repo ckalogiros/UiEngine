@@ -291,6 +291,9 @@ export class Rect_Mesh extends Rect {
 
    Destroy() {
 
+      for (let i = 0; i <= this.children.boundary; i++) {
+         if(this.children.buffer[i]) this.children.buffer[i].Destroy();
+      }
       return super.Destroy();
    }
 
@@ -389,6 +392,7 @@ export class Rect_Mesh extends Rect {
    ConstructListeners(parent_listeners = null) {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
+      if(!mesh.listeners) return;
 
       for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 

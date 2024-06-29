@@ -7,7 +7,7 @@ import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
 import { GetShaderTypeId } from '../Graphics/Debug/GfxDebug.js';
 
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Debug_info_create_ui_focused, Debug_info_ui } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Debug_info_create_ui_focused, Debug_info_ui, Debug_info_ui_static } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { GetRandomColor, GetRandomInt, GetRandomPos, GetSequencedColor, GetSign } from '../Helpers/Helpers.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
@@ -16,10 +16,10 @@ import { View_build_group_from_root_mesh, View_set_view_vb_start } from '../Engi
 
 import { MouseGetPos } from '../Engine/Controls/Input/Mouse.js';
 import { REL_POS } from '../Engine/Drawables/Operations/RelativePosComponent.js';
-import { Animations_create } from '../Engine/Animations/Animations.js';
+import { Mesh_animations_create } from '../Engine/Animations/MeshAnimations.js';
 import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gfx_uniforms_set_clbk, TEMP_PARTICLES_GEN_GFX } from '../Engine/ParticlesSystem/NewParticlesSystem.js';
 import { Set_color_rgb } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../Engine/Core/MeshUniformsBuffer.js';
+import { Mesh_unif_add_vb_root_wposx, Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../Engine/Core/MeshUniformsBuffer.js';
 
 import { TimerGetGlobalTimerCycle, Timer_get_global_timer, Timer_update_global_timer_cycle } from '../Engine/Timers/Timers.js';
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx } from '../Graphics/Buffers/VertexBuffers.js';
@@ -27,6 +27,8 @@ import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widge
 import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_value_from_callback, Uniforms_buffer_set_value_callback } from '../Graphics/Buffers/UniformBuffers.js';
 import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
 import { Gl_set_rgba } from '../Graphics/Buffers/VertexBuffersOps.js';
+import { Callback_animations_create, Callback_animations_get } from '../Engine/Animations/CallbackAnimations.js';
+import { Mesh_buffer_get_mesh_byidx, Widget_root_rerender, Widget_root_reset_gfx } from '../Engine/Core/MeshBuffer.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -76,6 +78,7 @@ export function TestWidgetsGeneric(scene) {
 
     { // Widget: Debug Info 
 
+
         // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);
         // const dbg_dp = Debug_info_ui();
 
@@ -99,7 +102,7 @@ export function TestWidgetsGeneric(scene) {
     
     
     { // Widget: Window with Menubar
-        // const panel = CreatePanel(_);
+        // const panel = CreatePanel(ROOT_WIDGETS.CREATE_ROOT);
         // const panel2 = CreatePanel(_);
         // CreateSceneMenuBar([panel]);
         // CreateSceneMenuBar([panel, panel2]);
@@ -111,8 +114,351 @@ export function TestWidgetsGeneric(scene) {
 
         // CreateWindowWithMenu();
 
+
     }
+
+    // { // Side Panel 
+
+
+
+        
+    //     /****************************************************************************************************************/
+    //     /****************************************************************************************************************/
+    //     /****************************************************************************************************************/        
+    //     // BallTail
+    //     const tail_particles = CreateBallTailParticles();
+    //     const section = tail_particles.section;
+    //     const tail_particles_buffer = tail_particles.tail_particles_buffer
+    //     const glow_particles_buffer = tail_particles.glow_particles_buffer;
+
+
+
+
+
+
+        
+    //     /****************************************************************************************************************/
+    //     /****************************************************************************************************************/
+    //     /****************************************************************************************************************/        
+    //     // Create Sliders for manipulating variables of particles
+
+    //     const slider_dim = [100, 10];
+    //     const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], YELLOWL[6], 'SliderSection', [0,10,2], );
+    //     slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    //     slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            
+    //     const flags = {
+    //         unif: SID.UNIF.ROOT_WPOS2,
+    //         pass: SID.PASS.WPOS2,
+    //     }
+
+    //     slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+    //     {
+
+    //         // Create Header
+    //         const controls_label = Create_widget_label(_, 'Ball Controls', _, [0,0,4], _, GREY[2]);
+    //         slider_section.AddItem(controls_label);
     
+    
+    
+    //         /****************************************************************************************************************/
+    //         // Create the switch to create/destroy colorpicker for particles color control
+            
+    //         // Create Header
+    //         const switch_label = Create_widget_label(_, 'ColorPick', _, [0,0,4], _, GREY[2]);
+    //         // switch_label.temp_align |= SECTION.HORIZONTAL;
+    //         slider_section.AddItem(switch_label);
+            
+    //         const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
+    //         // colorpicker_switch.temp_align |= SECTION.HORIZONTAL;
+    //         slider_section.AddItem(colorpicker_switch);
+    //         colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //         const x =  400, y = 100
+    //         colorpicker_switch.Bind(
+    //             (params)=>{
+    
+    //                 /**
+    //                  * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'eventCallbacks' of the switch widget??????
+    //                  * Explanation:
+    //                  * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
+    //                  * 
+    //                  */
+    //                 const switch_mesh = params.target_mesh;
+    //                 const tail_particles_buffer = params.params.tail_particles_buffer;
+    //                 const glow_particles_buffer = params.params.glow_particles_buffer;
+    //                 const isOn = switch_mesh.isOn;
+    
+                    
+    //                 if(isOn){
+    //                     // How should this callback know about the colorpicker, so that it can destroy it???????
+    
+    //                     const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
+    //                     colorpicker.AssignTargetMeshClbk((params)=>{
+    //                         const color = params;
+                            
+    //                         // Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+    //                         CopyArr4(tail_particles_buffer[0].col, color);
+    //                         CopyArr4(glow_particles_buffer[0].col, color);
+    //                         // For control of all ball's tail particles
+    //                         // for(let i=0; i<num_balls; i++){
+    //                         //     CopyArr4(tail_particles_buffer[i].col, color);
+    //                         //     CopyArr4(glow_particles_buffer[i].col, color);
+    //                         // }
+    //                     });
+    //                     switch_mesh.aaa = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
+    //                 }
+    //                 else{
+    
+    //                     const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.aaa)
+    //                     colorpicker.Destroy();
+    //                 }
+    //             }, 
+    //             null, 
+    //             {
+    //                 tail_particles_buffer:tail_particles_buffer,
+    //                 glow_particles_buffer:glow_particles_buffer,
+    //             },
+    //         );
+    
+    
+    
+    
+    
+    
+    //         /****************************************************************************************************************/
+    //         // Tail Particle System: Contol Sliders 
+    //         const tail_buffer_len = tail_particles_buffer.length;
+    //         { 
+    
+    //             // const glow_emitter = tail_particles_buffer[i]
+                
+    //             { // Slider 1 contol
+    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Speed');
+    //                 // slider.temp_align |= SECTION.VERTICAL;
+    //                 slider.SetInitialValue(0);
+    //                 slider_section.AddItem(slider);
+                    
+                    
+    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+                    
+    //                 Slider_connect(slider, (params, slider_val)=>{
+                        
+    //                     // const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
+                        
+    //                     for(let i=0; i < tail_buffer_len; i++){
+    
+    //                         const glow_emitter = tail_particles_buffer[i]
+    //                         let min = .8; // The min value gives the prolonged glow_emitter
+    //                         let max = 1.; // Calculate that the max value will be +1+min
+    //                         const rev_slider_val = 1-slider_val;
+    //                         glow_emitter.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
+    //                         glow_emitter.speed = (slider_val+1)*3;
+    //                     }
+    //                 }, _);
+                    
+    //             }
+    //             { // Slider 2 contol
+    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Intensity');
+    //                 slider.SetInitialValue(0);
+    //                 slider_section.AddItem(slider);
+                    
+    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+    //                 for (let i=0; i<tail_buffer_len; i++){
+                        
+    //                     const glow_emitter = tail_particles_buffer[i]
+    //                     Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 1)
+    //                 }
+                    
+    //             }
+    //             { // Slider 3 contol
+    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Tail: Fire Variation');
+    //                 slider.SetInitialValue(0);
+    //                 slider_section.AddItem(slider);
+                    
+    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+    //                 for (let i=0; i<tail_buffer_len; i++) {
+    
+    //                     const glow_emitter = tail_particles_buffer[i]
+    //                     Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 0)
+    //                 }
+    //             }
+    //         }
+            
+    //         // Glow Particle System: Contol Sliders 
+    //         const glow_buffer_len = glow_particles_buffer.length;
+    //         // for (let i=0; i<glow_buffer_len; i++) { 
+    //         for (let i=0; i<1; i++) { 
+                
+    //             const glow_emitter = glow_particles_buffer[i]
+    //             /**
+    //              * NICE EFFECT:
+    //              * Distance:{.28}, Brighter:{1}, Intensity:{.05}, Gravity:{.53{=.03}}, Acceleration:{.22}
+    //              */
+    
+    //             {
+    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
+    //                 slider_section.AddItem(slider);
+    //                 slider.SetInitialValue(0);
+                    
+    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+    //                 Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 0)
+    //             }
+    //             {
+    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
+    //                 slider_section.AddItem(slider);
+    //                 slider.SetInitialValue(100);
+                
+    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+    //                 Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
+    //             }
+    //             {
+    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
+    //                 slider_section.AddItem(slider);
+    //                 slider.SetInitialValue(3);
+                    
+    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+    //                 Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
+    //             }
+    //         }
+            
+    //     }
+
+
+
+
+        
+    //     /****************************************************************************************************************/
+    //     /****************************************************************************************************************/
+    //     /****************************************************************************************************************/
+    //     // Side panel
+    //     const side_panel = CreateSidePanel(0x0);
+        
+        
+    //     // Add the ballTail control properties to the side panel
+    //     const inner_section = side_panel.children.buffer[1];
+    //     // inner_section.AddItem(slider_section)
+        
+    //     // TEST
+    //     const test_dp = CreateDropdown();
+    //     inner_section.AddItem(test_dp)
+        
+    //     // Create scroller for the ui-mesh info widget
+    //     const scroller_width = 220;
+    //     const scroller = Create_widget_scroller(_, slider_section, [scroller_width, 90]);
+    //     scroller.StateEnable(MESH_STATE.ACTIVE);
+    //     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    //     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    //     inner_section.AddItem(scroller)
+        
+        
+    //     // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
+    //     // scroller.scrolled_section.options = SECTION.VERTICAL;
+        
+    //     // scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //     // scroller.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section);
+    //     side_panel.geom.pos[0] = VIEWPORT.WIDTH - scroller_width*2
+        
+        
+        
+    //     side_panel.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //     side_panel.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENTX
+    //     // side_panel.options = SECTION.HORIZONTAL
+        
+    //     // side_panel.options = SECTION.HORIZONTAL|SECTION.EXPAND|SECTION.RESIZE_PARENTX
+    //     side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+    //     side_panel.Calc_no_gfx_update();
+    //     side_panel.Render();
+    //     side_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, side_panel.gfx.vb.groupidx);
+    //     side_panel.ConstructListeners();
+    //     View_build_group_from_root_mesh(side_panel);
+
+
+
+    //     const sbtn = side_panel.children.buffer[0]
+        
+    //     const params = {
+    //         isOn: true,
+    //     };
+    //     sbtn.ChangeListenEvent(E.C, 
+    //         (params)=>{
+        
+                
+    //             const section = params.evt_params.section;
+    //             const btn = Mesh_buffer_get_mesh_byidx(params.meshidx);
+    //             const isOn = params.evt_params.rest_params.isOn;
+    //             const reduce_val = section.geom.dim[0]*2/10;
+                
+    //             if(isOn){ // Close Panel
+                    
+    //                 Callback_animations_create( // Close Panel
+    //                     (params)=>{ // Run Animation
+
+    //                         let reduce_val = params.reduce_val;
+    //                         const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
+    //                         if(unif_wpos+reduce_val < VIEWPORT.WIDTH - btn.geom.dim[0]*2 - 5){
+
+    //                             const section = params.section;
+    //                             Mesh_unif_add_vb_root_wposx(section.root_posidx, reduce_val);
+                                
+    //                             if(params.reduce_val > 5) params.reduce_val *= .9
+    //                             // console.log('reduce_val', reduce_val, unif_wpos)
+
+    //                             return true;
+    //                         }
+
+    //                         return false;
+    //                     }, 
+    //                     ()=>{ // Stop Animation
+
+    //                         return false;
+    //                     }, 
+    //                     {section:section, reduce_val:reduce_val}
+    //                 );
+                    
+    //                 params.evt_params.rest_params.isOn = false;
+    //             }
+    //             else { // Open Panel
+                    
+    //                 Callback_animations_create(
+    //                     (params)=>{ // Run Animation
+
+    //                         let reduce_val = params.reduce_val;
+    //                         const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
+    //                         if(unif_wpos > VIEWPORT.WIDTH - section.geom.dim[0]*2){
+
+    //                             const section = params.section;
+    //                             Mesh_unif_add_vb_root_wposx(section.root_posidx, -reduce_val);
+                                
+    //                             if(params.reduce_val > 5) params.reduce_val *= .9
+    //                             console.log('reduce_val', reduce_val, unif_wpos)
+
+    //                             return true;
+    //                         }
+
+    //                         return false;
+    //                     }, 
+    //                     ()=>{ // Stop Animation
+
+    //                         return false;
+    //                     }, 
+    //                     {section:section, reduce_val:reduce_val}
+    //                 );
+                    
+    //                 params.evt_params.rest_params.isOn = true;
+    //             }
+
+        
+    //         }
+    //         , {section:side_panel, rest_params:params},
+    //     );
+    // }
 
     { // Scroller Widgets
         // Create and pass scrollers in 'CreateScrollerInScroller()' 
@@ -129,19 +475,20 @@ export function TestWidgetsGeneric(scene) {
     { // Animations
         // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
         // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .01, .1, 1., _, .5, false)
+
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .01, .1, 1., _, .5, false)
         
-        // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0)
+        // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0)
         
-        // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.X, line, .5, -5., 5., 0)
-        // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.Y, line, .5, -5., 5., 0)
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .1, .0, 1.,)
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, line, .005, .2, .5, .2)
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .0025, .2, .8, .2)
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RG, line, .01, .2, .8, _, .2, false)
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, line, .01, .1, .1, _, .5, true)
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .001, .2, 1.4, _, .4, true)
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .001, .2, 1.4, _, .4, true)
+        // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.X, line, .5, -5., 5., 0)
+        // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.Y, line, .5, -5., 5., 0)
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .1, .0, 1.,)
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, line, .005, .2, .5, .2)
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .0025, .2, .8, .2)
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RG, line, .01, .2, .8, _, .2, false)
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, line, .01, .1, .1, _, .5, true)
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .001, .2, 1.4, _, .4, true)
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .001, .2, 1.4, _, .4, true)
     }
 
 
@@ -168,18 +515,30 @@ export function TestWidgetsGeneric(scene) {
 
 
 
-        // // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .01, .2, 1.4, _, .4, true);
-        // // Animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0);
+        // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .01, .2, 1.4, _, .4, true);
+        // // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0);
 
     }
 
 
     
     { // Widget: Colorpicker
-        // CreateColorPicker(SID.ATTR.WPOS_TIME4|SID.ATTR.DIM2)
-        // CreateColorPicker(SID.ATTR.DIM2)
-        // TODO: Enable multi vertex color in 'Widget_Slider_Simple' constructor
-        // CreateColorPicker();
+        // CreateColorPicker(x, y, SID.ATTR.WPOS_TIME4|SID.ATTR.DIM2)
+        // CreateColorPicker(x, y, SID.ATTR.DIM2)
+        
+        // // TODO: Enable multi vertex color in 'Widget_Slider_Simple' constructor
+        // const colorpicker = CreateColorPicker(_, _, _, ROOT_WIDGETS.CREATE_ROOT);
+
+        // const btn = CreateButton(100, 500, ROOT_WIDGETS.CREATE_ROOT);
+        // btn.Bind(
+        //     (params)=>{
+
+        //         params.evt_params.Destroy()
+        //     }, 
+        //     _, 
+        //     colorpicker,
+        // );
+        // colorpicker.Destroy()
         
         
         // Test change color of a mesh using the colorpicker
@@ -212,7 +571,7 @@ export function TestWidgetsGeneric(scene) {
         // const label = CreateLabel('ABCDEFGHIJKLM');
         // // CreateLabel('\\/+0');
         // const label = CreateLabel('CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line););CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line');
-        // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
         
         // CreateLabel('Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);');
         // CreateLabel('Gl._framebuffer:-{render}|[mesh](FB.agqtpQji,TYPE.DIMENTION!,@23#scene,(label);');
@@ -226,7 +585,7 @@ export function TestWidgetsGeneric(scene) {
 
     { // Widget: Dropdown
 
-        // CreateDropdown([0,0, 0])
+        // CreateDropdown([400, 200, 0])
         // CreateDropdown2([0, ypos+=40, 0], 0);
         // CreateDropdown2InSection([0, ypos+=40, 0], 0);
         // CreateDropdown3([0, ypos+=40, 0], 0);
@@ -243,11 +602,14 @@ export function TestWidgetsGeneric(scene) {
 
     { // PARTICLES
         /**************************/
-        // CreateGlowParticles();
+        // CreateGlowParticles(0, 100);
 
-        // CreateBallTailParticles();
+        // CreateBallTailParticles(0, 800, );
         
-        CreateSmokeParticles();
+        // CreateSmokeParticles(0, 1600);
+
+        // TestNoiseShader();
+
 
     }
 
@@ -258,7 +620,7 @@ export function TestWidgetsGeneric(scene) {
 
         // TestSections1();
 
-        // CreateManySections(scene);
+        CreateManySections(scene);
 
         // const helpui = Help(scene);
 
@@ -286,181 +648,13 @@ export function TestWidgetsGeneric(scene) {
         // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh.children.buffer[0]);
     }
     
+
+    // Must draw last so it is on top of everything
+    
+    Debug_info_ui_static();
 }
 
 
-
-
-
-
-
-
-
-/**************************************************************************************************************************************/
-// Widget Section Tests
-
-function TestSections1(){
-
-    const marg = [10,10];
-
-    // const pos = [VIEWPORT.WIDTH/2, VIEWPORT.HEIGHT/2, 0];
-    const pos = [0, 0, 0];
-    
-    const root = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, marg, pos, [0, 0], TRANSPARENCY(BLUEL[5], 1));
-    root.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    root.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    root.SetName('root_blue');
-    
-    { // Test 1
-        const s1 = Sections4(_, SECTION.HORIZONTAL, pos);
-        root.AddItem(s1);
-        const s2 = Sections4(_, SECTION.HORIZONTAL, pos);
-        root.AddItem(s2);
-    }
-    
-    { // Test 2
-        const s1 = Sections2(_, SECTION.VERTICAL, pos); root.AddItem(s1);
-
-        // { // Test: one into another recursive 
-        //     const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2);
-        //     const s3 = Sections2(_, SECTION.VERTICAL, pos); s2.AddItem(s3);
-        //     const s4 = Sections2(_, SECTION.HORIZONTAL, pos); s3.AddItem(s4);
-        // }
-        
-        // { const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2); }
-        // { const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2); }
-        
-        // const s2 = Sections2(_, SECTION.VERTICAL, pos); root.AddItem(s2);
-        // const s3 = Sections2(_, SECTION.HORIZONTAL, pos); root.AddItem(s3);
-        
-        // const s4 = Sections2(_, SECTION.HORIZONTAL, pos); root.AddItem(s4);
-    }
-    
-    { // Test 3
-        // {
-        //     const s = Create_widget_section(_, SECTION.HORIZONTAL, marg, [0,0,0], [10, 100], TRANSPARENCY(REDL[7], .6));
-        //     s.SetName('red1');
-        //     root.AddItem(s)
-            
-        //     { 
-        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
-        //         // const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
-        //     }
-        //     {
-                
-        //         const sr = Create_widget_section(_, SECTION.VERTICAL, marg, [0,0,0], [10, 10], TRANSPARENCY(REDL[7], .6));
-        //         sr.SetName('red2');
-        //         root.AddItem(sr)
-        //         const s1 = Sections2(_, SECTION.VERTICAL); sr.AddItem(s1); 
-        //         const s2 = Sections2(_, SECTION.HORIZONTAL); sr.AddItem(s2);
-        //     }
-        //     { 
-        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
-        //         const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
-        //     }
-        // }
-        // {
-        //     const s = Create_widget_section(_, SECTION.HORIZONTAL, marg, [0,0,0], [10, 100], TRANSPARENCY(REDL[7], .6));
-        //     s.SetName('red3');
-        //     root.AddItem(s)
-            
-        //     { 
-        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
-        //         // const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
-        //     }
-        //     {
-                
-        //         const sr = Create_widget_section(_, SECTION.VERTICAL, marg, [0,0,0], [10, 10], TRANSPARENCY(REDL[7], .6));
-        //         sr.SetName('red4');
-        //         root.AddItem(sr)
-        //         const s1 = Sections2(_, SECTION.VERTICAL); sr.AddItem(s1); 
-        //         const s2 = Sections2(_, SECTION.HORIZONTAL); sr.AddItem(s2);
-        //     }
-        //     { 
-        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
-        //         const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
-        //     }
-        // }
-
-    }
-    
-    
-
-
-    root.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    
-    root.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
-    root.Calc_no_gfx_update();
-    root.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root.gfx.vb.groupidx)
-
-    root.Render();
-
-    root.ConstructListeners();
-}
-let grey_cnt = 0;
-let green_cnt = 0;
-let orange_cnt = 0;
-function Sections2(is_root, align) {
-
-    const tr = .7;
-    const marg = [10, 10];
-    const dim = [10, 10];
-
-    const grey = Create_widget_section(is_root, align, marg, [0, 0, 0], dim, TRANSPARENCY(GREY[0], tr));
-    grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    grey.SetName(`grey${grey_cnt++}`);
-
-    const green = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(GREEN[3], tr));
-    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    green.SetName(`green${green_cnt++}`);
-    grey.AddItem(green);
-
-    const orange = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(ORANGER[7], tr));
-    orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    orange.SetName(`orange${orange_cnt++}`);
-    green.AddItem(orange);
-
-    return grey;
-}
-function Sections4(is_root, align) {
-
-    const tr = 1.;
-
-    const blu = Create_widget_section(is_root, align, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    blu.SetName('grey');
-
-    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-    red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    red.SetName('red');
-    blu.AddItem(red);
-    const green = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[6], tr));
-    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    green.SetName('green');
-    blu.AddItem(green);
-    // const purple = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-    // purple.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // purple.SetName('purple');
-    // blu.AddItem(purple);
-    // const orange = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGER[7], tr));
-    // orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // orange.SetName('orange');
-    // blu.AddItem(orange);
-
-
-
-    return blu;
-}
-
-
-
-function Test_widgets(ypos){
-    // CreateWindowWithMenu();
-    CreateDropdown2([0, ypos+=40, 0], 0);
-    CreateDropdown2InSection([0, ypos+=40, 0], 0);
-    CreateDropdown3([0, ypos+=40, 0], 0);
-    CreateScrollerClampAlphaTest()
-}
 
 
 
@@ -518,6 +712,7 @@ function CreatePanel(is_root_widget=undefined){
     scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
     scroller.scrolled_section.options = SECTION.VERTICAL;
     
+    scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     scroller.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section);
     // scroller.scrolled_section.children.buffer[0].GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section.children.buffer[0]);
     // scroller.scrolled_section.children.buffer[1].GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section.children.buffer[1]);
@@ -555,6 +750,140 @@ function CreatePanel(is_root_widget=undefined){
 }
 
 
+function CreateSidePanel(root_widget=ROOT_WIDGETS.CREATE_ROOT){
+    
+    const height = VIEWPORT.HEIGHT;
+    const width = 400;
+    const pad = 4;
+
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [pad, pad], [VIEWPORT.RIGHT-(width-pad*2), 0, 0], [width, height], TRANSPARENCY(GREY[1], 1), 'SidePanel', [0, 10, 1.8]);
+    // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [pad, pad], [VIEWPORT.RIGHT-width, 0, 0], [width, height], TRANSPARENCY(GREY[1], 1), 'SidePanel', [0, 10, 1.8]);
+    // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    
+    
+    const sbtn = Create_rect_mesh(_,[0, 0, 11], [6, height], TRANSPARENCY(BLUEL[3], 1.), 'Btn', [0, 22, 1.8], );
+    sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+    sbtn.EnableGfxAttributes(MESH_ENABLE.ATTR_STYLE);
+    section.AddItem(sbtn)
+    
+    const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 2], [100, 400], TRANSPARENCY(GREY[4], .8), 'InnerPanel', [0, 10, 1.8]);
+    section.AddItem(s);
+    // s.max_size[0] = 100;
+    // s.max_size[1] = 400;
+    s.options = SECTION.VERTICAL|SECTION.EXPAND|SECTION.TOP_DOWN
+    // s.options = SECTION.VERTICAL|SECTION.EXPAND|SECTION.FIXED_W
+    // s.options = SECTION.VERTICAL|SECTION.FIXED_W|SECTION.FIXED_H
+    
+    const heading = Create_widget_label(_, 'Properties', _, [0,0,4], _, GREY[2]);
+    s.AddItem(heading);
+    
+    const dbg_dp = Debug_info_ui(_, [0,0,3]);
+    s.AddItem(dbg_dp);
+
+
+    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
+
+        
+        section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        section.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENTX
+        // section.options = SECTION.HORIZONTAL|SECTION.EXPAND|SECTION.RESIZE_PARENTX
+        section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+        section.Calc_no_gfx_update();
+        section.Render();
+        section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+        section.ConstructListeners();
+        View_build_group_from_root_mesh(section);
+    }
+
+
+    // const params = {
+    //     isOn: true,
+    // };
+    // sbtn.ChangeListenEvent(E.C, 
+    //     (params)=>{
+      
+    //         console.log('[][][][]][][][][][][');
+            
+    //         const section = params.evt_params.section;
+    //         const btn = Mesh_buffer_get_mesh_byidx(params.meshidx);
+    //         const isOn = params.evt_params.rest_params.isOn;
+    //         const reduce_val = 25;
+    //         console.log(isOn)
+            
+    //         if(isOn){
+                
+    //             Callback_animations_create( // Close Panel
+    //                 (params)=>{ // Run Animation
+    //                     // console.log(params)
+
+    //                     let reduce_val = params.reduce_val;
+    //                     const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
+    //                     if(unif_wpos+reduce_val < VIEWPORT.WIDTH - btn.geom.dim[0]*2 - 5){
+    //                         // console.log('unif_wpos', unif_wpos)
+    //                         const section = params.section;
+    //                         Mesh_unif_add_vb_root_wposx(section.root_posidx, reduce_val);
+                            
+    //                         // params.reduce_val *= 1.03
+    //                         params.reduce_val *= .9
+    //                         // console.log('reduce_val', params.reduce_val)
+
+    //                         return true;
+    //                     }
+
+    //                     // Mesh_unif_add_vb_root_wposx(section.root_posidx, section.geom.dim[0]*2 - btn.geom.dim[0]*2 - 5);
+
+    //                     return false;
+    //                 }, 
+    //                 ()=>{ // Stop Animation
+
+    //                     return false;
+    //                 }, 
+    //                 {section:section, reduce_val:reduce_val}
+    //             );
+                
+    //             params.evt_params.rest_params.isOn = false;
+    //         }
+    //         else { // Open Panel
+                
+    //             Callback_animations_create(
+    //                 (params)=>{ // Run Animation
+
+    //                     let reduce_val = params.reduce_val;
+    //                     const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
+    //                     if(unif_wpos > VIEWPORT.WIDTH - section.geom.dim[0]*2 || reduce_val < 1){
+
+    //                         const section = params.section;
+    //                         Mesh_unif_add_vb_root_wposx(section.root_posidx, -reduce_val);
+                            
+    //                         params.reduce_val *= .9
+    //                         // console.log('unif_wpos', unif_wpos, 'reduce_val',VIEWPORT.WIDTH - btn.geom.dim[0])
+
+    //                         return true;
+    //                     }
+
+    //                     return false;
+    //                 }, 
+    //                 ()=>{ // Stop Animation
+
+    //                     return false;
+    //                 }, 
+    //                 {section:section, reduce_val:reduce_val}
+    //             );
+                
+    //             params.evt_params.rest_params.isOn = true;
+    //         }
+
+      
+    //     }
+    //     , {section:section, rest_params:params},
+    // );
+
+
+    return section;
+}
+
 
 function SectionResizable(pos) {
 
@@ -591,7 +920,7 @@ function SectionResizable(pos) {
 
 
 
-function CreateGlowParticles(){ // 3 control Sliders 
+function CreateGlowParticles(x=0, y=0){ // 3 control Sliders 
 
     /**
      * // TODO:
@@ -601,7 +930,7 @@ function CreateGlowParticles(){ // 3 control Sliders
 
     const scale_down = .2;
     
-    const emitter_idx1 = Particle_system_create_emitter('T1st Particle System', BLUEL[9], [0,0,10], [40,40], .6, 1, 4, .98, .1, 4);
+    const emitter_idx1 = Particle_system_create_emitter('T1st Particle System', BLUEL[9], [x, y, 10], [40,40], .6, 1, 4, .98, .1, 4);
     const emitter = Particles_get_particle_system(emitter_idx1);
     emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
     
@@ -644,11 +973,13 @@ function CreateGlowParticles(){ // 3 control Sliders
     const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
     slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-
     const flags = {
         unif: SID.UNIF.ROOT_WPOS2,
         pass: SID.PASS.WPOS2,
     }
+    slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+
 
 
     /****************************************************************************************************************/
@@ -662,9 +993,13 @@ function CreateGlowParticles(){ // 3 control Sliders
     // btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1, emitter_idx2] }, MESH_STATE.IS_HOLD_CLICK)
     btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1] }, MESH_STATE.IS_HOLD_CLICK)
 
+
+
+
     /****************************************************************************************************************/
     // Create the switch to auto-emitt particles
     const emitt_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
+    slider_section.AddItem(emitt_switch);
     const evt_params = { target_params: [emitter_idx1] };
     /**
      * Pass the Emitt pareticles callback 'Particle_system_emitt' as the t'targetBindingFunctions' parameter, 
@@ -674,15 +1009,61 @@ function CreateGlowParticles(){ // 3 control Sliders
     emitt_switch.Bind(Switch_simple_time_interval_callback, Particle_system_emitt, evt_params);
     emitt_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
+
+
+
+    /****************************************************************************************************************/
+    // Create the switch to create/destroy colorpicker for particles color control
+    const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
+    slider_section.AddItem(colorpicker_switch);
+    colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    colorpicker_switch.Bind(
+        (params)=>{
+
+            /**
+             * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'eventCallbacks' of the switch widget??????
+             * Explanation:
+             * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
+             * 
+             */
+            const switch_mesh = params.target_mesh;
+            const isOn = switch_mesh.isOn;
+
+            
+            if(isOn){
+                // How should this callback know about the colorpicker, so that it can destroy it???????
+
+                const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
+                colorpicker.AssignTargetMeshClbk((params)=>{
+                    const color = params;
+                    Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+                    CopyArr4(emitter.col, color);
+                });
+                switch_mesh.aaa = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
+            }
+            else{
+
+                const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.aaa)
+                colorpicker.Destroy();
+            }
+        }, 
+        null, null,
+    );
+
+    /***********************************************************************************************/
+    // Create Color Picker (INDEPENDENT CANNOT BE DESTROYED) to change the particles color
+    // const picker = CreateColorPicker(x, y, _, 0x0);
+    // picker.AssignTargetMeshClbk((params)=>{
+    //     const color = params;
+    //     Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+    //     CopyArr4(emitter.col, color);
+    // });
+    // slider_section.
     
 
     /*************************************************************************************************************** */
     // Create Sliders for manipulating variables of particles
 
-    slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    
-
-    slider_section.AddItem(emitt_switch)
 
     /**
      * NICE EFFECT:
@@ -720,7 +1101,7 @@ function CreateGlowParticles(){ // 3 control Sliders
         Particles_gfx_uniforms_set_clbk(emitter_idx1, 'u_glow_params', Slider_get_slider_val, slider, 2)
         // Particles_gfx_uniforms_set_clbk(emitter_idx2, 'u_glow_params', Slider_get_slider_val, slider, 2)
     }
-    {
+    { // Gravity
         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Gravity');
         slider_section.AddItem(slider);
         slider.SetInitialValue(48);
@@ -738,7 +1119,7 @@ function CreateGlowParticles(){ // 3 control Sliders
             emitter.gravity = y;
         }, _);
     }
-    {
+    { // Acceleration
         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Acceleration');
         slider_section.AddItem(slider);
         slider.SetInitialValue(59);
@@ -758,7 +1139,7 @@ function CreateGlowParticles(){ // 3 control Sliders
             emitter.max_speed = 4;
         }, _);
     }
-    {
+    { // Deccelerarion
         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Deccelerarion');
         slider_section.AddItem(slider);
         slider.SetInitialValue(19);
@@ -821,7 +1202,7 @@ function CreateGlowParticles(){ // 3 control Sliders
             console.log(slider_val, y)
         }, _);
     }
-    { // Set Emitter Y Position
+    { // Set Emitter Y Direction Y Down
         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Direction Y Down');
         slider_section.AddItem(slider);
         slider.SetInitialValue(10);
@@ -835,8 +1216,8 @@ function CreateGlowParticles(){ // 3 control Sliders
             console.log(slider_val, y)
         }, _);
     }
-    { // Set Emitter Y Position
-        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Direction X Left ');
+    { // Set Emitter Direction X Left
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Direction X Left');
         slider_section.AddItem(slider);
         slider.SetInitialValue(55);
         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -860,18 +1241,6 @@ function CreateGlowParticles(){ // 3 control Sliders
 
     slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
 
-
-
-    
-    
-    /***********************************************************************************************/
-    // Create Color Picker to change the particles color
-    const picker = CreateColorPicker();
-    picker.AssignTargetMeshClbk((params)=>{
-        const color = params;
-        Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
-        CopyArr4(emitter.col, color);
-    });
 }
 
 /**
@@ -879,7 +1248,7 @@ function CreateGlowParticles(){ // 3 control Sliders
  * Create a gfxContext match for particle systems of same type
  */
 
-function CreateBallTailParticles(num_balls=2){ // Particles Bouncing Ball Tail
+function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing Ball Tail
 
     let balls_buffer = [];
     let dirs_buffer = [];
@@ -887,7 +1256,7 @@ function CreateBallTailParticles(num_balls=2){ // Particles Bouncing Ball Tail
     let glow_particles_buffer = [];
 
             
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [100, 0], [0, 0, 0], [300, 300], TRANSPARENCY(GREY[3], 1.0), 'Particles Bouncing Ball Tail',)
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [100, 0], [x+300, y+0, 0], [300, 300], TRANSPARENCY(GREY[3], 1.0), 'Particles Bouncing Ball Tail',)
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
@@ -994,127 +1363,182 @@ function CreateBallTailParticles(num_balls=2){ // Particles Bouncing Ball Tail
 
 
 
-    /*************************************************************************************************************** */
-    // Create Sliders for manipulating variables of particles
 
-    const slider_dim = [100, 10];
-    const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
-    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // /*************************************************************************************************************** */
+    // // Create Sliders for manipulating variables of particles
+
+    // const slider_dim = [100, 10];
+    // const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [x+VIEWPORT.WIDTH-slider_dim[0]*2-40, y+60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
+    // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
            
-    const flags = {
-        unif: SID.UNIF.ROOT_WPOS2,
-        pass: SID.PASS.WPOS2,
-    }
+    // const flags = {
+    //     unif: SID.UNIF.ROOT_WPOS2,
+    //     pass: SID.PASS.WPOS2,
+    // }
 
-    slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-    // Tail Particle System: Contol Sliders 
-    const tail_buffer_len = tail_particles_buffer.length;
-    { 
 
-        // const glow_emitter = tail_particles_buffer[i]
+
+
+    // /****************************************************************************************************************/
+    // // Create the switch to create/destroy colorpicker for particles color control
+    // const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
+    // slider_section.AddItem(colorpicker_switch);
+    // colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // colorpicker_switch.Bind(
+    //     (params)=>{
+
+    //         /**
+    //          * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'eventCallbacks' of the switch widget??????
+    //          * Explanation:
+    //          * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
+    //          * 
+    //          */
+    //         const switch_mesh = params.target_mesh;
+    //         const isOn = switch_mesh.isOn;
+
+            
+    //         if(isOn){
+    //             // How should this callback know about the colorpicker, so that it can destroy it???????
+
+    //             const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
+    //             colorpicker.AssignTargetMeshClbk((params)=>{
+    //                 const color = params;
+    //                 Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+
+    //                 CopyArr4(tail_particles_buffer[0].col, color);
+    //                 CopyArr4(glow_particles_buffer[0].col, color);
+    //                 // For control of all ball's tail particles
+    //                 // for(let i=0; i<num_balls; i++){
+    //                 //     CopyArr4(tail_particles_buffer[i].col, color);
+    //                 //     CopyArr4(glow_particles_buffer[i].col, color);
+    //                 // }
+    //             });
+    //             switch_mesh.aaa = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
+    //         }
+    //         else{
+
+    //             const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.aaa)
+    //             colorpicker.Destroy();
+    //         }
+    //     }, 
+    //     null, null,
+    // );
+
+
+
+
+
+
+    // /****************************************************************************************************************/
+    // // Tail Particle System: Contol Sliders 
+    // const tail_buffer_len = tail_particles_buffer.length;
+    // { 
+
+    //     // const glow_emitter = tail_particles_buffer[i]
         
-        { // Slider 1 contol
-            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Speed');
-            slider.SetInitialValue(0);
-            slider_section.AddItem(slider);
+    //     { // Slider 1 contol
+    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Speed');
+    //         slider.SetInitialValue(0);
+    //         slider_section.AddItem(slider);
             
             
-            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             
             
-            Slider_connect(slider, (params, slider_val)=>{
+    //         Slider_connect(slider, (params, slider_val)=>{
                 
-                // const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
+    //             // const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
                 
-                for(let i=0; i < tail_buffer_len; i++){
+    //             for(let i=0; i < tail_buffer_len; i++){
 
-                    const glow_emitter = tail_particles_buffer[i]
-                    let min = .8; // The min value gives the prolonged glow_emitter
-                    let max = 1.; // Calculate that the max value will be +1+min
-                    const rev_slider_val = 1-slider_val;
-                    glow_emitter.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
-                    glow_emitter.speed = (slider_val+1)*3;
-                }
-            }, _);
+    //                 const glow_emitter = tail_particles_buffer[i]
+    //                 let min = .8; // The min value gives the prolonged glow_emitter
+    //                 let max = 1.; // Calculate that the max value will be +1+min
+    //                 const rev_slider_val = 1-slider_val;
+    //                 glow_emitter.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
+    //                 glow_emitter.speed = (slider_val+1)*3;
+    //             }
+    //         }, _);
             
-        }
-        { // Slider 2 contol
-            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Intensity');
-            slider.SetInitialValue(0);
-            slider_section.AddItem(slider);
+    //     }
+    //     { // Slider 2 contol
+    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Intensity');
+    //         slider.SetInitialValue(0);
+    //         slider_section.AddItem(slider);
             
-            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             
-            for (let i=0; i<tail_buffer_len; i++){
+    //         for (let i=0; i<tail_buffer_len; i++){
                 
-                const glow_emitter = tail_particles_buffer[i]
-                Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 1)
-            }
+    //             const glow_emitter = tail_particles_buffer[i]
+    //             Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 1)
+    //         }
             
-        }
-        { // Slider 3 contol
-            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Tail: Fire Variation');
-            slider.SetInitialValue(0);
-            slider_section.AddItem(slider);
+    //     }
+    //     { // Slider 3 contol
+    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Tail: Fire Variation');
+    //         slider.SetInitialValue(0);
+    //         slider_section.AddItem(slider);
             
-            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             
-            for (let i=0; i<tail_buffer_len; i++) {
+    //         for (let i=0; i<tail_buffer_len; i++) {
 
-                const glow_emitter = tail_particles_buffer[i]
-                Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 0)
-            }
-        }
-    }
+    //             const glow_emitter = tail_particles_buffer[i]
+    //             Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 0)
+    //         }
+    //     }
+    // }
     
-    // Glow Particle System: Contol Sliders 
-    const glow_buffer_len = glow_particles_buffer.length;
-    for (let i=0; i<glow_buffer_len; i++) { 
+    // // Glow Particle System: Contol Sliders 
+    // const glow_buffer_len = glow_particles_buffer.length;
+    // for (let i=0; i<glow_buffer_len; i++) { 
         
-        const glow_emitter = glow_particles_buffer[i]
-        /**
-         * NICE EFFECT:
-         * Distance:{.28}, Brighter:{1}, Intensity:{.05}, Gravity:{.53{=.03}}, Acceleration:{.22}
-         */
+    //     const glow_emitter = glow_particles_buffer[i]
+    //     /**
+    //      * NICE EFFECT:
+    //      * Distance:{.28}, Brighter:{1}, Intensity:{.05}, Gravity:{.53{=.03}}, Acceleration:{.22}
+    //      */
 
-        {
-            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
-            slider_section.AddItem(slider);
-            slider.SetInitialValue(0);
+    //     {
+    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
+    //         slider_section.AddItem(slider);
+    //         slider.SetInitialValue(0);
             
-            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-            Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 0)
-        }
-        {
-            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
-            slider_section.AddItem(slider);
-            slider.SetInitialValue(100);
+    //         Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 0)
+    //     }
+    //     {
+    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
+    //         slider_section.AddItem(slider);
+    //         slider.SetInitialValue(100);
         
-            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             
-            Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
-        }
-        {
-            const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
-            slider_section.AddItem(slider);
-            slider.SetInitialValue(3);
+    //         Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
+    //     }
+    //     {
+    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
+    //         slider_section.AddItem(slider);
+    //         slider.SetInitialValue(3);
             
-            slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             
-            Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
-        }
-    }
+    //         Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
+    //     }
+    // }
     
-    slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-    slider_section.Calc_no_gfx_update();
-    slider_section.Render();
-    slider_section.ConstructListeners();
+    // slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    // slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+    // slider_section.Calc_no_gfx_update();
+    // slider_section.Render();
+    // slider_section.ConstructListeners();
 
-    slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
+    // slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
 
 
 
@@ -1123,6 +1547,8 @@ function CreateBallTailParticles(num_balls=2){ // Particles Bouncing Ball Tail
   
 
 
+    /****************************************************************************************************************/
+    // Create the ball's animation callback
     const AnimateBall = function(params){
 
         
@@ -1153,7 +1579,7 @@ function CreateBallTailParticles(num_balls=2){ // Particles Bouncing Ball Tail
             
             const speed = 3;
             const variation = TimerGetGlobalTimerCycle()*.3 + .5;
-            const x = 1 * dir[0] * tail_emitter.speed * variation * .5;
+            const x = 1 * dir[0] * tail_emitter.speed * variation ;
             // const x = 0;
             const y = 1 * dir[1] * tail_emitter.speed * .5;
             // const y = 0;
@@ -1234,28 +1660,33 @@ function CreateBallTailParticles(num_balls=2){ // Particles Bouncing Ball Tail
         small_particles: glow_particles_buffer,
     }
 
-    TimeIntervalsCreate(1, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, AnimateBall, params);
+    TimeIntervalsCreate(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, AnimateBall, params);
 
 
 
     
     
-    /***********************************************************************************************/
-    // Create Color Picker to change the particles color
-    const picker = CreateColorPicker();
-    // picker.AssignTargetMesh();
-    picker.AssignTargetMeshClbk((params)=>{
-        const color = params;
-        Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
-        // CopyArr4(tail_particles_buffer[0].col, color);
-        CopyArr4(glow_particles_buffer[0].col, color);
-    });
+    // /****************************************************************************************************************/
+    // // Create Color Picker 'INDEPENDED-CANNOT BE DESTROYED' to change the particles color
+    // const picker = CreateColorPicker(x, y);
+    // // picker.AssignTargetMesh();
+    // picker.AssignTargetMeshClbk((params)=>{
+    //     const color = params;
+    //     Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+    //     // CopyArr4(tail_particles_buffer[0].col, color);
+    //     CopyArr4(glow_particles_buffer[0].col, color);
+    // });
 
+    return {
+        section:section,
+        tail_particles_buffer:tail_particles_buffer,
+        glow_particles_buffer: glow_particles_buffer,
+    };
 }
 
 
 
-function CreateSmokeParticles(){
+function CreateSmokeParticles(x=0, y=0){
 
     /**
      * // TODO: The "u_smoke_params" is one float instead of vec3 that we are passing 
@@ -1265,11 +1696,306 @@ function CreateSmokeParticles(){
     const emitter_idxs = [];
     const speed = 10;
     let cnt = 0;
-    const dim = [150,150]
+    const dim = [150,150];
+    
+
+    // Create Particle emitters
+    { // Emitter 1
+        const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', PURPLEB[9], [-90, y+530, 0], dim, 1.5, 1, 2, .98, -.1, 3);
+        const emitter = Particles_get_particle_system(emitter_idx);
+        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        emitter.speed = speed;
+        
+        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        emitter.EnableGfxUniforms({fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+
+        TEMP_PARTICLES_GEN_GFX(emitter);
+
+    
+        emitter.SetConeOfDirection(1, 1, -.1, .2);
+
+        emitters[cnt] = emitter;
+        emitter_idxs[cnt] = emitter_idx;
+        cnt++
+    }
+    { // Emitter 2
+        const emitter_idx = Particle_system_create_emitter('SmokeParticles 2', PURPLER[9], [-90, y+420, 0], dim, .7, 1, 2, .98, -.1, 3 );
+        const emitter = Particles_get_particle_system(emitter_idx);
+        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        emitter.speed = speed;
+        
+        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        emitter.EnableGfxUniforms({unif:SID.UNIF.UNIF_SMOKE2, fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+        
+        TEMP_PARTICLES_GEN_GFX(emitter);
+
+        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
+    
+        emitter.SetConeOfDirection(1, 1, -.1, .2);
+            
+        emitters[cnt] = emitter;
+        emitter_idxs[cnt] = emitter_idx;
+        cnt++
+    }
+    { // Emitter 3
+        const emitter_idx = Particle_system_create_emitter('SmokeParticles 3', YELLOW[9], [-90, y+310, 0], dim, .7, 1, 2, .98, -.1, 3 );
+        const emitter = Particles_get_particle_system(emitter_idx);
+        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        emitter.speed = speed;
+        
+        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        emitter.EnableGfxUniforms({unif:SID.UNIF.UNIF_SMOKE2, fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+        
+        TEMP_PARTICLES_GEN_GFX(emitter);
+
+        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
+    
+        emitter.SetConeOfDirection(1, 1, -.1, .2);
+
+        emitters[cnt] = emitter;
+        emitter_idxs[cnt] = emitter_idx;
+        cnt++
+    }
+    { // Emitter 4
+        const emitter_idx = Particle_system_create_emitter('SmokeParticles 4', GREEN[9], [-90, y+200, 0], dim, .7, 1, 2, .98, -.1, 3 );
+        const emitter = Particles_get_particle_system(emitter_idx);
+        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        emitter.speed = speed;
+        
+        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        emitter.EnableGfxUniforms({unif:SID.UNIF.UNIF_SMOKE2, fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+        
+        TEMP_PARTICLES_GEN_GFX(emitter);
+
+        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
+    
+        emitter.SetConeOfDirection(1, 1, -.1, .2);
+            
+        emitters[cnt] = emitter;
+        emitter_idxs[cnt] = emitter_idx;
+        cnt++
+
+    }
+
+
+    /*************************************************************************************************************** */
+    // Create Particles Control Panel
+
+    const slider_dim = [100, 10];
+
+
+    const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, y+60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
+    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+    const flags = {
+        unif: SID.UNIF.ROOT_WPOS2,
+        pass: SID.PASS.WPOS2,
+    }
+
+
+    /****************************************************************************************************************/
+    // Create the emitter button, as well as a switch to auto-emitt particles
+    const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', _, [0, 0, 1], 20, BLUEL[6], WHITE, [5, 5], .5);
+    slider_section.AddItem(btn)
+    btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    btn.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+    // btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1, emitter_idx2] }, MESH_STATE.IS_HOLD_CLICK)
+    btn.Bind(Particle_system_emitt, _, { target_params: emitter_idxs }, MESH_STATE.IS_HOLD_CLICK)
+
+    /****************************************************************************************************************/
+    // Create the switch to auto-emitt particles
+    const emitt_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
+    const evt_params = { target_params: emitter_idxs };
+    /**
+     * Pass the Emitt pareticles callback 'Particle_system_emitt' as the t'targetBindingFunctions' parameter, 
+     * so that the 'OnClick' of the switch widget will call the 'Switch_simple_time_interval_callback' 
+     * that will create the timeInterval passing the 'Particle_system_emitt' callback.
+     */
+    emitt_switch.Bind(Switch_simple_time_interval_callback, Particle_system_emitt, evt_params);
+    emitt_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+
+    
+
+    /*************************************************************************************************************** */
+    // Create Sliders for manipulating variables of particles
+
+    slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    slider_section.AddItem(emitt_switch)
+
+
+
+
+    /****************************************************************************************************************/
+    // Create the switch to create/destroy colorpicker for particles color control
+    const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
+    slider_section.AddItem(colorpicker_switch);
+    colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    colorpicker_switch.Bind(
+        (params)=>{
+
+            /**
+             * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'eventCallbacks' of the switch widget??????
+             * Explanation:
+             * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
+             * 
+             */
+            const switch_mesh = params.target_mesh;
+            const isOn = switch_mesh.isOn;
+
+            
+            if(isOn){
+                // How should this callback know about the colorpicker, so that it can destroy it???????
+
+                const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
+                colorpicker.AssignTargetMeshClbk((params)=>{
+                    const color = params;
+                    Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+
+                    CopyArr4(emitters[0].col, color);
+                });
+                switch_mesh.aaa = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
+            }
+            else{
+
+                const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.aaa)
+                colorpicker.Destroy();
+            }
+        }, 
+        null, null,
+    );
+
+
+
+
+    
+    /****************************************************************************************************************/
+    // Create slider contols
+    { // Distance
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(71);
+        
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+        Particles_gfx_uniforms_set_clbk(emitter_idxs[0], 'u_smoke_params', Slider_get_slider_val, slider, 0)
+    }
+    { // Unused
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Unused');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(0);
+    
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        // Particles_gfx_uniforms_set_clbk(emitter_idxs[0], 'u_smoke_params', Slider_get_slider_val, slider, 1)
+    }
+    { // Unused
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Unused');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(0);
+        
+        
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        // Particles_gfx_uniforms_set_clbk(emitter_idxs[0], 'u_smoke_params', Slider_get_slider_val, slider, 2)
+    }
+    { // Gravity
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Gravity');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(50);
+        
+        
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        Slider_connect(slider, (params, slider_val)=>{
+
+            // Linear Interpolation
+            const max = 1, start=-.5;
+            const y = (slider_val * max) + start;
+            emitters[0].gravity = y;
+        }, _);
+    }
+    { // Acceleration
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Acceleration');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(13);
+        
+        
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        Slider_connect(slider, (params, slider_val)=>{
+
+            emitters[0].accel = slider_val;
+
+            // Linear Interpolation
+            const max = 15, start=0;
+            const y = (slider_val * max) + start;
+            emitters[0].accel = y;
+            emitters[0].max_speed = 4;
+        }, _);
+    }
+    { // Deccelerarion
+        const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Deccelerarion');
+        slider_section.AddItem(slider);
+        slider.SetInitialValue(73);
+        
+        
+        slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        Slider_connect(slider, (params, slider_val)=>{
+
+            /* Solve for y~={0.86, 1.0} => {h:1, k:-2.8, r:3.8} */
+            const h=1, k=-2.8, r=3.8*3.8; 
+            const x = slider_val;
+            let y = 0;
+            y = Math.sqrt(-((x-h)*(x-h)) + r) +k;
+            emitters[0].deccel = y;
+           
+        }, _);
+    }
+
+
+    slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+    slider_section.Calc_no_gfx_update();
+    slider_section.Render();
+    slider_section.ConstructListeners();
+
+    slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
+
+    
+
+
+
+
+    // /***********************************************************************************************/
+    // // Create Color Picker to change the particles color
+    // const picker = CreateColorPicker(x, y);
+    // picker.AssignTargetMeshClbk((params)=>{
+    //     const color = params;
+    //     // Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+    //     CopyArr4(emitters[0].col, color);
+    // });
+}
+
+
+
+function TestNoiseShader(){
+
+    const emitters = [];
+    const emitter_idxs = [];
+    const speed = 10;
+    let cnt = 0;
+    const dim = [450,450]
 
     // Create Particle emitters
     {
-        const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', PURPLEB[9], [-90,530,10], dim, 1.5, 1, 2, .98, -.1, 3);
+        const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', PURPLEB[9], [-dim[0],230,10], dim, 1.5, 1, 4, .96, -.1, 3);
+        // const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', PURPLEB[9], [-dim[0],230,10], dim, 1.5, 1, 2, .98, -.1, 3);
+        // const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', PURPLEB[9], [300,230,10], dim, 1.5, 1, 2, .98, -.1, 3);
         const emitter = Particles_get_particle_system(emitter_idx);
         emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
         emitter.speed = speed;
@@ -1288,64 +2014,6 @@ function CreateSmokeParticles(){
         emitter_idxs[cnt] = emitter_idx;
         cnt++
     }
-    {
-        const emitter_idx = Particle_system_create_emitter('SmokeParticles 2', PURPLER[9], [-90,420,10], dim, .7, 1, 2, .98, -.1, 3 );
-        const emitter = Particles_get_particle_system(emitter_idx);
-        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
-        emitter.speed = speed;
-        
-        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
-        emitter.EnableGfxUniforms({unif:SID.UNIF.UNIF_SMOKE2, fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-        
-        TEMP_PARTICLES_GEN_GFX(emitter);
-
-        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
-    
-        emitter.SetConeOfDirection(1, 1, -.1, .2);
-            
-        emitters[cnt] = emitter;
-        emitter_idxs[cnt] = emitter_idx;
-        cnt++
-    }
-    {
-        const emitter_idx = Particle_system_create_emitter('SmokeParticles 3', YELLOW[9], [-90,310,10], dim, 1.5, 1, 2, .98, -.1, 3);
-        const emitter = Particles_get_particle_system(emitter_idx);
-        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
-        emitter.speed = speed;
-        
-        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
-        emitter.EnableGfxUniforms({unif:SID.UNIF.UNIF_SMOKE2, fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-        
-        TEMP_PARTICLES_GEN_GFX(emitter);
-
-        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
-    
-        emitter.SetConeOfDirection(1, 1, -.1, .2);
-
-        emitters[cnt] = emitter;
-        emitter_idxs[cnt] = emitter_idx;
-        cnt++
-    }
-    {
-        const emitter_idx = Particle_system_create_emitter('SmokeParticles 4', GREEN[9], [-90,200,10], dim, .7, 1, 2, .98, -.1, 3);
-        const emitter = Particles_get_particle_system(emitter_idx);
-        emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
-        emitter.speed = speed;
-        
-        emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
-        emitter.EnableGfxUniforms({unif:SID.UNIF.UNIF_SMOKE2, fx:SID.FX.FS_SMOKE}, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-        
-        TEMP_PARTICLES_GEN_GFX(emitter);
-
-        emitter.GfxUniformsSetClbk('u_smoke_params', function(){return [1,1,1]}, emitter.gfx.vb.groupidx);
-    
-        emitter.SetConeOfDirection(1, 1, -.1, .2);
-            
-        emitters[cnt] = emitter;
-        emitter_idxs[cnt] = emitter_idx;
-        cnt++
-
-    }
 
 
 
@@ -1357,6 +2025,7 @@ function CreateSmokeParticles(){
     btn.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     btn.Bind(Particle_system_emitt, _, { target_params: emitter_idxs }, MESH_STATE.IS_HOLD_CLICK)
+    // btn.Bind(Particle_system_emitt, _, { target_params: emitter_idxs }, _)
     
     
     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -1366,14 +2035,14 @@ function CreateSmokeParticles(){
 
 
     
-    /***********************************************************************************************/
-    // Create Color Picker to change the particles color
-    const picker = CreateColorPicker();
-    picker.AssignTargetMeshClbk((params)=>{
-        const color = params;
-        // Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
-        CopyArr4(emitters[0].col, color);
-    });
+    // /***********************************************************************************************/
+    // // Create Color Picker to change the particles color
+    // const picker = CreateColorPicker(x, y);
+    // picker.AssignTargetMeshClbk((params)=>{
+    //     const color = params;
+    //     // Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+    //     CopyArr4(emitters[0].col, color);
+    // });
 }
 
 
@@ -1416,34 +2085,35 @@ function CreateLabel(name = 'Label ') {
 
 
 
-function CreateButton() {
+function CreateButton(x=20, y=400, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
-    let ypos = 400
-    const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [20, ypos, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
+    const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [x, y, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     btn.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-    // btn.sid.inst |= SID.ATTR.COL4|SID.ATTR.WPOS_TIME4
+    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
 
-    btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    btn.Render();
-    btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
-    btn.ConstructListeners();
+        btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        btn.Render();
+        btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
+        btn.ConstructListeners();
+    }
 
-    Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, btn, .001, 0.6, .6, 0)
-    Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .002, 0.4, .8, .4)
-    Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn, .003, 0.2, .8, .8)
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .01, 0.6, 1.)
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGBA, btn, .01, 0.4, 1.)
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, btn, .01, 0.0, 1., 0)
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.A, btn, .01, .0, 1., .0)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, btn, .001, 0.6, .6, 0)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .002, 0.4, .8, .4)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn, .003, 0.2, .8, .8)
+    
+    // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .01, 0.6, 1.)
+    // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGBA, btn, .01, 0.4, 1.)
+    // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, btn, .01, 0.0, 1., 0)
+    // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.A, btn, .01, .0, 1., .0)
 
-    // btn.text_mesh.SetColorRGB(BLUE_10_120_220);
+    // // btn.text_mesh.SetColorRGB(BLUE_10_120_220);
 
-    // btn.Align(ALIGN.LEFT | ALIGN.TOP, [0, 0]);
-    // btn.Align(ALIGN.RIGHT | ALIGN.BOTTOM, [15, 5]);
+    // // btn.Align(ALIGN.LEFT | ALIGN.TOP, [0, 0]);
+    // // btn.Align(ALIGN.RIGHT | ALIGN.BOTTOM, [15, 5]);
 
     return btn;
 }
@@ -1616,64 +2286,79 @@ function SdfLine(col, pos, dim, render_instanced_flags=0x0) {
 
 
 
-function CreateDropdown(pos, id) {
+function CreateDropdown(pos=[0,0,0], id) {
 
     // const pad = [10, 2.5]
-    const pad = [4, 2]
-    const margin = [8, 8]
+    const pad = [10, 4]
+    const margin = [5, 5]
     // const dp = Create_widget_dropdown(`DP${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad);
-    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
+    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `ROOT`, pos, BLACK, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
     // dp.CreateHoverEvent();
     dp.CreateMoveEvent();
     dp.CreateClickEvent();
 
 
-    const sub_dp1_count = 1;
-    const sub_dp2_count = 1;
+    const sub_dp1_count = 2;
+    const sub_dp2_count = 2;
 
     const col = GetSequencedColor()
     for (let i = 0; i < sub_dp1_count; i++) {
 
-        const dpsub1 = Create_widget_dropdown(_, `${id}-${i}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+        const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
         dpsub1.CreateHoverEvent();
         dpsub1.CreateClickEvent();
         dp.AddToMenu(dpsub1);
 
-        // const label = Create_widget_label(_, 'l1', ALIGN.LEFT, [0,0,2], 10, REDL)
-        // dp.AddToMenu(label);
 
         const col1 = GetSequencedColor()
         for (let j = 0; j < sub_dp2_count; j++) {
 
-            const dpsub2 = Create_widget_dropdown(_, `${id}-${i}-${j}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
+            const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
             dpsub1.AddToMenu(dpsub2);
 
             const col2 = GetSequencedColor()
             for (let k = 0; k < sub_dp2_count; k++) {
-
-                const dpsub3 = Create_widget_dropdown(_, `DP${id}-${i}${j}${k}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+                
+                const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                 dpsub2.AddToMenu(dpsub3);
+                
+                const col3 = GetSequencedColor()
+                for (let k = 0; k < sub_dp2_count; k++) {
+    
+                    const dpsub4 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col3, WHITE, pad, _, _, _, margin);
+                    dpsub3.AddToMenu(dpsub4);
+                    
+                    const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
+                    dpsub4.AddToMenu(s)
+                    
+                }
+                
             }
         }
-        for (let j = 0; j < sub_dp2_count; j++) {
-
-            const dpsub2 = Create_widget_dropdown(_, `${id}-${i}-${j}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
-            dpsub1.AddToMenu(dpsub2);
-
-            const col2 = GetSequencedColor()
-            for (let k = 0; k < sub_dp2_count; k++) {
-
-                const dpsub3 = Create_widget_dropdown(_, `DP${id}-${i}${j}${k}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
-                dpsub2.AddToMenu(dpsub3);
-            }
-        }
+        // for (let j = 0; j < sub_dp2_count; j++) {
+            
+        //     const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
+        //     dpsub1.AddToMenu(dpsub2);
+            
+        //     const col2 = GetSequencedColor()
+        //     for (let k = 0; k < sub_dp2_count; k++) {
+                
+        //         const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //         console.log(i,j,k, dpsub3.GetName())
+        //         dpsub2.AddToMenu(dpsub3);
+                
+        //         const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk2', [0, 5, 1.8]);
+        //         dpsub3.AddToMenu(s)
+        //     }
+        // }
     }
 
     dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
     dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
 
-    dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+    // dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+    dp.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
     dp.Calc_no_gfx_update();
     
     dp.Render()
@@ -1686,54 +2371,6 @@ function CreateDropdown(pos, id) {
     View_build_group_from_root_mesh(dp);
 
     return dp;
-}
-
-
-
-function CreateDropdown3(pos, dim) {
-
-    const pad = [4, 2]
-    const margin = [8, 8]
-    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `0`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
-    // dp.CreateMoveEvent();
-    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // dp.CreateClickEvent();
-    
-    
-    const sub_dp1_count = 2;
-    const sub_dp2_count = 5;
-    
-    const col = GetSequencedColor()
-    for (let i = 0; i < sub_dp1_count; i++) {
-        
-        const dpsub1 = Create_widget_dropdown(_, `0${i}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-
-        dp.AddToMenu(dpsub1);
-
-        for (let j = 0; j < sub_dp2_count; j++) {
-            const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[7], 1.5), `0${i}${j}`)
-            s.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-            dpsub1.AddToMenu(s);
-        }
-        // for (let j = 0; j < sub_dp2_count; j++) {
-        //     const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[7], 1.5), `0${i}${j}`)
-        //     dpsub1.AddToMenu(s);
-        // }
-    }
-
-    dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-    dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
-    dp.Calc_no_gfx_update();
-    dp.Render()
-    dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
-    dp.ConstructListeners();
-
-    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-    View_build_group_from_root_mesh(dp)
-
 }
 
 
@@ -1756,20 +2393,20 @@ function CreateDropdown2(pos, id, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
     for (let i = 0; i < sub_dp1_count; i++) {
 
         col = GetRandomColor()
-        const dpsub2 = Create_widget_dropdown(_, `${i}0`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+        const dpsub2 = Create_widget_dropdown(_, `${i}0`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
         dp.AddToMenu(dpsub2);
 
         {
             col = GetRandomColor()
-            const dpsub3 = Create_widget_dropdown(_, `${i}00`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+            const dpsub3 = Create_widget_dropdown(_, `${i}00`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
             dpsub2.AddToMenu(dpsub3);
             {
                 col = GetRandomColor()
-                const dpsub4 = Create_widget_dropdown(_, `${i}000`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+                const dpsub4 = Create_widget_dropdown(_, `${i}000`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
                 dpsub3.AddToMenu(dpsub4);
                 {
                     col = GetRandomColor()
-                    const dpsub5 = Create_widget_dropdown(_, `${i}0000`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+                    const dpsub5 = Create_widget_dropdown(_, `${i}0000`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
                     dpsub4.AddToMenu(dpsub5);
                 }
             }
@@ -1799,6 +2436,54 @@ function CreateDropdown2(pos, id, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
     return dp;
 
 }
+
+
+function CreateDropdown3(pos, dim) {
+
+    const pad = [4, 2]
+    const margin = [8, 8]
+    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `0`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
+    // dp.CreateMoveEvent();
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // dp.CreateClickEvent();
+    
+    
+    const sub_dp1_count = 2;
+    const sub_dp2_count = 5;
+    
+    const col = GetSequencedColor()
+    for (let i = 0; i < sub_dp1_count; i++) {
+        
+        const dpsub1 = Create_widget_dropdown(_, `0${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+        dp.AddToMenu(dpsub1);
+
+        for (let j = 0; j < sub_dp2_count; j++) {
+            const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[7], 1.5), `0${i}${j}`)
+            s.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+            dpsub1.AddToMenu(s);
+        }
+        // for (let j = 0; j < sub_dp2_count; j++) {
+        //     const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[7], 1.5), `0${i}${j}`)
+        //     dpsub1.AddToMenu(s);
+        // }
+    }
+
+    dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+    dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
+    dp.Calc_no_gfx_update();
+    dp.Render()
+    dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
+    dp.ConstructListeners();
+
+    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
+    View_build_group_from_root_mesh(dp)
+
+}
+
 
 
 
@@ -1833,63 +2518,63 @@ function CreateDropdown2InSection(pos, id) {
         dp.AddToMenu(label);
         
         const col1 = GetSequencedColor()
-        const dpsub2 = Create_widget_dropdown(_, `${i}0`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
+        const dpsub2 = Create_widget_dropdown(_, `${i}0`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
         dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         dp.AddToMenu(dpsub2);
 
         // const col2 = GetSequencedColor()
         // {
-        //     const dpsub3 = Create_widget_dropdown(_, `${i}00`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //     const dpsub3 = Create_widget_dropdown(_, `${i}00`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //     dpsub2.AddToMenu(dpsub3);
         //     {
-        //         const dpsub5 = Create_widget_dropdown(_, `${i}000`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //         const dpsub5 = Create_widget_dropdown(_, `${i}000`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //         dpsub3.AddToMenu(dpsub5);
         //         {
-        //             const dpsub4 = Create_widget_dropdown(_, `${i}0000`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //             const dpsub4 = Create_widget_dropdown(_, `${i}0000`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //             dpsub5.AddToMenu(dpsub4);
         //         }
         //         {
-        //             const dpsub4 = Create_widget_dropdown(_, `${i}0001`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //             const dpsub4 = Create_widget_dropdown(_, `${i}0001`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //             dpsub5.AddToMenu(dpsub4);
         //         }
         //     }
         //     {
-        //         const dpsub5 = Create_widget_dropdown(_, `${i}001`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //         const dpsub5 = Create_widget_dropdown(_, `${i}001`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //         dpsub3.AddToMenu(dpsub5);
         //         {
-        //             const dpsub4 = Create_widget_dropdown(_, `${i}0010`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //             const dpsub4 = Create_widget_dropdown(_, `${i}0010`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //             dpsub5.AddToMenu(dpsub4);
         //         }
         //         {
-        //             const dpsub4 = Create_widget_dropdown(_, `${i}0011`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //             const dpsub4 = Create_widget_dropdown(_, `${i}0011`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //             dpsub5.AddToMenu(dpsub4);
         //         }
         //     }
         // }
         // {
-        //     const dpsub3 = Create_widget_dropdown(_, `${i}01`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //     const dpsub3 = Create_widget_dropdown(_, `${i}01`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //     dpsub2.AddToMenu(dpsub3);
         //     {
-        //         const dpsub5 = Create_widget_dropdown(_, `${i}010`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //         const dpsub5 = Create_widget_dropdown(_, `${i}010`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //         dpsub3.AddToMenu(dpsub5);
         //         {
-        //             const dpsub4 = Create_widget_dropdown(_, `${i}0100`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //             const dpsub4 = Create_widget_dropdown(_, `${i}0100`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //             dpsub5.AddToMenu(dpsub4);
         //         }
         //         {
-        //             const dpsub4 = Create_widget_dropdown(_, `${i}0101`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //             const dpsub4 = Create_widget_dropdown(_, `${i}0101`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //             dpsub5.AddToMenu(dpsub4);
         //         }
         //     }
         //     {
-        //         const dpsub5 = Create_widget_dropdown(_, `${i}011`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //         const dpsub5 = Create_widget_dropdown(_, `${i}011`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //         dpsub3.AddToMenu(dpsub5);
         //         {
-        //             const dpsub4 = Create_widget_dropdown(_, `${i}0110`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //             const dpsub4 = Create_widget_dropdown(_, `${i}0110`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //             dpsub5.AddToMenu(dpsub4);
         //         }
         //         {
-        //             const dpsub4 = Create_widget_dropdown(_, `${i}0111`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //             const dpsub4 = Create_widget_dropdown(_, `${i}0111`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
         //             dpsub5.AddToMenu(dpsub4);
         //         }
         //     }
@@ -1921,9 +2606,9 @@ function CreateDropdown2InSection(pos, id) {
 
 
 
-function CreateColorPicker(render_instanced_flags=0x0){
+function CreateColorPicker(x=0, y=0, render_instanced_flags=0x0, root_widget=ROOT_WIDGETS.CREATE_ROOT){
 
-    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [0, 40, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
+    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [x, y+40, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
     // picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
 
@@ -1932,13 +2617,17 @@ function CreateColorPicker(render_instanced_flags=0x0){
     picker.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     // picker.EnableGfxUniforms({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-    picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    
-    // picker.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
-    picker.Calc_no_gfx_update();
-    picker.Render();
-    picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
-    picker.ConstructListeners();
+
+    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
+
+        picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        
+        // picker.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
+        picker.Calc_no_gfx_update();
+        picker.Render();
+        picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
+        picker.ConstructListeners();
+    }
 
     return picker;
 
@@ -1960,21 +2649,24 @@ function CreateSceneMenuBar(items=null) {
     section.SetName('Main Window')
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
+    section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     const menu = Create_widget_menubar(_, [0,0,pos[2]+1], dim, TRANSPARENCY(BLUEL[6], 1.), WHITE, 'Menu Bar', [10, 6], _, style);
+    // menu.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     section.AddItem(menu);
     
-
+    
     // Create statistics menu
     const statistics = Debug_info_ui(_, [0,0,0]);
     menu.AddToMenuBar(statistics, REL_POS.LEFT);
-
+    
     menu.AddCloseButton(_, section, 'x', 8, TRANSPARENCY(BLUEL[6], 1.), BLUEL[1], _, 10, style);
     menu.AddMinimizeButton(_, section, 8, TRANSPARENCY(BLUEL[6], 1.), BLUEL[1], _, 10, _, style);
     
+    menu.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     
-    // menu.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
+    // // menu.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
     menu.options = SECTION.HORIZONTAL | SECTION.EXPAND;
 
 
@@ -1986,47 +2678,47 @@ function CreateSceneMenuBar(items=null) {
             section.AddItem(items[i]);
         }
     }
-    {
-        const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
-        dp.CreateClickEvent();
-        dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-        Dropdown_roots_set_root(dp, dp);
-        section.AddItem(dp);
+    // {
+    //     const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
+    //     dp.CreateClickEvent();
+    //     dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+    //     Dropdown_roots_set_root(dp, dp);
+    //     section.AddItem(dp);
     
-        {
-        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-        dp.AddToMenu(switch1);
-        }
-        {
-        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-        dp.AddToMenu(switch1);
-        }
-        {
-        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-        dp.AddToMenu(switch1);
-        }
-    }
-    // Create Second dropdown in the windows area
-    {
-        const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
-        dp.CreateClickEvent();
-        dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-        Dropdown_roots_set_root(dp, dp);
-        section.AddItem(dp);
+    //     {
+    //     const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+    //     dp.AddToMenu(switch1);
+    //     }
+    //     {
+    //     const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+    //     dp.AddToMenu(switch1);
+    //     }
+    //     {
+    //     const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+    //     dp.AddToMenu(switch1);
+    //     }
+    // }
+    // // Create Second dropdown in the windows area
+    // {
+    //     const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
+    //     dp.CreateClickEvent();
+    //     dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+    //     Dropdown_roots_set_root(dp, dp);
+    //     section.AddItem(dp);
     
-        {
-        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-        dp.AddToMenu(switch1);
-        }
-        {
-        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-        dp.AddToMenu(switch1);
-        }
-        {
-        const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-        dp.AddToMenu(switch1);
-        }
-    }
+    //     {
+    //     const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+    //     dp.AddToMenu(switch1);
+    //     }
+    //     {
+    //     const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+    //     dp.AddToMenu(switch1);
+    //     }
+    //     {
+    //     const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+    //     dp.AddToMenu(switch1);
+    //     }
+    // }
 
     
     section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, section);
@@ -2059,10 +2751,10 @@ function CreateSceneMenuBar(items=null) {
 
 
     /** Create Test Animations */
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, dp, .03, 0., 1.)
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, statistics, .01, 0., .4)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, dp, .03, 0., 1.)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, statistics, .01, 0., .4)
     // const btn = statistics.children.buffer[0]
-    // Animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn.text_mesh, .01, 0.1, .9)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn.text_mesh, .01, 0.1, .9)
 }
 
 
@@ -2077,54 +2769,62 @@ function  CreateWindowWithMenu() {
     section.SetName('ROOT')
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
+    section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
-    const menu = Create_widget_menubar(_, [0,0,pos[2]], _, TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
-    section.AddItem(menu);
+    // const menu = Create_widget_menubar(_, [0,0,pos[2]], _, TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
+    // section.AddItem(menu);
+    // menu.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
 
-    const l1 = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(GREY[1], 1.0), WHITE);
-    menu.AddToMenuBar(l1);
-    const l2 = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(PURPLER[5],1.0), WHITE);
-    menu.AddToMenuBar(l2);
-    // Create dropdown menu
-    const dp = Create_widget_dropdown(_, 'Options', [0, 0, 0], GREY[1], TRANSPARENCY(YELLOWL[8], .3), WHITE, _, _, _, _, [2,2]);
-    Dropdown_roots_set_root(dp, dp);
-    dp.menu.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
-    dp.options = SECTION.VERTICAL;
+    // const l1 = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(GREY[1], 1.0), WHITE);
+    // l1.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // menu.AddToMenuBar(l1);
+    // const l2 = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(PURPLER[5],1.0), WHITE);
+    // l2.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // menu.AddToMenuBar(l2);
+    // // Create dropdown menu
+    // const dp = Create_widget_dropdown(_, 'Options', [0, 0, 0], GREY[1], TRANSPARENCY(YELLOWL[8], .3), WHITE, _, _, _, _, [2,2]);
+    // dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // Dropdown_roots_set_root(dp, dp);
+    // dp.menu.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
+    // dp.options = SECTION.VERTICAL;
     // menu.AddToMenuBar(dp, REL_POS.LEFT);
     
     
     // Add a switch to the menu's dropdown
-    const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-    dp.AddToMenu(switch1);
+    // const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+    // dp.AddToMenu(switch1);
     
-    // Add a dp to the menu's dropdown
-    const dp_menu = CreateDropdown2([0,0,pos[2]], 0, null)
-    dp.AddToMenu(dp_menu);
+    // // Add a dp to the menu's dropdown
+    // const dp_menu = CreateDropdown2([0,0,pos[2]], 0, null)
+    // dp.AddToMenu(dp_menu);
     
-    {
-        const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
-        dp.AddToMenu(label);
-    }
-    {
-        const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
-        dp.AddToMenu(label);
-    }
-    {
-        const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
-        dp.AddToMenu(label);
-    }
-    menu.AddToMenuBar(dp, REL_POS.LEFT);
+    // {
+    //     const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
+    //     label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //     dp.AddToMenu(label);
+    // }
+    // {
+    //     const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
+    //     label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //     dp.AddToMenu(label);
+    // }
+    // {
+    //     const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
+    //     label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //     dp.AddToMenu(label);
+    // }
+    // menu.AddToMenuBar(dp, REL_POS.LEFT);
 
-    menu.AddCloseButton(_, section, 'x');
-    menu.AddMinimizeButton(_, section);
+    // menu.AddCloseButton(_, section, 'x');
+    // menu.AddMinimizeButton(_, section);
     
     
     
 
 
-    // menu.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
-    menu.options = SECTION.HORIZONTAL | SECTION.EXPAND;
+    // // menu.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
+    // menu.options = SECTION.HORIZONTAL | SECTION.EXPAND;
 
     // Create items for the section
     
@@ -2218,8 +2918,8 @@ function  CreateWindowWithMenu() {
             }
         }
     // Sliders
-    const sliders = CreateChangeMeshColorFromSliders(ROOT_WIDGETS.NULL);
-    section.AddItem(sliders);
+    // const sliders = CreateChangeMeshColorFromSliders(ROOT_WIDGETS.NULL);
+    // section.AddItem(sliders);
 
 
 
@@ -2250,6 +2950,7 @@ function CreateManySections(scene) {
     const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
     blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE); blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
+    
     // blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
     // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)
     
@@ -2383,7 +3084,7 @@ function CreateManySections(scene) {
     }
 
 
-
+    blu.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     // blu.options = SECTION.INHERIT | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
     blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
@@ -2807,6 +3508,169 @@ function CreateScrollerInScroller(items=null){
     return section
 }
 
+
+
+
+
+
+
+
+
+/**************************************************************************************************************************************/
+// Widget Section Tests
+
+function TestSections1(){
+
+    const marg = [10,10];
+
+    // const pos = [VIEWPORT.WIDTH/2, VIEWPORT.HEIGHT/2, 0];
+    const pos = [0, 0, 0];
+    
+    const root = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, marg, pos, [0, 0], TRANSPARENCY(BLUEL[5], 1));
+    root.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    root.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    root.SetName('root_blue');
+    
+    { // Test 1
+        const s1 = Sections4(_, SECTION.HORIZONTAL, pos);
+        root.AddItem(s1);
+        const s2 = Sections4(_, SECTION.HORIZONTAL, pos);
+        root.AddItem(s2);
+    }
+    
+    { // Test 2
+        const s1 = Sections2(_, SECTION.VERTICAL, pos); root.AddItem(s1);
+
+        // { // Test: one into another recursive 
+        //     const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2);
+        //     const s3 = Sections2(_, SECTION.VERTICAL, pos); s2.AddItem(s3);
+        //     const s4 = Sections2(_, SECTION.HORIZONTAL, pos); s3.AddItem(s4);
+        // }
+        
+        // { const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2); }
+        // { const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2); }
+        
+        // const s2 = Sections2(_, SECTION.VERTICAL, pos); root.AddItem(s2);
+        // const s3 = Sections2(_, SECTION.HORIZONTAL, pos); root.AddItem(s3);
+        
+        // const s4 = Sections2(_, SECTION.HORIZONTAL, pos); root.AddItem(s4);
+    }
+    
+    { // Test 3
+        // {
+        //     const s = Create_widget_section(_, SECTION.HORIZONTAL, marg, [0,0,0], [10, 100], TRANSPARENCY(REDL[7], .6));
+        //     s.SetName('red1');
+        //     root.AddItem(s)
+            
+        //     { 
+        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+        //         // const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+        //     }
+        //     {
+                
+        //         const sr = Create_widget_section(_, SECTION.VERTICAL, marg, [0,0,0], [10, 10], TRANSPARENCY(REDL[7], .6));
+        //         sr.SetName('red2');
+        //         root.AddItem(sr)
+        //         const s1 = Sections2(_, SECTION.VERTICAL); sr.AddItem(s1); 
+        //         const s2 = Sections2(_, SECTION.HORIZONTAL); sr.AddItem(s2);
+        //     }
+        //     { 
+        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+        //         const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+        //     }
+        // }
+        // {
+        //     const s = Create_widget_section(_, SECTION.HORIZONTAL, marg, [0,0,0], [10, 100], TRANSPARENCY(REDL[7], .6));
+        //     s.SetName('red3');
+        //     root.AddItem(s)
+            
+        //     { 
+        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+        //         // const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+        //     }
+        //     {
+                
+        //         const sr = Create_widget_section(_, SECTION.VERTICAL, marg, [0,0,0], [10, 10], TRANSPARENCY(REDL[7], .6));
+        //         sr.SetName('red4');
+        //         root.AddItem(sr)
+        //         const s1 = Sections2(_, SECTION.VERTICAL); sr.AddItem(s1); 
+        //         const s2 = Sections2(_, SECTION.HORIZONTAL); sr.AddItem(s2);
+        //     }
+        //     { 
+        //         const s1 = Sections2(_, SECTION.VERTICAL); s.AddItem(s1); 
+        //         const s2 = Sections2(_, SECTION.HORIZONTAL); s.AddItem(s2);
+        //     }
+        // }
+
+    }
+    
+    
+
+
+    root.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    
+    root.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+    root.Calc_no_gfx_update();
+    root.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root.gfx.vb.groupidx)
+
+    root.Render();
+
+    root.ConstructListeners();
+}
+let grey_cnt = 0;
+let green_cnt = 0;
+let orange_cnt = 0;
+function Sections2(is_root, align) {
+
+    const tr = .7;
+    const marg = [10, 10];
+    const dim = [10, 10];
+
+    const grey = Create_widget_section(is_root, align, marg, [0, 0, 0], dim, TRANSPARENCY(GREY[0], tr));
+    grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    grey.SetName(`grey${grey_cnt++}`);
+
+    const green = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(GREEN[3], tr));
+    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    green.SetName(`green${green_cnt++}`);
+    grey.AddItem(green);
+
+    const orange = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(ORANGER[7], tr));
+    orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    orange.SetName(`orange${orange_cnt++}`);
+    green.AddItem(orange);
+
+    return grey;
+}
+function Sections4(is_root, align) {
+
+    const tr = 1.;
+
+    const blu = Create_widget_section(is_root, align, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
+    blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    blu.SetName('grey');
+
+    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+    red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    red.SetName('red');
+    blu.AddItem(red);
+    const green = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[6], tr));
+    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    green.SetName('green');
+    blu.AddItem(green);
+    // const purple = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
+    // purple.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // purple.SetName('purple');
+    // blu.AddItem(purple);
+    // const orange = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGER[7], tr));
+    // orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // orange.SetName('orange');
+    // blu.AddItem(orange);
+
+
+
+    return blu;
+}
 
 
 function Help(scene) {

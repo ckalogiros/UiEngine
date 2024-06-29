@@ -83,8 +83,10 @@ export class Text_Mesh extends Mesh {
 
       // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
       // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy
-      if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary + 1)
-         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary + 1;
+      // if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary + 1)
+      //    this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary + 1;
+      if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.size + 1)
+         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.size;
 
       // BUG: If one text has by mistake a different 'this.mat.uvIdx', then the vb will store that uv-map index. Cause a vertex buffer may use only one texture.
       Vertex_buffer_group_set_texidx(this.gfx.vb.groupidx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index

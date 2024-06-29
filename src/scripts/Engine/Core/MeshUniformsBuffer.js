@@ -65,7 +65,7 @@ export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; 
 
 // IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
-export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vb_groupidx, ubidx) {
+export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vb_groupidx, ubidx, has_absolute_pos=0x0) {
 
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
@@ -76,8 +76,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
    wpos[0] = mesh_pos[0];
    wpos[1] = mesh_pos[1];
-   if(debug_vb_groupidx===3)
-      console.log 
+
 
    // if (mesh_parent !== null && mesh_parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
    if (mesh_parent !== null){
@@ -129,6 +128,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
       meshidx: meshidx, // Is needed to have a ref to the mesh from inside the '_per_vb_mesh_unif_wpos' buffer
       parent_posidx: parent_posidx,
       debug_vb_groupidx:debug_vb_groupidx,
+      has_absolute_pos: has_absolute_pos,
    }
 
    entry.wpos[0] += wpos[0];
@@ -149,7 +149,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
 
 
-export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, vb_groupidx) {
+export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, vb_groupidx, has_absolute_pos=0x0) {
    // TODO: check NULL object
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
@@ -175,7 +175,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    if (mesh_parent !== null && mesh_type & MESH_TYPE.TEXT_MESH) {
 
       const root_posidx = mesh_parent.root_posidx;
-      console.log('/////////////////////////////////////////////////////////', root_posidx)
+      // console.log('/////////////////////////////////////////////////////////', root_posidx)
 
       // Here we want to get the 'root wpos' of the 'root wpos' that the text mesh's parent its connected to.
       let parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
@@ -205,6 +205,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    unif_wpos.meshidx = meshidx;
    unif_wpos.parent_posidx = parent_posidx;
    unif_wpos.debug_vb_groupidx = vb_groupidx;
+   unif_wpos.has_absolute_pos = has_absolute_pos;
 
 
    const dbg_for_unifwpos = _debug_names_per_vb_mesh_unif_wpos.buffer[vb_groupidx];
@@ -212,6 +213,8 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    dbg_for_unifwpos.parent_meshidx = parent_meshidx;
    dbg_for_unifwpos.vbidx = vb_groupidx;
    // _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
+
+   return vb_groupidx; // Return this unif wpos index(which matches the vb_groupidx)
 }
 
 
@@ -247,8 +250,11 @@ export function Mesh_unif_get_vb_root_wpos_meshidx(root_posidx) {
 
 export function Mesh_unif_get_vb_root_wpos(root_posidx) {
    const pos = Mesh_unif_get_vb_root_wpos_recursive(root_posidx);
-   pos[0] += _screen_wpos[0];
-   pos[1] += _screen_wpos[1];
+
+   if( _per_vb_mesh_unif_wpos.buffer[root_posidx].has_absolute_pos === 0){
+      pos[0] += _screen_wpos[0];
+      pos[1] += _screen_wpos[1];
+   }
    return pos;
 }
 function Mesh_unif_get_vb_root_wpos_recursive(root_posidx) {

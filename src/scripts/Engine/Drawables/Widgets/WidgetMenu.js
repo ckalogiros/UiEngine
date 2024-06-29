@@ -11,6 +11,7 @@ import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_
 import { Styles_pad_set } from "../../Styles.js";
 import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/MeshBufferViews.js";
+import { Mesh_unif_add_vb_root_wposx, Mesh_unif_set_vb_root_wposx } from "../../Core/MeshUniformsBuffer.js";
 
 
 
@@ -123,6 +124,14 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
+   /** Must run for every mesh */
+   // GfxUniformsEnable(flags, name, type, shader_flags) {
+
+   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    this.label.EnableGfxUniforms(flags, name, type, shader_flags);
+
+   // }
+
    // GfxCtxSetFlag(FLAGS){
    //    // alert('-1 MENU')
 
@@ -225,11 +234,9 @@ export class Widget_Menu_Bar extends Section {
       // Use only the top-down pad
       const pad = [0, 0]; // IMPORTANT: If we are to set the dim of the close_btn's to a 'y padding', we better set the close_btn.pad[1] to 0
 
-      // temp_close_minim_style[2] = this.mat.style[2]; // Make the button to feather on hover.
 
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
-      // const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, temp_close_minim_style, font);
       const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, style, font);
       close_btn.SetName('close_btn');
 
@@ -277,10 +284,7 @@ export class Widget_Menu_Bar extends Section {
 
       // Use only the top-down pad
       const pad = [0, 0];
-      // pad[0] = this.label.StylesGetPad(STYLES.AXIS.Y) + 1;
-      // pad[1] = pad[0]-2;
 
-      // temp_close_minim_style[2] = this.mat.style[2]; // Make the button to feather on hover.
 
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
@@ -289,7 +293,6 @@ export class Widget_Menu_Bar extends Section {
          return;
       }
 
-      // const minimize_btn = Create_widget_minimize_btn(ROOT_WIDGET_FLAGS, root, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, temp_close_minim_style);
       const minimize_btn = Create_widget_minimize_btn(ROOT_WIDGET_FLAGS, root, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, style);
       minimize_btn.SetName('minimize_btn');
 
@@ -455,7 +458,7 @@ export class Widget_Minimize extends Widget_Button {
 
    toggle; // On/Off
    stored_children_meshes; // Store all children meshes of the root, to maximize the widget back to normal. 
-   stored_children_events; // Store the 'children' buffer of the roots EventListeners (class).
+   // stored_children_events; // Store the 'children' buffer of the roots EventListeners (class).
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = [0, 4, 1.8], font, is_debug_mesh) {
 
@@ -463,7 +466,7 @@ export class Widget_Minimize extends Widget_Button {
 
       this.toggle = false;
       this.store_children_meshes = null;
-      this.stored_children_events = new Array(LISTEN_EVENT_TYPES_INDEX.SIZE); // Store the 'children' buffer of the roots EventListeners (class). 
+      // this.stored_children_events = new Array(LISTEN_EVENT_TYPES_INDEX.SIZE); // Store the 'children' buffer of the roots EventListeners (class). 
 
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
@@ -515,12 +518,18 @@ export class Widget_Minimize extends Widget_Button {
       STATE.mesh.SetClicked(minim_mesh);
 
 
+      if(minim_mesh.group_bufferidxs[0] === INT_NULL) {
+         alert('Minimize button needs a ViewGrouup to work');
+         return;
+      }
+
       if (root) {
 
          if (!minim_mesh.toggle) {  // Minimize - toggle off
 
             // Copy root's children to a buffer
-            minim_mesh.stored_children_meshes = New_generic_buffer(root.children, 'minim_mesh.stored_children_meshes'); // TODO: Maybe copying all children is not efficient. Just get the pointer and use it later on maximize
+            // minim_mesh.stored_children_meshes = New_generic_buffer(root.children, 'minim_mesh.stored_children_meshes'); // TODO: Maybe copying all children is not efficient. Just get the pointer and use it later on maximize
+            minim_mesh.stored_children_meshes = root.children;
 
 
             // Reset Graphics buffers;
@@ -529,23 +538,35 @@ export class Widget_Minimize extends Widget_Button {
             // Store the root children tree structure to a temporary place, so that can be retrieved on maximize
             const menu_bar = root.children.buffer[0]; // CAUTION: First child suppose to be the menu_bar. What happens if it is at a different index???
 
-
+            
             // Render only the menu bar at the root
-
+            
             // Deactivate all children, except the menu bar, so they are not gonna be drawn to the vertex buffer on any re-render 
             for (let i = menu_bar.idx + 1; i <= root.children.boundary; i++) {
                if (root.children.buffer[i]) root.children.buffer[i].Deactivate()
             }
-
+            
             root.children.ResetFull(); // Reset the children's buffer and allocate new array
             root.AddChild(menu_bar);
 
-
+            
             // Store pos and dim of the un-munimized root mesh
             root.geom.defPos[1] = root.geom.pos[1];
             root.geom.defDim[1] = root.geom.dim[1];
             // Resize the root widget to include only the height of the menu bar
             root.geom.dim[1] = menu_bar.geom.dim[1] + root.StylesGetMargin(STYLES.AXIS.Y);
+            
+            { // For side-ways minimizing
+               
+               // // Store pos and dim of the un-munimized root mesh
+               // // root.geom.defPos[0] = root.geom.pos[0];
+               // Mesh_unif_set_vb_root_wposx(root.root_posidx, VIEWPORT.WIDTH - menu_bar.geom.dim[0]*2);
+               // // root.geom.pos[0] = VIEWPORT.WIDTH - root.GetPosX() - menu_bar.geom.dim[0]*2;
+               // root.geom.defDim[0] = root.geom.dim[0];
+               // // Resize the root widget to include only the height of the menu bar
+               // root.geom.dim[0] = menu_bar.geom.dim[0] + root.StylesGetMargin(STYLES.AXIS.X);
+               // // root.geom.dim[0] = menu_bar.geom.dim[0] ;
+            }
 
 
             // Change the minimized button text
@@ -571,10 +592,20 @@ export class Widget_Minimize extends Widget_Button {
                if (root.children.buffer[i]) root.children.buffer[i].Activate();
             }
 
-
+            
             // Retrieve stored pos and dim
             root.geom.pos[1] = root.geom.defPos[1];
             root.geom.dim[1] = root.geom.defDim[1];
+            
+            
+            { // For side-ways minimizing
+               // // Retrieve stored pos and dim
+               // // root.geom.pos[0] = root.geom.defPos[0];
+               // Mesh_unif_add_vb_root_wposx(root.root_posidx, -root.geom.defDim[0] * 2 + root.geom.dim[0] *2);
+               // console.log(root.geom.dim[0])
+               // // Mesh_unif_set_vb_root_wposx(root.root_posidx, VIEWPORT.WIDTH - menu_bar.geom.dim[0]*2);
+               // root.geom.dim[0] = root.geom.defDim[0];
+            }
 
 
             minim_mesh.text_mesh.RenderTextFromString('-');

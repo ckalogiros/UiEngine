@@ -479,7 +479,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	// TODO: Implement align self correctly
 	// TODO: Is there a way to align differently for each text mesh????
 
-	CreateNewText(dynamic_text, fontSize, text_col2, pad = [0, 0], bold = this.bold) {
+	CreateNewText(dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align=ALIGN.HORIZONTAL) {
 
 		/** DEBUG ERROR*/ if (!Array.isArray(pad)) console.error('Pad is not of type array');
 
@@ -505,6 +505,8 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC | new_text.geom.type | new_text.mat.type;
 
 
+		// Align_between(align, prev_text_mesh.geom, new_text.geom, pad, new_text.StylesGetPad(), prev_text_mesh.advancex)
+		// const pos_dif = Align_self_get_dif(align, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
 		Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.StylesGetPad(), prev_text_mesh.advancex)
 		const pos_dif = Align_self_get_dif(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
 		AddArr2(new_text.geom.pos, pos_dif);

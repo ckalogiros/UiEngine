@@ -642,8 +642,8 @@ export function Uniforms_buffer_print() {
          'name', _uniforms_buffer.buffer[i].name,
          'val', _uniforms_buffer.buffer[i].val,
          'progidx', _uniforms_buffer.buffer[i].progidx,
-         'Clbk', _uniforms_buffer.buffer[i].GetValClbk,
-         'clbk_params', _uniforms_buffer.buffer[i].clbk_params,
+         // 'Clbk', 'For Clbk seek in VertexBufferGroup.Unif_set_val_clbk()',
+         // 'clbk_params', 'For clbk_params seek in VertexBufferGroup.unif_set_val_clbk_params()',
       );
    }
 }

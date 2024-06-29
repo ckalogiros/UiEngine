@@ -1,10 +1,10 @@
 "use strict"
 
-import { Gl_set_alpha, Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps";
-import { CopyArr, CopyArr3, CopyArr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations";
+import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps";
+import { CopyArr3, CopyArr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse";
 import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_widget_slider_simple } from "../../Core/CreateWidget";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_batch_get_all_roots_by_vertex_buffer, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer";
+import { Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals";
@@ -13,6 +13,7 @@ import { BLACK, BLUE, BLUEL, GREEN, GREY, RED, REDL, WHITE, YELLOW } from "../Ma
 import { Section } from "../Meshes/Section";
 import { Find_parent_listen_event } from "../Operations/Recursions";
 import { Slider_simple_connect } from "./WidgetSlider";
+
 
 
 
@@ -254,6 +255,20 @@ export class Widget_Color_Picker extends Section {
    /****************************************************************************************************************************************************/
    // INHERITED METHODS
    /****************************************************************************************************************************************************/
+
+   Destroy(){
+      // alert('Implement Destroy()\nColorpicker Widget');
+
+      super.Destroy();
+
+      // This section
+      // Panel 1
+      // Panel 2
+      // Slider transparency
+      // Slider Hue
+      // Color pick area
+      // Color present area
+   }
 
 
    SetGfxEnableAttributes(which, params) {
@@ -730,9 +745,11 @@ export class Widget_Color_Picker extends Section {
        * The x axis controls the color hue. That is white on the left and the right's vertex color to the right
        * The y axis controls the color intensity. That is black on the bottom and full color to the top
        */
+
       const color = color_pick_mesh.mat.col[3]; // The 4-th is the v4 or the upper right vertex
       const hue = Mix_vec4_float32Array(WHITE, color, percentagex);
       const intensity = Mix_vec4_float32Array(BLACK, hue, percentagey);
+
 
 
 
@@ -744,9 +761,6 @@ export class Widget_Color_Picker extends Section {
       CopyArr3(transp_slider.mat.col[3], intensity);
       if(transp_slider.gfx) Gl_set_rgba_per_vertex(transp_slider.gfx, transp_slider.mat.col)
       intensity[3] = transp_slider.slider_val;
-      // CopyArr3(transp_slider.mat.col, intensity)
-      // Gl_set_rgba(transp_slider.gfx, intensity, transp_slider.geom.num_faces);
-      // console.log(transp_slider.slider_val)
 
 
 
@@ -755,6 +769,7 @@ export class Widget_Color_Picker extends Section {
 
       /*****************************************************************************************************/
       // Set the new color picked in the color present panel of the widget
+
       const color_present_mesh = panel2.children.buffer[temp_color_present_idx];
       CopyArr4(color_present_mesh.mat.col, intensity); 
       Gl_set_rgba(color_present_mesh.gfx, intensity, color_present_mesh.geom.num_faces);

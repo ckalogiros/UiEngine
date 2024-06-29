@@ -382,30 +382,30 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
 
 
-   /** A callback function calls another callback that must be called via 'timeInterval'. 
-    * Is responsible for creation/destruction of the timeInterval that in its turn 
-    * will run automaticaly a callback from the application */
-   export function Switch_simple_time_interval_callback(params){
+/** A callback function calls another callback that must be called via 'timeInterval'. 
+ * Is responsible for creation/destruction of the timeInterval that in its turn 
+ * will run automaticaly a callback from the application */
+export function Switch_simple_time_interval_callback(params){
 
-      const this_switch = params.target_mesh;
+   const this_switch = params.target_mesh;
 
-      if (this_switch.isOn === 0x0 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
+   if (this_switch.isOn === 0x0 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
 
-         const intervalIdx = this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-         TimeIntervalsDestroyByIdx(intervalIdx);
-         this_switch.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
+      const intervalIdx = this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      TimeIntervalsDestroyByIdx(intervalIdx);
+      this_switch.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
 
-         return;
-      }
-
-      if (this_switch.isOn === 0x1 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
-
-         const Clbk = params.targetBindingFunctions;
-         // const idx = TimeIntervalsCreate(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, this.evt_params.EventClbk, this.evt_params.evt_params);
-         const idx = TimeIntervalsCreate(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, Clbk, params.params);
-         this_switch.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
-      }
+      return;
    }
+
+   if (this_switch.isOn === 0x1 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
+
+      const Clbk = params.targetBindingFunctions;
+      // const idx = TimeIntervalsCreate(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, this.evt_params.EventClbk, this.evt_params.evt_params);
+      const idx = TimeIntervalsCreate(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, Clbk, params.params);
+      this_switch.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+   }
+}
 
 
 function Switch_click_default_callback(params) {

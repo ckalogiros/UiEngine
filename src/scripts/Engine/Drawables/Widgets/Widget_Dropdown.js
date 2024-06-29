@@ -5,7 +5,7 @@ import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Listener_get_parent_event } from "../../Events/EventListeners.js";
-import { AddArr2 } from "../../../Helpers/Math/MathOperations.js";
+import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_buffer_get_root_meshidx, Widget_root_is_widget_root, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
 import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
@@ -126,7 +126,6 @@ export class Widget_Dropdown extends Section {
       this.rootidx = INT_NULL;
 
       pos[2] += 1;
-      // this.menu = Create_widget_section(_, SECTION.VERTICAL, marginpad, [OUT_OF_VIEW, OUT_OF_VIEW, pos[2]], [1, 1], TRANSPARENCY(col_menu, tr), _, _, is_debug_mesh);
       this.menu = Create_widget_section(_, SECTION.VERTICAL, pad, [0, 0, pos[2]], [1, 1], TRANSPARENCY(col_menu, tr), _, _, is_debug_mesh);
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.parent = this;
@@ -157,7 +156,7 @@ export class Widget_Dropdown extends Section {
 
    
 
-    Activate() {
+   Activate() {
 
       this.state.mask |= MESH_STATE.ACTIVE;
       this.children.buffer[0].Activate(); // Button
@@ -551,6 +550,10 @@ export class Widget_Dropdown extends Section {
       }
 
       STATE.mesh.SetClicked(btn);
+      STATE.mesh.SetFocused(dp);
+      // console.log('111111111111111111111111111111111111111', dp.GetName())
+      // console.log('BBB', STATE.mesh.focused.GetName())
+
 
       return true;
    }
@@ -841,51 +844,112 @@ export class Widget_Dropdown extends Section {
       this.#DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 
-      temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
+      const widget_root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
+      const widget_root = Mesh_buffer_get_mesh_byidx(widget_root_meshidx)
+      // { // New Implementation: Run for all meshes
+         
+      //    if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
+      //    if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
+
+      //    Calculate_sizes_recursive(widget_root, widget_root.options, );
 
 
-      this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
-      this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
+      //    if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+      //       CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
+      //       CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
+      //    }
+      //    else {
+      //       if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
+      //       else {
+      //          if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
+      //          if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
+      //       }
+      //    }
+
+      //    widget_root.SectionSetPad();
+      // }
+      { // New Implementation: Run for all meshes
+         
+         if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
+         if (root.options & SECTION.FIXED_H) root.max_size[1] = root.geom.dim[1];
+
+         Calculate_sizes_recursive(root, root.options, );
+
+
+         if (root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+            CopyArr2(root.geom.dim, root.max_size); // Set size for the root dp.
+            CopyArr2(root.geom.defDim, root.max_size); // Store to default for the root.
+         }
+         else {
+            if (root.options & SECTION.RESIZE_PARENT) CopyArr2(root.geom.dim, root.max_size); // Set size for the root.
+            else {
+               if (root.options & SECTION.RESIZE_PARENTX) root.geom.dim[0] = root.max_size[0];
+               if (root.options & SECTION.RESIZE_PARENTY) root.geom.dim[1] = root.max_size[1];
+            }
+         }
+
+         root.SectionSetPad();
+      }
+      
+
+      { // Old Implementation: Run for clicked and set the parents in a loop
+
+         // temp_dp_calc_sizes(widget_root, _, widget_root.options & SECTION.INDEPENDENT);
+         // temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
+   
+   
+         // this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
+         // this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
+      }
+
+
 
       const cur_pos = [0,0];
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
       tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+      // tu(root, this.options, root.geom.pos, _, _, root.options & SECTION.INDEPENDENT);
+
+      // Calculate_positions_no_gfx_update_recursive(widget_root, widget_root.options, widget_root.geom.pos);
 
 
 
-      // Get the group root mesh to Recalc position/dimentions 
-      const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
-      const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-      let clip_top = null, clip_bottom = null;
-      if (group_root_mesh.parent) {
+      { // Clipping
 
-         clip_top = group_root_mesh.parent.GetPosY();
-         clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
-         // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
+         // // Get the group root mesh to Recalc position/dimentions 
+         // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+         // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
+         // let clip_top = null, clip_bottom = null;
+         // if (group_root_mesh.parent) {
+   
+         //    clip_top = group_root_mesh.parent.GetPosY();
+         //    clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
+         //    // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
+         // }
+         // else {
+         //    clip_top = group_root_mesh.GetPosY();
+         //    clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
+         // }
+   
+         // // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
+         // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+         // // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
+         // // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
+   
+   
+         // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
       }
-      else {
-         clip_top = group_root_mesh.GetPosY();
-         clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
-      }
-
-      // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
-      Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-      // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
-      // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
-
-
-      // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-      View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-
       
       
-
+      
+      
       // HACK: We want to update the handles size and pos after dp activation
       const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)
       const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshidx)
       if(root_mesh.type & MESH_TYPE.WIDGET_SCROLLER) TEMP_Scroller_calc_handle(root_mesh)
-
+         
+      // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
+      View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
    }
 
 
@@ -953,58 +1017,130 @@ export class Widget_Dropdown extends Section {
       
       
       // this.Calc_no_gfx_update();
+      
+      // const widget_root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
+      // const widget_root = Mesh_buffer_get_mesh_byidx(widget_root_meshidx)
+            
+      // Expand(this, this.options)
+      // Expand(widget_root, widget_root.options)
 
-
-      Expand(this, this.options)
-      temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
-
+      // {
          
-      this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
-      this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
+      //    if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
+      //    if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
+
+      //    Calculate_sizes_recursive(widget_root, widget_root.options, );
+
+
+      //    if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+      //       CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
+      //       CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
+      //    }
+      //    else {
+      //       if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
+      //       else {
+      //          if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
+      //          if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
+      //       }
+      //    }
+
+      //    widget_root.SectionSetPad();
+      // }
+      {
+         
+         if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
+         if (root.options & SECTION.FIXED_H) root.max_size[1] = root.geom.dim[1];
+
+         Calculate_sizes_recursive(root, root.options, );
+
+
+         if (root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+            CopyArr2(root.geom.dim, root.max_size); // Set size for the root dp.
+            CopyArr2(root.geom.defDim, root.max_size); // Store to default for the root.
+         }
+         else {
+            if (root.options & SECTION.RESIZE_PARENT) CopyArr2(root.geom.dim, root.max_size); // Set size for the root.
+            else {
+               if (root.options & SECTION.RESIZE_PARENTX) root.geom.dim[0] = root.max_size[0];
+               if (root.options & SECTION.RESIZE_PARENTY) root.geom.dim[1] = root.max_size[1];
+            }
+         }
+
+         root.SectionSetPad();
+      }
+
+      
+      // // temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
+      // // temp_dp_calc_sizes(root, _, root.options & SECTION.INDEPENDENT);
+      // // temp_dp_calc_sizes(widget_root, _, widget_root.options & SECTION.INDEPENDENT);
+      // Calculate_sizes_recursive(widget_root, widget_root.options & SECTION.INDEPENDENT);
+      // // Calculate_sizes_recursive(root, root.options & SECTION.INDEPENDENT);
+      // widget_root.geom.dim[0] = widget_root.max_size[0] + widget_root.StylesGetPad(STYLES.AXIS.X);
+      // widget_root.geom.dim[1] = widget_root.max_size[1] + widget_root.StylesGetPad(STYLES.AXIS.Y);
+      
+               
+      // this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
+      // this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
+
+
       
 
       const cur_pos = [0,0];
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
 
-      // Calculate_positions_no_gfx_update_recursive(this, this.options, cur_pos, _);
+      // // Calculate_positions_no_gfx_update_recursive(this, this.options, cur_pos, _);
       tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+      // tu(root, this.options, root.geom.pos, _, _, root.options & SECTION.INDEPENDENT);
+      // // tu(widget_root, widget_root.options, cur_pos, _, _, root.options & SECTION.INDEPENDENT);
+      
+      // Calculate_positions_no_gfx_update_recursive(this, this.options, this.geom.pos);
+      // Calculate_positions_no_gfx_update_recursive(root, root.options, root.geom.pos);
+      // Calculate_positions_no_gfx_update_recursive(widget_root, widget_root.options, widget_root.geom.pos);
 
 
 
-      if((this.options & SECTION.INDEPENDENT)===0){
+      // widget_root.Recalc_no_gfx_update(this.options & SECTION.INDEPENDENT)
+      // root.Recalc_no_gfx_update(this.options & SECTION.INDEPENDENT)
+      // this.Recalc_no_gfx_update(this.options & SECTION.INDEPENDENT)
 
-         // Get the group root mesh to Recalc position/dimentions 
-         const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
-         const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-         let clip_top = null, clip_bottom = null;
-         if (group_root_mesh.parent) {
+
+      { // Clipping
+
+         // if((this.options & SECTION.INDEPENDENT)===0){
    
-            clip_top = group_root_mesh.parent.GetPosY();
-            clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
-            // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
-         }
-         else {
-            clip_top = group_root_mesh.GetPosY();
-            clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
-         }
-
-         Clipy_from_group(group_root_mesh.group_bufferidxs[0], clip_top, clip_bottom);
-
-         
-         // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
-         // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
-         
-         // // Clip from the tree recursive, if this dp has 'INDEPENDENT' flag, else clip from the whole group
-         // if(this.options & SECTION.INDEPENDENT){
-         //    Clipy_from_tree_recursive(root, clip_top, clip_bottom);
+         //    // Get the group root mesh to Recalc position/dimentions 
+         //    const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+         //    const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
+         //    let clip_top = null, clip_bottom = null;
+         //    if (group_root_mesh.parent) {
+      
+         //       clip_top = group_root_mesh.parent.GetPosY();
+         //       clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
+         //       // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
+         //    }
+         //    else {
+         //       clip_top = group_root_mesh.GetPosY();
+         //       clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
+         //    }
+   
+         //    Clipy_from_group(group_root_mesh.group_bufferidxs[0], clip_top, clip_bottom);
+   
+            
+         //    // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
+         //    // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
+            
+         //    // // Clip from the tree recursive, if this dp has 'INDEPENDENT' flag, else clip from the whole group
+         //    // if(this.options & SECTION.INDEPENDENT){
+         //    //    Clipy_from_tree_recursive(root, clip_top, clip_bottom);
+         //    // }
+         //    // else{
+         //       //    Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+         //       // }
+               
+               
          // }
-         // else{
-            //    Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-            // }
-            
-            
-         }
+      }
          
          
       this.ConstructListenersForMenu(menu); // Create listeners, as children of menu listeners.
@@ -1018,6 +1154,7 @@ export class Widget_Dropdown extends Section {
 
       // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
       // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
+      // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
       View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
 
    }
@@ -1026,116 +1163,158 @@ export class Widget_Dropdown extends Section {
 
 
 function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
-   const parent = dp.parent;
+
+
    // Calculate sizes bottom-up the tree with this 'dp' being the root...  
    const dif = Calculate_sizes_recursive(dp, dp.options, target_child_idx);
-   
+
    const dim = dp.geom.dim
    const max = dp.max_size;
+   let prev_max = [max[0], max[1]];
    const pad = [0,0];
    
 
    // ... And then go up the tree, from this 'dp' to the actual root, to add the dimention difference that was calculated erlier.
    // NOTE: This is done so that we skip calculating all children from the root. Instead we calculate from this dp and all its children , and we propagate the size difference up to any 'Section' parents.   
-   let p = parent;
+   let p = dp.parent;
    while(p){
 
       const meshpad = p.StylesGetPad();
       pad[0] += meshpad[0];
-      // pad[1] += meshpad[1];
-
+      pad[1] += meshpad[1];
+      console.log(
+         'dim', p.geom.dim[1],
+         'max_size', p.max_size[1],
+         'dif', dif[1],
+         'name', p.GetName(),
+      )
       
-      if(p && (p.type & MESH_TYPE.SECTION_MESH)){
-         
-         
-         
-         if(p.type & MESH_TYPE.WIDGET_SCROLLER || p.type & MESH_TYPE.WIDGET_MENU_BAR || p.type & MESH_TYPE.WIDGET_WINDOW) {
-            // console.log(p.GetName())
-            break;
-         }
+      // if(p && (p.type & MESH_TYPE.SECTION_MESH)){
+      if(p){
+         if(p.type & MESH_TYPE.SECTION_MESH){
 
-         if(p.options & SECTION.VERTICAL){
-
-            if(dif[0] > POSSITIVE && p.geom.dim[0] < max[0]){
-               // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
-
-               // const a = dim[0] + pad[0];
-               const a = dim[0];
-               const b = p.geom.dim[0] - a;
-               // p.geom.dim[0] += (dif[0] - b)+ pad[0];
-               p.geom.dim[0] += dif[0];
-               p.max_size[0] = p.geom.dim[0];
+            if(p.type & MESH_TYPE.WIDGET_SCROLLER || p.type & MESH_TYPE.WIDGET_MENU_BAR || p.type & MESH_TYPE.WIDGET_WINDOW) {
+               console.log('BREAK', p.GetName())
+               break;
             }
-            // else if(dif[0] < POSSITIVE && p.geom.dim[0] > max[0]){
-            else if(dif[0] < POSSITIVE && p.geom.dim[0] > max[0]){
-               // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
+   
+            if(p.options & SECTION.VERTICAL){
+   
+               if(dif[0] > POSSITIVE && p.geom.dim[0] <= prev_max[0]){
+                  // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
+                  p.geom.dim[0] += dif[0];
+                  p.max_size[0] = p.geom.dim[0];
+   
+               }
+               // else if(dif[0] < POSSITIVE && p.geom.dim[0] > prev_max[0]){
+               else if(dif[0] < POSSITIVE){
+                  // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
+                  if(p.type & MESH_TYPE.WIDGET_DROP_DOWN){
 
-               const a = dim[0] + pad[0];
-               const b = p.geom.dim[0] - a;
-               // p.geom.dim[0] += (dif[0] - b);
-               // p.geom.dim[0] += dif[0]+(pad[0]-meshpad[0]);
-               p.geom.dim[0] += dif[0];
-               p.max_size[0] = p.geom.dim[0];
-
-            }
-            
-            // This is so that the outer sections will not be reduced less than the current dp 
-            if(p.geom.dim[0] < p.min_size[0]){
+                     const ms = Dp_menu_get_max_size_from_siblings(p)
+                     if(p.geom.dim[0] > ms[0]){
+      
+                        p.geom.dim[0] += dif[0];
+                        p.max_size[0] = p.geom.dim[0];
+      
+                        // p.geom.dim[1] -= pad[1];
+                     }
+                  }
+   
+               }
+               else{
+                  console.log('{{{{{}}}}}', p.geom.dim[0], 'clicked max', dp.max_size[0])
+               }
                
-               p.geom.dim[0] = p.min_size[0] + pad[0];
-               p.max_size[0] = p.geom.dim[0];
-            }
-
-            p.geom.dim[1] += dif[1] + pad[1];
-            p.max_size[1] = p.geom.dim[1];
-         }
-         else if(p.options & SECTION.HORIZONTAL){
-
-            p.geom.dim[1] += dif[1] + pad[1];
-            p.max_size[1] = p.geom.dim[1];
-            if(p.geom.dim[1] < p.min_size[1]){
-               
-               p.geom.dim[1] = p.min_size[1] + pad[1];
+   
+               p.geom.dim[1] += dif[1];
                p.max_size[1] = p.geom.dim[1];
             }
-
-            p.geom.dim[1] += dif[1] + pad[1];
-            p.max_size[1] = p.geom.dim[1];
+            else if(p.options & SECTION.HORIZONTAL){
+   
+               p.geom.dim[1] += dif[1] + pad[1];
+               p.max_size[1] = p.geom.dim[1];
+               if(p.geom.dim[1] < p.min_size[1]){
+                  
+                  p.geom.dim[1] = p.min_size[1] + pad[1];
+                  p.max_size[1] = p.geom.dim[1];
+               }
+   
+               p.geom.dim[1] += dif[1] + pad[1];
+               p.max_size[1] = p.geom.dim[1];
+            }
+   
+            prev_max[0] = p.max_size[0];
+            prev_max[1] = p.max_size[1];
          }
+         
+         
          p = p.parent
       }
    }
 
-}
+   
+   dp.geom.dim[0] -= dif[0]
+   dp.max_size[0] -= dif[0]
 
+   console.log('---------------------------------------')
+}
+/** */
 // function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
-// console.log('-----------------------')
 //    const parent = dp.parent;
 //    // Calculate sizes bottom-up the tree with this 'dp' being the root...  
 //    const dif = Calculate_sizes_recursive(dp, dp.options, target_child_idx);
-
-//    // let TEMP_scroller = null; // HACK: If there is a scroller 
+   
+//    const dim = dp.geom.dim
+//    const max = dp.max_size;
+//    const pad = [0,0];
+   
 
 //    // ... And then go up the tree, from this 'dp' to the actual root, to add the dimention difference that was calculated erlier.
-//    // NOTE: This is done so that we skip calculating all children from the root. Insted we calculate from this dp and all its children , and we propagate the size difference up to any 'Section' parents.   
-//    let p = parent
+//    // NOTE: This is done so that we skip calculating all children from the root. Instead we calculate from this dp and all its children , and we propagate the size difference up to any 'Section' parents.   
+//    let p = parent;
 //    while(p){
 
-//       const pad = p.StylesGetPad();
-//       // const pad = [0,0];
-//       // if(p && (p.type & MESH_TYPE.SECTION_MESH) &&  (parent.parent.type & MESH_TYPE.WIDGET_SCROLLER)===0){
-//       if(p && (p.type & MESH_TYPE.SECTION_MESH)){
-// console.log(p.GetName())
+//       const meshpad = p.StylesGetPad();
+//       pad[0] += meshpad[0];
+//       // pad[1] += meshpad[1];
 
+      
+//       if(p && (p.type & MESH_TYPE.SECTION_MESH)){
+         
+         
          
 //          if(p.type & MESH_TYPE.WIDGET_SCROLLER || p.type & MESH_TYPE.WIDGET_MENU_BAR || p.type & MESH_TYPE.WIDGET_WINDOW) {
+//             // console.log(p.GetName())
 //             break;
 //          }
 
 //          if(p.options & SECTION.VERTICAL){
 
-//             p.geom.dim[0] += dif[0] + pad[0];
-//             p.max_size[0] = p.geom.dim[0];
+//             if(dif[0] > POSSITIVE && p.geom.dim[0] < max[0]){
+//                // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
+
+//                // const a = dim[0] + pad[0];
+//                const a = dim[0];
+//                const b = p.geom.dim[0] - a;
+//                // p.geom.dim[0] += (dif[0] - b)+ pad[0];
+//                p.geom.dim[0] += dif[0];
+//                p.max_size[0] = p.geom.dim[0];
+//             }
+//             // else if(dif[0] < POSSITIVE && p.geom.dim[0] > max[0]){
+//             else if(dif[0] < POSSITIVE && p.geom.dim[0] > max[0]){
+//                // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
+
+//                const a = dim[0] + pad[0];
+//                const b = p.geom.dim[0] - a;
+//                // p.geom.dim[0] += (dif[0] - b);
+//                // p.geom.dim[0] += dif[0]+(pad[0]-meshpad[0]);
+//                p.geom.dim[0] += dif[0];
+//                p.max_size[0] = p.geom.dim[0];
+
+//             }
+            
+//             // This is so that the outer sections will not be reduced less than the current dp 
 //             if(p.geom.dim[0] < p.min_size[0]){
                
 //                p.geom.dim[0] = p.min_size[0] + pad[0];
@@ -1163,6 +1342,43 @@ function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
 //    }
 
 // }
+
+
+function Dp_menu_get_max_size_from_siblings(parent){
+
+   console.log('- parent', parent.geom.dim[0], 'max', parent.max_size[0], parent.GetName())
+   let max_size = [0, 0];
+   for (let i=0; i <= parent.children.boundary; i++){
+      const sib = parent.children.buffer[i];
+      console.log('---- sibling', sib.geom.dim[0], 'max', max_size[0], sib.GetName())
+      const pad = sib.StylesGetPad()
+      if(max_size[0] <= sib.geom.dim[0]+pad[0]*2){
+         max_size[0] = sib.geom.dim[0] + pad[0]*2;
+      // if(max_size[0] <= sib.geom.dim[0]+pad[0]){
+      //    max_size[0] = sib.geom.dim[0] + pad[0];
+         console.log('SET MAX SIZE', max_size[0])
+      }
+      else if(sib.max_size===_){console.log('Has no max_size', sib.GetName())}
+      // if(sib.max_size && max_size[0] < sib.geom.dim[0]){
+      //    max_size[0] = sib.geom.dim[0];
+      // }
+   }
+
+   // This is with max_size instead of .geom.dim
+   // for (let i=0; i <= parent.children.boundary; i++){
+   //    const sib = parent.children.buffer[i];
+   //    console.log('---- sibling', sib.geom.dim[0], 'sib max', 'max', max_size[0], sib.GetName())
+   //    const pad = sib.StylesGetPad()
+   //    if(sib.max_size && max_size[0] <= sib.max_size[0]+pad[0]*2){
+   //       max_size[0] = sib.max_size[0] + pad[0]*2;
+   //       console.log('SET MAX SIZE', max_size[0])
+   //    }
+   //    else if(sib.max_size===_){console.log('Has no max_size', sib.GetName())}
+   // }
+
+   return max_size;
+}
+
 
 
 export function TEMP_DP_STEAL_THE_DP_RECALC(dp){
@@ -1208,7 +1424,66 @@ function tu(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0
 }
 
 
+/**SAVE-SIMPLE REPOSITION ONLY FOR DP-DP_MENU-BUTTON */
+// function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is_for_build=false) {
 
+   
+//    const cur_pos = [
+//       curr[0] + parent.StylesGetPad(STYLES.AXIS.X), 
+//       is_for_build ? curr[1] : curr[1] + parent.StylesGetPad(STYLES.AXIS.Y), // 'is_for_build=true' don't add the pad on repositioning alredy buld dropdowns  
+//    ];
+
+   
+//    const pad = [0, 0]
+   
+//    const target_idx = (target_child_idx != undefined) ? (target_child_idx >= 0) ? target_child_idx : 0 : 0;
+
+//    if(target_idx > parent.children.boundary) return
+
+//    for (let i = target_idx; i <= parent.children.boundary; i++) {
+      
+//       const mesh = parent.children.buffer[i];
+
+//       if(mesh){
+
+//          let continue_recur = true;
+//          let opt = options
+   
+//          // console.log('  RecalcPos', mesh.GetName())
+   
+//          if (options & SECTION.INHERIT) opt = parent.options
+         
+//          const padd = [0,0,];
+//          if(padd){
+//             pad[0] += padd[0];
+//             pad[1] += padd[1];
+//          }
+   
+//          const rel_pos = [cur_pos[0], cur_pos[1]];
+
+//          mesh.geom.pos[0] = rel_pos[0]; 
+//          mesh.geom.pos[1] = rel_pos[1];
+   
+//          if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
+//             Temp_dp_calculate_positions(mesh, opt, cur_pos, _, _);
+//          }
+   
+   
+//          // Increment current position tracker
+//          if (parent.options & SECTION.VERTICAL) {
+//             cur_pos[1] += mesh.geom.dim[1] * 2;
+//             parent.last_pos[1] = cur_pos[1];
+//          }
+//          else if (parent.options & SECTION.HORIZONTAL) {
+//             cur_pos[0] += mesh.geom.dim[0] * 2;
+//             parent.last_pos[0] = cur_pos[0];
+//          }
+//       }
+
+//    }
+
+// }
+/** */
 function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is_for_build=false) {
 
    
@@ -1248,9 +1523,6 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
             pad[1] += padd[1];
          }
    
-         // cur_pos[0] += pad[0];
-         // cur_pos[1] += pad[1];
-         
          const rel_pos = [cur_pos[0], cur_pos[1]];
          
          if(mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC){
@@ -1266,8 +1538,6 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
          else if (mesh.type & MESH_TYPE.SECTION_MESH) 
          { // For meshes with a parent of type Section
    
-            // mesh.geom.pos[0] = rel_pos[0] + pad[0]; 
-            // mesh.geom.pos[1] = rel_pos[1] + pad[1];
             mesh.geom.pos[0] = rel_pos[0]; 
             mesh.geom.pos[1] = rel_pos[1];
             
@@ -1311,6 +1581,9 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
    }
 
 }
+
+
+
 /**SAVE */
 // function tu(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0){
 

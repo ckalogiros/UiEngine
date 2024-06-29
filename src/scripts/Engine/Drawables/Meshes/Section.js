@@ -120,6 +120,7 @@ export class Section extends Rect_Mesh {
 
          const child = this.children.buffer[i];
          if (child) {
+            // console.log('Destroy:', child.GetName(), 'chldren:', child.children.active_count, 'numfaces:', child.geom.num_faces)
             const shift_children = child.Destroy();
             if (shift_children) i--;
          }
@@ -429,7 +430,12 @@ export class Section extends Rect_Mesh {
 
             if (child.ConstructListeners) { // Call the widget's specific .ConstructListeners() to handle the widget's listen events creation
 
-               child.ConstructListeners([parent_listeners[0], parent_listeners[1]]);
+               if(parent_listeners) child.ConstructListeners([parent_listeners[0], parent_listeners[1]]);
+               else {
+                  // CreateListenEvent(etype, true)
+                  console.error('Potential BUG. Temporary FIX for root mesh listeners that are NULL')
+                  child.ConstructListeners([INT_NULL, INT_NULL]);
+               }
             }
          }
       }
@@ -809,7 +815,7 @@ export class Section extends Rect_Mesh {
       }
 
 
-      // Expand(section, options);
+      Expand(section, options);
 
 
       section.SectionSetPad();
@@ -944,9 +950,11 @@ export function Section_on_move_clbk(params) {
 
 
 
-export function Expand(parent, options) {
+export function Expand(parent, options, _width=0) {
 
-   const width = parent.geom.dim[0] + parent.StylesGetMargin(STYLES.AXIS.X);
+   // const width = parent.geom.dim[0] + parent.StylesGetMargin(STYLES.AXIS.X);
+   let width = parent.geom.dim[0] - parent.StylesGetPad(STYLES.AXIS.X);
+   if(width < _width) width = _width;
    let opt = options
 
    for (let i = 0; i <= parent.children.boundary; i++) {
@@ -982,10 +990,28 @@ export function Expand(parent, options) {
                }
             }
 
-            Expand(child, opt);
+            // Expand(child, opt, width);
+            width = Expand(child, opt, width);
+            // if(width < _width) width = _width;
+         }
+         else {
+            
+            if (opt & SECTION.VERTICAL) {
+               if (child.options & SECTION.EXPAND) {
+                  child.geom.dim[0] = width;
+                  child.geom.defDim[0] = child.geom.dim[0] + pad[0];
+               }
+            }
+            else if (opt & SECTION.HORIZONTAL) {
+               // width -= child.geom.dim[0] *2
+               // child.geom.dim[0] = width;
+               // child.geom.defDim[0] = child.geom.dim[0] + pad[0];
+            }
          }
       }
    }
+
+   return width
 }
 
 
@@ -1034,6 +1060,8 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
    for (let i = target_idx; i <= parent.children.boundary; i++) {
 
       const mesh = parent.children.buffer[i];
+      // console.log('Size', mesh.GetName())
+
 
       if (mesh) {
 
@@ -1085,7 +1113,7 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
 
 
             Calculate_sizes_recursive(mesh, opt, _, recur_cnt++); // Recurse if child mesh is of type of Section
-            // recur_cnt++
+            
             if ((mesh.options & SECTION.INHERIT) === 0) opt = parent.options; // Roll back to the options
 
 
@@ -1103,6 +1131,7 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
             }
 
             mesh.SectionSetPad();
+
 
             if (opt & SECTION.VERTICAL) {
                if ((parent.options & SECTION.FIXED_W) === 0 && parent.max_size[0] < mesh.geom.dim[0])
@@ -1211,6 +1240,13 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
 
             }
          }
+
+         // console.log(
+         //    '>>>>>',
+         //    'dim', mesh.geom.dim[0],
+         //    'max_size', mesh.max_size ? mesh.max_size[0] : 'null',
+         //    'name', mesh.GetName(),
+         // )
       }
    }
 

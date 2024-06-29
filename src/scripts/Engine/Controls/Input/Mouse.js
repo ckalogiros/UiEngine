@@ -2,6 +2,8 @@
 
 import { GetSign } from "../../../Helpers/Helpers.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
+import { Callback_animations_create } from "../../Animations/CallbackAnimations.js";
+import { Mesh_animations_create } from "../../Animations/MeshAnimations.js";
 import { Info_listener_dispatch_event } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { RegisterEvent } from "../../Events/Events.js";
 import { Scene_camera_scroll, Scene_camera_zoom } from "../../Scenes.js";
@@ -255,6 +257,10 @@ export function OnMouseOut(e){
 }
 
 
+let temp_deccel = .85;
+let temp_scroll_speed = 0;
+let temp_prev_dir = 1;
+let in_scolling = false;
 
 export function OnMouseWheel(e){
 
@@ -267,7 +273,55 @@ export function OnMouseWheel(e){
    mouse.wheel.x =  e.clientY;
    mouse.wheel.delta = GetSign(e.wheelDelta);
 
-   Scene_camera_scroll(STATE.scene.active_idx, mouse.wheel.delta)
+   // Scene_camera_scroll(STATE.scene.active_idx, mouse.wheel.delta*temp_scroll_speed);
+
+
+   let bool = true
+   if(temp_prev_dir !== mouse.wheel.delta) {
+
+      temp_prev_dir = mouse.wheel.delta;
+      bool = false;
+      temp_deccel = .8; // Reduce deccel if the user switched scroll direction
+      temp_scroll_speed = 0; // Cancel the deccelarate scrolling
+      // console.log(temp_prev_dir)
+   }
+
+   // temp_scroll_speed += temp_scroll_speed+1;
+   temp_scroll_speed += mouse.wheel.delta*8;
+   if(temp_deccel < .97 && bool !== mouse.wheel.delta) temp_deccel += .01; // Increase deccelarate scrolling on continuous scroll on the same directio
+
+
+   if(!in_scolling){
+
+      Callback_animations_create(
+         (params)=>{
+            
+            if(temp_scroll_speed > 1. || temp_scroll_speed < -1.){
+
+               in_scolling = true;
+               temp_scroll_speed *= temp_deccel; // deccelarate scrolling
+               
+               Scene_camera_scroll(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
+               // console.log(temp_scroll_speed, params.wheel_delta)
+
+               return true;
+            }
+            
+            return false;
+         }, 
+         ()=>{
+            console.log('END')
+            
+            in_scolling = false;
+            temp_scroll_speed = 0;
+            temp_deccel = .85;
+         }, 
+         {wheel_delta:mouse.wheel.delta}, 'SceneScroll'
+      );
+   }
+
+
+   // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.Y, line, .5, -5., 5., 0)
 
    // console.log(`MOUSE WHEEL: pos: ${e.x} ${e.y}, delta: ${e.wheelDelta}`)
 }

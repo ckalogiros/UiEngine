@@ -3,7 +3,7 @@ import { Timer_get_global_timer } from "../../../Timers/Timers.js";
 import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { GlRotateZ2D, Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
+import { Listener_change_child_event, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
@@ -394,7 +394,7 @@ export class Mesh {
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
 
         }
-        else if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
+        if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
 
             this.listeners.AddAtIndex(E.C, INT_NULL)
 
@@ -427,6 +427,16 @@ export class Mesh {
 
             this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, parent_event_idx);
             this.parent_event_idx = (parent_event_idx) ? parent_event_idx : INT_NULL;
+        }
+    }
+
+
+    // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
+    ChangeListenEvent(etypeidx, Clbk = null, params = null) {
+
+        if (this.state.mask & MESH_STATE.ACTIVE) { // HERE: see if can remove check
+
+            Listener_change_child_event(etypeidx, this.listeners.buffer[etypeidx], Clbk, params);
         }
     }
 
@@ -696,6 +706,7 @@ export class Mesh {
                 type: type,
                 ubidx: INT_NULL, // Should be set by the Gl Program creation. So the first mesh that will push to create the program will have the ubidx
                 shader: shader_flags,
+                // vertex_buffer_store_idx: INT_NULL,
             });
 
             this.temp_unif_wpos = idx - 1;
@@ -724,7 +735,9 @@ export class Mesh {
                 console.error('ubidx is INT_NULL. SEE if the uniform of this mesh has already been initialized for the vertex buffer.');
                 return;
             }
-            Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
+
+            // this.uniforms[found_idx].vertex_buffer_store_idx = Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
+            Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx, this.uniforms[found_idx].name);
             return;
         }
 

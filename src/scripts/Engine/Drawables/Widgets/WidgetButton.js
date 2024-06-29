@@ -129,14 +129,17 @@ export class Widget_Button extends Widget_Label {
 
       if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
       
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.evt_params = { // Create the parameters to pass for the button's click event. 
          EventClbk: EventClbk,
          targetBindingFunctions: targetBindingFunctions,
          target_mesh: this,
          params: params,
       };
-
+      
+      // The if statement is to avoid any clbk replacment if the button is still in preperation and no ConstructListeners have run to establish the Clbk in the EventListeners buffer
+      if(this.listeners && this.listeners.buffer[E.C] !== INT_NULL) 
+         this.ChangeListenEvent(E.C, EventClbk, params)
+      // this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       if(click_flags) this.state.mask |= click_flags;
 
    }

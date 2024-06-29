@@ -25,11 +25,11 @@ const ANIM_DATA = {
 
 
 
-function Animations_get_type_to_string(anim_type_flag){
+function MeshAnimations_get_type_to_string(anim_type_flag){
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR) return 'COLOR';
 }
 
-function Animations_get_value_size(anim_type_flag, anim_data_type){
+function MeshAnimations_get_value_size(anim_type_flag, anim_data_type){
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
         if(anim_data_type & ANIMATIONS.DATA.COLOR.R) return 1;
         if(anim_data_type & ANIMATIONS.DATA.COLOR.G) return 1;
@@ -59,7 +59,7 @@ function Animations_get_value_size(anim_type_flag, anim_data_type){
     alert('No apropriate size found for Animations value data size\nAnimations.js')
 }
 
-function Animations_get_value_offset(anim_type_flag, anim_data_type){
+function MeshAnimations_get_value_offset(anim_type_flag, anim_data_type){
 
     let offsets = [];
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
@@ -122,7 +122,7 @@ class VB_DATA {
         this.data.verts_per_rect = verts_per_rect;
         
         
-        this.data.offsets = Animations_get_value_offset(anim_type_flag, anim_data_type);
+        this.data.offsets = MeshAnimations_get_value_offset(anim_type_flag, anim_data_type);
         for(let i=0; i < this.values_len; i++){
             
             if(!has_start_value) this.data.values[this.data_count] = values[i];
@@ -151,7 +151,7 @@ class AnimationData {
 
 
 
-export class Animation{
+class MeshAnimation{
 
     constructor(anim_type_flag=0x0, anim_data_type){
         
@@ -161,7 +161,7 @@ export class Animation{
         this.is_active = false;
         this.in_animation = false;
         this.anim_type_flag = anim_type_flag;
-        this.nameidx = Str_buffer_store(Animations_get_type_to_string(anim_type_flag));
+        this.nameidx = Str_buffer_store(MeshAnimations_get_type_to_string(anim_type_flag));
     }
 
     SetVbData(vb_data){
@@ -181,18 +181,18 @@ export class Animation{
 
 
 
-const _animations = New_generic_buffer(_, 'Animations Buffer');
+const _mesh_animations_buffer = New_generic_buffer(_, 'Animations Buffer');
 
 
 
-export function AnimationsGet(){ return _animations; }
+export function Mesh_animations_get(){ return _mesh_animations_buffer; }
 
 
 function Vb_data_exist(anim_type_idx, vbidx){
     
-    if(_animations.buffer[anim_type_idx].vb_data === null) return INT_NULL;
+    if(_mesh_animations_buffer.buffer[anim_type_idx].vb_data === null) return INT_NULL;
 
-    if(_animations.buffer[anim_type_idx].vb_data.vbidx === vbidx) return anim_type_idx;
+    if(_mesh_animations_buffer.buffer[anim_type_idx].vb_data.vbidx === vbidx) return anim_type_idx;
 
     return INT_NULL;
 }
@@ -245,7 +245,7 @@ function Analyze_flag(anim_type_flag, flag){
  * @param {*} start_v   The starting value
  * @param {*} has_start_value   We need a separate bool in order to set as the start value the 0
  */
-export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=null, step=0, min=0, max=0, start_t=0, start_v=0, has_start_value=false){
+export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=null, step=0, min=0, max=0, start_t=0, start_v=0, has_start_value=false){
         
     const vbidx = mesh.gfx.vb.groupidx;
     const starts = mesh.gfx.vb.starts.buffer;
@@ -267,12 +267,12 @@ export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=
         
         if(ANIMATIONS.INDEX.COLOR !== INT_NULL){
             anim_type_idx = ANIMATIONS.INDEX.COLOR;
-            anim = _animations.buffer[anim_type_idx];
+            anim = _mesh_animations_buffer.buffer[anim_type_idx];
         }
         else {
             
-            anim = new Animation(anim_type_flag);
-            anim_type_idx = _animations.Add(anim);
+            anim = new MeshAnimation(anim_type_flag);
+            anim_type_idx = _mesh_animations_buffer.Add(anim);
             ANIMATIONS.INDEX.COLOR = anim_type_idx;
             
         }
@@ -284,19 +284,19 @@ export function Animations_create(anim_type_flag=0x0, values_len_flag=0x0, mesh=
         
         if(ANIMATIONS.INDEX.WPOS !== INT_NULL){
             anim_type_idx = ANIMATIONS.INDEX.WPOS;
-            anim = _animations.buffer[anim_type_idx];
+            anim = _mesh_animations_buffer.buffer[anim_type_idx];
         }
         else {
             
-            anim = new Animation(anim_type_flag);
-            anim_type_idx = _animations.Add(anim);
+            anim = new MeshAnimation(anim_type_flag);
+            anim_type_idx = _mesh_animations_buffer.Add(anim);
             ANIMATIONS.INDEX.WPOS = anim_type_idx;
         }
         values = mesh.geom.pos;
     }
 
 
-    const vals_len = Animations_get_value_size(anim_type_flag, values_len_flag)
+    const vals_len = MeshAnimations_get_value_size(anim_type_flag, values_len_flag)
     
     
     const t = start_t ? start_t : min;
@@ -367,23 +367,23 @@ function Min_max(values, anim_data, flags, values_len){
 }
 
 
-export function Animations_run(){
+export function Mesh_animations_run(){
 
-    if(_animations.active_count===0) return;
+    if(_mesh_animations_buffer.active_count===0) return;
 
-    for(let i=0; i <= _animations.boundary; i++){
+    for(let i=0; i <= _mesh_animations_buffer.boundary; i++){
         
-        if(_animations.buffer[i].is_active){
-            if(_animations.buffer[i].in_animation){
+        if(_mesh_animations_buffer.buffer[i].is_active){
+            if(_mesh_animations_buffer.buffer[i].in_animation){
                 
-                const len = _animations.buffer[i].vb_data.length;
+                const len = _mesh_animations_buffer.buffer[i].vb_data.length;
                 for(let j=0; j < len; j++){
                     
-                    const vb_data = _animations.buffer[i].vb_data[j];
-                    const anim_data = _animations.buffer[i].anim_data[j].data;
-                    Min_max(vb_data.data.values, anim_data, _animations.buffer[i].anim_type_flag, vb_data.values_len)
+                    const vb_data = _mesh_animations_buffer.buffer[i].vb_data[j];
+                    const anim_data = _mesh_animations_buffer.buffer[i].anim_data[j].data;
+                    Min_max(vb_data.data.values, anim_data, _mesh_animations_buffer.buffer[i].anim_type_flag, vb_data.values_len)
                     
-                    _animations.buffer[i].UpdateClbk(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, 
+                    _mesh_animations_buffer.buffer[i].UpdateClbk(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, 
                                                      vb_data.data.values_indices, vb_data.values_len, vb_data.attribsidx, 
                                                      vb_data.data.num_faces, vb_data.data.offsets, vb_data.data.which_vb, vb_data.data.counts);
                                                     //  vb_data.data.num_faces, vb_data.data.offsets, vb_data.data.which_vb, vb_data.data.counts, vb_data.data.num_faces[0]);
@@ -394,8 +394,8 @@ export function Animations_run(){
 
             }
             else{ // Here do stuf if animation stops
-                // _animations.buffer[i].is_active = false;
-                // _animations.buffer[i].stopAnimationClbk(_animations.buffer[i].params);
+                // _mesh_animations_buffer.buffer[i].is_active = false;
+                // _mesh_animations_buffer.buffer[i].stopAnimationClbk(_mesh_animations_buffer.buffer[i].params);
                 console.log("ANIMATIONS STOP")
             }
         }
@@ -406,162 +406,17 @@ export function Animations_run(){
 /**********************************************************************************************************************************/
 // Debug-Print
 
-export function Animations_print(){
+export function Mesh_animations_print(){
 
-    console.log('boundary', _animations.boundary, 'size', _animations.size)
-    for(let i=0; i <= _animations.boundary; i++){
+    console.log('boundary', _mesh_animations_buffer.boundary, 'size', _mesh_animations_buffer.size)
+    for(let i=0; i <= _mesh_animations_buffer.boundary; i++){
         console.log(
-            'type:', Animations_get_type_to_string(_animations.buffer[i].anim_type_flag),
-            '\nname:', Str_buffer_get_by_idx(_animations.buffer[i].nameidx),
-            '\nattribsidx:', _animations.buffer[i].vb_data.attribsidx,
-            '\nvb_data', _animations.buffer[i].vb_data,
-            '\nanim_data', _animations.buffer[i].anim_data,
+            'type:', MeshAnimations_get_type_to_string(_mesh_animations_buffer.buffer[i].anim_type_flag),
+            '\nname:', Str_buffer_get_by_idx(_mesh_animations_buffer.buffer[i].nameidx),
+            '\nattribsidx:', _mesh_animations_buffer.buffer[i].vb_data.attribsidx,
+            '\nvb_data', _mesh_animations_buffer.buffer[i].vb_data,
+            '\nanim_data', _mesh_animations_buffer.buffer[i].anim_data,
         );
     }
 }
 
-
-
-
-
-
-
-
-
-/**SAVE OLD CODE */
-
-// export class Animation{
-    
-//     constructor(animationClbk=null, stopAnimationClbk=null, params=null, name){
-//         this.params = params;
-//         this.animationClbk = animationClbk;
-//         this.stopAnimationClbk = stopAnimationClbk;
-//         this.is_active = false;
-//         this.in_animation = false;
-//         this.name = name;
-//         this.nameidx = Str_buffer_store(name);
-//     }
-
-
-
-//     Create(animationClbk, stopAnimationClbk, params, index, name){
-//         this.params = params;
-//         this.animationClbk = animationClbk;
-//         this.stopAnimationClbk = stopAnimationClbk;
-//         this.index = index;
-//         this.name = name;
-//     }
-
-
-//     Run(){
-//         this.in_animation = this.animationClbk(this.params);
-//     }
-
-
-//     Stop(){
-//         this.is_active = false;
-//         this.stopAnimationClbk(this.params);
-//     }
-
-// }
-
-
-
-// export class Animations{
-
-//     animations = [];
-//     count = 0;
-//     size = MAX_ANIMATIONS_SIZE;
-
-
-//     constructor(){
-
-//         // this.Init();
-//         for(let i=0; i<this.size; i++){
-//             this.animations[i] = new Animation;
-//             this.animations[i].Create(null, null, null);
-//         }
-//     }
-
-    
-//     GetNextFree() {
-//         for (let i = 0; i < this.size; i++) {
-//             if (!this.animations[i].is_active) {
-//                 return i;
-//             }
-//         }
-//         return INT_NULL;
-//     }
-
-
-//     Create(animationClbk, stopAnimationClbk, params, name){
-        
-//         const freeIdx = this.GetNextFree();
-//         if(freeIdx !== INT_NULL){
-            
-//             const anim = this.animations[freeIdx]
-//             anim.Create(animationClbk, stopAnimationClbk, params, this.count, name);
-//             anim.in_animation = true; 
-//             anim.is_active = true; 
-//             this.count++;
-//         }
-//         else{alert('Not enough space for new Animation. At Animations.js:Animations.Create()')}
-//         return freeIdx;
-//     }
-
-
-//     Run(){
-//         if(this.count){
-//             for(let i=0; i<this.size; i++){
-//                 if(this.animations[i].is_active){
-//                     if(this.animations[i].in_animation){
-//                         this.animations[i].Run();
-//                     }
-//                     else{ // Here do stuf if animation stops
-//                         this.animations[i].Stop();
-//                         this.count--;
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// }
-
-
-
-// const _animations = New_generic_buffer();
-
-
-
-// export function AnimationsGet(){ return _animations; }
-
-
-
-// export function Animations_create(animationClbk, stopAnimationClbk, params, name){
-        
-//     const anim = new Animation(animationClbk, stopAnimationClbk, params, name);
-//     const idx = _animations.Add(anim);
-    
-//     return idx;
-
-// }
-
-
-
-// export function Animations_run(){
-
-//     if(_animations.active_count===0) return;
-
-//     for(let i=0; i <= _animations.boundary; i++){
-
-//         if(_animations.buffer[i].is_active){
-//             if(_animations.buffer[i].in_animation){
-//                 _animations.buffer.Run();
-//             }
-//             else{ // Here do stuf if animation stops
-//                 _animations.buffer[i].Stop();
-//                 this.count--;
-//             }
-//         }
-//     }
-// }

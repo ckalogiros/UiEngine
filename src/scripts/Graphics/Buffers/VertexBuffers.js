@@ -351,6 +351,7 @@ class Vertex_Buffer_Group {
         this.Unif_set_val_clbk = []; // Function to call for getting the uniform value.
         this.unif_set_val_clbk_params = []; // The params of the above function callback.
         this.unif_ubidxs = []; // The params of the above function callback.
+        this.unif_names = []; // Uniforms names. Helper, to locate which element is what uniform
     }
 
 
@@ -430,8 +431,7 @@ export function Vertex_buffer_group_set_render_queueidx(vb_groupidx, render_queu
 /*************************************************************************************************************************/
 // Uniforms
 
-/** Set the callback on which the uniform update function will call to obtain the uniform value */
-export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, params, ubidx) {
+export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, params, ubidx, unif_name) {
 
     // Avoid adding callbacks if they have already been added for this vertex buffer
     const len = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs.length;
@@ -442,12 +442,11 @@ export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, para
         '\nFound at ubidx:', i, '\nValue set at uniform index:', params.val_idx, 'Found uniform value index:', _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[i])
     }
 
-    if(ubidx===4)
-        console.log()
-
     _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk.push(Clbk);
     _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params.push(params);
     _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs.push(ubidx);
+    _vertex_buffer_groups.buffer[vb_groupidx].unif_names.push(unif_name);
+
 }
 
 
@@ -457,6 +456,7 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
     const len = _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk.length;
     for(let i=0; i<len; i++){
 
+        // 'params' is an index to the '_per_vb_mesh_unif_wpos' buffer, that holds all root unif wpositions
         const params = _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[i];
         const val = _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk[i](params);
         const ubidx = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
@@ -472,18 +472,35 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
 
 
 
-// export function Vertex_buffer_group_assign_uniform_index(vb_groupidx, unif_name, ubidx) {
+/** If a vb is re-used, then the unif_wpos index is gonna be different and needs update.
+ * The 'clbk_params' OR else unif_wpos index, is the index of the '_per_vb_mesh_unif_wpos' buffer,
+ * from where the VertexBufferGroup should draw the root position for the vb uniform.
+ * If a mesh (in vb 1) has a parent mesh (in vb2), then the unif wpos will 
+ * run recursively in the '_per_vb_mesh_unif_wpos' and collect all vb's root wpositions,
+ * so the  '.clbk_params' should have the index value of:{0} because it needs to
+ * access the top root parent uunif_wpos in the '_per_vb_mesh_unif_wpos' buffer.
+ */
+export function Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, unif_name, unif_wpos_idx) {
 
-// 	const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
-// 	const len = vb_group.uniforms.length;
-// 	for(let i=0; i < len; i++){
-// 		if(vb_group.uniforms[i].name === unif_name){
-// 			vb_group.uniforms[i].ubidx = ubidx;
-//             console.log('<<<<<<<<<<<<<<<<<<<<<<<<<< ASIGN vbidx', vb_groupidx, ' ubidx:', ubidx, 'unif name:', vb_group.uniforms[i].name)
-// 			break;
-// 		}
-// 	}
-// }
+    let foundidx = INT_NULL;
+    const len = _vertex_buffer_groups.buffer[vb_groupidx].unif_names.length;
+
+    for(let i=0; i < len; i++){
+
+        const unif = _vertex_buffer_groups.buffer[vb_groupidx].unif_names[i];
+        if(unif === unif_name) {
+            foundidx = i;
+            break;
+        }
+
+        alert('6178823');
+        // No uniform with the neme:unif_name is found
+    }
+    // Replace the index of the '_per_vb_mesh_unif_wpos' buffer
+    _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[foundidx] = unif_wpos_idx
+}
+
+
 
 
 
@@ -532,14 +549,12 @@ export function Vertex_buffer_state_enable(vb_grouidx, vbidx, STATE_FLAG) {
 
 
 
-
 export function Vertex_buffer_group_state_enable(vb_grouidx, STATE_FLAG) {
 
     _vertex_buffer_groups.buffer[vb_grouidx].state.mask |= STATE_FLAG;
     if (STATE_FLAG & BUFFER_STATE.NEEDS_UPDATE)
         _vertex_buffer_groups.buffer[vb_grouidx].needs_any_update = true; // Set the groups needs update, so we don't have to check all vertex buffers if none needs update
 }
-
 
 
 
@@ -566,7 +581,6 @@ export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset
 
 
 
-
 /** Returns true/false */
 export function Vertex_buffer_exists_from_index(vbidx) {
 
@@ -577,6 +591,17 @@ export function Vertex_buffer_exists_from_index(vbidx) {
 }
 
 
+
+
+
+
+
+
+
+/***************************************************************************************************************************************************/
+/***************************************************************************************************************************************************/
+// Insert-Remove-Reset From Vertex Buffer
+/***************************************************************************************************************************************************/
 
 /** Reset Vertex Buffer to specific mesh start index */
 export function Vertex_buffer_reset_to_index(vb_groupidx, starts) {
@@ -602,6 +627,7 @@ export function Vertex_buffer_reset_to_index(vb_groupidx, starts) {
         const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
 
         vb_info.count = starts[i];
+
         const vCount = starts[i] ? starts[i] / attribs_per_vertex : 0;
         vb_info.vCount = vCount;
         vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
@@ -661,22 +687,6 @@ export function Vertex_buffer_reset(vb_groupidx, starts) {
 
 
 
-
-
-function temp_check_nan_rename_me(arr) {
-    if (arr.length === 2) {
-        if (arr[0] === NaN || arr[1] === NaN) alert('NaN value to gfx buffers')
-    }
-    if (arr.length === 3) {
-        if (arr[0] === NaN || arr[1] === NaN || arr[2] === NaN) alert('NaN value to gfx buffers')
-    }
-    if (arr.length === 3) {
-        if (arr[0] === NaN || arr[1] === NaN || arr[2] === NaN || arr[3] === NaN) alert('NaN value to gfx buffers')
-    }
-}
-
-
-
 /**
  * // TODO:
  * The index buffer pattern ({123, 234} or fan{12,13,14,15})
@@ -686,14 +696,6 @@ function temp_check_nan_rename_me(arr) {
  */
 export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces=0, dbg_mesh_name) {
 
-
-    // console.log(meshidx, dbg_mesh_name)
-    // /**DEBUG ERROR*/ if (geom.pos[0] === undefined) { console.error('Pos is UNDEFINED. mesh:', dbg_mesh_name) }
-    // /**DEBUG ERROR*/ if (geom.dim[0] === undefined) { console.error('Dim is UNDEFINED. mesh:', dbg_mesh_name) }
-    // /**DEBUG ERROR*/ if (mat.col[0] === undefined) { console.error('Col is UNDEFINED. mesh:', dbg_mesh_name) }
-    // /**DEBUG ERROR*/ if (mat.style[0] === undefined) { console.error('Style is UNDEFINED. mesh:', dbg_mesh_name) }
-    // /**DEBUG ERROR*/ temp_check_nan_rename_me(geom.pos); temp_check_nan_rename_me(geom.dim); temp_check_nan_rename_me(mat.col); temp_check_nan_rename_me(mat.style);
-    // /**DEBUG ERROR*/ if(meshidx === undefined){ console.error('Mesh index is not passed as a param. mesh:', dbg_mesh_name)}
 
     const progidx = gfx.prog.idx;
     const vb_groupidx = gfx.vb.groupidx;
@@ -717,7 +719,9 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces=0, dbg_mes
         if (vb_info.count + meshSize >= vb_info.size) vb_info.Realloc(meshSize);
         
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-        
+
+        // const vertex_count = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? attribs_per_vertex * ((2 * num_faces) +2) : verts_per_rect * num_faces;
+        // vCount
         // const stride = vb_info.attribs_info.count * verts_per_rect;
         const stride = vb_info.attribs_info.count;
         vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
@@ -754,6 +758,8 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces=0, dbg_mes
     // console.log(vb_groupidx, vb_group.draw_count)
     // return start;
 }
+
+
 
 export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces=0) {
 
@@ -891,9 +897,19 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces) {
 
     for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
 
+        // console.log('-----------------------------------------------------------------\ngfx.vb.counts.active_count', gfx.vb.counts.buffer[i], 'num_faces', num_faces)
+
         const vb_info = _vertex_buffer_infos.buffer[gfx.vb.groupidx];
 
-        const removed_attribs = gfx.vb.counts.buffer[i] * num_faces;
+        const attribsidx = Program_get_shader_attributes_index(vb_group.progidx);
+        const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
+
+        const removed_attribs = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) 
+                                ? attribs_per_vertex * ((2 * num_faces) +2) // For meshes with rects vertex conection
+                                : attribs_per_vertex * 4 * num_faces; // For meshes with separate rects 
+
+        // const removed_attribs = attribs_per_vertex * ( (2 * num_faces) + 2);
+        // const removed_attribs = gfx.vb.counts.buffer[i] * num_faces;
 
         let start = gfx.vb.starts.buffer[i];
         const end = start + removed_attribs;

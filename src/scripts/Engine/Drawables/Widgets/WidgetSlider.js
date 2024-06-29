@@ -371,18 +371,13 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       if(this.geom.dim[0] > this.geom.dim[1]){
 
          const pos = ( (this.geom.dim[0] * 2 * this.geom.num_faces ) /100) *val;
-         // const pos = (this.geom.dim[0] * 2 * this.geom.num_faces );
          const handle = this.children.buffer[0];
          handle.geom.pos[0] = pos -(handle.geom.dim[0] * 2 * this.slider_val); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
-         // handle.geom.pos[0] = pos-(handle.geom.dim[0] * 2 * this.geom.num_faces * val); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
-         console.log('==============================', pos, handle.geom.pos[1])
       }
       else {
-         // const pos = ( (this.geom.dim[1] * 2 * this.geom.num_faces) /100) * (100-val);
          const pos = ( (this.geom.dim[1] * 2 * this.geom.num_faces) /100) * (1 - this.slider_val);
          const handle = this.children.buffer[0];
          handle.geom.pos[1] = pos -( handle.geom.dim[1] * 2 * this.geom.num_faces * (1 - this.slider_val)); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
-         console.log('==============================', pos, handle.geom.pos[1])
       }
    }
 }

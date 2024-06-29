@@ -123,8 +123,7 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
       if (parent_event.view && !parent_event.view.children) {
          parent_event.view.children = New_generic_buffer(_, `Listeners->parent_event.view.children:${parent_event.name}`);
       }
-if(!parent_event.view)
-console.log()
+
       // Store the new event as a child to the parent in the listeners VIEW storage buffer.
       const view_idx = parent_event.view.children.Add({
          idx: event_idx,
@@ -158,6 +157,16 @@ console.log()
    //    event_idx:event_idx.parent_idx,
    // }
    return event_idx;
+}
+
+
+
+export function Listener_change_child_event(TYPE_IDX, event_idx, Clbk, evt_params) {
+
+   const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
+   event.Clbk = Clbk;
+   event.evt_params = evt_params;
+
 }
 
 

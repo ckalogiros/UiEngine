@@ -17,14 +17,16 @@ import { Styles_hover_margin_print, Styles_hover_margin_print_loop, Styles_margi
 import { TEMP_dbg_info_ui_print_entries_table, TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
 import { DEBUG_INFO_BUFFERS_PRINT, DEBUG_INFO_BUFFERS_PRINT2 } from "../../Core/Buffers.js";
 import { Uniforms_buffer_block_print, Uniforms_buffer_print } from "../../../Graphics/Buffers/UniformBuffers.js";
-import { Animations_print } from "../../Animations/Animations.js";
+import { Mesh_animations_print } from "../../Animations/MeshAnimations.js";
 import { Root_uniforms_for_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Callback_animations_print } from "../../Animations/CallbackAnimations.js";
 
 _CNT = 0;
 const p = _CNT++;
 const a1 = _CNT++;
 const a2 = _CNT++;
 const a3 = _CNT++;
+const a4 = _CNT++;
 const r1 = _CNT++;
 const r2 = _CNT++;
 const f1 = _CNT++;
@@ -104,10 +106,18 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'a3',
-      discr: 'Animations_print()',
+      discr: 'Mesh_animations_print()',
       func: (e)=>{
-         console.log('------------------ Animations_print() ------------------');
-         Animations_print();
+         console.log('------------------ Mesh_animations_print() ------------------');
+         Mesh_animations_print();
+      },
+   },
+   {
+      key: 'a4',
+      discr: 'Callback_animations_print()',
+      func: (e)=>{
+         console.log('------------------ Callback_animations_print() ------------------');
+         Callback_animations_print();
       },
    },
    {
@@ -527,6 +537,7 @@ export function OnKeyUp(e){
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[a1].func(e);  
          else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[a2].func(e);  
          else if  (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[a3].func(e);  
+         else if  (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[a4].func(e);  
       }
       else if  (_keys_buffer[0].key === 'f') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[f1].func(e);  
@@ -607,9 +618,9 @@ export function OnKeyUp(e){
    else if(len === 0){
 
       if       (_keys_buffer[len].key === 'p') { DEBUG_PRINT_KEYS[p].func(e); }
-      else if  (_keys_buffer[len].key === 'a') { console.log('@ Buffers Allocations', `\n  1:${DEBUG_PRINT_KEYS[a1].discr}\n2:${DEBUG_PRINT_KEYS[a2].discr}\n3:${DEBUG_PRINT_KEYS[a3].discr}`); }
-      else if  (_keys_buffer[len].key === 'r') { console.log('@ Render Queue', `\n  1:${DEBUG_PRINT_KEYS[r1].discr}, 2:${DEBUG_PRINT_KEYS[r2].discr}`); }
-      else if  (_keys_buffer[len].key === 'f') { console.log('@ Frame Buuffer', `\n  1:${DEBUG_PRINT_KEYS[f1].discr}, 2:${DEBUG_PRINT_KEYS[f2].discr}`);  }
+      else if  (_keys_buffer[len].key === 'a') { console.log('@ Buffers Allocations', `\n  1:${DEBUG_PRINT_KEYS[a1].discr}\n  2:${DEBUG_PRINT_KEYS[a2].discr}\n  3:${DEBUG_PRINT_KEYS[a3].discr}\n  4:${DEBUG_PRINT_KEYS[a4].discr}`); }
+      else if  (_keys_buffer[len].key === 'r') { console.log('@ Render Queue', `\n  1:${DEBUG_PRINT_KEYS[r1].discr},  2:${DEBUG_PRINT_KEYS[r2].discr}`); }
+      else if  (_keys_buffer[len].key === 'f') { console.log('@ Frame Buuffer', `\n  1:${DEBUG_PRINT_KEYS[f1].discr},  2:${DEBUG_PRINT_KEYS[f2].discr}`);  }
       else if  (_keys_buffer[len].key === 'i') { console.log('@ Time Intervals Queue', `\n  1:${DEBUG_PRINT_KEYS[i1].discr}`); }
       else if  (_keys_buffer[len].key === 'l') { console.log('@ Event Listeners', `\n  1:${DEBUG_PRINT_KEYS[l1].discr}\n  2:${DEBUG_PRINT_KEYS[l2].discr}\n  3:${DEBUG_PRINT_KEYS[l3].discr}`); }
       else if  (_keys_buffer[len].key === 's') { console.log('@ String Buffer', `\n  1:${DEBUG_PRINT_KEYS[s1].discr}\n  2:${DEBUG_PRINT_KEYS[s2].discr}\n  3:${DEBUG_PRINT_KEYS[s3].discr}\n  4:${DEBUG_PRINT_KEYS[s4].discr}`); }

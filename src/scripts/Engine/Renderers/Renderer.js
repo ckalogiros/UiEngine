@@ -12,8 +12,9 @@ import { Performance_timer_start, Performance_timer_stop, Performance_timers_upd
 import { Command_buffer_run } from "../Core/Commandbuffer.js";
 import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../Scenes.js";
 import { Input_reset } from "../Controls/Input/Input.js";
-import { Animations_run } from "../Animations/Animations.js";
+import { Mesh_animations_run } from "../Animations/MeshAnimations.js";
 import { Particle_system_update } from "../ParticlesSystem/NewParticlesSystem.js";
+import { Callback_animations_runs } from "../Animations/CallbackAnimations.js";
 
 
 
@@ -81,8 +82,10 @@ export class Renderer {
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Animations);
-         Animations_run();
+         Mesh_animations_run();
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Animations);
+
+         Callback_animations_runs();
 
          Framebuffer_update_draw();
          this.scene.OnUpdate();

@@ -113,7 +113,8 @@ let cnt = 0;
 export function Scene_camera_scroll(sceneidx, sign) {
 
     // Create a scroll value from the sign
-    const value = -sign * 10;
+    // const value = -sign * 10;
+    const value = -sign;
 
     // Transform to projection 
     // const projections_value = value;
