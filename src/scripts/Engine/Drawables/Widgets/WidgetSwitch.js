@@ -4,6 +4,7 @@ import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
+import { Listener_assign_parent_event } from "../../Events/EventListeners.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { BLUE, BLUEL, GREEN, GREY } from "../Material/Base/Colors.js";
 import { Rect, Rect_Mesh } from "../Meshes/Rect_Mesh.js";
@@ -50,7 +51,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       // this.SetStyle(style[0], size, style[2]);
       // this.SetStyle(style);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, true)
+      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       
       // const switch_pos = [pos[0] - size, pos[1], pos[2] + 1];
       const switch_pos = [pad, pad, pos[2] + 1];
@@ -70,6 +71,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
          // this.AddToWidgetRootBuffer(this.root_bufferidx)
          switch0.root_bufferidx = this.root_bufferidx;
       }
+
 
       // switch0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       // switch0.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
@@ -293,28 +295,95 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
 
 
-   ConstructListeners(parent_listeners = null) {
+   // ConstructListeners(parent_listeners = null) {
 
-      const mesh = this; // If in recursion, use as the current mesh the passed param. 
+   //    const mesh = this; // If in recursion, use as the current mesh the passed param. 
 
-      for (let i = 0; i <= mesh.listeners.boundary; i++) {
+   //    for (let i = 0; i <= mesh.listeners.boundary; i++) {
 
-         if (mesh.listeners.buffer[i]) {
+   //       if (mesh.listeners.buffer[i]) {
 
-            if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-               parent_listeners = [null, null];
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+   //          if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+   //             parent_listeners = [null, null];
+   //             parent_listeners[i] = Find_parent_listen_event(i, mesh);
+   //          }
+   //          else if (parent_listeners[i] === null) {
+   //             parent_listeners[i] = Find_parent_listen_event(i, mesh);
+   //          }
+
+
+   //          mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
+   //       }
+   //    }
+   // }
+
+
+   ListenEventCreate(etype) {
+
+      const etypeidx = Listen_event_get_idx_from_type(etype);
+      const mesh = this;
+
+      // For Hover events we need no callback and params
+      if (etype & LISTEN_EVENT_TYPES.HOVER) {
+
+         mesh.CreateListenEvent(etype);
+         if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, null, null);
+      }
+      else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+         const evt_params = { target_mesh: mesh, };
+         mesh.CreateListenEvent(etype);
+         if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+      }
+
+   }
+
+   ListenEventCreateAndAdd(parent_events = null) {
+
+      const mesh = this;
+
+      if (!mesh.listeners)
+         return; // Return if there are no listen events to add
+      // alert('228867 \nMust CreateListenEvent() first for dropdown mesh:.', mesh.GetName);
+      if (parent_events === null)
+         alert('228868 \nParent event must be a valid event index.', mesh.GetName);
+
+
+
+
+      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+
+         if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
+
+         const etype = Listen_event_types_get_type_from_index(etypeidx);
+
+         /***********************************************************************************************************************/
+         // Create for dropdown button
+         const dp_evt = mesh.listeners.buffer[etypeidx];
+         if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
+
+            // For Hover events we need no callback and params
+            if (etype & LISTEN_EVENT_TYPES.HOVER) {
+               mesh.AddListenEvent(etypeidx, null, null);
             }
-            else if (parent_listeners[i] === null) {
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+               const evt_params = { target_mesh: mesh, };
+               mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
             }
 
+            if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
 
-            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
+               const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
+
+               if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
+               else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
+            }
+            else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
+
          }
       }
    }
-
    
    OnClick(params) {
 
@@ -345,10 +414,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
          return;
       }
 
-      if (params.evt_params.EventClbk) {
-
-         const EventClbk = params.evt_params.EventClbk;
-         EventClbk(params.evt_params);
+      if (mesh.evt_params) {
+         if (mesh.evt_params.EventClbk) {
+   
+            const EventClbk = mesh.evt_params.EventClbk;
+            EventClbk(mesh.evt_params);
+         }
       }
 
       console.log('CLICKED')
@@ -368,7 +439,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       if (!EventClbk) { EventClbk = Switch_click_default_callback; params = 'Switch'; }
 
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      // this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.evt_params = { // Create the parameters to pass for the switch's click event. 
          EventClbk: EventClbk,
          targetBindingFunctions: targetBindingFunctions,

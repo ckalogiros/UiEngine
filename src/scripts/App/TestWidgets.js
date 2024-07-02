@@ -29,6 +29,8 @@ import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widget
 import { Gl_set_rgba } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Callback_animations_create, Callback_animations_get } from '../Engine/Animations/CallbackAnimations.js';
 import { Mesh_buffer_get_mesh_byidx, Widget_root_rerender, Widget_root_reset_gfx } from '../Engine/Core/MeshBuffer.js';
+import { Listener_assign_parent_event, Listener_create_root_view } from '../Engine/Events/EventListeners.js';
+import { Construct_listeners_relations, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -117,6 +119,63 @@ export function TestWidgetsGeneric(scene) {
 
     }
 
+    { // TEST FOR SIDE PANEL
+        const side_panel = CreateSidePanel(ROOT_WIDGETS.CREATE_ROOT);
+        // const side_panel = CreateSidePanel(0x0);
+        
+        
+        // Add the ballTail control properties to the side panel
+        const inner_section = side_panel.children.buffer[0];
+        // inner_section.AddItem(slider_section)
+        
+        // TEST
+        const test_dp = CreateDropdown([0,0,0], 0x0);
+        // inner_section.AddItem(test_dp)
+        
+        const scrolled_mesh = Create_widget_section(_, SECTION.VERTICAL, _, [0,0,0], _, PURPLER[3]);
+        scrolled_mesh.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        // scrolled_mesh.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
+        scrolled_mesh.AddItem(test_dp)
+
+        // Create scroller for the ui-mesh info widget
+        const scroller_width = 100;
+        const scroller = Create_widget_scroller(_, scrolled_mesh, [scroller_width, 190]);
+        // const scroller = Create_widget_scroller(_, slider_section, [scroller_width, 90]);
+        inner_section.AddItem(scroller);
+        // side_panel.AddItem(scroller);
+        // scroller.StateEnable(MESH_STATE.ACTIVE);
+        scroller.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+        scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+
+    
+        
+        // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
+        // scroller.scrolled_section.options = SECTION.VERTICAL;
+        
+        
+        // // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
+        // // scroller.scrolled_section.options = SECTION.VERTICAL;
+        
+        // scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // scroller.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section);
+        // side_panel.geom.pos[0] = VIEWPORT.WIDTH - scroller_width*2
+        
+        
+        
+        side_panel.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        side_panel.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENTX
+        // side_panel.options = SECTION.HORIZONTAL
+        
+        // side_panel.options = SECTION.HORIZONTAL|SECTION.EXPAND|SECTION.RESIZE_PARENTX
+        // side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+        side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        side_panel.Calc_no_gfx_update();
+        side_panel.Render();
+        side_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, side_panel.gfx.vb.groupidx);
+        Construct_listeners_relations(side_panel);
+        View_build_group_from_root_mesh(side_panel);
+    }
+
     // { // Side Panel 
 
 
@@ -144,8 +203,8 @@ export function TestWidgetsGeneric(scene) {
 
     //     const slider_dim = [100, 10];
     //     const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], YELLOWL[6], 'SliderSection', [0,10,2], );
-    //     slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    //     slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    //     slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
             
     //     const flags = {
     //         unif: SID.UNIF.ROOT_WPOS2,
@@ -338,32 +397,40 @@ export function TestWidgetsGeneric(scene) {
     //     /****************************************************************************************************************/
     //     /****************************************************************************************************************/
     //     // Side panel
-    //     const side_panel = CreateSidePanel(0x0);
+    //     const side_panel = CreateSidePanel(ROOT_WIDGETS.CREATE_ROOT);
+    //     // const side_panel = CreateSidePanel(0x0);
         
         
     //     // Add the ballTail control properties to the side panel
     //     const inner_section = side_panel.children.buffer[1];
-    //     // inner_section.AddItem(slider_section)
+    //     inner_section.AddItem(slider_section)
         
     //     // TEST
-    //     const test_dp = CreateDropdown();
-    //     inner_section.AddItem(test_dp)
+    //     const test_dp = CreateDropdown([0,0,0], 0x0);
+    //     // inner_section.AddItem(test_dp)
         
     //     // Create scroller for the ui-mesh info widget
-    //     const scroller_width = 220;
-    //     const scroller = Create_widget_scroller(_, slider_section, [scroller_width, 90]);
-    //     scroller.StateEnable(MESH_STATE.ACTIVE);
-    //     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     inner_section.AddItem(scroller)
-        
+    //     const scroller_width = 20;
+    //     const scroller = Create_widget_scroller(_, test_dp, [scroller_width, 90]);
+    //     // const scroller = Create_widget_scroller(_, slider_section, [scroller_width, 90]);
+    //     inner_section.AddItem(scroller);
+    //     // side_panel.AddItem(scroller);
+    //     // scroller.StateEnable(MESH_STATE.ACTIVE);
+    //     // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    //     // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+
+    
         
     //     // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
     //     // scroller.scrolled_section.options = SECTION.VERTICAL;
         
+        
+    //     // // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
+    //     // // scroller.scrolled_section.options = SECTION.VERTICAL;
+        
     //     // scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     //     // scroller.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section);
-    //     side_panel.geom.pos[0] = VIEWPORT.WIDTH - scroller_width*2
+    //     // side_panel.geom.pos[0] = VIEWPORT.WIDTH - scroller_width*2
         
         
         
@@ -373,15 +440,16 @@ export function TestWidgetsGeneric(scene) {
         
     //     // side_panel.options = SECTION.HORIZONTAL|SECTION.EXPAND|SECTION.RESIZE_PARENTX
     //     side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+    //     // side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     //     side_panel.Calc_no_gfx_update();
     //     side_panel.Render();
     //     side_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, side_panel.gfx.vb.groupidx);
-    //     side_panel.ConstructListeners();
+    //     Construct_listeners_relations(side_panel);
     //     View_build_group_from_root_mesh(side_panel);
 
 
-
-    //     const sbtn = side_panel.children.buffer[0]
+    //     const sbtn = side_panel.children.buffer[0];
+        
         
     //     const params = {
     //         isOn: true,
@@ -458,6 +526,8 @@ export function TestWidgetsGeneric(scene) {
     //         }
     //         , {section:side_panel, rest_params:params},
     //     );
+    
+    
     // }
 
     { // Scroller Widgets
@@ -494,8 +564,8 @@ export function TestWidgetsGeneric(scene) {
 
     { // Test sdf lines
         // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 100, 0], [400, 400], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
-        // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-        // // line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+        // line.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
+        // // line.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
 
         // // // // // // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
         // // // // // // line.sid.attr &= ~SID.ATTR.COL4;
@@ -526,7 +596,7 @@ export function TestWidgetsGeneric(scene) {
         // CreateColorPicker(x, y, SID.ATTR.WPOS_TIME4|SID.ATTR.DIM2)
         // CreateColorPicker(x, y, SID.ATTR.DIM2)
         
-        // // TODO: Enable multi vertex color in 'Widget_Slider_Simple' constructor
+        // TODO: Enable multi vertex color in 'Widget_Slider_Simple' constructor
         // const colorpicker = CreateColorPicker(_, _, _, ROOT_WIDGETS.CREATE_ROOT);
 
         // const btn = CreateButton(100, 500, ROOT_WIDGETS.CREATE_ROOT);
@@ -543,7 +613,7 @@ export function TestWidgetsGeneric(scene) {
         
         // Test change color of a mesh using the colorpicker
         // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 600, 0], [200, 80], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
-        // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+        // line.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
         // line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         // line.Render();
@@ -586,6 +656,7 @@ export function TestWidgetsGeneric(scene) {
     { // Widget: Dropdown
 
         // CreateDropdown([400, 200, 0])
+        // CreateDropdownWithScroller([400, 200, 0])
         // CreateDropdown2([0, ypos+=40, 0], 0);
         // CreateDropdown2InSection([0, ypos+=40, 0], 0);
         // CreateDropdown3([0, ypos+=40, 0], 0);
@@ -594,7 +665,7 @@ export function TestWidgetsGeneric(scene) {
 
     { // Widget: Scroller
     
-        // CreateScroller(scene);
+        // CreateScroller();
         // const scroller = CreateScrollerClampAlphaTest()
         
     }
@@ -620,7 +691,17 @@ export function TestWidgetsGeneric(scene) {
 
         // TestSections1();
 
-        CreateManySections(scene);
+        // CreateManySections();
+        // const blu = CreateManySectionsMinimal(0x0)
+
+        // blu.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        // // blu.options = SECTION.INHERIT | SECTION.VERTICAL 
+        // blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+        // blu.Calc_no_gfx_update();
+        // blu.Render();
+        // blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
+        // Construct_listeners_relations(blu)
 
         // const helpui = Help(scene);
 
@@ -651,7 +732,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Must draw last so it is on top of everything
     
-    Debug_info_ui_static();
+    // Debug_info_ui_static();
 }
 
 
@@ -693,8 +774,8 @@ function CreatePanel(is_root_widget=undefined){
         const scroller2 = Create_widget_scroller(is_root_widget, scrolled2, [80,60], BLUEL[8], _, _);
         scrolled.AddItem(scroller2);
         scroller2.StateEnable(MESH_STATE.ACTIVE);
-        scroller2.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        scroller2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        scroller2.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        scroller2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
         scroller2.options = SECTION.HORIZONTAL | SECTION.INHERIT;
         scroller2.scrolled_section.options = SECTION.VERTICAL;
         scroller2.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller2.scrolled_section);
@@ -705,8 +786,8 @@ function CreatePanel(is_root_widget=undefined){
     const scroller = Create_widget_scroller(is_root_widget, scrolled, [140,140], BLUEL[8], _, _);
 
     scroller.StateEnable(MESH_STATE.ACTIVE);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
 
     
     scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
@@ -724,14 +805,12 @@ function CreatePanel(is_root_widget=undefined){
     if(is_root_widget !== undefined){
 
         scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-        
         scroller.ScrollerAlign();
     
         // scroller.SetPosYNoGfxUpdate(200)
         scroller.SetPosXNoGfxUpdate(100)
     
         View_build_group_from_root_mesh(scroller.scrolled_section);
-        
         const clip_top = scroller.GetPosY();
         const clip_bottom = clip_top + scroller.geom.dim[1]*2;
         Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
@@ -750,25 +829,26 @@ function CreatePanel(is_root_widget=undefined){
 }
 
 
-function CreateSidePanel(root_widget=ROOT_WIDGETS.CREATE_ROOT){
+function CreateSidePanel(root_widget=ROOT_WIDGETS.CREATE_ROOT, render_target=false){
     
     const height = VIEWPORT.HEIGHT;
     const width = 400;
     const pad = 4;
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [pad, pad], [VIEWPORT.RIGHT-(width-pad*2), 0, 0], [width, height], TRANSPARENCY(GREY[1], 1), 'SidePanel', [0, 10, 1.8]);
+    const section = Create_widget_section(root_widget, SECTION.HORIZONTAL, [pad, pad], [VIEWPORT.RIGHT-(width-pad*2), 0, 0], [width, height], TRANSPARENCY(GREY[1], 1), 'SidePanel', [0, 10, 1.8]);
     // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [pad, pad], [VIEWPORT.RIGHT-width, 0, 0], [width, height], TRANSPARENCY(GREY[1], 1), 'SidePanel', [0, 10, 1.8]);
-    // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    // section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
     
     
-    const sbtn = Create_rect_mesh(_,[0, 0, 11], [6, height], TRANSPARENCY(BLUEL[3], 1.), 'Btn', [0, 22, 1.8], );
-    sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-    sbtn.EnableGfxAttributes(MESH_ENABLE.ATTR_STYLE);
-    section.AddItem(sbtn)
+    // const sbtn = Create_rect_mesh(_,[0, 0, 11], [6, height], TRANSPARENCY(BLUEL[3], 1.), 'Btn', [0, 22, 1.8], );
+    // // sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // // sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+    // sbtn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    // sbtn.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+    // sbtn.EnableGfxAttributes(MESH_ENABLE.ATTR_STYLE);
+    // section.AddItem(sbtn)
     
-    const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 2], [100, 400], TRANSPARENCY(GREY[4], .8), 'InnerPanel', [0, 10, 1.8]);
+    const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 2], [100, 400], TRANSPARENCY(GREY[0], 1.), 'InnerPanel', [0, 10, 1.8]);
     section.AddItem(s);
     // s.max_size[0] = 100;
     // s.max_size[1] = 400;
@@ -778,12 +858,13 @@ function CreateSidePanel(root_widget=ROOT_WIDGETS.CREATE_ROOT){
     
     const heading = Create_widget_label(_, 'Properties', _, [0,0,4], _, GREY[2]);
     s.AddItem(heading);
+    heading.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
     
-    const dbg_dp = Debug_info_ui(_, [0,0,3]);
-    s.AddItem(dbg_dp);
+    // const dbg_dp = Debug_info_ui(_, [0,0,3]);
+    // s.AddItem(dbg_dp);
 
 
-    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
+    if(render_target){
 
         
         section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -793,7 +874,7 @@ function CreateSidePanel(root_widget=ROOT_WIDGETS.CREATE_ROOT){
         section.Calc_no_gfx_update();
         section.Render();
         section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-        section.ConstructListeners();
+        Construct_listeners_relations(section);
         View_build_group_from_root_mesh(section);
     }
 
@@ -894,14 +975,18 @@ function SectionResizable(pos) {
 
     // const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, [0, 500, 0], dim, TRANSPARENCY(BLUEL[5], tr), _, [40, 40, 2]);
     const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], tr), _, [40, dim[1], 2]);
-    grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    grey.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    grey.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    grey.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
     grey.StateEnable(MESH_STATE.IS_RESIZEABLE);
     grey.SetName(`grey${grey_cnt++}`);
-    grey.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW)
+
+
+    // grey.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW)
 
     grey.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    grey.EnableGfxUniforms({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
+    // grey.EnableGfxUniforms({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
+    // grey.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+    // grey.EnableGfxUniforms({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
     
 
     // grey.geom.dim[0] *= sin;
@@ -911,9 +996,10 @@ function SectionResizable(pos) {
     grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
     // grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     grey.Render();
-    // grey.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, grey.gfx.vb.groupidx)
+    grey.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, grey.gfx.vb.groupidx)
     // grey.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
-    grey.ConstructListeners();
+    // grey.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, grey.gfx.vb.groupidx);
+    Construct_listeners_relations(grey);
 
     return grey;
 }
@@ -971,8 +1057,8 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
 
 
     const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
-    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     const flags = {
         unif: SID.UNIF.ROOT_WPOS2,
         pass: SID.PASS.WPOS2,
@@ -986,8 +1072,8 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
     // Create the emitter button, as well as a switch to auto-emitt particles
     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', _, [0, 0, 1], 20, BLUEL[6], WHITE, [5, 5], .5);
     slider_section.AddItem(btn)
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    btn.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    btn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     btn.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     // btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1, emitter_idx2] }, MESH_STATE.IS_HOLD_CLICK)
@@ -1000,6 +1086,8 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
     // Create the switch to auto-emitt particles
     const emitt_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
     slider_section.AddItem(emitt_switch);
+    emitt_switch.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+    emitt_switch.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
     const evt_params = { target_params: [emitter_idx1] };
     /**
      * Pass the Emitt pareticles callback 'Particle_system_emitt' as the t'targetBindingFunctions' parameter, 
@@ -1016,6 +1104,8 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
     // Create the switch to create/destroy colorpicker for particles color control
     const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
     slider_section.AddItem(colorpicker_switch);
+    colorpicker_switch.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+    colorpicker_switch.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
     colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     colorpicker_switch.Bind(
         (params)=>{
@@ -1237,7 +1327,7 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
     slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
     slider_section.Calc_no_gfx_update();
     slider_section.Render();
-    slider_section.ConstructListeners();
+    Construct_listeners_relations(slider_section);
 
     slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
 
@@ -1257,7 +1347,7 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
 
             
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [100, 0], [x+300, y+0, 0], [300, 300], TRANSPARENCY(GREY[3], 1.0), 'Particles Bouncing Ball Tail',)
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
     section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
 
@@ -1269,7 +1359,7 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
         const pos = GetRandomPos([0,0], [section.geom.dim[0], section.geom.dim[1]])
         
         const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, WHITE, 'Ball', [0, dim[0], 2]);
-        ball.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        ball.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
         ball.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
         section.AddItem(ball);
@@ -1341,7 +1431,7 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
     
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
     
-    section.ConstructListeners();
+    Construct_listeners_relations(section);
 
 
     // IMPORTANT: Generate particles gfx after the generation of any parent mesh, so that the particles system unif_wpos has a parent root_posidx
@@ -1369,8 +1459,8 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
 
     // const slider_dim = [100, 10];
     // const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [x+VIEWPORT.WIDTH-slider_dim[0]*2-40, y+60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
-    // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    // slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
            
     // const flags = {
     //     unif: SID.UNIF.ROOT_WPOS2,
@@ -1785,8 +1875,8 @@ function CreateSmokeParticles(x=0, y=0){
 
 
     const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, y+60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
-    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
 
     const flags = {
         unif: SID.UNIF.ROOT_WPOS2,
@@ -1798,8 +1888,8 @@ function CreateSmokeParticles(x=0, y=0){
     // Create the emitter button, as well as a switch to auto-emitt particles
     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', _, [0, 0, 1], 20, BLUEL[6], WHITE, [5, 5], .5);
     slider_section.AddItem(btn)
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    btn.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    btn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     btn.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     // btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1, emitter_idx2] }, MESH_STATE.IS_HOLD_CLICK)
@@ -1809,6 +1899,8 @@ function CreateSmokeParticles(x=0, y=0){
     // Create the switch to auto-emitt particles
     const emitt_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
     const evt_params = { target_params: emitter_idxs };
+    emitt_switch.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+    emitt_switch.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
     /**
      * Pass the Emitt pareticles callback 'Particle_system_emitt' as the t'targetBindingFunctions' parameter, 
      * so that the 'OnClick' of the switch widget will call the 'Switch_simple_time_interval_callback' 
@@ -1833,6 +1925,8 @@ function CreateSmokeParticles(x=0, y=0){
     // Create the switch to create/destroy colorpicker for particles color control
     const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
     slider_section.AddItem(colorpicker_switch);
+    colorpicker_switch.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+    colorpicker_switch.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
     colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     colorpicker_switch.Bind(
         (params)=>{
@@ -1962,7 +2056,7 @@ function CreateSmokeParticles(x=0, y=0){
     slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
     slider_section.Calc_no_gfx_update();
     slider_section.Render();
-    slider_section.ConstructListeners();
+    Construct_listeners_relations(slider_section);
 
     slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
 
@@ -2020,8 +2114,8 @@ function TestNoiseShader(){
     
     /*************************************************************************************************************** */
     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 160, 0], 20, BLUEL[6], WHITE, [5, 5], .5);
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    btn.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    btn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     btn.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     btn.Bind(Particle_system_emitt, _, { target_params: emitter_idxs }, MESH_STATE.IS_HOLD_CLICK)
@@ -2055,8 +2149,8 @@ function CreateLabel(name = 'Label ') {
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.RIGHT | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.BOTTOM, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, fontsize, GREY[0], WHITE, [5, 5], .5);
-    label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    label.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
+    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
 
@@ -2066,7 +2160,7 @@ function CreateLabel(name = 'Label ') {
     label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     label.Render()
     label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
-    label.ConstructListeners();
+    Construct_listeners_relations(label);
 
 
 
@@ -2087,9 +2181,9 @@ function CreateLabel(name = 'Label ') {
 
 function CreateButton(x=20, y=400, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
-    const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [x, y, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    const btn = Create_widget_button(root_widget, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [x, y, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
+    btn.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    btn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
 
     btn.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -2098,7 +2192,7 @@ function CreateButton(x=20, y=400, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
         btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         btn.Render();
         btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
-        btn.ConstructListeners();
+        Construct_listeners_relations(btn);
     }
 
     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, btn, .001, 0.6, .6, 0)
@@ -2125,10 +2219,9 @@ function CreateSwitchSimple(pos, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
     let ypos = 450
        
     const switch1 = Create_widget_switch_simple(root_widget, pos, 14, _, _, 4);
-    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+
     switch1.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
+    // switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
     
     if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
 
@@ -2137,7 +2230,7 @@ function CreateSwitchSimple(pos, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
         switch1.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, switch1.gfx.vb.groupidx)
         
-        switch1.ConstructListeners();
+        Construct_listeners_relations(switch1);
     }
 
     return switch1;
@@ -2149,8 +2242,8 @@ function CreateSwitch() {
 
     let ypos = 500
     const switch1 = Create_widget_switch(ROOT_WIDGETS.CREATE_ROOT, 'switch on', 'switch off', [100, ypos, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
-    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    switch1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    switch1.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
     switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
     switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
     switch1.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -2169,38 +2262,49 @@ function CreateSwitch() {
 
 
 
-function CreateSliderSimple() {
+function CreateSliderSimple(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
+
+    const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [200, 500, 0] : [0,0,0]
+    const slider = Create_widget_slider_simple(root_widget, pos, [150, 2]);
+    // const slider = Create_widget_slider_simple(ROOT_WIDGETS.CREATE_ROOT, [0, 0, 0], [150, 2]);
+    slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
 
 
-    const slider = Create_widget_slider_simple(ROOT_WIDGETS.CREATE_ROOT, [200, 500, 0], [150, 2]);
-    slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
 
-    slider.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        slider.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+        slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        slider.Render();
+        slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+        Construct_listeners_relations(slider);
+    }
 
-    slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    slider.Render();
-    slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
-    slider.ConstructListeners();
-
-
+    return slider;
 }
 
 
 
-function CreateSlider() {
+function CreateSlider(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
-    const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [200, 450, 0], [250, 10]);
-    slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [200, 500, 0] : [0,0,0]
+    const slider = Create_widget_slider(root_widget, pos, [250, 10]);
+    // slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
 
-    slider.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+    
+    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
+        
+        slider.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        slider.Render();
+        slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+        Construct_listeners_relations(slider);
+    }
 
-    slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    slider.Render();
-    slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
-    slider.ConstructListeners();
-
+    return slider
 
 }
 
@@ -2210,8 +2314,8 @@ function CreateSlider() {
 function CreateChangeMeshColorFromSliders(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
     const section = Create_widget_section(root_widget, SECTION.VERTICAL, [6, 6], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[0], .9))
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
 
     const slider_size = [70, 10]
 
@@ -2259,8 +2363,8 @@ function SdfLine(col, pos, dim, render_instanced_flags=0x0) {
 
 
     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(col, 1), 'sdf linem2', [0, 10, 1.8]);
-    line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    line.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
+    line.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
 
 
     line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -2286,76 +2390,268 @@ function SdfLine(col, pos, dim, render_instanced_flags=0x0) {
 
 
 
-function CreateDropdown(pos=[0,0,0], id) {
+function CreateDropdown(pos=[0,0,0], root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
     // const pad = [10, 2.5]
     const pad = [10, 4]
     const margin = [5, 5]
     // const dp = Create_widget_dropdown(`DP${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad);
-    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `ROOT`, pos, BLACK, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
-    // dp.CreateHoverEvent();
-    dp.CreateMoveEvent();
-    dp.CreateClickEvent();
+    const dp = Create_widget_dropdown(root_widget, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
+    // dp.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+    dp.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    dp.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    Dropdown_roots_set_root(dp, dp);
+    
+
+    {
+        const l = Create_widget_label(_, 'HI!', );
+        dp.AddToMenu(l);
+        l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    }
+
+    { // Test: Many section
+        const sections = CreateManySectionsMinimal(0x0);
+        dp.AddToMenu(sections);
+        sections.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    }
+
+    { // Test: Slider
+        const slider = CreateSliderSimple(0x0);
+        // const slider = CreateSlider(0x0);
+        dp.AddToMenu(slider);
+        // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    }
+    { // Test: Slider
+        const switch1 = CreateSwitchSimple([0,0,2], 0x0);
+        dp.AddToMenu(switch1);
+    }
 
 
-    const sub_dp1_count = 2;
-    const sub_dp2_count = 2;
 
-    const col = GetSequencedColor()
+    { // Many dps
+
+        // const sub_dp1_count = 2;
+        // const sub_dp2_count = 2;
+        
+        // const col = GetSequencedColor()
+        // for (let i = 0; i < sub_dp1_count; i++) {
+            
+        //     const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+        //     dp.AddToMenu(dpsub1);
+        //     dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        //     dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            
+        //     { // Test: Labels
+        //         const l = Create_widget_label(_, 'HI!', );
+        //         dpsub1.AddToMenu(l);
+        //         l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        //         l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        //     }
+        //     { // Test: Rect_mesh
+        //         const rect = Create_rect_mesh(_,);
+        //         dpsub1.AddToMenu(rect);
+        //         rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+        //         rect.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        //         rect.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        //     }
+    
+    
+    
+        //     const col1 = GetSequencedColor()
+        //     for (let j = 0; j < sub_dp2_count; j++) {
+    
+        //         const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
+        //         dpsub1.AddToMenu(dpsub2);
+        //         dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        //         dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+        //         // console.log()
+                
+        //         const col2 = GetSequencedColor()
+        //         for (let k = 0; k < sub_dp2_count; k++) {
+                    
+        //             const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+        //             dpsub2.AddToMenu(dpsub3);
+        //             dpsub3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        //             dpsub3.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+                    
+        //             const col3 = GetSequencedColor()
+        //             for (let k = 0; k < sub_dp2_count; k++) {
+                        
+        //                 const dpsub4 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col3, WHITE, pad, _, _, _, margin);
+        //                 dpsub3.AddToMenu(dpsub4);
+        //                 dpsub4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        //                 dpsub4.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+                        
+        //                 // const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
+        //                 // dpsub4.AddToMenu(s)
+                        
+        //             }
+                    
+        //         }
+        //     }
+    
+        // }
+    }
+    
+
+    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
+
+        dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+        dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+    
+        // dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+        dp.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+        dp.Calc_no_gfx_update();
+        
+        dp.Render()
+    
+        dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
+        
+        Construct_listeners_relations(dp);
+    
+        // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
+        View_build_group_from_root_mesh(dp);
+    }
+
+    return dp;
+}
+
+
+
+function CreateDropdownWithScroller(pos=[0,0,0], id) {
+
+    // const pad = [10, 2.5]
+    const pad = [10, 4]
+    const margin = [5, 5]
+    // const dp = Create_widget_dropdown(`DP${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad);
+    const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
+    // dp.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+    dp.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    dp.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    Dropdown_roots_set_root(dp, dp);
+    
+
+    
+    
+    const sub_dp1_count = 1;
+    const sub_dp2_count = 1;
+    
+    
+    let col = GetSequencedColor()
     for (let i = 0; i < sub_dp1_count; i++) {
-
+        
         const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-        dpsub1.CreateHoverEvent();
-        dpsub1.CreateClickEvent();
         dp.AddToMenu(dpsub1);
+        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        
+        { // Test: Labels
+            const l = Create_widget_label(_, 'HI!', );
+            dpsub1.AddToMenu(l);
+            l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        }
 
 
-        const col1 = GetSequencedColor()
+        col = GetSequencedColor()
         for (let j = 0; j < sub_dp2_count; j++) {
 
-            const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
+            const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
             dpsub1.AddToMenu(dpsub2);
+            dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
 
+            
             const col2 = GetSequencedColor()
             for (let k = 0; k < sub_dp2_count; k++) {
                 
                 const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                 dpsub2.AddToMenu(dpsub3);
+                dpsub3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                dpsub3.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
                 
                 const col3 = GetSequencedColor()
                 for (let k = 0; k < sub_dp2_count; k++) {
-    
+                    
                     const dpsub4 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col3, WHITE, pad, _, _, _, margin);
                     dpsub3.AddToMenu(dpsub4);
+                    dpsub4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    dpsub4.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
                     
-                    const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
-                    dpsub4.AddToMenu(s)
+                    // const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
+                    // dpsub4.AddToMenu(s)
                     
                 }
                 
             }
         }
-        // for (let j = 0; j < sub_dp2_count; j++) {
-            
-        //     const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
-        //     dpsub1.AddToMenu(dpsub2);
-            
-        //     const col2 = GetSequencedColor()
-        //     for (let k = 0; k < sub_dp2_count; k++) {
-                
-        //         const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
-        //         console.log(i,j,k, dpsub3.GetName())
-        //         dpsub2.AddToMenu(dpsub3);
-                
-        //         const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk2', [0, 5, 1.8]);
-        //         dpsub3.AddToMenu(s)
-        //     }
+
+    }
+
+    // {
+    //     const l = Create_widget_label(_, 'HI!', );
+    //     dp.AddToMenu(l);
+    //     l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    //     l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    // }
+
+    // { // Test: Many section
+    //     const sections = CreateManySectionsMinimal(0x0);
+    //     dp.AddToMenu(sections);
+    //     sections.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    // }
+
+    // { // Test: Slider
+    //     const slider = CreateSliderSimple(0x0);
+    //     // const slider = CreateSlider(0x0);
+    //     dp.AddToMenu(slider);
+    //     // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    //     slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    // }
+
+    { // Test: Scroller
+        const scroller = CreateScrollerClampAlphaTest(10, 0x0);
+        dp.AddToMenu(scroller);
+        // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    }
+
+
+    
+    col = GetSequencedColor()
+    for (let i = 0; i < sub_dp1_count; i++) {
+        
+        const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+        dp.AddToMenu(dpsub1);
+        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        
+        // { // Test: Labels
+        //     const l = Create_widget_label(_, 'HI!', );
+        //     dpsub1.AddToMenu(l);
+        //     l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        //     l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
         // }
+
+
+        col = GetSequencedColor()
+        for (let j = 0; j < sub_dp2_count; j++) {
+
+            const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+            dpsub1.AddToMenu(dpsub2);
+            dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+            // console.log()
+        }
+
     }
 
     dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+    // dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
     // dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
     dp.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
@@ -2365,7 +2661,7 @@ function CreateDropdown(pos=[0,0,0], id) {
 
     dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
     
-    dp.ConstructListeners();
+    Construct_listeners_relations(dp);
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(dp);
@@ -2381,7 +2677,7 @@ function CreateDropdown2(pos, id, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
     const margin = [10, 7]
     let col = GetSequencedColor()
     const dp = Create_widget_dropdown(root_widget, `${id}`, pos, col, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
-    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    dp.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
     dp.CreateClickEvent();
     // dp.CreateMoveEvent();
 
@@ -2444,8 +2740,8 @@ function CreateDropdown3(pos, dim) {
     const margin = [8, 8]
     const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `0`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
     // dp.CreateMoveEvent();
-    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    dp.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    dp.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     // dp.CreateClickEvent();
     
     
@@ -2456,7 +2752,7 @@ function CreateDropdown3(pos, dim) {
     for (let i = 0; i < sub_dp1_count; i++) {
         
         const dpsub1 = Create_widget_dropdown(_, `0${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
 
         dp.AddToMenu(dpsub1);
 
@@ -2494,12 +2790,12 @@ function CreateDropdown2InSection(pos, id) {
 
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[2], 1.5), 'S')
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
 
     const dp = Create_widget_dropdown(_, `0`, [0,0,pos[2]], GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
     dp.CreateClickEvent();
-    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    dp.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     Dropdown_roots_set_root(dp, dp);
     
     section.AddItem(dp)
@@ -2513,13 +2809,13 @@ function CreateDropdown2InSection(pos, id) {
         
         
         const label = Create_widget_label(_, `sssdsdsdsdsLabel ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0,0,pos[2]], fontsize, GREY[1], WHITE, [14, 4], .5);
-        label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        label.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
         dp.AddToMenu(label);
         
         const col1 = GetSequencedColor()
         const dpsub2 = Create_widget_dropdown(_, `${i}0`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
-        dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
         dp.AddToMenu(dpsub2);
 
         // const col2 = GetSequencedColor()
@@ -2608,9 +2904,9 @@ function CreateDropdown2InSection(pos, id) {
 
 function CreateColorPicker(x=0, y=0, render_instanced_flags=0x0, root_widget=ROOT_WIDGETS.CREATE_ROOT){
 
-    const picker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [x, y+40, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
-    // picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
+    const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y+40, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
+    // picker.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
+    // picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
 
     picker.sid.inst = render_instanced_flags;
 
@@ -2620,13 +2916,18 @@ function CreateColorPicker(x=0, y=0, render_instanced_flags=0x0, root_widget=ROO
 
     if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
 
+        
+
+        picker.ColorpickerCreateListeners();
+        // picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
+
         picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
         
         // picker.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
         picker.Calc_no_gfx_update();
         picker.Render();
         picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
-        picker.ConstructListeners();
+        Construct_listeners_relations(picker);
     }
 
     return picker;
@@ -2644,8 +2945,8 @@ function CreateSceneMenuBar(items=null) {
     const dim =  [VIEWPORT.WIDTH/2 - margin[0], 100];
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6,6], pos, dim, TRANSPARENCY(GREY[1], 1.), _, style, )
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     section.SetName('Main Window')
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
@@ -2764,88 +3065,87 @@ function  CreateWindowWithMenu() {
     const pos = [200, 200, 0]
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [0, 0], TRANSPARENCY(GREEN[2], .9))
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     section.SetName('ROOT')
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
-    section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
-    // const menu = Create_widget_menubar(_, [0,0,pos[2]], _, TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
-    // section.AddItem(menu);
-    // menu.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    const menu = Create_widget_menubar(_, [0,0,pos[2]], _, TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
+    section.AddItem(menu);
+    menu.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
 
-    // const l1 = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(GREY[1], 1.0), WHITE);
-    // l1.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    // menu.AddToMenuBar(l1);
-    // const l2 = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(PURPLER[5],1.0), WHITE);
-    // l2.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    // menu.AddToMenuBar(l2);
-    // // Create dropdown menu
-    // const dp = Create_widget_dropdown(_, 'Options', [0, 0, 0], GREY[1], TRANSPARENCY(YELLOWL[8], .3), WHITE, _, _, _, _, [2,2]);
-    // dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    // Dropdown_roots_set_root(dp, dp);
-    // dp.menu.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
-    // dp.options = SECTION.VERTICAL;
-    // menu.AddToMenuBar(dp, REL_POS.LEFT);
+    const l1 = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(GREY[1], 1.0), WHITE);
+    l1.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    menu.AddToMenuBar(l1);
+    const l2 = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(PURPLER[5],1.0), WHITE);
+    l2.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    menu.AddToMenuBar(l2);
+    // Create dropdown menu
+    const dp = Create_widget_dropdown(_, 'Options', [0, 0, 0], GREY[1], TRANSPARENCY(YELLOWL[8], .3), WHITE, _, _, _, _, [2,2]);
+    dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    Dropdown_roots_set_root(dp, dp);
+    dp.menu.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
+    dp.options = SECTION.VERTICAL;
+    menu.AddToMenuBar(dp, REL_POS.LEFT);
     
     
     // Add a switch to the menu's dropdown
-    // const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
-    // dp.AddToMenu(switch1);
+    const switch1 = CreateSwitchSimple([0,0,pos[2]], 0);
+    dp.AddToMenu(switch1);
     
-    // // Add a dp to the menu's dropdown
-    // const dp_menu = CreateDropdown2([0,0,pos[2]], 0, null)
-    // dp.AddToMenu(dp_menu);
+    // Add a dp to the menu's dropdown
+    const dp_menu = CreateDropdown2([0,0,pos[2]], 0, null)
+    dp.AddToMenu(dp_menu);
     
-    // {
-    //     const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
-    //     label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //     dp.AddToMenu(label);
-    // }
-    // {
-    //     const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
-    //     label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //     dp.AddToMenu(label);
-    // }
-    // {
-    //     const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
-    //     label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //     dp.AddToMenu(label);
-    // }
-    // menu.AddToMenuBar(dp, REL_POS.LEFT);
+    {
+        const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
+        label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        dp.AddToMenu(label);
+    }
+    {
+        const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
+        label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        dp.AddToMenu(label);
+    }
+    {
+        const label = Create_widget_label(_, 'Hi', _, _, 8, TRANSPARENCY(BLUEL[9], .9), WHITE);
+        label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        dp.AddToMenu(label);
+    }
+    menu.AddToMenuBar(dp, REL_POS.LEFT);
 
-    // menu.AddCloseButton(_, section, 'x');
-    // menu.AddMinimizeButton(_, section);
+    menu.AddCloseButton(_, section, 'x');
+    menu.AddMinimizeButton(_, section);
     
     
     
 
 
-    // // menu.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
-    // menu.options = SECTION.HORIZONTAL | SECTION.EXPAND;
+    // menu.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.EXPAND;
+    menu.options = SECTION.HORIZONTAL | SECTION.EXPAND;
 
     // Create items for the section
     
         {
             // const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], pos, [0, 0], TRANSPARENCY(PURPLEB[2], .9))
-            // s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            // s.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
             // s.SetName('Window Section')
             // section.AddItem(s)
             // {
             //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-            //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            //     label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
             //     s.AddItem(label)
             // }
             // {
             //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-            //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            //     label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
             //     s.AddItem(label)
             // }
             // {
             //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-            //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            //     label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
             //     s.AddItem(label)
             // }
             {
@@ -2857,63 +3157,63 @@ function  CreateWindowWithMenu() {
         
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
             }
             {
                 const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                 section.AddItem(label)
             }
             {
                 const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
                 section.AddItem(label)
             }
         }
@@ -2921,6 +3221,8 @@ function  CreateWindowWithMenu() {
     // const sliders = CreateChangeMeshColorFromSliders(ROOT_WIDGETS.NULL);
     // section.AddItem(sliders);
 
+
+    section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -2931,7 +3233,7 @@ function  CreateWindowWithMenu() {
     
     section.Render();
     
-    section.ConstructListeners();
+    Construct_listeners_relations(section);
 
     
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -2943,113 +3245,187 @@ function  CreateWindowWithMenu() {
 
 
 
+function CreateManySectionsMinimal(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
+
+    const tr = .7;
+
+    const blu = Create_widget_section(root_widget, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr), 'blu');
+    blu.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE); 
+    // blu.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+
+    
+    // blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
+    // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)
+    
+    const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr), 'red');
+    red.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    // red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.EXPAND;
+    red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
+    blu.AddItem(red);
+    
+    
+    
+    {
+        
+        const black1 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr), 'black1');
+        // black1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        red.AddItem(black1);
+
+        const grey11 = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[4], tr), 'grey11');
+        grey11.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        black1.AddItem(grey11);
+            const red111 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr), 'red111');
+            red111.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            grey11.AddItem(red111);
+            const yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr), 'yel_1');
+            yel_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            grey11.AddItem(yel_1);
+            const purp12 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr), 'purp12');
+            purp12.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        black1.AddItem(purp12);
+        const blue13 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[5], tr), 'blue13');
+        blue13.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        black1.AddItem(blue13);
+        const green14 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[5], tr), 'green14');
+        green14.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        black1.AddItem(green14);
+        const vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr), 'vert_0');
+        vert_0.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    
+
+    }
+
+
+    
+    
+    
+    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
+
+        blu.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        // blu.options = SECTION.INHERIT | SECTION.VERTICAL 
+        blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+        blu.Calc_no_gfx_update();
+        blu.Render();
+        blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
+        Construct_listeners_relations(blu)
+    }
+    
+
+
+
+    return blu;
+}
+
+
+
 function CreateManySections(scene) {
 
     const tr = .7;
 
     const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
-    blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE); blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    blu.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE); blu.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
 
     
     // blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
     // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)
     
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-    red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.EXPAND;
-    // red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
+    red.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    // red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.EXPAND;
+    red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
     blu.AddItem(red);
 
     
     const black1 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr));
-    black1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    black1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black1);
 
 
     const black2 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr));
-    black2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    black2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black2);
 
     const black3 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr));
-    black3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    black3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black3);
 
 
     const black4 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    black4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    black4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black4);
 
 
     const grey11 = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[4], tr));
-    grey11.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    grey11.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black1.AddItem(grey11);
         const red111 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-        red111.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        red111.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
         grey11.AddItem(red111);
         const yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
-        yel_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        yel_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
         grey11.AddItem(yel_1);
     const purp12 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-    purp12.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    purp12.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black1.AddItem(purp12);
     const blue13 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[5], tr));
-    blue13.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    blue13.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black1.AddItem(blue13);
     const green14 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[5], tr));
-    green14.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    green14.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black1.AddItem(green14);
 
 
     const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[0], tr));
-    bla.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    bla.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black3.AddItem(bla);
     const pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-    pin_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    pin_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black4.AddItem(pin_1);
     const blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[7], tr));
-    blu_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    blu_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black4.AddItem(blu_1);
     const yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
-    yel_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    yel_2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black2.AddItem(yel_2);
     const yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    yel_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    yel_3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black3.AddItem(yel_3);
     const gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    gre_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    gre_3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black3.AddItem(gre_3);
     const red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-    red_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    red_4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black2.AddItem(red_4);
     const yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-    yel_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    yel_4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black2.AddItem(yel_4);
     const ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    ora_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    ora_4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     black2.AddItem(ora_4);
     const gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    gry1_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     bla.AddItem(gry1_1);
     const gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[5], tr));
-    gry1_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    gry1_2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     bla.AddItem(gry1_2);
     const gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[7], tr));
-    gry1_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    gry1_3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     bla.AddItem(gry1_3);
     const gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    gry2_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    gry2_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     pin_1.AddItem(gry2_1);
     const gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    gry2_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    gry2_2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     pin_1.AddItem(gry2_2);
     const gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    gry2_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    gry2_3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     blu_1.AddItem(gry2_3);
     const gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    gry2_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    gry2_4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     blu_1.AddItem(gry2_4);
     const vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    vert_0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    vert_0.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     gry1_1.AddItem(vert_0);
 
     { // Set naming and listeners
@@ -3091,14 +3467,14 @@ function CreateManySections(scene) {
     blu.Calc_no_gfx_update();
     blu.Render();
     blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
-    blu.ConstructListeners();
+    Construct_listeners_relations(blu)
 
     return blu;
 }
 
 
 
-function CreateScroller(scene) {
+function CreateScroller() {
 
     const fontsize = 8;
     const tr = .3;
@@ -3107,116 +3483,137 @@ function CreateScroller(scene) {
     const colors = REDL;
     const count = colors.length;
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 10; i++) {
 
         const chunk = i;
         let row = 0;
-        const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GetRandomColor(), .3), `chunk:${chunk}`);
-        section.AddItem(s);
+        // const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GetRandomColor(), .3), `chunk:${chunk}`);
+        // section.AddItem(s);
 
-        for (let j = 0; j < 4; j++) {
-
-            let rowobj = 0;
-            const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GREY[1], .9), `chunk:${chunk} row:${j}`);
-            s.AddItem(s1);
-
-            for (let k = 0; k < 7; k++) {
-                const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6), `chunk:${chunk} row:${j} ${k}`);
-                s1.AddItem(s2);
-
-                { // Some labels and a slider
-                    // const l = Create_widget_label(_, `Label text ${i}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
-                    // s.AddItem(l);
-                    // const ss = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GetRandomColor(), tr));
-                    // s.AddItem(ss);
-                    // const ll = Create_widget_label(_, `Sub Label text${i}1`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
-                    // ss.AddItem(ll);
-                    // const sl = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-                    // s.AddItem(sl);
-                    // { // Many Sliders
-                    //     const sss = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GetRandomColor(), tr));
-                    //     ss.AddItem(sss);
-                    //     {
-                    //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-                    //         sss.AddItem(sl2);
-                    //     }
-                    //     {
-                    //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-                    //         sss.AddItem(sl2);
-                    //     }
-                    //     {
-                    //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-                    //         sss.AddItem(sl2);
-                    //     }
-                    //     {
-                    //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-                    //         sss.AddItem(sl2);
-                    //     }
-                    //     {
-                    //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-                    //         sss.AddItem(sl2);
-                    //     }
-                    //     {
-                    //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
-                    //         sss.AddItem(sl2);
-                    //     }
-                    // }
-                }
-                { // Large text
-                    // {
-                    //     const l = Create_widget_label(_, `Some large Label text  ${i} 0000000000000000000`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
-                    //     s.AddItem(l);
-                    // }
-                    // {
-                    //     const l = Create_widget_label(_, `Some large Label text  ${i} 0000000000000000000`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
-                    //     s.AddItem(l);
-                    // }
-                    // {
-                    //     const l = Create_widget_label(_, `Some large Label text  ${i} 0000000000000000000`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
-                    //     s.AddItem(l);
-                    // }
-                    // {
-                    //     const l = Create_widget_label(_, `Some large Label text  ${i} 0000000000000000000`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
-                    //     s.AddItem(l);
-                    // }
-                }
-                { // Large text
-                    // {
-                    // const dt = Create_widget_multi_text(_, 'Dynamic text', 'value', ALIGN.VERTICAL, [100, 300, 0], 6, BLUE_10_120_220, PURPLER[7]);
-                    // dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    // dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    // dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
-                    // dt.Align_pre(dt, ALIGN.VERTICAL);
-                    // s.AddItem(dt);
-                    // }
-                }
-            }
-            row++;
+        {
+            const l = Create_widget_label(_, 'HI!', );
+            section.AddItem(l);
+            l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            // l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
         }
+    
+        { // Test: Many section
+            const sections = CreateManySectionsMinimal(0x0);
+            section.AddItem(sections);
+            sections.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        }
+    
+        // { // Test: Slider
+        //     const slider = CreateSliderSimple(0x0);
+        //     // const slider = CreateSlider(0x0);
+        //     section.AddItem(slider);
+        //     // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        //     slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        // }
+
+        // for (let j = 0; j < 4; j++) {
+
+        //     let rowobj = 0;
+        //     const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GREY[1], .9), `chunk:${chunk} row:${j}`);
+        //     s.AddItem(s1);
+
+        //     for (let k = 0; k < 7; k++) {
+        //         const s2 = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [5, 5], TRANSPARENCY(GetRandomColor(), 1.6), `chunk:${chunk} row:${j} ${k}`);
+        //         s1.AddItem(s2);
+
+        //         { // Some labels and a slider
+        //             // const l = Create_widget_label(_, `Label text ${i}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
+        //             // s.AddItem(l);
+        //             // const ss = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GetRandomColor(), tr));
+        //             // s.AddItem(ss);
+        //             // const ll = Create_widget_label(_, `Sub Label text${i}1`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
+        //             // ss.AddItem(ll);
+        //             // const sl = Create_widget_slider(_, [200, 100, 0], [150, 10]);
+        //             // s.AddItem(sl);
+        //             // { // Many Sliders
+        //             //     const sss = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [280, 650, 0], [50, 20], TRANSPARENCY(GetRandomColor(), tr));
+        //             //     ss.AddItem(sss);
+        //             //     {
+        //             //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
+        //             //         sss.AddItem(sl2);
+        //             //     }
+        //             //     {
+        //             //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
+        //             //         sss.AddItem(sl2);
+        //             //     }
+        //             //     {
+        //             //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
+        //             //         sss.AddItem(sl2);
+        //             //     }
+        //             //     {
+        //             //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
+        //             //         sss.AddItem(sl2);
+        //             //     }
+        //             //     {
+        //             //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
+        //             //         sss.AddItem(sl2);
+        //             //     }
+        //             //     {
+        //             //         const sl2 = Create_widget_slider(_, [200, 100, 0], [150, 10]);
+        //             //         sss.AddItem(sl2);
+        //             //     }
+        //             // }
+        //         }
+        //         { // Large text
+        //             // {
+        //             //     const l = Create_widget_label(_, `Some large Label text  ${i} 0000000000000000000`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
+        //             //     s.AddItem(l);
+        //             // }
+        //             // {
+        //             //     const l = Create_widget_label(_, `Some large Label text  ${i} 0000000000000000000`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
+        //             //     s.AddItem(l);
+        //             // }
+        //             // {
+        //             //     const l = Create_widget_label(_, `Some large Label text  ${i} 0000000000000000000`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
+        //             //     s.AddItem(l);
+        //             // }
+        //             // {
+        //             //     const l = Create_widget_label(_, `Some large Label text  ${i} 0000000000000000000`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [700, 100, 0], 8, GetRandomColor(), WHITE);
+        //             //     s.AddItem(l);
+        //             // }
+        //         }
+        //         { // Large text
+        //             // {
+        //             // const dt = Create_widget_multi_text(_, 'Dynamic text', 'value', ALIGN.VERTICAL, [100, 300, 0], 6, BLUE_10_120_220, PURPLER[7]);
+        //             // dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             // dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             // dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             //     dt.CreateNewText('1234567890jhsdhansdiojjsodioksdlkaslkdopklxcd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', _fontsize, WHITE, [2, 2]);
+        //             // dt.Align_pre(dt, ALIGN.VERTICAL);
+        //             // s.AddItem(dt);
+        //             // }
+        //         }
+        //     }
+        //     row++;
+        // }
     }
 
     // Create scroller for the ui-mesh info widget
     const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [100, 140]);
     scroller.StateEnable(MESH_STATE.ACTIVE);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
 
     scroller.options = SECTION.VERTICAL | SECTION.INHERIT;
     scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.INHERIT;
@@ -3238,7 +3635,7 @@ function CreateScroller(scene) {
 
     View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
 
-    scroller.ConstructListeners();
+    Construct_listeners_relations(scroller);
 
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scroller.scrolled_section);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, section);
@@ -3312,7 +3709,7 @@ function CreateScrollerClampAlphaTest(num_items=10, root_widget=ROOT_WIDGETS.CRE
     ];
     const fontsize = 14;
     
-    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], .6));
+    const section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], .8));
     
     
     // const count = colors.length;
@@ -3323,28 +3720,31 @@ function CreateScrollerClampAlphaTest(num_items=10, root_widget=ROOT_WIDGETS.CRE
         const label = Create_widget_label(_, `${i}`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6,4])
 
         label.SetName(`${i}`);
-        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+        label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
         section.AddItem(label);
     }
 
 
     // Create scroller for the ui-mesh info widget
-    const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [100, 90]);
+    const scroller = Create_widget_scroller(root_widget, section, [60, 90], GREY[0]);
     scroller.StateEnable(MESH_STATE.ACTIVE);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
 
     
     scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
     scroller.scrolled_section.options = SECTION.VERTICAL;
+    // scroller.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+    // scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
     
     scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     scroller.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section);
     
     
-    // scroller.SetPosYNoGfxUpdate(200)
-    // scroller.SetPosXNoGfxUpdate(100)
-    
+    scroller.SetPosYNoGfxUpdate(200)
+    scroller.SetPosXNoGfxUpdate(100)
+
+
     if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
         
         scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
@@ -3364,7 +3764,7 @@ function CreateScrollerClampAlphaTest(num_items=10, root_widget=ROOT_WIDGETS.CRE
         View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
         // View_build_group_from_root_mesh(scroller.scrolled_section);
     
-        scroller.ConstructListeners();
+        Construct_listeners_relations(scroller);
     }
 
 
@@ -3430,8 +3830,8 @@ function CreateScrollerInScroller(items=null){
     const style = [0,8,2];
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6,6], pos, [200, 200], TRANSPARENCY(GREY[1], 1.), _, style, )
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     section.SetName('Main Section')
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
@@ -3458,7 +3858,7 @@ function CreateScrollerInScroller(items=null){
             }
             const scroller2 = Create_widget_scroller(_, scrolled2, [80,90], BLUEL[8], _, _);
             scrolled.AddItem(scroller2);
-            scroller2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            scroller2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
             // scroller2.options = SECTION.VERTICAL | SECTION.INHERIT;
             scroller2.scrolled_section.options = SECTION.VERTICAL;
             scroller2.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller2.scrolled_section);
@@ -3470,8 +3870,8 @@ function CreateScrollerInScroller(items=null){
     }
     const scroller = Create_widget_scroller(_, scrolled, [140,140], BLUEL[8], _, _);
     section.AddItem(scroller)
-    // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
     scroller.scrolled_section.options = SECTION.VERTICAL;
     scroller.SetName(`SCOLLER-1`);
@@ -3527,8 +3927,8 @@ function TestSections1(){
     const pos = [0, 0, 0];
     
     const root = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, marg, pos, [0, 0], TRANSPARENCY(BLUEL[5], 1));
-    root.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    root.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    root.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    root.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     root.SetName('root_blue');
     
     { // Test 1
@@ -3627,16 +4027,16 @@ function Sections2(is_root, align) {
     const dim = [10, 10];
 
     const grey = Create_widget_section(is_root, align, marg, [0, 0, 0], dim, TRANSPARENCY(GREY[0], tr));
-    grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    grey.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     grey.SetName(`grey${grey_cnt++}`);
 
     const green = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(GREEN[3], tr));
-    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    green.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     green.SetName(`green${green_cnt++}`);
     grey.AddItem(green);
 
     const orange = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(ORANGER[7], tr));
-    orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    orange.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     orange.SetName(`orange${orange_cnt++}`);
     green.AddItem(orange);
 
@@ -3647,23 +4047,23 @@ function Sections4(is_root, align) {
     const tr = 1.;
 
     const blu = Create_widget_section(is_root, align, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    blu.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     blu.SetName('grey');
 
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-    red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    red.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     red.SetName('red');
     blu.AddItem(red);
     const green = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[6], tr));
-    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    green.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     green.SetName('green');
     blu.AddItem(green);
     // const purple = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-    // purple.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // purple.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     // purple.SetName('purple');
     // blu.AddItem(purple);
     // const orange = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGER[7], tr));
-    // orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // orange.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     // orange.SetName('orange');
     // blu.AddItem(orange);
 
@@ -3680,7 +4080,7 @@ function Help(scene) {
 
     //options, margin, pos, dim, col, name
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [200, 100, 0], [100, 100], TRANSPARENCY(GREY[1], .8));
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
     section.SetName('Help section')
 
     // scene.StoreMesh(section)
@@ -3694,7 +4094,7 @@ function Help(scene) {
         msgs[i] = '\"' + DEBUG_PRINT_KEYS[i].key + '\": ' + DEBUG_PRINT_KEYS[i].discr
 
         const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 7, TRANSPARENCY(GREY[1], .4), WHITE, [7, 3], .5, [0, 4, 3])
-        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+        label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
 
         s1.AddItem(label)
     }
@@ -3741,14 +4141,14 @@ function MeshInfo(scene) {
     /********************************************************************************************************************************************************/
     // Info UI
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], pos, [0, 0], TRANSPARENCY(GREY[1], .8), 'MeshInfoUiTip');
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     section.ConstructListeners();
 
     /********************************************************************************************************************************************************/
     // Menu bar and Minimizer
     const menu = Create_widget_menubar(_, pos, _, TRANSPARENCY(GREY[4], .7), WHITE, 'Info tip', [10, 6]);
-    menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    menu.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
     menu.AddMinimizeButton(_, section);
     menu.options = SECTION.HORIZONTAL | SECTION.INHERIT;
     section.AddItem(menu);

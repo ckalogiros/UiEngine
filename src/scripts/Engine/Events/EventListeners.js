@@ -78,13 +78,11 @@ export function Listener_get_parent_event(TYPE_IDX, idx) {
 
 
 
-
 export function Listener_get_parent_event_meshidx(TYPE_IDX, idx) {
    const parent_idx = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].parent_idx;
    const parent_meshidx = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_idx].meshidx;
    return parent_meshidx;
 }
-
 
 
 
@@ -98,77 +96,119 @@ export function Listener_init_event_storage_buffers() {
 
 
 
-export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params, parent_event_idx) {
+/**********************************************************************************************************************************************************/
+// Create Listener
+export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params, is_fake) {
 
    /**DEBUG */const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
 
    const event_idx = _listeners_buffer_storage.buffer[TYPE_IDX].Add({
       /**DEBUG */name: (mesh) ? mesh.GetName() : 'NO SOURCE PARAMS',
       type: TYPE_IDX,
-      parent_idx: parent_event_idx!==null ? parent_event_idx : INT_NULL,
+      parent_idx: INT_NULL,
       Clbk: Clbk,
       meshidx: meshidx,
       evt_params: evt_params,
-      view_idx: INT_NULL,
+      is_fake: is_fake,
       view: null,
    });
 
-   const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
+if(mesh.GetName()==='Slider Bar')
+console.log()
 
-   if (parent_event_idx !== null && parent_event_idx !== INT_NULL) {
-
-      // Get the parent event.
-      const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_event_idx];
-
-      if (parent_event.view && !parent_event.view.children) {
-         parent_event.view.children = New_generic_buffer(_, `Listeners->parent_event.view.children:${parent_event.name}`);
-      }
-
-      // Store the new event as a child to the parent in the listeners VIEW storage buffer.
-      const view_idx = parent_event.view.children.Add({
-         idx: event_idx,
-         meshidx: meshidx,
-         children: null,
-      });
-
-      event.view = parent_event.view.children.buffer[view_idx];
-      event.view_idx = view_idx;
-   }
-   else {
-
-      // Create a tree buffer stucture view of the listeners storage buffer, for fast event listeners search
-      const view_idx = _listeners_buffer_view_storage.buffer[TYPE_IDX].Add({
-         idx: event_idx,
-         meshidx: meshidx,
-         children: null,
-      });
-
-
-      // Store a reference of view back to listeners storage buffer. Can't have an index cause the view is tree buffer structure.
-      event.view = _listeners_buffer_view_storage.buffer[TYPE_IDX].buffer[view_idx];
-      event.view_idx = view_idx;
-   }
-
+   // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx].event_idx = event_idx;
 
    LISTENERS_FLAGS[TYPE_IDX] = true;
 
-   // return {
-   //    event_idx,
-   //    event_idx:event_idx.parent_idx,
-   // }
    return event_idx;
 }
 
 
 
+
+/** Change an event's callback and parameters */
 export function Listener_change_child_event(TYPE_IDX, event_idx, Clbk, evt_params) {
 
    const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
-   event.Clbk = Clbk;
+   if(Clbk) event.Clbk = Clbk;
    event.evt_params = evt_params;
 
 }
 
+
+
+/**********************************************************************************************************************************************************/
+// Create Parent-Child relation
+/**
+ * The point of the view is to have in a tree like structure all events for fast access. 
+ * Root views are constructed based on the widget roots of the widget buffer,
+ * though a root event may be any children of the widget root tree.
+ * That is because if a root widget does not have a listener, we can create root event any child seen fit.
+ * 
+ */
+export function Listener_create_root_view(TYPE_IDX, event_idx){
+
+   const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
+
+   // Create a tree buffer stucture view of the listeners storage buffer, for fast event listeners search
+   const view_idx = _listeners_buffer_view_storage.buffer[TYPE_IDX].Add({
+      event_idx: event_idx,
+      meshidx: event.meshidx,
+      view_idx: INT_NULL,
+      children: null,
+   });
+
+   // Store the view's index in the parents children buffer.
+   _listeners_buffer_view_storage.buffer[TYPE_IDX].buffer[view_idx].view_idx = view_idx;
+
+   // Store a reference of view back to listeners storage buffer. Can't have an index cause the view is tree buffer structure.
+   event.view = _listeners_buffer_view_storage.buffer[TYPE_IDX].buffer[view_idx];
+
+}
+
+
+
+/**
+ * Every event that is not a root event, must be assigned a parent event in order to be checked by the event listen function(Hover, Click, ...) 
+ */
+export function Listener_assign_parent_event(TYPE_IDX, event_idx, parent_event_idx){
+
+   const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_event_idx];
+   if(parent_event===null || parent_event===undefined) 
+      alert('000111333')
+
+   const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
+   event.parent_idx = parent_event_idx;
+
+   // Create the parent's children View
+   if (!parent_event.view.children) {
+      parent_event.view.children = New_generic_buffer(_, `Listeners->parent_event.view.children:${parent_event.name}`);
+   }
+
+   // Store the new event as a child to the parent in the listeners VIEW storage buffer.
+   const view_idx = parent_event.view.children.Add({
+      event_idx: event_idx,
+      meshidx: event.meshidx,
+      view_idx: INT_NULL,
+      children: null,
+   });
+
+   /**
+    * // IMPORTANT: 
+    * The view_index is only a valid index to the parent event's children buffer, 
+    * which is untraceble because its a tree structure, unless the event is a root event,
+    * in which case the view_idx is an index to the '_listeners_buffer_view_storage'
+    * The only way to access a node is by searching the View storage buffer from the root event, 
+    * else it can be accessed from the events.view field, which has a refference of the view node, along with the children buffer
+    */
+   // Store the view's index in the parents children buffer.
+   parent_event.view.children.buffer[view_idx].view_idx = view_idx;
+   
+   // Store a reference of view back to listeners storage buffer. Can't have an index cause the view is tree buffer structure.
+   event.view = parent_event.view.children.buffer[view_idx];
+
+
+}
 
 
 
@@ -182,26 +222,33 @@ export function Listener_change_child_event(TYPE_IDX, event_idx, Clbk, evt_param
 
 
 /**********************************************************************************************************************************************************/
-// Destroy Listener
+// Destroy Event Listeners
 
-// CAUTION!: If the event is a child event, then its index is an invalid index, because its the index to the parents children buffer and not to the 'view_buffer.buffer[TYPE_IDX].buffer[evt_idx]'
+/**
+ * // IMPORTANT:
+ * If an event is to be removed that has child events(via the view tree struct), 
+ * then all the children events will be removed also, from the tree view as from the listeners storage buffer.
+ * Otherwise there would be events with no parent event (in the view tree) inaccesible from the EventListeners system.
+ * So we need to be cautious aboput any meshes that their event might be removed without calling specificaly for the event removal. 
+ */
 export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
 
    const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
 
-   // const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
+   if(event === null || event === undefined) {
+      console.error('1092873 \nTrying to remove an event that does not exist', 'Event type', TYPE_IDX, 'event idx', event_idx, '\nbuffer:', _listeners_buffer_storage.buffer[TYPE_IDX].buffer)
+      alert('1092873 \nTrying to remove an event that does not exist')
+   }
 
 
    // If event is root, has no 'parent_idx', then destroy its children from the view storage buffer
    if (event.parent_idx === INT_NULL) {
 
       event.view.children = null;
-      const view_idx = event.view_idx
-
-      _listeners_buffer_view_storage.buffer[TYPE_IDX].RemoveByIdx(view_idx);
+      _listeners_buffer_view_storage.buffer[TYPE_IDX].RemoveByIdx(event.view.view_idx);
 
    }
-   else { // Has a parent event... Remove the event from the view storage buffer
+   else { // Has a parent event... Remove the view event from the view storage buffer
 
       // Get parent event, in order to access the .view ref, and remove the event from the 'view' by its parent(Only Way)
       const parent = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event.parent_idx];
@@ -209,25 +256,55 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
       if (event.view && event.view.children)
          Listener_remove_all_children_events_from_view(TYPE_IDX, event.view.children);
 
-      const view_idx = event.view_idx
-      parent.view.children.RemoveByIdx(view_idx);
-
-
-
-      if (parent.view.children.boundary === parent.view.children.active_count && parent.view.children.active_count === 0)
-         console.log(view_idx, parent.view.children)
+      // console.log('1 Remove View', 'type', TYPE_IDX, 'view_idx', event.view)
+      parent.view.children.RemoveByIdx(event.view.view_idx);
 
    }
 
 
-   // HERE: We need to run a recursive loop in view storage buffer, to remove all childs from the events storage buffer
+   // Remove event from the listeners storage buffer
    event.view = null;
-   _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(event_idx)
+   
+   _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(event_idx);
 
    if (_listeners_buffer_storage.buffer[TYPE_IDX].active_count === 0)
       LISTENERS_FLAGS[TYPE_IDX] = false;
 
 }
+
+
+
+/** This function removes any tree view node from View storage buffer, but does not remove any listen events from the Listeners storage buffer */
+export function Listener_disable_event_view_and_all_children(TYPE_IDX, event_idx) {
+
+   const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
+   
+   if(event === null || event === undefined) {
+      console.error('1092873 \nTrying to remove an event that does not exist', 'Event type', TYPE_IDX, 'event idx', event_idx, '\nbuffer:', _listeners_buffer_storage.buffer[TYPE_IDX].buffer)
+      alert('1092873 \nTrying to remove an event that does not exist')
+   }
+
+   // If event is root, has no 'parent_idx', then destroy its children directly from the view storage buffer
+   if (event.parent_idx === INT_NULL) {
+
+      event.view.children = null;
+      _listeners_buffer_view_storage.buffer[TYPE_IDX].RemoveByIdx(event.view.view_idx);
+
+   }
+   else { // Else we need the parent event in order to remove the event view from the view tree
+
+      // Get parent event, in order to access the .view ref, and remove the event from the 'view' by its parent(Only Way)
+      const parent = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event.parent_idx];
+      parent.view.children.RemoveByIdx(event.view.view_idx);
+
+   }
+
+
+   // Remove event from the listeners storage buffer
+   event.view = null;
+   
+}
+
 
 
 function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
@@ -240,9 +317,10 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
          if (view.buffer[i].children) {
             Listener_remove_all_children_events_from_view(TYPE_IDX, view.buffer[i].children);
          }
-         _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view.buffer[i].idx].view = null; // Set null the 'view' var of this listener, in the listeners buffer
-         _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(view.buffer[i].idx); // Remover this listener from the listeners buffer
+         _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view.buffer[i].event_idx].view = null; // Set the 'view' field to null, removing any refference
+         _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(view.buffer[i].event_idx); // Remove the event from the listeners storage buffer
 
+         // IMPORTANT: Because we remove events that their mesh didn't call for, we just set the mesh's event index to INT_NULL here
          const mesh = Mesh_buffer_get_mesh_byidx(view.buffer[i].meshidx);
          mesh.listeners.buffer[TYPE_IDX] = INT_NULL
       }
@@ -253,72 +331,6 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
    // The actual view is removed-destroyed from it's parent, in the caller function
    Free_generic_buffer(view)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**********************************************************************************************************************************************************/
-
-// Batch Destroy
-
-const _batch_destroy_storage = New_generic_buffer(_, 'Listeners Buffer - _batch_destroy_storage');
-_batch_destroy_storage.Add(New_int16_buffer(_, 'EventListeners-batch destroy storage buffer1')); // Add for starters one listeners buffer. Maybe we could add via SIZE of LISTEN_EVENT_TYPE
-
-
-
-
-export function Listener_batch_destroy_store(TYPE_IDX, idx){
-   // TODOD: DEBUG the idx if exists and in boundaries
-
-   if(_batch_destroy_storage.buffer[TYPE_IDX] === undefined){
-      _batch_destroy_storage.Add(New_int16_buffer(_, 'EventListeners-batch destroy storage buffer2')); // If the buffer of the listener type does not exist, create one
-   }
-   // console.log('oooooo', TYPE_IDX, idx,_listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].meshidx)
-
-   _batch_destroy_storage.buffer[TYPE_IDX].Add(idx);
-}
-
-
-
-
-export function Listener_batch_destroy_run(){
-   // TODOD: DEBUG the idx if exists and in boundaries
-
-   for(let i=0; i <= _batch_destroy_storage.boundary; i++){
-
-      for(let j=0; j <= _batch_destroy_storage.buffer[i].boundary; j++){
-
-         const idx = _batch_destroy_storage.buffer[i].buffer[j];
-
-         const parent_idx = _listeners_buffer_storage.buffer[i].buffer[idx].parent_idx;
-         if(parent_idx !== INT_NULL){ // Remove event from parent
-
-            const view_child_idx = _listeners_buffer_storage.buffer[i].buffer[idx].view_idx;
-            _listeners_buffer_storage.buffer[i].buffer[parent_idx].view.children.RemoveByIdx(view_child_idx);
-            _listeners_buffer_storage.buffer[i].buffer[idx].parent_idx = INT_NULL;
-            _listeners_buffer_storage.buffer[i].buffer[idx].view_idx = INT_NULL;
-         }
-         console.log('oooooo', 'type:', i, 'index:', idx,_listeners_buffer_storage.buffer[i].buffer[idx])
-         _listeners_buffer_storage.buffer[i].buffer[idx].view = null;
-         _listeners_buffer_storage.buffer[i].RemoveByIdx(idx);
-      }
-
-      // console.log('oooooo', TYPE_IDX, idx,_listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].meshidx)
-      _batch_destroy_storage.buffer[i].Reset();
-   }
-
-}
-
 
 
 
@@ -368,36 +380,36 @@ export function Listener_dispatch_check_hover_event() {
 
    let intersects = false;
 
-   if(STATE.mesh.focused && STATE.mesh.focused.listeners){ // TODO: efficiency: must check because the focused may not have a listen event. FIXME
+   // if(STATE.mesh.focused && STATE.mesh.focused.listeners){ // TODO: efficiency: must check because the focused may not have a listen event. FIXME
       
-      const bounding_box = Mesh_buffer_get_mesh_bounding_box(STATE.mesh.focusedIdx);
+   //    const bounding_box = Mesh_buffer_get_mesh_bounding_box(STATE.mesh.focusedIdx);
       
-      const point = MouseGetPos();
+   //    const point = MouseGetPos();
 
-      // If and only if mouse is intersecting with the current mesh(mouse hover) ...
-      intersects = Intersection_point_rect(point, bounding_box);
+   //    // If and only if mouse is intersecting with the current mesh(mouse hover) ...
+   //    intersects = Intersection_point_rect(point, bounding_box);
 
-      if (intersects) {
+   //    if (intersects) {
 
-         const mesh = Mesh_buffer_get_mesh_byidx(STATE.mesh.focusedIdx);
+   //       const mesh = Mesh_buffer_get_mesh_byidx(STATE.mesh.focusedIdx);
 
-         const event = _listeners_buffer_storage.buffer[E.H].buffer[mesh.listeners.buffer[E.H]];
-         if(event){
+   //       const event = _listeners_buffer_storage.buffer[E.H].buffer[mesh.listeners.buffer[E.H]];
+   //       if(event){
 
-            if(event.view.children){
+   //          if(event.view.children){
    
-               if (Check_hover_recursive(event.view.children, point)) {
-                  // intersects = true;
-                  return;
-               }
-            }
+   //             if (Check_hover_recursive(event.view.children, point)) {
+   //                // intersects = true;
+   //                return;
+   //             }
+   //          }
    
-            Events_handle_immidiate({ type: 'hover', params: { mesh: mesh } });
-         }
+   //          Events_handle_immidiate({ type: 'hover', params: { mesh: mesh } });
+   //       }
 
-         return;
-      }
-   }
+   //       return;
+   //    }
+   // }
 
    for (let i = 0; i <= view_buffer.boundary; i++) {
 
@@ -520,65 +532,65 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
    let intersects = false;
 
 
-   if(STATE.mesh.focused && STATE.mesh.focused.listeners){ // TODO: efficiency: must check because the focused may not have a listen event. FIXME
+   // if(STATE.mesh.focused && STATE.mesh.focused.listeners){ // TODO: efficiency: must check because the focused may not have a listen event. FIXME
       
-      const bounding_box = Mesh_buffer_get_mesh_bounding_box(STATE.mesh.focusedIdx);
-      const point = MouseGetPos();
+   //    const bounding_box = Mesh_buffer_get_mesh_bounding_box(STATE.mesh.focusedIdx);
+   //    const point = MouseGetPos();
 
-      // If and only if mouse is intersecting with the current mesh(mouse hover) ...
-      intersects = Intersection_point_rect(point, bounding_box);
+   //    // If and only if mouse is intersecting with the current mesh(mouse hover) ...
+   //    intersects = Intersection_point_rect(point, bounding_box);
 
-      if (intersects) {
+   //    if (intersects) {
 
-         const mesh = Mesh_buffer_get_mesh_byidx(STATE.mesh.focusedIdx);
-         const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[mesh.listeners.buffer[TYPE_IDX]];
+   //       const mesh = Mesh_buffer_get_mesh_byidx(STATE.mesh.focusedIdx);
+   //       const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[mesh.listeners.buffer[TYPE_IDX]];
 
-         if(event.view.children){
+   //       if(event.view.children){
 
-            const event_found = Check_child_events_recursive(event.view.children, point);
-            if (event_found) {
+   //          const event_found = Check_child_events_recursive(event.view.children, point);
+   //          if (event_found) {
 
-               // Get the the event (which has all the event data) from the listeners storage buffer
-               const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_found.idx];
+   //             // Get the the event (which has all the event data) from the listeners storage buffer
+   //             const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_found.event_idx];
 
-               const dispatch_params = {
-                  meshidx: event.meshidx,
-                  evt_params: event.evt_params,
-                  trigger_params: trigger_params,
-                  event_type: TYPE_IDX,
-                  click_pos: point,
-               }
+   //             const dispatch_params = {
+   //                meshidx: event.meshidx,
+   //                evt_params: event.evt_params,
+   //                trigger_params: trigger_params,
+   //                event_type: TYPE_IDX,
+   //                click_pos: point,
+   //             }
 
-               if (event.Clbk) {
+   //             if (event.Clbk) {
 
-                  Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
-                  event.Clbk(dispatch_params);
+   //                Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+   //                event.Clbk(dispatch_params);
 
-                  return; // Return if at least one event is handled. Also return so that any event of the main event will not run.
-               }
-            }
-         }
+   //                return; // Return if at least one event is handled. Also return so that any event of the main event will not run.
+   //             }
+   //          }
+   //       }
 
-         // Else handle this event
-         if (event.Clbk) {
-            // Else if no children event was triggered, run any events of the main event.
-            const dispatch_params = {
-               meshidx: event.meshidx,
-               evt_params: event.evt_params,
-               trigger_params: trigger_params,
-               event_type: TYPE_IDX,
-               click_pos: point,
-            }
+   //       // Else handle this event
+   //       if (event.Clbk) {
+   //          // Else if no children event was triggered, run any events of the main event.
+   //          const dispatch_params = {
+   //             meshidx: event.meshidx,
+   //             evt_params: event.evt_params,
+   //             trigger_params: trigger_params,
+   //             event_type: TYPE_IDX,
+   //             click_pos: point,
+   //          }
 
-            Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
-            event.Clbk(dispatch_params); // Call the event
+   //          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.EventListener);
+   //          event.Clbk(dispatch_params); // Call the event
 
-         } 
-         return;
-      }
+   //       } 
+   //       return;
+   //    }
 
 
-   }
+   // }
 
    for (let i = 0; i <= view_buffer.boundary; i++) {
 
@@ -593,7 +605,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
          if (intersects) {
 
             // Get the event (which has all the event data) from the listeners storage buffer
-            const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view_buffer.buffer[i].idx];
+            const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view_buffer.buffer[i].event_idx];
 
             // Check all children (recursive)
             if (view_buffer.buffer[i].children) {
@@ -602,7 +614,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
                if (event_found) { // If the child event is found but does not have a Callback, handle the parent event
 
                   // Get the the event (which has all the event data) from the listeners storage buffer
-                  const e = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_found.idx];
+                  const e = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_found.event_idx];
 
                   const dispatch_params = {
                      meshidx: e.meshidx,
@@ -646,16 +658,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
 }
 
-/**
- * TODO:
- * Create a diagram of the implementation for a nice Listen events check.
- * 
- * 1. Go down the tree
- * 2. if event=null return the parent event
- * 3. if the event is FAKE, continue
- */
-
-
 
 
 function Check_child_events_recursive(view_children, point) {
@@ -677,16 +679,16 @@ function Check_child_events_recursive(view_children, point) {
 
             if (child_evt.children) { // Check all of its children(recursively)
                
-               const ret = Check_child_events_recursive(view_children.buffer[i].children, point)
+               const evt = Check_child_events_recursive(view_children.buffer[i].children, point)
                
-               if (ret) { // I has Callback then it is not a FAKE event, so its ok to return the event
+               if (evt) { // I has Callback then it is not a FAKE event, so its ok to return the event
                   
                   // Get the the event (which has all the event data) from the listeners storage buffer
-                  const e = _listeners_buffer_storage.buffer[E.C].buffer[ret.idx];
+                  const e = _listeners_buffer_storage.buffer[E.C].buffer[evt.event_idx];
 
    
                   // Because its a recursive procedure, when the mesh is found we must return it recursively immidiately after the return of the each recursion.
-                  if (ret && e.Clbk) return ret; // I has Callback then it is not a FAKE event, so its ok to return the event
+                  if (evt && e.Clbk) return evt; // I has Callback then it is not a FAKE event, so its ok to return the event
                   // Else continue
                }
             }
@@ -722,22 +724,8 @@ function Check_child_events_recursive(view_children, point) {
 /**********************************************************************************************************************************************************/
 // Misc
 
-export function Listener_set_root_mesh_priority() {
 
-   // Set render priority of all widget root meshes, based on their position in the listeners view buffer 
-   for (let i=0; i <= _listeners_buffer_view_storage.boundary; i++ ){
-      
-      for (let j=0; j <= _listeners_buffer_view_storage.buffer[i].boundary; j++ ){
-   
-         const view_buffer = _listeners_buffer_view_storage.buffer[i].buffer[j];
-   
-         const mesh = Mesh_buffer_get_mesh_byidx(view_buffer.meshidx);
-   
-         Renderqueue_set_priority_by_vb(FIRST, mesh.gfx.vb.groupidx);
-      }
-   }
 
-}
 
 
 
@@ -745,134 +733,6 @@ export function Listener_set_root_mesh_priority() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-/**********************************************************************************************************************************************************/
-// Create Listener
-
-// export function Listener_create_event(TYPE_IDX, meshidx, Clbk, evt_params) {
-
-//    return _listener.AddEvent(TYPE_IDX, meshidx, Clbk, evt_params);
-// }
-
-
-
-// export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params, parent_event) {
-
-//    return _listener.AddChildEvent(TYPE_IDX, meshidx, Clbk, evt_params, parent_event);
-// }
-
-
-
-
-
-
-
-/**********************************************************************************************************************************************************/
-// Destroy Listener
-
-// CAUTION!: If the event is a child event, then its index is an invalid index, because its the index to the parents children buffer and not to the 'view_buffer.buffer[TYPE_IDX].buffer[evt_idx]'
-// export function Listener_remove_event_by_idx(TYPE_IDX, evt) {
-
-//    view_buffer.buffer[TYPE_IDX].RemoveByIdx(evt.evt_idx);
-
-//    if (view_buffer.buffer[TYPE_IDX].active_count === 0)
-//       LISTENERS_FLAGS[TYPE_IDX] = false;
-
-// }
-
-
-
-// export function Listener_remove_child_event_from_parent(TYPE_IDX, evt) {
-
-//    // Remove child events requires the parent to remove the child event from 
-//    evt.parent_evt.children.RemoveByIdx(evt.evt_idx);
-
-//    if (view_buffer.buffer[TYPE_IDX].active_count === 0)
-//       LISTENERS_FLAGS[TYPE_IDX] = false;
-// }
-
-
-
-
-// export function Listener_destroy_children_buffer(TYPE_IDX, event_idx) {
-//    view_buffer.buffer[TYPE_IDX].buffer[event_idx].children = null;
-// }
-
-
-
-
-// export function Listener_recover_children_buffer(TYPE_IDX, event_idx, children_buffer) {
-//    view_buffer.buffer[TYPE_IDX].buffer[event_idx].children = children_buffer;
-//    view_buffer.buffer[TYPE_IDX].buffer[event_idx].has_child_events = true;
-// }
-
-
-
-
-// export function Listener_events_set_mesh_events_active(FLAGS, mesh_listeners, bool_activate) {
-
-//    if ((FLAGS & LISTENERS_FLAGS.HOVER) || (FLAGS & LISTENERS_FLAGS.ALL)) {
-
-//       if (mesh_listeners.buffer[E.H]) {
-//          view_buffer.buffer[E.H].buffer[mesh_listeners.buffer[E.H].idx].isActive = bool_activate;
-//       }
-//    }
-
-//    if ((FLAGS & LISTENERS_FLAGS.CLICK) || (FLAGS & LISTENERS_FLAGS.ALL)) {
-
-//       if (mesh_listeners.buffer[E.C]) {
-//          /**DEBUG ERROR*/ if (view_buffer.buffer[E.C].buffer[mesh_listeners.buffer[E.C].idx] === undefined)
-//             console.error('Undefined listen event:', mesh_listeners.buffer[E.C].idx, ' type:', E.C)
-
-//          view_buffer.buffer[E.C].buffer[mesh_listeners.buffer[E.C].idx].isActive = bool_activate;
-//       }
-//    }
-// }
-
-
-
-
-// export function Listener_set_event_active_by_idx(TYPE_IDX, root, childs_evt_idx) {
-//    // SEE ### docs/ScemeDraws/HoveListenEvents.drawio
-
-//    const parent_event_idx = root.listeners.buffer[TYPE_IDX].idx; // Get the parents event from the EventListener's buffer
-//    if (parent_event_idx === INT_NULL) alert('Root does not have a FAKE event')
-
-//    // Get the root's event.
-//    const evt = view_buffer.buffer[TYPE_IDX].buffer[parent_event_idx];
-
-//    if (evt === null) {
-
-//       console.error('evt is null');
-//       return;
-//    }
-
-//    if (evt.children === null) {
-
-//       evt.children = New_generic_buffer(_, 'Child Event Listeners buffer 3'); // Create new buffer as a children's events buffer
-//       evt.has_child_events = true;
-//    }
-
-//    // Copy the child's event params 
-//    const event_params = view_buffer.buffer[TYPE_IDX].buffer[childs_evt_idx];
-
-//    view_buffer.buffer[TYPE_IDX].RemoveByIdx(childs_evt_idx); // Remove the child's event from the root eventListeners buffer
-//    // Store them to the parents children event buffer
-//    const idx = evt.children.Add(event_params);
-
-//    return idx;
-// }
 
 
 
@@ -930,13 +790,13 @@ export function Listeners_click_get_size()   { return _listeners_buffer_storage.
 export function Listener_debug_print_storage_buffer() {
 
    for (let i = 0; i <= _listeners_buffer_storage.boundary; i++) {
-      console.log('Events Storage Buffer\n   ', _listeners_buffer_storage.buffer[i].buffer);
+      console.log('Events Storage (Linear) Buffer. Type:', i, '\n    ', _listeners_buffer_storage.buffer[i].buffer);
    }
 }
 export function Listener_debug_print_view_storage_buffer() {
 
    for (let i = 0; i <= _listeners_buffer_view_storage.boundary; i++) {
-      console.log('Events Storage Buffer:type:', i, '\n   ', _listeners_buffer_view_storage.buffer[i].buffer);
+      console.log('Events View Storage Buffer:type:', i, '\n   ', _listeners_buffer_view_storage.buffer[i].buffer);
    }
 }
 export function Listener_debug_print_view_recursive() {
@@ -971,16 +831,16 @@ function Listener_debug_print_info_recursive(TYPE_IDX, view, count) {
 
          for (let j = 0; j < count; j++) { r += '->'; }
 
-         const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[e.idx];
-         const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
-         const is_child_event = event.parent_idx !== null ? 'true' : 'false';
-         const parentEvent = e.parent_event ? e.parent_event.GetName() : 'NULL'
-         const is_fake = event.Clbk ? 'false' : 'true'
+         const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[e.event_idx];
+         if(event){
 
-
-         // console.log(`${r} :[${e.idx}] (is child:${is_child_event}) (is fake:${is_fake}) (parent:${event.parent_idx}) (${mesh.GetName()}) `, event.view);
-         console.log(`${r} :[${e.idx}] (is child:${is_child_event}) (is fake:${is_fake}) (parent:${event.parent_idx}) (${mesh.GetName()}) `);
-         total_count++;
+            const mesh = Mesh_buffer_get_mesh_byidx(event.meshidx);
+            const is_child_event = event.parent_idx !== null ? 'true' : 'false';
+            const is_fake = event.is_fake;
+   
+            console.log(`${r} :[${e.event_idx}] (is child:${is_child_event}) (is fake:${is_fake}) (parent:${event.parent_idx}) (${mesh.GetName()}) `);
+            total_count++;
+         }
 
          if (e.children) {
             count++;

@@ -971,6 +971,12 @@ function Listen_event_types_get_type_from_index(idx) {
 	if (idx === LISTEN_EVENT_TYPES_INDEX.CLICK) return LISTEN_EVENT_TYPES.CLICK_UP;
 }
 
+function Listen_event_get_idx_from_type(etype) {
+
+	if (etype & LISTEN_EVENT_TYPES.HOVER) return LISTEN_EVENT_TYPES_INDEX.HOVER;
+	if (etype & (LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE)) return LISTEN_EVENT_TYPES_INDEX.CLICK;
+}
+
 
 
 

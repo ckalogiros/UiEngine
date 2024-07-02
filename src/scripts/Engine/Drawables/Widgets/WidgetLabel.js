@@ -1,19 +1,20 @@
 "use strict";
 
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
-import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
-import { Rect, Rect_Mesh } from "../Meshes/Rect_Mesh.js";
+import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
-import { Mesh_per_vb_remove_mesh, Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
-import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
+import { Find_parent_listen_event } from "../Operations/Recursions.js";
+import { Listener_assign_parent_event } from "../../Events/EventListeners.js";
 
 
 
@@ -66,7 +67,7 @@ export class Widget_Label extends Rect_Mesh {
 
 
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-        this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+        this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
 
         // this.text_mesh.parent = NO_MESH_PARENT; // Use a special case for text meshes that are part of a widget without being in children's buffer.
@@ -169,9 +170,9 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    GfxCtxSetFlag(FLAGS, gfx_ctx_parent){
+    GfxCtxSetFlag(FLAGS, gfx_ctx_parent) {
 
-        if(!this.gfx_ctx_parent) {
+        if (!this.gfx_ctx_parent) {
 
             this.gfx_ctx_flags = FLAGS;
             this.gfx_ctx_parent = gfx_ctx_parent;
@@ -189,7 +190,7 @@ export class Widget_Label extends Rect_Mesh {
     /*******************************************************************************************************************************************************/
     GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_specific_vb_groupidx = INT_NULL, text_specific_vb_groupidx = INT_NULL) {
 
-        if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+        if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
         this.gfx = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
         if (text_specific_vb_groupidx === INT_NULL)
@@ -309,7 +310,7 @@ export class Widget_Label extends Rect_Mesh {
         this.text_mesh.geom.pos[0] = x + dx;
         this.text_mesh.geom.pos[1] = y + dy;
     }
-    
+
 
     TEMP_recalc_x(x) {
 
@@ -443,30 +444,118 @@ export class Widget_Label extends Rect_Mesh {
     // Listeners
     /*******************************************************************************************************************************************************/
 
-    ConstructListeners(parent_listeners = null) {
+    // ConstructListeners(parent_listeners = null) {
 
-        const mesh = this; // If in recursion, use as the current mesh the passed param. 
+    //     const mesh = this; // If in recursion, use as the current mesh the passed param. 
 
-        if (mesh.listeners) {
-            for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+    //     if (mesh.listeners) {
+    //         for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
-                const evt = mesh.listeners.buffer[etypeidx];
-                if (evt) { // If event is not null
-                    const evt_params = {
-                        EventClbk: null,
-                        targetBindingFunctions: null,
-                        target_mesh: mesh,
-                        params: null,
-                    }
-                    if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-                        parent_listeners = [null, null];
-                    }
-                    mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, parent_listeners[etypeidx]);
+    //             const evt = mesh.listeners.buffer[etypeidx];
+    //             if (evt) { // If event is not null
+    //                 const evt_params = {
+    //                     EventClbk: null,
+    //                     targetBindingFunctions: null,
+    //                     target_mesh: mesh,
+    //                     params: null,
+    //                 }
+    //                 if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+    //                     parent_listeners = [null, null];
+    //                 }
+    //                 mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, parent_listeners[etypeidx]);
+    //             }
+    //         }
+    //     }
+    // }
+
+    ListenEventCreate(etype) {
+
+        const etypeidx = Listen_event_get_idx_from_type(etype);
+        const mesh = this;
+
+        // For Hover events we need no callback and params
+        if (etype & LISTEN_EVENT_TYPES.HOVER) {
+
+            mesh.CreateListenEvent(etype);
+            if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, null, null);
+        }
+        else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+            const evt_params = { target_mesh: mesh, };
+            mesh.CreateListenEvent(etype);
+            if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+        }
+
+    }
+
+    ListenEventCreateAndAdd(parent_events = null) {
+
+        const mesh = this;
+
+        if (!mesh.listeners)
+            return; // Return if there are no listen events to add
+        // alert('228867 \nMust CreateListenEvent() first for dropdown mesh:.', mesh.GetName);
+        if (parent_events === null)
+            alert('228868 \nParent event must be a valid event index.', mesh.GetName);
+
+
+
+
+        for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+
+            if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
+
+            const etype = Listen_event_types_get_type_from_index(etypeidx);
+
+            /***********************************************************************************************************************/
+            // Create for dropdown button
+            const dp_evt = mesh.listeners.buffer[etypeidx];
+            if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
+
+                // For Hover events we need no callback and params
+                if (etype & LISTEN_EVENT_TYPES.HOVER) {
+                    mesh.AddListenEvent(etypeidx, null, null);
                 }
+                else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+                    const evt_params = { target_mesh: mesh, };
+                    mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+                }
+
+                // // It may be the case that the mesh is not ACTIVE, so the .addListenEvent() will not add any event and the 'mesh.listeners.buffer[etypeidx]' will be INT_NULL
+                // if(mesh.listeners.buffer[etypeidx] === INT_NULL) return; // Skip the dropdownn and the 
+
+                if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
+
+                    const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
+
+                    if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
+                    else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
+                }
+                else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
+
             }
         }
     }
+    // AddListeners() {
 
+    //     const mesh = this; // If in recursion, use as the current mesh the passed param. 
+    //     if(!mesh.listeners) alert('228866 \nMuste CreateListenEvent() first for mesh:.', mesh.GetName);
+
+    //     for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+
+    //        const evt = mesh.listeners.buffer[etypeidx];
+    //        if (evt) { // If event is not null
+    //           const evt_params = {
+    //              EventClbk: null,
+    //              targetBindingFunctions: null,
+    //              target_mesh: mesh,
+    //              params: null,
+    //           }
+    //           mesh.AddListenEvent(etypeidx, mesh.OnClick, mesh.evt_params, null);
+    //        }
+    //     }
+    //  }
 
     OnClick(params) {
 
@@ -521,7 +610,7 @@ export class Widget_Label extends Rect_Mesh {
 
             if (!is_resizesed) { // implement move 
                 // const OnMoveFn = mesh.OnMove;
-                const OnMoveFn = Section_on_move_clbk;
+                const OnMoveFn = Label_on_move_clbk;
                 const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
                 mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
             }
@@ -587,8 +676,14 @@ export class Widget_Label extends Rect_Mesh {
 }
 
 
-function Section_on_move_clbk(params) {
+function Label_on_move_clbk(params) {
 
+    /**
+     * Because the label is guaranteed not to have any children,
+     * the only reason to have a move function is for moving 
+     * the label alone.
+     * So there is no need to move the root widget via the uniform wposition 
+     */
     const mesh = params.params;
 
     if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
@@ -601,99 +696,19 @@ function Section_on_move_clbk(params) {
     }
 
 
-    const mouse_pos = MouseGetPosDif();
-    if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
+    const mouse_dif = MouseGetPosDif();
+    if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
 
-    // Widget_root_gfx_add_unif_wpos_per_vb(mesh.root_bufferidx, [mouse_pos.x, -mouse_pos.y]);
+    if (Mesh_unif_is_vb_root_wpos(mesh.root_posidx, mesh.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+        Mesh_unif_add_vb_root_wpos(mesh.root_posidx, mouse_dif.x, -mouse_dif.y);
+    }
+    else { // Else update the label alone 
 
-    mesh.SetUpdateFrameBuffer();
+        mesh.geom.MoveXY(mouse_dif.x, -mouse_dif.y, mesh.gfx);
+        mesh.text_mesh.geom.MoveXY(mouse_dif.x, -mouse_dif.y, mesh.text_mesh.gfx);
+    }
+
+
+    // mesh.SetUpdateFrameBuffer();
 }
 
-
-/** This is just to have a class named specific for menus text, like the popup menu,
- *  so that we only use this kind of class for all menus with text.
- */
-export class Widget_Label_Text_Mesh_Menu_Options extends Widget_Label {
-
-    constructor(text, Align, pos, fontSize, col, textCol, scale, pad, bold, font, style) {
-
-        super(text, Align, pos, fontSize, col, textCol, scale, pad, bold, font, style)
-        this.type |= MESH_TYPE.WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS;
-    }
-
-
-
-
-
-
-
-    /****************************************************************************************************************************************************/
-    /****************************************************************************************************************************************************/
-    // INHERITED METHODS
-    /****************************************************************************************************************************************************/
-
-
-    SetGfxEnableAttributes(which, params) {
-        alert('777\nSetGfxEnableAttributes\nWidgetSlider')
-    }
-
-
-    SetPos(pos) {
-        super.SetPos(pos)
-    }
-
-
-
-
-
-    /*******************************************************************************************************************************************************/
-    // Listeners
-    /*******************************************************************************************************************************************************/
-
-    OnClick(params) {
-
-        const mesh = Mesh_buffer_get_mesh_byidx(params.meshidx);
-        const point = MouseGetPos();
-        const m = mesh.geom;
-
-        // console.log('click')
-        // TODO: Isn't the mesh already been checked for collision??????
-        if (Check_intersection_point_rect(m.pos, m.dim, point, [0, 0])) {
-
-            console.log('Button Clicked! ', mesh.GetName())
-            STATE.mesh.SetClicked(mesh);
-
-            /** For popup menu options and slider connections.
-             *  If the option is clicked, then we must call the slider connect function
-             */
-            if (params.evt_params) {
-
-                const evt_params = {
-
-                    targetBindingFunctions: params.evt_params.targetBindingFunctions,
-                    self_mesh: params.evt_params.clicked_mesh,
-                    target_mesh: params.evt_params.target_mesh,
-                    event_type: params.event_type,
-                    /*FOR DEBUG*/clicked_mesh: mesh,
-                }
-                const EventClbk = params.evt_params.EventClbk;
-                EventClbk(evt_params);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-
-
-
-
-
-    /****************************************************************************************************************************************************/
-    /****************************************************************************************************************************************************/
-    // UNIQUE METHODS
-    /****************************************************************************************************************************************************/
-
-}

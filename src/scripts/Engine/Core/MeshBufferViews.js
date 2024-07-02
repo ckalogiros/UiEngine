@@ -472,10 +472,10 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
    // Get the root mesh
    const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
    const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
-   Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2)
-   if(do_reconstruct_listeners) 
-   mesh.ConstructListeners(parent_events); 
-   const delta = Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2)
+   // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2)
+   // if(do_reconstruct_listeners) 
+   // mesh.ConstructListeners(parent_events); 
+   // const delta = Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2)
    // if(do_reconstruct_listeners) mesh.ConstructListeners(); 
 
 }

@@ -5,7 +5,7 @@ import { MouseGetPos, MouseGetPosDif, MouseGetPosDifY } from "../../Controls/Inp
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Vertex_buffer_group_get_byidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Widget_root_add_mesh, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_gfx_add_unif_wpos_per_vb, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { BLUEL, GREY } from "../Material/Base/Colors.js";
@@ -13,8 +13,8 @@ import { View_render_from_view_all_buffers, View_rerender_from_view_all_buffers,
 import { Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Find_parent_listen_event } from "../Operations/Recursions.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
-import { Mesh_unif_add_vb_root_wpos, Mesh_unif_add_vb_root_wpos_all_siblings, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wpos_all_siblings, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
-import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
+import { Mesh_unif_add_vb_root_wpos, Mesh_unif_add_vb_root_wpos_all_siblings, Mesh_unif_add_vb_root_wposy, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wpos_all_siblings, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
+import { Listener_assign_parent_event, Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 
 
 
@@ -62,7 +62,7 @@ export class Widget_Scroller extends Section {
 
 
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-      this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
 
       this.type |= MESH_TYPE.WIDGET_SCROLLER;
@@ -133,7 +133,7 @@ export class Widget_Scroller extends Section {
       handle.SetStyle([0, 3, 1.6]);
       handle.SetName(`Scroll handle[${this.mesh_bufferidx}]`);
       handle.StylesSetMargin(marg);
-      handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      // handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       handle.StylesSetPad([3, 3]);
 
       handle.geom.pos[0] = bar.geom.pos[0];
@@ -158,9 +158,9 @@ export class Widget_Scroller extends Section {
 
       this.SetName(`Scroller[${this.mesh_bufferidx}]`);
 
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      bar.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      // this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+      // bar.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+      // handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
 
    }
@@ -264,17 +264,36 @@ export class Widget_Scroller extends Section {
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-      
-      // Call for each root mesh in every vertex buffer
-      Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
 
+      /**
+       * # UNIF PARAMS UPDATE ISSUE
+       * 
+       * Only for 'u_wposxy' uniform.
+       * 
+       * We want to create the link between the unif wpos of all the vertex buffers the scroller widget uses
+       * with the uniforms callback parameter which is the 'root_posidx'.
+       * 
+       * // IMPORTANT:
+       * The 'GfxUniformsSetClbk()' should be a generic function, handling all uniform connections.
+       * The problem is with the need to pass different parameters for the update uniforms callback function, 
+       * when a widget root uses more than on vertex buffers to render all of its meshes.
+       * The solution for setting the parameters for the uniform 'u_wposxy' is implemented below.
+       * The question then becomes what happens if we need to update other uniforms in the smae way????
+       * 
+       * // FIXME: We need to reimplement the whole concept of the parameters of the uniform callback update
+       */
+      if (unif_name === 'u_wposxy') {
 
-      // this.scroll_bar.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+         // Call for each root mesh in every vertex buffer
+         const root_meshes = Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
+         const len = root_meshes.length;
+         for (let i = 1; i < len; i++) {
 
-      // const handle = this.scroll_bar.children.buffer[0];
-      // handle.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+            const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
+            root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
 
-      // this.scrolled_section.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+         }
+      }
 
    }
 
@@ -430,92 +449,186 @@ export class Widget_Scroller extends Section {
    // Listeners
    /*******************************************************************************************************************************************************/
 
-   ConstructListeners(parent_listeners = null) {
+   // ConstructListeners(parent_listeners = null) {
 
-      const scroller = this;
+   //    const scroller = this;
+   //    const bar = this.scroll_bar;
+   //    const handle = bar.children.buffer[0];
+   //    const scrolled_section = this.scrolled_section;
+
+   //    for (let i = 0; i <= scroller.listeners.boundary; i++) {
+
+   //       if (scroller.listeners.buffer[i] !== null && scroller.listeners.buffer[i] !== INT_NULL) {
+
+   //          // If it is FAKE event OR hover event, does not need any Clbk and params
+   //          if (scroller.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
+
+   //             scroller.AddListenEvent(i, null, null, scroller.listeners.buffer[i]);
+   //             bar.AddListenEvent(i, null, null, scroller.listeners.buffer[i]);
+   //             handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
+   //          }
+   //          else { // Else construct with Clbk and params
+
+   //             const params = {
+   //                EventClbk: null, targetBindingFunctions: null,
+   //                target_mesh: scroller, params: null,
+   //             }
+
+   //             // CAUTION: We run for i:Hover and click, but the callback is always 'this.OnClick'. For Hover callback, check the event type and pass the apropriate callback.
+   //             scroller.AddListenEvent(i, scroller.OnClick, params, scroller.listeners.buffer[i]);
+   //          }
+
+   //          const params = {
+   //             EventClbk: null, targetBindingFunctions: null,
+   //             target_mesh: scroller, params: null,
+   //          }
+   //          bar.AddListenEvent(i, scroller.OnClick, params, scroller.listeners.buffer[i]);
+   //          handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
+   //       }
+   //       else { // Handle any FAKE listen event creation for scroller
+
+
+   //          if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+   //             parent_listeners = [null, null];
+   //          }
+
+   //          if (parent_listeners[i] === null || parent_listeners[i] === INT_NULL) {
+   //             parent_listeners[i] = Find_parent_listen_event(i, scroller);
+   //          }
+
+   //          if (scroller.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
+
+   //             scroller.AddListenEvent(i, null, null, parent_listeners[i]);
+   //             // bar.AddListenEvent(i, null, null, scroller.listeners.buffer[i]);
+   //             handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
+   //          }
+   //          else { // Else construct with Clbk and params
+
+   //             const params = {
+   //                EventClbk: null, targetBindingFunctions: null,
+   //                target_mesh: scroller, params: null,
+   //             }
+
+   //             // CAUTION: We run for i:Hover and click, but the callback is always 'this.OnClick'. For Hover callback, check the event type and pass the apropriate callback.
+   //             scroller.AddListenEvent(i, scroller.OnClick, params, parent_listeners[i]);
+   //             bar.AddListenEvent(i, scroller.OnClick, params, scroller.listeners.buffer[i]);
+   //             // handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
+   //          }
+
+   //          const params = {
+   //             EventClbk: null, targetBindingFunctions: null,
+   //             target_mesh: scroller, params: null,
+   //          }
+
+   //          // bar.AddListenEvent(i, scroller.OnClick, params, scroller.listeners.buffer[i]);
+   //          // handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
+
+   //       }
+
+   //    }
+
+   //    const parent_events = [scroller.listeners.buffer[0], scroller.listeners.buffer[1]];
+   //    // HACK: We create all event listeners for scrolled section, so that on scrolling, any children events will be removed from the scrolled section parent event 
+   //    scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
+   //    scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
+   //    scrolled_section.ConstructListeners(parent_events);
+
+   // }
+
+
+   ListenEventCreate(etype) {
+
+      const etypeidx = Listen_event_get_idx_from_type(etype);
+      const mesh = this;
       const bar = this.scroll_bar;
-      const handle = bar.children.buffer[0];
+      // const handle = bar.children.buffer[0];
       const scrolled_section = this.scrolled_section;
 
-      for (let i = 0; i <= scroller.listeners.boundary; i++) {
 
-         if (scroller.listeners.buffer[i] !== null && scroller.listeners.buffer[i] !== INT_NULL) {
+      // For Hover events we need no callback and params
+      if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
-            // If it is FAKE event OR hover event, does not need any Clbk and params
-            if (scroller.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
-
-               scroller.AddListenEvent(i, null, null, scroller.listeners.buffer[i]);
-               bar.AddListenEvent(i, null, null, scroller.listeners.buffer[i]);
-               handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
-            }
-            else { // Else construct with Clbk and params
-
-               const params = {
-                  EventClbk: null, targetBindingFunctions: null,
-                  target_mesh: scroller, params: null,
-               }
-
-               // CAUTION: We run for i:Hover and click, but the callback is always 'this.OnClick'. For Hover callback, check the event type and pass the apropriate callback.
-               scroller.AddListenEvent(i, scroller.OnClick, params, scroller.listeners.buffer[i]);
-            }
-
-            const params = {
-               EventClbk: null, targetBindingFunctions: null,
-               target_mesh: scroller, params: null,
-            }
-            bar.AddListenEvent(i, scroller.OnClick, params, scroller.listeners.buffer[i]);
-            handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
+         mesh.CreateListenEvent(etype);
+         bar.CreateListenEvent(etype);
+         if (mesh.state.mask & MESH_STATE.ACTIVE) {
+            mesh.AddListenEvent(etypeidx, null, null);
+            bar.AddListenEvent(etypeidx, null, null);
+            scrolled_section.AddListenEvent(etypeidx, null, null);
          }
-         else { // Handle any FAKE listen event creation for scroller
-
-
-            if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-               parent_listeners = [null, null];
-            }
-
-            if (parent_listeners[i] === null || parent_listeners[i] === INT_NULL) {
-               parent_listeners[i] = Find_parent_listen_event(i, scroller);
-            }
-
-            if (scroller.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
-
-               scroller.AddListenEvent(i, null, null, parent_listeners[i]);
-               // bar.AddListenEvent(i, null, null, scroller.listeners.buffer[i]);
-               handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
-            }
-            else { // Else construct with Clbk and params
-
-               const params = {
-                  EventClbk: null, targetBindingFunctions: null,
-                  target_mesh: scroller, params: null,
-               }
-
-               // CAUTION: We run for i:Hover and click, but the callback is always 'this.OnClick'. For Hover callback, check the event type and pass the apropriate callback.
-               scroller.AddListenEvent(i, scroller.OnClick, params, parent_listeners[i]);
-               bar.AddListenEvent(i, scroller.OnClick, params, scroller.listeners.buffer[i]);
-               // handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
-            }
-
-            const params = {
-               EventClbk: null, targetBindingFunctions: null,
-               target_mesh: scroller, params: null,
-            }
-
-            // bar.AddListenEvent(i, scroller.OnClick, params, scroller.listeners.buffer[i]);
-            // handle.AddListenEvent(i, null, null, bar.listeners.buffer[i])
-
-         }
-
       }
+      else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
 
-      const parent_events = [scroller.listeners.buffer[0], scroller.listeners.buffer[1]];
-      // HACK: We create all event listeners for scrolled section, so that on scrolling, any children events will be removed from the scrolled section parent event 
-      scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
-      scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
-      scrolled_section.ConstructListeners(parent_events);
+         const evt_params = { target_mesh: mesh, };
+         mesh.CreateListenEvent(etype);
+         bar.CreateListenEvent(etype);
+         if (mesh.state.mask & MESH_STATE.ACTIVE) {
+            mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+            bar.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+            scrolled_section.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+         }
+      }
 
    }
 
+   ListenEventCreateAndAdd(parent_events = null) {
+
+      const mesh = this;
+      const bar = this.scroll_bar;
+      // const handle = bar.children.buffer[0];
+      const scrolled_section = this.scrolled_section;
+
+
+      if (!mesh.listeners)
+         return; // Return if there are no listen events to add
+      // alert('228867 \nMust CreateListenEvent() first for dropdown mesh:.', mesh.GetName);
+      if (parent_events === null)
+         alert('228868 \nParent event must be a valid event index.', mesh.GetName);
+
+
+
+
+      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+
+         if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
+
+         const etype = Listen_event_types_get_type_from_index(etypeidx);
+
+         /***********************************************************************************************************************/
+         // Create for dropdown button
+         const dp_evt = mesh.listeners.buffer[etypeidx];
+         if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
+
+            // For Hover events we need no callback and params
+            if (etype & LISTEN_EVENT_TYPES.HOVER) {
+               mesh.AddListenEvent(etypeidx, null, null);
+            }
+            else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+               const evt_params = { target_mesh: mesh, };
+               mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+            }
+
+            if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
+
+               const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
+
+               if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
+               else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
+            }
+            else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
+
+         }
+      }
+
+
+      for (let i = 0; i <= scrolled_section.children.boundary; i++) {
+
+         const child = scrolled_section.children.buffer[i];
+         if (mesh.listeners) child.ListenEventCreateAndAdd(scrolled_section.listeners.buffer);
+         // If the parent mesh does not have any events, we force to continue the recursions in case other children  down the tree have any events
+         else child.ListenEventCreateAndAdd([INT_NULL, INT_NULL]);
+      }
+   }
 
    OnClick(params) {
 
@@ -640,7 +753,8 @@ export class Widget_Scroller extends Section {
       let changes_hapened = false;
 
 
-
+      /*********************************************************************************************************/
+      // 
       if (mouse_pos[0] > min_sizex) {
 
          const sizex = (mouse_pos[0] - pos[0]) / 2;
@@ -664,6 +778,8 @@ export class Widget_Scroller extends Section {
          changes_hapened = true;
       }
 
+      /*********************************************************************************************************/
+      // Calculate the handles size in dependance with the resized scroller
       if (mouse_pos[1] > min_sizey) {
 
          const sizey = (mouse_pos[1] - pos[1]) / 2;
@@ -681,8 +797,10 @@ export class Widget_Scroller extends Section {
          const clean_size = scroller.geom.dim[1] - pad[1];
          const a = (clean_size * clean_size) / scroller.scrolled_section.geom.dim[1];
 
-         if (a < bar.geom.dim[1]) handle.geom.dim[1] = a - handle_pad * 2;
-         else handle.geom.dim[1] = clean_bar_height - handle_pad * 2;
+
+         if (a < bar.geom.dim[1]) handle.geom.dim[1] = a - handle_pad;
+         else handle.geom.dim[1] = clean_bar_height - handle_pad;
+
 
          const handle_bot = handle.geom.pos[1] + handle.geom.dim[1] * 2
 
@@ -692,18 +810,37 @@ export class Widget_Scroller extends Section {
          const c = ((scroller.scrolled_section.geom.dim[1] * 2) + space) / cc;
          const e = ((scroller.geom.dim[1]) * 2) / c;
 
-         // handle.geom.pos[1] = -e;
-         if (handle.geom.pos[1] - e <= pad[1] + handle_pad) handle.geom.pos[1] = pad[1] + handle_pad;
-         else if (handle_bot >= bar.geom.dim[1] * 2 - handle_pad) handle.geom.pos[1] = bar.geom.dim[1] * 2 - handle.geom.dim[1] * 2 + handle_pad * 2;
+         // if (handle.geom.pos[1] - e <= pad[1] + handle_pad) {
+         //    handle.geom.pos[1] = scroller.geom.pos[1] + pad[1] + handle_pad;
+         //    console.log('909090909')
+         // }
+         // else 
+         if (handle.geom.pos[1] <= bar.geom.pos[1] + pad[1] + handle_pad) {
+            handle.geom.pos[1] = scroller.geom.pos[1] + pad[1] + handle_pad;
+         }
+         else if (handle_bot >= bar.geom.pos[1] + bar.geom.dim[1] * 2 - handle_pad) {
+            handle.geom.pos[1] = scroller.geom.pos[1] + (bar.geom.dim[1] * 2) - (handle.geom.dim[1] * 2) + handle_pad;
+         }
 
-         // console.log(handle.geom.dim)
-         // OLD
-         {
-            // Calculate handle dimention to the ratio of the scroller/scrolled_section
-            // const ratio = scroller.geom.dim[1] / scroller.scrolled_section.geom.dim[1];
-            // const h = (ratio * scroller.geom.dim[1] >= scroller.geom.dim[1]) ? bar.geom.dim[1] - handle.StylesGetMargin(STYLES.AXIS.Y) : ratio * scroller.geom.dim[1];
-            // handle.geom.dim[1] = h;
-            // handle.SetDim([UNCHANGED, h]);
+
+         { // Move scrolled section
+            const val = Scroller_calculate_value(bar, handle); // Calculate slider's value based on the handles position.
+
+            const scrolled_section = scroller.scrolled_section;
+            const scroller_top = scroller.GetPosY();
+            const scrolled_posy = scrolled_section.GetPosY() + scrolled_section.geom.dim[1];
+
+
+            // Calculate the ratio of the scrolled section height to that of the scrollers
+            const move_ratio = ((scrolled_section.geom.dim[1] * 2) - ((scroller.geom.dim[1] * 2)));
+
+            // Calculate the absolute position for the scrolled mesh. (Can't use the scolled_section's pos because it changes).
+            const posy = (move_ratio * -val) + scroller_top + scrolled_section.geom.dim[1];
+            const ydif = posy - scrolled_posy;
+
+
+            // Add the move difference to all vb's root positions.
+            Mesh_unif_add_vb_root_wposy(scrolled_section.root_posidx, ydif);
          }
 
 
@@ -713,7 +850,7 @@ export class Widget_Scroller extends Section {
 
 
       if (changes_hapened) {
-
+         console.warn('The Resize of the scroller is reseting all meshes from the root. \nMake sure the root is the scroller, OR else find a solution in rerendering only the scroller mesh.')
          // View_reset_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0]);
          Widget_root_reset_gfx(scroller.root_bufferidx)
 
@@ -743,7 +880,7 @@ export class Widget_Scroller extends Section {
       if (x === 0 && y === 0) return;
 
       // HERE: We need a way to get the unif idx by name: 'u_wposxy' 
-      Mesh_unif_add_vb_root_wpos(this.root_posidx, [x, y]);
+      Mesh_unif_add_vb_root_wpos(this.root_posidx, x, y);
 
    }
 
@@ -756,7 +893,7 @@ export class Widget_Scroller extends Section {
       this.scroll_bar.geom.pos[0] += x;
       this.scroll_bar.geom.pos[1] += y;
 
-      const handle = bar.children.buffer[0];
+      const handle = this.scroll_bar.children.buffer[0];
       handle.geom.pos[0] += x;
       handle.geom.pos[1] += y;
 
@@ -826,11 +963,6 @@ export class Widget_Scroller extends Section {
       else { // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update them as offsets 
 
          this.geom.pos[0] = x;
-         this.scroll_bar.geom.pos[0] = x;
-         const handle = this.scroll_bar.children.buffer[0];
-         handle.geom.pos[0] = x;
-         this.scrolled_section.SetPosXNoGfxUpdate(x);
-
       }
    }
 
@@ -843,10 +975,10 @@ export class Widget_Scroller extends Section {
       else { // Else if the root pos is in another higher level mesh, then we have an offset in both 'this' and this.children, and must update them as offsets 
 
          this.geom.pos[1] = y;
-         this.scroll_bar.geom.pos[1] = y;
-         const handle = this.scroll_bar.children.buffer[0];
-         handle.geom.pos[1] = y;
-         this.scrolled_section.SetPosYNoGfxUpdate(y);
+         // this.scroll_bar.geom.pos[1] = y;
+         // const handle = this.scroll_bar.children.buffer[0];
+         // handle.geom.pos[1] = y;
+         // this.scrolled_section.SetPosYNoGfxUpdate(y);
 
       }
    }
@@ -854,14 +986,25 @@ export class Widget_Scroller extends Section {
 
    TEMP_recalc(x, y) {
 
-      console.error('IMPLEMENT\nTEMP_recalc()\nWidget Scroller')
+      // const dx = this.geom.pos[0] - ;
+      // const dy = this.geom.pos[1] - ;
+      this.geom.pos[0] = x;
+      this.geom.pos[1] = y;
 
-      // const dx = this.text_mesh.geom.pos[0]-this.geom.pos[0];
-      // const dy = this.text_mesh.geom.pos[1]-this.geom.pos[1];
-      // this.geom.pos[0] = x;
-      // this.geom.pos[1] = y;
-      // this.text_mesh.geom.pos[0] = x+dx;
-      // this.text_mesh.geom.pos[1] = y+dy;
+
+      // this.scroll_bar.geom.pos[0] = x;
+      // this.scroll_bar.geom.pos[1] = y;
+
+      const handle = this.scroll_bar.children.buffer[0];
+      // handle.geom.pos[0] = x;
+      // handle.geom.pos[1] = y;
+
+      // this.scrolled_section.SetPosYNoGfxUpdate(x);
+      // this.scrolled_section.SetPosYNoGfxUpdate(y);
+
+      this.ScrollerAlign()
+      // this.ScrollerAlignBar()
+
    }
 
 
@@ -958,13 +1101,16 @@ export class Widget_Scroller extends Section {
 
       const size = scoller_marg;
 
-      this.scrolled_section.SetPosXYNoGfxUpdate(size[0], size[1]);
+      // this.scrolled_section.SetPosXYNoGfxUpdate(size[0], size[1]);
+      this.scrolled_section.SetPosXYNoGfxUpdate(this.geom.pos[0] + scoller_marg[0], this.geom.pos[1] + scoller_marg[1]);
 
       const bar = this.scroll_bar;
       const handle = bar.children.buffer[0];
 
-      this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_marg[0] + size[0]; // + bar.StylesGetPad(STYLES.AXIS.X)*2
+      // this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_marg[0] + size[0]; // + bar.StylesGetPad(STYLES.AXIS.X)*2
       bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) - (scoller_marg[0] * 2 + bar.geom.dim[0] + handle.StylesGetPad(STYLES.AXIS.X))
+      bar.geom.pos[1] = (this.geom.pos[1] + scoller_marg[0])
+      // bar.geom.pos[1] = (this.geom.pos[1] + this.geom.dim[0] * 2) - (scoller_marg[0] * 2 + bar.geom.dim[0] + handle.StylesGetPad(STYLES.AXIS.X))
 
       // Calculate handle dimention to the ratio of the scroller/scrolled_section
       const ratio = this.geom.dim[1] / this.scrolled_section.geom.dim[1];
@@ -972,7 +1118,32 @@ export class Widget_Scroller extends Section {
       handle.geom.dim[1] = h;
       const handle_pad = handle.StylesGetPad();
       handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
+      // handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
       handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
+
+
+   }
+
+
+   ScrollerAlignBar() {
+
+      const scoller_pad = this.StylesGetPad();
+      const bar = this.scroll_bar;
+      const handle = bar.children.buffer[0];
+
+      // this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_pad[0] + size[0]; // + bar.StylesGetPad(STYLES.AXIS.X)*2
+      console.log('1', bar.geom.pos[0])
+      bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) - (scoller_pad[0] * 2 + bar.geom.dim[0] + handle.StylesGetPad(STYLES.AXIS.X))
+      console.log('2', bar.geom.pos[0])
+      // console.log(this.geom.pos[0], this.geom.dim[0])
+
+      // Calculate handle dimention to the ratio of the scroller/scrolled_section
+      // const ratio = this.geom.dim[1] / this.scrolled_section.geom.dim[1];
+      // const h = (ratio * this.geom.dim[1] >= this.geom.dim[1]) ? bar.geom.dim[1] - handle.StylesGetPad(STYLES.AXIS.Y) : ratio * this.geom.dim[1];
+      // handle.geom.dim[1] = h;
+      // const handle_pad = handle.StylesGetPad();
+      // handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0]*2;
+      // handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
 
 
    }
@@ -1051,9 +1222,8 @@ export function Scroller_on_update_handle(_params) {
    const scroller_top = scroller.GetPosY();
    const scrolled_posy = scrolled_section.GetPosY() + scrolled_section.geom.dim[1];
 
-   // Calculate height of handle
-   const ratio = scroller.geom.dim[1] / scrolled_section.geom.dim[1];
 
+   // Calculate the ratio of the scrolled section height to that of the scrollers
    const move_ratio = ((scrolled_section.geom.dim[1] * 2) - ((scroller.geom.dim[1] * 2)));
 
    // Calculate the absolute position for the scrolled mesh. (Can't use the scolled_section's pos because it changes).
@@ -1062,41 +1232,29 @@ export function Scroller_on_update_handle(_params) {
 
 
    // Add the move difference to all vb's root positions.
-   // Widget_root_gfx_add_unif_wpos_per_vb(scroller.root_bufferidx, [0, ydif]);
-   // Widget_root_gfx_add_unif_wpos_per_vb(scrolled_section.root_posidx, [0, ydif]);
-   // Mesh_unif_add_vb_root_wpos_all_siblings(scrolled_section.root_posidx, 0, ydif);
-   Mesh_unif_add_vb_root_wpos(scrolled_section.root_posidx, [0, ydif]);
+   Mesh_unif_add_vb_root_wposy(scrolled_section.root_posidx, ydif);
 
-   // const clip_top = scroller_top, clip_bottom = (scroller_top) + scroller.geom.dim[1] * 2;
-   const clip_top = scroller_top,
-      clip_bottom = (scroller_top) + scroller.geom.dim[1] * 2;
 
-   // const changes_hapened = Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
+   const clip_top = scroller_top, clip_bottom = (scroller_top) + scroller.geom.dim[1] * 2;
    const changes_hapened = Clipy_from_tree_recursive(scrolled_section, clip_top, clip_bottom);
 
-   /**
-    * HERE: // IMIDIATELY
-    *   CAN WE SKIP RE-RENDER, BASED ON THE FACT THAT WE HAVE OFFSET POSITIONS FOR THE SCROLLED MOVE????
-    * UPDATE ONLY THE SCROLL HANDLE
-   */
-   // if (changes_hapened) 
-   {
 
-      // View_reset_from_view_all_buffers(scrolled_section.group_bufferidxs[0]);
-      Widget_root_reset_gfx(scroller.root_bufferidx);
+   View_reset_from_view_all_buffers(scrolled_section.group_bufferidxs[0]);
+   // Widget_root_reset_gfx(scroller.root_bufferidx);
 
 
-      // Remove all listen events. To rebuild from scratch all items listen events after the clip
-      for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
-         if (scrolled_section.listeners.buffer[i] !== null && scrolled_section.listeners.buffer[i] !== INT_NULL) {
-            // Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i])
-            // scrolled_section.listeners.buffer[i] = INT_NULL;
-         }
-      }
+   // Remove all listen events. To rebuild from scratch all items listen events after the clip
+   // for (let i = 0; i <= scrolled_section.listeners.boundary; i++) {
+   //    if (scrolled_section.listeners.buffer[i] !== null && scrolled_section.listeners.buffer[i] !== INT_NULL) {
+   //       // Listener_remove_event_by_idx(i, scrolled_section.listeners.buffer[i])
+   //       // scrolled_section.listeners.buffer[i] = INT_NULL;
+   //    }
+   // }
 
-      // View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
-      Widget_root_rerender(scroller.root_bufferidx);
-   }
+   View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
+   // Widget_root_rerender(scroller.root_bufferidx);
+
+
 
    /**FOR FRAMEBUFFER. DO NOT DELETE */
    // if(scrolled_section.isFramebufferRendered !== INT_NULL){

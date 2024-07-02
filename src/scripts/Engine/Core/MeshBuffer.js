@@ -262,8 +262,8 @@ export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
    }
 
 
-   // if(NOTIFICATIONS_ON) 
-   //    Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, vbidx);
+   if(NOTIFICATIONS_ON) 
+      Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, vb_groupidx);
 
 }
 
@@ -818,7 +818,7 @@ export function Widget_root_gfx_add_unif_wpos_per_vb(root_bufferidx, dif) {
       const vb_groupidx = root_vb_groupidxs.buffer[i];
       // TODO: A way of not change the root's wpos, but all its children. FIX it. (For scroller maybe we should call a View function that updates the unif pos of the scrolled meshes only) 
       if (vb_groupidx !== root_mesh.gfx.vb.groupidx) {
-         Mesh_unif_add_vb_root_wpos(vb_groupidx, dif); 
+         Mesh_unif_add_vb_root_wpos(vb_groupidx, dif[0], dif[1]); 
       }
    }
    
@@ -1025,16 +1025,21 @@ export function Widget_root_set_uniform_callback_per_gfx_root_mesh(root_bufferid
 
    // IMPORTANT : If a slider, which we want to cascade set the unif clbk belongs to a mesh that is the widget root, 
    // then it is not only the slider that are going to be effected rather all the meshes that belong to the widget root.
+
+   // SEE: # UNIF PARAMS UPDATE ISSUE
    
    // Call for each root mesh in every vertex buffer
    const root_meshes= Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx);
-   const len = root_meshes.length;
-   for(let i=1; i < len; i++){
+   // const len = root_meshes.length;
+   // for(let i=1; i < len; i++){
 
-      const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
-      root_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+   //    const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
+   //    // root_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+   //    root_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-   }
+   // }
+
+   return root_meshes;
 }
 export function Widget_root_set_render_queue_flags(root_bufferidx, flags) {
 

@@ -85,6 +85,7 @@ export class Text_Mesh extends Mesh {
       // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy
       // if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary + 1)
       //    this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary + 1;
+      // TODO: I think now we can get rid of 'temp_max_chars_inserted_in_gfx', if we manage to implement correctly the size of the inserted text vertices
       if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.size + 1)
          this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.size;
 
@@ -103,7 +104,6 @@ export class Text_Mesh extends Mesh {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxText)
       this.#TEMP();
-      // this.#TEMP_re_add();
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxText)
 
       // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
@@ -113,8 +113,6 @@ export class Text_Mesh extends Mesh {
 
       this.is_gfx_inserted = true;
 
-      // Add entry to Gfx Buffer
-      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
    }
 

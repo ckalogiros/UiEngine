@@ -172,7 +172,7 @@ export class Mesh {
         this.parent = null;
 
         this.listeners = null;
-        this.parent_event_idx = INT_NULL; // An index to the Listeners Buffer Struct. In many cases the parent event is not the mesh's parent, to avoid any annecessary listen events creation.
+        // this.parent_event_idx = INT_NULL; // An index to the Listeners Buffer Struct. In many cases the parent event is not the mesh's parent, to avoid any annecessary listen events creation.
 
         // this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
         this.eventCallbacks = null;
@@ -419,15 +419,14 @@ export class Mesh {
 
 
     // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
-    AddListenEvent(etypeidx, Clbk = null, params = null, parent_event_idx = null) {
+    AddListenEvent(etypeidx, Clbk = null, params = null) {
 
         if (this.listeners.buffer[etypeidx] !== INT_NULL) return;
+        if((this.state.mask & MESH_STATE.ACTIVE)===0x0) alert('0198815 \nMesh is INACTIVE to add a listen event')
 
-        if (this.state.mask & MESH_STATE.ACTIVE) { // HERE: see if can remove check
 
-            this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, parent_event_idx);
-            this.parent_event_idx = (parent_event_idx) ? parent_event_idx : INT_NULL;
-        }
+        const is_fake = (this.state.mask & MESH_STATE.IS_FAKE_EVENT) ? true : false;
+        this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, is_fake);
     }
 
 

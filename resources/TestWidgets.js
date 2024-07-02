@@ -24,7 +24,6 @@ import { Index_buffer_info_create } from '../Graphics/Buffers/IndexBuffers.js';
 // import { getFile } from '../Engine/Core/FileSystem.js';
 import { New_generic_buffer } from '../Engine/Core/Buffers.js';
 import { MouseGetPos } from '../Engine/Controls/Input/Mouse.js';
-import { Listener_set_root_mesh_priority } from '../Engine/Events/EventListeners.js';
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp, Relative_pos_comp_recalc_all } from '../Engine/Drawables/Operations/RelativePosComponent.js';
 import { Particle_system_create_emitter, Particle_system_emitt } from '../Engine/ParticlesSystem/NewParticlesSystem.js';
 import { Set_color_rgb } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
@@ -421,9 +420,6 @@ export function TestWidgetsGeneric(scene) {
     // Renderqueue_set_priority_by_program(FIRST, 0, 1)
 
 
-
-    // UNNECESSARY: the order should be set for the listeners and not for the renderqueue
-    // Listener_set_root_mesh_priority()
 
 
 }

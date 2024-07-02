@@ -206,6 +206,12 @@ export class Widget_Menu_Bar extends Section {
 
    }
 
+   
+   AddListeners() {
+
+      super.AddListeners();
+
+   }
 
    // Resize menu bar. Keep the menu elements to their relative positions 
    Resize(x) {

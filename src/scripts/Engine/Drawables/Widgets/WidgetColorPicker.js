@@ -4,7 +4,7 @@ import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_ver
 import { CopyArr3, CopyArr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse";
 import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_widget_slider_simple } from "../../Core/CreateWidget";
-import { Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals";
@@ -23,7 +23,6 @@ let temp_hue_pick_idx = INT_NULL;
 let temp_color_pick_idx = INT_NULL;
 let temp_color_present_idx = INT_NULL;
 let temp_tran_slider_idx = INT_NULL;
-let temp_slider_idx = INT_NULL;
 
 
 
@@ -47,7 +46,7 @@ export class Widget_Color_Picker extends Section {
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+      // this.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
 
 
       this.label_r = null;
@@ -79,7 +78,7 @@ export class Widget_Color_Picker extends Section {
       const color_pick = Create_rect_mesh(_, [20, 20, 2], [150, 150], [BLACK, WHITE,BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
       color_pick.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      // color_pick.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
 
       color_pick.state.mask &= ~MESH_STATE.ACTIVE;
       temp_color_pick_idx = panel.AddItem(color_pick);
@@ -186,17 +185,17 @@ export class Widget_Color_Picker extends Section {
       slider_tran.SetStyle([0, 6, 2]);
       slider_tran.StylesSetMargin([10, 0]);
 
-      const clbk_params_transparency_slider = {
-         src_mesh: this,
-         slider_tran: slider_tran,
-         color_pick_mesh: color_pick,
-         color_present_mesh: color_present,
-         target_mesh: null,
-      }
-      // Slider_connect(slider, ()=>{console.log('HI FROM SLIDER CONNECT CLBK');}, null)
-      slider_tran.SetInitialValue(100);
-      Slider_simple_connect(slider_tran, this.OnClickTranpsarencyPick, clbk_params_transparency_slider)
       temp_tran_slider_idx = panel.AddItem(slider_tran);
+      // const clbk_params_transparency_slider = {
+      //    src_mesh: this,
+      //    slider_tran: slider_tran,
+      //    color_pick_mesh: color_pick,
+      //    color_present_mesh: color_present,
+      //    target_mesh: null,
+      // }
+      // // Slider_connect(slider, ()=>{console.log('HI FROM SLIDER CONNECT CLBK');}, null)
+      // slider_tran.SetInitialValue(100);
+      // Slider_simple_connect(slider_tran, this.OnClickTranpsarencyPick, clbk_params_transparency_slider)
 
 
 
@@ -224,23 +223,29 @@ export class Widget_Color_Picker extends Section {
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       slider.StylesSetMargin([0, 20]);
       slider.SetStyle(style);
+      temp_hue_pick_idx = this.AddItem(slider);
 
-      const clbk_params = {
-         target_mesh: null,
-         src_mesh: this,
-         slider_mesh: slider,
-         slider_transp_mesh: slider_tran,
-         color_pick_mesh: color_pick,
-         color_present_mesh: color_present,
-      }
+      // const clbk_params = {
+      //    target_mesh: null,
+      //    src_mesh: this,
+      //    slider_mesh: slider,
+      //    slider_transp_mesh: slider_tran,
+      //    color_pick_mesh: color_pick,
+      //    color_present_mesh: color_present,
+      // }
       
       // slider.SetInitialValue(50*vertices_count);
-      slider.SetInitialValue(17);
-      Slider_simple_connect(slider, this.OnClickHuePick, clbk_params);
+      // slider.SetInitialValue(17);
+      // Slider_simple_connect(slider, this.OnClickHuePick, clbk_params);
 
+      console.log(
+         '\ntemp_panel2_idx' , temp_panel2_idx,
+         '\ntemp_hue_pick_idx' , temp_hue_pick_idx,
+         '\ntemp_color_pick_idx' , temp_color_pick_idx,
+         '\ntemp_color_present_idx' , temp_color_present_idx,
+         '\ntemp_tran_slider_idx' , temp_tran_slider_idx,
 
-      temp_slider_idx = this.AddItem(slider);
-
+      );
 
 
 
@@ -314,8 +319,18 @@ export class Widget_Color_Picker extends Section {
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
       
-      // Call for each root mesh in every vertex buffer
-      Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
+      if(unif_name === 'u_wposxy'){
+
+         // Call for each root mesh in every vertex buffer
+         const root_meshes = Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
+         const len = root_meshes.length;
+         for(let i=1; i < len; i++){
+      
+            const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
+            root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
+      
+         }
+      }
 
    }
 
@@ -372,68 +387,88 @@ export class Widget_Color_Picker extends Section {
    // Listeners
    /*******************************************************************************************************************************************************/
 
-   // TODO: THIS IS A BIG MESS
-   ConstructListeners(parent_listeners = null) {
 
-      // super.ConstructListeners()
+   ColorpickerCreateListeners(){
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-
-      for (let i = 0; i <= mesh.listeners.boundary; i++) {
-
-         if (mesh.listeners.buffer[i]) {
-
-            if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-               parent_listeners = [null, null];
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
-            }
-            else if (parent_listeners[i] === null) {
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
-            }
-
-            const evt_params = { // Create the parameters to pass for the switch's click event. 
-               EventClbk: null,
-               targetBindingFunctions: null,
-               target_mesh: this,
-               params: null,
-            };
-
-            mesh.AddListenEvent(i, mesh.OnClick, evt_params, parent_listeners[i]);
-            parent_listeners[i] = mesh.listeners.buffer[i];
-         }
-      }
-
-      const panel = this.children.buffer[0];
-
-      {
-         const color_mesh = panel.children.buffer[temp_color_pick_idx];
+      mesh.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
+      mesh.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+      
+      const parent_listeners = mesh.listeners.buffer;
+      
+      const panel = mesh.children.buffer[0];
+      const panel2 = panel.children.buffer[temp_panel2_idx];
+      const color_pick_mesh = panel.children.buffer[temp_color_pick_idx];
+      const hue_mesh = mesh.children.buffer[temp_hue_pick_idx];
+      const transp_slider_mesh = panel.children.buffer[temp_tran_slider_idx];
+      const color_present_mesh = panel2.children.buffer[temp_color_present_idx];
+      
+      { // Color Pick Panel
+         color_pick_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
          const evt_params = { // Create the parameters to pass for the switch's click event. 
             EventClbk: null,
             targetBindingFunctions: null,
-            target_mesh: this,
+            target_mesh: mesh,
             params: null,
          };
-         color_mesh.AddListenEvent(E.C, mesh.OnClickColorPick, evt_params, parent_listeners[E.C]);
+         color_pick_mesh.AddListenEvent(E.C, mesh.OnClickColorPick, evt_params, parent_listeners[E.C]);
       }
+      
+      { // Hue Slider
 
+         // For the hue slider, we create a click event from the Widget Slider class, so that on slider huue click we run the sliders click event.
+         hue_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+         const evt_params = { // Create the parameters to pass for the switch's click event. 
+            EventClbk: null,
+            targetBindingFunctions: null,
+            target_mesh: hue_mesh,
+            params: null,
+         };
+         hue_mesh.AddListenEvent(E.C, hue_mesh.OnClick, evt_params, parent_listeners[E.C]);
 
-      const hue_mesh = mesh.children.buffer[temp_slider_idx];
-      hue_mesh.ConstructListeners(parent_listeners);
+         /**
+          * Here we set up a connection between the slider and this class 'OnClickHuePick()'.
+          * We create a callback in the sliders 'EventCallback' buffer, so that the slider 
+          * after doing its part of calculation and move, to call this class 
+          * 'OnClickHuePick' function for further proccess.
+          * 
+          */
+         const clbk_params = {
+            target_mesh: null,
+            src_mesh: mesh,
+            slider_mesh: hue_mesh,
+            slider_transp_mesh: transp_slider_mesh,
+            color_pick_mesh: color_pick_mesh,
+            color_present_mesh: color_present_mesh,
+         }
+         hue_mesh.SetInitialValue(17);
+         Slider_simple_connect(hue_mesh, mesh.OnClickHuePick, clbk_params);
+         
+      }
+      
+      { // Tranparency Slider
 
-      const transp_slider_mesh = panel.children.buffer[temp_tran_slider_idx];
-      transp_slider_mesh.ConstructListeners(parent_listeners);
+         // Create the click event on the slider class
+         transp_slider_mesh.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+         const evt_params = { // Create the parameters to pass for the switch's click event. 
+            EventClbk: null,
+            targetBindingFunctions: null,
+            target_mesh: transp_slider_mesh,
+            params: null,
+         };
+         transp_slider_mesh.AddListenEvent(E.C, transp_slider_mesh.OnClick, evt_params, parent_listeners[E.C]);
 
-      {
-         // const hue_mesh = mesh.children.buffer[temp_hue_pick_idx];
-         // const hue_mesh = mesh.children.buffer[temp_slider_idx];
-         // hue_mesh.ConstructListeners(parent_listeners);
-         // const evt_params = { // Create the parameters to pass for the switch's click event. 
-         //    EventClbk: null,
-         //    targetBindingFunctions: null,
-         //    target_mesh: mesh,
-         //    params: null,
-         // };
-         // hue_mesh.AddListenEvent(E.C, mesh.OnClickHuePick, evt_params, parent_listeners[E.C]);
+         // Create the callback that the slider will call to run the local method for transparency slider
+         const clbk_params_transparency_slider = {
+            src_mesh: mesh,
+            slider_tran: transp_slider_mesh,
+            color_pick_mesh: color_pick_mesh,
+            color_present_mesh: color_present_mesh,
+            target_mesh: null,
+         }
+         transp_slider_mesh.SetInitialValue(100);
+         Slider_simple_connect(transp_slider_mesh, mesh.OnClickTranpsarencyPick, clbk_params_transparency_slider)
+
       }
    }
 
@@ -441,48 +476,14 @@ export class Widget_Color_Picker extends Section {
    OnClick(params) {
 
       const widget = params.evt_params.target_mesh;
-      // const hue_mesh = widget.children.buffer[temp_hue_pick_idx];
-      // const color_mesh = widget.children.buffer[temp_color_pick_idx];
 
       console.log('COLOR picker widget', widget.name);
 
-      // TODO: Implement Move and Resize functionality
+      // TODO: Implement Resize functionality
 
       STATE.mesh.SetClicked(widget);
 
       if (widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
-
-         const pos = widget.GetPosXY();
-         // const right = pos[0] + widget.geom.dim[0]*2;
-         // const bottom = pos[1] + widget.geom.dim[1]*2;
-
-         // const point = MouseGetPos();
-         // if (widget.state.mask & MESH_STATE.IS_RESIZEABLE && (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1])) {
-
-         //    // We have Resize
-         //    if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
-         //       // console.log('X Y RESIZE');
-
-         //       const OnResizeFn = widget.OnResize;
-         //       const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, widget);
-         //       widget.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
-         //    }
-         //    else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
-         //       // console.log('X RESIZE');
-         //    }
-         //    else { // Its a height resize
-         //       // console.log('Y RESIZE');
-         //    }
-
-         //    widget.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS;
-         //    STATE.mesh.SetGrabed(widget);
-         //    STATE.mesh.SetFocused(widget);
-         //    Widget_root_set_in_focus(widget.root_bufferidx);
-
-
-         //    return true;
-         // }
-
 
          /** Create Move event.
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
@@ -523,6 +524,7 @@ export class Widget_Color_Picker extends Section {
       const slider = params.clbk_params.slider_mesh;
       const slider_tran = params.clbk_params.slider_transp_mesh;
       const color_pick_mesh = params.clbk_params.color_pick_mesh;
+      const color_present_mesh = params.clbk_params.color_present_mesh;
 
       /**
        * part1 part2  3   4
@@ -583,8 +585,9 @@ export class Widget_Color_Picker extends Section {
       for (let i = 0; i < vertex_count; i++)
          color_pick_mesh.mat.col[i + vidx] = c;
       // Update the vertex buffer
-      if(color_pick_mesh.gfx) Gl_set_rgba_per_vertex_specify_vertex(color_pick_mesh.gfx, c, num_faces, vidx, vertex_count);
-      
+      if(color_pick_mesh.gfx) 
+         Gl_set_rgba_per_vertex_specify_vertex(color_pick_mesh.gfx, c, num_faces, vidx, vertex_count);
+
       
       
       
@@ -593,7 +596,7 @@ export class Widget_Color_Picker extends Section {
       // Calculate the color for the color present panel
       
       // Set the new color picked in the color present panel of the widget
-      const color_present_mesh = params.clbk_params.color_present_mesh;
+   
       
       // Adjust the new hue to the color present panel
       const xx = widget.color_pick_click_pos[0]; // The x coord of the selected area of the color pick panel
@@ -608,8 +611,9 @@ export class Widget_Color_Picker extends Section {
       const alpha = slider_tran.slider_val; // Get the alpha from the transparency slider
       // Contruct the final color
       const final_color = new Float32Array([intensity[0], intensity[1], intensity[2], alpha]);
-      CopyArr4(color_present_mesh.mat.col, final_color);
+      CopyArr4(color_present_mesh.mat.col[3], final_color);
       if(color_present_mesh.gfx) Gl_set_rgba(color_present_mesh.gfx, final_color, color_present_mesh.geom.num_faces);
+
 
 
       
@@ -660,7 +664,7 @@ export class Widget_Color_Picker extends Section {
 
       const widget = params.clbk_params.src_mesh;
       // const panel = widget.children.buffer[0];
-      // const slider_tran = panel.children.buffer[temp_slider_idx];
+      // const slider_tran = panel.children.buffer[???];
       const slider_tran = params.clbk_params.slider_tran;
       const num_faces = slider_tran.geom.num_faces; // Face Index:The first one
       const alphaidx = 3;
@@ -832,7 +836,7 @@ function On_move_clbk(params) {
    const mouse_dif = MouseGetPosDif();
    if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
 
-   Mesh_unif_add_vb_root_wpos(widget.root_posidx, [mouse_dif.x, -mouse_dif.y])
+   Mesh_unif_add_vb_root_wpos(widget.root_posidx, mouse_dif.x, -mouse_dif.y)
 
 }
 

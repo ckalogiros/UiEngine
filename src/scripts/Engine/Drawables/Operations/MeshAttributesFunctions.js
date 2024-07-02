@@ -3,7 +3,7 @@
 
 
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../../../Graphics/Buffers/UniformBuffers.js';
-import { Gl_set_alpha, Gl_set_rgba } from '../../../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
 
 
@@ -47,7 +47,7 @@ export function Set_color_rgba(mesh, col) {
 
    // Handle attribute color per vertex 
    if (mesh.gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
-      Gl_set_RGBA_per_vertex(mesh.gfx, color);
+      Gl_set_rgba_per_vertex(mesh.gfx, color);
    }
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
       math.CopyArr4(mesh.mat.col, color);
@@ -69,7 +69,7 @@ export function Set_color_rgb(mesh, col) {
 
    // Handle attribute color per vertex 
    if (mesh.gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
-      Gl_set_RGBA_per_vertex(mesh.gfx, color);
+      Gl_set_rgba_per_vertex(mesh.gfx, color);
    }
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
       Gl_set_rgba(mesh.gfx, color);
@@ -90,7 +90,7 @@ export function Set_hover_color_rgba(mesh) {
    // Handle attribute color per vertex 
    if (mesh.gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
       math.Mult_mat4_scalar2(mesh.mat.col, intensity)
-      Gl_set_RGBA_per_vertex(mesh.gfx, mesh.mat.col);
+      Gl_set_rgba_per_vertex(mesh.gfx, mesh.mat.col);
    }
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
       math.Mult_arr4_scalar(mesh.mat.col, intensity);
@@ -111,7 +111,7 @@ export function Set_default_color_rgba(mesh) {
 
    // Handle attribute color per vertex 
    if (mesh.gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
-      Gl_set_RGBA_per_vertex(mesh.gfx, color);
+      Gl_set_rgba_per_vertex(mesh.gfx, color);
    }
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
       Gl_set_rgba(mesh.gfx, color);
@@ -129,7 +129,7 @@ export function Set_color_a(mesh, alpha) {
    // Handle attribute color per vertex 
    if (mesh.gfx.sid.attr & SID.ATTR.COL4_PER_VERTEX) {
       math.Set_mat4_collumn(mesh.mat.col, alpha, 3)
-      Gl_set_RGBA_per_vertex(mesh.gfx, mesh.mat.col); // TODO: Do we need a specific function to set only the alpha value?
+      Gl_set_rgba_per_vertex(mesh.gfx, mesh.mat.col); // TODO: Do we need a specific function to set only the alpha value?
    }
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
       mesh.mat.col[3] = alpha;

@@ -428,8 +428,10 @@ export function Particle_system_emitt(params) {
 
 
    const len = params.params.target_params.length;
+   // const len = params.evt_params.target_params.length;
    for (let i = 0; i < len; i++) {
 
+      // const emitter_idx = params.evt_params.target_params[i]
       const emitter_idx = params.params.target_params[i]
       const emitter = _emitters.buffer[emitter_idx];
       const last_elem = emitter.free_particles_idxs_buffer.boundary;

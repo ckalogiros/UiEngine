@@ -14,7 +14,6 @@ export function Get_name_from_mesh_type(type) {
 	if (type & MESH_TYPE.RECT_MESH) { meshType.push('RECT_MESH'); }
 	if (type & MESH_TYPE.SECTION_MESH) { meshType.push('SECTION_MESH'); }
 	if (type & MESH_TYPE.WIDGET_LABEL) { meshType.push('Widget_Label'); }
-	if (type & MESH_TYPE.Widget_Label_Text_Mesh_Menu_Options) { meshType = 'Widget_Label_Text_Mesh_Menu_Options'; }
 	if (type & MESH_TYPE.WIDGET_BUTTON) { meshType.push('Widget_Button'); }
 	if (type & MESH_TYPE.WIDGET_SWITCH) { meshType.push('Widget_Switch'); }
 	if (type & MESH_TYPE.WIDGET_TEXT) { meshType.push('Widget_Text'); }

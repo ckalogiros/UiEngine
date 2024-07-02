@@ -19,9 +19,9 @@ export class Widget_Button extends Widget_Label {
       this.type |= MESH_TYPE.WIDGET_BUTTON;
 
       // Bind a default function for OnClick() event
-      this.Bind(Button_click_default_callback, _, 'Default Button Binding Function')
+      // this.Bind(Button_click_default_callback, _, 'Default Button Binding Function')
 
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      // this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    }
 
 
@@ -46,67 +46,179 @@ export class Widget_Button extends Widget_Label {
    /*******************************************************************************************************************************************************/
    // Listeners
    /*******************************************************************************************************************************************************/
-   ConstructListeners(parent_listeners = null) {
+   // ConstructListeners(parent_listeners = null) {
 
-      const mesh = this; // If in recursion, use as the current mesh the passed param. 
+   //    const mesh = this; // If in recursion, use as the current mesh the passed param. 
 
-      for (let i = 0; i <= mesh.listeners.boundary; i++) {
+   //    for (let i = 0; i <= mesh.listeners.boundary; i++) {
 
-         if (mesh.listeners.buffer[i]) { 
+   //       if (mesh.listeners.buffer[i]) { 
 
-            if(parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-               parent_listeners = [null, null];
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+   //          if(parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
+   //             parent_listeners = [null, null];
+   //             parent_listeners[i] = Find_parent_listen_event(i, mesh);
+   //          }
+   //          else if(parent_listeners[i] === null){
+   //             parent_listeners[i] = Find_parent_listen_event(i, mesh);
+   //          }
+
+
+   //          mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
+   //       }
+   //    }
+   // }
+
+   
+   // AddListeners() {
+
+   //    const mesh = this; // If in recursion, use as the current mesh the passed param. 
+   //    if(!mesh.listeners) alert('228866 \nMuste CreateListenEvent() first for mesh:.', mesh.GetName);
+
+   //    for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+
+   //       const evt = mesh.listeners.buffer[etypeidx];
+   //       if (evt) { // If event is not null
+   //          const evt_params = {
+   //             EventClbk: null,
+   //             targetBindingFunctions: null,
+   //             target_mesh: mesh,
+   //             params: null,
+   //          }
+   //          mesh.AddListenEvent(etypeidx, mesh.OnClick, mesh.evt_params, null);
+   //       }
+   //    }
+   // }
+   
+
+   ListenEventCreate(etype) {
+
+      const etypeidx = Listen_event_get_idx_from_type(etype);
+      const mesh = this;
+
+      // For Hover events we need no callback and params
+      if (etype & LISTEN_EVENT_TYPES.HOVER) {
+
+         mesh.CreateListenEvent(etype);
+         if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, null, null);
+      }
+      else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+         const evt_params = { target_mesh: mesh, };
+         mesh.CreateListenEvent(etype);
+         if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+      }
+
+   }
+
+   ListenEventCreateAndAdd(parent_events = null) {
+
+      const mesh = this;
+
+      if (!mesh.listeners)
+         return; // Return if there are no listen events to add
+      // alert('228867 \nMust CreateListenEvent() first for dropdown mesh:.', mesh.GetName);
+      if (parent_events === null)
+         alert('228868 \nParent event must be a valid event index.', mesh.GetName);
+
+
+
+
+      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+
+         if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
+
+         const etype = Listen_event_types_get_type_from_index(etypeidx);
+
+         /***********************************************************************************************************************/
+         // Create for dropdown button
+         const dp_evt = mesh.listeners.buffer[etypeidx];
+         if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
+
+            // For Hover events we need no callback and params
+            if (etype & LISTEN_EVENT_TYPES.HOVER) {
+               mesh.AddListenEvent(etypeidx, null, null);
             }
-            else if(parent_listeners[i] === null){
-               parent_listeners[i] = Find_parent_listen_event(i, mesh);
+            else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+               const evt_params = { target_mesh: mesh, };
+               mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
             }
 
+            if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
 
-            mesh.AddListenEvent(i, mesh.OnClick, mesh.evt_params, parent_listeners[i]);
+               const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
+
+               if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
+               else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
+            }
+            else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
+
          }
       }
    }
-
    
 
    OnClick(params) {
 
       const mesh = params.evt_params.target_mesh;
 
-      // Run for buttons that are enabled to a continuous click
-      if(mesh.StateCheck(MESH_STATE.IS_HOLD_CLICK)){
+      // Case the mesh has a chain callback function to call. (For now the button's chain callbacks are not chained)
+      if (mesh.evt_params && mesh.evt_params.EventClbk) {
 
-        if (params.evt_params && params.evt_params.EventClbk) {
-           
-         const EventClbk = params.evt_params.EventClbk;
-         const target_params = params.evt_params.params.target_params
-         const idx = TimeIntervalsCreate(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
-         mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
-         
-         STATE.mesh.SetClickHold(mesh)
-      }
+         // Create time interval to continuosly press the button
+         if(mesh.StateCheck(MESH_STATE.IS_HOLD_CLICK)){
 
-      }
-      else { // Run for one click buttons
-
-         /**
-          * For popup menu options and slider connections.
-          * If the option is clicked, then we must call the slider connect function
-          */
-         if (params.evt_params && params.evt_params.EventClbk) {
+            const EventClbk = mesh.evt_params.EventClbk;
+            const target_params = mesh.evt_params.params.target_params
+            const idx = TimeIntervalsCreate(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
+            mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
             
-            const EventClbk = params.evt_params.EventClbk;
-            EventClbk(params.evt_params);
+            STATE.mesh.SetClickHold(mesh);
          }
-         else { // Fallback to label OnClick()
-            super.OnClick(params);
-         }
+      }
+      if (params.evt_params && params.evt_params.EventClbk) {
+            
+         const EventClbk = params.evt_params.EventClbk;
+         EventClbk(params.evt_params);
+      }
+      else { // Fallback to label OnClick()
+         super.OnClick(params);
+      }
+
+      // // Run for buttons that are enabled to a continuous click
+      // if(mesh.StateCheck(MESH_STATE.IS_HOLD_CLICK)){
+
+      // //   if (params.evt_params && params.evt_params.EventClbk) {
+      //   if (mesh.evt_params && mesh.evt_params.EventClbk) {
+           
+      //    const EventClbk = mesh.evt_params.EventClbk;
+      //    const target_params = mesh.evt_params.params.target_params
+      //    const idx = TimeIntervalsCreate(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
+      //    mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+         
+      //    STATE.mesh.SetClickHold(mesh)
+      // }
+
+      // }
+      // else { // Run for one click buttons
+
+      //    /**
+      //     * For popup menu options and slider connections.
+      //     * If the option is clicked, then we must call the slider connect function
+      //     */
+      //    if (params.evt_params && params.evt_params.EventClbk) {
+            
+      //       const EventClbk = params.evt_params.EventClbk;
+      //       EventClbk(params.evt_params);
+      //    }
+      //    else { // Fallback to label OnClick()
+      //       super.OnClick(params);
+      //    }
    
          
-         // console.log('CLICKED')
-         return true;
-      }
+      //    // console.log('CLICKED')
+      //    return true;
+      // }
    }
 
 
@@ -137,9 +249,8 @@ export class Widget_Button extends Widget_Label {
       };
       
       // The if statement is to avoid any clbk replacment if the button is still in preperation and no ConstructListeners have run to establish the Clbk in the EventListeners buffer
-      if(this.listeners && this.listeners.buffer[E.C] !== INT_NULL) 
-         this.ChangeListenEvent(E.C, EventClbk, params)
-      // this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      // if(this.listeners && this.listeners.buffer[E.C] !== INT_NULL) 
+      //    this.ChangeListenEvent(E.C, null, params)
       if(click_flags) this.state.mask |= click_flags;
 
    }
@@ -213,6 +324,26 @@ export class Widget_Switch extends Widget_Button {
       }
    }
 
+   
+   AddListeners() {
+
+      const mesh = this; // If in recursion, use as the current mesh the passed param. 
+      if(!mesh.listeners) alert('228866 \nMuste CreateListenEvent() first for mesh:.', mesh.GetName);
+
+      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+
+         const evt = mesh.listeners.buffer[etypeidx];
+         if (evt) { // If event is not null
+            const evt_params = {
+               EventClbk: null,
+               targetBindingFunctions: null,
+               target_mesh: mesh,
+               params: null,
+            }
+            mesh.AddListenEvent(etypeidx, mesh.OnClick, mesh.evt_params, null);
+         }
+      }
+   }
 
    OnClick(params) {
 
@@ -252,7 +383,7 @@ export class Widget_Switch extends Widget_Button {
 
       if(!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
       
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      // this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.evt_params = { // Create the parameters to pass for the button's click event. 
          EventClbk: EventClbk,
          targetBindingFunctions: targetBindingFunctions,
