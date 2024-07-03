@@ -4,6 +4,6 @@ ngrok/*
 docs/ignore/*
 resources/ignore/*
 src/scripts/Tests/*
-src/scripts/UNUSED/*
-src/scripts/ignore/*
+UnusedCode/UNUSED/*
+UnusedCode/ignore/*
 src/scripts/Graphics/Shaders/OLD/*
