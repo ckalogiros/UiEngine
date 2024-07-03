@@ -785,7 +785,7 @@ function SdfLine(col, pos, dim) {
     // line.sid.attr &= ~SID.ATTR.COL4;
 
     // const params = null;
-    // const timer = TimersCreateTimer(0.01, 10, .1, 'T1', TEMP_TIMER_CLBK, params);
+    // const timer = Timers_create_timer(0.01, 10, .1, 'T1', TEMP_TIMER_CLBK, params);
 
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     line.Render();
@@ -822,9 +822,7 @@ function CreateDropdown(pos, id) {
     const margin = [8, 8]
     // const dp = Create_widget_dropdown(`DP${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad);
     const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
-    // dp.CreateHoverEvent();
-    dp.CreateMoveEvent();
-    dp.CreateClickEvent();
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
     const sub_dp1_count = 1;
@@ -834,8 +832,8 @@ function CreateDropdown(pos, id) {
     for (let i = 0; i < sub_dp1_count; i++) {
 
         const dpsub1 = Create_widget_dropdown(_, `${id}-${i}`, [OUT_OF_VIEW, OUT_OF_VIEW, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-        dpsub1.CreateHoverEvent();
-        dpsub1.CreateClickEvent();
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
         dp.AddToMenu(dpsub1);
 
         // const label = Create_widget_label(_, 'l1', ALIGN.LEFT, [0,0,2], 10, REDL)

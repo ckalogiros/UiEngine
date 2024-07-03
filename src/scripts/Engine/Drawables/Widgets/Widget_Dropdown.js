@@ -3,15 +3,13 @@
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate } from "../../Timers/TimeIntervals.js";
-import { Listener_assign_parent_event } from "../../Events/EventListeners.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_root_meshidx, Widget_root_is_widget_root, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
-import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_root_meshidx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
 import { Calculate_sizes_recursive, Expand, Section, Section_on_move_clbk } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from "../Operations/Recursions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import {  Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { TEMP_Scroller_calc_handle } from "./WidgetScroller.js";
@@ -284,8 +282,6 @@ export class Widget_Dropdown extends Section {
 
       mesh.idx = this.menu.AddItem(mesh);
 
-      // this.SetMenuItemsZindex(); // EFFICIENCY: It runs for all children al over again every time a new item is added
-
    }
 
 
@@ -368,187 +364,6 @@ export class Widget_Dropdown extends Section {
    // Listeners
    /*******************************************************************************************************************************************************/
 
-   // ConstructListeners(parent_listeners = null) {
-
-
-
-   //    /*****************************************************************************************************************/
-   //    // Create Listen Events for the dropdown
-   //    if (this.listeners) {
-
-   //       for (let i = 0; i <= this.listeners.boundary; i++) {
-
-   //          if (this.listeners.buffer[i] !== null) {
-
-   //             if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-   //                parent_listeners = [null, null];
-   //             }
-
-   //             // if (parent_listeners[i] !== null && parent_listeners[i] !== INT_NULL) {
-   //             if (parent_listeners[i] === null || parent_listeners[i] === INT_NULL) {
-   //                parent_listeners[i] = Find_parent_listen_event(i, this);
-   //             }
-
-   //             // If FAKE or HOVER, pass null params and null callback
-   //             if (this.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
-                  
-   //                // if(this.options & SECTION.INDEPENDENT){
-   //                //    this.AddListenEvent(i, null, null, null);
-   //                // }
-   //                // else 
-   //                   this.AddListenEvent(i, null, null, parent_listeners[i]);
-   //             }
-   //             else { // Else construct the params
-   //                const params = {
-   //                   EventClbk: null, targetBindingFunctions: null,
-   //                   target_mesh: this, params: null,
-   //                }
-                  
-   //                // if(this.options & SECTION.INDEPENDENT){
-   //                //    this.AddListenEvent(i, super.OnClick, params, null);
-   //                // }
-   //                // else 
-   //                this.AddListenEvent(i, super.OnClick, params, parent_listeners[i]);
-   //             }
-   //          }
-   //       }
-   //    }
-
-   //    /*****************************************************************************************************************/
-   //    // Create Listen Events for the button
-   //    const btn = this.children.buffer[0];
-   //    for (let i = 0; i <= btn.listeners.boundary; i++) {
-
-   //       if (btn.listeners.buffer[i] !== null) {
-
-
-   //          // Case there is a dropdown listener for dropdown, then make certain the button listener is a child
-   //          if (this.listeners !== null && this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
-
-   //             parent_listeners[i] = this.listeners.buffer[i];
-   //          }
-   //          else {
-
-   //             if (parent_listeners === null) { // If no parent event is passed, initialize variable 'parent_listeners'
-   //                parent_listeners = [null, null];
-   //             }
-
-   //             if (parent_listeners[i] === null || parent_listeners[i] === INT_NULL) {
-   //                parent_listeners[i] = Find_parent_listen_event(i, btn);
-   //             }
-   //          }
-
-
-   //          if (btn.state.mask & MESH_STATE.IS_FAKE_EVENT || (Listen_event_types_get_type_from_index(i) & LISTEN_EVENT_TYPES.HOVER)) {
-
-   //             btn.AddListenEvent(i, null, null, parent_listeners[i]);
-   //          }
-   //          else { // Else construct the params
-
-   //             const params = { // Build the parameters for the OnClick callback function (menu expansion).
-   //                drop_down: this,
-   //                menu: this.menu,
-   //             }
-
-   //             // CAUTION: We run for i:Hover and click, but the callback is always 'this.OnClick'. For Hover callback, check the event type and pass the apropriate callback.
-   //             btn.AddListenEvent(i, this.OnClick, params, parent_listeners[i]);
-   //          }
-   //       }
-   //    }
-
-   //    /*****************************************************************************************************************/
-   //    // Create Listen Events for the menu and its items
-   //    if (this.isOn & DP_MENU_STATE.ON) {
-   //       this.ConstructListenersForMenuItems()
-   //    }
-
-   // }
-
-
-   // ConstructListenersForMenuItems() { // Handle the dropdown's menu listen events creation. (if any of the items has listen events)
-
-   //    const dp = this;
-   //    const menu = this.menu;
-
-   //    for (let i = 0; i <= menu.children.boundary; i++) {
-
-   //       const item = menu.children.buffer[i];
-
-   //       // TEST: Remove the if(item!==null) case
-   //       if(item === null || item === undefined) alert('55143326 \nItem is null, do not remove the check');
-
-
-   //       item.ListenEventCreateAndAdd(dp.listeners.buffer);
-         
-   //       // If the item is a dropdown, run this function recursive 
-   //       if(item.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-   //          item.ConstructListenersForMenuItems();
-   //       }
-   //    }
-   // }
-
-   // TEMP_RECURSIVE(mesh, parent){
-
-   //    for (let i = 0; i <= mesh.children.boundary; i++) {
-
-   //       const child = mesh.children.buffer[i];
-   //       console.log(child.GetName())
-   //       child.ListenEventCreateAndAdd(parent.listeners.buffer);
-
-   //       if(child.children.active_count) TEMP_RECURSIVE(child, );
-   //    }
-   // }
-   
-   
-   // AddListeners() {
-
-   //    const dp = this; // If in recursion, use as the current mesh the passed param. 
-   //    if(!dp.listeners) 
-   //       alert('228866 \nMust CreateListenEvent() first for dropdown mesh:.', dp.GetName);
-
-   //    for (let etypeidx = 0; etypeidx <= dp.listeners.boundary; etypeidx++) {
-
-   //       const evt = dp.listeners.buffer[etypeidx];
-   //       if (evt !== null) { // If event is not null
-   //          const evt_params = {
-   //             EventClbk: null,
-   //             targetBindingFunctions: null,
-   //             target_mesh: dp,
-   //             params: null,
-   //          }
-   //          dp.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
-   //          const btn = this.children.buffer[0];
-   //          btn.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
-   //       }
-   //    }
-   // }
-
-   // ListenEventCreate(etype){
-
-   //    const etypeidx = Listen_event_get_idx_from_type(etype);
-   //    const dp = this;
-
-   //    // For Hover events we need no callback and params
-   //    if(etype & LISTEN_EVENT_TYPES.HOVER){
-
-   //       dp.CreateListenEvent(etype);
-   //       if(dp.state.mask & MESH_STATE.ACTIVE) dp.AddListenEvent(etypeidx, null, null);
-   //       const btn = dp.children.buffer[0];
-   //       btn.CreateListenEvent(etype);
-   //       if(btn.state.mask & MESH_STATE.ACTIVE) btn.AddListenEvent(etypeidx, null, null);
-   //    }
-   //    else if(etype & LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE){
-         
-   //       const evt_params = { target_mesh: dp, };
-   //       dp.CreateListenEvent(etype);
-   //       if(dp.state.mask & MESH_STATE.ACTIVE) dp.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
-   //       const btn = dp.children.buffer[0];
-   //       btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-   //       if(btn.state.mask & MESH_STATE.ACTIVE) btn.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
-   //    }
-
-   // }
-
 
    /**
     * Constructs all listen events enabled for this classs widget.
@@ -594,155 +409,6 @@ export class Widget_Dropdown extends Section {
       return false;
 
    }
-
-   /**
-    * This function creates events for meshes that are created at run time.
-    * So it must create the listen events and also assign the parent event.
-    * It gets a little complicated because it must find an apropriate parent event,
-    * for each event type is independend from any other event type.
-    * For instance, the click event may have a different parent event than the hover event of the same mesh. 
-    */
-   ListenEventCreateAndAdd(parent_events=null){
-
-      const dp = this; 
-      const btn = dp.children.buffer[0];
-
-      if(!dp.listeners) 
-         return; // Return if there are no listen events to add
-         // alert('228867 \nMust CreateListenEvent() first for dropdown mesh:.', dp.GetName);
-      if(parent_events === null) 
-         alert('228868 \nParent event must be a valid event index.', dp.GetName);
-      
-      
-
-
-      for (let etypeidx = 0; etypeidx <= dp.listeners.boundary; etypeidx++) {
-         
-         if((dp.state.mask & MESH_STATE.ACTIVE)===0x0) return; // Skip the dropdownn and button if are inactive 
-
-         const etype = Listen_event_types_get_type_from_index(etypeidx);
-         
-         /***********************************************************************************************************************/
-         // Create for dropdown button
-         const dp_evt = dp.listeners.buffer[etypeidx];
-         if (dp_evt !== null) { // If event for tis dp is null, don't do anything
-
-            // For Hover events we need no callback and params
-            if(etype & LISTEN_EVENT_TYPES.HOVER){
-               dp.AddListenEvent(etypeidx, null, null);
-            }
-            else if(etype & LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE){
-               
-               const evt_params = { target_mesh: dp, };
-               dp.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
-            }
-
-            // // It may be the case that the dp is not ACTIVE, so the .addListenEvent() will not add any event and the 'dp.listeners.buffer[etypeidx]' will be INT_NULL
-            // if(dp.listeners.buffer[etypeidx] === INT_NULL) return; // Skip the dropdownn and the 
-            
-            if(parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && dp.listeners.buffer[etypeidx] !== INT_NULL){ // Find parent event
-               
-               const parent_event_idx = Find_parent_listen_event(etypeidx, dp);
-               
-               if(parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
-               else Listener_assign_parent_event(etypeidx, dp.listeners.buffer[etypeidx], parent_event_idx);
-            }
-            else Listener_assign_parent_event(etypeidx, dp.listeners.buffer[etypeidx], parent_events[etypeidx]);
-
-         }
-
-         /***********************************************************************************************************************/
-         // Create for dropdown button
-         const btn_evt = btn.listeners.buffer[etypeidx];
-         if (btn_evt !== null) { // If event for tis dp is null, don't do anything
-
-            // For Hover events we need no callback and params
-            if(etype & LISTEN_EVENT_TYPES.HOVER){
-               btn.AddListenEvent(etypeidx, null, null);
-            }
-            else if(etype & LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE){
-               
-               const evt_params = { target_mesh: dp, };
-               btn.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
-            }
-            
-            
-            if(dp.listeners.buffer[etypeidx] === null){ // If the dropdow doesn't have a hover event, we must find from the mesh tree
-
-               const parent_event_idx = Find_parent_listen_event(etypeidx, dp);
-               if(parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
-               else Listener_assign_parent_event(etypeidx, btn.listeners.buffer[etypeidx], parent_event_idx); 
-            }
-            else Listener_assign_parent_event(etypeidx, btn.listeners.buffer[etypeidx], dp.listeners.buffer[etypeidx]);
-
-         }
-      }
-   }
-   // ListenEventCreateAndAdd(parent_events=null){
-
-   //    const dp = this; // If in recursion, use as the current mesh the passed param. 
-   //    if(!dp.listeners) 
-   //       return; // Return if there are no listen events to add
-   //       // alert('228867 \nMust CreateListenEvent() first for dropdown mesh:.', dp.GetName);
-   //    if(parent_events === null) 
-   //       alert('228868 \nParent event must be a valid event index.', dp.GetName);
-      
-   //    for (let etypeidx = 0; etypeidx <= dp.listeners.boundary; etypeidx++) {
-         
-   //       const etype = Listen_event_types_get_type_from_index(etypeidx);
-   //       const evt = dp.listeners.buffer[etypeidx];
-         
-   //       if (evt !== null) { // If event is not null
-
-   //          // For Hover events we need no callback and params
-   //          if(etype & LISTEN_EVENT_TYPES.HOVER){
-      
-   //             // dp.CreateListenEvent(etype);
-   //             dp.AddListenEvent(etypeidx, null, null);
-   //             if(parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null){ // Find parent event
-                  
-   //                const parent_event_idx = Find_parent_listen_event(etypeidx, dp);
-                  
-   //                if(parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
-   //                else {
-   //                   Listener_assign_parent_event(etypeidx, dp.listeners.buffer[etypeidx], parent_event_idx);
-   //                }
-   //             }
-   //             else Listener_assign_parent_event(etypeidx, dp.listeners.buffer[etypeidx], parent_events[etypeidx]);
-               
-   //             const btn = dp.children.buffer[0];
-   //             if(btn.listeners.buffer[etypeidx] !== null){ // Create hover event for button only if the user has set for hover event
-                  
-   //                // btn.CreateListenEvent(etype);
-   //                btn.AddListenEvent(etypeidx, null, null);
-                  
-   //                if(dp.listeners.buffer[etypeidx] === null){ // If the dropdow doesn't have a hover event, we must find from the mesh tree
-
-   //                   const parent_event_idx = Find_parent_listen_event(etypeidx, dp);
-   //                   if(parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
-   //                   else {
-   //                      Listener_assign_parent_event(etypeidx, btn.listeners.buffer[etypeidx], parent_event_idx);
-   //                   }
-                     
-   //                }
-   //                else Listener_assign_parent_event(etypeidx, btn.listeners.buffer[etypeidx], dp.listeners.buffer[etypeidx]);
-   //             }
-   //          }
-   //          else if(etype & LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE){
-               
-   //             const evt_params = { target_mesh: dp, };
-               
-   //             dp.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
-   //             Listener_assign_parent_event(etypeidx, dp.listeners.buffer[etypeidx], parent_events[etypeidx])
-      
-   //             const btn = dp.children.buffer[0];
-   //             btn.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
-   //             Listener_assign_parent_event(etypeidx, btn.listeners.buffer[etypeidx], dp.listeners.buffer[etypeidx])
-   //          }
-   //       }
-   //    }
-   // }
-
 
    
    // SEE: ## OnClick()
@@ -878,38 +544,6 @@ export class Widget_Dropdown extends Section {
 
 
    /*******************************************************************************************************************************************************/
-   // Events Handling
-   /*******************************************************************************************************************************************************/
-
-   CreateHoverEvent() {
-      // const btn = this.children.buffer[0];
-      // btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   }
-
-
-   CreateClickEvent() {
-      // If the 'click' event hasn't been activated by another call to 'CreateListenEvent' for this dp, 
-      // create FAKE click event, if dp is root (direct child of scene),
-      // else let the Construct listeners decide the parent event listener for dp's button
-      if (this.listeners && this.listeners.buffer[E.C]===null && Widget_root_is_widget_root(this.root_bufferidx, this.mesh_bufferidx)) {
-         this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
-      }
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      const btn = this.children.buffer[0];
-      btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-   }
-
-
-   CreateMoveEvent() {
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   }
-
-
-
-
-
-   /*******************************************************************************************************************************************************/
    // Setters_Getters
    /*******************************************************************************************************************************************************/
 
@@ -927,22 +561,6 @@ export class Widget_Dropdown extends Section {
       }
    }
 
-   // TEMP_TO_RECALC_FOR_DP_MENU(){
-   //    Expand(this, this.options)
-   //    temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
-
-         
-   //    this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
-   //    this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
-      
-
-   //    const cur_pos = [0,0];
-   //    cur_pos[0] = this.geom.pos[0]; 
-   //    cur_pos[1] = this.geom.pos[1]; 
-
-   //    // Calculate_positions_no_gfx_update_recursive(this, this.options, cur_pos, _);
-   //    tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-   // }
 
    TEMP_recalc(x, y) {
 
@@ -1142,28 +760,8 @@ export class Widget_Dropdown extends Section {
 
       const widget_root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(widget_root_meshidx)
-      // { // New Implementation: Run for all meshes
-         
-      //    if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
-      //    if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
-
-      //    Calculate_sizes_recursive(widget_root, widget_root.options, );
 
 
-      //    if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-      //       CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-      //       CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-      //    }
-      //    else {
-      //       if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-      //       else {
-      //          if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-      //          if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-      //       }
-      //    }
-
-      //    widget_root.SectionSetPad();
-      // }
       { // New Implementation: Run for all meshes
          
          if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
@@ -1205,10 +803,6 @@ export class Widget_Dropdown extends Section {
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
       tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-      // tu(root, this.options, root.geom.pos, _, _, root.options & SECTION.INDEPENDENT);
-
-      // Calculate_positions_no_gfx_update_recursive(widget_root, widget_root.options, widget_root.geom.pos);
-
 
 
       { // Clipping
@@ -1236,8 +830,6 @@ export class Widget_Dropdown extends Section {
    
          // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
       }
-      
-      
       
       
       // HACK: We want to update the handles size and pos after dp activation
@@ -1313,44 +905,14 @@ export class Widget_Dropdown extends Section {
       menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
       
       
-      // this.Calc_no_gfx_update();
-      
       const widget_root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(widget_root_meshidx)
             
-      // Expand(this, this.options)
-      // Expand(widget_root, widget_root.options)
 
-      // {
-         
-      //    if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
-      //    if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
-
-      //    Calculate_sizes_recursive(widget_root, widget_root.options, );
-
-
-      //    if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-      //       CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-      //       CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-      //    }
-      //    else {
-      //       if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-      //       else {
-      //          if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-      //          if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-      //       }
-      //    }
-
-      //    widget_root.SectionSetPad();
-      // }
       { // Calculate all meshes sizes from the root widget dropdown
          
          if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
          if (root.options & SECTION.FIXED_H) root.max_size[1] = root.geom.dim[1];
-
-         // root.max_size[0] = 0;
-         // root.max_size[1] = 0;
-
 
          
          // Calculate_sizes_recursive(root, root.options, );
@@ -1373,39 +935,14 @@ export class Widget_Dropdown extends Section {
       }
 
       
-      // // temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
-      // temp_dp_calc_sizes(root, _, root.options & SECTION.INDEPENDENT);
-      // // temp_dp_calc_sizes(widget_root, _, widget_root.options & SECTION.INDEPENDENT);
-      // Calculate_sizes_recursive(widget_root, widget_root.options & SECTION.INDEPENDENT);
-      // // Calculate_sizes_recursive(root, root.options & SECTION.INDEPENDENT);
-      // widget_root.geom.dim[0] = widget_root.max_size[0] + widget_root.StylesGetPad(STYLES.AXIS.X);
-      // widget_root.geom.dim[1] = widget_root.max_size[1] + widget_root.StylesGetPad(STYLES.AXIS.Y);
-      
-               
-      // this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
-      // this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
-
-
-      
 
       const cur_pos = [0,0];
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
 
-      // // Calculate_positions_no_gfx_update_recursive(this, this.options, cur_pos, _);
       tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-      // tu(root, this.options, root.geom.pos, _, _, root.options & SECTION.INDEPENDENT);
-      // // tu(widget_root, widget_root.options, cur_pos, _, _, root.options & SECTION.INDEPENDENT);
       
-      // Calculate_positions_no_gfx_update_recursive(this, this.options, this.geom.pos);
-      // Calculate_positions_no_gfx_update_recursive(root, root.options, root.geom.pos);
-      // Calculate_positions_no_gfx_update_recursive(widget_root, widget_root.options, widget_root.geom.pos);
 
-
-
-      // widget_root.Recalc_no_gfx_update(this.options & SECTION.INDEPENDENT)
-      // root.Recalc_no_gfx_update(this.options & SECTION.INDEPENDENT)
-      // this.Recalc_no_gfx_update(this.options & SECTION.INDEPENDENT)
 
 
       { // Clipping
@@ -1444,23 +981,11 @@ export class Widget_Dropdown extends Section {
                
          // }
       }
-         
-         /**
-          * HERE
-          * Follow the implementation of dropdown  listeners.
-          * 1. The user creates event on dp creation
-          * 2. Who calls the .AddListeners?
-          * 3. Who calls Construct_listen_events_relations_from_mesh_tree()?
-          * 4. What about the complication of the different TYPE of events?? 
-          * 5. Also we have listeners=null, listeners.buffer[i]=null, listeners.buffer[i]=INT_NULL
-          */
-      // this.ConstructListenersForMenuItems(); // Create listeners, as children of menu listeners.
-      // Construct_listen_events_relations_from_mesh_tree(menu)
+
 
       Construct_listen_events_from_mesh_tree(this.menu)
       Construct_listen_events_relations_from_mesh_tree(this.menu);
-      // Construct_listen_events_from_mesh_tree(widget_root)
-      // Construct_listen_events_relations_from_mesh_tree(widget_root);
+
 
       // HACK: We want to update the handles size and pos after dp activation
       const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)
@@ -1485,7 +1010,6 @@ function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
    // Calculate sizes bottom-up the tree with this 'dp' being the root...  
    const dif = Calculate_sizes_recursive(dp, dp.options, target_child_idx);
 
-   const dim = dp.geom.dim
    const max = dp.max_size;
    let prev_max = [max[0], max[1]];
    const pad = [0,0];
@@ -1499,14 +1023,8 @@ function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
       const meshpad = p.StylesGetPad();
       pad[0] += meshpad[0];
       pad[1] += meshpad[1];
-      console.log(
-         'dim', p.geom.dim[1],
-         'max_size', p.max_size[1],
-         'dif', dif[1],
-         'name', p.GetName(),
-      )
+
       
-      // if(p && (p.type & MESH_TYPE.SECTION_MESH)){
       if(p){
          if(p.type & MESH_TYPE.SECTION_MESH){
 
@@ -1523,9 +1041,8 @@ function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
                   p.max_size[0] = p.geom.dim[0];
    
                }
-               // else if(dif[0] < POSSITIVE && p.geom.dim[0] > prev_max[0]){
                else if(dif[0] < POSSITIVE){
-                  // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
+
                   if(p.type & MESH_TYPE.WIDGET_DROP_DOWN){
 
                      const ms = Dp_menu_get_max_size_from_siblings(p)
@@ -1574,91 +1091,8 @@ function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
    dp.geom.dim[0] -= dif[0]
    dp.max_size[0] -= dif[0]
 
-   console.log('---------------------------------------')
 }
-/** */
-// function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
-//    const parent = dp.parent;
-//    // Calculate sizes bottom-up the tree with this 'dp' being the root...  
-//    const dif = Calculate_sizes_recursive(dp, dp.options, target_child_idx);
-   
-//    const dim = dp.geom.dim
-//    const max = dp.max_size;
-//    const pad = [0,0];
-   
 
-//    // ... And then go up the tree, from this 'dp' to the actual root, to add the dimention difference that was calculated erlier.
-//    // NOTE: This is done so that we skip calculating all children from the root. Instead we calculate from this dp and all its children , and we propagate the size difference up to any 'Section' parents.   
-//    let p = parent;
-//    while(p){
-
-//       const meshpad = p.StylesGetPad();
-//       pad[0] += meshpad[0];
-//       // pad[1] += meshpad[1];
-
-      
-//       if(p && (p.type & MESH_TYPE.SECTION_MESH)){
-         
-         
-         
-//          if(p.type & MESH_TYPE.WIDGET_SCROLLER || p.type & MESH_TYPE.WIDGET_MENU_BAR || p.type & MESH_TYPE.WIDGET_WINDOW) {
-//             // console.log(p.GetName())
-//             break;
-//          }
-
-//          if(p.options & SECTION.VERTICAL){
-
-//             if(dif[0] > POSSITIVE && p.geom.dim[0] < max[0]){
-//                // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
-
-//                // const a = dim[0] + pad[0];
-//                const a = dim[0];
-//                const b = p.geom.dim[0] - a;
-//                // p.geom.dim[0] += (dif[0] - b)+ pad[0];
-//                p.geom.dim[0] += dif[0];
-//                p.max_size[0] = p.geom.dim[0];
-//             }
-//             // else if(dif[0] < POSSITIVE && p.geom.dim[0] > max[0]){
-//             else if(dif[0] < POSSITIVE && p.geom.dim[0] > max[0]){
-//                // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
-
-//                const a = dim[0] + pad[0];
-//                const b = p.geom.dim[0] - a;
-//                // p.geom.dim[0] += (dif[0] - b);
-//                // p.geom.dim[0] += dif[0]+(pad[0]-meshpad[0]);
-//                p.geom.dim[0] += dif[0];
-//                p.max_size[0] = p.geom.dim[0];
-
-//             }
-            
-//             // This is so that the outer sections will not be reduced less than the current dp 
-//             if(p.geom.dim[0] < p.min_size[0]){
-               
-//                p.geom.dim[0] = p.min_size[0] + pad[0];
-//                p.max_size[0] = p.geom.dim[0];
-//             }
-
-//             p.geom.dim[1] += dif[1] + pad[1];
-//             p.max_size[1] = p.geom.dim[1];
-//          }
-//          else if(p.options & SECTION.HORIZONTAL){
-
-//             p.geom.dim[1] += dif[1] + pad[1];
-//             p.max_size[1] = p.geom.dim[1];
-//             if(p.geom.dim[1] < p.min_size[1]){
-               
-//                p.geom.dim[1] = p.min_size[1] + pad[1];
-//                p.max_size[1] = p.geom.dim[1];
-//             }
-
-//             p.geom.dim[1] += dif[1] + pad[1];
-//             p.max_size[1] = p.geom.dim[1];
-//          }
-//          p = p.parent
-//       }
-//    }
-
-// }
 
 
 function Dp_menu_get_max_size_from_siblings(parent){
@@ -1681,18 +1115,6 @@ function Dp_menu_get_max_size_from_siblings(parent){
       // }
    }
 
-   // This is with max_size instead of .geom.dim
-   // for (let i=0; i <= parent.children.boundary; i++){
-   //    const sib = parent.children.buffer[i];
-   //    console.log('---- sibling', sib.geom.dim[0], 'sib max', 'max', max_size[0], sib.GetName())
-   //    const pad = sib.StylesGetPad()
-   //    if(sib.max_size && max_size[0] <= sib.max_size[0]+pad[0]*2){
-   //       max_size[0] = sib.max_size[0] + pad[0]*2;
-   //       console.log('SET MAX SIZE', max_size[0])
-   //    }
-   //    else if(sib.max_size===_){console.log('Has no max_size', sib.GetName())}
-   // }
-
    return max_size;
 }
 
@@ -1713,6 +1135,8 @@ export function TEMP_DP_STEAL_THE_DP_RECALC(dp){
    cur_pos[1] = dp.geom.pos[1]; 
    tu(dp, dp.options, cur_pos, _, _, dp.options & SECTION.INDEPENDENT);
 }
+
+
 
 function tu(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0){
 
@@ -1741,66 +1165,7 @@ function tu(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0
 }
 
 
-/**SAVE-SIMPLE REPOSITION ONLY FOR DP-DP_MENU-BUTTON */
-// function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is_for_build=false) {
 
-   
-//    const cur_pos = [
-//       curr[0] + parent.StylesGetPad(STYLES.AXIS.X), 
-//       is_for_build ? curr[1] : curr[1] + parent.StylesGetPad(STYLES.AXIS.Y), // 'is_for_build=true' don't add the pad on repositioning alredy buld dropdowns  
-//    ];
-
-   
-//    const pad = [0, 0]
-   
-//    const target_idx = (target_child_idx != undefined) ? (target_child_idx >= 0) ? target_child_idx : 0 : 0;
-
-//    if(target_idx > parent.children.boundary) return
-
-//    for (let i = target_idx; i <= parent.children.boundary; i++) {
-      
-//       const mesh = parent.children.buffer[i];
-
-//       if(mesh){
-
-//          let continue_recur = true;
-//          let opt = options
-   
-//          // console.log('  RecalcPos', mesh.GetName())
-   
-//          if (options & SECTION.INHERIT) opt = parent.options
-         
-//          const padd = [0,0,];
-//          if(padd){
-//             pad[0] += padd[0];
-//             pad[1] += padd[1];
-//          }
-   
-//          const rel_pos = [cur_pos[0], cur_pos[1]];
-
-//          mesh.geom.pos[0] = rel_pos[0]; 
-//          mesh.geom.pos[1] = rel_pos[1];
-   
-//          if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
-//             Temp_dp_calculate_positions(mesh, opt, cur_pos, _, _);
-//          }
-   
-   
-//          // Increment current position tracker
-//          if (parent.options & SECTION.VERTICAL) {
-//             cur_pos[1] += mesh.geom.dim[1] * 2;
-//             parent.last_pos[1] = cur_pos[1];
-//          }
-//          else if (parent.options & SECTION.HORIZONTAL) {
-//             cur_pos[0] += mesh.geom.dim[0] * 2;
-//             parent.last_pos[0] = cur_pos[0];
-//          }
-//       }
-
-//    }
-
-// }
-/** */
 function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is_for_build=false) {
 
    
@@ -1808,10 +1173,6 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
       curr[0] + parent.StylesGetPad(STYLES.AXIS.X), 
       is_for_build ? curr[1] : curr[1] + parent.StylesGetPad(STYLES.AXIS.Y), // 'is_for_build=true' don't add the pad on repositioning alredy buld dropdowns  
    ];
-   // const cur_pos = [
-   //    curr[0] + parent.StylesGetMargin(STYLES.AXIS.X), 
-   //    curr[1] + parent.StylesGetMargin(STYLES.AXIS.Y), // 'is_for_build=true' don't add the pad on repositioning alredy buld dropdowns  
-   // ];
 
    
    const pad = [0, 0]
@@ -1855,8 +1216,6 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
          }
          else if (mesh.type & MESH_TYPE.WIDGET_SCROLLER) {
             
-            // mesh.geom.pos[0] = rel_pos[0]; 
-            // mesh.geom.pos[1] = rel_pos[1];
             mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
             // mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
 
@@ -1878,7 +1237,6 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
    
             // mesh.TEMP_recalc(rel_pos[0] + pad[0], rel_pos[1] + pad[1]);
             mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-            // console.log(mesh.GetName())
    
             if(mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
             if(mesh.text_mesh) continue_recur = false;
@@ -1911,120 +1269,5 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
 
 }
 
-
-
-/**SAVE */
-// function tu(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0){
-
-//    // console.log(dp.GetName())
-//    Temp_dp_calculate_positions(dp, options, curr, target_child_idx, is_for_build);
-   
-//    const parent = dp.parent;
-
-   
-//    if(parent && parent.children.active_count){
-      
-//       const continue_recur = (is_independed & (parent.options & SECTION.INDEPENDENT)) ? true 
-//       : ((is_independed===0x0 && (parent.options & SECTION.INDEPENDENT)===0) ? true : false);
-
-//       if(parent.options & SECTION.VERTICAL) {
-//          curr[0] = parent.geom.pos[0];
-//          curr[1] = dp.geom.pos[1] + dp.geom.dim[1]*2;
-//       }
-
-//       const has_scroller = (parent && parent.parent) ? (parent.parent.type & MESH_TYPE.WIDGET_SCROLLER) : 0;
-//       // if(!has_scroller)tu(parent, options, curr, dp.idx+1, true);
-//       if(continue_recur)
-//          tu(parent, options, curr, dp.idx+1, true, (parent.options & SECTION.INDEPENDENT));
-//    }
-
-// }
-
-// function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is_for_build=false) {
-
-   
-//    const cur_pos = [
-//       curr[0] + parent.StylesGetMargin(STYLES.AXIS.X), 
-//       is_for_build ? curr[1] : curr[1] + parent.StylesGetMargin(STYLES.AXIS.Y), // 'is_for_build=true' don't add the margin on repositioning alredy buld dropdowns  
-//    ];
-
-   
-//    const pad = [0, 0]
-   
-//    const target_idx = (target_child_idx != undefined) ? (target_child_idx >= 0) ? target_child_idx : 0 : 0;
-
-//    if(target_idx > parent.children.boundary) return
-
-//    for (let i = target_idx; i <= parent.children.boundary; i++) {
-      
-//       const mesh = parent.children.buffer[i];
-//       let continue_recur = true;
-//       let opt = options
-
-//       console.log('  RecalcPos', mesh.GetName())
-
-//       if (options & SECTION.INHERIT) opt = parent.options
-
-//       const padd = mesh.StylesGetPad();
-//       if(padd){
-//          pad[0] += padd[0];
-//          pad[1] += padd[1];
-//       }
-      
-//       const rel_pos = [cur_pos[0], cur_pos[1]];
-      
-//       if(mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC){
-         
-//          mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
-//          continue_recur = false;
-//       }
-//       else if(mesh.type & MESH_TYPE.WIDGET_SLIDER){
-
-//          mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-//          continue_recur = false;
-//       }
-//       else if (mesh.type & MESH_TYPE.SECTION_MESH) 
-//       { // For meshes with a parent of type Section
-
-//          mesh.geom.pos[0] = rel_pos[0]; 
-//          mesh.geom.pos[1] = rel_pos[1];
-         
-//          // Case of menu bar, that has text directly as a child
-//          if(mesh.text_mesh){
-//             mesh.text_mesh.geom.pos[0] = rel_pos[0] 
-//             mesh.text_mesh.geom.pos[1] = rel_pos[1]
-//          }
-//       }
-//       else{
-
-//          mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-
-//          if(mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
-//          if(mesh.text_mesh) continue_recur = false;
-//       }
-
-
-//       if(parent.rel_comp){
-//          Relative_pos_comp_recalc_all(parent);
-//          continue_recur = false;
-//       }
-
-//       if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
-//          Temp_dp_calculate_positions(mesh, opt, cur_pos, _, _);
-//          // console.log('   RecalcPos', mesh.GetName())
-//       }
-
-
-//       // Increment current position tracker
-//       if (parent.options & SECTION.VERTICAL) {
-//          cur_pos[1] += mesh.geom.dim[1] * 2;
-//       }
-//       else if (parent.options & SECTION.HORIZONTAL) {
-//          cur_pos[0] += mesh.geom.dim[0] * 2;
-//       }
-
-//    }
-
-// }
 
 

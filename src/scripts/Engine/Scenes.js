@@ -1,6 +1,5 @@
 "use strict";
 import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name } from '../Graphics/Buffers/UniformBuffers.js';
-import { Matrix4_mult_vec2, Matrix4_mult_vec4 } from '../Helpers/Math/Matrix.js';
 import { M_Buffer } from './Core/Buffers.js';
 import { Screen_wpos_add_y } from './Core/MeshUniformsBuffer.js';
 import { HandleEvents } from './Events/Events.js';

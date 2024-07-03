@@ -2,7 +2,7 @@
 
 
 import { New_generic_buffer } from '../../Engine/Core/Buffers.js';
-import { Typed_array_create_from_type } from './TypedArrayBuffers.js';
+import { Typed_array_create_from_type } from './TypedArrayBuffersInterface.js';
 
 
 

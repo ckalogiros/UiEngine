@@ -649,34 +649,3 @@ export function Uniforms_buffer_print() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-/* Extract all uniforms and uniform data (size, type, name) directly from shader */
-// const numUniforms = gl.getProgramParameter(this.shader_program, gl.ACTIVE_UNIFORMS);
-// const indices = [...Array(numUniforms).keys()];
-// const blockIndices = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_BLOCK_INDEX);
-// const offsets = gl.getActiveUniforms(this.shader_program, indices, gl.UNIFORM_OFFSET);
-
-// const uniforms = [];
-// for (let ii = 0; ii < numUniforms; ++ii) {
-//   const uniformInfo = gl.getActiveUniform(this.shader_program, ii);
-// //   if (isBuiltIn(uniformInfo)) {
-// // 		continue;
-// //   }
-//   uniforms.push(uniformInfo);
-//   const {name, type, size} = uniformInfo;
-//   const blockIndex = blockIndices[ii];
-//   const offset = offsets[ii];
-// //   console.log(
-// // 	  name, size, glEnumToString(gl, type),
-// // 	  blockIndex, offset);
-// console.log(uniformInfo, blockIndex, offset)
-// }

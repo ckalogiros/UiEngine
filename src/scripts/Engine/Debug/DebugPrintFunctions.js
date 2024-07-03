@@ -21,7 +21,7 @@ export function Get_name_from_mesh_type(type) {
 	if (type & MESH_TYPE.WIDGET_SLIDER) { meshType.push('WIDGET_SLIDER'); }
 	if (type & MESH_TYPE.WIDGET_SLIDER_BAR) { meshType.push('WIDGET_SLIDER_BAR'); }
 	if (type & MESH_TYPE.WIDGET_SLIDER_HANDLE) { meshType.push('WIDGET_SLIDER_HANDLE'); }
-	if (type & MESH_TYPE.WIDGET_POP_UP) { meshType.push('WIDGET_POP_UP'); }
+	// if (type & MESH_TYPE.WIDGET_POP_UP) { meshType.push('WIDGET_POP_UP'); }
 
 	return meshType;
 }

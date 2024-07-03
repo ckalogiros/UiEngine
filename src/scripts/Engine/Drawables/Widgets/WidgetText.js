@@ -2,7 +2,6 @@
 
 import { Gl_set_alpha_from_offset } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { AddArr2, CopyArr2, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
-import { Batch_store } from "../../Batch/Batch.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
 import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
@@ -168,20 +167,14 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
-	Move(x, y) {
+	// Move(x, y) {
 
-		if (x === 0 && y === 0) return;
+	// 	if (x === 0 && y === 0) return;
 
-		this.geom.pos[0] += x;
-		this.geom.pos[1] += y;
+	// 	this.geom.pos[0] += x;
+	// 	this.geom.pos[1] += y;
 
-		const update_data = {
-			sizes: [2],
-			data: [x, y],
-		}
-		Batch_store(this, _, update_data, _);
-
-	}
+	// }
 
 
 	Activate() {
@@ -718,30 +711,13 @@ export class Widget_Multi_Text extends Widget_Text {
 	/*******************************************************************************************************************************************************/
 	// Transformations
 
-	Move(x, y) {
+	// Move(x, y) {
 
-		if (x === 0 && y === 0) return;
+	// 	if (x === 0 && y === 0) return;
 
-		this.geom.pos[0] += x;
-		this.geom.pos[1] += y;
-
-		const update_data = {
-			sizes: [2],
-			data: [x, y],
-		}
-		Batch_store(this, _, update_data, _);
-
-		// Move children text
-		for (let i = 0; i <= this.children.boundary; i++) {
-
-			const child = this.children.buffer[i];
-			if (child) {
-				child.geom.pos[0] += x;
-				child.geom.pos[1] += y;
-				Batch_store(child, _, update_data, _);
-			}
-		}
-	}
+	// 	this.geom.pos[0] += x;
+	// 	this.geom.pos[1] += y;
+	// }
 
 
 	MoveNoGfxUpdate(x, y) {

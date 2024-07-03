@@ -18,18 +18,7 @@ const COMMANDS = {
 const _command_storage_buffer = New_generic_buffer(_, 'Command Buffer');
 const _command_flags = { mask:0x0 }; // Fast way to find if a spesific ID command has been added to command buffer
 
-// function Command_exists(ID) {
 
-//    if (_command_storage_buffer.boundary < 0) return false;
-
-//    for (let i = 0; i <= _command_storage_buffer.boundary; i++) {
-
-//       const id = _command_storage_buffer.buffer[i].ID;
-//       if (id === ID) return true;
-//    }
-
-//    return false;
-// }
 
 export function Command_buffer_store(Clbk = null, params = null, ID = null) {
    

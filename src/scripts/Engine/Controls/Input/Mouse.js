@@ -3,10 +3,9 @@
 import { GetSign } from "../../../Helpers/Helpers.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Callback_animations_create } from "../../Animations/CallbackAnimations.js";
-import { Mesh_animations_create } from "../../Animations/MeshAnimations.js";
 import { Info_listener_dispatch_event } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { RegisterEvent } from "../../Events/Events.js";
-import { Scene_camera_scroll, Scene_camera_zoom } from "../../Scenes.js";
+import { Scene_camera_scroll } from "../../Scenes.js";
 
 
 const mouse = {

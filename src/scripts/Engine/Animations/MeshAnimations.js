@@ -1,10 +1,8 @@
 "use strict";
 
-import { Vertex_buffer_group_get_byidx, Vertex_buffer_state_enable } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_batch_set_RGBA, Gl_batch_set_pos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { New_generic_buffer } from "../Core/Buffers.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
-import { Timer_get_global_timer, Timer_get_global_timer_cosine, Timer_get_global_timer_sine } from "../Timers/Timers.js";
 
 
 /**

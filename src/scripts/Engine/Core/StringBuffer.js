@@ -1,7 +1,7 @@
 "use strict";
 
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Int16Buffer, M_Buffer, New_generic_buffer, New_int16_buffer } from "./Buffers.js";
+import { New_generic_buffer, New_int16_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
 
 

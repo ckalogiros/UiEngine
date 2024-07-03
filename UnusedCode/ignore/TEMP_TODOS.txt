@@ -1,0 +1,63 @@
+
+
+Implement destroying a mesh by the widget_root buffer.
+No recursions needed.
+Also on destroy, some recursiona may call destroy Listener more than one time.
+
+
+Separate Dynamic text set
+
+
+The root buffers are not synchronized On delete (batch buffer has a diferent root_bufferidx from root_buffer)
+
+
+// IMIDIATELY: 
+Camera program uniform does not need to update every frame. Only when changes happen 
+Also see camera in general for problems
+
+
+
+
+### Create a faster Calc, that handles position, size and activation (Clip) for meshes
+      FINISH THE NEW RECALC()
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+### Maybe the group views have another buffer to hold only the 'Active meshes'? (Very efficient for scrollers)
+      Or maybe the group has only the active meshes, and updates for every .SetActive() when ever is called(adding or removing meshes from the group)
+      The reason to do that is because lets sayy for example the debug info ui for all meshes in the mesh buffer can easily be 10.000 meshes    
+      so every time we scroll we have to loop through all meshes of the group, which is stupidly expensive 
+
+
+# Also for text, which is responsible for large ammounts of meshes,
+      we should implement a different aproach. maybe use another mesh with less data.
+      For example, text don't need event listeners buffer, ...
+
+
+
+
+# Correct the resize mouse pointer:
+      Check for mouse position on every time interval OnResize so that the resize happens if the pointer is in-between some area.
+      Avoid resize to the right when pointer has surpass the 'resize' area
+
+
+# INEFICIENCY: In ConstructListeners (widget classes) we pass clbk of OnClick for HOVER events too
+
+
+
+# Implement fast remove from root and group
+
+
+
+# Maybe for sliders we set listener only on slider widget and check in class Slider 
+      if the mouse click happened inside bar area,
+      instead of creating for bar and slider for move
+
+
+# pad for Text_Mesh-MultiText is anused. Check it
+
+# There is a confusion with the padding
+      In a text_mesh we use the padding to create space around the text and the rect that belongs to.
+      The question then becomes: When it comes to add the pad to calculations do we use a separate approach
+      for adding the pad to label's rect?
+      Because if we add the pad to set the max size of the label's parent meshthen we double add the padding
+      once in text mesh and second time in 

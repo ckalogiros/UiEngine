@@ -5,7 +5,6 @@
 /**
  * Global Timer.
  * Updates on every start and end of every frame.
- * 
  */
 
 class Time {

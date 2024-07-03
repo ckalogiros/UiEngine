@@ -2,13 +2,10 @@
 
 import { Intersection_point_rect } from "../Drawables/Operations/Collisions.js";
 import { MouseGetPos } from "../Controls/Input/Mouse.js";
-import { Free_generic_buffer, New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
+import { Free_generic_buffer, New_generic_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
-// import { Info_listener_create_event } from "../Drawables/DebugInfo/InfoListeners.js";
-import { GREY } from "../Drawables/Material/Base/Colors.js";
 import { Mesh_buffer_get_mesh_bounding_box, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_name_byidx } from "../Core/MeshBuffer.js";
-import { Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 
 
 
@@ -25,41 +22,6 @@ import { Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueu
  *    to directly check for click the 'STATE.mesh.hovered' and skip all 
  *    the one by one top root meshes checking for click, since the only clicked mesh is
  *    the one that is allready hovered.
- * CODE:
-      if (STATE.mesh.hovered &&
-         STATE.mesh.hovered.listeners.buffer[H] !== INT_NULL &&
-         STATE.mesh.hovered.listeners.buffer[C] !== INT_NULL) {
-
-         const idx = STATE.mesh.hovered.listeners.buffer[C];
-
-         const dispatch_params = {
-            meshidx: this.event_type[C].buffer[idx].meshidx,
-            evt_params: this.event_type[C].buffer[idx].evt_params,
-            trigger_params: trigger_params,
-            event_type: TYPE_IDX,
-         }
-         ret = this.event_type[TYPE_IDX].buffer[idx].Clbk(dispatch_params);
-
-      // First check the children's event buffer
-      if(this.event_type[C].buffer[idx].children !== null){ // Check children for events
-
-         for(let j=0; j<this.event_type[C].buffer[idx].children.boundary; j++){
-
-            const child_event = this.event_type[C].buffer[idx].children.buffer[j];
-
-            const dispatch_params = {
-               meshidx: child_event.meshidx,
-               evt_params: child_event.evt_params,
-               trigger_params: trigger_params,
-               event_type: TYPE_IDX,
-            }
-            
-            ret = child_event.Clbk(dispatch_params);
-            
-            if(ret) return; // If at least one event is handled, do not continue.
-         }
-         
-      }
  */
 
 /**

@@ -1,9 +1,9 @@
 "use strict";
 
-import * as math from '../../Helpers/Math/MathOperations.js'
+import * as math from '../Helpers/Math/MathOperations.js'
 import { Gl_set_wpos_time, Gl_set_wpos_xy, Gl_set_rgba, Gl_set_alpha, GlSetAttrParams1 } from "../../VertexBuffersOps.js";
-import { Mesh } from "../Drawables/Meshes/Base/Mesh.js";
-import { TimersCreateTimer } from "../Timers/Timers.js";
+import { Mesh } from "../Engine/Drawables/Meshes/Base/Mesh.js";
+import { Timers_create_timer } from "../Engine/Timers/Timers.js";
 
 
 
@@ -28,7 +28,7 @@ class Particle {
         this.mesh.pos[1] = ypos;
         if(col) math.CopyArr4(this.mesh.col, col);
         const params = {ballIdx: ballIdx, particleIdx: idx};
-        this.timer   = TimersCreateTimer(0.01, lifeTime, timerStep, name, clbk, params);
+        this.timer   = Timers_create_timer(0.01, lifeTime, timerStep, name, clbk, params);
         this.isAlive = true;
         this.dir = dir;
     }

@@ -73,7 +73,7 @@ export function Timer_update_global_timer_cosine(){ g_timer_cosine = Math.cos(g_
  * 
  * Timer class holds the backbone of a timer 
  * Timers class has a buffer of a large number of timers (SEE #1), that will be used by the application.
- * When a timer is reqquested(TimersCreateTimer() funtion), a free timer from the buffer is returned
+ * When a timer is reqquested(Timers_create_timer() funtion), a free timer from the buffer is returned
  * and that timer is set to 'occupied' (isActive = true), until the duration of the timer expires
  * and the timer is rendered free again to be recycled to the free timers for new use.
  * 
@@ -230,19 +230,19 @@ _timers.Init();
  */
 
 /** Getters-Setters */
-export function TimersGetTimers(){
+export function Timers_get_timers(){
     return _timers;
 }
 
 
 
-export function TimersGetTimer(idx){
+export function Timers_get_timer(idx){
     return _timers.buffer[idx];
 }
 
 
 
-export function TimersCreateTimer(start, duration, step, name, clbk, params){
+export function Timers_create_timer(start, duration, step, name, clbk, params){
     // Catch wrong parameters(name is a valid param only for debugging)
     if(!(typeof name === 'string' || name instanceof String))
     alert('--NAME FOR TIMERS NOT PASSED--')
@@ -257,7 +257,7 @@ export function TimersCreateTimer(start, duration, step, name, clbk, params){
  * 
  * // TODO !!!: Not efficient, it runs 350 elements without any being active
  */
-export function TimersUpdateTimers(){
+export function Timers_update(){
 
     for(let i=0; i<_timers.size; i++){
         const t = _timers.buffer[i]; // Cash
@@ -277,7 +277,7 @@ export function TimersUpdateTimers(){
 /**
  * Debug
  */
-export function TimersPrintTimers(){
+export function Timers_print_timers(){
 
     for(let i=0; i<_timers.size; i++){
         const t = _timers.buffer[i]; // Cash

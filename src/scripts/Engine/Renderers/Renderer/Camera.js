@@ -1,4 +1,4 @@
-import { MouseGetPosDif, MouseGetWheel } from '../../Controls/Input/Mouse.js';
+import { MouseGetPosDif } from '../../Controls/Input/Mouse.js';
 import { Timer_get_global_timer } from '../../Timers/Timers.js';
 import { Matrix4 } from '../../../Helpers/Math/Matrix4.js';
 
@@ -163,51 +163,7 @@ export class CameraOrthographic extends Camera {
 		this.makeOrthographic( 0, width, 0, height, near, far );
 		this.isSet = true;
 
-		// console.log('Camera Projection:', this.matrix)
 	}
-
-
-// 	Init(width, height) {
-
-// 		const zoom = 1;
-// 		const dx = ( width - 0 ) / ( 2 * zoom );
-// 		const dy = ( 0 - height ) / ( 2 * zoom );
-// 		const cx = ( width + 0 ) / 2;
-// 		const cy = ( 0 + height ) / 2;
-
-// 		let left = cx - dx;
-// 		let right = cx + dx;
-// 		let top = cy + dy;
-// 		let bottom = cy - dy;
-
-// 		const near = 0, far = -1000;
-
-// 		this.makeOrthographic( left, right, top, bottom, near, far );
-// 		this.isSet = true;
-
-// 		console.log('Camera Projection:', this.matrix)
-// 	}
-
-// 	Set(width, height){
-
-// 		const zoom = 1;
-// 		const dx = ( width - 0 ) / ( 2 * zoom );
-// 		const dy = ( 0 - height ) / ( 2 * zoom );
-// 		const cx = ( width + 0 ) / 2;
-// 		const cy = ( 0 + height ) / 2;
-
-// 		let left = cx - dx;
-// 		let right = cx + dx;
-// 		let top = cy + dy;
-// 		let bottom = cy - dy;
-
-// 		const near = 0, far = 1000;
-
-// 		this.makeOrthographic( left, right, top, bottom, near, far );
-// 		this.isSet = true;
-
-// 		// console.log('Camera Projection:', this.matrix)
-// 	}
 
 }
 

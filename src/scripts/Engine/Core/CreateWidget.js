@@ -6,7 +6,7 @@ import { Widget_Multi_Text, Widget_Text } from "../Drawables/Widgets/WidgetText.
 import { Widget_Scroller } from "../Drawables/Widgets/WidgetScroller.js";
 import { Widget_Slider_XX1, Widget_Slider_Simple } from "../Drawables/Widgets/WidgetSlider.js";
 import { Widget_Dropdown } from "../Drawables/Widgets/Widget_Dropdown.js";
-import { Rect, Rect_Mesh } from "../Drawables/Meshes/Rect_Mesh.js";
+import { Rect_Mesh } from "../Drawables/Meshes/Rect_Mesh.js";
 import { Text_Mesh } from "../Drawables/Meshes/Text_Mesh.js";
 import { Close_Button, Widget_Menu_Bar, Widget_Minimize } from "../Drawables/Widgets/WidgetMenu.js";
 import { Widget_Switch_Simple } from "../Drawables/Widgets/WidgetSwitch.js";

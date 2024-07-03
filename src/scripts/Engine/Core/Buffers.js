@@ -1062,48 +1062,6 @@ export class CharBuffer extends M_Buffer {
    }
 
 
-
-   // #GetNextFree() {
-
-   //    // Case the free buffer has a free index to the buffer
-   //    if(this.free_buffer.boundary > INT_NULL &&
-
-   //       this.free_buffer.buffer[this.free_buffer.boundary] !== INT_NULL){
-   //       const idx = this.free_buffer.buffer[this.free_buffer.boundary];
-   //       this.free_buffer.RemoveByIdxSortedVersionLastElemGuarantee();
-         
-   //       if(idx > this.boundary) this.boundary = idx;
-   //       return idx;
-   //    }
-
-   //    // Case there is an element beyond .boundary, which denotes the last used element.
-   //    if(this.boundary+1 < this.size){
-   //       this.boundary++;
-   //       return this.boundary;
-   //    }
-   //    else if(this.boundary+1 >= this.size){ // No free space left, Realloc
-   //       const idx = this.Realloc(); // Returns the first free elem index
-   //       this.boundary = idx;
-   //       return idx;
-   //    }
-
-   //    alert('Buffers.js, GetNextFree(). New element not found')
-   // }
-
-
-   // Reset() {
-
-   //    // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT -= this.active_count;
-
-   //    this.boundary = -1;
-   //    this.active_count = 0;
-   //    this.buffer[0] = '';
-   //    this.freeidx = 0;
-   //    this.reserveidx = INT_NULL;
-
-   // }
-
-
    RemoveByIdx(idx) {
 
       /**DEBUG ERROR*/ if (idx < 0 || idx > this.size - 1) {

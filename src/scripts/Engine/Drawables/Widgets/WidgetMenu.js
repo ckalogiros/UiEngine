@@ -1,17 +1,15 @@
 "use strict";
 
-import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Widget_Button } from "./WidgetButton.js";
 import { Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
-import { Calculate_positions_no_gfx_update_recursive, Section } from "../Meshes/Section.js";
+import { Section } from "../Meshes/Section.js";
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 import { Styles_pad_set } from "../../Styles.js";
-import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.js";
+import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/MeshBufferViews.js";
-import { Mesh_unif_add_vb_root_wposx, Mesh_unif_set_vb_root_wposx } from "../../Core/MeshUniformsBuffer.js";
 
 
 
@@ -54,7 +52,7 @@ export class Widget_Menu_Bar extends Section {
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.SetStyle(style);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-      this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       this.options = SECTION.INDEPENDENT;
 
 
@@ -124,23 +122,6 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
-   /** Must run for every mesh */
-   // GfxUniformsEnable(flags, name, type, shader_flags) {
-
-   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
-   //    this.label.EnableGfxUniforms(flags, name, type, shader_flags);
-
-   // }
-
-   // GfxCtxSetFlag(FLAGS){
-   //    // alert('-1 MENU')
-
-   //    this.gfx_ctx_flags = FLAGS;
-   //    if(!this.gfx_ctx_parent) this.gfx_ctx_parent = gfx_ctx_parent;
-   //    for (let i = 0; i <= this.children.boundary; i++) {
-   //       this.children.buffer[i].GfxCtxSetFlag(FLAGS,gfx_ctx_parent);
-   //    }
-   // }
 
 
 
@@ -198,50 +179,37 @@ export class Widget_Menu_Bar extends Section {
    // Listeners
    /*******************************************************************************************************************************************************/
 
-   // SEE ### Construct Listeners
-   // ConstructListeners(parent_listeners = null) {
 
-   //    // const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-   //    super.ConstructListeners(parent_listeners);
+   /**
+    * Constructs all listen events enabled for this classs widget.
+    * 
+    * The listener will be constructed only if:
+    *    1. the mesh is ACTIVE
+    *    2. the event index is INT_NULL. 
+    *       That is so we skip the construction of an already created listener, if the .listeners[etype] is a number [0..n] indexing the listener in the EventListeners System buffer
+    *       and it does not create a listener if the .listeners[etype] is null, if there is no listener assigned to be created
+    * 
+    *  This fuction must be called through 'Construct_listen_events_from_mesh_tree()', because it does not check if 'mesh.listeners' is null buffer
+    */
+   ListenEventConstruct() {
+      alert('556172834 \n Implement me')
 
-   // }
 
-   
-   // AddListeners() {
-
-   //    super.AddListeners();
-
-   // }
-   
-
-    /**
-     * Constructs all listen events enabled for this classs widget.
-     * 
-     * The listener will be constructed only if:
-     *    1. the mesh is ACTIVE
-     *    2. the event index is INT_NULL. 
-     *       That is so we skip the construction of an already created listener, if the .listeners[etype] is a number [0..n] indexing the listener in the EventListeners System buffer
-     *       and it does not create a listener if the .listeners[etype] is null, if there is no listener assigned to be created
-     * 
-     *  This fuction must be called through 'Construct_listen_events_from_mesh_tree()', because it does not check if 'mesh.listeners' is null buffer
-     */
-    ListenEventConstruct() {
-alert('556172834 \n Implement me')
       const mesh = this;
 
       if (mesh.state.mask & MESH_STATE.ACTIVE) {
 
-          // Construct HOVER event
-          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-              mesh.AddListenEvent(E.H, null, null);
-          }
-          // Construct CLICK_UP/MOVE event
-          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
-              const evt_params = { target_mesh: mesh, };
-              mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
-          }
+         // Construct HOVER event
+         if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
+            mesh.AddListenEvent(E.H, null, null);
+         }
+         // Construct CLICK_UP/MOVE event
+         if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
+            const evt_params = { target_mesh: mesh, };
+            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+         }
       }
-  }
+   }
 
    // Resize menu bar. Keep the menu elements to their relative positions 
    Resize(x) {
@@ -492,9 +460,8 @@ export class Close_Button extends Widget_Button {
 
 export class Widget_Minimize extends Widget_Button {
 
-   toggle; // On/Off
-   stored_children_meshes; // Store all children meshes of the root, to maximize the widget back to normal. 
-   // stored_children_events; // Store the 'children' buffer of the roots EventListeners (class).
+   // toggle; // On/Off
+   // stored_children_meshes; // Store all children meshes of the root, to maximize the widget back to normal. 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = [0, 4, 1.8], font, is_debug_mesh) {
 
@@ -502,7 +469,6 @@ export class Widget_Minimize extends Widget_Button {
 
       this.toggle = false;
       this.store_children_meshes = null;
-      // this.stored_children_events = new Array(LISTEN_EVENT_TYPES_INDEX.SIZE); // Store the 'children' buffer of the roots EventListeners (class). 
 
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
@@ -554,7 +520,7 @@ export class Widget_Minimize extends Widget_Button {
       STATE.mesh.SetClicked(minim_mesh);
 
 
-      if(minim_mesh.group_bufferidxs[0] === INT_NULL) {
+      if (minim_mesh.group_bufferidxs[0] === INT_NULL) {
          alert('Minimize button needs a ViewGrouup to work');
          return;
       }
@@ -574,26 +540,26 @@ export class Widget_Minimize extends Widget_Button {
             // Store the root children tree structure to a temporary place, so that can be retrieved on maximize
             const menu_bar = root.children.buffer[0]; // CAUTION: First child suppose to be the menu_bar. What happens if it is at a different index???
 
-            
+
             // Render only the menu bar at the root
-            
+
             // Deactivate all children, except the menu bar, so they are not gonna be drawn to the vertex buffer on any re-render 
             for (let i = menu_bar.idx + 1; i <= root.children.boundary; i++) {
                if (root.children.buffer[i]) root.children.buffer[i].Deactivate()
             }
-            
+
             root.children.ResetFull(); // Reset the children's buffer and allocate new array
             root.AddChild(menu_bar);
 
-            
+
             // Store pos and dim of the un-munimized root mesh
             root.geom.defPos[1] = root.geom.pos[1];
             root.geom.defDim[1] = root.geom.dim[1];
             // Resize the root widget to include only the height of the menu bar
             root.geom.dim[1] = menu_bar.geom.dim[1] + root.StylesGetMargin(STYLES.AXIS.Y);
-            
+
             { // For side-ways minimizing
-               
+
                // // Store pos and dim of the un-munimized root mesh
                // // root.geom.defPos[0] = root.geom.pos[0];
                // Mesh_unif_set_vb_root_wposx(root.root_posidx, VIEWPORT.WIDTH - menu_bar.geom.dim[0]*2);
@@ -628,12 +594,12 @@ export class Widget_Minimize extends Widget_Button {
                if (root.children.buffer[i]) root.children.buffer[i].Activate();
             }
 
-            
+
             // Retrieve stored pos and dim
             root.geom.pos[1] = root.geom.defPos[1];
             root.geom.dim[1] = root.geom.defDim[1];
-            
-            
+
+
             { // For side-ways minimizing
                // // Retrieve stored pos and dim
                // // root.geom.pos[0] = root.geom.defPos[0];

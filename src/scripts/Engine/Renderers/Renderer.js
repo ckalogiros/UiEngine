@@ -2,10 +2,9 @@
 
 import { Gl_draw } from "../../Graphics/GlDraw.js";
 import { TimeSample, TimeUpdate } from "../Timers/Time.js";
-import { TimersUpdateGlobalTimer, TimersUpdateTimers } from "../Timers/Timers.js";
+import { TimersUpdateGlobalTimer, Timers_update } from "../Timers/Timers.js";
 import { TimeIntervalsUpdateAll } from "../Timers/TimeIntervals.js";
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
-import { Batch_update } from "../Batch/Batch.js";
 import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Performance_timer_start, Performance_timer_stop, Performance_timers_update_tick } from "../Timers/PerformanceTimers.js";
@@ -13,7 +12,7 @@ import { Command_buffer_run } from "../Core/Commandbuffer.js";
 import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../Scenes.js";
 import { Input_reset } from "../Controls/Input/Input.js";
 import { Mesh_animations_run } from "../Animations/MeshAnimations.js";
-import { Particle_system_update } from "../ParticlesSystem/NewParticlesSystem.js";
+import { Particle_system_update } from "../ParticlesSystem/ParticlesSystem.js";
 import { Callback_animations_runs } from "../Animations/CallbackAnimations.js";
 
 
@@ -77,7 +76,7 @@ export class Renderer {
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
          TimeIntervalsUpdateAll(); // Update and run callbacks for each interval timer that has been set.
          TimersUpdateGlobalTimer(); // This is a globbal timer, going only forward
-         TimersUpdateTimers();
+         Timers_update();
          // TimersUpdateStepTimers();
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
 
@@ -89,8 +88,6 @@ export class Renderer {
 
          Framebuffer_update_draw();
          this.scene.OnUpdate();
-
-         Batch_update()
 
          Notifications_update();
 

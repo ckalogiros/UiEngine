@@ -8,26 +8,15 @@ import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_pro
 import { Mesh_per_vb_create_vb, Widget_root_batch_assign_and_accum_to_vb, Widget_root_gfx_add } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
-import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name, Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform, Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
+import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name, Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
-import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_from_existing_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_set_from_existing_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 
 
-// const Table_combi_look_up_wich_attrib_to_wich_vb = [
-//    // Unique combinations of diff attribs with diff vbidx's
-//    // Example: 0: {COL buffer + WPOS buffer} : 0(idx)
-// ];
 
-
-// function Store(sid, vbidx){
-
-//    const idx = Table_combi_look_up_wich_attrib_to_wich_vb.push(vbidx);
-
-//    return idx-1;
-// }
 
 
 export class GfxInfoMesh {

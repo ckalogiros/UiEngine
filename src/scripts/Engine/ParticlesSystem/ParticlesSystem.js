@@ -1,11 +1,9 @@
 "use strict";
 
-import { CLBK_TIMER } from "../../App/TestWidgets.js";
-import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_update_vertices } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos4_pos2, Gl_particles_batch_set_col4_wpos4_pos2_style3 } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
-import { Abs, Hash, Max } from "../../Helpers/Math/MathOperations.js";
+import { Hash, Max } from "../../Helpers/Math/MathOperations.js";
 import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../Core/StringBuffer.js";
@@ -14,47 +12,9 @@ import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 
 
-// Create particle struct
 
-// Create the emmiter struct. Should be a normal mesh?
-
-// Create the buffer for the children particles
-
-/**
- * Particles Shader
- * 
- * uniform color
- * uniform wpos
- * 
- * attribute pos
- * attribute dim
- * attribute tex // If Used
- * 
- * attribute time // Inside the wpo4 design
- * 
- * Alpha
- * attribute alpha // Inside the dim???
- * Or use the shader with the timer to calculate the alpha
- */
-const dir_factor = .6
-
-
-
-
-let yy = 0.
-// let speed = .01;
 const speed = 4;
-let accel = 2.;
-// let deccel = .98;
-// let deccel = .7;
-let deccel = .98;
-// let gravity = 1.03;
-let gravity = -.1;
-// let gravity = -1.1;
-// let gravity = 0.5;
-
 const speed_ratio = .01
-
 const max = 100;
 const interpolate = 1/max;
 
@@ -65,7 +25,6 @@ class Particle {
 
       if (emitter === null || emitter === undefined) alert('Trying to create particle with NULL emitter\nParticleSystem.js')
 
-      // this.col = [];
       this.col = [0, 0, 0, 0];
       this.pos = [0, 0, 0];
       this.dim = [0, 0];
