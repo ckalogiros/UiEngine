@@ -61,7 +61,9 @@ export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
    temp_no_allocation_buffer[0][0] = pos[0] - hover_margin[0];
    temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + hover_margin[0];
    temp_no_allocation_buffer[1][0] = pos[1] - hover_margin[1];
-   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + hover_margin[1];
+   // TODO: For meshes with more than 4 vertices we must multiply the dimention with the number of faces. So we need to know which coordinate the mesh has the extra vertices towards to, and then mult that coord with the num faces. Currently the only coord to expand is the x axis(for colorpicker HUE bar) 
+   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + hover_margin[1];
+   // temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + hover_margin[1];
 
    return temp_no_allocation_buffer;
 }

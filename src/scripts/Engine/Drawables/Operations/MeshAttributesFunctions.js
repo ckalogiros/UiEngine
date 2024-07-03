@@ -5,6 +5,7 @@
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../../../Graphics/Buffers/UniformBuffers.js';
 import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
+import { WHITE } from '../Material/Base/Colors.js';
 
 
 
@@ -95,6 +96,8 @@ export function Set_hover_color_rgba(mesh) {
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
       math.Mult_arr4_scalar(mesh.mat.col, intensity);
       Gl_set_rgba(mesh.gfx, mesh.mat.col);
+      // math.Mult_arr4_scalar(mesh.color_active, intensity);
+      // Gl_set_rgba(mesh.gfx, mesh.color_active);
    }
    else if (mesh.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
       math.Mult_arr4_scalar(mesh.mat.col, intensity);

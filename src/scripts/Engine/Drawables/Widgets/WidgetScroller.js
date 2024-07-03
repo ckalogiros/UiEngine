@@ -97,9 +97,9 @@ export class Widget_Scroller extends Section {
          last: this.scrolled_section.children.boundary,
       }
 
-      if (this.scrolled_section.listeners === null) {
-         this.scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
-      }
+      // if (this.scrolled_section.listeners === null) {
+      //    this.scrolled_section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
+      // }
 
 
 
@@ -116,6 +116,7 @@ export class Widget_Scroller extends Section {
       bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       bar.StylesSetMargin(marg);
+      // bar.StylesSetPad([10,10]);
       bar.SetStyle([1.5, 3, 1]);
       bar.SetName(`ScrollBar[${this.mesh_bufferidx}]`);
 
@@ -133,33 +134,34 @@ export class Widget_Scroller extends Section {
       handle.SetStyle([0, 3, 1.6]);
       handle.SetName(`Scroll handle[${this.mesh_bufferidx}]`);
       handle.StylesSetMargin(marg);
-      // handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      // handle.StylesSetPad([10,10]);
       handle.StylesSetPad([3, 3]);
-
+      
       handle.geom.pos[0] = bar.geom.pos[0];
       handle.geom.pos[1] = bar.geom.pos[1];
-
+      
       // Make the vertical area of the bar larger for hover and handle grabing.
       bar.hover_margin = [0, handle.geom.dim[1] + 4];
       bar.StylesSetHoverMargin([0, handle.geom.dim[1] + 4]);
-
-
-
+      
+      
+      
       /********************************************************************************************************************************************/
       // Align
-
-
+      
+      
       bar.AddChild(handle);
       this.scroll_bar = bar;
-
+      
       // Add the scrolled mesh
       this.AddItem(this.scrolled_section);
       this.AddItem(bar);
-
+      
       this.SetName(`Scroller[${this.mesh_bufferidx}]`);
-
+      
+      bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       // this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      // bar.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       // handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
 
@@ -353,8 +355,11 @@ export class Widget_Scroller extends Section {
       for (let i = 0; i <= this.scrolled_section.children.boundary; i++) {
          const child = this.scrolled_section.children.buffer[i];
          if (child) {
-            if (child.gfx_ctx_flags) child.GenGfxCtx(child.gfx_ctx_flags, INT_NULL);
-            else child.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section_vb_groupidx);
+            console.log('GenGfx', child.GetName(), child.gfx_ctx_flags)
+            if (child.gfx_ctx_flags) 
+               child.GenGfxCtx(child.gfx_ctx_flags, INT_NULL);
+            else 
+               child.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section_vb_groupidx);
          }
       }
 
@@ -536,99 +541,154 @@ export class Widget_Scroller extends Section {
    // }
 
 
-   ListenEventCreate(etype) {
+   // ListenEventCreate(etype) {
 
-      const etypeidx = Listen_event_get_idx_from_type(etype);
+   //    const etypeidx = Listen_event_get_idx_from_type(etype);
+   //    const mesh = this;
+   //    const bar = this.scroll_bar;
+   //    // const handle = bar.children.buffer[0];
+   //    const scrolled_section = this.scrolled_section;
+
+
+   //    // For Hover events we need no callback and params
+   //    if (etype & LISTEN_EVENT_TYPES.HOVER) {
+
+   //       mesh.CreateListenEvent(etype);
+   //       bar.CreateListenEvent(etype);
+   //       if (mesh.state.mask & MESH_STATE.ACTIVE) {
+   //          mesh.AddListenEvent(etypeidx, null, null);
+   //          bar.AddListenEvent(etypeidx, null, null);
+   //          scrolled_section.AddListenEvent(etypeidx, null, null);
+   //       }
+   //    }
+   //    else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+   //       const evt_params = { target_mesh: mesh, };
+   //       mesh.CreateListenEvent(etype);
+   //       bar.CreateListenEvent(etype);
+   //       if (mesh.state.mask & MESH_STATE.ACTIVE) {
+   //          mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //          bar.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //          scrolled_section.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //       }
+   //    }
+
+   // }
+
+   /**
+    * Constructs all listen events enabled for this classs widget.
+    * 
+    * The listener will be constructed only if:
+    *    1. the mesh is ACTIVE
+    *    2. the event index is INT_NULL. 
+    *       That is so we skip the construction of an already created listener, if the .listeners[etype] is a number [0..n] indexing the listener in the EventListeners System buffer
+    *       and it does not create a listener if the .listeners[etype] is null, if there is no listener assigned to be created
+    * 
+    *  This fuction must be called through 'Construct_listen_events_from_mesh_tree()', because it does not check if 'mesh.listeners' is null buffer
+    */
+   ListenEventConstruct() {
+
       const mesh = this;
       const bar = this.scroll_bar;
       // const handle = bar.children.buffer[0];
       const scrolled_section = this.scrolled_section;
 
 
-      // For Hover events we need no callback and params
-      if (etype & LISTEN_EVENT_TYPES.HOVER) {
-
-         mesh.CreateListenEvent(etype);
-         bar.CreateListenEvent(etype);
-         if (mesh.state.mask & MESH_STATE.ACTIVE) {
-            mesh.AddListenEvent(etypeidx, null, null);
-            bar.AddListenEvent(etypeidx, null, null);
-            scrolled_section.AddListenEvent(etypeidx, null, null);
+      /****************************************************************************/
+      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+         
+         // Construct HOVER event
+         if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
+            mesh.AddListenEvent(E.H, null, null);
          }
-      }
-      else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
-
-         const evt_params = { target_mesh: mesh, };
-         mesh.CreateListenEvent(etype);
-         bar.CreateListenEvent(etype);
-         if (mesh.state.mask & MESH_STATE.ACTIVE) {
-            mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-            bar.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-            scrolled_section.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+         // Construct CLICK_UP/MOVE event
+         if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
+            const evt_params = { target_mesh: mesh, };
+            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
          }
+         
+         // Construct for bar
+         if (bar.listeners && bar.listeners.buffer[E.H] === INT_NULL) {
+            bar.AddListenEvent(E.H, null, null);
+         }
+         // Construct CLICK_UP/MOVE event
+         if (bar.listeners && bar.listeners.buffer[E.C] === INT_NULL) {
+            const evt_params = { target_mesh: mesh, };
+            bar.AddListenEvent(E.C, mesh.OnClick, evt_params);
+         }
+
+         // // Construct for scrolled section
+         // if (scrolled_section.listeners && scrolled_section.listeners.buffer[E.H] === INT_NULL) {
+         //    scrolled_section.AddListenEvent(E.H, null, null);
+         // }
+         // // Construct CLICK_UP/MOVE event
+         // if (scrolled_section.listeners && scrolled_section.listeners.buffer[E.C] === INT_NULL) {
+         //    const evt_params = { target_mesh: mesh, };
+         //    scrolled_section.AddListenEvent(E.C, mesh.OnClick, evt_params);
+         // }
       }
 
    }
 
-   ListenEventCreateAndAdd(parent_events = null) {
+   // ListenEventCreateAndAdd(parent_events = null) {
 
-      const mesh = this;
-      const bar = this.scroll_bar;
-      // const handle = bar.children.buffer[0];
-      const scrolled_section = this.scrolled_section;
-
-
-      if (!mesh.listeners)
-         return; // Return if there are no listen events to add
-      // alert('228867 \nMust CreateListenEvent() first for dropdown mesh:.', mesh.GetName);
-      if (parent_events === null)
-         alert('228868 \nParent event must be a valid event index.', mesh.GetName);
+   //    const mesh = this;
+   //    const bar = this.scroll_bar;
+   //    // const handle = bar.children.buffer[0];
+   //    const scrolled_section = this.scrolled_section;
 
 
+   //    if (!mesh.listeners)
+   //       return; // Return if there are no listen events to add
+   //    // alert('228867 \nMust CreateListenEvent() first for dropdown mesh:.', mesh.GetName);
+   //    if (parent_events === null)
+   //       alert('228868 \nParent event must be a valid event index.', mesh.GetName);
 
 
-      for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
-
-         if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
-
-         const etype = Listen_event_types_get_type_from_index(etypeidx);
-
-         /***********************************************************************************************************************/
-         // Create for dropdown button
-         const dp_evt = mesh.listeners.buffer[etypeidx];
-         if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
-
-            // For Hover events we need no callback and params
-            if (etype & LISTEN_EVENT_TYPES.HOVER) {
-               mesh.AddListenEvent(etypeidx, null, null);
-            }
-            else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
-
-               const evt_params = { target_mesh: mesh, };
-               mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-            }
-
-            if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
-
-               const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
-
-               if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
-               else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
-            }
-            else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
-
-         }
-      }
 
 
-      for (let i = 0; i <= scrolled_section.children.boundary; i++) {
+   //    for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
 
-         const child = scrolled_section.children.buffer[i];
-         if (mesh.listeners) child.ListenEventCreateAndAdd(scrolled_section.listeners.buffer);
-         // If the parent mesh does not have any events, we force to continue the recursions in case other children  down the tree have any events
-         else child.ListenEventCreateAndAdd([INT_NULL, INT_NULL]);
-      }
-   }
+   //       if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
+
+   //       const etype = Listen_event_types_get_type_from_index(etypeidx);
+
+   //       /***********************************************************************************************************************/
+   //       // Create for dropdown button
+   //       const dp_evt = mesh.listeners.buffer[etypeidx];
+   //       if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
+
+   //          // For Hover events we need no callback and params
+   //          if (etype & LISTEN_EVENT_TYPES.HOVER) {
+   //             mesh.AddListenEvent(etypeidx, null, null);
+   //          }
+   //          else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+   //             const evt_params = { target_mesh: mesh, };
+   //             mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //          }
+
+   //          if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
+
+   //             const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
+
+   //             if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
+   //             else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
+   //          }
+   //          else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
+
+   //       }
+   //    }
+
+
+   //    for (let i = 0; i <= scrolled_section.children.boundary; i++) {
+
+   //       const child = scrolled_section.children.buffer[i];
+   //       if (mesh.listeners) child.ListenEventCreateAndAdd(scrolled_section.listeners.buffer);
+   //       // If the parent mesh does not have any events, we force to continue the recursions in case other children  down the tree have any events
+   //       else child.ListenEventCreateAndAdd([INT_NULL, INT_NULL]);
+   //    }
+   // }
 
    OnClick(params) {
 
@@ -986,23 +1046,38 @@ export class Widget_Scroller extends Section {
 
    TEMP_recalc(x, y) {
 
-      // const dx = this.geom.pos[0] - ;
-      // const dy = this.geom.pos[1] - ;
+      // this.geom.pos[0] = x;
+      // this.geom.pos[1] = y;
+
+      const dx = x - this.geom.pos[0];
+      const dy = y - this.geom.pos[1];
+
       this.geom.pos[0] = x;
       this.geom.pos[1] = y;
 
+      this.scroll_bar.geom.pos[0] += dx;
+      this.scroll_bar.geom.pos[1] += dy;
 
+      const handle = this.scroll_bar.children.buffer[0];
+      handle.geom.pos[0] += dx;
+      handle.geom.pos[1] += dy;
+
+      // this.scrolled_section.SetPosXYNoGfxUpdate(dx, dy);
+      // this.scrolled_section.SetPosYNoGfxUpdate(dx);
+      // this.scrolled_section.SetPosYNoGfxUpdate(dy);
+      this.scrolled_section.MoveNoGfxUpdate(dx, dy);
+     
       // this.scroll_bar.geom.pos[0] = x;
       // this.scroll_bar.geom.pos[1] = y;
 
-      const handle = this.scroll_bar.children.buffer[0];
+      // const handle = this.scroll_bar.children.buffer[0];
       // handle.geom.pos[0] = x;
       // handle.geom.pos[1] = y;
 
       // this.scrolled_section.SetPosYNoGfxUpdate(x);
       // this.scrolled_section.SetPosYNoGfxUpdate(y);
 
-      this.ScrollerAlign()
+      // this.ScrollerAlign()
       // this.ScrollerAlignBar()
 
    }
@@ -1094,6 +1169,7 @@ export class Widget_Scroller extends Section {
 
       this.scrolled_section.options |= SECTION.RESIZE_PARENT; // For the scrolled section to encapsulate all items.
       this.options |= SECTION.RESIZE_PARENTX;
+      // this.scrolled_section.Recalc_no_gfx_update();
       this.scrolled_section.Calc_no_gfx_update();
       // this.Calc_no_gfx_update();
 
@@ -1109,6 +1185,7 @@ export class Widget_Scroller extends Section {
 
       // this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_marg[0] + size[0]; // + bar.StylesGetPad(STYLES.AXIS.X)*2
       bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) - (scoller_marg[0] * 2 + bar.geom.dim[0] + handle.StylesGetPad(STYLES.AXIS.X))
+      // bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) 
       bar.geom.pos[1] = (this.geom.pos[1] + scoller_marg[0])
       // bar.geom.pos[1] = (this.geom.pos[1] + this.geom.dim[0] * 2) - (scoller_marg[0] * 2 + bar.geom.dim[0] + handle.StylesGetPad(STYLES.AXIS.X))
 
@@ -1131,8 +1208,9 @@ export class Widget_Scroller extends Section {
       const bar = this.scroll_bar;
       const handle = bar.children.buffer[0];
 
-      // this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_pad[0] + size[0]; // + bar.StylesGetPad(STYLES.AXIS.X)*2
+      this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_pad[0]; // + bar.StylesGetPad(STYLES.AXIS.X)*2
       console.log('1', bar.geom.pos[0])
+      // bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) - (scoller_pad[0] * 2 + bar.geom.dim[0] + handle.StylesGetPad(STYLES.AXIS.X))
       bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) - (scoller_pad[0] * 2 + bar.geom.dim[0] + handle.StylesGetPad(STYLES.AXIS.X))
       console.log('2', bar.geom.pos[0])
       // console.log(this.geom.pos[0], this.geom.dim[0])
@@ -1141,9 +1219,9 @@ export class Widget_Scroller extends Section {
       // const ratio = this.geom.dim[1] / this.scrolled_section.geom.dim[1];
       // const h = (ratio * this.geom.dim[1] >= this.geom.dim[1]) ? bar.geom.dim[1] - handle.StylesGetPad(STYLES.AXIS.Y) : ratio * this.geom.dim[1];
       // handle.geom.dim[1] = h;
-      // const handle_pad = handle.StylesGetPad();
-      // handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0]*2;
-      // handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
+      const handle_pad = handle.StylesGetPad();
+      handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
+      handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
 
 
    }
@@ -1233,6 +1311,7 @@ export function Scroller_on_update_handle(_params) {
 
    // Add the move difference to all vb's root positions.
    Mesh_unif_add_vb_root_wposy(scrolled_section.root_posidx, ydif);
+   // Mesh_unif_add_vb_root_wpos_all_siblings(scrolled_section.root_posidx, 0, ydif)
 
 
    const clip_top = scroller_top, clip_bottom = (scroller_top) + scroller.geom.dim[1] * 2;

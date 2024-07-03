@@ -10,47 +10,72 @@ export function Find_parent_listen_event(EVENT_TYPE_IDX, mesh) {
     if (mesh.parent === null) return INT_NULL;
 
     let current = mesh.parent;
+
+    
     while (current) {
+        /**
+         * HERE we must check if a parent is of type dropdown.
+         * If it is, we create a FAKE event to the dp
+         * and BREAK
+         */
+
 
         // Find the first parent with an event listener of type
         if (current.listeners !== null && current.listeners.buffer[EVENT_TYPE_IDX] !== null && current.listeners.buffer[EVENT_TYPE_IDX] !== INT_NULL) {
 
             return current.listeners.buffer[EVENT_TYPE_IDX];
         }
+
+
+        if(current.type & MESH_TYPE.WIDGET_DROP_DOWN){
+
+            const etype = Listen_event_types_get_type_from_index(EVENT_TYPE_IDX);
+            
+            // Create FAKE event
+            current.CreateListenEvent(etype, true); 
+            // Construct
+            current.AddListenEvent(EVENT_TYPE_IDX, null, null); 
+
+            // Find parent ELSE create root view event
+            const parent_eventidx = Find_parent_listen_event(EVENT_TYPE_IDX, current)
+        
+            // if(parent_eventidx === current.listeners.buffer[EVENT_TYPE_IDX]) alert('2')
+
+            // The third check is to avoid the fouund parent event being the root, so no root view has been created 
+            if (parent_eventidx !== null && parent_eventidx !== INT_NULL && parent_eventidx !== current.listeners.buffer[EVENT_TYPE_IDX]) { 
+                Listener_assign_parent_event(EVENT_TYPE_IDX, current.listeners.buffer[EVENT_TYPE_IDX], parent_eventidx)
+            }
+            else Listener_create_root_view(EVENT_TYPE_IDX, current.listeners.buffer[EVENT_TYPE_IDX]);
+            break;
+        }
+
         current = current.parent;
     }
 
 
-    // If no parent listener is found:
-    // 1. If mesh parent is of type section, create FAKE event listener
-    // 2. Else create FAKE event listener at widget root
-
-    // if(mesh.parent && (mesh.parent.type & MESH_TYPE.SECTION_MESH)){
-
-    //    mesh.parent.CreateListenEvent(mesh.event_flags, FAKE_LISTEN_EVENT);
-    //    mesh.parent.AddListenEvent(EVENT_TYPE_IDX, null, null, null);
-    //    return mesh.parent.listeners.buffer[EVENT_TYPE_IDX];
-    // }
-
-if(mesh.root_bufferidx === -1)
-console.log
-    // Ceate FAKE event listener at widget root. The current stored the root in the while loop above
+    // If no parent with event is found, create FAKE event at the widget root
     if (current === null) { // UNNECESSARY: I believe if break is not reached, then current will go to scene which is 'NO_MESH_PARENT'
         const root_meshidx = Widget_root_buffer_get_root_meshidx(mesh.root_bufferidx)
         current = Mesh_buffer_get_mesh_byidx(root_meshidx)
     }
-    // HERE! We want to create an event if the listeners buffer is null OR if the current TYPE_IDX is null
-    if (current.listeners === null || current.listeners.buffer[EVENT_TYPE_IDX] === null) {
 
-        const etype = Listen_event_types_get_type_from_index(EVENT_TYPE_IDX);
-        current.CreateListenEvent(etype, FAKE_LISTEN_EVENT);
-        current.AddListenEvent(EVENT_TYPE_IDX, null, null, null);
-        Listener_create_root_view(EVENT_TYPE_IDX, current.listeners.buffer[EVENT_TYPE_IDX]);
-    }
+    // // HERE! We want to create an event if the listeners buffer is null OR if the current TYPE_IDX is null
+    // if (current.listeners === null || current.listeners.buffer[EVENT_TYPE_IDX] === null) {
+    //     alert('0188263541 UNUSED IF STATMENT')
+    //     // const etype = Listen_event_types_get_type_from_index(EVENT_TYPE_IDX);
+    //     // current.CreateListenEvent(etype, FAKE_LISTEN_EVENT);
+    //     // current.AddListenEvent(EVENT_TYPE_IDX, null, null, null);
+    //     // Listener_create_root_view(EVENT_TYPE_IDX, current.listeners.buffer[EVENT_TYPE_IDX]);
+    // }
 
-    const parent_event_idx = current.listeners.buffer[EVENT_TYPE_IDX];
-    return parent_event_idx;
+    if(current.listeners && current.listeners.buffer[EVENT_TYPE_IDX]) return current.listeners.buffer[EVENT_TYPE_IDX]
+    return null;
+    // const parent_event_idx = current.listeners.buffer[EVENT_TYPE_IDX];
+    // return parent_event_idx;
 }
+
+
+
 
 
 
@@ -61,34 +86,33 @@ console.log
  * to find the first grand-parent with an equivalent event, and set it as the parent event.
  * If no such event is found, then a FAKE event of that type is created at the root parent mesh.
  */
-export function Construct_listeners_relations(mesh) {
+export function Construct_listen_events_relations_from_mesh_tree(mesh) {
+    
     let parent_events = null;
-    if (mesh.parent) {
-        parent_events = mesh.parent.listeners;
-        // console.log(mesh.GetName(), mesh.parent.GetName(), parent_events)
-    }
-    // else if(mesh)
-    console.log(mesh.GetName())
-    if(mesh.GetName() === 'Switch Widget')
-        console.log()
+    if (mesh.parent) parent_events = mesh.parent.listeners; 
 
-    // TODO: Remove from the event: to be as null and as an INT_NULL    
-    if (mesh.listeners !== null) {
+    // console.log(mesh.GetName())
+
+    if (mesh.listeners !== null && (mesh.state.mask & MESH_STATE.ACTIVE)) {
 
         for (let etype = 0; etype <= mesh.listeners.boundary; etype++) {
             
             if (mesh.listeners.buffer[etype] !== null) {
                 
-                // ERROR CHECK: Case parent event is INT_NUULL
-                if(parent_events && parent_events.buffer[etype] === INT_NULL) alert('7266534');
+                // ERROR CHECK: Case parent event is INT_NULL
+                if(parent_events && parent_events.buffer[etype] === INT_NULL) 
+                    alert('7266534');
 
                 
                 if (parent_events === null || parent_events.buffer[etype] === null) {
                     // Find from widget root tree any parent events
                     const parent_eventidx = Find_parent_listen_event(etype, mesh);
     
-                    if (parent_eventidx !== INT_NULL) { // Find any parent event from the widget root tree
-                        // Listener_create_root_view(etype, parent_eventidx);
+                    if (parent_eventidx !== null && parent_eventidx !== INT_NULL) { // Find any parent event from the widget root tree
+                        
+                        if(mesh.listeners.buffer[etype] === INT_NULL)
+                        console.log(mesh.listeners.buffer[etype], parent_eventidx)
+                        
                         Listener_assign_parent_event(etype, mesh.listeners.buffer[etype], parent_eventidx)
                     }
                     else if (mesh.listeners.buffer[etype] !== null && mesh.listeners.buffer[etype] !== INT_NULL) { // Create root event view 
@@ -99,66 +123,58 @@ export function Construct_listeners_relations(mesh) {
     
                     // Connect child's event with the current parent
                     Listener_assign_parent_event(etype, mesh.listeners.buffer[etype], parent_events.buffer[etype])
-                    console.log('Connect event:', mesh.listeners.buffer[etype], 'with parent', parent_events.buffer[etype])
+                    // console.log('Connect event:', mesh.listeners.buffer[etype], 'with parent', parent_events.buffer[etype])
                 }
             }
-
-            // TODO: If there is no current-parent event, create a fake one 
         }
     }
 
+    // Run recursive for mesh tree node
     for (let i = 0; i <= mesh.children.boundary; i++) {
 
         const child = mesh.children.buffer[i];
-        Construct_listeners_relations(child)
+        Construct_listen_events_relations_from_mesh_tree(child)
 
     }
-    // Run  for children
 }
-/**SAVE */
-// export function Construct_listeners_relations(mesh) {
-//     let parent_events = null;
-//     if (mesh.parent) {
-//         parent_events = mesh.parent.listeners;
-//         // console.log(mesh.GetName(), mesh.parent.GetName(), parent_events)
-//     }
-//     // else if(mesh)
 
-//     // TODO: Remove from the event: to be as null and as an INT_NULL    
-//     if (mesh.listeners !== null) {
-//         for (let etype = 0; etype <= mesh.listeners.boundary; etype++) {
-            
-//             if (mesh.listeners.buffer[etype] !== null) {
-                
-//                 if (parent_events === null || parent_events.buffer[etype] === null) {
-//                     // Find from widget root tree any parent events
-//                     const parent_eventidx = Find_parent_listen_event(etype, mesh);
+
+
+
+
+
+
+
+export function Construct_listen_events_from_mesh_tree(mesh){
+    // console.log('------------------------------------------------ \nTIMES Construct_listen_events_from_mesh_tree is CALLED\n', mesh.GetName(), '\n----------------------------------------');
+
+    /**
+     * READ CAREFULLY!!!
+     * Why children-meshes of a widget will call 'ListenEventConstruct()' more than one times
+     * and why they are gonna construct their listener only the first time
+     * 
+     * If the current mesh is a dropdown, the Dropdown method will be called.
+     * It will construct the listener in the EventListeners System buffer for however the method is implemented,
+     * that is construct at least click listener for the dp's button. 
+     * After the dp, this function will run for the dp's children.
+     * So the button will call it's 'ListenEventConstruct()', in button widget class.
+     * THAT IS NOT A PROBLEM of reconstruucting the buttons listener,
+     * only for the reason that any listener in the mesh.listeners buffer that is NOT INT_NULL,
+     * the listener construction will fail.
+     */
+    const continue_with_children = mesh.ListenEventConstruct();
+    // console.log('name:', mesh.GetName(), mesh.listeners.buffer )
     
-//                     if (parent_eventidx !== INT_NULL) { // Find any parent event from the widget root tree
-//                         // Listener_create_root_view(etype, parent_eventidx);
-//                         Listener_assign_parent_event(etype, mesh.listeners.buffer[etype], parent_eventidx)
-//                     }
-//                     else if (mesh.listeners.buffer[etype] !== null && mesh.listeners.buffer[etype] !== INT_NULL) { // Create root event view 
-//                         Listener_create_root_view(etype, mesh.listeners.buffer[etype]);
-//                     }
-//                 }
-//                 else if (parent_events.buffer[etype] !== INT_NULL && parent_events.buffer[etype] !== null && mesh.listeners.buffer[etype] !== INT_NULL) {
+    // Recurse 
+    // if(continue_with_children)
+    {
+        
+        for (let i=0; i <= mesh.children.boundary; i++){
+            const child = mesh.children.buffer[i];
+            // console.log('child:', child.GetName(), child.listeners.buffer )
+            Construct_listen_events_from_mesh_tree(child)
+        }
+    }
+    // else console.error('SKIP', mesh.GetName(), mesh.children.buffer)
+}
     
-//                     // Connect child's event with the current parent
-//                     Listener_assign_parent_event(etype, mesh.listeners.buffer[etype], parent_events.buffer[etype])
-//                     console.log('Connect event:', mesh.listeners.buffer[etype], 'with parent', parent_events.buffer[etype])
-//                 }
-//             }
-
-//             // TODO: If there is no current-parent event, create a fake one 
-//         }
-//     }
-
-//     for (let i = 0; i <= mesh.children.boundary; i++) {
-
-//         const child = mesh.children.buffer[i];
-//         Construct_listeners_relations(child)
-
-//     }
-//     // Run  for children
-// }

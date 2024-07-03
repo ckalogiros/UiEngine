@@ -11,7 +11,7 @@ import { Clipy_from_group, Clipy_from_tree_recursive } from "../Operations/Clip.
 import { Calculate_sizes_recursive, Expand, Section, Section_on_move_clbk } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
-import { Find_parent_listen_event } from "../Operations/Recursions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import {  Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { TEMP_Scroller_calc_handle } from "./WidgetScroller.js";
@@ -147,6 +147,7 @@ export class Widget_Dropdown extends Section {
       this.menu.SetName(`Dp_Menu[${this.menu.mesh_bufferidx}]{${text}}`);
       this.SetName(`Dropdown[${this.mesh_bufferidx}]{${text}}`);
 
+      btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
 
 
    }
@@ -464,27 +465,27 @@ export class Widget_Dropdown extends Section {
    // }
 
 
-   ConstructListenersForMenuItems() { // Handle the dropdown's menu listen events creation. (if any of the items has listen events)
+   // ConstructListenersForMenuItems() { // Handle the dropdown's menu listen events creation. (if any of the items has listen events)
 
-      const dp = this;
-      const menu = this.menu;
+   //    const dp = this;
+   //    const menu = this.menu;
 
-      for (let i = 0; i <= menu.children.boundary; i++) {
+   //    for (let i = 0; i <= menu.children.boundary; i++) {
 
-         const item = menu.children.buffer[i];
+   //       const item = menu.children.buffer[i];
 
-         // TEST: Remove the if(item!==null) case
-         if(item === null || item === undefined) alert('55143326 \nItem is null, do not remove the check');
+   //       // TEST: Remove the if(item!==null) case
+   //       if(item === null || item === undefined) alert('55143326 \nItem is null, do not remove the check');
 
 
-         item.ListenEventCreateAndAdd(dp.listeners.buffer);
+   //       item.ListenEventCreateAndAdd(dp.listeners.buffer);
          
-         // If the item is a dropdown, run this function recursive 
-         if(item.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-            item.ConstructListenersForMenuItems();
-         }
-      }
-   }
+   //       // If the item is a dropdown, run this function recursive 
+   //       if(item.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+   //          item.ConstructListenersForMenuItems();
+   //       }
+   //    }
+   // }
 
    // TEMP_RECURSIVE(mesh, parent){
 
@@ -522,32 +523,77 @@ export class Widget_Dropdown extends Section {
    //    }
    // }
 
-   ListenEventCreate(etype){
+   // ListenEventCreate(etype){
 
-      const etypeidx = Listen_event_get_idx_from_type(etype);
-      const dp = this;
+   //    const etypeidx = Listen_event_get_idx_from_type(etype);
+   //    const dp = this;
 
-      // For Hover events we need no callback and params
-      if(etype & LISTEN_EVENT_TYPES.HOVER){
+   //    // For Hover events we need no callback and params
+   //    if(etype & LISTEN_EVENT_TYPES.HOVER){
 
-         dp.CreateListenEvent(etype);
-         if(dp.state.mask & MESH_STATE.ACTIVE) dp.AddListenEvent(etypeidx, null, null);
-         const btn = dp.children.buffer[0];
-         btn.CreateListenEvent(etype);
-         if(btn.state.mask & MESH_STATE.ACTIVE) btn.AddListenEvent(etypeidx, null, null);
-      }
-      else if(etype & LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE){
+   //       dp.CreateListenEvent(etype);
+   //       if(dp.state.mask & MESH_STATE.ACTIVE) dp.AddListenEvent(etypeidx, null, null);
+   //       const btn = dp.children.buffer[0];
+   //       btn.CreateListenEvent(etype);
+   //       if(btn.state.mask & MESH_STATE.ACTIVE) btn.AddListenEvent(etypeidx, null, null);
+   //    }
+   //    else if(etype & LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE){
          
-         const evt_params = { target_mesh: dp, };
-         dp.CreateListenEvent(etype);
-         if(dp.state.mask & MESH_STATE.ACTIVE) dp.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
-         const btn = dp.children.buffer[0];
-         btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-         if(btn.state.mask & MESH_STATE.ACTIVE) btn.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
+   //       const evt_params = { target_mesh: dp, };
+   //       dp.CreateListenEvent(etype);
+   //       if(dp.state.mask & MESH_STATE.ACTIVE) dp.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
+   //       const btn = dp.children.buffer[0];
+   //       btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+   //       if(btn.state.mask & MESH_STATE.ACTIVE) btn.AddListenEvent(etypeidx, dp.OnClick, evt_params, null);
+   //    }
+
+   // }
+
+
+   /**
+    * Constructs all listen events enabled for this classs widget.
+    * 
+    * The listener will be constructed only if:
+    *    1. the mesh is ACTIVE
+    *    2. the event index is INT_NULL. 
+    *       That is so we skip the construction of an already created listener, if the .listeners[etype] is a number [0..n] indexing the listener in the EventListeners System buffer
+    *       and it does not create a listener if the .listeners[etype] is null, if there is no listener assigned to be created
+    * 
+    * This fuction must be called through 'Construct_listen_events_from_mesh_tree()', because it does not check if 'mesh.listeners' is null buffer
+   */
+   ListenEventConstruct() {
+
+      const dp = this;
+      const btn = this.children.buffer[0];
+
+
+      /****************************************************************************/
+      if (dp.state.mask & MESH_STATE.ACTIVE) {
+         
+         // Construct HOVER event
+         if (dp.listeners && dp.listeners.buffer[E.H] === INT_NULL) {
+            dp.AddListenEvent(E.H, null, null);
+         }
+         // Construct CLICK_UP/MOVE event
+         if (dp.listeners && dp.listeners.buffer[E.C] === INT_NULL) {
+
+            // Create listener on dropdow only for move events OR for hierarchy reasons, if we need to be the parent event of all mesh events in its menu 
+            const evt_params = { target_mesh: dp, };
+            dp.AddListenEvent(E.C, dp.OnClick, evt_params);
+            btn.AddListenEvent(E.C, dp.OnClick, evt_params);
+         }
+         else if (btn.listeners && btn.listeners.buffer[E.C] === INT_NULL) { // Definitely create dropdown's button click
+
+            // const evt_params = { target_mesh: btn, };
+            const evt_params = { target_mesh: dp, }; // TODO: HERE!!! implement the OnClick  to take either dp or btn as target_mesh
+            btn.AddListenEvent(E.C, dp.OnClick, evt_params);
+         }
       }
+
+      
+      return false;
 
    }
-
 
    /**
     * This function creates events for meshes that are created at run time.
@@ -749,6 +795,56 @@ export class Widget_Dropdown extends Section {
 
       return true;
    }
+   /**SAVE */
+   // OnClick(params) {
+
+   //    const dp = params.evt_params.target_mesh;
+
+   //    /*DEBUG*/if (!params.evt_params) { console.error('Target_params.params is null, in a OnClick() event. evt_params:', params.evt_params); return; }
+   //    /*DEBUG*/if (dp.rootidx === INT_NULL) { alert('Root for dropdown must be set. ', dp.GetName()); return; }
+
+   //    const btn = dp.children.buffer[0];
+   //    // Dropdown_roots_get_root_by_idx(dp.rootidx);
+
+   //    // Check if the button is clicked
+   //    if(params.meshidx === btn.mesh_bufferidx){
+
+   
+   //       if (dp.isOn & DP_MENU_STATE.OFF) { // Case: Activate Menu 
+   
+   //          dp.DpActivateMenu();
+   
+   //          btn.text_mesh.UpdateTextCharacter(dp.dp_symbols[1], 0); // Update the symbol text.
+   //          dp.isOn = DP_MENU_STATE.ON;
+   
+   //       }
+   //       else {  // Case: Deactivete Menu 
+   
+   //          btn.text_mesh.UpdateTextCharacter(dp.dp_symbols[0], 0);
+   
+   //          /* Need to update the symbol of the text(not only the gfx buffers), 
+   //             because when the btn will be activated it will be re-inserted in the gfx buffers 
+   //             and it will use the text_mesh's  string (wich is currently the '-' synmbol). */
+   //          btn.text_mesh.SliceText(0, 1);
+   //          btn.text_mesh.SetTextAtIndex(dp.dp_symbols[1], 0);
+   
+   //          dp.DpDeactivateMenu();
+   
+   //          dp.isOn |= DP_MENU_STATE.OFF;
+   //       }
+
+   //       STATE.mesh.SetClicked(btn);
+   //       STATE.mesh.SetFocused(dp);
+   //    }
+
+   //    // Else the click happened anywhere in dropdown except the button area
+   //    else if(dp.state.mask & MESH_STATE.IS_MOVABLE) { // Create move timeInterval if the dp has the move flag
+
+   //       dp.OnMove({params:dp});
+   //    }
+
+   //    return true;
+   // }
 
 
    // SEE ### OnMove Events Implementation Logic
@@ -1354,12 +1450,17 @@ export class Widget_Dropdown extends Section {
           * Follow the implementation of dropdown  listeners.
           * 1. The user creates event on dp creation
           * 2. Who calls the .AddListeners?
-          * 3. Who calls Construct_listeners_relations()?
+          * 3. Who calls Construct_listen_events_relations_from_mesh_tree()?
           * 4. What about the complication of the different TYPE of events?? 
           * 5. Also we have listeners=null, listeners.buffer[i]=null, listeners.buffer[i]=INT_NULL
           */
-      this.ConstructListenersForMenuItems(); // Create listeners, as children of menu listeners.
-      // Construct_listeners_relations(menu)
+      // this.ConstructListenersForMenuItems(); // Create listeners, as children of menu listeners.
+      // Construct_listen_events_relations_from_mesh_tree(menu)
+
+      Construct_listen_events_from_mesh_tree(this.menu)
+      Construct_listen_events_relations_from_mesh_tree(this.menu);
+      // Construct_listen_events_from_mesh_tree(widget_root)
+      // Construct_listen_events_relations_from_mesh_tree(widget_root);
 
       // HACK: We want to update the handles size and pos after dp activation
       const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)

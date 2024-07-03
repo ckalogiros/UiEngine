@@ -402,7 +402,7 @@ export function OnTouchStart(e) {
    const x = e.changedTouches[0].clientX;
    const y = e.changedTouches[0].clientY;
    MouseSetCoords([x,y]); // IMPORTANT: Must set the mouse position on click, because touch screens do not track any position
-   console.log('OnTouchStart:', [x,y])
+   // console.log('OnTouchStart:', [x,y])
    
    mouse.click.down.Set(MOUSE.BTN_ID.LEFT);
 
@@ -453,11 +453,69 @@ export function OnTouchMove(e) {
    // Update mouse coordinates
    const x = e.changedTouches[0].clientX;
    const y = e.changedTouches[0].clientY;
-   MouseSetCoords([x,y]);
 
+   const prevy = y;
+   const delta = GetSign(mouse.pos.y - prevy) ;
+   // console.log(mouse.pos.ydiff)
+   MouseSetCoords([x,y]);
+   // const delta = GetSign(mouse.pos.ydiff) * .1;
+   
+   console.log(delta)
+   // console.log(mouse.pos.ydiff)
+   // console.log(GetSign(mouse.pos.ydiff))
+   
    mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
    mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
-   // console.log('updated mouse:',mouse.pos);
+   
+   if(STATE.mouse.activeClickedButtonId !== INT_NULL && STATE.mesh.hovered === null){
+      // console.log('updated mouse:',STATE);
+      
+      const speed = 1.0
+      let bool = true
+      if(temp_prev_dir !== delta) {
+   
+         temp_prev_dir = delta;
+         bool = false;
+         temp_deccel = .8; // Reduce deccel if the user switched scroll direction
+         temp_scroll_speed = 0; // Cancel the deccelarate scrolling
+         // console.log(temp_prev_dir)
+      }
+   
+      // temp_scroll_speed += temp_scroll_speed+1;
+      temp_scroll_speed += delta*speed;
+      if(temp_deccel < .97 && bool !== delta) temp_deccel += .01; // Increase deccelarate scrolling on continuous scroll on the same directio
+   
+   
+      if(!in_scolling){
+   
+         Callback_animations_create(
+            (params)=>{
+               
+               if(temp_scroll_speed > 1. || temp_scroll_speed < -1.){
+   
+                  in_scolling = true;
+                  temp_scroll_speed *= temp_deccel; // deccelarate scrolling
+                  
+                  Scene_camera_scroll(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
+                  // console.log(temp_scroll_speed, params.wheel_delta)
+   
+                  return true;
+               }
+               
+               return false;
+            }, 
+            ()=>{
+               console.log('END')
+               
+               in_scolling = false;
+               temp_scroll_speed = 0;
+               temp_deccel = .85;
+            }, 
+            {wheel_delta:delta}, 'SceneScroll'
+         );
+      }
+   
+   }
    
 }
 

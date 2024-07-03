@@ -404,7 +404,7 @@ export class Mesh {
             if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_CLICKABLE);
 
         }
-        else if (etype & LISTEN_EVENT_TYPES.MOVE) {
+        if (etype & LISTEN_EVENT_TYPES.MOVE) {
 
             this.listeners.AddAtIndex(E.C, INT_NULL);
 

@@ -373,8 +373,21 @@ export function Mesh_unif_set_vb_root_wposy(root_posidx, y) {
 
 
 
+/*************************************************************************************************************/
 export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
+   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
+}
+
+
+
+export function Mesh_unif_add_vb_root_wposx(root_posidx, x) {
+   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
+}
+
+
+
+export function Mesh_unif_add_vb_root_wposy(root_posidx, y) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
 }
 
@@ -396,19 +409,6 @@ export function Mesh_unif_add_vb_root_wpos_all_siblings(root_posidx, x, y){
       }
    }
 }
-
-
-
-export function Mesh_unif_add_vb_root_wposx(root_posidx, x) {
-   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
-}
-
-
-
-export function Mesh_unif_add_vb_root_wposy(root_posidx, y) {
-   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
-}
-
 
 
 

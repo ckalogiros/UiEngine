@@ -199,19 +199,49 @@ export class Widget_Menu_Bar extends Section {
    /*******************************************************************************************************************************************************/
 
    // SEE ### Construct Listeners
-   ConstructListeners(parent_listeners = null) {
+   // ConstructListeners(parent_listeners = null) {
 
-      // const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
-      super.ConstructListeners(parent_listeners);
+   //    // const root = (_root) ? _root : this; // If in recursion, use as the current mesh the passed param. 
+   //    super.ConstructListeners(parent_listeners);
 
-   }
+   // }
 
    
-   AddListeners() {
+   // AddListeners() {
 
-      super.AddListeners();
+   //    super.AddListeners();
 
-   }
+   // }
+   
+
+    /**
+     * Constructs all listen events enabled for this classs widget.
+     * 
+     * The listener will be constructed only if:
+     *    1. the mesh is ACTIVE
+     *    2. the event index is INT_NULL. 
+     *       That is so we skip the construction of an already created listener, if the .listeners[etype] is a number [0..n] indexing the listener in the EventListeners System buffer
+     *       and it does not create a listener if the .listeners[etype] is null, if there is no listener assigned to be created
+     * 
+     *  This fuction must be called through 'Construct_listen_events_from_mesh_tree()', because it does not check if 'mesh.listeners' is null buffer
+     */
+    ListenEventConstruct() {
+alert('556172834 \n Implement me')
+      const mesh = this;
+
+      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+
+          // Construct HOVER event
+          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
+              mesh.AddListenEvent(E.H, null, null);
+          }
+          // Construct CLICK_UP/MOVE event
+          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
+              const evt_params = { target_mesh: mesh, };
+              mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+          }
+      }
+  }
 
    // Resize menu bar. Keep the menu elements to their relative positions 
    Resize(x) {

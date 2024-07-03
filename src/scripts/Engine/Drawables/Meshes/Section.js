@@ -444,83 +444,115 @@ export class Section extends Rect_Mesh {
 
 
 
-   ListenEventCreate(etype) {
+   // ListenEventCreate(etype) {
 
-      const etypeidx = Listen_event_get_idx_from_type(etype);
+   //    const etypeidx = Listen_event_get_idx_from_type(etype);
+   //    const mesh = this;
+
+   //    // For Hover events we need no callback and params
+   //    if (etype & LISTEN_EVENT_TYPES.HOVER) {
+
+   //       mesh.CreateListenEvent(etype);
+   //       if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, null, null);
+   //    }
+   //    else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+
+   //       const evt_params = { target_mesh: mesh, };
+   //       mesh.CreateListenEvent(etype);
+   //       if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //    }
+
+   // }
+
+   
+
+   /**
+    * Constructs all listen events enabled for this classs widget.
+    * 
+    * The listener will be constructed only if:
+    *    1. the mesh is ACTIVE
+    *    2. the event index is INT_NULL. 
+    *       That is so we skip the construction of an already created listener, if the .listeners[etype] is a number [0..n] indexing the listener in the EventListeners System buffer
+    *       and it does not create a listener if the .listeners[etype] is null, if there is no listener assigned to be created
+    * 
+    *  This fuction must be called through 'Construct_listen_events_from_mesh_tree()', because it does not check if 'mesh.listeners' is null buffer
+    */
+   ListenEventConstruct() {
+// alert('0009911827')
       const mesh = this;
 
-      // For Hover events we need no callback and params
-      if (etype & LISTEN_EVENT_TYPES.HOVER) {
-
-         mesh.CreateListenEvent(etype);
-         if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, null, null);
-      }
-      else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
-
-         const evt_params = { target_mesh: mesh, };
-         mesh.CreateListenEvent(etype);
-         if (mesh.state.mask & MESH_STATE.ACTIVE) mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-      }
-
-   }
-
-
-   ListenEventCreateAndAdd(parent_events = null) {
-
-      const mesh = this;
-
-      if (parent_events === null)
-         alert('228868 \nParent event must be a valid event index.', mesh.GetName);
-      
-      
-      // TODO: Is there another way, so we do not have to check ?      
-      if (mesh.listeners) {
-
-         for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
-   
-            if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
-   
-            const etype = Listen_event_types_get_type_from_index(etypeidx);
-   
-            /***********************************************************************************************************************/
-            // Create for dropdown button
-            const dp_evt = mesh.listeners.buffer[etypeidx];
-            if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
-   
-               // For Hover events we need no callback and params
-               if (etype & LISTEN_EVENT_TYPES.HOVER) {
-                  mesh.AddListenEvent(etypeidx, null, null);
-               }
-               else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
-   
-                  const evt_params = { target_mesh: mesh, };
-                  mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-               }
-   
-               if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
-   
-                  const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
-   
-                  if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
-                  else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
-               }
-               else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
-   
-            }
+      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+         
+         // Construct HOVER event
+         if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
+            mesh.AddListenEvent(E.H, null, null);
+         }
+         // Construct CLICK_UP/MOVE event
+         if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
+            const evt_params = { target_mesh: mesh, };
+            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
          }
       }
-
-
-      for (let i = 0; i <= mesh.children.boundary; i++) {
-
-         const child = mesh.children.buffer[i];
-         if(mesh.listeners) child.ListenEventCreateAndAdd(mesh.listeners.buffer); 
-         // If the parent mesh does not have any events, we force to continue the recursions in case other children  down the tree have any events
-         else child.ListenEventCreateAndAdd([INT_NULL, INT_NULL]);
-      }
-
-
+      return true;
    }
+
+
+   // ListenEventCreateAndAdd(parent_events = null) {
+
+   //    const mesh = this;
+
+   //    if (parent_events === null)
+   //       alert('228868 \nParent event must be a valid event index.', mesh.GetName);
+      
+      
+   //    // TODO: Is there another way, so we do not have to check ?      
+   //    if (mesh.listeners) {
+
+   //       for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+   
+   //          if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
+   
+   //          const etype = Listen_event_types_get_type_from_index(etypeidx);
+   
+   //          /***********************************************************************************************************************/
+   //          // Create for dropdown button
+   //          const dp_evt = mesh.listeners.buffer[etypeidx];
+   //          if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
+   
+   //             // For Hover events we need no callback and params
+   //             if (etype & LISTEN_EVENT_TYPES.HOVER) {
+   //                mesh.AddListenEvent(etypeidx, null, null);
+   //             }
+   //             else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+   
+   //                const evt_params = { target_mesh: mesh, };
+   //                mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //             }
+   
+   //             if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
+   
+   //                const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
+   
+   //                if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
+   //                else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
+   //             }
+   //             else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
+   
+   //          }
+   //       }
+   //    }
+
+
+   //    for (let i = 0; i <= mesh.children.boundary; i++) {
+
+   //       const child = mesh.children.buffer[i];
+   //       if(mesh.listeners) child.ListenEventCreateAndAdd(mesh.listeners.buffer); 
+   //       // If the parent mesh does not have any events, we force to continue the recursions in case other children  down the tree have any events
+   //       else child.ListenEventCreateAndAdd([INT_NULL, INT_NULL]);
+   //    }
+
+
+   // }
 
 
    // AddListeners() {
@@ -1176,39 +1208,39 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
 
          // if(mesh.temp_align) opt // TODO: Copy align from mesh. So we need to add .Vertical/.Horizontal and remove .Vertical/.Horizontal from opt, cause the options and the .temp_align are not the same
 
-         // if (mesh.type & MESH_TYPE.WIDGET_MENU_BAR) {
-         //    if ((mesh.options & SECTION.INHERIT) === 0) opt = mesh.options;
+         if (mesh.type & MESH_TYPE.WIDGET_MENU_BAR) {
+            if ((mesh.options & SECTION.INHERIT) === 0) opt = mesh.options;
 
 
-         //    Calculate_sizes_recursive(mesh, opt, _, recur_cnt++); // Recurse if child mesh is of type of Section
-         //    // recur_cnt++
-         //    if ((mesh.options & SECTION.INHERIT) === 0) opt = parent.options; // Roll back to the options
+            Calculate_sizes_recursive(mesh, opt, _, recur_cnt++); // Recurse if child mesh is of type of Section
+            // recur_cnt++
+            if ((mesh.options & SECTION.INHERIT) === 0) opt = parent.options; // Roll back to the options
 
 
-         //    if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) === 0) {
+            if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) === 0) {
 
-         //       mesh.geom.dim[0] -= pad[0];
-         //       mesh.geom.dim[1] = mesh.max_size[1];
+               mesh.geom.dim[0] -= pad[0];
+               mesh.geom.dim[1] = mesh.max_size[1];
 
-         //       // Update mesh's default dim
-         //       mesh.geom.defDim[0] = mesh.max_size[0] + pad[0];
-         //       mesh.geom.defDim[1] = mesh.max_size[1] + pad[1];
+               // Update mesh's default dim
+               mesh.geom.defDim[0] = mesh.max_size[0] + pad[0];
+               mesh.geom.defDim[1] = mesh.max_size[1] + pad[1];
 
-         //    }
+            }
 
-         //    mesh.SectionSetPad();
+            mesh.SectionSetPad();
 
-         //    if (opt & SECTION.VERTICAL) {
-         //       if ((parent.options & SECTION.FIXED_W) === 0 && parent.max_size[0] < mesh.geom.dim[0])
-         //          parent.max_size[0] = mesh.geom.dim[0] + marg[0];
-         //       if ((parent.options & SECTION.FIXED_H) === 0) parent.max_size[1] += mesh.geom.dim[1] + marg[1];
-         //    }
-         //    else if (opt & SECTION.HORIZONTAL) {
-         //       if ((parent.options & SECTION.FIXED_W) === 0) parent.max_size[0] += mesh.geom.dim[0] + marg[0];
-         //       if ((parent.options & SECTION.FIXED_H) === 0 && parent.max_size[1] < mesh.geom.dim[1]) parent.max_size[1] = mesh.geom.dim[1] + marg[1];
-         //    }
-         // }
-         // else 
+            if (opt & SECTION.VERTICAL) {
+               if ((parent.options & SECTION.FIXED_W) === 0 && parent.max_size[0] < mesh.geom.dim[0])
+                  parent.max_size[0] = mesh.geom.dim[0] + marg[0];
+               if ((parent.options & SECTION.FIXED_H) === 0) parent.max_size[1] += mesh.geom.dim[1] + marg[1];
+            }
+            else if (opt & SECTION.HORIZONTAL) {
+               if ((parent.options & SECTION.FIXED_W) === 0) parent.max_size[0] += mesh.geom.dim[0] + marg[0];
+               if ((parent.options & SECTION.FIXED_H) === 0 && parent.max_size[1] < mesh.geom.dim[1]) parent.max_size[1] = mesh.geom.dim[1] + marg[1];
+            }
+         }
+         else 
          if (mesh.type & MESH_TYPE.SECTION_MESH) {
 
             if ((mesh.options & SECTION.INHERIT) === 0) opt = mesh.options;
@@ -1220,10 +1252,12 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
             if ((mesh.options & SECTION.INHERIT) === 0) opt = parent.options; // Roll back to the options
 
 
-            if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) === 0) {
+            if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) === 0) 
+            {
 
                mesh.geom.dim[0] = mesh.max_size[0];
                mesh.geom.dim[1] = mesh.max_size[1];
+               
 
                // Update mesh's default dim
                mesh.geom.defDim[0] = mesh.max_size[0];
@@ -1232,11 +1266,9 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
                mesh.SectionSetPad(); // Must not update for scrollers 
             }
             else { // For scrollers
-               // console.log('SCROLLER?', mesh.GetName(), mesh.constructor.name)
-               // mesh.geom.dim[0] = 100
-               mesh.geom.dim[0] = parent.max_size[0]; // Set scrollers width to that of the parent section width
+               // mesh.geom.dim[0] = parent.max_size[0]; // Set scrollers width to that of the parent section width
+               mesh.geom.dim[0] = mesh.max_size[0]; // Set scrollers width to that of the parent section width
                mesh.ScrollerAlignBar();
-               // mesh.geom.dim[1] = parent.max_size[1];
             }
 
 
@@ -1478,21 +1510,29 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
 
          cur_pos[0] += marg[0];
          cur_pos[1] += marg[1];
-
+         
+         
          const rel_pos = [cur_pos[0], cur_pos[1]];
-
+         console.log('##########', mesh.GetName(), rel_pos)
+         
          if (mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
-
+            
             mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
             continue_recur = false;
          }
          else if (mesh.type & MESH_TYPE.WIDGET_SLIDER) {
-
+            
             // mesh.SetPosXYNoGfxUpdate(rel_pos[0], rel_pos[1]);
-            mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
+            // mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
+            mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
             continue_recur = false;
          }
          else if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+
+            mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
+            continue_recur = false;
+         }
+         else if (mesh.type & MESH_TYPE.WIDGET_SCROLLER) {
 
             mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
             continue_recur = false;

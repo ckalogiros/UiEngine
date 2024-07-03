@@ -40,18 +40,16 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       this.slider_val = 0;
 
       const handle = Create_rect_mesh(_,[pos[0]-handle_dim[0]+dim[0], pos[1]-handle_dim[1]+dim[1], pos[2]+1], handle_dim, handle_col, _, _, _, 1, is_debug_mesh);
-      // const handle = Create_rect_mesh(_,[-handle_dim[0]+dim[0], -handle_dim[1]+dim[1], pos[2]+1], handle_dim, handle_col, _, _, _, 1, is_debug_mesh);
-      // const handle = Create_rect_mesh(_,[0, 0, pos[2]+1], handle_dim, handle_col, _, _, _, 1, is_debug_mesh);
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
 
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 1.5]);
-      handle.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+
 
 
       // Make the vertical area of the bar larger for hover and handle moving.
-      // this.hover_margin = [0, handle.geom.dim[1] + 4];
-      this.StylesSetHoverMargin([0, handle.geom.dim[1] + 4]);
+      if(hover_margin[1] > handle.geom.dim[1]) hover_margin[1] = handle.geom.dim[1] + 4; // Avoid overlap with other widgets if the hover_margin is set too high from the user
+      this.StylesSetHoverMargin(hover_margin);
 
 
       this.AddChild(handle)
@@ -66,6 +64,8 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       handle.SetName('Slider handle');
       this.SetName('Slider Bar');
 
+
+      handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       // this.SetInitialValue(0)
 
       // It is enabled by the user, when a uniform is created for passing slider value to shaders
@@ -285,113 +285,146 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    
    // TODO!!!: the widget is passed in 'params.evt_params.target_mesh', so REMOVE the 'params.source_params' tha has the slider.area_mesh is not needed. 
    
-   ListenEventCreate(etype) {
+   // ListenEventCreate(etype) {
 
-      const etypeidx = Listen_event_get_idx_from_type(etype);
-      const mesh = this;
-      const handle = mesh.children.buffer[0];
+   //    const etypeidx = Listen_event_get_idx_from_type(etype);
+   //    const mesh = this;
+   //    const handle = mesh.children.buffer[0];
 
-      // For Hover events we need no callback and params
-      if (etype & LISTEN_EVENT_TYPES.HOVER) {
+   //    // For Hover events we need no callback and params
+   //    if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
          
-         if (mesh.state.mask & MESH_STATE.ACTIVE) {
+   //       if (mesh.state.mask & MESH_STATE.ACTIVE) {
 
-            mesh.CreateListenEvent(etype);
-            mesh.AddListenEvent(etypeidx, null, null);
+   //          mesh.CreateListenEvent(etype);
+   //          mesh.AddListenEvent(etypeidx, null, null);
             
-            handle.CreateListenEvent(etype);
-            handle.AddListenEvent(etypeidx, null, null);
-         }
+   //          handle.CreateListenEvent(etype);
+   //          handle.AddListenEvent(etypeidx, null, null);
+   //       }
          
-      }
-      else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+   //    }
+   //    else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
 
-         const evt_params = { target_mesh: mesh, };
+   //       const evt_params = { target_mesh: mesh, };
          
-         if (mesh.state.mask & MESH_STATE.ACTIVE) {
-            mesh.CreateListenEvent(etype);
-            mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-            // NOTE: There is no click in handle
-         }
-      }
+   //       if (mesh.state.mask & MESH_STATE.ACTIVE) {
+   //          mesh.CreateListenEvent(etype);
+   //          mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //          // NOTE: There is no click in handle
+   //       }
+   //    }
 
-   }
+   // }
    
 
-   ListenEventCreateAndAdd(parent_events = null) {
+   // ListenEventCreateAndAdd(parent_events = null) {
+
+   //    const mesh = this;
+
+   //    if (parent_events === null)
+   //       alert('228868 \nParent event must be a valid event index.', mesh.GetName);
+      
+      
+      
+   //    if (mesh.listeners) {
+
+   //       for (let etypeidx = 0; etypeidx < LISTEN_EVENT_TYPES_INDEX.SIZE; etypeidx++) {
+   //       // for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+   
+   //          if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
+   
+   //          const etype = Listen_event_types_get_type_from_index(etypeidx);
+   
+   //          /***********************************************************************************************************************/
+   //          // Create for dropdown button
+   //          const dp_evt = mesh.listeners.buffer[etypeidx];
+   //          if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
+   
+   //             // For Hover events we need no callback and params
+   //             if (etype & LISTEN_EVENT_TYPES.HOVER) {
+   //                mesh.AddListenEvent(etypeidx, null, null);
+   //             }
+   //             else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+   
+   //                const evt_params = { target_mesh: mesh, };
+   //                mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //             }
+   
+   //             if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
+   
+   //                const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
+   
+   //                if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
+   //                else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
+   //             }
+   //             else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
+   
+   //          }
+   //          /***********************************************************************************************************************/
+   //          // Create for dropdown button
+   //          const handle = this.children.buffer[0];
+   //          const handle_evt = handle.listeners.buffer[etypeidx];
+   //          if (handle_evt !== null) { // If event for tis mesh is null, don't do anything
+   
+   //             // For Hover events we need no callback and params
+   //             if(etype & LISTEN_EVENT_TYPES.HOVER){
+   //                handle.AddListenEvent(etypeidx, null, null);
+   //             }
+   //             else if(etype & LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE){
+                  
+   //                const evt_params = { target_mesh: mesh, };
+   //                handle.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //             }
+               
+               
+   //             if(mesh.listeners.buffer[etypeidx] === null){ // If the dropdow doesn't have a hover event, we must find from the mesh tree
+   
+   //                const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
+   //                if(parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
+   //                else Listener_assign_parent_event(etypeidx, handle.listeners.buffer[etypeidx], parent_event_idx); 
+   //             }
+   //             else Listener_assign_parent_event(etypeidx, handle.listeners.buffer[etypeidx], mesh.listeners.buffer[etypeidx]);
+   
+   //          }
+   //       }
+
+   //    }
+
+   // }
+
+   
+
+   /**
+    * Constructs all listen events enabled for this classs widget.
+    * 
+    * The listener will be constructed only if:
+    *    1. the mesh is ACTIVE
+    *    2. the event index is INT_NULL. 
+    *       That is so we skip the construction of an already created listener, if the .listeners[etype] is a number [0..n] indexing the listener in the EventListeners System buffer
+    *       and it does not create a listener if the .listeners[etype] is null, if there is no listener assigned to be created
+    * 
+    *  This fuction must be called through 'Construct_listen_events_from_mesh_tree()', because it does not check if 'mesh.listeners' is null buffer
+    */
+   ListenEventConstruct() {
 
       const mesh = this;
 
-      if (parent_events === null)
-         alert('228868 \nParent event must be a valid event index.', mesh.GetName);
-      
-      
-      
-      if (mesh.listeners) {
-
-         for (let etypeidx = 0; etypeidx < LISTEN_EVENT_TYPES_INDEX.SIZE; etypeidx++) {
-         // for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
-   
-            if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
-   
-            const etype = Listen_event_types_get_type_from_index(etypeidx);
-   
-            /***********************************************************************************************************************/
-            // Create for dropdown button
-            const dp_evt = mesh.listeners.buffer[etypeidx];
-            if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
-   
-               // For Hover events we need no callback and params
-               if (etype & LISTEN_EVENT_TYPES.HOVER) {
-                  mesh.AddListenEvent(etypeidx, null, null);
-               }
-               else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
-   
-                  const evt_params = { target_mesh: mesh, };
-                  mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-               }
-   
-               if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
-   
-                  const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
-   
-                  if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
-                  else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
-               }
-               else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
-   
-            }
-            /***********************************************************************************************************************/
-            // Create for dropdown button
-            const handle = this.children.buffer[0];
-            const handle_evt = handle.listeners.buffer[etypeidx];
-            if (handle_evt !== null) { // If event for tis mesh is null, don't do anything
-   
-               // For Hover events we need no callback and params
-               if(etype & LISTEN_EVENT_TYPES.HOVER){
-                  handle.AddListenEvent(etypeidx, null, null);
-               }
-               else if(etype & LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE){
-                  
-                  const evt_params = { target_mesh: mesh, };
-                  handle.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-               }
-               
-               
-               if(mesh.listeners.buffer[etypeidx] === null){ // If the dropdow doesn't have a hover event, we must find from the mesh tree
-   
-                  const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
-                  if(parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
-                  else Listener_assign_parent_event(etypeidx, handle.listeners.buffer[etypeidx], parent_event_idx); 
-               }
-               else Listener_assign_parent_event(etypeidx, handle.listeners.buffer[etypeidx], mesh.listeners.buffer[etypeidx]);
-   
-            }
+      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+         
+         // Construct HOVER event
+         if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
+            mesh.AddListenEvent(E.H, null, null);
          }
-
+         // Construct CLICK_UP/MOVE event
+         if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
+            const evt_params = { target_mesh: mesh, };
+            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+         }
       }
-
+      
+      return false;
    }
 
 
@@ -804,7 +837,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    value_text_idx; // Slider's value text mesh index in children buffer
    bar_idx; // Slider's bar and handle mesh index in children buffer
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col = TRANSPARENCY(GREY[0], .6), hover_margin = [14, 14], name='SLIDER UNAMED', is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col = TRANSPARENCY(GREY[0], .6), hover_margin = [5, 16], name='SLIDER UNAMED', is_debug_mesh) {
 
       // Calculate the bar's and handle's horizontal pading.
       const ratio = dim[0] / dim[1];
@@ -843,8 +876,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Slider Bar: Bar is child of the slider mesh
       const bar = Create_widget_slider_simple(_, [0, dim[1]*4, _pos[2]+1], [dim[0], 2], GREY[8], hover_margin, [10, 10], BLUEL[7], 1, is_debug_mesh);
-      bar.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
-      // bar.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+
       
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       // Slider Handle: Handle is a child of the bar mesh
@@ -857,7 +889,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       // Make the vertical area of the bar larger for hover and handle moving.
       // bar.hover_margin = [-handle.geom.dim[1] , handle.geom.dim[1] ];
-      bar.StylesSetHoverMargin([handle.geom.dim[1] , handle.geom.dim[1]] );
+      // bar.StylesSetHoverMargin([handle.geom.dim[1] , handle.geom.dim[1]] );
       bar.MoveYNoGfxUpdate(-handle.geom.dim[0])
 
 
@@ -902,6 +934,9 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       this.SetGfxEnableAttributes(MESH_ENABLE.GFX.ATTR_DIM2)
+
+      bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+      // bar.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
 
    }
 
@@ -1250,95 +1285,138 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    // }
    
 
-   ListenEventCreate(etype) {
+   // ListenEventCreate(etype) {
 
-      const etypeidx = Listen_event_get_idx_from_type(etype);
-      const mesh = this;
-      const bar = mesh.children.buffer[mesh.bar_idx];
+   //    const etypeidx = Listen_event_get_idx_from_type(etype);
+   //    const mesh = this;
+   //    const bar = mesh.children.buffer[mesh.bar_idx];
 
-      // For Hover events we need no callback and params
-      if (etype & LISTEN_EVENT_TYPES.HOVER) {
+   //    // For Hover events we need no callback and params
+   //    if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
-         super.ListenEventCreate(etype);
-         bar.ListenEventCreate(etype);
-         // Handle Hover listen event has been set in slider_simple constructor
+   //       super.ListenEventCreate(etype);
+   //       bar.ListenEventCreate(etype);
+   //       // Handle Hover listen event has been set in slider_simple constructor
 
-         if (mesh.state.mask & MESH_STATE.ACTIVE) {
-            mesh.AddListenEvent(etypeidx, null, null);
-            bar.AddListenEvent(etypeidx, null, null);
-         }
+   //       if (mesh.state.mask & MESH_STATE.ACTIVE) {
+   //          mesh.AddListenEvent(etypeidx, null, null);
+   //          bar.AddListenEvent(etypeidx, null, null);
+   //       }
          
-      }
-      else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+   //    }
+   //    else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
          
-         const evt_params = { target_mesh: mesh, };
-         super.ListenEventCreate(etype);
-         bar.ListenEventCreate(etype);
+   //       const evt_params = { target_mesh: mesh, };
+   //       super.ListenEventCreate(etype);
+   //       bar.ListenEventCreate(etype);
 
-         if (mesh.state.mask & MESH_STATE.ACTIVE) {
-            bar.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-            mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-            // NOTE: There is no click in handle
-         }
-      }
+   //       if (mesh.state.mask & MESH_STATE.ACTIVE) {
+   //          bar.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //          mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //          // NOTE: There is no click in handle
+   //       }
+   //    }
 
-   }
+   // }
 
 
-   ListenEventCreateAndAdd(parent_events = null) {
+   // ListenEventCreateAndAdd(parent_events = null) {
 
-      const mesh = this;
+   //    const mesh = this;
       
-      if (parent_events === null)
-         alert('228868 \nParent event must be a valid event index.', mesh.GetName);
+   //    if (parent_events === null)
+   //       alert('228868 \nParent event must be a valid event index.', mesh.GetName);
       
       
-      const bar = mesh.children.buffer[mesh.bar_idx];
+   //    const bar = mesh.children.buffer[mesh.bar_idx];
       
-      if (mesh.listeners) {
+   //    if (mesh.listeners) {
 
-         for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
+   //       for (let etypeidx = 0; etypeidx <= mesh.listeners.boundary; etypeidx++) {
    
-            if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
+   //          if ((mesh.state.mask & MESH_STATE.ACTIVE) === 0x0) return; // Skip the dropdownn and button if are inactive 
    
-            const etype = Listen_event_types_get_type_from_index(etypeidx);
+   //          const etype = Listen_event_types_get_type_from_index(etypeidx);
    
-            /***********************************************************************************************************************/
-            // Create for dropdown button
-            const dp_evt = mesh.listeners.buffer[etypeidx];
-            if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
+   //          /***********************************************************************************************************************/
+   //          // Create for dropdown button
+   //          const dp_evt = mesh.listeners.buffer[etypeidx];
+   //          if (dp_evt !== null) { // If event for tis mesh is null, don't do anything
    
-               // For Hover events we need no callback and params
-               if (etype & LISTEN_EVENT_TYPES.HOVER) {
-                  mesh.AddListenEvent(etypeidx, null, null);
-                  bar.AddListenEvent(etypeidx, null, null);
-               }
-               else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
+   //             // For Hover events we need no callback and params
+   //             if (etype & LISTEN_EVENT_TYPES.HOVER) {
+   //                mesh.AddListenEvent(etypeidx, null, null);
+   //                bar.AddListenEvent(etypeidx, null, null);
+   //             }
+   //             else if (etype & LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.MOVE) {
    
-                  const evt_params = { target_mesh: mesh, };
-                  mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-                  bar.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
-               }
+   //                const evt_params = { target_mesh: mesh, };
+   //                mesh.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //                bar.AddListenEvent(etypeidx, mesh.OnClick, evt_params, null);
+   //             }
    
-               if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
+   //             if (parent_events[etypeidx] === INT_NULL || parent_events[etypeidx] === null && mesh.listeners.buffer[etypeidx] !== INT_NULL) { // Find parent event
    
-                  const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
+   //                const parent_event_idx = Find_parent_listen_event(etypeidx, mesh);
    
-                  if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
-                  else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
-               }
-               else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
+   //                if (parent_event_idx === INT_NULL) alert('7182994 \nFailed to find any parent event in mesh tree');
+   //                else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_event_idx);
+   //             }
+   //             else Listener_assign_parent_event(etypeidx, mesh.listeners.buffer[etypeidx], parent_events[etypeidx]);
    
-            }
-         }
-      }
+   //          }
+   //       }
+   //    }
 
 
                
-      /***********************************************************************************************************************/
-      // Create for bar and handle
-      if(mesh.listeners) bar.ListenEventCreateAndAdd(mesh.listeners.buffer)
-      else bar.ListenEventCreateAndAdd([INT_NULL, INT_NULL])
+   //    /***********************************************************************************************************************/
+   //    // Create for bar and handle
+   //    if(mesh.listeners) bar.ListenEventCreateAndAdd(mesh.listeners.buffer)
+   //    else bar.ListenEventCreateAndAdd([INT_NULL, INT_NULL])
+   // }
+      
+
+   /**
+    * Constructs all listen events enabled for this classs widget.
+    * 
+    * The listener will be constructed only if:
+    *    1. the mesh is ACTIVE
+    *    2. the event index is INT_NULL. 
+    *       That is so we skip the construction of an already created listener, if the .listeners[etype] is a number [0..n] indexing the listener in the EventListeners System buffer
+    *       and it does not create a listener if the .listeners[etype] is null, if there is no listener assigned to be created
+    * 
+    *  This fuction must be called through 'Construct_listen_events_from_mesh_tree()', because it does not check if 'mesh.listeners' is null buffer
+    */
+   ListenEventConstruct() {
+
+      const mesh = this;
+      const bar = mesh.children.buffer[mesh.bar_idx];
+
+      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+         
+         // Construct HOVER event
+         if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
+            mesh.AddListenEvent(E.H, null, null);
+         }
+         // Construct CLICK_UP/MOVE event
+         if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
+            const evt_params = { target_mesh: mesh, };
+            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+         }
+         
+         // Construct for the bar
+         if (bar.listeners && bar.listeners.buffer[E.H] === INT_NULL) {
+            bar.AddListenEvent(E.H, null, null);
+         }
+         // Construct CLICK_UP/MOVE event
+         if (bar.listeners && bar.listeners.buffer[E.C] === INT_NULL) {
+            const evt_params = { target_mesh: mesh, };
+            bar.AddListenEvent(E.C, mesh.OnClick, evt_params);
+         }
+      }
+       
+      return false;  
    }
 
 
@@ -1416,7 +1494,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
 
       // Avoid moving when slider is child of another mesh. {{In order to work, slider must have a Move Event}}
-      if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+      if (Mesh_unif_is_vb_root_wpos(mesh.root_posidx, mesh.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
          Mesh_unif_add_vb_root_wpos(mesh.root_posidx, mouse_pos.x, -mouse_pos.y);
       }
       else{

@@ -84,7 +84,11 @@ vec4 color = v_col;
     
     vec2 uv2 = (gl_FragCoord.xy-(res*.5))/res;
     // float res_ratio = res.x/res.y;
+    float res_ratio = res.y/res.x;
+    // float res_ratio = min(res.y,res.x) / max(res.y,res.x); 
     // uv.x /= res_ratio;
+    // uv2.x *= res_ratio;
+    uv2.y *= res_ratio;
    
    
    
@@ -96,9 +100,16 @@ vec4 color = v_col;
     
     
     float complexity = 2.;
-    float ratio = 3.; 
-    float noise1 = fbm(complexity * uv2 * vec2(2., 2.)*ratio);
-    float noise2 = fbm(5. * uv2 * vec2(2., 2.)*ratio);
+    // float ratio = 3.; 
+    // float ratio = res_ratio * (dim.y/dim.x); 
+    // float ratio = min(dim.y,dim.x) / max(dim.y,dim.x); 
+    // vec2 ratio = vec2(dim.y,dim.x)*.006; 
+    vec2 ratio = vec2(1.)*.9; 
+    // float ratio = (dim.x/dim.y); 
+    // float noise1 = fbm(complexity * uv2 * vec2(2., 2.));
+    // float noise2 = fbm(5. * uv2 * vec2(2., 2.)*ratio);
+    float noise1 = fbm(complexity * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) ;
+    float noise2 = fbm(5. * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) * ratio.x;
     float n1 = noise1*revT*d2; // +1 for non negative values
     float n2 = noise2*revT*d2; // +1 for non negative values
     
@@ -192,6 +203,7 @@ vec4 color = v_col;
     
 
     
+    // return vec4(vec3(noise1), 1.);
     return c;
     // return vec4(1.,1.,1.,.1);
 

@@ -113,8 +113,6 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
       view: null,
    });
 
-if(mesh.GetName()==='Slider Bar')
-console.log()
 
    // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx].event_idx = event_idx;
 
@@ -150,6 +148,20 @@ export function Listener_create_root_view(TYPE_IDX, event_idx){
 
    const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
 
+
+   // Avoid creating duplicate root views of the same event
+   if(event.view){
+
+      // Get the event index ouuut of the view event, and compare it with the current event idxe we try to set as root view event
+      // If it is equal, meaning the current event is already a root view event, DO NOTHING 
+      const root_view_event_idx = _listeners_buffer_view_storage.buffer[TYPE_IDX].buffer[event.view.view_idx].event_idx
+      if(event_idx === root_view_event_idx){
+         return;
+      }
+   }
+
+
+
    // Create a tree buffer stucture view of the listeners storage buffer, for fast event listeners search
    const view_idx = _listeners_buffer_view_storage.buffer[TYPE_IDX].Add({
       event_idx: event_idx,
@@ -172,17 +184,26 @@ export function Listener_create_root_view(TYPE_IDX, event_idx){
  * Every event that is not a root event, must be assigned a parent event in order to be checked by the event listen function(Hover, Click, ...) 
  */
 export function Listener_assign_parent_event(TYPE_IDX, event_idx, parent_event_idx){
-
+if(event_idx === parent_event_idx) return
    const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_event_idx];
    if(parent_event===null || parent_event===undefined) 
       alert('000111333')
 
+   
    const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
-   event.parent_idx = parent_event_idx;
+
 
    // Create the parent's children View
    if (!parent_event.view.children) {
       parent_event.view.children = New_generic_buffer(_, `Listeners->parent_event.view.children:${parent_event.name}`);
+   }
+
+   // Avoid duuplicte views on a recostruction. If the current event already exists as a view node, Skip
+   if(parent_event.view && event.view){
+      if(parent_event.view.children.buffer[event.view.view_idx].event_idx === event_idx){
+         // console.log('ADDED index', 'event', event.name, 'parent', parent_event.name)
+         return
+      }
    }
 
    // Store the new event as a child to the parent in the listeners VIEW storage buffer.
@@ -192,6 +213,10 @@ export function Listener_assign_parent_event(TYPE_IDX, event_idx, parent_event_i
       view_idx: INT_NULL,
       children: null,
    });
+
+   // console.log('ADDED index', view_idx, 'event', event.name, 'parent', parent_event.name)
+
+   event.parent_idx = parent_event_idx;
 
    /**
     * // IMPORTANT: 
@@ -429,7 +454,10 @@ export function Listener_dispatch_check_hover_event() {
          intersects = Intersection_point_rect(point, bounding_box);
          // console.log(bounding_box[0][0], bounding_box[1][0], point[0], 'intersects', intersects)
 
+
+
          if (intersects) {
+            // console.log(view_buffer.buffer[i])
 
             if (view_buffer.buffer[i] !== null) {
 
@@ -451,6 +479,8 @@ export function Listener_dispatch_check_hover_event() {
             Events_handle_immidiate({ type: 'hover', params: { mesh: mesh } });
             // mesh.SetUpdateFrameBuffer();
             intersects = true;
+
+            break;
          }
       }
 
@@ -466,7 +496,6 @@ export function Listener_dispatch_check_hover_event() {
    // Performance_timer_detailed_stop(PERFORMANCE_TIMERS_IDXS.HoverListener);
    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.HoverListener);
 }
-
 
 
 
@@ -674,6 +703,7 @@ function Check_child_events_recursive(view_children, point) {
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          const intersects = Intersection_point_rect(point, bounding_box);
+         console.log(mesh.GetName(), 'intersects', intersects)
 
          if (intersects) {
 
@@ -699,6 +729,7 @@ function Check_child_events_recursive(view_children, point) {
       }
 
    }
+   console.log('-----------------------------------------')
    return null;
 }
 

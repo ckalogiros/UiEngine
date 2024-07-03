@@ -30,7 +30,8 @@ import { Gl_set_rgba } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Callback_animations_create, Callback_animations_get } from '../Engine/Animations/CallbackAnimations.js';
 import { Mesh_buffer_get_mesh_byidx, Widget_root_rerender, Widget_root_reset_gfx } from '../Engine/Core/MeshBuffer.js';
 import { Listener_assign_parent_event, Listener_create_root_view } from '../Engine/Events/EventListeners.js';
-import { Construct_listeners_relations, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
+import { New_generic_buffer, New_int16_buffer } from '../Engine/Core/Buffers.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -120,415 +121,445 @@ export function TestWidgetsGeneric(scene) {
     }
 
     { // TEST FOR SIDE PANEL
-        const side_panel = CreateSidePanel(ROOT_WIDGETS.CREATE_ROOT);
-        // const side_panel = CreateSidePanel(0x0);
+        // const side_panel = CreateSidePanel(ROOT_WIDGETS.CREATE_ROOT);
+        // // const side_panel = CreateSidePanel(0x0);
         
         
-        // Add the ballTail control properties to the side panel
-        const inner_section = side_panel.children.buffer[0];
-        // inner_section.AddItem(slider_section)
+        // // Add the ballTail control properties to the side panel
+        // const inner_section = side_panel.children.buffer[0];
+        // // inner_section.AddItem(slider_section)
         
-        // TEST
-        const test_dp = CreateDropdown([0,0,0], 0x0);
-        // inner_section.AddItem(test_dp)
+        // // TEST
+        // const test_dp = CreateDropdown([0,0,0], 0x0);
+        // // inner_section.AddItem(test_dp)
         
-        const scrolled_mesh = Create_widget_section(_, SECTION.VERTICAL, _, [0,0,0], _, PURPLER[3]);
-        scrolled_mesh.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        // scrolled_mesh.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
-        scrolled_mesh.AddItem(test_dp)
+        // const scrolled_mesh = Create_widget_section(_, SECTION.VERTICAL, _, [0,0,0], _, PURPLER[3]);
+        // scrolled_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        // // scrolled_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+        // scrolled_mesh.AddItem(test_dp)
 
-        // Create scroller for the ui-mesh info widget
-        const scroller_width = 100;
-        const scroller = Create_widget_scroller(_, scrolled_mesh, [scroller_width, 190]);
-        // const scroller = Create_widget_scroller(_, slider_section, [scroller_width, 90]);
-        inner_section.AddItem(scroller);
-        // side_panel.AddItem(scroller);
-        // scroller.StateEnable(MESH_STATE.ACTIVE);
-        scroller.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
-        scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        // // Create scroller for the ui-mesh info widget
+        // const scroller_width = 100;
+        // const scroller = Create_widget_scroller(_, scrolled_mesh, [scroller_width, 190]);
+        // // const scroller = Create_widget_scroller(_, slider_section, [scroller_width, 90]);
+        // inner_section.AddItem(scroller);
+        // // side_panel.AddItem(scroller);
+        // // scroller.StateEnable(MESH_STATE.ACTIVE);
+        // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+        // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     
-        
-        // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
-        // scroller.scrolled_section.options = SECTION.VERTICAL;
-        
         
         // // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
         // // scroller.scrolled_section.options = SECTION.VERTICAL;
         
-        // scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        // // // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
+        // // // scroller.scrolled_section.options = SECTION.VERTICAL;
+        
+        // // scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // // scroller.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section);
+        // // side_panel.geom.pos[0] = VIEWPORT.WIDTH - scroller_width*2
+        
+        
+        
+        // side_panel.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // side_panel.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENTX
+        // // side_panel.options = SECTION.HORIZONTAL
+        
+        // // side_panel.options = SECTION.HORIZONTAL|SECTION.EXPAND|SECTION.RESIZE_PARENTX
+        // // side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+        // side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        // side_panel.Calc_no_gfx_update();
+        // side_panel.Render();
+        // side_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, side_panel.gfx.vb.groupidx);
+
+        // Construct_listen_events_from_mesh_tree(side_panel);
+        // Construct_listen_events_relations_from_mesh_tree(side_panel);
+
+        // View_build_group_from_root_mesh(side_panel);
+    }
+
+    { // Side Panel 
+
+
+
+        
+        /****************************************************************************************************************/
+        /****************************************************************************************************************/
+        /****************************************************************************************************************/        
+        // BallTail
+        const tail_particles = CreateBallTailParticles(_, _, 1, 0x0);
+        const section = tail_particles.section;
+        const tail_particles_buffer = tail_particles.tail_particles_buffer
+        const glow_particles_buffer = tail_particles.glow_particles_buffer;
+
+
+
+        let zpos = 1;
+
+
+        
+        /****************************************************************************************************************/
+        /****************************************************************************************************************/
+        /****************************************************************************************************************/        
+        // Create Sliders for manipulating variables of particles
+
+        const slider_dim = [100, 10];
+        // const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], YELLOWL[6], 'SliderSection', [0,10,2], );
+        // const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], YELLOWL[6], 'SliderSection', [0,10,2], );
+        const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10,10], [0, 0, zpos], [0,0], YELLOWL[6], 'SliderSection', [0,10,2], );
+        // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+            
+        const flags = {
+            unif: SID.UNIF.ROOT_WPOS2,
+            pass: SID.PASS.WPOS2,
+        }
+
+        slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+        { // Create sliders and colorpicker
+            zpos++;
+            // Create Header
+            const controls_label = Create_widget_label(_, 'Ball Controls', _, [0,0,zpos], _, GREY[2]);
+            slider_section.AddItem(controls_label);
+    
+    
+    
+            /****************************************************************************************************************/
+            // Create the switch to create/destroy colorpicker for particles color control
+            
+            // Create Header
+            const switch_label = Create_widget_label(_, 'ColorPick', _, [0,0,zpos], _, GREY[2]);
+            // switch_label.temp_align |= SECTION.HORIZONTAL;
+            slider_section.AddItem(switch_label);
+            
+            const colorpicker_switch = Create_widget_switch_simple(_, [0,0,zpos], 18,  BLUEL[6], _);
+            // colorpicker_switch.temp_align |= SECTION.HORIZONTAL;
+            slider_section.AddItem(colorpicker_switch);
+            colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            const x =  0, y = 0
+            colorpicker_switch.Bind(
+                (params)=>{
+    
+                    /**
+                     * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'eventCallbacks' of the switch widget??????
+                     * Explanation:
+                     * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
+                     * 
+                     */
+                    const switch_mesh = params.target_mesh;
+                    const tail_particles_buffer = params.params.tail_particles_buffer;
+                    const glow_particles_buffer = params.params.glow_particles_buffer;
+                    const isOn = switch_mesh.isOn;
+    
+                    
+                    if(isOn){
+                        // How should this callback know about the colorpicker, so that it can destroy it???????
+    
+                        const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
+                        colorpicker.AssignTargetMeshClbk((params)=>{
+                            const color = params;
+                            
+                            // Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+                            CopyArr4(tail_particles_buffer[0].col, color);
+                            CopyArr4(glow_particles_buffer[0].col, color);
+                            // For control of all ball's tail particles
+                            // for(let i=0; i<num_balls; i++){
+                            //     CopyArr4(tail_particles_buffer[i].col, color);
+                            //     CopyArr4(glow_particles_buffer[i].col, color);
+                            // }
+                        });
+                        switch_mesh.aaa = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
+                    }
+                    else{
+    
+                        const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.aaa)
+                        colorpicker.Destroy();
+                    }
+                }, 
+                null, 
+                {
+                    tail_particles_buffer:tail_particles_buffer,
+                    glow_particles_buffer:glow_particles_buffer,
+                },
+            );
+    
+    
+    
+    
+    
+    
+            /****************************************************************************************************************/
+            // Tail Particle System: Control Sliders 
+            const tail_buffer_len = tail_particles_buffer.length;
+            { 
+    
+                // const glow_emitter = tail_particles_buffer[i]
+                
+                { // Slider 1 contol
+                    const slider = Create_widget_slider(_, [0, 0, zpos], slider_dim, _, _,  'Tail: Speed');
+                    // slider.temp_align |= SECTION.VERTICAL;
+                    slider.SetInitialValue(0);
+                    slider_section.AddItem(slider);
+                    
+                    
+                    slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+                    
+                    Slider_connect(slider, (params, slider_val)=>{
+                        
+                        // const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
+                        
+                        for(let i=0; i < tail_buffer_len; i++){
+    
+                            const glow_emitter = tail_particles_buffer[i]
+                            let min = .8; // The min value gives the prolonged glow_emitter
+                            let max = 1.; // Calculate that the max value will be +1+min
+                            const rev_slider_val = 1-slider_val;
+                            glow_emitter.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
+                            glow_emitter.speed = (slider_val+1)*3;
+                        }
+                    }, _);
+                    
+                }
+                { // Slider 2 contol
+                    const slider = Create_widget_slider(_, [0, 0, zpos], slider_dim, _, _,  'Tail: Intensity');
+                    slider.SetInitialValue(0);
+                    slider_section.AddItem(slider);
+                    
+                    slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+                    for (let i=0; i<tail_buffer_len; i++){
+                        
+                        const glow_emitter = tail_particles_buffer[i]
+                        Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 1)
+                    }
+                    
+                }
+                { // Slider 3 contol
+                    const slider = Create_widget_slider(_, [0, 0, zpos], slider_dim, _, _, 'Tail: Fire Variation');
+                    slider.SetInitialValue(0);
+                    slider_section.AddItem(slider);
+                    
+                    slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+                    for (let i=0; i<tail_buffer_len; i++) {
+    
+                        const glow_emitter = tail_particles_buffer[i]
+                        Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 0)
+                    }
+                }
+            }
+            
+            // Glow Particle System: Control Sliders 
+            const glow_buffer_len = glow_particles_buffer.length;
+            // for (let i=0; i<glow_buffer_len; i++) { 
+            for (let i=0; i<1; i++) { 
+                
+                const glow_emitter = glow_particles_buffer[i]
+                /**
+                 * NICE EFFECT:
+                 * Distance:{.28}, Brighter:{1}, Intensity:{.05}, Gravity:{.53{=.03}}, Acceleration:{.22}
+                 */
+    
+                {
+                    const slider = Create_widget_slider(_, [0, 0, zpos], slider_dim, _, _, 'Distance');
+                    slider_section.AddItem(slider);
+                    slider.SetInitialValue(0);
+                    
+                    slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+                    Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 0)
+                }
+                {
+                    const slider = Create_widget_slider(_, [0, 0, zpos], slider_dim, _, _, 'Brighter');
+                    slider_section.AddItem(slider);
+                    slider.SetInitialValue(100);
+                
+                    slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+                    Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
+                }
+                {
+                    const slider = Create_widget_slider(_, [0, 0, zpos], slider_dim, _, _, 'Intensity');
+                    slider_section.AddItem(slider);
+                    slider.SetInitialValue(3);
+                    
+                    slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                    
+                    Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
+                }
+            }
+            
+        }
+
+
+
+
+
+        
+        /****************************************************************************************************************/
+        /****************************************************************************************************************/
+        /****************************************************************************************************************/
+        // Side panel
+        const side_panel = CreateSidePanel(ROOT_WIDGETS.CREATE_ROOT);
+
+
+
+        const s = Create_widget_section(_, SECTION.VERTICAL, [10,10], [0, 0, 0], [0, 0], TRANSPARENCY(YELLOWL[5], 1), 'SidePanel', [0, 10, 1.8]);
+        side_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+        s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        // for(let i=0; i<15; i++){
+        //     const lab = Create_widget_label(_, 'LABEL')
+        //     s.AddItem(lab)
+        // }
+        s.AddItem(slider_section)
+
+        const dp = CreateDropdown([0,0,0], 0x0);
+        s.AddItem(dp)
+        
+        // Add the ballTail control properties to the side panel
+        const inner_section = side_panel.children.buffer[1];
+        // inner_section.AddItem(slider_section)
+        
+        // TEST
+        // const test_dp = CreateDropdown([0,0,0], 0x0);
+        // inner_section.AddItem(test_dp)
+        
+        // Create scroller for the ui-mesh info widget
+        const scroller_width = 150;
+        // const scroller = Create_widget_scroller(_, test_dp, [scroller_width, 90]);
+        // const scroller = Create_widget_scroller(_, slider_section, [scroller_width, 160], TRANSPARENCY(YELLOW[5], .5),);
+        const scroller = Create_widget_scroller(_, s, [scroller_width, 160]);
+        // side_panel.AddItem(scroller);
+        inner_section.AddItem(scroller);
+
+
+        // HACK: Set all text meshes of the scrolled_section to be rendered to a new VB
+        const controls_label = slider_section.children.buffer[0];
+        const text_mesh = controls_label.text_mesh;
+        text_mesh.gfx_ctx_flags = GFX_CTX_FLAGS.NEW
+
+    
+        
+        scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT|SECTION.RESIZE_PARENT;
+        // scroller.options |= SECTION.INHERIT;
+        scroller.scrolled_section.options = SECTION.VERTICAL;
+        // // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
+        // // scroller.scrolled_section.options = SECTION.VERTICAL;
+        
+        
+        
         // scroller.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section);
         // side_panel.geom.pos[0] = VIEWPORT.WIDTH - scroller_width*2
         
         
         
         side_panel.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // side_panel.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENT|SECTION.INHERIT
         side_panel.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENTX
         // side_panel.options = SECTION.HORIZONTAL
-        
         // side_panel.options = SECTION.HORIZONTAL|SECTION.EXPAND|SECTION.RESIZE_PARENTX
-        // side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-        side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        side_panel.Calc_no_gfx_update();
+        
+        side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+        // side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        // scroller.ScrollerAlignBar();
+        scroller.ScrollerAlign();
+        side_panel.Recalc_no_gfx_update();
         side_panel.Render();
         side_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, side_panel.gfx.vb.groupidx);
-        Construct_listeners_relations(side_panel);
+
+        Construct_listen_events_from_mesh_tree(side_panel);
+        Construct_listen_events_relations_from_mesh_tree(side_panel);
+
         View_build_group_from_root_mesh(side_panel);
+
+
+        const sbtn = side_panel.children.buffer[0];
+        
+        
+        const params = {
+            isOn: true,
+            section_pad: side_panel.StylesGetPad(),
+        };
+        sbtn.ChangeListenEvent(E.C, 
+            (params)=>{
+        
+                
+                const section = params.evt_params.section;
+                const btn = Mesh_buffer_get_mesh_byidx(params.meshidx);
+                const isOn = params.evt_params.rest_params.isOn;
+                const section_pad = params.evt_params.rest_params.section_pad;
+                const reduce_val = section.geom.dim[0]*2/10;
+                
+                if(isOn){ // Close Panel
+                    
+                    Callback_animations_create( // Close Panel
+                        (params)=>{ // Run Animation
+
+                            let reduce_val = params.reduce_val;
+                            const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
+
+                            if(unif_wpos+reduce_val < VIEWPORT.WIDTH - btn.geom.dim[0]*2 - section_pad[0]*2){
+
+                                const section = params.section;
+                                Mesh_unif_add_vb_root_wposx(section.root_posidx, reduce_val);
+                                
+                                if(params.reduce_val > 5) params.reduce_val *= .9
+                                // console.log('reduce_val', reduce_val, unif_wpos)
+
+                                return true;
+                            }
+
+                            return false;
+                        }, 
+                        ()=>{ // Stop Animation
+
+                            return false;
+                        }, 
+                        {section:section, reduce_val:reduce_val}
+                    );
+                    
+                    params.evt_params.rest_params.isOn = false;
+                }
+                else { // Open Panel
+                    
+                    Callback_animations_create(
+                        (params)=>{ // Run Animation
+
+                            let reduce_val = params.reduce_val;
+                            const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
+                            if(unif_wpos > VIEWPORT.WIDTH - section.geom.dim[0]*2){
+
+                                const section = params.section;
+                                Mesh_unif_add_vb_root_wposx(section.root_posidx, -reduce_val);
+                                
+                                if(params.reduce_val > 5) params.reduce_val *= .9
+                                // console.log('reduce_val', reduce_val, unif_wpos)
+
+                                return true;
+                            }
+
+                            return false;
+                        }, 
+                        ()=>{ // Stop Animation
+
+                            return false;
+                        }, 
+                        {section:section, reduce_val:reduce_val}
+                    );
+                    
+                    params.evt_params.rest_params.isOn = true;
+                }
+
+        
+            }
+            , {section:side_panel, rest_params:params},
+        );
+    
+    
     }
-
-    // { // Side Panel 
-
-
-
-        
-    //     /****************************************************************************************************************/
-    //     /****************************************************************************************************************/
-    //     /****************************************************************************************************************/        
-    //     // BallTail
-    //     const tail_particles = CreateBallTailParticles();
-    //     const section = tail_particles.section;
-    //     const tail_particles_buffer = tail_particles.tail_particles_buffer
-    //     const glow_particles_buffer = tail_particles.glow_particles_buffer;
-
-
-
-
-
-
-        
-    //     /****************************************************************************************************************/
-    //     /****************************************************************************************************************/
-    //     /****************************************************************************************************************/        
-    //     // Create Sliders for manipulating variables of particles
-
-    //     const slider_dim = [100, 10];
-    //     const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], YELLOWL[6], 'SliderSection', [0,10,2], );
-    //     slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    //     slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-            
-    //     const flags = {
-    //         unif: SID.UNIF.ROOT_WPOS2,
-    //         pass: SID.PASS.WPOS2,
-    //     }
-
-    //     slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-    //     {
-
-    //         // Create Header
-    //         const controls_label = Create_widget_label(_, 'Ball Controls', _, [0,0,4], _, GREY[2]);
-    //         slider_section.AddItem(controls_label);
-    
-    
-    
-    //         /****************************************************************************************************************/
-    //         // Create the switch to create/destroy colorpicker for particles color control
-            
-    //         // Create Header
-    //         const switch_label = Create_widget_label(_, 'ColorPick', _, [0,0,4], _, GREY[2]);
-    //         // switch_label.temp_align |= SECTION.HORIZONTAL;
-    //         slider_section.AddItem(switch_label);
-            
-    //         const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
-    //         // colorpicker_switch.temp_align |= SECTION.HORIZONTAL;
-    //         slider_section.AddItem(colorpicker_switch);
-    //         colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //         const x =  400, y = 100
-    //         colorpicker_switch.Bind(
-    //             (params)=>{
-    
-    //                 /**
-    //                  * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'eventCallbacks' of the switch widget??????
-    //                  * Explanation:
-    //                  * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
-    //                  * 
-    //                  */
-    //                 const switch_mesh = params.target_mesh;
-    //                 const tail_particles_buffer = params.params.tail_particles_buffer;
-    //                 const glow_particles_buffer = params.params.glow_particles_buffer;
-    //                 const isOn = switch_mesh.isOn;
-    
-                    
-    //                 if(isOn){
-    //                     // How should this callback know about the colorpicker, so that it can destroy it???????
-    
-    //                     const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
-    //                     colorpicker.AssignTargetMeshClbk((params)=>{
-    //                         const color = params;
-                            
-    //                         // Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
-    //                         CopyArr4(tail_particles_buffer[0].col, color);
-    //                         CopyArr4(glow_particles_buffer[0].col, color);
-    //                         // For control of all ball's tail particles
-    //                         // for(let i=0; i<num_balls; i++){
-    //                         //     CopyArr4(tail_particles_buffer[i].col, color);
-    //                         //     CopyArr4(glow_particles_buffer[i].col, color);
-    //                         // }
-    //                     });
-    //                     switch_mesh.aaa = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
-    //                 }
-    //                 else{
-    
-    //                     const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.aaa)
-    //                     colorpicker.Destroy();
-    //                 }
-    //             }, 
-    //             null, 
-    //             {
-    //                 tail_particles_buffer:tail_particles_buffer,
-    //                 glow_particles_buffer:glow_particles_buffer,
-    //             },
-    //         );
-    
-    
-    
-    
-    
-    
-    //         /****************************************************************************************************************/
-    //         // Tail Particle System: Contol Sliders 
-    //         const tail_buffer_len = tail_particles_buffer.length;
-    //         { 
-    
-    //             // const glow_emitter = tail_particles_buffer[i]
-                
-    //             { // Slider 1 contol
-    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Speed');
-    //                 // slider.temp_align |= SECTION.VERTICAL;
-    //                 slider.SetInitialValue(0);
-    //                 slider_section.AddItem(slider);
-                    
-                    
-    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-                    
-                    
-    //                 Slider_connect(slider, (params, slider_val)=>{
-                        
-    //                     // const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
-                        
-    //                     for(let i=0; i < tail_buffer_len; i++){
-    
-    //                         const glow_emitter = tail_particles_buffer[i]
-    //                         let min = .8; // The min value gives the prolonged glow_emitter
-    //                         let max = 1.; // Calculate that the max value will be +1+min
-    //                         const rev_slider_val = 1-slider_val;
-    //                         glow_emitter.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
-    //                         glow_emitter.speed = (slider_val+1)*3;
-    //                     }
-    //                 }, _);
-                    
-    //             }
-    //             { // Slider 2 contol
-    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Intensity');
-    //                 slider.SetInitialValue(0);
-    //                 slider_section.AddItem(slider);
-                    
-    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-                    
-    //                 for (let i=0; i<tail_buffer_len; i++){
-                        
-    //                     const glow_emitter = tail_particles_buffer[i]
-    //                     Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 1)
-    //                 }
-                    
-    //             }
-    //             { // Slider 3 contol
-    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Tail: Fire Variation');
-    //                 slider.SetInitialValue(0);
-    //                 slider_section.AddItem(slider);
-                    
-    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-                    
-    //                 for (let i=0; i<tail_buffer_len; i++) {
-    
-    //                     const glow_emitter = tail_particles_buffer[i]
-    //                     Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 0)
-    //                 }
-    //             }
-    //         }
-            
-    //         // Glow Particle System: Contol Sliders 
-    //         const glow_buffer_len = glow_particles_buffer.length;
-    //         // for (let i=0; i<glow_buffer_len; i++) { 
-    //         for (let i=0; i<1; i++) { 
-                
-    //             const glow_emitter = glow_particles_buffer[i]
-    //             /**
-    //              * NICE EFFECT:
-    //              * Distance:{.28}, Brighter:{1}, Intensity:{.05}, Gravity:{.53{=.03}}, Acceleration:{.22}
-    //              */
-    
-    //             {
-    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
-    //                 slider_section.AddItem(slider);
-    //                 slider.SetInitialValue(0);
-                    
-    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    
-    //                 Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 0)
-    //             }
-    //             {
-    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
-    //                 slider_section.AddItem(slider);
-    //                 slider.SetInitialValue(100);
-                
-    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-                    
-    //                 Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
-    //             }
-    //             {
-    //                 const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
-    //                 slider_section.AddItem(slider);
-    //                 slider.SetInitialValue(3);
-                    
-    //                 slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-                    
-    //                 Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
-    //             }
-    //         }
-            
-    //     }
-
-
-
-
-        
-    //     /****************************************************************************************************************/
-    //     /****************************************************************************************************************/
-    //     /****************************************************************************************************************/
-    //     // Side panel
-    //     const side_panel = CreateSidePanel(ROOT_WIDGETS.CREATE_ROOT);
-    //     // const side_panel = CreateSidePanel(0x0);
-        
-        
-    //     // Add the ballTail control properties to the side panel
-    //     const inner_section = side_panel.children.buffer[1];
-    //     inner_section.AddItem(slider_section)
-        
-    //     // TEST
-    //     const test_dp = CreateDropdown([0,0,0], 0x0);
-    //     // inner_section.AddItem(test_dp)
-        
-    //     // Create scroller for the ui-mesh info widget
-    //     const scroller_width = 20;
-    //     const scroller = Create_widget_scroller(_, test_dp, [scroller_width, 90]);
-    //     // const scroller = Create_widget_scroller(_, slider_section, [scroller_width, 90]);
-    //     inner_section.AddItem(scroller);
-    //     // side_panel.AddItem(scroller);
-    //     // scroller.StateEnable(MESH_STATE.ACTIVE);
-    //     // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    //     // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-
-    
-        
-    //     // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
-    //     // scroller.scrolled_section.options = SECTION.VERTICAL;
-        
-        
-    //     // // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
-    //     // // scroller.scrolled_section.options = SECTION.VERTICAL;
-        
-    //     // scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //     // scroller.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section);
-    //     // side_panel.geom.pos[0] = VIEWPORT.WIDTH - scroller_width*2
-        
-        
-        
-    //     side_panel.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //     side_panel.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENTX
-    //     // side_panel.options = SECTION.HORIZONTAL
-        
-    //     // side_panel.options = SECTION.HORIZONTAL|SECTION.EXPAND|SECTION.RESIZE_PARENTX
-    //     side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-    //     // side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    //     side_panel.Calc_no_gfx_update();
-    //     side_panel.Render();
-    //     side_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, side_panel.gfx.vb.groupidx);
-    //     Construct_listeners_relations(side_panel);
-    //     View_build_group_from_root_mesh(side_panel);
-
-
-    //     const sbtn = side_panel.children.buffer[0];
-        
-        
-    //     const params = {
-    //         isOn: true,
-    //     };
-    //     sbtn.ChangeListenEvent(E.C, 
-    //         (params)=>{
-        
-                
-    //             const section = params.evt_params.section;
-    //             const btn = Mesh_buffer_get_mesh_byidx(params.meshidx);
-    //             const isOn = params.evt_params.rest_params.isOn;
-    //             const reduce_val = section.geom.dim[0]*2/10;
-                
-    //             if(isOn){ // Close Panel
-                    
-    //                 Callback_animations_create( // Close Panel
-    //                     (params)=>{ // Run Animation
-
-    //                         let reduce_val = params.reduce_val;
-    //                         const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
-    //                         if(unif_wpos+reduce_val < VIEWPORT.WIDTH - btn.geom.dim[0]*2 - 5){
-
-    //                             const section = params.section;
-    //                             Mesh_unif_add_vb_root_wposx(section.root_posidx, reduce_val);
-                                
-    //                             if(params.reduce_val > 5) params.reduce_val *= .9
-    //                             // console.log('reduce_val', reduce_val, unif_wpos)
-
-    //                             return true;
-    //                         }
-
-    //                         return false;
-    //                     }, 
-    //                     ()=>{ // Stop Animation
-
-    //                         return false;
-    //                     }, 
-    //                     {section:section, reduce_val:reduce_val}
-    //                 );
-                    
-    //                 params.evt_params.rest_params.isOn = false;
-    //             }
-    //             else { // Open Panel
-                    
-    //                 Callback_animations_create(
-    //                     (params)=>{ // Run Animation
-
-    //                         let reduce_val = params.reduce_val;
-    //                         const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
-    //                         if(unif_wpos > VIEWPORT.WIDTH - section.geom.dim[0]*2){
-
-    //                             const section = params.section;
-    //                             Mesh_unif_add_vb_root_wposx(section.root_posidx, -reduce_val);
-                                
-    //                             if(params.reduce_val > 5) params.reduce_val *= .9
-    //                             console.log('reduce_val', reduce_val, unif_wpos)
-
-    //                             return true;
-    //                         }
-
-    //                         return false;
-    //                     }, 
-    //                     ()=>{ // Stop Animation
-
-    //                         return false;
-    //                     }, 
-    //                     {section:section, reduce_val:reduce_val}
-    //                 );
-                    
-    //                 params.evt_params.rest_params.isOn = true;
-    //             }
-
-        
-    //         }
-    //         , {section:side_panel, rest_params:params},
-    //     );
-    
-    
-    // }
 
     { // Scroller Widgets
         // Create and pass scrollers in 'CreateScrollerInScroller()' 
@@ -564,8 +595,8 @@ export function TestWidgetsGeneric(scene) {
 
     { // Test sdf lines
         // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 100, 0], [400, 400], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
-        // line.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
-        // // line.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+        // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+        // // line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         // // // // // // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
         // // // // // // line.sid.attr &= ~SID.ATTR.COL4;
@@ -613,7 +644,7 @@ export function TestWidgetsGeneric(scene) {
         
         // Test change color of a mesh using the colorpicker
         // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 600, 0], [200, 80], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
-        // line.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
+        // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
         // line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         // line.Render();
@@ -655,9 +686,10 @@ export function TestWidgetsGeneric(scene) {
 
     { // Widget: Dropdown
 
+        // TEST_LISTENERS_CreateDropdown([400, 200, 0])
+
         // CreateDropdown([400, 200, 0])
         // CreateDropdownWithScroller([400, 200, 0])
-        // CreateDropdown2([0, ypos+=40, 0], 0);
         // CreateDropdown2InSection([0, ypos+=40, 0], 0);
         // CreateDropdown3([0, ypos+=40, 0], 0);
     }
@@ -675,7 +707,7 @@ export function TestWidgetsGeneric(scene) {
         /**************************/
         // CreateGlowParticles(0, 100);
 
-        // CreateBallTailParticles(0, 800, );
+        // CreateBallTailParticles(0, 0,);
         
         // CreateSmokeParticles(0, 1600);
 
@@ -701,7 +733,7 @@ export function TestWidgetsGeneric(scene) {
         // blu.Calc_no_gfx_update();
         // blu.Render();
         // blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
-        // Construct_listeners_relations(blu)
+        // Construct_listen_events_relations_from_mesh_tree(blu)
 
         // const helpui = Help(scene);
 
@@ -732,7 +764,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Must draw last so it is on top of everything
     
-    // Debug_info_ui_static();
+    Debug_info_ui_static();
 }
 
 
@@ -774,8 +806,8 @@ function CreatePanel(is_root_widget=undefined){
         const scroller2 = Create_widget_scroller(is_root_widget, scrolled2, [80,60], BLUEL[8], _, _);
         scrolled.AddItem(scroller2);
         scroller2.StateEnable(MESH_STATE.ACTIVE);
-        scroller2.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-        scroller2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        scroller2.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        scroller2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         scroller2.options = SECTION.HORIZONTAL | SECTION.INHERIT;
         scroller2.scrolled_section.options = SECTION.VERTICAL;
         scroller2.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller2.scrolled_section);
@@ -786,8 +818,8 @@ function CreatePanel(is_root_widget=undefined){
     const scroller = Create_widget_scroller(is_root_widget, scrolled, [140,140], BLUEL[8], _, _);
 
     scroller.StateEnable(MESH_STATE.ACTIVE);
-    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     
     scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
@@ -832,36 +864,32 @@ function CreatePanel(is_root_widget=undefined){
 function CreateSidePanel(root_widget=ROOT_WIDGETS.CREATE_ROOT, render_target=false){
     
     const height = VIEWPORT.HEIGHT;
-    const width = 400;
+    const width = 300;
     const pad = 4;
 
-    const section = Create_widget_section(root_widget, SECTION.HORIZONTAL, [pad, pad], [VIEWPORT.RIGHT-(width-pad*2), 0, 0], [width, height], TRANSPARENCY(GREY[1], 1), 'SidePanel', [0, 10, 1.8]);
+    const section = Create_widget_section(root_widget, SECTION.HORIZONTAL, [pad, 0], [VIEWPORT.RIGHT-(width-pad*2)-40, 0, 0], [width, height], TRANSPARENCY(GREY[1], 1), 'SidePanel', [0, 10, 1.8]);
+    // const section = Create_widget_section(root_widget, SECTION.HORIZONTAL, [pad, pad], [VIEWPORT.RIGHT-(width-pad*2), 0, 0], [width, height], TRANSPARENCY(GREY[1], 1), 'SidePanel', [0, 10, 1.8]);
     // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [pad, pad], [VIEWPORT.RIGHT-width, 0, 0], [width, height], TRANSPARENCY(GREY[1], 1), 'SidePanel', [0, 10, 1.8]);
-    // section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+    // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
     
     
-    // const sbtn = Create_rect_mesh(_,[0, 0, 11], [6, height], TRANSPARENCY(BLUEL[3], 1.), 'Btn', [0, 22, 1.8], );
-    // // sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // // sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-    // sbtn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-    // sbtn.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+    const sbtn = Create_rect_mesh(_,[0, 0, 11], [6, height], TRANSPARENCY(BLUEL[7], .7), 'Btn', [0, 22, 1.8] );
+    sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    sbtn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
     // sbtn.EnableGfxAttributes(MESH_ENABLE.ATTR_STYLE);
-    // section.AddItem(sbtn)
+    section.AddItem(sbtn)
     
-    const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 2], [100, 400], TRANSPARENCY(GREY[0], 1.), 'InnerPanel', [0, 10, 1.8]);
+    // const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 2], [100, 400], TRANSPARENCY(GREY[0], 1.), 'InnerPanel', [0, 10, 1.8]);
+    const s = Create_widget_section(_, SECTION.VERTICAL, [20, 40], [0, 0, 2], [0, 0], TRANSPARENCY(GREY[0], .5), 'InnerPanel', [0, 10, 1.8]);
     section.AddItem(s);
-    // s.max_size[0] = 100;
-    // s.max_size[1] = 400;
-    s.options = SECTION.VERTICAL|SECTION.EXPAND|SECTION.TOP_DOWN
-    // s.options = SECTION.VERTICAL|SECTION.EXPAND|SECTION.FIXED_W
-    // s.options = SECTION.VERTICAL|SECTION.FIXED_W|SECTION.FIXED_H
+    // s.options = SECTION.VERTICAL|SECTION.EXPAND|SECTION.TOP_DOWN
+    // s.options = SECTION.VERTICAL|SECTION.EXPAND|SECTION.TOP_DOWN|SECTION.INHERIT
+    // s.options = SECTION.VERTICAL|SECTION.TOP_DOWN|SECTION.INHERIT
+    // s.options = SECTION.VERTICAL|SECTION.TOP_DOWN
     
     const heading = Create_widget_label(_, 'Properties', _, [0,0,4], _, GREY[2]);
     s.AddItem(heading);
-    heading.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
     
-    // const dbg_dp = Debug_info_ui(_, [0,0,3]);
-    // s.AddItem(dbg_dp);
 
 
     if(render_target){
@@ -871,10 +899,13 @@ function CreateSidePanel(root_widget=ROOT_WIDGETS.CREATE_ROOT, render_target=fal
         section.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENTX
         // section.options = SECTION.HORIZONTAL|SECTION.EXPAND|SECTION.RESIZE_PARENTX
         section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-        section.Calc_no_gfx_update();
+        section.Recalc_no_gfx_update();
         section.Render();
         section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-        Construct_listeners_relations(section);
+
+        Construct_listen_events_from_mesh_tree(section);
+        Construct_listen_events_relations_from_mesh_tree(section);
+
         View_build_group_from_root_mesh(section);
     }
 
@@ -975,8 +1006,8 @@ function SectionResizable(pos) {
 
     // const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, [0, 500, 0], dim, TRANSPARENCY(BLUEL[5], tr), _, [40, 40, 2]);
     const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], tr), _, [40, dim[1], 2]);
-    grey.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-    grey.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    grey.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     grey.StateEnable(MESH_STATE.IS_RESIZEABLE);
     grey.SetName(`grey${grey_cnt++}`);
 
@@ -999,7 +1030,7 @@ function SectionResizable(pos) {
     grey.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, grey.gfx.vb.groupidx)
     // grey.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
     // grey.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, grey.gfx.vb.groupidx);
-    Construct_listeners_relations(grey);
+    Construct_listen_events_relations_from_mesh_tree(grey);
 
     return grey;
 }
@@ -1057,8 +1088,8 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
 
 
     const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, 60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
-    slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     const flags = {
         unif: SID.UNIF.ROOT_WPOS2,
         pass: SID.PASS.WPOS2,
@@ -1072,8 +1103,7 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
     // Create the emitter button, as well as a switch to auto-emitt particles
     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', _, [0, 0, 1], 20, BLUEL[6], WHITE, [5, 5], .5);
     slider_section.AddItem(btn)
-    btn.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    btn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     btn.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     // btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1, emitter_idx2] }, MESH_STATE.IS_HOLD_CLICK)
@@ -1086,8 +1116,8 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
     // Create the switch to auto-emitt particles
     const emitt_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
     slider_section.AddItem(emitt_switch);
-    emitt_switch.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
-    emitt_switch.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
+    emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
     const evt_params = { target_params: [emitter_idx1] };
     /**
      * Pass the Emitt pareticles callback 'Particle_system_emitt' as the t'targetBindingFunctions' parameter, 
@@ -1104,8 +1134,8 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
     // Create the switch to create/destroy colorpicker for particles color control
     const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
     slider_section.AddItem(colorpicker_switch);
-    colorpicker_switch.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
-    colorpicker_switch.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
+    colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
     colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     colorpicker_switch.Bind(
         (params)=>{
@@ -1126,6 +1156,9 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
                 const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
                 colorpicker.AssignTargetMeshClbk((params)=>{
                     const color = params;
+                    
+                    CopyArr4(slider_section.mat.col, color);
+                    CopyArr4(slider_section.mat.defCol, color);
                     Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
                     CopyArr4(emitter.col, color);
                 });
@@ -1327,7 +1360,10 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
     slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
     slider_section.Calc_no_gfx_update();
     slider_section.Render();
-    Construct_listeners_relations(slider_section);
+
+    Construct_listen_events_from_mesh_tree(slider_section);
+    Construct_listen_events_relations_from_mesh_tree(slider_section);
+
 
     slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
 
@@ -1338,7 +1374,7 @@ function CreateGlowParticles(x=0, y=0){ // 3 control Sliders
  * Create a gfxContext match for particle systems of same type
  */
 
-function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing Ball Tail
+function CreateBallTailParticles(x=0, y=0, num_balls=2, root_widget=ROOT_WIDGETS.CREATE_ROOT){ // Particles Bouncing Ball Tail
 
     let balls_buffer = [];
     let dirs_buffer = [];
@@ -1346,8 +1382,8 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
     let glow_particles_buffer = [];
 
             
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [100, 0], [x+300, y+0, 0], [300, 300], TRANSPARENCY(GREY[3], 1.0), 'Particles Bouncing Ball Tail',)
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [100, 0], [x+10, y+0, 0], [120, 200], TRANSPARENCY(GREY[3], 1.0), 'Particles Bouncing Ball Tail',)
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
 
@@ -1359,7 +1395,7 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
         const pos = GetRandomPos([0,0], [section.geom.dim[0], section.geom.dim[1]])
         
         const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, WHITE, 'Ball', [0, dim[0], 2]);
-        ball.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        ball.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         ball.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
         section.AddItem(ball);
@@ -1370,6 +1406,7 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
 
         const scale = 2.;
         const particles_dim = [dim[0]*scale, dim[1]*scale]
+        // const particles_dim = [300, 300]
         const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], particles_dim, .7, 1);
         const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
         
@@ -1431,7 +1468,9 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
     
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
     
-    Construct_listeners_relations(section);
+
+    Construct_listen_events_from_mesh_tree(section);
+    Construct_listen_events_relations_from_mesh_tree(section);
 
 
     // IMPORTANT: Generate particles gfx after the generation of any parent mesh, so that the particles system unif_wpos has a parent root_posidx
@@ -1454,181 +1493,187 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
 
 
 
-    // /*************************************************************************************************************** */
-    // // Create Sliders for manipulating variables of particles
+    /*************************************************************************************************************** */
+    // Create Sliders for manipulating variables of particles
 
-    // const slider_dim = [100, 10];
-    // const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [x+VIEWPORT.WIDTH-slider_dim[0]*2-40, y+60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
-    // slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    // slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-           
-    // const flags = {
-    //     unif: SID.UNIF.ROOT_WPOS2,
-    //     pass: SID.PASS.WPOS2,
-    // }
-
-    // slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-
-
-
-    // /****************************************************************************************************************/
-    // // Create the switch to create/destroy colorpicker for particles color control
-    // const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
-    // slider_section.AddItem(colorpicker_switch);
-    // colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    // colorpicker_switch.Bind(
-    //     (params)=>{
-
-    //         /**
-    //          * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'eventCallbacks' of the switch widget??????
-    //          * Explanation:
-    //          * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
-    //          * 
-    //          */
-    //         const switch_mesh = params.target_mesh;
-    //         const isOn = switch_mesh.isOn;
-
-            
-    //         if(isOn){
-    //             // How should this callback know about the colorpicker, so that it can destroy it???????
-
-    //             const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
-    //             colorpicker.AssignTargetMeshClbk((params)=>{
-    //                 const color = params;
-    //                 Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
-
-    //                 CopyArr4(tail_particles_buffer[0].col, color);
-    //                 CopyArr4(glow_particles_buffer[0].col, color);
-    //                 // For control of all ball's tail particles
-    //                 // for(let i=0; i<num_balls; i++){
-    //                 //     CopyArr4(tail_particles_buffer[i].col, color);
-    //                 //     CopyArr4(glow_particles_buffer[i].col, color);
-    //                 // }
-    //             });
-    //             switch_mesh.aaa = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
-    //         }
-    //         else{
-
-    //             const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.aaa)
-    //             colorpicker.Destroy();
-    //         }
-    //     }, 
-    //     null, null,
-    // );
-
-
-
-
-
-
-    // /****************************************************************************************************************/
-    // // Tail Particle System: Contol Sliders 
-    // const tail_buffer_len = tail_particles_buffer.length;
-    // { 
-
-    //     // const glow_emitter = tail_particles_buffer[i]
-        
-    //     { // Slider 1 contol
-    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Speed');
-    //         slider.SetInitialValue(0);
-    //         slider_section.AddItem(slider);
-            
-            
-    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-            
-            
-    //         Slider_connect(slider, (params, slider_val)=>{
-                
-    //             // const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
-                
-    //             for(let i=0; i < tail_buffer_len; i++){
-
-    //                 const glow_emitter = tail_particles_buffer[i]
-    //                 let min = .8; // The min value gives the prolonged glow_emitter
-    //                 let max = 1.; // Calculate that the max value will be +1+min
-    //                 const rev_slider_val = 1-slider_val;
-    //                 glow_emitter.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
-    //                 glow_emitter.speed = (slider_val+1)*3;
-    //             }
-    //         }, _);
-            
-    //     }
-    //     { // Slider 2 contol
-    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Intensity');
-    //         slider.SetInitialValue(0);
-    //         slider_section.AddItem(slider);
-            
-    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-            
-    //         for (let i=0; i<tail_buffer_len; i++){
-                
-    //             const glow_emitter = tail_particles_buffer[i]
-    //             Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 1)
-    //         }
-            
-    //     }
-    //     { // Slider 3 contol
-    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Tail: Fire Variation');
-    //         slider.SetInitialValue(0);
-    //         slider_section.AddItem(slider);
-            
-    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-            
-    //         for (let i=0; i<tail_buffer_len; i++) {
-
-    //             const glow_emitter = tail_particles_buffer[i]
-    //             Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 0)
-    //         }
-    //     }
-    // }
+    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){ // Create slider controls only if this is to be rendered from this function
+        const slider_dim = [100, 10];
+        // const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [x+VIEWPORT.WIDTH-slider_dim[0]*2-40, y+60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
+        const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [x+VIEWPORT.WIDTH-slider_dim[0]*2-40, 500, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
+        slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+               
+        const flags = {
+            unif: SID.UNIF.ROOT_WPOS2,
+            pass: SID.PASS.WPOS2,
+        }
     
-    // // Glow Particle System: Contol Sliders 
-    // const glow_buffer_len = glow_particles_buffer.length;
-    // for (let i=0; i<glow_buffer_len; i++) { 
-        
-    //     const glow_emitter = glow_particles_buffer[i]
-    //     /**
-    //      * NICE EFFECT:
-    //      * Distance:{.28}, Brighter:{1}, Intensity:{.05}, Gravity:{.53{=.03}}, Acceleration:{.22}
-    //      */
-
-    //     {
-    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
-    //         slider_section.AddItem(slider);
-    //         slider.SetInitialValue(0);
-            
-    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-    //         Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 0)
-    //     }
-    //     {
-    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
-    //         slider_section.AddItem(slider);
-    //         slider.SetInitialValue(100);
-        
-    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-            
-    //         Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
-    //     }
-    //     {
-    //         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
-    //         slider_section.AddItem(slider);
-    //         slider.SetInitialValue(3);
-            
-    //         slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-            
-    //         Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
-    //     }
-    // }
+        slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
-    // slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    // slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-    // slider_section.Calc_no_gfx_update();
-    // slider_section.Render();
-    // slider_section.ConstructListeners();
-
-    // slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
+    
+    
+    
+        /****************************************************************************************************************/
+        // Create the switch to create/destroy colorpicker for particles color control
+        const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
+        slider_section.AddItem(colorpicker_switch);
+        colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        colorpicker_switch.Bind(
+            (params)=>{
+    
+                /**
+                 * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'eventCallbacks' of the switch widget??????
+                 * Explanation:
+                 * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
+                 * 
+                 */
+                const switch_mesh = params.target_mesh;
+                const isOn = switch_mesh.isOn;
+    
+                
+                if(isOn){
+                    // How should this callback know about the colorpicker, so that it can destroy it???????
+    
+                    const colorpicker = CreateColorPicker(x, section.geom.dim[1]*2, _, ROOT_WIDGETS.CREATE_ROOT);
+                    colorpicker.AssignTargetMeshClbk((params)=>{
+                        const color = params;
+                        Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
+    
+                        CopyArr4(tail_particles_buffer[0].col, color);
+                        CopyArr4(glow_particles_buffer[0].col, color);
+                        // For control of all ball's tail particles
+                        // for(let i=0; i<num_balls; i++){
+                        //     CopyArr4(tail_particles_buffer[i].col, color);
+                        //     CopyArr4(glow_particles_buffer[i].col, color);
+                        // }
+                    });
+                    switch_mesh.aaa = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
+                }
+                else{
+    
+                    const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.aaa)
+                    colorpicker.Destroy();
+                }
+            }, 
+            null, null,
+        );
+        
+        
+        
+        
+        
+        
+        /****************************************************************************************************************/
+        // Tail Particle System: Contol Sliders 
+        const tail_buffer_len = tail_particles_buffer.length;
+        { 
+    
+            // const glow_emitter = tail_particles_buffer[i]
+            
+            { // Slider 1 contol
+                const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Speed');
+                slider.SetInitialValue(0);
+                slider_section.AddItem(slider);
+                
+                
+                slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                
+                
+                Slider_connect(slider, (params, slider_val)=>{
+                    
+                    // const slider_val = Slider_get_slider_val({slider:slider, start_val:0, max:1});
+                    
+                    for(let i=0; i < tail_buffer_len; i++){
+    
+                        const glow_emitter = tail_particles_buffer[i]
+                        let min = .8; // The min value gives the prolonged glow_emitter
+                        let max = 1.; // Calculate that the max value will be +1+min
+                        const rev_slider_val = 1-slider_val;
+                        glow_emitter.t_step = rev_slider_val+min + ((max-slider_val)*(rev_slider_val)); 
+                        glow_emitter.speed = (slider_val+1)*3;
+                    }
+                }, _);
+                
+            }
+            { // Slider 2 contol
+                const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _,  'Tail: Intensity');
+                slider.SetInitialValue(0);
+                slider_section.AddItem(slider);
+                
+                slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                
+                for (let i=0; i<tail_buffer_len; i++){
+                    
+                    const glow_emitter = tail_particles_buffer[i]
+                    Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 1)
+                }
+                
+            }
+            { // Slider 3 contol
+                const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Tail: Fire Variation');
+                slider.SetInitialValue(0);
+                slider_section.AddItem(slider);
+                
+                slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                
+                for (let i=0; i<tail_buffer_len; i++) {
+    
+                    const glow_emitter = tail_particles_buffer[i]
+                    Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_noise_params', Slider_get_slider_val, slider, 0)
+                }
+            }
+        }
+        
+        // Glow Particle System: Contol Sliders 
+        const glow_buffer_len = glow_particles_buffer.length;
+        for (let i=0; i<glow_buffer_len; i++) { 
+            
+            const glow_emitter = glow_particles_buffer[i]
+            /**
+             * NICE EFFECT:
+             * Distance:{.28}, Brighter:{1}, Intensity:{.05}, Gravity:{.53{=.03}}, Acceleration:{.22}
+             */
+    
+            {
+                const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
+                slider_section.AddItem(slider);
+                slider.SetInitialValue(0);
+                
+                slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+                Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 0)
+            }
+            {
+                const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
+                slider_section.AddItem(slider);
+                slider.SetInitialValue(100);
+            
+                slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                
+                Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
+            }
+            {
+                const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
+                slider_section.AddItem(slider);
+                slider.SetInitialValue(3);
+                
+                slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                
+                Particles_gfx_uniforms_set_clbk(glow_emitter.idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
+            }
+        }
+        
+        slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+        slider_section.Calc_no_gfx_update();
+        slider_section.Render();
+    
+        Construct_listen_events_from_mesh_tree(slider_section);
+        Construct_listen_events_relations_from_mesh_tree(slider_section);
+    
+        slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
+    }
 
 
 
@@ -1752,6 +1797,13 @@ function CreateBallTailParticles(x=0, y=0, num_balls=2){ // Particles Bouncing B
 
     TimeIntervalsCreate(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, AnimateBall, params);
 
+        
+    // const particles_params = {
+    //     params: {
+    //         target_params:[tail_particles_buffer[0].idx],
+    //     }
+    // }
+    // Particle_system_emitt(particles_params);
 
 
     
@@ -1875,8 +1927,7 @@ function CreateSmokeParticles(x=0, y=0){
 
 
     const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [VIEWPORT.WIDTH-slider_dim[0]*2-40, y+60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
-    slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    slider_section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
     const flags = {
         unif: SID.UNIF.ROOT_WPOS2,
@@ -1888,8 +1939,7 @@ function CreateSmokeParticles(x=0, y=0){
     // Create the emitter button, as well as a switch to auto-emitt particles
     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', _, [0, 0, 1], 20, BLUEL[6], WHITE, [5, 5], .5);
     slider_section.AddItem(btn)
-    btn.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    btn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     btn.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     // btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idx1, emitter_idx2] }, MESH_STATE.IS_HOLD_CLICK)
@@ -1899,8 +1949,8 @@ function CreateSmokeParticles(x=0, y=0){
     // Create the switch to auto-emitt particles
     const emitt_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
     const evt_params = { target_params: emitter_idxs };
-    emitt_switch.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
-    emitt_switch.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
+    emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
     /**
      * Pass the Emitt pareticles callback 'Particle_system_emitt' as the t'targetBindingFunctions' parameter, 
      * so that the 'OnClick' of the switch widget will call the 'Switch_simple_time_interval_callback' 
@@ -1925,8 +1975,8 @@ function CreateSmokeParticles(x=0, y=0){
     // Create the switch to create/destroy colorpicker for particles color control
     const colorpicker_switch = Create_widget_switch_simple(_, [0,0,1], 18,  BLUEL[6], _);
     slider_section.AddItem(colorpicker_switch);
-    colorpicker_switch.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
-    colorpicker_switch.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP)
+    colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
     colorpicker_switch.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     colorpicker_switch.Bind(
         (params)=>{
@@ -2056,7 +2106,9 @@ function CreateSmokeParticles(x=0, y=0){
     slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
     slider_section.Calc_no_gfx_update();
     slider_section.Render();
-    Construct_listeners_relations(slider_section);
+
+    Construct_listen_events_from_mesh_tree(slider_section);
+    Construct_listen_events_relations_from_mesh_tree(slider_section);
 
     slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
 
@@ -2114,8 +2166,8 @@ function TestNoiseShader(){
     
     /*************************************************************************************************************** */
     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [10, 160, 0], 20, BLUEL[6], WHITE, [5, 5], .5);
-    btn.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    btn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     btn.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     btn.Bind(Particle_system_emitt, _, { target_params: emitter_idxs }, MESH_STATE.IS_HOLD_CLICK)
@@ -2125,7 +2177,9 @@ function TestNoiseShader(){
     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     btn.Render();
     btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx);
-    btn.ConstructListeners();
+
+    Construct_listen_events_from_mesh_tree(btn);
+    Construct_listen_events_relations_from_mesh_tree(btn);
 
 
     
@@ -2149,8 +2203,8 @@ function CreateLabel(name = 'Label ') {
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.RIGHT | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.BOTTOM, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, fontsize, GREY[0], WHITE, [5, 5], .5);
-    label.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
-    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
 
@@ -2160,7 +2214,7 @@ function CreateLabel(name = 'Label ') {
     label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     label.Render()
     label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
-    Construct_listeners_relations(label);
+    Construct_listen_events_relations_from_mesh_tree(label);
 
 
 
@@ -2182,17 +2236,21 @@ function CreateLabel(name = 'Label ') {
 function CreateButton(x=20, y=400, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
     const btn = Create_widget_button(root_widget, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [x, y, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
-    btn.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    btn.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-    btn.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
+    // btn.Bind(()=>{console.log('HI')}, )
+    
     if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
-
+        
+        btn.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         btn.Render();
         btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
-        Construct_listeners_relations(btn);
+                
+        Construct_listen_events_from_mesh_tree(btn)
+        Construct_listen_events_relations_from_mesh_tree(btn);
     }
 
     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, btn, .001, 0.6, .6, 0)
@@ -2229,8 +2287,9 @@ function CreateSwitchSimple(pos, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
         switch1.Render();
 
         switch1.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, switch1.gfx.vb.groupidx)
-        
-        Construct_listeners_relations(switch1);
+                
+        Construct_listen_events_from_mesh_tree(switch1)
+        Construct_listen_events_relations_from_mesh_tree(switch1);
     }
 
     return switch1;
@@ -2242,8 +2301,8 @@ function CreateSwitch() {
 
     let ypos = 500
     const switch1 = Create_widget_switch(ROOT_WIDGETS.CREATE_ROOT, 'switch on', 'switch off', [100, ypos, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
-    switch1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-    switch1.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
     switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
     switch1.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -2267,8 +2326,8 @@ function CreateSliderSimple(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
     const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [200, 500, 0] : [0,0,0]
     const slider = Create_widget_slider_simple(root_widget, pos, [150, 2]);
     // const slider = Create_widget_slider_simple(ROOT_WIDGETS.CREATE_ROOT, [0, 0, 0], [150, 2]);
-    slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+    // slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
 
     if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
@@ -2278,7 +2337,9 @@ function CreateSliderSimple(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
         slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         slider.Render();
         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
-        Construct_listeners_relations(slider);
+                
+        Construct_listen_events_from_mesh_tree(slider)
+        Construct_listen_events_relations_from_mesh_tree(slider);
     }
 
     return slider;
@@ -2290,8 +2351,8 @@ function CreateSlider(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
     const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [200, 500, 0] : [0,0,0]
     const slider = Create_widget_slider(root_widget, pos, [250, 10]);
-    // slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+    slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
     
     
@@ -2301,7 +2362,9 @@ function CreateSlider(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
         slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         slider.Render();
         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
-        Construct_listeners_relations(slider);
+                
+        Construct_listen_events_from_mesh_tree(slider)
+        Construct_listen_events_relations_from_mesh_tree(slider);
     }
 
     return slider
@@ -2314,8 +2377,8 @@ function CreateSlider(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 function CreateChangeMeshColorFromSliders(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
     const section = Create_widget_section(root_widget, SECTION.VERTICAL, [6, 6], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[0], .9))
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     const slider_size = [70, 10]
 
@@ -2363,8 +2426,8 @@ function SdfLine(col, pos, dim, render_instanced_flags=0x0) {
 
 
     const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], pos, dim, TRANSPARENCY(col, 1), 'sdf linem2', [0, 10, 1.8]);
-    line.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
-    line.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+    line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
 
     line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -2395,34 +2458,31 @@ function CreateDropdown(pos=[0,0,0], root_widget=ROOT_WIDGETS.CREATE_ROOT) {
     // const pad = [10, 2.5]
     const pad = [10, 4]
     const margin = [5, 5]
-    // const dp = Create_widget_dropdown(`DP${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad);
     const dp = Create_widget_dropdown(root_widget, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
-    // dp.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
-    dp.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    dp.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+
     Dropdown_roots_set_root(dp, dp);
     
 
     {
         const l = Create_widget_label(_, 'HI!', );
         dp.AddToMenu(l);
-        l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     }
 
     { // Test: Many section
         const sections = CreateManySectionsMinimal(0x0);
         dp.AddToMenu(sections);
-        sections.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        sections.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     }
 
-    { // Test: Slider
-        const slider = CreateSliderSimple(0x0);
-        // const slider = CreateSlider(0x0);
-        dp.AddToMenu(slider);
-        // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    }
+    // { // Test: Slider
+    //     const slider = CreateSliderSimple(0x0);
+    //     // const slider = CreateSlider(0x0);
+    //     dp.AddToMenu(slider);
+    //     // slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // }
     { // Test: Slider
         const switch1 = CreateSwitchSimple([0,0,2], 0x0);
         dp.AddToMenu(switch1);
@@ -2432,67 +2492,67 @@ function CreateDropdown(pos=[0,0,0], root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
     { // Many dps
 
-        // const sub_dp1_count = 2;
-        // const sub_dp2_count = 2;
+        const sub_dp1_count = 2;
+        const sub_dp2_count = 2;
         
-        // const col = GetSequencedColor()
-        // for (let i = 0; i < sub_dp1_count; i++) {
+        const col = GetSequencedColor()
+        for (let i = 0; i < sub_dp1_count; i++) {
             
-        //     const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-        //     dp.AddToMenu(dpsub1);
-        //     dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-        //     dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+            dp.AddToMenu(dpsub1);
+            dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+            dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             
-        //     { // Test: Labels
-        //         const l = Create_widget_label(_, 'HI!', );
-        //         dpsub1.AddToMenu(l);
-        //         l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        //         l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-        //     }
-        //     { // Test: Rect_mesh
-        //         const rect = Create_rect_mesh(_,);
-        //         dpsub1.AddToMenu(rect);
-        //         rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-        //         rect.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        //         rect.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-        //     }
+            { // Test: Labels
+                const l = Create_widget_label(_, 'HI!', );
+                dpsub1.AddToMenu(l);
+                l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+            }
+            { // Test: Rect_mesh
+                const rect = Create_rect_mesh(_,);
+                dpsub1.AddToMenu(rect);
+                rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+                rect.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+            }
     
     
     
-        //     const col1 = GetSequencedColor()
-        //     for (let j = 0; j < sub_dp2_count; j++) {
+            const col1 = GetSequencedColor()
+            for (let j = 0; j < sub_dp2_count; j++) {
     
-        //         const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
-        //         dpsub1.AddToMenu(dpsub2);
-        //         dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        //         dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
-        //         // console.log()
+                const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
+                dpsub1.AddToMenu(dpsub2);
+                dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+                // console.log()
                 
-        //         const col2 = GetSequencedColor()
-        //         for (let k = 0; k < sub_dp2_count; k++) {
+                const col2 = GetSequencedColor()
+                for (let k = 0; k < sub_dp2_count; k++) {
                     
-        //             const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
-        //             dpsub2.AddToMenu(dpsub3);
-        //             dpsub3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        //             dpsub3.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+                    const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+                    dpsub2.AddToMenu(dpsub3);
+                    dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
                     
-        //             const col3 = GetSequencedColor()
-        //             for (let k = 0; k < sub_dp2_count; k++) {
+                    const col3 = GetSequencedColor()
+                    for (let k = 0; k < sub_dp2_count; k++) {
                         
-        //                 const dpsub4 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col3, WHITE, pad, _, _, _, margin);
-        //                 dpsub3.AddToMenu(dpsub4);
-        //                 dpsub4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        //                 dpsub4.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+                        const dpsub4 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col3, WHITE, pad, _, _, _, margin);
+                        dpsub3.AddToMenu(dpsub4);
+                        dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                        dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
                         
-        //                 // const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
-        //                 // dpsub4.AddToMenu(s)
+                        // const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
+                        // dpsub4.AddToMenu(s)
                         
-        //             }
+                    }
                     
-        //         }
-        //     }
+                }
+            }
     
-        // }
+        }
     }
     
 
@@ -2510,13 +2570,95 @@ function CreateDropdown(pos=[0,0,0], root_widget=ROOT_WIDGETS.CREATE_ROOT) {
     
         dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
         
-        Construct_listeners_relations(dp);
+        Construct_listen_events_from_mesh_tree(dp)
+        Construct_listen_events_relations_from_mesh_tree(dp);
     
         // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
         View_build_group_from_root_mesh(dp);
     }
 
     return dp;
+}
+
+
+
+function TEST_LISTENERS_CreateDropdown(pos=[0,0,0], root_widget=ROOT_WIDGETS.CREATE_ROOT) {
+
+    // const pad = [10, 2.5]
+    const pad = [10, 4]
+    const margin = [5, 5]
+
+
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT,_,[20,20],_,[200, 400],BLACK);
+    section.options |= SECTION.FIXED_H
+    // section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+
+    // const dp = Create_widget_dropdown(_, `dp${0}`, [0,0,0], YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
+    // section.AddItem(dp);
+    // dp.SetName(`dp${0}`)
+    // Dropdown_roots_set_root(dp, dp);
+
+    // {
+    //     for(let j=0; j<2; j++){
+    //         const label = Create_widget_label(_, `label${j}`);
+    //         dp.AddToMenu(label);
+    //         label.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+    //     }
+    // }
+
+
+    for(let i=0; i<2; i++){
+        // const dp = Create_widget_dropdown(root_widget, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
+        const dp = Create_widget_dropdown(_, `dp${i}`, [0,0,0], YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
+        section.AddItem(dp);
+        dp.SetName(`dp${i}`)
+        
+        {
+            const dp1 = Create_widget_dropdown(_, `dp child`, [0,0,0], YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
+            dp.AddToMenu(dp1);
+            dp1.SetName(`dp child`)
+
+            for(let j=0; j<2; j++){
+                const label = Create_widget_label(_, `label${j}`);
+                dp1.AddToMenu(label);
+                label.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+            }
+        }
+        {
+            const dp1 = Create_widget_dropdown(_, `dp child`, [0,0,0], YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
+            dp.AddToMenu(dp1);
+            dp1.SetName(`dp child`)
+
+            for(let j=0; j<2; j++){
+                const label = Create_widget_label(_, `label${j}`);
+                dp1.AddToMenu(label);
+                label.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+            }
+        }
+
+        Dropdown_roots_set_root(dp, dp);
+    }
+
+
+
+    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
+
+        section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+        section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+        // section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+        section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.FIXED_H;
+        section.Calc_no_gfx_update();
+        section.Render()
+        section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
+        Construct_listen_events_from_mesh_tree(section)
+        Construct_listen_events_relations_from_mesh_tree(section);
+        View_build_group_from_root_mesh(section);
+        // View_build_group_from_root_mesh(dp);
+    }
+    
+
 }
 
 
@@ -2528,9 +2670,9 @@ function CreateDropdownWithScroller(pos=[0,0,0], id) {
     const margin = [5, 5]
     // const dp = Create_widget_dropdown(`DP${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad);
     const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
-    // dp.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
-    dp.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    dp.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    // dp.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     Dropdown_roots_set_root(dp, dp);
     
 
@@ -2545,14 +2687,14 @@ function CreateDropdownWithScroller(pos=[0,0,0], id) {
         
         const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
         dp.AddToMenu(dpsub1);
-        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         
         { // Test: Labels
             const l = Create_widget_label(_, 'HI!', );
             dpsub1.AddToMenu(l);
-            l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-            l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+            l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         }
 
 
@@ -2561,8 +2703,8 @@ function CreateDropdownWithScroller(pos=[0,0,0], id) {
 
             const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
             dpsub1.AddToMenu(dpsub2);
-            dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-            dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+            dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
             
             const col2 = GetSequencedColor()
@@ -2570,16 +2712,16 @@ function CreateDropdownWithScroller(pos=[0,0,0], id) {
                 
                 const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
                 dpsub2.AddToMenu(dpsub3);
-                dpsub3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-                dpsub3.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+                dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
                 
                 const col3 = GetSequencedColor()
                 for (let k = 0; k < sub_dp2_count; k++) {
                     
                     const dpsub4 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col3, WHITE, pad, _, _, _, margin);
                     dpsub3.AddToMenu(dpsub4);
-                    dpsub4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-                    dpsub4.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+                    dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
                     
                     // const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
                     // dpsub4.AddToMenu(s)
@@ -2594,28 +2736,28 @@ function CreateDropdownWithScroller(pos=[0,0,0], id) {
     // {
     //     const l = Create_widget_label(_, 'HI!', );
     //     dp.AddToMenu(l);
-    //     l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-    //     l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    //     l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    //     l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     // }
 
     // { // Test: Many section
     //     const sections = CreateManySectionsMinimal(0x0);
     //     dp.AddToMenu(sections);
-    //     sections.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    //     sections.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // }
 
     // { // Test: Slider
     //     const slider = CreateSliderSimple(0x0);
     //     // const slider = CreateSlider(0x0);
     //     dp.AddToMenu(slider);
-    //     // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-    //     slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    //     // slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     // }
 
     { // Test: Scroller
         const scroller = CreateScrollerClampAlphaTest(10, 0x0);
         dp.AddToMenu(scroller);
-        // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     }
 
 
@@ -2625,14 +2767,14 @@ function CreateDropdownWithScroller(pos=[0,0,0], id) {
         
         const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
         dp.AddToMenu(dpsub1);
-        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         
         // { // Test: Labels
         //     const l = Create_widget_label(_, 'HI!', );
         //     dpsub1.AddToMenu(l);
-        //     l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        //     l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        //     l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        //     l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         // }
 
 
@@ -2641,8 +2783,8 @@ function CreateDropdownWithScroller(pos=[0,0,0], id) {
 
             const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
             dpsub1.AddToMenu(dpsub2);
-            dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-            dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
+            dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
             // console.log()
         }
 
@@ -2661,7 +2803,7 @@ function CreateDropdownWithScroller(pos=[0,0,0], id) {
 
     dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
     
-    Construct_listeners_relations(dp);
+    Construct_listen_events_relations_from_mesh_tree(dp);
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(dp);
@@ -2671,67 +2813,7 @@ function CreateDropdownWithScroller(pos=[0,0,0], id) {
 
 
 
-function CreateDropdown2(pos, id, root_widget=ROOT_WIDGETS.CREATE_ROOT) {
 
-    const pad = [3, 1]
-    const margin = [10, 7]
-    let col = GetSequencedColor()
-    const dp = Create_widget_dropdown(root_widget, `${id}`, pos, col, BLUE_10_120_220, WHITE, pad, _, _, _, margin);
-    dp.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    dp.CreateClickEvent();
-    // dp.CreateMoveEvent();
-
-
-    const sub_dp1_count = 1;
-    const sub_dp2_count = 1;
-    
-    col = GetSequencedColor()
-    for (let i = 0; i < sub_dp1_count; i++) {
-
-        col = GetRandomColor()
-        const dpsub2 = Create_widget_dropdown(_, `${i}0`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-        dp.AddToMenu(dpsub2);
-
-        {
-            col = GetRandomColor()
-            const dpsub3 = Create_widget_dropdown(_, `${i}00`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-            dpsub2.AddToMenu(dpsub3);
-            {
-                col = GetRandomColor()
-                const dpsub4 = Create_widget_dropdown(_, `${i}000`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-                dpsub3.AddToMenu(dpsub4);
-                {
-                    col = GetRandomColor()
-                    const dpsub5 = Create_widget_dropdown(_, `${i}0000`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-                    dpsub4.AddToMenu(dpsub5);
-                }
-            }
-
-        }
-
-
-    }
-
-    if(root_widget & ROOT_WIDGETS.CREATE_ROOT){
-
-        dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-        dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-        dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
-        dp.Calc_no_gfx_update();
-        dp.Render()
-        dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
-        dp.ConstructListeners();
-        
-        // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-        View_build_group_from_root_mesh(dp)
-    }
-
-
-
-    return dp;
-
-}
 
 
 function CreateDropdown3(pos, dim) {
@@ -2740,9 +2822,9 @@ function CreateDropdown3(pos, dim) {
     const margin = [8, 8]
     const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `0`, pos, GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
     // dp.CreateMoveEvent();
-    dp.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    dp.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-    // dp.CreateClickEvent();
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // dp.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
     
     
     const sub_dp1_count = 2;
@@ -2752,9 +2834,9 @@ function CreateDropdown3(pos, dim) {
     for (let i = 0; i < sub_dp1_count; i++) {
         
         const dpsub1 = Create_widget_dropdown(_, `0${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-        dpsub1.ListenEventCreate(LISTEN_EVENT_TYPES.CLICK_UP);
-
         dp.AddToMenu(dpsub1);
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
 
         for (let j = 0; j < sub_dp2_count; j++) {
             const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[7], 1.5), `0${i}${j}`)
@@ -2773,7 +2855,8 @@ function CreateDropdown3(pos, dim) {
     dp.Calc_no_gfx_update();
     dp.Render()
     dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
-    dp.ConstructListeners();
+    Construct_listen_events_from_mesh_tree(dp)
+    Construct_listen_events_relations_from_mesh_tree(dp);
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(dp)
@@ -2790,12 +2873,12 @@ function CreateDropdown2InSection(pos, id) {
 
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[2], 1.5), 'S')
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
     const dp = Create_widget_dropdown(_, `0`, [0,0,pos[2]], GREY[2], BLUE_10_120_220, WHITE, pad, _, _, _, margin);
-    dp.CreateClickEvent();
-    dp.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     Dropdown_roots_set_root(dp, dp);
     
     section.AddItem(dp)
@@ -2809,13 +2892,13 @@ function CreateDropdown2InSection(pos, id) {
         
         
         const label = Create_widget_label(_, `sssdsdsdsdsLabel ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0,0,pos[2]], fontsize, GREY[1], WHITE, [14, 4], .5);
-        label.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-        label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         dp.AddToMenu(label);
         
         const col1 = GetSequencedColor()
         const dpsub2 = Create_widget_dropdown(_, `${i}0`, [0, 0, 0], GREY[1], col1, WHITE, pad, _, _, _, margin);
-        dpsub2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         dp.AddToMenu(dpsub2);
 
         // const col2 = GetSequencedColor()
@@ -2888,11 +2971,10 @@ function CreateDropdown2InSection(pos, id) {
     section.Render()
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
 
+    Construct_listen_events_from_mesh_tree(section)
+    Construct_listen_events_relations_from_mesh_tree(section);
+
     View_build_group_from_root_mesh(section)
-
-    // section.ConstructListeners();
-    section.ConstructListeners();
-
 
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
 
@@ -2905,7 +2987,7 @@ function CreateDropdown2InSection(pos, id) {
 function CreateColorPicker(x=0, y=0, render_instanced_flags=0x0, root_widget=ROOT_WIDGETS.CREATE_ROOT){
 
     const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y+40, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
-    // picker.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE)
+    // picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     // picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
 
     picker.sid.inst = render_instanced_flags;
@@ -2927,7 +3009,9 @@ function CreateColorPicker(x=0, y=0, render_instanced_flags=0x0, root_widget=ROO
         picker.Calc_no_gfx_update();
         picker.Render();
         picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
-        Construct_listeners_relations(picker);
+
+        Construct_listen_events_from_mesh_tree(picker);
+        Construct_listen_events_relations_from_mesh_tree(picker);
     }
 
     return picker;
@@ -2945,8 +3029,8 @@ function CreateSceneMenuBar(items=null) {
     const dim =  [VIEWPORT.WIDTH/2 - margin[0], 100];
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6,6], pos, dim, TRANSPARENCY(GREY[1], 1.), _, style, )
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.SetName('Main Window')
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
@@ -2981,7 +3065,7 @@ function CreateSceneMenuBar(items=null) {
     }
     // {
     //     const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
-    //     dp.CreateClickEvent();
+    //     dp.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
     //     dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
     //     Dropdown_roots_set_root(dp, dp);
     //     section.AddItem(dp);
@@ -3002,7 +3086,7 @@ function CreateSceneMenuBar(items=null) {
     // // Create Second dropdown in the windows area
     // {
     //     const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
-    //     dp.CreateClickEvent();
+    //     dp.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
     //     dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
     //     Dropdown_roots_set_root(dp, dp);
     //     section.AddItem(dp);
@@ -3046,6 +3130,8 @@ function CreateSceneMenuBar(items=null) {
 
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
     
+    Construct_listen_events_from_mesh_tree(section)
+    Construct_listen_events_relations_from_mesh_tree(section);
     // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
     View_build_group_from_root_mesh(section);
     // View_set_view_vb_start(section.group_bufferidxs, section.gfx.vb.start);
@@ -3065,8 +3151,8 @@ function  CreateWindowWithMenu() {
     const pos = [200, 200, 0]
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [0, 0], TRANSPARENCY(GREEN[2], .9))
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.SetName('ROOT')
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
@@ -3130,90 +3216,90 @@ function  CreateWindowWithMenu() {
     
         {
             // const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], pos, [0, 0], TRANSPARENCY(PURPLEB[2], .9))
-            // s.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            // s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             // s.SetName('Window Section')
             // section.AddItem(s)
             // {
             //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-            //     label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             //     s.AddItem(label)
             // }
             // {
             //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-            //     label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             //     s.AddItem(label)
             // }
             // {
             //     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-            //     label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            //     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             //     s.AddItem(label)
             // }
             {
                 const dp = Create_widget_dropdown(_, 'Dp', [0, 0, 0], YELLOWR[4], GREY[2], _, _, _, _, _, _);
-                dp.CreateClickEvent();
+                dp.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
                 dp.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
                 Dropdown_roots_set_root(dp, dp);
                 section.AddItem(dp);
         
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
                 {
                     const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                    label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dp.AddToMenu(label)
                 }
             }
             {
                 const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 section.AddItem(label)
             }
             {
                 const label = Create_widget_label(_, 'label', _, [0, 0, 0], 10, PURPLEB[3]);
-                label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+                label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 section.AddItem(label)
             }
         }
@@ -3233,7 +3319,7 @@ function  CreateWindowWithMenu() {
     
     section.Render();
     
-    Construct_listeners_relations(section);
+    Construct_listen_events_relations_from_mesh_tree(section);
 
     
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -3250,15 +3336,15 @@ function CreateManySectionsMinimal(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
     const tr = .7;
 
     const blu = Create_widget_section(root_widget, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr), 'blu');
-    blu.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE); 
-    // blu.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE); 
+    // blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     
     // blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
     // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)
     
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr), 'red');
-    red.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.EXPAND;
     red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
     blu.AddItem(red);
@@ -3268,29 +3354,29 @@ function CreateManySectionsMinimal(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
     {
         
         const black1 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr), 'black1');
-        // black1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        // black1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         red.AddItem(black1);
 
         const grey11 = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[4], tr), 'grey11');
-        grey11.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        grey11.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         black1.AddItem(grey11);
             const red111 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr), 'red111');
-            red111.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            red111.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             grey11.AddItem(red111);
             const yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr), 'yel_1');
-            yel_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            yel_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             grey11.AddItem(yel_1);
             const purp12 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr), 'purp12');
-            purp12.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            purp12.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         black1.AddItem(purp12);
         const blue13 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[5], tr), 'blue13');
-        blue13.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        blue13.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         black1.AddItem(blue13);
         const green14 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[5], tr), 'green14');
-        green14.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        green14.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         black1.AddItem(green14);
         const vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr), 'vert_0');
-        vert_0.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        vert_0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     
 
     }
@@ -3308,7 +3394,7 @@ function CreateManySectionsMinimal(root_widget=ROOT_WIDGETS.CREATE_ROOT) {
         blu.Calc_no_gfx_update();
         blu.Render();
         blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
-        Construct_listeners_relations(blu)
+        Construct_listen_events_relations_from_mesh_tree(blu)
     }
     
 
@@ -3324,108 +3410,108 @@ function CreateManySections(scene) {
     const tr = .7;
 
     const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
-    blu.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE); blu.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE); blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     
     // blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
     // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)
     
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-    red.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.EXPAND;
     red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
     blu.AddItem(red);
 
     
     const black1 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr));
-    black1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    black1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black1);
 
 
     const black2 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr));
-    black2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    black2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black2);
 
     const black3 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr));
-    black3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    black3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black3);
 
 
     const black4 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    black4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    black4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black4);
 
 
     const grey11 = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[4], tr));
-    grey11.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    grey11.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black1.AddItem(grey11);
         const red111 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-        red111.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        red111.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         grey11.AddItem(red111);
         const yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
-        yel_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+        yel_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         grey11.AddItem(yel_1);
     const purp12 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-    purp12.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    purp12.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black1.AddItem(purp12);
     const blue13 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[5], tr));
-    blue13.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    blue13.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black1.AddItem(blue13);
     const green14 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[5], tr));
-    green14.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    green14.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black1.AddItem(green14);
 
 
     const bla = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[0], tr));
-    bla.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    bla.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black3.AddItem(bla);
     const pin_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-    pin_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    pin_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black4.AddItem(pin_1);
     const blu_1 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], [20, 20], TRANSPARENCY(BLUEL[7], tr));
-    blu_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    blu_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black4.AddItem(blu_1);
     const yel_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(YELLOWR[7], tr));
-    yel_2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    yel_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black2.AddItem(yel_2);
     const yel_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    yel_3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    yel_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black3.AddItem(yel_3);
     const gre_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    gre_3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    gre_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black3.AddItem(gre_3);
     const red_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-    red_4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    red_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black2.AddItem(red_4);
     const yel_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLE[7], tr));
-    yel_4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    yel_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black2.AddItem(yel_4);
     const ora_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    ora_4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    ora_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black2.AddItem(ora_4);
     const gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGE_240_160_10, tr));
-    gry1_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     bla.AddItem(gry1_1);
     const gry1_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[5], tr));
-    gry1_2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    gry1_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     bla.AddItem(gry1_2);
     const gry1_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[7], tr));
-    gry1_3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    gry1_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     bla.AddItem(gry1_3);
     const gry2_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    gry2_1.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    gry2_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     pin_1.AddItem(gry2_1);
     const gry2_2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    gry2_2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    gry2_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     pin_1.AddItem(gry2_2);
     const gry2_3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    gry2_3.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    gry2_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     blu_1.AddItem(gry2_3);
     const gry2_4 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    gry2_4.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    gry2_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     blu_1.AddItem(gry2_4);
     const vert_0 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    vert_0.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    vert_0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     gry1_1.AddItem(vert_0);
 
     { // Set naming and listeners
@@ -3467,7 +3553,7 @@ function CreateManySections(scene) {
     blu.Calc_no_gfx_update();
     blu.Render();
     blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
-    Construct_listeners_relations(blu)
+    Construct_listen_events_relations_from_mesh_tree(blu)
 
     return blu;
 }
@@ -3493,22 +3579,22 @@ function CreateScroller() {
         {
             const l = Create_widget_label(_, 'HI!', );
             section.AddItem(l);
-            l.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-            // l.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+            l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            // l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         }
     
         { // Test: Many section
             const sections = CreateManySectionsMinimal(0x0);
             section.AddItem(sections);
-            sections.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            sections.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         }
     
         // { // Test: Slider
         //     const slider = CreateSliderSimple(0x0);
         //     // const slider = CreateSlider(0x0);
         //     section.AddItem(slider);
-        //     // slider.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
-        //     slider.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+        //     // slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         // }
 
         // for (let j = 0; j < 4; j++) {
@@ -3612,8 +3698,8 @@ function CreateScroller() {
     // Create scroller for the ui-mesh info widget
     const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [100, 140]);
     scroller.StateEnable(MESH_STATE.ACTIVE);
-    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     scroller.options = SECTION.VERTICAL | SECTION.INHERIT;
     scroller.scrolled_section.options = SECTION.VERTICAL | SECTION.INHERIT;
@@ -3635,7 +3721,9 @@ function CreateScroller() {
 
     View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
 
-    Construct_listeners_relations(scroller);
+    
+    Construct_listen_events_from_mesh_tree(scroller)
+    Construct_listen_events_relations_from_mesh_tree(scroller);
 
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scroller.scrolled_section);
     // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, section);
@@ -3718,18 +3806,19 @@ function CreateScrollerClampAlphaTest(num_items=10, root_widget=ROOT_WIDGETS.CRE
         // const label = Create_widget_section(_, _, _, [0, 0, 0], [20,20], TRANSPARENCY(colors[i], .7), `Section${i + 1}`)
         // const label = Create_widget_text(_, `${i}`, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], .7), WHITE)
         const label = Create_widget_label(_, `${i}`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6,4])
+        section.AddItem(label);
 
         label.SetName(`${i}`);
-        label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
-        section.AddItem(label);
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+        console.log('name:', label.GetName(), label.listeners.buffer )
     }
 
 
     // Create scroller for the ui-mesh info widget
     const scroller = Create_widget_scroller(root_widget, section, [60, 90], GREY[0]);
     scroller.StateEnable(MESH_STATE.ACTIVE);
-    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     
     scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
@@ -3763,8 +3852,9 @@ function CreateScrollerClampAlphaTest(num_items=10, root_widget=ROOT_WIDGETS.CRE
         
         View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
         // View_build_group_from_root_mesh(scroller.scrolled_section);
-    
-        Construct_listeners_relations(scroller);
+        
+        Construct_listen_events_from_mesh_tree(scroller)
+        Construct_listen_events_relations_from_mesh_tree(scroller);
     }
 
 
@@ -3830,8 +3920,8 @@ function CreateScrollerInScroller(items=null){
     const style = [0,8,2];
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6,6], pos, [200, 200], TRANSPARENCY(GREY[1], 1.), _, style, )
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.SetName('Main Section')
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.type |= MESH_TYPE.WIDGET_WINDOW;
@@ -3858,7 +3948,7 @@ function CreateScrollerInScroller(items=null){
             }
             const scroller2 = Create_widget_scroller(_, scrolled2, [80,90], BLUEL[8], _, _);
             scrolled.AddItem(scroller2);
-            scroller2.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+            scroller2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             // scroller2.options = SECTION.VERTICAL | SECTION.INHERIT;
             scroller2.scrolled_section.options = SECTION.VERTICAL;
             scroller2.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller2.scrolled_section);
@@ -3870,8 +3960,8 @@ function CreateScrollerInScroller(items=null){
     }
     const scroller = Create_widget_scroller(_, scrolled, [140,140], BLUEL[8], _, _);
     section.AddItem(scroller)
-    // scroller.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    scroller.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
     scroller.scrolled_section.options = SECTION.VERTICAL;
     scroller.SetName(`SCOLLER-1`);
@@ -3927,8 +4017,8 @@ function TestSections1(){
     const pos = [0, 0, 0];
     
     const root = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, marg, pos, [0, 0], TRANSPARENCY(BLUEL[5], 1));
-    root.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    root.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    root.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    root.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     root.SetName('root_blue');
     
     { // Test 1
@@ -4027,16 +4117,16 @@ function Sections2(is_root, align) {
     const dim = [10, 10];
 
     const grey = Create_widget_section(is_root, align, marg, [0, 0, 0], dim, TRANSPARENCY(GREY[0], tr));
-    grey.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     grey.SetName(`grey${grey_cnt++}`);
 
     const green = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(GREEN[3], tr));
-    green.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     green.SetName(`green${green_cnt++}`);
     grey.AddItem(green);
 
     const orange = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(ORANGER[7], tr));
-    orange.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     orange.SetName(`orange${orange_cnt++}`);
     green.AddItem(orange);
 
@@ -4047,23 +4137,23 @@ function Sections4(is_root, align) {
     const tr = 1.;
 
     const blu = Create_widget_section(is_root, align, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREY[1], tr));
-    blu.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     blu.SetName('grey');
 
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
-    red.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     red.SetName('red');
     blu.AddItem(red);
     const green = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(GREEN[6], tr));
-    green.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     green.SetName('green');
     blu.AddItem(green);
     // const purple = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(PURPLER[7], tr));
-    // purple.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    // purple.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // purple.SetName('purple');
     // blu.AddItem(purple);
     // const orange = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(ORANGER[7], tr));
-    // orange.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    // orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // orange.SetName('orange');
     // blu.AddItem(orange);
 
@@ -4080,7 +4170,7 @@ function Help(scene) {
 
     //options, margin, pos, dim, col, name
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [200, 100, 0], [100, 100], TRANSPARENCY(GREY[1], .8));
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.SetName('Help section')
 
     // scene.StoreMesh(section)
@@ -4094,7 +4184,7 @@ function Help(scene) {
         msgs[i] = '\"' + DEBUG_PRINT_KEYS[i].key + '\": ' + DEBUG_PRINT_KEYS[i].discr
 
         const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 7, TRANSPARENCY(GREY[1], .4), WHITE, [7, 3], .5, [0, 4, 3])
-        label.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER)
+        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         s1.AddItem(label)
     }
@@ -4141,14 +4231,14 @@ function MeshInfo(scene) {
     /********************************************************************************************************************************************************/
     // Info UI
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], pos, [0, 0], TRANSPARENCY(GREY[1], .8), 'MeshInfoUiTip');
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.MOVE);
-    section.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.ConstructListeners();
 
     /********************************************************************************************************************************************************/
     // Menu bar and Minimizer
     const menu = Create_widget_menubar(_, pos, _, TRANSPARENCY(GREY[4], .7), WHITE, 'Info tip', [10, 6]);
-    menu.ListenEventCreate(LISTEN_EVENT_TYPES.HOVER);
+    menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     menu.AddMinimizeButton(_, section);
     menu.options = SECTION.HORIZONTAL | SECTION.INHERIT;
     section.AddItem(menu);

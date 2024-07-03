@@ -196,10 +196,72 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
-	// For now plain text meshes have no listen events 
-	ConstructListeners(parent_listeners = null) { }
+	
+	ListenEventConstruct() { return false; }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -816,6 +878,12 @@ export class Widget_Multi_Text extends Widget_Text {
 		super.Align_pre(target_mesh, flags, pad)
 
 	}
+
+
+	ListenEventConstruct() {
+      return false;
+   }
+
 
 }
 

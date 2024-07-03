@@ -1,0 +1,3 @@
+The button class should:
+   * Have click on mouse up and not down
+   * If a click callback is present along with move, then it should run one of the two 
