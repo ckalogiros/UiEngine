@@ -665,7 +665,7 @@ function Check_child_events_recursive(view_children, point) {
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          const intersects = Intersection_point_rect(point, bounding_box);
-         console.log(mesh.GetName(), 'intersects', intersects)
+         // console.log(mesh.GetName(), 'intersects', intersects)
 
          if (intersects) {
 

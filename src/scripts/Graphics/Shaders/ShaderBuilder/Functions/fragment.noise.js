@@ -55,9 +55,9 @@ vec4 Noise(void)
 {
 
 #ifdef U_NOISE_PARAMS
-    vec2 controls = u_noise_params;
+    vec3 controls = u_noise_params;
 #else
-    vec2 controls = vec2(1.);
+    vec3 controls = vec2(1.);
 #endif
     
 vec4 color = v_col;
@@ -100,16 +100,12 @@ vec4 color = v_col;
     
     
     float complexity = 2.;
-    // float ratio = 3.; 
-    // float ratio = res_ratio * (dim.y/dim.x); 
     // float ratio = min(dim.y,dim.x) / max(dim.y,dim.x); 
-    // vec2 ratio = vec2(dim.y,dim.x)*.006; 
-    vec2 ratio = vec2(1.)*.9; 
-    // float ratio = (dim.x/dim.y); 
+    vec2 ratio = vec2(dim.y,dim.x)*controls.z*.25; 
     // float noise1 = fbm(complexity * uv2 * vec2(2., 2.));
     // float noise2 = fbm(5. * uv2 * vec2(2., 2.)*ratio);
     float noise1 = fbm(complexity * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) ;
-    float noise2 = fbm(5. * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) * ratio.x;
+    float noise2 = fbm(5. * uv2 * vec2(2.* ratio.x, 2.* ratio.x));
     float n1 = noise1*revT*d2; // +1 for non negative values
     float n2 = noise2*revT*d2; // +1 for non negative values
     

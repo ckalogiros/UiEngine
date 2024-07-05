@@ -12,7 +12,7 @@ import { View_add_to_group, View_remove_from_group, View_render_from_view_all_bu
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import {  Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
-import { TEMP_Scroller_calc_handle } from "./WidgetScroller.js";
+import { Scroller_calc_handle_pos_dim } from "./WidgetScroller.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 
 
@@ -700,7 +700,7 @@ export class Widget_Dropdown extends Section {
                   item.Deactivate();
                   item.SetIsGfxInserted(false);
    
-                  console.log(item.GetName())
+                  // console.log(item.GetName())
                   item.RemoveAllListenEvents();
                   
                   
@@ -713,8 +713,7 @@ export class Widget_Dropdown extends Section {
                      item.Deactivate();
                      item.SetIsGfxInserted(false);
                      
-                     console.log(item.GetName())
-                     
+                     // console.log(item.GetName())
                      item.RemoveAllListenEvents();
                   }
                }
@@ -758,54 +757,86 @@ export class Widget_Dropdown extends Section {
       this.#DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 
-      const widget_root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
-      const widget_root = Mesh_buffer_get_mesh_byidx(widget_root_meshidx)
 
+      if(root.parent && root.parent.type & MESH_TYPE.SCROLLED_SECTION) {
+                  
+         const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)
+         const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshidx)
+         const scroller = root.parent.parent
 
-      { // New Implementation: Run for all meshes
+         const temp = root_mesh;
+
+         { // Calculate all meshes sizes from the temp widget dropdown
          
-         if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
-         if (root.options & SECTION.FIXED_H) root.max_size[1] = root.geom.dim[1];
-
-         // Calculate_sizes_recursive(root, root.options, );
-         Calculate_sizes_recursive(widget_root, root.options, );
-
-
-         if (root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-            CopyArr2(root.geom.dim, root.max_size); // Set size for the root dp.
-            CopyArr2(root.geom.defDim, root.max_size); // Store to default for the root.
-         }
-         else {
-            if (root.options & SECTION.RESIZE_PARENT) CopyArr2(root.geom.dim, root.max_size); // Set size for the root.
-            else {
-               if (root.options & SECTION.RESIZE_PARENTX) root.geom.dim[0] = root.max_size[0];
-               if (root.options & SECTION.RESIZE_PARENTY) root.geom.dim[1] = root.max_size[1];
+            if (temp.options & SECTION.FIXED_W) temp.max_size[0] = temp.geom.dim[0];
+            if (temp.options & SECTION.FIXED_H) temp.max_size[1] = temp.geom.dim[1];
+   
+            
+            // Calculate_sizes_recursive(scroller, scroller.options, );
+            Calculate_sizes_recursive(temp, temp.options, );
+            // Calculate_sizes_recursive(widget_root, temp.options, );
+   
+   
+            if (temp.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+               CopyArr2(temp.geom.dim, temp.max_size); // Set size for the temp dp.
+               CopyArr2(temp.geom.defDim, temp.max_size); // Store to default for the temp.
             }
+            else {
+               if (temp.options & SECTION.RESIZE_PARENT) CopyArr2(temp.geom.dim, temp.max_size); // Set size for the temp.
+               else if (temp.options & SECTION.RESIZE_PARENTX) temp.geom.dim[0] = temp.max_size[0];
+               else if (temp.options & SECTION.RESIZE_PARENTY) temp.geom.dim[1] = temp.max_size[1];
+            }
+   
+            temp.SectionSetPad();
          }
 
-         root.SectionSetPad();
+         // Calculate handle position and dimention
+         // Scroller_calc_handle_pos_dim(scroller);
+         scroller.ScrollerAlignBar()
+   
+         // Calculate positions for dropdown
+         const cur_pos = [0,0];
+         cur_pos[0] = this.geom.pos[0]; 
+         cur_pos[1] = this.geom.pos[1]; 
+   
+         tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+      }
+      else {
+
+         { // Calculate all meshes sizes from the root widget dropdown
+            
+            if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
+            if (root.options & SECTION.FIXED_H) root.max_size[1] = root.geom.dim[1];
+
+            
+            Calculate_sizes_recursive(root, root.options, );
+
+
+            if (root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+               CopyArr2(root.geom.dim, root.max_size); // Set size for the root dp.
+               CopyArr2(root.geom.defDim, root.max_size); // Store to default for the root.
+            }
+            else {
+               if (root.options & SECTION.RESIZE_PARENT) CopyArr2(root.geom.dim, root.max_size); // Set size for the root.
+               else if (root.options & SECTION.RESIZE_PARENTX) root.geom.dim[0] = root.max_size[0];
+               else if (root.options & SECTION.RESIZE_PARENTY) root.geom.dim[1] = root.max_size[1];
+            }
+
+            root.SectionSetPad();
+         }
+         
+         // Calculate positions for dropdown
+         const cur_pos = [0,0];
+         cur_pos[0] = this.geom.pos[0]; 
+         cur_pos[1] = this.geom.pos[1]; 
+   
+         tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
       }
       
 
-      { // Old Implementation: Run for clicked and set the parents in a loop
-
-         // temp_dp_calc_sizes(widget_root, _, widget_root.options & SECTION.INDEPENDENT);
-         // temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
-   
-   
-         // this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
-         // this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
-      }
 
 
-
-      const cur_pos = [0,0];
-      cur_pos[0] = this.geom.pos[0]; 
-      cur_pos[1] = this.geom.pos[1]; 
-      tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-
-
-      { // Clipping
+      { // Clip
 
          // // Get the group root mesh to Recalc position/dimentions 
          // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
@@ -830,16 +861,116 @@ export class Widget_Dropdown extends Section {
    
          // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
       }
+
+
+      Construct_listen_events_from_mesh_tree(this.menu)
+      Construct_listen_events_relations_from_mesh_tree(this.menu);
       
-      
-      // HACK: We want to update the handles size and pos after dp activation
-      const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)
-      const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshidx)
-      if(root_mesh.type & MESH_TYPE.WIDGET_SCROLLER) TEMP_Scroller_calc_handle(root_mesh)
+
          
       // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
       View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
    }
+   /**SAVE */
+   // DpDeactivateMenu() {
+
+   //    const menu = this.menu;
+   //    const root = Dropdown_roots_get_root_by_idx(this.rootidx);
+
+   //    // Reset vertex buffers from group
+   //    View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
+
+   //    // Remove menu and all its items from the group view
+   //    if (menu.group_bufferidxs[0] !== INT_NULL) {
+   //       View_remove_from_group(menu);
+   //    }
+
+   //    // this.DpDestroyListeners(menu);
+   //    this.#DeactivateMenu();
+   //    this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
+
+   //    const widget_root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
+   //    const widget_root = Mesh_buffer_get_mesh_byidx(widget_root_meshidx)
+
+
+   //    { // New Implementation: Run for all meshes
+         
+   //       if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
+   //       if (root.options & SECTION.FIXED_H) root.max_size[1] = root.geom.dim[1];
+
+   //       Calculate_sizes_recursive(root, root.options, );
+   //       // Calculate_sizes_recursive(widget_root, root.options, );
+
+
+   //       if (root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+   //          CopyArr2(root.geom.dim, root.max_size); // Set size for the root dp.
+   //          CopyArr2(root.geom.defDim, root.max_size); // Store to default for the root.
+   //       }
+   //       else {
+   //          if (root.options & SECTION.RESIZE_PARENT) CopyArr2(root.geom.dim, root.max_size); // Set size for the root.
+   //          else {
+   //             if (root.options & SECTION.RESIZE_PARENTX) root.geom.dim[0] = root.max_size[0];
+   //             if (root.options & SECTION.RESIZE_PARENTY) root.geom.dim[1] = root.max_size[1];
+   //          }
+   //       }
+
+   //       root.SectionSetPad();
+   //    }
+      
+
+   //    { // Old Implementation: Run for clicked and set the parents in a loop
+
+   //       // temp_dp_calc_sizes(widget_root, _, widget_root.options & SECTION.INDEPENDENT);
+   //       // temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
+   
+   
+   //       // this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
+   //       // this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
+   //    }
+
+
+
+   //    const cur_pos = [0,0];
+   //    cur_pos[0] = this.geom.pos[0]; 
+   //    cur_pos[1] = this.geom.pos[1]; 
+   //    tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+
+
+   //    { // Clipping
+
+   //       // // Get the group root mesh to Recalc position/dimentions 
+   //       // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+   //       // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
+   //       // let clip_top = null, clip_bottom = null;
+   //       // if (group_root_mesh.parent) {
+   
+   //       //    clip_top = group_root_mesh.parent.GetPosY();
+   //       //    clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
+   //       //    // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
+   //       // }
+   //       // else {
+   //       //    clip_top = group_root_mesh.GetPosY();
+   //       //    clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
+   //       // }
+   
+   //       // // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
+   //       // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+   //       // // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
+   //       // // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
+   
+   
+   //       // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
+   //    }
+      
+      
+   //    // HACK: We want to update the handles size and pos after dp activation
+   //    const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)
+   //    const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshidx)
+   //    if(root_mesh.type & MESH_TYPE.WIDGET_SCROLLER) Scroller_calc_handle_pos_dim(root_mesh)
+         
+   //    // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
+   //    View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
+   // }
 
 
    #ActivateMenu(root) {
@@ -902,50 +1033,95 @@ export class Widget_Dropdown extends Section {
 
       
       this.#ActivateMenu(root); // Add dropdown to gfx buffers.
-      menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
+      // menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
       
+
       
-      const widget_root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
-      const widget_root = Mesh_buffer_get_mesh_byidx(widget_root_meshidx)
+      // // HACK: We want to update the handles size and pos after dp activation
+      if(root.parent && root.parent.type & MESH_TYPE.SCROLLED_SECTION) {
+         
+         const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
+         const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshidx);
+         const scroller = root.parent.parent
+
+         // const temp = scroller.scrolled_section
+         const temp = root_mesh
+
+
+         { // Calculate all meshes sizes from the temp widget dropdown
+         
+            if (temp.options & SECTION.FIXED_W) temp.max_size[0] = temp.geom.dim[0];
+            if (temp.options & SECTION.FIXED_H) temp.max_size[1] = temp.geom.dim[1];
+   
             
-
-      { // Calculate all meshes sizes from the root widget dropdown
-         
-         if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
-         if (root.options & SECTION.FIXED_H) root.max_size[1] = root.geom.dim[1];
-
-         
-         // Calculate_sizes_recursive(root, root.options, );
-         Calculate_sizes_recursive(widget_root, root.options, );
-
-
-         if (root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-            CopyArr2(root.geom.dim, root.max_size); // Set size for the root dp.
-            CopyArr2(root.geom.defDim, root.max_size); // Store to default for the root.
-         }
-         else {
-            if (root.options & SECTION.RESIZE_PARENT) CopyArr2(root.geom.dim, root.max_size); // Set size for the root.
-            else {
-               if (root.options & SECTION.RESIZE_PARENTX) root.geom.dim[0] = root.max_size[0];
-               if (root.options & SECTION.RESIZE_PARENTY) root.geom.dim[1] = root.max_size[1];
+            // Calculate_sizes_recursive(scroller, scroller.options, );
+            Calculate_sizes_recursive(temp, temp.options, );
+            // Calculate_sizes_recursive(widget_root, temp.options, );
+   
+   
+            if (temp.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+               CopyArr2(temp.geom.dim, temp.max_size); // Set size for the temp dp.
+               CopyArr2(temp.geom.defDim, temp.max_size); // Store to default for the temp.
             }
+            else {
+               if (temp.options & SECTION.RESIZE_PARENT) CopyArr2(temp.geom.dim, temp.max_size); // Set size for the temp.
+               else if (temp.options & SECTION.RESIZE_PARENTX) temp.geom.dim[0] = temp.max_size[0];
+               else if (temp.options & SECTION.RESIZE_PARENTY) temp.geom.dim[1] = temp.max_size[1];
+            }
+   
+            temp.SectionSetPad();
          }
 
-         root.SectionSetPad();
+
+         // Calculate positions for dropdown
+         const cur_pos = [0,0];
+         cur_pos[0] = this.geom.pos[0]; 
+         cur_pos[1] = this.geom.pos[1]; 
+         
+         tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+
+         // // Calculate handle position and dimention
+         // // Scroller_calc_handle_pos_dim(scroller);
+         // scroller.ScrollerAlignBar()
+      }
+      else {
+
+         { // Calculate all meshes sizes from the root widget dropdown
+            
+            if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
+            if (root.options & SECTION.FIXED_H) root.max_size[1] = root.geom.dim[1];
+
+            
+            Calculate_sizes_recursive(root, root.options, );
+
+
+            if (root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+               CopyArr2(root.geom.dim, root.max_size); // Set size for the root dp.
+               CopyArr2(root.geom.defDim, root.max_size); // Store to default for the root.
+            }
+            else {
+               if (root.options & SECTION.RESIZE_PARENT) CopyArr2(root.geom.dim, root.max_size); // Set size for the root.
+               else if (root.options & SECTION.RESIZE_PARENTX) root.geom.dim[0] = root.max_size[0];
+               else if (root.options & SECTION.RESIZE_PARENTY) root.geom.dim[1] = root.max_size[1];
+            }
+
+            root.SectionSetPad();
+            
+      
+            // Calculate positions for dropdown
+            const cur_pos = [0,0];
+            cur_pos[0] = this.geom.pos[0]; 
+            cur_pos[1] = this.geom.pos[1]; 
+      
+            tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+         }
+
+         
+         
       }
 
-      
 
-      const cur_pos = [0,0];
-      cur_pos[0] = this.geom.pos[0]; 
-      cur_pos[1] = this.geom.pos[1]; 
-
-      tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-      
-
-
-
-      { // Clipping
+      { // Clip
 
          // if((this.options & SECTION.INDEPENDENT)===0){
    
@@ -982,16 +1158,8 @@ export class Widget_Dropdown extends Section {
          // }
       }
 
-
       Construct_listen_events_from_mesh_tree(this.menu)
       Construct_listen_events_relations_from_mesh_tree(this.menu);
-
-
-      // HACK: We want to update the handles size and pos after dp activation
-      const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)
-      const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshidx)
-      if(root_mesh.type & MESH_TYPE.WIDGET_SCROLLER) TEMP_Scroller_calc_handle(root_mesh)
-
 
 
       // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh

@@ -2,12 +2,11 @@
 
 import { Dropdown_roots_set_root, TEMP_DP_STEAL_THE_DP_RECALC } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
-// import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
 import { Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get, Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_mesh_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_buffer_get_count, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_buffer_get_count, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals.js";
 import { Dbg_ui_create2 } from "./DebugInfoUiFactory.js";
-import { BLACK, BLUEL, GREEN, GREY, ORANGEL, ORANGE_240_160_10, PURPLEB, REDL, WHITE, YELLOW, YELLOWL } from "../Material/Base/Colors.js";
+import { BLACK, BLUEL, GREEN, GREY, ORANGEL, ORANGE_240_160_10, PURPLEB, REDL, WHITE } from "../Material/Base/Colors.js";
 import { NOTIFICATION_TYPE, Notifications_deactivate, Notifications_get_ui_widget, Notifications_set_ui_widget } from "./DebugInfoUiNotifications.js";
 import { View_add_to_group, View_build_group_from_root_mesh, View_remove_view, View_get_count, View_remove_from_group, View_set_view_vb_start } from "../../Core/MeshBufferViews.js";
 import { Clipy_from_group, Clipy_from_tree_recursive, Clipy_one_mesh } from "../Operations/Clip.js";
@@ -20,6 +19,7 @@ import { Mesh_unif_col_get_count, Mesh_unif_col_get_size, Mesh_unif_get_vb_root_
 import { Listeners_click_get_count, Listeners_hover_get_count } from "../../Events/EventListeners.js";
 import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
 
 
 
@@ -47,6 +47,7 @@ export function Debug_info_ui_static(){
    const zpos = 50;
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, zpos], [0, 0], TRANSPARENCY(GREY[1], transp), 'ui performance timers panel', [0, 10, 2]);
    section.SetName('InfoUi-static');
+   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
    const fontsize = 7;
@@ -145,8 +146,8 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,0,0]) {
 
    // const dp = Create_widget_dropdown(is_root_widget, 'Statistics', [VIEWPORT.RIGHT-280, 30, 0], GREY[0], GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
    const dp = Create_widget_dropdown(is_root_widget, 'Statistics', pos, TRANSPARENCY(GREY[0], .1), GREY[1], BLUEL[7], [10, 3], _, _, _, dp_margin);
-   // dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   // dp.CreateMoveEvent();
+   dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    Dropdown_roots_set_root(dp, dp);
 
    // dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -239,7 +240,9 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,0,0]) {
 
       dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
 
-      dp.ConstructListeners();
+        
+      Construct_listen_events_from_mesh_tree(dp)
+      Construct_listen_events_relations_from_mesh_tree(dp);
 
       // Create Group for this dropdown, to easily remove meshes from their vertex buffers and rebuild the vertex buffer
       View_build_group_from_root_mesh(dp);
@@ -561,7 +564,10 @@ function Debug_info_create_ui_stats() {
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
 
-   section.ConstructListeners();
+        
+   Construct_listen_events_from_mesh_tree(section)
+   Construct_listen_events_relations_from_mesh_tree(section);
+
 
    Widget_root_set_render_queue_flags(section.root_bufferidx, RENDER_QUEUE_FLAGS.SKIP_PRIORITY);
 
@@ -974,8 +980,9 @@ function Debug_info_create_ui_performance_timers() {
    section.Render()
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-   section.ConstructListeners();
+        
+   Construct_listen_events_from_mesh_tree(section)
+   Construct_listen_events_relations_from_mesh_tree(section);
 
 
    DEBUG_INFO.UI_TIMERS.MESH_BUFFER_IDX = section.mesh_bufferidx;
@@ -1052,8 +1059,9 @@ function Debug_info_create_ui_mouse() {
    section.Render()
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-   section.ConstructListeners();
+        
+   Construct_listen_events_from_mesh_tree(section)
+   Construct_listen_events_relations_from_mesh_tree(section);
 
    DEBUG_INFO.UI_MOUSE.MESH_BUFFER_IDX = section.mesh_bufferidx;
    DEBUG_INFO.UI_MOUSE.IS_ON = true;
@@ -1167,7 +1175,7 @@ export function Debug_info_create_ui_focused() {
    
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    
-   scroller.ScrollerAlign();
+   scroller.ScrollerAlignWithItemsRecalc();
    
    View_build_group_from_root_mesh(scroller.scrolled_section);
    
@@ -1182,10 +1190,10 @@ export function Debug_info_create_ui_focused() {
    
    View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
    // View_build_group_from_root_mesh(scroller.scrolled_section);
+        
+   Construct_listen_events_from_mesh_tree(scroller)
+   Construct_listen_events_relations_from_mesh_tree(scroller);
 
-   scroller.ConstructListeners();
-
-   
    DEBUG_INFO.UI_FOCUSED.MESH_BUFFER_IDX = section.mesh_bufferidx;
    DEBUG_INFO.UI_FOCUSED.IS_ON = true;
 
@@ -1378,7 +1386,7 @@ function Debug_info_update_ui_focused(params) {
 
    Widget_root_reset_gfx(scroller.root_bufferidx);
 
-   scroller.ScrollerAlign();
+   scroller.ScrollerAlignWithItemsRecalc();
 
 
    // info_mesh.AddToWidgetRootBuffer(scrolled.root_bufferidx)
@@ -1651,8 +1659,7 @@ function Debug_info_create_mesh_info(params) {
    // const dp = Create_widget_dropdown(_, `InfoUi Mesh DP`, DEBUG_INFO.UI_MESH.POS, GREY[1], TRANSPARENCY(GREY[1], tr), WHITE, temp_btnpad);
    const dp = Create_widget_dropdown(_, `InfoUi Mesh DP`, [0, 0, DEBUG_INFO.UI_MESH.POS[2]], GREY[1], TRANSPARENCY(GREY[1], tr), WHITE, temp_btnpad);
    dp.StateEnable(MESH_STATE.ACTIVE);
-   dp.CreateClickEvent();
-   dp.CreateMoveEvent();
+   dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    Dropdown_roots_set_root(dp, dp);
    dp.SetTypeDebug();
 
@@ -1689,14 +1696,14 @@ function Debug_info_create_mesh_info(params) {
    
    // scroller.Calc_no_gfx_update();
    scroller.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-   scroller.ScrollerAlign();
+   scroller.ScrollerAlignWithItemsRecalc();
 
    scroller.Render();
 
    scroller.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scroller.gfx.vb.groupidx)
-
-   scroller.ConstructListeners();
-
+        
+   Construct_listen_events_from_mesh_tree(scroller)
+   Construct_listen_events_relations_from_mesh_tree(scroller);
 
    View_build_group_from_root_mesh(scroller.scrolled_section)
 
@@ -1878,8 +1885,9 @@ function Debug_info_create_batch_info(params) {
    section.Render()
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-   section.ConstructListeners();
+        
+   Construct_listen_events_from_mesh_tree(scroller)
+   Construct_listen_events_relations_from_mesh_tree(scroller);
 
 
    // DEBUG_INFO.UI_BATCH.ROOT_IDX = section.root_bufferidx;
@@ -2156,7 +2164,7 @@ function Dbg_info_ui_create_ui(pos, name) {
 
    // Create the dropdown where all entries for the info will be stored
    const dp = Create_widget_dropdown(_, name, [0, 0, pos[2] + 2], col_dp, col_menu, _, _, _, _, style, pad, MESH_TYPE.DEBUG_MESH);
-   dp.CreateClickEvent();
+   dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    Dropdown_roots_set_root(dp, dp);
    dp.SetTypeDebug();
    scrolled.AddItem(dp)
@@ -2167,7 +2175,7 @@ function Dbg_info_ui_create_ui(pos, name) {
    dp.AddToMenu(info);
 
    // Create scroller for the ui-mesh info widget 
-   const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, scrolled, [100, 150], GREY[1], [14, 14], MESH_TYPE.DEBUG_MESH);
+   const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, scrolled, [100, 150], GREY[1], [10, 10], MESH_TYPE.DEBUG_MESH );
    scroller.StateEnable(MESH_STATE.ACTIVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -2180,13 +2188,14 @@ function Dbg_info_ui_create_ui(pos, name) {
    scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    
    scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-   scroller.ScrollerAlign();
+   scroller.ScrollerAlignWithItemsRecalc();
 
    scroller.Render();
 
    scroller.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scroller.gfx.vb.groupidx)
-
-   scroller.ConstructListeners();
+        
+   Construct_listen_events_from_mesh_tree(scroller)
+   Construct_listen_events_relations_from_mesh_tree(scroller);
 
    View_build_group_from_root_mesh(scroller.scrolled_section);
 
@@ -2425,7 +2434,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
          /*****************************************************/
 
          entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         entry_mesh.CreateClickEvent();
+         entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          entry_mesh.SetTypeDebug();
          const idx = root_dp.AddToMenu(entry_mesh);
 
@@ -2462,7 +2471,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
    }
 
    // Widget_root_reset_gfx(scroller.root_bufferidx)
-   // scroller.ScrollerAlign()
+   // scroller.ScrollerAlignWithItemsRecalc()
    // Widget_root_rerender(scroller.root_bufferidx)
    
    // Update size and count info of the mesh buffer
@@ -2485,7 +2494,7 @@ function Helper_mesh_buffer_info_create_more_info(parent, info_data, zindex, col
    { // Views indexes info
       const view = Create_widget_dropdown(_, `view`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       view.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-      view.CreateClickEvent();
+      view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       view.SetTypeDebug();
       view.Deactivate();
       parent.AddToMenu(view)
@@ -2500,7 +2509,7 @@ function Helper_mesh_buffer_info_create_more_info(parent, info_data, zindex, col
    { // Geometry info
       const view = Create_widget_dropdown(_, `geometry`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-      view.CreateClickEvent();
+      view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       view.SetTypeDebug();
       view.Deactivate();
       parent.AddToMenu(view)
@@ -2511,7 +2520,7 @@ function Helper_mesh_buffer_info_create_more_info(parent, info_data, zindex, col
    { // Gfx info
       const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       gfx.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-      gfx.CreateClickEvent();
+      gfx.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       gfx.SetTypeDebug();
       parent.AddToMenu(gfx)
       if (info_data.gfx) {
@@ -2651,7 +2660,7 @@ function Dbg_ui_string_buffer_create_entry(params) {
          /*****************************************************/
 
          // entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         entry_mesh.CreateClickEvent();
+         entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          entry_mesh.SetTypeDebug();
          root_dp.AddToMenu(entry_mesh);
 
@@ -2698,7 +2707,7 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
    { // Views indexes info
       const view = Create_widget_dropdown(_, `view`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       // view.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.EXPAND;
-      view.CreateClickEvent();
+      view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       view.SetTypeDebug();
       view.Deactivate();
       parent.AddToMenu(view)
@@ -2713,7 +2722,7 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
    { // Geometry info
       const view = Create_widget_dropdown(_, `geometry`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       // view.options = SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL | SECTION.INHERIT;
-      view.CreateClickEvent();
+      view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       view.SetTypeDebug();
       parent.AddToMenu(view)
       { const info = Create_widget_text(_, `pos:${info_data.geom.pos[0]}, ${info_data.geom.pos[1]}, ${info_data.geom.pos[2]}`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
@@ -2723,7 +2732,7 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
    { // Gfx info
       const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       // gfx.options = SECTION.TOP_DOWN | SECTION.EXPAND  | SECTION.VERTICAL | SECTION.INHERIT;
-      gfx.CreateClickEvent();
+      gfx.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       gfx.SetTypeDebug();
       gfx.Deactivate();
       parent.AddToMenu(gfx)
@@ -2861,7 +2870,7 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
          /*****************************************************/
 
          entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         entry_mesh.CreateClickEvent();
+         entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          entry_mesh.SetTypeDebug();
          root_dp.AddToMenu(entry_mesh);
 
@@ -2926,7 +2935,7 @@ function Helper_mesh_per_vb_buffer_info_create_more_info(parent, info_data, zind
 
          const all_meshes_buffer = Create_widget_dropdown(_, `meshes`, [100, 100, zindex + 1], GREY[1], GREY[2], _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
          all_meshes_buffer.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         all_meshes_buffer.CreateClickEvent();
+         all_meshes_buffer.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          all_meshes_buffer.SetTypeDebug();
          all_meshes_buffer.Deactivate();
          Dropdown_roots_set_root(all_meshes_buffer, all_meshes_buffer)
@@ -2953,7 +2962,7 @@ function Helper_mesh_per_vb_buffer_info_create_more_info(parent, info_data, zind
    // { // Gfx info
    //    const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
    //    gfx.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-   //    gfx.CreateClickEvent();
+   //    gfx.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    //    gfx.SetTypeDebug();
    //    parent.AddToMenu(gfx)
    //    if (info_data.gfx) {
@@ -3094,7 +3103,7 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
          /*****************************************************/
 
          entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         entry_mesh.CreateClickEvent();
+         entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          entry_mesh.SetTypeDebug();
          root_dp.AddToMenu(entry_mesh);
 
@@ -3200,10 +3209,10 @@ function Debug_info_render_queue_buffer_create_ui() {
 
       // Remember the ui's position based on the dropdown which is responsible of setting the position of the ui_widget widget arround it..
       render_queue_buffer_ui_pos[0] = ui_widget.geom.pos[0],
-         render_queue_buffer_ui_pos[1] = ui_widget.geom.pos[1],
-         render_queue_buffer_ui_pos[2] = ui_widget.geom.pos[2],
+      render_queue_buffer_ui_pos[1] = ui_widget.geom.pos[1],
+      render_queue_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
-         View_remove_view(ui_widget.scrolled_section.group_bufferidxs);
+      View_remove_view(ui_widget.scrolled_section.group_bufferidxs);
       ui_widget.Destroy();
 
 
@@ -3276,7 +3285,7 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
          /*****************************************************/
 
          entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         entry_mesh.CreateClickEvent();
+         entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          entry_mesh.SetTypeDebug();
          root_dp.AddToMenu(entry_mesh);
          entry_mesh.Deactivate();

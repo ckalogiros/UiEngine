@@ -453,6 +453,7 @@ const GFX_CTX_FLAGS = {
 
     ABSOLUTE_POSITION: _CNT <<= 0x1, // Any vertex buffer with a unif wposition will not draw from the scenen's position 
 
+
     // UNUSED
     // These are prioritized over all other above options.
     STATIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated rarely

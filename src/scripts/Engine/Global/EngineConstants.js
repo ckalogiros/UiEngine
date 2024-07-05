@@ -376,6 +376,11 @@ const MESH_STATE = {
 	HAS_POPUP: _CNT <<= 1,
 	HAS_CLIP: _CNT <<= 1,
 
+	// Masks for denoting a vertex buffer's uniform wpos as 'sticky, so it will be uupdated accordingly on canvas resize and scroll 
+	STICKY_POSX: _CNT <<= 0x1, 
+	STICKY_POSY: _CNT <<= 0x1,
+
+	
 	ToString(mask) {
 
 		let str = '';

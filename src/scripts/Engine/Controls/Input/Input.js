@@ -6,6 +6,7 @@ import { OnTouchStart, OnTouchEnd, OnTouchCancel, OnTouchMove, MouseResetDif, Mo
 import { OnMouseMove, OnMouseDown, OnMouseUp, OnMouseOut, OnMouseWheel } from "./Mouse.js";
 import { OnKeyDown, OnKeyUp } from "./Keyboard.js";
 import { Renderer_set_canvas_size } from "../../Renderers/Renderer.js";
+import { Mesh_unif_update_sticky_pos } from "../../Core/MeshUniformsBuffer.js";
 
 
 
@@ -22,8 +23,13 @@ function OnWindowResize(e) {
 
 export function On_window_resize() {
 
+  
   DEVICE.width = window.innerWidth;
   DEVICE.height = window.innerHeight;
+  
+  // Store the difference of the cur and prev canvas dimentions
+  const xdif = DEVICE.width - VIEWPORT.WIDTH; 
+  const ydif = DEVICE.height - VIEWPORT.HEIGHT; 
 
   VIEWPORT.WIDTH = DEVICE.width;
   VIEWPORT.HEIGHT = DEVICE.height;
@@ -48,6 +54,11 @@ export function On_window_resize() {
 
   Renderer_set_canvas_size(DEVICE.width, DEVICE.height);
   // console.log('RESIZE CANVAS')
+
+
+  // Move any meshes that suppose to be stick on the right hand side
+  // The position update is happening through the update of the wpos uniform of the root parent  
+  Mesh_unif_update_sticky_pos(xdif, ydif)
 }
 
 export function Input_create_user_input_listeners() {

@@ -1015,6 +1015,7 @@ export function Widget_root_set_in_focus(root_bufferidx) {
 
       const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
       // Renderqueue_set_priority_by_vb(LAST, gfx.vb.groupidx);
+      console.error('Implement: Widget_root_set_in_focus()')
    }
 
 }
@@ -1273,22 +1274,23 @@ export function Widgetroot_buffer_print_w1() {
                      'state', mesh.state.mask,
                      'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
                      'root_pos', mesh.root_posidx,
-                     'pos', mesh.geom.pos, mesh.GetName());
+                     'name', mesh.geom.pos, mesh.GetName());
                      // 'ubidxs', mesh.uniforms, mesh.GetName());
                   }
                   else {
                      console.log('   ', j,
                         'msbidx', mesh.mesh_bufferidx,
                         'ridx:', mesh.root_bufferidx,
-                        'is_gfx_inserted:', mesh.is_gfx_inserted,
+                        // 'is_gfx_inserted:', mesh.is_gfx_inserted,
                         // 'batchidx', mesh.batch_buffer_vbidx,
                         // 'gfxidx', mesh.per_vb_bufferidx,
                         'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.groupidx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
                         'root_pos', mesh.root_posidx,
                         // 'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
-                        'state', mesh.state.mask,
+                        // 'state', mesh.state.mask,
                         'start', mesh.gfx.vb.starts.buffer[0],
-                        // 'pos', mesh.GetPosXY(),
+                        'upos', mesh.GetPosXY(),
+                        'pos', mesh.geom.pos[0], mesh.geom.pos[1],
                         // 'dim', mesh.geom.dim,
                         // 'rel pos', mesh.geom.pos, 
                         mesh.GetName(),

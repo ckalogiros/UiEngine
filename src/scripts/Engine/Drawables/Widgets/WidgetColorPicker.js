@@ -36,7 +36,7 @@ export class Widget_Color_Picker extends Section {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin, pos, dim, col, name = 'Color Picker', style, num_faces, is_debug_mesh) {
       
 
-      const scale = .4;
+      const scale = .5;
       const fontsize = 8;
       const label_pad = 2;
       const label_style = [0, fontsize, 1.2];
@@ -80,7 +80,7 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create the color picker panel
-      const color_pick = Create_rect_mesh(_, [20, 20, 2], [150*scale, 150*scale], [BLACK, WHITE,BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
+      const color_pick = Create_rect_mesh(_, [20, 20, 2], [150*scale, 150*scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
       color_pick.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       // color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
@@ -187,7 +187,7 @@ export class Widget_Color_Picker extends Section {
       slider_tran.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      slider_tran.SetStyle([0, 6, 2]);
+      slider_tran.SetStyle([0, 12*scale, 2]);
       slider_tran.StylesSetMargin([10, 0]);
 
       temp_tran_slider_idx = panel.AddItem(slider_tran);
@@ -217,7 +217,7 @@ export class Widget_Color_Picker extends Section {
       slider.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       slider.StylesSetMargin([0, 20]);
-      slider.SetStyle(style);
+      slider.SetStyle([style[0], 20*scale, style[2]]);
       temp_hue_pick_idx = this.AddItem(slider);
 
 

@@ -774,6 +774,8 @@ export class Section extends Rect_Mesh {
          }
       }
 
+      console.log('mesh', section.GetName(), section.geom.dim)
+
 
       Expand(section, options);
 
@@ -1329,7 +1331,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
          
          
          const rel_pos = [cur_pos[0], cur_pos[1]];
-         console.log('##########', mesh.GetName(), rel_pos)
+         // console.log('##########', mesh.GetName(), rel_pos)
          
          if (mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
             
@@ -1348,13 +1350,16 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
             mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
             continue_recur = false;
          }
-         else if (mesh.type & MESH_TYPE.WIDGET_SCROLLER) {
-
-            mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-            continue_recur = false;
-         }
+         // else if (mesh.type & MESH_TYPE.WIDGET_SCROLLER) {
+            
+         //    mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
+         //       console.log('##########################################', mesh.scroll_bar.geom.pos)
+         //    continue_recur = false;
+         // }
          else if (mesh.type & MESH_TYPE.SECTION_MESH) { // For meshes with a parent of type Section
 
+            if(mesh.type & MESH_TYPE.WIDGET_SCROLLER) 
+               console.log('##########################################', mesh.scroll_bar.geom.pos)
             mesh.geom.pos[0] = rel_pos[0];
             mesh.geom.pos[1] = rel_pos[1];
 
@@ -1367,6 +1372,8 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
          else {
 
             mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
+            // if(mesh.type & MESH_TYPE.WIDGET_SCROLLER) 
+            //    console.log('##########################################', mesh.scroll_bar.geom.pos)
 
             if (mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
             if (mesh.text_mesh) continue_recur = false;

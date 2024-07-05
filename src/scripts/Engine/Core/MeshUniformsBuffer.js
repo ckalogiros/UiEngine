@@ -65,7 +65,7 @@ export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; 
 
 // IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
-export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vb_groupidx, ubidx, has_absolute_pos=0x0) {
+export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vb_groupidx, ubidx, has_absolute_pos=0x0, HAS_STICKY_POS=0x0) {
 
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
@@ -129,6 +129,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
       parent_posidx: parent_posidx,
       debug_vb_groupidx:debug_vb_groupidx,
       has_absolute_pos: has_absolute_pos,
+      sticky_pos: HAS_STICKY_POS,
    }
 
    entry.wpos[0] += wpos[0];
@@ -149,7 +150,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
 
 
-export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, vb_groupidx, has_absolute_pos=0x0) {
+export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, vb_groupidx, has_absolute_pos=0x0, HAS_STICKY_POS=0x0) {
    // TODO: check NULL object
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
@@ -206,6 +207,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    unif_wpos.parent_posidx = parent_posidx;
    unif_wpos.debug_vb_groupidx = vb_groupidx;
    unif_wpos.has_absolute_pos = has_absolute_pos;
+   unif_wpos.sticky_pos = HAS_STICKY_POS;
 
 
    const dbg_for_unifwpos = _debug_names_per_vb_mesh_unif_wpos.buffer[vb_groupidx];
@@ -410,6 +412,26 @@ export function Mesh_unif_add_vb_root_wpos_all_siblings(root_posidx, x, y){
    }
 }
 
+
+
+
+
+/*********************************************************************************************************/
+// MISC FUNCTIONS
+
+export function Mesh_unif_update_sticky_pos(xdif, ydif){
+
+   for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+      
+      const unif_pos = _per_vb_mesh_unif_wpos.buffer[i];
+      if(unif_pos.sticky_pos & MESH_STATE.STICKY_POSX){
+         _per_vb_mesh_unif_wpos.buffer[i].wpos[0] += xdif;
+      }
+      if(unif_pos.sticky_pos & MESH_STATE.STICKY_POSY){
+         _per_vb_mesh_unif_wpos.buffer[i].wpos[1] += ydif;
+      }
+   }
+}
 
 
 

@@ -326,7 +326,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                if(uniforms[i].name === 'u_wposxy'){
 
                   const has_absolute_pos = FLAGS & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-                  const root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx, ubidx, has_absolute_pos);
+                  // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
+                  const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
+                  const root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx, ubidx, has_absolute_pos, HAS_STICKY_POS);
                   mesh.root_posidx = root_posidx;
                   if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
                   

@@ -157,7 +157,7 @@ const YELLOWL8 = new Float32Array([0.695, 0.9, 0.0, 1.0]);
 const YELLOWL9 = new Float32Array([0.95 , 1.0, 0.0, 1.0]);
 export const YELLOWL = [ YELLOWL0, YELLOWL1, YELLOWL2, YELLOWL3, YELLOWL4, YELLOWL5, YELLOWL6, YELLOWL7, YELLOWL8, YELLOWL9, ];
 
-const GREY0 = new Float32Array([0.05, 0.05, 0.05, 1.0]);
+const GREY0 = new Float32Array([0.03, 0.03, 0.03, 1.0]);
 const GREY1 = new Float32Array([0.13, 0.13, 0.13, 1.0]);
 const GREY2 = new Float32Array([0.2,  0.2, 0.2, 1.0]);
 const GREY3 = new Float32Array([0.3,  0.3, 0.3, 1.0]);

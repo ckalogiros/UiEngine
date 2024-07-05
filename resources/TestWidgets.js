@@ -1706,7 +1706,7 @@ function CreateScroller(scene) {
     
     scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
     
-    scroller.ScrollerAlign();
+    scroller.ScrollerAlignWithItemsRecalc();
     
     View_build_group_from_root_mesh(scroller.scrolled_section);
 
@@ -1816,7 +1816,7 @@ function CreateScrollerClampAlphaTest(scene) {
     
     scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
     
-    scroller.ScrollerAlign();
+    scroller.ScrollerAlignWithItemsRecalc();
 
     scroller.SetPosYNoGfxUpdate(200)
     scroller.SetPosXNoGfxUpdate(100)
