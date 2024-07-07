@@ -47,7 +47,7 @@ export class Widget_Scroller extends Section {
    // renderables; // Store the first/upper and last/lower meshes that is rendered by the gfx buffers
    is_scrolled_section_private; // A way to set a scroller to use separate vertex buffer for the scrolled mesh and all its items  
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, scrolled_mesh, dim = [100, 50], col = TRANSPARENCY(GREY[1], .5), scroller_margin = [6, 6], style, num_faces, is_debug_mesh = 0x0) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, scrolled_mesh, dim = [100, 50], col = TRANSPARENCY(GREY[3], .5), scroller_margin = [6, 6], style, num_faces, is_debug_mesh = 0x0) {
 
       const pos = [0, 0, 0];
 
@@ -99,7 +99,7 @@ export class Widget_Scroller extends Section {
 
       const bar_dim = [10, dim[1] - pad[1]*2];
 
-      const bar = Create_rect_mesh(_, [0,0,0], bar_dim, GREY[0], _, _, _, _, is_debug_mesh);
+      const bar = Create_rect_mesh(_, [0,0,0], bar_dim, GREY[1], _, _, _, _, is_debug_mesh);
 
       bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
       bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [0, 3, 1]);
@@ -111,7 +111,7 @@ export class Widget_Scroller extends Section {
 
       const handle_pos = [0, 0, bar.geom.pos[2]+1];
       const handle_dim = [bar.geom.dim[0]-pad[0], bar.geom.dim[0]-pad[0]];
-      const handle = Create_rect_mesh(_, handle_pos, handle_dim, GREY[4], _, _, _, _, is_debug_mesh);
+      const handle = Create_rect_mesh(_, handle_pos, handle_dim, BLUEL[4], _, _, _, _, is_debug_mesh);
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [0, 3, 1]);
       handle.SetName(`Scroll handle[${this.mesh_bufferidx}]`);
       handle.StylesSetPad(pad);
@@ -959,32 +959,32 @@ export class Widget_Scroller extends Section {
 
    ScrollerAlignWithItemsRecalc() {
 
-      this.scrolled_section.options |= SECTION.RESIZE_PARENT; // For the scrolled section to encapsulate all items.
-      this.options |= SECTION.RESIZE_PARENTX;
-      this.scrolled_section.Recalc_no_gfx_update();
+      // this.scrolled_section.options |= SECTION.RESIZE_PARENT; // For the scrolled section to encapsulate all items.
+      // this.options |= SECTION.RESIZE_PARENTX;
+      // this.scrolled_section.Recalc_no_gfx_update();
 
-      const bar = this.scroll_bar;
-      const handle = bar.children.buffer[0];
+      // const bar = this.scroll_bar;
+      // const handle = bar.children.buffer[0];
 
-      const scoller_pad = this.StylesGetPad();
-      const scrolled_section_pad = this.scrolled_section.StylesGetPad(STYLES.AXIS.Y);
-      const handle_pad = handle.StylesGetPad()
+      // const scoller_pad = this.StylesGetPad();
+      // const scrolled_section_pad = this.scrolled_section.StylesGetPad(STYLES.AXIS.Y);
+      // const handle_pad = handle.StylesGetPad()
 
-      this.scrolled_section.SetPosXYNoGfxUpdate(this.geom.pos[0] + scoller_pad[0], this.geom.pos[1] + scoller_pad[1]);
+      // this.scrolled_section.SetPosXYNoGfxUpdate(this.geom.pos[0] + scoller_pad[0], this.geom.pos[1] + scoller_pad[1]);
 
 
-      this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_pad[0]*2 + scrolled_section_pad;
+      // this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_pad[0]*2 + scrolled_section_pad;
 
-      bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) - (scoller_pad[0] + bar.geom.dim[0] * 2)
-      bar.geom.pos[1] = (this.geom.pos[1] + scoller_pad[1])
+      // bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) - (scoller_pad[0] + bar.geom.dim[0] * 2)
+      // bar.geom.pos[1] = (this.geom.pos[1] + scoller_pad[1])
 
-      // Calculate handle dimention to the ratio of the scroller/scrolled_section
-      const ratio = this.geom.dim[1] / this.scrolled_section.geom.dim[1];
-      const h = (ratio * this.geom.dim[1] >= this.geom.dim[1]) ? bar.geom.dim[1] - handle_pad[1] : ratio * this.geom.dim[1];
-      handle.geom.dim[1] = h;
-      handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
-      handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
-      handle.geom.pos[2] = bar.geom.pos[2] + 1;
+      // // Calculate handle dimention to the ratio of the scroller/scrolled_section
+      // const ratio = this.geom.dim[1] / this.scrolled_section.geom.dim[1];
+      // const h = (ratio * this.geom.dim[1] >= this.geom.dim[1]) ? bar.geom.dim[1] - handle_pad[1] : ratio * this.geom.dim[1];
+      // handle.geom.dim[1] = h;
+      // handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
+      // handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
+      // handle.geom.pos[2] = bar.geom.pos[2] + 1;
 
 
    }
@@ -992,29 +992,29 @@ export class Widget_Scroller extends Section {
 
    ScrollerAlignBar() {
 
-      const bar = this.scroll_bar;
-      const handle = bar.children.buffer[0];
+      // const bar = this.scroll_bar;
+      // const handle = bar.children.buffer[0];
 
-      const scoller_pad = this.StylesGetPad();
-      const scrolled_section_pad = this.scrolled_section.StylesGetPad(STYLES.AXIS.Y);
-      const handle_pad = handle.StylesGetPad()
+      // const scoller_pad = this.StylesGetPad();
+      // const scrolled_section_pad = this.scrolled_section.StylesGetPad(STYLES.AXIS.Y);
+      // const handle_pad = handle.StylesGetPad()
 
 
-      this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_pad[0] + scrolled_section_pad;
+      // this.geom.dim[0] = this.scrolled_section.geom.dim[0] + bar.geom.dim[0] + scoller_pad[0] + scrolled_section_pad;
 
-      bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) - (scoller_pad[0] + bar.geom.dim[0] * 2)
-      bar.geom.pos[1] = (this.geom.pos[1] + scoller_pad[1])
+      // bar.geom.pos[0] = (this.geom.pos[0] + this.geom.dim[0] * 2) - (scoller_pad[0] + bar.geom.dim[0] * 2)
+      // bar.geom.pos[1] = (this.geom.pos[1] + scoller_pad[1])
 
-      // Calculate handle dimention to the ratio of the scroller/scrolled_section
-      const ratio = this.geom.dim[1] / this.scrolled_section.geom.dim[1];
-      const h = (ratio * this.geom.dim[1] * 2 >= this.geom.dim[1] * 2) ? bar.geom.dim[1] + handle_pad[1] : ratio * this.geom.dim[1] + handle_pad[1];
-      handle.geom.dim[1] = h;
-      handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0]+1;
+      // // Calculate handle dimention to the ratio of the scroller/scrolled_section
+      // const ratio = this.geom.dim[1] / this.scrolled_section.geom.dim[1];
+      // const h = (ratio * this.geom.dim[1] * 2 >= this.geom.dim[1] * 2) ? bar.geom.dim[1] + handle_pad[1] : ratio * this.geom.dim[1] + handle_pad[1];
+      // handle.geom.dim[1] = h;
+      // handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0]+10;
       
-      // Scroller_calc_handle_pos_dim(this);
-      Scroller_calc_handle_pos_dim_no_gfx_update(this);
+      // // Scroller_calc_handle_pos_dim(this);
+      // // Scroller_calc_handle_pos_dim_no_gfx_update(this);
 
-      Update_scrolled_section_pos_by_uniform(this);
+      // // Update_scrolled_section_pos_by_uniform(this);
 
    }
 }
@@ -1086,7 +1086,8 @@ function Scroller_calc_handle_pos_dim_no_gfx_update(scroller) {
 
    const handle_bot = handle.geom.pos[1] + handle.geom.dim[1] * 2
 
-   // Set handles poosition
+   // Set handles position
+   // handle.geom.pos[0] = scroller.geom.pos[0] + scroller_pad + handle_pad;
    if (handle.geom.pos[1] <= bar.geom.pos[1] + scroller_pad + handle_pad) {
       handle.geom.pos[1] = scroller.geom.pos[1] + scroller_pad + handle_pad;
    }

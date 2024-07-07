@@ -1387,7 +1387,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
 
             mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
             // if(mesh.type & MESH_TYPE.WIDGET_SCROLLER) 
-            //    console.log('##########################################', mesh.scroll_bar.geom.pos)
+               console.log('##########################################', mesh.GetName(), mesh.geom.pos, rel_pos)
 
             if (mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
             if (mesh.text_mesh) continue_recur = false;
