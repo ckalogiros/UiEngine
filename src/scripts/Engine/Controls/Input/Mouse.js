@@ -281,7 +281,7 @@ export function OnMouseWheel(e){
       temp_prev_dir = mouse.wheel.delta;
       bool = false;
       temp_deccel = .8; // Reduce deccel if the user switched scroll direction
-      temp_scroll_speed = 0; // Cancel the deccelarate scrolling
+      temp_scroll_speed = .5; // Cancel the deccelarate scrolling
       // console.log(temp_prev_dir)
    }
 
@@ -312,7 +312,7 @@ export function OnMouseWheel(e){
             console.log('END')
             
             in_scolling = false;
-            temp_scroll_speed = 0;
+            temp_scroll_speed = .5;
             temp_deccel = .85;
          }, 
          {wheel_delta:mouse.wheel.delta}, 'SceneScroll'
@@ -374,6 +374,7 @@ export function OnMouseUp(e) {
 export function OnMouseMove_Android(e) {
    MouseSetCoords([e.clientX, e.clientY]);
    console.log('OnMouseMove_Android: ', mouse.pos.x, mouse.pos.y)
+   console.log('000000')
 }
 
 
@@ -448,49 +449,44 @@ export function OnTouchCancel(e) {
 export function OnTouchMove(e) {
    e.stopPropagation();
    e.preventDefault(); 
-   // console.log('OnTouchMove:',[e.changedTouches[0].clientX, e.changedTouches[0].clientY]);
+
+
    // Update mouse coordinates
    const x = e.changedTouches[0].clientX;
    const y = e.changedTouches[0].clientY;
 
    const prevy = y;
    const delta = GetSign(mouse.pos.y - prevy) ;
-   // console.log(mouse.pos.ydiff)
    MouseSetCoords([x,y]);
-   // const delta = GetSign(mouse.pos.ydiff) * .1;
-   
-   console.log(delta)
-   // console.log(mouse.pos.ydiff)
-   // console.log(GetSign(mouse.pos.ydiff))
    
    mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
    mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
    
-   if(STATE.mouse.activeClickedButtonId !== INT_NULL && STATE.mesh.hovered === null){
-      // console.log('updated mouse:',STATE);
+   
+   // TODO: We need to account for clicked meshes too(I mean if an area below the mouse is clickable we shouldn't run the move event )
+   if(STATE.mouse.activeClickedButtonId !== INT_NULL && STATE.mesh.hovered === null && STATE.mesh.grabed === null){
       
-      const speed = 1.0
+      const speed = 1.
       let bool = true
       if(temp_prev_dir !== delta) {
-   
+         
          temp_prev_dir = delta;
          bool = false;
-         temp_deccel = .8; // Reduce deccel if the user switched scroll direction
-         temp_scroll_speed = 0; // Cancel the deccelarate scrolling
-         // console.log(temp_prev_dir)
+         temp_deccel = .9; // Reduce deccel if the user switched scroll direction
+         temp_scroll_speed = 1; // Cancel the deccelarate scrolling
       }
    
-      // temp_scroll_speed += temp_scroll_speed+1;
-      temp_scroll_speed += delta*speed;
-      if(temp_deccel < .97 && bool !== delta) temp_deccel += .01; // Increase deccelarate scrolling on continuous scroll on the same directio
-   
+      const dist = (mouse.pos.ydiff < 50) ? (mouse.pos.ydiff > -50) ? mouse.pos.ydiff : -50 : mouse.pos.ydiff;
+      temp_scroll_speed += speed * dist * -.2;
+      // if(temp_deccel < .97 && bool !== delta) temp_deccel += .002; // Increase deccelarate scrolling on continuous scroll on the same direction
+
    
       if(!in_scolling){
    
          Callback_animations_create(
             (params)=>{
                
-               if(temp_scroll_speed > 1. || temp_scroll_speed < -1.){
+               if(temp_scroll_speed > .2 || temp_scroll_speed < -.2){
    
                   in_scolling = true;
                   temp_scroll_speed *= temp_deccel; // deccelarate scrolling
@@ -504,17 +500,68 @@ export function OnTouchMove(e) {
                return false;
             }, 
             ()=>{
-               console.log('END')
+               // console.log('END')
                
                in_scolling = false;
-               temp_scroll_speed = 0;
-               temp_deccel = .85;
+               temp_scroll_speed = 1;
+               temp_deccel = .9;
             }, 
             {wheel_delta:delta}, 'SceneScroll'
          );
       }
    
    }
+   
+
+   // if(STATE.mouse.activeClickedButtonId !== INT_NULL && STATE.mesh.hovered === null){
+   //    // console.log('updated mouse:',STATE);
+      
+   //    const speed = 1.0
+   //    let bool = true
+   //    if(temp_prev_dir !== delta) {
+   
+   //       temp_prev_dir = delta;
+   //       bool = false;
+   //       temp_deccel = .8; // Reduce deccel if the user switched scroll direction
+   //       temp_scroll_speed = 0; // Cancel the deccelarate scrolling
+   //       // console.log(temp_prev_dir)
+   //    }
+   
+   //    // temp_scroll_speed += temp_scroll_speed+1;
+   //    temp_scroll_speed += delta*speed;
+   //    // if(temp_deccel < .97 && bool !== delta) temp_deccel += .01; // Increase deccelarate scrolling on continuous scroll on the same direction
+   
+   
+   //    if(!in_scolling){
+   
+   //       Callback_animations_create(
+   //          (params)=>{
+               
+   //             if(temp_scroll_speed > 1. || temp_scroll_speed < -1.){
+   
+   //                in_scolling = true;
+   //                temp_scroll_speed *= temp_deccel; // deccelarate scrolling
+                  
+   //                Scene_camera_scroll(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
+   //                // console.log(temp_scroll_speed, params.wheel_delta)
+   
+   //                return true;
+   //             }
+               
+   //             return false;
+   //          }, 
+   //          ()=>{
+   //             console.log('END')
+               
+   //             in_scolling = false;
+   //             temp_scroll_speed = 0;
+   //             temp_deccel = .85;
+   //          }, 
+   //          {wheel_delta:delta}, 'SceneScroll'
+   //       );
+   //    }
+   
+   // }
    
 }
 

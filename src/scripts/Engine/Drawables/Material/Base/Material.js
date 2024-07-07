@@ -77,7 +77,7 @@ export class Material {
 
 
    SetStyle(style) {
-      if (!Array.isArray(style)) console.error
+      if (!Array.isArray(style)) console.error('335188764');
       math.CopyArr3(this.style, style);
    }
 

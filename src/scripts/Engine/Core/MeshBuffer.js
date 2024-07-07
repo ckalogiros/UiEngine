@@ -7,7 +7,7 @@ import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Cr
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Renderqueue_set_flags } from "../Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 import { REL_POS, Relative_pos_comp_move_right_buffer } from "../Drawables/Operations/RelativePosComponent.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "./MeshUniformsBuffer.js";
 import { Index_buffer_reset } from "../../Graphics/Buffers/IndexBuffers.js";
@@ -1044,6 +1044,9 @@ export function Widget_root_set_uniform_callback_per_gfx_root_mesh(root_bufferid
 
    return root_meshes;
 }
+
+
+
 export function Widget_root_set_render_queue_flags(root_bufferidx, flags) {
 
 
@@ -1054,6 +1057,22 @@ export function Widget_root_set_render_queue_flags(root_bufferidx, flags) {
       
       const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
       Renderqueue_set_flags(gfx.vb.groupidx, flags)
+   }
+
+}
+
+
+
+export function Widget_root_set_render_queue_priority(root_bufferidx) {
+
+
+   const vb_mesh_roots = Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx);
+   const len = vb_mesh_roots.length;
+
+   for (let i = len-1; i >= 0; i--) {
+      
+      const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
+      Renderqueue_set_priority_by_vb(FIRST, gfx.vb.groupidx);
    }
 
 }

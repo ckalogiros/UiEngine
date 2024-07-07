@@ -621,12 +621,6 @@ export class Mesh {
      */
     EnableGfxAttributes(which, params) {
 
-        if (this.alreadyAdded === true) {
-            console.error(`You are trying to enable ${which} but the shaders have been already created. Try Enable() before inserting the mesh to a Scene().`);
-            alert('SEE console error');
-        }
-
-
         switch (which) {
 
             case MESH_ENABLE.GFX.ATTR_STYLE: {
@@ -634,8 +628,9 @@ export class Mesh {
                 this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
                 this.sid.pass |= SID.PASS.WPOS2 | SID.PASS.DIM2;
                 // this.sid.pass |= SID.PASS.WPOS2;
-                if (!(params === null || params === undefined)) {
-                    this.mat.style = params.style;
+                // if (!(params === null || params === undefined)) {
+                if (Array.isArray(params)) {
+                    this.SetStyle(params);
                 }
                 break;
             }
@@ -663,15 +658,6 @@ export class Mesh {
 
     EnableGfxUniforms(flags=0x0, name, type, shader_flags) {
 
-        if (this.alreadyAdded === true) {
-            console.error(`You are trying to enable ${which} but the shaders have been already created. Try Enable() before inserting the mesh to a Scene().`);
-            alert('SEE console error');
-        }
-
-        // if (flags.shad === undefined) alert('flags must have a .shad, but undefined  detected\nEnableGfxUniforms() @ Mesh class')
-        // if (flags.attr === undefined) alert('flags must have a .shad, but undefined  detected\nEnableGfxUniforms() @ Mesh class')
-        // if (flags.unif === undefined) alert('flags must have a .shad, but undefined  detected\nEnableGfxUniforms() @ Mesh class')
-        // if (flags.pass === undefined) alert('flags must have a .shad, but undefined  detected\nEnableGfxUniforms() @ Mesh class')
 
         /**
          * How to set up a uniform:
@@ -708,6 +694,7 @@ export class Mesh {
                 // vertex_buffer_store_idx: INT_NULL,
             });
 
+            
             this.temp_unif_wpos = idx - 1;
 
         }
@@ -740,7 +727,8 @@ export class Mesh {
             return;
         }
 
-        alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js')
+        console.error('No Uniform Found', unif_name, this.GetName())
+        alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
 
     }
 

@@ -99,6 +99,8 @@ export function Input_create_user_input_listeners() {
 
 
     if (canvas.requestFullscreen) canvas.requestFullscreen();
+
+    DEVICE.device_scale = .8;
   }
   else {
 

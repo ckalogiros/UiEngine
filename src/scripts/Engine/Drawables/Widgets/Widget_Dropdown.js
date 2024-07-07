@@ -110,7 +110,7 @@ export class Widget_Dropdown extends Section {
 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col_menu = PURPLER[7], text_col = WHITE, 
-               btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, style = [2, 5, 2], pad = [10, 10], is_debug_mesh) {
+               btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, fontsize, style = [2, 5, 2], pad = [10, 10], is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, pad, pos, [10, 10], col1, _, style, _, is_debug_mesh);
 
@@ -132,9 +132,8 @@ export class Widget_Dropdown extends Section {
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
 
       this.dp_symbols = ['+', '-'];
-      const btn = Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, this.menu.geom.pos[2] + 1], _font_size, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
-      // const btn = Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, this.menu.geom.pos[2] + 1], _font_size, TRANSPARENCY(col_menu, .1), WHITE, btn_pad, bold, style, font, is_debug_mesh);
-      // AddArr2(btn.total_margin, this.menu.total_margin);
+      const btn = Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, this.menu.geom.pos[2] + 1], fontsize, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
+
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
 
       this.AddItem(btn);
@@ -272,6 +271,7 @@ export class Widget_Dropdown extends Section {
             mesh.rootidx = this.rootidx;
          }
       }
+
 
 
       if (this.root_bufferidx !== INT_NULL && this.menu.root_bufferidx === INT_NULL) {
@@ -871,106 +871,6 @@ export class Widget_Dropdown extends Section {
       // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
       View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
    }
-   /**SAVE */
-   // DpDeactivateMenu() {
-
-   //    const menu = this.menu;
-   //    const root = Dropdown_roots_get_root_by_idx(this.rootidx);
-
-   //    // Reset vertex buffers from group
-   //    View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
-
-   //    // Remove menu and all its items from the group view
-   //    if (menu.group_bufferidxs[0] !== INT_NULL) {
-   //       View_remove_from_group(menu);
-   //    }
-
-   //    // this.DpDestroyListeners(menu);
-   //    this.#DeactivateMenu();
-   //    this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
-
-   //    const widget_root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
-   //    const widget_root = Mesh_buffer_get_mesh_byidx(widget_root_meshidx)
-
-
-   //    { // New Implementation: Run for all meshes
-         
-   //       if (root.options & SECTION.FIXED_W) root.max_size[0] = root.geom.dim[0];
-   //       if (root.options & SECTION.FIXED_H) root.max_size[1] = root.geom.dim[1];
-
-   //       Calculate_sizes_recursive(root, root.options, );
-   //       // Calculate_sizes_recursive(widget_root, root.options, );
-
-
-   //       if (root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-   //          CopyArr2(root.geom.dim, root.max_size); // Set size for the root dp.
-   //          CopyArr2(root.geom.defDim, root.max_size); // Store to default for the root.
-   //       }
-   //       else {
-   //          if (root.options & SECTION.RESIZE_PARENT) CopyArr2(root.geom.dim, root.max_size); // Set size for the root.
-   //          else {
-   //             if (root.options & SECTION.RESIZE_PARENTX) root.geom.dim[0] = root.max_size[0];
-   //             if (root.options & SECTION.RESIZE_PARENTY) root.geom.dim[1] = root.max_size[1];
-   //          }
-   //       }
-
-   //       root.SectionSetPad();
-   //    }
-      
-
-   //    { // Old Implementation: Run for clicked and set the parents in a loop
-
-   //       // temp_dp_calc_sizes(widget_root, _, widget_root.options & SECTION.INDEPENDENT);
-   //       // temp_dp_calc_sizes(this, _, this.options & SECTION.INDEPENDENT);
-   
-   
-   //       // this.geom.dim[0] = this.max_size[0] + this.StylesGetPad(STYLES.AXIS.X);
-   //       // this.geom.dim[1] = this.max_size[1] + this.StylesGetPad(STYLES.AXIS.Y);
-   //    }
-
-
-
-   //    const cur_pos = [0,0];
-   //    cur_pos[0] = this.geom.pos[0]; 
-   //    cur_pos[1] = this.geom.pos[1]; 
-   //    tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-
-
-   //    { // Clipping
-
-   //       // // Get the group root mesh to Recalc position/dimentions 
-   //       // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
-   //       // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-   //       // let clip_top = null, clip_bottom = null;
-   //       // if (group_root_mesh.parent) {
-   
-   //       //    clip_top = group_root_mesh.parent.GetPosY();
-   //       //    clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
-   //       //    // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
-   //       // }
-   //       // else {
-   //       //    clip_top = group_root_mesh.GetPosY();
-   //       //    clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
-   //       // }
-   
-   //       // // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
-   //       // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-   //       // // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
-   //       // // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
-   
-   
-   //       // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-   //    }
-      
-      
-   //    // HACK: We want to update the handles size and pos after dp activation
-   //    const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx)
-   //    const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshidx)
-   //    if(root_mesh.type & MESH_TYPE.WIDGET_SCROLLER) Scroller_calc_handle_pos_dim(root_mesh)
-         
-   //    // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
-   //    View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-   // }
 
 
    #ActivateMenu(root) {
@@ -1046,6 +946,8 @@ export class Widget_Dropdown extends Section {
 
          // const temp = scroller.scrolled_section
          const temp = root_mesh
+
+         // Expand(root, root.options, )
 
 
          { // Calculate all meshes sizes from the temp widget dropdown

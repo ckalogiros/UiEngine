@@ -4,7 +4,7 @@ import { Rect_Mesh } from '../Meshes/Rect_Mesh.js';
 import { MouseGetPosDif } from '../../Controls/Input/Mouse.js';
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/TimeIntervals.js';
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
-import { AddArr2, Min } from '../../../Helpers/Math/MathOperations.js';
+import { AddArr2, CopyArr4, Min } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } from '../../Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
@@ -396,16 +396,26 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       this.slider_val = (1/100)*val;
       
       if(this.geom.dim[0] > this.geom.dim[1]){
-
+         
          const pos = ( (this.geom.dim[0] * 2 * this.geom.num_faces ) /100) *val;
          const handle = this.children.buffer[0];
          handle.geom.pos[0] = pos -(handle.geom.dim[0] * 2 * this.slider_val); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
       }
       else {
-         const pos = ( (this.geom.dim[1] * 2 * this.geom.num_faces) /100) * (1 - this.slider_val);
+
          const handle = this.children.buffer[0];
-         handle.geom.pos[1] = pos -( handle.geom.dim[1] * 2 * this.geom.num_faces * (1 - this.slider_val)); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
+         handle.geom.pos[1] = (this.geom.dim[1] * 2) - ( (val/100) * (this.geom.dim[1] * 2) ); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
       }
+
+      return this.slider_val;
+   }
+
+
+   SetColorHandleNoGfxUpdate(col){
+
+      const handle = this.children.buffer[0];
+      CopyArr4(handle.mat.col, col);
+      CopyArr4(handle.mat.defCol, col);
    }
 }
 
@@ -956,6 +966,24 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
+   GfxCtxAddFlag(FLAGS){
+
+      this.gfx_ctx_flags |= FLAGS;
+
+      const bar = this.children.buffer[this.bar_idx];
+      bar.gfx_ctx_flags |= FLAGS;
+
+      const name_text = this.text_mesh;
+      name_text.gfx_ctx_flags |= FLAGS;
+
+      const handle = bar.children.buffer[0];
+      handle.gfx_ctx_flags |= FLAGS;
+
+      const value_text = this.children.buffer[this.value_text_idx];
+      value_text.gfx_ctx_flags |= FLAGS;
+   }
+
+
 
 
    
@@ -1484,6 +1512,12 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.SliderSetValueToInfoText(val);
    }
    
+
+   SetColorHandleNoGfxUpdate(col){
+
+      const bar = this.children.buffer[this.bar_idx];
+      bar.SetColorHandleNoGfxUpdate(col);
+   }
 }
    
 

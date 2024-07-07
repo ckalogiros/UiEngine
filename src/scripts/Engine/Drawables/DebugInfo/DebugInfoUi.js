@@ -5,7 +5,7 @@ import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimers
 import { Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_buffer_get_count, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
 import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals.js";
-import { Dbg_ui_create2 } from "./DebugInfoUiFactory.js";
+import { Ui_create_label_switch } from "./DebugInfoUiFactory.js";
 import { BLACK, BLUEL, GREEN, GREY, ORANGEL, ORANGE_240_160_10, PURPLEB, REDL, WHITE } from "../Material/Base/Colors.js";
 import { NOTIFICATION_TYPE, Notifications_deactivate, Notifications_get_ui_widget, Notifications_set_ui_widget } from "./DebugInfoUiNotifications.js";
 import { View_add_to_group, View_build_group_from_root_mesh, View_remove_view, View_get_count, View_remove_from_group, View_set_view_vb_start } from "../../Core/MeshBufferViews.js";
@@ -44,14 +44,14 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 export function Debug_info_ui_static(){
 
    const transp = .5;
-   const zpos = 50;
+   const zpos = 0;
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, zpos], [0, 0], TRANSPARENCY(GREY[1], transp), 'ui performance timers panel', [0, 10, 2]);
    section.SetName('InfoUi-static');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
-
+   
    const fontsize = 7;
-   const fontsizedynamic = 9;
+   const fontsizedynamic = 7.5;
    let pad1 = [0, 1];
    let pad2 = [4, 0];
    const g_ms = 0;
@@ -64,6 +64,7 @@ export function Debug_info_ui_static(){
    let generic_time_interval = INT_NULL;
 
    { // FPS average 1 second
+
       ms = (g_ms) ? g_ms : 1000;
       const timer = Create_widget_multi_text(_, 'FPS:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
       section.AddItem(timer);
@@ -161,52 +162,52 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,0,0]) {
 
       /************************************************************************************************************************************************/
       // Performance timers
-      const stats_ui = Dbg_ui_create2('Stats', fontsize, switch_size, Debug_info_create_ui_stats, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      const stats_ui = Ui_create_label_switch('Stats', fontsize, switch_size, Debug_info_create_ui_stats, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
       dp.AddToMenu(stats_ui);
 
 
       /************************************************************************************************************************************************/
       // Performance timers
-      const perf_timers_ui = Dbg_ui_create2('Performance', fontsize, switch_size, Debug_info_create_ui_performance_timers, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      const perf_timers_ui = Ui_create_label_switch('Performance', fontsize, switch_size, Debug_info_create_ui_performance_timers, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
       dp.AddToMenu(perf_timers_ui);
 
 
       /************************************************************************************************************************************************/
       // Mouse Info
-      const mouse_ui = Dbg_ui_create2('Mouse', fontsize, switch_size, Debug_info_create_ui_mouse, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      const mouse_ui = Ui_create_label_switch('Mouse', fontsize, switch_size, Debug_info_create_ui_mouse, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
       dp.AddToMenu(mouse_ui);
 
 
       /************************************************************************************************************************************************/
       // Mesh Tree
-      const mesh_ui = Dbg_ui_create2('Mesh Tree', fontsize, switch_size, Debug_info_create_mesh_info, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      const mesh_ui = Ui_create_label_switch('Mesh Tree', fontsize, switch_size, Debug_info_create_mesh_info, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
       dp.AddToMenu(mesh_ui);
 
 
       /************************************************************************************************************************************************/
       // Mesh Buffer
-      const mesh_buffer_ui = Dbg_ui_create2('Mesh Buffer', fontsize, switch_size, Debug_info_mesh_buffer_create_ui, NOTIFICATION_TYPE.MESH_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      const mesh_buffer_ui = Ui_create_label_switch('Mesh Buffer', fontsize, switch_size, Debug_info_mesh_buffer_create_ui, NOTIFICATION_TYPE.MESH_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
       dp.AddToMenu(mesh_buffer_ui);
 
       /************************************************************************************************************************************************/
       // String Buffer
-      const string_buffer_ui = Dbg_ui_create2('String Buffer', fontsize, switch_size, Debug_info_string_buffer_create_ui, NOTIFICATION_TYPE.STRING_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      const string_buffer_ui = Ui_create_label_switch('String Buffer', fontsize, switch_size, Debug_info_string_buffer_create_ui, NOTIFICATION_TYPE.STRING_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
       dp.AddToMenu(string_buffer_ui);
 
       /************************************************************************************************************************************************/
       // Mesh per vb Buffer
-      const mesh_per_vb_buffer_ui = Dbg_ui_create2('Mesh Per Vb Buffer', fontsize, switch_size, Debug_info_mesh_per_vb_buffer_create_ui, NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      const mesh_per_vb_buffer_ui = Ui_create_label_switch('Mesh Per Vb Buffer', fontsize, switch_size, Debug_info_mesh_per_vb_buffer_create_ui, NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
       dp.AddToMenu(mesh_per_vb_buffer_ui);
 
       /************************************************************************************************************************************************/
       // Vertex Buffer
-      const vertex_buffer_ui = Dbg_ui_create2('Vertex Buffer', fontsize, switch_size, Debug_info_vertex_buffer_create_ui, NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      const vertex_buffer_ui = Ui_create_label_switch('Vertex Buffer', fontsize, switch_size, Debug_info_vertex_buffer_create_ui, NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
       dp.AddToMenu(vertex_buffer_ui);
 
 
       /************************************************************************************************************************************************/
       // Render Queue
-      const render_queue_buffer_ui = Dbg_ui_create2('Render Queue Buffer', fontsize, switch_size, Debug_info_render_queue_buffer_create_ui, NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      const render_queue_buffer_ui = Ui_create_label_switch('Render Queue Buffer', fontsize, switch_size, Debug_info_render_queue_buffer_create_ui, NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
       dp.AddToMenu(render_queue_buffer_ui);
 
 

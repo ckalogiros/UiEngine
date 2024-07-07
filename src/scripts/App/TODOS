@@ -3,3 +3,11 @@ The button class should:
    * If a click callback is present along with move, then it should run one of the two 
 
 If a vertex buffer's draw_count is 0, remove the vb from the render queue 
+
+
+Create a timed tip info event:
+   Pause the App
+   Animate window with instructions
+   Point out the target object  
+   Animate out of the info
+   Unpauuse

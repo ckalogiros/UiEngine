@@ -45,7 +45,6 @@ export class Widget_Label extends Rect_Mesh {
 
 
         super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col, _, style, pad, 1, is_debug_mesh);
-        // super(_pos, dim, col, 1, _,);
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
         this.StylesSetPad(pad);
         this.SetStyle(style)
@@ -175,6 +174,18 @@ export class Widget_Label extends Rect_Mesh {
             this.gfx_ctx_flags = FLAGS;
             this.gfx_ctx_parent = gfx_ctx_parent;
             this.text_mesh.gfx_ctx_flags = FLAGS;
+            this.text_mesh.gfx_ctx_parent = gfx_ctx_parent;
+        }
+    }
+
+
+    GfxCtxAddFlag(FLAGS, gfx_ctx_parent) {
+
+        if (!this.gfx_ctx_parent) {
+
+            this.gfx_ctx_flags |= FLAGS;
+            this.gfx_ctx_parent = gfx_ctx_parent;
+            this.text_mesh.gfx_ctx_flags |= FLAGS;
             this.text_mesh.gfx_ctx_parent = gfx_ctx_parent;
         }
     }

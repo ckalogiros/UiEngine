@@ -248,11 +248,11 @@ export function Create_widget_scroller(ROOT_WIDGET_FLAGS=0x0, scrolled_mesh, dim
 
 
 
-export function Create_widget_dropdown(ROOT_WIDGET_FLAGS=0x0, text, pos, col1, col_menu, text_col, btn_pad, bold, font, style, margin, is_debug_mesh=0x0) {
+export function Create_widget_dropdown(ROOT_WIDGET_FLAGS=0x0, text, pos, col1, col_menu, text_col, btn_pad, bold, font, fontsize, style, margin, is_debug_mesh=0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Dropdown(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1, col_menu, text_col, btn_pad, bold, font, style, margin, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Dropdown(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1, col_menu, text_col, btn_pad, bold, font, fontsize, style, margin, is_debug_mesh));
       
    if(NOTIFICATIONS_ON && !is_debug_mesh) 
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);

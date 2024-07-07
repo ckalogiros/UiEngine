@@ -208,74 +208,78 @@ float fbm(vec2 uv)
 
 vec4 Smoke()
 {
-    float rand = u_smoke_params.x;
+    float rand = u_smoke_params.x*2.;
     vec2 res = u_screen_res;
     vec2 dim = v_dim; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
     
 #ifndef UV_READY
-   #define UV_READY 1
-   uv = (gl_FragCoord.xy-(res*.5));
-   uv.x += (res.x*.5); // Center mesh to screen
-   uv.y -= (res.y*.5); // Center mesh to screen
-   
-   vec2 wpos = v_wpos;
-   uv.x -= wpos.x; // To move with mesh position
-   uv.y += wpos.y; // To move with mesh position
-   
-   uv.x -= dim.x; // Subtract constant dimention
-   uv.y -= -dim.y; // Subtract constant dimention
+    #define UV_READY 1
+    uv = (gl_FragCoord.xy-(res*.5));
+    uv.x += (res.x*.5); // Center mesh to screen
+    uv.y -= (res.y*.5); // Center mesh to screen
+    
+    vec2 wpos = v_wpos;
+    uv.x -= wpos.x; // To move with mesh position
+    uv.y += wpos.y; // To move with mesh position
+    
+    uv.x -= dim.x; // Subtract constant dimention
+    uv.y -= -dim.y; // Subtract constant dimention
 #endif
 
 
-   float t  = v_time;
-   float revT  = 1.-t; // Reverse t to be from 1 to 0
+    float t  = v_time;
+    float revT  = 1.-t; // Reverse t to be from 1 to 0
+
+        
+    float r = u_scale2.x;
+    float wide = u_smoke_params.y;
+    float start = 1. - wide; // 1.is the max time
+    float d2 = 1.- smoothstep(0., dim.y*r*(t*wide+start+.1), length(uv));
+    // float shape = d2 ;
+    // shape *= revT;
+        
+        
+
+    float complexity = 6. * u_smoke_params.z;
+    float ratio = 0.002; // A value to sustitute the screen space for the shader space(-1,+1), for producing the noise
+    // float noise = fbm(complexity * uv * ratio + sin(t+rand));
+    float noise = fbm(complexity * uv * ratio + (sin(t)+rand));
+    // float noise = fbm(complexity * uv * ratio);
+
+    
+
+    float n1 = noise*noise*noise*noise*6.*d2; // +1 for non negative values
+    // float n2 = noise*noise*noise*noise*6.*d2; // +1 for non negative values
+
+    
+    
+    // float mixer = shape-n1;
+    // return vec4((mixer));
+    // return vec4((mixer-n1));
 
 
-   float wide = .7;
-   float start = 1. - wide; // 1.is the max time
-   float d2 = 1.- smoothstep(0., dim.y*(t*wide+start+.1), length(uv));
-   float shape = d2 ;
-   shape *= revT;
-      
-      
 
-   float complexity = 3.;
-   float ratio = 0.002; // A value to sustitute the screen space for the shader space(-1,+1), for producing the noise
-   float noise = fbm(complexity * uv * ratio + sin(t+rand));
+    /**************************************************************/
 
-   
+    // return vec4(1.);
 
-   float n1 = noise*noise*noise*noise*6.*d2; // +1 for non negative values
-   float n2 = noise*noise*noise*noise*d2; // +1 for non negative values
+    // vec4 s2 = vec4(mixer);
+    // return s2;
+    
+    vec4 s3 = vec4(n1);
+    // return s3;
 
-   
-   
-   float mixer = shape-n1;
-   // return vec4((mixer));
-   // return vec4((mixer-n1));
+    // vec4 s4 = vec4(n2);
+    // return s4;
 
 
+    // Final Color
+    vec4 c = s3*revT;
+    // vec4 c = s4*revT;
+    // vec4 c = mix(s3, s2, t)*revT;
 
-   /**************************************************************/
-
-   // return vec4(1.);
-
-   vec4 s2 = vec4(mixer);
-   // return s2;
-   
-   vec4 s3 = vec4(n1);
-   // return s3;
-
-   vec4 s4 = vec4(n2);
-   // return s4;
-
-
-   // Final Color
-   vec4 c = s3*revT;
-   // vec4 c = mix(s3, s2, t)*revT;
-
-   c*=v_col;
-   return c;
+    c*=v_col;
+    return c;
 
 }
 `;

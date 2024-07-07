@@ -411,7 +411,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
  * NOTE: The Particles Emitter is not a renderable mesh.
  * What we create bellow is the Gfx context for the particles them selfs
  */
-export function TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, gfx_pool_request, specific_vb_groupidx = INT_NULL) {
+export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_pool_request, specific_vb_groupidx = INT_NULL) {
 
 
    // Cash

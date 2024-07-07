@@ -6,8 +6,8 @@ import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Hash, Max } from "../../Helpers/Math/MathOperations.js";
 import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
-import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../Core/StringBuffer.js";
-import { TEMP_Gfx_generate_context_for_particles } from "../Interfaces/Gfx/MeshGfxContext.js";
+import { Str_buffer_get_by_idx, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store, Str_buffer_store } from "../Core/StringBuffer.js";
+import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 
@@ -117,7 +117,7 @@ class Emitter {
       this.gfx = null;
       this.type = MESH_TYPE.PARTICLES;
       this.idx = INT_NULL;
-      this.nameidx = Str_buffer_mesh_names_store(name);
+      this.nameidx = Str_buffer_store(name);
 
       this.UpdateGfxBuffersFn = null; // Function pointer to update the vertex buffer of the particle system
 
@@ -200,10 +200,6 @@ class Emitter {
 
    EnableGfxAttributes(which, params) {
 
-      if (this.alreadyAdded === true) {
-         console.error(`You are trying to enable ${which} but the shaders have been already created. Try Enable() before inserting the mesh to a Scene().`);
-         alert('SEE console error');
-      }
 
       switch (which) {
 
@@ -240,11 +236,6 @@ class Emitter {
 
 
    EnableGfxUniforms(flags=0x0, name, type, shader_flags) {
-
-      if (this.alreadyAdded === true) {
-         console.error(`You are trying to enable ${which} but the shaders have been already created. Try Enable() before inserting the mesh to a Scene().`);
-         alert('SEE console error');
-      }
 
       /**
        * How to set up a uniform:
@@ -306,6 +297,7 @@ class Emitter {
          return;
       }
 
+      console.error('No Uniform Found', unif_name, this.GetName())
       alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js')
 
    }
@@ -315,7 +307,7 @@ class Emitter {
 
 
    GetName() {
-      return Str_buffer_mesh_names_get_by_idx(this.nameidx);
+      return Str_buffer_get_by_idx(this.nameidx);
    }
 
 }
@@ -352,12 +344,14 @@ export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clb
    emitter.GfxUniformsSetClbk(unif_name, Clbk, params);
 }
 
-export function TEMP_PARTICLES_GEN_GFX(emitter, parent){
+export function TEMP_PARTICLES_GEN_GFX(emitter, parent=null, specific_vb_groupidx){
+
+   if(!parent) console.error('4431623 \nEmmiter should have a parent mesh.')
 
    emitter.parent = parent;
 
    const FLAGS = GFX_CTX_FLAGS.PRIVATE;
-   emitter.gfx = TEMP_Gfx_generate_context_for_particles(FLAGS, emitter, _,);
+   emitter.gfx = Gfx_generate_context_for_particle_system(FLAGS, emitter, _, specific_vb_groupidx,);
 
    emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
 
@@ -367,6 +361,8 @@ export function TEMP_PARTICLES_GEN_GFX(emitter, parent){
    if(emitter.sid.fx & SID.FX.FS_GLOW)
       emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2_style3;
    else emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2;
+
+   return emitter.gfx.vb.groupidx;
 }
 
 // TODO: pass an already created sid, for selecting from a gama of shader particles
@@ -595,5 +591,94 @@ export function Particle_system_update() {
    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*********************************************************************************************************/
+// DEBUG-PRINT
+
+
+
+// Print the widget groups buffer
+export function Particle_system_print_info() {
+
+   
+   console.log('_emitters:\n count:', _emitters.active_count, 'size',  _emitters.size)
+   for (let i = 0; i <= _emitters.boundary; i++) {
+
+      const emitter = _emitters.buffer[i];
+
+      // for(let k=0; k<emitter.uniforms.length; k++) {
+
+      //    console.log(emitter.uniforms[k]);
+      // }
+
+      // .gfx
+      const parent = (emitter.parent !== null) ? emitter.parent.GetName() : 'null'
+
+      console.log('emitter:', i, 'name:', Str_buffer_get_by_idx(emitter.nameidx),
+         '\nindex:', emitter.idx,
+         'sid:', emitter.sid,
+         '\nroot_pos:', emitter.root_posidx,
+         'temp_unif_wpos:', emitter.temp_unif_wpos,
+         'prog:', emitter.gfx.prog.idx, 'vb:', emitter.gfx.vb.groupidx,'ib:', emitter.gfx.ib.idx, 'attribsPerVertex:', emitter.gfx.attribsPerVertex,
+         '\nparent:', parent,
+         '\ncolor:', emitter.col,
+         '\npos:', emitter.pos,
+         '\ndim:', emitter.dim,
+         '\nAccel:', emitter.accel,
+         '\ndeccel:', emitter.deccel,
+         '\ngravity:', emitter.gravity,
+         '\nspeed:', emitter.speed,
+         '\nmax_speed:', emitter.max_speed,
+         '\nlife_time:', emitter.life_time,
+         '\nt_step:', emitter.t_step,
+         '\ndirection:', emitter.dir,
+         '\nvariation_emission:', emitter.variation_emission,
+         '\nuniforms:', emitter.uniforms,
+         // '||| parent:', parent_name,
+         // 'parent_posidx:', _per_vb_mesh_unif_wpos.buffer[i].parent_posidx,
+         // 'Uniforms:', uniform_names,
+      );
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -340,6 +340,15 @@ export class Rect_Mesh extends Rect {
    }
 
 
+   GfxCtxAddFlag(FLAGS) {
+
+      this.gfx_ctx_flags |= FLAGS;
+      for (let i = 0; i <= this.children.boundary; i++) {
+         if (this.children.buffer[i]) this.children.buffer[i].gfx_ctx_flags |= FLAGS;
+      }
+   }
+
+
    GfxUniformsEnable(flags, name, type, shader_flags) {
 
       super.EnableGfxUniforms(flags, name, type, shader_flags);

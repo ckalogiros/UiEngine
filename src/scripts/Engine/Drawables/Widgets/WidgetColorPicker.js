@@ -33,7 +33,7 @@ export class Widget_Color_Picker extends Section {
    label_b;
    label_a;
    
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin, pos, dim, col, name = 'Color Picker', style, num_faces, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin, pos, dim=[100, 100], col=GREY[1], name = 'Color Picker', style=[0, 10, 2], num_faces, is_debug_mesh) {
       
 
       const scale = .5;
@@ -173,6 +173,7 @@ export class Widget_Color_Picker extends Section {
 
       }
 
+
       /******************************************************************************/
       // Create the tranparency slider
 
@@ -289,11 +290,12 @@ export class Widget_Color_Picker extends Section {
    GfxUniformsEnable(flags, name, type, shader_flags) {
       // alert('+++\nGfxUniformsEnable')
       super.EnableGfxUniforms(flags, name, type, shader_flags);
-      
       for (let i = 0; i <= this.children.boundary; i++) {
-         if(this.children.buffer[i].GfxUniformsEnable === null)
-            console.log()
-         if (this.children.buffer[i]) this.children.buffer[i].GfxUniformsEnable(flags, name, type, shader_flags);
+         const child = this.children.buffer[i];
+         // if (child) child.EnableGfxUniforms(flags, name, type, shader_flags);
+         if (child) child.GfxUniformsEnable(flags, name, type, shader_flags);
+         // if(this.children.buffer[i].GfxUniformsEnable === null)
+         // if (this.children.buffer[i]) this.children.buffer[i].GfxUniformsEnable(flags, name, type, shader_flags);
       }
    }
 
@@ -375,7 +377,7 @@ export class Widget_Color_Picker extends Section {
    ColorpickerCreateListeners(){
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
-      mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+      // mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       
       const parent_listeners = mesh.listeners.buffer;
@@ -567,8 +569,10 @@ export class Widget_Color_Picker extends Section {
       
       // Store the calculated color to the color pick mesh 
       for (let i = 0; i < vertex_count; i++)
-         color_pick_mesh.mat.col[i + vidx] = c;
-      // Update the vertex buffer
+         CopyArr4(color_pick_mesh.mat.col[i + vidx], c);
+         // color_pick_mesh.mat.col[i + vidx] = c;
+      
+         // Update the vertex buffer
       if(color_pick_mesh.gfx) 
          Gl_set_rgba_per_vertex_specify_vertex(color_pick_mesh.gfx, c, num_faces, vidx, vertex_count);
 
@@ -595,9 +599,7 @@ export class Widget_Color_Picker extends Section {
       const alpha = slider_tran.slider_val; // Get the alpha from the transparency slider
       // Contruct the final color
       const final_color = new Float32Array([intensity[0], intensity[1], intensity[2], alpha]);
-      // console.log(color_present_mesh.mat.col)
       CopyArr4(color_present_mesh.mat.col, final_color);
-      // CopyArr4(color_present_mesh.mat.col[3], final_color);
       if(color_present_mesh.gfx) Gl_set_rgba(color_present_mesh.gfx, final_color, color_present_mesh.geom.num_faces);
 
 
@@ -648,8 +650,6 @@ export class Widget_Color_Picker extends Section {
    OnClickTranpsarencyPick(params, slider_val) {
 
       const widget = params.clbk_params.src_mesh;
-      // const panel = widget.children.buffer[0];
-      // const slider_tran = panel.children.buffer[???];
       const slider_tran = params.clbk_params.slider_tran;
       const num_faces = slider_tran.geom.num_faces; // Face Index:The first one
       const alphaidx = 3;
@@ -666,7 +666,6 @@ export class Widget_Color_Picker extends Section {
       // Set the new color picked in the color present panel of the widget
       const color_present_mesh = params.clbk_params.color_present_mesh;
 
-      // if (Array.isArray(color_present_mesh.mat.col[0])) {
       if (color_present_mesh.mat.col[0].constructor === Float32Array) {
 
          for (let i = 0; i < color_present_mesh.mat.col.length; i++)
@@ -703,6 +702,7 @@ export class Widget_Color_Picker extends Section {
             slider_val,
          ]));
       }
+      
    }
 
 
@@ -771,6 +771,7 @@ export class Widget_Color_Picker extends Section {
       widget.label_b.text_mesh.RenderTextFromNumber(intensity[2])
       widget.label_a.text_mesh.RenderTextFromNumber(intensity[3])
 
+      
 
 
 
@@ -786,6 +787,70 @@ export class Widget_Color_Picker extends Section {
    AssignTargetMeshClbk(Clbk){
       this.temp_target_mesh_clbk = Clbk;
    }
+
+
+   SetTransparencySliderSetInitialValue(slider_val){
+
+      const mesh = this;
+      const panel = mesh.children.buffer[0];
+      const panel2 = panel.children.buffer[temp_panel2_idx];
+      const color_pick_mesh = panel.children.buffer[temp_color_pick_idx];
+      const transp_slider_mesh = panel.children.buffer[temp_tran_slider_idx];
+      const color_present_mesh = panel2.children.buffer[temp_color_present_idx];
+
+
+      const params = {
+         clbk_params:{
+
+            src_mesh: mesh,
+            slider_tran: transp_slider_mesh,
+            color_pick_mesh: color_pick_mesh,
+            color_present_mesh: color_present_mesh,
+            target_mesh: null,
+         },
+
+      };
+
+
+      const interpolated_slider_val = transp_slider_mesh.SetInitialValue(slider_val);
+      this.OnClickTranpsarencyPick(params, interpolated_slider_val)
+
+      
+   }
+
+
+   SetHueSliderSetInitialValue(slider_val){
+
+      const mesh = this;
+      const panel = mesh.children.buffer[0];
+      const panel2 = panel.children.buffer[temp_panel2_idx];
+      const color_pick_mesh = panel.children.buffer[temp_color_pick_idx];
+      const transp_slider_mesh = panel.children.buffer[temp_tran_slider_idx];
+      const color_present_mesh = panel2.children.buffer[temp_color_present_idx];
+      const hue_mesh = mesh.children.buffer[temp_hue_pick_idx];
+
+
+      const params = {
+         clbk_params:{
+
+            src_mesh: mesh,
+            slider_mesh: hue_mesh,
+            slider_transp_mesh: transp_slider_mesh,
+            color_pick_mesh: color_pick_mesh,
+            color_present_mesh: color_present_mesh,
+            target_mesh: null,
+         },
+
+      };
+
+
+      const interpolated_slider_val = hue_mesh.SetInitialValue(slider_val);
+      this.OnClickHuePick(params, interpolated_slider_val)
+
+   }
+
+   
+
 }
 
 

@@ -173,6 +173,7 @@ const DEVICE = {
 	width: 0,
 	height: 0,
 	ratio: 1, // Create same proportions throughout any device. It measures the ratio of the game's build device width and the current device width
+	device_scale:1, // Scale fonts depending on the device platform
 }
 
 
@@ -683,9 +684,14 @@ const MAT_ENABLE = {
 
 
 function TRANSPARENCY(col, transparency) {
-	// return [col[0], col[1], col[2], transparency]
-	col[3] = transparency;
-	return col;
+
+	// Muust make a copy, else it stores the transparency to the Global Color 
+	return new Float32Array([
+		col[0],
+		col[1],
+		col[2],
+		transparency,
+	]);
 }
 
 

@@ -6,7 +6,13 @@ import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byid
 import { Program_get_programs } from './ShaderPrograms.js';
 
 
-
+// rgb(38, 27, 37)
+// const R = .18;
+// const G = .18;
+// const B = .18;
+const R = (1/255) * 32;
+const G = (1/255) * 29;
+const B = (1/255) * 32;
 
 export function Gl_draw(gl) {
 
@@ -16,7 +22,7 @@ export function Gl_draw(gl) {
     // console.log(Hash(TimerGetGlobalTimerCycle()).toFixed(1))
 
 
-    gl.clearColor(0.18, 0.18, 0.18, 1.0);
+    gl.clearColor(R, G, B, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     // gl.disable(gl.SCISSOR_TEST);
 

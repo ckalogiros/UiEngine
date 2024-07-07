@@ -204,6 +204,28 @@ function Renderer_create_webgl_context(canvas) {
       // gfxctx.sampleCoverage(2.2, false);
    }
 
+
+
+   // Measure GPU time. Not working in all browsers
+   const ext_gpu_timer_query = gfxctx.getExtension('EXT_disjoint_timer_query');
+   if (!ext_gpu_timer_query) {
+      
+      // const ext_gpu_timer_query2 = gfxctx.getExtension('disjoint_timer_query_webgl2');
+      // if (!ext_gpu_timer_query2) {
+         
+      //    console.error('EXT_disjoint_timer_query 2 is not supported');
+      //    return
+      // }
+      console.error('EXT_disjoint_timer_query is not supported');
+   }
+
+
+
+
+
+
+
+
    console.error(gfxctx.isContextLost());
 
    canvas.addEventListener('webglcontextlost', function (event) {

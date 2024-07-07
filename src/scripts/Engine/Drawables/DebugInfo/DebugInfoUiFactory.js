@@ -4,7 +4,7 @@ import { Create_widget_label, Create_widget_section, Create_widget_switch_simple
 import { Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 
 
-export function Dbg_ui_create2(name, fontsize, switch_size, switch_fn, callback_params, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex){
+export function Ui_create_label_switch(name, fontsize, switch_size, switch_fn, callback_params, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex){
 
    const style = [0, 4, 2];
    const section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zindex + 1], [0, 0], section_col, `DBG_UI ${name}`, label_style);

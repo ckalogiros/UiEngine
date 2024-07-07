@@ -162,6 +162,18 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       }
    }
 
+   
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent){
+      
+      if(!this.gfx_ctx_parent) {
+         
+         this.gfx_ctx_flags |= FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+         this.children.buffer[0].gfx_ctx_flags |= FLAGS;
+         this.children.buffer[0].gfx_ctx_parent = gfx_ctx_parent;
+      }
+   }
+
 
 
    

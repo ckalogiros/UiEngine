@@ -101,7 +101,7 @@ vec4 color = v_col;
     
     float complexity = 2.;
     // float ratio = min(dim.y,dim.x) / max(dim.y,dim.x); 
-    vec2 ratio = vec2(dim.y,dim.x)*controls.z*.25; 
+    vec2 ratio = vec2(dim.y,dim.x*2.)*controls.z*.25; 
     // float noise1 = fbm(complexity * uv2 * vec2(2., 2.));
     // float noise2 = fbm(5. * uv2 * vec2(2., 2.)*ratio);
     float noise1 = fbm(complexity * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) ;

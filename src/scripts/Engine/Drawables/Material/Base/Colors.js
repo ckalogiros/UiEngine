@@ -7,6 +7,10 @@ export const TRANSPARENT = new Float32Array([0.0, 0.0, 0.0, 0.0]);
 export const WHITE = new Float32Array([1.0, 1.0, 1.0, 1.0]);
 export const BLACK = new Float32Array([0.04, 0.04, 0.04, 1.0]);
 
+// export function CHECK_WHITE(){
+// 	if(WHITE[3] < 1)
+// 		console.log()
+// }
 
 
 const ORANGE0 = new Float32Array([0.1, 0.050, 0.0, 1.0]);
@@ -37,14 +41,14 @@ export const ORANGEL = [ ORANGEL0, ORANGEL1, ORANGEL2, ORANGEL3, ORANGEL4, ORANG
 
 const ORANGER0 = new Float32Array([0.1, 0.075, 0.0, 1.0]);
 const ORANGER1 = new Float32Array([0.2, 0.150, 0.0, 1.0]);
-const ORANGER2 = new Float32Array([0.3, 0.150, 0.0, 1.0]);
-const ORANGER3 = new Float32Array([0.4, 0.225, 0.0, 1.0]);
-const ORANGER4 = new Float32Array([0.5, 0.300, 0.0, 1.0]);
-const ORANGER5 = new Float32Array([0.6, 0.374, 0.0, 1.0]);
-const ORANGER6 = new Float32Array([0.7, 0.450, 0.0, 1.0]);
-const ORANGER7 = new Float32Array([0.8, 0.525, 0.0, 1.0]);
-const ORANGER8 = new Float32Array([0.9, 0.600, 0.0, 1.0]);
-const ORANGER9 = new Float32Array([1.0, 0.675, 0.0, 1.0]);
+const ORANGER2 = new Float32Array([0.3, 0.225, 0.0, 1.0]);
+const ORANGER3 = new Float32Array([0.4, 0.300, 0.0, 1.0]);
+const ORANGER4 = new Float32Array([0.5, 0.375, 0.0, 1.0]);
+const ORANGER5 = new Float32Array([0.6, 0.450, 0.0, 1.0]);
+const ORANGER6 = new Float32Array([0.7, 0.525, 0.0, 1.0]);
+const ORANGER7 = new Float32Array([0.8, 0.600, 0.0, 1.0]);
+const ORANGER8 = new Float32Array([0.9, 0.675, 0.0, 1.0]);
+const ORANGER9 = new Float32Array([1.0, 0.750, 0.0, 1.0]);
 export const ORANGER = [ ORANGER0, ORANGER1, ORANGER2, ORANGER3, ORANGER4, ORANGER5, ORANGER6, ORANGER7, ORANGER8, ORANGER9, ];
 
 
@@ -158,16 +162,17 @@ const YELLOWL9 = new Float32Array([0.95 , 1.0, 0.0, 1.0]);
 export const YELLOWL = [ YELLOWL0, YELLOWL1, YELLOWL2, YELLOWL3, YELLOWL4, YELLOWL5, YELLOWL6, YELLOWL7, YELLOWL8, YELLOWL9, ];
 
 const GREY0 = new Float32Array([0.03, 0.03, 0.03, 1.0]);
-const GREY1 = new Float32Array([0.13, 0.13, 0.13, 1.0]);
-const GREY2 = new Float32Array([0.2,  0.2, 0.2, 1.0]);
-const GREY3 = new Float32Array([0.3,  0.3, 0.3, 1.0]);
-const GREY4 = new Float32Array([0.43, 0.43, 0.43, 1.0]);
-const GREY5 = new Float32Array([0.5,  0.5, 0.5, 1.0]);
-const GREY6 = new Float32Array([0.6,  0.6, 0.6, 1.0]);
-const GREY7 = new Float32Array([0.7,  0.7, 0.7, 1.0]);
-const GREY8 = new Float32Array([0.8,  0.8, 0.8, 1.0]);
-const GREY9 = new Float32Array([0.9,  0.9, 0.9, 1.0]);
-export const GREY = [ GREY0, GREY1, GREY2, GREY3, GREY4, GREY5, GREY6, GREY7, GREY8, GREY9, ];
+const GREY1 = new Float32Array([0.08, 0.08, 0.08, 1.0]);
+const GREY2 = new Float32Array([0.13, 0.13, 0.13, 1.0]);
+const GREY3 = new Float32Array([0.2,  0.2, 0.2, 1.0]);
+const GREY4 = new Float32Array([0.3,  0.3, 0.3, 1.0]);
+const GREY5 = new Float32Array([0.43, 0.43, 0.43, 1.0]);
+const GREY6 = new Float32Array([0.5,  0.5, 0.5, 1.0]);
+const GREY7 = new Float32Array([0.6,  0.6, 0.6, 1.0]);
+const GREY8 = new Float32Array([0.7,  0.7, 0.7, 1.0]);
+const GREY9 = new Float32Array([0.8,  0.8, 0.8, 1.0]);
+const GREY10 = new Float32Array([0.9,  0.9, 0.9, 1.0]);
+export const GREY = [ GREY0, GREY1, GREY2, GREY3, GREY4, GREY5, GREY6, GREY7, GREY8, GREY9, GREY10];
 
 const PURPLE0 = new Float32Array([0.1, 0.0, 0.1, 1.0]);
 const PURPLE1 = new Float32Array([0.2, 0.0, 0.2, 1.0]);
@@ -207,11 +212,11 @@ export const PURPLER = [ PURPLER0, PURPLER1, PURPLER2, PURPLER3, PURPLER4, PURPL
 
 
 export const COLOR_ARRAY3 = [
-	ORANGE,
 	BLUEL,
-	ORANGEL,
-	PURPLEB,
 	PURPLER,
+	PURPLEB,
+	ORANGE,
+	ORANGEL,
 	REDL,
 	YELLOW,
 	GREEN,
@@ -225,31 +230,31 @@ export const COLOR_ARRAY3 = [
 
 
 const citf = 1 / 255;
-function InterpolateRgb(red, green, blue) {
+export function Interpolate_rgb_to_01(red, green, blue) {
 	return new Float32Array([citf * red, citf * green, citf * blue, 1.0]);
 }
 
-const PINK_240_60_160 = InterpolateRgb(240, 60, 160);
-const PINK_240_60_200 = InterpolateRgb(240, 60, 200);
-const RED_200_10_10 = InterpolateRgb(200, 10, 10);
-const GREEN_33_208_40 = InterpolateRgb(33, 208, 40);
-const GREEN_60_240_100 = InterpolateRgb(60, 240, 100);
-const GREEN_60_240_60 = InterpolateRgb(60, 240, 60);
-const GREEN_140_240_10 = InterpolateRgb(140, 240, 10);
-export const BLUE_10_160_220 = InterpolateRgb(10, 160, 220);
-export const BLUE_10_120_220 = InterpolateRgb(10, 120, 220);
-const BLUE_15_130_255 = InterpolateRgb(15, 130, 255);
-const CYAN_10_200_240 = InterpolateRgb(10, 200, 240);
-const CYAN_10_230_240 = InterpolateRgb(10, 230, 240);
-const CYAN_10_230_180 = InterpolateRgb(10, 230, 180);
-const YELLOW_240_240_10 = InterpolateRgb(240, 240, 10);
-const YELLOW_240_220_10 = InterpolateRgb(240, 200, 10);
-export const ORANGE_240_160_10 = InterpolateRgb(240, 160, 10);
-const ORANGE_240_200_10 = InterpolateRgb(240, 200, 10);
-const ORANGE_240_130_10 = InterpolateRgb(240, 130, 10);
-const ORANGE_240_75_10 = InterpolateRgb(255, 75, 10);
+const PINK_240_60_160 = Interpolate_rgb_to_01(240, 60, 160);
+const PINK_240_60_200 = Interpolate_rgb_to_01(240, 60, 200);
+const RED_200_10_10 = Interpolate_rgb_to_01(200, 10, 10);
+const GREEN_33_208_40 = Interpolate_rgb_to_01(33, 208, 40);
+const GREEN_60_240_100 = Interpolate_rgb_to_01(60, 240, 100);
+const GREEN_60_240_60 = Interpolate_rgb_to_01(60, 240, 60);
+const GREEN_140_240_10 = Interpolate_rgb_to_01(140, 240, 10);
+export const BLUE_10_160_220 = Interpolate_rgb_to_01(10, 160, 220);
+export const BLUE_10_120_220 = Interpolate_rgb_to_01(10, 120, 220);
+const BLUE_15_130_255 = Interpolate_rgb_to_01(15, 130, 255);
+const CYAN_10_200_240 = Interpolate_rgb_to_01(10, 200, 240);
+const CYAN_10_230_240 = Interpolate_rgb_to_01(10, 230, 240);
+const CYAN_10_230_180 = Interpolate_rgb_to_01(10, 230, 180);
+const YELLOW_240_240_10 = Interpolate_rgb_to_01(240, 240, 10);
+const YELLOW_240_220_10 = Interpolate_rgb_to_01(240, 200, 10);
+export const ORANGE_240_160_10 = Interpolate_rgb_to_01(240, 160, 10);
+const ORANGE_240_200_10 = Interpolate_rgb_to_01(240, 200, 10);
+const ORANGE_240_130_10 = Interpolate_rgb_to_01(240, 130, 10);
+const ORANGE_240_75_10 = Interpolate_rgb_to_01(255, 75, 10);
 
-// const BLUE_LIGHT = InterpolateRgb(76, 171, 254);
+// const BLUE_LIGHT = Interpolate_rgb_to_01(76, 171, 254);
 
 
 // export const COLOR_ARRAY = [
@@ -522,31 +527,31 @@ const ORANGE_240_75_10 = InterpolateRgb(255, 75, 10);
 
 
 // const citf = 1 / 255;
-// function InterpolateRgb(red, green, blue) {
+// function Interpolate_rgb_to_01(red, green, blue) {
 // 	return [citf * red, citf * green, citf * blue, 1.0];
 // }
 
-// const PINK_240_60_160 = InterpolateRgb(240, 60, 160);
-// const PINK_240_60_200 = InterpolateRgb(240, 60, 200);
-// const RED_200_10_10 = InterpolateRgb(200, 10, 10);
-// const GREEN_33_208_40 = InterpolateRgb(33, 208, 40);
-// const GREEN_60_240_100 = InterpolateRgb(60, 240, 100);
-// const GREEN_60_240_60 = InterpolateRgb(60, 240, 60);
-// const GREEN_140_240_10 = InterpolateRgb(140, 240, 10);
-// export const BLUE_10_160_220 = InterpolateRgb(10, 160, 220);
-// export const BLUE_10_120_220 = InterpolateRgb(10, 120, 220);
-// const BLUE_15_130_255 = InterpolateRgb(15, 130, 255);
-// const CYAN_10_200_240 = InterpolateRgb(10, 200, 240);
-// const CYAN_10_230_240 = InterpolateRgb(10, 230, 240);
-// const CYAN_10_230_180 = InterpolateRgb(10, 230, 180);
-// const YELLOW_240_240_10 = InterpolateRgb(240, 240, 10);
-// const YELLOW_240_220_10 = InterpolateRgb(240, 200, 10);
-// export const ORANGE_240_160_10 = InterpolateRgb(240, 160, 10);
-// const ORANGE_240_200_10 = InterpolateRgb(240, 200, 10);
-// const ORANGE_240_130_10 = InterpolateRgb(240, 130, 10);
-// const ORANGE_240_75_10 = InterpolateRgb(255, 75, 10);
+// const PINK_240_60_160 = Interpolate_rgb_to_01(240, 60, 160);
+// const PINK_240_60_200 = Interpolate_rgb_to_01(240, 60, 200);
+// const RED_200_10_10 = Interpolate_rgb_to_01(200, 10, 10);
+// const GREEN_33_208_40 = Interpolate_rgb_to_01(33, 208, 40);
+// const GREEN_60_240_100 = Interpolate_rgb_to_01(60, 240, 100);
+// const GREEN_60_240_60 = Interpolate_rgb_to_01(60, 240, 60);
+// const GREEN_140_240_10 = Interpolate_rgb_to_01(140, 240, 10);
+// export const BLUE_10_160_220 = Interpolate_rgb_to_01(10, 160, 220);
+// export const BLUE_10_120_220 = Interpolate_rgb_to_01(10, 120, 220);
+// const BLUE_15_130_255 = Interpolate_rgb_to_01(15, 130, 255);
+// const CYAN_10_200_240 = Interpolate_rgb_to_01(10, 200, 240);
+// const CYAN_10_230_240 = Interpolate_rgb_to_01(10, 230, 240);
+// const CYAN_10_230_180 = Interpolate_rgb_to_01(10, 230, 180);
+// const YELLOW_240_240_10 = Interpolate_rgb_to_01(240, 240, 10);
+// const YELLOW_240_220_10 = Interpolate_rgb_to_01(240, 200, 10);
+// export const ORANGE_240_160_10 = Interpolate_rgb_to_01(240, 160, 10);
+// const ORANGE_240_200_10 = Interpolate_rgb_to_01(240, 200, 10);
+// const ORANGE_240_130_10 = Interpolate_rgb_to_01(240, 130, 10);
+// const ORANGE_240_75_10 = Interpolate_rgb_to_01(255, 75, 10);
 
-// const BLUE_LIGHT = InterpolateRgb(76, 171, 254);
+// const BLUE_LIGHT = Interpolate_rgb_to_01(76, 171, 254);
 
 
 // export const COLOR_ARRAY = [

@@ -201,6 +201,19 @@ export class Section extends Rect_Mesh {
    }
 
 
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent) {
+
+      if (!this.gfx_ctx_parent) {
+
+         this.gfx_ctx_flags |= FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+         for (let i = 0; i <= this.children.boundary; i++) {
+            if (this.children.buffer[i]) this.children.buffer[i].GfxCtxSetFlag(FLAGS, gfx_ctx_parent);
+         }
+      }
+   }
+
+
 
 
 
@@ -1352,14 +1365,15 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
          }
          // else if (mesh.type & MESH_TYPE.WIDGET_SCROLLER) {
             
-         //    mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-         //       console.log('##########################################', mesh.scroll_bar.geom.pos)
+         //    // console.log('##########################################', mesh.scroll_bar.geom.pos)
+         //    // mesh.geom.pos[0] = rel_pos[0];
+         //    // mesh.geom.pos[1] = rel_pos[1];
+          
+         //    // mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
          //    continue_recur = false;
          // }
          else if (mesh.type & MESH_TYPE.SECTION_MESH) { // For meshes with a parent of type Section
 
-            if(mesh.type & MESH_TYPE.WIDGET_SCROLLER) 
-               console.log('##########################################', mesh.scroll_bar.geom.pos)
             mesh.geom.pos[0] = rel_pos[0];
             mesh.geom.pos[1] = rel_pos[1];
 

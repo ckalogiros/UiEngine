@@ -356,6 +356,9 @@ export function Mesh_unif_set_vb_root_wposx_all_siblings(root_posidx, x) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] = x;
    
    const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[root_posidx].parent_posidx;
+   if(parent_rootidx === INT_NULL) return;
+
+   
    // Run from parent root_posidx to the end of buffer, and add the pos to any elem that is a sibling(same parent)
    // BUG: Assuming the parent always is before any children, which probably it is not the case when root wpos's are removed and new are replacing existing elements
    for(let i=parent_rootidx+1; i <= _per_vb_mesh_unif_wpos.boundary; i++){

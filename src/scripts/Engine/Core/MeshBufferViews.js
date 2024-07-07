@@ -241,6 +241,7 @@ function View_add_mesh(groupidx, mesh) {
 
 function Build_per_gfx_view_group_from_root_mesh_recursive(mesh, groupidx) {
 
+
    // Connect the mesh with the View via indexes
    const info = View_add_mesh(groupidx, mesh);
    mesh.group_bufferidxs[0] = info[0]; // Groups buffer index.
