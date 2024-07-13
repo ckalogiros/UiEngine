@@ -180,12 +180,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
    // Graphics
    /*******************************************************************************************************************************************************/
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL, params = null) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
       if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
       
-      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, params);
-      this.children.buffer[0].GenGfxCtx(FLAGS, specific_vb_groupidx, params);
+      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
+      this.children.buffer[0].GenGfxCtx(FLAGS, specific_vb_groupidx);
 
       return gfx;
    }
@@ -350,12 +350,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       if (mesh.isOn) {
          Set_color_rgba(mesh, mesh.color_active);
          switch0.geom.pos[0] += mesh.geom.dim[0];
-         switch0.geom.MoveX(mesh.geom.dim[0], switch0.gfx);
+         switch0.geom.AddWposX(switch0.gfx, mesh.geom.dim[0], );
       }
       else {
          Set_default_color_rgba(mesh);
          switch0.geom.pos[0] -= mesh.geom.dim[0];
-         switch0.geom.MoveX(-mesh.geom.dim[0], switch0.gfx);
+         switch0.geom.AddWposX(switch0.gfx, -mesh.geom.dim[0], );
       }
 
       

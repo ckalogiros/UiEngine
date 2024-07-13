@@ -202,7 +202,7 @@ export class Textured_Mesh extends Mesh {
       // Move 
       const mouse_pos = MouseGetPosDif();
 
-      mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, mesh.gfx);
+      mesh.geom.AddWposXY( mesh.gfx, mouse_pos.x, -mouse_pos.y);
 
    }
 

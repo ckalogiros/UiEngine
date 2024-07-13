@@ -95,7 +95,7 @@ export class Rect extends Mesh {
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      // if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+      if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
@@ -380,13 +380,24 @@ export class Rect_Mesh extends Rect {
       // if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) child.GenGfxCtx(FLAGS, specific_vb_groupidx);
+      }
       return gfx;
    }
 
 
    Render() {
 
-      if (this.state.mask & MESH_STATE.ACTIVE) super.AddToGfx();
+      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) 
+         super.AddToGfx();
+      // if (this.state.mask & MESH_STATE.ACTIVE) 
+      //    super.AddToGfx();
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) child.Render();
+      }
    }
 
 

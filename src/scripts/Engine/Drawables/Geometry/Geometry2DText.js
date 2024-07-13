@@ -33,12 +33,12 @@ export class Geometry2D_Text extends Geometry2D {
    /*******************************************************************************************************************************************************/
    // 
 
-   MoveXY(x, y, gfx) {
-      super.MoveXY(x, y, gfx, this.num_faces)
+   AddWposXY(gfx, x, y) {
+      super.AddWposXY(gfx, x, y, this.num_faces)
    }
 
-   SetPosXYZ(pos, gfx) {
-      super.SetPosXYZ(pos, gfx, this.num_faces)
+   SetWposXY(pos, gfx) {
+      super.SetWposXY(gfx, pos[0], pos[1], this.num_faces)
    }
 
    SetPosY(y, gfx) {

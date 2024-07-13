@@ -697,12 +697,12 @@ export class Widget_Multi_Text extends Widget_Text {
 		if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
 
 		// Move 'this' text
-		mesh.geom.MoveXY(mouse_pos.x, -mouse_pos.y, mesh.gfx);
+		mesh.geom.AddWposXY(mesh.gfx, mouse_pos.x, -mouse_pos.y, );
 
 		// Move children text
 		for (let i = 0; i <= mesh.children.boundary; i++) {
 			const child = mesh.children.buffer[i];
-			if (child) child.MoveXY(mouse_pos.x, -mouse_pos.y, child.gfx);
+			if (child) child.AddWposXY(child.gfx, mouse_pos.x, -mouse_pos.y, );
 		}
 	}
 

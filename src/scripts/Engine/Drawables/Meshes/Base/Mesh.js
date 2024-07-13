@@ -95,6 +95,7 @@ export class Mesh {
 
     rel_comp; // A component to position this mesh's children relative to the position of one of 'LEFT-CENTER-RIGHT' and relative all other children's position
     root_posidx; // An index to the root position buffer. 
+    scroller_comp; // Pointer to scroll bar mesh. 
 
     debug_info;         // Struct: Debug_info_ui.
     minimized;          // Pointer: to a minimized version of the mesh.
@@ -138,7 +139,7 @@ export class Mesh {
 
         this.uniforms = [];
         if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
-            this.EnableGfxUniforms({unif:SID.UNIF.PROJECTION_MATRIX}, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+            this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
 
 
         // if (APP.ENABLE_SHADER_WPOS_UNIFORM)
@@ -181,6 +182,7 @@ export class Mesh {
 
         this.rel_comp = null;
         this.root_posidx = INT_NULL;
+        this.scroller_comp = null;
 
 
         this.hover_margin = [0, 0];
@@ -281,13 +283,11 @@ export class Mesh {
 
             if (this.type & (MESH_TYPE.WIDGET_TEXT | MESH_TYPE.WIDGET_TEXT_DYNAMIC | MESH_TYPE.TEXT_MESH)) { // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
 
-                // console.log('Destroy1:', this.name, this.gfx.vb.groupidx, this.geom.num_faces, this.mat.temp_max_chars_inserted_in_gfx)
-                const ret = Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
+                Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
             }
             else {
 
-                // console.log('Destroy:', this.name, this.gfx.vb.groupidx, this.geom.num_faces)
-                const ret = Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
+                Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
             }
 
         }
@@ -422,7 +422,7 @@ export class Mesh {
     AddListenEvent(etypeidx, Clbk = null, params = null) {
 
         if (this.listeners.buffer[etypeidx] !== INT_NULL) return;
-        if((this.state.mask & MESH_STATE.ACTIVE)===0x0) alert('0198815 \nMesh is INACTIVE to add a listen event')
+        if ((this.state.mask & MESH_STATE.ACTIVE) === 0x0) alert('0198815 \nMesh is INACTIVE to add a listen event')
 
 
         const is_fake = (this.state.mask & MESH_STATE.IS_FAKE_EVENT) ? true : false;
@@ -508,19 +508,19 @@ export class Mesh {
     SetDefaultPosXY() { this.SetUpdateFrameBuffer(); this.geom.SetDefaultPosXY(this.gfx); }
 
 
-    SetPosXYZ(pos) { this.SetUpdateFrameBuffer(); this.geom.SetPosXYZ(pos, this.gfx); }
+    SetWposXY(pos) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, pos[0], pos[1]); }
 
 
-    SetPosXY(pos) { this.SetUpdateFrameBuffer(); this.geom.SetPosXY(pos, this.gfx); }
+    SetPosXY(pos) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, pos[0], pos[1]); }
 
 
-    SetPosX(x) { this.SetUpdateFrameBuffer(); this.geom.SetPosX(x, this.gfx, this.geom.num_faces); }
+    SetPosX(x) { this.SetUpdateFrameBuffer(); this.geom.SetWposX(this.gfx, x, this.geom.num_faces); }
 
 
-    SetPosY(y) { this.SetUpdateFrameBuffer(); this.geom.SetPosY(y, this.gfx); }
+    SetPosY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y, ); }
 
 
-    SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDim(dim, this.gfx); }
+    SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY( this.gfxdim[0], dim[1],); }
 
 
     GetName() { return Str_buffer_mesh_names_get_by_idx(this.nameidx); }
@@ -568,9 +568,9 @@ export class Mesh {
     }
 
 
-    MoveXY(x, y) {
+    AddWposXY(x, y) {
         this.SetUpdateFrameBuffer();
-        this.geom.MoveXY(x, y, this.gfx, _, this.state.mask & MESH_STATE.ACTIVE); // console.log('Mesh MoveXY')
+        this.geom.AddWposXY(this.gfx, x, y, _, this.state.mask & MESH_STATE.ACTIVE); // console.log('Mesh AddWposXY')
     }
 
 
@@ -656,7 +656,7 @@ export class Mesh {
     }
 
 
-    EnableGfxUniforms(flags=0x0, name, type, shader_flags) {
+    EnableGfxUniforms(flags = 0x0, name, type, shader_flags) {
 
 
         /**
@@ -672,9 +672,9 @@ export class Mesh {
          *          this might lead to unwilingly updating same loc of another program's uniform. 
          */
 
-        if(flags.unif) this.sid.unif |= flags.unif;
-        if(flags.pass) this.sid.pass |= flags.pass;
-        if(flags.fx) this.sid.fx |= flags.fx;
+        if (flags.unif) this.sid.unif |= flags.unif;
+        if (flags.pass) this.sid.pass |= flags.pass;
+        if (flags.fx) this.sid.fx |= flags.fx;
 
         // Avoid duplicates
         const len = this.uniforms.length;
@@ -694,7 +694,7 @@ export class Mesh {
                 // vertex_buffer_store_idx: INT_NULL,
             });
 
-            
+
             this.temp_unif_wpos = idx - 1;
 
         }
@@ -716,9 +716,9 @@ export class Mesh {
 
         if (found_idx !== INT_NULL) {
 
-            if(this.uniforms[found_idx].ubidx === INT_NULL){
+            if (this.uniforms[found_idx].ubidx === INT_NULL) {
 
-                console.error('ubidx is INT_NULL. SEE if the uniform of this mesh has already been initialized for the vertex buffer.');
+                // console.error('ubidx is INT_NULL. SEE if the uniform of this mesh has already been initialized for the vertex buffer.');
                 return;
             }
 

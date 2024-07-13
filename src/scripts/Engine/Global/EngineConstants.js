@@ -421,6 +421,18 @@ const MESH_STATE = {
 
 
 
+_CNT = 0x1;
+const COMPONENTS = {
+	SCROLLER: _CNT,
+}
+
+
+
+
+
+
+
+
 const MOUSE = {
 
 	BTN_ID: {
@@ -444,6 +456,7 @@ _CNT = 0x1;
 const RENDER_QUEUE_FLAGS = {
 	IS_ACTIVE: _CNT,
 	SKIP_PRIORITY: _CNT <<= 0x1,
+	NEEDS_UPDATE: _CNT <<= 0x1,
 }
 
 

@@ -7,7 +7,7 @@ import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Cr
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../Renderers/Renderer/RenderQueue.js";
 import { REL_POS, Relative_pos_comp_move_right_buffer } from "../Drawables/Operations/RelativePosComponent.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "./MeshUniformsBuffer.js";
 import { Index_buffer_reset } from "../../Graphics/Buffers/IndexBuffers.js";
@@ -1079,6 +1079,27 @@ export function Widget_root_set_render_queue_priority(root_bufferidx) {
 
 
 
+// Activate render queue vertex buffers.
+export function Widget_root_activate_all_vbs_in_renderqueue(root_bufferidx){
+   /**DEBUG */ if(root_bufferidx===INT_NULL) 
+      alert('560199235 \nroot_bufferidx is INT_NULL');
+
+
+   // Get all vbs of the the root mesh and all its children
+   const rootgfxs = Widget_root_gfx_get(root_bufferidx);
+   
+   for (let i = 0; i <= rootgfxs.boundary; i++) {
+
+      // Get the root mesh from each vb
+      const root_mesh_per_vb_idx = _root_batch_buffer.buffer[root_bufferidx].vb[i].meshidx;
+      const mesh = _mesh_buffer.buffer[root_mesh_per_vb_idx];
+
+      // Activate the vb, once per root mesh per vb
+      Renderqueue_set_active(mesh.gfx.vb.groupidx, true) 
+   }
+}
+
+
 
 
 
@@ -1308,8 +1329,8 @@ export function Widgetroot_buffer_print_w1() {
                         // 'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
                         // 'state', mesh.state.mask,
                         'start', mesh.gfx.vb.starts.buffer[0],
-                        'upos', mesh.GetPosXY(),
-                        'pos', mesh.geom.pos[0], mesh.geom.pos[1],
+                        'upos', mesh.GetPosX(), mesh.GetPosY(),
+                        'pos', mesh.geom.pos,
                         // 'dim', mesh.geom.dim,
                         // 'rel pos', mesh.geom.pos, 
                         mesh.GetName(),

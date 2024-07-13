@@ -449,7 +449,7 @@ const GFX_CTX_FLAGS = {
     FROM_ROOT_WIDGET: _CNT <<= 0x1, // Check from root descending
     FROM_PARENT_ASC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
     FROM_PARENT_DSC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree descending.
-    FROM_PARENT_CHLDREN_DESC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent children
+    FROM_PARENT_CHILDREN_DESC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent children
 
     ABSOLUTE_POSITION: _CNT <<= 0x1, // Any vertex buffer with a unif wposition will not draw from the scenen's position 
 

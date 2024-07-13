@@ -36,7 +36,6 @@ class RenderQueueData {
       this.vb_groupidx = INT_NULL;
       this.ibidx = INT_NULL;
       this.queueIdx = INT_NULL;
-      this.isActive = false;
       this.flags = 0x0;
    }
 
@@ -51,6 +50,7 @@ class RenderQueue {
    size = 0;
    active = [];
    activeCount = 0;
+   needs_update = false; 
 
 
    constructor() {
@@ -66,19 +66,18 @@ class RenderQueue {
    }
 
 
-   Deactivate(vb_groupidx) {
+   // Deactivate(vb_groupidx) {
 
-      const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
+   //    const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
 
-      if (idx !== INT_NULL && idx < this.count - 1) {
+   //    if (idx !== INT_NULL && idx < this.count - 1) {
 
-         this.buffer[idx].flags &= ~RENDER_QUEUE_FLAGS.IS_ACTIVE;
-         this.RebuildActiveQueue();
+   //       this.buffer[idx].flags &= ~RENDER_QUEUE_FLAGS.IS_ACTIVE;
+   //       this.RebuildActiveQueue();
 
-         Vertex_buffer_group_set_render_queueidx(vb_groupidx, INT_NULL);
-         console.error('0000000000000000000000000000000000000');
-      }
-   }
+   //       Vertex_buffer_group_set_render_queueidx(vb_groupidx, INT_NULL);
+   //    }
+   // }
 
 
    RebuildActiveQueue() { // Recreates an array of all active vertex buffers from the draw queue on every Frame.
@@ -92,12 +91,15 @@ class RenderQueue {
             this.active[this.activeCount++] = this.buffer[i];
          }
       }
+
+      // Active queuuue is updated, remove the needs update flag
+      _render_queue.needs_update = false;
    }
 
 
-   UpdateActiveQueueByIdx(idx) { // Recreates an array of all active vertex buffers from the draw queue on every Frame.
-      this.active[this.activeCount++] = this.buffer[idx];
-   }
+   // UpdateActiveQueueByIdx(idx) { // Recreates an array of all active vertex buffers from the draw queue on every Frame.
+   //    this.active[this.activeCount++] = this.buffer[idx];
+   // }
 
 
    Add(progidx, vb_groupidx, ibidx, isActive) {
@@ -107,7 +109,7 @@ class RenderQueue {
          vb_groupidx: vb_groupidx,
          ibidx: ibidx,
          queueIdx: this.count,
-         isActive: isActive,
+         // isActive: isActive,
       }
 
       this.buffer[this.count].Set(obj);
@@ -125,29 +127,29 @@ class RenderQueue {
    }
 
 
-   #Find(vb_groupidx) {
+   // #Find(vb_groupidx) {
 
-      if (!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
-      for (let i = 0; i < this.size; i++) {
-         if (this.buffer[i].vb_groupidx === vb_groupidx){
-            return i;
-         }
-      }
-      return INT_NULL;
-   }
+   //    if (!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
+   //    for (let i = 0; i < this.size; i++) {
+   //       if (this.buffer[i].vb_groupidx === vb_groupidx){
+   //          return i;
+   //       }
+   //    }
+   //    return INT_NULL;
+   // }
 
 
-   FindAllBuffersFromProgram(progidx) {
+   // FindAllBuffersFromProgram(progidx) {
 
-      if (!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
-      let idxs = [];
-      for (let i = 0; i < this.size; i++) {
-         if (this.buffer[i].progidx === progidx) {
-            idxs.push(i);
-         }
-      }
-      return idxs;
-   }
+   //    if (!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
+   //    let idxs = [];
+   //    for (let i = 0; i < this.size; i++) {
+   //       if (this.buffer[i].progidx === progidx) {
+   //          idxs.push(i);
+   //       }
+   //    }
+   //    return idxs;
+   // }
 
 
    Swap(obj1, obj2) {
@@ -214,24 +216,6 @@ class RenderQueue {
       }
    }
 
-
-   // Debug
-   PrintAll() {
-      console.log('--- RenderQueue All');
-      for (let i = 0; i < this.count; i++) {
-         if (this.buffer[i]) console.log(this.buffer[i]);
-      }
-   }
-
-
-   PrintActive() {
-      console.log('--- RenderQueue Active');
-      console.log(this.active);
-      for (let i = 0; i < this.activeCount; i++) {
-         if (this.active[i]) console.log(this.active[i]);
-      }
-   }
-
 }
 
 
@@ -247,7 +231,6 @@ export function Renderqueue_get() { return _render_queue; }
 export function Renderqueue_get_count() { return _render_queue.activeCount; }
 export function Renderqueue_get_size() { return _render_queue.size; }
 export function Renderqueue_active_get_count() { return _render_queue.activeCount; }
-// export function Renderqueue_active_get_size() { return _render_queue.active.size; }
 
 
 
@@ -255,7 +238,11 @@ export function Renderqueue_get_byidx(idx) { return _render_queue.buffer[idx]; }
 
 
 
-export function Renderqueue_get_active() { return _render_queue.active; }
+export function Renderqueue_get_active() { 
+
+   if(_render_queue.needs_update) _render_queue.RebuildActiveQueue(); // Create a new active buffer from the renderqueue
+   return _render_queue.active; 
+}
 
 
 
@@ -287,11 +274,12 @@ export function Renderqueue_set_active(vb_groupidx, isActive) {
    const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
    if (idx !== INT_NULL) {
 
-      if (isActive === true) _render_queue.buffer[idx].flags |= isActive;
-      else if (isActive === false) _render_queue.buffer[idx].flags &= ~isActive;
+      if (isActive === true) _render_queue.buffer[idx].flags |= RENDER_QUEUE_FLAGS.IS_ACTIVE;
+      else if (isActive === false) _render_queue.buffer[idx].flags &= ~RENDER_QUEUE_FLAGS.IS_ACTIVE;
 
-      // IMPORTANT: Rebuild the queue once, if this function is called at least once
-      _render_queue.RebuildActiveQueue(); // Create a new active buffer from the updated queue
+      // Enable renderqueue's self-update the active queue
+      _render_queue.needs_update = true;
+
    }
 
 }
@@ -320,3 +308,45 @@ export function Renderqueue_init() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************************************************/
+// DEBUG-PRINT
+
+export function Renderqueue_print_all(){
+
+   console.log('--- RenderQueue All');
+
+   const queue = _render_queue;
+   for (let i = 0; i < queue.count; i++) {
+      if (queue.buffer[i]) console.log(queue.buffer[i]);
+   }
+}
+
+
+
+
+export function Renderqueue_print_active(){
+   
+   console.log('--- RenderQueue Active');
+
+   const queue = _render_queue;
+   for (let i = 0; i < queue.activeCount; i++) {
+      if (queue.active[i]) console.log(queue.active[i]);
+   }
+}

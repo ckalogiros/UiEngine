@@ -31,7 +31,6 @@ export function Gl_draw(gl) {
         
         const progidx = drawQueue[i].progidx;
         const vb_groupidx = drawQueue[i].vb_groupidx;
-        // const vbidx = drawQueue[i].vbidx;
         const ibidx = drawQueue[i].ibidx;
         
         const progs = Program_get_programs();
@@ -52,14 +51,7 @@ export function Gl_draw(gl) {
             GL.BOUND_VAO = vb_group.vao;
         }
 
-        // Uniforms - wpos per vertex buffer uniform
-        // const unif_len = progs.buffer[progidx].uniforms.length;
-        // for(let k=0; k < unif_len; k++){
-            
-        //     // if(ubidx !== INT_NULL) 
-        //     // TODO: Runs function call for every uniform, event the uniform block.
-        //     Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
-        // }
+
         Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
 
 

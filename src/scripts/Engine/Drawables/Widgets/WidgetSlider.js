@@ -433,7 +433,7 @@ function Slider_horizontal_move_handle(bar, handle) {
    const bar_length = bar.geom.dim[0] * 2 * bar.geom.num_faces;
    if (handle.geom.pos[0] + x >= bar.geom.pos[0] && handle.geom.pos[0] + handle.geom.dim[0] * 2 + x <= bar.geom.pos[0] + bar_length) {
       handle.geom.pos[0] += x;
-      handle.geom.MoveX(x, handle.gfx);
+      handle.geom.AddWposX(handle.gfx, x, );
    }
 
    // TODO: It is very complicated that we do not have a pipeline for the "mesh update gfx buffers". We need something more concrete  as to where the updates are passing through
@@ -452,7 +452,7 @@ function Slider_vertical_move_handle(bar, handle) {
    const bar_length = bar.geom.dim[1] * 2 * bar.geom.num_faces;
    if (handle.geom.pos[1] + y >= bar.geom.pos[1] && handle.geom.pos[1] + handle.geom.dim[1] * 2 + y <= bar.geom.pos[1] + bar_length) {
       handle.geom.pos[1] += y;
-      handle.geom.MoveY(y, handle.gfx);
+      handle.geom.AddWposY(handle.gfx, y, );
    }
 
    handle.SetUpdateFrameBuffer(); 
@@ -1212,19 +1212,19 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       if (x === 0 && y === 0) return;
 
       AddArr2(this.geom.pos, [x, y]);
-      this.geom.MoveXY(x, y, this.gfx);
+      this.geom.AddWposXY(this.gfx, x, y, );
 
       const bar = this.children.buffer[this.bar_idx];
-      bar.geom.MoveXY(x, y, bar.gfx);
+      bar.geom.AddWposXY(bar.gfx, x, y, );
 
       const name_text = this.text_mesh;
-      name_text.geom.MoveXY(x, y, name_text.gfx);
+      name_text.geom.AddWposXY(name_text.gfx, x, y, );
 
       const handle = bar.children.buffer[0];
-      handle.geom.MoveXY(x, y, handle.gfx);
+      handle.geom.AddWposXY(handle.gfx, x, y, );
 
       const value_text = this.children.buffer[this.value_text_idx];
-      value_text.geom.MoveXY(x, y, value_text.gfx);
+      value_text.geom.AddWposXY(value_text.gfx, x, y, );
 
    }
 

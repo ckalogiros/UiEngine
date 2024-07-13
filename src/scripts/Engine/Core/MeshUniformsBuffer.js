@@ -54,6 +54,7 @@ export function Screen_wpos_add_y(y) { _screen_wpos[1] += y; }
 const _per_vb_mesh_unif_wpos = New_generic_buffer(_, '_per_vb_mesh_unif_wpos');
 const _per_vb_mesh_unif_wpos_ubidxs = New_generic_buffer(_, '_per_vb_mesh_unif_wpos_ubidxs');
 const _debug_names_per_vb_mesh_unif_wpos = New_generic_buffer(_, '_debug_names_per_vb_mesh_unif_wpos');
+const _debug_names_all_meshes_per_vb_unif = New_generic_buffer(_, '_debug_names_all_meshes_per_vb_unif');
 
 
 
@@ -130,6 +131,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
       debug_vb_groupidx:debug_vb_groupidx,
       has_absolute_pos: has_absolute_pos,
       sticky_pos: HAS_STICKY_POS,
+      scroll_bar: INT_NULL, // unif_wpos index for any scrollbar. Use: Move the scrollbar with the root mesh move (seperately), because the scrollbars aren't children of any root unif
    }
 
    entry.wpos[0] += wpos[0];
@@ -138,6 +140,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
 
    const idx = _per_vb_mesh_unif_wpos.Add(entry);
+   // _debug_names_all_meshes_per_vb_unif.Add()
 
 
    // Store the uniform's index, for updating the uuniforms on position change
@@ -208,6 +211,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    unif_wpos.debug_vb_groupidx = vb_groupidx;
    unif_wpos.has_absolute_pos = has_absolute_pos;
    unif_wpos.sticky_pos = HAS_STICKY_POS;
+   unif_wpos.scroll_bar = INT_NULL;
 
 
    const dbg_for_unifwpos = _debug_names_per_vb_mesh_unif_wpos.buffer[vb_groupidx];
@@ -320,12 +324,6 @@ function Mesh_unif_get_vb_root_wposy_recursive(root_posidx) {
 
 /*********************************************************************************************************/
 // SETTERS
-export function Mesh_unif_set_vb_root_wpos(root_posidx, x, y) {
-   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] = x;
-   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] = y;
-}
-
-
 
 export function Mesh_unif_set_vb_root_wpos_all_siblings(root_posidx, x, y){
 
@@ -340,6 +338,12 @@ export function Mesh_unif_set_vb_root_wpos_all_siblings(root_posidx, x, y){
          _per_vb_mesh_unif_wpos.buffer[i].wpos[1] = y;
       }
    }
+}
+
+
+export function Mesh_unif_set_vb_root_wpos(root_posidx, x, y) {
+   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] = x;
+   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] = y;
 }
 
 
@@ -382,6 +386,24 @@ export function Mesh_unif_set_vb_root_wposy(root_posidx, y) {
 export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
+
+   /**
+    * Move any scroll bars that belong to any unif_wpos below current unif_wpos(in the tree structure, children-tree)
+    */
+   for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+      
+      const elem = _per_vb_mesh_unif_wpos.buffer[i];
+
+      // console.log(i)
+      if(elem.scroll_bar !== INT_NULL && 
+         ( _per_vb_mesh_unif_wpos.buffer[i].parent_posidx === root_posidx || //Meaning the unif that has a scrollbar(i) must be child of the current moved unif (root_posidx)
+         i === root_posidx ) // Or the current i is the one that has the scrollbar 
+      ){
+
+         _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[0] += x;
+         _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[1] += y;
+      }
+   }
 }
 
 
@@ -552,6 +574,40 @@ export function Mesh_unif_add_vb_root_col(idx, rgba) {
 
 
 
+
+
+
+/*************************************************************************************************************/
+// Connect scrollbars unif_wpos with their scrolled section unif_wpos
+export function Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(root_posidx, scrollbar_posidx) {
+   _per_vb_mesh_unif_wpos.buffer[root_posidx].scroll_bar = scrollbar_posidx;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*********************************************************************************************************/
 // DEBUG-PRINT
 
@@ -567,11 +623,14 @@ export function Root_uniforms_for_wpos() {
       const parent_name = (parent) ? Str_buffer_mesh_names_get_by_idx(parent.nameidx) : 'NULL'
 
       console.log(i,
+         'ABSOLUTE_POSITION:', (_per_vb_mesh_unif_wpos.buffer[i].has_absolute_pos & GFX_CTX_FLAGS.ABSOLUTE_POSITION) ? true : false,
+         'STICKY_POSX:', (_per_vb_mesh_unif_wpos.buffer[i].sticky_pos & MESH_STATE.STICKY_POSX) ? true : false,
          'pos:', _per_vb_mesh_unif_wpos.buffer[i].wpos,
          'name:', Str_buffer_mesh_names_get_by_idx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].nameidx),
          '||| parent:', parent_name,
          'parent_posidx:', _per_vb_mesh_unif_wpos.buffer[i].parent_posidx,
          'vbidx:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
+         'scrollbar:', _per_vb_mesh_unif_wpos.buffer[i].scroll_bar,
       );
    }
 }

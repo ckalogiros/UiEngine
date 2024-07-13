@@ -716,7 +716,75 @@ function Check_child_events_recursive(view_children, point) {
 
 /**********************************************************************************************************************************************************/
 // Misc
+/** Change the listeners position in the listeners view buffer, so it gets checked before/after ather events */
+export function Listeners_set_priority(TYPE_IDX, listeners){
+// export function Listeners_set_priority(listeners){
 
+  
+   const event_idx = listeners.buffer[TYPE_IDX];
+   if(event_idx!==null && event_idx!==INT_NULL){
+
+      const event = _listeners_buffer_storage.buffer[E.C].buffer[event_idx];
+      
+      // Case the view index belongs to the view storage buffer, being a direct child with no parent.
+      if(event.parent_idx === INT_NULL){
+         
+         const child_view_idx =  event.view.view_idx;
+         Set_priority_first(_listeners_buffer_view_storage.buffer[E.C].buffer, child_view_idx, TYPE_IDX);
+
+      }
+      else { // Else the event has a parent. Find the view by its parent
+
+         const parent_event_idx = event.parent_idx;  
+         const child_view_idx =  _listeners_buffer_storage.buffer[E.C].buffer[parent_event_idx];
+         alert('44182730046 \nImplement me')
+      }
+
+   }
+
+}
+
+
+/**
+ * Substitutes the first element and Shifts all events up to the substituted to the right.
+ */
+function Set_priority_first(buffer, idx, TYPE_IDX){
+
+   // Store the element to be shifted first
+   const temp = {
+      event_idx: buffer[idx].event_idx,
+      meshidx:  buffer[idx].meshidx,
+      view_idx:  buffer[idx].view_idx,
+      children:  buffer[idx].children,
+   }
+
+   // Shift all elements to the right once
+   for( let i=idx; i > 0; i--){
+
+      const cur_elem = buffer[i];
+      const next_elem = buffer[i-1];
+
+      // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[next_elem.event_idx].view.view_idx = cur_elem.event_idx;
+      _listeners_buffer_storage.buffer[TYPE_IDX].buffer[cur_elem.event_idx].view.view_idx = next_elem.event_idx;
+
+      cur_elem.event_idx = next_elem.event_idx;
+      cur_elem.meshidx  = next_elem.meshidx    ;
+      cur_elem.view_idx = next_elem.view_idx  ;
+      cur_elem.children = next_elem.children  ;
+
+   }
+
+   // Finaly replace the first elem
+   buffer[0].event_idx = temp.event_idx;
+   buffer[0].meshidx   = temp.meshidx;
+   buffer[0].view_idx  = temp.view_idx;
+   buffer[0].children  = temp.children;
+
+   // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[0].event_idx].parent_idx = ??????; // TODO: Implement the parent_idx substitution
+   // Substitute the children index of the event view 
+   _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[0].event_idx].view_idx = 0;
+
+}
 
 
 
@@ -738,7 +806,7 @@ function Check_child_events_recursive(view_children, point) {
 
 
 /**************************************************************************************************************************/
-// Debug Info Getters
+// Debug Info Callback functions
 export function Listeners_get_count()        { return _listeners_buffer_storage.active_count; }
 export function Listeners_get_size()         { return _listeners_buffer_storage.size; }
 export function Listeners_hover_get_count()  { return _listeners_buffer_storage.buffer[E.H].active_count; }

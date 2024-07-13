@@ -86,10 +86,11 @@ export function Find_parent_listen_event(EVENT_TYPE_IDX, mesh) {
  * to find the first grand-parent with an equivalent event, and set it as the parent event.
  * If no such event is found, then a FAKE event of that type is created at the root parent mesh.
  */
-export function Construct_listen_events_relations_from_mesh_tree(mesh) {
+export function Construct_listen_events_relations_from_mesh_tree(mesh, parent=null) {
     
     let parent_events = null;
-    if (mesh.parent) parent_events = mesh.parent.listeners; 
+    if(parent!==null) parent_events = parent.listeners;
+    else if (mesh.parent) parent_events = mesh.parent.listeners; 
 
     // console.log(mesh.GetName())
 
@@ -100,8 +101,10 @@ export function Construct_listen_events_relations_from_mesh_tree(mesh) {
             if (mesh.listeners.buffer[etype] !== null) {
                 
                 // ERROR CHECK: Case parent event is INT_NULL
-                if(parent_events && parent_events.buffer[etype] === INT_NULL) 
+                if(parent_events && parent_events.buffer[etype] === INT_NULL) {
+                    console.error('mesh', mesh.GetName(), '\nlisteners', mesh.listeners, '\nparent_events', parent_events, 'etype', etype);
                     alert('7266534');
+                }
 
                 
                 if (parent_events === null || parent_events.buffer[etype] === null) {

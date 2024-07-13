@@ -1,7 +1,7 @@
 "use strict";
 
 import { Listener_debug_print_view_recursive, Listener_debug_print_storage_buffer, Listener_debug_print_view_storage_buffer } from "../../Events/EventListeners.js";
-import { Renderqueue_get } from "../../Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_print_active, Renderqueue_print_all } from "../../Renderers/Renderer/RenderQueue.js";
 import { TimeIntervalsPrintAll } from "../../Timers/TimeIntervals.js";
 import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
@@ -124,18 +124,18 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'r1',
-      discr: 'RenderQueue All',
+      discr: 'Renderqueue_print_all',
       func: (e)=>{
-         console.log('------------------ RenderQueue All ------------------');
-         Renderqueue_get().PrintAll();
+         console.log('------------------ Renderqueue_print_all ------------------');
+         Renderqueue_print_all();
       },
    },
    {
       key: 'r2',
-      discr: 'RenderQueue Active',
+      discr: 'Renderqueue_print_active',
       func: (e)=>{
-         console.log('------------------ RenderQueue Active ------------------');
-         Renderqueue_get().PrintActive();
+         console.log('------------------ Renderqueue_print_active ------------------');
+         Renderqueue_print_active();
       },
    },
    {

@@ -5,13 +5,19 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Rect_Mesh } from "./Rect_Mesh.js";
-import { Widget_root_create_root, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_reset_gfx, Widget_root_resize_and_rerender, Widget_root_gfx_reset_mesh_per_vb_buffer, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Widget_root_create_root, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_reset_gfx, Widget_root_resize_and_rerender, Widget_root_gfx_reset_mesh_per_vb_buffer, Widget_root_add_mesh, Mesh_per_vb_store_mesh, Mesh_per_vb_remove_mesh } from "../../Core/MeshBuffer.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_add_vb_root_wpos, Mesh_unif_set_vb_root_wposx_all_siblings, Mesh_unif_set_vb_root_wpos_all_siblings, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 import { BLUEL } from "../Material/Base/Colors.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
+import { Mesh } from "./Base/Mesh.js";
+import { Geometry2D } from "../Geometry/Base/Geometry.js";
+import { Material } from "../Material/Base/Material.js";
+import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 
 
 
@@ -20,7 +26,8 @@ import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 
 
 // export class Section extends Rect {
-export class Section extends Rect_Mesh {
+// export class Section extends Rect_Mesh {
+export class Section extends Mesh {
 
    // options: BIT-FIELD. Stores some state for 'this'.
    // pad:     [1,1] Stores pad for the meshes in-between space.
@@ -32,7 +39,11 @@ export class Section extends Rect_Mesh {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), pad = [4, 4], pos = [200, 400, 0],
       dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = [10, 6, 2.], num_faces = 1, is_debug_mesh) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, name, style, pad, num_faces, is_debug_mesh);
+      const geom = new Geometry2D(pos, dim, _, num_faces);
+      const mat = new Material(col);
+
+      super(geom, mat);
+      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, name, style, pad, num_faces, is_debug_mesh);
       // super(pos, dim, col, num_faces, is_debug_mesh);
 
       this.mesh_bufferidx = mesh_bufferidx;
@@ -101,6 +112,13 @@ export class Section extends Rect_Mesh {
    }
 
 
+   SetTypeDebug() {
+      this.type |= MESH_TYPE.DEBUG_MESH;
+      for (let i = 0; i <= this.children.boundary; i++) {
+         if (this.children.buffer[i]) this.children.buffer[i].SetTypeDebug();
+      }
+   }
+
 
 
 
@@ -168,6 +186,8 @@ export class Section extends Rect_Mesh {
          const child = this.children.buffer[i];
          if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
       }
+
+      // if(this.scroller_comp) this.scroller_comp.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
    }
 
 
@@ -175,7 +195,10 @@ export class Section extends Rect_Mesh {
 
       this.options |= options;
 
-      const idx = this.AddChild(mesh);
+      const idx = this.children.Add(mesh);
+      mesh.idx = idx;
+      mesh.parent = this;
+   
 
       if (this.root_bufferidx !== INT_NULL && mesh.root_bufferidx === INT_NULL) {
          mesh.AddToWidgetRootBuffer(this.root_bufferidx)
@@ -201,6 +224,11 @@ export class Section extends Rect_Mesh {
    }
 
 
+   /**
+    * 
+    * @param {*} FLAGS 
+    * @param {*} gfx_ctx_parent Pass a parent to which the GenGfx will run to, preventing any search above parent mesh in the widget root tree structure
+    */
    GfxCtxAddFlag(FLAGS, gfx_ctx_parent) {
 
       if (!this.gfx_ctx_parent) {
@@ -215,6 +243,11 @@ export class Section extends Rect_Mesh {
 
 
 
+   RemoveFromMeshPerVbBuffer() {
+      Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
+   }
+
+
 
 
 
@@ -225,40 +258,49 @@ export class Section extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
 
    // HACK: I need to pass an extra param from Menu_bar widget, so that its children are handled by its class(all that because Widget_Menu_Bar inherits from Section)
-   // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL, params = null, run_for_children = true) {
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      // const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx, params);
-      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
+      // const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
+      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
-      // if (run_for_children) {
-      if (true) {
-         for (let i = 0; i <= this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
-            const child = this.children.buffer[i];
-            // if (child) child.GenGfxCtx(FLAGS, specific_vb_groupidx, params);
-            if (child) child.GenGfxCtx(FLAGS, specific_vb_groupidx);
-         }
+         const child = this.children.buffer[i];
+         // if (child.type & MESH_TYPE.SECTION_MESH_ONLY) 
+            child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
 
-
-      return gfx;
    }
 
 
    Render(run_for_children = true) {
 
-      if (this.state.mask & MESH_STATE.ACTIVE) super.AddToGfx();
+      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) {
+         this.AddToGfx()
+      }
 
       if (run_for_children) {
          for (let i = 0; i <= this.children.boundary; i++) {
             const child = this.children.buffer[i];
             if (child) child.Render();
+            // console.log('2', child.GetName())
          }
       }
 
+   }
+   
+
+   AddToGfx() {
+
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
+      this.is_gfx_inserted = true;
+
+      // Add entry to Gfx Buffer
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+
+      return this.gfx.vb.start;
    }
 
 
@@ -278,6 +320,17 @@ export class Section extends Rect_Mesh {
    }
 
 
+   AddToGfxFromReset() {
+
+      Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
+      Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, this.GetName())
+
+      Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
+      this.is_gfx_inserted = true;
+
+      return this.gfx.vb.start;
+   }
+
    DeactivateGfx() {
 
       super.DeactivateGfx();
@@ -296,6 +349,12 @@ export class Section extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
    // Setters-Getters
    /*******************************************************************************************************************************************************/
+
+   GetMaxWidth() { return this.geom.dim[0]; }
+
+
+   GetTotalHeight() { return this.geom.dim[1]; }
+
 
    SectionSetPad() {
       this.geom.dim[0] += this.StylesGetPad(STYLES.AXIS.X);
@@ -894,7 +953,7 @@ function Section_set_posxy_children_recursive(pos, mesh) {
       }
    }
 
-   mesh.geom.SetPosXY(pos, mesh.gfx);
+   mesh.geom.SetPosXY(mesh.gfx, pos[0], pos[1]);
 
 }
 
@@ -918,6 +977,9 @@ export function Section_on_move_clbk(params) {
    if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
 
    Mesh_unif_add_vb_root_wpos(section.root_posidx, mouse_dif.x, -mouse_dif.y)
+
+
+   // if(section.scroller_comp) Mesh_unif_add_vb_root_wpos(section.scroller_comp.root_posidx, mouse_dif.x, -mouse_dif.y);
 
 }
 

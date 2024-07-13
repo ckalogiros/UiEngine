@@ -11,6 +11,7 @@ import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indic
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
 import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBufferFillOps.js";
+import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
 
 
 
@@ -908,8 +909,6 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces) {
                                 ? attribs_per_vertex * ((2 * num_faces) +2) // For meshes with rects vertex conection
                                 : attribs_per_vertex * 4 * num_faces; // For meshes with separate rects 
 
-        // const removed_attribs = attribs_per_vertex * ( (2 * num_faces) + 2);
-        // const removed_attribs = gfx.vb.counts.buffer[i] * num_faces;
 
         let start = gfx.vb.starts.buffer[i];
         const end = start + removed_attribs;
@@ -927,8 +926,7 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces) {
         const vCount = removed_attribs / gfx.vb.counts.buffer[i];
         vb_info.vCount -= vCount;
 
-        if (vb_info.count < 0) {
-
+        /**DEBUG*/ if (vb_info.count < 0) {
             console.error('!!!!!!!!!!!!!!!!!!!!!!!!!',
                 'vbidx', gfx.vb.groupidx,
                 // 'mesh', debug_mesh.mesh_bufferidx,
@@ -937,17 +935,16 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces) {
                 'vb: count', vb_info.count,
             );
         }
-        // if (vb_info.count < 0) return true
 
 
 
-        // POTENTIAL_BUG: If the buffer is empty MUST be updated!!!
-        // TODO: If The buffer is not used, by deactivating it below, then we need to update the render queue
         // Set inactive 
         if (vb_info.count === 0) {
 
             vb_info.state.mask &= ~BUFFER_STATE.IS_ACTIVE;
             vb_group.state.mask &= ~BUFFER_STATE.IS_ACTIVE;
+
+            Renderqueue_set_active(gfx.vb.groupidx, false);
         }
         else vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 
@@ -960,8 +957,6 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces) {
 
     vb_group.needs_any_update = true;
 
-    return false
-    // return removed_attribs;
 }
 
 

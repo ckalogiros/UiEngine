@@ -194,6 +194,7 @@ export class Widget_Label extends Rect_Mesh {
 
 
 
+
     /*******************************************************************************************************************************************************/
     // Graphics
     /*******************************************************************************************************************************************************/
@@ -276,7 +277,7 @@ export class Widget_Label extends Rect_Mesh {
             /** If the alignment happens after the widgets insertion to 
              * the vertex buffers, we must update the vertex buffers too.
              */
-            this.text_mesh.geom.MoveXY(move_dif[0], move_dif[1], this.text_mesh.gfx);
+            this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, move_dif[0], move_dif[1]);
         }
         else {
             this.text_mesh.geom.pos[0] += move_dif[0];
@@ -293,16 +294,16 @@ export class Widget_Label extends Rect_Mesh {
         console.error('UNUSED FUNC, CHECK IT')
 
         if (x === 0 && y === 0) return;
-        this.geom.MoveXY(x, y, this.gfx);
-        this.text_mesh.geom.MoveXY(x, y, this.text_mesh.gfx);
+        this.geom.AddWposXY(this.gfx, x, y, );
+        this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y);
 
     }
 
 
-    MoveY(y) {
+    AddWposY(y) {
 
-        this.geom.MoveY(y, this.gfx);
-        this.text_mesh.geom.MoveY(y, this.text_mesh.gfx);
+        this.geom.AddWposY(this.gfx, y, );
+        this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y, );
     }
 
 
@@ -636,8 +637,8 @@ function Label_on_move_clbk(params) {
     }
     else { // Else update the label alone 
 
-        mesh.geom.MoveXY(mouse_dif.x, -mouse_dif.y, mesh.gfx);
-        mesh.text_mesh.geom.MoveXY(mouse_dif.x, -mouse_dif.y, mesh.text_mesh.gfx);
+        mesh.geom.AddWposXY( mesh.gfx, mouse_dif.x, -mouse_dif.y);
+        mesh.text_mesh.geom.AddWposXY(mesh.text_mesh.gfx, mouse_dif.x, -mouse_dif.y);
     }
 
 

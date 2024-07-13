@@ -41,14 +41,7 @@ export function Gfx_pool_find_notActive_and_notPrivate_vb(progidx) {
 export function Gfx_pool_remove_geometry(gfx, num_faces, start_index, debug_mesh=null) {
 
    Gl_remove_geometry(gfx, num_faces, start_index, debug_mesh);
-   // const ret = Gl_remove_geometry(gfx, num_faces, start_index, debug_mesh);
-   // if (ret.empty) { // If the vertex buffer is empty, then set it as not active, so it can be used by other gfx demands.
-   //    alert('IMPLEMENT ME. GfxPool.js\nGfx_pool_remove_geometry()')
-   //    // _gfx_pool.buffer[gfx.prog.groupidx].buffer[gfx.prog.idx].buffer[gfx.vb.groupidx].inUse = false;
 
-   //    // TODO: DONT FORGET TO UPDATE THE RENDERQUE OR SET AN UPDATE IF RENDERQUEUE CHANGED TO AVOID THE OVERHEAD    }
-   // }
-   // return ret;
 }
 
 

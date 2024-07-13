@@ -9,7 +9,7 @@ import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
-import { BLACK, BLUE, BLUEL, GREEN, GREY, RED, REDL, WHITE, YELLOW } from "../Material/Base/Colors.js";
+import { BLACK, BLUE, BLUEL, GREEN, GREY, RED, REDL, TRANSPARENT, WHITE, YELLOW } from "../Material/Base/Colors.js";
 import { Section } from "../Meshes/Section.js";
 import { Slider_simple_connect } from "./WidgetSlider.js";
 
@@ -36,10 +36,7 @@ export class Widget_Color_Picker extends Section {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin, pos, dim=[100, 100], col=GREY[1], name = 'Color Picker', style=[0, 10, 2], num_faces, is_debug_mesh) {
       
 
-      const scale = .5;
-      const fontsize = 8;
-      const label_pad = 2;
-      const label_style = [0, fontsize, 1.2];
+      const scale = .6;
       style[1] = 15
       
       if(col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
@@ -68,6 +65,7 @@ export class Widget_Color_Picker extends Section {
       // Create panel to align further meshes
       style[1] = 10;
       const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10*scale, 10*scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, is_debug_mesh, 1);
+      // const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10*scale, 10*scale], [0, 0, 1], _, [TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT], 'Color Picker Panel', style, is_debug_mesh, 1);
       panel.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel.options |= SECTION.RESIZE_PARENT;
       panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -114,59 +112,63 @@ export class Widget_Color_Picker extends Section {
       temp_color_present_idx = panel2.AddItem(color_present_mesh);
 
 
+      const fontsize = 10*scale*1.2;
+      const label_pad = [10*scale*scale, 6*scale*scale];
+      const label_style = [0, 10*scale, 1.2];
+
       /******************************************************************************/
       // Create Label Info meshes
       {
          {
-            const label = Create_widget_label(_, 'R', _, [0, 0, 3], fontsize, REDL[5], WHITE, [label_pad, label_pad], _, label_style);
+            const label = Create_widget_label(_, 'R', _, [0, 0, 3], fontsize, REDL[5], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
             label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            label.StylesSetMargin([label_pad, label_pad]);
+            label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
 
-            this.label_r = Create_widget_label(_, 'RRRRR', _, [0, 0, 3], fontsize, GREY[2], WHITE, [label_pad, label_pad], _, label_style);
+            this.label_r = Create_widget_label(_, 'RRRRR', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
             this.label_r.temp_align |= SECTION.HORIZONTAL;
             this.label_r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            this.label_r.StylesSetMargin([label_pad, 0]);
+            this.label_r.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_r);
          }
          {
-            const label = Create_widget_label(_, 'G', _, [0, 0, 3], fontsize, GREEN[4], WHITE, [label_pad, label_pad], _, label_style);
+            const label = Create_widget_label(_, 'G', _, [0, 0, 3], fontsize, GREEN[4], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
             label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            label.StylesSetMargin([label_pad, label_pad]);
+            label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
 
-            this.label_g = Create_widget_label(_, 'GGGGG', _, [0, 0, 3], fontsize, GREY[2], WHITE, [label_pad, label_pad], _, label_style);
+            this.label_g = Create_widget_label(_, 'GGGGG', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
             this.label_g.temp_align |= SECTION.HORIZONTAL;
             this.label_g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            this.label_g.StylesSetMargin([label_pad, 0]);
+            this.label_g.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_g);
          }
          {
-            const label = Create_widget_label(_, 'B', _, [0, 0, 3], fontsize, BLUEL[6], WHITE, [label_pad, label_pad], _, label_style);
+            const label = Create_widget_label(_, 'B', _, [0, 0, 3], fontsize, BLUEL[6], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
             label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            label.StylesSetMargin([label_pad, label_pad]);
+            label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
 
-            this.label_b = Create_widget_label(_, 'BBBBB', _, [0, 0, 3], fontsize, GREY[2], WHITE, [label_pad, label_pad], _, label_style);
+            this.label_b = Create_widget_label(_, 'BBBBB', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
             this.label_b.temp_align |= SECTION.HORIZONTAL;
             this.label_b.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            this.label_b.StylesSetMargin([label_pad, 0]);
+            this.label_b.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_b);
          }
          {
-            const label = Create_widget_label(_, 'A', _, [0, 0, 3], fontsize, GREY[6], WHITE, [label_pad, label_pad], _, label_style);
+            const label = Create_widget_label(_, 'A', _, [0, 0, 3], fontsize, GREY[6], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
             label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            label.StylesSetMargin([label_pad, label_pad]);
+            label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
 
-            this.label_a = Create_widget_label(_, 'AAAAA', _, [0, 0, 3], fontsize, GREY[2], WHITE, [label_pad, label_pad], _, label_style);
+            this.label_a = Create_widget_label(_, 'AAAAA', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
             this.label_a.temp_align |= SECTION.HORIZONTAL;
             this.label_a.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-            this.label_a.StylesSetMargin([label_pad, 0]);
+            this.label_a.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_a);
          }
 
@@ -190,6 +192,7 @@ export class Widget_Color_Picker extends Section {
       slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       slider_tran.SetStyle([0, 12*scale, 2]);
       slider_tran.StylesSetMargin([10, 0]);
+      slider_tran.SetName('Slider Transparency');
 
       temp_tran_slider_idx = panel.AddItem(slider_tran);
 
@@ -219,6 +222,7 @@ export class Widget_Color_Picker extends Section {
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       slider.StylesSetMargin([0, 20]);
       slider.SetStyle([style[0], 20*scale, style[2]]);
+      slider.SetName('Slider Hue');
       temp_hue_pick_idx = this.AddItem(slider);
 
 
@@ -332,14 +336,14 @@ export class Widget_Color_Picker extends Section {
    // Graphics
    /*******************************************************************************************************************************************************/
 
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL, params = null) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
       for (let i = 0; i <= this.children.boundary; i++) {
-         if (this.children.buffer[i]) this.children.buffer[i].GenGfxCtx(FLAGS, specific_vb_groupidx, params);
+         if (this.children.buffer[i]) this.children.buffer[i].GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
    }
 
@@ -347,9 +351,12 @@ export class Widget_Color_Picker extends Section {
    Render() {
 
       if (this.state.mask & MESH_STATE.ACTIVE) {
+         // super.AddToGfx();
          super.AddToGfx();
          for (let i = 0; i <= this.children.boundary; i++) {
-            if (this.children.buffer[i]) this.children.buffer[i].Render();
+            const child = this.children.buffer[i];
+            
+            if (child) child.Render();
          }
       }
 

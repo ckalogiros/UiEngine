@@ -150,7 +150,7 @@ export class Widget_Menu_Bar extends Section {
 
    Render() {
 
-      super.Render(false); // For the menu meshes
+      super.AddToGfx(false); // For the menu meshes
 
       for (let i = 0; i <= this.children.boundary; i++) { // For the children meshes
 

@@ -302,17 +302,6 @@ export class Widget_Scroller extends Section {
    }
 
 
-   GfxCtxAddFlag(FLAGS, gfx_ctx_parent) {
-
-      if (!this.gfx_ctx_parent) {
-         this.gfx_ctx_flags |= FLAGS;
-         this.gfx_ctx_parent = gfx_ctx_parent;
-
-         this.scroll_bar.GfxCtxSetFlag(FLAGS, gfx_ctx_parent);
-
-         this.scrolled_section.GfxCtxSetFlag(FLAGS, gfx_ctx_parent)
-      }
-   }
 
 
 
@@ -1034,7 +1023,7 @@ export class Widget_Scroller extends Section {
 
 export function Scroller_calc_handle_pos_dim(scroller) {
 
-   const bar = scroller.scroll_bar;
+   // const bar = scroller.scroll_bar;
    const handle = bar.children.buffer[0];
 
    // Set min dimentions. // TODO: Who decides for the minimum dimentions??????
@@ -1236,7 +1225,7 @@ function Scroller_move_handle(bar, handle) {
    if (handle.geom.pos[1] - handle_marg * 2 + y >= bar.geom.pos[1] &&
       handle.geom.pos[1] + handle.geom.dim[1] * 2 + handle_marg * 2 + y <= bar.geom.pos[1] + bar_length) {
       handle.geom.pos[1] += y;
-      handle.geom.MoveY(y, handle.gfx);
+      handle.geom.AddWposY(handle.gfx, y, );
    }
    // else {
    //    if (handle.geom.pos[1] - handle_marg * 2 + y < bar.geom.pos[1]) {

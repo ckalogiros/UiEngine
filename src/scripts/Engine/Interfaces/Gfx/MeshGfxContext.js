@@ -379,7 +379,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
       // TODO: Set active on Add function
-      Renderqueue_set_active(vb_groupidx, true); // Update the draw buffer
+      // Renderqueue_set_active(vb_groupidx, true); // Update the draw buffer
 
 
       // POTENTIAL_BUG: In case we reuse a created VB from gfx Pool, we need to insert it to the new widget root gfx buffer.
@@ -571,7 +571,7 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
 
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
-      Renderqueue_set_active(vb_groupidx, true); // Update the draw buffer
+      // Renderqueue_set_active(vb_groupidx, true); // Update the draw buffer
 
 
       // Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs);

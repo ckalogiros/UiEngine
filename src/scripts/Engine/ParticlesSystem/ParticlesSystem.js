@@ -6,7 +6,7 @@ import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Hash, Max } from "../../Helpers/Math/MathOperations.js";
 import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
-import { Str_buffer_get_by_idx, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store, Str_buffer_store } from "../Core/StringBuffer.js";
+import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
 import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 
@@ -14,7 +14,9 @@ import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 
 const speed = 4;
+// const speed = 34;
 const speed_ratio = .01
+// const speed_ratio = .1
 const max = 100;
 const interpolate = 1/max;
 
@@ -512,10 +514,10 @@ export function Particle_system_update() {
             
             // TODO: For efficiency create 2 loops, and check which case the particles are and run the for without if statement
             if(emitter.flags & PARTICLES.HAS_START_POS_VARIATION){
-               // const x = GetRandomInt(-4, 4);
-               // const y = GetRandomInt(-4, 4);
-               // particle.pos[0] += (x)*.17;
-               // particle.pos[1] += (y)*.17;
+               const x = GetRandomInt(-4, 4);
+               const y = GetRandomInt(-4, 4);
+               particle.pos[0] += (x)*.17;
+               particle.pos[1] += (y)*.17;
                // const x = GetRandomInt(-40, 40);
                // const y = GetRandomInt(-40, 40);
                // particle.pos[0] += (x)*.017;
@@ -540,33 +542,21 @@ export function Particle_system_update() {
             }
             
             if(true){ // Fade away
-               // const h=1.8, k=0, r=1.8*1.8; 
+               const h=1.8, k=0, r=1.8*1.8; 
                // const h=1, k=0, r=1; 
-               // const x = particle.time;
-               // let y = Math.sqrt((-(x-h)*(x-h)) + r) +k;
-               // y = 2 *(Math.sin((x*x*x)+Math.PI/2))-1;
+               const x = particle.time;
+               let y = Math.sqrt((-(x-h)*(x-h)) + r) +k;
+               y = 2 *(Math.sin((x*x*x)+Math.PI/2))-1;
+               particle.col[3] *= y;
                // particle.col[3] -= emitter.t_step;
                // particle.col[3] -= emitter.t_step*y;
-               // particle.col[3] *= y;
-               // if(i===0) console.log(y)
-               // if(i===0) console.log(particle.col[3])
             }
-
-               // particle.pos[0] += speed * particle.accel * particle.dirx;
-               // particle.pos[1] += speed * particle.accel * particle.diry * particle.grav;
-               // // particle.pos[1] += speed  * particle.diry * particle.grav;
-               // if (particle.accel > 1) particle.accel *= deccel
-               // particle.grav *= gravity;
-               // // particle.diry = GetRandomInt(5, max)*dir_factor;
-
 
 
             emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time);
 
-            // particle.time += .003;
             particle.time += emitter.t_step *speed_ratio;
             
-            // console.log(emitter.t_step)
             if (particle.time >= emitter.life_time) {
 
                // Reset particle for reuse
@@ -579,8 +569,6 @@ export function Particle_system_update() {
                particle.col[3] = 1
 
                emitter.free_particles_idxs_buffer.Add(j)
-               // emitter.particles_buffer.RemoveByIdx(j);
-
             }
 
             needs_update = true;
