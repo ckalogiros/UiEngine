@@ -1,5 +1,6 @@
 "use strict";
 
+import { CONSOLAS_20Hpx } from "../../../../../resources/fonts/consolas_5/metrics/consolas_5.js";
 // import { consola_msdf_test_1024_metrics } from "../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js";
 import { consola_msdf_test_1024_metrics } from "../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js";
 import { Abs } from "../../../Helpers/Math/MathOperations.js";
@@ -12,6 +13,7 @@ let _font_metrics_buffer_count = 0;
 function Font_get_metrics_by_texid(texture_id){
    switch(texture_id){
       case TEXTURES.MSDF_CONSOLAS_1024: return consola_msdf_test_1024_metrics;
+      case TEXTURES.CONSOLAS_20px: return CONSOLAS_20Hpx;
       default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_id:', texture_id);
    }
 }
@@ -21,7 +23,7 @@ function Font_get_metrics_by_texid(texture_id){
 export function Font_create_uvmap(texture_id){
 
    const json_metrics_object = Font_get_metrics_by_texid(texture_id); 
-   _font_metrics_buffer[_font_metrics_buffer_count++] = Parse_json_metrics(json_metrics_object); 
+   // _font_metrics_buffer[_font_metrics_buffer_count++] = Parse_json_metrics(json_metrics_object); 
 }
 
 

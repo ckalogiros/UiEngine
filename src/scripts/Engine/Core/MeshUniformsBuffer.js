@@ -400,8 +400,22 @@ export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
          i === root_posidx ) // Or the current i is the one that has the scrollbar 
       ){
 
-         _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[0] += x;
-         _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[1] += y;
+         // _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[0] += x;
+         // _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[1] += y;
+
+         /** MOVE THE SCROLLBAR MESH INSTEAD OF IT'S UNIF WPOS. This impl is for storing scrollbars in the same vertex buffer */
+         // TODO: It is not correct to set the mesh pos here, but is the easiest way to have access to all scrollbars.
+         const scrollbaridx = _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].meshidx;
+         const scrollbar = Mesh_buffer_get_mesh_byidx(scrollbaridx);
+
+         const handle = scrollbar.children.buffer[0];
+         scrollbar.geom.pos[0] += x;
+         scrollbar.geom.pos[1] += y;
+         scrollbar.geom.AddWposXY(scrollbar.gfx, x, y);
+         handle.geom.pos[0] += x;
+         handle.geom.pos[1] += y;
+         handle.geom.AddWposXY(handle.gfx, x, y);
+         // console.log(scrollbar)
       }
    }
 }
@@ -409,13 +423,69 @@ export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
 
 
 export function Mesh_unif_add_vb_root_wposx(root_posidx, x) {
+
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
+   
+   // /**
+   //  * Move any scroll bars that belong to any unif_wpos below current unif_wpos(in the tree structure, children-tree)
+   //  */
+   // for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+   //    const elem = _per_vb_mesh_unif_wpos.buffer[i];
+      
+   //    // console.log(i)
+   //    if(elem.scroll_bar !== INT_NULL && 
+   //       ( _per_vb_mesh_unif_wpos.buffer[i].parent_posidx === root_posidx || //Meaning the unif that has a scrollbar(i) must be child of the current moved unif (root_posidx)
+   //       i === root_posidx ) // Or the current i is the one that has the scrollbar 
+   //    ){
+            
+   //       _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[0] += x;
+
+   //       /** MOVE THE SCROLLBAR MESH INSTEAD OF IT'S UNIF WPOS. This impl is for storing scrollbars in the same vertex buffer */
+   //       // TODO: It is not correct to set the mesh pos here, but is the easiest way to have access to all scrollbars.
+   //       const scrollbaridx = _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].meshidx;
+   //       const scrollbar = Mesh_buffer_get_mesh_byidx(scrollbaridx);
+
+   //       const handle = scrollbar.children.buffer[0];
+   //       scrollbar.geom.pos[0] += x;
+   //       scrollbar.geom.AddWposX(scrollbar.gfx, x);
+   //       handle.geom.pos[0] += x;
+   //       handle.geom.AddWposX(handle.gfx, x);
+   //    }
+   // }
 }
 
 
 
 export function Mesh_unif_add_vb_root_wposy(root_posidx, y) {
+
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
+      
+   // /**
+   //  * Move any scroll bars that belong to any unif_wpos below current unif_wpos(in the tree structure, children-tree)
+   //  */
+   // for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+   //    const elem = _per_vb_mesh_unif_wpos.buffer[i];
+      
+   //    // console.log(i)
+   //    if(elem.scroll_bar !== INT_NULL && 
+   //       ( _per_vb_mesh_unif_wpos.buffer[i].parent_posidx === root_posidx || //Meaning the unif that has a scrollbar(i) must be child of the current moved unif (root_posidx)
+   //       i === root_posidx ) // Or the current i is the one that has the scrollbar 
+   //    ){
+            
+   //       _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[1] += y;
+
+   //       /** MOVE THE SCROLLBAR MESH INSTEAD OF IT'S UNIF WPOS. This impl is for storing scrollbars in the same vertex buffer */
+   //       // TODO: It is not correct to set the mesh pos here, but is the easiest way to have access to all scrollbars.
+   //       const scrollbaridx = _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].meshidx;
+   //       const scrollbar = Mesh_buffer_get_mesh_byidx(scrollbaridx);
+
+   //       const handle = scrollbar.children.buffer[0];
+   //       scrollbar.geom.pos[1] += y;
+   //       scrollbar.geom.AddWposX(scrollbar.gfx, y);
+   //       handle.geom.pos[1] += y;
+   //       handle.geom.AddWposX(handle.gfx, y);
+   //    }
+   // }
 }
 
 

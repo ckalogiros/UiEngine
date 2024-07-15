@@ -132,7 +132,7 @@ export function Device_set_up() {
 
   // const canvas = document.getElementById("canvas");
   DEVICE.width = window.innerWidth;
-  DEVICE.height = window.innerHeight;
+  DEVICE.height = window.innerHeight + document.documentElement.offsetHeight*2;
   console.log('DEVICE width: ', DEVICE.width, ' height: ', DEVICE.height)
   // console.log('WINDOW: ', window)
 
@@ -161,8 +161,52 @@ export function Device_set_up() {
 
   POSITION_CENTER[0] = VIEWPORT.WIDTH / 2;
   POSITION_CENTER[1] = VIEWPORT.HEIGHT / 2;
+  
+  DEVICE.info = {
+    inner_width:window.innerWidth,
+    inner_height:window.innerHeight,
+    outer_width:window.outerWidth,
+    outer_height:window.outerHeight,
+    
+    page_xoffset:window.pageXOffset,
+    page_yoffset:window.pageYOffset,
+    
+    gpu:window.navigator.gpu,
+    
+    virtual_keyboard:window.navigator.virtualKeyboard,
 
+    offsetHeight:   document.documentElement.offsetHeight,
+    offsetLeft:   document.documentElement.offsetLeft,
+    offsetParent:   document.documentElement.offsetParent,
+    offsetTop:   document.documentElement.offsetTop,
+    offsetWidth:   document.documentElement.offsetWidth,
+    clientHeight:   document.documentElement.clientHeight,
+    clientLeft:   document.documentElement.clientLeft,
+    clientTop:   document.documentElement.clientTop,
+    clientWidth:   document.documentElement.clientWidth,
+  };
+  
 
+  console.log('DEVICE.info', DEVICE.info)
+  console.log('WINDOW', window)
+  console.log('DOCUMENT', document);
+  console.log('VIEWPORT', VIEWPORT);
+  console.log('DEVICE', DEVICE);
+  
+  /**
+    offsetHeight: 1032
+    offsetLeft: 0
+    offsetParent: null
+    offsetTop: 0
+    offsetWidth: 799
+
+    clientHeight: 899
+    clientLeft: 0
+    clientTop: 0
+    clientWidth: 799
+   */
+  console.log('document.documentElement', document.documentElement);
+  console.log('document.documentElement.clientWidth', document.documentElement.clientWidth);
 }
 
 export function Detect_host_platform() {

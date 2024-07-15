@@ -1,6 +1,7 @@
 "use strict";
 
 import { Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Font_metrics_get_interpolated_x } from "../../Loaders/Font/Font.js";
 import { Geometry2D } from "./Base/Geometry.js";
 
 
@@ -14,10 +15,16 @@ import { Geometry2D } from "./Base/Geometry.js";
 
 export class Geometry2D_Text extends Geometry2D {
 
-   constructor(pos=[0,0,0], fontSize=4, scale=[0,0], text='', texidx = INT_NULL) {
+   constructor(pos=[0,0,0], fontSize=4, scale=[0,0], text='', texidx = INT_NULL, advancex) {
+
+
+      // const ratio = Font_metrics_get_interpolated_x(0)
+      // const ratio = advancex/fontSize;
+      // console.log('][][][][][][][][][][][][][][][][][', ratio)
 
       let dim = [0, 0]
-      dim = [fontSize, fontSize];
+      // dim = [fontSize, fontSize];
+      dim = [advancex, fontSize];
 
       super(pos, dim, scale);
 

@@ -5,17 +5,15 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate } from "../../Timers/TimeIntervals.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_store_mesh, Widget_root_add_mesh, Widget_root_buffer_get_byidx, Widget_root_buffer_get_root_meshidx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_root_meshidx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
 import { Calculate_sizes_recursive, Expand, Section, Section_on_move_clbk } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
-import {  Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
-import { Scroller_calc_handle_pos_dim } from "./WidgetScroller.js";
+import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
-import { Scroller_component_calculate_handle_pos_dim, Scroller_component_calculate_scroller_component, Scroller_component_set_pos, Scroller_component_update_scrolled_section_pos_by_uniform } from "./ScrollerComponent.js";
-import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos } from "./ScrollerComponent.js";
 
 
 
@@ -126,7 +124,8 @@ export class Widget_Dropdown extends Section {
       this.rootidx = INT_NULL;
 
       pos[2] += 1;
-      this.menu = Create_widget_section(_, SECTION.VERTICAL, pad, [0, 0, pos[2]], [1, 1], TRANSPARENCY(col_menu, tr), _, _, is_debug_mesh);
+      // this.menu = Create_widget_section(_, SECTION.VERTICAL, pad, [0, 0, pos[2]], [1, 1], TRANSPARENCY(col_menu, tr), _, _, is_debug_mesh);
+      this.menu = Create_widget_section(_, SECTION.VERTICAL, pad, [0, 0, pos[2]], [1, 1], col_menu, _, _, is_debug_mesh);
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.parent = this;
       AddArr2(this.menu.total_margin, this.menu.StylesGetPad());
@@ -1231,6 +1230,17 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
             mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
             continue_recur = false;
          }
+         else if(mesh.scroller_comp !== null){
+
+            console.log(mesh.GetName())
+            
+            const root_meshidx = Widget_root_buffer_get_root_meshidx(mesh.root_bufferidx);
+            const widget_root = mesh;
+            Scroller_component_set_pos(mesh.scroller_comp, widget_root, cur_pos[0]-mesh.geom.pos[0], cur_pos[1]-mesh.geom.pos[1]);
+            
+            mesh.geom.pos[0] = rel_pos[0]; 
+            mesh.geom.pos[1] = rel_pos[1];
+         }
          else if(mesh.type & MESH_TYPE.WIDGET_SLIDER){
    
             // mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
@@ -1264,27 +1274,23 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
             if(mesh.text_mesh) continue_recur = false;
          }
 
-         // console.log(mesh.GetName(), mesh.scroller_comp)
-         if(mesh.scroller_comp !== null){
-            console.log(mesh.GetName(), mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY())
-            console.log(mesh.GetName(), cur_pos[0], cur_pos[1])
+         // // console.log(mesh.GetName(), mesh.scroller_comp)
+         // if(mesh.scroller_comp !== null){
+         //    console.log(mesh.GetName(), mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY())
+         //    console.log(mesh.GetName(), cur_pos[0], cur_pos[1])
             
-            const root_meshidx = Widget_root_buffer_get_root_meshidx(mesh.root_bufferidx);
-            // const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
-            const widget_root = mesh;
-            Scroller_component_set_pos(mesh.scroller_comp, widget_root, cur_pos[0], cur_pos[1]);
-            console.log(mesh.GetName())
-            // Mesh_unif_set_vb_root_wpos(mesh.scroller_comp.root_posidx, cur_pos[0]+200, cur_pos[1]);
-
-            // Mesh_unif_set_vb_root_wpos(mesh.scroller_comp.root_posidx, mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.geom.pos[1]-mesh.geom.dim[1]*2)
-            // Mesh_unif_set_vb_root_wpos(mesh.scroller_comp.root_posidx, mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY()-mesh.geom.dim[1]*2);
-            // Mesh_unif_set_vb_root_wpos(mesh.root_posidx, mesh.scroller_comp.geom.pos[0], mesh.scroller_comp.geom.pos[1]);  
-            
-            // Scroller_component_update_scrolled_section_pos_by_uniform(mesh, mesh.scroller_comp);
-            
-            // Scroller_component_calculate_handle_pos_dim(mesh, mesh.scroller_comp);
-            // Mesh_unif_set_vb_root_wpos(mesh.scroller_comp.root_posidx, mesh.GetPosX()-20, mesh.GetPosY()-80)
-         }
+         //    const root_meshidx = Widget_root_buffer_get_root_meshidx(mesh.root_bufferidx);
+         //    // const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
+         //    const widget_root = mesh;
+         //    // const dx = mesh.geom.pos[0] - cur_pos[0];
+         //    // const dy = mesh.geom.pos[1] - cur_pos[1];
+         //    // Scroller_component_set_pos(mesh.scroller_comp, widget_root, dx, dy);
+         //    Scroller_component_set_pos(mesh.scroller_comp, widget_root, cur_pos[0], cur_pos[1]);
+         //    // Scroller_component_set_pos(mesh.scroller_comp, widget_root, mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY());
+         //    // Scroller_component_calculate_handle_pos_dim(mesh.scroller_comp, widget_root);
+         //    // Scroller_component_calculate_handle_pos_dim(mesh.scroller_comp, widget_root, cur_pos[0], cur_pos[1]);
+         //    // console.log(mesh.GetName())
+         // }
    
    
          if(parent.rel_comp){

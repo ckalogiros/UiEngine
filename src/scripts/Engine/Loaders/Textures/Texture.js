@@ -92,7 +92,7 @@ export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT){
 			Font_create_uvmap(textureid);
 
-			uvmap_idx = Font_load_uvs();
+			uvmap_idx = Font_load_uvs(textureid);
 		}
 	}
 	else {

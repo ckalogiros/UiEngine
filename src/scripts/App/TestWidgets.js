@@ -73,55 +73,11 @@ function CLBK_TIMER_CYCLE() {
 
 function TestScrollerComponent() {
 
-    {
+    const dp = CreateDropdown([0, 0, 0], ROOT_WIDGETS.CREATE_ROOT);
 
-        // const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [10, 10, 0], [100, 40], GREY[4]);
-        // s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        // s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        // s.SetName('Scrolled Section');
-
-
-        // for (let i = 0; i < 25; i++) {
-
-        //     const l = Create_widget_label(_, 'l' + i, _, _, _, YELLOWL[6], _, [5, 5]);
-        //     l.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-        //     s.AddItem(l)
-        // }
-
-
-        // // s.options = SECTION.VERTICAL|SECTION.FIXED_H
-        // s.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT
-        // s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-
-        // s.Calc_no_gfx_update();
-
-
-        // s.Render();
-        // Widget_root_activate_all_vbs_in_renderqueue(s.root_bufferidx);
-
-        // Construct_listen_events_from_mesh_tree(s);
-        // Construct_listen_events_relations_from_mesh_tree(s);
-
-        // s.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, s.gfx.vb.groupidx);
-
-
-        // const scroller_component = Components_create_scroller_component(s, 100);
-        // Scroller_component_calculate_scroller_component(s, scroller_component);
-        // Scoller_component_gengfx_and_render(scroller_component);
-    }
-
-    {
-        const dp = CreateDropdown([100, 100, 0], ROOT_WIDGETS.CREATE_ROOT);
-
-        const scroller_component = Components_create_scroller_component(dp, 100, );
-        // Scroller_component_calculate_scroller_component(dp, scroller_component);
-        Scoller_component_gengfx_and_render(scroller_component, dp);
-        Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(dp.root_posidx , scroller_component.root_posidx) 
-        // Listeners_set_priority(E.C, scroller_component.listeners);
-    }
-
-
+    const scroller_component = Components_create_scroller_component(dp, 100, );
+    Scoller_component_gengfx_and_render(scroller_component, dp);
+    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(dp.root_posidx , scroller_component.root_posidx) 
 
 }
 
@@ -131,16 +87,16 @@ function TestScrollerComponent2() {
 
     {
 
-        const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [10, 10, 0], [100, 40], GREY[4]);
+        const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [100, 100, 0], [100, 40], GREY[4]);
         s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        s.SetName('Scrolled Section');
+        s.SetName('Main Section');
         
         
         
         let mesh_to_add_scroller1 = null;
         {
-            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [10, 10, 0], [100, 40], YELLOWR[4]);
+            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [100, 40], YELLOWR[4]);
             s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             s.AddItem(s2)
             s2.SetName('SS2');
@@ -152,9 +108,9 @@ function TestScrollerComponent2() {
             dp.SetName('DP');
             s2.AddItem(dp)
             
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 2; i++) {
                 
-                const s3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [10, 10, 0], [100, 40], BLUEL[4]);
+                const s3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [100, 40], BLUEL[4]);
                 s3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
                 s3.SetName('S3');
                 dp.AddToMenu(s3)
@@ -167,7 +123,7 @@ function TestScrollerComponent2() {
                 s3.AddItem(dp1)
                 
                 
-                const l = Create_widget_label(_, 'l' + i, _, _, _, YELLOWL[6], _, [5, 5]);
+                const l = Create_widget_label(_, 'label +++' + i, _, _, _, YELLOWL[6], _, [5, 5]);
                 l.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
                 dp1.AddToMenu(l)
                 
@@ -182,7 +138,7 @@ function TestScrollerComponent2() {
         let mesh_to_add_scroller2 = null;
         {
 
-            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [10, 10, 0], [100, 40], YELLOWR[4]);
+            const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [100, 40], YELLOWR[4]);
             s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             s.AddItem(s2)
             s2.SetName('SS3');
@@ -194,9 +150,9 @@ function TestScrollerComponent2() {
             dp.SetName('DP');
             s2.AddItem(dp)
             
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 2; i++) {
                 
-                const s3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [10, 10, 0], [100, 40], BLUEL[4]);
+                const s3 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [100, 40], BLUEL[4]);
                 s3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
                 s3.SetName('S3');
                 dp.AddToMenu(s3)
@@ -239,18 +195,15 @@ function TestScrollerComponent2() {
 
         
         const scroller_component1 = Components_create_scroller_component(mesh_to_add_scroller1, mesh_to_add_scroller1.geom.dim[1]);
-        // Scroller_component_calculate_scroller_component(mesh_to_add_scroller1, scroller_component1);
         Scoller_component_gengfx_and_render(scroller_component1, mesh_to_add_scroller1);
-        Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(mesh_to_add_scroller1.root_posidx , scroller_component1.root_posidx) 
+        Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(mesh_to_add_scroller1.root_posidx , scroller_component1.root_posidx);
+        Listeners_set_priority(E.C, scroller_component1.listeners)
         
         const scroller_component2 = Components_create_scroller_component(mesh_to_add_scroller2, mesh_to_add_scroller2.geom.dim[1]);
-        // Scroller_component_calculate_scroller_component(mesh_to_add_scroller2, scroller_component2);
         Scoller_component_gengfx_and_render(scroller_component2, mesh_to_add_scroller2);
         Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(mesh_to_add_scroller2.root_posidx , scroller_component2.root_posidx);
+        Listeners_set_priority(E.C, scroller_component2.listeners)
         
-        
-        // Listeners_set_priority(E.C, scroller_component1.listeners);
-        // Listeners_set_priority(E.C, scroller_component2.listeners);
     }
 
 }
@@ -260,7 +213,7 @@ function TestScrollerComponent2() {
 function TestScrollerComponent3() {
 
 
-    const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [10, 10, 0], [100, 40], GREY[4]);
+    const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [100, 40], GREY[4]);
     s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     s.SetName('Scrolled Section');
@@ -270,7 +223,7 @@ function TestScrollerComponent3() {
     let mesh_to_add_scroller1 = null;
     let scrolled_meshes_buffer = [];
         
-    const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [10, 10, 0], [100, 40], YELLOWR[4]);
+    const s2 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [100, 40], YELLOWR[4]);
     s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     s.AddItem(s2)
     s2.SetName('SS2');
@@ -347,10 +300,8 @@ function TestScrollerComponent3() {
     
     for(let i=0; i < scrolled_meshes_buffer.length; i++){
 
-        // const scroller_component1 = Components_create_scroller_component(scrolled_meshes_buffer[i], scrolled_meshes_buffer[i].geom.dim[1]);
-        const scroller_component1 = Components_create_scroller_component(scrolled_meshes_buffer[i], 30);
-        Scroller_component_calculate_scroller_component(scrolled_meshes_buffer[i], scroller_component1);
-        Scoller_component_gengfx_and_render(scroller_component1);
+        const scroller_component1 = Components_create_scroller_component(scrolled_meshes_buffer[i], scrolled_meshes_buffer[i].geom.dim[1]);
+        Scoller_component_gengfx_and_render(scroller_component1, scrolled_meshes_buffer[i]);
         Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(scrolled_meshes_buffer[i].root_posidx , scroller_component1.root_posidx);
         Listeners_set_priority(E.C, scroller_component1.listeners)
     }
@@ -364,9 +315,11 @@ export function TestWidgetsGeneric(scene) {
 
     let ypos = 500
 
+    // const device_info = Create_widget;
+
 
     // TestScrollerComponent();
-    TestScrollerComponent2()
+    // TestScrollerComponent2()
     // TestScrollerComponent3()
 
 
@@ -532,7 +485,7 @@ export function TestWidgetsGeneric(scene) {
 
     { // Widget: Label-buttons
 
-        // const label = CreateLabel('ABCDEFGHIJKLM');
+        const label = CreateLabel('AThis is a Text !?');
         // // CreateLabel('\\/+0');
         // const label = CreateLabel('CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line););CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line');
         // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
@@ -570,7 +523,7 @@ export function TestWidgetsGeneric(scene) {
         /**************************/
         // CreateGlowParticles(0, 100);
 
-        // CreateBallTailParticles(0, 0,);
+        // CreateBallTailParticles(0, 0, _, _);
 
         // CreateSmokeParticles(0, 0);
 
@@ -619,7 +572,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Must draw last so it is on top of everything
 
-    // Debug_info_ui_static();
+    Debug_info_ui_static();
 
 }
 
@@ -770,7 +723,7 @@ function CreateLabel(name = 'Label ') {
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.RIGHT | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.BOTTOM, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
-    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, fontsize, GREY[0], WHITE, [5, 5], .5);
+    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, 10, GREY[0], WHITE, [0, 0], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -783,6 +736,8 @@ function CreateLabel(name = 'Label ') {
     label.Render()
     Widget_root_activate_all_vbs_in_renderqueue(label.root_bufferidx);
     label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
+    
+    Construct_listen_events_from_mesh_tree(label);
     Construct_listen_events_relations_from_mesh_tree(label);
 
 

@@ -148,7 +148,8 @@ export class FontMaterial extends Material {
       math.CopyArr2(this.sdf_params, sdf_params);
       this.texidx = texidx;
       
-      this.sid.attr |= SID.ATTR.TEX2 | SID.ATTR.MSDF; // 
+      // this.sid.attr |= SID.ATTR.TEX2 | SID.ATTR.MSDF; // 
+      this.sid.attr |= SID.ATTR.TEX2; // 
       this.type |= MESH_TYPE.FONT_MATERIAL;
 
       // Load texture and uv map, via indexes to the actual buffers

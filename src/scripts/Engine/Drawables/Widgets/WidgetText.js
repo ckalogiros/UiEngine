@@ -132,28 +132,28 @@ export class Widget_Text extends Text_Mesh {
 
 
 	ClampX(x, margin = 0) {
+alert('00998877655')
+		// const clamp = x - margin;
+		// // const clamp = x - margin*2;
 
-		const clamp = x - margin;
-		// const clamp = x - margin*2;
+		// const char_width = Floor(this.fontsize * Font_get_font_advancex(this.mat.texidx)) * 2;
+		// let text_width = char_width;
+		// let k = 0; // Will store the number of characters need to be clamped.
+		// // Calculate how many characters we must ommit.
+		// while (text_width + char_width < clamp && k < this.geom.num_faces) {
+		// 	text_width += char_width;
+		// 	k++;
+		// }
+		// this.geom.num_faces = k;
 
-		const char_width = Floor(this.fontsize * Font_get_font_advancex(this.mat.texidx)) * 2;
-		let text_width = char_width;
-		let k = 0; // Will store the number of characters need to be clamped.
-		// Calculate how many characters we must ommit.
-		while (text_width + char_width < clamp && k < this.geom.num_faces) {
-			text_width += char_width;
-			k++;
-		}
-		this.geom.num_faces = k;
+		// // Update the gfx buffers, if the mesh is already inserted.
+		// if (this.is_gfx_inserted) {
+		// 	// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
 
-		// Update the gfx buffers, if the mesh is already inserted.
-		if (this.is_gfx_inserted) {
-			// TODO: Here we decide if we rebuild the vertex buffer or just not draw the ommited text
-
-			const ommited_chars = this.mat.char_buffer.boundary - this.geom.num_faces - 1;
-			Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces - 1, ommited_chars); // Update alpha in text vertex buffer
-			// Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, this.geom.num_faces); // Update alpha in text vertex buffer
-		}
+		// 	const ommited_chars = this.mat.char_buffer.boundary - this.geom.num_faces - 1;
+		// 	Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces - 1, ommited_chars); // Update alpha in text vertex buffer
+		// 	// Gl_set_alpha_from_offset(this.gfx, 0, this.geom.num_faces, this.geom.num_faces); // Update alpha in text vertex buffer
+		// }
 	}
 
 

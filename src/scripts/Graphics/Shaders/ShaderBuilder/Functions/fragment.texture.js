@@ -60,7 +60,7 @@ vec4 Msdf() {\n\
   float pxDist = screenPxRange() * (dist - 0.5);\n\
   float opacity = clamp(pxDist + 0.5, 0.0, 1.0);\n\
   // opacity += Glow() * 2.4; // Combine the original texture with the blurred alpha\n\
-  vec4 alpha = vec4(opacity+.0); \n\
+  vec4 alpha = vec4(opacity+.2); \n\
   return alpha; \n\
 }\n\
 ';
@@ -107,7 +107,7 @@ export const frag_tex = '\n\
   float min = .1097;\n\
   float max = .1113;\n\
   color.rgb *= texture( u_sampler0, v_tex_coord).rgb;\n\
-  if((color.r >= min && color.r <= max) && (color.g >= min && color.g <= max) && (color.b >= min && color.b <= max)) color.a = 0.0;\n\
+  // if((color.r >= min && color.r <= max) && (color.g >= min && color.g <= max) && (color.b >= min && color.b <= max)) color.a = 0.0;\n\
   // if((color.r >= min && color.r <= max)) color.a = 0.0;\n\
   color.rgb *= color.a;\n\
 ';

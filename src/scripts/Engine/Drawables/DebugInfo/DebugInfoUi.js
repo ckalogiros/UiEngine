@@ -58,32 +58,135 @@ export function Debug_info_ui_static(){
    const g_ms = 0;
    let ms = 500;
    const align = ALIGN.HORIZONTAL;
+   // const align = ALIGN.VERTICAL;
 
    //TODO: Name all the timers correctly
 
    // Use custom interval for all debug ui for efficiency
    let generic_time_interval = INT_NULL;
 
-   { // FPS average 1 second
+   // { // FPS average 1 second
+
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'FPS:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
+   //    section.AddItem(timer);
+
+   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
+   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+
+   //    timer.CreateNewText('Meshes:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+   //    timer.CreateNewText('000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_buffer_get_count, _, _, _); // idx param is for use in creating separate timer for each widget dynamic text.
+   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+   //    timer.CreateNewText('Active VBs:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   //    // timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Vertex_buffer_get_Active_count, _, _, generic_time_interval)
+   //    timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Renderqueue_get_count, _, _, generic_time_interval)
+   // }
+   // { // Device Info
+
+   //    ms = (g_ms) ? g_ms : 1000;
+   //    const timer = Create_widget_multi_text(_, 'MAX-WIDTH:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
+   //    section.AddItem(timer);
+
+   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, ()=>{return DEVICE.MAX_WIDTH}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
+   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+
+   //    timer.CreateNewText('MAX-HEIGHT:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+   //    timer.CreateNewText('000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Stats MeshCount`, ms, ()=>{return DEVICE.MAX_HEIGHT}, _, _, _); // idx param is for use in creating separate timer for each widget dynamic text.
+   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      
+   //    timer.CreateNewText('MARGIN-LEFT:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, ()=>{return VIEWPORT.MARGIN.LEFT}, _, _, generic_time_interval)
+   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      
+   //    timer.CreateNewText('MARGIN-RIGHT:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+   //    timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+   //    timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, ()=>{return VIEWPORT.MARGIN.RIGHT}, _, _, generic_time_interval)
+   //    generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+   // }
+   { // Device Info
+      /**
+         DEVICE.info: 
+         inner_width:window.innerWidth,
+         inner_height:window.innerHeight,
+         outer_width:window.outerWidth,
+         outer_height:window.outerHeight,
+         
+         page_xoffset:window.pageXOffset,
+         page_yoffset:window.pageYOffset,
+         
+         gpu:window.navigator.gpu,
+         
+         virtual_keyboard:window.navigator.virtualKeyboard,
+
+         offsetHeight:   document.documentElement.offsetHeight,
+         offsetLeft:   document.documentElement.offsetLeft,
+         offsetParent:   document.documentElement.offsetParent,
+         offsetTop:   document.documentElement.offsetTop,
+         offsetWidth:   document.documentElement.offsetWidth,
+         clientHeight:   document.documentElement.clientHeight,
+         clientLeft:   document.documentElement.clientLeft,
+         clientTop:   document.documentElement.clientTop,
+         clientWidth:   document.documentElement.clientWidth,
+       */
 
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'FPS:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
-      section.AddItem(timer);
+      const nfo1 = Create_widget_multi_text(_, 'clientHeight:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
+      section.AddItem(nfo1);
+      nfo1.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      nfo1.SetDynamicText(`ms${ms} Renderloop avg`, ms, ()=>{return DEVICE.info.clientHeight}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo1 for each widget dynamic text.
+      generic_time_interval = nfo1.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      nfo1.CreateNewText('clientLeft:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+      nfo1.CreateNewText('000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      nfo1.SetDynamicText(`ms${ms} Stats MeshCount`, ms, ()=>{return DEVICE.info.clientLeft}, _, _, _); // idx param is for use in creating separate nfo1 for each widget dynamic text.
+      generic_time_interval = nfo1.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
-      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      
+      //////////////////////////////////////////////////////////
+      const nfo12 = Create_widget_multi_text(_, 'clientTop:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
+      section.AddItem(nfo12);
+      nfo12.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      nfo12.SetDynamicText(`ms${ms} Renderloop avg`, ms, ()=>{return DEVICE.info.clientTop}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo1 for each widget dynamic text.
+      generic_time_interval = nfo12.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      nfo12.CreateNewText('clientWidth:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+      nfo12.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      nfo12.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, ()=>{return DEVICE.info.clientWidth}, _, _, generic_time_interval)
+      generic_time_interval = nfo12.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
+      
+      
+      //////////////////////////////////////////////////////////
+      const nfo3 = Create_widget_multi_text(_, 'offsetLeft:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
+      section.AddItem(nfo3);
+      nfo3.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      nfo3.SetDynamicText(`ms${ms} Renderloop avg`, ms, ()=>{return DEVICE.info.offsetLeft}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo2 for each widget dynamic text.
+      generic_time_interval = nfo3.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      nfo3.CreateNewText('offsetHeight:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+      nfo3.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      nfo3.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, ()=>{return DEVICE.info.offsetHeight}, _, _, generic_time_interval)
+      generic_time_interval = nfo3.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-      timer.CreateNewText('Meshes:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
-      timer.CreateNewText('000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_buffer_get_count, _, _, _); // idx param is for use in creating separate timer for each widget dynamic text.
-      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      
+      
+      //////////////////////////////////////////////////////////
+      const nfo4 = Create_widget_multi_text(_, 'offsetWidth:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
+      section.AddItem(nfo4);
+      nfo4.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      nfo4.SetDynamicText(`ms${ms} Renderloop avg`, ms, ()=>{return DEVICE.info.offsetWidth}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo2 for each widget dynamic text.
+      generic_time_interval = nfo4.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      nfo4.CreateNewText('offsetTop:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+      nfo4.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      nfo4.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, ()=>{return DEVICE.info.offsetTop}, _, _, generic_time_interval)
+      generic_time_interval = nfo4.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-      timer.CreateNewText('Active VBs:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
-      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      // timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Vertex_buffer_get_Active_count, _, _, generic_time_interval)
-      timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Renderqueue_get_count, _, _, generic_time_interval)
    }
 
 
@@ -163,39 +266,39 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,0,0]) {
 
       const section_col = GREY[1];
 
-      // /************************************************************************************************************************************************/
-      // // Performance timers
-      // const stats_ui = Ui_create_label_switch('Stats', fontsize, switch_size, Debug_info_create_ui_stats, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      // dp.AddToMenu(stats_ui);
+      /************************************************************************************************************************************************/
+      // Performance timers
+      const stats_ui = Ui_create_label_switch('Stats', fontsize, switch_size, Debug_info_create_ui_stats, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      dp.AddToMenu(stats_ui);
 
 
-      // /************************************************************************************************************************************************/
-      // // Performance timers
-      // const perf_timers_ui = Ui_create_label_switch('Performance', fontsize, switch_size, Debug_info_create_ui_performance_timers, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      // dp.AddToMenu(perf_timers_ui);
+      /************************************************************************************************************************************************/
+      // Performance timers
+      const perf_timers_ui = Ui_create_label_switch('Performance', fontsize, switch_size, Debug_info_create_ui_performance_timers, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      dp.AddToMenu(perf_timers_ui);
 
 
-      // /************************************************************************************************************************************************/
-      // // Mouse Info
-      // const mouse_ui = Ui_create_label_switch('Mouse', fontsize, switch_size, Debug_info_create_ui_mouse, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      // dp.AddToMenu(mouse_ui);
+      /************************************************************************************************************************************************/
+      // Mouse Info
+      const mouse_ui = Ui_create_label_switch('Mouse', fontsize, switch_size, Debug_info_create_ui_mouse, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      dp.AddToMenu(mouse_ui);
 
 
-      // /************************************************************************************************************************************************/
-      // // Mesh Tree
-      // const mesh_ui = Ui_create_label_switch('Mesh Tree', fontsize, switch_size, Debug_info_create_mesh_info, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      // dp.AddToMenu(mesh_ui);
+      /************************************************************************************************************************************************/
+      // Mesh Tree
+      const mesh_ui = Ui_create_label_switch('Mesh Tree', fontsize, switch_size, Debug_info_create_mesh_info, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      dp.AddToMenu(mesh_ui);
 
 
-      // /************************************************************************************************************************************************/
-      // // Mesh Buffer
-      // const mesh_buffer_ui = Ui_create_label_switch('Mesh Buffer', fontsize, switch_size, Debug_info_mesh_buffer_create_ui, NOTIFICATION_TYPE.MESH_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      // dp.AddToMenu(mesh_buffer_ui);
+      /************************************************************************************************************************************************/
+      // Mesh Buffer
+      const mesh_buffer_ui = Ui_create_label_switch('Mesh Buffer', fontsize, switch_size, Debug_info_mesh_buffer_create_ui, NOTIFICATION_TYPE.MESH_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      dp.AddToMenu(mesh_buffer_ui);
 
-      // /************************************************************************************************************************************************/
-      // // String Buffer
-      // const string_buffer_ui = Ui_create_label_switch('String Buffer', fontsize, switch_size, Debug_info_string_buffer_create_ui, NOTIFICATION_TYPE.STRING_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      // dp.AddToMenu(string_buffer_ui);
+      /************************************************************************************************************************************************/
+      // String Buffer
+      const string_buffer_ui = Ui_create_label_switch('String Buffer', fontsize, switch_size, Debug_info_string_buffer_create_ui, NOTIFICATION_TYPE.STRING_BUFFER_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      dp.AddToMenu(string_buffer_ui);
 
       /************************************************************************************************************************************************/
       // Mesh per vb Buffer

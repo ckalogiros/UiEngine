@@ -174,6 +174,7 @@ const DEVICE = {
 	height: 0,
 	ratio: 1, // Create same proportions throughout any device. It measures the ratio of the game's build device width and the current device width
 	device_scale:1, // Scale fonts depending on the device platform
+	info:{},
 }
 
 
@@ -731,6 +732,8 @@ const TEXTURE_TYPE = {
 
 // Textures
 // Font textures
+// const FONT_CONSOLAS_20px = '../../../../resources/fonts/consolas_5/consolas_5.bmp';
+const FONT_CONSOLAS_20px = 'consolas_5';
 const FONT_CONSOLAS_SDF_LARGE = 'consolas_sdf_11115w';
 const FONT_CONSOLAS_SDF_SMALL = 'consolas_sdf_2048w';
 const COMIC_FONT_METRICS_PATH = '../../../../resources/fonts/consolas_sdf/metrics/consolas_sdf35.txt'
@@ -751,6 +754,13 @@ const TEXTURE_PATHS = [
 		imgName: TEST_MTSDF_FONT_TEST_1024DIM,
 		imgType: 'png',
 	},
+	{
+		// imgPath: 'fonts/consolas_5',
+		imgPath: 'fonts/consolas_5_new',
+		imgName: FONT_CONSOLAS_20px,
+		// imgType: 'png',
+		imgType: 'bmp',
+	},
 ];
 
 
@@ -765,6 +775,7 @@ const TEXTURES = {
 	// POTENTIAL_BUG: 
 	// IMPORTANT:Font textures MUST precede all other textures
 	MSDF_CONSOLAS_1024: g_cnt++,
+	CONSOLAS_20px: g_cnt++,
 	FONT_COUNT: g_cnt,
 
 	COUNT: g_cnt,

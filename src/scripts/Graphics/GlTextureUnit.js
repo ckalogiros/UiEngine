@@ -26,16 +26,16 @@ export class Gl_Texture {
 
 
 export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=0) {
-/**                gl.RGBA8
-                gl.SRGB8_ALPHA8 (also available as an extension for WebGL 1, see below)
-                gl.RGB10_A2
-                gl.RGBA8UI
-                gl.RGBA8I
-                gl.RGB10_A2UI
-                gl.RGBA16UI
-                gl.RGBA16I
-                gl.RGBA32I
-                gl.RGBA32UI */
+/** gl.RGBA8
+    gl.SRGB8_ALPHA8 (also available as an extension for WebGL 1, see below)
+    gl.RGB10_A2
+    gl.RGBA8UI
+    gl.RGBA8I
+    gl.RGB10_A2UI
+    gl.RGBA16UI
+    gl.RGBA16I
+    gl.RGBA32I
+    gl.RGBA32UI */
     const texture = new Gl_Texture();
     texture.tex_unit_id = gl.TEXTURE0 + idx; // Advance the texture ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
     texture.texidx = idx; // Advance the texture ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
@@ -72,8 +72,10 @@ export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=
          * GL_REPEAT
          * GL_MIRRORED_REPEAT
          */
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.GL_CLAMP_TO_BORDER);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.GL_CLAMP_TO_BORDER);
+        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.GL_CLAMP_TO_BORDER);
+        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.GL_CLAMP_TO_BORDER);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
@@ -94,10 +96,10 @@ function Gl_texture_unit_load(gl, texture) {
         gl.texImage2D(gl.TEXTURE_2D, texture.level, texture.internalFormat, texture.img.width, 
                         texture.img.height, 0, texture.srcFormat, texture.srcType, texture.img);
 
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 

@@ -188,6 +188,7 @@ function Renderer_create_webgl_context(canvas) {
     */
    gfxctx.enable(gfxctx.BLEND);
    gfxctx.blendFunc(gfxctx.DST_ALPHA, gfxctx.ONE_MINUS_SRC_ALPHA);
+   // gfxctx.blendFunc(gfxctx.SRC_ALPHA, gfxctx.ONE_MINUS_SRC_ALPHA);
 
    {
       // gfxctx.blendFunc(gfxctx.SRC_ALPHA, gfxctx.ONE_MINUS_SRC_ALPHA);
