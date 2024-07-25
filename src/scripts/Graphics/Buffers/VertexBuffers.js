@@ -418,6 +418,12 @@ export function Vertex_buffer_group_set_texidx(vb_groupidx, texidx) {
 
 
 
+export function Vertex_buffer_group_get_texidx(vb_groupidx) {
+    return _vertex_buffer_groups.buffer[vb_groupidx].texidx;
+}
+
+
+
 export function Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx) {
     _vertex_buffer_groups.buffer[vb_groupidx].ibidx = ibidx;
 }
@@ -736,7 +742,7 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces=0, dbg_mes
 
 
         // Store the texture index in the vertex
-        vb_info.texidx = mat.texidx;
+        vb_info.texidx = mat.textureid;
         gfx.vb.counts.buffer[i] = verts_per_rect * vb_info.attribs_info.count;
 
         // gfx.vb.counts.buffer[i] = vb_info.count;
@@ -803,7 +809,7 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces
 
 
         // Store the texture index in the vertex
-        vb_info.texidx = mat.texidx;
+        vb_info.texidx = mat.textureid;
         gfx.vb.counts.buffer[i] = VERTS_PER_RECT_INDEXED * vb_info.attribs_info.count;
 
 

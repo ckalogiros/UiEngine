@@ -152,7 +152,7 @@
 // }
 // `;
 /**SAVE */
-export const frag_smoke_call = `\
+export const frag_smoke_call = `
 
    vec4 shader_col = Smoke();
    color = shader_col;

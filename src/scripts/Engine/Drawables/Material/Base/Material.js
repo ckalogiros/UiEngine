@@ -19,7 +19,8 @@ export class Material {
    // defCol;  Array: Store the initial color, used as a storage buffer
    // style;  Array: of [];
    // uv;  Array: of [v1,u1,v2,u2]
-   // uvIdx;  Value: The index of the uvmap data for the texture
+   // uvIdx;  Value: The index of the uvmap data for the texture 
+   // textureid;  Value: The textuure id of type 'TEXTURE.'
    // texidx;  Value: The index of the texture
 
    // TODO
@@ -45,6 +46,7 @@ export class Material {
       this.style = [0, 0, 0]; // Initialize style: []
       this.uv = [0, 1, 0, 1];
       this.uvIdx = INT_NULL;
+      this.textureid = INT_NULL;
       this.texidx = INT_NULL;
 
 
@@ -114,6 +116,7 @@ alert('00188723')
          math.CopyArr4(this.uv, mat.uv);
          math.CopyArr3(this.style, mat.style);
          this.type = mat.type;
+         this.textureid = mat.textureid;
          this.texidx = mat.texidx;
          this.uvIdx = mat.uvIdx;
 
@@ -131,9 +134,9 @@ export class FontMaterial extends Material {
    // temp_max_chars_inserted_in_gfx;
    // sdf_params;
 
-   constructor(col = [1, 1, 1, 1], texidx = INT_NULL, text = '', sdf_params = [.5, .5]) {
+   constructor(col = [1, 1, 1, 1], textureid = INT_NULL, text = '', sdf_params = [.5, .5]) {
 
-      super(col, texidx);
+      super(col, textureid);
 
       
       const len = text.length;
@@ -146,16 +149,16 @@ export class FontMaterial extends Material {
       this.text = text;
       this.sdf_params = [0, 0];
       math.CopyArr2(this.sdf_params, sdf_params);
-      this.texidx = texidx;
+      this.textureid = textureid;
       
       // this.sid.attr |= SID.ATTR.TEX2 | SID.ATTR.MSDF; // 
       this.sid.attr |= SID.ATTR.TEX2; // 
       this.type |= MESH_TYPE.FONT_MATERIAL;
-
+      
       // Load texture and uv map, via indexes to the actual buffers
-      const tex_idxs = Texture_load_texture_byid(this.texidx, TEXTURE_TYPE.TYPE_FONT);
-      this.texidx = tex_idxs.texidx;
-      this.uvIdx = tex_idxs.uvmapidx;
+      const texture = Texture_load_texture_byid(this.textureid, TEXTURE_TYPE.TYPE_FONT);
+      this.texidx = texture.texidx;
+      this.uvIdx = texture.uvmapidx;
 
 
       { // Debug
@@ -181,8 +184,9 @@ export class Texture_Material extends Material {
       this.sid.attr |= SID.ATTR.TEX2; // Enable texture coordinates for the vertex shader
       this.type |= MESH_TYPE.TEXTURE_MATERIAL;
 
-      const tex_idxs = Texture_load_texture_byid(textureid, TEXTURE_TYPE.TYPE_TEXTURE);
-      this.texidx = tex_idxs.texidx;
+      const texture = Texture_load_texture_byid(textureid, TEXTURE_TYPE.TYPE_TEXTURE);
+      this.texidx = texture.texidx;
+      this.textureId = textureid;
       // NOTE: Simple texture does not have a uvmap
 
 

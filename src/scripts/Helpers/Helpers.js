@@ -47,9 +47,9 @@ export function GetRandomColor(){
 
 
 let nextidx = 0;
-export function GetSequencedColor(){
+export function GetSequencedColor(intensity=9){
     if(nextidx >= COLOR_ARRAY3.length) nextidx = 0;
-    return COLOR_ARRAY3[nextidx++][9];
+    return COLOR_ARRAY3[nextidx++][intensity];
     // return COLOR_ARRAY3[nextidx++];
 }
 

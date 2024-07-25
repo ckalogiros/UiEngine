@@ -80,6 +80,10 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       // this.slider_val_unif_ubidx = INT_NULL;
 
    }
+
+
+
+
    /****************************************************************************************************************************************************/
    /****************************************************************************************************************************************************/
    // OVERIDEN METHODS
@@ -340,7 +344,6 @@ export class Widget_Slider_Simple extends Rect_Mesh {
          handle.geom.pos[1] = (this.geom.pos[1] + this.geom.dim[1])- handle.geom.dim[1];
       }
    }
-
    
 
    MoveNoGfxUpdate(x, y) {
@@ -543,80 +546,109 @@ export function Slider_horizontal_on_update_handle(_params) {
 
 /** Update slider handle for vertical sliders */
 export function Slider_vertical_on_update_handle(_params) {
-
+   
    /**
     * The function is called by the timeInterval.
     * The timeInterval has been set by the 'Slider_create_on_click_event',
     * that is called from 'HandleEvents()' 
     * as 'mesh.eventCallbacks.buffer[i].Clbk(target, Clbk);'
     * The 'HandleEvents()' passes the param '_params' to this function.
-    */
-
-   const bar = _params.params;
-   const handle = bar.children.buffer[0];
-
-   if (bar.StateCheck(MESH_STATE.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
-
-      // If bar out of hover, delete the timeInterval for moving the handle
-      const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-      TimeIntervalsDestroyByIdx(intervalIdx);
-      bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
-
-      return;
+   */
+  
+  const bar = _params.params;
+  const handle = bar.children.buffer[0];
+  
+  if (bar.StateCheck(MESH_STATE.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
+     
+     // If bar out of hover, delete the timeInterval for moving the handle
+     const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+     TimeIntervalsDestroyByIdx(intervalIdx);
+     bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
+     
+     return;
    }
-
+   
    Slider_vertical_move_handle(bar, handle);
-
+   
    const val = Slider_vertical_calculate_value(bar, handle); // Calculate slider's value based on the handles position.
-
+   
    // Do stuf with the slider handle value, based on the parent slider_widget
    if (bar.parent) {
       if (bar.parent.SliderSetValueToInfoText) bar.parent.SliderSetValueToInfoText(val);
    }
-
+   
    /**
     * Dispatch all callbacks for all targets, that are
     * stored in eventCallbacks[] buffer.  
-    */
-   if (bar.eventCallbacks) {
-      for (let i = 0; i <= bar.eventCallbacks.boundary; i++) {
-
-         if (bar.eventCallbacks.buffer[i] !== null) {
-
-            // const params = bar.eventCallbacks.buffer[i].clbk_params;
-            const params = bar.eventCallbacks.buffer[i];
-            const Clbk = bar.eventCallbacks.buffer[i].Clbk;
-            Clbk(params, val);
+   */
+  if (bar.eventCallbacks) {
+     for (let i = 0; i <= bar.eventCallbacks.boundary; i++) {
+        
+        if (bar.eventCallbacks.buffer[i] !== null) {
+           
+           // const params = bar.eventCallbacks.buffer[i].clbk_params;
+           const params = bar.eventCallbacks.buffer[i];
+           const Clbk = bar.eventCallbacks.buffer[i].Clbk;
+           Clbk(params, val);
          }
       }
    }
+   
+}
 
+
+/** Set the value for a slider and update the handles position (and value text) */
+export function Slider_simple_set_value(slider_bar, new_value) {
+   
+   const bar = slider_bar;
+   const handle = bar.children.buffer[0];
+   
+   bar.slider_val = new_value;
+
+   // We claculate from origin pos = 0. So we subtract any slider bar pos.
+   const extra_padd = bar.geom.pos[0];
+      
+   if(bar.geom.dim[0] > bar.geom.dim[1]){
+      
+      const pos = ( (bar.geom.dim[0] * 2 * bar.geom.num_faces ) ) *new_value;
+      handle.geom.pos[0] = pos -(handle.geom.dim[0] * 2 * bar.slider_val - extra_padd); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
+      handle.geom.UpdateSetWposX(handle.gfx)
+   }
+   else {
+
+      const handle = bar.children.buffer[0];
+      handle.geom.pos[1] = (bar.geom.dim[1] * 2) - ( (new_value) * (bar.geom.dim[1] * 2)); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
+   }
+
+   if(bar.parent) bar.parent.SliderSetValueToInfoText(new_value);
+   
 }
 
 
 
+/** Connect a simple slider class, has no panel and/or text name/value */
 export function Slider_simple_connect(slider_bar, Clbk, clbk_params) {
-
+   
    const bar = slider_bar;
-
-
+   
+   
    const params = {
       Clbk: Clbk,
       clbk_params: clbk_params,
    }
-
+   
    // bar.CreateEventCallback(params);
    bar.CreateEventCallback(params);
-
+   
    // Run the callback to set the sliders initial value.
    Clbk(params, bar.slider_val);
-
+   
 }
 
 
-
+/** Connect a slider of class Slider, with panel and text name/value */
 export function Slider_connect(slider, Clbk, clbk_params) {
-
+   
    const bar = slider.children.buffer[slider.bar_idx];
 
 
@@ -677,7 +709,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    value_text_idx; // Slider's value text mesh index in children buffer
    bar_idx; // Slider's bar and handle mesh index in children buffer
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col = TRANSPARENCY(GREY[0], .6), hover_margin = [5, 16], name='SLIDER UNAMED', is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos=[0,0,0], dim=[120, 10], col = TRANSPARENCY(GREY[0], .6), hover_margin = [5, 16], name='SLIDER UNAMED', is_debug_mesh) {
 
       // Calculate the bar's and handle's horizontal pading.
       const ratio = dim[0] / dim[1];
@@ -694,7 +726,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
-      const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, name, pos, fontSize, WHITE, .4, is_debug_mesh);
+      const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, name, pos, fontSize, WHITE, .4, _, _, is_debug_mesh);
 
 
       /** Label area mesh */
@@ -723,7 +755,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       // Create value_text
-      const value_text = Create_widget_text(ROOT_WIDGET_FLAGS, '0000', pos, fontSize, WHITE, .4, is_debug_mesh);
+      const value_text = Create_widget_text(ROOT_WIDGET_FLAGS, '0000', pos, fontSize, WHITE, .4, _, _, is_debug_mesh);
 
 
       // Make the vertical area of the bar larger for hover and handle moving.
@@ -1482,14 +1514,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
 
-   SliderSetValueToInfoText(val) {
-      // TODO: This is a HOT-PATH to do so many if statements
-      const value_text = this.children.buffer[this.value_text_idx];
-      if(this.gfx) value_text.RenderTextFromNumber(val); // Change the text mesh to the current slider's value
-      else value_text.SetText(`${val}`);
-   }
-
-
 
 
 
@@ -1499,11 +1523,20 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    // UNIQUE METHODS
    /****************************************************************************************************************************************************/
 
+   SliderSetValueToInfoText(val) {
+      // TODO: This is a HOT-PATH to do so many if statements
+      const value_text = this.children.buffer[this.value_text_idx];
+      if(this.gfx) value_text.RenderTextFromNumber(val); // Change the text mesh to the current slider's value
+      else value_text.SetText(`${val}`);
+   }
+
+
    SliderConnect(Clbk, clbk_params) {
    
       const bar = this.children.buffer[this.bar_idx];
       Slider_simple_connect(bar, Clbk, clbk_params);
    }
+
 
    SetInitialValue(val){
       

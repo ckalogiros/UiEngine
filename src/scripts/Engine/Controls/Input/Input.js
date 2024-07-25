@@ -100,7 +100,7 @@ export function Input_create_user_input_listeners() {
 
     if (canvas.requestFullscreen) canvas.requestFullscreen();
 
-    DEVICE.device_scale = .8;
+    // DEVICE.device_scale = .8;
   }
   else {
 
@@ -132,18 +132,19 @@ export function Device_set_up() {
 
   // const canvas = document.getElementById("canvas");
   DEVICE.width = window.innerWidth;
-  DEVICE.height = window.innerHeight + document.documentElement.offsetHeight*2;
+  DEVICE.height = window.innerHeight;
   console.log('DEVICE width: ', DEVICE.width, ' height: ', DEVICE.height)
   // console.log('WINDOW: ', window)
 
-  if (DEVICE.width > DEVICE.MAX_WIDTH) {
-    VIEWPORT.WIDTH = DEVICE.MAX_WIDTH;
-    VIEWPORT.HEIGHT = DEVICE.height;
-  }
-  else {
+  // TODO: When width is changed resuults are stretched
+  // if (DEVICE.width > DEVICE.MAX_WIDTH) {
+  //   VIEWPORT.WIDTH = DEVICE.MAX_WIDTH;
+  //   VIEWPORT.HEIGHT = DEVICE.height;
+  // }
+  // else {
     VIEWPORT.WIDTH = DEVICE.width;
     VIEWPORT.HEIGHT = DEVICE.height;
-  }
+  // }
   // Update (global) VIEWPORT object
   console.log('VIEWPORT.WIDTH: ', VIEWPORT.WIDTH, ' VIEWPORT.HEIGHT: ', VIEWPORT.HEIGHT)
 

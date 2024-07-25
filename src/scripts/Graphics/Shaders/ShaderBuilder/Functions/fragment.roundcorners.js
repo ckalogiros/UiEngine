@@ -80,15 +80,16 @@ vec2 uv = vec2(0,0);
 
 vec4 Stylize()
 {
+    #ifdef U_SCALE
+        float scale_down = u_scale2.x;
+    #else
+        float scale_down = 1.;
+    #endif
+    
     // Radius(From 0.01 to 0.35 good values) for rounding corners
     float border_width = v_border_width;
     // float scale_down = .25;
     // float scale_down = .5;
-#ifdef U_SCALE
-    float scale_down = u_scale2.x;
-#else
-    float scale_down = 1.;
-#endif
     float scale_up = 1./scale_down;
     vec2 rCorners = vec2(v_rCorners) * scale_down;
     float feather = v_border_feather;

@@ -97,11 +97,12 @@ export function Create_text_mesh(text, pos, fontsize, col, bold, font, is_debug_
 
 
 
-export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, dim, col, name, style, is_debug_mesh=0x0, num_faces) {
+// export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, dim, col, name, style, textureId, is_debug_mesh=0x0, num_faces) {
+export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, dim, col, name, style, num_faces, textureId, is_debug_mesh=0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, pad, pos, dim, col, name, style, num_faces, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, pad, pos, dim, col, name, style, num_faces, textureId, is_debug_mesh));
    
    if(NOTIFICATIONS_ON && !is_debug_mesh) 
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -111,11 +112,11 @@ export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, 
 
 
 
-export function Create_widget_text(ROOT_WIDGET_FLAGS=0x0, text, pos, fontSize, col, bold, pad, is_debug_mesh=0x0) {
+export function Create_widget_text(ROOT_WIDGET_FLAGS=0x0, text, pos, fontSize, col, bold, pad, font, is_debug_mesh=0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, fontSize, col, bold, pad, is_debug_mesh));
+   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, fontSize, col, bold, pad, font, is_debug_mesh));
 
    
    // Store the meshbuffer's index to the newly created mesh.
@@ -130,11 +131,11 @@ export function Create_widget_text(ROOT_WIDGET_FLAGS=0x0, text, pos, fontSize, c
 
 
 
-export function Create_widget_multi_text(ROOT_WIDGET_FLAGS=0x0, text, ALIGNMENT, pos, fontSize, text_col, bold, pad, is_debug_mesh=0x0) {
+export function Create_widget_multi_text(ROOT_WIDGET_FLAGS=0x0, text, ALIGNMENT, pos, fontSize, text_col, bold, pad, font, is_debug_mesh=0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(ROOT_WIDGET_FLAGS, text, ALIGNMENT, pos, fontSize, text_col, bold, pad, is_debug_mesh));
+   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(ROOT_WIDGET_FLAGS, text, ALIGNMENT, pos, fontSize, text_col, bold, pad, font, is_debug_mesh));
    
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;

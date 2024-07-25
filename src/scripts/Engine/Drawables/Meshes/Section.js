@@ -14,7 +14,7 @@ import { BLUEL } from "../Material/Base/Colors.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
-import { Material } from "../Material/Base/Material.js";
+import { Material, Texture_Material } from "../Material/Base/Material.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
@@ -37,14 +37,13 @@ export class Section extends Mesh {
 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), pad = [4, 4], pos = [200, 400, 0],
-      dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = [10, 6, 2.], num_faces = 1, is_debug_mesh) {
+      dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = [10, 6, 2.], num_faces = 1, textureId=INT_NULL, is_debug_mesh) {
 
       const geom = new Geometry2D(pos, dim, _, num_faces);
-      const mat = new Material(col);
+      // Create texture if the user has passed a texture id of type:TEXTURES.
+      const mat = (textureId===INT_NULL) ? new Material(col) : new Texture_Material(col, textureId);
 
       super(geom, mat);
-      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, name, style, pad, num_faces, is_debug_mesh);
-      // super(pos, dim, col, num_faces, is_debug_mesh);
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.total_margin = [0, 0];
@@ -331,6 +330,7 @@ export class Section extends Mesh {
       return this.gfx.vb.start;
    }
 
+   
    DeactivateGfx() {
 
       super.DeactivateGfx();
@@ -505,7 +505,7 @@ export class Section extends Mesh {
                // console.log('X Y RESIZE');
 
                const OnResizeFn = section.OnResize;
-               const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, section);
+               const idx = TimeIntervalsCreate(10, 'ResizeXY Section', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, section);
                section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
             }
             else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
@@ -530,7 +530,7 @@ export class Section extends Mesh {
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
           * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
           */
-         const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, section);
+         const idx = TimeIntervalsCreate(10, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, section);
          section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
          if (section.StateCheck(MESH_STATE.IS_GRABABLE)) {
@@ -629,10 +629,23 @@ export class Section extends Mesh {
    /*******************************************************************************************************************************************************/
 
    Move(x, y) {
-      alert('Section.js\nMove')
+      // alert('Section.js\nMove')
       if (x === 0 && y === 0) return;
 
-      Mesh_unif_add_vb_root_wpos(this.root_posidx, x, y);
+      // alert('Section.js\nMoveNoGfxUpdate')
+      // this.geom.pos[0] += x;
+      // this.geom.pos[1] += y;
+      // this.geom.UpdateAddWposXY(this.gfx);
+      
+      
+      this.geom.pos[0] += x;
+      this.geom.pos[1] += y;
+      this.geom.AddWposXY(this.gfx, x, y);
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if(child===undefined || child===null) alert('43321455265 \n child is null');
+         child.Move(x, y);
+      }
 
    }
 

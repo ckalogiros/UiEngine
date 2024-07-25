@@ -7,6 +7,7 @@ export const frag_noise = `\
 #define MAX_SPEED 19.
 
 #ifndef UV_READY
+    // #define UV_READY 1
     vec2 uv = vec2(0,0);
 #endif
 
@@ -68,39 +69,32 @@ vec4 color = v_col;
     vec2 dim = v_dim; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
     
    
-#ifndef UV_READY
-   #define UV_READY 1
-   uv = (gl_FragCoord.xy-(res*.5));
-   uv.x += (res.x*.5); // Center mesh to screen
-   uv.y -= (res.y*.5); // Center mesh to screen
-   
-   vec2 wpos = v_wpos;
-   uv.x -= wpos.x; // To move with mesh position
-   uv.y += wpos.y; // To move with mesh position
-   
-   uv.x -= dim.x; // Subtract constant dimention
-   uv.y -= -dim.y; // Subtract constant dimention
-#endif
+    #ifndef UV_READY
+        #define UV_READY 1
+        uv = (gl_FragCoord.xy-(res*.5));
+        uv.x += (res.x*.5); // Center mesh to screen
+        uv.y -= (res.y*.5); // Center mesh to screen
+        
+        vec2 wpos = v_wpos;
+        uv.x -= wpos.x; // To move with mesh position
+        uv.y += wpos.y; // To move with mesh position
+        
+        uv.x -= dim.x; // Subtract constant dimention
+        uv.y -= -dim.y; // Subtract constant dimention
+    #endif
     
     vec2 uv2 = (gl_FragCoord.xy-(res*.5))/res;
-    // float res_ratio = res.x/res.y;
     float res_ratio = res.y/res.x;
-    // float res_ratio = min(res.y,res.x) / max(res.y,res.x); 
-    // uv.x /= res_ratio;
-    // uv2.x *= res_ratio;
     uv2.y *= res_ratio;
    
    
    
     float d2 = 1.- smoothstep(0.0, dim.y, length(uv));
     float shape = d2 ;
-    // float shape = d2 * min(2.9, controls*.5);
-    // shape *= revT * (MAX_SPEED-controls) * .1;
     shape *= revT * (MAX_SPEED) * .1;
     
     
     float complexity = 2.;
-    // float ratio = min(dim.y,dim.x) / max(dim.y,dim.x); 
     vec2 ratio = vec2(dim.y,dim.x*2.)*controls.z*.25; 
     // float noise1 = fbm(complexity * uv2 * vec2(2., 2.));
     // float noise2 = fbm(5. * uv2 * vec2(2., 2.)*ratio);
@@ -108,6 +102,7 @@ vec4 color = v_col;
     float noise2 = fbm(5. * uv2 * vec2(2.* ratio.x, 2.* ratio.x));
     float n1 = noise1*revT*d2; // +1 for non negative values
     float n2 = noise2*revT*d2; // +1 for non negative values
+
     
     float alpha = revT*d2;
 
@@ -123,11 +118,10 @@ vec4 color = v_col;
     F *= d2;
 
     
-    // 
+    // TODO: Create controls for: [pow(.., X1), F*X2, X3*(time+.4))]
     // float mixer = pow((shape-n1)*F*4.5, 3.);
     // float mixer = (shape-n1)*F*4.5;
     // float mixer = pow((shape-n1)*F*4.5, 4.*(time+.4));
-    // float mixer = pow((shape-n1)*F*2.5, 2.*(time+.4));
     float mixer = pow((shape-n1)*F*2.5, 2.*(time+.4));
     float mixer2 = pow((shape-n1)*F*2., 6.*(time+.4));
     // return vec4(mixer);
@@ -145,45 +139,27 @@ vec4 color = v_col;
     // return s1;
     
     
-    // Color 2 
-    float color_intensity = 2.;
-    // float color_intensity = (controls.x+1.)*5.;
-    // vec4 s2 = vec4(vec3(n2*n2*col*color_intensity), alpha);
-    // vec4 s2 = vec4(vec3(n2*n2*col*color_intensity), F);
-    // vec4 s2 = vec4(vec3(n2*n2*col*color_intensity), 0.);
-
-    // Keep the darker cloud noise at the start, but remove it as time goes by.
-    vec4 s2 = mix(vec4(vec3(n2*n2*col*color_intensity), F), vec4(vec3(n2*n2*col*color_intensity), 0.), time);
+    // Color 2. Very Nice smoke like effect
+    vec4 s2 = vec4(vec3(col*pow((n1)*F*4.5, 2.)), mixer); 
+    // vec4 s2 = vec4(vec3(col*pow((n1)*F*4.5, 2.)), F); 
     // return s2;
-    
-
-
-
-    // Color 3. Very Nice smoke like effect
-    vec4 s3 = vec4(vec3(col*pow((n1)*F*4.5, 2.)), mixer); 
-    // vec4 s3 = vec4(vec3(col*pow((n1)*F*4.5, 2.)), F); 
-    // return s3;
     
     // vec4 s4 = vec4(vec3(col*n1), F); 
     
     
     // Final Color
-    // vec4 c = mix(s1, s3, alpha);
-    // vec4 c = mix(s1, s3, F);
-    // vec4 c = mix(s1, s3, mixer);
-    // vec4 c = mix(s1, s3, mixer2);
-    
-    
+    // vec4 c = mix(s1, s2, alpha);
+    // vec4 c = mix(s1, s2, F);
     // vec4 c = mix(s1, s2, mixer);
-    vec4 c = mix(s1, s3, mixer);
+    // vec4 c = mix(s1, s2, mixer2);
+    
+    
+    vec4 c = mix(s1, s2, mixer);
     
     
     
     /** CHOOSE ONE OF THE BELLOW: bright2 is good for purple color, bright 1 is good for a very bright fire ball */
     vec4 bright2 = mix(s1, vec4(vec3(mixer2), 1.-F*2.6), mixer); // EFFECT VERY BRIGHT
-    // vec4 bright2 = mix(s1, vec4(vec3(mixer2*col*1.3), 1.-F*2.6), mixer); // EFFECT VERY BRIGHT
-    // vec4 bright2 = mix(s1, vec4(mixer2*col*1., F*4.6), mixer); // EFFECT VERY BRIGHT
-    // vec4 bright2 = mix(s1, vec4(vec3(mixer2), 1.-F*6.6), mixer); // EFFECT VERY BRIGHT
     // c += bright2*.5;
     // c += bright2;
     
@@ -199,9 +175,12 @@ vec4 color = v_col;
     
 
     
-    // return vec4(vec3(noise1), 1.);
+    // return vec4(noise1);
+    // return vec4(vec3(noise1), .0);
     return c;
-    // return vec4(1.,1.,1.,.1);
+    // return vec4(1.,1.,1.,.0);
 
 }
 `;
+
+

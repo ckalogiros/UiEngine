@@ -1,0 +1,6 @@
+﻿[Wait]
+Path=Ubuntu-Yaru-Busy.ani
+
+[AppStarting]
+Path=Ubuntu-Yaru-WorkingInBackground.ani
+

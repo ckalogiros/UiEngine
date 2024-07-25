@@ -88,7 +88,7 @@ const GFX_GROUPS = {
  * Shader creation flags 
  */
 
-let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1;
+let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1, BITTEST = 0x1;
 const SID = {
 
     SHAD: {
@@ -97,6 +97,10 @@ const SID = {
         INDEXED_PATT_DISCONTINUE_4: BIT1 <<= 1, // Break vertex indices
         INDEXED_PATT_DISCONTINUE_6: BIT1 <<= 1, // Break vertex indices
         PRE_MULTIPLIED_ALPHA: BIT1 <<= 1,
+
+        // Test Shaders
+        FS_TEST1: BIT1 <<= 1,
+        VS_TEST1: BIT1 <<= 1,
     },
 
     ATTR: {
@@ -173,31 +177,10 @@ const SID = {
         FS_NOISE: BIT6<<=0x1,
         FS_SMOKE: BIT6<<=0x1,
     },
-    // FX: {
-    //     FS_PARTICLES: BIT3,
-    //     FS_FIRE: BIT3 <<= 1,
-    //     FS_EXPLOSION_CIRCLE: BIT3 <<= 1,
-    //     FS_EXPLOSION_SIMPLE: BIT3 <<= 1,
-    //     FS_VORONOI_EXPLOSION: BIT3 <<= 1,
-    //     FS_GRADIENT: BIT3 <<= 1,
-    //     FS_HIGH_TECH: BIT3 <<= 1,
-    //     FS_CRAMBLE: BIT3 <<= 1,
-    //     FS_NOISE: BIT3 <<= 1,
-    //     FS_V2DGFX: BIT3 <<= 1,
-    //     FS_GLOW: BIT3 <<= 1,
-    //     FS_TWIST: BIT3 <<= 1,
-    //     FS_VORTEX: BIT3 <<= 1,
-    //     FS_VOLUMETRIC_EXPLOSION: BIT3 <<= 1,
-    //     FS_SHADOW: BIT3 <<= 1,
-    // },
 
-
-    // DEBUG: false,
-
-
-    // This function is used only to be able to reason of which mesh inherits from which mesh
-    // InheritUniform(target, src){
-    //     target.unif |= src.unif;
+    // // Test Shaders
+    // TEST: {
+    //     TEST1: BITTEST,
     // },
 
 
@@ -407,6 +390,7 @@ const MESH_ENABLE = {
         UNIFORM: _CNT <<= 1,
         UNIF_TIMER: _CNT <<= 1,
         ATTR_DIM2: _CNT <<= 1,
+        ATTR_TEX2: _CNT <<= 1,
         ATTR_TIME: _CNT <<= 1,
         ATTR_STYLE: _CNT <<= 1,
         ATTR_COL4_PER_VERTEX: _CNT <<= 1,

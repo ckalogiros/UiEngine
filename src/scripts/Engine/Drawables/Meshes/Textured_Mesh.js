@@ -1,7 +1,7 @@
 "use strict";
 
 import { Mesh } from "./Base/Mesh.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_group_set_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
@@ -67,8 +67,8 @@ export class Textured_Mesh extends Mesh {
 
       // If texture exists, store texture index, else if font texture exists, store font texture index, else store null
       // BUG: Make sure the below statement makes sense for Texture_Material(it is copied from the Font_Material)
-      this.gfx.tb.idx = (this.mat.texidx !== INT_NULL) ? this.mat.texidx : ((this.mat.uvIdx !== INT_NULL) ? this.mat.uvIdx : INT_NULL);
-      Vertex_buffer_group_set_texidx(this.gfx.vb.groupidx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
+      // this.gfx.tb.idx = (this.mat.texidxtextureid !== INT_NULL) ? this.mat.texidx : ((this.mat.uvIdx !== INT_NULL) ? this.mat.uvIdx : INT_NULL);
+      // Vertex_buffer_group_set_texidx(this.gfx.vb.groupidx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
 
       return this.gfx;
    }
@@ -161,7 +161,7 @@ export class Textured_Mesh extends Mesh {
                * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
                * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
             */
-            const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
+            const idx = TimeIntervalsCreate(10, 'Move Textured_Mesh', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
             console.log('Time interval idx:', idx)
             // mesh.timeIntervalsIdxBuffer.Add(idx);
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);

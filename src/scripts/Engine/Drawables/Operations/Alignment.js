@@ -101,7 +101,8 @@ export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0]
     const first_num_faces=first_mesh.num_faces, second_num_faces=second_mesh.num_faces; 
     // const dif = first_num_faces*2*advancex;
     // const w = (first_mesh.dim[0])*first_num_faces*2;
-    const w = (first_mesh.dim[0]*advancex)*first_num_faces*2;
+    // const w = (first_mesh.dim[0]*advancex)*first_num_faces*2;
+    const w = first_mesh.text_width;
 
     if(flags & ALIGN.VERTICAL){
         second_mesh.pos[0] = first_mesh.dim[0];
@@ -116,6 +117,34 @@ export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0]
         second_mesh.pos[1] = first_mesh.pos[1];
     }
 }
+/**SAVE */
+// export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0], second_pad = [0, 0], advancex) {
+
+//     // Check if any of the acceptable ALIGN flags are passed.
+//     if((flags & (ALIGN.VERTICAL | ALIGN.HORIZONTAL)) === 0) {
+//         console.warn('NO APROPRIATE ALIGN FLAG IS PASSED');
+//         return;
+//     }
+
+
+//     const first_num_faces=first_mesh.num_faces, second_num_faces=second_mesh.num_faces; 
+//     // const dif = first_num_faces*2*advancex;
+//     // const w = (first_mesh.dim[0])*first_num_faces*2;
+//     const w = (first_mesh.dim[0]*advancex)*first_num_faces*2;
+
+//     if(flags & ALIGN.VERTICAL){
+//         second_mesh.pos[0] = first_mesh.dim[0];
+//         second_mesh.pos[1] = first_mesh.pos[1];
+//         second_mesh.pos[1] += (first_mesh.dim[1] + first_pad[1]) + second_mesh.dim[1];
+//     }
+//     else if(flags & ALIGN.HORIZONTAL){
+//         second_mesh.pos[0] = first_mesh.pos[0] + first_pad[0];
+//         // second_mesh.pos[0] += (w+first_mesh.dim[0] + first_pad[0]) + (second_mesh.dim[0] + second_pad[0]);
+//         // second_mesh.pos[0] += (w + first_pad[0]);
+//         second_mesh.pos[0] += (w + second_pad[0]);
+//         second_mesh.pos[1] = first_mesh.pos[1];
+//     }
+// }
 
 
 

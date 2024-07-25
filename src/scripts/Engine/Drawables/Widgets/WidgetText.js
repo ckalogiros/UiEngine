@@ -1,16 +1,14 @@
 "use strict";
 
-import { Gl_set_alpha_from_offset } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { AddArr2, CopyArr2, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
+import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
 import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
-import { Font_get_font_advancex } from "../../Loaders/Font/ChlumskyFontMetricsLoader.js";
 import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx, TimeIntervalsGetByIdx } from "../../Timers/TimeIntervals.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
-import { Align_between, Align_self_get_dif } from "../Operations/Alignment.js";
+import { Align_self_get_dif } from "../Operations/Alignment.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 
 
@@ -26,15 +24,10 @@ export class Widget_Text extends Text_Mesh {
 
 	// pad;
 
-	constructor(ROOT_WIDGET_FLAGS, text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0], is_debug_mesh) {
+	constructor(ROOT_WIDGET_FLAGS, text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0], font, is_debug_mesh) {
 
-		// const sdfouter = CalculateSdfOuterFromDim(fontSize);
-		// if (sdfouter + bold > 1) bold = 1 - sdfouter;
-
-		super(text, pos, fontSize, col, _, _, _, is_debug_mesh)
+		super(text, pos, fontSize, col, _, font, _, is_debug_mesh)
 		this.type |= MESH_TYPE.WIDGET_TEXT;
-
-		// if(ROOT_WIDGET_FLAGS !== undefined) this.root_bufferidx = 
 
 		this.StylesSetPad(pad);
 	}
@@ -55,6 +48,19 @@ export class Widget_Text extends Text_Mesh {
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
    }
+	
+
+	Activate() {
+
+		this.state.mask |= MESH_STATE.ACTIVE;
+	}
+
+
+	Deactivate() {
+
+		this.state.mask &= ~MESH_STATE.ACTIVE;
+	}
+
 
 
 	/*******************************************************************************************************************************************************/
@@ -136,7 +142,7 @@ alert('00998877655')
 		// const clamp = x - margin;
 		// // const clamp = x - margin*2;
 
-		// const char_width = Floor(this.fontsize * Font_get_font_advancex(this.mat.texidx)) * 2;
+		// const char_width = Floor(this.fontsize * Font_get_font_advancex(this.mat.uvidx)) * 2;
 		// let text_width = char_width;
 		// let k = 0; // Will store the number of characters need to be clamped.
 		// // Calculate how many characters we must ommit.
@@ -167,27 +173,17 @@ alert('00998877655')
 	}
 
 
-	// Move(x, y) {
+	Move(x, y) {
 
-	// 	if (x === 0 && y === 0) return;
+		if (x === 0 && y === 0) return;
 
-	// 	this.geom.pos[0] += x;
-	// 	this.geom.pos[1] += y;
+		this.geom.pos[0] += x;
+		this.geom.pos[1] += y;
+		this.geom.AddWposXY(this.gfx, x, y);
 
-	// }
+		// console.log(this.GetName(), this.geom.pos)
 
-
-	Activate() {
-
-		this.state.mask |= MESH_STATE.ACTIVE;
 	}
-
-
-	Deactivate() {
-
-		this.state.mask &= ~MESH_STATE.ACTIVE;
-	}
-
 
 	
 	ListenEventConstruct() { return false; }
@@ -263,9 +259,9 @@ export class Widget_Multi_Text extends Widget_Text {
 	alignment = 0x0;
 
 	/** Set the max number of characters for the dynamic text, by passing any text as 'dynamic_text' of length= dynamic text number of characters*/
-	constructor(ROOT_WIDGET_FLAGS, text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad, is_debug_mesh) {
+	constructor(ROOT_WIDGET_FLAGS, text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad, font, is_debug_mesh) {
 
-		super(ROOT_WIDGET_FLAGS, text, pos, fontSize, text_col, bold, pad, is_debug_mesh);
+		super(ROOT_WIDGET_FLAGS, text, pos, fontSize, text_col, bold, pad, font, is_debug_mesh);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
 		// Default alignment for all children text meshes
@@ -466,7 +462,8 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
 			for (let i = 0; i <= this.children.boundary; i++) {
-				if (this.children.buffer[i]) max_width += this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+				// if (this.children.buffer[i]) max_width += this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+				if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 			}
 			return max_width;
 		}
@@ -474,7 +471,8 @@ export class Widget_Multi_Text extends Widget_Text {
 			for (let i = 0; i <= this.children.boundary; i++) {
 				if (this.children.buffer[i]) {
 
-					const w = this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+					// const w = this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+					const w = this.children.buffer[i].CalculateTextWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 					if (max_width < w)
 						max_width = w;
 				}
@@ -552,17 +550,41 @@ export class Widget_Multi_Text extends Widget_Text {
 		else prev_text_mesh = this;
 
 		// CopyArr3(pos, this.geom.pos); // Copy the dynamic's text mesh pos
-		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad);
+		// const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad, this.mat.);
+		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad, this.mat.textureid);
 		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
 		// Add the new new_text as a child of 'this'.
 		const idx = this.AddChild(new_text);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC | new_text.geom.type | new_text.mat.type;
 
+		this.CalculateTextWidth();
 
-		// Align_between(align, prev_text_mesh.geom, new_text.geom, pad, new_text.StylesGetPad(), prev_text_mesh.advancex)
-		// const pos_dif = Align_self_get_dif(align, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
-		Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.StylesGetPad(), prev_text_mesh.advancex)
+
+		// Align text properly
+		if(prev_text_mesh.text_width === 0){
+			prev_text_mesh.CalculateTextWidth();
+		}
+
+		// Position horizontaly
+		// Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.StylesGetPad(), prev_text_mesh.advancex)
+		
+		const first_pad = prev_text_mesh.StylesGetPad();
+		const second_pad = new_text.StylesGetPad();
+
+
+		if(this.alignment & ALIGN.VERTICAL){
+			new_text.geom.pos[0] = prev_text_mesh.geom.dim[0];
+			new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
+			new_text.geom.pos[1] += (prev_text_mesh.geom.dim[1] + first_pad[1]) + new_text.geom.dim[1];
+		}
+		else if(this.alignment & ALIGN.HORIZONTAL){
+			new_text.geom.pos[0] = prev_text_mesh.geom.pos[0] + first_pad[0];
+			new_text.geom.pos[0] += prev_text_mesh.text_width*2 + second_pad[0];
+			new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
+		}
+
+
 		const pos_dif = Align_self_get_dif(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
 		AddArr2(new_text.geom.pos, pos_dif);
 

@@ -112,7 +112,7 @@ export class Widget_Dropdown extends Section {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col_menu = PURPLER[7], text_col = WHITE, 
                btn_pad = [3, 3], bold = .6, font = TEXTURES.MSDF_CONSOLAS_1024, fontsize, style = [2, 5, 2], pad = [10, 10], is_debug_mesh) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, pad, pos, [10, 10], col1, _, style, _, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, pad, pos, [10, 10], col1, _, style, _, _, is_debug_mesh);
 
       // NOTE: The mesh_bufferidx and the root_bufferidx as the root creation, happen in the Section from super(). 
 
@@ -124,8 +124,7 @@ export class Widget_Dropdown extends Section {
       this.rootidx = INT_NULL;
 
       pos[2] += 1;
-      // this.menu = Create_widget_section(_, SECTION.VERTICAL, pad, [0, 0, pos[2]], [1, 1], TRANSPARENCY(col_menu, tr), _, _, is_debug_mesh);
-      this.menu = Create_widget_section(_, SECTION.VERTICAL, pad, [0, 0, pos[2]], [1, 1], col_menu, _, _, is_debug_mesh);
+      this.menu = Create_widget_section(_, SECTION.VERTICAL, pad, [0, 0, pos[2]], [1, 1], col_menu, _, _, _, _, is_debug_mesh);
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.parent = this;
       AddArr2(this.menu.total_margin, this.menu.StylesGetPad());
@@ -529,7 +528,7 @@ export class Widget_Dropdown extends Section {
        * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
        * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
        */
-      const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, dp);
+      const idx = TimeIntervalsCreate(10, 'Move Widget_Dropdown', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, dp);
       dp.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
       if (dp.StateCheck(MESH_STATE.IS_GRABABLE)) {

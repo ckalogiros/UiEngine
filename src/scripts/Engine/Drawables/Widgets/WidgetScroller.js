@@ -52,7 +52,7 @@ export class Widget_Scroller extends Section {
       const pos = [0, 0, 0];
 
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.HORIZONTAL, scroller_margin, pos, dim, col, _, style, num_faces, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.HORIZONTAL, scroller_margin, pos, dim, col, _, style, num_faces, _, is_debug_mesh);
 
       this.is_scrolled_section_private = false;
 
@@ -516,7 +516,7 @@ export class Widget_Scroller extends Section {
          if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
 
             const OnResizeFn = mesh.OnResize;
-            const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, { mesh: mesh, mouse_click: point });
+            const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Scroller', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, { mesh: mesh, mouse_click: point });
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
          }
          else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize

@@ -30,9 +30,11 @@ import { Callback_animations_create } from '../Engine/Animations/CallbackAnimati
 import { Mesh_buffer_get_mesh_byidx, Widget_root_activate_all_vbs_in_renderqueue } from '../Engine/Core/MeshBuffer.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
 import { Ui_create_label_switch } from '../Engine/Drawables/DebugInfo/DebugInfoUiFactory.js';
-import { CreateBallTailParticles, CreateGlowParticles, CreateSmokeParticles, Demo_all, Demo_ball_tail, Demo_ball_tail_2, Demo_glow_particles_2, Demo_smoke_2 } from './DemoParticleSystem.js';
+import { CreateBallTailParticles, CreateGlowParticles, CreateSmokeParticles, Demo_all, Demo_ball_tail, Demo_ball_tail_2, Demo_glow_particles_2, Demo_smoke_2, TestNoiseShader } from './DemoParticleSystem.js';
 import { Scroller_component_calculate_scroller_component, Components_create_scroller_component, Scoller_component_gengfx_and_render } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
+import { Physics_collisions } from './DemoPhysicsCollisions.js';
+import { Elastic_collisions, Sattelite_rotation } from './Demos.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -335,6 +337,23 @@ export function TestWidgetsGeneric(scene) {
 
     }
 
+    { // Textured Meshes
+        // // const t = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0,0], [10, 20, 0], [16, 16], WHITE, _, _, _, TEXTURES.TEST );
+        // const t = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0,0], [10, 20, 0], [256/2, 256/2], WHITE, _, _, _, TEXTURES.SMOKE_1 );
+        // t.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+        // t.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        
+        
+        
+        
+        // t.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC)
+        // t.Render();
+        // Widget_root_activate_all_vbs_in_renderqueue(t.root_bufferidx);
+        // Construct_listen_events_from_mesh_tree(t);
+        // Construct_listen_events_relations_from_mesh_tree(t);
+        // t.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, t.gfx.vb.groupidx);
+    }
+
 
     { // Rotation: Rotate sdf line. Dont forget to disable the 'style' attribu\te
 
@@ -362,17 +381,6 @@ export function TestWidgetsGeneric(scene) {
         // CreateWindowWithMenu();
 
 
-    }
-
-    { // Demo Particles 
-
-        // Demo_glow_particles_2();
-        // Demo_smoke_2()
-
-
-        // Demo_ball_tail();
-        // Demo_ball_tail_2();
-        // Demo_all();
     }
 
 
@@ -485,7 +493,9 @@ export function TestWidgetsGeneric(scene) {
 
     { // Widget: Label-buttons
 
-        const label = CreateLabel('AThis is a Text !?');
+        // const label = CreateLabel('!@#$%^&*\'(12345678)[abdf],{LPARREA}');
+        // const label = CreateLabel('12345678');
+        // const label = CreateLabel('AAAAAA', 120);
         // // CreateLabel('\\/+0');
         // const label = CreateLabel('CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line););CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line');
         // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
@@ -519,17 +529,44 @@ export function TestWidgetsGeneric(scene) {
     }
 
 
-    { // PARTICLES
+    { // PARTICLES: NONE WORKING, CODE NEEDS UPDATE
         /**************************/
+
         // CreateGlowParticles(0, 100);
 
-        // CreateBallTailParticles(0, 0, _, _);
+        // CreateBallTailParticles(0, 0, 250, 250, 1);
 
         // CreateSmokeParticles(0, 0);
 
         // TestNoiseShader();
 
 
+    }
+    
+
+    { // Demo Particles 
+
+        // Demo_glow_particles_2();
+        // Demo_smoke_2()
+
+
+        // Demo_ball_tail();
+        // Demo_ball_tail_2();
+        // Demo_all();
+    }
+
+
+    { // Physics - Collisions
+        
+        // Physics_collisions(); // OLD overlap resoluution
+
+    }
+
+    { // Demos (Misc)
+
+        // Sattelite_rotation()
+
+        Elastic_collisions()
     }
 
     /** Section Synthesizes */
@@ -717,13 +754,13 @@ function SectionResizable(pos) {
 
 
 let labelCount = 1;
-function CreateLabel(name = 'Label ') {
+function CreateLabel(name = 'Label ', font_size=10) {
 
     const pos = [400, 470 + (labelCount * 35), 2];
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.RIGHT | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.BOTTOM, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
-    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, 10, GREY[0], WHITE, [0, 0], .5);
+    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, font_size, GREY[2], WHITE, [5, 5], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);

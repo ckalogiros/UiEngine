@@ -507,7 +507,7 @@ function Scroller_component_onClick(params) {
    //    if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
    
    //       const OnResizeFn = mesh.OnResize;
-   //       const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, { mesh: mesh, mouse_click: point });
+   //       const idx = TimeIntervalsCreate(10, 'ResizeXY Component_scroller', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, { mesh: mesh, mouse_click: point });
    //       mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
    //    }
    //    else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize

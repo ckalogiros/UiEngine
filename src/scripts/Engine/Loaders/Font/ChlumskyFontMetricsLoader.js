@@ -1,6 +1,11 @@
 "use strict";
 
+import { CONSOLAS_12Hpx } from "../../../../../resources/fonts/consolas_3/metrics/consolas_3.js";
+import { CONSOLAS_16Hpx } from "../../../../../resources/fonts/consolas_4/metrics/consolas_4.js";
 import { CONSOLAS_20Hpx } from "../../../../../resources/fonts/consolas_5/metrics/consolas_5.js";
+import { CONSOLAS_24Hpx } from "../../../../../resources/fonts/consolas_6/metrics/consolas_6.js";
+import { CONSOLAS_28Hpx } from "../../../../../resources/fonts/consolas_7/metrics/consolas_7.js";
+import { CONSOLAS_32Hpx } from "../../../../../resources/fonts/consolas_8/metrics/consolas_8.js";
 // import { consola_msdf_test_1024_metrics } from "../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js";
 import { consola_msdf_test_1024_metrics } from "../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js";
 import { Abs } from "../../../Helpers/Math/MathOperations.js";
@@ -13,7 +18,12 @@ let _font_metrics_buffer_count = 0;
 function Font_get_metrics_by_texid(texture_id){
    switch(texture_id){
       case TEXTURES.MSDF_CONSOLAS_1024: return consola_msdf_test_1024_metrics;
+      case TEXTURES.CONSOLAS_12px: return CONSOLAS_12Hpx;
+      case TEXTURES.CONSOLAS_16px: return CONSOLAS_16Hpx;
       case TEXTURES.CONSOLAS_20px: return CONSOLAS_20Hpx;
+      case TEXTURES.CONSOLAS_24px: return CONSOLAS_24Hpx;
+      case TEXTURES.CONSOLAS_28px: return CONSOLAS_28Hpx;
+      case TEXTURES.CONSOLAS_32px: return CONSOLAS_32Hpx;
       default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_id:', texture_id);
    }
 }

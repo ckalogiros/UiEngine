@@ -56,7 +56,8 @@ export function Gl_draw(gl) {
 
 
 
-        if (GL.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
+        // if (GL.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
+        if (GL.BOUND_TEXTURE_IDX !== vb_group.texidx && vb_group.texidx !== INT_NULL ) {
             const texture = Texture_get_texture_byidx(vb_group.texidx);
             Gl_texture_unit_bind(gl, texture);
             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);

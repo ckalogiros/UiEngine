@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_change_uniform_value_clbk_params } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_change_uniform_value_clbk_params, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object } from "../../../Graphics/ShaderPrograms.js";
@@ -249,15 +249,36 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
    // if((FLAGS & GFX_CTX_FLAGS.PRIVATE)===0 && specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
    if (specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
-      vbidxs = Vertex_buffer_group_get_vbidxs(specific_vb_groupidx);
-      progidx = Vertex_buffer_group_get_progidx(specific_vb_groupidx);
-      vb_groupidx = specific_vb_groupidx
+      
+      // Check if mesh has texture, and if it isn't tha same texture as is the 'specific_vb_groupidx', must create new vertex buffer
+      if(mesh.mat.texidx !== INT_NULL){
+
+         const texidx = Vertex_buffer_group_get_texidx(specific_vb_groupidx);
+         if(texidx === mesh.mat.texidx){
+
+            vbidxs = Vertex_buffer_group_get_vbidxs(specific_vb_groupidx);
+            progidx = Vertex_buffer_group_get_progidx(specific_vb_groupidx);
+            vb_groupidx = specific_vb_groupidx;
+         }
+         else { // Try to find an existing vertex buffer with the same SID and texidx
+
+            vb_groupidx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, specific_vb_groupidx);
+         }
+      }
+      else {
+
+         vbidxs = Vertex_buffer_group_get_vbidxs(specific_vb_groupidx);
+         progidx = Vertex_buffer_group_get_progidx(specific_vb_groupidx);
+         vb_groupidx = specific_vb_groupidx;
+      }
+
    }
    else {
       // Check buffers validity, or find buffers based on Flags
       vb_groupidx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, specific_vb_groupidx);
    }
 
+   //vx:
 
 
 
@@ -300,6 +321,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          vb_groupidx = vb_group.idx;
          vbidxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
 
+         Vertex_buffer_group_set_texidx(vb_groupidx, mesh.mat.texidx); // Update the vertex buffer to store the texture index
+         console.log('texidx', mesh.mat.texidx)
 
          // Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_PRIVATE);
          if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidxs);
@@ -472,6 +495,9 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
          vb_groupidx = vb_group.idx;
          vbidxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
 
+         Vertex_buffer_group_set_texidx(vb_groupidx, emitter.mat.texidx); // Update the vertex buffer to store the texture index
+         console.log('texidx', emitter.mat.texidx)
+
 
          // Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_PRIVATE);
          if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidxs);
@@ -587,7 +613,7 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
 
             const ubidx = uniforms[i].ubidx
             // if has unif u_col, create uunif col root
-            Mesh_unif_create_vb_root_col(emitter.col)
+            Mesh_unif_create_vb_root_col(emitter.mat.col)
          }
       }
       

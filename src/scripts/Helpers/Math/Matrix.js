@@ -240,30 +240,51 @@ function CreateRectVertexPos3D(pos){
 }
 
 
-export function RotateZ(dim, angle) {
+export function Rotation_z_get_2D_matrix(angle) {
 
-	// c, 0, -s, 0,
-	// s, 0, c, 0,
-	// 0, 0, 1, 0,
-	// 0, 0, 0, 1
+	// c, -s,
+	// s,  c, 
+	const c = Math.cos(angle);
+	const s = Math.sin(angle);
+	const r = [ c, -s, s, c, ];
+
+	return r;
+};
+
+
+export function RotateZ(dim, angle) {
 
 	const c = Math.cos(angle);
 	const s = Math.sin(angle);
-	const p = CreateRectVertexPos2D(dim);
+	// const p = CreateRectVertexPos2D(dim);
+	const p = [dim[0], dim[1]];
 	const r = [ c, -s, s, c, ];
 
+	// const newPos = [
+	// 	p[0]*r[0] + p[1]*r[2],
+	// 	p[0]*r[1] + p[1]*r[3],
+		
+	// 	p[2]*r[0] + p[3]*r[2],
+	// 	p[2]*r[1] + p[3]*r[3],
+		
+	// 	p[4]*r[0] + p[5]*r[2],
+	// 	p[4]*r[1] + p[5]*r[3],
+		
+	// 	p[6]*r[0] + p[7]*r[2],
+	// 	p[6]*r[1] + p[7]*r[3],
+	// ];
 	const newPos = [
+		-p[0]*r[0] + p[1]*r[2],
+		-p[0]*r[1] + p[1]*r[3],
+		
+		-p[0]*r[0] + -p[1]*r[2],
+		-p[0]*r[1] + -p[1]*r[3],
+		
 		p[0]*r[0] + p[1]*r[2],
 		p[0]*r[1] + p[1]*r[3],
 		
-		p[2]*r[0] + p[3]*r[2],
-		p[2]*r[1] + p[3]*r[3],
-		
-		p[4]*r[0] + p[5]*r[2],
-		p[4]*r[1] + p[5]*r[3],
-		
-		p[6]*r[0] + p[7]*r[2],
-		p[6]*r[1] + p[7]*r[3],
+		p[0]*r[0] + -p[1]*r[2],
+		p[0]*r[1] + -p[1]*r[3],
 	];
 
 	return newPos;

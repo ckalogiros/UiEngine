@@ -40,7 +40,7 @@ export class Widget_Color_Picker extends Section {
       style[1] = 15
       
       if(col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, [margin[0]*scale, margin[1]*scale], pos, [dim[0]*scale, dim[1]*scale], col, name, style, num_faces, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, [margin[0]*scale, margin[1]*scale], pos, [dim[0]*scale, dim[1]*scale], col, name, style, num_faces, _, is_debug_mesh);
       
       
       // Multi color vertex
@@ -64,8 +64,7 @@ export class Widget_Color_Picker extends Section {
       /******************************************************************************/
       // Create panel to align further meshes
       style[1] = 10;
-      const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10*scale, 10*scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, is_debug_mesh, 1);
-      // const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10*scale, 10*scale], [0, 0, 1], _, [TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT], 'Color Picker Panel', style, is_debug_mesh, 1);
+      const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10*scale, 10*scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
       panel.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel.options |= SECTION.RESIZE_PARENT;
       panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -90,7 +89,7 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create panel for the color presentation and info labels
-      const panel2 = Create_widget_section(_, SECTION.VERTICAL, [10*scale, 10*scale], [0, 0, 1], _, [BLACK, BLACK, BLACK, BLACK], 'Inner Panel 1', style, is_debug_mesh, 1);
+      const panel2 = Create_widget_section(_, SECTION.VERTICAL, [10*scale, 10*scale], [0, 0, 1], _, [BLACK, BLACK, BLACK, BLACK], 'Inner Panel 1', style, 1, _, is_debug_mesh);
       panel2.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel2.options |= SECTION.RESIZE_PARENT;
       panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -482,7 +481,7 @@ export class Widget_Color_Picker extends Section {
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
           * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
           */
-         const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
+         const idx = TimeIntervalsCreate(10, 'Move Widget_Color_Picker', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
          widget.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
          if (widget.StateCheck(MESH_STATE.IS_GRABABLE)) {

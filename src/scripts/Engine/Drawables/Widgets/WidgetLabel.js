@@ -39,7 +39,7 @@ export class Widget_Label extends Rect_Mesh {
         _pos[2] -= 1; // Set z for area 'behind' this.text_mesh
 
         const dim = [
-            text_mesh.GetMaxWidth() + pad[0] * 2,
+            text_mesh.CalculateTextWidth() + pad[0] * 2,
             text_mesh.geom.dim[1] + pad[1] * 2,
         ];
 
@@ -525,7 +525,7 @@ export class Widget_Label extends Rect_Mesh {
                         // console.log('X Y RESIZE');
 
                         const OnResizeFn = mesh.OnResize;
-                        const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
+                        const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
                         mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
                     }
                     else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
@@ -544,7 +544,7 @@ export class Widget_Label extends Rect_Mesh {
             if (!is_resizesed) { // implement move 
                 // const OnMoveFn = mesh.OnMove;
                 const OnMoveFn = Label_on_move_clbk;
-                const idx = TimeIntervalsCreate(10, 'Move Widget_Text', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
+                const idx = TimeIntervalsCreate(10, 'Move Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
                 mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
             }
 

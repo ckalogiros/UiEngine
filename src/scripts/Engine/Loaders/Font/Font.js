@@ -1,6 +1,11 @@
 "use strict";
 import { COMIC_FONT_METRICS } from './ComicFontMetrics.js'
 import { CONSOLAS_20Hpx } from '../../../../../resources/fonts/consolas_5/metrics/consolas_5.js'
+import { CONSOLAS_12Hpx } from '../../../../../resources/fonts/consolas_3/metrics/consolas_3.js';
+import { CONSOLAS_16Hpx } from '../../../../../resources/fonts/consolas_4/metrics/consolas_4.js';
+import { CONSOLAS_24Hpx } from '../../../../../resources/fonts/consolas_6/metrics/consolas_6.js';
+import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metrics/consolas_7.js';
+import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
 
 
 
@@ -16,74 +21,81 @@ const ASCII_NUM_CHARACTERS = '~'.charCodeAt(0) - (' '.charCodeAt(0));
 const FONTS_MAX_COUNT = TEXTURES.FONT_COUNT; 
 
 const _fontMetricsBuffer = [];
-let _fontMetricsBufferCount = 0;
 const _fontsUvMap = [];
 const _activeFontTextures = new Int8Array(FONTS_MAX_COUNT); 
 
 
-function GetNextFreeElem(){
+
+
+/** The 'metrics' variables are fixed, but because the 'TEXTURE_PATHS' is a global variable, the 'metrics' fiels must be set in a function enviroment */
+// Connect the image textures with their apropriate metrics file
+export function Font_texture_images_set_metrics_file() {
+
+	TEXTURE_PATHS[0].metrics = COMIC_FONT_METRICS;
+	TEXTURE_PATHS[1].metrics = CONSOLAS_12Hpx;
+	TEXTURE_PATHS[2].metrics = CONSOLAS_16Hpx;
+	TEXTURE_PATHS[3].metrics = CONSOLAS_20Hpx;
+	TEXTURE_PATHS[4].metrics = CONSOLAS_24Hpx;
+	TEXTURE_PATHS[5].metrics = CONSOLAS_28Hpx;
+	TEXTURE_PATHS[6].metrics = CONSOLAS_32Hpx;
+}
+
+
+
+export function Font_create_storage_buffer_font() {
+
+
+	const metrics = {
+		ch: [],
+		size: 0,
+		texWidth: 0,
+		texHeight: 0,
+		row_height: 0,
+		advancex: 0, // Start (in pixels) of curr character unti the start of next character(in the texture)
+		padding: 0,
+		isMonoSpace: 0, // In non monospace fonts, the advancex variable is different from char to char (compare to monospace fonts)
+		ratio: 0,
+	};
+
+	// New uvMap for every font
+	const uvMap = [];
 	
-	const idx = _fontMetricsBufferCount++;
-
-	if(idx >= FONTS_MAX_COUNT) {
-		alert('Fonts buffer overflow. @ Font_load_uvs.js')
-	}
-
-	return idx;
-}
-
-
-
-export function Font_init_fonts_storage_buffer() {
-
-	for (let i = 0; i < FONTS_MAX_COUNT; i++) {
-
-		_activeFontTextures[i] = INT_NULL; // Initialize elements for active font textures
-		_fontMetricsBuffer[i] = {
-			ch: [],
-			size: 0,
-			texWidth: 0,
-			texHeight: 0,
-			advancex: 0, // Start (in pixels) of curr character unti the start of next character(in the texture)
-			padding: 0,
-			isMonoSpace: 0, // In non monospace fonts, the advancex variable is different from char to char (compare to monospace fonts)
-			ratio: 0,
-		};
-
-		// New uvMap for every font
-		_fontsUvMap[i] = [];
+	// New font metrics for every character
+	for (let j = 0; j <= ASCII_NUM_CHARACTERS; j++) {
 		
-		// New font metrics for every character
-		const char_metrics = _fontMetricsBuffer[i]; 
-		for (let j = 0; j <= ASCII_NUM_CHARACTERS; j++) {
-			
-			char_metrics.ch[j] = {
-				left: 0,
-				right: 0,
-				top: 0,
-				bottom: 0,
-				advancex: 0,
-				width: 0,
-				height: 0,
-				// bearingtop: 0,
-				// bearingleft: 0,
-				ratio: 0, // Ratio width to height, for each character's. Used for non monospace fonts
-			};
-			// New uv coordinates for every character
-			_fontsUvMap[i][j] = [0,0,0,0];
-		}
+		metrics.ch[j] = {
+			left: 0,
+			right: 0,
+			top: 0,
+			bottom: 0,
+			advancex: 0,
+			width: 0,
+			height: 0,
+			// bearingtop: 0,
+			// bearingleft: 0,
+			ratio: 0, // Ratio width to height, for each character's. Used for non monospace fonts
+		};
+		// New uv coordinates for every character
+		uvMap[j] = [0,0,0,0];
 	}
+
+	return {
+		metrics:metrics,
+		uvMap:uvMap,
+	};
 }
 
-export function Font_is_loaded(texidx) {
-	if (_activeFontTextures[texidx] === INT_NULL) return false;
+
+
+export function Font_is_loaded(textureid) {
+	if (_activeFontTextures[textureid] === INT_NULL) return false;
 	return true;
 }
 
 
 
-export function Font_retrieve_fontidx(texidx) {
-	return _activeFontTextures[texidx];
+export function Font_retrieve_fontidx(textureid) {
+	return _activeFontTextures[textureid];
 }
 
 
@@ -91,48 +103,63 @@ export function Font_retrieve_fontidx(texidx) {
 /**
  * UV Coordinates Getters
  */
-export function Font_get_uv_coords(fontIdx, ch) {
+export function Font_get_uv_coords(font_idx, ch) {
 	
-	return _fontsUvMap[fontIdx][ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET];
+	return _fontsUvMap[font_idx][ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET];
 }
 
 
 
-export function FontGetFontDimRatio(fontIdx) {
-	return _fontMetricsBuffer[fontIdx].ratio;
+export function FontGetFontDimRatio(font_idx) {
+	return _fontMetricsBuffer[font_idx].ratio;
 }
 
 
 
-export function Font_metrics_get_advancex(fontIdx) { return _fontMetricsBuffer[fontIdx].advancex; }
-export function Font_metrics_get_height(fontIdx) { return _fontMetricsBuffer[fontIdx].texHeight; }
-export function Font_metrics_get_width(fontIdx) { return _fontMetricsBuffer[fontIdx].texWidth; }
-export function Font_metrics_get_interpolated_x(fontIdx) { return 1.0 / _fontMetricsBuffer[fontIdx].texWidth; } // Transform to 0-1 coords 
+export function Font_metrics_get_advancex(font_idx) { return _fontMetricsBuffer[font_idx].advancex; }
+export function Font_metrics_get_width(font_idx) { return _fontMetricsBuffer[font_idx].texWidth; }
+export function Font_metrics_get_char_width(font_idx, ch) { return _fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
+export function Font_metrics_get_height(font_idx) { return _fontMetricsBuffer[font_idx].texHeight; }
+export function Font_metrics_get_row_height(font_idx) { return _fontMetricsBuffer[font_idx].row_height; }
+export function Font_metrics_get_interpolated_x(font_idx) { return 1.0 / _fontMetricsBuffer[font_idx].texWidth; } // Transform to 0-1 coords 
 
-//IMIDIATELY: Font_load_uvs() should be called upon texture creation. Also a name or an index must be passed so we load the correct metrics.
-export function Font_load_uvs() {
 
-	const fontIdx = LoadMetrics(_fontMetricsBuffer);
-	Create_uv_map(_fontMetricsBuffer[fontIdx], _fontsUvMap[fontIdx]);
-	console.log('--------------------------------------------------------------------\n', _fontMetricsBuffer[fontIdx])
+
+
+export function Font_load_uvs(textureid) {
+
+	// Create new font metrics and uvmap
+	const ret = Font_create_storage_buffer_font();
+
+	const font_idx = _fontMetricsBuffer.push(ret.metrics) -1;
+	_activeFontTextures[textureid] = font_idx; // Update the 'active' fonts
+
+	const uvmap_idx = _fontsUvMap.push(ret.uvMap) -1;
+
+
+	if(font_idx !== uvmap_idx) alert('6111282237 \nFont index and uvmap index must be equual.');
+
+
+	LoadMetrics(font_idx, textureid);
+	Create_uv_map(font_idx);
+	// console.log('--------------------------------------------------------------------\n', _fontMetricsBuffer[font_idx])
+	console.log('--------------------------------------------------------------------\n', _fontMetricsBuffer, _fontsUvMap)
 	
-	_activeFontTextures[fontIdx] = fontIdx; // Font textures and their equivalent metrics have 1to1 indexing.
-	return fontIdx;
+	return font_idx;
 }
 
 
 
 
-// filePos has memory to continue from where it was the previous time it accessed a file.
+
+// Read the text file using 'filePos' as guide of word-line
 const filePos = { start: 0, end: 0, len: 0, line: 0 };
-function LoadMetrics(metricsBuffer) {
+function LoadMetrics(font_idx, textureid) {
 
-	const fontIdx = GetNextFreeElem(); // IMPORTANT: This index is the same for: The texture in the texture buffer, the font in the font buffer and the metrics of the font in the metrics buffer. The texture and the font are the SAME FILE.
-	const metrics = metricsBuffer[fontIdx];
+	const metrics = _fontMetricsBuffer[font_idx];
 
 	const file = { content: '', name: '', pos: filePos, size: 0, };
-	// file.content = COMIC_FONT_METRICS; // IMIDIATELY: Load the metrics automaticaly (from a buffer of fileNames)
-	file.content = CONSOLAS_20Hpx; 
+	file.content = TEXTURE_PATHS[textureid].metrics; 
 	file.size = file.content.length;
 
 
@@ -151,10 +178,8 @@ function LoadMetrics(metricsBuffer) {
 		metrics.texWidth = FindNextValue(file, "[]");
 		// The next val inside [] is the height 
 		metrics.texHeight = FindNextValue(file, "[]");
+		metrics.row_height = FindNextValue(file, "[]");
 	}
-
-	// let normalizedU = 1.0 / metrics.texWidth;	   // Normalize texture coords to 0-1 values.
-	// let normalizedV = 1.0 / metrics.texHeight;   // Normalize texture coords to 0-1 values.
 
 	// In monospace {Only} the advance x is the same for every character
 	metrics.advancex = FindNextValue(file, "[]");
@@ -170,8 +195,9 @@ function LoadMetrics(metricsBuffer) {
 	metrics.ch[0].right = 0;
 	metrics.ch[0].top = 0;
 	metrics.ch[0].bottom = 0;
-	metrics.ch[0].width = 0;
+	metrics.ch[0].width = metrics.advancex;
 	metrics.ch[0].height = 0;
+	metrics.ch[0].row_num = 0;
 	if (!metrics.isMonoSpace) {
 		metrics.ch[0].advancex = metrics.advancex;
 		metrics.ch[0].ratio = metrics.texHeight / metrics.ch[0].advancex; // width to height ratio(and not the other way arround)
@@ -193,6 +219,7 @@ function LoadMetrics(metricsBuffer) {
 		metrics.ch[i].bottom 		= FindNextValue(file, "[]");
 		metrics.ch[i].width 			= FindNextValue(file, "[]");
 		metrics.ch[i].height 		= FindNextValue(file, "[]");
+		metrics.ch[i].row_num 		= FindNextValue(file, "[]");
 		metrics.ch[i].bearingleft 	= FindNextValue(file, "[]");
 		metrics.ch[i].bearingtop 	= FindNextValue(file, "[]");
 		if (!metrics.isMonoSpace) {
@@ -202,12 +229,15 @@ function LoadMetrics(metricsBuffer) {
 	}
 
 	if(DEBUG.UVS){ console.log('metrics', metrics); }
-	return fontIdx;
+	return font_idx;
 }
 
 
 
-function Create_uv_map(metrics, uvmap) {
+function Create_uv_map(font_idx) {
+
+	const metrics = _fontMetricsBuffer[font_idx]; 
+	const uvmap = _fontsUvMap[font_idx];
 
 	let transormedU = 1.0 / metrics.texWidth;	// Transform to 0-1 coords
 	if (metrics.advancex % 2) {
@@ -231,12 +261,24 @@ function Create_uv_map(metrics, uvmap) {
 		uvmap[j][U1] = transormedU * uv.left;
 		uvmap[j][U2] = transormedU * uv.right;
 
-		let scalex = (metrics.advancex - uv.width) / 2;
-		uvmap[j][U1] -= transormedU * scalex;
-		uvmap[j][U2] += transormedU * scalex;
+		/** Sqeeze the uv left and right, by the left and right emty space of the font */
+		// let scalex = (metrics.advancex - uv.width) / 2;
+		// uvmap[j][U1] -= transormedU * scalex * .5; // HACK: The correct calculation is to remove the *.5
+		// uvmap[j][U2] += transormedU * scalex * .5; // HACK: The correct calculation is to remove the *.5
 
-		uvmap[j][V1] = 0;
-		uvmap[j][V2] = 1;
+
+		/** Transformations for the top-bottom */
+		// uvmap[j][V1] = transormedV * uv.top;
+		// uvmap[j][V2] = transormedV * uv.bottom;
+
+		// let scaley = (metrics.row_height - uv.height) / 2;
+		// uvmap[j][V1] -= transormedU * scaley;
+		// uvmap[j][V2] += transormedU * scaley;
+
+		uvmap[j][V1] = metrics.row_height * transormedV * (uv.row_num);
+		uvmap[j][V2] = uvmap[j][V1] + (metrics.row_height * transormedV);
+		// uvmap[j][V2] = (metrics.row_height * transormedV * (uv.row_num+1));
+		// console.log(j, 'uv.row_num+1', uv.row_num+1)
 
 		if (metrics.texHeight % 2)
 			uvmap[j][V1] += transormedV;

@@ -7,7 +7,7 @@ import { Framebuffer_get } from "../../../Graphics/Buffers/FrameBuffers.js";
 
 export function Create_mesh_for_framebuffer(mesh, fb, pos, dim) {
 
-   const rect = new Textured_Mesh(pos, [dim[0], dim[1]], [1.0, 1., 1.0, 1.], fb.texture.texidx, 'Framebuffer 0');
+   const rect = new Textured_Mesh(pos, [dim[0], dim[1]], [1.0, 1., 1.0, 1.], fb.texture.textureid, 'Framebuffer 0');
    // rect.sid.shad |= SID.SHAD.PRE_MULTIPLIED_ALPHA; // Enable premultiply alpha
 
    { // Test for scrolled section resize

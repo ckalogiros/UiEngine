@@ -3,7 +3,7 @@
 import { Gl_texture_unit_create } from "../../../Graphics/GlTextureUnit.js";
 import { Str_buffer_store } from "../../Core/StringBuffer.js";
 import { Font_create_uvmap } from "../Font/ChlumskyFontMetricsLoader.js";
-import { Font_init_fonts_storage_buffer, Font_load_uvs, Font_retrieve_fontidx } from "../Font/Font.js";
+import { Font_load_uvs, Font_retrieve_fontidx, Font_texture_images_set_metrics_file } from "../Font/Font.js";
 import { ImageLoader } from "../ImageLoader.js";
 
 
@@ -44,8 +44,7 @@ export function Texture_init_texture_storage_buffer() { // Initialize a buffer t
 		_textureBuffer[i] = null;
 	}
 
-	// Initialize font buffers
-	Font_init_fonts_storage_buffer();
+	Font_texture_images_set_metrics_file();
 }
 
 
@@ -66,7 +65,7 @@ function Texture_is_loaded(textureid, TEX_TYPE) {
 		}
 		// TODO: Maybe create a spesific to framebuffers TEXTURE_TYPE constant
 		else if(TEX_TYPE & TEXTURE_TYPE.TYPE_TEXTURE){
-			if(_textureBuffer[i] && _textureBuffer[i].texidx === textureid)
+			if(_textureBuffer[i] && _textureBuffer[i].texid === textureid)
 			return i
 
 		}
@@ -85,8 +84,10 @@ export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 
 	if (texidx === INT_NULL) {
 
-		const img = ImageLoader.Load(TEXTURE_PATHS[textureid].imgPath, TEXTURE_PATHS[textureid].imgName, TEXTURE_PATHS[textureid].imgType);
 		// Load the texture image
+		const img = ImageLoader.Load(TEXTURE_PATHS[textureid].imgPath, TEXTURE_PATHS[textureid].imgName, TEXTURE_PATHS[textureid].imgType);
+		
+		// Create webGl texture
 		texture_idx = Texture_create_texture(gfxCtx.gl, textureid, img, TEXTURE_PATHS[textureid].imgName);
 
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT){
@@ -98,10 +99,8 @@ export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 	else {
 		texture_idx = texidx; 
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT)
-				uvmap_idx = Font_retrieve_fontidx(texidx);// the index for the texture metrics in the font metrics buffer
-		// else if();
+				uvmap_idx = Font_retrieve_fontidx(textureid);// the index for the texture metrics in the font metrics buffer
 	}
-	// console.info('_textureBuffer:', _textureBuffer)
 
 	return { texidx: texture_idx, uvmapidx: uvmap_idx };
 }
@@ -115,7 +114,6 @@ export function Texture_create_renderbuffer_texture(gl, textureid, width, height
 	_textureBuffer[idx].nameidx = Str_buffer_store(name);
 
 	return _textureBuffer[idx];
-	// return idx;
 }
 
 

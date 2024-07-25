@@ -7,6 +7,7 @@ import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './
 import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
 import { frag_noise, frag_noise_call } from './Functions/fragment.noise.js';
 import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
+import { frag_test1, frag_test1_call } from './Functions/fragment.tests.js';
 
 
 
@@ -166,6 +167,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // DEFINES
       '\n',
+      ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // INS
@@ -211,6 +213,17 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Scale in Vertex Shader
+      (sid.shad & SID.SHAD.VS_TEST1) ? '// HI FROM VS_TEST1' : '',
+      
+      
+      
+      
+
+
+      
+      
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // TEMPORARY CODE FOR QUICK ROTATIONS IMPLEMENTATION
       // `\
       // // float t = u_time*2.1;\n\
@@ -224,14 +237,22 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       // gl_Position = u_projection *rot* p;\n\
       // \n\
       // `,
-
-
-
-
+      
+      
+      '  vec2 vpos = a_pos;',
+      ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '  vpos *= u_scale2;' : '',
+      // (sid.unif & SID.UNIF.SCALE2) ? ' ' : '',
+      
+      
       (sid.pass & SID.PASS.WPOS2) ? '  vec2 wpos = vec2(a_wpos_time.x+ u_wposxy.x, a_wpos_time.y+u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
+      
+      
+      
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-      ? '  gl_Position = u_projection * vec4(a_pos.x + wpos.x, a_pos.y + wpos.y, a_wpos_time.z, 1.0);' 
-      : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
+      ? '  gl_Position = u_projection * vec4(vpos.x + wpos.x, vpos.y + wpos.y, a_wpos_time.z, 1.0);' 
+      : '  gl_Position = vec4(vpos.x + a_wpos_time.x, vpos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
+      // ? '  gl_Position = u_projection * vec4(a_pos.x + wpos.x, a_pos.y + wpos.y, a_wpos_time.z, 1.0);' 
+      // : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
       
       
       
@@ -285,7 +306,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       // true ? 'layout(origin_upper_left) in vec4 frag_color;' : '',
       true ? '#include <precision_medium>' : '',
       true ? '#include <out_frag_color>' : '',
-      (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
+      ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_FS)) ? '#define U_SCALE 1' : '',
       (sid.fx & SID.FX.FS_GLOW) ? '#define U_GLOW_PARAMS 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       // (sid.unif & SID.UNIF.UNIF_SPEED) ? '#define U_SPEED 1' : '',
@@ -319,10 +340,13 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
       (sid.attr & SID.ATTR.MSDF) ? frag_msdf : '',
       ////////////////////////////////////////////////////
-      // Fx shder functions
+      // Fx shader functions
       (sid.fx & SID.FX.FS_GLOW) ? frag_glow : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
       (sid.fx & SID.FX.FS_SMOKE) ? frag_smoke : '',
+      ////////////////////////////////////////////////////
+      // Test shader functions
+      (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1 : '',
 
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -336,6 +360,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
       (sid.fx & SID.FX.FS_SMOKE) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2 ) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '', 
+      (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
 
 
 
@@ -347,7 +372,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // TESTS
-      (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', // HACK: prevent optimizer from removing the uniform u_scale2
+      // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', // HACK: prevent optimizer from removing the uniform u_scale2
       (sid.unif & SID.UNIF.TIME) ? '  if(u_time == 0.) ;' : '',
       // (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
       // (sid.unif & SID.UNIF.SCALE2) ? '  frag_color.xyz *= u_scale2.x;' : '',

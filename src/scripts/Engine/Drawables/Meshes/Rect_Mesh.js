@@ -277,6 +277,8 @@ export class Rect_Mesh extends Rect {
       this.SetStyle(style);
       this.SetName(`[${this.mesh_bufferidx}]{${name}}-RECT_MESH`);
 
+      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+
    }
 
 

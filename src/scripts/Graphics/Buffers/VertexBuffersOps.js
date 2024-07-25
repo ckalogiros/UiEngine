@@ -424,23 +424,23 @@ export function Gl_set_dim_x(gfxInfo, x, num_faces = 1) {
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
 
-   let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[dimidx] + 1;
+   let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[dimidx];
    let loop_count = num_faces;
    let stride = vb_info.attribs_info.count - 1;
 
-   x*=2
+   x*=2;
 
    while (loop_count) {
 
       vb_data[index++] = 0;
       index += stride;
-
+      
       vb_data[index++] = 0;
       index += stride;
-
+      
       vb_data[index++] = x;
       index += stride;
-
+      
       vb_data[index++] = x;
       index += stride;
 
@@ -464,15 +464,15 @@ export function Gl_set_dim_y(gfxInfo, y, num_faces = 1) {
    let stride = vb_info.attribs_info.count - 1;
 
    // y*=2;
-   /** // TODO: Correct the vetex position with the dimention expansion
-            // VERTEX POSITION
-            vb_data[index++] = vpos_x;
-            if(j===0) vb_data[index++] = geom.dim[1]*2;
-            if(j===1) vb_data[index++] = 0;
-            
-            // DIMENTIONS
-            vb_data[index++] = geom.dim[0] * num_faces;
-            vb_data[index++] = geom.dim[1];
+   /** // TODO: Correct the vetex position with the dimention expansion. IF it exists in the attributes of the vertex buffer
+      // VERTEX POSITION
+      vb_data[index++] = vpos_x;
+      if(j===0) vb_data[index++] = geom.dim[1]*2;
+      if(j===1) vb_data[index++] = 0;
+      
+      // DIMENTIONS
+      vb_data[index++] = geom.dim[0] * num_faces;
+      vb_data[index++] = geom.dim[1];
    */
    while (loop_count) {
 
@@ -1634,6 +1634,194 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colo
 }
 
 
+export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_rot4(vbidx, start, colors, positions, time, p, r) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+
+   let index = start;
+   const len = 1;
+
+   for (let i = 0; i < len; i++) {
+
+      const col = colors;
+      const pos = positions;
+      const t = time;
+      // const dim = dim;
+
+      // V1
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      vb_data[index++] = t;
+      
+      vb_data[index++] = -p[0]*r[0] + p[1]*r[2];
+      vb_data[index++] = -p[0]*r[1] + p[1]*r[3];
+
+      index+=2
+		
+
+      // V2
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      vb_data[index++] = t;
+      
+      vb_data[index++] = -p[0]*r[0] + -p[1]*r[2];
+      vb_data[index++] = -p[0]*r[1] + -p[1]*r[3];
+
+      index+=2
+      
+      
+      // V3
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      vb_data[index++] = t;
+      
+      vb_data[index++] = p[0]*r[0] + p[1]*r[2];
+      vb_data[index++] = p[0]*r[1] + p[1]*r[3];
+      
+      index+=2
+      
+      
+      // V4
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      vb_data[index++] = t;
+      
+      vb_data[index++] =  p[0]*r[0] + -p[1]*r[2]; //console.log(r)
+      vb_data[index++] =  p[0]*r[1] + -p[1]*r[3];
+      index+=2
+   }
+
+}
+
+
+export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4(vbidx, start, colors, positions, time, p, r, uvs) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+
+   let index = start;
+   const len = 1;
+
+   for (let i = 0; i < len; i++) {
+
+      const col = colors;
+      const pos = positions;
+      const t = time;
+      // const dim = dim;
+
+      // V1
+      // VERTEX COLOR
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      // WORLD POSITION + TIME
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      vb_data[index++] = t;
+      
+      // VERTEX POSITION
+      vb_data[index++] = -p[0]*r[0] + p[1]*r[2];
+      vb_data[index++] = -p[0]*r[1] + p[1]*r[3];
+
+      // TEXTURE COORDS
+      vb_data[index++] = uvs[0];
+      vb_data[index++] = uvs[2];
+
+      index+=2
+		
+
+      // V2
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      vb_data[index++] = t;
+      
+      vb_data[index++] = -p[0]*r[0] + -p[1]*r[2];
+      vb_data[index++] = -p[0]*r[1] + -p[1]*r[3];
+      
+      // TEXTURE COORDS
+      vb_data[index++] = uvs[0];
+      vb_data[index++] = uvs[3];
+
+      index+=2
+      
+      
+      // V3
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      vb_data[index++] = t;
+      
+      vb_data[index++] = p[0]*r[0] + p[1]*r[2];
+      vb_data[index++] = p[0]*r[1] + p[1]*r[3];
+      
+      // TEXTURE COORDS
+      vb_data[index++] = uvs[1];
+      vb_data[index++] = uvs[2];
+
+      index+=2
+      
+      
+      // V4
+      vb_data[index++] = col[0];
+      vb_data[index++] = col[1];
+      vb_data[index++] = col[2];
+      vb_data[index++] = col[3];
+      
+      vb_data[index++] = pos[0];
+      vb_data[index++] = pos[1];
+      vb_data[index++] = pos[2];
+      vb_data[index++] = t;
+      
+      vb_data[index++] =  p[0]*r[0] + -p[1]*r[2]; //console.log(r)
+      vb_data[index++] =  p[0]*r[1] + -p[1]*r[3];
+
+      // TEXTURE COORDS
+      vb_data[index++] = uvs[1];
+      vb_data[index++] = uvs[3];
+
+      index+=2
+   }
+
+}
+
+
 export function Gl_particles_batch_set_col4_wpos4_pos2(vbidx, start, colors, positions, time) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
@@ -1655,7 +1843,7 @@ export function Gl_particles_batch_set_col4_wpos4_pos2(vbidx, start, colors, pos
 
       vb_data[index++] = pos[0];
       vb_data[index++] = pos[1];
-      vb_data[index++] = pos[2];
+      vb_data[index++] = pos[2]; 
       vb_data[index++] = t;
       
       index+=4
@@ -1789,18 +1977,7 @@ export function GlSetAttrParams1(gfxInfo, param, paramOffset) {
 
 
 export function GlRotateZ2D(gfxInfo, dim, angle, num_faces = 1) {
-// export function GlRotateZ2D(gfxInfo, dim, angle) {
 
-   // const vbidx = gfxInfo.vb.which_vb.wpos_buf;
-   // const wposidx = gfxInfo.vb.which_attrib.wpos_idx; // An index to access the wpos elements
-   // const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
-   // const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
-
-
-   // let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[wposidx];
-   // let loop_count = num_faces;
-   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
-   // let stride = vb_info.attribs_info.count - 2;
 
    const vbidx = gfxInfo.vb.which_vb.dim_buf;
    const dimidx = gfxInfo.vb.which_attrib.dim_idx; // An index to access the wpos elements
@@ -1809,26 +1986,9 @@ export function GlRotateZ2D(gfxInfo, dim, angle, num_faces = 1) {
 
 
    let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[dimidx];
-   // let index = 12;
-   let loop_count = num_faces;
    let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[dimidx];
-   // let stride = vb_info.attribs_info.count - 2;
-
-   // dim[0]*=2; dim[1]*=2;
 
    const newPos = RotateZ(dim, angle)
-   // index-=8
-
-
-   // let i = 0;
-   // while (loop_count) {
-
-   //    vb_data[index++] = newPos[i++];
-   //    vb_data[index++] = newPos[i++];
-      
-   //    index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-   //    loop_count--;
-   // }
    
    vb_data[index++] = newPos[0];
    vb_data[index++] = newPos[1];

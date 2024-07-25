@@ -343,3 +343,50 @@ export function Mix_vec3_float32Array( vec1, vec2, ratio ) {
 
 	return res;
 }
+
+
+/**
+ * 
+ * @param {*} x: Number 
+ * @param {*} y: Number
+ */
+export function Magnitude(x, y){
+
+    const length = Math.sqrt((x*x)+(y*y));
+
+    return length;
+}
+/**
+ * 
+ * @param {*} v1: Array[x, y] 
+ * @param {*} v2: Array[x, y]
+ */
+export function Magnitude_2vectors(v1, v2){
+
+    const x = v1[0]-v2[0];
+    const y = v1[1]-v2[1];
+    const length = Math.sqrt(( (x*x) + (y*y) ));
+    // console.log(length)
+
+    return length;
+}
+
+
+
+
+export function Dot(vx1, vy1, vx2, vy2){
+    return (vx1*vx2) + (vy1*vy2);
+    // const norm = Normalize_vec2(vx2, vy2)
+    // return (vx1*norm[0]) + (vy1*norm[1]);
+}
+
+
+
+
+export function Normalize_vec2(vx, vy){
+
+    const mag = Magnitude(vx, vy);
+    return [vx/mag, vy/mag];
+}
+
+

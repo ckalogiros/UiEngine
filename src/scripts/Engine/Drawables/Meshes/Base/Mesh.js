@@ -614,6 +614,12 @@ export class Mesh {
     }
 
 
+    /** Enable the .shad flags */
+    EnableGfxShadAttributes(SID_FLAGS) {
+
+        this.sid.shad |= SID_FLAGS;
+    }
+
     /**
      * Enable shader properties.
      * In order for a mesh to be drawn in a certain way, specific shaders must be build.
@@ -636,6 +642,7 @@ export class Mesh {
             }
             case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; break; }
             case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; break; }
+            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; break; }
             case MESH_ENABLE.GFX.ATTR_DIM2: {
 
                 this.sid.attr |= SID.ATTR.DIM2;

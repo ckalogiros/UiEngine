@@ -98,7 +98,7 @@ export class Widget_Button extends Widget_Label {
             EventClbk(mesh.evt_params);
          }
       }
-      if (params.evt_params && params.evt_params.EventClbk) {
+      else if (params.evt_params && params.evt_params.EventClbk) { // Is this neccessary, if the evt_params are in the mesh????
 
          const EventClbk = params.evt_params.EventClbk;
          EventClbk(params.evt_params);
@@ -142,6 +142,9 @@ export class Widget_Button extends Widget_Label {
 
       if (click_flags) this.state.mask |= click_flags;
 
+      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+      // If there is a click event already created
    }
 }
 

@@ -733,12 +733,19 @@ const TEXTURE_TYPE = {
 // Textures
 // Font textures
 // const FONT_CONSOLAS_20px = '../../../../resources/fonts/consolas_5/consolas_5.bmp';
+const FONT_CONSOLAS_12px = 'consolas_3';
+const FONT_CONSOLAS_16px = 'consolas_4';
 const FONT_CONSOLAS_20px = 'consolas_5';
+const FONT_CONSOLAS_24px = 'consolas_6';
+const FONT_CONSOLAS_28px = 'consolas_7';
+const FONT_CONSOLAS_32px = 'consolas_8';
 const FONT_CONSOLAS_SDF_LARGE = 'consolas_sdf_11115w';
 const FONT_CONSOLAS_SDF_SMALL = 'consolas_sdf_2048w';
 const COMIC_FONT_METRICS_PATH = '../../../../resources/fonts/consolas_sdf/metrics/consolas_sdf35.txt'
 const TEST_MSDF_FONT_1 = 'msdf_a_char';
 const TEST_MTSDF_FONT_TEST_1024DIM = 'consola_mtsdf_test_1024';
+const TEXTURE_SMOKE1 = 'smoke';
+const TEXTURE_TEST = 'Coin_1_64x64';
 
 
 
@@ -753,13 +760,55 @@ const TEXTURE_PATHS = [
 		imgPath: 'fonts/consolas_sdf',
 		imgName: TEST_MTSDF_FONT_TEST_1024DIM,
 		imgType: 'png',
+		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
 	{
-		// imgPath: 'fonts/consolas_5',
-		imgPath: 'fonts/consolas_5_new',
-		imgName: FONT_CONSOLAS_20px,
-		// imgType: 'png',
+		imgPath: 'fonts/consolas_3',
+		imgName: FONT_CONSOLAS_12px,
 		imgType: 'bmp',
+		metrics: null, 
+	},
+	{
+		imgPath: 'fonts/consolas_4',
+		imgName: FONT_CONSOLAS_16px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{
+		imgPath: 'fonts/consolas_5',
+		imgName: FONT_CONSOLAS_20px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{
+		imgPath: 'fonts/consolas_6',
+		imgName: FONT_CONSOLAS_24px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{
+		imgPath: 'fonts/consolas_7',
+		imgName: FONT_CONSOLAS_28px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{
+		imgPath: 'fonts/consolas_8',
+		imgName: FONT_CONSOLAS_32px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{
+		imgPath: 'textures',
+		imgName: TEXTURE_SMOKE1,
+		imgType: 'png',
+		metrics: null, 
+	},
+	{
+		imgPath: 'textures',
+		imgName: TEXTURE_TEST,
+		imgType: 'png',
+		metrics: null, 
 	},
 ];
 
@@ -772,11 +821,23 @@ const TEXTURE_PATHS = [
 
 g_cnt = 0;
 const TEXTURES = {
+
 	// POTENTIAL_BUG: 
 	// IMPORTANT:Font textures MUST precede all other textures
+
+	// Font Textures
 	MSDF_CONSOLAS_1024: g_cnt++,
+	CONSOLAS_12px: g_cnt++,
+	CONSOLAS_16px: g_cnt++,
 	CONSOLAS_20px: g_cnt++,
+	CONSOLAS_24px: g_cnt++,
+	CONSOLAS_28px: g_cnt++,
+	CONSOLAS_32px: g_cnt++,
 	FONT_COUNT: g_cnt,
+
+	// Image Textures
+	SMOKE_1:g_cnt++, // g_cnt must be the index of the element in 'TEXTURE_PATHS'. // TODO: Either create the 'TEXTURE_PATHS' element at g_cnt OR set the g_cnt equual to the index this texture represents
+	TEST:g_cnt++, 
 
 	COUNT: g_cnt,
 }

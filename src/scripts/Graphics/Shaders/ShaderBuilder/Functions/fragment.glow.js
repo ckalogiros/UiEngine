@@ -32,11 +32,11 @@ export const frag_glow = `
 vec4 Glow(float alpha)
 {
 
-#ifdef U_GLOW_PARAMS
-    vec3 controls = u_glow_params;
-#else
-    vec3 controls = vec3(1.);
-#endif
+    #ifdef U_GLOW_PARAMS
+        vec3 controls = u_glow_params;
+    #else
+        vec3 controls = vec3(1.);
+    #endif
 
    float outer = controls.x+.4;
    float inner = controls.y;
@@ -44,19 +44,19 @@ vec4 Glow(float alpha)
    vec2 res = u_screen_res;
    vec2 dim = v_dim; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
    
-#ifndef UV_READY
-   #define UV_READY 1
-   uv = (gl_FragCoord.xy-(res*.5));
-   uv.x += (res.x*.5); // Center mesh to screen
-   uv.y -= (res.y*.5); // Center mesh to screen
-   
-   vec2 wpos = v_wpos;
-   uv.x -= wpos.x; // To move with mesh position
-   uv.y += wpos.y; // To move with mesh position
-   
-   uv.x -= dim.x; // Subtract constant dimention
-   uv.y -= -dim.y; // Subtract constant dimention
-#endif
+    #ifndef UV_READY
+        #define UV_READY 1
+        uv = (gl_FragCoord.xy-(res*.5));
+        uv.x += (res.x*.5); // Center mesh to screen
+        uv.y -= (res.y*.5); // Center mesh to screen
+        
+        vec2 wpos = v_wpos;
+        uv.x -= wpos.x; // To move with mesh position
+        uv.y += wpos.y; // To move with mesh position
+        
+        uv.x -= dim.x; // Subtract constant dimention
+        uv.y -= -dim.y; // Subtract constant dimention
+    #endif
    
    
    
