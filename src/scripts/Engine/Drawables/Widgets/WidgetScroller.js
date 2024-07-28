@@ -419,15 +419,15 @@ export class Widget_Scroller extends Section {
       vb.EnableScissorBox();
       vb.SetScissorBox(scissorbox);
 
-      const textgfx = Find_textgfx_from_parent_descending(this);
-      if (textgfx) {
-         const vb_text = Vertex_buffer_group_get_byidx(textgfx.vb.groupidx);
-         /**DEBUG */ if (!vb_text) alert('SetScissorBox() in Scroller cannot resolve vertex buffer for text');
-         vb_text.EnableScissorBox();
-         vb_text.SetScissorBox(scissorbox);
-      }
-      else
-         console.log('{}{}{}{}}}{}{}} TEXT BUFFER NNOT FOUND')
+      // const textgfx = Find_textgfx_from_parent_descending(this);
+      // if (textgfx) {
+      //    const vb_text = Vertex_buffer_group_get_byidx(textgfx.vb.groupidx);
+      //    /**DEBUG */ if (!vb_text) alert('SetScissorBox() in Scroller cannot resolve vertex buffer for text');
+      //    vb_text.EnableScissorBox();
+      //    vb_text.SetScissorBox(scissorbox);
+      // }
+      // else
+      //    console.log('{}{}{}{}}}{}{}} TEXT BUFFER NNOT FOUND')
    }
 
 

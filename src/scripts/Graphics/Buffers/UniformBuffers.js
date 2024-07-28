@@ -74,7 +74,7 @@ function SetValueV4ui(gl, loc, val) { gl.uniform4uiv(loc, val); }
 class Uniform {
 
 
-   constructor(gl = null, shader_program = null, type = INT_NULL, name = '', progidx=INT_NULL) {
+   constructor(gl = null, shader_program = null, type = INT_NULL, name = '', progidx=INT_NULL, vb_groupidx=INT_NULL) {
 
       const loc = gl.getUniformLocation(shader_program, name);
       // const t = gl.getActiveUniform(shader_program, 1)
@@ -88,6 +88,7 @@ class Uniform {
       this.val = 0;// Uniform value
       this.loc = loc; // Uniform location
       this.progidx = progidx; // The index of the program
+      this.vb_groupidx = vb_groupidx; // The index of the Vretex Buffer
       this.name = name; // Uniform name
       this.needs_update = false;
       this.UpdateUniform = null; // Gl specific type function for updating the uniform.
@@ -158,11 +159,11 @@ const _uniforms_buffer = New_generic_buffer(_, 'GFX Uniforms');
 let any_needs_update = false; // 
 
 
-export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, progidx) {
+export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, progidx, vb_groupidx) {
 
-   const uniform = new Uniform(gl, shader_program, type, name, progidx);
+   const uniform = new Uniform(gl, shader_program, type, name, progidx, vb_groupidx);
    const ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
-   console.info('UUUUUUUUUUUUUUUUUUUUUUUUUUUUU\nUniform Created at index:', ubidx, _uniforms_buffer);
+   // console.info('UUUUUUUUUUUUUUUUUUUUUUUUUUUUU\nUniform Created at index:', ubidx, _uniforms_buffer);
 
    return ubidx;
 }
@@ -642,6 +643,7 @@ export function Uniforms_buffer_print() {
          'name', _uniforms_buffer.buffer[i].name,
          'val', _uniforms_buffer.buffer[i].val,
          'progidx', _uniforms_buffer.buffer[i].progidx,
+         'vb_groupidx', _uniforms_buffer.buffer[i].vb_groupidx,
          // 'Clbk', 'For Clbk seek in VertexBufferGroup.Unif_set_val_clbk()',
          // 'clbk_params', 'For clbk_params seek in VertexBufferGroup.unif_set_val_clbk_params()',
       );

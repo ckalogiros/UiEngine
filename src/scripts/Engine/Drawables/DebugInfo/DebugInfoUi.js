@@ -20,7 +20,7 @@ import { Listeners_click_get_count, Listeners_hover_get_count } from "../../Even
 import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_scroller_component } from "../Widgets/ScrollerComponent.js";
+import { Components_create_scroller_component, Scoller_component_gengfx_and_render } from "../Widgets/ScrollerComponent.js";
 
 
 
@@ -2237,7 +2237,7 @@ const _ui_info_buffer = New_generic_buffer(_, '_ui_info_buffer');
 
 
 function Dbg_info_ui_create_ui(pos, name) {
-
+alert('30174619 \nOld scroler. Uupdate to new scroller')
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
    const pad = [6, 6], style = [0, 3, 2], fontsize = 9.8;
    // const pad = [6, 6], style = [0, 1, 0], fontsize = 9.8;
@@ -2316,8 +2316,8 @@ function Dbg_info_ui_create_ui(pos, name) {
 
    View_build_group_from_root_mesh(scrolled);
 
-   const scroller_component = Components_create_scroller_component(scrolled, 60);
-   Scroller_component_calculate_scroller_component(scrolled, scroller_component);
+   const scroller_component = Components_create_scroller_component(_, 60, scrolled, scrolled.GetPosY());
+   // Scroller_component_calculate_scroller_component(scrolled, scroller_component);
    Scoller_component_gengfx_and_render(scroller_component);
 
 

@@ -118,7 +118,9 @@ export function FontGetFontDimRatio(font_idx) {
 
 export function Font_metrics_get_advancex(font_idx) { return _fontMetricsBuffer[font_idx].advancex; }
 export function Font_metrics_get_width(font_idx) { return _fontMetricsBuffer[font_idx].texWidth; }
-export function Font_metrics_get_char_width(font_idx, ch) { return _fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
+export function Font_metrics_get_char_width(font_idx, ch) { 
+	console.log(ch, ch.charCodeAt(0))
+	return _fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
 export function Font_metrics_get_height(font_idx) { return _fontMetricsBuffer[font_idx].texHeight; }
 export function Font_metrics_get_row_height(font_idx) { return _fontMetricsBuffer[font_idx].row_height; }
 export function Font_metrics_get_interpolated_x(font_idx) { return 1.0 / _fontMetricsBuffer[font_idx].texWidth; } // Transform to 0-1 coords 
@@ -190,24 +192,32 @@ function LoadMetrics(font_idx, textureid) {
 	metrics.isMonoSpace = FindNextValue(file, "[]");
 	metrics.ratio = metrics.texHeight / metrics.advancex;
 
+	let ii = 0;
+
+	/**
+	 * // TODO: Set the start character=10->\n,
+	 * leave emty array elements to the ' '=32
+	 */
 	// For char space character ' '
-	metrics.ch[0].left = 0;
-	metrics.ch[0].right = 0;
-	metrics.ch[0].top = 0;
-	metrics.ch[0].bottom = 0;
-	metrics.ch[0].width = metrics.advancex;
-	metrics.ch[0].height = 0;
-	metrics.ch[0].row_num = 0;
+	metrics.ch[ii].left = 0;
+	metrics.ch[ii].right = 0;
+	metrics.ch[ii].top = 0;
+	metrics.ch[ii].bottom = 0;
+	metrics.ch[ii].width = metrics.advancex;
+	metrics.ch[ii].height = 0;
+	metrics.ch[ii].row_num = 0;
 	if (!metrics.isMonoSpace) {
-		metrics.ch[0].advancex = metrics.advancex;
-		metrics.ch[0].ratio = metrics.texHeight / metrics.ch[0].advancex; // width to height ratio(and not the other way arround)
+		metrics.ch[ii].advancex = metrics.advancex;
+		metrics.ch[ii].ratio = metrics.texHeight / metrics.ch[0].advancex; // width to height ratio(and not the other way arround)
 	}
+
+	ii++;
 
 	// Reset the file's pos
 	file.pos.start = 0;
 
 	// Load all property values to character map for each character
-	for (let i = 1; i < size; i++) {
+	for (let i = ii; i < size; i++) {
 		file.pos = FindWord(file.content, "Face Left", file.pos);
 		if (file.pos.len)
 			metrics.ch[i].left = FindNextValue(file, "[]");

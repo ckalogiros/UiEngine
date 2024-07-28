@@ -83,5 +83,5 @@ export const frag_tex = `
   color.rgb *= color.a;
 
   // Remove all black color and render only the colored texture
-  // color.a = color.r * color.g * color.b*.01;
+  color.a = color.r * color.g * color.b*.01;
 `;

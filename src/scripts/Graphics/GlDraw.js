@@ -24,9 +24,9 @@ export function Gl_draw(gl) {
 
     gl.clearColor(R, G, B, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    // gl.disable(gl.SCISSOR_TEST);
-
-
+    
+    
+    
     for (let i = 0; i < drawQueueCount; i++) {
         
         const progidx = drawQueue[i].progidx;
@@ -42,18 +42,23 @@ export function Gl_draw(gl) {
         }
         
         
+        
         const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
         const ib_info = Index_buffer_info_get_by_ibidx(ibidx);
         
-
+        
         if (GL.BOUND_VAO !== vb_group.vao){
             gl.bindVertexArray(vb_group.vao);
             GL.BOUND_VAO = vb_group.vao;
         }
-
-
+        
+        
         Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
-
+        
+        if(vb_group.has_scissorbox){
+            gl.enable(gl.SCISSOR_TEST);
+            gl.scissor(vb_group.scissorbox[0], vb_group.scissorbox[1], vb_group.scissorbox[2], vb_group.scissorbox[3]);
+        }
 
 
         // if (GL.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
@@ -114,6 +119,7 @@ export function Gl_draw(gl) {
         // if(i === 0) gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 5)
         // else gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
 
+        if(vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
     }
 
 }

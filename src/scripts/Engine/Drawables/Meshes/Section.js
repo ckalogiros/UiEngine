@@ -16,7 +16,7 @@ import { Mesh } from "./Base/Mesh.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material, Texture_Material } from "../Material/Base/Material.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 
 
@@ -989,10 +989,15 @@ export function Section_on_move_clbk(params) {
    const mouse_dif = MouseGetPosDif();
    if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
 
-   Mesh_unif_add_vb_root_wpos(section.root_posidx, mouse_dif.x, -mouse_dif.y)
+   Mesh_unif_add_vb_root_wpos(section.root_posidx, mouse_dif.x, -mouse_dif.y);
 
 
-   // if(section.scroller_comp) Mesh_unif_add_vb_root_wpos(section.scroller_comp.root_posidx, mouse_dif.x, -mouse_dif.y);
+   /********************************************************************************************************************/
+   // Set any scissor box
+   // TODO: Where to update any scissor box??? 1. at the update functions(Move, resize, etc)? At the 'mesh uniform' file(for move)???
+   if(Vertex_buffer_group_has_scissorbox(section.gfx.vb.groupidx)){
+      Vertex_buffer_group_set_scissorbox(section.gfx.vb.groupidx);
+   }
 
 }
 
@@ -1438,15 +1443,6 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
             mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
             continue_recur = false;
          }
-         // else if (mesh.type & MESH_TYPE.WIDGET_SCROLLER) {
-            
-         //    // console.log('##########################################', mesh.scroll_bar.geom.pos)
-         //    // mesh.geom.pos[0] = rel_pos[0];
-         //    // mesh.geom.pos[1] = rel_pos[1];
-          
-         //    // mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-         //    continue_recur = false;
-         // }
          else if (mesh.type & MESH_TYPE.SECTION_MESH) { // For meshes with a parent of type Section
 
             mesh.geom.pos[0] = rel_pos[0];
@@ -1462,7 +1458,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
 
             mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
             // if(mesh.type & MESH_TYPE.WIDGET_SCROLLER) 
-               console.log('##########################################', mesh.GetName(), mesh.geom.pos, rel_pos)
+               // console.log('##########################################', mesh.GetName(), mesh.geom.pos, rel_pos)
 
             if (mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
             if (mesh.text_mesh) continue_recur = false;

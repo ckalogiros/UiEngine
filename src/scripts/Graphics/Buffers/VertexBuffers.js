@@ -12,6 +12,7 @@ import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/De
 import { Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
 import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBufferFillOps.js";
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
+import { Mesh_buffer_get_mesh_byidx, Widget_root_gfx_get } from "../../Engine/Core/MeshBuffer.js";
 
 
 
@@ -339,6 +340,10 @@ class Vertex_Buffer_Group {
         this.idx = INT_NULL;        // Self index to the '_vertex_buffer_groups' buffer
         this.needs_any_update = false; // 
 
+        this.has_scissorbox = false;
+        this.scissorbox = [0, 0, 0, 0];
+        this.scissorbox_meshidx = [INT_NULL, INT_NULL, INT_NULL, INT_NULL]; // Store the mesh index for retrieving scissorbox values
+
         
         this.render_queueidx = INT_NULL; // index to the Render queue buffer of the current vb 
         
@@ -355,7 +360,21 @@ class Vertex_Buffer_Group {
         this.unif_names = []; // Uniforms names. Helper, to locate which element is what uniform
     }
 
+    CreateScissorBox(mx, my, mw, mh){
+        this.scissorbox_meshidx[0] = mx; 
+        this.scissorbox_meshidx[1] = my; 
+        this.scissorbox_meshidx[2] = mw; 
+        this.scissorbox_meshidx[3] = mh; 
+        this.has_scissorbox = true;
+    }
 
+    SetScissorBox(x, y, w, h){
+        this.scissorbox[0] = x; 
+        this.scissorbox[1] = y; 
+        this.scissorbox[2] = w; 
+        this.scissorbox[3] = h; 
+
+    }
 }
 
 /****************************************************************************************************************************************************/
@@ -435,19 +454,69 @@ export function Vertex_buffer_group_set_render_queueidx(vb_groupidx, render_queu
 }
 
 
+
+/** Pass the mesh.bufferidx index of the meshes that the scissor box will draw values from. [posx, posy, width, height] */
+export function Vertex_buffer_group_create_scissorbox(vb_groupidx, mx, my, mw, mh) {
+    _vertex_buffer_groups.buffer[vb_groupidx].CreateScissorBox(mx, my, mw, mh);
+    Vertex_buffer_group_set_scissorbox(vb_groupidx);
+}
+
+
+
+export function Vertex_buffer_group_set_scissorbox(vb_groupidx) {
+    
+    /**
+     * 1. Get the meshes for scissor box x, y, width and height values.
+     * 2. Extract these values
+     * 3. Run a loop for all vertex buffers that belong to the same root widget
+     * 4. Update the scissor box values of the group   
+     */
+    
+    const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
+
+    const H = VIEWPORT.HEIGHT;
+    const mx = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[0]);
+    const my = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[1]);
+    const mw = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[2]);
+    const mh = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[3]);
+
+    const x = mx.GetPosX();
+    const y = my.GetPosY();
+    const w = mw.geom.dim[0]*2;
+    const h = mh.geom.dim[1]*2;
+    
+    const root_vb_groupidxs = Widget_root_gfx_get(mx.root_bufferidx);
+    
+    // Run for all vertex buffer groups that belong to the root widget
+    for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
+
+        const vb_group_ = _vertex_buffer_groups.buffer[root_vb_groupidxs.buffer[i]];
+        if(vb_group_.has_scissorbox) 
+            vb_group_.SetScissorBox(x, (H-y)-h, w, h);
+    }
+}
+
+
+
+export function Vertex_buffer_group_has_scissorbox(vb_groupidx) {
+    return _vertex_buffer_groups.buffer[vb_groupidx].has_scissorbox;
+}
+
+
 /*************************************************************************************************************************/
 // Uniforms
 
 export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, params, ubidx, unif_name) {
 
     // Avoid adding callbacks if they have already been added for this vertex buffer
-    const len = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs.length;
-    for(let i=0; i < len; i++){
-        const ubidx1 = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
-        if(ubidx === ubidx1) 
-        console.error('Duplicate functions for ubidx:', ubidx, 'vb_groupidx', vb_groupidx, 
-        '\nFound at ubidx:', i, '\nValue set at uniform index:', params.val_idx, 'Found uniform value index:', _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[i])
-    }
+    // const len = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs.length;
+    // for(let i=0; i < len; i++){
+    //     const ubidx1 = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
+    //     // if(ubidx === ubidx1) 
+    //     // console.error('Duplicate functions for ubidx:', ubidx, 'vb_groupidx', vb_groupidx, 
+    //     // '\nFound at ubidx:', i, '\nValue set at uniform index:', params.val_idx, 'Found uniform value index:', _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[i])
+    //     return;
+    // }
 
     _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk.push(Clbk);
     _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params.push(params);
@@ -474,7 +543,7 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
         Uniforms_buffer_set_uniform_val_from_index(ubidx, val, val_idx);
         Uniforms_buffer_update_uniform(ubidx);
 
-    }
+    }``
 }
 
 
@@ -628,7 +697,7 @@ export function Vertex_buffer_reset_to_index(vb_groupidx, starts) {
         const vbidx = vb_group.vb_idxs.buffer[i]
 
         const vb_info = _vertex_buffer_infos.buffer[vbidx];
-        if (starts[i] < 0 || starts[i] > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js, ');
+        if (starts[i] < 0 || starts[i] > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js \nstart index:', starts[i], 'vb count', vb_info.count);
 
         const attribsidx = Program_get_shader_attributes_index(vb_group.progidx);
         const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
@@ -670,7 +739,8 @@ export function Vertex_buffer_reset(vb_groupidx, starts) {
         const vbidx = vb_group.vb_idxs.buffer[i]
 
         const vb_info = _vertex_buffer_infos.buffer[vbidx];
-        if (starts[i] < 0 || starts[i] > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js, ');
+        if (starts[i] < 0 || starts[i] > vb_info.count) 
+            console.error('Start should be less than vertex buffer count. @VertexBuffers.js \nstart index:', starts[i], 'vb count', vb_info.count);
 
         const attribsidx = Program_get_shader_attributes_index(vb_group.progidx);
         const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);

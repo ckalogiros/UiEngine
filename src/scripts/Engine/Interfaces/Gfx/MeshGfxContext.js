@@ -341,7 +341,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
             const shader_program = Progarm_get_webgl_program_object(progidx);
             if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
 
-               const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx);
+               const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx, vb_groupidx);
                uniforms[i].ubidx = ubidx;
                
 
@@ -517,7 +517,7 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
             const shader_program = Progarm_get_webgl_program_object(progidx);
             if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
 
-               const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx);
+               const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx, vb_groupidx);
                uniforms[i].ubidx = ubidx;
                
 

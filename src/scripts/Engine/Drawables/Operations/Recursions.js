@@ -113,10 +113,10 @@ export function Construct_listen_events_relations_from_mesh_tree(mesh, parent=nu
     
                     if (parent_eventidx !== null && parent_eventidx !== INT_NULL) { // Find any parent event from the widget root tree
                         
-                        if(mesh.listeners.buffer[etype] === INT_NULL)
+                        if(mesh.listeners.buffer[etype] === INT_NULL) //return;
                         console.log(mesh.listeners.buffer[etype], parent_eventidx)
                         
-                        Listener_assign_parent_event(etype, mesh.listeners.buffer[etype], parent_eventidx)
+                        Listener_assign_parent_event(etype, mesh.listeners.buffer[etype], parent_eventidx, mesh)
                     }
                     else if (mesh.listeners.buffer[etype] !== null && mesh.listeners.buffer[etype] !== INT_NULL) { // Create root event view 
                         Listener_create_root_view(etype, mesh.listeners.buffer[etype]);
@@ -125,7 +125,7 @@ export function Construct_listen_events_relations_from_mesh_tree(mesh, parent=nu
                 else if (parent_events.buffer[etype] !== INT_NULL && parent_events.buffer[etype] !== null && mesh.listeners.buffer[etype] !== INT_NULL) {
     
                     // Connect child's event with the current parent
-                    Listener_assign_parent_event(etype, mesh.listeners.buffer[etype], parent_events.buffer[etype])
+                    Listener_assign_parent_event(etype, mesh.listeners.buffer[etype], parent_events.buffer[etype], mesh)
                     // console.log('Connect event:', mesh.listeners.buffer[etype], 'with parent', parent_events.buffer[etype])
                 }
             }
@@ -162,7 +162,7 @@ export function Construct_listen_events_from_mesh_tree(mesh){
      * After the dp, this function will run for the dp's children.
      * So the button will call it's 'ListenEventConstruct()', in button widget class.
      * THAT IS NOT A PROBLEM of reconstruucting the buttons listener,
-     * only for the reason that any listener in the mesh.listeners buffer that is NOT INT_NULL,
+     * for the reason that any listener in the mesh.listeners buffer that is NOT INT_NULL,
      * the listener construction will fail.
      */
     const continue_with_children = mesh.ListenEventConstruct();
@@ -174,7 +174,7 @@ export function Construct_listen_events_from_mesh_tree(mesh){
         
         for (let i=0; i <= mesh.children.boundary; i++){
             const child = mesh.children.buffer[i];
-            // console.log('child:', child.GetName(), child.listeners.buffer )
+            // console.log('child:', child.GetName(), child.listeners )
             Construct_listen_events_from_mesh_tree(child)
         }
     }

@@ -14,6 +14,8 @@ import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos } from "./ScrollerComponent.js";
+import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Mesh_set_scissorbox } from "../Operations/MeshHelperFunctions.js";
 
 
 
@@ -963,6 +965,15 @@ export class Widget_Dropdown extends Section {
 
 
       /********************************************************************************************************************/
+      // Set any scissor box
+      if(Vertex_buffer_group_has_scissorbox(this.gfx.vb.groupidx)){
+         Vertex_buffer_group_set_scissorbox(this.gfx.vb.groupidx);
+      }
+
+
+
+
+      /********************************************************************************************************************/
       // Set any scroller component
       if(this.scroller_comp){
          Scroller_component_calculate_handle_pos_dim(this, this.scroller_comp);
@@ -981,7 +992,7 @@ export class Widget_Dropdown extends Section {
       // Clip unnecessary meshes
       { 
 
-         // // Get the group root mesh to Recalc position/dimentions 
+         // Get the group root mesh to Recalc position/dimentions 
          // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
          // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
          // let clip_top = null, clip_bottom = null;

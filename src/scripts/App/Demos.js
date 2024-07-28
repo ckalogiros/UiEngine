@@ -2,10 +2,13 @@
 
 import { Create_rect_mesh, Create_widget_multi_text, Create_widget_section, Create_widget_slider, Create_widget_text } from "../Engine/Core/CreateWidget.js";
 import { Widget_root_activate_all_vbs_in_renderqueue } from "../Engine/Core/MeshBuffer.js";
-import { Mesh_unif_get_vb_root_wpos } from "../Engine/Core/MeshUniformsBuffer.js";
+import { View_build_group_from_root_mesh } from "../Engine/Core/MeshBufferViews.js";
+import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../Engine/Core/MeshUniformsBuffer.js";
 import { BLUEL, GREEN, GREY, WHITE, YELLOWL } from "../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Drawables/Operations/Recursions.js";
+import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Slider_connect, Slider_simple_set_value } from "../Engine/Drawables/Widgets/WidgetSlider.js";
+import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
 import { TimeIntervalsCreate } from "../Engine/Timers/TimeIntervals.js";
 import { GlRotateZ2D } from "../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSequencedColor } from "../Helpers/Helpers.js";
@@ -686,11 +689,20 @@ export function Elastic_collisions() {
    info_section_panel.Render();
    Widget_root_activate_all_vbs_in_renderqueue(info_section_panel.root_bufferidx);
 
-   info_section_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, info_section_panel.gfx.vb.groupidx)
+   info_section_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, info_section_panel.gfx.vb.groupidx);
+
+   // View_build_group_from_root_mesh(info_section_panel);
 
 
    Construct_listen_events_from_mesh_tree(info_section_panel)
    Construct_listen_events_relations_from_mesh_tree(info_section_panel);
+
+   const scroller_component = Components_create_scroller_component(10, elastic_cllisions_panel_dim[1], info_section_panel, info_section_panel.GetPosY(), );
+   Scoller_component_gengfx_and_render(scroller_component, info_section_panel);
+   Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(info_section_panel.root_posidx , scroller_component.root_posidx);
+   // Listeners_set_priority(E.C, scroller_component.listeners)
+
+   Scroller_component_calculate_handle_pos_dim(info_section_panel, scroller_component);
 }
 
 

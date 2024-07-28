@@ -126,7 +126,6 @@ export class Rect extends Mesh {
       // Add entry to Gfx Buffer
       // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
-      return this.gfx.vb.start;
    }
 
 

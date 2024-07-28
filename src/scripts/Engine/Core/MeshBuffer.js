@@ -11,6 +11,7 @@ import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority
 import { REL_POS, Relative_pos_comp_move_right_buffer } from "../Drawables/Operations/RelativePosComponent.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "./MeshUniformsBuffer.js";
 import { Index_buffer_reset } from "../../Graphics/Buffers/IndexBuffers.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Drawables/Operations/Recursions.js";
 
 
 
@@ -911,7 +912,9 @@ export function Widget_root_rerender_from_root_reconstruct_listeners(root_buffer
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
       if (mesh.state.mask & MESH_STATE.ACTIVE) {
 
-         mesh.AddToGfxFromReset();
+         // mesh.AddToGfxFromReset();
+         mesh.AddToGfx();
+         // console.log('Add mesh from reset', mesh.GetName(), mesh.gfx.vb.starts.buffer[0])
       }
       // else console.log('INACTIVE', mesh.GetName())
    }
@@ -921,8 +924,13 @@ export function Widget_root_rerender_from_root_reconstruct_listeners(root_buffer
 
       // Get the root mesh
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[0]);
-      const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
-      mesh.ConstructListeners(parent_events);
+      // const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
+      // mesh.ConstructListeners(parent_events);
+
+      /********************************************************************************************************************/
+      // Re-create listen events 
+      Construct_listen_events_from_mesh_tree(mesh)
+      Construct_listen_events_relations_from_mesh_tree(mesh);
    }
 
 }
@@ -1033,15 +1041,6 @@ export function Widget_root_set_uniform_callback_per_gfx_root_mesh(root_bufferid
    
    // Call for each root mesh in every vertex buffer
    const root_meshes= Widget_root_batch_get_all_roots_by_vertex_buffer(root_bufferidx);
-   // const len = root_meshes.length;
-   // for(let i=1; i < len; i++){
-
-   //    const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
-   //    // root_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-   //    root_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-
-   // }
-
    return root_meshes;
 }
 

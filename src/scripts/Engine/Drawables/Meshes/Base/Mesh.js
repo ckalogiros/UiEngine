@@ -422,7 +422,10 @@ export class Mesh {
     AddListenEvent(etypeidx, Clbk = null, params = null) {
 
         if (this.listeners.buffer[etypeidx] !== INT_NULL) return;
-        if ((this.state.mask & MESH_STATE.ACTIVE) === 0x0) alert('0198815 \nMesh is INACTIVE to add a listen event')
+        if ((this.state.mask & MESH_STATE.ACTIVE) === 0x0) {
+            // console.error('0198815 \nMesh is INACTIVE to add a listen event \n', this.GetName());
+            return;
+        }
 
 
         const is_fake = (this.state.mask & MESH_STATE.IS_FAKE_EVENT) ? true : false;

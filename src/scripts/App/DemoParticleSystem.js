@@ -11,7 +11,7 @@ import { Mesh_unif_add_vb_root_wposx, Mesh_unif_add_vb_root_wposy, Mesh_unif_con
 import { Debug_info_ui } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { BLACK, BLUEL, GREEN, GREY, Interpolate_rgb_to_01, ORANGE, ORANGEL, ORANGER, PURPLEB, PURPLER, WHITE, YELLOW, YELLOWL, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Drawables/Operations/Recursions.js';
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_scroller_component } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
+import { Components_create_scroller_component, Scoller_component_gengfx_and_render } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
@@ -20,6 +20,7 @@ import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_pa
 import { Renderqueue_set_priority_by_vb } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { TimeIntervalsCreate } from '../Engine/Timers/TimeIntervals.js';
 import { TimerGetGlobalTimerCycle } from '../Engine/Timers/Timers.js';
+import { Vertex_buffer_group_create_scissorbox } from '../Graphics/Buffers/VertexBuffers.js';
 import { Gl_set_rgba } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { GetRandomPos, GetSequencedColor } from '../Helpers/Helpers.js';
 import { CopyArr4 } from '../Helpers/Math/MathOperations.js';
@@ -1160,12 +1161,12 @@ export function TestNoiseShader() {
 
       emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
       // emitter.EnableGfxUniforms({ fx: SID.FX.FS_SMOKE }, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-      emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
       TEMP_PARTICLES_GEN_GFX(emitter);
 
       // emitter.GfxUniformsSetClbk('u_smoke_params', function () { return [1, 1, 1] }, emitter.gfx.vb.groupidx);
-      emitter.GfxUniformsSetClbk('u_scale2', function () { return [.5, .5] }, emitter.gfx.vb.groupidx);
+      // emitter.GfxUniformsSetClbk('u_scale2', function () { return [.5, .5] }, emitter.gfx.vb.groupidx);
 
 
       emitter.SetConeOfDirection(1, 1, -.9, .4);
@@ -1621,7 +1622,7 @@ function CreateSidePanel(root_widget = ROOT_WIDGETS.CREATE_ROOT, render_target =
    const height = VIEWPORT.HEIGHT/2;
    const pad = 4;
 
-   const section = Create_widget_section(root_widget, SECTION.HORIZONTAL, [pad, 2], [VIEWPORT.RIGHT - (width - pad * 2+10), 0, 0], [width, height], GREY[1], 'SidePanel', [0, 1, 1.8]);
+   const section = Create_widget_section(root_widget, SECTION.HORIZONTAL, [pad, 2], [VIEWPORT.RIGHT - (width+250 - pad * 2+10), 0, 0], [width, height], GREY[1], 'SidePanel', [0, 1, 1.8]);
    // section.state.mask |= MESH_STATE.STICKY_POSX;
 
 
@@ -1636,9 +1637,6 @@ function CreateSidePanel(root_widget = ROOT_WIDGETS.CREATE_ROOT, render_target =
 
    const heading = Create_widget_label(_, 'Properties Panel', _, [0, 0, 4], _, GREY[1], BLUEL[9], [10, 4], _, [0, 8, 1.8]);
    s.AddItem(heading);
-
-   // section.geom.pos[0] -= 200
-
 
 
    if (render_target) {
@@ -3537,7 +3535,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
    console.log(s.geom.pos[1], s.GetPosY())
 
    // Add scroller
-   const scroller_component = Components_create_scroller_component(s, side_panel.geom.dim[1], _, TRANSPARENCY(GREY[0], .4), TRANSPARENCY(GREY[8], .2));
+   const scroller_component = Components_create_scroller_component(_, side_panel.geom.dim[1], s, side_panel.GetPosY(), TRANSPARENCY(GREY[0], .4), TRANSPARENCY(GREY[8], .2));
    
    
    const sbtn = side_panel.children.buffer[0];
@@ -4090,17 +4088,19 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
       View_build_group_from_root_mesh(side_panel);
       
       
-      const scroller_component = Components_create_scroller_component(controls_dp, controls_dp.geom.dim[1]);
+      // const scroller_component = Components_create_scroller_component(_, controls_dp.geom.dim[1], controls_dp, controls_dp.GetPosY(),);
+      const scroller_component = Components_create_scroller_component(_, 100, controls_dp, controls_dp.GetPosY(),);
       Scoller_component_gengfx_and_render(scroller_component, controls_dp);
       Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(controls_dp.root_posidx , scroller_component.root_posidx);
       // Listeners_set_priority(E.C, scroller_component.listeners)
 
-
-      // Scroller_component_calculate_scroller_component(controls_dp, scroller_component);
-      // Scoller_component_gengfx_and_render(scroller_component);
-      // // const scroller_component = Components_create_scroller_component(controls_panel, 50);
-      // // Scroller_component_calculate_scroller_component(controls_panel, scroller_component);
-      // // Scoller_component_gengfx_and_render(scroller_component);
+      
+      // Set scissor box
+      const mx = controls_dp.mesh_bufferidx;
+      const my = scroller_component.mesh_bufferidx;
+      const mw = controls_dp.mesh_bufferidx;
+      const mh = scroller_component.mesh_bufferidx;
+      Vertex_buffer_group_create_scissorbox(controls_dp.gfx.vb.groupidx, mx, my, mw, mh);
 
 
       const sbtn = side_panel.children.buffer[0];
@@ -4261,9 +4261,10 @@ export function Demo_all() { // Side Panel
    side_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, side_panel.gfx.vb.groupidx);
       
       
-   const scroller_component = Components_create_scroller_component(s, 140, scroller_panel_width);
+   const scroller_component = Components_create_scroller_component(scroller_panel_width, 140, s, s.GetPosY(),);
    Scoller_component_gengfx_and_render(scroller_component, s);
    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(s.root_posidx , scroller_component.root_posidx);
+   Listeners_set_priority(E.H, scroller_component.listeners)
    Listeners_set_priority(E.C, scroller_component.listeners)
 
 
