@@ -30,11 +30,10 @@ import { Callback_animations_create } from '../Engine/Animations/CallbackAnimati
 import { Mesh_buffer_get_mesh_byidx, Widget_root_activate_all_vbs_in_renderqueue, Widget_root_rerender_from_root_reconstruct_listeners, Widget_root_reset_gfx } from '../Engine/Core/MeshBuffer.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
 import { Ui_create_label_switch } from '../Engine/Drawables/DebugInfo/DebugInfoUiFactory.js';
-import { CreateBallTailParticles, CreateGlowParticles, CreateSmokeParticles, Demo_all, Demo_ball_tail, Demo_ball_tail_2, Demo_glow_particles_2, Demo_smoke_2, TestNoiseShader } from './DemoParticleSystem.js';
+import { CreateBallTailParticles, CreateGlowParticles, CreateSmokeParticles, Demo_all, Demo_ball_tail, Demo_ball_tail_2, Demo_glow_particles_2, Demo_smoke_2, TestNoiseShader } from './DemoParticles.js';
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
-import { Physics_collisions } from './DemoPhysicsCollisions.js';
-import { Elastic_collisions, Sattelite_rotation } from './Demos.js';
+import { Elastic_collisions, Sattelite_rotation } from './DemoPhysics.js';
 import { Mesh_set_scissorbox } from '../Engine/Drawables/Operations/MeshHelperFunctions.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
@@ -496,6 +495,8 @@ export function TestWidgetsGeneric(scene) {
     { // Widget: Label-buttons
 
         // const label = CreateLabel('!@#$%^&*\'(12345678)[abdf],{LPARREA}');
+        // const label = CreateLabel('!@#$%^&*\'\n(12345678)\n[abdf],\n{LPARREA}');
+        
         // const label = CreateLabel('12345678');
         // const label = CreateLabel('AAAAAA', 120);
         // // CreateLabel('\\/+0');
@@ -525,7 +526,7 @@ export function TestWidgetsGeneric(scene) {
 
     { // Widget: Scroller
 
-        // const scroller = CreateScrollerClampAlphaTest(100)
+        // const scroller = CreateScrollerClampAlphaTest(10)
 
         // TestScrollerComponent();
 
@@ -567,17 +568,24 @@ export function TestWidgetsGeneric(scene) {
     }
 
 
-    { // Physics - Collisions
-        
-        // Physics_collisions(); // OLD overlap resoluution
-
-    }
-
-    { // Demos (Misc)
+    { // Demos Physics
 
         // Sattelite_rotation()
 
         // Elastic_collisions()
+    }
+
+
+    { // Demos Widgets
+
+        // section/rect move
+        // sections - hovering (no moving so that for android devices can hover on touch)
+
+        // label - move - hover
+
+        // dropdown - move - hover
+
+        // scrolling
     }
 
     /** Section Synthesizes */
@@ -620,7 +628,7 @@ export function TestWidgetsGeneric(scene) {
 
     // Must draw last so it is on top of everything
 
-    // Debug_info_ui_static();
+    Debug_info_ui_static();
 
 }
 
@@ -771,7 +779,7 @@ function CreateLabel(name = 'Label ', font_size=10) {
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.RIGHT | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.BOTTOM, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
-    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, font_size, GREY[2], WHITE, [5, 5], .5);
+    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, font_size, GREY[3], WHITE, [5, 5], .5);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -2212,8 +2220,8 @@ function CreateScrollerClampAlphaTest(num_items = 10, root_widget = ROOT_WIDGETS
     const count = num_items;
     for (let i = 0; i < count; i++) {
 
-        // const label = Create_widget_label(_, `${i} and \n`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
-        const label = Create_widget_label(_, `!${i} and `, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
+        // const label = Create_widget_label(_, `${i} and `, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
+        const label = Create_widget_label(_, `!${i} and \n000\n888`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
         section.AddItem(label);
         label.SetName(`${i}`);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)

@@ -153,7 +153,7 @@ export class Rect extends Mesh {
    GetMaxWidth() { return this.geom.dim[0]; }
 
 
-   GetTotalHeight() { return this.geom.dim[1]; }
+   GetMaxHeight() { return this.geom.dim[1]; }
 
 
    SetIsGfxInserted(flag) {

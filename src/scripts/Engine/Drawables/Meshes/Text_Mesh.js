@@ -22,9 +22,10 @@ export class Text_Mesh extends Mesh {
    advancex; // The advancex is a ratio with which we calculate the correct width of any text
    last_charidx; // An index to the last char of each state of the current text.(dynamic text changes, so it is good to always have the last char).
    text_width; // An extra var to store the width of the text(for efficiency reasons).
+   text_height; // An extra var to store the height including any new lines.
 
    // constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.MSDF_CONSOLAS_1024, scale = [1, 1], is_debug_mesh) {
-   constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.CONSOLAS_16px, scale = [1, 1], is_debug_mesh) {
+   constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.DEFAULT_FONT, scale = [1, 1], is_debug_mesh) {
 
       const sdfouter = CalculateSdfOuterFromDim(fontsize);
       if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -42,7 +43,11 @@ export class Text_Mesh extends Mesh {
 
       const advancex = Font_metrics_get_advancex(mat.uvIdx)/2;
       this.advancex = advancex;
-      this.text_width = 0;
+      
+      this.CalculateTextWidth()
+      // this.text_width = 0;
+      // this.text_height = Font_metrics_get_row_height(mat.uvIdx);
+
    }
 
 
@@ -298,7 +303,7 @@ export class Text_Mesh extends Mesh {
    GetMaxWidth() { return this.text_width; }
 
 
-   GetTotalHeight() { return this.geom.dim[1]; }
+   GetMaxHeight() { return this.text_height; }
 
 
    GetCenterPosX() { return this.geom.pos[0] + this.GetMaxWidth() - this.geom.dim[0]; }
@@ -336,14 +341,28 @@ export class Text_Mesh extends Mesh {
 
       const face_count = this.mat.char_buffer.size; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
       let width = 0;
+      let prevline_width = 0;
+      let height = Font_metrics_get_row_height(this.mat.uvIdx)/2;
+      // let height = 0;
 
       for (let i = 0; i < face_count; i++) {
-         width += Font_metrics_get_char_width(this.mat.uvIdx, this.mat.char_buffer.buffer[i])/2;
+
+         if(this.mat.char_buffer.buffer[i] === '\n'){
+            
+            if(width > prevline_width) prevline_width = width;
+            width = 0;
+            height += Font_metrics_get_row_height(this.mat.uvIdx)/2;
+         }
+         else {
+            width += Font_metrics_get_char_width(this.mat.uvIdx, this.mat.char_buffer.buffer[i])/2;
+         }
       }
 
-      this.text_width = width;
-      return this.text_width;
+      this.text_width = (width > prevline_width) ? width : prevline_width;
+      this.text_height = height;
+      return {w:this.text_width, h:height};
    }
+
 
 
    /** Pass array[] of { strings or arrays } */
@@ -664,30 +683,39 @@ export class Text_Mesh extends Mesh {
 
       for (let i = 0; i < face_count; i++) {
 
-         // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
-         this.mat.uv = space_char_uv;
-         const width = Font_metrics_get_char_width(this.mat.uvIdx, this.mat.char_buffer.buffer[i])/2;
-
-         if (this.mat.char_buffer.buffer[i]) { // If there is a text, get char uv and metrics
-
-            // this.mat.uv = Font_get_char_uv_coords(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
-            this.mat.uv = Font_get_uv_coords(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
-            geom_copy.dim[0] = width;
-
+         const char = this.mat.char_buffer.buffer[i];
+         if(char==='\n'){ // Case new line
+            
+            geom_copy.pos[1] += Font_metrics_get_row_height(this.mat.uvIdx);
+            geom_copy.pos[0] = this.geom.pos[0];
          }
-
-         if (i === 0) {
-            Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
+         else {
+            
+            // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
+            this.mat.uv = space_char_uv;
+            const width = Font_metrics_get_char_width(this.mat.uvIdx, char)/2;
+   
+            if (char) { // If there is a text, get char uv and metrics
+   
+               this.mat.uv = Font_get_uv_coords(this.mat.uvIdx, char);
+               geom_copy.dim[0] = width;
+   
+            }
+   
+            if (i === 0) {
+               Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${this.GetName()}`);
+            }
+            else { // The first face exista as an entity, the rest are constructed here and store only to the vertex buffer
+               Vertex_buffer_add_vertices_from_reset(this.gfx, geom_copy, this.mat, 1, `${char} in: ${this.GetName()}`);
+            }
+   
+            // Advance to next free char position
+            geom_copy.pos[0] += (width*2);
+   
+            // Reset geometry copy
+            geom_copy.dim[0] = this.geom.dim[0]; 
+            geom_copy.dim[1] = this.geom.dim[1]; 
          }
-         else { // The first face exista as an entity, the rest are constructed here and store only to the vertex buffer
-            Vertex_buffer_add_vertices_from_reset(this.gfx, geom_copy, this.mat, 1, `${this.mat.char_buffer.buffer[i]} in: ${this.GetName()}`);
-         }
-
-
-         geom_copy.pos[0] += (width*2);
-
-         // Reset geometry copy
-         geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1];
 
       }
    }

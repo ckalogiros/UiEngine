@@ -507,7 +507,7 @@ export function Elastic_collisions() {
       // { // Create the info widgets
 
          // const COLOR = ball.mat.col;
-         // let x = (i-1 >= 0) ? info_buffer[i-1].pos_after.CalculateTextWidth()*2+10 : 0;
+         // let x = (i-1 >= 0) ? info_buffer[i-1].pos_after.CalculateTextWidth().w*2+10 : 0;
          // let y = 10;
          // const pos_orig = [0, 0]
    
@@ -516,25 +516,25 @@ export function Elastic_collisions() {
          // ball.AddItem(name);
          // info_buffer[i].name = name;
    
-      //    y += name.GetTotalHeight() * 2 + 4
+      //    y += name.GetMaxHeight() * 2 + 4
       //    const info_pos = Create_widget_text(_, `p ${i}:0000000000`, [pos_orig[0]+size/2+x, pos_orig[1]+y, zpos++], _, COLOR, )
       //    info_pos.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       //    ball.AddItem(info_pos);
       //    info_buffer[i].pos = info_pos;
    
-      //    y += info_pos.GetTotalHeight() * 2 + 4
+      //    y += info_pos.GetMaxHeight() * 2 + 4
       //    const info_overlap = Create_widget_text(_, `overlap ${i}:00000`, [pos_orig[0]+size/2+x, pos_orig[1]+y, zpos++], _, COLOR, )
       //    info_overlap.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       //    ball.AddItem(info_overlap);
       //    info_buffer[i].overlap = info_overlap;
    
-      //    y += info_pos.GetTotalHeight() * 2 + 4
+      //    y += info_pos.GetMaxHeight() * 2 + 4
       //    const info_dir = Create_widget_text(_, `dir ${i}:0000000000`, [pos_orig[0]+size/2+x, pos_orig[1]+y, zpos++], _, COLOR, )
       //    info_dir.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       //    ball.AddItem(info_dir);
       //    info_buffer[i].dir = info_dir;
    
-      //    y += info_overlap.GetTotalHeight() * 2 + 4
+      //    y += info_overlap.GetMaxHeight() * 2 + 4
       //    const info_pos_after = Create_widget_text(_, `p${i}:000000000000000`, [pos_orig[0]+size/2+x, pos_orig[1]+y, zpos++], _, COLOR, )
       //    info_pos_after.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       //    ball.AddItem(info_pos_after);

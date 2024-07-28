@@ -835,6 +835,8 @@ const TEXTURES = {
 	CONSOLAS_32px: g_cnt++,
 	FONT_COUNT: g_cnt,
 
+	DEFAULT_FONT: 0x0, 
+
 	// Image Textures
 	SMOKE_1:g_cnt++, // g_cnt must be the index of the element in 'TEXTURE_PATHS'. // TODO: Either create the 'TEXTURE_PATHS' element at g_cnt OR set the g_cnt equual to the index this texture represents
 	TEST:g_cnt++, 
@@ -842,7 +844,8 @@ const TEXTURES = {
 	COUNT: g_cnt,
 }
 
-
+// Set default font texture
+TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_16px;
 
 
 

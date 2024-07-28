@@ -353,7 +353,7 @@ export class Section extends Mesh {
    GetMaxWidth() { return this.geom.dim[0]; }
 
 
-   GetTotalHeight() { return this.geom.dim[1]; }
+   GetMaxHeight() { return this.geom.dim[1]; }
 
 
    SectionSetPad() {
@@ -1210,8 +1210,8 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
             if (opt & SECTION.VERTICAL) {
 
                if (mesh.children.boundary) { // Case text mesh has separate text as children, calculate size of all of them.
-                  accum_size_per_section[1] += mesh.GetTotalHeight();
-                  parent.max_size[1] += mesh.GetTotalHeight() + marg[1];
+                  accum_size_per_section[1] += mesh.GetMaxHeight();
+                  parent.max_size[1] += mesh.GetMaxHeight() + marg[1];
                }
                else {
                   accum_size_per_section[1] += mesh.geom.dim[1] + marg[1];

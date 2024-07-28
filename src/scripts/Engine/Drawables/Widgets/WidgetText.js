@@ -463,7 +463,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
 			for (let i = 0; i <= this.children.boundary; i++) {
 				// if (this.children.buffer[i]) max_width += this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
-				if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+				if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 			}
 			return max_width;
 		}
@@ -472,7 +472,7 @@ export class Widget_Multi_Text extends Widget_Text {
 				if (this.children.buffer[i]) {
 
 					// const w = this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
-					const w = this.children.buffer[i].CalculateTextWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+					const w = this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 					if (max_width < w)
 						max_width = w;
 				}
@@ -483,7 +483,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	GetTotalHeight() {
+	GetMaxHeight() {
 
 		let max_height = this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
 
@@ -563,7 +563,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		// Align text properly
 		if(prev_text_mesh.text_width === 0){
-			prev_text_mesh.CalculateTextWidth();
+			prev_text_mesh.CalculateTextWidth().w;
 		}
 
 		// Position horizontaly

@@ -231,7 +231,7 @@ export class Widget_Menu_Bar extends Section {
    /****************************************************************************************************************************************************/
 
 
-   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = [2, 5, 2], font = TEXTURES.MSDF_CONSOLAS_1024) {
+   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = [2, 5, 2], font = TEXTURES.DEFAULT_FONT) {
 
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
 
@@ -282,7 +282,7 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
-   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[1], text_col = WHITE, _pad, bold = .4, font = TEXTURES.MSDF_CONSOLAS_1024, style = [2, 5, 2]) {
+   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[1], text_col = WHITE, _pad, bold = .4, font = TEXTURES.DEFAULT_FONT, style = [2, 5, 2]) {
 
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
 
@@ -399,7 +399,7 @@ export class Widget_Menu_Bar extends Section {
 export class Close_Button extends Widget_Button {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE,
-      pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.MSDF_CONSOLAS_1024, is_debug_mesh) {
+      pad = [0, 0], bold = .4, style = [6, 5, 3], font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
 
