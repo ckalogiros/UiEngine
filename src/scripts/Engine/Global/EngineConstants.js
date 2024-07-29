@@ -156,6 +156,7 @@ const PLATFORM = {
 	ANDROID_IMPL: false,
 	I_PHONE_IMPL: false,
 	BLACK_BERRY_IMPL: false,
+	ANY_SMARTPHONE_DEVICE: false,
 }
 
 
@@ -587,6 +588,29 @@ const PERFORMANCE_TIMERS_IDXS = {
 	MiscTest2: INT_NULL,
 	MiscTest3: INT_NULL,
 	MiscTest4: INT_NULL,
+
+	GetStrName(idx){
+		switch(idx){
+			case this.GameLoop: return 'GameLoop';
+			case this.GlDraw: return 'GlDraw';
+			case this.AllTimersUpdate: return 'AllTimersUpdate';
+			case this.Batch: return 'Batch';
+			case this.Batch2: return 'Batch2';
+			case this.SceneUpdate: return 'SceneUpdate';
+			case this.EventListener: return 'EventListener';
+			case this.HoverListener: return 'HoverListener';
+			case this.MeshInfoTip: return 'MeshInfoTip';
+			case this.FramebufferRendering: return 'FramebufferRendering';
+			case this.AddToGfxRect: return 'AddToGfxRect';
+			case this.AddToGfxText: return 'AddToGfxText';
+			case this.Animations: return 'Animations';
+			case this.Particles: return 'Particles';
+			case this.MiscTest1: return 'MiscTest1';
+			case this.MiscTest2: return 'MiscTest2';
+			case this.MiscTest3: return 'MiscTest3';
+			case this.MiscTest4: return 'MiscTest4';
+		}
+	}
 }
 
 _CNT = 0x1;

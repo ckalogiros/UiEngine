@@ -56,7 +56,7 @@ vec4 Msdf() {
 
   vec4 texel = texture(u_sampler0, v_tex_coord);
   float dist = median(texel.r, texel.g, texel.b);
-  float pxDist = screenPxRange() * (dist - 0.5);
+  // float pxDist = screenPxRange() * (dist - 0.5);
   float opacity = clamp(pxDist + 0.5, 0.0, 1.0);
   // opacity += Glow() * 2.4; // Combine the original texture with the blurred alpha
  
@@ -79,9 +79,13 @@ vec4 Msdf() {
  */
 export const frag_tex = `
 
-  color *= texture( u_sampler0, v_tex_coord);
+  vec4 texel = texture( u_sampler0, v_tex_coord);
+  
+  color *= texel;
   color.rgb *= color.a;
-
+  
   // Remove all black color and render only the colored texture
-  color.a = color.r * color.g * color.b*.01;
-`;
+  color.a *= texel.r;
+  // if(texel.r <= 0.8) color.a *= texel.r;
+
+  `;

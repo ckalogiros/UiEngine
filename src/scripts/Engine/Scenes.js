@@ -84,7 +84,6 @@ export function Scenes_get_count() { return _scenes.active_count; }
 export function Scene_set_projection_matrix(sceneidx) {
 
     const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
-    // console.log('Screen Res:', _scenes.buffer[sceneidx].camera.matrix);
     Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
 }
 
@@ -93,7 +92,6 @@ export function Scene_set_projection_matrix(sceneidx) {
 export function Scene_set_screen_res_uniform() {
 
     const unifidx = Uniforms_block_get_uniform_by_name('u_screen_res');
-    // console.log('Screen Res:', VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
     Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
 }
 
@@ -112,22 +110,11 @@ let cnt = 0;
 export function Scene_camera_scroll(sceneidx, sign) {
 
     // Create a scroll value from the sign
-    // const value = -sign * 10;
     const value = -sign;
-
-    // Transform to projection 
-    // const projections_value = value;
-    // _scenes.buffer[sceneidx].camera.Scroll(projections_value);
-    // // Update the projection matrix
-    // const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
-    // Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
-    // const matrix_y_pos = _scenes.buffer[sceneidx].camera.matrix[13];
 
     // Set the screen wpos
     let screen_wpos_val = value;
     Screen_wpos_add_y(-screen_wpos_val);
-
-    // console.log(cnt, 'matrix_y_pos', matrix_y_pos, 'val', value, 'proj val:', projections_value, 'screen wpos val', screen_wpos_val)
 }
 
 

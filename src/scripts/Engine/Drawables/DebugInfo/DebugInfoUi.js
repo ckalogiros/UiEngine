@@ -15,12 +15,12 @@ import { Str_buffer_get_count, Str_buffer_get_size, Str_buffer_mesh_names_get_by
 import { GetRandomColor } from "../../../Helpers/Helpers.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Renderqueue_active_get_count, Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
-import { Mesh_unif_col_get_count, Mesh_unif_col_get_size, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_wpos_get_count, Mesh_unif_wpos_get_size } from "../../Core/MeshUniformsBuffer.js";
-import { Listeners_click_get_count, Listeners_hover_get_count } from "../../Events/EventListeners.js";
+import { Mesh_unif_col_get_count, Mesh_unif_col_get_size, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_wpos_get_count, Mesh_unif_wpos_get_size } from "../../Core/MeshUniformsBuffer.js";
+import { Listeners_click_get_count, Listeners_hover_get_count, Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render } from "../Widgets/ScrollerComponent.js";
+import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Widgets/ScrollerComponent.js";
 
 
 
@@ -72,7 +72,7 @@ export function Debug_info_ui_static(){
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
-      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
+      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.GameLoop, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
 
@@ -202,7 +202,7 @@ export function Debug_info_ui_static(){
 const _font_size = 8.5;
 
 /** 'is_root_widget' can be two values: 1. ROOT_WIDGETS.CREATE_ROOT-which creates an independed widget, 2. undefined-which means that ths widget will belong to some parent structure */
-export function Debug_info_ui(is_root_widget = undefined, pos=[300,0,0]) {
+export function Debug_info_ui(is_root_widget = undefined, pos=[300,80,0]) {
 
    // Style generic for widgets.
    const tr = 1.5; // Transparency
@@ -258,10 +258,16 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,0,0]) {
       dp.AddToMenu(mouse_ui);
 
 
+      // /************************************************************************************************************************************************/
+      // // Mesh Tree
+      // const mesh_ui = Ui_create_label_switch('Mesh Tree', fontsize, switch_size, Debug_info_create_mesh_info, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      // dp.AddToMenu(mesh_ui);
+
+
       /************************************************************************************************************************************************/
       // Mesh Tree
-      const mesh_ui = Ui_create_label_switch('Mesh Tree', fontsize, switch_size, Debug_info_create_mesh_info, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      dp.AddToMenu(mesh_ui);
+      const mesh_tree_ui = Ui_create_label_switch('Mesh Tree', fontsize, switch_size, Debug_info_mesh_tree_create_ui, NOTIFICATION_TYPE.MESH_TREE_IDXS, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      dp.AddToMenu(mesh_tree_ui);
 
 
       /************************************************************************************************************************************************/
@@ -1239,46 +1245,26 @@ export function Debug_info_create_ui_focused() {
    /********************************************************************************************************************************/
    // Create the scroller
 
-
-
-   const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, section, [100, 90]);
-   scroller.StateEnable(MESH_STATE.ACTIVE);
-   scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-
-   
-   scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT;
-   scroller.scrolled_section.options = SECTION.VERTICAL;
-   
-   scroller.scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scroller.scrolled_section);
+   section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   section.options = SECTION.HORIZONTAL | SECTION.INHERIT;
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    
    
-   // scroller.SetPosYNoGfxUpdate(200)
-   // scroller.SetPosXNoGfxUpdate(100)
+   View_build_group_from_root_mesh(section);
    
-   scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   const clip_top = section.GetPosY();
+   const clip_bottom = clip_top + section.geom.dim[1]*2;
+   Clipy_from_group(section.group_bufferidxs[0], clip_top, clip_bottom);
    
-   scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   section.Render();
+   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    
-   // scroller.ScrollerAlignWithItemsRecalc();
+   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
    
-   View_build_group_from_root_mesh(scroller.scrolled_section);
-   
-   const clip_top = scroller.GetPosY();
-   const clip_bottom = clip_top + scroller.geom.dim[1]*2;
-   // const clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1];
-   Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
-   
-   scroller.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(scroller.root_bufferidx);
-   
-   scroller.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scroller.gfx.vb.groupidx);
-   
-   View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
-   // View_build_group_from_root_mesh(scroller.scrolled_section);
+   View_set_view_vb_start(section.group_bufferidxs, section.gfx.vb.start);
         
-   Construct_listen_events_from_mesh_tree(scroller)
-   Construct_listen_events_relations_from_mesh_tree(scroller);
+   Construct_listen_events_from_mesh_tree(section)
+   Construct_listen_events_relations_from_mesh_tree(section);
 
    DEBUG_INFO.UI_FOCUSED.MESH_BUFFER_IDX = section.mesh_bufferidx;
    DEBUG_INFO.UI_FOCUSED.IS_ON = true;
@@ -1286,7 +1272,7 @@ export function Debug_info_create_ui_focused() {
    // Create an Info listener to update the mouse position ui text
    section.debug_info.evtidx = Info_listener_create_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, Debug_info_update_ui_focused, null, scroller);
 
-   return scroller;
+   return section;
 
 }
 
@@ -2208,11 +2194,13 @@ function Debug_info_create_vertexbuffer_2D(params) {
 
 
 
+let mesh_tree_ui_counter = 0;
 let mesh_buffer_ui_counter = 0;
 let string_buffer_ui_counter = 0;
 let mesh_per_vb_buffer_ui_counter = 0;
 let vertex_buffer_ui_counter = 0;
 let render_queue_buffer_ui_counter = 0;
+let mesh_tree_ui_pos = [100, 600, 0];
 let mesh_buffer_ui_pos = [100, 600, 0];
 let string_buffer_ui_pos = [300, 600, 0];
 let mesh_per_vb_buffer_ui_pos = [300, 600, 0];
@@ -2237,7 +2225,7 @@ const _ui_info_buffer = New_generic_buffer(_, '_ui_info_buffer');
 
 
 function Dbg_info_ui_create_ui(pos, name) {
-alert('30174619 \nOld scroler. Uupdate to new scroller')
+
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
    const pad = [6, 6], style = [0, 3, 2], fontsize = 9.8;
    // const pad = [6, 6], style = [0, 1, 0], fontsize = 9.8;
@@ -2264,35 +2252,7 @@ alert('30174619 \nOld scroler. Uupdate to new scroller')
    const info = Create_widget_text(_, `count:000 size:000`, [0, 0, pos[2] + 2], fontsize, BLACK, _, _, _, MESH_TYPE.DEBUG_MESH);
    info.SetTypeDebug();
    dp.AddToMenu(info);
-
-   { // Old Scroller Render
-      // // Create scroller for the ui-mesh info widget 
-      // const scroller = Create_widget_scroller(ROOT_WIDGETS.CREATE_ROOT, scrolled, [100, 150], GREY[1], [10, 10], MESH_TYPE.DEBUG_MESH );
-      // scroller.StateEnable(MESH_STATE.ACTIVE);
-      // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   
-   
-      // scroller.SetTypeDebug();
-   
-      // scroller.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      
-      // scroller.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-      
-      // scroller.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-      // scroller.ScrollerAlignWithItemsRecalc();
-   
-      // scroller.Render();
-      // Widget_root_activate_all_vbs_in_renderqueue(scroller.root_bufferidx);
-   
-      // scroller.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scroller.gfx.vb.groupidx)
-           
-      // Construct_listen_events_from_mesh_tree(scroller)
-      // Construct_listen_events_relations_from_mesh_tree(scroller);
-   
-      // View_build_group_from_root_mesh(scroller.scrolled_section);
-
-   }   
+  
 
 
    scrolled.SetTypeDebug();
@@ -2316,10 +2276,12 @@ alert('30174619 \nOld scroler. Uupdate to new scroller')
 
    View_build_group_from_root_mesh(scrolled);
 
-   const scroller_component = Components_create_scroller_component(_, 60, scrolled, scrolled.GetPosY());
-   // Scroller_component_calculate_scroller_component(scrolled, scroller_component);
-   Scoller_component_gengfx_and_render(scroller_component);
+   const scroller_component = Components_create_scroller_component(_, 200, scrolled, 100);
+   Scoller_component_gengfx_and_render(scroller_component, scrolled);
+   Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(scrolled.root_posidx , scroller_component.root_posidx);
+   Listeners_set_priority(E.C, scroller_component.listeners);
 
+   Scroller_component_calculate_handle_pos_dim(scrolled, scroller_component);
 
    return scrolled;
 }
@@ -2410,6 +2372,9 @@ function Dbg_ui_update_callback(params) {
       Dbg_ui_destroy_entry(params)
    }
    if (FLAGS & NOTIFICATION_TYPE.FLAGS.CREATE) {
+      if (TYPE_IDX === NOTIFICATION_TYPE.MESH_TREE_IDXS.ENTRIES) {
+         Dbg_ui_mesh_buffer_create_entry(params, TYPE_IDX)
+      }
       if (TYPE_IDX === NOTIFICATION_TYPE.MESH_BUFFER_IDXS.ENTRIES) {
          Dbg_ui_mesh_buffer_create_entry(params, TYPE_IDX)
       }
@@ -2450,6 +2415,300 @@ export function Dbg_ui_init_buffer_entries() {
 
 export function TEMP_dbg_info_ui_print_entries_table() {
    console.log(_ui_info_buffer);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************************************************************************************************************************************/
+// DEBUG Info - Create mesh info from tree mesh
+/****************************************************************************************************************************************************/
+
+export function Debug_info_mesh_tree_create_ui() {
+
+
+   // This is called by a 'switch' or 'button'. If the debug ui widget exists, then we called to close/destroy.
+   const ui_widget = Notifications_get_ui_widget(NOTIFICATION_TYPE.MESH_TREE_IDXS.NOTIF);
+   if (ui_widget) {
+      
+      // Remember the ui's position based on the dropdown which is responsible of setting the position of the ui_widget widget arround it..
+      mesh_tree_ui_pos[0] = ui_widget.geom.pos[0],
+      mesh_tree_ui_pos[1] = ui_widget.geom.pos[1],
+      mesh_tree_ui_pos[2] = ui_widget.geom.pos[2],
+
+      View_remove_view(ui_widget.scrolled_section.group_bufferidxs);
+      ui_widget.Destroy();
+
+
+      // Set all entries to NOT inserted, so next time the ui wil open, all entries will be drawn
+      const flags_table = _ui_info_buffer.buffer[NOTIFICATION_TYPE.MESH_TREE_IDXS.ENTRIES].entries_flags
+      for (let i = 0; i <= flags_table.boundary; i++) {
+         flags_table.buffer[i] &= ~NOTIFICATION_TYPE.FLAGS.IS_INSERTED;
+      }
+
+      Notifications_deactivate(NOTIFICATION_TYPE.MESH_TREE_IDXS.NOTIF);
+
+      mesh_tree_ui_counter = 0;
+
+      return;
+   }
+
+   const new_ui_widget = Dbg_info_ui_create_ui(mesh_tree_ui_pos, 'Mesh Buffer');
+
+   // Connect Vertex buffer notification with the root ui widget
+   Notifications_set_ui_widget(NOTIFICATION_TYPE.MESH_TREE_IDXS.NOTIF, new_ui_widget);
+
+
+   const _params = {
+      type_idxs: NOTIFICATION_TYPE.MESH_TREE_IDXS,
+      flags: 0x0,
+      root: new_ui_widget,
+   }
+
+   Dbg_ui_mesh_tree_create_entry(_params);
+
+}
+
+
+
+function Dbg_ui_mesh_tree_create_entry(params) {
+
+   const scrolled = params.root;
+   scrolled.options |= SECTION.RESIZE_PARENT
+   const root_dp = scrolled.children.buffer[0];
+   const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
+   const flags = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries_flags;
+
+
+   const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
+   const margin = [root_dp.StylesGetPad(STYLES.AXIS.X), root_dp.StylesGetPad(STYLES.AXIS.Y)];
+   const style = [0, 3, 1];
+   const zindex = root_dp.menu.geom.pos[2];
+
+   
+
+   const widget_roots = Widget_root_buffer_get();
+   const len = widget_roots.boundary; // Avoid infinite loop (Avoid creating info for self debug UI's)
+   
+   for (let i = 0; i <= len; i++) {
+      
+      const child = Mesh_buffer_get_mesh_byidx(widget_roots.buffer[i].buffer[0]);
+      TEMPORARY(child, root_dp)
+   }
+
+
+
+   // const len = new_entries.boundary; // Avoid infinite loop (Avoid creating info for self debug UI's)
+
+   // for (let i = 0; i <= len; i++) {
+
+   //    const info_data = Mesh_buffer_get_mesh_byidx(new_entries.buffer[i][0]);
+   //    // console.log(info_data.mesh_bufferidx, info_data.GetName())
+
+   //    const is_inserted = (flags.buffer[i] & NOTIFICATION_TYPE.FLAGS.IS_INSERTED);
+
+   //    if (!is_inserted && info_data && (info_data.type & MESH_TYPE.DEBUG_MESH) === 0) { // Insert meshes that belong only to DEFAULT grouping
+
+   //       flags.buffer[i] |= NOTIFICATION_TYPE.FLAGS.IS_INSERTED; // Set flag for current entry to 'INSERTED'
+   //       const entry_mesh = Create_widget_dropdown(_, `${mesh_tree_ui_counter++} @[${info_data.mesh_bufferidx}]`, [0, 0, zindex], col_dp, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
+
+   //       /*****************************************************/
+   //       // Connect entry's mesh_bufferidx to mesh
+   //       new_entries.buffer[i][1] = entry_mesh.mesh_bufferidx;
+   //       /*****************************************************/
+
+   //       entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   //       entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+   //       entry_mesh.SetTypeDebug();
+   //       const idx = root_dp.AddToMenu(entry_mesh);
+
+
+   //       Helper_mesh_tree_info_create_more_info(entry_mesh, info_data, zindex, col_menu, col_dp, margin, style);
+
+   //       /*********************************************************************************************************************************************/
+   //       // Set up and Render new meshes
+   //       entry_mesh.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //       entry_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   //       if (root_dp.menu.is_gfx_inserted) {
+
+   //          scrolled.Recalc_no_gfx_update();
+   //          // scrolled.Recalc();
+
+   //          const scroller = scrolled.scroller_comp;
+   //          const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]
+   //          Clipy_one_mesh(entry_mesh, clip_top, clip_bottom)
+   //          if (entry_mesh.state.mask & MESH_STATE.ACTIVE) {
+   //             entry_mesh.Render();
+   //             // TODO: MAKE SURE THE MESHES ARE ADDED TO ALREADY EXISTING VERTEX BUUFFERS ELSE WE NEED TO UPDATE THE RENDERQUEUE
+   //             const parent_events = [root_dp.menu.listeners.buffer[0], root_dp.menu.listeners.buffer[1]];
+   //             // entry_mesh.ConstructListeners(parent_events);
+   //          }
+   //          if (root_dp.menu.group_bufferidxs[0] !== INT_NULL) View_add_to_group(entry_mesh, root_dp.group_bufferidxs[0])
+   //       }
+
+   //    }
+
+   // }
+
+   
+   // Update size and count info of the mesh buffer
+   const buffer_info = root_dp.menu.children.buffer[0];
+   const size = Mesh_buffer_get_count(), count = Mesh_buffer_get_size();
+   const text = `count:${size} size:${count}`;
+   if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
+   else buffer_info.SetText(text);
+
+   console.log(scrolled.GetName(), scrolled)
+
+}
+
+
+function TEMPORARY(mesh, parent, root_entry_dp){
+
+   // const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
+   // const flags = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries_flags;
+   
+   
+   
+   const info_data = mesh;
+   // const root_dp = root_entry_dp; // HACK for now
+   // console.log(info_data.mesh_bufferidx, info_data.GetName())
+
+   // const is_inserted = (flags.buffer[i] & NOTIFICATION_TYPE.FLAGS.IS_INSERTED);
+
+   // if (!is_inserted && info_data && (info_data.type & MESH_TYPE.DEBUG_MESH) === 0) { // Insert meshes that belong only to DEFAULT grouping
+   if (info_data && (info_data.type & MESH_TYPE.DEBUG_MESH) === 0) { // Insert meshes that belong only to DEFAULT grouping
+   
+      // const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
+      // const margin = [root_dp.StylesGetPad(STYLES.AXIS.X), root_dp.StylesGetPad(STYLES.AXIS.Y)];
+      // const style = [0, 3, 1];
+      // const zindex = root_dp.menu.geom.pos[2]
+
+      // // flags.buffer[i] |= NOTIFICATION_TYPE.FLAGS.IS_INSERTED; // Set flag for current entry to 'INSERTED'
+      // const entry_mesh = Create_widget_dropdown(_, `${mesh_tree_ui_counter++} @[${info_data.mesh_bufferidx}]`, [0, 0, zindex], col_dp, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
+
+      // // /*****************************************************/
+      // // // Connect entry's mesh_bufferidx to mesh
+      // // new_entries.buffer[i][1] = entry_mesh.mesh_bufferidx;
+      // /*****************************************************/
+
+      // entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+      // entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+      // entry_mesh.SetTypeDebug();
+      // const idx = root_dp.AddToMenu(entry_mesh);
+
+      // // Create a dropdown for the mesh, and then create some info of the mesh as text and add it to the dropdown's menu
+      // const dp_mesh = Create_widget_dropdown(_, `${mesh.GetName()}`, [0, 0, parent.geom.pos[2] + 1], TRANSPARENCY(GREY[5], .5), TRANSPARENCY(GREY[1], .8), WHITE, temp_btnpad, _, _, _, _, [4, 4]);
+      // parent.AddToMenu(dp_mesh);
+      // dp_mesh.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+      // dp_mesh.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
+   
+      // const fontsize = 10;
+
+
+      // Create a dropdown for the mesh, and then create some info of the mesh as text and add it to the dropdown's menu
+      const dp_mesh = Create_widget_dropdown(_, `${mesh.GetName()}`, [0, 0, parent.geom.pos[2] + 1], TRANSPARENCY(GREY[5], .5), TRANSPARENCY(GREY[1], .8), WHITE, temp_btnpad, _, _, _, _, [4, 4]);
+      parent.AddToMenu(dp_mesh);
+      dp_mesh.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+      dp_mesh.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
+
+console.log(mesh.GetName())
+      // Gather all info to a string buffr
+      // const meshinfo = Helper_mesh_tree_info_create_more_info(mesh);
+      const meshinfo = Mesh_info_builder(mesh);
+      if (mesh.parent) {
+         const parentinfo = Mesh_info_builder(mesh.parent);
+         meshinfo.push('Parent:');
+         for (let i = 0; i < parentinfo.length; i++) {
+            meshinfo.push(parentinfo[i]);
+         }
+      }
+      else {
+         meshinfo.push('parent:NULL');
+      }
+   
+      // Create the text widget's from the info string buffer
+      for (let i = 0; i < meshinfo.length; i++) {
+         const info = Create_widget_text(_, meshinfo[i], [0, 0, parent.geom.pos[2] + 1], 7);
+         dp_mesh.AddToMenu(info);
+      }
+      // Run recursively for any mesh's children
+      for (let i = 0; i <= mesh.children.boundary; i++) {
+         const child = mesh.children.buffer[i];
+         if (child)
+            TEMPORARY(child, dp_mesh);
+      }
+   }
+
+}
+
+function Helper_mesh_tree_info_create_more_info(parent, info_data, zindex, col_menu, col_dp, margin, style) {
+
+
+   { // Views indexes info
+      const view = Create_widget_dropdown(_, `view`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
+      view.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+      view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+      view.SetTypeDebug();
+      view.Deactivate();
+      parent.AddToMenu(view)
+      { const info = Create_widget_text(_, `gfx:${info_data.per_vb_bufferidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
+      { const info = Create_widget_text(_, `root:${info_data.root_bufferidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
+      { const info = Create_widget_text(_, `batch:${info_data.batch_buffer_vbidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
+      { const info = Create_widget_text(_, `group:${info_data.group_bufferidxs}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
+      { const info = Create_widget_text(_, `fbidx:${info_data.fbidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
+      { const info = Create_widget_text(_, `batch_fnidx:${info_data.batch_fnidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
+   }
+
+   { // Geometry info
+      const view = Create_widget_dropdown(_, `geometry`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
+      view.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+      view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+      view.SetTypeDebug();
+      view.Deactivate();
+      parent.AddToMenu(view)
+      { const info = Create_widget_text(_, `pos:${info_data.geom.pos[0]}, ${info_data.geom.pos[1]}, ${info_data.geom.pos[2]}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
+      { const info = Create_widget_text(_, `dim:${info_data.geom.dim[0]}, ${info_data.geom.dim[1]}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
+   }
+
+   { // Gfx info
+      const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
+      gfx.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+      gfx.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+      gfx.SetTypeDebug();
+      parent.AddToMenu(gfx)
+      if (info_data.gfx) {
+         // Program
+         { const info = Create_widget_text(_, `prog: {idx:${info_data.gfx.prog.idx} attribsidx:${info_data.gfx.prog.attribsidx} }`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); gfx.AddToMenu(info); }
+         // Vertex buffer
+         { const info = Create_widget_text(_, `vb: { idx:${info_data.gfx.vb.idx} start:${info_data.gfx.vb.start} count:${info_data.gfx.vb.count} }`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); gfx.AddToMenu(info); }
+         // Index buffer
+         { const info = Create_widget_text(_, `ib: { idx:${info_data.gfx.ib.idx} count:${info_data.gfx.ib.count} }`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); gfx.AddToMenu(info); }
+         // Texture
+         { const info = Create_widget_text(_, `tb: { idx:${info_data.gfx.tb.idx} }`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); gfx.AddToMenu(info); }
+      }
+      else {
+         { // Vertex buffer
+            const info = Create_widget_text(_, `NULL`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
+            info.SetTypeDebug();
+            info.Deactivate();
+            gfx.AddToMenu(info);
+         }
+      }
+   }
 }
 
 
@@ -2522,8 +2781,7 @@ export function Debug_info_mesh_buffer_create_ui() {
 
 function Dbg_ui_mesh_buffer_create_entry(params) {
 
-   // const scroller = params.root;
-   // const scrolled = scroller.scrolled_section;
+
    const scrolled = params.root;
    scrolled.options |= SECTION.RESIZE_PARENT
    const root_dp = scrolled.children.buffer[0];
@@ -2576,13 +2834,14 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
             scrolled.Recalc_no_gfx_update();
             // scrolled.Recalc();
 
+            const scroller = scrolled.scroller_comp;
             const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]
             Clipy_one_mesh(entry_mesh, clip_top, clip_bottom)
             if (entry_mesh.state.mask & MESH_STATE.ACTIVE) {
                entry_mesh.Render();
                // TODO: MAKE SURE THE MESHES ARE ADDED TO ALREADY EXISTING VERTEX BUUFFERS ELSE WE NEED TO UPDATE THE RENDERQUEUE
                const parent_events = [root_dp.menu.listeners.buffer[0], root_dp.menu.listeners.buffer[1]];
-               entry_mesh.ConstructListeners(parent_events);
+               // entry_mesh.ConstructListeners(parent_events);
             }
             if (root_dp.menu.group_bufferidxs[0] !== INT_NULL) View_add_to_group(entry_mesh, root_dp.group_bufferidxs[0])
          }
@@ -2593,9 +2852,6 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
       }
    }
 
-   // Widget_root_reset_gfx(scroller.root_bufferidx)
-   // scroller.ScrollerAlignWithItemsRecalc()
-   // Widget_root_rerender(scroller.root_bufferidx)
    
    // Update size and count info of the mesh buffer
    const buffer_info = root_dp.menu.children.buffer[0];
@@ -2603,9 +2859,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
    const text = `count:${size} size:${count}`;
    if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
    else buffer_info.SetText(text);
-   
-   // if(root_dp.children.buffer[1]) console.log(scrolled.GetName(), root_dp.children.buffer[1].children.buffer)
-   // if(change_happened)  scroller.Recalc();
+
 
 }
 
@@ -2693,7 +2947,6 @@ export function TEMP_mesh_buffer_info_ui_print_entries_table() {
 
 
 
-
 /****************************************************************************************************************************************************/
 // DEBUG Info - Create mesh info from String Buffer
 /****************************************************************************************************************************************************/
@@ -2752,7 +3005,7 @@ export function Debug_info_string_buffer_create_ui() {
 function Dbg_ui_string_buffer_create_entry(params) {
 
    const scrolled = params.root;
-   // const scrolled = scroller.scrolled_section;
+
    scrolled.options |= SECTION.RESIZE_PARENT
    const root_dp = scrolled.children.buffer[0];
    const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
@@ -2798,11 +3051,12 @@ function Dbg_ui_string_buffer_create_entry(params) {
 
             scrolled.Recalc_no_gfx_update();
 
+            const scroller = scrolled.scroller_comp;
             const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]
             Clipy_one_mesh(entry_mesh, clip_top, clip_bottom)
             if (entry_mesh.state.mask & MESH_STATE.ACTIVE) {
                entry_mesh.Render();
-               entry_mesh.ConstructListeners(root_dp);
+               // entry_mesh.ConstructListeners(root_dp);
             }
             if (root_dp.menu.group_bufferidxs[0] !== INT_NULL) View_add_to_group(entry_mesh, root_dp.group_bufferidxs[0])
          }
@@ -2879,6 +3133,7 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
       }
    }
 }
+
 
 
 
@@ -3008,11 +3263,12 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
 
             scrolled.Recalc_no_gfx_update();
 
+            const scroller = scrolled.scroller_comp;
             const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]
             Clipy_one_mesh(entry_mesh, clip_top, clip_bottom)
             if (entry_mesh.state.mask & MESH_STATE.ACTIVE) {
                entry_mesh.Render();
-               entry_mesh.ConstructListeners(root_dp);
+               // entry_mesh.ConstructListeners(root_dp);
             }
             if (root_dp.menu.group_bufferidxs[0] !== INT_NULL) View_add_to_group(entry_mesh, root_dp.group_bufferidxs[0])
          }
@@ -3030,8 +3286,6 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
    const text = `count:${size} size:${count}`;
    if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
    else buffer_info.SetText(text);
-
-   // if(change_happened)  scroller.Recalc();
 
 }
 
@@ -3107,6 +3361,7 @@ function Helper_mesh_per_vb_buffer_info_create_more_info(parent, info_data, zind
    //    }
    // }
 }
+
 
 
 
@@ -3209,8 +3464,6 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
 
    for (let i = 0; i <= len; i++) {
 
-      // for (let j = 0; j <= new_entries.buffer[i][0].boundary; j++) { // Run for all Vertex Attributes Buffering
-
       const vb_group = Vertex_buffer_group_get_byidx(new_entries.buffer[i][VERTEX_BUFFER_INFO]);
 
       const is_inserted = (flags.buffer[i] & NOTIFICATION_TYPE.FLAGS.IS_INSERTED);
@@ -3223,8 +3476,8 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
          /*****************************************************/
          // Connect entry's mesh_bufferidx to mesh
          new_entries.buffer[i][MESH_IDX] = entry_mesh.mesh_bufferidx;
+         
          /*****************************************************/
-
          entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
          entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          entry_mesh.SetTypeDebug();
@@ -3241,17 +3494,17 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
 
             scrolled.Recalc_no_gfx_update();
 
+            const scroller = scrolled.scroller_comp;
             const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]
             Clipy_one_mesh(entry_mesh, clip_top, clip_bottom)
             if (entry_mesh.state.mask & MESH_STATE.ACTIVE) {
                entry_mesh.Render();
                const parent_events = [root_dp.menu.listeners.buffer[0], root_dp.menu.listeners.buffer[1]];
-               entry_mesh.ConstructListeners(parent_events);
+               // entry_mesh.ConstructListeners(parent_events);
             }
             if (root_dp.menu.group_bufferidxs[0] !== INT_NULL) View_add_to_group(entry_mesh, root_dp.group_bufferidxs[0])
          }
       }
-      // }
    }
 
 
@@ -3261,8 +3514,6 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
    const text = `count:${count} size:${size}`;
    if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
    else buffer_info.SetText(text);
-
-   // scroller.Recalc();
 
 }
 
@@ -3423,30 +3674,24 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
          TEMP_DP_STEAL_THE_DP_RECALC(root_dp)
          if (root_dp.menu.is_gfx_inserted) {
 
-            // scrolled.Recalc_no_gfx_update();
-            // root_dp.Recalc_no_gfx_update();
-
-            // scrolled.geom.dim[1] += 10;
-
+            const scroller = scrolled.scroller_comp;
             const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]
             Clipy_one_mesh(entry_mesh, clip_top, clip_bottom)
             if (entry_mesh.state.mask & MESH_STATE.ACTIVE)
-            // if (!entry_mesh.is_gfx_inserted) 
             {
                entry_mesh.Render();
                const parent_events = [root_dp.menu.listeners.buffer[0], root_dp.menu.listeners.buffer[1]];
-               entry_mesh.ConstructListeners(parent_events);
+               // entry_mesh.ConstructListeners(parent_events);
             }
 
             if (root_dp.menu.group_bufferidxs[0] !== INT_NULL) View_add_to_group(entry_mesh, root_dp.group_bufferidxs[0])
          }
-
       }
    }
 
-   // if (root_dp.menu.is_gfx_inserted) {
-   //    scrolled.Recalc_no_gfx_update();
-   // }
+   if (root_dp.menu.is_gfx_inserted) {
+      scrolled.Recalc_no_gfx_update();
+   }
 
    // Update size and count info of the mesh buffer
    const buffer_info = root_dp.menu.children.buffer[0];
@@ -3454,8 +3699,6 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
    const text = `count:${count} size:${size}`;
    if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
    else buffer_info.SetText(text);
-
-   // scroller.Recalc();
 
 }
 

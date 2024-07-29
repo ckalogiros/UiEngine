@@ -14,6 +14,10 @@ export const NOTIFICATION_TYPE = {
    VERTEX_BUFFER: _CNT<<=0x1,
    RENDER_QUEUE_BUFFER: _CNT<<=0x1,
    
+   MESH_TREE_IDXS: {
+      NOTIF:INT_NULL,
+      ENTRIES:INT_NULL,
+   },
    MESH_BUFFER_IDXS: {
       NOTIF:INT_NULL,
       ENTRIES:INT_NULL,
@@ -114,6 +118,12 @@ export function Notifications_initialize() {
 
    {
       const ret = Create();
+      NOTIFICATION_TYPE.MESH_TREE_IDXS.ENTRIES = ret.entries_bufferidx;
+      NOTIFICATION_TYPE.MESH_TREE_IDXS.NOTIF = ret.type_idx;
+      _notifications_buffer.buffer[ret.type_idx].params.type_idxs = NOTIFICATION_TYPE.MESH_TREE_IDXS; // A reference
+   }
+   {
+      const ret = Create();
       NOTIFICATION_TYPE.MESH_BUFFER_IDXS.ENTRIES = ret.entries_bufferidx;
       NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF = ret.type_idx;
       _notifications_buffer.buffer[ret.type_idx].params.type_idxs = NOTIFICATION_TYPE.MESH_BUFFER_IDXS; // A reference
@@ -207,7 +217,8 @@ export function Notifications_update() {
 export function Notifications_destroy(TYPE_IDX) {
 
    _notifications_buffer.RemoveByIdx(TYPE_IDX);
-   if(TYPE_IDX === NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF = INT_NULL;
+   if(TYPE_IDX === NOTIFICATION_TYPE.MESH_TREE_IDXS.NOTIF) NOTIFICATION_TYPE.MESH_TREE_IDXS.NOTIF = INT_NULL;
+   else if(TYPE_IDX === NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF = INT_NULL;
    else if(TYPE_IDX === NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF = INT_NULL;
    else if(TYPE_IDX === NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF = INT_NULL;
    else if(TYPE_IDX === NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF = INT_NULL;

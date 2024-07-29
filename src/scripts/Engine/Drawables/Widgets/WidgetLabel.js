@@ -293,12 +293,27 @@ export class Widget_Label extends Rect_Mesh {
     // Transformations
 
     Move(x, y) {
+        alert('14321009465 \n USE THE AddWposXY() instead ')
         console.error('UNUSED FUNC, CHECK IT')
 
         if (x === 0 && y === 0) return;
         this.geom.AddWposXY(this.gfx, x, y, );
         this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y);
 
+    }
+
+
+    AddWposXY(x, y) {
+
+        this.geom.AddWposXY(this.gfx, x, y,);
+        this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y,);
+    }
+
+
+    AddWposX(x) {
+
+        this.geom.AddWposX(this.gfx, x, );
+        this.text_mesh.AddWposX(x);
     }
 
 
@@ -411,8 +426,16 @@ export class Widget_Label extends Rect_Mesh {
 
     SetPosX(x) {
 
+        // const dx = this.geom.pos[0] - x;
         super.SetPosX(x);
-        this.text_mesh.SetPosX(x);
+        
+        // this.text_mesh.MoveXNoGfxUpdate(dx);
+        // this.text_mesh.geom.AddWposX(this.text_mesh.gfx, -dx, this.text_mesh.geom.num_faces);
+        // this.text_mesh.SetPosX(dx);
+        
+        // const dx = this.text_mesh.geom.pos[0]-this.geom.pos[0];
+        // console.log(x, dx)
+        // this.text_mesh.AddWposX(dx);
     }
 
 

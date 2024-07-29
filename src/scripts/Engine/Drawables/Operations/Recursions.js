@@ -103,7 +103,7 @@ export function Construct_listen_events_relations_from_mesh_tree(mesh, parent=nu
                 // ERROR CHECK: Case parent event is INT_NULL
                 if(parent_events && parent_events.buffer[etype] === INT_NULL) {
                     console.error('mesh', mesh.GetName(), '\nlisteners', mesh.listeners, '\nparent_events', parent_events, 'etype', etype);
-                    alert('7266534');
+                    // alert('7266534');
                 }
 
                 

@@ -181,11 +181,15 @@ export class Text_Mesh extends Mesh {
 
    SetPosX(x) {
 
-      super.SetPosX(x);
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) child.SetPosX(x);
-      }
+      // THERE is no point setting all characters to the same position
+      console.error('implement me')
+      // this.geom.SetPosX(this.gfx, x, this.geom.num_faces);
+
+   }
+   AddWposX(x) {
+
+      this.geom.AddWposX(this.gfx, x, this.geom.num_faces);
+
    }
 
 

@@ -81,34 +81,35 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
 export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_right=null) {
 
    let changes_hapened = false;
-   const limit = (clip_left && clip_right) ? { left: clip_left, right: clip_right, } : { left: TEST_CLIP_TOP, right: TEST_CLIP_BOTTOM, }
+   const limit = (clip_left && clip_right) ? { left: clip_left, right: clip_right, } : { left: TEST_CLIP_LEFT, right: TEST_CLIP_RIGHT, }
 
    const group = View_get_view_byidx(group_bufferidx);
 
    for(let i=0; i <= group.vb.boundary; i++){
    
       const meshshes_idx = group.vb.buffer[i].data;
-      for(let j=0; j<=meshshes_idx.boundary; j++){
+      for(let j=1; j<=meshshes_idx.boundary; j++){
          
          const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
          const left    = mesh.GetPosX();
          const right   = left + mesh.geom.dim[0]*2;
    
-         if(right < limit.left){
+         if(left > limit.right){
 
-            if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_X)===0){
+            if(mesh.state.mask & MESH_STATE.ACTIVE){
 
-               mesh.state.mask &= ~MESH_STATE.ACTIVE;
-               mesh.state.mask |= MESH_STATE.CLIPED_X;
+               mesh.StateDisable(MESH_STATE.ACTIVE);
+               mesh.StateEnable(MESH_STATE.CLIPED_X);
                changes_hapened = true;
+               mesh.RemoveAllListenEvents();
             }
          }
          else{
             
             if(mesh.state.mask & MESH_STATE.CLIPED_X){
-            
-               mesh.state.mask |= MESH_STATE.ACTIVE;
-               mesh.state.mask &= ~MESH_STATE.CLIPED_X;
+               
+               mesh.StateEnable(MESH_STATE.ACTIVE);
+               mesh.StateDisable(MESH_STATE.CLIPED_Y);
                changes_hapened = true;
             }
          }
@@ -127,35 +128,25 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
    const group = View_get_view_byidx(group_bufferidx);
-   console.log('========================')
    
    for(let i=0; i <= group.vb.boundary; i++){
       
       const meshshes_idx = group.vb.buffer[i].data;
-      // const root_group_mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[0]);
-      // const root_wposy = root_group_mesh.GetPosY(); // Get the root wpos from each vb root mesh, no need to get the root wpos for every group mesh.
    
       for(let j=0; j <= meshshes_idx.boundary; j++){
          
          const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-         // const top      = root_wposy + mesh.geom.pos[1];
          const top      = mesh.GetPosY();
          const bottom   = top + mesh.geom.dim[1]*2;
 
    
          if(bottom < limit.up || top > limit.down){
 
-            // if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
             if(mesh.state.mask & MESH_STATE.ACTIVE){
 
                mesh.StateDisable(MESH_STATE.ACTIVE);
                mesh.StateEnable(MESH_STATE.CLIPED_Y);
                changes_hapened = true;
-               // if(mesh.GetName()==='0')
-               //    console.log
-
-               // Listener_remove_event_by_idx(TYPE_IDX, event_idx)
-               // console.log(mesh.GetName())
                mesh.RemoveAllListenEvents();
             }
          }

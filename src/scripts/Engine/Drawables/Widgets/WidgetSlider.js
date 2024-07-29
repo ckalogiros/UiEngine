@@ -1551,6 +1551,11 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       const bar = this.children.buffer[this.bar_idx];
       bar.SetColorHandleNoGfxUpdate(col);
    }
+
+   GetValue(){
+      const bar = this.children.buffer[this.bar_idx];
+      return bar.slider_val;
+   }
 }
    
 

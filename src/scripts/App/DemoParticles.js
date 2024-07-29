@@ -3828,8 +3828,6 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
 
       const label = Create_widget_label(_, 'Color Picker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
       color_picker.AddItem(label);
-      // // HACK: Set all text meshes of the scrolled_section to be rendered to a new VB
-      // label.text_mesh.gfx_ctx_flags = GFX_CTX_FLAGS.NEW
 
       const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, zpos + 2], switch_size, switch_col, switch_col2, switch_pad, _, [6, 14, 2]);
       colorpicker_switch.SetName('color_picker switch');

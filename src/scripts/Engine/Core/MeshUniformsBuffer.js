@@ -35,6 +35,9 @@ export function Screen_wpos_get_y() { return _screen_wpos[1]; }
 export function Screen_wpos_add_y(y) { _screen_wpos[1] += y; }
 
 
+export function Screen_wpos_set_y(y) { _screen_wpos[1] = y; }
+
+
 
 
 

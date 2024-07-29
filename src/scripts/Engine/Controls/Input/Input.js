@@ -220,15 +220,18 @@ export function Detect_host_platform() {
    */
   if (/IEMobile/i.test(wn.userAgent)) {
     PLATFORM.WIN_PHONE_IMPL = true;
-    console.log('-- Windows Phone Platform --')
+    PLATFORM.ANY_SMARTPHONE_DEVICE = true;
+    console.log('-- Windows Phone Platform --');
   }
   else if (/Android/i.test(wn.userAgent)) {
     PLATFORM.ANDROID_IMPL = true;
+    PLATFORM.ANY_SMARTPHONE_DEVICE = true;
     console.log('-- Android Phone Platform --')
     // alert('-- Android Phone Platform --')
   }
   else if (/iPhone|iPad|iPod/i.test(wn.userAgent)) {
     PLATFORM.I_PHONE_IMPL = true;
+    PLATFORM.ANY_SMARTPHONE_DEVICE = true;
     console.log('-- Iphone Phone Platform --')
   }
   /** Windows NT

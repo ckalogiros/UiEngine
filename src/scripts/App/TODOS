@@ -9,3 +9,28 @@ Create a timed tip info event:
    Point out the target object  
    Animate out of the info
    Unpause
+
+
+*******************************************************************************************************************************
+* Fix debug info ui to work with new scroller
+
+* Root widgets must be renamed to Group widgets
+   and all of its buuffers, like meshidxs:[], gfx:[], batch:[], etc
+
+* Complete the cursor texture changes
+
+* Scissor box must group all scissored vertex buffer indices
+
+* Complete all scissoring for all scrollers of the app
+
+* Scissor box must move on scene scroll
+
+* scrolled section must reduce its event listen dimentions so it is not grabable on scissored areas
+   We could set the events dimentions at the evant creation to be the height of the scroller
+
+* Correct the widget switch hover problem
+*******************************************************************************************************************************
+
+
+!!! IMPORTANT
+* The mesh per vb buffer is not updating correctly

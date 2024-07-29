@@ -1,7 +1,7 @@
 "use strict";
 
 import { New_generic_buffer } from '../Core/Buffers.js';
-import { Str_buffer_store } from '../Core/StringBuffer.js';
+import { Str_buffer_get_by_idx, Str_buffer_store } from '../Core/StringBuffer.js';
 
 
 
@@ -24,7 +24,7 @@ class Timer_Base_Fast {
 }
 class Timer_Base_Detailed {
 
-   constructor(name, fnidx) {
+   constructor(name=null, fnidx) {
 
       this.accum = 0.0;
       this.cnt = 0;
@@ -32,6 +32,7 @@ class Timer_Base_Detailed {
       this.best = 512.001;
       this.called = 0;
       this.fnidx = fnidx;
+      // if(name)
       this.nameidx = Str_buffer_store(name);
 
    }
@@ -45,7 +46,7 @@ class Performance_Timer {
    }
 }
 
-function Performance_timer_contruct(TYPE = INT_NULL, name) {
+function Performance_timer_construct(TYPE = INT_NULL, name) {
 
    if (TYPE & PERFORMANCE_TIMER.BASE) return new Timer_Base_Fast(PERFORMANCE_TIMER.BASE_FN_IDX);
    if (TYPE & PERFORMANCE_TIMER.DETAILED) return new Timer_Base_Detailed(name, PERFORMANCE_TIMER.DETAILED_FN_IDX);
@@ -59,7 +60,7 @@ const _performance_timers_buffer = New_generic_buffer(_, 'Performance_Timer');
 // TYPE: SEE->PERFORMANCE_TIMER
 function Performance_timer_create(TYPE, name) {
 
-   const pt = Performance_timer_contruct(TYPE, name);
+   const pt = Performance_timer_construct(TYPE, name);
 
    const pt_group = new Performance_Timer();
    pt_group.group.Add(pt);
@@ -73,7 +74,7 @@ function Performance_timer_create(TYPE, name) {
 export function Performance_timer_create_secondary_timer(TYPE, timer_groupidx = INT_NULL) {
    /**DEBUG */ if (_performance_timers_buffer.buffer[timer_groupidx] === undefined) console.error('SEVERE_ERROR\nNULL timer is passed as param');
 
-   const pt = Performance_timer_contruct(TYPE);
+   const pt = Performance_timer_construct(TYPE);
 
    const timeridx = _performance_timers_buffer.buffer[timer_groupidx].group.Add(pt);
 
@@ -163,6 +164,11 @@ export function PerformanceTimersGetNanosec(timer_idxs) {
 export function Performance_timers_get_avg_1sec_reset(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
    const avg = (1000 / (timer.accum / timer.cnt));
+   // { // Debug
+   //    const called = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]].called;
+   //    const cnt = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]].cnt;
+   //    console.log(timer_idxs, 'called', called, 'cnt', cnt, 'name', PERFORMANCE_TIMERS_IDXS.GetStrName(timer_idxs[0]))
+   // }
    timer.cnt = 0;
    timer.accum = 0; // Get the accumulated time from the timer.
    return ~~(avg);

@@ -859,7 +859,7 @@ export class Section extends Mesh {
          }
       }
 
-      console.log('mesh', section.GetName(), section.geom.dim)
+      // console.log('mesh', section.GetName(), section.geom.dim)
 
 
       Expand(section, options);
@@ -1172,35 +1172,50 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
             if ((mesh.options & SECTION.INHERIT) === 0) opt = parent.options; // Roll back to the options
 
 
-            if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) === 0) 
-            {
-
-               mesh.geom.dim[0] = mesh.max_size[0];
-               mesh.geom.dim[1] = mesh.max_size[1];
+            // if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) === 0) 
+            // {
+            // if (mesh.scroller_comp !== null) {
+               
+            // mesh.geom.dim[0] = mesh.max_size[0];
+            // mesh.geom.dim[1] = mesh.scroller_comp.geom.dim[1];
+            // parent.min_size[1] = mesh.scroller_comp.geom.dim[1];
                
 
                // Update mesh's default dim
+               // mesh.geom.defDim[0] = mesh.max_size[0];
+               // mesh.geom.defDim[1] = mesh.scroller_comp.geom.dim[1];
+            // }
+            // else 
+            {
+               
+               mesh.geom.dim[0] = mesh.max_size[0];
+               mesh.geom.dim[1] = mesh.max_size[1];
+               
+               
+               // Update mesh's default dim
                mesh.geom.defDim[0] = mesh.max_size[0];
                mesh.geom.defDim[1] = mesh.max_size[1];
-
+               
                mesh.SectionSetPad(); // Must not update for scrollers 
             }
-            else { // For scrollers
-               // mesh.geom.dim[0] = parent.max_size[0]; // Set scrollers width to that of the parent section width
-               mesh.geom.dim[0] = mesh.max_size[0]; // Set scrollers width to that of the parent section width
-               mesh.ScrollerAlignBar();
-            }
-
-
-
+            
+            
             if (opt & SECTION.VERTICAL) {
                if ((parent.options & SECTION.FIXED_W) === 0 && parent.max_size[0] < mesh.geom.dim[0])
                   parent.max_size[0] = mesh.geom.dim[0] + marg[0];
-               if ((parent.options & SECTION.FIXED_H) === 0) parent.max_size[1] += mesh.geom.dim[1] + marg[1];
+               if (mesh.scroller_comp !== null){ // Case mesh is scrolled mesh, resize the parent to the scroll bar height.
+                  parent.max_size[1] = mesh.scroller_comp.geom.dim[1];
+                  parent.max_size[0] += mesh.scroller_comp.geom.dim[0];
+               }
+               else if ((parent.options & SECTION.FIXED_H) === 0) parent.max_size[1] += mesh.geom.dim[1] + marg[1];
             }
             else if (opt & SECTION.HORIZONTAL) {
                if ((parent.options & SECTION.FIXED_W) === 0) parent.max_size[0] += mesh.geom.dim[0] + marg[0];
-               if ((parent.options & SECTION.FIXED_H) === 0 && parent.max_size[1] < mesh.geom.dim[1]) parent.max_size[1] = mesh.geom.dim[1] + marg[1];
+               if (mesh.scroller_comp !== null){ // Case mesh is scrolled mesh, resize the parent to the scroll bar height.
+                  parent.max_size[1] = mesh.scroller_comp.geom.dim[1];
+                  parent.max_size[0] += mesh.scroller_comp.geom.dim[0];
+               }
+               else if ((parent.options & SECTION.FIXED_H) === 0 && parent.max_size[1] < mesh.geom.dim[1]) parent.max_size[1] = mesh.geom.dim[1] + marg[1];
             }
 
          }
@@ -1234,7 +1249,7 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
             }
          }
          else { // Case the current item is not a section either a text, accumulate its size
-            // console.log('000 max size', parent.max_size[0])
+
             if (mesh.temp_align & SECTION.HORIZONTAL) {
 
                cur_align = SECTION.HORIZONTAL
@@ -1447,7 +1462,6 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
 
             mesh.geom.pos[0] = rel_pos[0];
             mesh.geom.pos[1] = rel_pos[1];
-
             // Case of menu bar, that has text directly as a child
             if (mesh.text_mesh) {
                mesh.text_mesh.geom.pos[0] = rel_pos[0]
@@ -1457,8 +1471,6 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
          else {
 
             mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-            // if(mesh.type & MESH_TYPE.WIDGET_SCROLLER) 
-               // console.log('##########################################', mesh.GetName(), mesh.geom.pos, rel_pos)
 
             if (mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
             if (mesh.text_mesh) continue_recur = false;
@@ -1491,6 +1503,10 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
          else if (parent.options & SECTION.HORIZONTAL) {
             cur_pos[0] += mesh.geom.dim[0] * 2;
             parent.last_pos[0] += mesh.geom.dim[0] * 2;
+            if (mesh.scroller_comp !== null){ // Include scroll bar in the position calculation.
+               cur_pos[0] += mesh.scroller_comp.geom.dim[0]*2;
+               parent.last_pos[0] += mesh.scroller_comp.geom.dim[0]*2;
+            }
          }
       }
 

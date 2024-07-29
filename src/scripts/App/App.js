@@ -65,6 +65,7 @@ export function AppInit() {
     Notifications_initialize();
     Callback_animations_initialize();
     
+    if(PLATFORM.ANY_SMARTPHONE_DEVICE) TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_12px;
     
     TestWidgetsGeneric(scene);
     
