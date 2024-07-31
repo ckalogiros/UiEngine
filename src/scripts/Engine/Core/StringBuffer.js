@@ -19,6 +19,7 @@ const NOTIFICATIONS_ON = true;
 
 const _str_buffer = New_generic_buffer(_, 'String buffer');
 _str_buffer.Add(''); // Empty string
+export function Str_buffer_reset() { _str_buffer.ResetFull(); } 
 
 
 
@@ -82,6 +83,8 @@ export function Str_buffer_destroy(nameidx) {
 
 
 const _str_buffer_mesh_names = New_generic_buffer(_, 'String buffer names');
+export function Str_buffer_mesh_names_reset() { _str_buffer_mesh_names.ResetFull(); } 
+
 
 
 
@@ -90,7 +93,7 @@ const _str_buffer_mesh_names = New_generic_buffer(_, 'String buffer names');
 // These 2 buffers must be 1to1. If a mesh name is stored at inde 3, then the '_str_buffer_mesh_names_index_buffer' must have the meshe's 'mesh_bufferidx' at index 3 also.
 // Usage of indices buffer to string names buffer: We need a connection back to the mesh, so we can change any mesh's name on the sorted buffers. 
 const _str_buffer_mesh_names_index_buffer = New_int16_buffer(512, 'StringBuffer-mesh names buffer');
-
+export function Str_buffer_mesh_names_index_buffer_reset() { _str_buffer_mesh_names_index_buffer.Reset(); } 
 
 
 export function Str_buffer_mesh_names_get_count() { return _str_buffer_mesh_names.active_count; }

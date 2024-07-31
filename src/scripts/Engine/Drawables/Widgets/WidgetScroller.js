@@ -3,7 +3,7 @@
 import { Section } from "../Meshes/Section.js";
 import { MouseGetPos, MouseGetPosDif, MouseGetPosDifY } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Vertex_buffer_group_get_byidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
@@ -516,7 +516,7 @@ export class Widget_Scroller extends Section {
          if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
 
             const OnResizeFn = mesh.OnResize;
-            const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Scroller', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, { mesh: mesh, mouse_click: point });
+            const idx = Time_intervals_create(10, 'ResizeXY Widget_Scroller', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, { mesh: mesh, mouse_click: point });
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
          }
          else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
@@ -550,7 +550,7 @@ export class Widget_Scroller extends Section {
 
             if ((bar.type & MESH_TYPE.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
-               const idx = TimeIntervalsCreate(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_on_update_handle, bar);
+               const idx = Time_intervals_create(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_on_update_handle, bar);
                bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
                STATE.mesh.SetGrabed(bar);
@@ -569,7 +569,7 @@ export class Widget_Scroller extends Section {
             // Move Scroller
             if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) && mesh.StateCheck(MESH_STATE.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
-               const idx = TimeIntervalsCreate(10, 'Move Scroller', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_on_move_clbk, mesh);
+               const idx = Time_intervals_create(10, 'Move Scroller', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_on_move_clbk, mesh);
                mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
                STATE.mesh.SetGrabed(mesh);
@@ -595,7 +595,7 @@ export class Widget_Scroller extends Section {
       if (scroller.StateCheck(MESH_STATE.IN_GRAB) === 0 && scroller.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
          const intervalIdx = scroller.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-         TimeIntervalsDestroyByIdx(intervalIdx);
+         Time_intervals_destroy_byidx(intervalIdx);
          scroller.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
          return;
@@ -1131,7 +1131,7 @@ function Scroller_on_move_clbk(params) {// Called by timeInterval as a callback 
    if (scroller.StateCheck(MESH_STATE.IN_GRAB) === 0 && scroller.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
       const intervalIdx = scroller.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-      TimeIntervalsDestroyByIdx(intervalIdx);
+      Time_intervals_destroy_byidx(intervalIdx);
       scroller.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
       return;
@@ -1158,7 +1158,7 @@ export function Scroller_on_update_handle(_params) {
 
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-      TimeIntervalsDestroyByIdx(intervalIdx);
+      Time_intervals_destroy_byidx(intervalIdx);
       bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
 
       handle.state.mask &= ~MESH_STATE.IN_GRAB;

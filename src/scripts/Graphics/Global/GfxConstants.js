@@ -16,7 +16,7 @@ const gfxCtx = {
 
 
 
-const GL = {
+const GL_STATE = {
     BOUND_PROG_IDX: INT_NULL, // The current bound gl program index
     BOUND_PROG: INT_NULL, // The current bound gl program 
     BOUND_VAO: INT_NULL, // The current bound vertex array  
@@ -26,6 +26,17 @@ const GL = {
     BOUND_IBIDX: INT_NULL, // The current bound vertex buffer index
     BOUND_TEXTURE_IDX: INT_NULL, // The current bound texture index 
     // BOUND_TEXTURE_UNIT_ID: INT_NULL, // The current bound texture 
+
+    Reset(){
+        this.BOUND_PROG_IDX = INT_NULL;
+        this.BOUND_PROG = INT_NULL;
+        this.BOUND_VAO = INT_NULL;
+        this.BOUND_VBO = INT_NULL;
+        this.BOUND_VBIDX = INT_NULL;
+        this.BOUND_IBO = INT_NULL;
+        this.BOUND_IBIDX = INT_NULL;
+        this.BOUND_TEXTURE_IDX = INT_NULL;
+    }
 };
 
 
@@ -322,25 +333,25 @@ const SHADER_ATTRIBUTES = SID.ATTR;
 
 
 
-const GRAPHICS_LAYOUT = {
-    ONE_ATTR_SIZE: 1,
-    ATTR_SIZES: {
-        COL4: 4,
-        WPOS4: 4,
-        GENERIC_ATTR1_VEC4: 4,
-        POS2: 2,
-        TEX2: 2,
-        XY: 2,
-        XYZ: 3,
-    },
-    ATTR_SELF_OFFSETS: {
-        ALPHA: 3, // the third float in a col4
-        WPOS_Y: 1, // The second attribute in a WPOS-X
-        DIM_Y: 1, // The second attribute in a DIM2
-        WPOS_Z: 2, // The second attribute in a WPOS-X
-        WPOS4_TIME: 3, // The second attribute in a WPOS-X
-    },
-};
+// const GRAPHICS_LAYOUT = {
+//     ONE_ATTR_SIZE: 1,
+//     ATTR_SIZES: {
+//         COL4: 4,
+//         WPOS4: 4,
+//         GENERIC_ATTR1_VEC4: 4,
+//         POS2: 2,
+//         TEX2: 2,
+//         XY: 2,
+//         XYZ: 3,
+//     },
+//     ATTR_SELF_OFFSETS: {
+//         ALPHA: 3, // the third float in a col4
+//         WPOS_Y: 1, // The second attribute in a WPOS-X
+//         DIM_Y: 1, // The second attribute in a DIM2
+//         WPOS_Z: 2, // The second attribute in a WPOS-X
+//         WPOS4_TIME: 3, // The second attribute in a WPOS-X
+//     },
+// };
 
 
 

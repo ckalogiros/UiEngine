@@ -1,6 +1,6 @@
 "use strict";
 import { Timer_get_global_timer } from "../../../Timers/Timers.js";
-import { TimeIntervalsDestroyByIdx } from "../../../Timers/TimeIntervals.js";
+import { Time_intervals_destroy_byidx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { GlRotateZ2D, Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_change_child_event, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
@@ -95,7 +95,9 @@ export class Mesh {
 
     rel_comp; // A component to position this mesh's children relative to the position of one of 'LEFT-CENTER-RIGHT' and relative all other children's position
     root_posidx; // An index to the root position buffer. 
-    scroller_comp; // Pointer to scroll bar mesh. 
+    
+    scroller_comp;  // Pointer to scroll bar mesh. 
+    components;     // BitField: Type of 'COMPONENTS'
 
     debug_info;         // Struct: Debug_info_ui.
     minimized;          // Pointer: to a minimized version of the mesh.
@@ -260,7 +262,7 @@ export class Mesh {
 
                 const intervalIdx = this.timeIntervalsIdxBuffer.buffer[i];
                 if (intervalIdx !== INT_NULL) {
-                    TimeIntervalsDestroyByIdx(intervalIdx);
+                    Time_intervals_destroy_byidx(intervalIdx);
                     this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(i);
                 }
             }
@@ -313,7 +315,7 @@ export class Mesh {
         // Remove from widget root buffer.
         // Mesh_buffer_batch_destroy_store(this.mesh_bufferidx);
         // Command_buffer_store(Mesh_buffer_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
-        Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
+        if((this.components & COMPONENTS.SCROLLER)===0) Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
 
         // Destroy Generic Buffers
         if (this.eventCallbacks) Free_generic_buffer(this.eventCallbacks);

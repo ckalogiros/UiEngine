@@ -4,7 +4,7 @@ import { Mesh } from "./Base/Mesh.js";
 import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Texture_Material } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
@@ -161,7 +161,7 @@ export class Textured_Mesh extends Mesh {
                * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
                * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
             */
-            const idx = TimeIntervalsCreate(10, 'Move Textured_Mesh', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
+            const idx = Time_intervals_create(10, 'Move Textured_Mesh', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
             console.log('Time interval idx:', idx)
             // mesh.timeIntervalsIdxBuffer.Add(idx);
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
@@ -193,7 +193,7 @@ export class Textured_Mesh extends Mesh {
       if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
          const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-         TimeIntervalsDestroyByIdx(intervalIdx);
+         Time_intervals_destroy_byidx(intervalIdx);
          mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
          return;

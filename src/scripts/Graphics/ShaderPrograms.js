@@ -14,6 +14,7 @@ const DISABLE_DEBUG = true;
 
 
 const _programs = New_generic_buffer(_, 'Shader Programs');
+export function Program_reset() { _programs.ResetFull(); }
 
 
 /***************************************************************************************************************************************************/
@@ -181,8 +182,8 @@ export function Program_create_program(sid, uniforms) {
 
 	// Bind shader program's uniforms
 	gfxCtx.gl.useProgram(prog.shader_program);
-	GL.BOUND_PROG_IDX = progidx;
-	GL.BOUND_PROG = prog.shader_program;
+	GL_STATE.BOUND_PROG_IDX = progidx;
+	GL_STATE.BOUND_PROG = prog.shader_program;
 
 	return progidx;
 }
@@ -286,8 +287,8 @@ export function Program_store_index_buffer_idx(progidx, ibidx) {
 
 export function Program_use_program(shader_program, progidx) {
 	gfxCtx.gl.useProgram(shader_program);
-	GL.BOUND_PROG_IDX = progidx;
-	GL.BOUND_PROG = shader_program;
+	GL_STATE.BOUND_PROG_IDX = progidx;
+	GL_STATE.BOUND_PROG = shader_program;
 }
 
 

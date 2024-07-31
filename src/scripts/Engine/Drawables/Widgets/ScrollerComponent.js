@@ -4,7 +4,7 @@ import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Widget_root_gfx_reset_mesh_per_vb_buffer, Widget_root_rerender, Widget_root_rerender_from_root_reconstruct_listeners, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wposy, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
-import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { GREY } from "../Material/Base/Colors.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
@@ -71,6 +71,13 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    mesh.components |= COMPONENTS.SCROLLER;
    return bar;
 
+}
+
+
+export function Scoller_component_destroy(bar, ){
+   const handle = bar.children.buffer[0];
+   handle.Destroy();
+   bar.Destroy();
 }
 
 
@@ -252,7 +259,7 @@ function Scroller_component_on_update_handle(_params) {
 
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-      TimeIntervalsDestroyByIdx(intervalIdx);
+      Time_intervals_destroy_byidx(intervalIdx);
       bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
 
       handle.state.mask &= ~MESH_STATE.IN_GRAB;
@@ -350,7 +357,7 @@ function Scroller_component_onClick(params) {
    //    if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
    
    //       const OnResizeFn = mesh.OnResize;
-   //       const idx = TimeIntervalsCreate(10, 'ResizeXY Component_scroller', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, { mesh: mesh, mouse_click: point });
+   //       const idx = Time_intervals_create(10, 'ResizeXY Component_scroller', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, { mesh: mesh, mouse_click: point });
    //       mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
    //    }
    //    else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
@@ -382,7 +389,7 @@ function Scroller_component_onClick(params) {
 
       if ((bar.type & MESH_TYPE.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
-         const idx = TimeIntervalsCreate(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_component_on_update_handle, bar);
+         const idx = Time_intervals_create(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_component_on_update_handle, bar);
          bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
          STATE.mesh.SetGrabed(bar);
@@ -458,7 +465,7 @@ function Scroller_component_update_scrolled_section_pos_from_handle(scrolled_sec
 //    if (scroller.StateCheck(MESH_STATE.IN_GRAB) === 0 && scroller.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
 //       const intervalIdx = scroller.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-//       TimeIntervalsDestroyByIdx(intervalIdx);
+//       Time_intervals_destroy_byidx(intervalIdx);
 //       scroller.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
 //       return;

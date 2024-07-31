@@ -7,7 +7,7 @@ export class Gl_Texture {
 
     
     /** The Graphic's texture unit object. */
-    TO = null; 
+    tbo = null; 
 	tex_unit_id = -1; // Graphic's unique 'unsigned integer' id. 
     texidx = INT_NULL; // Self refference index to the texture buffer.
     texid = INT_NULL; // The texture id from the 'TEXTURES.' global contant
@@ -46,9 +46,9 @@ export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=
     texture.srcType = gl.UNSIGNED_BYTE;
     
     gl.activeTexture(texture.tex_unit_id);
-    texture.TO = gl.createTexture();
+    texture.tbo = gl.createTexture();
     
-    if (!texture.TO) alert('Could not create Texture');
+    if (!texture.tbo) alert('Could not create Texture');
 
     texture.img = img; // Load the font image
 
@@ -61,7 +61,7 @@ export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=
     }
     else{ // Must set the width and height
 
-        // gl.bindTexture(gl.TEXTURE_2D, texture.TO);
+        // gl.bindTexture(gl.TEXTURE_2D, texture.tbo);
         Gl_texture_unit_bind(gl, texture);
         gl.texImage2D(gl.TEXTURE_2D, texture.level, texture.internalFormat, width, 
                                 height, 0, texture.srcFormat, texture.srcType, null);
@@ -122,10 +122,9 @@ function Gl_texture_unit_load(gl, texture) {
 export function Gl_texture_unit_bind(gl, texture) {
 
     gl.activeTexture(texture.tex_unit_id);
-    gl.bindTexture(gl.TEXTURE_2D, texture.TO);
+    gl.bindTexture(gl.TEXTURE_2D, texture.tbo);
 
-    GL.BOUND_TEXTURE_IDX = texture.texidx;
+    GL_STATE.BOUND_TEXTURE_IDX = texture.texidx;
     Texture.boundTexture = texture.texidx; // Update the global Texture constant object
 }
-
 

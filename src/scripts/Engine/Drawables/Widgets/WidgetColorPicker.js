@@ -7,7 +7,7 @@ import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_wi
 import { Mesh_buffer_get_mesh_byidx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { BLACK, BLUE, BLUEL, GREEN, GREY, RED, REDL, TRANSPARENT, WHITE, YELLOW } from "../Material/Base/Colors.js";
 import { Section } from "../Meshes/Section.js";
@@ -481,7 +481,7 @@ export class Widget_Color_Picker extends Section {
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
           * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
           */
-         const idx = TimeIntervalsCreate(10, 'Move Widget_Color_Picker', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
+         const idx = Time_intervals_create(10, 'Move Widget_Color_Picker', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
          widget.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
          if (widget.StateCheck(MESH_STATE.IS_GRABABLE)) {
@@ -872,7 +872,7 @@ function On_move_clbk(params) {
    if (widget.StateCheck(MESH_STATE.IN_GRAB) === 0 && widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
       const intervalIdx = widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-      TimeIntervalsDestroyByIdx(intervalIdx);
+      Time_intervals_destroy_byidx(intervalIdx);
       widget.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
       return;

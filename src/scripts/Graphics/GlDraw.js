@@ -35,10 +35,10 @@ export function Gl_draw(gl) {
         
         const progs = Program_get_programs();
         
-        if (GL.BOUND_PROG_IDX !== progidx){
+        if (GL_STATE.BOUND_PROG_IDX !== progidx){
             gfxCtx.gl.useProgram(progs.buffer[progidx].shader_program);
-            GL.BOUND_PROG_IDX = progidx;
-            GL.BOUND_PROG = progs.buffer[progidx].shader_program;
+            GL_STATE.BOUND_PROG_IDX = progidx;
+            GL_STATE.BOUND_PROG = progs.buffer[progidx].shader_program;
         }
         
         
@@ -47,9 +47,9 @@ export function Gl_draw(gl) {
         const ib_info = Index_buffer_info_get_by_ibidx(ibidx);
         
         
-        if (GL.BOUND_VAO !== vb_group.vao){
+        if (GL_STATE.BOUND_VAO !== vb_group.vao){
             gl.bindVertexArray(vb_group.vao);
-            GL.BOUND_VAO = vb_group.vao;
+            GL_STATE.BOUND_VAO = vb_group.vao;
         }
         
         
@@ -61,8 +61,8 @@ export function Gl_draw(gl) {
         }
 
 
-        // if (GL.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
-        if (GL.BOUND_TEXTURE_IDX !== vb_group.texidx && vb_group.texidx !== INT_NULL ) {
+        // if (GL_STATE.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
+        if (GL_STATE.BOUND_TEXTURE_IDX !== vb_group.texidx && vb_group.texidx !== INT_NULL ) {
             const texture = Texture_get_texture_byidx(vb_group.texidx);
             Gl_texture_unit_bind(gl, texture);
             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
@@ -82,8 +82,8 @@ export function Gl_draw(gl) {
                     // TODO: Set bufferData instead
                     gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.STATIC_DRAW, 0);
                     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-                    GL.BOUND_VBO = vb_info.vbo;
-                    GL.BOUND_VBIDX = vb_info.vbidx;
+                    GL_STATE.BOUND_VBO = vb_info.vbo;
+                    GL_STATE.BOUND_VBIDX = vb_info.vbidx;
                 }
             }
             vb_group.needs_any_update = false
@@ -96,8 +96,8 @@ export function Gl_draw(gl) {
             const ib_data = Index_buffer_get_by_ibidx(ib_info.ibidx);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib_data, gl.STATIC_DRAW, 0);
             ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-            GL.BOUND_IBO = ib_info.ibo;
-            GL.BOUND_IBIDX = ib_info.ibidx;
+            GL_STATE.BOUND_IBO = ib_info.ibo;
+            GL_STATE.BOUND_IBIDX = ib_info.ibidx;
         }
 
 
@@ -152,7 +152,7 @@ export function Gl_draw_specific(gl, gfx_queue, w, h) {
 
     //     const progs = gfx_group.buffer[groupidx];
 
-    //     if (GL.BOUND_PROG_IDX !== progidx)
+    //     if (GL_STATE.BOUND_PROG_IDX !== progidx)
     //         Program_use_program(progs.buffer[progidx].shader_program, progidx)
 
     //     // Update all program uniforms
@@ -161,7 +161,7 @@ export function Gl_draw_specific(gl, gfx_queue, w, h) {
     //     const vb = progs.buffer[progidx].vb[vbidx];
     //     const ib = Gl_ib_get_byidx(progs.buffer[progidx].ib[vbidx]);
 
-    //     if (GL.BOUND_VAO !== ib.vao)
+    //     if (GL_STATE.BOUND_VAO !== ib.vao)
     //         GlBindVAO(ib.vao)
 
 

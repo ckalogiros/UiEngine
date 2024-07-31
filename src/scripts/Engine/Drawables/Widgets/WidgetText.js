@@ -5,7 +5,7 @@ import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
 import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
-import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx, TimeIntervalsGetByIdx } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create, Time_intervals_destroy_byidx, Time_intervals_get_byidx } from "../../Timers/TimeIntervals.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
 import { Align_self_get_dif } from "../Operations/Alignment.js";
@@ -635,7 +635,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			else meshes.push(this.children.buffer[idx]);
 			params.meshes = meshes;
 
-			const tIdx = TimeIntervalsCreate(msInterval, name, TIME_INTERVAL_REPEAT_ALWAYS, this.Update, params);
+			const tIdx = Time_intervals_create(msInterval, name, TIME_INTERVAL_REPEAT_ALWAYS, this.Update, params);
 			this.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, tIdx);
 		}
 		else { // Update multiText via one timeIntrval Update().
@@ -652,7 +652,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 			// If the user passes an interval idx, use that. // CAUTION: NO CHECK for interval timer validity
 			const interval_idx = (custom_interval_idx !== INT_NULL) ? custom_interval_idx : this.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-			const interval = TimeIntervalsGetByIdx(interval_idx);
+			const interval = Time_intervals_get_byidx(interval_idx);
 			const prevFuncs = interval.clbkParams.params.func;
 			const prevFuncsParams = interval.clbkParams.params.func_params;
 			const prevMeshBuffer = interval.clbkParams.params.meshes;
@@ -684,8 +684,8 @@ export class Widget_Multi_Text extends Widget_Text {
 			if (msInterval === INT_NULL) msInterval = interval.interval;
 
 			/** Destroy old timeInterval and create a new one with all the previous meshes and their callbacks and callback_params */
-			TimeIntervalsDestroyByIdx(interval.idx);
-			const tIdx = TimeIntervalsCreate(msInterval, name, TIME_INTERVAL_REPEAT_ALWAYS, this.Update, params);
+			Time_intervals_destroy_byidx(interval.idx);
+			const tIdx = Time_intervals_create(msInterval, name, TIME_INTERVAL_REPEAT_ALWAYS, this.Update, params);
 			this.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, tIdx);
 			// this.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 		}

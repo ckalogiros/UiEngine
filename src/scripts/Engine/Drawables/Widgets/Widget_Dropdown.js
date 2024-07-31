@@ -2,7 +2,7 @@
 
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { TimeIntervalsCreate } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_root_meshidx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
@@ -42,7 +42,8 @@ import { Mesh_set_scissorbox } from "../Operations/MeshHelperFunctions.js";
  * The reason being not to store a reference pointer of the root in the  dropdown, 
  * rather an index to a buffer of all root-dropdowns. (?Does it worthh it?)
  */
-let _root_dropdown = New_generic_buffer(_, 'Widget Dropdown roots');
+const _root_dropdown = New_generic_buffer(_, 'Widget Dropdown roots');
+export function Dropdown_roots_reset() { _root_dropdown.ResetFull(); }
 
 export function Dropdown_roots_set_root(root, dropdown) {
    dropdown.rootidx = _root_dropdown.Add(root);
@@ -530,7 +531,7 @@ export class Widget_Dropdown extends Section {
        * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
        * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
        */
-      const idx = TimeIntervalsCreate(10, 'Move Widget_Dropdown', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, dp);
+      const idx = Time_intervals_create(10, 'Move Widget_Dropdown', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, dp);
       dp.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
       if (dp.StateCheck(MESH_STATE.IS_GRABABLE)) {

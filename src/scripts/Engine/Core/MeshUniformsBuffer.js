@@ -7,7 +7,6 @@
 
 "use strict";
 
-import { Uniforms_buffer_set_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { New_generic_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer.js";
@@ -57,8 +56,11 @@ export function Screen_wpos_set_y(y) { _screen_wpos[1] = y; }
 const _per_vb_mesh_unif_wpos = New_generic_buffer(_, '_per_vb_mesh_unif_wpos');
 const _per_vb_mesh_unif_wpos_ubidxs = New_generic_buffer(_, '_per_vb_mesh_unif_wpos_ubidxs');
 const _debug_names_per_vb_mesh_unif_wpos = New_generic_buffer(_, '_debug_names_per_vb_mesh_unif_wpos');
-const _debug_names_all_meshes_per_vb_unif = New_generic_buffer(_, '_debug_names_all_meshes_per_vb_unif');
 
+
+export function Mesh_unif_wpos_reset() { _per_vb_mesh_unif_wpos.ResetFull(); }
+export function Mesh_unif_wpos_ubidxs_reset(){ _per_vb_mesh_unif_wpos_ubidxs.ResetFull(); }
+export function Mesh_unif_wpos_debug_names_reset(){ _debug_names_per_vb_mesh_unif_wpos.ResetFull(); }
 
 
 
@@ -143,7 +145,6 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
 
    const idx = _per_vb_mesh_unif_wpos.Add(entry);
-   // _debug_names_all_meshes_per_vb_unif.Add()
 
 
    // Store the uniform's index, for updating the uuniforms on position change
@@ -552,7 +553,9 @@ export function Mesh_unif_update_sticky_pos(xdif, ydif){
 // per_vb_mesh_unif_#type
 
 const _per_vb_mesh_unif_col = New_generic_buffer(_, '_per_vb_mesh_unif_col');
-
+export function Mesh_unif_col_reset() {
+   _per_vb_mesh_unif_col.ResetFull();
+}
 
 
 export function Mesh_unif_col_get_count() { return _per_vb_mesh_unif_col.active_count; }
@@ -560,7 +563,6 @@ export function Mesh_unif_col_get_size() { return _per_vb_mesh_unif_col.size; }
 
 
 
-// const _debug_names_per_vb_mesh_unif_col = New_generic_buffer(_, '_debug_names_per_vb_mesh_unif_col');
 
 // Each element(uniform color) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_col'. 
 export function Mesh_unif_create_vb_root_col(mesh_col) {

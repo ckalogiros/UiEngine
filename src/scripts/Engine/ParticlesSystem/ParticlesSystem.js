@@ -176,6 +176,12 @@ class Emitter {
    }
 
 
+   Reset(){
+
+      this.particles_buffer.ResetFull();
+      this.free_particles_idxs_buffer.Reset();
+   }
+
 
 
    ParticleAddToGfx(particle_idx) {
@@ -332,11 +338,10 @@ class Emitter {
 }
 
 const _emitters = New_generic_buffer(_, 'Particle System: Emitter buffer');
+export function Particles_system_reset() { return _emitters.ResetFull(); }
 
 
-export function Particles_get_particle_system(idx) {
-   return _emitters.buffer[idx];
-}
+export function Particles_get_particle_system(idx) { return _emitters.buffer[idx]; }
 
 
 

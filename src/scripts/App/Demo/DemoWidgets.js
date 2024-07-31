@@ -1,24 +1,22 @@
 "use strict";
 
-import { Mesh_animations_create } from '../Engine/Animations/MeshAnimations.js';
-import { Create_rect_mesh, Create_text_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from '../Engine/Core/CreateWidget.js';
-import { Widget_root_activate_all_vbs_in_renderqueue, Widget_root_rerender_from_root_reconstruct_listeners, Widget_root_reset_gfx } from '../Engine/Core/MeshBuffer.js';
-import { View_build_group_from_root_mesh } from '../Engine/Core/MeshBufferViews.js';
-import { Mesh_unif_add_vb_root_wpos, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
-import { BLUE, BLUEL, BLUER, GREEN, GREENL, GREENR, GREY, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
-import { Set_color_rgb } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Drawables/Operations/Recursions.js';
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
-import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Slider_connect } from '../Engine/Drawables/Widgets/WidgetSlider.js';
-import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
-import { Vertex_buffer_group_create_scissorbox } from '../Graphics/Buffers/VertexBuffers.js';
-import { GetSequencedColor } from '../Helpers/Helpers.js';
+import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
+import { Widget_root_activate_all_vbs_in_renderqueue, Widget_root_rerender_from_root_reconstruct_listeners, Widget_root_reset_gfx } from '../../Engine/Core/MeshBuffer.js';
+import { View_build_group_from_root_mesh } from '../../Engine/Core/MeshBufferViews.js';
+import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
+import { BLUE, BLUEL, BLUER, GREEN, GREENL, GREENR, GREY, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Drawables/Operations/Recursions.js';
+import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
+import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
+import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
+import { Listeners_set_priority } from '../../Engine/Events/EventListeners.js';
+import { GetSequencedColor } from '../../Helpers/Helpers.js';
 
 
 
 
-
+const l_pad = 10;
+const t_pad = 20;
 
 
 
@@ -45,7 +43,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    ];
    const fontsize = 1;
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [pos[0] + 30, pos[1] + 60, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [pos[0] + l_pad, pos[1] + t_pad*2, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
    // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -151,8 +149,9 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    
    const tr = 1.;
    const min_size = [10, 10];
+   const pad = 10;
    
-   const root_s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [pos[0]+30, pos[1]+30, 0], [100, 100], TRANSPARENCY(GREY[3], tr));
+   const root_s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [pos[0]+l_pad, pos[1]+t_pad, 0], [100, 100], TRANSPARENCY(GREY[3], tr));
    root_s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) root_s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
@@ -279,9 +278,9 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
                   const _1 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[6], tr));
                   _1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                   gry1_1.AddItem(_1);
-                  const _2 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
-                  _2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-                  gry1_1.AddItem(_2);
+                  // const _2 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
+                  // _2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                  // gry1_1.AddItem(_2);
                }
             }
             {
@@ -303,13 +302,13 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
          }
       }
       {
-         const l2_s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
+         const l2_s1 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
          l2_s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          l1_s3.AddItem(l2_s1);
          {
             {
 
-               const gry1_1 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLER[8], tr));
+               const gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLER[8], tr));
                gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                l2_s1.AddItem(gry1_1);
                {
@@ -320,14 +319,14 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
                   const _1 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[6], tr));
                   _1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                   gry1_1.AddItem(_1);
-                  const _2 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
-                  _2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-                  gry1_1.AddItem(_2);
+                  // const _2 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
+                  // _2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                  // gry1_1.AddItem(_2);
                }
             }
             {
 
-               const gry1_1 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLEB[9], tr));
+               const gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLEB[9], tr));
                gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                l2_s1.AddItem(gry1_1);
                {
@@ -398,7 +397,7 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    //    if (root.StateCheck(MESH_STATE.IN_GRAB) === 0 && root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
    //       const intervalIdx = root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-   //       TimeIntervalsDestroyByIdx(intervalIdx);
+   //       Time_intervals_destroy_byidx(intervalIdx);
    //       root.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
    //       return;
@@ -477,7 +476,7 @@ export function Demo_widgets_dropdown(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    const dp_menu_col = ORANGER[8];
 
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [pos[0] + 30, pos[1] + 30, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [pos[0] + l_pad, pos[1] + t_pad, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('root section')
@@ -625,7 +624,7 @@ export function Demo_widgets_dropdown(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
 export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos=[0,0], ) {
 
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [pos[0] + 30, pos[1] + 30, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [pos[0] + l_pad, pos[1] + t_pad, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('root section')

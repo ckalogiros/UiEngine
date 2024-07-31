@@ -33,6 +33,16 @@ const _listeners_buffer_view_storage = New_generic_buffer(_, '_listeners_buffer_
 
 
 
+export function Listener_reset_event_storage_buffers() {
+
+   for (let i = 0; i < LISTEN_EVENT_TYPES_INDEX.SIZE; i++) {
+      _listeners_buffer_storage.buffer[i].ResetFull();
+      _listeners_buffer_view_storage.buffer[i].ResetFull();
+   }
+}
+
+
+
 export function Listener_get_parent_event(TYPE_IDX, idx) {
    const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].parent_idx;
    return parent_event;
@@ -55,6 +65,7 @@ export function Listener_init_event_storage_buffers() {
       _listeners_buffer_view_storage.Add(New_generic_buffer(_, '_listeners_buffer_view_storage - Click'));
    }
 }
+
 
 
 

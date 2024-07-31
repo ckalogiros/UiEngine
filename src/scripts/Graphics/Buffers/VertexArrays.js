@@ -12,6 +12,10 @@ import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
 
 
 const _vertex_array_object = New_generic_buffer(_, 'GFX Vertex Array');
+export function Gl_vertex_array_object_reset() { 
+   Gl_vertex_array_vao_delete_all()
+   _vertex_array_object.ResetFull(); 
+}
 
 
 
@@ -34,10 +38,21 @@ export function Gl_vertex_array_object_create(sid) {
 }
 
 
-function Gl_vertex_array_object_delete(vaoidx) {
+export function Gl_vertex_array_vao_delete(vaoidx) {
 
-   const vao = _vertex_array_object.buffer[vaoidx];
+   const vao = _vertex_array_object.buffer[vaoidx].vao;
    gfxCtx.gl.deleteVertexArray(vao);
+}
+
+
+function Gl_vertex_array_vao_delete_all() {
+
+   for(let i=0; i <= _vertex_array_object.boundary; i++){
+
+      const vao = _vertex_array_object.buffer[i].vao;
+      gfxCtx.gl.bindVertexArray(null);
+      gfxCtx.gl.deleteVertexArray(vao);
+   }
 }
 
 

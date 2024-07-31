@@ -3,7 +3,7 @@
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -550,7 +550,7 @@ export class Widget_Label extends Rect_Mesh {
                         // console.log('X Y RESIZE');
 
                         const OnResizeFn = mesh.OnResize;
-                        const idx = TimeIntervalsCreate(10, 'ResizeXY Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
+                        const idx = Time_intervals_create(10, 'ResizeXY Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
                         mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
                     }
                     else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
@@ -569,7 +569,7 @@ export class Widget_Label extends Rect_Mesh {
             if (!is_resizesed) { // implement move 
                 // const OnMoveFn = mesh.OnMove;
                 const OnMoveFn = Label_on_move_clbk;
-                const idx = TimeIntervalsCreate(10, 'Move Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
+                const idx = Time_intervals_create(10, 'Move Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
                 mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
             }
 
@@ -592,7 +592,7 @@ export class Widget_Label extends Rect_Mesh {
         if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
             const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-            TimeIntervalsDestroyByIdx(intervalIdx);
+            Time_intervals_destroy_byidx(intervalIdx);
             mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
             return;
@@ -647,7 +647,7 @@ function Label_on_move_clbk(params) {
     if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
         const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-        TimeIntervalsDestroyByIdx(intervalIdx);
+        Time_intervals_destroy_byidx(intervalIdx);
         mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
 
         return;

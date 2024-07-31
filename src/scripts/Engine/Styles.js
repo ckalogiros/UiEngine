@@ -9,8 +9,11 @@ import { New_generic_buffer, New_int16_buffer } from "./Core/Buffers.js";
 
 
 const _margin_buffer = New_generic_buffer(_, 'Margins');
+export function Styles_margin_reset(){ _margin_buffer.ResetFull(); } 
 const _pad_buffer = New_generic_buffer(_, 'Paddings');
+export function Styles_pad_reset(){ _pad_buffer.ResetFull(); } 
 const _hover_margin_buffer = New_generic_buffer(_, 'Hover Margins');
+export function Styles_hover_margin_reset(){ _hover_margin_buffer.ResetFull(); } 
 
 
 

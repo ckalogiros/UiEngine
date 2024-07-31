@@ -1,7 +1,7 @@
 "use strict";
 
 import { New_generic_buffer } from "../../Core/Buffers.js";
-import { Dbg_ui_init_buffer_entries, Dbg_ui_store_changes } from "./DebugInfoUi.js";
+import { Dbg_ui_init_buffer_entries, Dbg_ui_reset_buffer_entries, Dbg_ui_store_changes } from "./DebugInfoUi.js";
 
 
 _CNT = 0x1;
@@ -49,6 +49,21 @@ export const NOTIFICATION_TYPE = {
       IS_INSERTED:xxx<<=0x1, // This is set by the function that inserts a new entry to the entries flag table, to denote if the current entry has been drawn.
    },
 
+   Reset(){
+      this.MESH_TREE_IDXS.NOTIF =INT_NULL
+      this.MESH_TREE_IDXS.ENTRIES =INT_NULL
+      this.MESH_BUFFER_IDXS.NOTIF =INT_NULL
+      this.MESH_BUFFER_IDXS.ENTRIES =INT_NULL
+      this.STRING_BUFFER_IDXS.NOTIF =INT_NULL
+      this.STRING_BUFFER_IDXS.ENTRIES =INT_NULL
+      this.MESH_PER_VB_BUFFER_IDXS.NOTIF =INT_NULL
+      this.MESH_PER_VB_BUFFER_IDXS.ENTRIES =INT_NULL
+      this.VERTEX_BUFFER_IDXS.NOTIF =INT_NULL
+      this.VERTEX_BUFFER_IDXS.ENTRIES =INT_NULL
+      this.RENDER_QUEUE_BUFFER_IDXS.NOTIF =INT_NULL
+      this.RENDER_QUEUE_BUFFER_IDXS.ENTRIES =INT_NULL
+   }
+
 }
 
 function Notification_type_to_sting(idx) {
@@ -76,6 +91,9 @@ function Notification_process_to_sting(idx) {
 
 const _notifications_buffer = New_generic_buffer(_, '_notifications_buffer');
 
+
+
+export function Notifications_reset() { _notifications_buffer.ResetFull(); Dbg_ui_reset_buffer_entries() }
 
 
 export function Notifications_get_ui_widget(TYPE_IDX){
@@ -113,6 +131,9 @@ function Create(){
 
    return { type_idx:type_idx, entries_bufferidx:ret.entries_bufferidx };
 }
+
+
+
 
 export function Notifications_initialize() {
 
@@ -156,28 +177,6 @@ export function Notifications_initialize() {
 }
 
 
-
-// export function Notifications_assign(TYPE, Clbk_store, Clbk_update, params) {
-
-//    // const type_idx = _notifications_buffer.Add({
-//    //    is_active: false,
-//    //    needs_update: true,
-//    //    Clbk_store: Clbk_store,
-//    //    Clbk_update: Clbk_update,
-//    //    params: params,
-//    // });
-
-//    // if(TYPE & NOTIFICATION_TYPE.MESH_BUFFER){
-//    //    NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF = type_idx
-//    // }
-//    // else if(TYPE & NOTIFICATION_TYPE.STRING_BUFFER){
-//    //    NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF = type_idx
-//    // }
-//    // else if(TYPE & NOTIFICATION_TYPE.VERTEX_BUFFER){
-//    //    NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF = type_idx
-//    // }
-
-// }
 
 
 
@@ -240,4 +239,17 @@ export function Notifications_deactivate(TYPE_IDX) {
 export function Notifications_print() {
 
    console.log(_notifications_buffer);
+}
+export function Notifications_print_loop() {
+
+   for(let i=0; i <= _notifications_buffer.boundary; i++){
+
+      console.log( i,
+         'is active', _notifications_buffer.buffer[i].is_active,
+         'needs_update', _notifications_buffer.buffer[i].needs_update,
+         'flags', _notifications_buffer.buffer[i].params.flags,
+         'root', _notifications_buffer.buffer[i].params.root,
+         'Callback', _notifications_buffer.buffer[i].Clbk_update.name,
+      );
+   }
 }

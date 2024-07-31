@@ -1,6 +1,6 @@
 "use strict";
 
-import { TimeIntervalsCreate, TimeIntervalsDestroyByIdx } from '../../Timers/TimeIntervals.js';
+import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
 import { GREY, WHITE } from '../Material/Base/Colors.js';
 import { Widget_Label } from './WidgetLabel.js';
 
@@ -87,7 +87,7 @@ export class Widget_Button extends Widget_Label {
 
             const EventClbk = mesh.evt_params.EventClbk;
             const target_params = mesh.evt_params.params.target_params
-            const idx = TimeIntervalsCreate(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
+            const idx = Time_intervals_create(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
             STATE.mesh.SetClickHold(mesh);
@@ -116,7 +116,7 @@ export class Widget_Button extends Widget_Label {
          console.error('intervalIdx', intervalIdx, 'this.timeIntervalsIdxBuffer.buffer', this.timeIntervalsIdxBuffer.buffer)
          alert('417772839 \nIssue with timeInterval\nPossible error: We overloaded the time intervals buffer\nThe buffer currently holds up to two intervals\nINTERVALS.UPDATE and INTERVALS.MOVE\nTry to dissable mesh Move event')
       }
-      TimeIntervalsDestroyByIdx(intervalIdx);
+      Time_intervals_destroy_byidx(intervalIdx);
       this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(idx);
    }
 

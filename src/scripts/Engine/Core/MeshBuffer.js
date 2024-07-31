@@ -23,12 +23,17 @@ const NOTIFICATIONS_ON = true;
 
 
 const _mesh_buffer = New_generic_buffer(_, 'Mesh Buffer');
+export function Mesh_buffer_reset() { _mesh_buffer.ResetFull(); }
 const _mesh_per_vertex_buffer = New_generic_buffer(_, 'Mesh per Vertex buffer');
+export function Mesh_per_vb_reset() { _mesh_per_vertex_buffer.ResetFull(); }
 
 
 const _widget_root_buffer = New_generic_buffer(_, 'Widget root');
+export function Root_group_buffer_reset() { _widget_root_buffer.ResetFull(); }
 const _root_batch_buffer = New_generic_buffer(_, 'Root batch');
+export function Root_group_batch_buffer_reset() { _root_batch_buffer.ResetFull(); }
 const _widget_root_gfx = New_generic_buffer(_, 'Root gfx');
+export function Root_group_gfx_buffer_reset() { _widget_root_gfx.ResetFull(); }
 
 
 
@@ -443,8 +448,6 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
          // If the removed mesh happens to be root of any of the batch-vbs, we MUST replace it with the FIRST, same SID, mesh_bufferidx.
          // else 
 
-         if (_root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx] === _)        
-            console.log
          if (_root_batch_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx === mesh_bufferidx) {
 
             // Unfortunately we have no other option but to search the meshes through widget_root_buffer
@@ -473,7 +476,7 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
 
          /*********************************************************************************************************************************/
          // Batch Remove
-         _widget_root_buffer.buffer[root_bufferidx].RemoveByIdxSortedVersion(elem_found, root_bufferidx, 'Widget_root_remove_element_byidx');
+         _widget_root_buffer.buffer[root_bufferidx].RemoveByIdxSortedVevbrsion(elem_found, root_bufferidx, 'Widget_root_remove_element_byidx');
 
       }
       else console.error('Widget root FAILED to remove element. root idx:', root_bufferidx, 'mesh_bufferidx', mesh_bufferidx, ' element idx:', elem_found,);
@@ -486,6 +489,8 @@ function Widget_root_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, me
 function Widget_root_find_element_byidx(root_bufferidx, mesh_bufferidx) {
 
    const root = _widget_root_buffer.buffer[root_bufferidx];
+
+   if(root_bufferidx===INT_NULL) return INT_NULL;
 
    // Avoid checking the root element
    for (let i = 1; i <= root.boundary; i++) {

@@ -21,7 +21,7 @@ import { TimeGet } from "./Time.js";
  */
 
 let _time = null; // Store a local refference of the App's timer
-export function TimeIntervalsInit(){
+export function Time_intervals_init_time(){
    _time = TimeGet();
 }
 
@@ -250,40 +250,48 @@ export function Time_intervals_initialize(){
    intervalTimers.Init();
 }
 
-export function TimeIntervalResetTimer(idx) {
+export function Time_intervals_destroy() {
+   for (let i = 0; i < intervalTimers.size; i++) {
+      intervalTimers.DestroyByIdx(i);
+   }
+}
+
+
+
+export function Time_intervals_reset_byidx(idx) {
    intervalTimers.ti[idx].ResetTime();
 }
 
 
 
-export function TimeIntervalsUpdateAll() {
+export function Time_intervals_update() {
    intervalTimers.Update();
 }
 
 
 
 //  Returns the timeInterval index
-export function TimeIntervalsCreate(interval, name, repeat, clbk, params) {
+export function Time_intervals_create(interval, name, repeat, clbk, params) {
    // console.log('INTERVAL create', name)
    return intervalTimers.Create(interval, name, repeat, clbk, params);
 }
 
 
 
-export function TimeIntervalsGetByIdx(idx) {
+export function Time_intervals_get_byidx(idx) {
    return intervalTimers.ti[idx];
 }
 
 
 
-export function TimeIntervalsDestroyByIdx(idx) {
+export function Time_intervals_destroy_byidx(idx) {
    intervalTimers.DestroyByIdx(idx);
 }
 
 
 
 // DEBUG
-export function TimeIntervalsPrintAll() {
+export function Time_intervals_print() {
    intervalTimers.Print();
 }
 
@@ -407,19 +415,14 @@ class StepTimers {
 
 
 const stepTimers = new StepTimers;
-export function StepTimersUpdateAll() {
-   // stepTimers.Update();
-}
 
-
-
-export function StepTimersCreate(duration, step, clbk, stopClbk, params) {
+export function Step_timers_create(duration, step, clbk, stopClbk, params) {
    stepTimers.Create(duration, step, clbk, stopClbk, params);
 }
 
 
 
-export function TimersUpdateStepTimers() {
+export function Step_timers_update() {
 
    for (let i = 0; i < stepTimers.size; i++) {
       const t = stepTimers.buffer[i]; // Cash

@@ -1,5 +1,5 @@
 "use strict";
-import { TimeIntervalsCreate, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
+import { Time_intervals_create, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
 import { Abs, CopyArr4, FloorArr2, FloorArr3, Hash, Pow } from '../Helpers/Math/MathOperations.js';
 
 
@@ -30,12 +30,14 @@ import { Callback_animations_create } from '../Engine/Animations/CallbackAnimati
 import { Mesh_buffer_get_mesh_byidx, Widget_root_activate_all_vbs_in_renderqueue, Widget_root_rerender_from_root_reconstruct_listeners, Widget_root_reset_gfx } from '../Engine/Core/MeshBuffer.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
 import { Ui_create_label_switch } from '../Engine/Drawables/DebugInfo/DebugInfoUiFactory.js';
-import { CreateBallTailParticles, CreateGlowParticles, CreateSmokeParticles, Demo_all, Demo_ball_tail, Demo_ball_tail_2, Demo_glow_particles_2, Demo_smoke_2, TestNoiseShader } from './DemoParticles.js';
+import { CreateBallTailParticles, CreateGlowParticles, CreateSmokeParticles, Demo_all, Demo_ball_tail, Demo_ball_tail_2, Demo_glow_particles_2, Demo_smoke_2, TestNoiseShader } from './Demo/DemoParticles.js';
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
-import { Elastic_collisions, Sattelite_rotation } from './DemoPhysics.js';
+import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
 import { Mesh_set_scissorbox } from '../Engine/Drawables/Operations/MeshHelperFunctions.js';
-import { Demo_widgets_button, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './DemoWidgets.js';
+import { Demo_widgets_button, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
+import { AppInit, AppReset } from './App.js';
+import { Demo_page } from './DemoPage.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -67,6 +69,9 @@ export function CLBK_TIMER() {
     return Timer_get_global_timer();
     // return .5;
 }
+
+
+
 function CLBK_TIMER_CYCLE() {
     return TimerGetGlobalTimerCycle();
     // return .5;
@@ -324,7 +329,7 @@ function TestScrollerComponent3() {
 
 
 
-export function TestWidgetsGeneric(scene) {
+export function TestWidgetsGeneric(createId=1) {
 
 
     let ypos = 500
@@ -336,6 +341,55 @@ export function TestWidgetsGeneric(scene) {
     // for(let i=0; i<aaa.length; i++){
     //     console.log(aaa[i], aaa.charCodeAt(i))
     // }
+
+    // Demo_page();
+
+    
+    { // Reload
+
+        // const reload_btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Reload', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 140, 10, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
+        // reload_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        // reload_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+        // reload_btn.Bind(
+        //     (params) => {
+
+        //         Callback_animations_create( // Scroll Up
+        //             (params) => { // Run Animation
+
+        //                 // window.location.reload(false, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<sjksjhjdks>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'); 
+
+        //                 AppReset();
+        //                 // const label = CreateLabel('1');
+        //                 // Demo_ball_tail();
+        //                 // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);
+        //                 Debug_info_ui_static();
+
+        //                 createId++; // The id is for rendering a different
+        //                 TestWidgetsGeneric()
+
+        //                 return false;
+        //             },
+        //             () => { // Stop Animation
+        //                 return false;
+        //             },
+        //         );
+        //     },
+        //     _, _, _,
+        // );
+
+
+        // reload_btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+        // reload_btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+        // reload_btn.Render()
+        // Widget_root_activate_all_vbs_in_renderqueue(reload_btn.root_bufferidx);
+
+        // reload_btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, reload_btn.gfx.vb.groupidx)
+
+        // Construct_listen_events_from_mesh_tree(reload_btn)
+        // Construct_listen_events_relations_from_mesh_tree(reload_btn);
+
+    }
 
 
 
@@ -369,7 +423,7 @@ export function TestWidgetsGeneric(scene) {
     { // Rotation: Rotate sdf line. Dont forget to disable the 'style' attribu\te
 
         // const line1 = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
-        // TimeIntervalsCreate(16, 'TEST ROTATION', TIME_INTERVAL_REPEAT_ALWAYS, function TEST_ROTATE_FUNC(params){
+        // Time_intervals_create(16, 'TEST ROTATION', TIME_INTERVAL_REPEAT_ALWAYS, function TEST_ROTATE_FUNC(params){
         //     const mesh = params.params
         //     // const t = (TimerGetGlobalTimerCycle()-.5)*10;
         //     const t = (Timer_get_global_timer())*1;
@@ -495,7 +549,7 @@ export function TestWidgetsGeneric(scene) {
         // const label = CreateLabel('!@#$%^&*\'(12345678)[abdf],{LPARREA}');
         // const label = CreateLabel('!@#$%^&*\'\n(12345678)\n[abdf],\n{LPARREA}');
 
-        // const label = CreateLabel('12345678');
+        // const label = CreateLabel('1');
         // const label = CreateLabel('AAAAAA', 120);
         // // CreateLabel('\\/+0');
         // const label = CreateLabel('CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line););CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line');
@@ -564,90 +618,90 @@ export function TestWidgetsGeneric(scene) {
 
     { // Demos Physics
 
-        // Sattelite_rotation()
-
-        // Elastic_collisions()
+        // const total_height = Elastic_collisions()
+        
+        // Sattelite_rotation([0, total_height*2+100])
     }
 
 
     { // Demos Widgets
 
-        let y = 0;
-        const pad = 50;
-        /* section/rect move */
-        /* sections - hovering (no moving so that for android devices can hover on touch) */
-        const sections = Demo_widgets_sections(_, [0, y]);
-        y += sections.geom.dim[1]*2 + pad;
+        // let y = 0;
+        // const pad = 50;
+        // /* section/rect move */
+        // /* sections - hovering (no moving so that for android devices can hover on touch) */
+        // const sections = Demo_widgets_sections(_, [0, y]);
+        // y += sections.geom.dim[1]*2 + pad;
 
         
-        /* label - move - hover */
-        /* Button - click(with counter?) */
-        /* Switces */
-        /* Slider */
-        const btn = Demo_widgets_button(_, [0, y]);
-        y += btn.geom.dim[1]*2 + pad;
+        // /* label - move - hover */
+        // /* Button - click(with counter?) */
+        // /* Switces */
+        // /* Slider */
+        // const btn = Demo_widgets_button(_, [0, y]);
+        // y += btn.geom.dim[1]*2 + pad;
 
 
-        /* scrolling */
-        const scroller = Demo_widgets_scrolled_labels(_, [0, y]);
-        y += scroller.geom.dim[1]*2 + pad;
+        // /* scrolling */
+        // const scroller = Demo_widgets_scrolled_labels(_, [0, y]);
+        // y += scroller.geom.dim[1]*2 + pad;
 
 
-        /* dropdown - move - hover */
-        const dp = Demo_widgets_dropdown(_, [0, y], )
-        y += dp.geom.dim[1]*2 + pad;
+        // /* dropdown - move - hover */
+        // const dp = Demo_widgets_dropdown(_, [0, y], )
+        // y += dp.geom.dim[1]*2 + pad;
 
 
-        /* Colorpicker */
+        // /* Colorpicker */
 
-        /* Coloring per vertex */
+        // /* Coloring per vertex */
 
-        /* Resizable widgets */
-
-
-        { // Create the button for going to the top
-
-            const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Up', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
-            btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-            btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-            btn.Bind(
-                (params) => {
-
-                    Callback_animations_create( // Scroll Up
-                        (params) => { // Run Animation
-
-                            const unif_wpos = Screen_wpos_get_y();
-                            if (unif_wpos < 0) {
-
-                                const ypos = unif_wpos/2;
-                                Screen_wpos_set_y(ypos);
-                                console.log('ypos', ypos, 'unif_wpos', unif_wpos)
-                                return true;
-                            }
-
-                            return false;
-                        },
-                        () => { // Stop Animation
-                            return false;
-                        },
-                    );
-                },
-                _, _, _,
-            );
+        // /* Resizable widgets */
 
 
-            btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-            btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-            btn.Render()
-            Widget_root_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
+        // { // Create the button for going to the top
 
-            btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
+        //     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Up', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
+        //     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        //     btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-            Construct_listen_events_from_mesh_tree(btn)
-            Construct_listen_events_relations_from_mesh_tree(btn);
+        //     btn.Bind(
+        //         (params) => {
 
-        }
+        //             Callback_animations_create( // Scroll Up
+        //                 (params) => { // Run Animation
+
+        //                     const unif_wpos = Screen_wpos_get_y();
+        //                     if (unif_wpos < 0) {
+
+        //                         const ypos = unif_wpos/2;
+        //                         Screen_wpos_set_y(ypos);
+        //                         console.log('ypos', ypos, 'unif_wpos', unif_wpos)
+        //                         return true;
+        //                     }
+
+        //                     return false;
+        //                 },
+        //                 () => { // Stop Animation
+        //                     return false;
+        //                 },
+        //             );
+        //         },
+        //         _, _, _,
+        //     );
+
+
+        //     btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+        //     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+        //     btn.Render()
+        //     Widget_root_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
+
+        //     btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
+
+        //     Construct_listen_events_from_mesh_tree(btn)
+        //     Construct_listen_events_relations_from_mesh_tree(btn);
+
+        // }
 
     }
 
@@ -684,7 +738,7 @@ export function TestWidgetsGeneric(scene) {
         // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, helpui);
 
         // const meshinfo_mesh = MeshInfo(scene)
-        // TimeIntervalsCreate(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
+        // Time_intervals_create(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
         // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh);
         // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh.children.buffer[0]);
     }
@@ -692,9 +746,10 @@ export function TestWidgetsGeneric(scene) {
 
     // Must draw last so it is on top of everything
 
-    Debug_info_ui_static();
+    // Debug_info_ui_static();
 
 }
+
 
 
 
@@ -844,11 +899,11 @@ function CreateLabel(name = 'Label ', font_size = 10) {
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.RIGHT | ALIGN.VERT_CENTER, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     // const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, ALIGN.HOR_CENTER | ALIGN.BOTTOM, pos, fontsize, PURPLER[6], WHITE, [5, 5], .5);
     const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, font_size, GREY[3], WHITE, [5, 5], .5);
-    label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    // label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
     // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
-
     // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
     // label.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
 
@@ -857,8 +912,8 @@ function CreateLabel(name = 'Label ', font_size = 10) {
     Widget_root_activate_all_vbs_in_renderqueue(label.root_bufferidx);
     label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
 
-    Construct_listen_events_from_mesh_tree(label);
-    Construct_listen_events_relations_from_mesh_tree(label);
+    // Construct_listen_events_from_mesh_tree(label);
+    // Construct_listen_events_relations_from_mesh_tree(label);
 
 
 

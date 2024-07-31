@@ -1,7 +1,7 @@
 "use strict";
 
-import { Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_gfx_get } from "../../Core/MeshBuffer";
+import { Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Widget_root_gfx_get } from "../../Core/MeshBuffer.js";
 
 
 

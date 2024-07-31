@@ -17,6 +17,8 @@ const COMMANDS = {
 
 const _command_storage_buffer = New_generic_buffer(_, 'Command Buffer');
 const _command_flags = { mask:0x0 }; // Fast way to find if a spesific ID command has been added to command buffer
+export function Command_buffer_reset() { _command_storage_buffer.ResetFull(); }
+
 
 
 

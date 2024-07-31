@@ -9,6 +9,8 @@ const DISABLE_DEBUG = true;
 
 
 const _shader_attribs_buffer = New_generic_buffer(_, '_shader_attribs_buffer');
+export function Shader_attributes_reset() { 
+   _shader_attribs_buffer.ResetFull(); }
 
 
 

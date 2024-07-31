@@ -208,6 +208,101 @@ export function Device_set_up() {
    */
   console.log('document.documentElement', document.documentElement);
   console.log('document.documentElement.clientWidth', document.documentElement.clientWidth);
+
+
+
+      // Test cursor
+    // document.elm.style.border = "3px solid #FF0000";
+    // document.activeElement.style.cursor = url("https://img.icons8.com/doodle/48/000000/cancel-2.png"), auto;
+
+    /** Default mouse pointers */
+    document.activeElement.style.cursor = "alias";
+    // document.activeElement.style.cursor = "all-scroll";
+    // document.activeElement.style.cursor = "auto";
+    // document.activeElement.style.cursor = "cell";
+    // document.activeElement.style.cursor = "col-resize";
+    // document.activeElement.style.cursor = "context-menu";
+    // document.activeElement.style.cursor = "copy";
+    // document.activeElement.style.cursor = "crosshair";
+    // document.activeElement.style.cursor = "default";
+    // document.activeElement.style.cursor = "e-resize";
+    // document.activeElement.style.cursor = "ew-resize";
+    // document.activeElement.style.cursor = "grab";
+    // document.activeElement.style.cursor = "grabbing";
+    // document.activeElement.style.cursor = "help";
+    // document.activeElement.style.cursor = "move";
+    // document.activeElement.style.cursor = "n-resize";
+    // document.activeElement.style.cursor = "ne-resize";
+    // document.activeElement.style.cursor = "nesw-resize";
+    // document.activeElement.style.cursor = "ns-resize";
+    // document.activeElement.style.cursor = "nw-resize";
+    // document.activeElement.style.cursor = "nwse-resize";
+    // document.activeElement.style.cursor = "no-drop";
+    // document.activeElement.style.cursor = "none";
+    // document.activeElement.style.cursor = "not-allowed";
+    // document.activeElement.style.cursor = "pointer";
+    // document.activeElement.style.cursor = "progress";
+    // document.activeElement.style.cursor = "row-resize";
+    // document.activeElement.style.cursor = "s-resize";
+    // document.activeElement.style.cursor = "se-resize";
+    // document.activeElement.style.cursor = "sw-resize";
+    // document.activeElement.style.cursor = "text";
+    // document.activeElement.style.cursor = "w-resize";
+    // document.activeElement.style.cursor = "wait";
+    // document.activeElement.style.cursor = "zoom-in";
+    // document.activeElement.style.cursor = "zoom-out";
+    
+    /**Custom  mouse pointers */
+    // document.activeElement.style.cursor =  new URL("App/move.cur");
+    // document.activeElement.style.cursor = 'url("../resources/icons/cursor/move.cur"), auto';
+    // document.activeElement.style.cursor = 'url("../resources/icons/cursor/ubuntu/rinux_real_nswe-resize.cur"), auto';
+    document.activeElement.style.cursor = 'url("../resources/icons/cursor/small-windows/move.cur"), auto';
+    
+    // const url = new URL("../App/move.cur", document.baseURI);
+    // const url = new URL("../App/move.cur", document.baseURI);
+    // console.log(url.hostname); 
+    // console.log(url.pathname); 
+    // document.activeElement.style.cursor =  url;
+
+
+/**
+alias
+all-scroll
+auto
+cell
+col-resize
+context-menu
+copy
+crosshair
+default
+e-resize
+ew-resize
+grab
+grabbing
+help
+move
+n-resize
+ne-resize
+nesw-resize
+ns-resize
+nw-resize
+nwse-resize
+no-drop
+none
+not-allowed
+pointer
+progress
+row-resize
+s-resize
+se-resize
+sw-resize
+text
+w-resize
+wait
+zoom-in
+zoom-out
+myBall.cur
+ */
 }
 
 export function Detect_host_platform() {

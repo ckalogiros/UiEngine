@@ -157,6 +157,7 @@ class Uniform {
 
 const _uniforms_buffer = New_generic_buffer(_, 'GFX Uniforms');
 let any_needs_update = false; // 
+export function Uniforms_buffer_reset() { _uniforms_buffer.ResetFull(); }
 
 
 export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, progidx, vb_groupidx) {
@@ -383,7 +384,8 @@ const ERROR_UBS = `
 
 
 
-let _uniform_blocks = New_generic_buffer(_, 'GFX Uniforms Block');
+const _uniform_blocks = New_generic_buffer(_, 'GFX Uniforms Block');
+export function Uniform_blocks_buffer_reset() { _uniform_blocks.ResetFull(); }
 
 
 // const CreatedUniforms = [];

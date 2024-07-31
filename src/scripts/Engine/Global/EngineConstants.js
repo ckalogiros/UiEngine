@@ -307,6 +307,31 @@ const STATE = {
 
 		activeClickedButtonId: INT_NULL,
 	},
+
+	Reset(){
+
+		// this.scene.active = null;
+		// this.scene.active_idx = null;
+	
+		this.loop.paused = false;
+	
+		this.mesh.hovered = null;
+		this.mesh.hoveredIdx = INT_NULL;
+		
+		this.mesh.clicked = null;
+		this.mesh.clickedIdx = INT_NULL;
+		
+		this.mesh.grabed = null;
+		this.mesh.grabedIdx = INT_NULL;
+		
+		this.mesh.focused = null;
+		this.mesh.focusedIdx = INT_NULL;
+		
+		this.mesh.click_hold = null;
+		this.mesh.click_holdidx = INT_NULL;
+
+		this.mouse.activeClickedButtonId
+	}
 };
 
 
@@ -1279,6 +1304,49 @@ const DEBUG_INFO = {
 		MESH_BUFFER_IDX: INT_NULL,
 		POS: [340, 100, 10]
 	},
+
+	Reset(){
+		this.UI_STATS.IS_ON = false;
+		this.UI_STATS.IDX = INT_NULL,
+		this.UI_STATS.MESH_BUFFER_IDX = INT_NULL;
+		this.UI_STATS.POS = [0, 0, 10];
+		
+		this.UI_TIMERS.IS_ON = false;
+		this.UI_TIMERS.IDX = INT_NULL;
+		this.UI_TIMERS.MESH_BUFFER_IDX = INT_NULL;
+		this.UI_TIMERS.POS = [0, 0, 10];
+
+		this.UI_MOUSE.IS_ON = false
+		this.UI_MOUSE.IDX = INT_NULL
+		this.UI_MOUSE.MESH_BUFFER_IDX = INT_NULL
+		this.UI_MOUSE.POS = [0, 0, 10];
+
+		this.UI_GFX.IS_ON = false
+		this.UI_GFX.ROOT_IDX = INT_NULL
+		this.UI_GFX.MESH_BUFFER_IDX = INT_NULL
+		this.UI_GFX.POS = [400, 300, 10];
+		
+		this.UI_MESH.IS_ON = false
+		this.UI_MESH.ROOT_IDX = INT_NULL
+		this.UI_MESH.MESH_BUFFER_IDX = INT_NULL
+		this.UI_MESH.POS = [530, 50, 10]
+		
+		this.UI_FOCUSED.IS_ON = false
+		this.UI_FOCUSED.ROOT_IDX = INT_NULL
+		this.UI_FOCUSED.MESH_BUFFER_IDX = INT_NULL
+		this.UI_FOCUSED.POS = [530, 50, 10]
+		
+		this.UI_BATCH.IS_ON = false
+		this.UI_BATCH.IDX = INT_NULL
+		this.UI_BATCH.ROOT_IDX = INT_NULL
+		this.UI_BATCH.MESH_BUFFER_IDX = INT_NULL
+		this.UI_BATCH.POS = [530, 50, 10]
+		
+		this.UI_VB_2D.IS_ON = false
+		this.UI_VB_2D.ROOT_IDX = INT_NULL
+		this.UI_VB_2D.MESH_BUFFER_IDX = INT_NULL
+		this.UI_VB_2D.POS = [340, 100, 10]
+	}
 };
 
 

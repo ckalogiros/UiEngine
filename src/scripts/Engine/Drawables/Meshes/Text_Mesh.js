@@ -470,16 +470,8 @@ export class Text_Mesh extends Mesh {
             geom_copy.dim[0] = width; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
          }
 
-         // Gl_set_dim_x(this.gfx, width*2);
          Gl_set_uv(this.gfx, this.mat.uv);
-         // this.geom.SetDimX(this.gfx, 20)
          Gl_set_dim_x(this.gfx, width);
-         // Gl_add_wpos_x(this.gfx, -1);
-         // console.log()
-
-         // geom_copy.dim[0] *= plane_bounds.width;
-         // geom_copy.dim[1] *= plane_bounds.height;
-
 
          this.gfx.vb.starts.buffer[0] += this.gfx.vb.counts.buffer[0];
       }
@@ -588,27 +580,10 @@ export class Text_Mesh extends Mesh {
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
-      // const width = Font_metrics_get_char_width(this.mat.uvIdx, _text)/2;
-      // const advancex = Font_get_font_advancex(this.mat.uvidx);
-
-      // const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, text);
-
-      // Set character dimentions. 
-      // geom_copy.dim[0] *= plane_bounds.width;
-      // geom_copy.dim[1] *= plane_bounds.height;
-      // Gl_set_dim_xy(gfx_copy, geom_copy.dim);
-
-      // Set character y position and advance.
-      // geom_copy.pos[0] +=  (advancex+plane_bounds.left) * 2 * this.fontsize;
-      // geom_copy.pos[1] += geom_copy.dim[1] + plane_bounds.yoffset * this.fontsize;
-      // geom_copy.pos[0] += Floor(this.fontsize * advancex);
-
       // Set the correct uv coordinates.
       this.mat.uv = Font_get_uv_coords(this.mat.uvIdx, text);
       geom_copy.dim[0] = 12; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
-      // const uvs = Font_get_char_uv_coords(this.mat.uvIdx, _text);
       Gl_set_uv(this.gfx, this.mat.uv);
-      // Gl_set_uv(gfx_copy, this.mat.uv);
 
    }
    /**SAVE FOR MSDF RENDER*/

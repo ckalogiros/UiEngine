@@ -88,6 +88,7 @@ class View {
 
 
 const _view_buffer = New_generic_buffer(_, 'Mesh buffer Views');
+export function View_buffer_reset() { _view_buffer.ResetFull(); }
 
 
 

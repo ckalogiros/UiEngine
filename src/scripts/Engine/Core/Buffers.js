@@ -942,6 +942,7 @@ export class M_Buffer {
 
 
 const _generic_buffers_container = new M_Buffer();
+export function Generic_buffers_container_reset() { _generic_buffers_container.ResetFull(); }
 
 export function Get_generic_buffers_container_get_total_allocations() { return _generic_buffers_container.active_count; }
 

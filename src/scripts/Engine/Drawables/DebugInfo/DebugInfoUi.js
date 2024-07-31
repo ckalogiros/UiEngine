@@ -4,10 +4,10 @@ import { Dropdown_roots_set_root, TEMP_DP_STEAL_THE_DP_RECALC } from "../Widgets
 import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
 import { Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_activate_all_vbs_in_renderqueue, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_buffer_get_count, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
-import { TimeIntervalsCreate, } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create, } from "../../Timers/TimeIntervals.js";
 import { Ui_create_label_switch } from "./DebugInfoUiFactory.js";
 import { BLACK, BLUEL, GREEN, GREY, ORANGEL, ORANGE_240_160_10, PURPLEB, REDL, WHITE } from "../Material/Base/Colors.js";
-import { NOTIFICATION_TYPE, Notifications_deactivate, Notifications_get_ui_widget, Notifications_set_ui_widget } from "./DebugInfoUiNotifications.js";
+import { NOTIFICATION_TYPE, Notifications_deactivate, Notifications_get_ui_widget, Notifications_initialize, Notifications_set_ui_widget } from "./DebugInfoUiNotifications.js";
 import { View_add_to_group, View_build_group_from_root_mesh, View_remove_view, View_get_count, View_remove_from_group, View_set_view_vb_start } from "../../Core/MeshBufferViews.js";
 import { Clipy_from_group, Clipy_from_tree_recursive, Clipy_one_mesh } from "../Operations/Clip.js";
 import { VBI_get_byidx, Vertex_buffer_get_Active_count, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_count, Vertex_buffer_group_get_size } from "../../../Graphics/Buffers/VertexBuffers.js";
@@ -15,12 +15,12 @@ import { Str_buffer_get_count, Str_buffer_get_size, Str_buffer_mesh_names_get_by
 import { GetRandomColor } from "../../../Helpers/Helpers.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Renderqueue_active_get_count, Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
-import { Mesh_unif_col_get_count, Mesh_unif_col_get_size, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_wpos_get_count, Mesh_unif_wpos_get_size } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_col_get_count, Mesh_unif_col_get_size, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_wpos_get_count, Mesh_unif_wpos_get_size, Screen_wpos_get_y } from "../../Core/MeshUniformsBuffer.js";
 import { Listeners_click_get_count, Listeners_hover_get_count, Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Widgets/ScrollerComponent.js";
+import { Components_create_scroller_component, Scoller_component_destroy, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Widgets/ScrollerComponent.js";
 
 
 
@@ -28,6 +28,20 @@ import { Components_create_scroller_component, Scoller_component_gengfx_and_rend
 
 
 
+
+
+
+
+
+
+export function Dbg_ui_info_all_reset() { 
+   Dbg_ui_reset_buffer_entries();
+   Dbg_ui_info_reset();
+   DEBUG_INFO.Reset();
+
+   NOTIFICATION_TYPE.Reset();
+   Notifications_initialize();
+}
 
 
 
@@ -1969,7 +1983,7 @@ function Debug_info_create_batch_info(params) {
    DEBUG_INFO.UI_BATCH.MESH_BUFFER_IDX = section.mesh_bufferidx;
    DEBUG_INFO.UI_BATCH.IS_ON = true;
 
-   const idx = TimeIntervalsCreate(64, 'Batch info ui', TIME_INTERVAL_REPEAT_ALWAYS, Debug_info_update_batch, { target_params: section });
+   const idx = Time_intervals_create(64, 'Batch info ui', TIME_INTERVAL_REPEAT_ALWAYS, Debug_info_update_batch, { target_params: section });
    section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
 }
@@ -2220,7 +2234,38 @@ let render_queue_buffer_ui_pos = [800, 600, 0];
  * Any 'debug_mesh' is not processed (by setting to -1).
  */
 const _ui_info_buffer = New_generic_buffer(_, '_ui_info_buffer');
+function Dbg_ui_info_reset() { _ui_info_buffer.ResetFull(); }
 
+
+
+
+export function Dbg_ui_init_buffer_entries() {
+
+
+   const entries_bufferidx = _ui_info_buffer.Add({
+      entries: New_generic_buffer(_, 'Entries of _ui_info_buffer'),
+      entries_flags: New_int8_buffer(_, 'NEW entries_flags'),
+   });
+
+   const ret = {
+      // params:params,
+      update: Dbg_ui_update_callback,
+      entries_bufferidx: entries_bufferidx,
+   };
+
+   return ret;
+
+}
+
+
+
+export function Dbg_ui_reset_buffer_entries() {
+
+   for(let i=0; i<=_ui_info_buffer.boundary; i++){
+      _ui_info_buffer.buffer[i].entries.ResetFull();
+      _ui_info_buffer.buffer[i].entries_flags.Reset();
+   }
+}
 
 
 
@@ -2391,25 +2436,6 @@ function Dbg_ui_update_callback(params) {
 
 }
 
-
-
-export function Dbg_ui_init_buffer_entries() {
-
-
-   const entries_bufferidx = _ui_info_buffer.Add({
-      entries: New_generic_buffer(_, 'Entries of _ui_info_buffer'),
-      entries_flags: New_int8_buffer(_, 'NEW entries_flags'),
-   });
-
-   const ret = {
-      // params:params,
-      update: Dbg_ui_update_callback,
-      entries_bufferidx: entries_bufferidx,
-   };
-
-   return ret;
-
-}
 
 
 
@@ -2625,7 +2651,6 @@ function TEMPORARY(mesh, parent, root_entry_dp){
       dp_mesh.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
       dp_mesh.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
 
-console.log(mesh.GetName())
       // Gather all info to a string buffr
       // const meshinfo = Helper_mesh_tree_info_create_more_info(mesh);
       const meshinfo = Mesh_info_builder(mesh);
@@ -3177,7 +3202,8 @@ export function Debug_info_mesh_per_vb_buffer_create_ui() {
       mesh_per_vb_buffer_ui_pos[1] = ui_widget.geom.pos[1],
       mesh_per_vb_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
-      View_remove_view(ui_widget.scrolled_section.group_bufferidxs);
+      Scoller_component_destroy(ui_widget.scroller_comp);
+      View_remove_view(ui_widget.group_bufferidxs);
       ui_widget.Destroy();
 
 
@@ -3195,6 +3221,7 @@ export function Debug_info_mesh_per_vb_buffer_create_ui() {
    }
 
 
+   mesh_per_vb_buffer_ui_pos[1] = Screen_wpos_get_y();
    const new_ui_widget = Dbg_info_ui_create_ui(mesh_per_vb_buffer_ui_pos, 'Mesh Per Vb Buffer');
 
    // Connect Vertex buffer notification with the root ui widget

@@ -24,8 +24,7 @@ class Callback_Animation {
       this.nameidx = INT_NULL;
       // this.nameidx = Str_buffer_store(name);
    }
-   
-   
+      
    
    Create(animationClbk, stopAnimationClbk, params, index=null, name) {
       this.params = params;
@@ -73,6 +72,20 @@ export function Callback_animations_initialize() {
 
 
 
+export function Callback_animations_destroy() {
+   for (let i = 0; i <= _clbk_animations_buffer.boundary; i++) {
+      
+      const anim = _clbk_animations_buffer.buffer[i];
+
+      if (anim.is_active) {
+         
+         anim.Stop();
+      }
+   }
+}
+
+
+
 function Get_next_free() {
 
    for (let i = 0; i <= _clbk_animations_buffer.boundary; i++) {
@@ -107,7 +120,7 @@ export function Callback_animations_create(animationClbk, stopAnimationClbk, par
 
 
 
-export function Callback_animations_runs() {
+export function Callback_animations_run() {
 
 
    for (let i = 0; i <= _clbk_animations_buffer.boundary; i++) {

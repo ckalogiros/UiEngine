@@ -17,6 +17,7 @@ const DISABLE_DEBUG = true;
 
 
 const _index_buffers = New_generic_buffer(_, 'GFX Index Buffer');
+export function Index_buffer_reset_buffer() { _index_buffers.ResetFull(); }
 
 
 
@@ -54,8 +55,8 @@ function Index_buffer_set_ib_data(gl, buffer) {
 
    buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
 
-   GL.BOUND_IBO = buffer.ibo;
-   GL.BOUND_IBIDX = buffer.ibidx;
+   GL_STATE.BOUND_IBO = buffer.ibo;
+   GL_STATE.BOUND_IBIDX = buffer.ibidx;
 
    console.log('----------------- INDEX BUFFER:BINDING AND SETTING DATA. ')
    console.log(' ibidx:', buffer.ibidx, 'count:', buffer.count, 'vCount:', buffer.vCount)
@@ -94,8 +95,29 @@ function Index_buffer_create(type, size) {
 
 
 const _index_buffers_info = New_generic_buffer(_, 'GFX Index Buffer Info');
+export function Index_buffer_info_reset_buffer() { 
+   Gl_index_buffer_info_ibo_delete_all();
+   _index_buffers_info.ResetFull(); 
+}
 
 
+
+export function Gl_index_buffer_info_ibo_delete(ibidx) {
+
+   const ibo = _index_buffers_info.buffer[ibidx].ibo;
+   gfxCtx.gl.deleteBuffer(ibo);
+}
+
+
+function Gl_index_buffer_info_ibo_delete_all() {
+
+   for(let i=0; i <= _index_buffers_info.boundary; i++){
+
+      const ibo = _index_buffers_info.buffer[i].ibo;
+      gfxCtx.gl.bindBuffer(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, null);
+      gfxCtx.gl.deleteBuffer(ibo);
+   }
+}
 
 export function Index_buffer_info_get() { return _index_buffers_info; }
 

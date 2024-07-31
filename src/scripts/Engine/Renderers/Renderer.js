@@ -3,7 +3,7 @@
 import { Gl_draw } from "../../Graphics/GlDraw.js";
 import { TimeSample, TimeUpdate } from "../Timers/Time.js";
 import { TimersUpdateGlobalTimer, Timers_update } from "../Timers/Timers.js";
-import { TimeIntervalsUpdateAll } from "../Timers/TimeIntervals.js";
+import { Time_intervals_update } from "../Timers/TimeIntervals.js";
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
 import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
@@ -13,7 +13,7 @@ import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../Sc
 import { Input_reset } from "../Controls/Input/Input.js";
 import { Mesh_animations_run } from "../Animations/MeshAnimations.js";
 import { Particle_system_update } from "../ParticlesSystem/ParticlesSystem.js";
-import { Callback_animations_runs } from "../Animations/CallbackAnimations.js";
+import { Callback_animations_run } from "../Animations/CallbackAnimations.js";
 
 
 
@@ -29,6 +29,12 @@ export function Renderer_create_renderer(scene, camera) {
    return _renderer;
 }
 
+
+
+
+export function Renderer_create_gl_context(){
+   _renderer.CreateGlContext();
+}
 
 
 export class Renderer {
@@ -65,6 +71,19 @@ export class Renderer {
       this.canvas.height = height;
    }
 
+   CreateGlContext(){
+
+      this.canvas = document.getElementById("canvas");
+
+      this.canvas.width = VIEWPORT.WIDTH;
+      this.canvas.height = VIEWPORT.HEIGHT;
+
+      const ctx = Renderer_create_webgl_context(this.canvas);
+      this.gfxctx = ctx.gfxctx;
+      this.extensions = ctx.extensions;
+   }
+
+
    Render() {
 
       if (STATE.loop.paused === false) {
@@ -74,17 +93,17 @@ export class Renderer {
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
-         TimeIntervalsUpdateAll(); // Update and run callbacks for each interval timer that has been set.
+         Time_intervals_update(); // Update and run callbacks for each interval timer that has been set.
          TimersUpdateGlobalTimer(); // This is a globbal timer, going only forward
          Timers_update();
-         // TimersUpdateStepTimers();
+         // Step_timers_update();
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Animations);
          Mesh_animations_run();
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Animations);
 
-         Callback_animations_runs();
+         Callback_animations_run();
 
          Framebuffer_update_draw();
          this.scene.OnUpdate();
@@ -254,7 +273,6 @@ function Renderer_create_webgl_context(canvas) {
 
    return { gfxctx: gfxctx, extensions: extensions };
 }
-
 
 
 

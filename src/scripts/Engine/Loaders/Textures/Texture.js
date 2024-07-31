@@ -8,11 +8,43 @@ import { ImageLoader } from "../ImageLoader.js";
 
 
 
+// TODO: Make texture buffer from New_generic_buffer();
+
+
+
 
 const TEXTURES_MAX_COUNT = 16;
-const _textureBuffer = [];
+var _textureBuffer = [];
 let _textureBufferCount = 0;
 
+
+export function Texture_buffer_reset() {
+	Gl_texture_unit_delete_all();
+	_textureBuffer = [];
+	_textureBufferCount = 0;
+}
+
+// TODOD: Name the texture index. Is it stored in meshes texidx???????
+function Gl_texture_unit_delete(NAME_ME) {
+
+	const tbo = _textureBuffer[NAME_ME];
+	gfxCtx.gl.deleteTexture(tbo);
+}
+
+
+function Gl_texture_unit_delete_all() {
+
+	for (let i = 0; i < _textureBuffer.length; i++) {
+
+		if(_textureBuffer[i] !== null){
+			
+			const tbo = _textureBuffer[i].tbo;
+			gfxCtx.gl.activeTexture(_textureBuffer[i].tex_unit_id);
+			gfxCtx.gl.bindTexture(gfxCtx.gl.TEXTURE_2D, null);
+			gfxCtx.gl.deleteTexture(tbo);
+		}
+	}
+}
 
 
 function Get_next_free_index() {
@@ -27,12 +59,12 @@ function Get_next_free_index() {
 
 
 
-function Texture_create_texture(gl, textureid, img, name='Texture UNAMED') {
+function Texture_create_texture(gl, textureid, img, name = 'Texture UNAMED') {
 
 	const idx = Get_next_free_index();
 	_textureBuffer[idx] = Gl_texture_unit_create(gl, textureid, idx, img);
 	_textureBuffer[idx].nameidx = Str_buffer_store(name);
-	
+
 	return idx;
 }
 
@@ -58,15 +90,15 @@ export function Texture_get_texture_byidx(idx) {
 
 function Texture_is_loaded(textureid, TEX_TYPE) {
 
-	for(let i=0; i<_textureBufferCount; i++){
-		if(TEX_TYPE & TEXTURE_TYPE.TYPE_FONT){
-			if(_textureBuffer[i] && _textureBuffer[i].texid === textureid)
-			return i
+	for (let i = 0; i < _textureBufferCount; i++) {
+		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) {
+			if (_textureBuffer[i] && _textureBuffer[i].texid === textureid)
+				return i
 		}
 		// TODO: Maybe create a spesific to framebuffers TEXTURE_TYPE constant
-		else if(TEX_TYPE & TEXTURE_TYPE.TYPE_TEXTURE){
-			if(_textureBuffer[i] && _textureBuffer[i].texid === textureid)
-			return i
+		else if (TEX_TYPE & TEXTURE_TYPE.TYPE_TEXTURE) {
+			if (_textureBuffer[i] && _textureBuffer[i].texid === textureid)
+				return i
 
 		}
 	}
@@ -86,20 +118,20 @@ export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 
 		// Load the texture image
 		const img = ImageLoader.Load(TEXTURE_PATHS[textureid].imgPath, TEXTURE_PATHS[textureid].imgName, TEXTURE_PATHS[textureid].imgType);
-		
+
 		// Create webGl texture
 		texture_idx = Texture_create_texture(gfxCtx.gl, textureid, img, TEXTURE_PATHS[textureid].imgName);
 
-		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT){
+		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) {
 			Font_create_uvmap(textureid);
 
 			uvmap_idx = Font_load_uvs(textureid);
 		}
 	}
 	else {
-		texture_idx = texidx; 
+		texture_idx = texidx;
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT)
-				uvmap_idx = Font_retrieve_fontidx(textureid);// the index for the texture metrics in the font metrics buffer
+			uvmap_idx = Font_retrieve_fontidx(textureid);// the index for the texture metrics in the font metrics buffer
 	}
 
 	return { texidx: texture_idx, uvmapidx: uvmap_idx };
@@ -107,8 +139,8 @@ export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 
 
 
-export function Texture_create_renderbuffer_texture(gl, textureid, width, height, name='Renderbuffer UNAMED') {
-	
+export function Texture_create_renderbuffer_texture(gl, textureid, width, height, name = 'Renderbuffer UNAMED') {
+
 	const idx = Get_next_free_index();
 	_textureBuffer[idx] = Gl_texture_unit_create(gl, textureid, idx, null, width, height);
 	_textureBuffer[idx].nameidx = Str_buffer_store(name);
@@ -118,8 +150,25 @@ export function Texture_create_renderbuffer_texture(gl, textureid, width, height
 
 
 
-export function Texture_set_texture_name(texidx, name='UNAMED') {
-	
+export function Texture_set_texture_name(texidx, name = 'UNAMED') {
+
 	_textureBuffer[texidx].nameidx = Str_buffer_store(name);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Debug Print
+export function Texture_buffer_print(){
+	console.log(_textureBuffer);
+}

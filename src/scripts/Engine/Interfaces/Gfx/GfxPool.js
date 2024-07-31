@@ -1,9 +1,14 @@
 "use strict";
 
-import { Index_buffer_info_get } from "../../../Graphics/Buffers/IndexBuffers.js";
-import { VBI_get_byidx, VBI_get_whole_buffer, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Index_buffer_info_get, Index_buffer_info_reset_buffer, Index_buffer_reset_buffer } from "../../../Graphics/Buffers/IndexBuffers.js";
+import { Uniform_blocks_buffer_reset, Uniforms_buffer_reset } from "../../../Graphics/Buffers/UniformBuffers.js";
+import { Gl_vertex_array_object_reset } from "../../../Graphics/Buffers/VertexArrays.js";
+import { VBI_get_byidx, VBI_get_whole_buffer, Vertex_buffer_get_by_vbidx, Vertex_buffer_reset, Vertex_buffer_group_get, Vertex_buffer_group_reset, Vertex_buffer_info_reset, Vertex_buffer_reset_full } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_remove_geometry } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Progarm_get_program } from "../../../Graphics/ShaderPrograms.js";
+import { Shader_attributes_reset } from "../../../Graphics/ShaderAttributes.js";
+import { Progarm_get_program, Program_reset } from "../../../Graphics/ShaderPrograms.js";
+import { Texture_buffer_reset } from "../../Loaders/Textures/Texture.js";
+import { Renderer_create_gl_context } from "../../Renderers/Renderer.js";
 
 
 /**
@@ -22,18 +27,38 @@ import { Progarm_get_program } from "../../../Graphics/ShaderPrograms.js";
 
 
 
-export function Gfx_pool_find_notActive_and_notPrivate_vb(progidx) {
-   alert('IMPLEMENT ME. GfxPool.js\n Gfx_pool_find_notActive_and_notPrivate_vb()')
-   // 
-   const prog = Progarm_get_program(progidx);
+export function Gfx_pool_vb_reset() {
+   
+   
+   // const vb_info_buffer = Vertex_buffer_group_get();
 
-   for(let i=0; i <= prog.vb.boundary; i++){
+   // for (let i = 0; i <= vb_info_buffer.boundary; i++) {
 
-      const vb = Vertex_buffer_get_by_vbidx(prog.vb.buffer[i]);
-      if (!vb.inUse && !vb.isPrivate) return vb;
-   }
+   //    if((vb_info_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE)){
 
-   return null;
+   //       vb_info_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
+   //       vb_info_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
+   //    }
+   // }
+
+   Vertex_buffer_reset_full();
+   Vertex_buffer_info_reset();
+   Vertex_buffer_group_reset();
+
+   Index_buffer_reset_buffer();
+   Index_buffer_info_reset_buffer();
+
+   Texture_buffer_reset();
+
+   Gl_vertex_array_object_reset();
+
+   Program_reset();
+   Shader_attributes_reset();
+
+   Uniforms_buffer_reset();
+   // Uniform_blocks_buffer_reset();
+
+   // Renderer_create_gl_context();
 }
 
 
@@ -49,7 +74,6 @@ export function Gfx_pool_remove_geometry(gfx, num_faces, start_index, debug_mesh
 export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags) {
 
    const vb_info_buffer = Vertex_buffer_group_get();
-   // const vb_info_buffer = VBI_get_whole_buffer();
 
    // Return first buffer match
    if(pool_request_flags & GFX_POOL_REQUESTS.ANY){ 

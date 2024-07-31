@@ -530,7 +530,6 @@ export class Widget_Minimize extends Widget_Button {
          if (!minim_mesh.toggle) {  // Minimize - toggle off
 
             // Copy root's children to a buffer
-            // minim_mesh.stored_children_meshes = New_generic_buffer(root.children, 'minim_mesh.stored_children_meshes'); // TODO: Maybe copying all children is not efficient. Just get the pointer and use it later on maximize
             minim_mesh.stored_children_meshes = root.children;
 
 

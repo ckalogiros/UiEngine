@@ -45,16 +45,32 @@ class RenderQueueData {
 
 class RenderQueue {
 
+   
    buffer = [];
    count = 0;
    size = 0;
    active = [];
    activeCount = 0;
    needs_update = false; 
-
-
+   
    constructor() {
       this.size = MAX_DRAWQUEUE_COUNT;
+      // this.buffer = [];
+      // this.count = 0;
+      // this.size = 0;
+      // this.active = [];
+      // this.activeCount = 0;
+      // this.needs_update = false; 
+   }
+
+   
+   Reset(){
+      this.buffer = [];
+      this.count = 0;
+      this.size = MAX_DRAWQUEUE_COUNT;
+      this.active = [];
+      this.activeCount = 0;
+      this.needs_update = false; 
    }
 
 
@@ -64,20 +80,6 @@ class RenderQueue {
          this.buffer[i] = new RenderQueueData;
       }
    }
-
-
-   // Deactivate(vb_groupidx) {
-
-   //    const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
-
-   //    if (idx !== INT_NULL && idx < this.count - 1) {
-
-   //       this.buffer[idx].flags &= ~RENDER_QUEUE_FLAGS.IS_ACTIVE;
-   //       this.RebuildActiveQueue();
-
-   //       Vertex_buffer_group_set_render_queueidx(vb_groupidx, INT_NULL);
-   //    }
-   // }
 
 
    RebuildActiveQueue() { // Recreates an array of all active vertex buffers from the draw queue on every Frame.
@@ -95,11 +97,6 @@ class RenderQueue {
       // Active queuuue is updated, remove the needs update flag
       _render_queue.needs_update = false;
    }
-
-
-   // UpdateActiveQueueByIdx(idx) { // Recreates an array of all active vertex buffers from the draw queue on every Frame.
-   //    this.active[this.activeCount++] = this.buffer[idx];
-   // }
 
 
    Add(progidx, vb_groupidx, ibidx, isActive) {
@@ -234,6 +231,34 @@ export function Renderqueue_active_get_count() { return _render_queue.activeCoun
 
 
 
+export function Renderqueue_Add(progidx, vb_groupidx, ibidx, isActive) {
+   _render_queue.Add(progidx, vb_groupidx, ibidx, isActive);
+}
+
+
+
+export function Renderqueue_set_flags(vb_groupidx, flags) {
+
+   const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
+   _render_queue.buffer[idx].flags |= flags;
+}
+
+
+
+
+export function Renderqueue_init() {
+   _render_queue.Init(); // One time initialization(creates an empty buffer...)
+}
+
+
+
+
+export function Renderqueue_reset() {
+   _render_queue.Reset();
+   _render_queue.Init(); // One time initialization(creates an empty buffer...)
+}
+
+
 export function Renderqueue_get_byidx(idx) { return _render_queue.buffer[idx]; }
 
 
@@ -284,26 +309,6 @@ export function Renderqueue_set_active(vb_groupidx, isActive) {
 
 }
 
-
-
-export function Renderqueue_Add(progidx, vb_groupidx, ibidx, isActive) {
-   _render_queue.Add(progidx, vb_groupidx, ibidx, isActive);
-}
-
-
-
-export function Renderqueue_set_flags(vb_groupidx, flags) {
-
-   const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
-   _render_queue.buffer[idx].flags |= flags;
-}
-
-
-
-
-export function Renderqueue_init() {
-   _render_queue.Init(); // One time initialization(creates an empty buffer...)
-}
 
 
 
