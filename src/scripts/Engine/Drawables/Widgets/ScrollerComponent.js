@@ -2,8 +2,8 @@
 
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
-import { Widget_root_gfx_reset_mesh_per_vb_buffer, Widget_root_rerender, Widget_root_rerender_from_root_reconstruct_listeners, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wposy, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { GREY } from "../Material/Base/Colors.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
@@ -276,8 +276,8 @@ function Scroller_component_on_update_handle(_params) {
    // Construct_listen_events_from_mesh_tree(scrolled_section);
    // Construct_listen_events_relations_from_mesh_tree(scrolled_section);
 
-   Widget_root_reset_gfx(scrolled_section.root_bufferidx)
-   Widget_root_rerender_from_root_reconstruct_listeners(scrolled_section.root_bufferidx);
+   Root_group_reset_gfxs(scrolled_section.root_bufferidx)
+   Root_group_rerender_from_root_reconstruct_listeners(scrolled_section.root_bufferidx);
    
 }
 
@@ -370,7 +370,6 @@ function Scroller_component_onClick(params) {
    //    mesh.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS;
    //    STATE.mesh.SetGrabed(mesh);
    //    STATE.mesh.SetFocused(mesh);
-   //    Widget_root_set_in_focus(mesh.root_bufferidx);
    
    //    return true;
    // }
@@ -396,7 +395,6 @@ function Scroller_component_onClick(params) {
          // STATE.mesh.SetFocused(mesh);
          // mesh.state.mask |= MESH_STATE.IN_FOCUS;
          bar.StateEnable(MESH_STATE.IN_GRAB);
-         // Widget_root_set_in_focus(mesh.root_bufferidx);
       }
 
       return true;

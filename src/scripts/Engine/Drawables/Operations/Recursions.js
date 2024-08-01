@@ -1,6 +1,7 @@
 "use strict";
 
-import { Mesh_buffer_get_mesh_byidx, Widget_root_buffer_get_root_meshidx } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
+import { Root_group_view_buffer_get_root_meshidx } from "../../Core/Views/RootView.js";
 import { Listener_assign_parent_event, Listener_create_root_view } from "../../Events/EventListeners.js";
 
 
@@ -55,7 +56,7 @@ export function Find_parent_listen_event(EVENT_TYPE_IDX, mesh) {
 
     // If no parent with event is found, create FAKE event at the widget root
     if (current === null) { // UNNECESSARY: I believe if break is not reached, then current will go to scene which is 'NO_MESH_PARENT'
-        const root_meshidx = Widget_root_buffer_get_root_meshidx(mesh.root_bufferidx)
+        const root_meshidx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx)
         current = Mesh_buffer_get_mesh_byidx(root_meshidx)
     }
 

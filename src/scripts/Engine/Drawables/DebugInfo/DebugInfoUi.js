@@ -3,7 +3,7 @@
 import { Dropdown_roots_set_root, TEMP_DP_STEAL_THE_DP_RECALC } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
 import { Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx, Widget_root_activate_all_vbs_in_renderqueue, Widget_root_buffer_get, Widget_root_buffer_get_byidx, Widget_root_buffer_get_count, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_render_queue_flags } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx } from "../../Core/MeshBuffer.js";
 import { Time_intervals_create, } from "../../Timers/TimeIntervals.js";
 import { Ui_create_label_switch } from "./DebugInfoUiFactory.js";
 import { BLACK, BLUEL, GREEN, GREY, ORANGEL, ORANGE_240_160_10, PURPLEB, REDL, WHITE } from "../Material/Base/Colors.js";
@@ -21,6 +21,7 @@ import { Info_listener_create_event, Info_listener_remove_event } from "./InfoLi
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_destroy, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Widgets/ScrollerComponent.js";
+import { Root_group_activate_all_vbs_in_renderqueue, Root_group_view_buffer_get, Root_group_view_buffer_get_byidx, Root_group_view_buffer_get_count, Root_group_rerender, Root_group_reset_gfxs, Root_group_set_render_queue_flags } from "../../Core/Views/RootView.js";
 
 
 
@@ -188,7 +189,7 @@ export function Debug_info_ui_static(){
    section.Calc_no_gfx_update();
 
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
 
@@ -338,7 +339,7 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,80,0]) {
       dp.Calc_no_gfx_update();
 
       dp.Render();
-      Widget_root_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
 
       dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
 
@@ -484,7 +485,7 @@ function Debug_info_create_ui_stats() {
       ms = (g_ms) ? g_ms : 500;
       const i1 = Create_widget_multi_text(_, 'Widget Roots Buffer:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
       i1.CreateNewText('000000', fontsizedynamic, ORANGE_240_160_10, dt_pad, .9);
-      i1.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Widget_root_buffer_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
+      i1.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Root_group_view_buffer_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       section.AddItem(i1);
 
    }
@@ -663,7 +664,7 @@ function Debug_info_create_ui_stats() {
    section.Calc_no_gfx_update();
 
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
 
@@ -672,7 +673,7 @@ function Debug_info_create_ui_stats() {
    Construct_listen_events_relations_from_mesh_tree(section);
 
 
-   Widget_root_set_render_queue_flags(section.root_bufferidx, RENDER_QUEUE_FLAGS.SKIP_PRIORITY);
+   Root_group_set_render_queue_flags(section.root_bufferidx, RENDER_QUEUE_FLAGS.SKIP_PRIORITY);
 
 
    DEBUG_INFO.UI_STATS.MESH_BUFFER_IDX = section.mesh_bufferidx;
@@ -1081,7 +1082,7 @@ function Debug_info_create_ui_performance_timers() {
    Mesh_unif_set_vb_root_wpos(section.root_posidx, VIEWPORT.RIGHT - w * 2, 0);
 
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
         
@@ -1161,7 +1162,7 @@ function Debug_info_create_ui_mouse() {
    section.Calc_no_gfx_update();
 
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
         
@@ -1271,7 +1272,7 @@ export function Debug_info_create_ui_focused() {
    Clipy_from_group(section.group_bufferidxs[0], clip_top, clip_bottom);
    
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
    
@@ -1470,7 +1471,7 @@ function Debug_info_update_ui_focused(params) {
    }
 
 
-   Widget_root_reset_gfx(scroller.root_bufferidx);
+   Root_group_reset_gfxs(scroller.root_bufferidx);
 
    // scroller.ScrollerAlignWithItemsRecalc();
 
@@ -1483,7 +1484,7 @@ function Debug_info_update_ui_focused(params) {
    const clip_top = scroller.GetPosY();
    const clip_bottom = clip_top + scroller.geom.dim[1] * 2;
    Clipy_from_tree_recursive(scroller.scrolled_section, clip_top, clip_bottom);
-   Widget_root_rerender(scroller.root_bufferidx);
+   Root_group_rerender(scroller.root_bufferidx);
 
 }
 
@@ -1713,7 +1714,7 @@ function Debug_info_create_mesh_info(params) {
    // Deactivate/Destroy/Close the DebugMeshInfoUi 
    if (DEBUG_INFO.UI_MESH.IS_ON) {
 
-      const widget_root = Widget_root_buffer_get_byidx(DEBUG_INFO.UI_MESH.ROOT_IDX);
+      const widget_root = Root_group_view_buffer_get_byidx(DEBUG_INFO.UI_MESH.ROOT_IDX);
       const scroller = Mesh_buffer_get_mesh_byidx(widget_root.buffer[0]);
 
       Info_listener_remove_event(scroller.debug_info.evtidx);
@@ -1725,7 +1726,8 @@ function Debug_info_create_mesh_info(params) {
          scroller.geom.pos[2],
       ];
 
-      View_remove_view(scroller.scrolled_section.group_bufferidxs);
+      Scoller_component_destroy(ui_widget.scroller_comp);
+      View_remove_view(scroller.group_bufferidxs);
       scroller.Destroy();
 
 
@@ -1767,7 +1769,7 @@ function Debug_info_create_mesh_info(params) {
 
 
    // Create the dropdown structure representing all the applications's meshes
-   const root_meshes_idxs = Widget_root_buffer_get();
+   const root_meshes_idxs = Root_group_view_buffer_get();
    for (let i = 0; i <= root_meshes_idxs.boundary; i++) {
 
       if(root_meshes_idxs.buffer[i]){
@@ -1785,7 +1787,7 @@ function Debug_info_create_mesh_info(params) {
    // scroller.ScrollerAlignWithItemsRecalc();
 
    scroller.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(scroller.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(scroller.root_bufferidx);
 
    scroller.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scroller.gfx.vb.groupidx)
         
@@ -1883,7 +1885,7 @@ function Debug_info_mesh_update(params) {
       dp_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, gfx_idxs);
       root_info_dp.Calc_no_gfx_update();
       dp_mesh.Render();
-      Widget_root_activate_all_vbs_in_renderqueue(dp_mesh.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(dp_mesh.root_bufferidx);
       dp_mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp_mesh.gfx.vb.groupidx);
 
    }
@@ -1971,7 +1973,7 @@ function Debug_info_create_batch_info(params) {
    section.Calc_no_gfx_update();
 
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
         
@@ -2312,7 +2314,7 @@ function Dbg_info_ui_create_ui(pos, name) {
    scrolled.Calc_no_gfx_update();
 
    scrolled.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(scrolled.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(scrolled.root_bufferidx);
 
    scrolled.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scrolled.gfx.vb.groupidx)
         
@@ -2475,7 +2477,8 @@ export function Debug_info_mesh_tree_create_ui() {
       mesh_tree_ui_pos[1] = ui_widget.geom.pos[1],
       mesh_tree_ui_pos[2] = ui_widget.geom.pos[2],
 
-      View_remove_view(ui_widget.scrolled_section.group_bufferidxs);
+      Scoller_component_destroy(ui_widget.scroller_comp);
+      View_remove_view(ui_widget.group_bufferidxs);
       ui_widget.Destroy();
 
 
@@ -2526,7 +2529,7 @@ function Dbg_ui_mesh_tree_create_entry(params) {
 
    
 
-   const widget_roots = Widget_root_buffer_get();
+   const widget_roots = Root_group_view_buffer_get();
    const len = widget_roots.boundary; // Avoid infinite loop (Avoid creating info for self debug UI's)
    
    for (let i = 0; i <= len; i++) {
@@ -2765,10 +2768,11 @@ export function Debug_info_mesh_buffer_create_ui() {
       
       // Remember the ui's position based on the dropdown which is responsible of setting the position of the ui_widget widget arround it..
       mesh_buffer_ui_pos[0] = ui_widget.geom.pos[0],
-         mesh_buffer_ui_pos[1] = ui_widget.geom.pos[1],
-         mesh_buffer_ui_pos[2] = ui_widget.geom.pos[2],
+      mesh_buffer_ui_pos[1] = ui_widget.geom.pos[1],
+      mesh_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
-         View_remove_view(ui_widget.scrolled_section.group_bufferidxs);
+      Scoller_component_destroy(ui_widget.scroller_comp);
+      View_remove_view(ui_widget.group_bufferidxs);
       ui_widget.Destroy();
 
 
@@ -2990,7 +2994,8 @@ export function Debug_info_string_buffer_create_ui() {
       string_buffer_ui_pos[1] = ui_widget.geom.pos[1],
       string_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
-      View_remove_view(ui_widget.scrolled_section.group_bufferidxs);
+      Scoller_component_destroy(ui_widget.scroller_comp);
+      View_remove_view(ui_widget.group_bufferidxs);
       ui_widget.Destroy();
 
 
@@ -3430,10 +3435,11 @@ function Debug_info_vertex_buffer_create_ui() {
 
       // Remember the ui's position based on the dropdown which is responsible of setting the position of the ui_widget widget arround it..
       vertex_buffer_ui_pos[0] = ui_widget.geom.pos[0],
-         vertex_buffer_ui_pos[1] = ui_widget.geom.pos[1],
-         vertex_buffer_ui_pos[2] = ui_widget.geom.pos[2],
-
-         View_remove_view(ui_widget.scrolled_section.group_bufferidxs);
+      vertex_buffer_ui_pos[1] = ui_widget.geom.pos[1],
+      vertex_buffer_ui_pos[2] = ui_widget.geom.pos[2],
+      
+      Scoller_component_destroy(ui_widget.scroller_comp);
+      View_remove_view(ui_widget.group_bufferidxs);
       ui_widget.Destroy();
 
 
@@ -3613,6 +3619,7 @@ function Debug_info_render_queue_buffer_create_ui() {
       render_queue_buffer_ui_pos[1] = ui_widget.geom.pos[1],
       render_queue_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
+      Scoller_component_destroy(ui_widget.scroller_comp);
       View_remove_view(ui_widget.group_bufferidxs);
       ui_widget.Destroy();
 

@@ -5,9 +5,10 @@
 import { Callback_animations_create } from '../../Engine/Animations/CallbackAnimations.js';
 import { Mesh_animations_create } from '../../Engine/Animations/MeshAnimations.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
-import { Mesh_buffer_get_mesh_byidx, Widget_root_activate_all_vbs_in_renderqueue, Widget_root_set_render_queue_priority } from '../../Engine/Core/MeshBuffer.js';
+import { Mesh_buffer_get_mesh_byidx } from '../../Engine/Core/MeshBuffer.js';
 import { View_build_group_from_root_mesh } from '../../Engine/Core/MeshBufferViews.js';
-import { Mesh_unif_add_vb_root_wposx, Mesh_unif_add_vb_root_wposy, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from '../../Engine/Core/MeshUniformsBuffer.js';
+import { Mesh_unif_add_vb_root_wposx, Mesh_unif_add_vb_root_wposy, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy, Screen_wpos_get_y } from '../../Engine/Core/MeshUniformsBuffer.js';
+import { Root_group_activate_all_vbs_in_renderqueue, Root_group_set_render_queue_priority } from '../../Engine/Core/Views/RootView.js';
 import { Debug_info_ui } from '../../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { BLACK, BLUEL, GREEN, GREY, Interpolate_rgb_to_01, ORANGE, ORANGEL, ORANGER, PURPLEB, PURPLER, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Drawables/Operations/Recursions.js';
@@ -375,7 +376,7 @@ export function CreateGlowParticles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CRE
       slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
       slider_section.Calc_no_gfx_update();
       slider_section.Render();
-      Widget_root_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
 
       Construct_listen_events_from_mesh_tree(slider_section);
       Construct_listen_events_relations_from_mesh_tree(slider_section);
@@ -482,7 +483,7 @@ export function CreateBallTailParticles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10,
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
@@ -702,7 +703,7 @@ export function CreateBallTailParticles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10,
       slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
       slider_section.Calc_no_gfx_update();
       slider_section.Render();
-      Widget_root_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
 
 
       Construct_listen_events_from_mesh_tree(slider_section);
@@ -1126,7 +1127,7 @@ export function CreateSmokeParticles(x = 0, y = 0) {
    slider_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
    slider_section.Calc_no_gfx_update();
    slider_section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
 
 
    Construct_listen_events_from_mesh_tree(slider_section);
@@ -1302,7 +1303,7 @@ export function TestNoiseShader() {
                colorpicker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
                colorpicker.Calc_no_gfx_update();
                colorpicker.Render();
-               Widget_root_activate_all_vbs_in_renderqueue(colorpicker.root_bufferidx);
+               Root_group_activate_all_vbs_in_renderqueue(colorpicker.root_bufferidx);
 
                colorpicker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, colorpicker.gfx.vb.groupidx);
 
@@ -1537,7 +1538,7 @@ export function TestNoiseShader() {
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
    section.Calc_no_gfx_update();
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
   
    Construct_listen_events_from_mesh_tree(section);
@@ -1575,7 +1576,7 @@ export function TestNoiseShader() {
    s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
    s.Calc_no_gfx_update();
    s.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(s.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(s.root_bufferidx);
 
    s.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, s.gfx.vb.groupidx);
 
@@ -1648,7 +1649,7 @@ function CreateSidePanel(root_widget = ROOT_WIDGETS.CREATE_ROOT, render_target =
       section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
       section.Calc_no_gfx_update();
       section.Render();
-      Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
@@ -1745,6 +1746,7 @@ function CreateSidePanel(root_widget = ROOT_WIDGETS.CREATE_ROOT, render_target =
 
    return section;
 }
+
 function CreateSidePanelHorizontal(root_widget = ROOT_WIDGETS.CREATE_ROOT, render_target = false, height=300) {
 
    // const height = VIEWPORT.HEIGHT/2;
@@ -1780,7 +1782,7 @@ function CreateSidePanelHorizontal(root_widget = ROOT_WIDGETS.CREATE_ROOT, rende
       section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
       section.Calc_no_gfx_update();
       section.Render();
-      // Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
@@ -2044,7 +2046,7 @@ export function Demo_glow_particles_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x 
                colorpicker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
                colorpicker.Calc_no_gfx_update();
                colorpicker.Render();
-               Widget_root_activate_all_vbs_in_renderqueue(colorpicker.root_bufferidx);
+               Root_group_activate_all_vbs_in_renderqueue(colorpicker.root_bufferidx);
 
                colorpicker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, colorpicker.gfx.vb.groupidx)
       
@@ -2282,7 +2284,7 @@ export function Demo_glow_particles_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x 
       controls_dp.Calc_no_gfx_update();
 
       controls_dp.Render();
-      Widget_root_activate_all_vbs_in_renderqueue(controls_dp.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(controls_dp.root_bufferidx);
 
 
       Construct_listen_events_from_mesh_tree(controls_dp);
@@ -2597,7 +2599,7 @@ export function Demo_ball_tail() { // Side Panel
    side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
    side_panel.Recalc_no_gfx_update();
    side_panel.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(side_panel.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(side_panel.root_bufferidx);
 
    side_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, side_panel.gfx.vb.groupidx);
 
@@ -2936,7 +2938,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
                colorpicker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
                colorpicker.Calc_no_gfx_update();
                colorpicker.Render();
-               Widget_root_activate_all_vbs_in_renderqueue(colorpicker.root_bufferidx);
+               Root_group_activate_all_vbs_in_renderqueue(colorpicker.root_bufferidx);
 
                colorpicker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, colorpicker.gfx.vb.groupidx)
       
@@ -3257,7 +3259,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
                colorpicker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
                colorpicker.Calc_no_gfx_update();
                colorpicker.Render();
-               Widget_root_activate_all_vbs_in_renderqueue(colorpicker.root_bufferidx);
+               Root_group_activate_all_vbs_in_renderqueue(colorpicker.root_bufferidx);
 
                colorpicker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, colorpicker.gfx.vb.groupidx);
 
@@ -3522,7 +3524,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
    // side_panel.SetPosXNoGfxUpdate(VIEWPORT.WIDTH - side_panel.geom.dim[0]*2)
 
    side_panel.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(side_panel.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(side_panel.root_bufferidx);
 
   
    Construct_listen_events_from_mesh_tree(side_panel);
@@ -3856,7 +3858,7 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
                const colorpicker = CreateColorPicker(x, y + tail_particles.section.geom.dim[1] * 2, _, ROOT_WIDGETS.CREATE_ROOT);
                
                // Renderqueue_set_priority_by_vb(FIRST, colorpicker.gfx.vb.groupidx);
-               Widget_root_set_render_queue_priority(colorpicker.root_bufferidx);
+               Root_group_set_render_queue_priority(colorpicker.root_bufferidx);
 
                colorpicker.AssignTargetMeshClbk((params) => {
                   const color = params;
@@ -4076,7 +4078,7 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
       side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
       side_panel.Recalc_no_gfx_update();
       side_panel.Render();
-      Widget_root_activate_all_vbs_in_renderqueue(side_panel.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(side_panel.root_bufferidx);
 
       side_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, side_panel.gfx.vb.groupidx);
       
@@ -4212,7 +4214,7 @@ export function Demo_all() { // Side Panel
    /****************************************************************************************************************/
    // Side panel
 
-   const side_panel = CreateSidePanel(ROOT_WIDGETS.CREATE_ROOT, _, side_panel_width+scroller_panel_width);
+   const side_panel = CreateSidePanel(ROOT_WIDGETS.CREATE_ROOT, _, side_panel_width+scroller_panel_width*2);
    side_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
    
       
@@ -4221,7 +4223,7 @@ export function Demo_all() { // Side Panel
    const inner_section = side_panel.children.buffer[1];
    
 
-   const s = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [0, 0, 0], [10, 10], TRANSPARENCY(BLUEL[4], 1), 'Controls', [0, 10, 1.8]);
+   const s = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [0, -Screen_wpos_get_y(), 0], [10, 10], TRANSPARENCY(BLUEL[4], 1), 'Controls', [0, 10, 1.8]);
    s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    s.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
    
@@ -4236,20 +4238,23 @@ export function Demo_all() { // Side Panel
    
    inner_section.AddItem(s);
 
-
+   // side_panel.MoveXNoGfxUpdate(-30)
+   // side_panel.geom.pos[0] -= 30;
 
 
    // Render side panel
    side_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    side_panel.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX
 
-   side_panel.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-   side_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, side_panel.mesh_bufferidx);
-   // side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-   side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   // side_panel.gfx_ctx_flags |= GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC|GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+   // side_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, side_panel.mesh_bufferidx);
+   side_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, side_panel.mesh_bufferidx);
+
+   // side_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   side_panel.GenGfxCtx();
    side_panel.Recalc_no_gfx_update();
    side_panel.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(side_panel.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(side_panel.root_bufferidx);
 
    Construct_listen_events_from_mesh_tree(side_panel);
    Construct_listen_events_relations_from_mesh_tree(side_panel);
@@ -4264,7 +4269,6 @@ export function Demo_all() { // Side Panel
    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(s.root_posidx , scroller_component.root_posidx);
    Listeners_set_priority(E.H, scroller_component.listeners)
    Listeners_set_priority(E.C, scroller_component.listeners)
-
 
 
 

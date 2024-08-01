@@ -56,23 +56,14 @@ export const VIEW_INFO = {
 
 
 /**
- * 
- * Θελουμε το mesh, απο το οποιο θα αντλησουμε τα starts
- * και μαλλον τα num_faces
-   
-   NEW
-   view:[]
-      .buffer[i]:       {vb:[]GenericBuffer} For all vb_groupidxs
-         .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
-            .info:    {num_faces:int, starts:[]},
-            .mesh_data:      meshidx
-
-   OLD
-   view:[]
-      .buffer[i]:       {vb:[]GenericBuffer}
-         .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
-            .info:      [PROGIDX, VB_GROUP_IDX, IBIDX, START, NUM_FACES],
-            .data:      meshidx
+ * View Group struct 
+ *  
+ *  view:[]
+ *     .buffer[i]:       {vb:[]GenericBuffer} Stores all vb_groupidxs that the meshes of the group belong.
+ *        .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
+ *           .info:      {num_faces:int, starts:[]},
+ *           .mesh_data: [meshidx, meshidx, ...]
+ *
  */
 
 class View {
@@ -409,7 +400,22 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
       const starts = mesh.gfx.vb.starts.buffer;
       Vertex_buffer_reset_to_index(vb_groupidx, starts);
 
-      // Mesh_per_vb_remove_all_from_index(vb_groupidx, view.vb.buffer[i].data.buffer[0]); // Pass the meshidx of the first mesh on the current accessed vb
+      // Lopp for all meshidxs for this vb
+      for(let j=0; j <= view.vb.buffer[i].data.boundary; j++){
+
+         
+         // if(meshidx === INT_NULL) 
+         //    alert('3094716442');
+         // if((mesh.state.mask & MESH_STATE.ACTIVE)===0)
+         //    console.error('DEACTIVATED mesh', mesh.GetName(), mesh)
+         // if(mesh.per_vb_bufferidx===INT_NULL)
+         //    console.error('per_vb_bufferidx = -1', mesh.GetName(), mesh)
+         
+         const meshidx = view.vb.buffer[i].data.buffer[j];
+         const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
+         if(mesh.state.mask & MESH_STATE.ACTIVE)
+            Mesh_per_vb_remove_mesh(vb_groupidx, mesh.per_vb_bufferidx)
+      }
    }
 
 }
@@ -486,21 +492,21 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
 
 
 
-/** Remove all view's meshes from Gfx buffer */
-export function View_remove_mesh_from_gfx_buffer_by_view_all_vb(view_bufferidx) {
+// /** Remove all view's meshes from Gfx buffer */
+// export function View_remove_mesh_from_gfx_buffer_by_view_all_vb(view_bufferidx) {
 
-   const view = _view_buffer.buffer[view_bufferidx];
+//    const view = _view_buffer.buffer[view_bufferidx];
 
-   for (let i = 0; i <= view.vb.boundary; i++) {
+//    for (let i = 0; i <= view.vb.boundary; i++) {
 
-      // Get the fist mesh of the vb group buffer
-      const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[0]);
+//       // Get the fist mesh of the vb group buffer
+//       const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[0]);
 
-      Mesh_per_vb_remove_mesh(mesh.gfx.vb.groupidx, mesh.per_vb_bufferidx);
+//       Mesh_per_vb_remove_mesh(mesh.gfx.vb.groupidx, mesh.per_vb_bufferidx);
 
-   }
+//    }
 
-}
+// }
 
 
 

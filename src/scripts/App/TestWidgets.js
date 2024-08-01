@@ -27,7 +27,7 @@ import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widge
 import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
 import { Gl_set_rgba } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Callback_animations_create } from '../Engine/Animations/CallbackAnimations.js';
-import { Mesh_buffer_get_mesh_byidx, Widget_root_activate_all_vbs_in_renderqueue, Widget_root_rerender_from_root_reconstruct_listeners, Widget_root_reset_gfx } from '../Engine/Core/MeshBuffer.js';
+import { Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
 import { Ui_create_label_switch } from '../Engine/Drawables/DebugInfo/DebugInfoUiFactory.js';
 import { CreateBallTailParticles, CreateGlowParticles, CreateSmokeParticles, Demo_all, Demo_ball_tail, Demo_ball_tail_2, Demo_glow_particles_2, Demo_smoke_2, TestNoiseShader } from './Demo/DemoParticles.js';
@@ -38,6 +38,7 @@ import { Mesh_set_scissorbox } from '../Engine/Drawables/Operations/MeshHelperFu
 import { Demo_widgets_button, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
 import { AppInit, AppReset } from './App.js';
 import { Demo_page } from './DemoPage.js';
+import { Root_group_activate_all_vbs_in_renderqueue } from '../Engine/Core/Views/RootView.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -198,7 +199,7 @@ function TestScrollerComponent2() {
         s.Calc_no_gfx_update();
 
         s.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(s.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(s.root_bufferidx);
 
         Construct_listen_events_from_mesh_tree(s);
         Construct_listen_events_relations_from_mesh_tree(s);
@@ -307,7 +308,7 @@ function TestScrollerComponent3() {
     s.Calc_no_gfx_update();
 
     s.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(s.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(s.root_bufferidx);
 
     Construct_listen_events_from_mesh_tree(s);
     Construct_listen_events_relations_from_mesh_tree(s);
@@ -342,7 +343,7 @@ export function TestWidgetsGeneric(createId=1) {
     //     console.log(aaa[i], aaa.charCodeAt(i))
     // }
 
-    // Demo_page();
+    Demo_page();
 
     
     { // Reload
@@ -382,7 +383,7 @@ export function TestWidgetsGeneric(createId=1) {
         // reload_btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
         // reload_btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
         // reload_btn.Render()
-        // Widget_root_activate_all_vbs_in_renderqueue(reload_btn.root_bufferidx);
+        // Root_group_activate_all_vbs_in_renderqueue(reload_btn.root_bufferidx);
 
         // reload_btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, reload_btn.gfx.vb.groupidx)
 
@@ -392,11 +393,10 @@ export function TestWidgetsGeneric(createId=1) {
     }
 
 
-
     { // Widget: Debug Info 
 
 
-        const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);
+        // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);
         // const dbg_dp = Debug_info_ui();
 
 
@@ -413,7 +413,7 @@ export function TestWidgetsGeneric(createId=1) {
 
         // t.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC)
         // t.Render();
-        // Widget_root_activate_all_vbs_in_renderqueue(t.root_bufferidx);
+        // Root_group_activate_all_vbs_in_renderqueue(t.root_bufferidx);
         // Construct_listen_events_from_mesh_tree(t);
         // Construct_listen_events_relations_from_mesh_tree(t);
         // t.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, t.gfx.vb.groupidx);
@@ -484,7 +484,7 @@ export function TestWidgetsGeneric(createId=1) {
 
         // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         // line.Render();
-        // Widget_root_activate_all_vbs_in_renderqueue(line.root_bufferidx);
+        // Root_group_activate_all_vbs_in_renderqueue(line.root_bufferidx);
         // line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx);
         // // line.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, line.gfx.vb.groupidx);
         // // line.GfxUniformsSetClbk('u_time', CLBK_TIMER, line.gfx.vb.groupidx);
@@ -524,7 +524,7 @@ export function TestWidgetsGeneric(createId=1) {
         // line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         // line.Render();
-        // Widget_root_activate_all_vbs_in_renderqueue(line.root_bufferidx);
+        // Root_group_activate_all_vbs_in_renderqueue(line.root_bufferidx);
         // line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx);
         // line.ConstructListeners();
         // const picker = CreateColorPicker();
@@ -694,7 +694,7 @@ export function TestWidgetsGeneric(createId=1) {
         //     btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
         //     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
         //     btn.Render()
-        //     Widget_root_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
+        //     Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
 
         //     btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
 
@@ -832,7 +832,7 @@ function CreatePanel(is_root_widget = undefined) {
         Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
 
         scroller.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(scroller.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(scroller.root_bufferidx);
 
         scroller.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scroller.gfx.vb.groupidx);
 
@@ -876,7 +876,7 @@ function SectionResizable(pos) {
     grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     // grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     grey.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(grey.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(grey.root_bufferidx);
     grey.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, grey.gfx.vb.groupidx)
     // grey.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
     // grey.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, grey.gfx.vb.groupidx);
@@ -909,7 +909,7 @@ function CreateLabel(name = 'Label ', font_size = 10) {
 
     label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     label.Render()
-    Widget_root_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
     label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
 
     // Construct_listen_events_from_mesh_tree(label);
@@ -946,7 +946,7 @@ function CreateButton(x = 20, y = 400, root_widget = ROOT_WIDGETS.CREATE_ROOT) {
         btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         btn.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
         btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
 
         Construct_listen_events_from_mesh_tree(btn)
@@ -985,7 +985,7 @@ function CreateSwitchSimple(pos, root_widget = ROOT_WIDGETS.CREATE_ROOT) {
 
         switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         switch1.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
 
         switch1.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, switch1.gfx.vb.groupidx)
 
@@ -1011,7 +1011,7 @@ function CreateSwitch() {
 
     switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     switch1.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
 
     switch1.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, switch1.gfx.vb.groupidx)
     // switch1.text_mesh.SetColorRGB(PURPLER[7], 4);
@@ -1038,7 +1038,7 @@ function CreateSliderSimple(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
 
         slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         slider.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
         Construct_listen_events_from_mesh_tree(slider)
@@ -1064,7 +1064,7 @@ function CreateSlider(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
         slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         slider.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
         Construct_listen_events_from_mesh_tree(slider)
@@ -1113,7 +1113,7 @@ function CreateChangeMeshColorFromSliders(root_widget = ROOT_WIDGETS.CREATE_ROOT
         section.Calc_no_gfx_update();
 
         section.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
         section.ConstructListeners();
 
@@ -1137,7 +1137,7 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0) {
     line.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     line.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(line.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(line.root_bufferidx);
     line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx)
     line.ConstructListeners();
 
@@ -1279,7 +1279,7 @@ function CreateDropdown(pos = [0, 0, 0], root_widget = ROOT_WIDGETS.CREATE_ROOT)
         dp.Calc_no_gfx_update();
 
         dp.Render()
-        Widget_root_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
 
         dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
 
@@ -1364,7 +1364,7 @@ function TEST_LISTENERS_CreateDropdown(pos = [0, 0, 0], root_widget = ROOT_WIDGE
         section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.FIXED_H;
         section.Calc_no_gfx_update();
         section.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
         section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
         Construct_listen_events_from_mesh_tree(section)
         Construct_listen_events_relations_from_mesh_tree(section);
@@ -1514,7 +1514,7 @@ function CreateDropdownWithScroller(pos = [0, 0, 0], id) {
     dp.Calc_no_gfx_update();
 
     dp.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
 
     dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
 
@@ -1569,7 +1569,7 @@ function CreateDropdown3(pos, dim) {
     dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
     dp.Calc_no_gfx_update();
     dp.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
     dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
     Construct_listen_events_from_mesh_tree(dp)
     Construct_listen_events_relations_from_mesh_tree(dp);
@@ -1685,7 +1685,7 @@ function CreateDropdown2InSection(pos, id) {
 
 
     section.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
 
     Construct_listen_events_from_mesh_tree(section)
@@ -1726,7 +1726,7 @@ export function CreateColorPicker(x = 0, y = 0, render_instanced_flags = 0x0, ro
         // picker.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
         picker.Calc_no_gfx_update();
         picker.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(picker.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(picker.root_bufferidx);
         picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
 
         Construct_listen_events_from_mesh_tree(picker);
@@ -1840,7 +1840,7 @@ function CreateSceneMenuBar(items = null) {
         Clipy_from_group(scroller.scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
     }
     section.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     if (items && Array.isArray(items)) {
         const scroller = items[0]
         View_set_view_vb_start(scroller.scrolled_section.group_bufferidxs, scroller.scrolled_section.gfx.vb.start);
@@ -2038,7 +2038,7 @@ function CreateWindowWithMenu() {
     section.options &= ~SECTION.RESIZE_PARENT;
 
     section.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -2117,7 +2117,7 @@ function CreateManySectionsMinimal(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
         blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
         blu.Calc_no_gfx_update();
         blu.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(blu.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(blu.root_bufferidx);
         blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
         Construct_listen_events_from_mesh_tree(blu)
         Construct_listen_events_relations_from_mesh_tree(blu);
@@ -2278,7 +2278,7 @@ function CreateManySections(scene) {
     blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
     blu.Calc_no_gfx_update();
     blu.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(blu.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(blu.root_bufferidx);
     blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
 
     Construct_listen_events_from_mesh_tree(blu)
@@ -2360,7 +2360,7 @@ function CreateScrollerClampAlphaTest(num_items = 10, root_widget = ROOT_WIDGETS
         View_build_group_from_root_mesh(section);
 
         section.Render();
-        Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+        Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
         section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
@@ -2387,8 +2387,8 @@ function CreateScrollerClampAlphaTest(num_items = 10, root_widget = ROOT_WIDGETS
 
 
         // Unfortunately must Re-render the section for the clipping of the scroller to take place
-        Widget_root_reset_gfx(section.root_bufferidx);
-        Widget_root_rerender_from_root_reconstruct_listeners(section.root_bufferidx);
+        Root_group_reset_gfxs(section.root_bufferidx);
+        Root_group_rerender_from_root_reconstruct_listeners(section.root_bufferidx);
 
     }
 
@@ -2536,7 +2536,7 @@ function TestSections1() {
     root.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root.gfx.vb.groupidx)
 
     root.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(root.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(root.root_bufferidx);
 
     root.ConstructListeners();
 }
@@ -2637,7 +2637,7 @@ function Help(scene) {
 
 
     section.Render()
-    Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
 
     View_build_group_from_root_mesh(section)
@@ -2706,7 +2706,7 @@ function MeshInfo(scene) {
     section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.RESIZE_PARENT;
     section.Calc_no_gfx_update();
     section.Render();
-    Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     section.ConstructListeners();
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 

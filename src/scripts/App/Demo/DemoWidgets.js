@@ -1,9 +1,9 @@
 "use strict";
 
 import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
-import { Widget_root_activate_all_vbs_in_renderqueue, Widget_root_rerender_from_root_reconstruct_listeners, Widget_root_reset_gfx } from '../../Engine/Core/MeshBuffer.js';
 import { View_build_group_from_root_mesh } from '../../Engine/Core/MeshBufferViews.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
+import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from '../../Engine/Core/Views/RootView.js';
 import { BLUE, BLUEL, BLUER, GREEN, GREENL, GREENR, GREY, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Drawables/Operations/Recursions.js';
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
@@ -90,7 +90,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    View_build_group_from_root_mesh(scrolled_section);
 
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
    scrolled_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scrolled_section.gfx.vb.groupidx);
@@ -119,8 +119,8 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
 
    // Unfortunately must Re-render the section for the clipping of the scroller to take place
-   Widget_root_reset_gfx(scrolled_section.root_bufferidx);
-   Widget_root_rerender_from_root_reconstruct_listeners(scrolled_section.root_bufferidx);
+   Root_group_reset_gfxs(scrolled_section.root_bufferidx);
+   Root_group_rerender_from_root_reconstruct_listeners(scrolled_section.root_bufferidx);
 
 
    // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scroller.scrolled_section);
@@ -382,7 +382,7 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    root_s.Calc_no_gfx_update();
    View_build_group_from_root_mesh(root_s);
    root_s.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(root_s.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(root_s.root_bufferidx);
    root_s.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root_s.gfx.vb.groupidx);
 
    Construct_listen_events_from_mesh_tree(root_s);
@@ -433,7 +433,7 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    //    if (changes_hapened) {
 
 
-   //       Widget_root_reset_gfx(root.root_bufferidx)
+   //       Root_group_reset_gfxs(root.root_bufferidx)
 
    //       const root_pos = root.GetPosXY();
    //       const clip_left = root_pos[0];
@@ -450,15 +450,15 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    //       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom) 
 
    //       // First reset the buffer that holds all meshes(per vertex buffer), because the 'AddFromGfx' is gonna populate the buuffer with the added mesh
-   //       Widget_root_gfx_reset_mesh_per_vb_buffer(root.root_bufferidx);
+   //       Root_group_vbidx_view_reset_mesh_per_vb_buffer(root.root_bufferidx);
 
    //       // root.Recalc_no_gfx_update();
 
 
    //       // const mouse_dif = MouseGetPosDif()
    //       // const dif = { x: mouse_dif.x / 2, y: -mouse_dif.y / 2 };
-   //       // Widget_root_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
-   //       Widget_root_rerender_from_root_reconstruct_listeners(root.root_bufferidx)
+   //       // Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
+   //       Root_group_rerender_from_root_reconstruct_listeners(root.root_bufferidx)
    //    }
    // }
 
@@ -603,7 +603,7 @@ export function Demo_widgets_dropdown(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    section.Calc_no_gfx_update();
 
    section.Render()
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
 
@@ -747,7 +747,7 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos=
    section.Calc_no_gfx_update();
    
    section.Render()
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
    

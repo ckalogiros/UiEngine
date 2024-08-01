@@ -9,8 +9,8 @@ import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Texture_Material } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { WHITE } from "../Material/Base/Colors.js";
-import { Widget_root_set_in_focus } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
+import { Root_group_set_in_focus } from "../../Core/Views/RootView.js";
 
 
 
@@ -81,7 +81,7 @@ export class Textured_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
    }
 
@@ -171,7 +171,7 @@ export class Textured_Mesh extends Mesh {
                STATE.mesh.SetGrabed(mesh);
                STATE.mesh.SetFocused(mesh);
                mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-               Widget_root_set_in_focus(mesh.root_bufferidx);
+               Root_group_set_in_focus(mesh.root_bufferidx);
             }
 
          }

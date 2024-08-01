@@ -191,6 +191,8 @@ export function Str_buffer_mesh_names_remove_by_idx(nameidx) {
    if (replacer_meshidx !== INT_NULL) {
 
       const replacer_mesh = Mesh_buffer_get_mesh_byidx(replacer_meshidx);
+      if(replacer_mesh===_)
+         console.error()
 
       if(!(replacer_mesh === RESERVED_MESH)){
 

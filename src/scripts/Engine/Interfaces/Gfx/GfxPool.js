@@ -71,7 +71,7 @@ export function Gfx_pool_remove_geometry(gfx, num_faces, start_index, debug_mesh
 
 
 
-export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags) {
+export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, gfx_ctx_flags) {
 
    const vb_info_buffer = Vertex_buffer_group_get();
 
@@ -80,6 +80,7 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags) 
 
       for (let i = 0; i <= vb_info_buffer.boundary; i++) {
 
+         // Case the vertex buuffer is empty and unused
          if((vb_info_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
                
             if(SID.CheckSidMatch(sid, vb_info_buffer.buffer[i].sid)){
@@ -88,6 +89,15 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags) 
                return i;
             }
          }
+         // // Add all meshes not registered as private to the same vb
+         // else if((gfx_ctx_flags & GFX_CTX_FLAGS.PRIVATE)===0){
+               
+         //    if(SID.CheckSidMatch(sid, vb_info_buffer.buffer[i].sid)){
+      
+         //       vb_info_buffer.buffer[i].state.mask |= BUFFER_g1STATE.IS_ACTIVE;
+         //       return i;
+         //    }
+         // }
       }
    }
 

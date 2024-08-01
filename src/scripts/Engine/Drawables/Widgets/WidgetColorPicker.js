@@ -4,8 +4,9 @@ import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_ver
 import { CopyArr3, CopyArr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_widget_slider_simple } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Root_group_set_in_focus, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -311,7 +312,7 @@ export class Widget_Color_Picker extends Section {
       if(unif_name === 'u_wposxy'){
 
          // Call for each root mesh in every vertex buffer
-         const root_meshes = Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
+         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
          const len = root_meshes.length;
          for(let i=1; i < len; i++){
       
@@ -490,7 +491,7 @@ export class Widget_Color_Picker extends Section {
             STATE.mesh.SetFocused(widget);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
             widget.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-            Widget_root_set_in_focus(widget.root_bufferidx);
+            Root_group_set_in_focus(widget.root_bufferidx);
          }
 
       }

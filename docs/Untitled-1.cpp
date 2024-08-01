@@ -49,7 +49,7 @@ const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [
    EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE)
    EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
    SetStyle(style);
-   Widget_root_create_root(this.mesh_bufferidx)
+   Root_group_view_buffer_create_root(this.mesh_bufferidx)
 }
 
 line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
@@ -95,8 +95,8 @@ line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
             Renderqueue_Add(progidx, vbidx, ibidx, true);
             Renderqueue_set_active(vbidx, true); // Update the draw buffer
             Vertex_buffer_group_set_ibidx(vbidx, ibidx); // Create a refference of ib to vb
-            Widget_root_gfx_add(root_bufferidx, mesh_bufferidx, progidx, vbidx);
-            Widget_root_batch_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vbidx, mesh_count)
+            Root_group_vbidx_view_add(root_bufferidx, mesh_bufferidx, progidx, vbidx);
+            Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vbidx, mesh_count)
             // Create root wpos for vertex buffer uniform 
             Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vbidx) // FIXME: Needs mesh position data
          }

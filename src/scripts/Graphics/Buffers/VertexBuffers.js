@@ -12,7 +12,8 @@ import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/De
 import { Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
 import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBufferFillOps.js";
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_gfx_get } from "../../Engine/Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Engine/Core/MeshBuffer.js";
+import { Root_group_vbidx_view_view_get } from "../../Engine/Core/Views/RootView.js";
 
 
 
@@ -519,7 +520,7 @@ export function Vertex_buffer_group_set_scissorbox(vb_groupidx) {
     const w = mw.geom.dim[0] * 2;
     const h = mh.geom.dim[1] * 2;
 
-    const root_vb_groupidxs = Widget_root_gfx_get(mx.root_bufferidx);
+    const root_vb_groupidxs = Root_group_vbidx_view_view_get(mx.root_bufferidx);
 
     // Run for all vertex buffer groups that belong to the root widget
     for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {

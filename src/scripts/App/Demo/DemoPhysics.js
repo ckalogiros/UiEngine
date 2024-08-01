@@ -1,14 +1,12 @@
 "use strict";
 
 import { Create_rect_mesh, Create_widget_multi_text, Create_widget_section, Create_widget_slider, Create_widget_text } from "../../Engine/Core/CreateWidget.js";
-import { Widget_root_activate_all_vbs_in_renderqueue, Widget_root_rerender_from_root_reconstruct_listeners, Widget_root_reset_gfx } from "../../Engine/Core/MeshBuffer.js";
-import { View_build_group_from_root_mesh } from "../../Engine/Core/MeshBufferViews.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
+import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, WHITE, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_group_create_scissorbox } from "../../Graphics/Buffers/VertexBuffers.js";
 import { GlRotateZ2D } from "../../Graphics/Buffers/VertexBuffersOps.js";
@@ -83,7 +81,7 @@ export function Sattelite_rotation(_pos=[0,0]){
    controls_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    controls_section.Calc_no_gfx_update();
    controls_section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
    controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
    Construct_listen_events_from_mesh_tree(controls_section)
    Construct_listen_events_relations_from_mesh_tree(controls_section);
@@ -147,7 +145,7 @@ export function Sattelite_rotation(_pos=[0,0]){
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
    Construct_listen_events_from_mesh_tree(section)
@@ -310,7 +308,7 @@ export function Sattelite_rotation(_pos=[0,0]){
       info_section.Calc_no_gfx_update();
 
       info_section.Render();
-      Widget_root_activate_all_vbs_in_renderqueue(info_section.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(info_section.root_bufferidx);
 
       info_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, info_section.gfx.vb.groupidx)
 
@@ -564,7 +562,7 @@ export function Elastic_collisions(_pos=[0,0]) {
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    section.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
    Construct_listen_events_from_mesh_tree(section)
@@ -689,7 +687,7 @@ export function Elastic_collisions(_pos=[0,0]) {
    info_section_panel.Calc_no_gfx_update();
 
    info_section_panel.Render();
-   Widget_root_activate_all_vbs_in_renderqueue(info_section_panel.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(info_section_panel.root_bufferidx);
 
    info_section_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, info_section_panel.gfx.vb.groupidx);
 
@@ -717,8 +715,8 @@ export function Elastic_collisions(_pos=[0,0]) {
 
 
    // Unfortunately must Re-render the section for the clipping of the scroller to take place
-   Widget_root_reset_gfx(info_section_panel.root_bufferidx);
-   Widget_root_rerender_from_root_reconstruct_listeners(info_section_panel.root_bufferidx);
+   Root_group_reset_gfxs(info_section_panel.root_bufferidx);
+   Root_group_rerender_from_root_reconstruct_listeners(info_section_panel.root_bufferidx);
 
    return total_height;
 }

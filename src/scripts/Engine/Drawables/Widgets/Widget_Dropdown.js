@@ -5,7 +5,7 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_buffer_get_root_meshidx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_get } from "../../Core/MeshBuffer.js";
 import { Calculate_sizes_recursive, Expand, Section, Section_on_move_clbk } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
@@ -16,6 +16,7 @@ import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos } from "./ScrollerComponent.js";
 import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Mesh_set_scissorbox } from "../Operations/MeshHelperFunctions.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_set_in_focus, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 
 
 
@@ -234,7 +235,7 @@ export class Widget_Dropdown extends Section {
    AddToWidgetRootBuffer(root_bufferidx) {
       
       this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
       
       const btn = this.children.buffer[0];
       btn.AddToWidgetRootBuffer(root_bufferidx);
@@ -281,7 +282,7 @@ export class Widget_Dropdown extends Section {
       if (this.root_bufferidx !== INT_NULL && this.menu.root_bufferidx === INT_NULL) {
 
          this.menu.root_bufferidx = this.root_bufferidx;
-         Widget_root_add_mesh(this.menu.root_bufferidx, this.menu.mesh_bufferidx);
+         Root_group_view_buffer_add_mesh(this.menu.root_bufferidx, this.menu.mesh_bufferidx);
       }
 
       mesh.idx = this.menu.AddItem(mesh);
@@ -540,7 +541,7 @@ export class Widget_Dropdown extends Section {
          STATE.mesh.SetFocused(dp);
          Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: dp })
          dp.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-         Widget_root_set_in_focus(dp.root_bufferidx);
+         Root_group_set_in_focus(dp.root_bufferidx);
       }
 
 
@@ -664,7 +665,7 @@ export class Widget_Dropdown extends Section {
       if(unif_name === 'u_wposxy'){
 
          // Call for each root mesh in every vertex buffer
-         const root_meshes = Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
+         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
          const len = root_meshes.length;
          for(let i=1; i < len; i++){
       
@@ -708,7 +709,7 @@ export class Widget_Dropdown extends Section {
                // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
                if (item.type & MESH_TYPE.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
    
-                  item.RemoveFromMeshPerVbBuffer();
+                  // item.RemoveFromMeshPerVbBuffer();
                   item.Deactivate();
                   item.SetIsGfxInserted(false);
    
@@ -721,7 +722,7 @@ export class Widget_Dropdown extends Section {
                else {
                   if (item.gfx && item.is_gfx_inserted) {
                      
-                     item.RemoveFromMeshPerVbBuffer();
+                     // item.RemoveFromMeshPerVbBuffer();
                      item.Deactivate();
                      item.SetIsGfxInserted(false);
                      
@@ -737,7 +738,7 @@ export class Widget_Dropdown extends Section {
             menu.state.mask &= ~MESH_STATE.ACTIVE;
 
             // Mesh_per_vb_remove_mesh(menu.gfx.vb.groupidx, menu.per_vb_bufferidx);
-            menu.RemoveFromMeshPerVbBuffer();
+            // menu.RemoveFromMeshPerVbBuffer();
 
             // Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
             menu.is_gfx_inserted = false;
@@ -772,7 +773,7 @@ export class Widget_Dropdown extends Section {
 
 
       
-      const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
+      const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
       // const widget_root = root.parent;
       // const widget_root = root;
@@ -914,23 +915,23 @@ export class Widget_Dropdown extends Section {
       this.isOn |= DP_MENU_STATE.ON;
       this.isOn &= ~DP_MENU_STATE.OFF;
 
+      View_reset_from_view_all_buffers(root.group_bufferidxs[0]); // Reset the vertex buuffer and the mesh_per_vb, before the adition of the 'menu's' meshes to the view group
 
       this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
+
 
       // Case its the first time this menu will be rendered
       if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
          View_add_to_group(menu, this.group_bufferidxs[0])
       }
 
-      View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
-      // Mesh_per_vb_remove_all_from_index(root.gfx.vb.groupidx, root.per_vb_bufferidx);
 
       
       this.#ActivateMenu(root); // Add dropdown to gfx buffers.
       // menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
       
 
-      const root_meshidx = Widget_root_buffer_get_root_meshidx(this.root_bufferidx);
+      const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
 
       /********************************************************************************************************************/
@@ -961,6 +962,11 @@ export class Widget_Dropdown extends Section {
       
       tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
 
+
+      // Special case for 'side-panels'
+      // if(SIDE_PANEL){
+      //    MOVE LEFT TO ACCOUNT FOR THE SIZE REDUCE/EXPAND FROM THE VIEWPORT RIGHT 
+      // } 
 
 
 
@@ -1245,7 +1251,7 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
 
             console.log(mesh.GetName())
             
-            const root_meshidx = Widget_root_buffer_get_root_meshidx(mesh.root_bufferidx);
+            const root_meshidx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
             const widget_root = mesh;
             Scroller_component_set_pos(mesh.scroller_comp, widget_root, cur_pos[0]-mesh.geom.pos[0], cur_pos[1]-mesh.geom.pos[1]);
             
@@ -1290,7 +1296,7 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
          //    console.log(mesh.GetName(), mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY())
          //    console.log(mesh.GetName(), cur_pos[0], cur_pos[1])
             
-         //    const root_meshidx = Widget_root_buffer_get_root_meshidx(mesh.root_bufferidx);
+         //    const root_meshidx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
          //    // const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
          //    const widget_root = mesh;
          //    // const dx = mesh.geom.pos[0] - cur_pos[0];

@@ -1,7 +1,7 @@
 "use strict";
 
 import { Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Widget_root_gfx_get } from "../../Core/MeshBuffer.js";
+import { Root_group_vbidx_view_view_get } from "../../Core/Views/RootView.js";
 
 
 
@@ -36,7 +36,7 @@ export function Mesh_get_uniform_ubidx_from_name(uniforms, unif_name) {
 
 export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshidx_w, meshidx_h) {
 
-    const root_vb_groupidxs = Widget_root_gfx_get(root_bufferidx);
+    const root_vb_groupidxs = Root_group_vbidx_view_view_get(root_bufferidx);
 
     // const mx = Mesh_buffer_get_mesh_byidx(meshidx_x);
     // const my = Mesh_buffer_get_mesh_byidx(meshidx_y);
@@ -62,7 +62,7 @@ export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshid
 
 // export function Mesh_set_scissorbox(root_bufferidx, x, y, w, h) {
 
-//     const root_vb_groupidxs = Widget_root_gfx_get(root_bufferidx);
+//     const root_vb_groupidxs = Root_group_vbidx_view_view_get(root_bufferidx);
 
 //     // Run for all vertex buffer groups that belong to the root widget
 //     for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {

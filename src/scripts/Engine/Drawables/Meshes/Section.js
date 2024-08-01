@@ -4,8 +4,7 @@ import { CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
-import { Rect_Mesh } from "./Rect_Mesh.js";
-import { Widget_root_create_root, Widget_root_set_in_focus, Widget_root_buffer_get_mesh_by_rootidx, Widget_root_reset_gfx, Widget_root_resize_and_rerender, Widget_root_gfx_reset_mesh_per_vb_buffer, Widget_root_add_mesh, Mesh_per_vb_store_mesh, Mesh_per_vb_remove_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_store_mesh, Mesh_per_vb_remove_mesh } from "../../Core/MeshBuffer.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_add_vb_root_wpos, Mesh_unif_set_vb_root_wposx_all_siblings, Mesh_unif_set_vb_root_wpos_all_siblings, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
@@ -18,6 +17,7 @@ import { Material, Texture_Material } from "../Material/Base/Material.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_set_in_focus } from "../../Core/Views/RootView.js";
 
 
 
@@ -69,7 +69,7 @@ export class Section extends Mesh {
 
 
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) {
-         this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
+         this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
       }
    }
 
@@ -149,7 +149,7 @@ export class Section extends Mesh {
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
       for (let i = 0; i <= this.children.boundary; i++) {
 
@@ -242,9 +242,9 @@ export class Section extends Mesh {
 
 
 
-   RemoveFromMeshPerVbBuffer() {
-      Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-   }
+   // RemoveFromMeshPerVbBuffer() {
+   //    Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
+   // }
 
 
 
@@ -323,8 +323,11 @@ export class Section extends Mesh {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, this.GetName())
-
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
+
+      
+      // Add entry to Gfx Buffer
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
       this.is_gfx_inserted = true;
 
       return this.gfx.vb.start;
@@ -519,7 +522,7 @@ export class Section extends Mesh {
             STATE.mesh.SetGrabed(section);
             STATE.mesh.SetFocused(section);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
-            Widget_root_set_in_focus(section.root_bufferidx);
+            Root_group_set_in_focus(section.root_bufferidx);
 
 
             return true;
@@ -539,7 +542,7 @@ export class Section extends Mesh {
             STATE.mesh.SetFocused(section);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
             section.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-            Widget_root_set_in_focus(section.root_bufferidx);
+            Root_group_set_in_focus(section.root_bufferidx);
          }
 
       }
@@ -593,7 +596,7 @@ export class Section extends Mesh {
       if (changes_hapened) {
 
 
-         Widget_root_reset_gfx(root.root_bufferidx)
+         Root_group_reset_gfxs(root.root_bufferidx)
 
          const root_pos = root.GetPosXY();
          const clip_top = root_pos[1];
@@ -608,15 +611,14 @@ export class Section extends Mesh {
          // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
          // First reset the buffer that holds all meshes(per vertex buffer), because the 'AddFromGfx' is gonna populate the buuffer with the added mesh
-         Widget_root_gfx_reset_mesh_per_vb_buffer(root.root_bufferidx);
+         Root_group_vbidx_view_reset_mesh_per_vb_buffer(root.root_bufferidx);
 
 
          const mouse_dif = MouseGetPosDif()
          const dif = { x: mouse_dif.x / 2, y: -mouse_dif.y / 2 };
          // const dif = {x:mouse_dif.x, y: -mouse_dif.y};  
-         Widget_root_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
-         // Widget_root_resize_and_rerender(root.root_bufferidx, root.geom.dim[0], root.geom.dim[1]);
-         // Widget_root_rerender(root.root_bufferidx);
+         Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
+         // Root_group_resize_and_rerender(root.root_bufferidx, root.geom.dim[0], root.geom.dim[1]);
       }
    }
 
@@ -1349,7 +1351,7 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
 export function Calculate_positions_recursive(parent, options) {
    alert()
 
-   const root = Widget_root_buffer_get_mesh_by_rootidx(parent.root_bufferidx);
+   const root = Root_group_view_buffer_get_mesh_by_rootidx(parent.root_bufferidx);
    const pos = root.GetPosXYZ();
    const top = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[0] + parent.geom.pos[0] + parent.StylesGetMargin(STYLES.AXIS.X) : pos[0] + parent.StylesGetMargin(STYLES.AXIS.X);
    const left = (root.mesh_bufferidx !== parent.mesh_bufferidx) ? pos[1] + parent.geom.pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y) : pos[1] + parent.StylesGetMargin(STYLES.AXIS.Y);

@@ -2,8 +2,9 @@
 
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { GREEN, GREY } from "../Material/Base/Colors.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
@@ -64,7 +65,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
 
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
-         this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
+         this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
 
          // this.AddToWidgetRootBuffer(this.root_bufferidx)
          switch0.root_bufferidx = this.root_bufferidx;
@@ -123,9 +124,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
       this.children.buffer[0].root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.children.buffer[0].root_bufferidx, this.children.buffer[0].mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.children.buffer[0].root_bufferidx, this.children.buffer[0].mesh_bufferidx);
    }
 
 

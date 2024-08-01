@@ -6,11 +6,12 @@ import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timer
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { AddArr2, CopyArr4, Min } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } from '../../Core/CreateWidget.js';
-import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_create_root, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from '../../Core/MeshBuffer.js';
+import { Mesh_buffer_get_mesh_byidx } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { BLUEL, GREY, WHITE } from '../Material/Base/Colors.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_set_in_focus, Root_group_per_vb_meshidx_view_get_all_roots } from '../../Core/Views/RootView.js';
 
 
 
@@ -63,10 +64,10 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       this.AddChild(handle)
 
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
-         this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
+         this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
 
          handle.root_bufferidx = this.root_bufferidx;
-         Widget_root_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
+         Root_group_view_buffer_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
       }
 
       handle.SetName('Slider handle');
@@ -128,11 +129,11 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
       const handle = this.children.buffer[0];
       handle.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
 
    }
 
@@ -295,7 +296,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
          bar.state.mask |= MESH_STATE.IN_FOCUS;
          bar.state.mask |= MESH_STATE.IN_GRAB;
          
-         Widget_root_set_in_focus(bar.root_bufferidx);
+         Root_group_set_in_focus(bar.root_bufferidx);
       }
 
       return true;
@@ -785,15 +786,15 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
-         this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
+         this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
 
          const name_text = this.text_mesh;
          name_text.root_bufferidx = this.root_bufferidx;
-         Widget_root_add_mesh(name_text.root_bufferidx, name_text.mesh_bufferidx);
+         Root_group_view_buffer_add_mesh(name_text.root_bufferidx, name_text.mesh_bufferidx);
 
          const value_text = this.children.buffer[this.value_text_idx];
          value_text.root_bufferidx = this.root_bufferidx;
-         Widget_root_add_mesh(value_text.root_bufferidx, value_text.mesh_bufferidx);
+         Root_group_view_buffer_add_mesh(value_text.root_bufferidx, value_text.mesh_bufferidx);
 
          bar.AddToWidgetRootBuffer(this.root_bufferidx);
       }
@@ -839,15 +840,15 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
       const name_text = this.text_mesh;
       name_text.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(name_text.root_bufferidx, name_text.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(name_text.root_bufferidx, name_text.mesh_bufferidx);
 
       const value_text = this.children.buffer[this.value_text_idx];
       value_text.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(value_text.root_bufferidx, value_text.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(value_text.root_bufferidx, value_text.mesh_bufferidx);
 
       const bar = this.children.buffer[this.bar_idx];
       bar.AddToWidgetRootBuffer(root_bufferidx);
@@ -893,7 +894,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       if(unif_name === 'u_wposxy'){
 
          // Call for each root mesh in every vertex buffer
-         const root_meshes = Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
+         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
          const len = root_meshes.length;
          for(let i=1; i < len; i++){
       
@@ -1179,7 +1180,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
             STATE.mesh.SetFocused(mesh);
             mesh.state.mask |= MESH_STATE.IN_FOCUS;
             bar.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-            Widget_root_set_in_focus(mesh.root_bufferidx);
+            Root_group_set_in_focus(mesh.root_bufferidx);
          }
 
          return true;
@@ -1196,7 +1197,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
             STATE.mesh.SetGrabed(mesh);
             STATE.mesh.SetFocused(mesh);
             mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-            Widget_root_set_in_focus(mesh.root_bufferidx);
+            Root_group_set_in_focus(mesh.root_bufferidx);
          }
 
          return true;

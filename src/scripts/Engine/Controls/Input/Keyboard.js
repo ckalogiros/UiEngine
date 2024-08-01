@@ -5,7 +5,7 @@ import { Renderqueue_print_active, Renderqueue_print_all } from "../../Renderers
 import { Time_intervals_print } from "../../Timers/TimeIntervals.js";
 import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
-import { Mesh_buffer_print, Mesh_buffer_print_loop, Widgetroot_buffer_print_w1, Widgetroot_gfx_print_w3, Widgetroot_gfx_print_loop_w2, Widget_root_batch_print_w4, Widgetroot_buffer_print_w6, Mesh_per_vb_print, Gfx_buffer_print_loop } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_print, Mesh_buffer_print_loop, Mesh_per_vb_print } from "../../Core/MeshBuffer.js";
 import { Str_buffer_print, Str_buffer_mesh_names_print, Str_buffer_mesh_names_print_loop, Str_buffer_print_loop } from "../../Core/StringBuffer.js";
 import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js";
@@ -23,6 +23,7 @@ import { Callback_animations_print } from "../../Animations/CallbackAnimations.j
 import { Particle_system_print_info } from "../../ParticlesSystem/ParticlesSystem.js";
 import { Notifications_print, Notifications_print_loop } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Texture_buffer_print } from "../../Loaders/Textures/Texture.js";
+import { Widget_root_per_vb_meshidx_print_w4, Root_group_buffer_print_w1, Root_group_buffer_print_w6, Root_group_vbidx_buffer_print_loop_w2, Root_group_vbidx_buffer_print_w3 } from "../../Core/Views/RootView.js";
 
 _CNT = 0;
 const p = _CNT++;
@@ -260,34 +261,34 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'w1',
-      discr: 'Widgetroot_buffer_print_w1',
+      discr: 'Root_group_buffer_print_w1',
       func: (e)=>{
-         console.log('------------------ Widgetroot_buffer_print_w1() ------------------');
-         Widgetroot_buffer_print_w1();
+         console.log('------------------ Root_group_buffer_print_w1() ------------------');
+         Root_group_buffer_print_w1();
       },
    },
    {
       key: 'w2',
-      discr: 'Widgetroot_gfx_print_loop_w2',
+      discr: 'Root_group_vbidx_buffer_print_loop_w2',
       func: (e)=>{
-         console.log('------------------ Widgetroot_gfx_print_loop_w2() ------------------');
-         Widgetroot_gfx_print_loop_w2();
+         console.log('------------------ Root_group_vbidx_buffer_print_loop_w2() ------------------');
+         Root_group_vbidx_buffer_print_loop_w2();
       },
    },
    {
       key: 'w3',
-      discr: 'Widgetroot_gfx_print_w3',
+      discr: 'Root_group_vbidx_buffer_print_w3',
       func: (e)=>{
-         console.log('------------------ Widgetroot_gfx_print_w3() ------------------');
-         Widgetroot_gfx_print_w3();
+         console.log('------------------ Root_group_vbidx_buffer_print_w3() ------------------');
+         Root_group_vbidx_buffer_print_w3();
       },
    },
    {
       key: 'w4',
-      discr: 'Widget_root_batch_print_w4',
+      discr: 'Widget_root_per_vb_meshidx_print_w4',
       func: (e)=>{
-         console.log('------------------ Widget_root_batch_print_w4() ------------------');
-         Widget_root_batch_print_w4();
+         console.log('------------------ Widget_root_per_vb_meshidx_print_w4() ------------------');
+         Widget_root_per_vb_meshidx_print_w4();
       },
    },
    {
@@ -299,10 +300,10 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'w6',
-      discr: 'Widgetroot_buffer_print_w6',
+      discr: 'Root_group_buffer_print_w6',
       func: (e)=>{
-         console.log('------------------ Widgetroot_buffer_print_w6() ------------------');
-         Widgetroot_buffer_print_w6();
+         console.log('------------------ Root_group_buffer_print_w6() ------------------');
+         Root_group_buffer_print_w6();
       },
    },
    {
@@ -387,10 +388,10 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'g2',
-      discr: 'Gfx_buffer_print_loop',
+      discr: 'Mesh_per_vb_print_loop',
       func: (e)=>{
-         console.log('------------------ Gfx_buffer_print_loop ------------------');
-         Gfx_buffer_print_loop()
+         console.log('------------------ Mesh_per_vb_print_loop ------------------');
+         Mesh_per_vb_print_loop()
       },
    },
    {

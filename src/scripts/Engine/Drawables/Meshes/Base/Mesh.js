@@ -4,7 +4,7 @@ import { Time_intervals_destroy_byidx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { GlRotateZ2D, Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_change_child_event, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
-import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_create, Styles_remove_byidx, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
@@ -291,6 +291,9 @@ export class Mesh {
 
                 Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
             }
+
+            // Remove from 'mesh_per_vb_buffer'
+            Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx)
 
         }
 

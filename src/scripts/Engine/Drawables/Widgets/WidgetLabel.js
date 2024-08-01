@@ -9,10 +9,11 @@ import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Ali
 import { Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
-import { Mesh_per_vb_remove_mesh, Widget_root_add_mesh, Widget_root_create_root } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 
 
 
@@ -75,9 +76,9 @@ export class Widget_Label extends Rect_Mesh {
 
 
         if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
-            this.root_bufferidx = Widget_root_create_root(this.mesh_bufferidx);
+            this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
             this.text_mesh.root_bufferidx = this.root_bufferidx;
-            Widget_root_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+            Root_group_view_buffer_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
         }
 
     }
@@ -141,9 +142,9 @@ export class Widget_Label extends Rect_Mesh {
     AddToWidgetRootBuffer(root_bufferidx) {
 
         this.root_bufferidx = root_bufferidx;
-        Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+        Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
         this.text_mesh.root_bufferidx = root_bufferidx;
-        Widget_root_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+        Root_group_view_buffer_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
     }
 
 
@@ -471,10 +472,10 @@ export class Widget_Label extends Rect_Mesh {
     /*******************************************************************************************************************************************************/
 
 
-    RemoveFromMeshPerVbBuffer() {
-        Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-        Mesh_per_vb_remove_mesh(this.text_mesh.gfx.vb.groupidx, this.text_mesh.per_vb_bufferidx);
-    }
+    // RemoveFromMeshPerVbBuffer() {
+    //     Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
+    //     Mesh_per_vb_remove_mesh(this.text_mesh.gfx.vb.groupidx, this.text_mesh.per_vb_bufferidx);
+    // }
 
 
 

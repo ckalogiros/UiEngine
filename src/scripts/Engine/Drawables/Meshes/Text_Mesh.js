@@ -68,9 +68,9 @@ export class Text_Mesh extends Mesh {
    }
 
 
-   RemoveFromMeshPerVbBuffer() {
-      Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-   }
+   // RemoveFromMeshPerVbBuffer() {
+   //    Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
+   // }
 
 
 
@@ -116,6 +116,10 @@ export class Text_Mesh extends Mesh {
       if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary + 1)
          this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary + 1;
 
+      
+      // Add entry to Gfx Buffer
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      
       this.is_gfx_inserted = true;
 
 

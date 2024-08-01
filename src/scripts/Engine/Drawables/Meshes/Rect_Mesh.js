@@ -4,11 +4,12 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
-import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh, Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_per_vb_remove_mesh, Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Mesh_unif_is_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { BLUEL } from "../Material/Base/Colors.js";
+import { Root_group_view_buffer_add_mesh } from "../../Core/Views/RootView.js";
 
 
 export class Rect extends Mesh {
@@ -65,7 +66,7 @@ export class Rect extends Mesh {
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
    }
 
@@ -81,9 +82,9 @@ export class Rect extends Mesh {
 
 
 
-   RemoveFromMeshPerVbBuffer() {
-      Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-   }
+   // RemoveFromMeshPerVbBuffer() {
+   //    Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
+   // }
 
 
 
@@ -124,7 +125,7 @@ export class Rect extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
    }
 
@@ -320,7 +321,7 @@ export class Rect_Mesh extends Rect {
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
       for (let i = 0; i <= this.children.boundary; i++) {
 

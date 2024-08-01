@@ -34,3 +34,12 @@ Create a timed tip info event:
 
 !!! IMPORTANT
 * The mesh per vb buffer is not updating correctly
+
+
+
+
+{
+      MAKE SURE NO VIEW GROUP IS CREATED IF IT IS A ROOT GROUP AS WELL
+
+   A dropdow can create view grouup only if the dp is not the root group
+}

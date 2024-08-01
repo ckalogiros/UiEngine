@@ -3,13 +3,14 @@
 import { Widget_Button } from "./WidgetButton.js";
 import { Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_reset_gfx } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 import { Section } from "../Meshes/Section.js";
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 import { Styles_pad_set } from "../../Styles.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/MeshBufferViews.js";
+import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
 
 
 
@@ -99,7 +100,7 @@ export class Widget_Menu_Bar extends Section {
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
       this.label.AddToWidgetRootBuffer(root_bufferidx);
 
@@ -534,7 +535,7 @@ export class Widget_Minimize extends Widget_Button {
 
 
             // Reset Graphics buffers;
-            Widget_root_reset_gfx(root.root_bufferidx)
+            Root_group_reset_gfxs(root.root_bufferidx)
 
             // Store the root children tree structure to a temporary place, so that can be retrieved on maximize
             const menu_bar = root.children.buffer[0]; // CAUTION: First child suppose to be the menu_bar. What happens if it is at a different index???
@@ -583,7 +584,7 @@ export class Widget_Minimize extends Widget_Button {
          else { // Maximize - toggle on
 
             // Gfx_deactivate_no_listeners_touch(root);
-            Widget_root_reset_gfx(root.root_bufferidx)
+            Root_group_reset_gfxs(root.root_bufferidx)
 
             root.children.Reset();
             root.children = minim_mesh.stored_children_meshes;

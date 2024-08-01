@@ -3,8 +3,8 @@
 import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
-import { Widget_root_add_mesh } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
+import { Root_group_view_buffer_add_mesh } from "../../Core/Views/RootView.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx, Time_intervals_get_byidx } from "../../Timers/TimeIntervals.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
@@ -82,7 +82,7 @@ export class Widget_Text extends Text_Mesh {
 	AddToWidgetRootBuffer(root_bufferidx) {
 
 		this.root_bufferidx = root_bufferidx;
-		Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+		Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 	}
 
 
@@ -298,7 +298,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		if (this.root_bufferidx !== INT_NULL && text_mesh.root_bufferidx === INT_NULL) {
 			text_mesh.root_bufferidx = this.root_bufferidx;
-			Widget_root_add_mesh(text_mesh.root_bufferidx, text_mesh.mesh_bufferidx);
+			Root_group_view_buffer_add_mesh(text_mesh.root_bufferidx, text_mesh.mesh_bufferidx);
 		}
 
 		// this.children_all.Add(text_mesh.mesh_bufferidx);
@@ -312,14 +312,14 @@ export class Widget_Multi_Text extends Widget_Text {
 	AddToWidgetRootBuffer(root_bufferidx) {
 
 		this.root_bufferidx = root_bufferidx;
-		Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+		Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
 		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
 			if (child) {
 
 				child.root_bufferidx = root_bufferidx;
-				Widget_root_add_mesh(child.root_bufferidx, child.mesh_bufferidx);
+				Root_group_view_buffer_add_mesh(child.root_bufferidx, child.mesh_bufferidx);
 			}
 		}
 	}

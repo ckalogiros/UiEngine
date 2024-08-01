@@ -2,8 +2,8 @@
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
 import { Create_widget_button, Create_widget_section } from "../Engine/Core/CreateWidget.js";
-import { Widget_root_activate_all_vbs_in_renderqueue } from "../Engine/Core/MeshBuffer.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Screen_wpos_get_y, Screen_wpos_set_y } from "../Engine/Core/MeshUniformsBuffer.js";
+import { Root_group_activate_all_vbs_in_renderqueue } from "../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
 import { BLUEL, GREY } from "../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Drawables/Operations/Recursions.js";
@@ -164,7 +164,7 @@ export function Demo_page(create_demo_id = 1) {
    page3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    page3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    load_page_panel.AddItem(page3_btn);
-   load_page_panel.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+   load_page_panel.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
 
    page3_btn.Bind(
       (params) => {
@@ -189,11 +189,12 @@ export function Demo_page(create_demo_id = 1) {
    );
 
 
-   load_page_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   // load_page_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   load_page_panel.GenGfxCtx();
    load_page_panel.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
    load_page_panel.Calc_no_gfx_update();
    load_page_panel.Render()
-   Widget_root_activate_all_vbs_in_renderqueue(load_page_panel.root_bufferidx);
+   Root_group_activate_all_vbs_in_renderqueue(load_page_panel.root_bufferidx);
 
    load_page_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, load_page_panel.gfx.vb.groupidx)
 
@@ -249,10 +250,11 @@ export function Demo_page(create_demo_id = 1) {
       );
 
 
-      btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-      btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
+      // btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      btn.GenGfxCtx(GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
       btn.Render()
-      Widget_root_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
 
       btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
 

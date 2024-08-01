@@ -5,7 +5,7 @@ import { MouseGetPos, MouseGetPosDif, MouseGetPosDifY } from "../../Controls/Inp
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Vertex_buffer_group_get_byidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Mesh_buffer_get_mesh_byidx, Widget_root_add_mesh, Widget_root_rerender, Widget_root_reset_gfx, Widget_root_set_in_focus, Widget_root_set_uniform_callback_per_gfx_root_mesh } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { BLACK, BLUEL, GREY } from "../Material/Base/Colors.js";
@@ -14,6 +14,7 @@ import { Gl_set_dim_y, Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuf
 import { Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_add_vb_root_wposy, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { GetSign } from "../../../Helpers/Helpers.js";
+import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs, Root_group_set_in_focus, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 
 
 
@@ -203,14 +204,14 @@ export class Widget_Scroller extends Section {
    AddToWidgetRootBuffer(root_bufferidx, ROOT_WIDGET_FLAGS) {
       // alert('88712')
       this.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
       this.scroll_bar.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(this.scroll_bar.root_bufferidx, this.scroll_bar.mesh_bufferidx);
 
       const handle = this.scroll_bar.children.buffer[0];
       handle.root_bufferidx = root_bufferidx;
-      Widget_root_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
+      Root_group_view_buffer_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
 
       this.scrolled_section.AddToWidgetRootBuffer(root_bufferidx);
 
@@ -263,7 +264,7 @@ export class Widget_Scroller extends Section {
       if (unif_name === 'u_wposxy') {
 
          // Call for each root mesh in every vertex buffer
-         const root_meshes = Widget_root_set_uniform_callback_per_gfx_root_mesh(this.root_bufferidx, unif_name, Clbk, clbk_params);
+         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
          const len = root_meshes.length;
          for (let i = 1; i < len; i++) {
 
@@ -529,7 +530,7 @@ export class Widget_Scroller extends Section {
          mesh.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS;
          STATE.mesh.SetGrabed(mesh);
          STATE.mesh.SetFocused(mesh);
-         Widget_root_set_in_focus(mesh.root_bufferidx);
+         Root_group_set_in_focus(mesh.root_bufferidx);
 
          return true;
       }
@@ -557,7 +558,7 @@ export class Widget_Scroller extends Section {
                STATE.mesh.SetFocused(mesh);
                mesh.state.mask |= MESH_STATE.IN_FOCUS;
                bar.StateEnable(MESH_STATE.IN_GRAB);
-               Widget_root_set_in_focus(mesh.root_bufferidx);
+               Root_group_set_in_focus(mesh.root_bufferidx);
             }
 
             return true;
@@ -575,7 +576,7 @@ export class Widget_Scroller extends Section {
                STATE.mesh.SetGrabed(mesh);
                STATE.mesh.SetFocused(mesh);
                mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-               Widget_root_set_in_focus(mesh.root_bufferidx);
+               Root_group_set_in_focus(mesh.root_bufferidx);
             }
 
             return true;
@@ -711,7 +712,7 @@ export class Widget_Scroller extends Section {
          console.warn('The Resize of the scroller is reseting all meshes from the root. \nMake sure the root is the scroller, OR else find a solution in rerendering only the scroller mesh.')
 
          // View_reset_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0]);
-         Widget_root_reset_gfx(scroller.root_bufferidx)
+         Root_group_reset_gfxs(scroller.root_bufferidx)
 
          // CLIP FROM GROUP
          // if (scroller.scrolled_section.group_bufferidxs[0] !== INT_NULL) {
@@ -732,7 +733,7 @@ export class Widget_Scroller extends Section {
 
          // View_rerender_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0], false);
          // View_render_from_view_all_buffers(scroller.scrolled_section.group_bufferidxs[0], true);
-         Widget_root_rerender(scroller.root_bufferidx);
+         Root_group_rerender(scroller.root_bufferidx);
       }
    }
 
@@ -1184,11 +1185,10 @@ export function Scroller_on_update_handle(_params) {
 
 
    View_reset_from_view_all_buffers(scrolled_section.group_bufferidxs[0]);
-   // Widget_root_reset_gfx(scroller.root_bufferidx);
 
 
    View_rerender_from_view_all_buffers(scrolled_section.group_bufferidxs[0], true);
-   // Widget_root_rerender(scroller.root_bufferidx);
+   // Root_group_rerender(scroller.root_bufferidx);
 
 
 
