@@ -64,6 +64,7 @@ export function Mesh_unif_wpos_debug_names_reset(){ _debug_names_per_vb_mesh_uni
 
 
 
+export function Mesh_unif_wpos_get_debug() { return _per_vb_mesh_unif_wpos.buffer; }
 export function Mesh_unif_wpos_get_count() { return _per_vb_mesh_unif_wpos.active_count; }
 export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; }
 
@@ -71,8 +72,9 @@ export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; 
 
 // IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
-export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, debug_vb_groupidx, ubidx, has_absolute_pos=0x0, HAS_STICKY_POS=0x0) {
-
+export function Mesh_unif_create_vb_root_wpos(mesh, debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, COPY_MESH_POS) {
+  
+   const mesh_bufferidx = mesh.mesh_bufferidx, mesh_pos = mesh.geom.pos, mesh_type = mesh.type, mesh_nameidx = mesh.nameidx, mesh_parent = mesh.parent;
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
    let meshidx = mesh_bufferidx;
@@ -80,11 +82,14 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
    const wpos = [0, 0];
 
-   wpos[0] = mesh_pos[0];
-   wpos[1] = mesh_pos[1];
+   if(COPY_MESH_POS){
+      wpos[0] = mesh_pos[0];
+      wpos[1] = mesh_pos[1];
+   }
 
 
-   // if (mesh_parent !== null && mesh_parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
+   // This is where we relate uniform positions to 'add' their position to a 'parent' uniform position. 
+   // ??? Only Section classes are allowed to have offset position to another uniform position
    if (mesh_parent !== null){
 
 
@@ -93,7 +98,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
    }
 
-   // If the mesh is a text mesh, we want to connect it(take its wpos offset) from any 'root wpos' that the parent of the text mesh takes its offset position.
+   // If the mesh is a text mesh, we want to relate it(its wpos offset) from the 'root wpos' that the parent of the text mesh takes its offset position.
    // See code below for explanation
    if (mesh_parent !== null && mesh_type & MESH_TYPE.TEXT_MESH) {
 
@@ -125,22 +130,22 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    }
    else{
 
-      mesh_pos[0] = 0;
-      mesh_pos[1] = 0;
+      // 
+      if(COPY_MESH_POS){
+         mesh_pos[0] = 0;
+         mesh_pos[1] = 0;
+      }
    }
 
    const entry = {
-      wpos: [0, 0],
+      wpos: [wpos[0], wpos[1]],
       meshidx: meshidx, // Is needed to have a ref to the mesh from inside the '_per_vb_mesh_unif_wpos' buffer
       parent_posidx: parent_posidx,
       debug_vb_groupidx:debug_vb_groupidx,
-      has_absolute_pos: has_absolute_pos,
+      has_absolute_pos: HAS_ABSOLUTE_POS,
       sticky_pos: HAS_STICKY_POS,
       scroll_bar: INT_NULL, // unif_wpos index for any scrollbar. Use: Move the scrollbar with the root mesh move (seperately), because the scrollbars aren't children of any root unif
    }
-
-   entry.wpos[0] += wpos[0];
-   entry.wpos[1] += wpos[1];
 
    _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
 
@@ -157,7 +162,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
 
 
-export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, vb_groupidx, has_absolute_pos=0x0, HAS_STICKY_POS=0x0) {
+export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, vb_groupidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0) {
    // TODO: check NULL object
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
@@ -213,7 +218,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    unif_wpos.meshidx = meshidx;
    unif_wpos.parent_posidx = parent_posidx;
    unif_wpos.debug_vb_groupidx = vb_groupidx;
-   unif_wpos.has_absolute_pos = has_absolute_pos;
+   unif_wpos.has_absolute_pos = HAS_ABSOLUTE_POS;
    unif_wpos.sticky_pos = HAS_STICKY_POS;
    unif_wpos.scroll_bar = INT_NULL;
 

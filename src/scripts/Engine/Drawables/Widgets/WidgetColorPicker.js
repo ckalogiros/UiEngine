@@ -214,7 +214,7 @@ export class Widget_Color_Picker extends Section {
       ];
 
       const vertices_count = (HUE_COLOR.length / 2) - 1;
-
+      //                            ROOT_WIDGET_FLAGS, pos, dim, col, hover_margin, handle_dim, handle_col, faces, is_debug_mesh
       const slider = Create_widget_slider_simple(_, [0, 0, 2], [dim[0]*scale, 20*scale], HUE_COLOR, [0, 0], [4*scale, 24*scale], WHITE, vertices_count);
       
       slider.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;

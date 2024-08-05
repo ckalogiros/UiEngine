@@ -25,7 +25,7 @@ import { Vertex_buffer_group_create_scissorbox } from '../../Graphics/Buffers/Ve
 import { Gl_set_rgba } from '../../Graphics/Buffers/VertexBuffersOps.js';
 import { GetRandomPos, GetSequencedColor } from '../../Helpers/Helpers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
-import { CreateColorPicker } from '../TestWidgets.js';
+import { Demo_widgets_colorpicker } from './DemoWidgets.js';
 
 
 
@@ -169,7 +169,7 @@ export function CreateGlowParticles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CRE
          if (isOn) {
             // How should this callback know about the colorpicker, so that it can destroy it???????
 
-            const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
+            const colorpicker = Demo_widgets_colorpicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
             colorpicker.AssignTargetMeshClbk((params) => {
                const color = params;
 
@@ -191,7 +191,7 @@ export function CreateGlowParticles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CRE
 
    /***********************************************************************************************/
    // Create Color Picker (INDEPENDENT CANNOT BE DESTROYED) to change the particles color
-   // const picker = CreateColorPicker(x, y, _, 0x0);
+   // const picker = Demo_widgets_colorpicker(x, y, _, 0x0);
    // picker.AssignTargetMeshClbk((params)=>{
    //     const color = params;
    //     Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
@@ -557,7 +557,7 @@ export function CreateBallTailParticles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10,
             if (isOn) {
                // How should this callback know about the colorpicker, so that it can destroy it???????
 
-               const colorpicker = CreateColorPicker(x, section.geom.dim[1] * 2, _, ROOT_WIDGETS.CREATE_ROOT);
+               const colorpicker = Demo_widgets_colorpicker(x, section.geom.dim[1] * 2, _, ROOT_WIDGETS.CREATE_ROOT);
                colorpicker.AssignTargetMeshClbk((params) => {
                   const color = params;
                   Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
@@ -1006,7 +1006,7 @@ export function CreateSmokeParticles(x = 0, y = 0) {
          if (isOn) {
             // How should this callback know about the colorpicker, so that it can destroy it???????
 
-            const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
+            const colorpicker = Demo_widgets_colorpicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT);
             colorpicker.AssignTargetMeshClbk((params) => {
                const color = params;
                Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
@@ -1285,7 +1285,7 @@ export function TestNoiseShader() {
             if (isOn) {
                // How should this callback know about the colorpicker, so that it can destroy it???????
                
-               // const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT,);
+               // const colorpicker = Demo_widgets_colorpicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT,);
                
                
                const colorpicker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [emitters[0].pos[0], emitters[0].pos[1]+50, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
@@ -1588,7 +1588,7 @@ export function TestNoiseShader() {
 
    // /***********************************************************************************************/
    // // Create Color Picker to change the particles color
-   // const picker = CreateColorPicker(x, y);
+   // const picker = Demo_widgets_colorpicker(x, y);
    // picker.AssignTargetMeshClbk((params)=>{
    //     const color = params;
    //     // Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
@@ -2028,7 +2028,7 @@ export function Demo_glow_particles_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x 
             if (isOn) {
                // How should this callback know about the colorpicker, so that it can destroy it???????
    
-               // const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT,);
+               // const colorpicker = Demo_widgets_colorpicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT,);
 
 
                const colorpicker_dim = [300, VIEWPORT.WIDTH/2-8];
@@ -2410,7 +2410,7 @@ export function Demo_ball_tail() { // Side Panel
             if (isOn) {
                // How should this callback know about the colorpicker, so that it can destroy it???????
 
-               const colorpicker = CreateColorPicker(x, y + tail_particles.section.geom.dim[1] * 2, _, ROOT_WIDGETS.CREATE_ROOT);
+               const colorpicker = Demo_widgets_colorpicker(x, y + tail_particles.section.geom.dim[1] * 2, _, ROOT_WIDGETS.CREATE_ROOT);
                colorpicker.AssignTargetMeshClbk((params) => {
                   const color = params;
 
@@ -3242,7 +3242,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
             if (isOn) {
                // How should this callback know about the colorpicker, so that it can destroy it???????
    
-               // const colorpicker = CreateColorPicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT,);
+               // const colorpicker = Demo_widgets_colorpicker(x, y, _, ROOT_WIDGETS.CREATE_ROOT,);
 
 
                const colorpicker = Create_widget_color_picker(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [emitters[2].pos[0], emitters[2].pos[1]+50, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
@@ -3855,7 +3855,7 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
             if (isOn) {
                // How should this callback know about the colorpicker, so that it can destroy it???????
 
-               const colorpicker = CreateColorPicker(x, y + tail_particles.section.geom.dim[1] * 2, _, ROOT_WIDGETS.CREATE_ROOT);
+               const colorpicker = Demo_widgets_colorpicker(x, y + tail_particles.section.geom.dim[1] * 2, _, ROOT_WIDGETS.CREATE_ROOT);
                
                // Renderqueue_set_priority_by_vb(FIRST, colorpicker.gfx.vb.groupidx);
                Root_group_set_render_queue_priority(colorpicker.root_bufferidx);

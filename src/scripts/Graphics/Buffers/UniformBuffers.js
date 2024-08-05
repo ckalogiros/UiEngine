@@ -164,7 +164,6 @@ export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, p
 
    const uniform = new Uniform(gl, shader_program, type, name, progidx, vb_groupidx);
    const ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
-   // console.info('UUUUUUUUUUUUUUUUUUUUUUUUUUUUU\nUniform Created at index:', ubidx, _uniforms_buffer);
 
    return ubidx;
 }

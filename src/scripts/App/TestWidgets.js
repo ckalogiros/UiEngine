@@ -1,6 +1,5 @@
 "use strict";
-import { Time_intervals_create, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
-import { Abs, CopyArr4, FloorArr2, FloorArr3, Hash, Pow } from '../Helpers/Math/MathOperations.js';
+import { FloorArr2, FloorArr3 } from '../Helpers/Math/MathOperations.js';
 
 
 import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
@@ -25,7 +24,7 @@ import { TimerGetGlobalTimerCycle, Timer_get_global_timer } from '../Engine/Time
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
-import { Gl_set_rgba } from '../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba, GlRotateZ2D } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Callback_animations_create } from '../Engine/Animations/CallbackAnimations.js';
 import { Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
@@ -34,9 +33,7 @@ import { CreateBallTailParticles, CreateGlowParticles, CreateSmokeParticles, Dem
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
 import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
-import { Mesh_set_scissorbox } from '../Engine/Drawables/Operations/MeshHelperFunctions.js';
-import { Demo_widgets_button, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
-import { AppInit, AppReset } from './App.js';
+import { Demo_widgets_button, Demo_widgets_colorpicker, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
 import { Demo_page } from './DemoPage.js';
 import { Root_group_activate_all_vbs_in_renderqueue } from '../Engine/Core/Views/RootView.js';
 
@@ -420,6 +417,11 @@ export function TestWidgetsGeneric(createId=1) {
     }
 
 
+    { // Test sdf lines
+        // const line1 = SdfLine(YELLOW[7], [300, 300, 5], [200, 10]);
+    }
+
+
     { // Rotation: Rotate sdf line. Dont forget to disable the 'style' attribu\te
 
         // const line1 = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
@@ -469,56 +471,12 @@ export function TestWidgetsGeneric(createId=1) {
     }
 
 
-    { // Test sdf lines
-        // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 100, 0], [400, 400], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
-        // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-        // // line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-
-        // // // // // // line.sid.attr &= ~SID.ATTR.GENERIC_ATTR1_VEC4;
-        // // // // // // line.sid.attr &= ~SID.ATTR.COL4;
-        // line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        // // line.GfxUniformsEnable({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        // // line.GfxUniformsEnable({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
-        // // line.sid.fx |= SID.FX.FS_NOISE;
-        // // // // line.EnableGfxUniforms({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
-
-        // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        // line.Render();
-        // Root_group_activate_all_vbs_in_renderqueue(line.root_bufferidx);
-        // line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx);
-        // // line.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, line.gfx.vb.groupidx);
-        // // line.GfxUniformsSetClbk('u_time', CLBK_TIMER, line.gfx.vb.groupidx);
-        // // // // line.GfxUniformsSetClbk('u_time', CLBK_TIMER, _)
-        // line.ConstructListeners();
-
-
-
-        // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .01, .2, 1.4, _, .4, true);
-        // // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0);
-
-    }
-
-
     { // Widget: Colorpicker
-        // CreateColorPicker(x, y, SID.ATTR.WPOS_TIME4|SID.ATTR.DIM2)
-        // CreateColorPicker(x, y, SID.ATTR.DIM2)
-
+        
         // TODO: Enable multi vertex color in 'Widget_Slider_Simple' constructor
-        // const colorpicker = CreateColorPicker(_, _, _, ROOT_WIDGETS.CREATE_ROOT);
-
-        // const btn = CreateButton(100, 500, ROOT_WIDGETS.CREATE_ROOT);
-        // btn.Bind(
-        //     (params)=>{
-
-        //         params.evt_params.Destroy()
-        //     }, 
-        //     _, 
-        //     colorpicker,
-        // );
-        // colorpicker.Destroy()
-
-
-        // Test change color of a mesh using the colorpicker
+        // const colorpicker = Demo_widgets_colorpicker(_, _, _, ROOT_WIDGETS.CREATE_ROOT);
+        
+        /* Test change color of a mesh using the colorpicker */
         // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 600, 0], [200, 80], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
         // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
         // line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -529,7 +487,11 @@ export function TestWidgetsGeneric(createId=1) {
         // line.ConstructListeners();
         // const picker = CreateColorPicker();
         // picker.AssignTargetMesh(line);
+        
 
+        /** Colorpicker Instanced Geometry*/
+        // Demo_widgets_colorpicker(x, y, SID.ATTR.WPOS_TIME4|SID.ATTR.DIM2)
+        // Demo_widgets_colorpicker(x, y, SID.ATTR.DIM2)
     }
 
 
@@ -1139,19 +1101,8 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0) {
     line.Render();
     Root_group_activate_all_vbs_in_renderqueue(line.root_bufferidx);
     line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx)
-    line.ConstructListeners();
-
-    const vb_info = VBI_get_byidx(line.gfx.vb.groupidx)
-    const vb_data = Vertex_buffer_get_by_vbidx(line.gfx.vb.idxs[0])
-
-
-    // setInterval(()=>{GlRotateZ2D(line.gfx, line.geom.dim, Timer_get_global_timer()*.55)}, 16)
-    // GlRotateZ2D(line.gfx, line.geom.dim, 1.23)
-
-    // gfx_idxs[0] = mesh.gfx.prog.idx;
-    // gfx_idxs[1] = mesh.gfx.vb.idx;
-    // mesh.Move(-mesh.geom.pos[0]+mesh.geom.dim[0], VIEWPORT.HEIGHT - mesh.geom.pos[1]-mesh.geom.dim[1]);
-    // mesh.RotateZ(5.5);
+    Construct_listen_events_from_mesh_tree(line)
+    Construct_listen_events_relations_from_mesh_tree(line);
 
     return line;
 }
@@ -1699,43 +1650,6 @@ function CreateDropdown2InSection(pos, id) {
 
 }
 
-
-
-export function CreateColorPicker(x = 0, y = 0, render_instanced_flags = 0x0, root_widget = ROOT_WIDGETS.CREATE_ROOT) {
-
-    // const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y + 40, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
-    const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y + 40, 0], [300, 200], [TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT], _, [0, 35, 2]);
-    picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    // picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
-
-    picker.sid.inst = render_instanced_flags;
-
-    picker.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    // picker.EnableGfxUniforms({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
-
-
-
-        picker.ColorpickerCreateListeners();
-        // picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
-
-        picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-
-        // picker.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
-        picker.Calc_no_gfx_update();
-        picker.Render();
-        Root_group_activate_all_vbs_in_renderqueue(picker.root_bufferidx);
-        picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
-
-        Construct_listen_events_from_mesh_tree(picker);
-        Construct_listen_events_relations_from_mesh_tree(picker);
-    }
-
-    return picker;
-
-}
 
 
 

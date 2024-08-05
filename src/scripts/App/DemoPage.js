@@ -2,7 +2,7 @@
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
 import { Create_widget_button, Create_widget_section } from "../Engine/Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Screen_wpos_get_y, Screen_wpos_set_y } from "../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_wpos_get_debug, Screen_wpos_get_y, Screen_wpos_set_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
 import { BLUEL, GREY } from "../Engine/Drawables/Material/Base/Colors.js";
@@ -25,18 +25,17 @@ export function Demo_page(create_demo_id = 1) {
 
       let y = 0;
       const pad = 50;
-      /* section/rect move */
-      /* sections - hovering (no moving so that for android devices can hover on touch) */
-      const sections = Demo_widgets_sections(_, [0, y]);
-      y += sections.geom.dim[1] * 2 + pad;
 
 
-      /* label - move - hover */
-      /* Button - click(with counter?) */
-      /* Switces */
-      /* Slider */
-      const btn = Demo_widgets_button(_, [0, y]);
-      y += btn.geom.dim[1] * 2 + pad;
+      // /* section/rect move */
+      // /* sections - hovering (no moving so that for android devices can hover on touch) */
+      // const sections = Demo_widgets_sections(_, [0, y]);
+      // y += sections.geom.dim[1] * 2 + pad;
+
+
+      // /* Button Switces  Slider */
+      // const btn = Demo_widgets_button(_, [0, y]);
+      // y += btn.geom.dim[1] * 2 + pad;
 
 
       /* scrolling */
@@ -44,9 +43,9 @@ export function Demo_page(create_demo_id = 1) {
       y += scroller.geom.dim[1] * 2 + pad;
 
 
-      /* dropdown - move - hover */
-      const dp = Demo_widgets_dropdown(_, [0, y],)
-      y += dp.geom.dim[1] * 2 + pad;
+      // /* dropdown - move - hover */
+      // const dp = Demo_widgets_dropdown(_, [0, y],)
+      // y += dp.geom.dim[1] * 2 + pad;
 
 
       /* Colorpicker */
@@ -57,23 +56,23 @@ export function Demo_page(create_demo_id = 1) {
 
 
 
-      Debug_info_ui_static();
+      // Debug_info_ui_static();
 
    }
 
-   if (create_demo_id === 2) { // Demo Particles 
+   // if (create_demo_id === 2) { // Demo Particles 
 
-      // Demo_glow_particles_2();
-      // Demo_smoke_2()
+   //    // Demo_glow_particles_2();
+   //    // Demo_smoke_2()
 
 
-      // Demo_ball_tail();
-      // Demo_ball_tail_2();
-      Demo_all();
+   //    // Demo_ball_tail();
+   //    // Demo_ball_tail_2();
+   //    Demo_all();
 
-      Debug_info_ui_static();
+   //    Debug_info_ui_static();
 
-   }
+   // }
 
 
    if (create_demo_id === 3) { // Demos Physics
@@ -164,14 +163,13 @@ export function Demo_page(create_demo_id = 1) {
    page3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    page3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    load_page_panel.AddItem(page3_btn);
-   load_page_panel.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
-
+   
    page3_btn.Bind(
       (params) => {
-
+         
          Callback_animations_create( // Scroll Up
             (params) => { // Run Animation
-
+               
                if(create_demo_id !== 3){
                   AppReset(); // Reset all 
                   // Create new page
@@ -187,8 +185,11 @@ export function Demo_page(create_demo_id = 1) {
       },
       _, _, _,
    );
+   
 
 
+
+   load_page_panel.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
    // load_page_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    load_page_panel.GenGfxCtx();
    load_page_panel.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
@@ -206,62 +207,62 @@ export function Demo_page(create_demo_id = 1) {
    Listeners_set_priority(E.C, page2_btn.listeners);
    Listeners_set_priority(E.C, page3_btn.listeners);
 
-   Mesh_unif_set_vb_root_wpos(load_page_panel.root_posidx, VIEWPORT.RIGHT - load_page_panel.geom.dim[0]*2, load_page_panel.geom.pos[1]);
+   // Mesh_unif_set_vb_root_wpos(load_page_panel.root_posidx, VIEWPORT.RIGHT - load_page_panel.geom.dim[0]*2, load_page_panel.geom.pos[1]);
    // load_page_panel.SetWposX(VIEWPORT.RIGHT - load_page_panel.geom.dim[0]*2)
 
 
+
    
    
    
    
    
-   
-   
-   /****************************************************************************************************************************************************/
-   { // Create the button for going to the top
+//    /****************************************************************************************************************************************************/
+//    { // Create the button for going to the top
 
-      const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Up', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 10], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
-      btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+//       const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Up', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 10], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
+//       btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+//       btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-      btn.Bind(
-         (params) => {
+//       btn.Bind(
+//          (params) => {
 
-            Callback_animations_create( // Scroll Up
-               (params) => { // Run Animation
+//             Callback_animations_create( // Scroll Up
+//                (params) => { // Run Animation
 
-                  const unif_wpos = Screen_wpos_get_y();
-                  if (unif_wpos < 0) {
+//                   const unif_wpos = Screen_wpos_get_y();
+//                   if (unif_wpos < 0) {
 
-                     const ypos = unif_wpos / 2;
-                     Screen_wpos_set_y(ypos);
-                     console.log('ypos', ypos, 'unif_wpos', unif_wpos)
-                     return true;
-                  }
+//                      const ypos = unif_wpos / 2;
+//                      Screen_wpos_set_y(ypos);
+//                      console.log('ypos', ypos, 'unif_wpos', unif_wpos)
+//                      return true;
+//                   }
 
-                  return false;
-               },
-               () => { // Stop Animation
-                  return false;
-               },
-            );
-         },
-         _, _, _,
-      );
+//                   return false;
+//                },
+//                () => { // Stop Animation
+//                   return false;
+//                },
+//             );
+//          },
+//          _, _, _,
+//       );
 
 
-      btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
-      // btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-      btn.GenGfxCtx(GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-      btn.Render()
-      Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
+//       btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
+//       // btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+//       btn.GenGfxCtx();
+//       btn.Render()
+//       Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
 
-      btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
+//       btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
 
-      Construct_listen_events_from_mesh_tree(btn)
-      Construct_listen_events_relations_from_mesh_tree(btn);
+//       Construct_listen_events_from_mesh_tree(btn)
+//       Construct_listen_events_relations_from_mesh_tree(btn);
 
-      Listeners_set_priority(E.C, btn.listeners);
+//       Listeners_set_priority(E.C, btn.listeners);
 
-   }
+//    }
+
 }

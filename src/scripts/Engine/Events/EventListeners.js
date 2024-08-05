@@ -919,7 +919,7 @@ function Set_priority_first(buffer, idx, TYPE_IDX){
       children:  buffer[idx].children,
    }
 
-   console.log('event_idx', idx, temp);
+   // console.log('event_idx', idx, temp);
 
    // Shift all elements to the right once
    for( let i=idx; i > 0; i--){
@@ -930,7 +930,7 @@ function Set_priority_first(buffer, idx, TYPE_IDX){
       // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[prev_elem.event_idx].view.view_idx = cur_elem.event_idx;
       // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[cur_elem.event_idx].view.view_idx = prev_elem.event_idx;
 
-      console.log(i, 'cur_elem', cur_elem, 'prev_elem', prev_elem)
+      // console.log(i, 'cur_elem', cur_elem, 'prev_elem', prev_elem)
       
       cur_elem.event_idx = prev_elem.event_idx;
       cur_elem.meshidx  = prev_elem.meshidx   ;
@@ -939,9 +939,8 @@ function Set_priority_first(buffer, idx, TYPE_IDX){
       
       _listeners_buffer_storage.buffer[TYPE_IDX].buffer[cur_elem.event_idx].view = cur_elem;
       
-      console.log()
    }
-   console.log('[0]', buffer[0], 'prev_elem', temp)
+   // console.log('[0]', buffer[0], 'prev_elem', temp)
    
    // Finaly replace the first elem
    buffer[0].event_idx = temp.event_idx;

@@ -54,7 +54,7 @@ export function Sattelite_rotation(_pos=[0,0]){
    // Controls
    const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4,4], [_pos[0]+pad, _pos[1]+total_height*2, 0], [0, 0], GREY[1]);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   controls_section.SetName('controls_section');
+   controls_section.SetName('Sattelite_rotation->controls_section');
    controls_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    
    const flags = {
@@ -95,6 +95,7 @@ export function Sattelite_rotation(_pos=[0,0]){
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [_pos[0]+pad, _pos[1]+total_height*2, 0], [panel_height, panel_height], GREY[1]);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
+   section.SetName('Sattelite_rotation->panel');
    
 
    const balls_buffer=[], physics=[];
@@ -251,7 +252,7 @@ export function Sattelite_rotation(_pos=[0,0]){
    {
       const info_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [_pos[0]+pad, _pos[1]+total_height*2, 0], [0, 0], GREY[1]);
       if(!PLATFORM.ANY_SMARTPHONE_DEVICE) info_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      info_section.SetName('InfoUi-panel');
+      info_section.SetName('Sattelite_rotation->InfoUi-panel');
 
 
       const font_size = _;
@@ -499,6 +500,7 @@ export function Elastic_collisions(_pos=[0,0]) {
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [_pos[0]+pad, _pos[1]+total_height*2, 0], elastic_cllisions_panel_dim, GREY[1]);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
+   section.SetName('Elastic_collisions');
 
 
    const balls_buffer = [], physics = [], info_buffer = [];

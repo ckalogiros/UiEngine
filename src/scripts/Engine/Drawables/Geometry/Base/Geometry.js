@@ -38,7 +38,7 @@ export class Geometry2D {
 
         const dim1 = dim;
         
-        // if(num_faces>1) dim1[0] = dim[0]/num_faces
+        if(num_faces>1) dim1[0] = dim[0]/num_faces; // (Example: color hue)
 
         math.CopyArr3(this.pos, pos);
         math.CopyArr2(this.dim, dim1);

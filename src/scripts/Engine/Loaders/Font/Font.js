@@ -142,8 +142,6 @@ export function Font_load_uvs(textureid) {
 
 	LoadMetrics(font_idx, textureid);
 	Create_uv_map(font_idx);
-	// console.log('--------------------------------------------------------------------\n', _fontMetricsBuffer[font_idx])
-	console.log('--------------------------------------------------------------------\n', _fontMetricsBuffer, _fontsUvMap)
 	
 	return font_idx;
 }

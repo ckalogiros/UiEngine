@@ -1,10 +1,10 @@
 "use strict";
 
-import { Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
+import { Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
 import { View_build_group_from_root_mesh } from '../../Engine/Core/MeshBufferViews.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from '../../Engine/Core/Views/RootView.js';
-import { BLUE, BLUEL, BLUER, GREEN, GREENL, GREENR, GREY, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
+import { BLUE, BLUEL, BLUER, GREEN, GREENL, GREENR, GREY, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, TRANSPARENT, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Drawables/Operations/Recursions.js';
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
@@ -47,7 +47,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.SetName('root section')
+   section.SetName('Demo_widgets_scrolled_labels');
    section.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
 
 
@@ -104,7 +104,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    const scroller_component = Components_create_scroller_component(10, scroller_height, scrolled_section, 100);
    Scoller_component_gengfx_and_render(scroller_component, scrolled_section);
    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(scrolled_section.root_posidx, scroller_component.root_posidx);
-   Listeners_set_priority(E.C, scroller_component.listeners)
+   Listeners_set_priority(E.C, scroller_component.listeners);
 
 
    section.Calc_no_gfx_update();
@@ -153,6 +153,7 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    
    const root_s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [pos[0]+l_pad, pos[1]+t_pad, 0], [100, 100], TRANSPARENCY(GREY[3], tr));
    root_s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   root_s.SetName('Demo_widgets_sections');
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) root_s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
@@ -479,7 +480,7 @@ export function Demo_widgets_dropdown(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [pos[0] + l_pad, pos[1] + t_pad, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.SetName('root section')
+   section.SetName('Demo_widgets_dropdown')
    section.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
 
 
@@ -549,7 +550,7 @@ export function Demo_widgets_dropdown(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
                   dpsub4.AddToMenu(l);
 
                   
-                  const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [2, 2], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[2], .8));
+                  const s = Create_widget_section(_, SECTION.HORIZONTAL, [2, 2], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[2], .8));
                   // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
                   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
                   s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -627,7 +628,7 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos=
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [pos[0] + l_pad, pos[1] + t_pad, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.SetName('root section')
+   section.SetName('Demo_widgets_button');
    section.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
 
 
@@ -646,7 +647,7 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos=
 
    // Create Button Widget with counter on click
    {
-      const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
+      const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
       s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       s.SetName('button panel');
       section.AddItem(s);
@@ -670,9 +671,11 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos=
          _, params, _,
       );
    }
+
+
    // Create Switch Widget
    {
-      const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
+      const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
       s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       s.SetName('button panel');
       section.AddItem(s);
@@ -697,15 +700,17 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos=
          _, _, _,
       );
    }
+
+
    // Create Slider Widget
    {
-      const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
+      const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
       s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       s.SetName('button panel');
       section.AddItem(s);
       
       // const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [200, 500, 0] : [0, 0, 0]
-      const slider = Create_widget_slider(root_widget, [0,0,1], [100, 10], TRANSPARENCY(YELLOWR[9], .6), _, 'Test slider',);
+      const slider = Create_widget_slider(_, [0,0,1], [100, 10], TRANSPARENCY(YELLOWR[9], .6), _, 'Test slider',);
       slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       slider.SetInitialValue(0);
       s.AddItem(slider);
@@ -754,23 +759,66 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos=
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
    
-   // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-   // View_build_group_from_root_mesh(section);
-   
-   // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, btn, .001, 0.6, .6, 0)
-   // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .002, 0.4, .8, .4)
-   // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn, .003, 0.2, .8, .8)
-   
-   // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .01, 0.6, 1.)
-   // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGBA, btn, .01, 0.4, 1.)
-   // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, btn, .01, 0.0, 1., 0)
-   // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.A, btn, .01, .0, 1., .0)
-   
-   // // btn.text_mesh.SetColorRGB(BLUE_10_120_220);
-   
-   // // btn.Align(ALIGN.LEFT | ALIGN.TOP, [0, 0]);
-   // // btn.Align(ALIGN.RIGHT | ALIGN.BOTTOM, [15, 5]);
-   // text.text_mesh.RenderTextFromNumber(0);
+   { // Animations
+      // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
+      // View_build_group_from_root_mesh(section);
+      
+      // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, btn, .001, 0.6, .6, 0)
+      // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .002, 0.4, .8, .4)
+      // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn, .003, 0.2, .8, .8)
+      
+      // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .01, 0.6, 1.)
+      // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGBA, btn, .01, 0.4, 1.)
+      // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, btn, .01, 0.0, 1., 0)
+      // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.A, btn, .01, .0, 1., .0)
+      
+      // // btn.text_mesh.SetColorRGB(BLUE_10_120_220);
+      
+      // // btn.Align(ALIGN.LEFT | ALIGN.TOP, [0, 0]);
+      // // btn.Align(ALIGN.RIGHT | ALIGN.BOTTOM, [15, 5]);
+      // text.text_mesh.RenderTextFromNumber(0);
+   }
    
    return section;
+}
+
+
+
+
+
+
+export function Demo_widgets_colorpicker(x = 0, y = 0, render_instanced_flags = 0x0, root_widget = ROOT_WIDGETS.CREATE_ROOT) {
+
+   const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y + 40, 0], [300, 200], [GREY[0], GREY[1], GREY[0], GREY[1]], _, [0, 35, 2]);
+   // const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y + 40, 0], [300, 200], [TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT], _, [0, 35, 2]);
+   picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+   // picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
+
+   picker.sid.inst = render_instanced_flags;
+
+   picker.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // picker.EnableGfxUniforms({unif:SID.UNIF.DIM2}, 'u_dim', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+
+   if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+
+
+
+       picker.ColorpickerCreateListeners();
+       // picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
+
+       picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+
+       // picker.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN;
+       picker.Calc_no_gfx_update();
+       picker.Render();
+       Root_group_activate_all_vbs_in_renderqueue(picker.root_bufferidx);
+       picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
+
+       Construct_listen_events_from_mesh_tree(picker);
+       Construct_listen_events_relations_from_mesh_tree(picker);
+   }
+
+   return picker;
+
 }

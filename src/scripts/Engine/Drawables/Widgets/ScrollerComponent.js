@@ -36,7 +36,7 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, mesh.style);
    bar.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-   bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR
+   bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
    bar.SetName('ScrollBar');
 
    bar.OnClick = Scroller_component_onClick;

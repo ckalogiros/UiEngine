@@ -29,7 +29,7 @@ const DISABLE_DEBUG = true;
 
 
 
-export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx) {
+export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx, IS_PRIVATE) {
 
     /***********************************************************************************************/
     // Create VAO
@@ -48,6 +48,7 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 
     // Create vertex buffer group
     const vb_group = new Vertex_Buffer_Group(progidx, vaoidx, vao.vao, sid);
+    vb_group.state.mask |= IS_PRIVATE;
 
     if (sid.inst) {
 
@@ -65,6 +66,7 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
         // Create vertex buffer info
         const vbinfo = new Vertex_Buffer_Info(size, vbo, vbidx, type, sid.inst);
         vbinfo.SetAddFn(attribsidx, 0x0, sid.inst);
+        // vbinfo.state.mask |= IS_PRIVATE;
         const vb_infoidx = _vertex_buffer_infos.Add(vbinfo);
 
 
@@ -98,6 +100,7 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
         // Create vertex buffer info
         const vbinfo = new Vertex_Buffer_Info(size, vbo, vbidx, type, sid.attr & ~sid.inst);
         vbinfo.SetAddFn(attribsidx, sid.attr & ~sid.inst, 0x0);
+        // vbinfo.state.mask |= IS_PRIVATE;
         const vb_infoidx = _vertex_buffer_infos.Add(vbinfo);
 
 

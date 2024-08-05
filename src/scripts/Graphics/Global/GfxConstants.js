@@ -424,7 +424,7 @@ const MESH_ENABLE = {
 
 
 
-
+const TEMP_SCROLLER_VB_IDX = INT_NULL;
 
 
 
@@ -449,6 +449,10 @@ const GFX_CTX_FLAGS = {
     ABSOLUTE_POSITION: _CNT <<= 0x1, // Any vertex buffer with a unif wposition will not draw from the scenen's position 
 
 
+    // For vertex buffers to be used for meshes at the scene level(NO private OR private for specific meshes)
+    SCROLLER_VB: _CNT <<= 0x1, // TODO: The index of the scroller meshes must be stored globaly?????
+
+
     // UNUSED
     // These are prioritized over all other above options.
     STATIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated rarely
@@ -471,6 +475,7 @@ const BUFFER_STATE = {
     NEEDS_UPDATE: _CNT,
     // IS_PRIVATE: _CNT <<= 0x1,
     IS_ACTIVE: _CNT <<= 0x1,
+    IS_PRIVATE: _CNT <<= 0x1,
 };
 
 
