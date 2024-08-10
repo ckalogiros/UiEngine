@@ -97,16 +97,20 @@ export class ArrayBufferInterface {
       }
    }
 
+
    Reset() {
+
+      for (let i = 0; i <= this.boundary; i++) {
+         this.buffer[i] = INT_NULL;
+      }
+
       // INFO: Size is responsible for reallocation, so it shouldn't be reseted
       DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= this.size-1;
       this.boundary = -1;
       this.active_count = 0;
-      this.buffer[0] = INT_NULL;
       this.freeidx = 0;
       this.reserveidx = INT_NULL;
    }
-
 
 
    CopyFromBufferToStart(oldData) {
@@ -200,7 +204,6 @@ export class Int8Buffer extends ArrayBufferInterface {
       return old_size; // The new empty index.
    }
 
-
    RemoveByIdxSortedVersion(idx, debug_id, debug_name) {
 
       if (this.buffer[idx] !== INT_NULL) {
@@ -221,7 +224,6 @@ export class Int8Buffer extends ArrayBufferInterface {
 
       return INT_NULL
    }
-
 
    /**Returns -1 if there was no replacment(the removed element happens to be last) */
    #ShortReplaceWithLast(removed_idx) {
@@ -329,7 +331,6 @@ export class Int16Buffer extends ArrayBufferInterface {
       this.debug_name = debug_name;
    }
 
-
    Realloc() {
 
       DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= this.size;
@@ -352,8 +353,6 @@ export class Int16Buffer extends ArrayBufferInterface {
 
       return old_size; // The new empty index. 
    }
-
-
 
    RemoveByIdx(idx) {
 
@@ -381,7 +380,6 @@ export class Int16Buffer extends ArrayBufferInterface {
       }
    }
 
-
    /** Fast Remove Last Item. Caller is responsible of making sure at least one element exists. No check happens */
    RemoveByIdxSortedVersionLastElemGuarantee() {
 
@@ -390,7 +388,6 @@ export class Int16Buffer extends ArrayBufferInterface {
       this.active_count--;
       /**Debug */ if(this.boundary < INT_NULL) alert('0-Boundary is out of bounds\nBoundary <= -2');
    }
-
 
    RemoveByIdxSortedVersion(idx, debug_id, debug_name) {
 
@@ -412,7 +409,6 @@ export class Int16Buffer extends ArrayBufferInterface {
 
       return INT_NULL
    }
-
 
    /**Returns -1 if there was no replacment(the removed element happens to be last) */
    #ShortReplaceWithLast(removed_idx) {

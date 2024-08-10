@@ -10,6 +10,7 @@ import { Components_create_scroller_component, Scoller_component_gengfx_and_rend
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Listeners_set_priority } from '../../Engine/Events/EventListeners.js';
+import { Vertex_buffer_group_create_scissorbox } from '../../Graphics/Buffers/VertexBuffers.js';
 import { GetSequencedColor } from '../../Helpers/Helpers.js';
 
 
@@ -21,7 +22,7 @@ const t_pad = 20;
 
 
 
-export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0], num_items = 80, scroller_height = 200) {
+export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0], num_items = 80, scroller_height = 150) {
 
    const colors = [
       RED[0], RED[1], RED[2], RED[3], RED[3], RED[4], RED[5], RED[6], RED[7], RED[8],
@@ -58,9 +59,10 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    section.AddItem(scrolled_section);
 
 
-   const count = colors.length;
-   // const count = 20;
+   // const count = colors.length;
+   const count = 20;
 
+   var label_text_mesh = null; // Copy the vertexbuffer index of the text meshes.
    for (let i = 0; i < count; i++) {
 
       const label = Create_widget_label(_, `${i}`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
@@ -69,6 +71,8 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
       scrolled_section.AddItem(label);
       label.SetName(`${i}`);
       label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+      label_text_mesh = label.text_mesh;
    }
 
 
@@ -100,22 +104,23 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
 
 
-   // const scroller_height = scroller_height;
    const scroller_component = Components_create_scroller_component(10, scroller_height, scrolled_section, 100);
    Scoller_component_gengfx_and_render(scroller_component, scrolled_section);
    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(scrolled_section.root_posidx, scroller_component.root_posidx);
    Listeners_set_priority(E.C, scroller_component.listeners);
+   section.AddChildScrollerIdx(scrolled_section.scroller_comp_idx);
 
 
    section.Calc_no_gfx_update();
    Scroller_component_calculate_handle_pos_dim(scrolled_section, scroller_component);
 
-   // // Set scissor box
-   // const mx = scrolled_section.mesh_bufferidx;
-   // const my = scroller_component.mesh_bufferidx;
-   // const mw = scrolled_section.mesh_bufferidx;
-   // const mh = scroller_component.mesh_bufferidx;
-   // Vertex_buffer_group_create_scissorbox(scrolled_section.gfx.vb.groupidx, mx, my, mw, mh);
+   // Set scissor box
+   const mx = scrolled_section.mesh_bufferidx;
+   const my = scroller_component.mesh_bufferidx;
+   const mw = scrolled_section.mesh_bufferidx;
+   const mh = scroller_component.mesh_bufferidx;
+   Vertex_buffer_group_create_scissorbox(scrolled_section.gfx.vb.groupidx, mx, my, mw, mh);
+   Vertex_buffer_group_create_scissorbox(label_text_mesh.gfx.vb.groupidx, mx, my, mw, mh);
 
 
    // Unfortunately must Re-render the section for the clipping of the scroller to take place

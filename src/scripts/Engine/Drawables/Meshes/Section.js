@@ -15,9 +15,10 @@ import { Mesh } from "./Base/Mesh.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material, Texture_Material } from "../Material/Base/Material.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_set_in_focus } from "../../Core/Views/RootView.js";
+import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 
 
 
@@ -995,11 +996,20 @@ export function Section_on_move_clbk(params) {
 
 
    /********************************************************************************************************************/
+   // Set any scrollbar
+   // TODO: We need to make the scroller visible to the root parent 'section' mesh.
+   if(section.scroller_comp !== null || section.has_children_scrollers) 
+      Scroller_component_movexy(section.children_scrollers_buffer, mouse_dif.x, -mouse_dif.y);
+
+
+
+
+   /********************************************************************************************************************/
    // Set any scissor box
-   // TODO: Where to update any scissor box??? 1. at the update functions(Move, resize, etc)? At the 'mesh uniform' file(for move)???
-   if(Vertex_buffer_group_has_scissorbox(section.gfx.vb.groupidx)){
-      Vertex_buffer_group_set_scissorbox(section.gfx.vb.groupidx);
-   }
+   // if(Vertex_buffer_group_has_scissorbox(section.gfx.vb.groupidx)){
+   //    Vertex_buffer_group_update_scissorbox_all_vb(section.gfx.vb.groupidx);
+   //    // console.log('[]')
+   // }
 
 }
 

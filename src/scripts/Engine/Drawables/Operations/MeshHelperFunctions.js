@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Root_group_vbidx_view_view_get } from "../../Core/Views/RootView.js";
 
 
@@ -53,8 +53,8 @@ export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshid
 
 
         // Set scissor box
-        Vertex_buffer_group_set_scissorbox(root_vb_groupidxs.buffer[i], meshidx_x, meshidx_y, meshidx_w, meshidx_h)
-        Vertex_buffer_group_set_scissorbox(root_vb_groupidxs.buffer[i], meshidx_x, meshidx_y, meshidx_w, meshidx_h)
+        Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], meshidx_x, meshidx_y, meshidx_w, meshidx_h)
+        Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], meshidx_x, meshidx_y, meshidx_w, meshidx_h)
     }
 }
 
@@ -68,8 +68,8 @@ export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshid
 //     for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
 
 //         // Set scissor box
-//         Vertex_buffer_group_set_scissorbox(root_vb_groupidxs.buffer[i], x, y, w, h)
-//         Vertex_buffer_group_set_scissorbox(root_vb_groupidxs.buffer[i], x, y, w, h)
+//         Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], x, y, w, h)
+//         Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], x, y, w, h)
 //     }
 // }
 

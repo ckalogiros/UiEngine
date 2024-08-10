@@ -7,6 +7,7 @@ import { BLUEL, GREEN, GREY, WHITE, YELLOWL } from "../../Engine/Drawables/Mater
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
+import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_group_create_scissorbox } from "../../Graphics/Buffers/VertexBuffers.js";
 import { GlRotateZ2D } from "../../Graphics/Buffers/VertexBuffersOps.js";
@@ -699,12 +700,14 @@ export function Elastic_collisions(_pos=[0,0]) {
    Construct_listen_events_from_mesh_tree(info_section_panel)
    Construct_listen_events_relations_from_mesh_tree(info_section_panel);
 
+
    const scroller_component = Components_create_scroller_component(10, elastic_cllisions_panel_dim[1], info_section_panel, info_section_panel.GetPosY(), );
    Scoller_component_gengfx_and_render(scroller_component, info_section_panel);
    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(info_section_panel.root_posidx , scroller_component.root_posidx);
-   // Listeners_set_priority(E.C, scroller_component.listeners)
-
+   Listeners_set_priority(E.C, scroller_component.listeners)
+   info_section_panel.AddChildScrollerIdx(info_section_panel.scroller_comp_idx);
    Scroller_component_calculate_handle_pos_dim(info_section_panel, scroller_component);
+
    
 
    // Set scissor box

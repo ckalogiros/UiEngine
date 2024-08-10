@@ -167,6 +167,7 @@ export function AppReset(){
 
     STATE.Reset();
     GL_STATE.Reset();
+    GFX_VBIDX_RENAME_ME.Reset();
 
     Generic_buffers_container_reset();
 

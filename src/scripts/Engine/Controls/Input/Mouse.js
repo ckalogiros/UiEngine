@@ -1,11 +1,12 @@
 "use strict";
 
+import { Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { GetSign } from "../../../Helpers/Helpers.js";
-import { Floor } from "../../../Helpers/Math/MathOperations.js";
+import { Abs, Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Callback_animations_create } from "../../Animations/CallbackAnimations.js";
 import { Info_listener_dispatch_event } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { RegisterEvent } from "../../Events/Events.js";
-import { Scene_camera_scroll } from "../../Scenes.js";
+import { Scene_camera_scroll_add } from "../../Scenes.js";
 
 
 const mouse = {
@@ -209,6 +210,8 @@ export function MouseSetCoords(coord){
 
 }
 
+
+
 export function OnMouseMove(e) {
 
    e.stopPropagation();
@@ -256,6 +259,9 @@ export function OnMouseOut(e){
 }
 
 
+
+
+
 let temp_deccel = .85;
 let temp_scroll_speed = 0;
 let temp_prev_dir = 1;
@@ -271,8 +277,6 @@ export function OnMouseWheel(e){
    mouse.wheel.x = e.clientX;
    mouse.wheel.x =  e.clientY;
    mouse.wheel.delta = GetSign(e.wheelDelta);
-
-   // Scene_camera_scroll(STATE.scene.active_idx, mouse.wheel.delta*temp_scroll_speed);
 
 
    let bool = true
@@ -300,8 +304,9 @@ export function OnMouseWheel(e){
                in_scolling = true;
                temp_scroll_speed *= temp_deccel; // deccelarate scrolling
                
-               Scene_camera_scroll(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
-               // console.log(temp_scroll_speed, params.wheel_delta)
+               Scene_camera_scroll_add(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
+               Vertex_buffer_group_update_scissorbox_all_vb();
+               console.log(temp_scroll_speed, params.wheel_delta)
 
                return true;
             }
@@ -456,7 +461,10 @@ export function OnTouchMove(e) {
    const y = e.changedTouches[0].clientY;
 
    const prevy = y;
-   const delta = GetSign(mouse.pos.y - prevy) ;
+   const delta = GetSign(mouse.pos.y - prevy);
+
+   if(Abs(delta) < 1) return;
+
    MouseSetCoords([x,y]);
    
    mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
@@ -491,7 +499,7 @@ export function OnTouchMove(e) {
                   in_scolling = true;
                   temp_scroll_speed *= temp_deccel; // deccelarate scrolling
                   
-                  Scene_camera_scroll(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
+                  Scene_camera_scroll_add(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
                   // console.log(temp_scroll_speed, params.wheel_delta)
    
                   return true;
@@ -511,57 +519,6 @@ export function OnTouchMove(e) {
       }
    
    }
-   
-
-   // if(STATE.mouse.activeClickedButtonId !== INT_NULL && STATE.mesh.hovered === null){
-   //    // console.log('updated mouse:',STATE);
-      
-   //    const speed = 1.0
-   //    let bool = true
-   //    if(temp_prev_dir !== delta) {
-   
-   //       temp_prev_dir = delta;
-   //       bool = false;
-   //       temp_deccel = .8; // Reduce deccel if the user switched scroll direction
-   //       temp_scroll_speed = 0; // Cancel the deccelarate scrolling
-   //       // console.log(temp_prev_dir)
-   //    }
-   
-   //    // temp_scroll_speed += temp_scroll_speed+1;
-   //    temp_scroll_speed += delta*speed;
-   //    // if(temp_deccel < .97 && bool !== delta) temp_deccel += .01; // Increase deccelarate scrolling on continuous scroll on the same direction
-   
-   
-   //    if(!in_scolling){
-   
-   //       Callback_animations_create(
-   //          (params)=>{
-               
-   //             if(temp_scroll_speed > 1. || temp_scroll_speed < -1.){
-   
-   //                in_scolling = true;
-   //                temp_scroll_speed *= temp_deccel; // deccelarate scrolling
-                  
-   //                Scene_camera_scroll(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
-   //                // console.log(temp_scroll_speed, params.wheel_delta)
-   
-   //                return true;
-   //             }
-               
-   //             return false;
-   //          }, 
-   //          ()=>{
-   //             console.log('END')
-               
-   //             in_scolling = false;
-   //             temp_scroll_speed = 0;
-   //             temp_deccel = .85;
-   //          }, 
-   //          {wheel_delta:delta}, 'SceneScroll'
-   //       );
-   //    }
-   
-   // }
    
 }
 

@@ -424,7 +424,15 @@ const MESH_ENABLE = {
 
 
 
-const TEMP_SCROLLER_VB_IDX = INT_NULL;
+// TODO: Rename. This is a global storage of vertex buffer indexes concerning specific types of meshes been drawn together(like scrollers)
+const GFX_VBIDX_RENAME_ME = {
+    SCROLLER_VB_IDX: INT_NULL,
+
+
+    Reset(){
+        this.SCROLLER_VB_IDX = INT_NULL;
+    }
+}
 
 
 

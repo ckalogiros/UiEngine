@@ -144,6 +144,8 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
    gfx_ctx.num_faces = num_faces;
    gfx_ctx.vertsPerRect = vertsPerRect;
    gfx_ctx.attribsPerVertex = attribsPerVertex;
+   if(vb_group === _)
+      console.log()
    gfx_ctx.vao = vb_group.vao;
 
    gfx_ctx.prog.idx = progidx;
@@ -228,7 +230,6 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
  * I the group in sid is set, then create a new group for the vertex buffers
  * Else default to the default group
  */
-//(this.sid, this.sceneidx, this.geom.num_faces, GFX_CTX_FLAGS.SPECIFIC, rect_igfx.idxs, this.root_bufferidx, this.mesh_bufferidx);
 export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NULL) {
 
 
@@ -239,6 +240,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    const root_bufferidx = mesh.root_bufferidx;
    const mesh_bufferidx = mesh.mesh_bufferidx;
    const uniforms = mesh.uniforms;
+
+   const flags = (mesh.gfx_ctx_flags !== 0x0) ? mesh.gfx_ctx_flags : FLAGS;
 
 
    let progidx = INT_NULL;
@@ -302,7 +305,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    // Vertex Buffer
 
 
-   // if((FLAGS & GFX_CTX_FLAGS.PRIVATE)===0 && specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
+   /** Check for any vbidx match, from already created vbs, in the mesh tree structure */
    if (specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
       
       // Check if mesh has texture, and if it isn't tha same texture as is the 'specific_vb_groupidx', must create new vertex buffer
@@ -317,7 +320,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          }
          else { // Try to find an existing vertex buffer with the same SID and texidx
 
-            vb_groupidx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, specific_vb_groupidx);
+            vb_groupidx = Find_gfx_match_from_mesh_tree(flags, mesh, specific_vb_groupidx);
          }
       }
       else {
@@ -328,19 +331,19 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       }
 
    }
-   // else {
-   // TODO: I think must check for private, else if ANY is selected we need to find the vb with 'Gfx_pool_find_vb_notActive_and_private()' OR create new function 'Gfx_pool_find_vb_NOT_private'
-   else if((FLAGS & GFX_CTX_FLAGS.PRIVATE) || (FLAGS & GFX_CTX_FLAGS.SPECIFIC)) {
+   else if(flags & GFX_CTX_FLAGS.SCROLLER_VB && GFX_VBIDX_RENAME_ME.SCROLLER_VB_IDX !== INT_NULL) {
+      // Scroller meshes have their own vb. If none vb is initialized, 'SCROLLER_VB_IDX' will be = INT_NULL, and a new vb will be created for scrollers.
+      vb_groupidx = GFX_VBIDX_RENAME_ME.SCROLLER_VB_IDX;
+   }
+   else if((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) {
       // Check buffers validity, or find buffers based on Flags
-      vb_groupidx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, specific_vb_groupidx);
-   }
-   else if(FLAGS & GFX_CTX_FLAGS.SCROLLER_VB && TEMP_SCROLLER_VB_IDX !==_INT_NULL) {
-      // Scroller meshes have their own vb. If none vb is initialized, let the vb creation code below to create one and store the index to 'TEMP_SCROLLER_VB_IDX'.
-      vb_groupidx = TEMP_SCROLLER_VB_IDX;
+      vb_groupidx = Find_gfx_match_from_mesh_tree(flags, mesh, specific_vb_groupidx);
    }
 
 
 
+
+   /** If no vbidx found from the mesh tree, search the vb pool if any apropriate vb exists. If none fouund, create a new one */
    let is_vertex_buffer_created = false;
 
    const pool_request_flags = mesh.gfx_pool_request;
@@ -349,14 +352,18 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       // First look the gfx pool for any matching vertex buffer
 
-      // vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, mesh.gfx_ctx_flags);
-      if((FLAGS & GFX_CTX_FLAGS.PRIVATE) || (FLAGS & GFX_CTX_FLAGS.SPECIFIC)) vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, mesh.gfx_ctx_flags);
-      // Here we must check for all vb's that are stored globaly(like for scrollers) 
-      else if((FLAGS & GFX_CTX_FLAGS.PRIVATE)===0 || (FLAGS & GFX_CTX_FLAGS.SCROLLER_VB)===0) vb_groupidx = Gfx_pool_find_vb_notPrivate(sid, pool_request_flags);
+      // Avoid searching vb for scrollers, because it is specific and it would have been found earlier
+      if((flags & GFX_CTX_FLAGS.SCROLLER_VB) === 0){
+
+         // vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, mesh.gfx_ctx_flags);
+         if((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, mesh.gfx_ctx_flags);
+         // Here we must check for all vb's that are stored globaly(like for scrollers) 
+         else if((flags & GFX_CTX_FLAGS.PRIVATE)===0 || (flags & GFX_CTX_FLAGS.SCROLLER_VB)===0) vb_groupidx = Gfx_pool_find_vb_notPrivate(sid, pool_request_flags);
+      }
 
       if (vb_groupidx === INT_NULL) {
 
-         const is_private = ((FLAGS & GFX_CTX_FLAGS.PRIVATE) || (FLAGS & GFX_CTX_FLAGS.SPECIFIC)) ? BUFFER_STATE.IS_PRIVATE : 0x0;
+         const is_private = ((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) ? BUFFER_STATE.IS_PRIVATE : 0x0;
          vb_group = Vertex_buffer_create(sid, _, progidx, is_private);
 
          // TODO: Here we need to check if the vb to be created is for scrollers
@@ -364,6 +371,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
          vb_groupidx = vb_group.idx;
          vbidxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
+
+         // Here we store any scroller created vb for all scrollers in the program
+         if(flags & GFX_CTX_FLAGS.SCROLLER_VB) GFX_VBIDX_RENAME_ME.SCROLLER_VB_IDX = vb_groupidx;
 
          Vertex_buffer_group_set_texidx(vb_groupidx, mesh.mat.texidx); // Update the vertex buffer to store the texture index
 
@@ -390,13 +400,13 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
                if(uniforms[i].name === 'u_wposxy'){
 
-                  const HAS_ABSOLUTE_POS = FLAGS & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+                  const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
                   // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
                   const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
                   // Choose to assign the mesh as the rrot uniform position, or the mesh and any mesh of this vertexbuffer should use it's Move function to be moved 
-                  const COPY_MESH_POS = false;
+                  const COPY_MESH_POS = (flags) ? true : false;
                   // Create the uniform position that will update the vertexbuffer's uniform
-                  mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
+                  mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
 
                   // root_posidx must be equal to the vertex buffer index. Every vertexbuffer has a uniform wpos.
                   if (mesh.root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
@@ -414,7 +424,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          // Get the unif wpos that is already created for this vb
          // mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
          // Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, 'u_wposxy', mesh.root_posidx);
-
 
       }
 
@@ -452,9 +461,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
-      // TODO: Set active on Add function
-      // Renderqueue_set_active(vb_groupidx, true); // Update the draw buffer
-
 
       // POTENTIAL_BUG: In case we reuse a created VB from gfx Pool, we need to insert it to the new widget root gfx buffer.
       Root_group_vbidx_view_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs);
@@ -462,7 +468,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
    }
 
-   // TODO: Implement
    // Add mesh to the root batch buffer for batch update
    Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, mesh_count);
 
@@ -477,6 +482,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
 }
+
 
 
 
@@ -553,11 +559,8 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
          // Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_PRIVATE);
          if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidxs);
 
-         // Program_store_vertex_buffer_group_idx(progidx, vbidx, vb_info.vao, vb_info.vaoidx); // Store the vertexbuffer index to the programs vb array  
-
          // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
          Mesh_per_vb_create_vb(vb_groupidx);
-
          
 
 
@@ -572,37 +575,26 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
                uniforms[i].ubidx = ubidx;
                
 
-               // HACK: The u_wposxy is a kind of generic uuuniform for all meshes, and is set up differently, so for convinience we set uup the callback here
+               // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set uup the callback here
                if(uniforms[i].name === 'u_wposxy'){
-                  const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, ubidx);
-                  emitter.root_posidx = root_posidx;
-                  if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
+
+                  // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, ubidx);
+                  const HAS_ABSOLUTE_POS = 0x0, HAS_STICKY_POS = 0x0, COPY_MESH_POS = false;
+                  emitter.root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
+                  if (emitter.root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
                   
                }
 
             }
          }
          
-         // const ubidx = Uniforms_buffer_find_ubidx_from_name('u_wposxy', progidx);
-
-         // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vb_groupidx, ubidx);
-         // emitter.root_posidx = root_posidx;
-         // if (root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
-                  
-         // Every vertex buffer needs a uniform 'u_wpos'
-         // const val = Mesh_unif_get_vb_root_wpos(root_posidx);
-         // Uniforms_buffer_set_uniform(ubidx, val);
-
          is_vertex_buffer_created = true;
 
       }
       else {
 
          // Get the unif wpos that is already created for this vb
-         
          Mesh_unif_set_from_existing_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx);
-         // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, null, vb_groupidx);
-         // emitter.root_posidx = root_posidx;
 
       }
 

@@ -14,6 +14,7 @@ import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBu
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Engine/Core/MeshBuffer.js";
 import { Root_group_vbidx_view_view_get } from "../../Engine/Core/Views/RootView.js";
+import { Screen_wpos_get, Screen_wpos_get_y } from "../../Engine/Core/MeshUniformsBuffer.js";
 
 
 
@@ -496,42 +497,87 @@ export function Vertex_buffer_group_set_render_queueidx(vb_groupidx, render_queu
 /** Pass the mesh.bufferidx index of the meshes that the scissor box will draw values from. [posx, posy, width, height] */
 export function Vertex_buffer_group_create_scissorbox(vb_groupidx, mx, my, mw, mh) {
     _vertex_buffer_groups.buffer[vb_groupidx].CreateScissorBox(mx, my, mw, mh);
-    Vertex_buffer_group_set_scissorbox(vb_groupidx);
+    Vertex_buffer_group_update_scissorbox(vb_groupidx);
 }
 
 
 
-export function Vertex_buffer_group_set_scissorbox(vb_groupidx) {
+// export function Vertex_buffer_group_update_scissorbox_all_vb(vb_groupidx) {
 
+//     /**
+//      * 1. Get the meshes for scissor box x, y, width and height values.
+//      * 2. Extract these values
+//      * 3. Run a loop for all vertex buffers that belong to the same root widget
+//      * 4. Update the scissor box values of the group   
+//      */
+
+//     const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
+
+   
+//     const mx = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[0]);
+//     const my = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[1]);
+//     const mw = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[2]);
+//     const mh = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[3]);
+    
+//     const x = mx.GetPosX();
+//     const y = my.GetPosY();
+//     const w = mw.geom.dim[0] * 2;
+//     const h = mh.geom.dim[1] * 2;
+    
+//     const root_vb_groupidxs = Root_group_vbidx_view_view_get(mx.root_bufferidx);
+    
+//     // Run for all vertex buffer groups that belong to the root widget
+//     const H = VIEWPORT.HEIGHT;
+//     for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
+
+//         const vb_group_ = _vertex_buffer_groups.buffer[root_vb_groupidxs.buffer[i]];
+//         if (vb_group_.has_scissorbox)
+//             vb_group_.SetScissorBox(x, (H - y) - h, w, h);
+//     }
+// }
+
+
+
+export function Vertex_buffer_group_update_scissorbox_all_vb() {
+    
+    // Run for all vertex buffer groups that belong to the root widget
+    for (let i = 0; i <= _vertex_buffer_groups.boundary; i++) {
+        
+        const vb_group = _vertex_buffer_groups.buffer[i];
+        if(vb_group.has_scissorbox){
+    
+            Vertex_buffer_group_update_scissorbox(i)
+        }
+    }
+}
+
+
+
+export function Vertex_buffer_group_update_scissorbox(vb_groupidx) {
+    
     /**
      * 1. Get the meshes for scissor box x, y, width and height values.
      * 2. Extract these values
      * 3. Run a loop for all vertex buffers that belong to the same root widget
      * 4. Update the scissor box values of the group   
-     */
+    */
+   
+   const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
 
-    const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
-
-    const H = VIEWPORT.HEIGHT;
+   
     const mx = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[0]);
     const my = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[1]);
     const mw = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[2]);
     const mh = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[3]);
-
+    
     const x = mx.GetPosX();
     const y = my.GetPosY();
     const w = mw.geom.dim[0] * 2;
     const h = mh.geom.dim[1] * 2;
+    const H = VIEWPORT.HEIGHT;
 
-    const root_vb_groupidxs = Root_group_vbidx_view_view_get(mx.root_bufferidx);
-
-    // Run for all vertex buffer groups that belong to the root widget
-    for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
-
-        const vb_group_ = _vertex_buffer_groups.buffer[root_vb_groupidxs.buffer[i]];
-        if (vb_group_.has_scissorbox)
-            vb_group_.SetScissorBox(x, (H - y) - h, w, h);
-    }
+    vb_group.SetScissorBox(x, (H - y) - h, w, h);
+    
 }
 
 

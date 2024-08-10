@@ -12,7 +12,7 @@ import { Root_group_activate_all_vbs_in_renderqueue, Root_group_set_render_queue
 import { Debug_info_ui } from '../../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { BLACK, BLUEL, GREEN, GREY, Interpolate_rgb_to_01, ORANGE, ORANGEL, ORANGER, PURPLEB, PURPLER, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Drawables/Operations/Recursions.js';
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
+import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_movexy } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Slider_connect, Slider_get_slider_val } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../../Engine/Drawables/Widgets/WidgetSwitch.js';
@@ -4267,8 +4267,10 @@ export function Demo_all() { // Side Panel
    const scroller_component = Components_create_scroller_component(scroller_panel_width, 140, s, s.GetPosY(),);
    Scoller_component_gengfx_and_render(scroller_component, s);
    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(s.root_posidx , scroller_component.root_posidx);
-   Listeners_set_priority(E.H, scroller_component.listeners)
-   Listeners_set_priority(E.C, scroller_component.listeners)
+   Listeners_set_priority(E.H, scroller_component.listeners);
+   Listeners_set_priority(E.C, scroller_component.listeners);
+   Listeners_set_priority(E.C, scroller_component.listeners);
+   side_panel.AddChildScrollerIdx(s.scroller_comp_idx);
 
 
 
@@ -4298,13 +4300,18 @@ export function Demo_all() { // Side Panel
             Callback_animations_create( // Close Panel
                (params) => { // Run Animation
 
-                  let reduce_val = params.reduce_val;
+                  const reduce_val = params.reduce_val;
                   const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
 
                   if (unif_wpos + reduce_val < VIEWPORT.WIDTH - btn.geom.dim[0] * 2 - section_pad[0]) {
 
                      const section = params.section;
                      Mesh_unif_add_vb_root_wposx(section.root_posidx, reduce_val);
+
+                     /*******************************************/
+                     // Move any scrollbar
+                     if(section.scroller_comp !== null || section.has_children_scrollers) 
+                        Scroller_component_movexy(section.children_scrollers_buffer, reduce_val, 0)
 
                      if (params.reduce_val > 5) params.reduce_val *= .9
                      // console.log('reduce_val', reduce_val, unif_wpos)
@@ -4330,12 +4337,17 @@ export function Demo_all() { // Side Panel
 
                   
                   const scroll_comp_width = params.scroll_comp_width;
-                  let reduce_val = params.reduce_val;
+                  const reduce_val = params.reduce_val;
                   const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
                   if (unif_wpos > VIEWPORT.WIDTH - section.geom.dim[0] * 2 - scroll_comp_width) {
 
                      const section = params.section;
                      Mesh_unif_add_vb_root_wposx(section.root_posidx, -reduce_val);
+
+                     /*******************************************/
+                     // Move any scrollbar
+                     if(section.scroller_comp !== null || section.has_children_scrollers) 
+                        Scroller_component_movexy(section.children_scrollers_buffer, -reduce_val, 0)
 
                      if (params.reduce_val > 5) params.reduce_val *= .9
                      // console.log('reduce_val', reduce_val, unif_wpos)

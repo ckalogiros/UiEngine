@@ -7,7 +7,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Relative_pos_comp_move_right_buffer } from "../../Drawables/Operations/RelativePosComponent.js";
 import { Renderqueue_set_active, Renderqueue_set_flags } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx } from "../MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb_remove_all_from_index } from "../MeshBuffer.js";
 import { Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
 
 
@@ -637,7 +637,11 @@ export function Root_group_reset_gfxs(root_bufferidx) {
       Vertex_buffer_create_attribs_info_per_vb_instanced(mesh.gfx.prog.attribsidx, mesh.gfx.vb.starts.buffer);
 
       Index_buffer_reset(mesh.gfx.ib.idx); // BUG: The vertex buffer is getting reset to specific index, although the index buffer is reset to 0
+      
+      // Reset the mesh per vb buffer of each vb
+      Mesh_per_vb_remove_all_from_index(mesh.gfx.vb.groupidx);
    }
+
 }
 
 

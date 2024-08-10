@@ -1,6 +1,7 @@
 "use strict";
 
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
+import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_unif_add_vb_root_wposy, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
@@ -14,6 +15,11 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 
 
 
+
+
+
+
+const _scrollers_buffer = New_generic_buffer(_, 'Scrollers Buffer');
 
 
 
@@ -63,12 +69,19 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    
    // Scroller_clip_scrolled_section(mesh, abs_ypos, height);
 
+   // HACK: We replace the scrollers uniform wposition (of the vb all the scrollers are inserted to) with the meshes unif wpos, what ever that is(maybe the mesh has a root widget from which it takes its unif wpos). 
+   bar.root_posidx = mesh.root_posidx; 
+
 
    bar.AddChild(handle);
    bar.scrolled_section = mesh;
    
+   const idx = _scrollers_buffer.Add(bar);
+   mesh.scroller_comp_idx = idx;
+   
    mesh.scroller_comp = bar;
    mesh.components |= COMPONENTS.SCROLLER;
+   
    return bar;
 
 }
@@ -86,12 +99,12 @@ export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags=0x0, pa
    // Create absolute position on canvas scrolling
    if(gfx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION){
 
-      bar.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-      bar.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, bar.mesh_bufferidx);
+      bar.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.SCROLLER_VB;
+      bar.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.SCROLLER_VB, bar.mesh_bufferidx);
    }
 
 
-   bar.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   bar.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC|GFX_CTX_FLAGS.SCROLLER_VB);
 
    // Set positions after 'GenGfxCtx' so that the bar's
    /** Set bar pos */
@@ -416,7 +429,8 @@ function Scroller_clip_scrolled_section(scrolled_section, clip_top, height) {
       Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
    }
    else {
-      console.error('SCROLLER ERROR \nThe current scrolled section does not have a \'group\'. create a grouup for the scrolled mesh so that the scroller can clip.')
+      console.error('SCROLLER ERROR \nThe current scrolled section does not have a \'group\'. create a grouup for the scrolled mesh so that the scroller can clip.');
+      console.log(scrolled_section.scroller_comp.GetName(), scrolled_section.scroller_comp.mesh_bufferidx)
    }
 }
 
@@ -501,3 +515,53 @@ function Scroller_component_update_scrolled_section_pos_from_handle(scrolled_sec
 //    }
 
 // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************************************************************************************************************************************/
+// 
+
+export function Scroller_component_movexy(scroller_buffer_idxs, x, y){
+   
+   
+   for(let i = 0; i <= scroller_buffer_idxs.boundary; i++){
+      
+      const scrolleridx = scroller_buffer_idxs.buffer[i];
+      const bar = _scrollers_buffer.buffer[scrolleridx];
+      
+      // const rootpos = Mesh_unif_get_vb_root_wpos(bar.root_posidx);
+      const rootpos = [0, 0];
+      rootpos[0] += x;
+      rootpos[1] += y;
+
+      bar.geom.pos[0] += rootpos[0];
+      bar.geom.pos[1] += rootpos[1];
+      bar.geom.AddWposXY(bar.gfx, rootpos[0], rootpos[1]);
+   
+      const handle = bar.children.buffer[0];
+      handle.geom.pos[0] += rootpos[0];
+      handle.geom.pos[1] += rootpos[1];
+      handle.geom.AddWposXY(handle.gfx, rootpos[0], rootpos[1]);
+      // console.log(bar.mesh_bufferidx, bar.GetName())
+   }
+
+}

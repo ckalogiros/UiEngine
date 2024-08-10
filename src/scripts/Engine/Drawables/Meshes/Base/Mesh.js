@@ -1,7 +1,7 @@
 "use strict";
 import { Timer_get_global_timer } from "../../../Timers/Timers.js";
 import { Time_intervals_destroy_byidx } from "../../../Timers/TimeIntervals.js";
-import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
+import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { GlRotateZ2D, Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_change_child_event, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh } from "../../../Core/MeshBuffer.js";
@@ -96,8 +96,11 @@ export class Mesh {
     rel_comp; // A component to position this mesh's children relative to the position of one of 'LEFT-CENTER-RIGHT' and relative all other children's position
     root_posidx; // An index to the root position buffer. 
     
-    scroller_comp;  // Pointer to scroll bar mesh. 
-    components;     // BitField: Type of 'COMPONENTS'
+    scroller_comp;  // Pointer to scroller mesh.
+    scroller_comp_idx;  // An index to scroller buffer.
+    children_scrollers_buffer; // A buffer to store all scrollers this mesh is the root for. (For Move() functionality etc) 
+    has_children_scrollers; // A quick way to check if any children scroller exists
+    components;     // BitField: Type of 'COMPONENTS'. // TODO: Later implement more components other than scrollers.
 
     debug_info;         // Struct: Debug_info_ui.
     minimized;          // Pointer: to a minimized version of the mesh.
@@ -180,11 +183,14 @@ export class Mesh {
         // this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
         this.eventCallbacks = null;
         this.children = New_generic_buffer(_, 'Mesh children');
-        this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'NEW time_intervals');
-
+        this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'Mesh time_intervals');
+        
         this.rel_comp = null;
         this.root_posidx = INT_NULL;
         this.scroller_comp = null;
+        this.scroller_comp_idx = INT_NULL;
+        this.children_scrollers_buffer = New_int16_buffer(_, 'Mesh children_scrollers_buffer');
+        this.has_children_scrollers = false;
 
 
         this.hover_margin = [0, 0];
@@ -748,9 +754,17 @@ export class Mesh {
     }
 
 
-    // ReserveUnifWpos(){
+    AddChildScrollerIdx(scroller_comp_idx){
+        /**
+         * In order for a root widget to have access to all scrollers of any of it's children meshes,
+         * we need a storage buffer to store all scrollers indexes.
+         * The use is for example moving the root, then all scrollers must move.
+         */
+        this.children_scrollers_buffer.Add(scroller_comp_idx);
+        this.has_children_scrollers = true;
+    }
 
-    // }
+
 
 }
 

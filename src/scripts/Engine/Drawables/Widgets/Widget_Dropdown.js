@@ -14,7 +14,7 @@ import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos } from "./ScrollerComponent.js";
-import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Mesh_set_scissorbox } from "../Operations/MeshHelperFunctions.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_set_in_focus, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 
@@ -974,7 +974,7 @@ export class Widget_Dropdown extends Section {
       /********************************************************************************************************************/
       // Set any scissor box
       if(Vertex_buffer_group_has_scissorbox(this.gfx.vb.groupidx)){
-         Vertex_buffer_group_set_scissorbox(this.gfx.vb.groupidx);
+         Vertex_buffer_group_update_scissorbox_all_vb(this.gfx.vb.groupidx);
       }
 
 

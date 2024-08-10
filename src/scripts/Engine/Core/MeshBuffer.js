@@ -290,11 +290,11 @@ export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
  *       so no other meshes except the root group can be stored to the group's vertex buffers 
  */
 export function Mesh_per_vb_remove_all_from_index(vb_groupidx) {
+   
+   _mesh_per_vertex_buffer.buffer[vb_groupidx].Reset();
 
    // const mesh = _mesh_buffer.buffer[meshidx];
    // if (mesh.per_vb_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
-   
-   _mesh_per_vertex_buffer.buffer[vb_groupidx].ResetFull();
 
    // for (let i = _mesh_per_vertex_buffer.buffer[vb_groupidx].boundary; i >= mesh.per_vb_bufferidx; i--) {
    //    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxSortedVersion(mesh.per_vb_bufferidx, meshidx, 'Mesh_per_vb_remove_all_from_index');

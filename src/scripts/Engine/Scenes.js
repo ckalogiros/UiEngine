@@ -1,7 +1,8 @@
 "use strict";
 import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name } from '../Graphics/Buffers/UniformBuffers.js';
+import { Vertex_buffer_group_update_scissorbox_all_vb } from '../Graphics/Buffers/VertexBuffers.js';
 import { M_Buffer } from './Core/Buffers.js';
-import { Screen_wpos_add_y } from './Core/MeshUniformsBuffer.js';
+import { Screen_wpos_add_y, Screen_wpos_set_y } from './Core/MeshUniformsBuffer.js';
 import { HandleEvents } from './Events/Events.js';
 
 
@@ -105,16 +106,23 @@ export function Scene_camera_zoom(sceneidx, value) {
 }
 
 
-let cnt = 0;
 
-export function Scene_camera_scroll(sceneidx, sign) {
-
-    // Create a scroll value from the sign
-    const value = -sign;
+export function Scene_camera_scroll_set(sceneidx, value) {
 
     // Set the screen wpos
-    let screen_wpos_val = value;
-    Screen_wpos_add_y(-screen_wpos_val);
+    Screen_wpos_set_y(value);
+
+    Vertex_buffer_group_update_scissorbox_all_vb();
+}
+
+
+
+export function Scene_camera_scroll_add(sceneidx, value) {
+
+    // Set the screen wpos
+    Screen_wpos_add_y(value);
+
+    Vertex_buffer_group_update_scissorbox_all_vb();
 }
 
 

@@ -18,10 +18,10 @@ import { REL_POS, Relative_pos_comp_create_new_comp } from '../Engine/Drawables/
 import { Mesh_animations_create } from '../Engine/Animations/MeshAnimations.js';
 import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gfx_uniforms_set_clbk, TEMP_PARTICLES_GEN_GFX } from '../Engine/ParticlesSystem/ParticlesSystem.js';
 import { Set_color_rgb } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
-import { Mesh_unif_add_vb_root_wposx, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Screen_wpos_add_y, Screen_wpos_get_y, Screen_wpos_set_y } from '../Engine/Core/MeshUniformsBuffer.js';
+import { Mesh_unif_add_vb_root_wposx, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
 
 import { TimerGetGlobalTimerCycle, Timer_get_global_timer } from '../Engine/Timers/Timers.js';
-import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox } from '../Graphics/Buffers/VertexBuffers.js';
+import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
 import { Gl_set_rgba, GlRotateZ2D } from '../Graphics/Buffers/VertexBuffersOps.js';
@@ -35,7 +35,7 @@ import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
 import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
 import { Demo_widgets_button, Demo_widgets_colorpicker, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
 import { Demo_page } from './DemoPage.js';
-import { Root_group_activate_all_vbs_in_renderqueue } from '../Engine/Core/Views/RootView.js';
+import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from '../Engine/Core/Views/RootView.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -541,6 +541,7 @@ export function TestWidgetsGeneric(createId=1) {
     { // Widget: Scroller
 
         // const scroller = CreateScrollerClampAlphaTest(10)
+        // const scroller2 = CreateScrollerClampAlphaTest(10)
 
         // TestScrollerComponent();
 

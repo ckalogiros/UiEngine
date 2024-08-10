@@ -7,6 +7,7 @@
 
 "use strict";
 
+import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../Graphics/Buffers/VertexBuffers.js";
 import { New_generic_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer.js";
@@ -72,9 +73,11 @@ export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; 
 
 // IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
-export function Mesh_unif_create_vb_root_wpos(mesh, debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, COPY_MESH_POS) {
-  
-   const mesh_bufferidx = mesh.mesh_bufferidx, mesh_pos = mesh.geom.pos, mesh_type = mesh.type, mesh_nameidx = mesh.nameidx, mesh_parent = mesh.parent;
+export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent, debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, COPY_MESH_POS) {
+
+
+
+   // const mesh_bufferidx = mesh.mesh_bufferidx, mesh_pos = mesh.geom.pos, mesh_type = mesh.type, mesh_nameidx = mesh.nameidx, mesh_parent = mesh.parent;
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
    let meshidx = mesh_bufferidx;
@@ -401,31 +404,40 @@ export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
     */
    for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
       
-      const elem = _per_vb_mesh_unif_wpos.buffer[i];
+      // const elem = _per_vb_mesh_unif_wpos.buffer[i];
 
-      // console.log(i)
-      if(elem.scroll_bar !== INT_NULL && 
-         ( _per_vb_mesh_unif_wpos.buffer[i].parent_posidx === root_posidx || //Meaning the unif that has a scrollbar(i) must be child of the current moved unif (root_posidx)
-         i === root_posidx ) // Or the current i is the one that has the scrollbar 
-      ){
 
-         // _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[0] += x;
-         // _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[1] += y;
-
-         /** MOVE THE SCROLLBAR MESH INSTEAD OF IT'S UNIF WPOS. This impl is for storing scrollbars in the same vertex buffer */
-         // TODO: It is not correct to set the mesh pos here, but is the easiest way to have access to all scrollbars.
-         const scrollbaridx = _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].meshidx;
-         const scrollbar = Mesh_buffer_get_mesh_byidx(scrollbaridx);
-
-         const handle = scrollbar.children.buffer[0];
-         scrollbar.geom.pos[0] += x;
-         scrollbar.geom.pos[1] += y;
-         scrollbar.geom.AddWposXY(scrollbar.gfx, x, y);
-         handle.geom.pos[0] += x;
-         handle.geom.pos[1] += y;
-         handle.geom.AddWposXY(handle.gfx, x, y);
-         // console.log(scrollbar)
+      /********************************************************************************************************************/
+      // Set any scissor box
+      // TODO: Where to update any scissor box??? 1. at the update functions(Move, resize, etc)? At the 'mesh uniform' file(for move)???
+      if(Vertex_buffer_group_has_scissorbox(i)){
+         Vertex_buffer_group_update_scissorbox(i);
       }
+
+
+   //    // console.log(i)
+   //    if(elem.scroll_bar !== INT_NULL && 
+   //       ( _per_vb_mesh_unif_wpos.buffer[i].parent_posidx === root_posidx || // Meaning the unif that has a scrollbar(i) must be child of the current moved unif (root_posidx)
+   //       i === root_posidx ) // Or the current i is the one that has the scrollbar 
+   //    ){
+
+   //       // _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[0] += x;
+   //       // _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[1] += y;
+
+   //       /** MOVE THE SCROLLBAR MESH INSTEAD OF IT'S UNIF WPOS. This impl is for storing scrollbars in the same vertex buffer */
+   //       // TODO: It is not correct to set the mesh pos here, but is the easiest way to have access to all scrollbars.
+   //       const scrollbaridx = _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].meshidx;
+   //       const scrollbar = Mesh_buffer_get_mesh_byidx(scrollbaridx);
+
+   //       const handle = scrollbar.children.buffer[0];
+   //       scrollbar.geom.pos[0] += x;
+   //       scrollbar.geom.pos[1] += y;
+   //       scrollbar.geom.AddWposXY(scrollbar.gfx, x, y);
+   //       handle.geom.pos[0] += x;
+   //       handle.geom.pos[1] += y;
+   //       handle.geom.AddWposXY(handle.gfx, x, y);
+   //       console.log(scrollbar.mesh_bufferidx, scrollbar.GetName())
+   //    }
    }
 }
 
@@ -600,13 +612,6 @@ export function Mesh_unif_store_vb_root_col(idx, pos) {
    _per_vb_mesh_unif_col.buffer[idx].col[3] = pos[3];
 }
 
-
-
-
-
-
-/*********************************************************************************************************/
-// GETTERS
 
 
 
