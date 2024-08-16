@@ -213,6 +213,7 @@ const STATE = {
 	scene: {
 		active: null,
 		active_idx: null,
+		scroll_enable: true,
 	},
 
 	loop: {

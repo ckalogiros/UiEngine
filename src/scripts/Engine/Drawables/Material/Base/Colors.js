@@ -237,12 +237,12 @@ export const PURPLER = [ PURPLER0, PURPLER1, PURPLER2, PURPLER3, PURPLER4, PURPL
 
 export const COLOR_ARRAY3 = [
 	BLUEL,
-	YELLOW,
-	PURPLER,
 	PURPLEB,
+	PURPLER,
+	REDL,
+	YELLOW,
 	ORANGE,
 	ORANGEL,
-	REDL,
 	GREEN,
 ];
 
@@ -254,8 +254,8 @@ export const COLOR_ARRAY3 = [
 
 
 const citf = 1 / 255;
-export function Interpolate_rgb_to_01(red, green, blue) {
-	return new Float32Array([citf * red, citf * green, citf * blue, 1.0]);
+export function Interpolate_rgb_to_01(red, green, blue, alpha=1) {
+	return new Float32Array([citf * red, citf * green, citf * blue, alpha]);
 }
 
 const PINK_240_60_160 = Interpolate_rgb_to_01(240, 60, 160);

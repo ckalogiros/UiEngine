@@ -45,6 +45,7 @@ class Callback_Animation {
    Stop() {
       this.is_active = false;
       this.stopAnimationClbk(this.params);
+
    }
 
 }
@@ -80,6 +81,7 @@ export function Callback_animations_destroy() {
       if (anim.is_active) {
          
          anim.Stop();
+         
       }
    }
 }
@@ -91,7 +93,8 @@ function Get_next_free() {
    for (let i = 0; i <= _clbk_animations_buffer.boundary; i++) {
 
       const anim = _clbk_animations_buffer.buffer[i];
-      if (!anim.is_active) {
+      if (anim.is_active === false) {
+         // console.log(i, 'Animation:', anim.is_active)
          return i;
       }
    }
@@ -114,8 +117,9 @@ export function Callback_animations_create(animationClbk, stopAnimationClbk, par
       anim.Create(animationClbk, stopAnimationClbk, params, null, name);
       anim.in_animation = true;
       anim.is_active = true;
+      return freeIdx;
    }
-   return freeIdx;
+   alert('666555444');
 }
 
 
@@ -136,6 +140,7 @@ export function Callback_animations_run() {
          else { // Here do stuf if animation stops
       
             anim.Stop();
+            // console.log('----- Animation STOP', i)
          }
       }
    }

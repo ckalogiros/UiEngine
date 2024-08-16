@@ -260,19 +260,50 @@ export function RotateZ(dim, angle) {
 	const p = [dim[0], dim[1]];
 	const r = [ c, -s, s, c, ];
 
-	// const newPos = [
-	// 	p[0]*r[0] + p[1]*r[2],
-	// 	p[0]*r[1] + p[1]*r[3],
+	const newPos = [
+		-p[0]*r[0] + p[1]*r[2],
+		-p[0]*r[1] + p[1]*r[3],
 		
-	// 	p[2]*r[0] + p[3]*r[2],
-	// 	p[2]*r[1] + p[3]*r[3],
+		-p[0]*r[0] + -p[1]*r[2],
+		-p[0]*r[1] + -p[1]*r[3],
 		
-	// 	p[4]*r[0] + p[5]*r[2],
-	// 	p[4]*r[1] + p[5]*r[3],
+		p[0]*r[0] + p[1]*r[2],
+		p[0]*r[1] + p[1]*r[3],
 		
-	// 	p[6]*r[0] + p[7]*r[2],
-	// 	p[6]*r[1] + p[7]*r[3],
-	// ];
+		p[0]*r[0] + -p[1]*r[2],
+		p[0]*r[1] + -p[1]*r[3],
+	];
+
+	return newPos;
+};
+
+/**
+  	const yaw = [
+		1, c, -s, 0, // 0 1 2 4 5 6 7 8 9 10 15
+		0,  s, c, 0,
+		0,  0, 1, 0,	
+		0,  0, 0, 1,	
+	];
+	const pitch = [
+		c, 0, s, 0,
+		0, 1, 0, 0,
+		-s, 0, c, 0,
+		0, 0, 0, 1,
+	];
+	const rol = [
+		1, 0,  0, 0,
+		0, c, -s, 0,
+		0, s,  c, 0,	
+		0, 0,  0, 1,	
+	];
+ */
+export function RotateY(dim, angle) {
+alert('61544312 \nIMPLEMENT ME')
+	const c = Math.cos(angle);
+	const s = Math.sin(angle);
+	const p = [dim[0], dim[1]];
+	const r = [ c, s, -s, c, ];
+
 	const newPos = [
 		-p[0]*r[0] + p[1]*r[2],
 		-p[0]*r[1] + p[1]*r[3],

@@ -221,7 +221,7 @@ function Analyze_flag(anim_type_flag, flag){
         if(flag & ANIMATIONS.DATA.COLOR.A) return ANIMATIONS.DATA.COLOR.A;
     }
     else if(anim_type_flag & ANIMATIONS.TYPE.WPOS){
-        // alert('IMPLEMET FOR WPOS\nEEE\nAnimations.js')
+        // alert('IMPLEMENT FOR WPOS\nEEE\nAnimations.js')
         if(flag & ANIMATIONS.DATA.POS.ROT) return (ANIMATIONS.DATA.POS.ROT);
         if(flag & ANIMATIONS.DATA.POS.XY) return (ANIMATIONS.DATA.POS.X|ANIMATIONS.DATA.POS.Y);
         if(flag & ANIMATIONS.DATA.POS.X) return ANIMATIONS.DATA.POS.X;

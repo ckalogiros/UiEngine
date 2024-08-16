@@ -71,7 +71,7 @@ export function HandleEvents() {
                      * Case the mouse 'click-up' happens outside the buttons area.
                      * Instead of run the buttons 'OnClick' method, we call directly a method
                      * to remove the the time interval.
-                     * Else we should call the ListenEvents, which could not find any 
+                     * Else we should call the ListenEvents, which would not find any 
                      * intersection between the mouse and the button
                      */
                     STATE.mesh.click_hold.RemoveTimeInterval(INTERVALS.UPDATE);

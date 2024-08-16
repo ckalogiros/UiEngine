@@ -521,8 +521,13 @@ export class Mesh {
 
     SetDefaultPosXY() { this.SetUpdateFrameBuffer(); this.geom.SetDefaultPosXY(this.gfx); }
 
-
-    SetWposXY(pos) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, pos[0], pos[1]); }
+    // TODO: Update the .pos of the mesh for the rest of the methods
+    SetWposXY(pos) { 
+        this.SetUpdateFrameBuffer(); 
+        this.geom.pos[0] = pos[0];
+        this.geom.pos[1] = pos[1];
+        this.geom.SetWposXY(this.gfx, pos[0], pos[1]); 
+    }
 
 
     SetPosXY(pos) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, pos[0], pos[1]); }

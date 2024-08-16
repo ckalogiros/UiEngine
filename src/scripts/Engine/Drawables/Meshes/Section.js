@@ -493,7 +493,27 @@ export class Section extends Mesh {
 
       STATE.mesh.SetClicked(section);
 
-      if (section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+      // This is to bind a click event to a section.
+      if (section.evt_params && section.evt_params.EventClbk) {
+
+         // Create time interval to continuosly press the button
+         if (section.StateCheck(MESH_STATE.IS_HOLD_CLICK)) {
+
+            const EventClbk = section.evt_params.EventClbk;
+            const target_params = section.evt_params.params.target_params
+            const idx = Time_intervals_create(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
+            section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+
+            STATE.mesh.SetClickHold(section);
+         }
+         else  {
+
+            const EventClbk = section.evt_params.EventClbk;
+            EventClbk(section.evt_params);
+         }
+      }
+      // This is for move and/or resize events
+      else if (section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
          const pos = section.GetPosXY();
          const right = pos[0] + section.geom.dim[0] * 2;
@@ -547,6 +567,7 @@ export class Section extends Mesh {
          }
 
       }
+
 
       return true;
 
@@ -624,6 +645,15 @@ export class Section extends Mesh {
    }
 
 
+   RemoveTimeInterval(idx) {
+      const intervalIdx = this.timeIntervalsIdxBuffer.buffer[idx];
+      if(intervalIdx===-1){
+         console.error('intervalIdx', intervalIdx, 'this.timeIntervalsIdxBuffer.buffer', this.timeIntervalsIdxBuffer.buffer)
+         alert('4177834776439 \nIssue with timeInterval\nPossible error: We overloaded the time intervals buffer\nThe buffer currently holds up to two intervals\nINTERVALS.UPDATE and INTERVALS.MOVE\nTry to dissable mesh Move event')
+      }
+      Time_intervals_destroy_byidx(intervalIdx);
+      this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(idx);
+   }
 
 
 
@@ -909,6 +939,23 @@ export class Section extends Mesh {
       }
       section.max_size[0] = 0;
       section.max_size[1] = 0;
+
+   }
+
+
+   Bind(EventClbk = null, targetBindingFunctions = _, params, click_flags) {
+
+
+      this.evt_params = { // Create the parameters to pass for the button's click event. 
+         EventClbk: EventClbk,
+         targetBindingFunctions: targetBindingFunctions,
+         target_mesh: this,
+         params: params,
+      };
+
+      if (click_flags) this.state.mask |= click_flags;
+
+      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
    }
 }

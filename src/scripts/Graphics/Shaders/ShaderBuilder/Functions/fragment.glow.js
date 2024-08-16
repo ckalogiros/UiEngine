@@ -18,9 +18,9 @@ export const frag_glow_call = `
     // Removes any previous functions calculations. Must be combined with:'color = glowcol'
     // glowcol.rgb *= (1.-alpha); 
     // color = glowcol;
+    // color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
     color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
-
-
+    // color.a = .5;
 `;
 
 export const frag_glow = `
@@ -69,8 +69,8 @@ vec4 Glow(float alpha)
     // color.rgb *= original_a;
     // alpha *= original_a;
     // vec3 color = vec3(d*intensity);
-    // vec3 color = min(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
-    // vec3 color = max(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
+    // color = min(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
+    // color = max(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
    
    
     return vec4(color, alpha);

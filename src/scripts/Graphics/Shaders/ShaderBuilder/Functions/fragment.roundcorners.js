@@ -131,21 +131,20 @@ vec4 Stylize()
     float wa = 1.;
     float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);
     float alpha = src.a * (wa * wb);
-    // color += color + src.rgb * alpha;
     color += color + src.rgb * alpha;
     
-    // float wide = rCorners.x; 
-    // float strength = 1.8; 
+    float wide = rCorners.x; 
+    float strength = 1.8; 
     // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 5., abs(d)) );
-    // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 20., abs(d)*wide) );
+    color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 20., abs(d)*wide) );
     
     //   Border Width. It is 0.001 for every pixel
-    // float borderWidth = border_width;
-    // float bd = (abs(d)-borderWidth) - blur.x;
-    // wa = clamp(-bd * AA, 0.0, 1.0);
-    // wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);
-    // color += color * vec3(abs(wa * wb));
-    // color +=  color * pow(vec3(abs(wa * wb)), vec3(4.4));
+    float borderWidth = border_width;
+    float bd = (abs(d)-borderWidth) - blur.x;
+    wa = clamp(-bd * AA, 0.0, 1.0);
+    wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);
+    color += color * vec3(abs(wa * wb));
+    color +=  color * pow(vec3(abs(wa * wb)), vec3(4.4));
     return vec4(color, alpha);
 }
 `;

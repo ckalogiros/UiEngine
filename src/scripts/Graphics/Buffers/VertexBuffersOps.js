@@ -463,17 +463,7 @@ export function Gl_set_dim_y(gfxInfo, y, num_faces = 1) {
    let loop_count = num_faces;
    let stride = vb_info.attribs_info.count - 1;
 
-   // y*=2;
-   /** // TODO: Correct the vetex position with the dimention expansion. IF it exists in the attributes of the vertex buffer
-      // VERTEX POSITION
-      vb_data[index++] = vpos_x;
-      if(j===0) vb_data[index++] = geom.dim[1]*2;
-      if(j===1) vb_data[index++] = 0;
-      
-      // DIMENTIONS
-      vb_data[index++] = geom.dim[0] * num_faces;
-      vb_data[index++] = geom.dim[1];
-   */
+
    while (loop_count) {
 
       vb_data[index++] = y*2;
@@ -512,29 +502,78 @@ export function Gl_add_dim_xy(gfxInfo, x, y, num_faces = 1) {
    let loop_count = num_faces;
    let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[dimidx];
 
-   x*=2; y*=2;
+   // x*=2; y*=2;
 
-
+   // HACK: Change the roundnes attribute
+   const roundness_idx = 7;
+   const vpos = [x*2, y*2]
+   const dim = [x, y]
+   const size = (vb_data[index+1]+x*2)/2;
+   
    while (loop_count) {
-
+      
       vb_data[index++] += 0;
-      vb_data[index++] += y;
-      index += stride;
+      vb_data[index++] += vpos[1];
 
+      vb_data[index++] += dim[0];
+      vb_data[index++] += dim[1];
+      vb_data[index-roundness_idx] = size;
+      index += stride-2;
+      
+      
+      
       vb_data[index++] += 0;
       vb_data[index++] += 0;
-      index += stride;
 
-      vb_data[index++] += x;
-      vb_data[index++] += y;
-      index += stride;
+      vb_data[index++] += dim[0];
+      vb_data[index++] += dim[1];
+      vb_data[index-roundness_idx] = size;
+      index += stride-2;
 
-      vb_data[index++] += x;
+      
+      vb_data[index++] += vpos[0];
+      vb_data[index++] += vpos[1];
+      
+      vb_data[index++] += dim[0];
+      vb_data[index++] += dim[1];
+      vb_data[index-roundness_idx] = size;
+      index += stride-2;
+      
+      
+      vb_data[index++] += vpos[0];
       vb_data[index++] += 0;
-      index += stride;
+      
+      vb_data[index++] += dim[0];
+      vb_data[index++] += dim[1];
+      vb_data[index-roundness_idx] = size;
+      index += stride-2;
+      
 
       loop_count--;
    }
+
+   // while (loop_count) {
+
+   //    vb_data[index++] += 0;
+   //    vb_data[index++] += vpos[1];
+   //    index += stride;
+
+   //    vb_data[index++] += 0;
+   //    vb_data[index++] += 0;
+   //    index += stride;
+
+   //    vb_data[index++] += vpos[0];
+   //    vb_data[index++] += vpos[1];
+   //    index += stride;
+
+   //    vb_data[index++] += vpos[0];
+   //    vb_data[index++] += 0;
+   //    index += stride;
+
+   //    // console.log(x, y)
+
+   //    loop_count--;
+   // }
 
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);

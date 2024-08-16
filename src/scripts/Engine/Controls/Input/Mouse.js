@@ -404,8 +404,8 @@ export function OnTouchStart(e) {
    e.stopPropagation();
    e.preventDefault(); 
 
-   const x = e.changedTouches[0].clientX;
-   const y = e.changedTouches[0].clientY;
+   const x = e.changedTouches[0].clientX + DEVICE.info.canvas_left;
+   const y = e.changedTouches[0].clientY + DEVICE.info.canvas_top ;
    MouseSetCoords([x,y]); // IMPORTANT: Must set the mouse position on click, because touch screens do not track any position
    // console.log('OnTouchStart:', [x,y])
    
@@ -418,6 +418,9 @@ export function OnTouchStart(e) {
    
    RegisterEvent('mouse-click-down', params);
 
+   // alert(`Touch coordinates:${x}, ${y}`);
+   
+
 }
 
 
@@ -427,8 +430,8 @@ export function OnTouchEnd(e) {
    e.stopPropagation();
    e.preventDefault(); 
    
-   const x = e.changedTouches[0].clientX;
-   const y = e.changedTouches[0].clientY;
+   const x = e.changedTouches[0].clientX + DEVICE.info.canvas_left;
+   const y = e.changedTouches[0].clientY + DEVICE.info.canvas_top ;
    MouseSetCoords([x,y]);
    // console.log('OnTouchEnd:',[x, y]);
 
@@ -451,26 +454,29 @@ export function OnTouchCancel(e) {
 }
 
 
+
 export function OnTouchMove(e) {
    e.stopPropagation();
    e.preventDefault(); 
 
 
+   
    // Update mouse coordinates
-   const x = e.changedTouches[0].clientX;
-   const y = e.changedTouches[0].clientY;
-
+   const x = e.changedTouches[0].clientX + DEVICE.info.canvas_left;
+   const y = e.changedTouches[0].clientY + DEVICE.info.canvas_top ;
+   
    const prevy = y;
    const delta = GetSign(mouse.pos.y - prevy);
-
+   
    if(Abs(delta) < 1) return;
-
+   
    MouseSetCoords([x,y]);
    
    mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
    mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
    
    
+   if(STATE.scene.scroll_enable === false) return;
    // TODO: We need to account for clicked meshes too(I mean if an area below the mouse is clickable we shouldn't run the move event )
    if(STATE.mouse.activeClickedButtonId !== INT_NULL && STATE.mesh.hovered === null && STATE.mesh.grabed === null){
       
@@ -522,4 +528,10 @@ export function OnTouchMove(e) {
    
 }
 
+
+
+export function Android_deactivate_scrolling(){
+
+   STATE.scene.scroll_enable = false;
+}
  

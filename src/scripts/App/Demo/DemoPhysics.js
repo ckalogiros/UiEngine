@@ -3,7 +3,7 @@
 import { Create_rect_mesh, Create_widget_multi_text, Create_widget_section, Create_widget_slider, Create_widget_text } from "../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
-import { BLUEL, GREEN, GREY, WHITE, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, WHITE, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
@@ -17,7 +17,12 @@ import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/Math
 
 
 
-
+/**
+ * VELOCITY DISTRIBUTION SUMMED OF ANY DIRECTION FOR BOTH Y AND X 
+ * from 1.0 to 1.41422. this is true for any direction.
+ * the 1.0 is the max of any axis move (x or y), 
+ * and it gets larger towards diagonal move, where max velocity for each (x,y) is 0.70711  
+ */
 
 
 
@@ -29,7 +34,7 @@ import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/Math
 
 /*****************************************************************************************************************************************************/
 /*****************************************************************************************************************************************************/
-// Elastic Collisions
+// Sattelite rotation
 
 const random_velocities = [
    -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3, 
@@ -49,7 +54,7 @@ export function Sattelite_rotation(_pos=[0,0]){
    
    let total_height = 20;
    const pad = 10;
-   const panel_height = 170;
+   const panel_height = 150;
    
    /**********************************************************************************************************************************************/
    // Controls
@@ -63,7 +68,7 @@ export function Sattelite_rotation(_pos=[0,0]){
       pass: SID.PASS.WPOS2,
    };
 
-   const slider_dim = [170, 10];
+   const slider_dim = [300, 10];
    // Rotation slider
    const rot_slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Rotation');
    controls_section.AddItem(rot_slider);
@@ -108,7 +113,7 @@ export function Sattelite_rotation(_pos=[0,0]){
       // Balls
       const size = 30;
       const dim = [size, size]
-      const pos = [180, 180];
+      const pos = [(panel_height-size), (panel_height-size)];
 
 
       const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, BLUEL[9], 'Ball', [0, dim[0], 2]);
@@ -123,8 +128,8 @@ export function Sattelite_rotation(_pos=[0,0]){
       const mass=ball.geom.dim[0]; 
       const momentum=[velocity[0]*mass, velocity[1] * mass];
       const acceleration = [0, 0];
-      // const speed = GetRandomInt(1, 1);
       const speed = .5;
+
       physics[i] = {
          vel:velocity,
          mass:mass,
@@ -133,14 +138,10 @@ export function Sattelite_rotation(_pos=[0,0]){
          speed:speed,
       }
 
-      // total_height += dim[0];
-      
    }
    
    const sat = Create_rect_mesh(_, _, [6, 12], YELLOWL[9]);
    sat.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [0, 10, 1.2]);
-   // sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
    section.AddItem(sat)
 
    // Render
@@ -276,6 +277,11 @@ export function Sattelite_rotation(_pos=[0,0]){
          nfo.SetDynamicText(`ms${ms} -`, ms, ()=>{ return physics[0].vel[1]; }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
+         nfo.CreateNewText('Sum:', font_size, WHITE, pad2, .9, );
+         nfo.CreateNewText('00000', font_size, ORANGER[9], pad2, .9);
+         nfo.SetDynamicText(`ms${ms} -`, ms, ()=>{ return Abs(physics[0].vel[0])+Abs(physics[0].vel[1]); }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
+         generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
       }
       { // Info
          const ball = balls_buffer[0];
@@ -296,6 +302,29 @@ export function Sattelite_rotation(_pos=[0,0]){
          nfo.CreateNewText('b:', font_size, WHITE, pad2, .9,);
          nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
          nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return  Abs(sat.geom.pos[1] + (ball.geom.dim[1] * Math.sin(Math.atan2(physics[0].vel[0], physics[0].vel[1])))); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+      }
+      { // Info Magnitude
+         const ball = balls_buffer[0];
+
+         const ms = 60;
+         const nfo = Create_widget_multi_text(_, 'Vector Mag:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
+         info_section.AddItem(nfo);
+
+
+         // Cache the ball 1 and ball 2 center positions
+         const p1 = [
+            (ball.geom.pos[0] + ball.geom.dim[0]) ,
+            (ball.geom.pos[1] + ball.geom.dim[1]) 
+         ];
+         // Calc the vector of the impact line and the magnitude of that vector...
+         const impact_vector = [p1[0], p1[1]];
+         const impact_mag = Magnitude(impact_vector[0], impact_vector[1]);
+
+
+         nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return  impact_mag; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       }

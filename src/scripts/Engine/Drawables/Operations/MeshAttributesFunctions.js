@@ -146,7 +146,6 @@ export function Set_color_a(mesh, alpha) {
 
 
 
-export function a() { }
 
 
 

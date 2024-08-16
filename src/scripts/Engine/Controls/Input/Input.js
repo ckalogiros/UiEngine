@@ -70,11 +70,11 @@ export function Input_create_user_input_listeners() {
   if (PLATFORM.ANDROID_IMPL) {
 
     // Firefox
-    if (canvas.mozRequestFullScreen) canvas.mozRequestFullScreen();
+    // if (canvas.mozRequestFullScreen) canvas.mozRequestFullScreen();
     // Chrome, Safari, and Opera
-    else if (canvas.webkitRequestFullscreen) canvas.webkitRequestFullscreen();
+    // else if (canvas.webkitRequestFullscreen) canvas.webkitRequestFullscreen();
     // IE/Edge
-    else if (canvas.msRequestFullscreen) canvas.msRequestFullscreen();
+    // else if (canvas.msRequestFullscreen) canvas.msRequestFullscreen();
 
     // Touch screen events
     canvas.addEventListener("touchstart", OnTouchStart, { passive: false });
@@ -185,9 +185,37 @@ export function Device_set_up() {
     clientLeft:   document.documentElement.clientLeft,
     clientTop:   document.documentElement.clientTop,
     clientWidth:   document.documentElement.clientWidth,
+
+    canvas_top: canvas.getBoundingClientRect().top,
+    canvas_bot: canvas.getBoundingClientRect().bottom,
+    canvas_left: canvas.getBoundingClientRect().left,
+    canvas_right: canvas.getBoundingClientRect().right,
   };
   
+  // IMPORTANT window variables
+  // window.client_information:
+  //    .platform
+  // window.location.reload():
 
+  const body = document.querySelector("html");
+  console.log('getBoundingClientRect()', body.getBoundingClientRect())
+  {
+    // alert(`top: ${body.getBoundingClientRect().top}`);
+    // alert(`left: ${body.getBoundingClientRect().left}`);
+    
+    
+    // alert(`offsetHeight: ${DEVICE.info.offsetHeight}`);
+    // alert(`offsetParent: ${DEVICE.info.offsetParent}`);
+    // alert(`offsetTop: ${DEVICE.info.offsetTop}`);
+    // alert(`offsetParent: ${DEVICE.info.offsetParent}`);
+    // alert(`clientTop: ${DEVICE.info.clientTop}`);
+    // alert(`clientTop: ${DEVICE.info.clientTop}`);
+    
+    // alert(`canvas top: ${canvas.getBoundingClientRect().top}`);
+    // alert(`height: ${canvas.getBoundingClientRect().height}`);
+    // alert(`y: ${canvas.getBoundingClientRect().y}`);
+
+  }
   console.log('DEVICE.info', DEVICE.info)
   console.log('WINDOW', window)
   console.log('DOCUMENT', document);

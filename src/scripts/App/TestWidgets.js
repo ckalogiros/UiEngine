@@ -36,6 +36,11 @@ import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
 import { Demo_widgets_button, Demo_widgets_colorpicker, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
 import { Demo_page } from './DemoPage.js';
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from '../Engine/Core/Views/RootView.js';
+import { TEMP } from '../Graphics/Shaders/OLD/Saves/CircleGradientAndBorder.js';
+import { Clbk_animations_circle_flip, Clbk_animations_circle_scale } from './Demo/DemoAnimations.js';
+import { Demo_snake_animation } from './Demo/DemoSnakeAnimation.js';
+import { Demo_chain_link } from './Demo/DemoChainLink.js';
+import { Game_snake } from './Demo/Games/Snake/Snake.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -340,7 +345,15 @@ export function TestWidgetsGeneric(createId=1) {
     //     console.log(aaa[i], aaa.charCodeAt(i))
     // }
 
-    Demo_page();
+    // Demo_page();
+
+    // Clbk_animations_circle_scale();
+    // Clbk_animations_circle_flip();
+
+    // Demo_snake_animation();
+    // Demo_chain_link();
+
+    // Game_snake();
 
     
     { // Reload
@@ -555,7 +568,7 @@ export function TestWidgetsGeneric(createId=1) {
     { // PARTICLES: NONE WORKING, CODE NEEDS UPDATE
         /**************************/
 
-        // CreateGlowParticles(0, 100);
+        CreateGlowParticles(0, 100);
 
         // CreateBallTailParticles(0, 0, 250, 250, 1);
 
@@ -583,7 +596,8 @@ export function TestWidgetsGeneric(createId=1) {
 
         // const total_height = Elastic_collisions()
         
-        // Sattelite_rotation([0, total_height*2+100])
+        // Sattelite_rotation([0, 100]);
+
     }
 
 
