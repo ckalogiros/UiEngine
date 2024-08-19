@@ -223,7 +223,7 @@ class Emitter {
       this.sid.shad |= SID_FLAGS;
    }
 
-   EnableGfxAttributes(which, params) {
+   EnableGfxAttributes(which, params=null) {
 
 
       switch (which) {
@@ -232,9 +232,10 @@ class Emitter {
 
             this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
             this.sid.pass |= SID.PASS.WPOS2 | SID.PASS.DIM2;
-            if (!(params === null || params === undefined)) {
-               this.mat.style = params.style;
+            if (Array.isArray(params)) {
+                this.SetStyle(params);
             }
+            break;
             break;
          }
          case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; break; }
@@ -329,6 +330,9 @@ class Emitter {
 
 
    // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)
+
+
+   SetStyle(style) { this.mat.SetStyle(style); }
 
 
    GetName() {

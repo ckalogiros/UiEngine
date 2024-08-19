@@ -56,7 +56,7 @@ export function CreateGlowParticles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CRE
    emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
 
    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
-   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [0, 40, 2]);
    emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
    emitter.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
@@ -176,7 +176,7 @@ export function CreateGlowParticles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CRE
                CopyArr4(slider_section.mat.col, color);
                CopyArr4(slider_section.mat.defCol, color);
                Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
-               CopyArr4(emitter.col, color);
+               CopyArr4(emitter.mat.col, color);
             });
             switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
          }
@@ -195,7 +195,7 @@ export function CreateGlowParticles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CRE
    // picker.AssignTargetMeshClbk((params)=>{
    //     const color = params;
    //     Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
-   //     CopyArr4(emitter.col, color);
+   //     CopyArr4(emitter.mat.col, color);
    // });
    // slider_section.
 
@@ -2060,7 +2060,7 @@ export function Demo_glow_particles_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x 
                   CopyArr4(controls_dp.mat.col, color);
                   CopyArr4(controls_dp.mat.defCol, color);
                   Gl_set_rgba(controls_dp.gfx, color, controls_dp.geom.num_faces);
-                  CopyArr4(emitter.col, color);
+                  CopyArr4(emitter.mat.col, color);
                });
                switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
             }

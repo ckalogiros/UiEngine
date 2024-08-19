@@ -306,7 +306,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       // true ? 'layout(origin_upper_left) in vec4 frag_color;' : '',
       true ? '#include <precision_medium>' : '',
       true ? '#include <out_frag_color>' : '',
-      ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_FS)) ? '#define U_SCALE 1' : '',
+      // ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_FS)) ? '#define U_SCALE 1' : '',
+      (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
       (sid.fx & SID.FX.FS_GLOW) ? '#define U_GLOW_PARAMS 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       // (sid.unif & SID.UNIF.UNIF_SPEED) ? '#define U_SPEED 1' : '',

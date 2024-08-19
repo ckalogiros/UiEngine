@@ -644,7 +644,7 @@ export class Mesh {
      * In order for a mesh to be drawn in a certain way, specific shaders must be build.
      * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
      */
-    EnableGfxAttributes(which, params) {
+    EnableGfxAttributes(which, params=null) {
 
         switch (which) {
 
@@ -753,8 +753,15 @@ export class Mesh {
             return;
         }
 
-        console.error('No Uniform Found', unif_name, this.GetName())
-        alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
+        console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
+
+        // Alert if the current mesh has the uniform enabled but failed to find it in the 'this.uniforms' buffer
+        // else this mesh will be stored in a vertex buffer program with the analogous uniforms
+        if(SID.CheckSidUnifByName(this.sid.unif, unif_name) === true){
+
+            alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
+        }
+
 
     }
 

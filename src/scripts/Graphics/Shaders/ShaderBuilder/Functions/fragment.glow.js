@@ -14,13 +14,10 @@
 
 export const frag_glow_call = `
 
-    // color = Stylize();
     vec4 glowcol = Glow(color.a);
     // Removes any previous functions calculations. Must be combined with:'color = glowcol'
-    glowcol.rgb *= (1.-alpha); 
-    // color = glowcol;
+    // glowcol.rgb *= (1.-alpha); 
     color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
-    // color.a = .5;
 `;
 
 export const frag_glow = `
@@ -61,6 +58,7 @@ vec4 Glow(float alpha)
    
    
     float r = dim.y*u_scale2.x;
+    // float r = dim.y;
     // float d = smoothstep(dim.y, r,  length(uv));
     float d = smoothstep(dim.y*outer, r*inner,  length(uv));
 

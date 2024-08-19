@@ -643,6 +643,12 @@ export class Widget_Color_Picker extends Section {
       // Update target meshes
 
       if(widget.temp_target_mesh_clbk){
+         // widget.temp_target_mesh_clbk(new Float32Array([
+         //    final_color[0],
+         //    final_color[1],
+         //    final_color[2],
+         //    final_color[3],
+         // ]));
          widget.temp_target_mesh_clbk(new Float32Array([
             intensity[0],
             intensity[1],

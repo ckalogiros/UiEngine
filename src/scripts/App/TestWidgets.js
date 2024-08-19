@@ -353,7 +353,44 @@ export function TestWidgetsGeneric(createId=1) {
     // Demo_snake_animation();
     // Demo_chain_link();
 
-    // Game_snake();
+    Game_snake();
+
+    {
+
+        
+        // const glow = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [100,100,0], [40,40], BLUEL[9], 'Glow Mesh', [0, 40, 2]);
+        // // const emitter = Particles_get_particle_system(emitter_idx1);
+        // // emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
+        
+        // glow.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
+        // // glow.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [0, 40, 2]);
+        // glow.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // glow.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+        // glow.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+        
+        
+        
+        // glow.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
+        // glow.GenGfxCtx();
+        // glow.options = SECTION.INHERIT|SECTION.HORIZONTAL|SECTION.RESIZE_PARENT;
+        // glow.Render();
+        
+        
+        // Root_group_activate_all_vbs_in_renderqueue(glow.root_bufferidx);
+        // Construct_listen_events_from_mesh_tree(glow);
+        // Construct_listen_events_relations_from_mesh_tree(glow);
+        
+        
+        // const scale_down = .2;
+        // glow.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, glow.gfx.vb.groupidx);
+        // glow.GfxUniformsSetClbk('u_scale2', function () { return [scale_down, 1] }, glow.gfx.vb.groupidx);
+        
+        // const clbk_params_0 = { vb_grouidx: glow.gfx.vb.groupidx, val_idx: 0, start_val: .5, }
+        // glow.SetClbkGfxUniforms('u_glow_params', ()=>{return .5}, clbk_params_0);
+        // const clbk_params_1 = { vb_grouidx: glow.gfx.vb.groupidx, val_idx: 2, start_val: .5, }
+        // glow.SetClbkGfxUniforms('u_glow_params', ()=>{return 1.}, clbk_params_1);
+    }
+
 
     
     { // Reload
@@ -568,7 +605,7 @@ export function TestWidgetsGeneric(createId=1) {
     { // PARTICLES: NONE WORKING, CODE NEEDS UPDATE
         /**************************/
 
-        CreateGlowParticles(0, 100);
+        // CreateGlowParticles(0, 100);
 
         // CreateBallTailParticles(0, 0, 250, 250, 1);
 
@@ -831,7 +868,8 @@ function SectionResizable(pos) {
     const dim = [200, 200];
 
     // const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, [0, 500, 0], dim, TRANSPARENCY(BLUEL[5], tr), _, [40, 40, 2]);
-    const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], tr), _, [40, dim[1], 2]);
+    // const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], tr), _, [40, dim[1], 2]);
+    const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], tr), _, [, dim[1], 2]);
     grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     grey.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     grey.StateEnable(MESH_STATE.IS_RESIZEABLE);

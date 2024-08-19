@@ -156,17 +156,25 @@ const SID = {
         SCREEN_RESOLUTION: BIT5 <<= 0x1,
 
         // Individual Uniforms
-        TIME: BIT5 <<= 0x1,
-        DIM2: BIT5 <<= 0x1,
-        // WPOS4: BIT5 <<= 0x1,
-        SCALE2: BIT5 <<= 0x1,
-        ROOT_WPOS2: BIT5 <<= 0x1,
-        // UNIF_GLOW2: BIT5 <<= 0x1,
-        // UNIF_NOISE2: BIT5 <<= 0x1,
-        // UNIF_SMOKE2: BIT5 <<= 0x1,
-        UNIF_SPEED: BIT5 <<= 0x1,
-        COL4: BIT5 <<= 0x1,
+        COL4: BIT5 <<= 0x1,         // u_col4
+        DIM2: BIT5 <<= 0x1,         // u_dim2
+        SCALE2: BIT5 <<= 0x1,       // u_scale2
+        ROOT_WPOS2: BIT5 <<= 0x1,   // u_wposxy
+        TIME: BIT5 <<= 0x1,         // u_time
+        // UNIF_SPEED: BIT5 <<= 0x1, // u_speed
 
+    },
+    
+
+    CheckSidUnifByName(sid_unif, unif_name) {
+
+        if(unif_name === 'u_col4') return (sid_unif & this.UNIF.COL4) ? true : false;
+        else if(unif_name === 'u_dim2') return (sid_unif & this.UNIF.DIM2) ? true : false;
+        else if(unif_name === 'u_scale2') return (sid_unif & this.UNIF.SCALE2) ? true : false;
+        else if(unif_name === 'u_wposxy') return (sid_unif & this.UNIF.ROOT_WPOS2) ? true : false;
+        else if(unif_name === 'u_time') return (sid_unif & this.UNIF.TIME) ? true : false;
+
+        return false;
     },
 
     PASS: {
@@ -189,10 +197,6 @@ const SID = {
         FS_SMOKE: BIT6<<=0x1,
     },
 
-    // // Test Shaders
-    // TEST: {
-    //     TEST1: BITTEST,
-    // },
 
 
     CheckSidMatch(sid1, sid2) {

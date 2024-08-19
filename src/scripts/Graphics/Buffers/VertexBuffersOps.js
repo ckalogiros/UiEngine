@@ -386,30 +386,46 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
 
    let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[dimidx];
    let loop_count = num_faces;
-   let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[dimidx];
+   // For programs with 'DIM2' attribute, we need to include the extra attrib count for the stride
+   const account_for_dim_attrib = (gfxInfo.sid.attr & SID.ATTR.DIM2) ? 2 : 0;
+   let stride = vb_info.attribs_info.count - (vb_info.attribs_info.sizes[dimidx] + account_for_dim_attrib);
 
-   x*=2; y*=2;
+   const vpos = [x*2, y*2];
+   const dim = [x, y];
+
+
+   // FIXME: For now we check if program has 'DIM2', but we never check for the attributes assignment in the loop, we just assume all calls to this function use prg with 'DIM2'
 
    while (loop_count) {
 
       vb_data[index++] = 0;
-      vb_data[index++] = y;
+      vb_data[index++] = vpos[1];
+      vb_data[index++] = dim[0];
+      vb_data[index++] = dim[1];
       index += stride;
 
       vb_data[index++] = 0;
       vb_data[index++] = 0;
+      vb_data[index++] = dim[0];
+      vb_data[index++] = dim[1];
       index += stride;
-
-      vb_data[index++] = x;
-      vb_data[index++] = y;
+      
+      vb_data[index++] = vpos[0];
+      vb_data[index++] = vpos[1];
+      vb_data[index++] = dim[0];
+      vb_data[index++] = dim[1];
       index += stride;
-
-      vb_data[index++] = x;
+      
+      vb_data[index++] = vpos[0];
       vb_data[index++] = 0;
+      vb_data[index++] = dim[0];
+      vb_data[index++] = dim[1];
       index += stride;
 
       loop_count--;
    }
+
+   if(gfxInfo.sid.attr & SID.ATTR.DIM2)
 
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
@@ -506,8 +522,8 @@ export function Gl_add_dim_xy(gfxInfo, x, y, num_faces = 1) {
 
    // HACK: Change the roundnes attribute
    const roundness_idx = 7;
-   const vpos = [x*2, y*2]
-   const dim = [x, y]
+   const vpos = [x*2, y*2];
+   const dim = [x, y];
    const size = (vb_data[index+1]+x*2)/2;
    
    while (loop_count) {

@@ -65,7 +65,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
  */
 
 
-export const frag_round_corners_call = '   color = Stylize();';
+export const frag_round_corners_call = '  color = Stylize();';
 /** NEW SDF RECT IMPLEMENTATION */
 
 export const frag_round_corners = `
@@ -117,7 +117,6 @@ vec4 Stylize()
 #endif    
     
     
-    // vec2 q = (abs(uv) - dim) + scale_down + rCorners.x; // Again Subtract constant dimention //THIS!!! 
     vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention
     float d = length(max(q, 0.0)) - rCorners.x;
     // float d = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - rCorners.x;
@@ -130,6 +129,7 @@ vec4 Stylize()
     float dd = d - blur.x;
     float wa = 1.;
     float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);
+    
     float alpha = src.a * (wa * wb);
     color += color + src.rgb * alpha;
     
@@ -145,6 +145,7 @@ vec4 Stylize()
     wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);
     color += color * vec3(abs(wa * wb));
     color +=  color * pow(vec3(abs(wa * wb)), vec3(4.4));
+    
     return vec4(color, alpha);
 }
 `;
