@@ -390,3 +390,11 @@ export function Normalize_vec2(vx, vy){
 }
 
 
+
+
+export function Range(val, min, max){
+
+    return min + (val * (max - min));
+}
+
+

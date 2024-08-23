@@ -164,13 +164,20 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       '// Vertex Shader',
       '#include <precision_medium>', // TODO: Let the app decide the precision
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // DEFINES
+      /********************************************************************************************************/
+      // Defines
+      /********************************************************************************************************/
       '\n',
       ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // INS
+
+
+
+
+
+      /********************************************************************************************************/
+      // Attributes In
+      /********************************************************************************************************/
 
       (sid.attr & SID.ATTR.COL4) ? 'in vec4 a_col;' : '',
       (sid.attr & SID.ATTR.WPOS_TIME4) ? 'in vec4 a_wpos_time;' : '',
@@ -180,16 +187,26 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.TEX2) ? 'in vec2 a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <in_attr_sdf2>' : '',
       '\n',
-      
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+      /********************************************************************************************************/
       // UNIFORMS
+      /********************************************************************************************************/
       Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_VS),
       '\n',
-      
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+      /********************************************************************************************************/
       // OUTS
+      /********************************************************************************************************/
       (sid.pass & SID.PASS.COL4) ? 'out vec4 v_col; ' : '',
       (sid.pass & SID.PASS.DIM2) ? 'out vec2 v_dim;' : (sid.pass & SID.ATTR.DIM2) ? 'out vec2 v_dim;' :'',
       (sid.pass & SID.PASS.WPOS2) ? 'out vec2 v_wpos;' : '',
@@ -202,28 +219,33 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.FEATHER) ? '#include <out_border_feather>' : '',
       (sid.attr & SID.ATTR.TIME) ? 'out float v_time;' : '',
       '\n',
-      
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+      /********************************************************************************************************/
+      // Main Function
+      /********************************************************************************************************/
       'void main(void) ',
       '{',
-      
-      
-      
 
 
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+      /********************************************************************************************************/
       // Scale in Vertex Shader
       (sid.shad & SID.SHAD.VS_TEST1) ? '// HI FROM VS_TEST1' : '',
-      
-      
-      
-      
 
 
-      
-      
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+      /********************************************************************************************************/
       // TEMPORARY CODE FOR QUICK ROTATIONS IMPLEMENTATION
       // `\
       // // float t = u_time*2.1;\n\
@@ -253,12 +275,13 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       : '  gl_Position = vec4(vpos.x + a_wpos_time.x, vpos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
       // ? '  gl_Position = u_projection * vec4(a_pos.x + wpos.x, a_pos.y + wpos.y, a_wpos_time.z, 1.0);' 
       // : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
-      
-      
-      
-      
-      
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+      /********************************************************************************************************/
       // ASSIGNMENTS
       (sid.pass & SID.PASS.COL4) ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') : '', 
       (sid.pass & SID.PASS.DIM2) ? '  v_dim = a_dim;' : (sid.pass & SID.ATTR.DIM2) ? '  v_dim = a_dim;' : '', // TODO: If we have created an attribute a_dim, we have to use it, else the attribs buffering is gonna be wrong
@@ -300,7 +323,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       (true) ? '#version 300 es' : '',
       '// Fragment Shader',
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+      /********************************************************************************************************/
       // DEFINES
       '\n',
       // true ? 'layout(origin_upper_left) in vec4 frag_color;' : '',
@@ -312,7 +340,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       // (sid.unif & SID.UNIF.UNIF_SPEED) ? '#define U_SPEED 1' : '',
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+      /********************************************************************************************************/
       // In
       '\n',
       (sid.pass & SID.PASS.COL4) ? '#include <in_frag_col4>' : '',
@@ -325,32 +358,55 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.SDF) ? '#include <in_frag_sdf2>' : '',
       (sid.attr & SID.ATTR.TIME) ? 'in float v_time;' : '',
 
-      
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+      /********************************************************************************************************/
       // UNIFORMS
       '\n',
       Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_FS),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
 
-      
-      
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+      /********************************************************************************************************/
       // Function definitions
       '\n',
       (sid.attr & SID.ATTR.STYLE) ? frag_round_corners : '',
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
       (sid.attr & SID.ATTR.MSDF) ? frag_msdf : '',
-      ////////////////////////////////////////////////////
+
+
+
+
+
+
+      /********************************************************************************************************/
       // Fx shader functions
       (sid.fx & SID.FX.FS_GLOW) ? frag_glow : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
       (sid.fx & SID.FX.FS_SMOKE) ? frag_smoke : '',
-      ////////////////////////////////////////////////////
+
+
+
+
+
+
+      /********************************************************************************************************/
       // Test shader functions
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1 : '',
 
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+      /********************************************************************************************************/
       // Main
       true ? 'void main(void) ' : '',
       true ? '{' : '',
@@ -365,13 +421,21 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
 
 
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+      /********************************************************************************************************/
       // Color fragment
       true ? '  frag_color = color;' : '',
       (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '  frag_color.rgb *= v_col.a; ' : '',
       // true ? '  frag_color.rgb *= color.a;' : '',
 
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+      /********************************************************************************************************/
       // TESTS
       // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', // HACK: prevent optimizer from removing the uniform u_scale2
       (sid.unif & SID.UNIF.TIME) ? '  if(u_time == 0.) ;' : '',

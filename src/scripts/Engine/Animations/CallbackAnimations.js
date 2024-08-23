@@ -165,3 +165,17 @@ export function Callback_animations_print(){
    }
 }
 
+
+
+export function Callback_animations_print_size(){
+
+   let count = 0;
+   for(let i=0; i <= _clbk_animations_buffer.boundary; i++){
+
+      const anim = _clbk_animations_buffer.buffer[i];
+      if( anim.is_active) count++;
+   }
+   console.log(count);
+
+}
+

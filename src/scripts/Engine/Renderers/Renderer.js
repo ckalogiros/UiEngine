@@ -185,7 +185,7 @@ function Renderer_create_webgl_context(canvas) {
 
    // gfxctx.enable(gfxctx.DEPTH_TEST);
    // gfxctx.depthFunc(gfxctx.LEQUAL)
-   // // gfxctx.depthFunc(gfxctx.GEQUAL)
+   // gfxctx.depthFunc(gfxctx.GEQUAL)
    // gfxctx.depthMask(true);
 
    /**

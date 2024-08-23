@@ -518,12 +518,11 @@ export function Gl_add_dim_xy(gfxInfo, x, y, num_faces = 1) {
    let loop_count = num_faces;
    let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[dimidx];
 
-   // x*=2; y*=2;
 
-   // HACK: Change the roundnes attribute
-   const roundness_idx = 7;
    const vpos = [x*2, y*2];
    const dim = [x, y];
+   // HACK: Change the roundnes attribute
+   const roundness_idx = 7;
    const size = (vb_data[index+1]+x*2)/2;
    
    while (loop_count) {
