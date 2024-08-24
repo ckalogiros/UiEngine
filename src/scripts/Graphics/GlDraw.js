@@ -115,7 +115,7 @@ export function Gl_draw(gl) {
         // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, 4)
         // gl.drawElements(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0);
         
-        gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
+        if(vb_groupidx !== 2)gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
         // if(i === 0) gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 5)
         // else gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
 

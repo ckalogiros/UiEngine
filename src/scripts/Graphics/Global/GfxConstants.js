@@ -216,8 +216,8 @@ const SID = {
             sid1.shad === sid2.shad &&
             attr1 === attr2 &&
             unif1 === unif2 && 
-            sid1.pass === sid2.pass &&
-            sid1.fx === sid2.fx
+            sid1.pass === sid2.pass
+            // sid1.fx === sid2.fx
         ) {
             return true;
         }
@@ -228,10 +228,21 @@ const SID = {
     Copy(dst, src){
         dst.shad = 0x0;        dst.shad |= src.shad;
         dst.attr = 0x0;        dst.attr |= src.attr;
-        dst.attr = 0x0;        dst.attr |= src.attr;
         dst.unif = 0x0;        dst.unif |= src.unif;
         dst.pass = 0x0;        dst.pass |= src.pass;
+        dst.fx   = 0x0;        dst.fx   |= src.fx;
         dst.gfx_group = 0x0;
+    },
+
+    CreateCopy(src){
+        return {
+            shad: src.shad,
+            attr: src.attr,
+            unif: src.unif,
+            pass: src.pass,
+            fx:   src.fx,
+            gfx_group: 0x0,
+        };
     },
 
     ToString(sid){

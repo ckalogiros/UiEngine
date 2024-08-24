@@ -4,7 +4,7 @@
 import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_change_uniform_value_clbk_params, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
-import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object } from "../../../Graphics/ShaderPrograms.js";
+import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_fx_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
@@ -135,7 +135,6 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
    // Cash values
    const vertsPerRect = VERTS_PER_RECT_INDEXED; // TODO: Let the program creation decide for the vertices per rect
    const attribsPerVertex = Shader_attributes_get_attribs_per_vertex(prog.attribsidx);
-   // const count = vertsPerRect * attribsPerVertex; // Total attributes of the mesh. All text meshes have only one face registered, the rest of the faces are calculated if needed.
 
    // Create meshe's gfx info
    const gfx_ctx = new GfxInfoMesh; // NOTE: This is the only construction of a new GfxInfoMesh object(as for now), all other calls are for creating a copy of an existing GfxInfoMesh. 
@@ -144,8 +143,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
    gfx_ctx.num_faces = num_faces;
    gfx_ctx.vertsPerRect = vertsPerRect;
    gfx_ctx.attribsPerVertex = attribsPerVertex;
-   if(vb_group === _)
-      console.log()
+
    gfx_ctx.vao = vb_group.vao;
 
    gfx_ctx.prog.idx = progidx;
@@ -234,7 +232,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
    // Cash
-   const sid = mesh.sid;
+   const sid = SID.CreateCopy(mesh.sid)
+   sid.fx = 0x0;
    const sceneidx = mesh.sceneidx;
    const mesh_count = mesh.geom.num_faces;
    const root_bufferidx = mesh.root_bufferidx;
@@ -301,12 +300,15 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
 
+
+
+
    /*******************************************************************************************************************/
    // Vertex Buffer
 
 
    /** Check for any vbidx match, from already created vbs, in the mesh tree structure */
-   if (specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
+   if (specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
       
       // Check if mesh has texture, and if it isn't tha same texture as is the 'specific_vb_groupidx', must create new vertex buffer
       if(mesh.mat.texidx !== INT_NULL){
@@ -339,9 +341,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       // Check buffers validity, or find buffers based on Flags
       vb_groupidx = Find_gfx_match_from_mesh_tree(flags, mesh, specific_vb_groupidx);
    }
-
-
-
+ 
 
    /** If no vbidx found from the mesh tree, search the vb pool if any apropriate vb exists. If none fouund, create a new one */
    let is_vertex_buffer_created = false;
@@ -395,6 +395,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
             if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
 
                const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx, vb_groupidx);
+
+
                uniforms[i].ubidx = ubidx;
 
                // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
@@ -467,6 +469,53 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
 
    }
+   
+
+
+
+
+
+
+   /*******************************************************************************************************************/
+   // 
+   if(mesh.sid.fx){
+      console.error('==============================================================');
+
+      if(mesh.sid.fx & SID.FX.FS_GLOW){
+
+         // Check if program already exists
+         let fx_progidx = Program_fx_program_exists_from_sid(mesh.sid);
+
+         if (fx_progidx === INT_NULL) { // If shader program does not exist, create new program.
+
+
+            const fx_sid = SID.CreateCopy(mesh.sid);
+            fx_sid.attr &= ~(SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.GENERIC_ATTR1_VEC4)
+            fx_progidx = Program_create_program(fx_sid, uniforms);
+
+            Scene_set_projection_matrix(sceneidx)
+
+            // HACK: the uniform block should not be implemented HERE, Also weather or not the 'u_screen_res' should be enabled is responsibility of 'WHO'???????????????????
+            const unifidx = Uniforms_block_get_uniform_by_name('u_screen_res');
+            Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
+
+            // Add the new vertexBuffer to the render queue
+            Renderqueue_Add(fx_progidx, vb_groupidx, ibidx, true);
+
+         }
+      }
+      else if(mesh.sid.fx & SID.FX.FS_NOISE){/** TODO: Implement */}
+      else if(mesh.sid.fx & SID.FX.FS_SMOKE){/** TODO: Implement */}
+   }
+
+
+
+
+
+
+
+
+
 
    // Add mesh to the root batch buffer for batch update
    Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, mesh_count);

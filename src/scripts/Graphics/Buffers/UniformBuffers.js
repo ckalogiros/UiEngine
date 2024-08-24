@@ -163,6 +163,7 @@ export function Uniforms_buffer_reset() { _uniforms_buffer.ResetFull(); }
 export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, progidx, vb_groupidx) {
 
    const uniform = new Uniform(gl, shader_program, type, name, progidx, vb_groupidx);
+   // if(uniform === null) return INT_NULL;
    const ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
 
    return ubidx;

@@ -131,11 +131,24 @@ export function Program_program_exists_from_sid(sid) {
 
 
 export function Program_program_exists_from_index(progidx) {
-
+	
 	if (_programs.buffer[progidx] === null || _programs.buffer[progidx] === undefined) 
 		return false;
 	
 	return true;
+}
+
+
+
+
+/** Returns 'INT_NULL': if program does NOT exist AND 'progidx':if program exists. */
+export function Program_fx_program_exists_from_sid(sid) {
+
+	if (ERROR_NULL(_programs) || ERROR_NULL(_programs.buffer)) return INT_NULL
+	for (let i = 0; i <= _programs.boundary; i++)
+		if (sid.fx === _programs.buffer[i].sid.fx) return i;
+
+	return INT_NULL;
 }
 
 

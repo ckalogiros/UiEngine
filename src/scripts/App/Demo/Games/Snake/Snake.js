@@ -38,8 +38,8 @@ import { Abs, Magnitude } from "../../../../Helpers/Math/MathOperations.js";
 
 const MAX_BODY_MESHES = 100;
 var slope_constant1 = .2;
-const INITIAL_SIZE = 35;
-const snake_initial_body_count = 3;
+const INITIAL_SIZE = 20;
+const snake_initial_body_count = 30;
 
 // const collectable_pos_constraints = [];
 
@@ -85,11 +85,11 @@ const snake = {
    count:0, // Number of snake body meshes
    size:INITIAL_SIZE, // Size of the snake body meshes
    min_size: 4,
-   style: [0, INITIAL_SIZE, 2],
+   style: [4, INITIAL_SIZE, 2],
    max_scale_factor:1.5, // Max scale will be: 'max_scale_factor' times bigger to the original size
    reduce_size:1., // Max scale will be: 'max_scale_factor' times bigger to the original size
    reduce_mod: .5, // Max scale will be: 'max_scale_factor' times bigger to the original size
-   glow_scale_down_factor: .5, // The regular rendered body mesh will be: 'glow_scale_down_factor' times bigger/smaller to the body glow effect 
+   glow_scale_down_factor: 1., // The regular rendered body mesh will be: 'glow_scale_down_factor' times bigger/smaller to the body glow effect 
    body_meshes_dist_mod: 2./.5, // A modifier to control the distance between the snake body meshes
    in_scale_animation: false,
    first_body_mesh_idx: INT_NULL, // The index of the snake head mesh 
@@ -113,17 +113,16 @@ const snake = {
 // 
 function Clbk_u_glow_params_0(params){
 
-   const body = snake.body.buffer[0];
-   // const 
+   // const body = snake.body.buffer[0];
 
    return (snake.in_scale_animation) ? .5 : .3;
    // return (body.mesh.geom.dim[0] > snake.min_size) ? body.mesh.geom.dim[0] * .015 : .3;
-   return body.mesh.geom.dim[0] * .015;
-   return .3;
+   // return body.mesh.geom.dim[0] * .015;
+   // return .3;
 }
 function Clbk_u_glow_params_2(params){
 
-   const body = snake.body.buffer[0];
+   // const body = snake.body.buffer[0];
 
    return .5;
 }
@@ -157,7 +156,7 @@ export function Game_snake() {
       board_height - DEVICE.info.canvas_top + DEVICE.info.canvas_bot;
    }
 
-   const board_color = TRANSPARENCY(Interpolate_rgb_to_01(16, 28, 35), 1.);
+   const board_color = TRANSPARENCY(Interpolate_rgb_to_01(16, 28, 35), .2);
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [board_pad, board_pad, 0], [board_width,board_height], board_color, 'section', style);
    // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    section.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -219,7 +218,7 @@ export function Game_snake() {
    /*************************************************************************************************/
    // Create snake body meshes
 
-   const speed = 1.5;
+   const speed = 2.;
    let next_posx = board_width/2;
    let zpos = 1;
    
@@ -235,12 +234,12 @@ export function Game_snake() {
 
 
       // const body_mesh = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 20, MAX_BODY_MESHES-i+1], [calc_size, calc_size], TRANSPARENCY(YELLOWR[9], 1.), 'body_mesh', [snake.style[0], calc_size, snake.style[2]]);
-      const body_mesh = Create_widget_section(_, _, [0,0], [next_posx, 20, MAX_BODY_MESHES-i+1], [calc_size, calc_size], TRANSPARENCY(YELLOWR[9], 1.), 'body_mesh', [snake.style[0], calc_size, snake.style[2]]);
+      const body_mesh = Create_widget_section(_, _, [0,0], [next_posx, 20, MAX_BODY_MESHES-i+1], [calc_size, calc_size], TRANSPARENCY(YELLOWR[9], 1.), 'body_mesh', [4, calc_size, snake.style[2]]);
       body_mesh.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       section.AddItem(body_mesh);
       
-      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      // body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      // body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       
       const bodyidx = snake.body.Add(new Body_mesh_properties(body_mesh));
       snake.body.buffer[bodyidx].idx = bodyidx; // Store the index for convinience
@@ -278,17 +277,6 @@ export function Game_snake() {
 
       next_posx -= calc_size*2;
 
-      // body_mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
-      // body_mesh.GenGfxCtx();
-      // body_mesh.Render();
-      
-      
-      // Root_group_activate_all_vbs_in_renderqueue(body_mesh.root_bufferidx);
-      // Construct_listen_events_from_mesh_tree(body_mesh);
-      // Construct_listen_events_relations_from_mesh_tree(body_mesh);
-   
-      // body_mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, body_mesh.gfx.vb.groupidx);
-      // body_mesh.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, body_mesh.gfx.vb.groupidx);
    }
 
 
@@ -351,12 +339,18 @@ export function Game_snake() {
 
 
    /*************************************************************************************************/
-   const head = snake.body.buffer[0].mesh;
-   head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, head.gfx.vb.groupidx);
-   const clbk_params_0 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 0, start_val: .0, }
-   head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_0, clbk_params_0);
-   const clbk_params_1 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 2, start_val: .0, }
-   head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_2, clbk_params_1);
+   // const head = snake.body.buffer[0].mesh;
+   // head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, 3);
+   // const clbk_params_0 = { vb_grouidx: 3, val_idx: 0, start_val: .0, }
+   // head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_0, clbk_params_0);
+   // const clbk_params_1 = { vb_grouidx: 3, val_idx: 2, start_val: .0, }
+   // head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_2, clbk_params_1);
+   // head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, head.gfx.vb.groupidx);
+   // const clbk_params_0 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 0, start_val: .0, }
+   // head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_0, clbk_params_0);
+   // const clbk_params_1 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 2, start_val: .0, }
+   // head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_2, clbk_params_1);
+   // head.GfxUniformsSetClbk('u_glow_params', Clbk_u_glow_params_2, clbk_params_1);
 
 
 
@@ -740,6 +734,8 @@ function Animation_scale_down_run(params){
       body.mesh.geom.dim[1] = body_initial_size;
       body.mesh.geom.SetDimXY(body.mesh.gfx, body_initial_size, body_initial_size);
 
+      // TODO: Set the style roundness(via gfx buffers function)
+
       // const posx = 0;
       // const posy = 0;
       // body.mesh.geom.pos[0] = posx;
@@ -789,8 +785,8 @@ function Animation_scale_down_stop(params){
       
       
       
-      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      // body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      // body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       
       body_mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, last_mesh.gfx.vb.groupidx);
       body_mesh.Render();
