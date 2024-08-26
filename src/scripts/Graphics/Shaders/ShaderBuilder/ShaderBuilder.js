@@ -140,12 +140,12 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader){
 
 // const _attribs_generic_decider_buffer = New_generic_buffer(_, _attribs_generic_decider_buffer);
 
-// const _attribs_generic1_vec4 = {
-//    attr1: {is_occupied:false, code:'', },
-//    attr2: {is_occupied:false, code:'', },
-//    attr3: {is_occupied:false, code:'', },
-//    attr4: {is_occupied:false, code:'', },
-// };
+const _attribs_generic1_vec4 = {
+   attr1: {is_occupied:false, code:'', },
+   attr2: {is_occupied:false, code:'', },
+   attr3: {is_occupied:false, code:'', },
+   attr4: {is_occupied:false, code:'', },
+};
 
 // function Resolve_generic_attributes(sid, progidx){
 
