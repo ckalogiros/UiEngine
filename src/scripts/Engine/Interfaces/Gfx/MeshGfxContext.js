@@ -1,17 +1,17 @@
 "use strict";
 
 
-import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_change_uniform_value_clbk_params, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
-import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_fx_program_exists_from_sid } from "../../../Graphics/ShaderPrograms.js";
+import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
-import { Renderqueue_Add, Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_Add } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name, Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
-import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_set_from_existing_vb_root_wpos, Mesh_unif_wpos_get_debug } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_set_from_existing_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add } from "../../Core/Views/RootView.js";
@@ -63,7 +63,7 @@ export class GfxInfoMesh {
          which_attrib: {
             col_idx: INT_NULL,   // The index of the color attribute
             wpos_idx: INT_NULL,  // The index of the wpos attribute
-            params1_idx: INT_NULL,  // The index of the wpos attribute
+            generic1_idx: INT_NULL,  // The index of the wpos attribute
             dim_idx: INT_NULL,   // The index of the vertex pos attribute
             tex_idx: INT_NULL,   // The index of the texture attribute
          },
@@ -110,7 +110,7 @@ export class GfxInfoMesh {
          which_attrib: {
             col_idx: this.vb.which_attrib.col_idx,
             wpos_idx: this.vb.which_attrib.wpos_idx,
-            params1_idx: this.vb.which_attrib.params1_idx,
+            generic1_idx: this.vb.which_attrib.generic1_idx,
             dim_idx: this.vb.which_attrib.dim_idx,
             tex_idx: this.vb.which_attrib.tex_idx,
          },
@@ -206,7 +206,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
 
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i;
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS_TIME4) gfx_ctx.vb.which_attrib.wpos_idx = i;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) gfx_ctx.vb.which_attrib.params1_idx = i;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) gfx_ctx.vb.which_attrib.generic1_idx = i;
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.POS2) gfx_ctx.vb.which_attrib.dim_idx = i;
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i;
    }
@@ -233,7 +233,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
    // Cash
    const sid = SID.CreateCopy(mesh.sid)
-   sid.fx = 0x0;
+   // sid.fx = 0x0;
    const sceneidx = mesh.sceneidx;
    const mesh_count = mesh.geom.num_faces;
    const root_bufferidx = mesh.root_bufferidx;
@@ -275,28 +275,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    }
 
 
-
-
-
-
-
-
-   /**
-    * I want a vb to choose between having a unifwpos for all its meshes and for each mesh seperately
-    * That means the move event of the meshes should only use the Move function of the target mesh and not the unifwpos add function
-    * Also means that the construction of a unifwpos must choose not to take the meshes position, and the mesh position not become 0
-    * 
-    * // TODO: For scrollers create a specific vb that will store them
-    * -- Must duplicate the vb creation for that special vb so that the position of the scroller 
-    * is not set to 0 and the unif wpo of the vb is not set to the scrollers position.
-    * -- And for moving any scrollers we must use a regular move function, that updates the vb pos and not the unif wpos
-    * 
-    * // TODO: What about meshes that belong to vb->ANY??? What would be the aproach for the uniform wpos of that vb?? 
-    * Maybe we set a flag to denote that the vb to be created can copy the mesh wpos to the vb uniform.
-    * The problem is: Who decides if OnMove events should be called the Mesh_unif_wpos() or the Move for the mesh.  
-    * 
-    * Maybe we have a vb specific for the scene, for every mesh that is not a Section. And it's unifWpos is 0.
-    */
 
 
 
@@ -468,44 +446,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       Root_group_vbidx_view_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs);
       Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
 
-   }
-   
-
-
-
-
-
-
-   /*******************************************************************************************************************/
-   // 
-   if(mesh.sid.fx){
-      console.error('==============================================================');
-
-      if(mesh.sid.fx & SID.FX.FS_GLOW){
-
-         // Check if program already exists
-         let fx_progidx = Program_fx_program_exists_from_sid(mesh.sid);
-
-         if (fx_progidx === INT_NULL) { // If shader program does not exist, create new program.
-
-
-            const fx_sid = SID.CreateCopy(mesh.sid);
-            fx_sid.attr &= ~(SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.GENERIC_ATTR1_VEC4)
-            fx_progidx = Program_create_program(fx_sid, uniforms);
-
-            Scene_set_projection_matrix(sceneidx)
-
-            // HACK: the uniform block should not be implemented HERE, Also weather or not the 'u_screen_res' should be enabled is responsibility of 'WHO'???????????????????
-            const unifidx = Uniforms_block_get_uniform_by_name('u_screen_res');
-            Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
-
-            // Add the new vertexBuffer to the render queue
-            Renderqueue_Add(fx_progidx, vb_groupidx, ibidx, true);
-
-         }
-      }
-      else if(mesh.sid.fx & SID.FX.FS_NOISE){/** TODO: Implement */}
-      else if(mesh.sid.fx & SID.FX.FS_SMOKE){/** TODO: Implement */}
    }
 
 

@@ -925,29 +925,32 @@ export class Widget_Scroller extends Section {
 
    AddItemToScrolledSection(mesh) {
 
-      /**DEBUG*/if (ERROR_NULL(mesh)) { console.error('AddItemToScrolledSection(), the mesh to be added is null or undefined'); return; }
+      alert('1637466538 \nImplement me.');
 
-      this.scrolled_section.AddItem(mesh);
+      // /**DEBUG*/if (ERROR_NULL(mesh)) { console.error('AddItemToScrolledSection(), the mesh to be added is null or undefined'); return; }
 
-      const size = this.scrolled_section.Recalc();
-      if (size[0] > this.geom.dim[0]) {
-         this.#RecalculateWidth(size[0]);
-      }
-      this.#Reposition();
+      // this.scrolled_section.AddItem(mesh);
 
-      // Set scroller's y pos
-      this.geom.pos[1] = (this.scrolled_section.geom.pos[1] - this.scrolled_section.geom.dim[1]) + this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
+      // const size = this.scrolled_section.Recalc();
+      // if (size[0] > this.geom.dim[0]) {
+      //    this.#RecalculateWidth(size[0]);
+      // }
+      // this.#Reposition();
 
-      // Set the bar and handle y pos
-      this.scroll_bar.SetPosY(this.geom.pos[1]);
-      const handle = this.scroll_bar.children.buffer[0];
-      handle.SetPosY(this.geom.pos[1]);
+      // // Set scroller's y pos
+      // this.geom.pos[1] = (this.scrolled_section.geom.pos[1] - this.scrolled_section.geom.dim[1]) + this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
 
-      // return SCROLL_MESH_IDX;
+      // // Set the bar and handle y pos
+      // this.scroll_bar.SetPosY(this.geom.pos[1]);
+      // const handle = this.scroll_bar.children.buffer[0];
+      // handle.SetPosY(this.geom.pos[1]);
+
    }
 
 
    ScrollerAlignWithItemsRecalc() {
+
+      alert('1637466539 \nImplement me.');
 
       // this.scrolled_section.options |= SECTION.RESIZE_PARENT; // For the scrolled section to encapsulate all items.
       // this.options |= SECTION.RESIZE_PARENTX;
@@ -981,6 +984,8 @@ export class Widget_Scroller extends Section {
 
 
    ScrollerAlignBar() {
+
+      alert('1637466540 \nImplement me.');
 
       // const bar = this.scroll_bar;
       // const handle = bar.children.buffer[0];

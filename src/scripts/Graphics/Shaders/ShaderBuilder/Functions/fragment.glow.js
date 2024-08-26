@@ -29,15 +29,26 @@ export const frag_glow = `
 vec4 Glow(float alpha)
 {
 
-    #ifdef U_GLOW_PARAMS
+    #ifdef U_GLOW_PARAMS_VEC3
         vec3 controls = u_glow_params;
+        float outer = controls.x+.4;
+        float inner = controls.y;
+        float intensity = controls.z;
+    #elif defined(U_GLOW_PARAMS_VEC2)
+        vec2 controls = u_glow_params;
+        float outer = controls.x+.4;
+        float inner = controls.y;
+        #ifdef A_GLOW_INTENSITY_FLOAT
+            float intensity = v_glow_intensity;
+        #else
+            float intensity = .5;
+        #endif
     #else
-        vec3 controls = vec3(1.);
+        float outer = .5;
+        float inner = 1.0;
+        float intensity = .5;
     #endif
 
-   float outer = controls.x+.4;
-   float inner = controls.y;
-   float intensity = controls.z;
    vec2 res = u_screen_res;
    vec2 dim = v_dim; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
    

@@ -1,15 +1,16 @@
 import { Callback_animations_create, Callback_animations_print_size } from "../../../../Engine/Animations/CallbackAnimations.js";
+import { Mesh_animations_create } from "../../../../Engine/Animations/MeshAnimations.js";
 import { Android_deactivate_scrolling, MouseGetPosDifX } from "../../../../Engine/Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh, Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../../../../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { GREENL, GREY, Interpolate_rgb_to_01, ORANGEL, ORANGER, PURPLEB, PURPLER, WHITE, YELLOWL, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { BLUEL, GREENL, GREY, Interpolate_rgb_to_01, ORANGEL, ORANGER, PURPLEB, PURPLER, REDL, WHITE, YELLOWL, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_calc_pos_dif } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Drawables/Operations/Recursions.js";
 import { Time_intervals_create } from "../../../../Engine/Timers/TimeIntervals.js";
-import { GlRotateZ2D } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_glow_intensity, GlRotateZ2D } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomPos } from "../../../../Helpers/Helpers.js";
 import { Slope_function_logarithmic } from "../../../../Helpers/Math/MathFunction.js";
 import { Abs, Magnitude } from "../../../../Helpers/Math/MathOperations.js";
@@ -38,7 +39,7 @@ import { Abs, Magnitude } from "../../../../Helpers/Math/MathOperations.js";
 
 const MAX_BODY_MESHES = 100;
 var slope_constant1 = .2;
-const INITIAL_SIZE = 20;
+const INITIAL_SIZE = 35;
 const snake_initial_body_count = 30;
 
 // const collectable_pos_constraints = [];
@@ -54,6 +55,37 @@ const snake_initial_body_count = 30;
 
 
 
+
+const snake = {
+   count:0, // Number of snake body meshes
+   size:INITIAL_SIZE, // Size of the snake body meshes
+
+   color:TRANSPARENCY(YELLOWR[8], 1.),
+
+   speed:1,
+
+   min_size: 4,
+   style: [0, INITIAL_SIZE, 2],
+   // max_scale_factor:4.7, // Max scale will be: 'max_scale_factor' times bigger to the original size
+   reduce_size: 1., // 
+   reduce_mod: .5, // 
+   glow_intensity: .35,
+   glow_intensity_step: .1,
+   glow_scale_down_factor: .5, // The regular rendered body mesh will be: 'glow_scale_down_factor' times bigger/smaller to the body glow effect 
+   body_meshes_dist_mod: 2./.54, // A modifier to control the distance between the snake body meshes
+   in_scale_animation: false,
+   first_body_mesh_idx: INT_NULL, // The index of the snake head mesh 
+
+   // rot_amt:0,
+   rotation: { // This variable is to store the ammount of users input mouse, so that user can rotate the head mesh 
+      amt:0.0,
+   },
+   
+   
+   step:0.005, // The step that the 'Move' function will use to advance the body meshes to the next position
+   body:New_generic_buffer(_, 'Game Snake Body Meshes'), // Where all snake's body meshes variables will be stored
+};
+
 class Body_mesh_properties {
 
    constructor(_mesh = null){
@@ -68,7 +100,7 @@ class Body_mesh_properties {
       this.t = 0; // Values = [0-1]
       this.slope = Slope_function_logarithmic(this.t, slope_constant1) +1;// Stores the current calculated 't' to be used on the next snake 'Move' calculation. 
       // console.log(this.mesh.idx, slope_constant1 + (this.mesh.idx*3.5 + 1), this.slope)
-      this.max_scale_factor = 1.5; // Max scale will be = 'max_scale_factor' times bigger to the original size
+      this.max_scale_factor = 1.8; // Max scale will be = 'max_scale_factor' times bigger to the original size
       
       this.reduce_size = 1.; // Max scale will be: 'max_scale_factor' times bigger to the original size
       // this.reduce_mod = .005; // Max scale will be: 'max_scale_factor' times bigger to the original size
@@ -78,32 +110,11 @@ class Body_mesh_properties {
       this.border = 0;
       this.roundness = 0;
       this.feather = 0;
+
+
+      this.glow_intensity = snake.glow_intensity;
    }
 }
-
-const snake = {
-   count:0, // Number of snake body meshes
-   size:INITIAL_SIZE, // Size of the snake body meshes
-   min_size: 4,
-   style: [4, INITIAL_SIZE, 2],
-   max_scale_factor:1.5, // Max scale will be: 'max_scale_factor' times bigger to the original size
-   reduce_size:1., // Max scale will be: 'max_scale_factor' times bigger to the original size
-   reduce_mod: .5, // Max scale will be: 'max_scale_factor' times bigger to the original size
-   glow_scale_down_factor: 1., // The regular rendered body mesh will be: 'glow_scale_down_factor' times bigger/smaller to the body glow effect 
-   body_meshes_dist_mod: 2./.5, // A modifier to control the distance between the snake body meshes
-   in_scale_animation: false,
-   first_body_mesh_idx: INT_NULL, // The index of the snake head mesh 
-
-   // rot_amt:0,
-   rotation: { // This variable is to store the ammount of users input mouse, so that user can rotate the head mesh 
-      amt:0.0,
-   },
-   
-   
-   step:0.005, // The step that the 'Move' function will use to advance the body meshes to the next position
-   body:New_generic_buffer(_, 'Game Snake Body Meshes'), // Where all snake's body meshes variables will be stored
-};
-
 
 
 
@@ -115,16 +126,18 @@ function Clbk_u_glow_params_0(params){
 
    // const body = snake.body.buffer[0];
 
-   return (snake.in_scale_animation) ? .5 : .3;
+   // return (snake.in_scale_animation) ? .5 : .3;
    // return (body.mesh.geom.dim[0] > snake.min_size) ? body.mesh.geom.dim[0] * .015 : .3;
    // return body.mesh.geom.dim[0] * .015;
-   // return .3;
+   return .3;
+   // return .5;
+   // return .8;
 }
 function Clbk_u_glow_params_2(params){
 
    // const body = snake.body.buffer[0];
 
-   return .5;
+   return .0;
 }
 
 
@@ -158,12 +171,8 @@ export function Game_snake() {
 
    const board_color = TRANSPARENCY(Interpolate_rgb_to_01(16, 28, 35), .2);
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [board_pad, board_pad, 0], [board_width,board_height], board_color, 'section', style);
-   // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    section.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-   
-   // section.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   // section.EnableGfxUniforms({ fx: SID.FX.FS_GLOW, }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
 
 
@@ -178,7 +187,7 @@ export function Game_snake() {
    // Create the Collectible mesh
 
    // const collectable_size = snake.size*1.4;
-   const collectable_size = 20;
+   const collectable_size = 40;
    const posx_start = section.geom.pos[0]                         + collectable_size*2 + 10;
    const posx_end = (section.geom.pos[0] + section.geom.dim[0]*2) - (collectable_size*2 + 10);
    const posy_start = section.geom.pos[1]                         + collectable_size*2 + 10;
@@ -187,28 +196,30 @@ export function Game_snake() {
    const rand_pos = GetRandomPos([posx_start, posy_start], [posx_end, posy_end]);
 
    const collectable = Create_widget_section(_, _, [0,0], [rand_pos[0], rand_pos[1], 0], [collectable_size,collectable_size], PURPLEB[9], 'section', [0, collectable_size, 6]);
-   collectable.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   collectable.SetName('collectable');
-   section.AddItem(collectable); 
-
-   // collectable.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   // collectable.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-
-
    
+   collectable.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   collectable.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   collectable.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC2,}, 'u_glow_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   collectable.SetName('collectable');
 
-
-
+   // TODO: Enable attribute via the method GfxEnableAttrib()
+   collectable.sid.attr |= SID.ATTR.GLOW_INTENSITY;
+   
+   section.AddItem(collectable); 
+   
+   
+   
+   
+   
+   
+   
+   
    /*************************************************************************************************/
    // Create the snake head's nose mesh (Shows the direction of the snke)
    const nose = Create_rect_mesh(_, [0, 0, 1], [3, 8], TRANSPARENCY(PURPLER[9], .2));
+   nose.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    nose.SetName('Nose');
    section.AddItem(nose);
-   
-   nose.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // nose.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-   // nose.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   // nose.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
 
 
@@ -218,8 +229,8 @@ export function Game_snake() {
    /*************************************************************************************************/
    // Create snake body meshes
 
-   const speed = 2.;
-   let next_posx = board_width/2;
+   let next_posx = board_width;
+   let next_posy = 60;
    let zpos = 1;
    
    for(let i=0; i < snake_initial_body_count; i++){
@@ -234,19 +245,27 @@ export function Game_snake() {
 
 
       // const body_mesh = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 20, MAX_BODY_MESHES-i+1], [calc_size, calc_size], TRANSPARENCY(YELLOWR[9], 1.), 'body_mesh', [snake.style[0], calc_size, snake.style[2]]);
-      const body_mesh = Create_widget_section(_, _, [0,0], [next_posx, 20, MAX_BODY_MESHES-i+1], [calc_size, calc_size], TRANSPARENCY(YELLOWR[9], 1.), 'body_mesh', [4, calc_size, snake.style[2]]);
+      const body_mesh = Create_widget_section(_, _, [0,0], [next_posx, next_posy, MAX_BODY_MESHES-i+1], [calc_size, calc_size], snake.color, 'body_mesh', [snake.style[0], calc_size, snake.style[2]]);
       body_mesh.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      // body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC3,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC2,}, 'u_glow_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      // TODO: Enable attribute via the method GfxEnableAttrib()
+      body_mesh.sid.attr |= SID.ATTR.GLOW_INTENSITY;
+      
       section.AddItem(body_mesh);
       
-      // body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      // body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       
       const bodyidx = snake.body.Add(new Body_mesh_properties(body_mesh));
       snake.body.buffer[bodyidx].idx = bodyidx; // Store the index for convinience
+      snake.body.buffer[bodyidx].size = calc_size; // Store the index for convinience
+      snake.body.buffer[bodyidx].reduce_size = reduce_size;
+
       snake.count++;
       if(bodyidx !== i) alert('514332139908', 'snake body mesh should index mismatch');
       // Name each body according to its index 
       body_mesh.SetName('body-' + bodyidx);
+
 
 
       // Set the max scale factor according to body mesh index
@@ -272,10 +291,12 @@ export function Game_snake() {
          mass:mass,
          mom: momentum,
          accel: acceleration,
-         speed:speed,
+         speed:snake.speed,
       }
 
-      next_posx -= calc_size*2;
+      // next_posx -= snake.reduce_mod;
+      next_posx += snake.reduce_mod;
+      next_posy += snake.reduce_mod;
 
    }
 
@@ -305,13 +326,11 @@ export function Game_snake() {
             params.params.target_params.rot.amt += mouse_xdif*mod;
             phys.vel[0] = Math.sin(params.params.target_params.rot.amt);
             phys.vel[1] = Math.cos(params.params.target_params.rot.amt);
-            // console.log('mouse_xdif', mouse_xdif, 'amt', params.params.target_params.amt);
          }
             
       }, 
       _, 
       {target_params: {head:snake.body.buffer[0].mesh, nose:nose, phys: physics[0], rot: snake.rotation, } }, 
-      // {nose: nose, phys: physics[0], }, 
       MESH_STATE.IS_HOLD_CLICK
    );
    
@@ -328,29 +347,30 @@ export function Game_snake() {
    Construct_listen_events_relations_from_mesh_tree(section);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-   // section.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, section.gfx.vb.groupidx);
-   // const clbk_params_0 = { vb_grouidx: section.gfx.vb.groupidx, val_idx: 0, start_val: .0, }
-   // section.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_0, clbk_params_0);
-   // const clbk_params_1 = { vb_grouidx: section.gfx.vb.groupidx, val_idx: 2, start_val: .0, }
-   // section.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_2, clbk_params_1);
 
 
 
 
 
    /*************************************************************************************************/
-   // const head = snake.body.buffer[0].mesh;
-   // head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, 3);
-   // const clbk_params_0 = { vb_grouidx: 3, val_idx: 0, start_val: .0, }
-   // head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_0, clbk_params_0);
-   // const clbk_params_1 = { vb_grouidx: 3, val_idx: 2, start_val: .0, }
-   // head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_2, clbk_params_1);
-   // head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, head.gfx.vb.groupidx);
-   // const clbk_params_0 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 0, start_val: .0, }
-   // head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_0, clbk_params_0);
-   // const clbk_params_1 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 2, start_val: .0, }
-   // head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_2, clbk_params_1);
-   // head.GfxUniformsSetClbk('u_glow_params', Clbk_u_glow_params_2, clbk_params_1);
+   
+   collectable.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, collectable.gfx.vb.groupidx);
+   collectable.SetClbkGfxUniforms('u_glow_params', ()=>{ return .7}, { vb_grouidx: collectable.gfx.vb.groupidx, val_idx: 0, start_val: .8, });
+   collectable.SetClbkGfxUniforms('u_glow_params', ()=>{ return .0}, { vb_grouidx: collectable.gfx.vb.groupidx, val_idx: 1, start_val: .0, });
+   Gl_set_glow_intensity(collectable.gfx, 1.);
+
+   Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, collectable, .01, .35, .75, _, .35, false)
+   // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, collectable, .01, .35, .75, _, .35, false)
+   // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, collectable, .1, -1., 1., 0);
+   // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.ROT, collectable, .5, -5., 5., 0);
+
+   const head = snake.body.buffer[0].mesh;
+   head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, head.gfx.vb.groupidx);
+   const clbk_params_0 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 0, start_val: 1.0, }
+   head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_0, clbk_params_0);
+   const clbk_params_1 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 1, start_val: .0, }
+   head.SetClbkGfxUniforms('u_glow_params', ()=>{ return .0}, clbk_params_1);
+
 
 
 
@@ -363,7 +383,6 @@ export function Game_snake() {
    const pad = 0;
    
    const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4,4], [0+pad, 0+total_height*2, 0], [0, 0], GREY[1]);
-   // if(!PLATFORM.ANY_SMARTPHONE_DEVICE) controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    controls_section.SetName('Sattelite_rotation->controls_section');
    controls_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -393,6 +412,7 @@ export function Game_snake() {
    // Debug_info_ui_static();
       
 }
+
 
 function Animate_snake(params) {
 
@@ -433,12 +453,10 @@ function Animate_snake(params) {
    
    if (ball_bot > bot_bound) {
       phys.vel[1] *= -1; // Reverse velocity
-      // head.geom.pos[1] = bot_bound-ball_radius*2; // Puut back inside the panel area
       hit=true;
    }
    else if (ball_top < top_bound) {
       phys.vel[1] *= -1;
-      // head.geom.pos[1] = 0;
       hit=true;
    }
    if (ball_right > right_bound) {
@@ -448,7 +466,6 @@ function Animate_snake(params) {
       head.geom.pos[0] =  right_bound - ((x - b_dist) + ball_radius*2);
       head.geom.UpdateSetWposX(head.gfx);
       hit=true;
-      // console.log(i, x, b_dist, x-b_dist, head.geom.pos[0])
    }
    else if (ball_left < left_bound) {
       phys.vel[0] *= -1;
@@ -457,7 +474,6 @@ function Animate_snake(params) {
       const b_dist = left_bound + head.geom.pos[0];
       head.geom.pos[0] =  left_bound + (Abs(x) - b_dist);
       head.geom.UpdateSetWposX(head.gfx);
-      // head.geom.pos[0] = 0;
       hit=true;
    }
    else {
@@ -597,6 +613,7 @@ function Animate_snake(params) {
 
 }
 
+
 function Animation_scale_up_run(params){
 
    if(params.body_mesh_idx === 0) snake.in_scale_animation = true;
@@ -623,11 +640,15 @@ function Animation_scale_up_run(params){
    body.mesh.geom.dim[0] += res;
    body.mesh.geom.dim[1] += res;
    body.mesh.geom.AddDimXY(body.mesh.gfx, res, res);
-
+   
    // Also move the body meshes because the coordinate system is the top-left of the mesh
    body.mesh.geom.pos[0] += -res;
    body.mesh.geom.pos[1] += -res;
    body.mesh.geom.AddWposXY(body.mesh.gfx, -res, -res);
+   
+   
+   body.glow_intensity +=  snake.glow_intensity_step;
+   Gl_set_glow_intensity(body.mesh.gfx, body.glow_intensity);
 
    
 
@@ -684,6 +705,7 @@ function Animation_scale_up_stop(params){
    return false;
 }
 
+
 function Animation_scale_down_run(params){
    
    const bodyidx = params.body_mesh_idx;
@@ -714,6 +736,13 @@ function Animation_scale_down_run(params){
       body.mesh.geom.pos[1] += res;
       body.mesh.geom.AddWposXY(body.mesh.gfx, res, res);
 
+         
+      body.glow_intensity -=  snake.glow_intensity_step;
+      Gl_set_glow_intensity(body.mesh.gfx, body.glow_intensity);
+
+      // if(bodyidx===0)
+         // console.log(body.glow_intensity)
+
 
 
       /*******************************************************************************************/
@@ -723,6 +752,7 @@ function Animation_scale_down_run(params){
          const physics = params.physics;
          nose.geom.AddWposXY(nose.gfx, -res * .5 * physics[0].vel[0], -res * .5 * physics[0].vel[1]);
       }
+      
       
       return true;
    }
@@ -741,6 +771,10 @@ function Animation_scale_down_run(params){
       // body.mesh.geom.pos[0] = posx;
       // body.mesh.geom.pos[1] = posy;
       // body.mesh.geom.SetWposXY(body.mesh.gfx, posx, posy);
+
+      // Reset the glow intensity
+      body.glow_intensity = snake.glow_intensity;
+      Gl_set_glow_intensity(body.mesh.gfx, snake.glow_intensity);
 
       return false;
    }
@@ -768,7 +802,7 @@ function Animation_scale_down_stop(params){
       const posy = last_mesh.geom.pos[1] + axis[1];
 
       // Calculate body size according to body mesh index (the greater the index the smaller the size)
-      let reduce_size = snake.count * snake.reduce_mod;
+      let reduce_size = (snake.count-1) * snake.reduce_mod;
       let calc_size = snake.size - reduce_size;
       if(calc_size < snake.min_size) {
          calc_size = snake.min_size;
@@ -779,15 +813,22 @@ function Animation_scale_down_stop(params){
 
 
       const zpos = snake.count;
-      const body_mesh = Create_widget_section(_, _, [0,0], [posx, posy, MAX_BODY_MESHES-zpos], [calc_size, calc_size], TRANSPARENCY(YELLOWR[9], 1.), 'body_mesh', [snake.style[0], calc_size, snake.style[2]]);
+      const body_mesh = Create_widget_section(_, _, [0,0], [posx, posy, MAX_BODY_MESHES-zpos], [calc_size, calc_size], snake.color, 'body_mesh', [snake.style[0], calc_size, snake.style[2]]);
       body_mesh.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       section.AddItem(body_mesh);
       
       
       
-      // body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      // body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      // body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC3,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC2,}, 'u_glow_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       
+
+      // TODO: Enable attribute via the method GfxEnableAttrib()
+      body_mesh.sid.attr |= SID.ATTR.GLOW_INTENSITY;
+
+
+
       body_mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, last_mesh.gfx.vb.groupidx);
       body_mesh.Render();
       
@@ -798,25 +839,30 @@ function Animation_scale_down_stop(params){
       const mass = body_mesh.geom.dim[0]; 
       const momentum = [velocity[0]*mass, velocity[1] * mass];
       const acceleration = [0, 0];
-      const speed = 5.5;
       
       const physics = {
          vel:velocity,
          mass:mass,
          mom: momentum,
          accel: acceleration,
-         speed:speed,
+         speed:snake.speed,
       }
       
+
+      // /*************************************************************************************************/
+      // const head = snake.body.buffer[0].mesh;
+      // head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, head.gfx.vb.groupidx);
+      // const clbk_params_0 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 0, start_val: 1.0, }
+      // head.SetClbkGfxUniforms('u_glow_params', Clbk_u_glow_params_0, clbk_params_0);
+      // const clbk_params_1 = { vb_grouidx: head.gfx.vb.groupidx, val_idx: 1, start_val: .0, }
+      // head.SetClbkGfxUniforms('u_glow_params', ()=>{ return .0}, clbk_params_1);
       
       const bodyidx = snake.body.Add(new Body_mesh_properties(body_mesh));
-      snake.body.buffer[bodyidx].idx = bodyidx; // Store the index for convinience
       snake.count++;
-      
       body_mesh.SetName('body-' + bodyidx);
-
+      
       const body = snake.body.buffer[bodyidx];
-
+      body.idx = bodyidx; // Store the index for convinience
       body.reduce_size = reduce_size;
       body.size = calc_size;
       
@@ -831,10 +877,10 @@ function Animation_scale_down_stop(params){
       // else body.max_scale_factor = max_scale_factor;
       
       // STATE.loop.paused = true;
-      snake.in_scale_animation = false;
+      // snake.in_scale_animation = false;
    }
    
-   // snake.in_scale_animation = false;
+   snake.in_scale_animation = false;
    const bodyidx = params.body_mesh_idx;
    snake.body.buffer[bodyidx].t = 0.0;
    snake.body.buffer[bodyidx].slope = Slope_function_logarithmic(snake.body.buffer[bodyidx].t, slope_constant1) +1;

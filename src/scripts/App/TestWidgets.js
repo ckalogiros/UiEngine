@@ -366,7 +366,7 @@ export function TestWidgetsGeneric(createId=1) {
         // // glow.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [0, 40, 2]);
         // glow.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         // glow.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        // glow.EnableGfxUniforms({fx: SID.FX.FS_GLOW,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+        // glow.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC3,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
         
         
         

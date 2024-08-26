@@ -46,6 +46,8 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshid
 const _root_dropdown = New_generic_buffer(_, 'Widget Dropdown roots');
 export function Dropdown_roots_reset() { _root_dropdown.ResetFull(); }
 
+
+
 export function Dropdown_roots_set_root(root, dropdown) {
    dropdown.rootidx = _root_dropdown.Add(root);
    return dropdown.rootidx;
@@ -87,22 +89,6 @@ export function Dropdown_roots_print_root_buffer() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const tr = 1.5;
-const _font_size = 7.5;
 
 export class Widget_Dropdown extends Section {
 

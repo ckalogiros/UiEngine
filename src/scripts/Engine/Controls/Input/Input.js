@@ -10,16 +10,23 @@ import { Mesh_unif_update_sticky_pos } from "../../Core/MeshUniformsBuffer.js";
 
 
 
+
+
+
+
 export function Input_reset() {  // HOT-PATH
   MouseResetDif(.5);
   MouseResetWheel();
 }
 
 
+
 function OnWindowResize(e) {
 
   On_window_resize();
 }
+
+
 
 export function On_window_resize() {
 
@@ -60,6 +67,8 @@ export function On_window_resize() {
   // The position update is happening through the update of the wpos uniform of the root parent  
   Mesh_unif_update_sticky_pos(xdif, ydif)
 }
+
+
 
 export function Input_create_user_input_listeners() {
 
@@ -126,6 +135,7 @@ export function Input_create_user_input_listeners() {
   document.addEventListener('keyup', OnKeyUp, false);
 
 }
+
 
 
 export function Device_set_up() {
@@ -332,6 +342,8 @@ zoom-out
 myBall.cur
  */
 }
+
+
 
 export function Detect_host_platform() {
 

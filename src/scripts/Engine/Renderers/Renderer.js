@@ -177,7 +177,8 @@ function Renderer_create_webgl_context(canvas) {
    console.log('WebGl version: ', gfxctx.getParameter(gfxctx.SHADING_LANGUAGE_VERSION));
    console.log('WebGl renderer info: ', gfxctx.getParameter(gfxctx.RENDERER));
 
-   console.log('Suported line widths:', gfxctx.getParameter(gfxctx.ALIASED_LINE_WIDTH_RANGE))
+   console.log('Suported line widths:', gfxctx.getParameter(gfxctx.ALIASED_LINE_WIDTH_RANGE));
+   console.log('Max vertex attributes:', gfxctx.getParameter(gfxctx.MAX_VERTEX_ATTRIBS));
 
    const extensions = gfxctx.getSupportedExtensions();
    // gfxctx.getExtension('OES_standard_derivatives');

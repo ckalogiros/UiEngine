@@ -14,7 +14,7 @@ const out_border_width           = 'out float v_border_width;';
 const out_border_feather         = 'out float v_border_feather;';
 const out_rCorners               = 'out float v_rCorners;';
 const u_orthoProj_in             = 'uniform mat4 u_projection;';
-const in_a_vec4_params1          = 'in vec4 a_params1;';
+const in_attr_generic_vec4          = 'in vec4 a_generic1;';
 const out_attr_col4              = 'out vec4 v_col; ';
 const out_attr_wpos2             = 'out vec2 v_wpos;';
 const out_vtime1                 = 'out float v_time;';
@@ -34,10 +34,10 @@ const sdf2_assign_sdf2           = '  v_sdf = a_sdf;';
 const vdim2_assign_apos2         = '  v_dim = abs(a_pos);';
 const vstyle3_assign_astyle3     = '  v_style = a_style;';
 const vtime1_assign_awpostime1   = '  v_time = a_wpos_time.w;';
-const a_params4_1_assign         = '  v_params1 = a_params1;';
-const assign_out_border_width    = '  v_border_width = a_params1.x;';
-const assign_out_rCorners        = '  v_rCorners = a_params1.y;';
-const assign_out_border_feather  = '  v_border_feather = a_params1.z;';
+const a_params4_1_assign         = '  v_params1 = a_generic1;';
+const assign_out_border_width    = '  v_border_width = a_generic1.x;';
+const assign_out_rCorners        = '  v_rCorners = a_generic1.y;';
+const assign_out_border_feather  = '  v_border_feather = a_generic1.z;';
 // const u_params_assign            = '  v_uniforms_buffer = uniforms_buffer;';
 const gl_position                = '  gl_Position = u_projection * vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);';
 
@@ -58,7 +58,7 @@ export const vertex_shader_chunks = {
    out_attr_sdf2           : out_attr_sdf2,
    in_attr_style3          : in_attr_style3,
    out_attr_style3         : out_attr_style3,
-   in_a_vec4_params1       : in_a_vec4_params1,
+   in_attr_generic_vec4    : in_attr_generic_vec4,
    u_orthoProj_in          : u_orthoProj_in,
    // in_uniforms_buffer      : in_uniforms_buffer,
    // out_uniforms_buffer     : out_uniforms_buffer,

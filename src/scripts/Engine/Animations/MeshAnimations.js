@@ -179,7 +179,12 @@ class MeshAnimation{
 
 
 
+const _mesh_animations_mesh_refs_buffer = New_generic_buffer(_, 'Animations Mesh References Buffer');
+
+
 const _mesh_animations_buffer = New_generic_buffer(_, 'Animations Buffer');
+
+
 export function Mesh_animations_reset() { _mesh_animations_buffer.ResetFull(); }
 
 
@@ -253,8 +258,8 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
     const attribsidx = mesh.gfx.prog.attribsidx;
     const num_faces = mesh.geom.num_faces;
     let values = [];
-
-
+    
+    
     const vals_len_flag = Analyze_flag(anim_type_flag, values_len_flag)
     console.log('values_len_flag', values_len_flag, '\nvals_len_flag', vals_len_flag)
     
@@ -290,20 +295,31 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
             anim_type_idx = _mesh_animations_buffer.Add(anim);
             ANIMATIONS.INDEX.WPOS = anim_type_idx;
         }
+        
+        // values = new Float32Array([
+        //     mesh.geom.pos[0],
+        //     mesh.geom.pos[1],
+        // ]);
         values = mesh.geom.pos;
+        // values = mesh.GetPosX();
+        
+        // Store a refference of the mesh so we can change the wpos or color of the mesh
+        // _mesh_animations_mesh_refs_buffer.Add({
+        //     mesh.geom.pos,
+        // });
     }
-
-
+    
+    
     const vals_len = MeshAnimations_get_value_size(anim_type_flag, values_len_flag)
     
     
     const t = start_t ? start_t : min;
     const t_step = step;
-
+    
     // Create vb data, if does't exist
     let vb_data_idx = Vb_data_exist(anim_type_idx, vbidx)
     if(vb_data_idx === INT_NULL){
-
+        
         const vb_data = new VB_DATA(vbidx, attribsidx, vals_len);
         vb_data_idx = anim.SetVbData(vb_data);
         
@@ -311,17 +327,16 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
         const anim_data = new AnimationData();
         anim.SetAnimData(anim_data);
     }
-
+    
     // Finally, after type and vb are set, create the animation data for the mesh
     anim.vb_data[vb_data_idx].SetData(starts, values, num_faces, anim_type_flag, vals_len_flag, which_vb, counts, verts_per_rect, start_v, has_start_value)
     anim.anim_data[vb_data_idx].SetData(t, t_step, min, max)
-
+    
     // Set apropriate callback
     anim.UpdateClbk = Choose_update_callback(anim_type_flag)
-
+    
     anim.is_active = true;
     anim.in_animation = true;
-    
 }
 
 
@@ -351,6 +366,7 @@ function Min_max(values, anim_data, flags, values_len){
         }
         
         values[i] += anim_data[ANIM_DATA.STEP];
+
         
         // if(i===0)values[i] += Timer_get_global_timer_sine()*4;
         // else values[i] += Timer_get_global_timer_cosine()*4;
@@ -387,7 +403,10 @@ export function Mesh_animations_run(){
                                                     //  vb_data.data.num_faces, vb_data.data.offsets, vb_data.data.which_vb, vb_data.data.counts, vb_data.data.num_faces[0]);
 
 
+                    // _mesh_animations_mesh_refs_buffer.buffer[i].geom.pos[0] += vb_data.data.values[0]
                 }
+
+                
                 
 
             }

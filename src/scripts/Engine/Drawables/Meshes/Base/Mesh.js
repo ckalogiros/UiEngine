@@ -178,9 +178,7 @@ export class Mesh {
         this.parent = null;
 
         this.listeners = null;
-        // this.parent_event_idx = INT_NULL; // An index to the Listeners Buffer Struct. In many cases the parent event is not the mesh's parent, to avoid any annecessary listen events creation.
 
-        // this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
         this.eventCallbacks = null;
         this.children = New_generic_buffer(_, 'Mesh children');
         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'Mesh time_intervals');
@@ -199,7 +197,6 @@ export class Mesh {
 
 
         this.gfx_scale = [1, 1];
-        // this.EnableGfxUniforms({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
 
         this.menu_options_idx = INT_NULL;
@@ -510,16 +507,11 @@ export class Mesh {
     SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
 
 
-    // SetColorAlpha(alpha) { this.SetUpdateFrameBuffer(); Set_color_a(this, alpha); }
-
-
-    // SetDefaultColor() { this.SetUpdateFrameBuffer(); Set_default_color_rgba(this) }
-
-
     SetStyle(style) { this.SetUpdateFrameBuffer(); this.mat.SetStyle(style); }
 
 
     SetDefaultPosXY() { this.SetUpdateFrameBuffer(); this.geom.SetDefaultPosXY(this.gfx); }
+
 
     // TODO: Update the .pos of the mesh for the rest of the methods
     SetWposXY(pos) { 
@@ -639,6 +631,7 @@ export class Mesh {
         this.sid.shad |= SID_FLAGS;
     }
 
+
     /**
      * Enable shader properties.
      * In order for a mesh to be drawn in a certain way, specific shaders must be build.
@@ -673,9 +666,19 @@ export class Mesh {
             case MESH_ENABLE.GFX.PASS_DIM2: { this.sid.pass |= SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
             case MESH_ENABLE.GFX.PASS_TIME1: { this.sid.pass |= SID.PASS.TIME1; break; }
-            // Effect Shaders
-            case MESH_ENABLE.GFX.FX_GLOW: { this.sid.fx |= SID.FX.FS_GLOW; break; }
-            case MESH_ENABLE.GFX.FX_NOISE: { this.sid.fx |= SID.FX.FS_NOISE; break; }
+            
+            // // Effect Shaders
+            // case MESH_ENABLE.GFX.FX_GLOW: { this.sid.fx |= SID.FX.FS_GLOW_VEC3; break; }
+            // case MESH_ENABLE.GFX.FX_NOISE: { this.sid.fx |= SID.FX.FS_NOISE; break; }
+            
+            
+            // case MESH_ENABLE.GFX.FX_GLOW: { 
+                
+            //     for(let i = 0; i < 4; i++){
+            //         if()
+            //     }
+            //     this.attr.fx |= SID.FX.FS_GLOW_VEC3; break; 
+            // }
 
             default: console.error('Enable material\'s shader param failed. @ Material.js');
         }

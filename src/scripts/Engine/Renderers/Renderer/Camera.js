@@ -30,6 +30,7 @@ export const CAMERA_CONTROLS = {
 
 
 
+
 export class Camera extends Matrix4 {
 
 	isSet; // To debug if camera has been created.
@@ -138,6 +139,9 @@ export class Camera extends Matrix4 {
 
 }
 
+
+
+
 export class CameraOrthographic extends Camera {
 
 
@@ -166,6 +170,9 @@ export class CameraOrthographic extends Camera {
 	}
 
 }
+
+
+
 
 export class CameraPerspective extends Camera {
 

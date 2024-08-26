@@ -129,6 +129,7 @@ const SID = {
         BORDER: BIT2 <<= 1,
         R_CORNERS: BIT2 <<= 1,
         FEATHER: BIT2 <<= 1,
+        GLOW_INTENSITY: BIT2 <<= 1,
         COL4_PER_VERTEX: BIT2 <<= 1,
         EMPTY: BIT2 <<= 1,
         TEST_MULTI_VERTEX: BIT2 <<= 1,
@@ -192,7 +193,8 @@ const SID = {
 
     // FX
     FX: {
-        FS_GLOW: BIT6,
+        FS_GLOW_VEC3: BIT6,
+        FS_GLOW_VEC2: BIT6<<=0x1,
         FS_NOISE: BIT6<<=0x1,
         FS_SMOKE: BIT6<<=0x1,
     },

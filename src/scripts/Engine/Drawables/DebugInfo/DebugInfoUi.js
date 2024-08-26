@@ -1628,7 +1628,7 @@ function Ui_focused_create_info_gfx(mesh, zpos){
          which_attrib: {
             col_idx
             wpos_idx
-            params1_idx
+            generic1_idx
             dim_idx
             tex_idx
          },
@@ -2513,6 +2513,7 @@ export function Debug_info_mesh_tree_create_ui() {
 
 
 
+
 function Dbg_ui_mesh_tree_create_entry(params) {
 
    const scrolled = params.root;
@@ -2605,6 +2606,8 @@ function Dbg_ui_mesh_tree_create_entry(params) {
 }
 
 
+
+
 function TEMPORARY(mesh, parent, root_entry_dp){
 
    // const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
@@ -2682,6 +2685,9 @@ function TEMPORARY(mesh, parent, root_entry_dp){
    }
 
 }
+
+
+
 
 function Helper_mesh_tree_info_create_more_info(parent, info_data, zindex, col_menu, col_dp, margin, style) {
 
@@ -2861,7 +2867,6 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
          if (root_dp.menu.is_gfx_inserted) {
 
             scrolled.Recalc_no_gfx_update();
-            // scrolled.Recalc();
 
             const scroller = scrolled.scroller_comp;
             const clip_top = scroller.geom.pos[1] - scroller.geom.dim[1], clip_bottom = scroller.geom.pos[1] + scroller.geom.dim[1]
@@ -3101,8 +3106,6 @@ function Dbg_ui_string_buffer_create_entry(params) {
    const text = `count:${size} size:${count}`;
    if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
    else buffer_info.SetText(text);
-
-   // if(change_happened)  scroller.Recalc();
 
 }
 

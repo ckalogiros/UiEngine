@@ -425,7 +425,7 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
       loop_count--;
    }
 
-   if(gfxInfo.sid.attr & SID.ATTR.DIM2)
+   // if(gfxInfo.sid.attr & SID.ATTR.DIM2)
 
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
@@ -714,6 +714,60 @@ export function Gl_set_uv(gfxInfo, uvs, num_faces = 1) {
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 }
 
+
+
+
+
+
+
+
+
+
+/**************************************************************************************************************************************/
+// VERTEX GENERIC ATTRIBUTES
+/**************************************************************************************************************************************/
+
+export function Gl_set_glow_intensity(gfxInfo, f, num_faces = 1) {
+
+   const vbidx = gfxInfo.vb.which_vb.dim_buf;
+   const generic1_idx = gfxInfo.vb.which_attrib.generic1_idx; // An index to access the wpos elements
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+
+   const glow_intensity_attrib_offset = 3; // HACK: The offset for now, concidered to be the last elem of a generic_vec4 attribute buffer after the style attrib is enabled
+
+   let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[generic1_idx] + glow_intensity_attrib_offset;
+   let loop_count = num_faces;
+
+   // For programs with 'DIM2' attribute, we need to include the extra attrib count for the stride
+   const account_for_dim_attrib = (gfxInfo.sid.attr & SID.ATTR.DIM2) ? 2 : 0;
+   let stride = vb_info.attribs_info.count - 1;
+   // let stride = vb_info.attribs_info.count - (vb_info.attribs_info.sizes[generic1_idx] + account_for_dim_attrib);
+
+
+   // FIXME: For now we check if program has 'DIM2', but we never check for the attributes assignment in the loop, we just assume all calls to this function use prg with 'DIM2'
+   // FIXME: For now the glow intensity is passed in the generic_vec4 used for style attributes. Make an implementation for independed glow intensity attrib 
+
+   while (loop_count) {
+
+      vb_data[index++] = f;
+      index += stride;
+
+      vb_data[index++] = f;
+      index += stride;
+
+      vb_data[index++] = f;
+      index += stride;
+
+      vb_data[index++] = f;
+      index += stride;
+
+      loop_count--;
+   }
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
+}
 
 
 
@@ -1057,7 +1111,7 @@ export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_l
          let advance = 0;
          const pos_offsets_len = pos_offsets.length;
          for (let k = 0; k < pos_len; k++) {
-            vb_data[index + pos_offsets[advance] + k] = pos[pos_indices[i] + k];
+            vb_data[index + pos_offsets[advance] + k] += pos[pos_indices[i] + k];
             advance++;
             if(advance >= pos_offsets_len-1) advance = 0;
          }

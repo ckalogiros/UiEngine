@@ -16,14 +16,11 @@ import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 
 const speed = 4;
-// const speed = 34;
 const speed_ratio = .01
-// const speed_ratio = .1
 const max = 100;
 const interpolate = 1 / max;
 
 const initial_scale = 10
-// const initial_rotation_speed = .1
 
 
 
@@ -252,7 +249,7 @@ class Emitter {
          case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
          case MESH_ENABLE.GFX.PASS_TIME1: { this.sid.pass |= SID.PASS.TIME1; break; }
          // Effect Shaders
-         case MESH_ENABLE.GFX.FX_GLOW: { this.sid.fx |= SID.FX.FS_GLOW; break; }
+         case MESH_ENABLE.GFX.FX_GLOW: { this.sid.fx |= SID.FX.FS_GLOW_VEC3; break; }
          case MESH_ENABLE.GFX.FX_NOISE: { this.sid.fx |= SID.FX.FS_NOISE; break; }
          case MESH_ENABLE.GFX.FX_SMOKE: { this.sid.fx |= SID.FX.FS_SMOKE; break; }
 
@@ -341,8 +338,13 @@ class Emitter {
 
 }
 
+
+
+
 const _emitters = New_generic_buffer(_, 'Particle System: Emitter buffer');
 export function Particles_system_reset() { return _emitters.ResetFull(); }
+
+
 
 
 export function Particles_get_particle_system(idx) { return _emitters.buffer[idx]; }
@@ -372,6 +374,9 @@ export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clb
    emitter.GfxUniformsSetClbk(unif_name, Clbk, params);
 }
 
+
+
+
 export function TEMP_PARTICLES_GEN_GFX(emitter, parent = null, specific_vb_groupidx) {
 
    if (!parent) console.error('4431623 \nEmmiter should have a parent mesh.')
@@ -388,7 +393,7 @@ export function TEMP_PARTICLES_GEN_GFX(emitter, parent = null, specific_vb_group
 
 
    // TODO: Temporary implementation of assigning the correct gfx update function pointer
-   if (emitter.sid.fx & SID.FX.FS_GLOW){
+   if (emitter.sid.fx & SID.FX.FS_GLOW_VEC3){
       emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2_style3;
    }
    else if(emitter.sid.fx & SID.FX.FS_NOISE){
@@ -399,6 +404,9 @@ export function TEMP_PARTICLES_GEN_GFX(emitter, parent = null, specific_vb_group
 
    return emitter.gfx.vb.groupidx;
 }
+
+
+
 
 // TODO: pass an already created sid, for selecting from a gama of shader particles
 export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId) {

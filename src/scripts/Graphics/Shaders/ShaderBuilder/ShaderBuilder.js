@@ -8,6 +8,7 @@ import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
 import { frag_noise, frag_noise_call } from './Functions/fragment.noise.js';
 import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
 import { frag_test1, frag_test1_call } from './Functions/fragment.tests.js';
+import { New_generic_buffer } from '../../../Engine/Core/Buffers.js';
 
 
 
@@ -131,31 +132,39 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader){
 }
 
 
+
+
+/**********************************************************************************************************************************************/
+/**********************************************************************************************************************************************/
+//
+
+// const _attribs_generic_decider_buffer = New_generic_buffer(_, _attribs_generic_decider_buffer);
+
+// const _attribs_generic1_vec4 = {
+//    attr1: {is_occupied:false, code:'', },
+//    attr2: {is_occupied:false, code:'', },
+//    attr3: {is_occupied:false, code:'', },
+//    attr4: {is_occupied:false, code:'', },
+// };
+
+// function Resolve_generic_attributes(sid, progidx){
+
+//    // _attribs_generic_decider_buffer.Add(New_generic_buffer(_, ));
+
+//    const 
+
+//    if((sid.attr & SID.ATTR.BORDER)){ 
+
+//       if()
+
+//    }
+// }
+
+
+
 /**
- * // TODO:
- * We can have a sid 'CONDITIONS' for some decisions.
- * the 'CONDITIONS' is set to 0x0 on every new shader program code (in Shaders_build_vertex_shader)
- * 
- * Example:
- * Lets say create uinform screen res stand alone.
- * In  'Resolve_uniforms_from_sid_vs()' we set 'CONDITIONS' to have a flag that creates:
- *    Vertex Shader
- *       'out vec2 v_screen_res;'
- *       'v_screen_res = u_screen_res;'
- *    Fragmet Shader
- *       'in vec2 v_screen_res;'
- *    In the function that gets the screen res
- *       By ifndef block of code????
- * 
- * !!!!!!!!!!!!
- * QUESTION: Should the ATTR.STYLE be responsible for creating the code for screen res???
- * So in Mesh class, on sid creation we should also implement: If ATTR.STYLE then ADD 'UNIF.SCREEN_RES'  
- * 
- * 
- * Set 'DEFINES_xxxx' and then find the and replace the 'DEFINES_xxxx' with code from a function
+ * Set 'DEFINES_xxxx' and then find and replace the 'DEFINES_xxxx' with code from a function
  */
-
-
 export function Shaders_build_vertex_shader(sid, uniforms_info){
 
    const vs_chunks = [
@@ -178,14 +187,19 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       /********************************************************************************************************/
       // Attributes In
       /********************************************************************************************************/
-
+      /**
+       * // TODO: We should add a step where we analyzing  the attributes sid,
+       * and creating a sid with vec4 generic buffers. Here we check only the attr_generic1_vec4/vec2, attr_generic2_vec4/vec2 etc 
+       */
       (sid.attr & SID.ATTR.COL4) ? 'in vec4 a_col;' : '',
       (sid.attr & SID.ATTR.WPOS_TIME4) ? 'in vec4 a_wpos_time;' : '',
-      (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? '#include <in_a_vec4_params1>' : '',
+      (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? '#include <in_attr_generic_vec4>' : '',
+      // (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'out float v_glow_intensity;' : '',
       (sid.attr & SID.ATTR.POS2) ? 'in vec2 a_pos;' : '',
       (sid.attr & SID.ATTR.DIM2) ? 'in vec2 a_dim;' : '',
       (sid.attr & SID.ATTR.TEX2) ? 'in vec2 a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <in_attr_sdf2>' : '',
+      // (_attribs_generic1_vec4.attr1.is_occupied) ? : '',
       '\n',
 
 
@@ -218,6 +232,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.R_CORNERS) ? '#include <out_rCorners>' : '',
       (sid.attr & SID.ATTR.FEATHER) ? '#include <out_border_feather>' : '',
       (sid.attr & SID.ATTR.TIME) ? 'out float v_time;' : '',
+      (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'out float v_glow_intensity;' : '',
       '\n',
 
 
@@ -246,35 +261,14 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
 
       /********************************************************************************************************/
-      // TEMPORARY CODE FOR QUICK ROTATIONS IMPLEMENTATION
-      // `\
-      // // float t = u_time*2.1;\n\
-      // float t = .1;\n\
-      // // mat2 rot = mat2(cos(t),-sin(t), sin(t),cos(t));\n\
-      // // mat3 rot = mat3(cos(t), -sin(t), 0, sin(t),cos(t), 0, 0, 0, 1);\n\
-      // mat4 rot = mat4(  cos(t), -sin(t), 0., 0.,     sin(t), cos(t), 0., 0., 0.,    0, 0, 1.,      0., 0., 0., 1.);\n\
-      // vec2 wpos = vec2(u_wposxy.x, u_wposxy.y);\n\
-      // vec4 p = vec4(a_pos.x + a_wpos_time.x + wpos.x, a_pos.y + a_wpos_time.y + wpos.y, a_wpos_time.z, 1.0);\n\
-      // // gl_Position = u_projection * p * rot;\n\
-      // gl_Position = u_projection *rot* p;\n\
-      // \n\
-      // `,
-      
+      // Calculate vertex position-rotation-scale
       
       '  vec2 vpos = a_pos;',
       ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '  vpos *= u_scale2;' : '',
-      // (sid.unif & SID.UNIF.SCALE2) ? ' ' : '',
-      
-      
       (sid.pass & SID.PASS.WPOS2) ? '  vec2 wpos = vec2(a_wpos_time.x+ u_wposxy.x, a_wpos_time.y+u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
-      
-      
-      
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
       ? '  gl_Position = u_projection * vec4(vpos.x + wpos.x, vpos.y + wpos.y, a_wpos_time.z, 1.0);' 
       : '  gl_Position = vec4(vpos.x + a_wpos_time.x, vpos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
-      // ? '  gl_Position = u_projection * vec4(a_pos.x + wpos.x, a_pos.y + wpos.y, a_wpos_time.z, 1.0);' 
-      // : '  gl_Position = vec4(a_pos.x + a_wpos_time.x, a_pos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
 
 
 
@@ -288,9 +282,10 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       (sid.pass & (SID.PASS.WPOS2|SID.UNIF.ROOT_WPOS2)) ? '  v_wpos = vec2(wpos.x,wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
       (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
       (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
-      (sid.attr & SID.ATTR.BORDER) ? '  v_border_width = a_params1.x;' : '',
-      (sid.attr & SID.ATTR.R_CORNERS) ? '  v_rCorners = a_params1.y;' : '',
-      (sid.attr & SID.ATTR.FEATHER) ? '  v_border_feather = a_params1.z;' : '',
+      (sid.attr & SID.ATTR.BORDER) ? '  v_border_width = a_generic1.x;' : '',
+      (sid.attr & SID.ATTR.R_CORNERS) ? '  v_rCorners = a_generic1.y;' : '',
+      (sid.attr & SID.ATTR.FEATHER) ? '  v_border_feather = a_generic1.z;' : '',
+      (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '  v_glow_intensity = a_generic1.w;' : '', // HACK: We assume the glow intensity attrib is together with the style attributes. Need to separate style with glow shaders, so if no style is active then the glow_intensity will be allocated at a_generic1.x
       (sid.attr & SID.ATTR.TIME) ? '  v_time = a_wpos_time.w;' : '',
       (true) ? '  gl_PointSize = 10.0;' : '',
       '}',
@@ -332,12 +327,14 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       // DEFINES
       '\n',
       // true ? 'layout(origin_upper_left) in vec4 frag_color;' : '',
-      true ? '#include <precision_medium>' : '',
-      true ? '#include <out_frag_color>' : '',
+      '#include <precision_medium>',
+      '#include <out_frag_color>',
       // ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_FS)) ? '#define U_SCALE 1' : '',
       (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
-      (sid.fx & SID.FX.FS_GLOW) ? '#define U_GLOW_PARAMS 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
-      (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
+      (sid.fx & SID.FX.FS_GLOW_VEC3) ? '#define U_GLOW_PARAMS_VEC3 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
+      (sid.fx & SID.FX.FS_GLOW_VEC2) ? '#define U_GLOW_PARAMS_VEC2 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
+      (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '', 
+      (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '#define A_GLOW_INTENSITY_FLOAT' : '',
       // (sid.unif & SID.UNIF.UNIF_SPEED) ? '#define U_SPEED 1' : '',
 
 
@@ -357,6 +354,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       (sid.attr & SID.ATTR.FEATHER) ? '#include <in_frag_border_feather>' : '',
       (sid.attr & SID.ATTR.SDF) ? '#include <in_frag_sdf2>' : '',
       (sid.attr & SID.ATTR.TIME) ? 'in float v_time;' : '',
+      (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'in float v_glow_intensity;' : '',
 
 
 
@@ -388,7 +386,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
       /********************************************************************************************************/
       // Fx shader functions
-      (sid.fx & SID.FX.FS_GLOW) ? frag_glow : '',
+      (sid.fx & (SID.FX.FS_GLOW_VEC3|SID.FX.FS_GLOW_VEC2)) ? frag_glow : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
       (sid.fx & SID.FX.FS_SMOKE) ? frag_smoke : '',
 
@@ -412,8 +410,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       true ? '{' : '',
       true ? '#include <frag_color_create>' : '', // Creates the variable 'color' of the fragment shader color output.
       (sid.attr & SID.ATTR.STYLE) ? frag_round_corners_call : '', // TODO: Check either for .STYLE or .BORDER|.FEATHER|.RCORNERS
-      (sid.fx & SID.FX.FS_GLOW) ? '  float alpha = color.a;' : '',
-      (sid.fx & SID.FX.FS_GLOW) ? frag_glow_call : '',
+      (sid.fx & (SID.FX.FS_GLOW_VEC3|SID.FX.FS_GLOW_VEC2)) ? '  float alpha = color.a;' : '',
+      (sid.fx & (SID.FX.FS_GLOW_VEC3|SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
       (sid.fx & SID.FX.FS_SMOKE) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2 ) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '', 

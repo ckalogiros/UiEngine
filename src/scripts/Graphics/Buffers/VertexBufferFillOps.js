@@ -16,6 +16,7 @@ import { Shader_attributes_get_attribs } from "../ShaderAttributes.js";
 _CNT = 0;
 const FUNCTION_TABLE_IDXS = {
    COL4_WPOS4_GENATTR1_POS2: INT_NULL,
+   COL4_WPOS4_GENATTR1_POS2_DIM2_GLOW_INTENSITY: INT_NULL,
    COL4_WPOS4_GENATTR1_POS2_DIM2: INT_NULL,
    COL4_WPOS4_GENATTR1_POS2_DIM2_TIME: INT_NULL,
    COL4_WPOS4_GENATTR1_POS2_DIM2_TEX2: INT_NULL,
@@ -60,6 +61,7 @@ const Vertex_buffer_fn_table_operation_add = [
    FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2_TIME,
    FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2_TEX2,
    FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_TEX2,
+   FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2_GLOW_INTENSITY,
    FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2,
    FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_DIM2_TEX2_TIME,
    FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_DIM2_TEX2,
@@ -102,6 +104,7 @@ function Set_up_fn_table() {
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2_TIME) FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2_DIM2_TIME = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2_DIM2_TEX2 = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2_TEX2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2_GLOW_INTENSITY) FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2_DIM2_GLOW_INTENSITY = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2) FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2_DIM2 = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_DIM2_TEX2_TIME) FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2_DIM2_TEX2_TIME = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_DIM2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS4_POS2_DIM2_TEX2 = i;
@@ -162,7 +165,6 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
       if(inst & SHADER_ATTRIBUTES.TEX2) clean_inst |= SHADER_ATTRIBUTES.TEX2;
       
       if (clean_inst === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_GENATTR1;
-      // if (clean_inst === (SID.ATTR.COL4_PER_VERTEX|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_COL4PERVERTEX_WPOS4_GENATTR1_POS2;
       if (clean_inst === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_TEX2;
       if (clean_inst === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4_POS2;
       if (clean_inst === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS4;
@@ -185,9 +187,11 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
       if(attr & SHADER_ATTRIBUTES.DIM2) clean_attr |= SHADER_ATTRIBUTES.DIM2;
       if(attr & SHADER_ATTRIBUTES.TEX2) clean_attr |= SHADER_ATTRIBUTES.TEX2;
       if(attr & SHADER_ATTRIBUTES.TIME) clean_attr |= SHADER_ATTRIBUTES.TIME;
+      if(attr & SHADER_ATTRIBUTES.GLOW_INTENSITY) clean_attr |= SHADER_ATTRIBUTES.GLOW_INTENSITY;
       
       
       if (clean_attr === (SID.ATTR.COL4_PER_VERTEX|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2|SID.ATTR.DIM2)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS4_GENATTR1_POS2_DIM2;
+      if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2|SID.ATTR.DIM2|SID.ATTR.GLOW_INTENSITY)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2_DIM2_GLOW_INTENSITY;
       if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2|SID.ATTR.DIM2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2_DIM2;
       if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2|SID.ATTR.DIM2|SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2_DIM2_TIME;
       if (clean_attr === (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4|SID.ATTR.GENERIC_ATTR1_VEC4|SID.ATTR.POS2|SID.ATTR.DIM2|SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS4_GENATTR1_POS2_DIM2_TEX2;
@@ -792,6 +796,53 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2(vb_data, geom, mat, st
          vb_data[index++] = mat.style[1];
          vb_data[index++] = mat.style[2];
          index++; // For GENERIC_ATTR1_VEC4 - STYLE3
+
+         // VERTEX POSITION
+         vb_data[index++] = vpos_x;
+         if(j===0) vb_data[index++] = geom.dim[1]*2;
+         if(j===1) vb_data[index++] = 0;
+         
+         // DIMENTIONS
+         vb_data[index++] = geom.dim[0] * num_faces;
+         vb_data[index++] = geom.dim[1];
+         
+         attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+      }
+      
+      vpos_x += geom.dim[0]*2; // Increment the vertex position for the next 2 verts (face)
+   }
+
+
+   return attribs_count;
+}
+function FILL_VERTEX_BUFFER_COL4_WPOS4_GENATTR1_POS2_DIM2_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride){
+
+   let attribs_count = 0;
+   let index = start;
+   let vpos_x = 0;
+
+   for (let i = 0; i < num_faces+1; i++) {
+   
+      for (let j = 0; j < 2; j++) {
+
+         // V1
+         // COLOR
+         vb_data[index++] = mat.col[0];
+         vb_data[index++] = mat.col[1];
+         vb_data[index++] = mat.col[2];
+         vb_data[index++] = mat.col[3];
+         
+         // WPOS
+         vb_data[index++] = geom.pos[0];
+         vb_data[index++] = geom.pos[1];
+         vb_data[index++] = geom.pos[2];
+         index++; // For WPOS4 TIME
+         
+         // GENERIC_ATTRIBUTES1_VEC4
+         vb_data[index++] = mat.style[0];
+         vb_data[index++] = mat.style[1];
+         vb_data[index++] = mat.style[2];
+         vb_data[index++] = .02; // For GENERIC_ATTR1_VEC4 - for glow shader intensity attribute
 
          // VERTEX POSITION
          vb_data[index++] = vpos_x;
