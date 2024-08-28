@@ -136,29 +136,273 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader){
 
 /**********************************************************************************************************************************************/
 /**********************************************************************************************************************************************/
-//
+// Shader Attributes Builder 
 
-// const _attribs_generic_decider_buffer = New_generic_buffer(_, _attribs_generic_decider_buffer);
 
-const _attribs_generic1_vec4 = {
-   attr1: {is_occupied:false, code:'', },
-   attr2: {is_occupied:false, code:'', },
-   attr3: {is_occupied:false, code:'', },
-   attr4: {is_occupied:false, code:'', },
-};
 
-// function Resolve_generic_attributes(sid, progidx){
+const attribs_xyzw = ['.x', '.y', '.z', '.w'];
+let locations = null;
+let attributes_in_code = '';
+let attributes_out_code = '';
+let attributes_assign_code = '';
+let fs_attribs_in_code = '';
 
-//    // _attribs_generic_decider_buffer.Add(New_generic_buffer(_, ));
 
-//    const 
 
-//    if((sid.attr & SID.ATTR.BORDER)){ 
+function Create_new_attrib_location(loc, loc_idx){
+   loc_idx++; 
+   attributes_in_code += `in vec4 a_generic_${loc_idx};\n`;
+   loc[loc_idx].name =`a_generic_${loc_idx}`;
+   loc[loc_idx].is_active = true;
 
-//       if()
+   return loc_idx;
+}
 
-//    }
-// }
+
+
+function Create_attribute(name, location_name, attr_idx, pass_to_fs=0x0) {
+
+   return {
+      is_occupied:true, 
+      is_passing:pass_to_fs, // Is this attrib passing to the fragment shader 
+      name:name,  
+      out_name: `v_${name}`, 
+      in_name:`${location_name}${attribs_xyzw[attr_idx]}`,
+   };
+}
+
+
+
+
+function Vertex_shader_resolve_attributes_in(sid){
+
+   const loc = [
+      {
+         is_active: false,
+         // is_full: false,
+         name: '',
+         attr: [
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+         ],
+      },
+      {
+         is_active: false,
+         name: '',
+         attr: [
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+         ],
+      },
+      {
+         is_active: false,
+         name: '',
+         attr: [
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+         ],
+      },
+      {
+         is_active: false,
+         name: '',
+         attr: [
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+            {is_occupied:false, name:'', in_name:'',},
+         ],
+      },
+   ];
+
+   let loc_idx = -1;
+   let vec_idx = 0;
+
+   loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; 
+
+   if(sid.attr & SID.ATTR.COL4){
+      
+      const pass_to_fs = sid.pass & SID.PASS.COL4;
+      
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('col4_r', loc[loc_idx].name, vec_idx, pass_to_fs,);
+      vec_idx++;
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('col4_g', loc[loc_idx].name, vec_idx, pass_to_fs,);
+      vec_idx++;
+      
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('col4_b', loc[loc_idx].name, vec_idx, pass_to_fs,);
+      vec_idx++;
+      
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('col4_a', loc[loc_idx].name, vec_idx, pass_to_fs,);
+      vec_idx++;
+   }
+   
+   if(sid.attr & SID.ATTR.WPOS_TIME4) {
+      
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_x', loc[loc_idx].name, vec_idx, sid.pass & (SID.PASS.WPOS3|SID.PASS.WPOS2),);
+      vec_idx++;
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_y', loc[loc_idx].name, vec_idx, sid.pass & (SID.PASS.WPOS3|SID.PASS.WPOS2),);
+      vec_idx++;
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_z', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.WPOS3,);
+      vec_idx++;
+
+   }
+      
+   if(sid.attr & SID.ATTR.TIME) {
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('time', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.TIME,);
+      vec_idx++
+   }
+            
+   if(sid.attr & SID.ATTR.POS2) {
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.POS2,);
+      vec_idx++;
+      
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.POS2,);
+      vec_idx++;
+
+   }
+   
+   if(sid.attr & SID.ATTR.DIM2) {
+      
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2,);
+      vec_idx++;
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2);
+      vec_idx++;
+   }
+
+   if(sid.attr & SID.ATTR.R_CORNERS) {
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('rcorners', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.R_CORNERS,);
+      vec_idx++;
+
+   }
+
+   if(sid.attr & SID.ATTR.BORDER) {
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('border', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.BORDER,);
+      vec_idx++;
+   }
+   
+   if(sid.attr & SID.ATTR.FEATHER) {
+      
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('feather', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.FEATHER,);
+      vec_idx++;
+   }
+
+   if(sid.attr & SID.ATTR.TEX2) {
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('tex2_u', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.TEX2);
+      vec_idx++;
+      
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('tex2_v', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.TEX2);
+      vec_idx++;
+   }
+
+   if(sid.attr & SID.ATTR.GLOW_INTENSITY) {
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('glow_intensity', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.GLOW_INTENSITY);
+      vec_idx++;
+   }
+
+   if(sid.attr & SID.ATTR.SDF) {
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('sdf', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.SDF);
+      vec_idx++;
+   }
+
+   if(sid.attr & SID.ATTR.MSDF) {
+
+      if(vec_idx >= 4) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+      loc[loc_idx].attr[vec_idx] = Create_attribute('msdf', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.MSDF);
+      vec_idx++;
+   }
+
+
+   locations = loc;
+
+
+
+   // console.log('attributes_in_code:\n', attributes_in_code, '\n\n', 'loc:', loc);
+   // for(let i=0; i<loc.length; i++){
+      
+   //    if(loc[i].is_active) console.log('loc:', loc[i].name, 'is active:', loc[i].is_active);
+
+   //    for(let j=0; j<4; j++){
+   //       if(loc[i].attr[j].is_occupied) console.log(j, 'attrib:', loc[i].name+loc[i].attr[j].name);
+   //    }
+   // }
+
+}
+
+
+
+function Vertex_shader_resolve_attributes_out(){
+
+   for(let i=0; i<locations.length; i++){
+      
+      for(let j=0; j<locations[i].attr.length; j++){
+
+         const attrib = locations[i].attr[j];
+         if(attrib.is_passing){
+            attributes_out_code += `out float ${attrib.out_name};\n`;
+         }
+      }
+   }
+
+
+   // console.log('-------------------------------------------------------\nResolver: Attributes Out:\n', attributes_out_code);
+}
+
+
+
+function Vertex_shader_resolve_attributes_out_assignment(){
+
+   for(let i=0; i<locations.length; i++){
+      
+      for(let j=0; j<locations[i].attr.length; j++){
+
+         const attrib = locations[i].attr[j];
+         if(attrib.is_occupied && !attrib.is_passing){
+            attributes_assign_code += `  float ${attrib.out_name} = ${attrib.in_name};\n`;
+         }
+         else if(attrib.is_passing){
+            attributes_assign_code += `  ${attrib.out_name} = ${attrib.in_name};\n`;
+         }
+      }
+   }
+
+
+   // console.log('-------------------------------------------------------\nResolver: Attributes Assign:\n', attributes_assign_code);
+}
 
 
 
@@ -166,6 +410,11 @@ const _attribs_generic1_vec4 = {
  * Set 'DEFINES_xxxx' and then find and replace the 'DEFINES_xxxx' with code from a function
  */
 export function Shaders_build_vertex_shader(sid, uniforms_info){
+
+
+   Vertex_shader_resolve_attributes_in(sid);
+   Vertex_shader_resolve_attributes_out();
+   Vertex_shader_resolve_attributes_out_assignment();
 
    const vs_chunks = [
 
@@ -191,17 +440,18 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
        * // TODO: We should add a step where we analyzing  the attributes sid,
        * and creating a sid with vec4 generic buffers. Here we check only the attr_generic1_vec4/vec2, attr_generic2_vec4/vec2 etc 
        */
-      (sid.attr & SID.ATTR.COL4) ? 'in vec4 a_col;' : '',
-      (sid.attr & SID.ATTR.WPOS_TIME4) ? 'in vec4 a_wpos_time;' : '',
-      (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? '#include <in_attr_generic_vec4>' : '',
-      // (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'out float v_glow_intensity;' : '',
-      (sid.attr & SID.ATTR.POS2) ? 'in vec2 a_pos;' : '',
-      (sid.attr & SID.ATTR.DIM2) ? 'in vec2 a_dim;' : '',
-      (sid.attr & SID.ATTR.TEX2) ? 'in vec2 a_tex;' : '',
-      (sid.attr & SID.ATTR.SDF) ? '#include <in_attr_sdf2>' : '',
-      // (_attribs_generic1_vec4.attr1.is_occupied) ? : '',
-      '\n',
+      // (sid.attr & SID.ATTR.COL4) ? 'in vec4 a_col;' : '',
+      // (sid.attr & SID.ATTR.WPOS_TIME4) ? 'in vec4 a_wpos_time;' : '',
+      // (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? '#include <in_attr_generic_vec4>' : '',
+      // // (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'out float v_glow_intensity;' : '',
+      // (sid.attr & SID.ATTR.POS2) ? 'in vec2 a_pos;' : '',
+      // (sid.attr & SID.ATTR.DIM2) ? 'in vec2 a_dim;' : '',
+      // (sid.attr & SID.ATTR.TEX2) ? 'in vec2 a_tex;' : '',
+      // (sid.attr & SID.ATTR.SDF) ? '#include <in_attr_sdf2>' : '',
+      // // (_attribs_generic1_vec4.attr1.is_occupied) ? : '',
 
+      attributes_in_code,
+      '\n',
 
 
 
@@ -221,18 +471,19 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       /********************************************************************************************************/
       // OUTS
       /********************************************************************************************************/
-      (sid.pass & SID.PASS.COL4) ? 'out vec4 v_col; ' : '',
-      (sid.pass & SID.PASS.DIM2) ? 'out vec2 v_dim;' : (sid.pass & SID.ATTR.DIM2) ? 'out vec2 v_dim;' :'',
-      (sid.pass & SID.PASS.WPOS2) ? 'out vec2 v_wpos;' : '',
-      (sid.pass & SID.PASS.TIME1) ? '#include <out_vtime1>' : '',
-      (sid.pass & SID.PASS.RES2) ? '#include <out_vres2>' : '',
-      (sid.attr & SID.ATTR.TEX2) ? 'out vec2 v_tex_coord;' : '',
-      (sid.attr & SID.ATTR.SDF) ? '#include <out_attr_sdf2>' : '',
-      (sid.attr & SID.ATTR.BORDER) ? '#include <out_border_width>' : '',
-      (sid.attr & SID.ATTR.R_CORNERS) ? '#include <out_rCorners>' : '',
-      (sid.attr & SID.ATTR.FEATHER) ? '#include <out_border_feather>' : '',
-      (sid.attr & SID.ATTR.TIME) ? 'out float v_time;' : '',
-      (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'out float v_glow_intensity;' : '',
+      // (sid.pass & SID.PASS.COL4) ? 'out vec4 v_col; ' : '',
+      // (sid.pass & SID.PASS.DIM2) ? 'out vec2 v_dim;' : (sid.pass & SID.ATTR.DIM2) ? 'out vec2 v_dim;' :'',
+      // (sid.pass & SID.PASS.WPOS2) ? 'out vec2 v_wpos;' : '',
+      // (sid.pass & SID.PASS.TIME) ? '#include <out_vtime1>' : '',
+      // (sid.pass & SID.PASS.RES2) ? '#include <out_vres2>' : '',
+      // (sid.attr & SID.ATTR.TEX2) ? 'out vec2 v_tex_coord;' : '',
+      // (sid.attr & SID.ATTR.SDF) ? '#include <out_attr_sdf2>' : '',
+      // (sid.attr & SID.ATTR.BORDER) ? '#include <out_border_width>' : '',
+      // (sid.attr & SID.ATTR.R_CORNERS) ? '#include <out_rCorners>' : '',
+      // (sid.attr & SID.ATTR.FEATHER) ? '#include <out_border_feather>' : '',
+      // (sid.attr & SID.ATTR.TIME) ? 'out float v_time;' : '',
+      // (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'out float v_glow_intensity;' : '',
+      attributes_out_code,
       '\n',
 
 
@@ -248,6 +499,9 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
 
 
+      /********************************************************************************************************/
+      // 
+      attributes_assign_code,
 
 
 
@@ -263,12 +517,29 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       /********************************************************************************************************/
       // Calculate vertex position-rotation-scale
       
-      '  vec2 vpos = a_pos;',
-      ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '  vpos *= u_scale2;' : '',
-      (sid.pass & SID.PASS.WPOS2) ? '  vec2 wpos = vec2(a_wpos_time.x+ u_wposxy.x, a_wpos_time.y+u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
+      /**
+       * Current vertex: gl_VertexID.
+       * Use to set the vertex position.
+       * Use #directives to enable vertex pos by the vertex id we are currently on.
+       * Example:
+       *    Vertex pos: V1:[0,y], V2:[0,0], V3:[x,y], V4:[x,0]
+       * That way we can pass 2 attributes as the mesh dimention
+       * and create the vertex position from them. No need to pass 8 values
+       * for vertex pos and another 2 for dimention
+       */
+
+      // '  vec2 vpos = a_pos;',
+      // ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '  vpos *= u_scale2;' : '',
+      // (sid.pass & SID.PASS.WPOS2) ? '  vec2 wpos = vec2(a_wpos_time.x+ u_wposxy.x, a_wpos_time.y+u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
+      // (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
+      // ? '  gl_Position = u_projection * vec4(vpos.x + wpos.x, vpos.y + wpos.y, a_wpos_time.z, 1.0);' 
+      // : '  gl_Position = vec4(vpos.x + a_wpos_time.x, vpos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
+      
+      true ? '  vec2 wpos = vec2(v_wpos3_x + u_wposxy.x, v_wpos3_y + u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-      ? '  gl_Position = u_projection * vec4(vpos.x + wpos.x, vpos.y + wpos.y, a_wpos_time.z, 1.0);' 
-      : '  gl_Position = vec4(vpos.x + a_wpos_time.x, vpos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
+      // ? '  gl_Position = u_projection * vec4(v_pos2_x + (v_wpos3_x + u_wposxy.x), v_pos2_y + (v_wpos3_y + u_wposxy.y), v_wpos3_z, 1.0);' 
+      ? '  gl_Position = u_projection * vec4(v_pos2_x + wpos.x, v_pos2_y + wpos.y, v_wpos3_z, 1.0);' 
+      : '  gl_Position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
 
 
 
@@ -277,17 +548,17 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
       /********************************************************************************************************/
       // ASSIGNMENTS
-      (sid.pass & SID.PASS.COL4) ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') : '', 
-      (sid.pass & SID.PASS.DIM2) ? '  v_dim = a_dim;' : (sid.pass & SID.ATTR.DIM2) ? '  v_dim = a_dim;' : '', // TODO: If we have created an attribute a_dim, we have to use it, else the attribs buffering is gonna be wrong
-      (sid.pass & (SID.PASS.WPOS2|SID.UNIF.ROOT_WPOS2)) ? '  v_wpos = vec2(wpos.x,wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
-      (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
-      (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
-      (sid.attr & SID.ATTR.BORDER) ? '  v_border_width = a_generic1.x;' : '',
-      (sid.attr & SID.ATTR.R_CORNERS) ? '  v_rCorners = a_generic1.y;' : '',
-      (sid.attr & SID.ATTR.FEATHER) ? '  v_border_feather = a_generic1.z;' : '',
-      (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '  v_glow_intensity = a_generic1.w;' : '', // HACK: We assume the glow intensity attrib is together with the style attributes. Need to separate style with glow shaders, so if no style is active then the glow_intensity will be allocated at a_generic1.x
-      (sid.attr & SID.ATTR.TIME) ? '  v_time = a_wpos_time.w;' : '',
-      (true) ? '  gl_PointSize = 10.0;' : '',
+      // (sid.pass & SID.PASS.COL4) ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') : '', 
+      // (sid.pass & SID.PASS.DIM2) ? '  v_dim = a_dim;' : (sid.pass & SID.ATTR.DIM2) ? '  v_dim = a_dim;' : '', // TODO: If we have created an attribute a_dim, we have to use it, else the attribs buffering is gonna be wrong
+      // (sid.pass & (SID.PASS.WPOS2|SID.UNIF.ROOT_WPOS2)) ? '  v_wpos = vec2(wpos.x,wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
+      // (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
+      // (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
+      // (sid.attr & SID.ATTR.BORDER) ? '  v_border = a_generic_1.x;' : '',
+      // (sid.attr & SID.ATTR.R_CORNERS) ? '  v_rcorners = a_generic_1.y;' : '',
+      // (sid.attr & SID.ATTR.FEATHER) ? '  v_feather = a_generic_1.z;' : '',
+      // (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '  v_glow_intensity = a_generic_1.w;' : '', // HACK: We assume the glow intensity attrib is together with the style attributes. Need to separate style with glow shaders, so if no style is active then the glow_intensity will be allocated at a_generic_1.x
+      // (sid.attr & SID.ATTR.TIME) ? '  v_time = a_wpos_time.w;' : '',
+      // (true) ? '  gl_PointSize = 10.0;' : '',
       '}',
 
    ];
@@ -311,7 +582,27 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
 
 
+
+function Fragment_shader_resolve_attributes_in(){
+
+   for(let i=0; i<locations.length; i++){
+      
+      for(let j=0; j<locations[i].attr.length; j++){
+
+         const attrib = locations[i].attr[j];
+         if(attrib.is_passing){
+            fs_attribs_in_code += `in float ${attrib.out_name};\n`;
+         }
+      }
+   }
+
+
+   // console.log('-------------------------------------------------------\nResolver: Fragment Shader Inputs:\n', fs_attribs_in_code);
+}
+
 export function Shaders_build_fragment_shader(sid, uniforms_info){
+
+   Fragment_shader_resolve_attributes_in();
 
    const fs_chunks = [
 
@@ -345,16 +636,17 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       /********************************************************************************************************/
       // In
       '\n',
-      (sid.pass & SID.PASS.COL4) ? '#include <in_frag_col4>' : '',
-      (sid.pass & SID.PASS.DIM2) ? '#include <in_frag_dim2>'   : '',
-      (sid.pass & SID.PASS.WPOS2) ? '#include <in_frag_wpos2>' : '',
-      (sid.attr & SID.ATTR.TEX2) ? '#include <in_frag_tex2>' : '',
-      (sid.attr & SID.ATTR.BORDER) ? '#include <in_frag_border_width>' : '',
-      (sid.attr & SID.ATTR.R_CORNERS) ? '#include <in_frag_rCorners>' : '',
-      (sid.attr & SID.ATTR.FEATHER) ? '#include <in_frag_border_feather>' : '',
-      (sid.attr & SID.ATTR.SDF) ? '#include <in_frag_sdf2>' : '',
-      (sid.attr & SID.ATTR.TIME) ? 'in float v_time;' : '',
-      (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'in float v_glow_intensity;' : '',
+      // (sid.pass & SID.PASS.COL4) ? '#include <in_frag_col4>' : '',
+      // (sid.pass & SID.PASS.DIM2) ? '#include <in_frag_dim2>'   : '',
+      // (sid.pass & SID.PASS.WPOS2) ? '#include <in_frag_wpos2>' : '',
+      // (sid.attr & SID.ATTR.TEX2) ? '#include <in_frag_tex2>' : '',
+      // (sid.attr & SID.ATTR.BORDER) ? '#include <in_frag_border_width>' : '',
+      // (sid.attr & SID.ATTR.R_CORNERS) ? '#include <in_frag_rCorners>' : '',
+      // (sid.attr & SID.ATTR.FEATHER) ? '#include <in_frag_border_feather>' : '',
+      // (sid.attr & SID.ATTR.SDF) ? '#include <in_frag_sdf2>' : '',
+      // (sid.attr & SID.ATTR.TIME) ? 'in float v_time;' : '',
+      // (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'in float v_glow_intensity;' : '',
+      fs_attribs_in_code,
 
 
 
@@ -375,7 +667,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       /********************************************************************************************************/
       // Function definitions
       '\n',
-      (sid.attr & SID.ATTR.STYLE) ? frag_round_corners : '',
+      (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? frag_round_corners : '',
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
       (sid.attr & SID.ATTR.MSDF) ? frag_msdf : '',
 
@@ -407,9 +699,10 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
       /********************************************************************************************************/
       // Main
       true ? 'void main(void) ' : '',
-      true ? '{' : '',
-      true ? '#include <frag_color_create>' : '', // Creates the variable 'color' of the fragment shader color output.
-      (sid.attr & SID.ATTR.STYLE) ? frag_round_corners_call : '', // TODO: Check either for .STYLE or .BORDER|.FEATHER|.RCORNERS
+      '{',
+      // true ? '#include <frag_color_create>' : '', // Creates the variable 'color' of the fragment shader color output.
+      '  vec4 color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);',
+      (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? frag_round_corners_call : '', // TODO: Check either for .STYLE or .BORDER|.FEATHER|.RCORNERS
       (sid.fx & (SID.FX.FS_GLOW_VEC3|SID.FX.FS_GLOW_VEC2)) ? '  float alpha = color.a;' : '',
       (sid.fx & (SID.FX.FS_GLOW_VEC3|SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
@@ -424,7 +717,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
       /********************************************************************************************************/
       // Color fragment
-      true ? '  frag_color = color;' : '',
+      '  frag_color = color;',
       (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '  frag_color.rgb *= v_col.a; ' : '',
       // true ? '  frag_color.rgb *= color.a;' : '',
 
@@ -449,7 +742,16 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
    const fs = Fragment_shader_includes_resolve(fragment_shader);
 
-   if(DEBUG.SHADERS) console.info(fs)
+
+   // Reset for the next Shader Program build
+   locations = null;
+   attributes_in_code = '';
+   attributes_out_code = '';
+   attributes_assign_code = '';
+   fs_attribs_in_code = '';
+
+
+   if(DEBUG.SHADERS) console.info(fs);
    return fs;
 }
 

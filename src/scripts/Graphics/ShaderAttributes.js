@@ -170,7 +170,7 @@ export function Shader_attributes_create(sid, shader_program) {
       else if (attrib_info.name === 'a_wpos_time') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.WPOS_TIME4;
       else if (attrib_info.name === 'a_pos') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.POS2;
       else if (attrib_info.name === 'a_dim') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.DIM2;
-      else if (attrib_info.name === 'a_generic1') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4;
+      else if (attrib_info.name === 'a_generic_1') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4;
       else if (attrib_info.name === 'a_tex') shader_attribs.nameids[loc] = SHADER_ATTRIBUTES.TEX2;
 
    }

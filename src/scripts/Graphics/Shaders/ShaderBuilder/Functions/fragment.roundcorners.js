@@ -87,16 +87,16 @@ vec4 Stylize()
     #endif
     
     // Radius(From 0.01 to 0.35 good values) for rounding corners
-    float border_width = v_border_width;
+    float border_width = v_border;
     // float scale_down = .25;
     // float scale_down = .5;
     float scale_up = 1./scale_down;
-    vec2 rCorners = vec2(v_rCorners) * scale_down;
-    float feather = v_border_feather;
+    vec2 rCorners = vec2(v_rcorners) * scale_down;
+    float feather = v_feather;
     vec2 blur = vec2(0.0, feather);
     vec2 res = u_screen_res;
     // vec2 uv = (gl_FragCoord.xy-(res*.5));
-    vec2 dim = v_dim * scale_down; // v_dim is the abs(a_pos), and is an interpolated value for every fragment in the span of min-a_pos to max-a_pos
+    vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down; // v_dim is the abs(a_pos), and is an interpolated value for every fragment in the span of min-a_pos to max-a_pos
     
     float clarity = 40.4;
     ScreenH = min(res.x, res.y)*clarity;
@@ -108,7 +108,7 @@ vec4 Stylize()
     uv.x += (res.x*.5); // Center mesh to screen
     uv.y -= (res.y*.5); // Center mesh to screen
     
-    vec2 wpos = v_wpos;
+    vec2 wpos = vec2(v_wpos3_x, v_wpos3_y);
     uv.x -= wpos.x; // To move with mesh position
     uv.y += wpos.y; // To move with mesh position
     
@@ -122,7 +122,7 @@ vec4 Stylize()
     // float d = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - rCorners.x;
     
     
-    vec4 src = v_col;
+    vec4 src = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
     vec3 color = vec3(0.0);
     
     

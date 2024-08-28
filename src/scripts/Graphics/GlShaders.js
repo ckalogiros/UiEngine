@@ -31,7 +31,7 @@ export function Shaders_load(gl, sid, uniforms_info) {
 
 	const shader_program = Load_shaders(gl, shader, sid);
 	if (shader_program) {
-		if (dbg.GL_DEBUG_SHADERS) console.log('Shader Program Created Successfully!\nShader Type ID: ', dbg.GetShaderTypeId(sid));
+		if (dbg.GL_DEBUG_SHADERS) console.log('Shader Program Created Successfully!\nShader Type ID: ', SID.GetTypeToString(sid));
 	} 
 	else {
 		alert('Unable to CREATE shader program: ' + gl.getProgramInfoLog(shader_program));
@@ -55,7 +55,7 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 		loc++;
 	}
 	if(sid.attr & SID.ATTR.GENERIC_ATTR1_VEC4){
-		gl.bindAttribLocation(shader_program, loc, 'a_generic1');
+		gl.bindAttribLocation(shader_program, loc, 'a_generic_1');
 		loc++;
 	}
 	if(sid.attr & SID.ATTR.POS2){

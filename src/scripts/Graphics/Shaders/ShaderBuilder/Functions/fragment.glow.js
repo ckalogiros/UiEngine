@@ -58,7 +58,7 @@ vec4 Glow(float alpha)
         uv.x += (res.x*.5); // Center mesh to screen
         uv.y -= (res.y*.5); // Center mesh to screen
         
-        vec2 wpos = v_wpos;
+        vec2 wpos = vec2(v_wpos3_x, v_wpos3_y);
         uv.x -= wpos.x; // To move with mesh position
         uv.y += wpos.y; // To move with mesh position
         
@@ -73,7 +73,7 @@ vec4 Glow(float alpha)
     // float d = smoothstep(dim.y, r,  length(uv));
     float d = smoothstep(dim.y*outer, r*inner,  length(uv));
 
-    vec3 color = v_col.rgb*d*intensity;
+    vec3 color = vec3(v_col4_r, v_col4_g, v_col4_b)*d*intensity;
     // color.rgb *= d;
     // color.rgb *= original_a;
     // alpha *= original_a;

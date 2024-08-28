@@ -3,7 +3,6 @@ import { FloorArr2, FloorArr3 } from '../Helpers/Math/MathOperations.js';
 
 
 import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
-import { GetShaderTypeId } from '../Graphics/Debug/GfxDebug.js';
 
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Debug_info_create_ui_focused, Debug_info_ui, Debug_info_ui_static } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
@@ -353,7 +352,7 @@ export function TestWidgetsGeneric(createId=1) {
     // Demo_snake_animation();
     // Demo_chain_link();
 
-    Game_snake();
+    // Game_snake();
 
     {
 
@@ -722,7 +721,7 @@ export function TestWidgetsGeneric(createId=1) {
 
     /** Section Synthesizes */
     {
-        // SectionResizable([300, 300, 0])
+        Section([300, 300, 0])
         // SectionResizable([350, 350, 0])
 
         // TestSections1();
@@ -857,6 +856,39 @@ function CreatePanel(is_root_widget = undefined) {
     }
 
     return scroller
+}
+
+
+function Section(pos) {
+
+    const marg = [10, 10];
+    const dim = [20, 20];
+
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], 1), _, [, dim[1], 2]);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.SetName(`section${grey_cnt++}`);
+    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: 0x0}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+
+    // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    // section.Render();
+    // Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
+    // Construct_listen_events_relations_from_mesh_tree(section);
+
+    section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
+    section.GenGfxCtx();
+    section.Render();
+    
+    
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(section);
+    Construct_listen_events_relations_from_mesh_tree(section);
+ 
+    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+
+    return section;
 }
 
 
@@ -2778,7 +2810,7 @@ function Create3DCubes(scene) {
             const cube = new Mesh(geom, mat);
             scene.AddMesh(cube);
 
-            console.log('cube', GetShaderTypeId(cube.sid), cube.sid)
+            console.log('cube', SID.GetTypeToString(cube.sid), cube.sid)
             cube.type |= geom.type;
             cube.type |= mat.type;
         }
@@ -2795,7 +2827,7 @@ function Create3DCubes(scene) {
             });
             const cube2 = new Mesh(geom, mat);
             scene.AddMesh(cube2);
-            console.log('cube2:', GetShaderTypeId(cube2.sid), cube2.sid)
+            console.log('cube2:', SID.GetTypeToString(cube2.sid), cube2.sid)
             cube2.type |= geom.type;
             cube2.type |= mat.type;
         }
@@ -2812,7 +2844,7 @@ function Create3DCubes(scene) {
             });
             const cube3 = new Mesh(geom, mat);
             scene.AddMesh(cube3);
-            console.log('cube3:', GetShaderTypeId(cube3.sid), cube3.sid)
+            console.log('cube3:', SID.GetTypeToString(cube3.sid), cube3.sid)
             cube3.type |= geom.type;
             cube3.type |= mat.type;
         }

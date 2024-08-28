@@ -16,45 +16,6 @@ const GL_DEBUG_BUFFERS_ALL = true;
 
 
 
-export function GetShaderTypeId(sid) {
-
-    let str = 'Shader Attributes: ';
-
-    if (sid.shad) str += 'Shader General Properties:'
-    if (sid.shad & SID.SHAD.INDEXED) str += 'Indexed Geometry.'
-    if (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) str += 'Premultiplied Alpha.'
-    if (sid.shad) str += '\n'
-
-    if (sid.attr) str += 'Attribs:'
-    if (sid.attr & SID.ATTR.COL4) str += 'col4, '
-    if (sid.attr & SID.ATTR.COL4_PER_VERTEX) str += 'col4 per vertex, '
-    if (sid.attr & SID.ATTR.POS2) str += 'pos2, '
-    if (sid.attr & SID.ATTR.SCALE2) str += 'scale2, '
-    if (sid.attr & SID.ATTR.TEX2) str += 'tex2, '
-    if (sid.attr & SID.ATTR.WPOS_TIME4) str += 'wpos3, time1, '
-    if (sid.attr & SID.ATTR.WPOS_TIME4) str += 'wposTime4, '
-    if (sid.attr & SID.ATTR.TIME) str += 'time, '
-    if (sid.attr & SID.ATTR.SDF) str += 'Sdf, '
-    if (sid.attr & (SID.ATTR.BORDER & SID.ATTR.FEATHER & SID.ATTR.R_CORNERS)) str += 'round corners, border width, border feather, '
-    if (sid.attr) str += '\n'
-
-    if (sid.unif) str += 'Uniforms:'
-    if (sid.unif & SID.UNIF.PROJECTION) str += 'Projection Matrix, '
-    if (sid.unif) str += '\n'
-
-    if (sid.pass) str += 'Passes:'
-    if (sid.pass & SID.PASS.COL4) str += 'col4, '
-    if (sid.pass & SID.PASS.DIM2) str += 'dim2, '
-    if (sid.pass & SID.PASS.RES2) str += 'res2, '
-    if (sid.pass & SID.PASS.TEX2) str += 'tex2, '
-    if (sid.pass & SID.PASS.TIME1) str += 'time1, '
-    if (sid.pass & SID.PASS.WPOS2) str += 'wpos2, '
-    if (sid.pass & SID.PASS) str += 'Passes:'
-    if (sid.pass) str += '\n'
-
-    return str;
-}
-
 
 
 /**
@@ -64,7 +25,7 @@ export function GetShaderTypeId(sid) {
  */
 export function PrintProgram(prog, idx) {
     if (!GL_DEBUG_PROGRAM) return;
-    console.log('-[Gl Program]-\nProgram index:', idx, ' program:', prog, ' sid:', GetShaderTypeId(prog.info.sid))
+    console.log('-[Gl Program]-\nProgram index:', idx, ' program:', prog, ' sid:', SID.GetTypeToString(prog.info.sid))
 }
 
 
@@ -75,7 +36,7 @@ export function PrintProgram(prog, idx) {
  */
 export function PrintShaderInfo(prog) {
     if (!GL_DEBUG_SHADER_INFO) return;
-    console.log('-[Gl Shader Info]-\n', prog.shaderinfo, ' sid:', GetShaderTypeId(prog.info.sid))
+    console.log('-[Gl Shader Info]-\n', prog.shaderinfo, ' sid:', SID.GetTypeToString(prog.info.sid))
 }
 export function PrintVertexBuffer(vb) {
     if (!GL_DEBUG_VERTEX_BUFFER) return;

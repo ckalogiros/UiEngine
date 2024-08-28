@@ -125,7 +125,7 @@ const SID = {
         SDF: BIT2 <<= 1,
         MSDF: BIT2 <<= 1,
         GENERIC_ATTR1_VEC4: BIT2 <<= 1,
-        STYLE: BIT2 <<= 1,
+        // STYLE: BIT2 <<= 1,
         BORDER: BIT2 <<= 1,
         R_CORNERS: BIT2 <<= 1,
         FEATHER: BIT2 <<= 1,
@@ -180,11 +180,17 @@ const SID = {
 
     PASS: {
         COL4: BIT4,
+        COL4_PER_VERTEX: BIT4<<= 1,
         POS2: BIT4 <<= 1,
         DIM2: BIT4 <<= 1,
         TEX2: BIT4 <<= 1,
         WPOS2: BIT4 <<= 1,
-        TIME1: BIT4 <<= 1,
+        WPOS3: BIT4 <<= 1,
+        TIME: BIT4 <<= 1,
+        BORDER: BIT2 <<= 1,
+        R_CORNERS: BIT2 <<= 1,
+        FEATHER: BIT2 <<= 1,
+        GLOW_INTENSITY: BIT2 <<= 1,
         RES2: BIT4 <<= 1,
         STYLE3: BIT4 <<= 1,
         SDF2: BIT4 <<= 1,
@@ -320,7 +326,7 @@ const SID = {
         if (sid.pass & SID.PASS.DIM2) str[k] += 'dim2, '
         if (sid.pass & SID.PASS.WPOS2) str[k] += 'wpos2, '
         if (sid.pass & SID.PASS.TEX2) str[k] += 'tex2, '
-        if (sid.pass & SID.PASS.TIME1) str[k] += 'time1, '
+        if (sid.pass & SID.PASS.TIME) str[k] += 'time1, '
         if (sid.pass & SID.PASS.style3) str[k] += 'style3, '
         if (sid.pass & SID.PASS.SDF2) str[k] += 'sdf2'
         if (sid.pass & SID.PASS.GENERIC_ATTR1_VEC4) str[k] += 'generir_attribs1'
