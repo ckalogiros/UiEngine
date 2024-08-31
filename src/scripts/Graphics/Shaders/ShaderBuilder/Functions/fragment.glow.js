@@ -50,7 +50,7 @@ vec4 Glow(float alpha)
     #endif
 
    vec2 res = u_screen_res;
-   vec2 dim = v_dim; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
+   vec2 dim = vec2(v_dim2_x, v_dim2_y); // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
    
     #ifndef UV_READY
         #define UV_READY 1

@@ -242,7 +242,8 @@ class Gl_Program {
 
 		this.uniforms = uniforms;
 
-		this.shader_program = Shaders_load(gfxCtx.gl, sid, uniforms);
+		const ret = Shaders_load(gfxCtx.gl, sid, uniforms);
+		this.shader_program = ret.shader_program;
 
 		this.vb_group = New_int8_buffer(1, 'NEW GlProgram-VBGROUP'); // Array of indexes to all vertex buffers in '_vertex_buffer_groups' buffer. 
 
@@ -254,7 +255,7 @@ class Gl_Program {
 		this.ubidxs = New_generic_buffer(_, 'Program ubidxs');
 
 
-		this.attribsidx = Shader_attributes_create(sid, this.shader_program);
+		this.attribsidx = Shader_attributes_create(this.shader_program, ret.attribs_info.mesh_attribs);
 		this.attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(this.attribsidx);
 
 

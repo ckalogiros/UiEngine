@@ -6,7 +6,7 @@ import { Create_rect_mesh, Create_widget_section } from "../../../../Engine/Core
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../../../../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { BLUEL, GREENL, GREY, Interpolate_rgb_to_01, ORANGEL, ORANGER, PURPLEB, PURPLER, REDL, WHITE, YELLOWL, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { BLACK, BLUEL, GREEN, GREENL, GREY, Interpolate_rgb_to_01, ORANGEL, ORANGER, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOWL, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_calc_pos_dif } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Drawables/Operations/Recursions.js";
 import { Time_intervals_create } from "../../../../Engine/Timers/TimeIntervals.js";
@@ -40,7 +40,7 @@ import { Abs, Magnitude } from "../../../../Helpers/Math/MathOperations.js";
 const MAX_BODY_MESHES = 100;
 var slope_constant1 = .2;
 const INITIAL_SIZE = 35;
-const snake_initial_body_count = 30;
+const snake_initial_body_count = 2;
 
 // const collectable_pos_constraints = [];
 
@@ -61,6 +61,7 @@ const snake = {
    size:INITIAL_SIZE, // Size of the snake body meshes
 
    color:TRANSPARENCY(YELLOWR[8], 1.),
+   // color:TRANSPARENCY(WHITE, 1.),
 
    speed:1,
 
@@ -169,7 +170,8 @@ export function Game_snake() {
       board_height - DEVICE.info.canvas_top + DEVICE.info.canvas_bot;
    }
 
-   const board_color = TRANSPARENCY(Interpolate_rgb_to_01(16, 28, 35), .2);
+   // const board_color = TRANSPARENCY(Interpolate_rgb_to_01(16, 28, 35), .2);
+   const board_color = TRANSPARENCY(Interpolate_rgb_to_01(160, 250, 255), .2);
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [board_pad, board_pad, 0], [board_width,board_height], board_color, 'section', style);
    section.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -204,6 +206,8 @@ export function Game_snake() {
 
    // TODO: Enable attribute via the method GfxEnableAttrib()
    collectable.sid.attr |= SID.ATTR.GLOW_INTENSITY;
+   collectable.sid.pass |= SID.PASS.GLOW_INTENSITY;
+   collectable.sid.pass |= SID.PASS.DIM2;
    
    section.AddItem(collectable); 
    
@@ -252,6 +256,8 @@ export function Game_snake() {
       body_mesh.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC2,}, 'u_glow_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       // TODO: Enable attribute via the method GfxEnableAttrib()
       body_mesh.sid.attr |= SID.ATTR.GLOW_INTENSITY;
+      body_mesh.sid.pass |= SID.PASS.GLOW_INTENSITY;
+      body_mesh.sid.pass |= SID.PASS.DIM2;
       
       section.AddItem(body_mesh);
       
@@ -826,6 +832,8 @@ function Animation_scale_down_stop(params){
 
       // TODO: Enable attribute via the method GfxEnableAttrib()
       body_mesh.sid.attr |= SID.ATTR.GLOW_INTENSITY;
+      body_mesh.sid.pass |= SID.PASS.GLOW_INTENSITY;
+      body_mesh.sid.pass |= SID.PASS.DIM2;
 
 
 

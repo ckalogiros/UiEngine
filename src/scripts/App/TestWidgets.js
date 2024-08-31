@@ -338,12 +338,11 @@ export function TestWidgetsGeneric(createId=1) {
 
     // const device_info = Create_widget;
 
-    // Print code characters
-    // const aaa = '\r\n 123456789ƕ';
-    // for(let i=0; i<aaa.length; i++){
-    //     console.log(aaa[i], aaa.charCodeAt(i))
-    // }
 
+
+
+
+    
     // Demo_page();
 
     // Clbk_animations_circle_scale();
@@ -721,7 +720,8 @@ export function TestWidgetsGeneric(createId=1) {
 
     /** Section Synthesizes */
     {
-        Section([300, 300, 0])
+        Section([300, 300, 0]);
+
         // SectionResizable([350, 350, 0])
 
         // TestSections1();
@@ -862,9 +862,9 @@ function CreatePanel(is_root_widget = undefined) {
 function Section(pos) {
 
     const marg = [10, 10];
-    const dim = [20, 20];
+    const dim = [200, 200];
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], 1), _, [, dim[1], 2]);
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, BLUEL[5], _, [0, dim[1], 2]);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.SetName(`section${grey_cnt++}`);

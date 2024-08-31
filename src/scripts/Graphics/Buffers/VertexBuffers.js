@@ -2,7 +2,7 @@
 
 
 import { New_generic_buffer, New_int8_buffer } from "../../Engine/Core/Buffers.js";
-import { Shader_attributes_enable, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex, Vertex_buffer_create_attribs_info_per_vb_instanced } from "../ShaderAttributes.js";
+import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex, Vertex_buffer_create_attribs_info_per_vb_instanced } from "../ShaderAttributes.js";
 import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index } from "../ShaderPrograms.js";
 import { Typed_array_create_from_type } from "./TypedArrayBuffersInterface.js";
 import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays.js";
@@ -862,6 +862,7 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
     const vb_groupidx = gfx.vb.groupidx;
     const prog = Progarm_get_program(progidx);
     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
+    const attribs_info = Shader_attributes_get_attribs(prog.attribsidx);
 
     // const num_faces = 1; // Even for text rendering, the loop for all text faces is the caller, so no need to have num_faces. num_faces currently are working for vertex buffer updates 
     const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
@@ -885,7 +886,7 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         // vCount
         // const stride = vb_info.attribs_info.count * verts_per_rect;
         const stride = vb_info.attribs_info.count;
-        vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
+        vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride, attribs_info);
         vb_info.vCount = vb_info.count / stride;
         // if (vb_groupidx>=2) console.log(vb_groupidx, vb_info.count)
         // vb_info.attribs_info.attrib_divisor++;

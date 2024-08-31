@@ -21,15 +21,17 @@ import { Shaders_build_vertex_shader, Shaders_build_fragment_shader } from './Sh
 
 export function Shaders_load(gl, sid, uniforms_info) {
 
-	const shader = {
-		vShader: Shaders_build_vertex_shader(sid, uniforms_info),
-		fShader: Shaders_build_fragment_shader(sid, uniforms_info),
-	};
+	// const shader = {
+	// 	vShader: Shaders_build_vertex_shader(sid, uniforms_info),
+	// 	fShader: Shaders_build_fragment_shader(sid, uniforms_info),
+	// };
+	
+	const vShader = Shaders_build_vertex_shader(sid, uniforms_info);
+	const fShader = Shaders_build_fragment_shader(sid, uniforms_info);
 
 
 
-
-	const shader_program = Load_shaders(gl, shader, sid);
+	const shader_program = Load_shaders(gl, vShader.vs, fShader, sid);
 	if (shader_program) {
 		if (dbg.GL_DEBUG_SHADERS) console.log('Shader Program Created Successfully!\nShader Type ID: ', SID.GetTypeToString(sid));
 	} 
@@ -37,7 +39,11 @@ export function Shaders_load(gl, sid, uniforms_info) {
 		alert('Unable to CREATE shader program: ' + gl.getProgramInfoLog(shader_program));
 	}
 
-	return shader_program;
+	// return shader_program;
+	return {
+		shader_program:shader_program, 
+		attribs_info:vShader.attribs_info, 
+	};
 }
 
 
@@ -74,10 +80,10 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 
 
 
-function Load_shaders(gl, shader, sid) {
+function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 
-	const vShader = Load_shader(gl, gl.VERTEX_SHADER, shader.vShader, 'Vertex');
-	const fShader = Load_shader(gl, gl.FRAGMENT_SHADER, shader.fShader, 'Fragment');
+	const vShader = Load_shader(gl, gl.VERTEX_SHADER, vertex_shader, 'Vertex');
+	const fShader = Load_shader(gl, gl.FRAGMENT_SHADER, fragment_shader, 'Fragment');
 
 	const shader_program = gl.createProgram();
 
