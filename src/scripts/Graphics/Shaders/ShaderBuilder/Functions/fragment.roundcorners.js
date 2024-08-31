@@ -88,14 +88,11 @@ vec4 Stylize()
     
     // Radius(From 0.01 to 0.35 good values) for rounding corners
     float border_width = v_border;
-    // float scale_down = .25;
-    // float scale_down = .5;
     float scale_up = 1./scale_down;
     vec2 rCorners = vec2(v_rcorners) * scale_down;
     float feather = v_feather;
     vec2 blur = vec2(0.0, feather);
     vec2 res = u_screen_res;
-    // vec2 uv = (gl_FragCoord.xy-(res*.5));
     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down; // v_dim is the abs(a_pos), and is an interpolated value for every fragment in the span of min-a_pos to max-a_pos
     
     float clarity = 40.4;
@@ -130,7 +127,8 @@ vec4 Stylize()
     float wa = 1.;
     float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);
     
-    float alpha = src.a * (wa * wb);
+    // float alpha = src.a * (wa * wb);
+    float alpha = 1.;
     color += color + src.rgb * alpha;
     
     float wide = rCorners.x; 
@@ -146,6 +144,7 @@ vec4 Stylize()
     // color += color * vec3(abs(wa * wb));
     // color +=  color * pow(vec3(abs(wa * wb)), vec3(4.4));
     
-    return vec4(color, alpha);
+    // return vec4(color, alpha);
+    return vec4(1.);
 }
 `;

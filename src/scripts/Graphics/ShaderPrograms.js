@@ -255,7 +255,8 @@ class Gl_Program {
 		this.ubidxs = New_generic_buffer(_, 'Program ubidxs');
 
 
-		this.attribsidx = Shader_attributes_create(this.shader_program, ret.attribs_info.mesh_attribs);
+		// this.attribsidx = Shader_attributes_create(this.shader_program, ret.attribs_info.mesh_attribs);
+		this.attribsidx = Shader_attributes_create(this.shader_program, ret.attribs_info);
 		this.attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(this.attribsidx);
 
 

@@ -77,7 +77,7 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
         vbinfo.attribs_info = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.inst, attrib_divisor);
 
 
-        Shader_attributes_enable(attribsidx, vbinfo.attribs_info)
+        Shader_attributes_enable(attribsidx, attrib_divisor)
 
         // Store the vbidx to the group
         vb_group.vb_idxs.Add(vbidx);
@@ -111,7 +111,7 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
         vbinfo.attribs_info = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.attr & ~sid.inst, attrib_divisor);
 
 
-        Shader_attributes_enable(attribsidx, vbinfo.attribs_info)
+        Shader_attributes_enable(attribsidx, attrib_divisor);
 
         // Store the vbidx to the group
         vb_group.vb_idxs.Add(vbidx);
@@ -883,9 +883,7 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
         // const vertex_count = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? attribs_per_vertex * ((2 * num_faces) +2) : verts_per_rect * num_faces;
-        // vCount
-        // const stride = vb_info.attribs_info.count * verts_per_rect;
-        const stride = vb_info.attribs_info.count;
+        const stride = vb_info.attribs_info.count * verts_per_rect;
         vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride, attribs_info);
         vb_info.vCount = vb_info.count / stride;
         // if (vb_groupidx>=2) console.log(vb_groupidx, vb_info.count)

@@ -110,19 +110,19 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader){
    if(block_created) uniforms_code += '};\n';
    
 
-   // TODO: For the time being despite the fact that a uniform is categorized as "IN_VS", the "uniforms_code += " will ad it to any shader called by this function. CORRECT IT.
-   for(let i=0; i< len; i++){
+   uniforms_code += '\n// Uniforms\n';
+   for(let i=0; i<len; i++){
       if((_uniforms_info[i].shader & UNIFORM.IN_VS && (which_shader & UNIFORM.IN_VS)) ){
 
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
-         console.log('<<<<<<<<<<<<<<< VERTEX SHADER >>>>>>>>>>>>>>>\nUNIFORM ENABLE:', _uniforms_info[i].name)
+         console.log('<<<<<<<<<<<<<<< VERTEX SHADER UNIFORM ENABLE:', _uniforms_info[i].name)
       }
       else if((_uniforms_info[i].shader & UNIFORM.IN_FS) && (which_shader & UNIFORM.IN_FS)){
          
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`; 
-         console.log('<<<<<<<<<<<<<<< FRAGMENT SHADER >>>>>>>>>>>>>>>\nUNIFORM ENABLE:', _uniforms_info[i].name)
+         console.log('<<<<<<<<<<<<<<< FRAGMENT SHADER UNIFORM ENABLE:', _uniforms_info[i].name)
       }
    }
 
@@ -203,6 +203,8 @@ function Create_attribute(name, location_name, attr_idx, pass_to_fs=0x0) {
 
 
 function Vertex_shader_resolve_attributes_in(sid){
+
+   attributes_in_code += ''
 
    const loc = [
       {
@@ -360,7 +362,7 @@ function Vertex_shader_resolve_attributes_in(sid){
       
       
       const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'dim';
+      mesh_attribute.name = 'dim2';
       mesh_attribute.nameid |= SID.ATTR.DIM2;
       mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
       
@@ -571,9 +573,9 @@ function Vertex_shader_resolve_attributes_in(sid){
          }
          
          attribs_info.attribs_loc.push({
-            loc: i,
-            size: size,
-            offset: offset, 
+            locs: i,
+            sizes: size,
+            offsets: offset, 
          });
       }
    }
@@ -581,11 +583,7 @@ function Vertex_shader_resolve_attributes_in(sid){
 
 
    // DEBUG-PRINT
-   console.log('mesh_attributes:', mesh_attributes);
-   for(let i=0; i<mesh_attributes.length; i++){
-
-      console.log('names:', mesh_attributes[i].name);
-   }
+   for(let i=0; i<mesh_attributes.length; i++) console.log('names:', mesh_attributes[i].name);
 
 
    // return mesh_attributes;
@@ -647,73 +645,39 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
    const vs_chunks = [
 
-      '#version 300 es',
-      '// Vertex Shader',
-      '#include <precision_medium>', // TODO: Let the app decide the precision
+      '#version 300 es   /*** Vertex Shader ***/\n',
+      
+      '#include <precision_medium>\n', 
 
       /********************************************************************************************************/
       // Defines
       /********************************************************************************************************/
-      '\n',
+      '\n// Defines',
       ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
-
-
-
-
-
-
-      /********************************************************************************************************/
-      // Attributes In
-      /********************************************************************************************************/
-      /**
-       * // TODO: We should add a step where we analyzing  the attributes sid,
-       * and creating a sid with vec4 generic buffers. Here we check only the attr_generic1_vec4/vec2, attr_generic2_vec4/vec2 etc 
-       */
-      // (sid.attr & SID.ATTR.COL4) ? 'in vec4 a_col;' : '',
-      // (sid.attr & SID.ATTR.WPOS_TIME4) ? 'in vec4 a_wpos_time;' : '',
-      // (sid.attr & (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) ? '#include <in_attr_generic_vec4>' : '',
-      // // (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'out float v_glow_intensity;' : '',
-      // (sid.attr & SID.ATTR.POS2) ? 'in vec2 a_pos;' : '',
-      // (sid.attr & SID.ATTR.DIM2) ? 'in vec2 a_dim;' : '',
-      // (sid.attr & SID.ATTR.TEX2) ? 'in vec2 a_tex;' : '',
-      // (sid.attr & SID.ATTR.SDF) ? '#include <in_attr_sdf2>' : '',
-      // // (_attribs_generic1_vec4.attr1.is_occupied) ? : '',
-
-      attributes_in_code,
-      '\n',
-
-
 
 
 
       /********************************************************************************************************/
       // UNIFORMS
       /********************************************************************************************************/
+      '\n// Uniforms Block',
       Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_VS),
-      '\n',
 
 
 
+      /********************************************************************************************************/
+      // Attributes In
+      /********************************************************************************************************/
+      '\n// Input Attributes',
+      attributes_in_code,
 
 
 
       /********************************************************************************************************/
       // OUTS
       /********************************************************************************************************/
-      // (sid.pass & SID.PASS.COL4) ? 'out vec4 v_col; ' : '',
-      // (sid.pass & SID.PASS.DIM2) ? 'out vec2 v_dim;' : (sid.pass & SID.ATTR.DIM2) ? 'out vec2 v_dim;' :'',
-      // (sid.pass & SID.PASS.WPOS2) ? 'out vec2 v_wpos;' : '',
-      // (sid.pass & SID.PASS.TIME) ? '#include <out_vtime1>' : '',
-      // (sid.pass & SID.PASS.RES2) ? '#include <out_vres2>' : '',
-      // (sid.attr & SID.ATTR.TEX2) ? 'out vec2 v_tex_coord;' : '',
-      // (sid.attr & SID.ATTR.SDF) ? '#include <out_attr_sdf2>' : '',
-      // (sid.attr & SID.ATTR.BORDER) ? '#include <out_border_width>' : '',
-      // (sid.attr & SID.ATTR.R_CORNERS) ? '#include <out_rCorners>' : '',
-      // (sid.attr & SID.ATTR.FEATHER) ? '#include <out_border_feather>' : '',
-      // (sid.attr & SID.ATTR.TIME) ? 'out float v_time;' : '',
-      // (sid.attr & SID.ATTR.GLOW_INTENSITY) ? 'out float v_glow_intensity;' : '',
+      '\n// Out variables',
       attributes_out_code,
-      '\n',
 
 
 
@@ -729,7 +693,8 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
 
       /********************************************************************************************************/
-      // 
+      // Assignments
+      '  // Assignments',
       attributes_assign_code,
 
 
@@ -740,11 +705,9 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
 
 
 
-
-
-
       /********************************************************************************************************/
       // Calculate vertex position-rotation-scale
+      '  // Vertex Shader Logic',
       
       /**
        * Current vertex: gl_VertexID.
@@ -757,16 +720,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
        * for vertex pos and another 2 for dimention
        */
 
-      // '  vec2 vpos = a_pos;',
-      // ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '  vpos *= u_scale2;' : '',
-      // (sid.pass & SID.PASS.WPOS2) ? '  vec2 wpos = vec2(a_wpos_time.x+ u_wposxy.x, a_wpos_time.y+u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
-      // (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-      // ? '  gl_Position = u_projection * vec4(vpos.x + wpos.x, vpos.y + wpos.y, a_wpos_time.z, 1.0);' 
-      // : '  gl_Position = vec4(vpos.x + a_wpos_time.x, vpos.y + a_wpos_time.y, a_wpos_time.z, 1.0);',
-      
-      // 'v_empty_1 *= 0.;',
-      // 'v_empty_2 *= 0.;',
-      // 'v_empty_3 *= 0.;',
 
       // 'v_wpos3_x = 0.;',
       // 'v_wpos3_y = 0.;',
@@ -780,23 +733,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info){
       : '  gl_Position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
 
 
-
-
-
-
-      /********************************************************************************************************/
-      // ASSIGNMENTS
-      // (sid.pass & SID.PASS.COL4) ? (sid.attr & SID.ATTR.COL4 ? '  v_col = a_col;' : (sid.unif & SID.UNIF.COL4) ? '  v_col = u_col4;' : '') : '', 
-      // (sid.pass & SID.PASS.DIM2) ? '  v_dim = a_dim;' : (sid.pass & SID.ATTR.DIM2) ? '  v_dim = a_dim;' : '', // TODO: If we have created an attribute a_dim, we have to use it, else the attribs buffering is gonna be wrong
-      // (sid.pass & (SID.PASS.WPOS2|SID.UNIF.ROOT_WPOS2)) ? '  v_wpos = vec2(wpos.x,wpos.y);' : (sid.pass & SID.PASS.WPOS2) ? '  v_wpos = a_wpos_time.xy;' : '',
-      // (sid.attr & SID.ATTR.TEX2) ? '  v_tex_coord = a_tex;' : '',
-      // (sid.attr & SID.ATTR.SDF) ? '  v_sdf = a_sdf;' : '',
-      // (sid.attr & SID.ATTR.BORDER) ? '  v_border = a_generic_1.x;' : '',
-      // (sid.attr & SID.ATTR.R_CORNERS) ? '  v_rcorners = a_generic_1.y;' : '',
-      // (sid.attr & SID.ATTR.FEATHER) ? '  v_feather = a_generic_1.z;' : '',
-      // (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '  v_glow_intensity = a_generic_1.w;' : '', // HACK: We assume the glow intensity attrib is together with the style attributes. Need to separate style with glow shaders, so if no style is active then the glow_intensity will be allocated at a_generic_1.x
-      // (sid.attr & SID.ATTR.TIME) ? '  v_time = a_wpos_time.w;' : '',
-      // (true) ? '  gl_PointSize = 10.0;' : '',
       '}',
 
    ];
@@ -847,8 +783,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info){
 
    const fs_chunks = [
 
-      (true) ? '#version 300 es' : '',
-      '// Fragment Shader',
+      '#version 300 es   /*** Vertex Shader ***/\n',
 
 
 

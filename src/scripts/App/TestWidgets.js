@@ -720,13 +720,13 @@ export function TestWidgetsGeneric(createId=1) {
 
     /** Section Synthesizes */
     {
-        Section([300, 300, 0]);
+        // Section([0, 0, 0]);
 
         // SectionResizable([350, 350, 0])
 
         // TestSections1();
 
-        // CreateManySections();
+        CreateManySections();
         // const blu = CreateManySectionsMinimal()
 
 
@@ -864,12 +864,16 @@ function Section(pos) {
     const marg = [10, 10];
     const dim = [200, 200];
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, BLUEL[5], _, [0, dim[1], 2]);
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, BLUEL[5], _, [0, 0, 0]);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.SetName(`section${grey_cnt++}`);
     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: 0x0}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
+    
+    const s = Create_widget_section(_, _, marg, _, [20,20], BLUEL[5], _, [0, 0, 0]);
+    s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: 0x0}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    section.AddItem(s);
+    
 
     // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     // section.Render();
@@ -2271,7 +2275,8 @@ function CreateManySections(scene) {
     }
 
 
-    blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     // blu.options = SECTION.INHERIT | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
     blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;

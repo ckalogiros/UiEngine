@@ -16,14 +16,14 @@ export function Shader_attributes_reset() {
 
 export function Shader_attributes_get_attribs(attribsidx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
-   return _shader_attribs_buffer.buffer[attribsidx];
+   return _shader_attribs_buffer.buffer[attribsidx].mesh_attribs;
 }
 
 
 
 export function Shader_attributes_get_attribs_per_vertex(attribsidx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
-   return _shader_attribs_buffer.buffer[attribsidx].attribs_per_vertex;
+   return _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.attribs_per_vertex;
 }
 
 
@@ -32,7 +32,7 @@ export function Shader_attributes_get_attrib_offset_by_nameid(attribsidx, nameid
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
    const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
-   return _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx];
+   return _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.offsets[attrib_idx];
 }
 
 
@@ -41,7 +41,7 @@ export function Shader_attributes_get_attribs_size(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
    const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
-   return _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx];
+   return _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.sizes[attrib_idx];
 }
 
 
@@ -51,8 +51,8 @@ export function Shader_attributes_get_attribs_offset_size(attribsidx, nameid) {
 
    const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
    return {
-      offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
-      size: _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx],
+      offset: _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.offsets[attrib_idx],
+      size: _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.sizes[attrib_idx],
    };
 }
 
@@ -63,8 +63,8 @@ export function Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsi
 
    const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
    return {
-      offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
-      attribs_per_vertex: _shader_attribs_buffer.buffer[attribsidx].attribs_per_vertex,
+      offset: _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.offsets[attrib_idx],
+      attribs_per_vertex: _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.attribs_per_vertex,
    };
 }
 
@@ -73,7 +73,7 @@ export function Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsi
 export function Shader_attributes_get_attribs_attribs_per_vertex(attribsidx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
-   return _shader_attribs_buffer.buffer[attribsidx].attribs_per_vertex;
+   return _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.attribs_per_vertex;
 }
 
 
@@ -83,9 +83,9 @@ export function Shader_attributes_get_attribs_offset_size_attribs_per_vertex(att
 
    const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
    return {
-      offset: _shader_attribs_buffer.buffer[attribsidx].offsets[attrib_idx],
-      size: _shader_attribs_buffer.buffer[attribsidx].sizes[attrib_idx],
-      attribs_per_vertex: _shader_attribs_buffer.buffer[attribsidx].attribs_per_vertex,
+      offset: _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.offsets[attrib_idx],
+      size: _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.sizes[attrib_idx],
+      attribs_per_vertex: _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.attribs_per_vertex,
    };
 }
 
@@ -94,16 +94,16 @@ export function Shader_attributes_get_attribs_offset_size_attribs_per_vertex(att
 export function Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
 
-   const shader_attribs = _shader_attribs_buffer.buffer[attribsidx];
+   const attribs = _shader_attribs_buffer.buffer[attribsidx].mesh_attribs;
 
-   const len = shader_attribs.locs.length;
+   const len = attribs.locs.length;
    for (let i = 0; i < len; i++) {
 
-      if (shader_attribs.nameids[i] === nameid)
+      if (attribs.nameids[i] === nameid)
          return i;
    }
 
-   console.error('Attribute with name id:', nameid, ' from ids:', SHADER_ATTRIBUTES, ' was not found in program attris:', shader_attribs)
+   console.error('Attribute with name id:', nameid, ' from ids:', SHADER_ATTRIBUTES, ' was not found in program attris:', attribs)
    alert('NO ATTRIBUTE FOUND\n SEE CONSOLE ERROR')
 }
 
@@ -143,11 +143,12 @@ export function Shader_attributes_create(shader_program, attribs_info) {
       /**DEBUG*/names: [],
    };
 
+   const mesh_attribs = attribs_info.mesh_attribs;
    
    
    /*************************************************************************************/
    // Convert to Typed Arrays
-   const len = attribs_info.length;
+   const len = mesh_attribs.length;
    const shader_attribs_typed_arrays = {
       locs: new Uint8Array(len),
       sizes: new Uint8Array(len),
@@ -160,14 +161,14 @@ export function Shader_attributes_create(shader_program, attribs_info) {
 
    for (let i = 0; i < len; i++) {
 
-      shader_attribs_typed_arrays.locs[i]    = attribs_info[i].loc;
-      shader_attribs_typed_arrays.sizes[i]   = attribs_info[i].size;
-      shader_attribs_typed_arrays.offsets[i] = attribs_info[i].offset;
-      shader_attribs_typed_arrays.types[i]   = attribs_info[i].type;
-      shader_attribs_typed_arrays.nameids[i] = attribs_info[i].nameid;
-      shader_attribs_typed_arrays.names[i]   = Str_buffer_store(attribs_info[i].name); /** For debug only */
+      shader_attribs_typed_arrays.locs[i]    = mesh_attribs[i].loc;
+      shader_attribs_typed_arrays.sizes[i]   = mesh_attribs[i].size;
+      shader_attribs_typed_arrays.offsets[i] = mesh_attribs[i].offset;
+      shader_attribs_typed_arrays.types[i]   = mesh_attribs[i].type;
+      shader_attribs_typed_arrays.nameids[i] = mesh_attribs[i].nameid;
+      shader_attribs_typed_arrays.names[i]   = Str_buffer_store(mesh_attribs[i].name); /** For debug only */
 
-      shader_attribs_typed_arrays.attribs_per_vertex += attribs_info[i].size;
+      shader_attribs_typed_arrays.attribs_per_vertex += mesh_attribs[i].size;
 
       /**DEBUG */ // IMPORTANT: Use the right Uint array size type for the attributes info. Checking is we overflow any type
       if (shader_attribs.locs[i] > MAX_UINT8) alert('Not enough bit depth of array to store a large int value. -locs- @ShaderAttributes.js, Shader_attributes_create().')
@@ -179,7 +180,10 @@ export function Shader_attributes_create(shader_program, attribs_info) {
    }
 
 
-   const idx = _shader_attribs_buffer.Add(shader_attribs_typed_arrays);
+   const idx = _shader_attribs_buffer.Add({
+      mesh_attribs:shader_attribs_typed_arrays,
+      attribs_loc:attribs_info.attribs_loc,
+   });
 
    console.log('--- Shader Attributes ---', _shader_attribs_buffer.buffer[idx])
 
@@ -191,15 +195,14 @@ export function Shader_attributes_create(shader_program, attribs_info) {
 
 
 
-export function Shader_attributes_enable(attribsidx, vb_attribs) {
+export function Shader_attributes_enable(attribsidx, attribs_divisor) {
 
    const gl_type = gfxCtx.gl.FLOAT; // TODO: store the gl.type inside the shaderinfo???
 
-   let unique_loc = -1;
-
-   const len = vb_attribs.locs.length;
-   // for (let i = 0; i < len; i++) {
-   for (let i = 0; i < 3; i++) {
+   const stride = _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.attribs_per_vertex;
+   const vb_attribs = _shader_attribs_buffer.buffer[attribsidx].attribs_loc;
+   const len = vb_attribs.length;
+   for (let i = 0; i < len; i++) {
 
       /** The attrib divisor is denotes the frequency at wich the different meshes will be drawn out of the vertex buffer.
        * For example: An intanced vb has 4 wpos. If we set divisor to 1, then each instanced geometry will use 1 wpos.
@@ -208,16 +211,10 @@ export function Shader_attributes_enable(attribsidx, vb_attribs) {
        * then we set the divisor to 2, so that 2 meshes will consume 1 wpo => 8/4=2(divisor)
        */
 
-      // if(vb_attribs.locs[i] !== unique_loc)
-      { // Skip all attributes at the same location
-
-         gfxCtx.gl.enableVertexAttribArray(vb_attribs.locs[i]);
-         // gfxCtx.gl.vertexAttribPointer(vb_attribs.locs[i], vb_attribs.sizes[i], gl_type, false, vb_attribs.count * FLOAT32_BYTE_SIZE, vb_attribs.offsets[i] * FLOAT32_BYTE_SIZE);
-         gfxCtx.gl.vertexAttribPointer(vb_attribs.locs[i], 4, gl_type, false, vb_attribs.count * FLOAT32_BYTE_SIZE, vb_attribs.offsets[i] * FLOAT32_BYTE_SIZE);
-         gfxCtx.gl.vertexAttribDivisor(vb_attribs.locs[i], vb_attribs.attrib_divisor);
-
-         unique_loc++;
-      }
+      gfxCtx.gl.enableVertexAttribArray(vb_attribs[i].locs);
+      gfxCtx.gl.vertexAttribPointer(vb_attribs[i].locs, vb_attribs[i].sizes, gl_type, false, stride * FLOAT32_BYTE_SIZE, vb_attribs[i].offsets * FLOAT32_BYTE_SIZE);
+      // gfxCtx.gl.vertexAttribPointer(vb_attribs[i].locs, 2, gl_type, false, stride * FLOAT32_BYTE_SIZE, vb_attribs[i].offsets * FLOAT32_BYTE_SIZE);
+      gfxCtx.gl.vertexAttribDivisor(vb_attribs[i].locs, attribs_divisor);
 
    }
 }
@@ -294,11 +291,25 @@ export function Shader_attributes_print() {
 
    console.log('\n---------- Shader Attributes ----------');
    for (let i = 0; i <= _shader_attribs_buffer.boundary; i++) {
+      
+      console.log(`-- Program ${i}--`);
 
-      const attribs = _shader_attribs_buffer.buffer[i];
-      for (let k = 0; k < attribs.names.length; k++) {
-
-         console.log('loc', attribs.locs[k], 'size', attribs.sizes[k], 'offsets', attribs.offsets[k], Str_buffer_get_by_idx(attribs.names[k]),)
+      // Mesh Attributes
+      console.log(`-Mesh Attributes-`);
+      const mesh_attribs = _shader_attribs_buffer.buffer[i].mesh_attribs;
+      console.log('Attributes per vertex:', mesh_attribs.attribs_per_vertex);
+      for (let k = 0; k < mesh_attribs.names.length; k++) {
+         
+         console.log('loc', mesh_attribs.locs[k], 'size', mesh_attribs.sizes[k], 'offsets', mesh_attribs.offsets[k], Str_buffer_get_by_idx(mesh_attribs.names[k]),)
       }
+
+      // Attributes Locations
+      console.log(`-Attributes Locations-`);
+      const attribs_loc = _shader_attribs_buffer.buffer[i].attribs_loc;
+      for (let k = 0; k < attribs_loc.length; k++) {
+         
+         console.log('loc', attribs_loc[k].locs, 'size', attribs_loc[k].sizes, 'offsets', attribs_loc[k].offsets,)
+      }
+   
    }
 }

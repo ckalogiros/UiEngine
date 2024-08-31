@@ -147,10 +147,6 @@ export class Mesh {
             this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
 
 
-        // if (APP.ENABLE_SHADER_WPOS_UNIFORM)
-        //     this.EnableGfxUniforms(SID.UNIF.ROOT_WPOS2, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-
 
 
         this.type = MESH_TYPE.MESH;
@@ -644,7 +640,7 @@ export class Mesh {
             case MESH_ENABLE.GFX.ATTR_STYLE: {
 
                 // this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
-                this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
+                this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.DIM2;
                 this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER | SID.PASS.WPOS2 | SID.PASS.DIM2;
                 if (Array.isArray(params)) {
                     this.SetStyle(params);

@@ -1154,12 +1154,17 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_TEX2_FN1(vb_data, geom, mat, start, 
 
 
 
-function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
 
    let index = start;
    let attribs_count = 0;
 
+   const wposx = geom.pos[0];
+   const wposy = geom.pos[1];
+   const posx = geom.dim[0] * 2;
+   const posy = geom.dim[1] * 2;
 
+   
    for (let i = 0; i < num_faces; i++) {
 
       // V1
@@ -1168,13 +1173,13 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2(vb_data, geom, mat, start, num_f
       vb_data[index++] = mat.col[2];
       vb_data[index++] = mat.col[3];
 
-      vb_data[index++] = geom.pos[0] + geom.dim[0];
-      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = wposx;
+      vb_data[index++] = wposy;
       vb_data[index++] = geom.pos[2];
       // index++; // For WPOS4
 
       vb_data[index++] = 0;
-      vb_data[index++] = geom.dim[1];
+      vb_data[index++] = posy;
 
 
       // V2
@@ -1183,8 +1188,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2(vb_data, geom, mat, start, num_f
       vb_data[index++] = mat.col[2];
       vb_data[index++] = mat.col[3];
 
-      vb_data[index++] = geom.pos[0] + geom.dim[0];
-      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = wposx;
+      vb_data[index++] = wposy;
       vb_data[index++] = geom.pos[2];
       // index++; // For WPOS4
 
@@ -1198,13 +1203,13 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2(vb_data, geom, mat, start, num_f
       vb_data[index++] = mat.col[2];
       vb_data[index++] = mat.col[3];
 
-      vb_data[index++] = geom.pos[0] + geom.dim[0];
-      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = wposx;
+      vb_data[index++] = wposy;
       vb_data[index++] = geom.pos[2];
       // index++; // For WPOS4
 
-      vb_data[index++] = geom.dim[0];
-      vb_data[index++] = geom.dim[1];
+      vb_data[index++] = posx;
+      vb_data[index++] = posy;
 
 
       // V4
@@ -1213,16 +1218,16 @@ function FILL_VERTEX_BUFFER_COL4_WPOS4_POS2_FN2(vb_data, geom, mat, start, num_f
       vb_data[index++] = mat.col[2];
       vb_data[index++] = mat.col[3];
 
-      vb_data[index++] = geom.pos[0] + geom.dim[0];
-      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = wposx;
+      vb_data[index++] = wposy;
       vb_data[index++] = geom.pos[2];
       // index++; // For WPOS4
 
-      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = posx;
       vb_data[index++] = 0;
 
       // index += stride;
-      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+      attribs_count += stride; 
    }
 
    return attribs_count;
