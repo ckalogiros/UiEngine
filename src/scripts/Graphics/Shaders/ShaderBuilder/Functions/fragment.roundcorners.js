@@ -65,10 +65,113 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
  */
 
 
-export const frag_round_corners_call = '  color = Stylize();';
-/** NEW SDF RECT IMPLEMENTATION */
 
+
+
+
+
+
+
+
+export const frag_round_corners_call = '  color = Round_corners(scale_down);';
 export const frag_round_corners = `
+
+
+#ifndef UV_READY
+    vec2 uv = vec2(0,0);
+#endif
+
+vec4 Round_corners(float scale_down)
+{
+    float scale_up = 1./scale_down;
+    vec2 rCorners = vec2(v_rcorners) * scale_down;
+    float feather = v_feather;
+    vec2 res = u_screen_res;
+    vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down; // v_dim is the abs(a_pos), and is an interpolated value for every fragment in the span of min-a_pos to max-a_pos
+    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+    
+
+#ifndef UV_READY
+    #define UV_READY 1
+    
+    uv = (gl_FragCoord.xy-(res*.5));
+    uv.x += (res.x*.5); // Center mesh to screen
+    uv.y -= (res.y*.5); // Center mesh to screen
+    
+    // To move with mesh position
+    uv.x -= v_wpos3_x;
+    uv.y += v_wpos3_y;
+    
+    // Subtract constant dimention
+    uv.x -= dim.x*scale_up; 
+    uv.y -= -dim.y*scale_up;
+#endif    
+    
+    
+    vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention
+    float d = length(max(q, 0.0)) - rCorners.x;
+    
+    
+    float wb = clamp(-d / feather, 0.0, 1.0);
+    float alpha = src_color.a * wb;
+    
+
+    vec3 color = src_color.rgb * alpha;
+    
+    /*** Shaded Color ***/
+    float wide = dim.x*.03; 
+    float strength = .6; 
+    color = mix( color, pow(color, vec3(3.8)), strength-smoothstep(0.0, dim.x, abs(d)*wide) );
+
+    
+    return vec4(color, alpha);
+}
+`;
+
+
+export const frag_feather_call = '  color *= Feather(scale_down);';
+export const frag_feather = `
+
+
+#ifndef UV_READY
+    vec2 uv = vec2(0,0);
+#endif
+
+float Feather(float scale_down)
+{
+    vec2 res = u_screen_res;
+    vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
+    float feather = (v_feather <= 0.0) ? 0.00001 : v_feather;
+    float scale_up = 1./scale_down;
+
+    // #ifndef UV_READY
+    //     #define UV_READY 1
+        
+    //     uv = (gl_FragCoord.xy-(res*.5));
+    //     uv.x += (res.x*.5); // Center mesh to screen
+    //     uv.y -= (res.y*.5); // Center mesh to screen
+        
+    //     // To move with mesh position
+    //     uv.x -= v_wpos3_x;
+    //     uv.y += v_wpos3_y;
+        
+    //     // Subtract constant dimention
+    //     uv.x -= dim.x*scale_up; 
+    //     uv.y -= -dim.y*scale_up;
+    // #endif   
+
+    float width = feather;
+    vec2 q = (abs(uv) - dim) + width;
+    float d = length(max(q, 0.0)) - width;
+    float alpha = clamp(-d/feather, 0.0, 1.0);
+
+    return alpha;
+}
+`;
+
+
+export const frag_style_call = '  color = Stylize(scale_down);';
+export const frag_style_corners = `
 
 vec2 pos = vec2(.0);
 float ScreenH;
@@ -78,14 +181,8 @@ float AA;
 vec2 uv = vec2(0,0);
 #endif
 
-vec4 Stylize()
+vec4 Stylize(float scale_down)
 {
-    #ifdef U_SCALE
-        float scale_down = u_scale2.x;
-    #else
-        float scale_down = 1.;
-    #endif
-    
     // Radius(From 0.01 to 0.35 good values) for rounding corners
     float border_width = v_border;
     float scale_up = 1./scale_down;
@@ -94,6 +191,7 @@ vec4 Stylize()
     vec2 blur = vec2(0.0, feather);
     vec2 res = u_screen_res;
     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down; // v_dim is the abs(a_pos), and is an interpolated value for every fragment in the span of min-a_pos to max-a_pos
+    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
     
     float clarity = 40.4;
     ScreenH = min(res.x, res.y)*clarity;
@@ -101,50 +199,48 @@ vec4 Stylize()
 
 #ifndef UV_READY
     #define UV_READY 1
+    
     uv = (gl_FragCoord.xy-(res*.5));
     uv.x += (res.x*.5); // Center mesh to screen
     uv.y -= (res.y*.5); // Center mesh to screen
     
-    vec2 wpos = vec2(v_wpos3_x, v_wpos3_y);
-    uv.x -= wpos.x; // To move with mesh position
-    uv.y += wpos.y; // To move with mesh position
+    // To move with mesh position
+    uv.x -= v_wpos3_x;
+    uv.y += v_wpos3_y;
     
-    uv.x -= dim.x*scale_up; // Subtract constant dimention
-    uv.y -= -dim.y*scale_up; // Subtract constant dimention
+    // Subtract constant dimention
+    uv.x -= dim.x*scale_up; 
+    uv.y -= -dim.y*scale_up;
 #endif    
     
     
     vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention
     float d = length(max(q, 0.0)) - rCorners.x;
-    // float d = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - rCorners.x;
     
     
-    vec4 src = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
-    vec3 color = vec3(0.0);
+    float wb = clamp(-d / feather, 0.0, 1.0);
+    float alpha = src_color.a * wb;
     
+
+    vec3 color = src_color.rgb * alpha;
     
-    float dd = d - blur.x;
-    float wa = 1.;
-    float wb = clamp(-dd / (blur.x+blur.y), 0.0, 1.);
-    
-    // float alpha = src.a * (wa * wb);
-    float alpha = 1.;
-    color += color + src.rgb * alpha;
-    
-    float wide = rCorners.x; 
-    float strength = 1.8; 
+    /*** Shaded Color ***/
+    float wide = dim.x*.03; 
+    float strength = .6; 
     // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 5., abs(d)) );
-    color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 20., abs(d)*wide) );
+    // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 5., abs(d)) );
+    // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 20., abs(d)*wide) );
+    color = mix( color, pow(color, vec3(3.8)), strength-smoothstep(0.0, dim.x, abs(d)*wide) );
+    // color = mix( color, pow(color, vec3(strength)), smoothstep(0.0, 200., (d)*wide) );
     
-    //   Border Width. It is 0.001 for every pixel
+    /*** Border ***/
     // float borderWidth = border_width;
-    // float bd = (abs(d)-borderWidth) - blur.x;
-    // wa = clamp(-bd * AA, 0.0, 1.0);
-    // wb = clamp(-bd / (blur.x+blur.y), 0.0, 1.0);
+    // float bd = (abs(d)-borderWidth);
+    // float wa = clamp(-bd * AA, 0.0, 1.0);
+    // wb = clamp(-bd / feather, 0.0, 1.0);
     // color += color * vec3(abs(wa * wb));
     // color +=  color * pow(vec3(abs(wa * wb)), vec3(4.4));
     
-    // return vec4(color, alpha);
-    return vec4(1.);
+    return vec4(color, alpha);
 }
 `;

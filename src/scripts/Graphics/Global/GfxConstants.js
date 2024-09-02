@@ -99,6 +99,10 @@ const GFX_GROUPS = {
  * Shader creation flags 
  */
 
+const SID_ATTR_NAMES_BUFFER = [
+
+];
+
 let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1, BITTEST = 0x1;
 const SID = {
 
@@ -120,12 +124,12 @@ const SID = {
         DIM2: BIT2 <<= 1,
         SCALE2: BIT2 <<= 1,
         TEX2: BIT2 <<= 1,
-        WPOS_TIME4: BIT2 <<= 1,
+        WPOS3: BIT2 <<= 1,
         TIME: BIT2 <<= 1,
         SDF: BIT2 <<= 1,
         MSDF: BIT2 <<= 1,
         GENERIC_ATTR1_VEC4: BIT2 <<= 1,
-        // STYLE: BIT2 <<= 1,
+        STYLE: BIT2 <<= 1,
         BORDER: BIT2 <<= 1,
         R_CORNERS: BIT2 <<= 1,
         FEATHER: BIT2 <<= 1,
@@ -139,7 +143,7 @@ const SID = {
         COL4: BIT3,
         POS2: BIT3 <<= 1,
         TEX2: BIT3 <<= 1,
-        WPOS_TIME4: BIT3 <<= 1,
+        WPOS3: BIT3 <<= 1,
         TIME: BIT3 <<= 1,
         SDF: BIT3 <<= 1,
         MSDF: BIT3 <<= 1,
@@ -278,16 +282,16 @@ const SID = {
         if (sid.attr & SID.ATTR.DIM2) str[k] += 'dim2, '
         if (sid.attr & SID.ATTR.SCALE2) str[k] += 'scale2, '
         if (sid.attr & SID.ATTR.TEX2) str[k] += 'tex2, '
-        if (sid.attr & SID.ATTR.WPOS_TIME4) str[k] += 'wpos4, '
+        if (sid.attr & SID.ATTR.WPOS3) str[k] += 'wpos4, '
         if (sid.attr & SID.ATTR.TIME) str[k] += 'time, '
         if (sid.attr & SID.ATTR.SDF) str[k] += 'Sdf, '
         if (sid.attr & SID.ATTR.MSDF) str[k] += 'Msdf, '
-        if (sid.attr & SID.ATTR.GENERIC_ATTR1_VEC4) {
-            str[k] += 'generir_attribs1, ';
-            if (sid.attr & (SID.ATTR.STYLE)) str[k] += 'style, ';
-            if (sid.attr & (SID.ATTR.BORDER & SID.ATTR.FEATHER & SID.ATTR.R_CORNERS)) str[k] += '[round corners, border width, border feather], ';
-            if (sid.attr & (SID.ATTR.EMPTY)) str[k] += 'empty, ';
-        }
+        // if (sid.attr & SID.ATTR.GENERIC_ATTR1_VEC4) {
+        //     str[k] += 'generir_attribs1, ';
+        //     if (sid.attr & (SID.ATTR.STYLE)) str[k] += 'style, ';
+        //     if (sid.attr & (SID.ATTR.BORDER & SID.ATTR.FEATHER & SID.ATTR.R_CORNERS)) str[k] += '[round corners, border width, border feather], ';
+        //     if (sid.attr & (SID.ATTR.EMPTY)) str[k] += 'empty, ';
+        // }
         // if (sid.attr) str[k] += '\n'
     
         k++;
@@ -295,7 +299,7 @@ const SID = {
         if (sid.inst & SID.INST.COL4) str[k] += 'cal4, '
         if (sid.inst & SID.INST.POS2) str[k] += 'pos2, '
         if (sid.inst & SID.INST.TEX2) str[k] += 'tex2, '
-        if (sid.inst & SID.INST.WPOS_TIME4) str[k] += 'wpos4, '
+        if (sid.inst & SID.INST.WPOS3) str[k] += 'wpos4, '
         if (sid.inst & SID.INST.TIME) str[k] += 'time, '
         if (sid.inst & SID.INST.SDF) str[k] += 'sdf, '
         if (sid.inst & SID.INST.MSDF) str[k] += 'msdf, '
@@ -337,9 +341,9 @@ const SID = {
 
 };
 
-if(SID.ATTR > MAX_BIT_MASK) console.error('SID ATTR exceeding javascript\'s max number value');
-if(SID.UNIF > MAX_BIT_MASK) console.error('SID UNIF exceeding javascript\'s max number value');
-if(SID.PASS > MAX_BIT_MASK) console.error('SID PASS exceeding javascript\'s max number value');
+if(SID.ATTR > MAX_BIT_MASK) alert('SID ATTR exceeding javascript\'s max number value');
+if(SID.UNIF > MAX_BIT_MASK) alert('SID UNIF exceeding javascript\'s max number value');
+if(SID.PASS > MAX_BIT_MASK) alert('SID PASS exceeding javascript\'s max number value');
 
 
 
@@ -427,6 +431,9 @@ const MESH_ENABLE = {
         ATTR_TEX2: _CNT <<= 1,
         ATTR_TIME: _CNT <<= 1,
         ATTR_STYLE: _CNT <<= 1,
+        ATTR_R_CORNERS: _CNT <<= 1,
+        ATTR_FEATHER: _CNT <<= 1,
+        ATTR_BORDER: _CNT <<= 1,
         ATTR_COL4_PER_VERTEX: _CNT <<= 1,
         
         FX_GLOW: _CNT <<= 1,

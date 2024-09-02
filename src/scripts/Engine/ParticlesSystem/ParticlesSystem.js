@@ -144,7 +144,7 @@ class Emitter {
 
       this.sid = {
          shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
-         attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4 | SID.ATTR.DIM2,
+         attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,
          unif: 0x0,
          pass: SID.PASS.COL4 | SID.PASS.DIM2,
          fx: 0x0,

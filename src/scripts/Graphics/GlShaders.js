@@ -21,15 +21,8 @@ import { Shaders_build_vertex_shader, Shaders_build_fragment_shader } from './Sh
 
 export function Shaders_load(gl, sid, uniforms_info) {
 
-	// const shader = {
-	// 	vShader: Shaders_build_vertex_shader(sid, uniforms_info),
-	// 	fShader: Shaders_build_fragment_shader(sid, uniforms_info),
-	// };
-	
 	const vShader = Shaders_build_vertex_shader(sid, uniforms_info);
 	const fShader = Shaders_build_fragment_shader(sid, uniforms_info);
-
-
 
 	const shader_program = Load_shaders(gl, vShader.vs, fShader, sid);
 	if (shader_program) {
@@ -39,10 +32,10 @@ export function Shaders_load(gl, sid, uniforms_info) {
 		alert('Unable to CREATE shader program: ' + gl.getProgramInfoLog(shader_program));
 	}
 
-	// return shader_program;
 	return {
 		shader_program:shader_program, 
-		attribs_info:vShader.attribs_info, 
+		attribsidx:vShader.attribsidx, 
+		attribs_indexing:vShader.attribs_indexing,
 	};
 }
 
@@ -56,7 +49,7 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 		gl.bindAttribLocation(shader_program, loc, 'a_col');
 		loc++;
 	}
-	if(sid.attr & SID.ATTR.WPOS_TIME4){
+	if(sid.attr & SID.ATTR.WPOS3){
 		gl.bindAttribLocation(shader_program, loc, 'a_wpos_time');
 		loc++;
 	}

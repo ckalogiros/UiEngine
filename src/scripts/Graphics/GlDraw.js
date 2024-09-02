@@ -52,7 +52,7 @@ export function Gl_draw(gl) {
             GL_STATE.BOUND_VAO = vb_group.vao;
         }
         
-        
+        // TODO: Distinguish uniforms that will update with uniforms with constant value
         Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
         
         if(vb_group.has_scissorbox){

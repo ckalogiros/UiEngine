@@ -74,7 +74,9 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 
         const attrib_divisor = 1; // run per instance
         // Calculate the attributes info specific for the attributes of this vertex buffer.
-        vbinfo.attribs_info = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.inst, attrib_divisor);
+        const ret = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.inst, attrib_divisor);
+        vbinfo.attribs_info = ret.attribs_info;
+        vbinfo.attribs_indexing = ret.attribs_indexing;
 
 
         Shader_attributes_enable(attribsidx, attrib_divisor)
@@ -108,8 +110,9 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 
         const attrib_divisor = 0; // run per instance
         // Calculate the attributes info specific for the attributes of this vertex buffer.
-        vbinfo.attribs_info = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.attr & ~sid.inst, attrib_divisor);
-
+        const ret = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.attr & ~sid.inst, attrib_divisor);
+        vbinfo.attribs_info = ret.attribs_info;
+        vbinfo.attribs_indexing = ret.attribs_indexing;
 
         Shader_attributes_enable(attribsidx, attrib_divisor);
 
@@ -246,6 +249,7 @@ class Vertex_Buffer_Info {
         this.type = type;   // The type of the typed array buffer
 
         this.attribs_info = null; // TODO: create a local object, instead of a refference
+        this.attribs_indexing = null; 
 
         this.add_to_vb_fnidx = null; // Function pointer. Each vertex buffer has a function that knows how to add attributes to the buffer
     }
@@ -883,9 +887,11 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
         // const vertex_count = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? attribs_per_vertex * ((2 * num_faces) +2) : verts_per_rect * num_faces;
-        const stride = vb_info.attribs_info.count * verts_per_rect;
-        vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride, attribs_info);
-        vb_info.vCount = vb_info.count / stride;
+        const attribs_count = vb_info.attribs_info.count * verts_per_rect * num_faces;
+        // vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride, attribs_info);
+        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, attribs_info);
+        vb_info.count += attribs_count;
+        vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
         // if (vb_groupidx>=2) console.log(vb_groupidx, vb_info.count)
         // vb_info.attribs_info.attrib_divisor++;
 
@@ -1197,7 +1203,7 @@ function Vertex_to_string(flags, progidx, vbidx, count) {
 
     const attribsidx = Program_get_shader_attributes_index(progidx);
     const stride = Program_get_shader_attribute_attribs_per_vertex(progidx);
-    const wpos_attr = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.WPOS_TIME4);
+    const wpos_attr = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.WPOS3);
 
     const arr = [];
     const faces = count / (stride * 4);

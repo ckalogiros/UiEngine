@@ -38,7 +38,7 @@ export class Section extends Mesh {
 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), pad = [4, 4], pos = [200, 400, 0],
-      dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = [10, 6, 2.], num_faces = 1, textureId=INT_NULL, is_debug_mesh) {
+      dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = [4, 0, 2], num_faces = 1, textureId=INT_NULL, is_debug_mesh) {
 
       const geom = new Geometry2D(pos, dim, _, num_faces);
       // Create texture if the user has passed a texture id of type:TEXTURES.
@@ -56,7 +56,13 @@ export class Section extends Mesh {
       this.last_pos = [0, 0];
 
 
+
       // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+
+
+
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 

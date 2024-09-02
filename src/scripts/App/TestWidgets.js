@@ -351,7 +351,7 @@ export function TestWidgetsGeneric(createId=1) {
     // Demo_snake_animation();
     // Demo_chain_link();
 
-    // Game_snake();
+    Game_snake();
 
     {
 
@@ -500,7 +500,7 @@ export function TestWidgetsGeneric(createId=1) {
 
 
     { // Animations
-        // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
+        // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS3);
         // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
 
         // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .01, .1, 1., _, .5, false)
@@ -538,7 +538,7 @@ export function TestWidgetsGeneric(createId=1) {
         
 
         /** Colorpicker Instanced Geometry*/
-        // Demo_widgets_colorpicker(x, y, SID.ATTR.WPOS_TIME4|SID.ATTR.DIM2)
+        // Demo_widgets_colorpicker(x, y, SID.ATTR.WPOS3|SID.ATTR.DIM2)
         // Demo_widgets_colorpicker(x, y, SID.ATTR.DIM2)
     }
 
@@ -720,13 +720,13 @@ export function TestWidgetsGeneric(createId=1) {
 
     /** Section Synthesizes */
     {
-        // Section([0, 0, 0]);
+        // Section([20, 20, 0]);
 
         // SectionResizable([350, 350, 0])
 
         // TestSections1();
 
-        CreateManySections();
+        // CreateManySections();
         // const blu = CreateManySectionsMinimal()
 
 
@@ -864,14 +864,15 @@ function Section(pos) {
     const marg = [10, 10];
     const dim = [200, 200];
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, BLUEL[5], _, [0, 0, 0]);
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, BLUEL[5], _, [dim[0], 0, 15]);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     section.SetName(`section${grey_cnt++}`);
-    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: 0x0}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
-    const s = Create_widget_section(_, _, marg, _, [20,20], BLUEL[5], _, [0, 0, 0]);
-    s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: 0x0}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    const s = Create_widget_section(_, _, marg, [0,0,1], [50,50], YELLOW[5], _, [10, 0, 1]);
+    s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     section.AddItem(s);
     
 
@@ -900,11 +901,8 @@ function SectionResizable(pos) {
 
     const tr = 1.;
     const marg = [10, 10];
-    // const dim = [VIEWPORT.WIDTH, VIEWPORT.HEIGHT];
     const dim = [200, 200];
 
-    // const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, [0, 500, 0], dim, TRANSPARENCY(BLUEL[5], tr), _, [40, 40, 2]);
-    // const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], tr), _, [40, dim[1], 2]);
     const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], tr), _, [, dim[1], 2]);
     grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     grey.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -912,25 +910,13 @@ function SectionResizable(pos) {
     grey.SetName(`grey${grey_cnt++}`);
 
 
-    // grey.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW)
-
     grey.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    // grey.EnableGfxUniforms({unif:SID.UNIF.TIME}, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_VS);
-    // grey.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-    // grey.EnableGfxUniforms({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-
-
-    // grey.geom.dim[0] *= sin;
-    // grey.geom.dim[1] *= cos;
 
 
     grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    // grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
     grey.Render();
     Root_group_activate_all_vbs_in_renderqueue(grey.root_bufferidx);
     grey.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, grey.gfx.vb.groupidx)
-    // grey.GfxUniformsSetClbk('u_time', Timer_get_global_timer, _)
-    // grey.GfxUniformsSetClbk('u_scale2', function(){return [1,1]}, grey.gfx.vb.groupidx);
     Construct_listen_events_relations_from_mesh_tree(grey);
 
     return grey;
@@ -955,8 +941,8 @@ function CreateLabel(name = 'Label ', font_size = 10) {
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     
     // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
-    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
-    // label.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4);
+    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+    // label.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
 
     label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     label.Render()
@@ -2067,7 +2053,7 @@ function CreateManySectionsMinimal(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
 
 
     // blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
-    // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)
+    // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3)
 
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr), 'red');
     red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -2136,14 +2122,14 @@ function CreateManySectionsMinimal(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
 
 function CreateManySections(scene) {
 
-    const tr = .7;
+    const tr = 1.7;
 
-    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
+    // const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
+    const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [0, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
     blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE); blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
 
-    // blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
-    // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)
+    // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3)
 
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
     red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -2276,7 +2262,7 @@ function CreateManySections(scene) {
 
 
     // blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     // blu.options = SECTION.INHERIT | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
     blu.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;

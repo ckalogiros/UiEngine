@@ -109,6 +109,13 @@ export function Program_get_shader_attribute_attribs_per_vertex(progidx) {
 
 
 
+export function Program_get_shader_attribs_indexing(progidx) {
+	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber);
+	return _programs.buffer[progidx].attribs_indexing;
+}
+
+
+
 
 
 /***************************************************************************************************************************************************/
@@ -203,32 +210,6 @@ export function Program_create_program(sid, uniforms) {
 
 
 
-// export function Program_assign_uniform_index(progidx, unif_name, ubidx) {
-
-// 	const prog = _programs.buffer[progidx];
-// 	const len = prog.uniforms.length;
-// 	for(let i=0; i < len; i++){
-// 		if(prog.uniforms[i].name === unif_name){
-// 			prog.uniforms[i].ubidx = ubidx;
-// 			break;
-// 		}
-// 	}
-// }
-
-
-
-// export function Program_get_uniform_by_name(progidx, unif_name) {
-
-// 	const prog = _programs.buffer[progidx];
-// 	const len = prog.uniforms.length;
-// 	for(let i=0; i < len; i++){
-// 		if(prog.uniforms[i].name === unif_name){
-// 			return prog.uniforms[i];
-// 		}
-// 	}
-// }
-
-
 
 
 class Gl_Program {
@@ -243,20 +224,16 @@ class Gl_Program {
 		this.uniforms = uniforms;
 
 		const ret = Shaders_load(gfxCtx.gl, sid, uniforms);
+
 		this.shader_program = ret.shader_program;
+		this.attribsidx = ret.attribsidx;
+		this.attribs_indexing = ret.attribs_indexing;
 
 		this.vb_group = New_int8_buffer(1, 'NEW GlProgram-VBGROUP'); // Array of indexes to all vertex buffers in '_vertex_buffer_groups' buffer. 
-
 		this.ib = New_int8_buffer(1, 'NEW GlProgram-ib'); // Array of indexes to all index buffers in '_index_buffers_info' buffer. 
-
 		this.vao = null;
 		this.vaoidx = INT_NULL;
-
 		this.ubidxs = New_generic_buffer(_, 'Program ubidxs');
-
-
-		// this.attribsidx = Shader_attributes_create(this.shader_program, ret.attribs_info.mesh_attribs);
-		this.attribsidx = Shader_attributes_create(this.shader_program, ret.attribs_info);
 		this.attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(this.attribsidx);
 
 

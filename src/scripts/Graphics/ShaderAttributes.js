@@ -8,6 +8,85 @@ import { Str_buffer_get_by_idx, Str_buffer_store } from "../Engine/Core/StringBu
 const DISABLE_DEBUG = true;
 
 
+
+
+export class Attributes_indexing { // Attributes indexing based on attribute type (color, position, etc)
+
+   constructor() {
+
+      this.COL4 = INT_NULL;
+      this.WPOS3 = INT_NULL;
+      this.POS2 = INT_NULL;
+      this.DIM2 = INT_NULL;
+      this.BORDER = INT_NULL;
+      this.R_CORNERS = INT_NULL;
+      this.FEATHER = INT_NULL;
+      this.SCALE2 = INT_NULL;
+      this.TEX2 = INT_NULL;
+      this.TIME = INT_NULL;
+      this.SDF = INT_NULL;
+      this.MSDF = INT_NULL;
+      this.GLOW_INTENSITY = INT_NULL;
+      this.COL4_PER_VERTEX = INT_NULL;
+   }
+
+   FindByNameAndStoreIndex(attrib_nameid, index){
+
+      if (attrib_nameid & SID.ATTR.COL4) {
+         this.COL4 = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.WPOS3) {
+         this.WPOS3 = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.TIME) {
+         this.TIME = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.POS2) {
+         this.POS2 = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.DIM2) {
+         this.DIM2 = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.R_CORNERS) {
+         this.R_CORNERS = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.BORDER) {
+         this.BORDER = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.FEATHER) {
+         this.FEATHER = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.TEX2) {
+         this.TEX2 = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.GLOW_INTENSITY) {
+         this.GLOW_INTENSITY = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.SDF) {
+         this.SDF = index;
+      }
+      
+      else if (attrib_nameid & SID.ATTR.MSDF) {
+         this.MSDF = index;
+      }
+   }
+}
+
+
+
+
+
+
 const _shader_attribs_buffer = New_generic_buffer(_, '_shader_attribs_buffer');
 export function Shader_attributes_reset() { 
    _shader_attribs_buffer.ResetFull(); }
@@ -43,6 +122,18 @@ export function Shader_attributes_get_attribs_size(attribsidx, nameid) {
    const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
    return _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.sizes[attrib_idx];
 }
+
+
+
+// export function Shader_attributes_get_attribs_offset_size(attribsidx, nameid) {
+//    if (!DISABLE_DEBUG) DEBUG_PRINT(_shader_attribs_buffer, attribsidx, new Error().lineNumber);
+
+//    const attrib_idx = Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid);
+//    return {
+//       offset: _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.offsets[attrib_idx],
+//       size: _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.sizes[attrib_idx],
+//    };
+// }
 
 
 
@@ -130,7 +221,9 @@ export function Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid) {
 
 
 
-export function Shader_attributes_create(shader_program, attribs_info) {
+
+
+export function Shader_attributes_create(attribs_info) {
 
 
    const shader_attribs = {
@@ -239,13 +332,15 @@ export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, s
       // types: [],
    }
 
+   const attribs_indexing = new Attributes_indexing();
+
    let offset = 0;
 
    // Select and build the info from the attributes that the vertex buffer has
    const len = shader_attribs.nameids.length;
    for (let i=0; i<len; i++){
 
-      // if(sid & shader_attribs.nameids[i])
+      if(sid & shader_attribs.nameids[i])
       {
 
          attribs_info.count += shader_attribs.sizes[i];
@@ -254,12 +349,18 @@ export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, s
          attribs_info.sizes.push(shader_attribs.sizes[i]);
          // attribs_info.types.push(shader_attribs.types[i]);
          attribs_info.offsets.push(offset);
-         offset += shader_attribs.sizes[i]
+         offset += shader_attribs.sizes[i];
+
+         attribs_indexing.FindByNameAndStoreIndex(shader_attribs.nameids[i], i)
       }
 
    }
 
-   return attribs_info;
+
+   return {
+      attribs_info:attribs_info, 
+      attribs_indexing:attribs_indexing
+   };
 
 }
 

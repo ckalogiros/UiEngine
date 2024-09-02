@@ -174,7 +174,7 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
 
 
    // root_s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
-   // root_s.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS_TIME4)
+   // root_s.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3)
 
 
    const l1_s = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(GREY[1], tr));

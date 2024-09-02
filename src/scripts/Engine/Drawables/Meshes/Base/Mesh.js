@@ -640,13 +640,17 @@ export class Mesh {
             case MESH_ENABLE.GFX.ATTR_STYLE: {
 
                 // this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
-                this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.DIM2;
-                this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER | SID.PASS.WPOS2 | SID.PASS.DIM2;
+                // this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.DIM2;
+                this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)  | SID.ATTR.STYLE | SID.ATTR.DIM2;
+                this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER  | SID.PASS.WPOS2 | SID.PASS.DIM2;
+                // this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER;
                 if (Array.isArray(params)) {
                     this.SetStyle(params);
                 }
                 break;
             }
+            case MESH_ENABLE.GFX.ATTR_R_CORNERS: { this.sid.attr |= SID.ATTR.R_CORNERS| SID.ATTR.DIM2;  this.sid.pass |= SID.PASS.R_CORNERS| SID.PASS.DIM2; break; }
+            case MESH_ENABLE.GFX.ATTR_FEATHER: { this.sid.attr |= SID.ATTR.FEATHER| SID.ATTR.DIM2;  this.sid.pass |= SID.PASS.FEATHER| SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME;  this.sid.pass |= SID.PASS.TIME; break; }
             case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; this.sid.pass |= SID.PASS.COL4_PER_VERTEX; break; }
             case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.attr |= SID.PASS.TEX2; break; }

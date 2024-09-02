@@ -28,9 +28,9 @@ export class Geometry2D {
         
         this.sid = {
             shad: SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
-            // attr: (SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4 | SID.ATTR.DIM2),
-            attr: (SID.ATTR.POS2 | SID.ATTR.WPOS_TIME4),
-            // inst: SID.ATTR.WPOS_TIME4,
+            // attr: (SID.ATTR.POS2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2),
+            attr: (SID.ATTR.POS2 | SID.ATTR.WPOS3),
+            // inst: SID.ATTR.WPOS3,
             inst: 0x0,
             unif: 0,
             pass: 0,
@@ -136,7 +136,7 @@ export class Geometry3D {
 
         this.sid = {
             shad: 0,
-            attr: (SID.ATTR.POS3 | SID.ATTR.WPOS_TIME4),
+            attr: (SID.ATTR.POS3 | SID.ATTR.WPOS3),
             unif: 0,
             pass: 0,
         };
