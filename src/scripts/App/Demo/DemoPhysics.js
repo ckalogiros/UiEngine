@@ -118,7 +118,9 @@ export function Sattelite_rotation(_pos=[0,0]){
 
       const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, BLUEL[9], 'Ball', [0, dim[0], 2]);
       ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_BORDER);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
       section.AddItem(ball);
       
       balls_buffer[i] = ball;

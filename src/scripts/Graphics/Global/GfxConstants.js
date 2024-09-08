@@ -206,7 +206,7 @@ const SID = {
         FS_GLOW_VEC3: BIT6,
         FS_GLOW_VEC2: BIT6<<=0x1,
         FS_NOISE: BIT6<<=0x1,
-        FS_SMOKE: BIT6<<=0x1,
+        FS_SMOKE_VEC3: BIT6<<=0x1,
     },
 
 
@@ -434,6 +434,7 @@ const MESH_ENABLE = {
         ATTR_R_CORNERS: _CNT <<= 1,
         ATTR_FEATHER: _CNT <<= 1,
         ATTR_BORDER: _CNT <<= 1,
+        ATTR_GLOW_INTENSITY: _CNT <<= 1,
         ATTR_COL4_PER_VERTEX: _CNT <<= 1,
         
         FX_GLOW: _CNT <<= 1,

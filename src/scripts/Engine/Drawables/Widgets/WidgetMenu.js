@@ -34,7 +34,7 @@ export class Widget_Menu_Bar extends Section {
    close_btn_idx;
    minimize_btn_idx;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [2, 5, 2], num_faces, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = [5, 2, 2], num_faces, is_debug_mesh) {
 
       const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, col, text_col, _, _, _, _, is_debug_mesh);
 
@@ -232,7 +232,7 @@ export class Widget_Menu_Bar extends Section {
    /****************************************************************************************************************************************************/
 
 
-   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = [2, 5, 2], font = TEXTURES.DEFAULT_FONT) {
+   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = [5, 2, 2], font = TEXTURES.DEFAULT_FONT) {
 
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
 
@@ -283,7 +283,7 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
-   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[1], text_col = WHITE, _pad, bold = .4, font = TEXTURES.DEFAULT_FONT, style = [2, 5, 2]) {
+   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[1], text_col = WHITE, _pad, bold = .4, font = TEXTURES.DEFAULT_FONT, style = [5, 2, 2]) {
 
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
 
@@ -347,7 +347,7 @@ export class Widget_Menu_Bar extends Section {
 
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
-      mesh.SetStyle([2, 5, 2]);
+      mesh.SetStyle([5, 2, 2]);
 
       // Any mesh of bese type Section, must be calculated(position/size) independent of any other mesh of the menu bar and/or parent/parent-children
       // if(mesh.type & MESH_TYPE.SECTION_MESH) mesh.options |= this.options = SECTION.INDEPENDENT;
@@ -464,7 +464,7 @@ export class Widget_Minimize extends Widget_Button {
    // toggle; // On/Off
    // stored_children_meshes; // Store all children meshes of the root, to maximize the widget back to normal. 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = [0, 4, 1.8], font, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = [4, 0, 1.8], font, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, '_', _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
 

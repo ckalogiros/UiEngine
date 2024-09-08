@@ -7,6 +7,7 @@ import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Vi
 import { ORANGEL, PURPLER } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
+import { Gl_add_vpos_xy, Gl_set_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Slope_function_logarithmic } from "../../Helpers/Math/MathFunction.js";
 
 
@@ -17,8 +18,9 @@ import { Slope_function_logarithmic } from "../../Helpers/Math/MathFunction.js";
 
 
 var t = 0.0;
+const final_t = .5; // The time for the animation. Greter values increments more the scale-rotation
 const step = 0.005;
-const size = 40;
+const size = 60;
 
 
 
@@ -28,13 +30,13 @@ const size = 40;
 /**************************************************************************************************************************************************************/
 // Circle scale animation
 
-var slope_constant1 = 0;
+var slope_constant1 = .1;
 
 export function Clbk_animations_circle_scale() {
 
    /*************************************************************************************************/
    
-   const circle = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [250, 100, 0], [size,size], PURPLER[8], 'circle', [0, size, 2]);
+   const circle = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [VIEWPORT.WIDTH/2, VIEWPORT.HEIGHT/2, 0], [size,size], PURPLER[8], 'circle', [size, 0, 2]);
    circle.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    circle.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    
@@ -55,7 +57,6 @@ export function Clbk_animations_circle_scale() {
    // Constant value slope_constant1 slider
    const slider_dim = [300, 10];
    const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [0, 0, 0], slider_dim, _, _, 'Speed');
-   slope_constant1=.5;
    slider.SetInitialValue(slope_constant1*100);
    slider.GfxUniformsEnable(slider, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -118,11 +119,16 @@ function Animation_scale_up_run(params){
    circle.geom.AddWposXY(circle.gfx, -res, -res);
    // console.log(res)
 
+   
+   Gl_add_vpos_xy(circle.gfx, res, res);
 
-   // if(circle.geom.dim[0] < 100) return true;
-   if(circle.geom.dim[0] < size*2 && res > 1) return true;
-   // if(t < 1 && res > 1) return true;
-   // if(t < 1) return true;
+   if(circle.mat.sid.attr & SID.ATTR.R_CORNERS) {
+
+      circle.mat.style[0] =  circle.geom.dim[0];
+      Gl_set_round_corners(circle.gfx, circle.geom.dim[0]);
+   }
+
+   if(res >= final_t) return true;
    else return false
 
 }
@@ -160,11 +166,15 @@ function Animation_scale_down_run(params){
    circle.geom.pos[1] += res;
    circle.geom.AddWposXY(circle.gfx, res, res);
    
-   // console.log(t)
+   Gl_add_vpos_xy(circle.gfx, -res, -res);
 
-   // if(circle.geom.dim[0] > 20) return true;
-   if(circle.geom.dim[0] > size &&  res > .01) return true;
-   // if(t < .4 &&  res > .01) return true;
+   if(circle.mat.sid.attr & SID.ATTR.R_CORNERS) {
+
+      circle.mat.style[0] =  circle.geom.dim[0];
+      Gl_set_round_corners(circle.gfx, circle.geom.dim[0]);
+   }
+
+   if(res > .01) return true;
    else return false
 }
 
@@ -196,15 +206,15 @@ function Animation_scale_down_stop(params){
 /**************************************************************************************************************************************************************/
 // Circle flip animation
 
-let slope_constant2 = 0;
+let slope_constant2 = 1;
 let rotation = 0;
-let rotation_step = .02;
+let rotation_step = .001;
 
 export function Clbk_animations_circle_flip() {
    
    /*************************************************************************************************/
    
-   const circle = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [250, 350, 0], [size,size], ORANGEL[8], 'circle', [0, size, 2]);
+   const circle = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [250, 350, 0], [size,size], ORANGEL[8], 'circle', [size, 0, 2]);
    circle.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    circle.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    
@@ -225,7 +235,6 @@ export function Clbk_animations_circle_flip() {
    // Constant value slope_constant slider
    const slider_dim = [300, 10];
    const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [0, 250, 0], slider_dim, _, _, 'Speed');
-   slope_constant2 = .5;
    slider.SetInitialValue(slope_constant2*100);
    slider.GfxUniformsEnable(slider, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -273,7 +282,7 @@ function Animation_flip_up_run(params){
    rotation += rotation_step+res;
    circle.RotateZ(rotation);
 
-   if(rotation < Math.PI) return true;
+   if(rotation < Math.PI/3) return true;
    else return false
 
 }

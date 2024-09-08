@@ -1,5 +1,5 @@
 export const frag_noise_call = `
-   color = Noise();
+   color = Noise(scale_down);
 `;
 export const frag_noise = `\
 
@@ -7,7 +7,6 @@ export const frag_noise = `\
 #define MAX_SPEED 19.
 
 #ifndef UV_READY
-    // #define UV_READY 1
     vec2 uv = vec2(0,0);
 #endif
 
@@ -52,21 +51,21 @@ float fbm(vec2 uv)
 #define MinVec3F(a, f)  vec3(MIN(a.x, f), MIN(a.y, f), MIN(a.z, f))
 
 
-vec4 Noise(void)
+vec4 Noise(float scale_down)
 {
 
-#ifdef U_NOISE_PARAMS
-    vec3 controls = u_noise_params;
-#else
-    vec3 controls = vec2(1.);
-#endif
-    
-vec4 color = v_col;
-    float time  = v_time;
-    float revT  = 1.-time; // Reverse time to be from 1 to 0
+    #ifdef U_NOISE_PARAMS
+        vec3 controls = u_noise_params;
+    #else
+        vec3 controls = vec2(1.);
+    #endif
+        
 
     vec2 res = u_screen_res;
-    vec2 dim = v_dim; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
+    vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
+    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+    float time  = v_time;
+    float revT  = 1.-time; // Reverse time to be from 1 to 0
     
    
     #ifndef UV_READY
@@ -75,9 +74,8 @@ vec4 color = v_col;
         uv.x += (res.x*.5); // Center mesh to screen
         uv.y -= (res.y*.5); // Center mesh to screen
         
-        vec2 wpos = v_wpos;
-        uv.x -= wpos.x; // To move with mesh position
-        uv.y += wpos.y; // To move with mesh position
+        uv.x -= v_wpos3_x; // To move with mesh position
+        uv.y += v_wpos3_y; // To move with mesh position
         
         uv.x -= dim.x; // Subtract constant dimention
         uv.y -= -dim.y; // Subtract constant dimention
@@ -107,13 +105,13 @@ vec4 color = v_col;
     float alpha = revT*d2;
 
 
-    float sum = 1.-((color.r + color.g + color.b)/3.); // Make equal color intensity for all rgb combinations
+    float sum = 1.-((src_color.r + src_color.g + src_color.b)/3.); // Make equal src_color intensity for all rgb combinations
     n1 *= sum * 2.0;
 
-    vec3 col = color.rgb;
+    vec3 col = src_color.rgb;
 
     
-    float F = pow(noise2, 3.) *2.; // Characterizes the noize into the color.
+    float F = pow(noise2, 3.) *2.; // Characterizes the noize into the src_color.
     // F *= d2 + (controls*.000000000001);
     F *= d2;
 
@@ -129,7 +127,7 @@ vec4 color = v_col;
 
 
     /*
-        We want 0 alpha for the outer color(s1), and use 'F' for the alpha of the highlights(s2)
+        We want 0 alpha for the outer src_color(s1), and use 'F' for the alpha of the highlights(s2)
     */
 
 
@@ -158,7 +156,7 @@ vec4 color = v_col;
     
     
     
-    /** CHOOSE ONE OF THE BELLOW: bright2 is good for purple color, bright 1 is good for a very bright fire ball */
+    /** CHOOSE ONE OF THE BELLOW: bright2 is good for purple src_color, bright 1 is good for a very bright fire ball */
     vec4 bright2 = mix(s1, vec4(vec3(mixer2), 1.-F*2.6), mixer); // EFFECT VERY BRIGHT
     // c += bright2*.5;
     // c += bright2;

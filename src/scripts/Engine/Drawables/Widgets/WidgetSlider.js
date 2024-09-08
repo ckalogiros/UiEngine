@@ -52,7 +52,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
 
       handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      handle.SetStyle([5, Min(handle_dim[0],handle_dim[1]), 1.5]);
+      handle.SetStyle([Min(handle_dim[0],handle_dim[1]), 5, 1.5]);
 
 
 
@@ -740,7 +740,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.type |= MESH_TYPE.WIDGET_SLIDER;
 
       this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      this.SetStyle([0, 6, 2]);
+      this.SetStyle([6, 0, 2]);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 

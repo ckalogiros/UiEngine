@@ -190,7 +190,7 @@ export class Widget_Color_Picker extends Section {
       slider_tran.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      slider_tran.SetStyle([0, 12*scale, 2]);
+      slider_tran.SetStyle(12*scale, [0, 2]);
       slider_tran.StylesSetMargin([10, 0]);
       slider_tran.SetName('Slider Transparency');
 
@@ -221,7 +221,7 @@ export class Widget_Color_Picker extends Section {
       slider.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       slider.StylesSetMargin([0, 20]);
-      slider.SetStyle([style[0], 20*scale, style[2]]);
+      slider.SetStyle([20*scale, style[1], style[2]]);
       slider.SetName('Slider Hue');
       temp_hue_pick_idx = this.AddItem(slider);
 

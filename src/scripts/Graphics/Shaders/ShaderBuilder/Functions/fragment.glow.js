@@ -14,7 +14,7 @@
 
 export const frag_glow_call = `
 
-    vec4 glowcol = Glow(color.a);
+    vec4 glowcol = Glow(color.a, scale_down);
     // Removes any previous functions calculations. Must be combined with:'color = glowcol'
     // glowcol.rgb *= (1.-alpha); 
     color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
@@ -26,7 +26,7 @@ export const frag_glow = `
    vec2 uv = vec2(0,0);
 #endif
 
-vec4 Glow(float alpha)
+vec4 Glow(float alpha, float scale_down)
 {
 
     #ifdef U_GLOW_PARAMS_VEC3
@@ -44,13 +44,13 @@ vec4 Glow(float alpha)
             float intensity = .5;
         #endif
     #else
-        float outer = .5;
-        float inner = 1.0;
-        float intensity = .5;
+        float outer = .8;
+        float inner = 1.;
+        float intensity = 0.2;
     #endif
 
    vec2 res = u_screen_res;
-   vec2 dim = vec2(v_dim2_x, v_dim2_y); // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
+   vec2 dim = vec2(v_dim2_x, v_dim2_y);
    
     #ifndef UV_READY
         #define UV_READY 1
@@ -68,12 +68,13 @@ vec4 Glow(float alpha)
    
    
    
-    float r = dim.y*u_scale2.x;
+    float r = dim.y*scale_down;
     // float r = dim.y;
     // float d = smoothstep(dim.y, r,  length(uv));
     float d = smoothstep(dim.y*outer, r*inner,  length(uv));
 
-    vec3 color = vec3(v_col4_r, v_col4_g, v_col4_b)*d*intensity;
+    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+    vec3 color = src_color.rgb*d*intensity;
     // color.rgb *= d;
     // color.rgb *= original_a;
     // alpha *= original_a;

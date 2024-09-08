@@ -56,9 +56,10 @@ export function CreateGlowParticles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CRE
    emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
 
    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
-   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [0, 40, 2]);
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 40);
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   emitter.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+   emitter.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC2,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
 
    emitter.SetConeOfDirection(1, 1, .2, -.2);
@@ -73,7 +74,7 @@ export function CreateGlowParticles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CRE
    // emitter2.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
    // emitter2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
    // emitter2.EnableGfxUniforms({unif:SID.UNIF.SCALE2}, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   // emitter2.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+   // emitter2.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC2,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
    // TEMP_PARTICLES_GEN_GFX(emitter2);
    // emitter2.GfxUniformsSetClbk('u_scale2', function(){return [scale_down,1]}, emitter2.gfx.vb.groupidx);
@@ -96,7 +97,7 @@ export function CreateGlowParticles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CRE
    const slider_dim = [120*DEVICE.device_scale, 10*DEVICE.device_scale];
 
 
-   const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [VIEWPORT.WIDTH - slider_dim[0] * 2 - 40, 60, 1], [0, 0], GREEN[2], 'SliderSection', [0, 10, 2],);
+   const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [VIEWPORT.WIDTH - slider_dim[0] * 2 - 40, 60, 1], [0, 0], BLACK, 'SliderSection', [0, 10, 2],);
    slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    const flags = {
@@ -413,13 +414,15 @@ export function CreateBallTailParticles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10,
 
       /**************************************************************************************************************************************/
       // Balltail particles
-      const dim = [10, 10]
+      const dim = [20, 20]
       const pos = GetRandomPos([0, 0], [section.geom.dim[0], section.geom.dim[1]])
 
       const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, WHITE, 'Ball', [0, dim[0], 2]);
       ball.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_BORDER);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
       section.AddItem(ball);
 
       balls_buffer[i] = ball
@@ -436,7 +439,8 @@ export function CreateBallTailParticles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10,
       tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
       tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
 
-      tail_emitter.EnableGfxUniforms(0x0, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+
+      tail_emitter.EnableGfxUniforms({fx: SID.FX.FS_NOISE,}, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       
       
       
@@ -444,15 +448,16 @@ export function CreateBallTailParticles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10,
       
       /**************************************************************************************************************************************/
       // Secondary particles
-      
-      const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', color, [0, 0, 3], [40, 40], 1, 1, 2, .79, 0, 2);
+      const glow_dim = 40;
+      const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', color, [0, 0, 3], [glow_dim, glow_dim], 1, 1, 2, .79, 0, 2);
       const glow_emitter = Particles_get_particle_system(glow_emitter_idx);
       glow_emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
       
       glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
-      glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, glow_dim);
+      glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       glow_emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      glow_emitter.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      glow_emitter.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC3,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
       glow_emitter.SetDir(-1, -1);
       glow_emitter.SetConeOfDirection(-.1, .1, .1, -.1);
@@ -496,8 +501,8 @@ export function CreateBallTailParticles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10,
    // IMPORTANT: Generate particles gfx after the generation of any parent mesh, so that the particles system unif_wpos has a parent root_posidx
    for (let i = 0; i < num_balls; i++) {
 
-      const scale_down = .04;
-      // const scale_down = .22;
+      // const scale_down = .04;
+      const scale_down = .22;
       
       const glow_emitter = glow_particles_buffer[i];
       TEMP_PARTICLES_GEN_GFX(glow_emitter, section);
@@ -521,7 +526,7 @@ export function CreateBallTailParticles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10,
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
       const slider_dim = [120*DEVICE.device_scale, 10*DEVICE.device_scale];
       // const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10,10], [x+VIEWPORT.WIDTH-slider_dim[0]*2-40, y+60, 1], [0,0], GREEN[2], 'SliderSection', [0,10,2], );
-      const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x + VIEWPORT.WIDTH - slider_dim[0] * 2 - 40, 500, 1], [0, 0], GREEN[2], 'SliderSection', [0, 10, 2],);
+      const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x + VIEWPORT.WIDTH - slider_dim[0] * 2 - 40, 500, 1], [0, 0], GREY[2], 'SliderSection', [100, , 2],);
       slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
@@ -529,7 +534,6 @@ export function CreateBallTailParticles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10,
          unif: SID.UNIF.ROOT_WPOS2,
          pass: SID.PASS.WPOS2,
       }
-
       slider_section.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
@@ -1197,7 +1201,7 @@ export function TestNoiseShader() {
    const trans = .2, trans2 = .2;
 
    // Style for the label widgets: [BORDER, ROUND_CORNERS, FEATHER]
-   const label_style = [0, 6, 2];
+   const label_style = [6, 0, 2];
    const label_pad = [6, 6];
    const label_col = TRANSPARENCY(BLUEL[1], 0);
    const label_text_col = WHITE;
@@ -1221,7 +1225,7 @@ export function TestNoiseShader() {
       pass: SID.PASS.WPOS2,
    }
 
-   const controls_dp = Create_widget_dropdown(_, 'Emitter Test', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+   const controls_dp = Create_widget_dropdown(_, 'Emitter Test', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
    controls_dp.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    Dropdown_roots_set_root(controls_dp, controls_dp);
    // controls_dp.AddToMenu(controls_dp);
@@ -1338,7 +1342,7 @@ export function TestNoiseShader() {
 
    { // Contol Params for shader params
 
-      // const glow_controls_dp = Create_widget_dropdown(_, 'Shader Params', [0, 0, zpos], YELLOW[6], CGREY, WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+      // const glow_controls_dp = Create_widget_dropdown(_, 'Shader Params', [0, 0, zpos], YELLOW[6], CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
       // glow_controls_dp.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // {
       //    const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Scale');
@@ -1387,7 +1391,7 @@ export function TestNoiseShader() {
    { // Contol Params for tarnsform and physics
 
       const slider_dim = [120*DEVICE.device_scale, 10*DEVICE.device_scale];
-      const glow_controls_dp2 = Create_widget_dropdown(_, 'Transform Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+      const glow_controls_dp2 = Create_widget_dropdown(_, 'Transform Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
       glow_controls_dp2.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       controls_dp.AddToMenu(glow_controls_dp2)
 
@@ -1897,9 +1901,10 @@ export function Demo_glow_particles_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x 
    emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
 
    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
-   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 40);
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   emitter.EnableGfxUniforms(0x0, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+   emitter.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC3,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
 
    emitter.SetConeOfDirection(1, 1, .2, -.2);
@@ -1924,7 +1929,7 @@ export function Demo_glow_particles_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x 
 
    const slider_dim = [120*DEVICE.device_scale, 10*DEVICE.device_scale];
 
-   const controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Glow Particles Demo', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [10, 4], _, _, header_font_size, [0, 6, 2], [4, 4],);
+   const controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Glow Particles Demo', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [10, 4], _, _, header_font_size, [6, 0, 2], [4, 4],);
    Dropdown_roots_set_root(controls_dp, controls_dp);
 
 
@@ -1956,7 +1961,7 @@ export function Demo_glow_particles_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x 
    const clp_fontsize = regular_font_size;
 
    // Style for the label widgets: [BORDER, ROUND_CORNERS, FEATHER]
-   const label_style = [0, 6, 2];
+   const label_style = [6, 0, 2];
    const label_pad = [6, 6];
    const label_col = TRANSPARENCY(BLUEL[1], 0);
    const label_text_col = WHITE;
@@ -2096,7 +2101,7 @@ export function Demo_glow_particles_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x 
       */
 
       // Contol Params for shader params
-      const glow_controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Shader Params', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+      const glow_controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Shader Params', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
       glow_controls_dp.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
       {
@@ -2133,7 +2138,7 @@ export function Demo_glow_particles_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x 
 
 
       // Contol Params for tarnsform and physics
-      const glow_controls_dp2 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Transform Params', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+      const glow_controls_dp2 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Transform Params', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
       glow_controls_dp2.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       { // Gravity
          const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Gravity');
@@ -2331,7 +2336,7 @@ export function Demo_ball_tail() { // Side Panel
    // Create Sliders for manipulating variables of particles
 
    const slider_dim = [120*DEVICE.device_scale, 10*DEVICE.device_scale];
-   const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, zpos], [0, 0], YELLOWL[6], 'SliderSection', [0, 10, 2],);
+   const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, zpos], [0, 0], YELLOWL[6], 'SliderSection', [10, 0, 2],);
    // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
    const flags = {
@@ -2573,7 +2578,7 @@ export function Demo_ball_tail() { // Side Panel
 
 
    // Create the panel for holding all controls
-   const controls_panel = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [0, 0, 0], [0, 0], TRANSPARENCY(PURPLEB[5], 1), 'SidePanel', [0, 10, 1.8]);
+   const controls_panel = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [0, 0, 0], [0, 0], TRANSPARENCY(PURPLEB[5], 1), 'SidePanel', [10, 0, 1.8]);
    side_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
    controls_panel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
@@ -2723,6 +2728,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
       emitter.speed = speed;
       
       emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+      emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
       emitter.EnableGfxUniforms({ fx: SID.FX.FS_SMOKE }, 'u_smoke_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
@@ -2785,7 +2791,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
 
    const slider_dim = [120*DEVICE.device_scale, 10*DEVICE.device_scale];
 
-   // const controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Smoke Particles Demo', [0, 0+40, zpos], YELLOWL[6], GREY[1], WHITE, [10, 4], _, _, header_font_size, [0, 6, 2], [4, 4],);
+   // const controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Smoke Particles Demo', [0, 0+40, zpos], YELLOWL[6], GREY[1], WHITE, [10, 4], _, _, header_font_size, [6, 0, 2], [4, 4],);
    // Dropdown_roots_set_root(controls_dp, controls_dp);
 
 
@@ -2814,7 +2820,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
    const clp_fontsize = regular_font_size;
 
    // Style for the label widgets: [BORDER, ROUND_CORNERS, FEATHER]
-   const label_style = [0, 6, 2];
+   const label_style = [6, 0, 2];
    const label_pad = [6, 6];
    const label_col = TRANSPARENCY(BLUEL[1], 0);
    const label_text_col = WHITE;
@@ -2854,7 +2860,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
    // Emitter 1-2 controls
 
       
-   const ctrl_dp_emitt12 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Emitters 1-2', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+   const ctrl_dp_emitt12 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Emitters 1-2', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
    ctrl_dp_emitt12.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // controls_dp.AddToMenu(ctrl_dp_emitt12);
 
@@ -2981,7 +2987,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
 
       { // Contol Params for shader params
 
-         const glow_controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Shader Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+         const glow_controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Shader Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
          glow_controls_dp.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          ctrl_dp_emitt12.AddToMenu(glow_controls_dp);
 
@@ -3034,7 +3040,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
 
       { // Contol Params for tarnsform and physics
 
-         const glow_controls_dp2 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Transform Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+         const glow_controls_dp2 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Transform Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
          glow_controls_dp2.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          ctrl_dp_emitt12.AddToMenu(glow_controls_dp2);
          
@@ -3180,7 +3186,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
    // Emitter 3 controls
 
       
-   const ctrl_dp_emitt3 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Emitter 3', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+   const ctrl_dp_emitt3 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Emitter 3', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
    ctrl_dp_emitt3.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // controls_dp.AddToMenu(ctrl_dp_emitt3);
 
@@ -3193,7 +3199,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
       const label = Create_widget_label(_, 'Emitter 3', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
       emitter_section.AddItem(label);
    
-      const emitter_switch = Create_widget_switch_simple(_, [0, 0, zpos + 2], switch_size, switch_col, switch_col2, switch_pad, _, [6, 14, 2]);
+      const emitter_switch = Create_widget_switch_simple(_, [0, 0, zpos + 2], switch_size, switch_col, switch_col2, switch_pad, _, [14, 6, 2]);
       emitter_switch.SetName('emitter_switch switch 3');
       emitter_section.AddItem(emitter_switch);
    
@@ -3294,7 +3300,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
 
    { // Contol Params for shader params
 
-      const glow_controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Shader Params', [0, 0, zpos], YELLOW[6], CGREY, WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+      const glow_controls_dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Shader Params', [0, 0, zpos], YELLOW[6], CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
       glow_controls_dp.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       {
          const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Scale');
@@ -3343,7 +3349,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
 
    { // Contol Params for tarnsform and physics
 
-      const glow_controls_dp2 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Transform Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+      const glow_controls_dp2 = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, 'Transform Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
       glow_controls_dp2.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       ctrl_dp_emitt3.AddToMenu(glow_controls_dp2)
 
@@ -3486,7 +3492,7 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
    side_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
 
 
-   const s = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [0, 0, 0], [100, 100], CGREY, 'SidePanel', [0, 10, 1.8]);
+   const s = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [0, 0, 0], [100, 100], CGREY, 'SidePanel', [10, 0, 1.8]);
    s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    s.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
 
@@ -3776,7 +3782,7 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
    /****************************************************************************************************************/
    // Create Sliders for manipulating variables of particles
 
-   const controls_dp = Create_widget_dropdown(_, 'Ball Tail Demo', [0, 0, zpos], TRANSPARENCY(BLACK, .2), GREY[1], WHITE, [10, 4], _, _, header_font_size, [0, 6, 2], [4, 4],);
+   const controls_dp = Create_widget_dropdown(_, 'Ball Tail Demo', [0, 0, zpos], TRANSPARENCY(BLACK, .2), GREY[1], WHITE, [10, 4], _, _, header_font_size, [6, 0, 2], [4, 4],);
    Dropdown_roots_set_root(controls_dp, controls_dp);
    // controls_dp.SetName('controls_dp');
 
@@ -3808,7 +3814,7 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
       const clp_fontsize = regular_font_size;
 
       // Style for the label widgets: [BORDER, ROUND_CORNERS, FEATHER]
-      const label_style = [0, 6, 2];
+      const label_style = [6, 0, 2];
       const label_pad = [6, 6];
       const label_col = TRANSPARENCY(BLUEL[1], 0);
       const label_text_col = WHITE;
@@ -3902,7 +3908,7 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
       const tail_buffer_len = tail_particles_buffer.length;
       {
 
-         const ball_tail_controls = Create_widget_dropdown(_, 'Ball Tail Controls', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [4, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+         const ball_tail_controls = Create_widget_dropdown(_, 'Ball Tail Controls', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [4, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
          // const glow_emitter = tail_particles_buffer[i]
 
          { // Slider 1 contol
@@ -3985,7 +3991,7 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
       for (let i = 0; i < glow_buffer_len; i++) {
 
          const glow_emitter = glow_particles_buffer[i];
-         const glow_particles_controls = Create_widget_dropdown(_, 'Glow Particles Controls', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [4, 4], _, _, regular_font_size, [0, 6, 2], [4, 4],);
+         const glow_particles_controls = Create_widget_dropdown(_, 'Glow Particles Controls', [0, 0, zpos], YELLOWL[6], GREY[1], WHITE, [4, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
 
          /**
           * NICE EFFECT:
@@ -4223,7 +4229,7 @@ export function Demo_all() { // Side Panel
    const inner_section = side_panel.children.buffer[1];
    
 
-   const s = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [0, -Screen_wpos_get_y(), 0], [10, 10], TRANSPARENCY(BLUEL[4], 1), 'Controls', [0, 10, 1.8]);
+   const s = Create_widget_section(_, SECTION.VERTICAL, [4, 4], [0, -Screen_wpos_get_y(), 0], [10, 10], TRANSPARENCY(BLUEL[4], 1), 'Controls', [10, 0, 1.8]);
    s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    s.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
    

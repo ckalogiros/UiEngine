@@ -843,6 +843,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.fx & SID.FX.FS_GLOW_VEC3) ? '#define U_GLOW_PARAMS_VEC3 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       (sid.fx & SID.FX.FS_GLOW_VEC2) ? '#define U_GLOW_PARAMS_VEC2 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '',
+      (sid.attr & SID.ATTR.TEX2) ? '#define A_TEX_COORD 1' : '',
       (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '#define A_GLOW_INTENSITY_FLOAT' : '',
  
 
@@ -889,6 +890,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
                                        (sid.attr & SID.ATTR.FEATHER) ? frag_feather : '',
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
       (sid.attr & SID.ATTR.MSDF) ? frag_msdf : '',
+      // (sid.attr & (SID.ATTR.GLOW_INTENSITY)) ? frag_glow : '',
 
 
 
@@ -899,7 +901,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // Fx shader functions
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
-      (sid.fx & SID.FX.FS_SMOKE) ? frag_smoke : '',
+      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke : '',
 
 
 
@@ -920,7 +922,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       true ? 'void main(void) ' : '',
       '{',
 
-      '#ifdef U_SCALE\n  float scale_down = u_scale2.x;\n  \n#else\n  float scale_down = 1.;\n#endif\n',
+      '#ifdef U_SCALE\n  float scale_down = u_scale2.x;\n#else\n  float scale_down = 1.;\n#endif\n',
+      '#ifdef A_TEX_COORD\n  vec2 v_tex_coord = vec2(v_tex2_u, v_tex2_v);\n#endif\n',
 //       `    
 // #define A_DIM 1
 // #ifndef A_DIM
@@ -952,8 +955,9 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       '  vec4 color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);',
       
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_call : 
-      ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
-      (sid.attr & SID.ATTR.FEATHER) ? frag_feather_call : '',
+                                       ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
+                                       (sid.attr & SID.ATTR.FEATHER) ? frag_feather_call : '',
+      // (sid.attr & (SID.ATTR.GLOW_INTENSITY)) ? frag_glow_call : '',
       
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '  float alpha = color.a;' : '',
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',

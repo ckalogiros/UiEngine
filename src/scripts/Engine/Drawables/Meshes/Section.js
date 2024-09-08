@@ -59,7 +59,7 @@ export class Section extends Mesh {
 
       // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+      // this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
 
 
 

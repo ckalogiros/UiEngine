@@ -60,7 +60,7 @@ export function Demo_snake_animation() {
 
    Init_t();
 
-   const style = [0, size, 1.8];
+   const style = [size, 0, 1.8];
    const board_size = 300;
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20,20], [20, 100, 0], [board_size,board_size], GREY[1], 'section', style);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
@@ -77,7 +77,7 @@ export function Demo_snake_animation() {
    // Collectible
 
    const rand_pos = GetRandomPos([20, 20], [section.geom.dim[0]-20, section.geom.dim[1]-20]);
-   const collectible = Create_widget_section(_, _, [0,0], [rand_pos[0], rand_pos[1], 0], [15,15], GREENL[9], 'section', [0, 15, 2]);
+   const collectible = Create_widget_section(_, _, [0,0], [rand_pos[0], rand_pos[1], 0], [15,15], GREENL[9], 'section', [15, 0, 2]);
    collectible.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    collectible.SetName('collectible');
    section.AddItem(collectible); 
@@ -108,7 +108,7 @@ export function Demo_snake_animation() {
       
       // const color = GetSequencedColor(9);
       
-      const circle = Create_widget_section(_, _, [0,0], [next_posx, 20, 1], [size,size], TRANSPARENCY(PURPLER[9], .6), 'circle', [0, size, 2]);
+      const circle = Create_widget_section(_, _, [0,0], [next_posx, 20, 1], [size,size], TRANSPARENCY(PURPLER[9], .6), 'circle', [size, 0, 2]);
       // const circle = Create_widget_section(_, _, [0,0], [next_posx, 20, 1], [size,size], TRANSPARENCY(color,.6), 'circle', style);
       circle.SetName('circle'+i);
       circle.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);

@@ -649,12 +649,14 @@ export class Mesh {
                 }
                 break;
             }
+            case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
+            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.attr |= SID.PASS.TEX2; break; }
             case MESH_ENABLE.GFX.ATTR_R_CORNERS: { this.sid.attr |= SID.ATTR.R_CORNERS| SID.ATTR.DIM2;  this.sid.pass |= SID.PASS.R_CORNERS| SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.ATTR_FEATHER: { this.sid.attr |= SID.ATTR.FEATHER| SID.ATTR.DIM2;  this.sid.pass |= SID.PASS.FEATHER| SID.PASS.DIM2; break; }
+            case MESH_ENABLE.GFX.ATTR_BORDER: { this.sid.attr |= SID.ATTR.BORDER| SID.ATTR.DIM2;  this.sid.pass |= SID.PASS.BORDER| SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME;  this.sid.pass |= SID.PASS.TIME; break; }
+            case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY;  this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
             case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; this.sid.pass |= SID.PASS.COL4_PER_VERTEX; break; }
-            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.attr |= SID.PASS.TEX2; break; }
-            case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
             // case MESH_ENABLE.GFX.PASS_COL4: { this.sid.pass |= SID.PASS.COL4; break; }
             // case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS2; break; }
             // case MESH_ENABLE.GFX.PASS_DIM2: { this.sid.pass |= SID.PASS.DIM2; break; }

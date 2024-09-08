@@ -87,25 +87,25 @@ vec4 Round_corners(float scale_down)
     vec2 rCorners = vec2(v_rcorners) * scale_down;
     float feather = v_feather;
     vec2 res = u_screen_res;
-    vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down; // v_dim is the abs(a_pos), and is an interpolated value for every fragment in the span of min-a_pos to max-a_pos
+    vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
     
 
-#ifndef UV_READY
-    #define UV_READY 1
-    
-    uv = (gl_FragCoord.xy-(res*.5));
-    uv.x += (res.x*.5); // Center mesh to screen
-    uv.y -= (res.y*.5); // Center mesh to screen
-    
-    // To move with mesh position
-    uv.x -= v_wpos3_x;
-    uv.y += v_wpos3_y;
-    
-    // Subtract constant dimention
-    uv.x -= dim.x*scale_up; 
-    uv.y -= -dim.y*scale_up;
-#endif    
+    #ifndef UV_READY
+        #define UV_READY 1
+        
+        uv = (gl_FragCoord.xy-(res*.5));
+        uv.x += (res.x*.5); // Center mesh to screen
+        uv.y -= (res.y*.5); // Center mesh to screen
+        
+        // To move with mesh position
+        uv.x -= v_wpos3_x;
+        uv.y += v_wpos3_y;
+        
+        // Subtract constant dimention
+        uv.x -= dim.x*scale_up; 
+        uv.y -= -dim.y*scale_up;
+    #endif    
     
     
     vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention
@@ -230,7 +230,7 @@ vec4 Stylize(float scale_down)
     // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 5., abs(d)) );
     // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 5., abs(d)) );
     // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 20., abs(d)*wide) );
-    color = mix( color, pow(color, vec3(3.8)), strength-smoothstep(0.0, dim.x, abs(d)*wide) );
+    // color = mix( color, pow(color, vec3(3.8)), strength-smoothstep(0.0, dim.x, abs(d)*wide) );
     // color = mix( color, pow(color, vec3(strength)), smoothstep(0.0, 200., (d)*wide) );
     
     /*** Border ***/

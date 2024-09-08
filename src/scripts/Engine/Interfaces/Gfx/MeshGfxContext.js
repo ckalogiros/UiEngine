@@ -367,6 +367,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
          /*******************************************************************************************************************/
          // Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms block buffer.
+         console.log('vb_groupidx', vb_groupidx)
          for (let i = 0; i < uniforms.length; i++) {
 
             const shader_program = Progarm_get_webgl_program_object(progidx);
@@ -376,9 +377,11 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
                uniforms[i].ubidx = ubidx;
+               console.log(uniforms[i].name, 'ubidx', ubidx)
 
                // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
                if(uniforms[i].name === 'u_wposxy'){
+
 
                   const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
                   // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position

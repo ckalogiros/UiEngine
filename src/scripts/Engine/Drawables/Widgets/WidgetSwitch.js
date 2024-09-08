@@ -22,7 +22,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    color_active;
    pad; // int, not array for x-y pad
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = [0, 15, 2.], is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = [15, 0, 2.], is_debug_mesh) {
 
       const ratio = .2;
       const pad = (_pad !== 0) ? _pad : size*ratio;
@@ -57,7 +57,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       const switch0 = Create_rect_mesh(_, switch_pos, [size - pad, size - pad], GREY[9], _, _, _, _, is_debug_mesh);
       this.AddChild(switch0);
       switch0.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      switch0.SetStyle([style[0], size * (1-ratio), style[2]]);
+      switch0.SetStyle([size * (1-ratio), style[1], style[2]]);
       // switch0.SetStyle(style);
       switch0.SetName('switch');
       switch0.state.mask &= ~MESH_STATE.ACTIVE;

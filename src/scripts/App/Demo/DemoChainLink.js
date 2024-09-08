@@ -37,13 +37,14 @@ export function Demo_chain_link() {
    Debug_info_ui_static();
 
 
-   const style = [0, size, 1.8];
+   const style = [size, 0, 1.8];
    const color = GetSequencedColor(9);
+   const tr = .9;
    
    let next_posx = 300;
    
    // const head = Create_widget_section(_, _, [0,0], [next_posx, 20, 1], [size,size], ORANGEL[9], 'head', [0, size, 2]);
-   const head = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], TRANSPARENCY(color,.6), 'head', style);
+   const head = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], TRANSPARENCY(color,tr), 'head', style);
    head.SetName('head')
    head.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    head.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -64,7 +65,7 @@ export function Demo_chain_link() {
    // Body mesh (parent for all other body meshes)
    next_posx -= size*2;
    
-   const body = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], TRANSPARENCY(GetSequencedColor(9),.6), 'head', style);
+   const body = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], TRANSPARENCY(GetSequencedColor(9),tr), 'head', style);
    body.SetName('body');
    body.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    
@@ -73,7 +74,7 @@ export function Demo_chain_link() {
       next_posx -= size*2 + next_posx;
       // next_posx = body.geom.pos[0];
       
-      const body_child = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 0, 1], [size,size], TRANSPARENCY(YELLOW[9],.6), 'head', style);
+      const body_child = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 0, 1], [size,size], TRANSPARENCY(YELLOW[9],tr), 'head', style);
       body_child.SetName('body_child 2');
       body_child.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       

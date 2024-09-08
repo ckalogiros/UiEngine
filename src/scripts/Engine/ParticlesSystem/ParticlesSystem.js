@@ -144,13 +144,13 @@ class Emitter {
 
       this.sid = {
          shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
-         attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,
+         attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME,
          unif: 0x0,
-         pass: SID.PASS.COL4 | SID.PASS.DIM2,
+         pass: SID.PASS.COL4 | SID.PASS.DIM2 | SID.PASS.TIME,
          fx: 0x0,
       };
 
-      this.style = [0, Max(dim[0], dim[1]), 1.5];
+      // this.style = [Max(dim[0], dim[1]), 0, 1.5];
 
       const mat = (this.textureId===INT_NULL) ? new Material(col) : new Texture_Material(col, this.textureId);
       this.mat = mat;
@@ -222,42 +222,59 @@ class Emitter {
 
    EnableGfxAttributes(which, params=null) {
 
-
       switch (which) {
 
-         case MESH_ENABLE.GFX.ATTR_STYLE: {
+          case MESH_ENABLE.GFX.ATTR_STYLE: {
 
-            this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
-            this.sid.pass |= SID.PASS.WPOS2 | SID.PASS.DIM2;
-            if (Array.isArray(params)) {
-                this.SetStyle(params);
-            }
-            break;
-            break;
+              // this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
+              // this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.DIM2;
+              this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.STYLE | SID.ATTR.DIM2;
+              this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER | SID.PASS.WPOS2 | SID.PASS.DIM2;
+              // this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER;
+              if (Array.isArray(params)) {
+                  this.SetStyle(params);
+              }
+              break;
+          }
+          case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
+          case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.attr |= SID.PASS.TEX2; break; }
+          case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME;  this.sid.pass |= SID.PASS.TIME; break; }
+          case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY;  this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
+          case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; this.sid.pass |= SID.PASS.COL4_PER_VERTEX; break; }
+          case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
+          
+          case MESH_ENABLE.GFX.ATTR_R_CORNERS: { 
+            this.sid.attr |= SID.ATTR.R_CORNERS| SID.ATTR.DIM2;  
+            this.sid.pass |= SID.PASS.R_CORNERS| SID.PASS.DIM2; 
+            if(params) this.mat.style[0] = params; 
+            else this.mat.style[0] = 0; 
+            break; 
          }
-         case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; break; }
-         case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; break; }
-         case MESH_ENABLE.GFX.ATTR_DIM2: {
+         case MESH_ENABLE.GFX.ATTR_BORDER: { 
+            this.sid.attr |= SID.ATTR.BORDER| SID.ATTR.DIM2;  
+            this.sid.pass |= SID.PASS.BORDER| SID.PASS.DIM2;  
+            if(params) this.mat.style[1] = params; 
+            else this.mat.style[1] = 0; 
+            break; 
+         }
+         case MESH_ENABLE.GFX.ATTR_FEATHER: { 
+            this.sid.attr |= SID.ATTR.FEATHER| SID.ATTR.DIM2;  
+            this.sid.pass |= SID.PASS.FEATHER| SID.PASS.DIM2; 
+            if(params) this.mat.style[2] = params; 
+            else this.mat.style[2] = 0; 
+            break; 
+         }
 
-            this.sid.attr |= SID.ATTR.DIM2;
-            this.sid.pass |= SID.PASS.DIM2; // TODO: Do we set the passing of dim to fargment shader automaticaly????
-            break;
-         }
-         case MESH_ENABLE.GFX.PASS_COL4: { this.sid.pass |= SID.PASS.COL4; break; }
-         case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS2; break; }
-         case MESH_ENABLE.GFX.PASS_DIM2: { this.sid.pass |= SID.PASS.DIM2; break; }
-         case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
-         case MESH_ENABLE.GFX.PASS_TIME1: { this.sid.pass |= SID.PASS.TIME; break; }
          // Effect Shaders
          case MESH_ENABLE.GFX.FX_GLOW: { this.sid.fx |= SID.FX.FS_GLOW_VEC3; break; }
          case MESH_ENABLE.GFX.FX_NOISE: { this.sid.fx |= SID.FX.FS_NOISE; break; }
          case MESH_ENABLE.GFX.FX_SMOKE: { this.sid.fx |= SID.FX.FS_SMOKE; break; }
 
-         default: console.error('Enable material\'s shader param failed. @ Material.js');
+          default: console.error('Enable material\'s shader param failed. @ Material.js');
       }
-   }
+  }
 
-
+  
    EnableGfxUniforms(flags = 0x0, name, type, shader_flags) {
 
       /**

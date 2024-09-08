@@ -6,7 +6,7 @@ import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js
 
 
 
-const MAX_ANIMATIONS_SIZE = 20;
+const MAX_ANIMATIONS_SIZE = 80;
 
 
 
@@ -98,7 +98,7 @@ function Get_next_free() {
          return i;
       }
    }
-
+   console.error(_clbk_animations_buffer)
    alert('Not enough space for new Callback_Animation. At Callback_Animations.js:Callback_Animations.Create()')
    return INT_NULL;
 }

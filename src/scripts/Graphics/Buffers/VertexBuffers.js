@@ -886,14 +886,12 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
 
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
-        // const vertex_count = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? attribs_per_vertex * ((2 * num_faces) +2) : verts_per_rect * num_faces;
-        const attribs_count = vb_info.attribs_info.count * verts_per_rect * num_faces;
-        // vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride, attribs_info);
+        // const attribs_count = vb_info.attribs_info.count * verts_per_rect * num_faces;
+        const attribs_count = vb_info.attribs_info.count;
         Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, attribs_info);
-        vb_info.count += attribs_count;
+        // vb_info.count += attribs_count;
+        vb_info.count += attribs_count * verts_per_rect * num_faces;
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
-        // if (vb_groupidx>=2) console.log(vb_groupidx, vb_info.count)
-        // vb_info.attribs_info.attrib_divisor++;
 
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
@@ -903,8 +901,6 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         // Store the texture index in the vertex
         vb_info.texidx = mat.textureid;
         gfx.vb.counts.buffer[i] = verts_per_rect * vb_info.attribs_info.count;
-
-        // gfx.vb.counts.buffer[i] = vb_info.count;
 
     }
 
@@ -934,6 +930,7 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces
     const vb_groupidx = gfx.vb.groupidx;
     const prog = Progarm_get_program(progidx);
     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
+    const attribs_info = Shader_attributes_get_attribs(prog.attribsidx);
 
     const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
 
@@ -956,10 +953,17 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces
 
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
-        // const stride = vb_info.attribs_info.count * verts_per_rect;
-        const stride = vb_info.attribs_info.count;
-        // Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
-        vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
+        // // const stride = vb_info.attribs_info.count * verts_per_rect;
+        // const stride = vb_info.attribs_info.count;
+        // // Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
+        // vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
+
+        // const attribs_count = vb_info.attribs_info.count * verts_per_rect * num_faces;
+        const attribs_count = vb_info.attribs_info.count;
+        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, attribs_info);
+        vb_info.count += attribs_count * verts_per_rect * num_faces;
+        vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
+
 
 
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb

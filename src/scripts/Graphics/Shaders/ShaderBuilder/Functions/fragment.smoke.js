@@ -154,7 +154,7 @@
 /**SAVE */
 export const frag_smoke_call = `
 
-   vec4 shader_col = Smoke();
+   vec4 shader_col = Smoke(scale_down);
    color = shader_col;
 `;
 
@@ -206,25 +206,29 @@ float fbm(vec2 uv)
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define MinVec3F(a, f)  vec3(MIN(a.x, f), MIN(a.y, f), MIN(a.z, f))
 
-vec4 Smoke()
+vec4 Smoke(float scale_down)
 {
+    float scale_up = 1./scale_down;
     float rand = u_smoke_params.x*2.;
     vec2 res = u_screen_res;
-    vec2 dim = v_dim; // v_dim is the abs(a_pos), and is an interpolated value fro every fragment in the span of min-a_pos to max-a_pos
-    
-#ifndef UV_READY
-    #define UV_READY 1
-    uv = (gl_FragCoord.xy-(res*.5));
-    uv.x += (res.x*.5); // Center mesh to screen
-    uv.y -= (res.y*.5); // Center mesh to screen
-    
-    vec2 wpos = v_wpos;
-    uv.x -= wpos.x; // To move with mesh position
-    uv.y += wpos.y; // To move with mesh position
-    
-    uv.x -= dim.x; // Subtract constant dimention
-    uv.y -= -dim.y; // Subtract constant dimention
-#endif
+    vec2 dim = vec2(v_dim2_x, v_dim2_y);  
+    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);  
+
+    #ifndef UV_READY
+        #define UV_READY 1
+        
+        uv = (gl_FragCoord.xy-(res*.5));
+        uv.x += (res.x*.5); // Center mesh to screen
+        uv.y -= (res.y*.5); // Center mesh to screen
+        
+        // To move with mesh position
+        uv.x -= v_wpos3_x;
+        uv.y += v_wpos3_y;
+        
+        // Subtract constant dimention
+        uv.x -= dim.x*scale_up; 
+        uv.y -= -dim.y*scale_up;
+    #endif 
 
 
     float t  = v_time;
@@ -278,7 +282,7 @@ vec4 Smoke()
     // vec4 c = s4*revT;
     // vec4 c = mix(s3, s2, t)*revT;
 
-    c*=v_col;
+    c*=src_color;
     return c;
 
 }
