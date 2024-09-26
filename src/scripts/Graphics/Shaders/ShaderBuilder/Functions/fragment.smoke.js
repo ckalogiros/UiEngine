@@ -208,8 +208,14 @@ float fbm(vec2 uv)
 
 vec4 Smoke(float scale_down)
 {
+    #ifdef U_SMOKE_PARAMS_VEC3
+        vec3 controls = u_smoke_params;
+    #else
+        vec intensity = vec3(1., 1., 1.);
+    #endif
+
     float scale_up = 1./scale_down;
-    float rand = u_smoke_params.x*2.;
+    float rand = controls.x*2.;
     vec2 res = u_screen_res;
     vec2 dim = vec2(v_dim2_x, v_dim2_y);  
     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);  
@@ -235,8 +241,8 @@ vec4 Smoke(float scale_down)
     float revT  = 1.-t; // Reverse t to be from 1 to 0
 
         
-    float r = u_scale2.x;
-    float wide = u_smoke_params.y;
+    float r = scale_down;
+    float wide = controls.y;
     float start = 1. - wide; // 1.is the max time
     float d2 = 1.- smoothstep(0., dim.y*r*(t*wide+start+.1), length(uv));
     // float shape = d2 ;
@@ -244,7 +250,7 @@ vec4 Smoke(float scale_down)
         
         
 
-    float complexity = 6. * u_smoke_params.z;
+    float complexity = 6. * controls.z;
     float ratio = 0.002; // A value to sustitute the screen space for the shader space(-1,+1), for producing the noise
     // float noise = fbm(complexity * uv * ratio + sin(t+rand));
     float noise = fbm(complexity * uv * ratio + (sin(t)+rand));

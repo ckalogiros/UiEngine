@@ -27,11 +27,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       const ratio = .2;
       const pad = (_pad !== 0) ? _pad : size*ratio;
       const switch_dim = [size * 2, size]
-      // const style = [_style[0], size * (1-ratio), _style[2]]
-      style[1] = size;
+      style[0] = size;
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, switch_dim, col, _, style, _pad, 1, is_debug_mesh)
-      // super(pos, switch_dim, col, _, is_debug_mesh)
 
       this.color_active = [0, 0, 0, 0];
       CopyArr4(this.color_active, col2);
@@ -45,20 +43,14 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.pad = pad;
 
 
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      // this.SetStyle(style[0], size, style[2]);
-      // this.SetStyle(style);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       
-      // const switch_pos = [pos[0] - size, pos[1], pos[2] + 1];
       const switch_pos = [pad, pad, pos[2] + 1];
       const switch0 = Create_rect_mesh(_, switch_pos, [size - pad, size - pad], GREY[9], _, _, _, _, is_debug_mesh);
       this.AddChild(switch0);
-      switch0.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       switch0.SetStyle([size * (1-ratio), style[1], style[2]]);
-      // switch0.SetStyle(style);
       switch0.SetName('switch');
       switch0.state.mask &= ~MESH_STATE.ACTIVE;
       
@@ -66,17 +58,8 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
-
-         // this.AddToWidgetRootBuffer(this.root_bufferidx)
          switch0.root_bufferidx = this.root_bufferidx;
       }
-
-
-      // switch0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      // switch0.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
-
-
-
 
    }
 
@@ -176,6 +159,13 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 
+   EnableGfxAttributes(which, params=null){
+      
+      super.EnableGfxAttributes(which, params);
+      if(which & MESH_ENABLE.GFX.ATTR_R_CORNERS) params = this.children.buffer[0].geom.dim[1];
+      this.children.buffer[0].EnableGfxAttributes(which, params);
+   }
+
 
    
    /*******************************************************************************************************************************************************/
@@ -215,6 +205,41 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
    // Transformation
 
+   AddWposXY(x, y) {
+
+      if (x === 0 && y === 0) return;
+
+      this.geom.pos[0] += x;
+      this.geom.pos[1] += y;
+      this.geom.AddWposXY(this.gfx, x, y, );
+      this.children.buffer[0].geom.pos[0] += x;
+      this.children.buffer[0].geom.pos[1] += y;
+      this.children.buffer[0].geom.AddWposXY(this.gfx, x, y, );
+      
+   }
+   
+   
+   AddWposX(x) {
+      
+      if (x === 0) return;
+      
+      this.geom.pos[0] += x;
+      this.geom.AddWposX(this.gfx, x,);
+      this.children.buffer[0].geom.pos[0] += x;
+      this.children.buffer[0].geom.AddWposX(this.gfx, x,);
+   }
+   
+   
+   AddWposY(y) {
+      
+      if (y === 0) return;
+      
+      this.geom.pos[1] += y;
+      this.geom.AddWposY(this.gfx, y, );
+      this.children.buffer[0].geom.pos[1] += y;
+      this.children.buffer[0].geom.AddWposY(this.gfx, y, );
+
+   }
 
    MoveNoGfxUpdate(x, y) {
 
@@ -238,11 +263,13 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.children.buffer[0].geom.pos[0] += x;
    }
 
+
    SetPosX(x) {
 
       super.SetPosX(x);
       this.children.buffer[0].SetPosX(x);
    }
+
 
    SetPosXNoGfxUpdate(x) {
       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
@@ -292,7 +319,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       // console.log('1', this.children.buffer[0].geom.pos,this.GetName())
    }
 
+   
    SetHoverColor() { this.SetUpdateFrameBuffer(); Set_hover_color_rgba(this.children.buffer[0]); }
+
 
    SetHoverColorDefault() { this.SetUpdateFrameBuffer(); Set_default_color_rgba(this.children.buffer[0]); }
 

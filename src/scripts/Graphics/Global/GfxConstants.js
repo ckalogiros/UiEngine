@@ -128,7 +128,6 @@ const SID = {
         TIME: BIT2 <<= 1,
         SDF: BIT2 <<= 1,
         MSDF: BIT2 <<= 1,
-        GENERIC_ATTR1_VEC4: BIT2 <<= 1,
         STYLE: BIT2 <<= 1,
         BORDER: BIT2 <<= 1,
         R_CORNERS: BIT2 <<= 1,
@@ -147,31 +146,31 @@ const SID = {
         TIME: BIT3 <<= 1,
         SDF: BIT3 <<= 1,
         MSDF: BIT3 <<= 1,
-        GENERIC_ATTR1_VEC4: BIT3 <<= 1,
         STYLE: BIT3 <<= 1,
         POS3: BIT3 <<= 1,
         COL4_PER_VERTEX: BIT3 <<= 1,
         EMPTY: BIT3 <<= 1,
     },
-
+    
     UNIF: {
-
+        
         // Block Uniforms
         PROJECTION_MATRIX: BIT5,
         SCREEN_RESOLUTION: BIT5 <<= 0x1,
-
+        
         // Individual Uniforms
         COL4: BIT5 <<= 0x1,         // u_col4
         DIM2: BIT5 <<= 0x1,         // u_dim2
         SCALE2: BIT5 <<= 0x1,       // u_scale2
         ROOT_WPOS2: BIT5 <<= 0x1,   // u_wposxy
         TIME: BIT5 <<= 0x1,         // u_time
+        FS_RCORNERS_FLOAT: BIT5<<=0x1,
         // UNIF_SPEED: BIT5 <<= 0x1, // u_speed
 
     },
     
 
-    CheckSidUnifByName(sid_unif, unif_name) {
+    CheckSidUnifByName(sid_unif, unif_name) {unif: SID.UNIF.FS_RCORNERS_FLOAT
 
         if(unif_name === 'u_col4') return (sid_unif & this.UNIF.COL4) ? true : false;
         else if(unif_name === 'u_dim2') return (sid_unif & this.UNIF.DIM2) ? true : false;
@@ -198,7 +197,6 @@ const SID = {
         RES2: BIT4 <<= 1,
         STYLE3: BIT4 <<= 1,
         SDF2: BIT4 <<= 1,
-        GENERIC_ATTR1_VEC4: BIT4 <<= 1,
     },
 
     // FX
@@ -207,6 +205,7 @@ const SID = {
         FS_GLOW_VEC2: BIT6<<=0x1,
         FS_NOISE: BIT6<<=0x1,
         FS_SMOKE_VEC3: BIT6<<=0x1,
+        FS_SMOKE_VEC2: BIT6<<=0x1,
     },
 
 
@@ -286,13 +285,6 @@ const SID = {
         if (sid.attr & SID.ATTR.TIME) str[k] += 'time, '
         if (sid.attr & SID.ATTR.SDF) str[k] += 'Sdf, '
         if (sid.attr & SID.ATTR.MSDF) str[k] += 'Msdf, '
-        // if (sid.attr & SID.ATTR.GENERIC_ATTR1_VEC4) {
-        //     str[k] += 'generir_attribs1, ';
-        //     if (sid.attr & (SID.ATTR.STYLE)) str[k] += 'style, ';
-        //     if (sid.attr & (SID.ATTR.BORDER & SID.ATTR.FEATHER & SID.ATTR.R_CORNERS)) str[k] += '[round corners, border width, border feather], ';
-        //     if (sid.attr & (SID.ATTR.EMPTY)) str[k] += 'empty, ';
-        // }
-        // if (sid.attr) str[k] += '\n'
     
         k++;
         if (sid.inst) str[k] += 'InstancedGeometry:'
@@ -303,7 +295,7 @@ const SID = {
         if (sid.inst & SID.INST.TIME) str[k] += 'time, '
         if (sid.inst & SID.INST.SDF) str[k] += 'sdf, '
         if (sid.inst & SID.INST.MSDF) str[k] += 'msdf, '
-        if (sid.inst & SID.INST.GENERIC_ATTR1_VEC4) {
+        if (sid.inst & SID.INST.STYLE) {
             str[k] += 'generir_attribs1, ';
             if (sid.attr & (SID.ATTR.STYLE)) str[k] += 'style, ';
             if (sid.attr & (SID.ATTR.BORDER & SID.ATTR.FEATHER & SID.ATTR.R_CORNERS)) str[k] += '[round corners, border width, border feather], ';
@@ -331,9 +323,8 @@ const SID = {
         if (sid.pass & SID.PASS.WPOS2) str[k] += 'wpos2, '
         if (sid.pass & SID.PASS.TEX2) str[k] += 'tex2, '
         if (sid.pass & SID.PASS.TIME) str[k] += 'time1, '
-        if (sid.pass & SID.PASS.style3) str[k] += 'style3, '
         if (sid.pass & SID.PASS.SDF2) str[k] += 'sdf2'
-        if (sid.pass & SID.PASS.GENERIC_ATTR1_VEC4) str[k] += 'generir_attribs1'
+        if (sid.pass & SID.PASS.STYLE3) str[k] += 'generir_attribs1'
         // if (sid.pass) str[k] += '\n'
     
         return str;
@@ -356,29 +347,6 @@ if(SID.PASS > MAX_BIT_MASK) alert('SID PASS exceeding javascript\'s max number v
 // Create a copy of the SID.ATTR, so we can compare with 'sid'
 const SHADER_ATTRIBUTES = SID.ATTR;
 
-
-
-
-
-// const GRAPHICS_LAYOUT = {
-//     ONE_ATTR_SIZE: 1,
-//     ATTR_SIZES: {
-//         COL4: 4,
-//         WPOS4: 4,
-//         GENERIC_ATTR1_VEC4: 4,
-//         POS2: 2,
-//         TEX2: 2,
-//         XY: 2,
-//         XYZ: 3,
-//     },
-//     ATTR_SELF_OFFSETS: {
-//         ALPHA: 3, // the third float in a col4
-//         WPOS_Y: 1, // The second attribute in a WPOS-X
-//         DIM_Y: 1, // The second attribute in a DIM2
-//         WPOS_Z: 2, // The second attribute in a WPOS-X
-//         WPOS4_TIME: 3, // The second attribute in a WPOS-X
-//     },
-// };
 
 
 

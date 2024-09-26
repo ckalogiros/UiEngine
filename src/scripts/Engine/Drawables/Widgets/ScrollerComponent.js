@@ -36,7 +36,7 @@ export function Components_create_scroller_component(width = 12, height=100, mes
 
    const bar = Create_rect_mesh(_, pos, [width, height], col_bar, )
    bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, mesh.style);
+   bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [bar.geom.dim[0]/2, 4, 2]);
    bar.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
    bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
    bar.SetName('ScrollBar');
@@ -58,7 +58,7 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    const handle_pos = [handle_pad[0], handle_pad[1], pos[2]+1]
    const handle = Create_rect_mesh(_, handle_pos, [handle_width, handle_height], col_handle, )
    handle.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, mesh.style);
+   handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [bar.geom.dim[0]/2, 4, 2]);
    handle.SetName('Handle');
    handle.StylesSetPad(handle_pad);
 
@@ -418,7 +418,7 @@ function Scroller_clip_scrolled_section(scrolled_section, clip_top, height) {
       Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
    }
    else {
-      console.error('SCROLLER ERROR \nThe current scrolled section does not have a \'group\'. create a grouup for the scrolled mesh so that the scroller can clip.');
+      console.error('SCROLLER ERROR \nThe current scrolled section does not have a \'group\'. create a group for the scrolled mesh so that the scroller can clip.');
       console.log(scrolled_section.scroller_comp.GetName(), scrolled_section.scroller_comp.mesh_bufferidx)
    }
 }

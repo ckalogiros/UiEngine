@@ -36,19 +36,19 @@ export class Widget_Text extends Text_Mesh {
 
 	GfxUniformsEnable(flags, name, type, shader_flags) {
 
-      super.EnableGfxUniforms(flags, name, type, shader_flags);
+		super.EnableGfxUniforms(flags, name, type, shader_flags);
 
-   }
+	}
 
 
-	
-   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
-      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+	GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
-   }
-	
+		// NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+		this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+
+	}
+
 
 	Activate() {
 
@@ -138,7 +138,7 @@ export class Widget_Text extends Text_Mesh {
 
 
 	ClampX(x, margin = 0) {
-alert('00998877655')
+		alert('00998877655')
 		// const clamp = x - margin;
 		// // const clamp = x - margin*2;
 
@@ -185,7 +185,7 @@ alert('00998877655')
 
 	}
 
-	
+
 	ListenEventConstruct() { return false; }
 
 }
@@ -379,26 +379,26 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-   GfxUniformsEnable(flags, name, type, shader_flags) {
+	GfxUniformsEnable(flags, name, type, shader_flags) {
 
-      super.EnableGfxUniforms(flags, name, type, shader_flags);
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) child.EnableGfxUniforms(flags, name, type, shader_flags);
-      }
+		super.EnableGfxUniforms(flags, name, type, shader_flags);
+		for (let i = 0; i <= this.children.boundary; i++) {
+			const child = this.children.buffer[i];
+			if (child) child.EnableGfxUniforms(flags, name, type, shader_flags);
+		}
 
-   }
+	}
 
-		
-   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
-      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-      }
-   }
+	GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+
+		// NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+		this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+		for (let i = 0; i <= this.children.boundary; i++) {
+			const child = this.children.buffer[i];
+			if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+		}
+	}
 
 
 	/*******************************************************************************************************************************************************/
@@ -532,7 +532,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	// TODO: Implement align self correctly
 	// TODO: Is there a way to align differently for each text mesh????
 
-	CreateNewText(dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align=ALIGN.HORIZONTAL) {
+	CreateNewText(dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL) {
 
 		/** DEBUG ERROR*/ if (!Array.isArray(pad)) console.error('Pad is not of type array');
 
@@ -562,25 +562,25 @@ export class Widget_Multi_Text extends Widget_Text {
 
 
 		// Align text properly
-		if(prev_text_mesh.text_width === 0){
+		if (prev_text_mesh.text_width === 0) {
 			prev_text_mesh.CalculateTextWidth().w;
 		}
 
 		// Position horizontaly
 		// Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.StylesGetPad(), prev_text_mesh.advancex)
-		
+
 		const first_pad = prev_text_mesh.StylesGetPad();
 		const second_pad = new_text.StylesGetPad();
 
 
-		if(this.alignment & ALIGN.VERTICAL){
+		if (this.alignment & ALIGN.VERTICAL) {
 			new_text.geom.pos[0] = prev_text_mesh.geom.dim[0];
 			new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
 			new_text.geom.pos[1] += (prev_text_mesh.geom.dim[1] + first_pad[1]) + new_text.geom.dim[1];
 		}
-		else if(this.alignment & ALIGN.HORIZONTAL){
+		else if (this.alignment & ALIGN.HORIZONTAL) {
 			new_text.geom.pos[0] = prev_text_mesh.geom.pos[0] + first_pad[0];
-			new_text.geom.pos[0] += prev_text_mesh.text_width*2 + second_pad[0];
+			new_text.geom.pos[0] += prev_text_mesh.text_width * 2 + second_pad[0];
 			new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
 		}
 
@@ -719,12 +719,12 @@ export class Widget_Multi_Text extends Widget_Text {
 		if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
 
 		// Move 'this' text
-		mesh.geom.AddWposXY(mesh.gfx, mouse_pos.x, -mouse_pos.y, );
+		mesh.geom.AddWposXY(mesh.gfx, mouse_pos.x, -mouse_pos.y,);
 
 		// Move children text
 		for (let i = 0; i <= mesh.children.boundary; i++) {
 			const child = mesh.children.buffer[i];
-			if (child) child.AddWposXY(child.gfx, mouse_pos.x, -mouse_pos.y, );
+			if (child) child.AddWposXY(child.gfx, mouse_pos.x, -mouse_pos.y,);
 		}
 	}
 
@@ -826,6 +826,20 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
+	SetPosXY(x, y) {
+		super.SetPosXY(x, y);
+	}
+
+
+	SetPosX(x) {
+		super.SetPosX(x);
+	}
+
+
+	SetPosY(y) {
+		super.SetPosX(y);
+	}
+
 
 	TEMP_recalc(x, y) {
 		alert('IMPLEMENT ME\nTEMP_recalc\nWidget_Multi_Text')
@@ -879,8 +893,8 @@ export class Widget_Multi_Text extends Widget_Text {
 
 
 	ListenEventConstruct() {
-      return false;
-   }
+		return false;
+	}
 
 
 }

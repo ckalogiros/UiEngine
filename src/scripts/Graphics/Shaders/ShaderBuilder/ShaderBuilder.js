@@ -734,20 +734,20 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
 
       /********************************************************************************************************/
       // Assignments
-      '  // Assignments',
+      '   // Assignments',
       attributes_assign_code,
 
 
 
       /********************************************************************************************************/
       // Scale in Vertex Shader
-      (sid.shad & SID.SHAD.VS_TEST1) ? '// HI FROM VS_TEST1' : '',
+      (sid.shad & SID.SHAD.VS_TEST1) ? '   // HI FROM VS_TEST1' : '',
 
 
 
       /********************************************************************************************************/
       // Calculate vertex position-rotation-scale
-      '  // Vertex Shader Logic',
+      '   // Vertex Shader Logic',
 
       /**
        * Current vertex: gl_VertexID.
@@ -761,17 +761,20 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
        */
 
 
-      // 'v_wpos3_x = 0.;',
-      // 'v_wpos3_y = 0.;',
-      // 'v_pos2_x *= 0.;',
-      // 'v_pos2_y *= 0.;',
-      // true ? '  vec2 wpos = vec2(v_wpos3_x + u_wposxy.x*0., v_wpos3_y + u_wposxy.y*0.);' : '  vec2 wpos = vec2(0.0, 0.0);',
-      // true ? '  vec2 wpos = vec2(v_wpos3_x + u_wposxy.x + v_empty_1, v_wpos3_y + u_wposxy.y + v_empty_2+v_empty_3);' : '  vec2 wpos = vec2(0.0, 0.0);',
-      // true ? '  vec2 wpos = vec2(v_wpos3_x + u_wposxy.x, v_wpos3_y + u_wposxy.y);' : '  vec2 wpos = vec2(0.0, 0.0);',
+
+      // 'float v1pos = 0.;',
+      // 'if(gl_VertexID==0) v1pos = v_pos2_x;',
+      
+      // 'float vposx = v_pos2_x + float(gl_VertexID)*float(gl_VertexID);',
+      // 'float vposy = v_pos2_y + float(gl_VertexID)*float(gl_VertexID);',
+      // (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
+      //    ? '  gl_Position = u_projection * vec4(vposx + v_wpos3_x, vposy + v_wpos3_y, v_wpos3_z, 1.0);'
+      //    : '  gl_Position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+
+
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-         // ? '  gl_Position = u_projection * vec4(v_pos2_x + wpos.x, v_pos2_y + wpos.y, v_wpos3_z, 1.0);' 
-         ? '  gl_Position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
-         : '  gl_Position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+         ? '   gl_Position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
+         : '   gl_Position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
 
 
       '}',
@@ -840,10 +843,14 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       '#include <precision_medium>',
       '#include <out_frag_color>',
       (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
-      (sid.fx & SID.FX.FS_GLOW_VEC3) ? '#define U_GLOW_PARAMS_VEC3 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
-      (sid.fx & SID.FX.FS_GLOW_VEC2) ? '#define U_GLOW_PARAMS_VEC2 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
+      (sid.unif & SID.UNIF.FS_RCORNERS_FLOAT) ? '#define U_RCORNERS_FLOAT 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
+      (sid.fx & SID.FX.FS_GLOW_VEC3) ? '#define U_GLOW_PARAMS_VEC3 1' : '', 
+      (sid.fx & SID.FX.FS_GLOW_VEC2) ? '#define U_GLOW_PARAMS_VEC2 1' : '', 
+      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '', 
+      (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '', 
       (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '',
       (sid.attr & SID.ATTR.TEX2) ? '#define A_TEX_COORD 1' : '',
+      (sid.attr & SID.ATTR.TIME) ? '#define A_TIME 1' : '',
       (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '#define A_GLOW_INTENSITY_FLOAT' : '',
  
 
@@ -922,47 +929,22 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       true ? 'void main(void) ' : '',
       '{',
 
-      '#ifdef U_SCALE\n  float scale_down = u_scale2.x;\n#else\n  float scale_down = 1.;\n#endif\n',
-      '#ifdef A_TEX_COORD\n  vec2 v_tex_coord = vec2(v_tex2_u, v_tex2_v);\n#endif\n',
-//       `    
-// #define A_DIM 1
-// #ifndef A_DIM
-//    #ifndef UV_READY
-//       vec2 uv = vec2(0,0);
-//    #endif
-
-//    float scale_up = 1./scale_down;
-
-//    #ifndef UV_READY
-//       #define UV_READY 1
-
-//       uv = (gl_FragCoord.xy-(u_screen_res*.5));
-//       uv.x += (u_screen_res.x*.5); // Center mesh to screen
-//       uv.y -= (u_screen_res.y*.5); // Center mesh to screen
-
-//       // To move with mesh position
-//       uv.x -= v_wpos3_x;
-//       uv.y += v_wpos3_y;
-
-//       // Subtract constant dimention
-//       uv.x -= v_dim2_x*scale_up; 
-//       uv.y -= -v_dim2_y*scale_up;
-//    #endif 
-// #endif 
-//       `,
+      '   #ifdef U_SCALE\n     float scale_down = u_scale2.x;\n   #else\n      float scale_down = 1.;\n   #endif\n',
+      '   #ifdef A_TEX_COORD\n      vec2 v_tex_coord = vec2(v_tex2_u, v_tex2_v);\n   #endif\n',
 
 
-      '  vec4 color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);',
+
+      '   vec4 color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);',
       
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_call : 
                                        ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
                                        (sid.attr & SID.ATTR.FEATHER) ? frag_feather_call : '',
       // (sid.attr & (SID.ATTR.GLOW_INTENSITY)) ? frag_glow_call : '',
       
-      (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '  float alpha = color.a;' : '',
+      (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '   float alpha = color.a;' : '',
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
-      (sid.fx & SID.FX.FS_SMOKE) ? frag_smoke_call : '',
+      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '',
 
 
@@ -972,8 +954,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
       /********************************************************************************************************/
       // Color fragment
-      '  frag_color = color;',
-      (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '  frag_color.rgb *= v_col.a; ' : '',
+      '   frag_color = color;',
+      (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   frag_color.rgb *= v_col.a; ' : '',
       // true ? '  frag_color.rgb *= color.a;' : '',
 
 
@@ -984,7 +966,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       /********************************************************************************************************/
       // TESTS
       // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', // HACK: prevent optimizer from removing the uniform u_scale2
-      (sid.unif & SID.UNIF.TIME) ? '  if(u_time == 0.) ;' : '',
+      (sid.unif & SID.UNIF.TIME) ? '   if(u_time == 0.) ;' : '',
       // (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
       // (sid.unif & SID.UNIF.SCALE2) ? '  frag_color.xyz *= u_scale2.x;' : '',
       // true ? 'frag_color = vec4(1.);' : '',

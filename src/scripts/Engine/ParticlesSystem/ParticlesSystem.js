@@ -33,13 +33,13 @@ class Particle {
       this.col = [0, 0, 0, 0];
       this.pos = [0, 0, 0];
       this.dim = [0, 0];
-      
+
       this.random_val = Hash(Timer_get_global_timer()); // This parameter is only for the Fragment Shader 
       this.is_alive = false;
-      
+
       const rnd = Abs(this.random_val);
       this.scale = initial_scale;
-      this.accel = emitter.accel*(rnd*.5+1)*1.4;
+      this.accel = emitter.accel * (rnd * .5 + 1) * 1.4;
       this.deccel = emitter.deccel;
       this.grav = emitter.gravity;
 
@@ -69,7 +69,7 @@ class Particle {
 
       this.rot = [1, 1, 1, 1];
       // Create random rotation
-      this.angle = (rnd *.5+2)*Math.PI*2;
+      this.angle = (rnd * .5 + 2) * Math.PI * 2;
       this.rot = Rotation_z_get_2D_matrix(this.angle);
       // this.rotation_speed = initial_rotation_speed
 
@@ -100,7 +100,7 @@ class Particle {
 
 class Emitter {
 
-   constructor(name, col, pos, dim, t_step = .1, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, textureId=INT_NULL) {
+   constructor(name, col, pos, dim, t_step = .1, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, textureId = INT_NULL) {
 
       this.sid = 0x0;
       this.sceneidx = STATE.scene.active_idx;
@@ -144,15 +144,17 @@ class Emitter {
 
       this.sid = {
          shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
-         attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME,
+         // attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME,
+         attr: SID.ATTR.COL4 | SID.ATTR.POS2 | SID.ATTR.WPOS3,
          unif: 0x0,
-         pass: SID.PASS.COL4 | SID.PASS.DIM2 | SID.PASS.TIME,
+         pass: SID.PASS.COL4,
+         // pass: SID.PASS.COL4 | SID.PASS.DIM2 | SID.PASS.TIME,
          fx: 0x0,
       };
 
       // this.style = [Max(dim[0], dim[1]), 0, 1.5];
 
-      const mat = (this.textureId===INT_NULL) ? new Material(col) : new Texture_Material(col, this.textureId);
+      const mat = (this.textureId === INT_NULL) ? new Material(col) : new Texture_Material(col, this.textureId);
       this.mat = mat;
       this.sid.attr |= mat.sid.attr;
       this.sid.unif |= mat.sid.unif;
@@ -173,7 +175,7 @@ class Emitter {
    }
 
 
-   Reset(){
+   Reset() {
 
       this.particles_buffer.ResetFull();
       this.free_particles_idxs_buffer.Reset();
@@ -189,7 +191,7 @@ class Emitter {
          dim: this.particles_buffer.buffer[particle_idx].dim,
          time: this.particles_buffer.buffer[particle_idx].time,
       }
-      
+
       const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, this.mat, _);
       this.particles_buffer.buffer[particle_idx].SetGfxStart(start);
 
@@ -220,49 +222,44 @@ class Emitter {
       this.sid.shad |= SID_FLAGS;
    }
 
-   EnableGfxAttributes(which, params=null) {
+   EnableGfxAttributes(which, params = null) {
 
       switch (which) {
 
-          case MESH_ENABLE.GFX.ATTR_STYLE: {
+         case MESH_ENABLE.GFX.ATTR_STYLE: {
 
-              // this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
-              // this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.DIM2;
-              this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.STYLE | SID.ATTR.DIM2;
-              this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER | SID.PASS.WPOS2 | SID.PASS.DIM2;
-              // this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER;
-              if (Array.isArray(params)) {
-                  this.SetStyle(params);
-              }
-              break;
-          }
-          case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
-          case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.attr |= SID.PASS.TEX2; break; }
-          case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME;  this.sid.pass |= SID.PASS.TIME; break; }
-          case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY;  this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
-          case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; this.sid.pass |= SID.PASS.COL4_PER_VERTEX; break; }
-          case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
-          
-          case MESH_ENABLE.GFX.ATTR_R_CORNERS: { 
-            this.sid.attr |= SID.ATTR.R_CORNERS| SID.ATTR.DIM2;  
-            this.sid.pass |= SID.PASS.R_CORNERS| SID.PASS.DIM2; 
-            if(params) this.mat.style[0] = params; 
-            else this.mat.style[0] = 0; 
-            break; 
+            this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.STYLE | SID.ATTR.DIM2;
+            this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER | SID.PASS.WPOS2 | SID.PASS.DIM2;
+            if (Array.isArray(params)) this.SetStyle(params);
+            break;
          }
-         case MESH_ENABLE.GFX.ATTR_BORDER: { 
-            this.sid.attr |= SID.ATTR.BORDER| SID.ATTR.DIM2;  
-            this.sid.pass |= SID.PASS.BORDER| SID.PASS.DIM2;  
-            if(params) this.mat.style[1] = params; 
-            else this.mat.style[1] = 0; 
-            break; 
+         case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
+         case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
+         case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; this.sid.pass |= SID.PASS.TIME; break; }
+         case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
+         case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; this.sid.pass |= SID.PASS.COL4_PER_VERTEX; break; }
+         case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
+
+         case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
+            this.sid.attr |= SID.ATTR.R_CORNERS | SID.ATTR.DIM2;
+            this.sid.pass |= SID.PASS.R_CORNERS | SID.PASS.DIM2;
+            if (params) this.mat.style[0] = params;
+            else this.mat.style[0] = 0;
+            break;
          }
-         case MESH_ENABLE.GFX.ATTR_FEATHER: { 
-            this.sid.attr |= SID.ATTR.FEATHER| SID.ATTR.DIM2;  
-            this.sid.pass |= SID.PASS.FEATHER| SID.PASS.DIM2; 
-            if(params) this.mat.style[2] = params; 
-            else this.mat.style[2] = 0; 
-            break; 
+         case MESH_ENABLE.GFX.ATTR_BORDER: {
+            this.sid.attr |= SID.ATTR.BORDER | SID.ATTR.DIM2;
+            this.sid.pass |= SID.PASS.BORDER | SID.PASS.DIM2;
+            if (params) this.mat.style[1] = params;
+            else this.mat.style[1] = 0;
+            break;
+         }
+         case MESH_ENABLE.GFX.ATTR_FEATHER: {
+            this.sid.attr |= SID.ATTR.FEATHER | SID.ATTR.DIM2;
+            this.sid.pass |= SID.PASS.FEATHER | SID.PASS.DIM2;
+            if (params) this.mat.style[2] = params;
+            else this.mat.style[2] = 0;
+            break;
          }
 
          // Effect Shaders
@@ -270,11 +267,11 @@ class Emitter {
          case MESH_ENABLE.GFX.FX_NOISE: { this.sid.fx |= SID.FX.FS_NOISE; break; }
          case MESH_ENABLE.GFX.FX_SMOKE: { this.sid.fx |= SID.FX.FS_SMOKE; break; }
 
-          default: console.error('Enable material\'s shader param failed. @ Material.js');
+         default: console.error('Enable material\'s shader param failed. @ Material.js');
       }
-  }
+   }
 
-  
+
    EnableGfxUniforms(flags = 0x0, name, type, shader_flags) {
 
       /**
@@ -341,6 +338,7 @@ class Emitter {
       alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js')
 
    }
+
 
 
    // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)
@@ -410,10 +408,10 @@ export function TEMP_PARTICLES_GEN_GFX(emitter, parent = null, specific_vb_group
 
 
    // TODO: Temporary implementation of assigning the correct gfx update function pointer
-   if (emitter.sid.fx & SID.FX.FS_GLOW_VEC3){
+   if (emitter.sid.fx & SID.FX.FS_GLOW_VEC3) {
       emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2_style3;
    }
-   else if(emitter.sid.fx & SID.FX.FS_NOISE){
+   else if (emitter.sid.fx & SID.FX.FS_NOISE) {
       emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2;
    }
    else emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4;
@@ -455,7 +453,7 @@ export function Particle_system_emitt(params) {
       let last_elem = emitter.free_particles_idxs_buffer.boundary;
 
 
-      for(let i=0; i<1; i++){
+      for (let i = 0; i < 1; i++) {
          if (last_elem === INT_NULL) {
 
             {
@@ -472,9 +470,9 @@ export function Particle_system_emitt(params) {
             const particle = emitter.particles_buffer.buffer[particle_idx];
 
             if (particle !== undefined) {
-   
+
                particle.is_alive = true;
-               particle.accel = emitter.accel*(Abs(particle.random_val*.5+1))*1.4;
+               particle.accel = emitter.accel * (Abs(particle.random_val * .5 + 1)) * 1.4;
                particle.deccel = emitter.deccel;
                particle.gravity = emitter.gravity;
 
@@ -482,13 +480,13 @@ export function Particle_system_emitt(params) {
 
                particle.pos[0] = emitter.pos[0];
                particle.pos[1] = emitter.pos[1];
-   
+
                particle.col[0] = emitter.mat.col[0];
                particle.col[1] = emitter.mat.col[1];
                particle.col[2] = emitter.mat.col[2];
                particle.col[3] = emitter.mat.col[3];
-   
-   
+
+
                if (emitter.dir[0] !== 0 && GetSign(particle.dirx) !== emitter.dir[0]) {
                   particle.dirx *= -1;
                   emitter.dirx_change = false;
@@ -497,21 +495,21 @@ export function Particle_system_emitt(params) {
                   particle.diry *= -1;
                   emitter.diry_change = false;
                }
-   
+
                if (emitter.flags & PARTICLES.HAS_START_POS_VARIATION) {
-   
+
                   const minx = emitter.variation_emission.xdir_neg * max
                   const maxx = emitter.variation_emission.xdir_pos * max
                   const dx = GetRandomInt(minx, maxx);
                   particle.dirx = interpolate * dx;
-   
+
                   const miny = emitter.variation_emission.ydir_neg * max
                   const maxy = emitter.variation_emission.ydir_pos * max
                   const dy = GetRandomInt(miny, maxy);
                   particle.diry = interpolate * dy;
-   
+
                }
-   
+
                emitter.free_particles_idxs_buffer.RemoveByIdx(last_elem);
                last_elem = emitter.free_particles_idxs_buffer.boundary
             }
@@ -611,59 +609,32 @@ export function Particle_system_update() {
                particle.accel *= emitter.deccel;
             }
 
-            if (true) { // Fade away
-               { // SAVE
-                  // const h = 1.8, k = 0, r = 1.8 * 1.8;
-                  // const x = particle.time;
-                  // let y = Math.sqrt((-(x - h) * (x - h)) + r) + k;
-                  // y = 2 * (Math.sin((x * x * x) + Math.PI / 2)) - 1;
-               }
-               
-               if(particle.time > .3) {
-                  // // const h = 0, k = -(1-emitter.mat.defCol[3]), r = 1. * 1.;
-                  // const h = 0, k = 0, r = 1. * 1.;
-                  // // const x = particle.time+(1-.8);
-                  // const x = .9;
-                  // let y = Math.sqrt((-(x - h) * (x - h)) + r) + k;
-                  // y = 2 * (Math.sin((x * x * x) + Math.PI / 2)) - 1;
-                  particle.col[3] *= .975;
-               }
+
+            if (particle.time > .5) {
+               // particle.col[3] *= .975;
+               particle.col[3] *= .915;
+            }
+            else if (particle.col[3] < .1) { // 
+               particle.col[3] *= 2.5;
             }
 
+            if (particle.time >= .99) particle.col[3] = 0.0;
 
-            // const random = GetRandomInt(1, 5) * 1.01;
             // if(particle.dim[0] < 1280)
-               {
-               // particle.dim[0] *= 1.01;
-               // particle.dim[1] *= 1.01;
-               // const scale = (emitter.life_time - (particle.time+.8));
-
-               // console.log(y)
+            {
                // particle.scale = 2
-               particle.dim[0] *= particle.scale * .0055 +1;
-               particle.dim[1] *= particle.scale * .0055 +1;
-               if(particle.scale > 1.00) {
-                  /* Solve for y~={1.0, .91} => {h:0, k:-4.7, r:5.7} */
-                  // const h = .0, k = -4.7, r = 5.7 * 5.7;
-                  // const x = particle.time;
-                  // let y = 0;
-                  // y = Math.sqrt(-((x - h) * (x - h)) + r) + k;
-                  particle.scale *= .97;
+               particle.dim[0] *= particle.scale * .0055 + 1;
+               particle.dim[1] *= particle.scale * .0055 + 1;
+               if (particle.scale > 1.00) {
+                  particle.scale *= .98;
                }
-               // console.log(particle.scale)
-               // particle.dim[0] *= (particle.time *.01 +1) * 1.02;
-               // particle.dim[1] *= (particle.time *.01 +1) * 1.02;
-               // console.log(particle.dim[0], (particle.time +1) * 1.000001)
-               // particle.dim[0] *= 1.01*random;
-               // particle.dim[1] *= 1.01*random;
             }
-            // console.log(particle.dim[0], particle.scale)
-            // console.log(random, 1.01*random, particle.dim[0], particle.dim[0]*1.01*random)
 
-            let rotspeed = (emitter.life_time - (particle.time+.8)*.9) * .1;
-            if(rotspeed > 0) particle.angle -= rotspeed;
+            let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
+               ? (emitter.life_time - (particle.time + .8) * .9) * .1
+               : (((particle.time + .8) * .9) * .1) - emitter.life_time;
+            if (rotspeed > 0) particle.angle -= rotspeed;
             particle.rot = Rotation_z_get_2D_matrix(particle.angle);
-            // console.log(particle.rot)
 
 
             emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time, particle.dim, particle.rot, particle.uv);
@@ -743,7 +714,7 @@ export function Particle_system_print_info() {
          'sid:', emitter.sid,
          '\nroot_pos:', emitter.root_posidx,
          'temp_unif_wpos:', emitter.temp_unif_wpos,
-         'prog:', emitter.gfx.prog.idx, 'vb:', emitter.gfx.vb.groupidx, 'ib:', emitter.gfx.ib.idx, 'attribsPerVertex:', emitter.gfx.attribsPerVertex,
+         '\nprog:', emitter.gfx.prog.idx, 'vb:', emitter.gfx.vb.groupidx, 'ib:', emitter.gfx.ib.idx, 'attribsPerVertex:', emitter.gfx.attribsPerVertex,
          '\nparent:', parent,
          '\ncolor:', emitter.mat.col,
          '\npos:', emitter.pos,

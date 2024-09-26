@@ -28,7 +28,7 @@ import { Callback_animations_create } from '../Engine/Animations/CallbackAnimati
 import { Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
 import { Ui_create_label_switch } from '../Engine/Drawables/DebugInfo/DebugInfoUiFactory.js';
-import { CreateBallTailParticles, CreateGlowParticles, CreateSmokeParticles, Demo_all, Demo_ball_tail, Demo_ball_tail_2, Demo_glow_particles_2, Demo_smoke_2, TestNoiseShader } from './Demo/DemoParticles.js';
+import { Create_ball_tail_particles, Create_glow_particles, Create_smoke_particles, Demo_all, Demo_ball_tail, Demo_ball_tail_2, Demo_glow_particles_2, Demo_smoke_2, Test_noise_shader } from './Demo/DemoParticles.js';
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
 import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
@@ -340,9 +340,8 @@ export function TestWidgetsGeneric(createId=1) {
 
 
 
-
-
-    
+    // Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
+    // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
     // Demo_page();
 
     // Clbk_animations_circle_scale();
@@ -441,7 +440,7 @@ export function TestWidgetsGeneric(createId=1) {
     { // Widget: Debug Info 
 
 
-        const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);
+        // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);
         // const dbg_dp = Debug_info_ui();
 
 
@@ -524,16 +523,20 @@ export function TestWidgetsGeneric(createId=1) {
         // TODO: Enable multi vertex color in 'Widget_Slider_Simple' constructor
         // const colorpicker = Demo_widgets_colorpicker(_, _, _, ROOT_WIDGETS.CREATE_ROOT);
         
-        /* Test change color of a mesh using the colorpicker */
-        // const line = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 600, 0], [200, 80], TRANSPARENCY(GREEN[2], 1.), 'sdf linem2');
-        // line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-        // line.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        // line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        // line.Render();
-        // Root_group_activate_all_vbs_in_renderqueue(line.root_bufferidx);
-        // line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx);
-        // line.ConstructListeners();
-        // const picker = CreateColorPicker();
+        // /* Test change color of a mesh using the colorpicker */
+        // const cp = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 600, 0], [200, 80], TRANSPARENCY(GREEN[2], 1.), 'ColorPicker');
+        // cp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+        // cp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // cp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        // cp.Render();
+
+
+        // Root_group_activate_all_vbs_in_renderqueue(cp.root_bufferidx);
+        // cp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, cp.gfx.vb.groupidx);
+        // Construct_listen_events_from_mesh_tree(cp);
+        // Construct_listen_events_relations_from_mesh_tree(cp);
+
+        const color_picker = Demo_widgets_colorpicker(0, 0, 0x0, ROOT_WIDGETS.CREATE_ROOT)
         // picker.AssignTargetMesh(line);
         
 
@@ -556,7 +559,7 @@ export function TestWidgetsGeneric(createId=1) {
 
     { // Widget: Label-buttons
 
-        const label = CreateLabel('12.345$%^&*}');
+        // const label = CreateLabel('12.345$%^&*}');
         // const label = CreateLabel('!@#$%^&*\'\n(12345678)\n[abdf],\n{LPARREA}');
 
         // const label = CreateLabel('1');
@@ -603,13 +606,13 @@ export function TestWidgetsGeneric(createId=1) {
     { // PARTICLES: NONE WORKING, CODE NEEDS UPDATE
         /**************************/
 
-        // CreateGlowParticles(0, 100);
+        // Create_glow_particles(0, 100);
 
-        // CreateBallTailParticles(0, 0, 250, 250, 1);
+        // Create_ball_tail_particles(0, 0, 250, 250, 1);
 
-        // CreateSmokeParticles(0, 0);
+        // Create_smoke_particles(0, 0);
 
-        // TestNoiseShader();
+        // Test_noise_shader();
 
 
     }
@@ -620,11 +623,8 @@ export function TestWidgetsGeneric(createId=1) {
         // Demo_glow_particles_2();
         // Demo_smoke_2()
 
-        // CreateGlowParticles(0, 0, ROOT_WIDGETS.CREATE_ROOT)
+        // Create_glow_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT)
 
-        // const balltail_section_xpos = 4;
-        // const balltail_section_ypos = 43;
-        // const tail_particles = CreateBallTailParticles(balltail_section_xpos, balltail_section_ypos, _, _, 1, ROOT_WIDGETS.CREATE_ROOT);
         // Demo_ball_tail();
 
         // Demo_ball_tail_2();
@@ -634,7 +634,7 @@ export function TestWidgetsGeneric(createId=1) {
 
     { // Demos Physics
 
-        // const total_height = Elastic_collisions()
+        // const total_height = Elastic_collisions();
         
         // Sattelite_rotation([0, 100]);
 
@@ -1098,6 +1098,8 @@ function CreateSlider(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
 
     const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [200, 500, 0] : [0, 0, 0]
     const slider = Create_widget_slider(root_widget, pos, [250, 10]);
+    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     // slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
@@ -1257,7 +1259,7 @@ function CreateDropdown(pos = [0, 0, 0], root_widget = ROOT_WIDGETS.CREATE_ROOT)
             { // Test: Rect_mesh
                 const rect = Create_rect_mesh(_,);
                 dpsub1.AddToMenu(rect);
-                rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+                // rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
                 rect.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 // rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
             }

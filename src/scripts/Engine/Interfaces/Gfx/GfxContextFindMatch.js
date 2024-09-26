@@ -12,82 +12,9 @@ const GFX_CONEXT_DEBUG = false;
 
 
 /****************************************************************************************************************************************************/
-// Graphicks Generation Function
+// Graphics Generation Function
 /****************************************************************************************************************************************************/
 
-/** Check buffers validity, or find buffers based on Flags */
-// TODO: the flags are anecessary, just return [prog, vb, and maybe ib]
-/**SAVE */
-// export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) {
-
-
-//    let vb_groupidx = INT_NULL;
-
-//    // If a parent is set, use gfx_ctx_parent as parent
-//    const parent = (mesh.gfx_ctx_parent) ? mesh.gfx_ctx_parent : mesh.parent;
-
-
-//    // If 'PRIVATE' then one of the folowing FLAGS shouuld be also present
-//    if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
-
-//       if (FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET) {
-//          vb_groupidx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid);
-//       }
-//       else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC) {
-
-//          if (parent === null) {
-//             console.warn(parent)
-//             if (GFX_CONEXT_DEBUG) console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', mesh.GetName(), mesh);
-
-//             // Case the mesh is a text mesh, and there is a gfx buffer to be found, then because we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
-//             if (mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH) {
-//                vb_groupidx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid);
-//             }
-//          }
-//          else {
-
-//             vb_groupidx = Find_match_gfx_from_parent_ascending(mesh, mesh.parent);
-
-//             if (vb_groupidx === INT_NULL) { // Fallback to search all ascending-descending until root is reached.
-//                vb_groupidx = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
-//             }
-//          }
-//       }
-//       else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_DSC) {
-//          vb_groupidx = Find_match_gfx_from_parent_descending_search_all(mesh, parent)
-//       }
-//       else {
-//          // console.warn(mesh.parent.GetName())
-//          console.error('NO CORRECT GenGfxCtx FLAG found for generating gfx.\nProbably forgot to pass one of the flags \'FROM_ROOT_WIDGET, FROM_PARENT_ASC, FROM_PARENT_CHILDREN_DESC, ...\'');
-//          alert('SEE console.error');
-//       }
-//    }
-//    else if (FLAGS & GFX_CTX_FLAGS.SPECIFIC) {
-
-//       /**
-//        * Case SPECIFIC is passed for 1 kind of mesh and not for all meshes of the widget.
-//        * Example: Widget_Label may have spesific _vb_groupidx for the rect area but not for the text.
-//        * We distinguish this case by having the _vb_groupidx param as being null,
-//        * and we re-call this function so that we search for any text gfx without the FLAG:SPECIFIC.
-//        */
-//       // Check the passed _vb_groupidx params if they are valid gfx indexes
-//       if (_vb_groupidx !== null) {
-//          if (_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(_vb_groupidx) === true)) {
-//             if (GFX_CONEXT_DEBUG) console.error('INCORRECT _vb_groupidx passed for generating SPECIFIC gfx.\n_gfxidxs:', _vb_groupidx);
-//             vb_groupidx = _vb_groupidx;
-//          }
-//          else {
-//             vb_groupidx = Find_gfx_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
-//          }
-//       }
-//       else { // If for some reason fails, re-call recursive this to resolve
-//          // We need to pass different flags, to avoid infinite loop, since the _vb_groupidx are always null
-//          vb_groupidx = Find_gfx_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
-//       }
-//    }
-
-//    return vb_groupidx;
-// }
 export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) {
 
 
@@ -129,7 +56,7 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
       else {
          // console.warn(mesh.parent.GetName())
          console.error('NO CORRECT GenGfxCtx FLAG found for generating gfx.\nProbably forgot to pass one of the flags \'FROM_ROOT_WIDGET, FROM_PARENT_ASC, FROM_PARENT_CHILDREN_DESC, ...\'');
-         alert('SEE console.error');
+         // alert('SEE console.error');
       }
    }
    else if (FLAGS & GFX_CTX_FLAGS.SPECIFIC) {
@@ -198,94 +125,6 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
 
    return vb_groupidx;
 }
-
-
-
-// export function Find_texture_index_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) {
-
-
-//    let vb_groupidx = INT_NULL;
-
-//    // If a parent is set, use gfx_ctx_parent as parent
-//    const parent = (mesh.gfx_ctx_parent) ? mesh.gfx_ctx_parent : mesh.parent;
-
-
-//    // // If 'PRIVATE' then one of the folowing FLAGS shouuld be also present
-//    // if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
-
-//    //    if (FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET) {
-//    //       vb_groupidx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid);
-//    //    }
-//    //    else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC) {
-
-//    //       if (parent === null) {
-//    //          console.warn(parent)
-//    //          if (GFX_CONEXT_DEBUG) console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', mesh.GetName(), mesh);
-
-//    //          // Case the mesh is a text mesh, and there is a gfx buffer to be found, then because we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
-//    //          if (mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH) {
-//    //             vb_groupidx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid);
-//    //          }
-//    //       }
-//    //       else {
-
-//    //          vb_groupidx = Find_match_gfx_from_parent_ascending(mesh, mesh.parent);
-
-//    //          if (vb_groupidx === INT_NULL) { // Fallback to search all ascending-descending until root is reached.
-//    //             vb_groupidx = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
-//    //          }
-//    //       }
-//    //    }
-//    //    else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_DSC) {
-//    //       vb_groupidx = Find_match_gfx_from_parent_descending_search_all(mesh, parent)
-//    //    }
-//    //    else {
-//    //       // console.warn(mesh.parent.GetName())
-//    //       console.error('NO CORRECT GenGfxCtx FLAG found for generating gfx.\nProbably forgot to pass one of the flags \'FROM_ROOT_WIDGET, FROM_PARENT_ASC, FROM_PARENT_CHILDREN_DESC, ...\'');
-//    //       alert('SEE console.error');
-//    //    }
-//    // }
-//    // else if (FLAGS & GFX_CTX_FLAGS.SPECIFIC) {
-
-
-//    const texidx = Vertex_buffer_group_get_texidx(_vb_groupidx);
-//    if(texidx === mesh.mat.texidx){
-//       return _vb_groupidx;
-//    }
-//    else {
-//       vb_groupidx = Find_texture_index_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
-//    }
-
-//       /**
-//        * Case SPECIFIC is passed for 1 kind of mesh and not for all meshes of the widget.
-//        * Example: Widget_Label may have spesific _vb_groupidx for the rect area but not for the text.
-//        * We distinguish this case by having the _vb_groupidx param as being null,
-//        * and we re-call this function so that we search for any text gfx without the FLAG:SPECIFIC.
-//        */
-//       // Check the passed _vb_groupidx params if they are valid gfx indexes
-//       // if (_vb_groupidx !== null) {
-//       //    // if (_vb_groupidx === INT_NULL || SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(_vb_groupidx)===false)) {
-//       //    if (_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(_vb_groupidx) === true)) {
-//       //       if (GFX_CONEXT_DEBUG) console.error('NO CORRECT _vb_groupidx passed for generating SPECIFIC gfx.\n_gfxidxs:', _vb_groupidx);
-//       //       vb_groupidx = _vb_groupidx;
-//       //    }
-//       //    else {
-//       //       // if (Program_program_exists_from_index(_vb_groupidx) && Vertex_buffer_exists_from_index(_vb_groupidx)) {
-//       //       vb_groupidx = Find_texture_index_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
-//       //       if (Vertex_buffer_exists_from_index(_vb_groupidx)) {
-
-//       //       }
-//       //    }
-//       // }
-//       // else { // If for some reason fails, re-call recursive this to resolve
-//       //    // igfx = Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx);
-//       //    // We need to pass different flags, to avoid infinite loop, since the _vb_groupidx are always null
-//       //    vb_groupidx = Find_texture_index_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
-//       // }
-//    // }
-
-//    return vb_groupidx;
-// }
 
 
 
@@ -473,7 +312,7 @@ function Find_match_gfx_from_parent_descending_search_all(mesh, parent) {
    // If the mesh match the parent sid, use parent's gfx buffer
    if (SID.CheckSidMatch(mesh.sid, parent.sid)) {
 
-      // In case mesh is the parent mesh, obviusly we haven't created yet any gfx, so return -1 in order to create new vertex buffer
+      // In case mesh is the parent mesh, obviously we haven't created yet any gfx, so return -1 in order to create new vertex buffer
       if (mesh === parent) return INT_NULL;
 
       

@@ -253,19 +253,25 @@ export class Text_Mesh extends Mesh {
       this.mat.char_buffer.Reset();
 
       const len = (str.length < this.mat.char_buffer.size) ? str.length : this.mat.char_buffer.size;
+      // const len = this.mat.char_buffer.size;
 
       for (let i = 0; i < len; i++) {
 
          this.mat.char_buffer.Add(str[i]);
       }
 
-      for (let i = len; i < this.mat.char_buffer.size; i++) {
+      if(str.length > this.mat.char_buffer.size){
 
-         this.mat.char_buffer.buffer[i] = ' '; // We do not want to increment active_count for '' empty characters, so we avoid .Add
+         for (let i = len; i < this.mat.char_buffer.size; i++) {
+   
+            this.mat.char_buffer.buffer[i] = ' '; // We do not want to increment active_count for '' empty characters, so we avoid .Add
+         }
       }
 
+      // this.mat.text = str;
+      // this.geom.num_faces = str.length;
       this.mat.text = str;
-      this.geom.num_faces = str.length;
+      // this.geom.num_faces = len;
    }
 
 
@@ -455,45 +461,49 @@ export class Text_Mesh extends Mesh {
 
 
       const store_start = this.gfx.vb.starts.buffer[0];
+      const attribs_count = this.gfx.vb.counts.buffer[0];
 
       // TODO: Remove arrays, substitute with variables
-      const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-         pos: [this.geom.pos[0] - this.geom.dim[0] * 2, this.geom.pos[1], this.geom.pos[2]],
-         dim: [this.geom.dim[0], this.geom.dim[1]],
-      }
+      // const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
+      //    pos: [this.geom.pos[0] - this.geom.dim[0] * 2, this.geom.pos[1], this.geom.pos[2]],
+      //    dim: [this.geom.dim[0], this.geom.dim[1]],
+      // }
 
       const c = this.mat.char_buffer.buffer;
       const space_char_uv = Font_get_uv_coords(this.mat.uvIdx, ' ');
-
-
+      // const advancex = Font_metrics_get_advancex(this.mat.uvIdx);
+      
+      
       // Update text faces
       for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
-
+         
          // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
          this.mat.uv = space_char_uv;
-         // const width = Font_metrics_get_char_width(this.mat.uvIdx, this.mat.char_buffer.buffer[i])/2;
-         const width = Font_metrics_get_char_width(this.mat.uvIdx, this.mat.char_buffer.buffer[i])*2;
-
+         // const width = Font_metrics_get_char_width(this.mat.uvIdx, c[i]);
+         
          if (c[i] !== ' ') // If char=' ' space, just render [0,0] uv coordinates.
          {
-            this.mat.uv = Font_get_uv_coords(this.mat.uvIdx, this.mat.char_buffer.buffer[i]);
-            // Reset this mesh's attributes to that of the first character of the text 
+            this.mat.uv = Font_get_uv_coords(this.mat.uvIdx, c[i]);
+            // // Reset this mesh's attributes to that of the first character of the text 
             // geom_copy.dim[0] = width; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; 
          }
          
          Gl_set_uv(this.gfx, this.mat.uv);
-         Gl_set_dim_x(this.gfx, width*2);
+         // Gl_set_dim_x(this.gfx, width);
          
-         this.gfx.vb.starts.buffer[0] += this.gfx.vb.counts.buffer[0];
+         this.gfx.vb.starts.buffer[0] += attribs_count;
+         // // Reset this mesh's attributes to that of the first character of the text 
+         // geom_copy.dim[0] = width; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; 
       }
       
       // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
       for (let i = this.mat.char_buffer.boundary + 1; i < this.mat.char_buffer.size; i++) {
          
-         let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
-         Gl_set_uv(this.gfx, uvs);
+         // let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
+         Gl_set_uv(this.gfx, space_char_uv);
+         // Gl_set_dim_x(this.gfx, advancex);
          
-         this.gfx.vb.starts.buffer[0] += this.gfx.vb.counts.buffer[0];
+         this.gfx.vb.starts.buffer[0] += attribs_count;
       }
       
       // Reset this mesh's vb start index to that of the first character of the text 

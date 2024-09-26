@@ -83,6 +83,13 @@ export const frag_round_corners = `
 
 vec4 Round_corners(float scale_down)
 {
+
+    #ifdef U_RCORNERS_FLOAT
+        float slider = u_rcorners_1f;
+    #else
+        float slider = .3;
+    #endif
+
     float scale_up = 1./scale_down;
     vec2 rCorners = vec2(v_rcorners) * scale_down;
     float feather = v_feather;
@@ -114,19 +121,118 @@ vec4 Round_corners(float scale_down)
     
     float wb = clamp(-d / feather, 0.0, 1.0);
     float alpha = src_color.a * wb;
-    
-
     vec3 color = src_color.rgb * alpha;
-    
-    /*** Shaded Color ***/
-    float wide = dim.x*.03; 
-    float strength = .6; 
-    color = mix( color, pow(color, vec3(3.8)), strength-smoothstep(0.0, dim.x, abs(d)*wide) );
 
+
+    float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
+    // float strength = 2.2 * ((1. + 1.8*.5) - ((slider+1.)*.5));   /* Creates a lighter shadow on full slider */
+    float strength = 2.2 * (((slider+1.)*.5));                      /* Creates a stronger shadow on full slider */
+    // float strength = 2.2;
+    
+    /* The greater the power, the bigger the distance of the effect. pow:min=0.0, max=1.0*/
+    float ratio = pow(min_dim, .6) * .46;                           /* More in large lengths and less in small */
+    // float ratio = pow(min_dim, .36) * 1.;                        /* More in small lengths and less in large */
+    float depth = rCorners.x * ratio * slider;
+
+    /* Shadow effect depth */
+    float shad_len = length(max((abs(uv) - dim) + depth, 0.0));
+
+    float g = smoothstep(.0, min_dim, shad_len);
+
+
+    // if(g>=1.) color = vec3(1.);
+    // else if(g<=0.) color = vec3(.0, 1., 1.);
+    color = mix( color, pow(color, vec3(strength)), g );
+    // color = mix( color, pow(color, vec3(strength)), 0. );
     
     return vec4(color, alpha);
 }
 `;
+
+// export const frag_round_corners = `
+
+
+// #ifndef UV_READY
+//     vec2 uv = vec2(0,0);
+// #endif
+
+// vec4 Round_corners(float scale_down)
+// {
+
+//     #ifdef U_RCORNERS_FLOAT
+//         float distance = u_rcorners_1f*.1;
+//     #else
+//         float distance = .3;
+//     #endif
+
+//     float scale_up = 1./scale_down;
+//     vec2 rCorners = vec2(v_rcorners) * scale_down;
+//     float feather = v_feather;
+//     vec2 res = u_screen_res;
+//     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
+//     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+    
+
+//     #ifndef UV_READY
+//         #define UV_READY 1
+        
+//         uv = (gl_FragCoord.xy-(res*.5));
+//         uv.x += (res.x*.5); // Center mesh to screen
+//         uv.y -= (res.y*.5); // Center mesh to screen
+        
+//         // To move with mesh position
+//         uv.x -= v_wpos3_x;
+//         uv.y += v_wpos3_y;
+        
+//         // Subtract constant dimention
+//         uv.x -= dim.x*scale_up; 
+//         uv.y -= -dim.y*scale_up;
+//     #endif    
+    
+    
+//     vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention
+//     float d = length(max(q, 0.0)) - rCorners.x;
+    
+    
+//     float wb = clamp(-d / feather, 0.0, 1.0);
+//     float alpha = src_color.a * wb;
+    
+
+//     vec3 color = src_color.rgb * alpha;
+    
+//     /*** Shaded Color ***/
+//     // float wide = dim.x*.03; 
+//     // float wide = dim.x*.4; 
+//     // float wide = dim.x*.1; 
+//     // float max_dist = 1.; 
+//     // float strength = 3.8; 
+//     // color = mix( color, pow(color, vec3(strength)), max_dist-smoothstep(0.0, dim.x, abs(d)*wide) );
+
+
+//     float dist = (dim.x < dim.y) ? dim.x : dim.y;
+//     float wide = 1.; 
+//     // float wide = dist*.01; 
+//     float strength = 14.2; 
+//     // float g = 1.0 - clamp(smoothstep(0.0, distance, abs(d)*wide), 0.0, 1.0);
+//     // float g = clamp(smoothstep(distance, 0.0, abs(d)*wide), 0., 1.9);
+//     // float g = clamp(smoothstep(10., 0.0, abs(d))*distance, 0., 1.9);
+//     // float g = smoothstep(1., .0, abs(d * (dim.x+dim.y))*distance);
+//     float g = smoothstep(1., .0, abs(d)*distance);
+    
+//     float ddd = 15.;
+//     float jjj = length(max((abs(uv) - dim)+ ddd, 0.0)) - ddd;
+//     // float jjj = length((abs(uv) - dim) + dim);
+//     // float jjj = length((abs(uv) - dim));
+//     // float g = smoothstep(1., .0, abs(jjj)*distance); // + (dim.x*dim.y);
+//     // float g = 1.-smoothstep(.0, 1.0, abs(jjj)*distance);
+//     // float g = smoothstep(.0, 1.0, abs(jjj)*wide);
+    
+//     color = mix( color, pow(color, vec3(strength)), g+g );
+
+    
+//     return vec4(color, alpha);
+// }
+// `;
 
 
 export const frag_feather_call = '  color *= Feather(scale_down);';
@@ -226,19 +332,19 @@ vec4 Stylize(float scale_down)
     
     /*** Shaded Color ***/
     float wide = dim.x*.03; 
-    float strength = .6; 
-    // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 5., abs(d)) );
-    // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 5., abs(d)) );
-    // color = mix( color, pow(color, vec3(strength)), 1.0-smoothstep(0.0, 20., abs(d)*wide) );
-    // color = mix( color, pow(color, vec3(3.8)), strength-smoothstep(0.0, dim.x, abs(d)*wide) );
-    // color = mix( color, pow(color, vec3(strength)), smoothstep(0.0, 200., (d)*wide) );
+    float max_dist = .6; 
+    // color = mix( color, pow(color, vec3(max_dist)), 1.0-smoothstep(0.0, 5., abs(d)) );
+    // color = mix( color, pow(color, vec3(max_dist)), 1.0-smoothstep(0.0, 5., abs(d)) );
+    // color = mix( color, pow(color, vec3(max_dist)), 1.0-smoothstep(0.0, 20., abs(d)*wide) );
+    // color = mix( color, pow(color, vec3(3.8)), max_dist-smoothstep(0.0, dim.x, abs(d)*wide) );
+    color = mix( color, pow(color, vec3(max_dist)), smoothstep(0.0, 200., (d)*wide) );
     
     /*** Border ***/
-    // float borderWidth = border_width;
-    // float bd = (abs(d)-borderWidth);
-    // float wa = clamp(-bd * AA, 0.0, 1.0);
-    // wb = clamp(-bd / feather, 0.0, 1.0);
-    // color += color * vec3(abs(wa * wb));
+    float borderWidth = border_width;
+    float bd = (abs(d)-borderWidth);
+    float wa = clamp(-bd * AA, 0.0, 1.0);
+    wb = clamp(-bd / feather, 0.0, 1.0);
+    color += color * vec3(abs(wa * wb));
     // color +=  color * pow(vec3(abs(wa * wb)), vec3(4.4));
     
     return vec4(color, alpha);

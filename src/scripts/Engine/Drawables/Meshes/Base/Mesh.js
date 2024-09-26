@@ -133,6 +133,7 @@ export class Mesh {
             inst: (this.geom.sid.inst | this.mat.sid.inst),
             unif: this.mat.sid.unif,
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
+            fx: 0x0,
             gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
         };
 
@@ -510,20 +511,26 @@ export class Mesh {
 
 
     // TODO: Update the .pos of the mesh for the rest of the methods
-    SetWposXY(pos) { 
+    SetWposXY(x, y) { 
         this.SetUpdateFrameBuffer(); 
-        this.geom.pos[0] = pos[0];
-        this.geom.pos[1] = pos[1];
-        this.geom.SetWposXY(this.gfx, pos[0], pos[1]); 
+        this.geom.pos[0] = x;
+        this.geom.pos[1] = y;
+        this.geom.SetWposXY(this.gfx, x, y); 
+    }
+    SetWposX(x) { 
+        this.SetUpdateFrameBuffer(); 
+        this.geom.pos[0] = x;
+        this.geom.SetWposX(this.gfx, x); 
+    }
+    SetWposY(y) { 
+        this.SetUpdateFrameBuffer(); 
+        this.geom.pos[1] = y;
+        this.geom.SetWposY(this.gfx, y); 
     }
 
 
-    SetPosXY(pos) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, pos[0], pos[1]); }
-
-
+    SetPosXY(x, y) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, x, y); }
     SetPosX(x) { this.SetUpdateFrameBuffer(); this.geom.SetWposX(this.gfx, x, this.geom.num_faces); }
-
-
     SetPosY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y, ); }
 
 
@@ -639,36 +646,40 @@ export class Mesh {
 
             case MESH_ENABLE.GFX.ATTR_STYLE: {
 
-                // this.sid.attr |= (SID.ATTR.STYLE | SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.EMPTY | SID.ATTR.DIM2;
-                // this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.GENERIC_ATTR1_VEC4 | SID.ATTR.DIM2;
                 this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)  | SID.ATTR.STYLE | SID.ATTR.DIM2;
                 this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER  | SID.PASS.WPOS2 | SID.PASS.DIM2;
-                // this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER;
-                if (Array.isArray(params)) {
-                    this.SetStyle(params);
-                }
+                if (Array.isArray(params)) this.SetStyle(params);
                 break;
             }
+
             case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.attr |= SID.PASS.TEX2; break; }
-            case MESH_ENABLE.GFX.ATTR_R_CORNERS: { this.sid.attr |= SID.ATTR.R_CORNERS| SID.ATTR.DIM2;  this.sid.pass |= SID.PASS.R_CORNERS| SID.PASS.DIM2; break; }
-            case MESH_ENABLE.GFX.ATTR_FEATHER: { this.sid.attr |= SID.ATTR.FEATHER| SID.ATTR.DIM2;  this.sid.pass |= SID.PASS.FEATHER| SID.PASS.DIM2; break; }
-            case MESH_ENABLE.GFX.ATTR_BORDER: { this.sid.attr |= SID.ATTR.BORDER| SID.ATTR.DIM2;  this.sid.pass |= SID.PASS.BORDER| SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME;  this.sid.pass |= SID.PASS.TIME; break; }
             case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY;  this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
             case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; this.sid.pass |= SID.PASS.COL4_PER_VERTEX; break; }
-            // case MESH_ENABLE.GFX.PASS_COL4: { this.sid.pass |= SID.PASS.COL4; break; }
-            // case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS2; break; }
-            // case MESH_ENABLE.GFX.PASS_DIM2: { this.sid.pass |= SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
-            // case MESH_ENABLE.GFX.PASS_TIME1: { this.sid.pass |= SID.PASS.TIME; break; }
             
-            // // Effect Shaders
-            // case MESH_ENABLE.GFX.FX_GLOW: { this.sid.fx |= SID.FX.FS_GLOW_VEC3; break; }
-            // case MESH_ENABLE.GFX.FX_NOISE: { this.sid.fx |= SID.FX.FS_NOISE; break; }
+            case MESH_ENABLE.GFX.ATTR_R_CORNERS: { 
+              this.sid.attr |= SID.ATTR.R_CORNERS| SID.ATTR.DIM2;  
+              this.sid.pass |= SID.PASS.R_CORNERS| SID.PASS.DIM2; 
+              if(params) this.mat.style[0] = params; 
+              break; 
+           }
+           case MESH_ENABLE.GFX.ATTR_BORDER: { 
+              this.sid.attr |= SID.ATTR.BORDER| SID.ATTR.DIM2;  
+              this.sid.pass |= SID.PASS.BORDER| SID.PASS.DIM2;  
+              if(params) this.mat.style[1] = params; 
+              break; 
+           }
+           case MESH_ENABLE.GFX.ATTR_FEATHER: { 
+              this.sid.attr |= SID.ATTR.FEATHER| SID.ATTR.DIM2;  
+              this.sid.pass |= SID.PASS.FEATHER| SID.PASS.DIM2; 
+              if(params) this.mat.style[2] = params; 
+              break; 
+           }
 
-            default: console.error('Enable material\'s shader param failed. @ Material.js');
         }
+        
     }
 
 

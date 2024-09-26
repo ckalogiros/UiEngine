@@ -57,7 +57,7 @@ export function Clbk_animations_circle_scale() {
    // Constant value slope_constant1 slider
    const slider_dim = [300, 10];
    const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [0, 0, 0], slider_dim, _, _, 'Speed');
-   slider.SetInitialValue(slope_constant1*100);
+   slider.SetInitialValue(slope_constant1);
    slider.GfxUniformsEnable(slider, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
@@ -235,7 +235,7 @@ export function Clbk_animations_circle_flip() {
    // Constant value slope_constant slider
    const slider_dim = [300, 10];
    const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [0, 250, 0], slider_dim, _, _, 'Speed');
-   slider.SetInitialValue(slope_constant2*100);
+   slider.SetInitialValue(slope_constant2);
    slider.GfxUniformsEnable(slider, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 

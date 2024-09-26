@@ -14,7 +14,7 @@ import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBu
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Engine/Core/MeshBuffer.js";
 import { Root_group_vbidx_view_view_get } from "../../Engine/Core/Views/RootView.js";
-import { Screen_wpos_get, Screen_wpos_get_y } from "../../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Screen_wpos_get, Screen_wpos_get_y } from "../../Engine/Core/MeshUniformsBuffer.js";
 
 
 
@@ -440,6 +440,13 @@ export function Vertex_buffer_group_get_size() {
 
 
 
+export function Vertex_buffer_set_name_for_debuging(vb_groupidx, name) { 
+    if (!DISABLE_DEBUG) (_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
+    _vertex_buffer_groups.buffer[vb_groupidx].name = name;
+}
+
+
+
 export function Vertex_buffer_group_get_byidx(vb_groupidx) {
     if (!DISABLE_DEBUG) (_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
     return _vertex_buffer_groups.buffer[vb_groupidx];
@@ -625,10 +632,11 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
         const val = _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk[i](params);
         const ubidx = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
 
-        const val_idx = (params.val_idx !== undefined) ? params.val_idx : null;
+        // const val_idx = (params.val_idx !== undefined) ? params.val_idx : null;
 
         // Uniforms_buffer_set_uniform(ubidx, val, val_idx)
-        Uniforms_buffer_set_uniform_val_from_index(ubidx, val, val_idx);
+        // Uniforms_buffer_set_uniform_val_from_index(ubidx, val, val_idx);
+        Uniforms_buffer_set_uniform_val_from_index(ubidx, val,  params.val_idx);
         Uniforms_buffer_update_uniform(ubidx);
 
     } ``
@@ -807,6 +815,7 @@ export function Vertex_buffer_reset_to_index(vb_groupidx, starts) {
     vb_group.needs_any_update = true;
 
 }
+
 
 
 /** Reset Vertex Buffer to 0 */
@@ -1060,6 +1069,7 @@ export function Vertex_buffer_update_vertices_explicit_Params(vb_groupidx, start
 }
 
 
+
 export function Vertex_buffer_remove_geometry(gfx, num_faces) {
 
 
@@ -1113,7 +1123,13 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces) {
             vb_info.state.mask &= ~BUFFER_STATE.IS_ACTIVE;
             vb_group.state.mask &= ~BUFFER_STATE.IS_ACTIVE;
 
+            // Deactivate the vertex buffer rendering in the render queue
             Renderqueue_set_active(gfx.vb.groupidx, false);
+            
+            // Reset the wpos uniform in the wpos uniforms buffer
+            Mesh_unif_set_vb_root_wposx(gfx.vb.groupidx, 0);
+            Mesh_unif_set_vb_root_wposy(gfx.vb.groupidx, 0);
+
         }
         else vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 

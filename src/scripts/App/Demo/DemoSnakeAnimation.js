@@ -161,7 +161,7 @@ export function Demo_snake_animation() {
    const slider_dim = [300, 10];
    const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [0, 0, 0], slider_dim, _, _, 'Speed');
    slope_constant1 = 1.;
-   slider.SetInitialValue(slope_constant1*100);
+   slider.SetInitialValue(slope_constant1);
    slider.GfxUniformsEnable(slider, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
@@ -478,7 +478,7 @@ function Animate_sattelite(params) {
       
       // Create new collectible in another random position
       const rand_pos = GetRandomPos([20, 20], [section.geom.dim[0]*2-20, section.geom.dim[1]*2-20]);
-      collectible.SetWposXY(rand_pos)
+      collectible.SetWposXY(rand_pos[0, rand_pos[1]])
 
       // Add a body to the snake
 

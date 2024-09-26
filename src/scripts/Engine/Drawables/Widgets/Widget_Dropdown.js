@@ -288,6 +288,31 @@ export class Widget_Dropdown extends Section {
       }
    }
 
+
+   EnableGfxAttributes(which, params=null){
+      
+      super.EnableGfxAttributes(which, params);
+      
+      if(this.menu) this.menu.EnableGfxAttributes(which, params);
+      
+      const btn = this.children.buffer[0];
+      btn.EnableGfxAttributes(which, params);
+      
+   }
+   
+   EnableGfxUniforms(flags, name, type, shader_flags){
+      
+      super.EnableGfxUniforms(flags, name, type, shader_flags);
+      
+      if(this.menu) this.menu.EnableGfxUniforms(flags, name, type, shader_flags);
+            
+      if(this.children){
+         
+         const btn = this.children.buffer[0];
+         if(btn) btn.EnableGfxUniforms(flags, name, type, shader_flags);
+      } 
+      
+   }
    
    // GfxCtxSetFlag(FLAGS){
    //    alert('-1 DROPDOWN')
@@ -544,6 +569,8 @@ export class Widget_Dropdown extends Section {
    // Setters_Getters
    /*******************************************************************************************************************************************************/
 
+
+   
    SetPosXYNoGfxUpdate(x, y) {
 
       if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
@@ -842,8 +869,26 @@ export class Widget_Dropdown extends Section {
 
       /********************************************************************************************************************/
       // Re-create listen events 
-      Construct_listen_events_from_mesh_tree(this.menu)
-      Construct_listen_events_relations_from_mesh_tree(this.menu);
+      /**
+       * ISSUE 
+       * Normaly we would construct the listeners only for the dp menu.
+       * Though in case of another dp in the widget_root, it's meshes 
+       * are active from the scroller cliping, but the listeners havn't
+       * been activated.
+       * So we activate the listeners of all meshes of the widget_root,
+       * eventhough this is very inefficient.
+       * 
+       * Solution:
+       * Find a way to create the listeners.
+       * In 'Clip()' would be the best place but unfortunately the
+       * activation of the listeners must be called once, from the mesh 
+       * that is the parent, so that the listeners tree view will 
+       * be build correctly(in the EventListeners.js)
+       */
+      // Construct_listen_events_from_mesh_tree(this.menu)
+      // Construct_listen_events_relations_from_mesh_tree(this.menu);
+      Construct_listen_events_from_mesh_tree(widget_root)
+      Construct_listen_events_relations_from_mesh_tree(widget_root);
       
       
 

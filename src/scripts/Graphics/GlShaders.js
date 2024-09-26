@@ -53,7 +53,7 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 		gl.bindAttribLocation(shader_program, loc, 'a_wpos_time');
 		loc++;
 	}
-	if(sid.attr & SID.ATTR.GENERIC_ATTR1_VEC4){
+	if(sid.attr & SID.ATTR.STYLE){
 		gl.bindAttribLocation(shader_program, loc, 'a_generic_1');
 		loc++;
 	}

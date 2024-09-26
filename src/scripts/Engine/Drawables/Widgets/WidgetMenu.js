@@ -454,6 +454,12 @@ export class Close_Button extends Widget_Button {
       const root = params.evt_params
       root.Destroy(root);
 
+      if(root.eventCallbacks){
+         // alert()
+
+         root.eventCallbacks.buffer[0].evt_clbks();
+      }
+
    }
 
 }

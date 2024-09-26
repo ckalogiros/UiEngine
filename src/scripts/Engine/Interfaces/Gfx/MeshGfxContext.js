@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx, Vertex_buffer_change_uniform_value_clbk_params, Vertex_buffer_set_name_for_debuging } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object } from "../../../Graphics/ShaderPrograms.js";
@@ -189,7 +189,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
       // Here we assign the correct vertex buffer index to the mesh attributes(COL,WPOS,DIM, etc)
       if (vb_info.sid & SID.ATTR.COL4) { gfx_ctx.vb.which_vb.col_buf = i; }
       if (vb_info.sid & SID.ATTR.WPOS3) { gfx_ctx.vb.which_vb.wpos_buf = i; }
-      if (vb_info.sid & SID.ATTR.GENERIC_ATTR1_VEC4) { gfx_ctx.vb.which_vb.generic_attr1_buf = i; }
+      if (vb_info.sid & SID.ATTR.STYLE) { gfx_ctx.vb.which_vb.generic_attr1_buf = i; }
       if (vb_info.sid & SID.ATTR.POS2) { gfx_ctx.vb.which_vb.dim_buf = i; }
       if (vb_info.sid & SID.ATTR.TEX2) { gfx_ctx.vb.which_vb.tex_buf = i; }
 
@@ -206,7 +206,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
 
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i;
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = i;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.GENERIC_ATTR1_VEC4) gfx_ctx.vb.which_attrib.generic1_idx = i;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = i;
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.POS2) gfx_ctx.vb.which_attrib.dim_idx = i;
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i;
    }
@@ -321,8 +321,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    }
  
 
-   /** If no vbidx found from the mesh tree, search the vb pool if any apropriate vb exists. If none fouund, create a new one */
+   /** If no vbidx found from the mesh tree, search the vb pool if any apropriate vb exists. If none found, create a new one */
    let is_vertex_buffer_created = false;
+   let vertex_buffer_from_pool_is_used = false;
 
    const pool_request_flags = mesh.gfx_pool_request;
 
@@ -333,7 +334,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       // Avoid searching vb for scrollers, because it is specific and it would have been found earlier
       if((flags & GFX_CTX_FLAGS.SCROLLER_VB) === 0){
 
-         // vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, mesh.gfx_ctx_flags);
+         // Find any unused vb
          if((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, mesh.gfx_ctx_flags);
          // Here we must check for all vb's that are stored globaly(like for scrollers) 
          else if((flags & GFX_CTX_FLAGS.PRIVATE)===0 || (flags & GFX_CTX_FLAGS.SCROLLER_VB)===0) vb_groupidx = Gfx_pool_find_vb_notPrivate(sid, pool_request_flags);
@@ -343,6 +344,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
          const is_private = ((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) ? BUFFER_STATE.IS_PRIVATE : 0x0;
          vb_group = Vertex_buffer_create(sid, _, progidx, is_private);
+
+         // For debugging only 
+         Vertex_buffer_set_name_for_debuging(vb_group.idx, mesh.GetName());
 
          // TODO: Here we need to check if the vb to be created is for scrollers
 
@@ -403,9 +407,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       }
       else {
-
-         // Get the unif wpos that is already created for this vb
-         // mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
+         // If the vertex buffer already exists and is reused from the pool
+         // get the unif wpos that has already been created for this vb
+         mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
          // Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, 'u_wposxy', mesh.root_posidx);
 
       }
@@ -543,6 +547,8 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
          vb_group = Vertex_buffer_create(sid, _, progidx);
          vb_groupidx = vb_group.idx;
          vbidxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
+
+         Vertex_buffer_set_name_for_debuging(vb_group.idx, emitter.GetName());
 
          Vertex_buffer_group_set_texidx(vb_groupidx, emitter.mat.texidx); // Update the vertex buffer to store the texture index
          console.log('texidx', emitter.mat.texidx)

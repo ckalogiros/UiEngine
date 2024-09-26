@@ -242,7 +242,8 @@ export class Section extends Mesh {
          this.gfx_ctx_flags |= FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
          for (let i = 0; i <= this.children.boundary; i++) {
-            if (this.children.buffer[i]) this.children.buffer[i].GfxCtxSetFlag(FLAGS, gfx_ctx_parent);
+            // if (this.children.buffer[i]) this.children.buffer[i].GfxCtxSetFlag(FLAGS, gfx_ctx_parent);
+            if (this.children.buffer[i]) this.children.buffer[i].GfxCtxAddFlag(FLAGS, gfx_ctx_parent);
          }
       }
    }
@@ -268,8 +269,8 @@ export class Section extends Mesh {
       for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
-         // if (child.type & MESH_TYPE.SECTION_MESH_ONLY) 
-            child.GenGfxCtx(FLAGS, specific_vb_groupidx);
+         if (child.gfx_ctx_flags) FLAGS = child.gfx_ctx_flags;
+         child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
 
    }
@@ -661,19 +662,56 @@ export class Section extends Mesh {
    // Transformations
    /*******************************************************************************************************************************************************/
 
-   Move(x, y) {
+   AddWposXY(x, y) {
 
       if (x === 0 && y === 0) return;
       
       this.geom.pos[0] += x;
       this.geom.pos[1] += y;
+      // if(this.state.mask & MESH_STATE.ACTIVE) 
       this.geom.AddWposXY(this.gfx, x, y);
       for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
          if(child===undefined || child===null) alert('43321455265 \n child is null');
-         child.Move(x, y);
+         child.AddWposXY(x, y);
       }
 
+   }
+
+
+   AddWposX(x) {
+
+      if (x === 0) return;
+      
+      this.geom.pos[0] += x;
+      // if(this.state.mask & MESH_STATE.ACTIVE) 
+      this.geom.AddWposY(this.gfx, x);
+      
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if(child===undefined || child===null) alert('43321455265 \n child is null');
+         child.AddWposX(x);
+      }
+
+   }
+   
+
+   AddWposY(y) {
+
+      if (y === 0) return;
+      
+      this.geom.pos[1] += y;
+      // if(this.state.mask & MESH_STATE.ACTIVE) 
+      this.geom.AddWposY(this.gfx, y);
+
+      for (let i = 0; i <= this.children.boundary; i++) {
+
+         const child = this.children.buffer[i];
+         if(child===undefined || child===null) alert('43321455265 \n child is null');
+         
+         child.AddWposY(y);
+      }
+      
    }
 
 
@@ -734,7 +772,7 @@ export class Section extends Mesh {
    }
 
 
-   SetPosXY(x, y) { Section_set_posxy_children_recursive([x, y], this); }
+   SetPosXY(x, y) { Section_set_posxy_children_recursive(x, y, this); }
 
 
    SetPosX(x) { super.SetPosX(x); }
@@ -934,7 +972,7 @@ function Section_set_posxy_children_recursive(pos, mesh) {
             Section_set_posxy_children_recursive(pos, child);
          }
          else { // NOTE: To avoid moving section twice (as a child and as a section from recursion)
-            child.SetPosXY(pos);
+            child.SetPosXY(pos[0], pos[1]);
          }
       }
    }

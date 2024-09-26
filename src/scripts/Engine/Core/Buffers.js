@@ -8,6 +8,8 @@
 
 
 
+const DEBUG_PRINT_ALLOCATIONS = true;
+
 
 
 
@@ -102,10 +104,12 @@ export class ArrayBufferInterface {
 
       for (let i = 0; i <= this.boundary; i++) {
          this.buffer[i] = INT_NULL;
+         DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE--;
       }
 
       // INFO: Size is responsible for reallocation, so it shouldn't be reseted
-      DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= this.size-1;
+      // DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= this.size-1;
+      // DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= this.size-1;
       this.boundary = -1;
       this.active_count = 0;
       this.freeidx = 0;
@@ -254,6 +258,10 @@ export function New_int8_buffer(size=1, debug_name='INT8 DEBUB UNAMED') {
    DEBUG_INFO_STRUCTS.BUFFER.INT8.BUFFER_COUNT++;
    DEBUG_INFO_STRUCTS.BUFFER.INT8.TOTAL_BUFFER_SIZE+=size;
    // console.log('MemAlloc idx', debug_name, 'size', size)
+
+   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:Int8. name', debug_name);
+
+
    return new Int8Buffer(size, debug_name);
 }
 
@@ -439,6 +447,9 @@ export function New_int16_buffer(size=1, debug_name='INT16 DEBUB UNAMED') {
    DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE += size;
    // console.log('MemAlloc idx', debug_name, 'size', size)
    // console.error('ppppppppppppppppppp', debug_name)
+
+   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:Int16. name', debug_name);
+   
    return new Int16Buffer(size, debug_name);
 }
 
@@ -943,17 +954,19 @@ export function Generic_buffers_container_reset() { _generic_buffers_container.R
 export function Get_generic_buffers_container_get_total_allocations() { return _generic_buffers_container.active_count; }
 
 
-export function New_generic_buffer(obj, name = 'UNAMED BUFFER') {
+export function New_generic_buffer(obj, debug_name = 'UNAMED BUFFER') {
    
-   const buffer = new M_Buffer(obj, name);
+   const buffer = new M_Buffer(obj, debug_name);
    buffer.buffer_container_idx = _generic_buffers_container.Add({
       buffer: buffer,
-      name: name,
+      name: debug_name,
       type: 'Generic Buffer',
    });
 
    DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE += buffer.size;
    DEBUG_INFO_STRUCTS.BUFFER.GENERIC.BUFFER_COUNT++;
+
+   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:Generic. name', debug_name);
 
    return buffer;
 }
@@ -1116,9 +1129,9 @@ export class CharBuffer extends M_Buffer {
 
 
 
-export function New_generic_char_buffer(obj, name = 'UNAMED BUFFER') {
+export function New_generic_char_buffer(obj, debug_name = 'UNAMED BUFFER') {
    
-   const buffer = new CharBuffer(obj, name);
+   const buffer = new CharBuffer(obj, debug_name);
    buffer.buffer_container_idx = _generic_buffers_container.Add({
       buffer: buffer,
       name: name,
@@ -1127,6 +1140,8 @@ export function New_generic_char_buffer(obj, name = 'UNAMED BUFFER') {
 
    // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE += buffer.size;
    // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.BUFFER_COUNT++;
+
+   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:CharBuffer. name', debug_name);
 
    return buffer;
 }

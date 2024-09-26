@@ -167,6 +167,14 @@ export function Listener_assign_parent_event(TYPE_IDX, event_idx, parent_event_i
    const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
 
 
+   // TODO: Resolve any null so we do not check
+   if(parent_event === null || parent_event.view === null){
+
+      console.error('1 Remove View', 'type', TYPE_IDX, 'event', event, 'parent', parent )
+      // alert('listeners: parent.view.children === null'); // console.log()
+      return;
+   }
+
    // Create the parent's children View
    if (!parent_event.view.children) {
       parent_event.view.children = New_generic_buffer(_, `Listeners->parent_event.view.children:${parent_event.name}`);
@@ -264,6 +272,13 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
       if (event.view && event.view.children)
          Listener_remove_all_children_events_from_view(TYPE_IDX, event.view.children);
 
+      // TODO: Resolve any null so we do not check
+      if(parent === null || parent.view === null  || parent.view.children === null){
+
+         console.error('1 Remove View', 'type', TYPE_IDX, 'event', event, 'parent', parent )
+         // alert('listeners: parent.view.children === null'); // console.log()
+         return;
+      }
       // console.log('1 Remove View', 'type', TYPE_IDX, 'view_idx', event.view)
       parent.view.children.RemoveByIdx(event.view.view_idx);
 

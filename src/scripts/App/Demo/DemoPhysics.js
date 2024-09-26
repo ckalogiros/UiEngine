@@ -6,8 +6,9 @@ import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_ro
 import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, WHITE, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
-import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
+import { Slider_connect, Slider_get_slider_val, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
+import { Particles_gfx_uniforms_set_clbk } from "../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_group_create_scissorbox } from "../../Graphics/Buffers/VertexBuffers.js";
 import { GlRotateZ2D } from "../../Graphics/Buffers/VertexBuffersOps.js";
@@ -37,32 +38,37 @@ import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/Math
 // Sattelite rotation
 
 const random_velocities = [
-   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3, 
-   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3, 
-   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3, 
-   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3, 
-   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3, 
-   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3, 
-   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3, 
+   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3,
+   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3,
+   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3,
+   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3,
+   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3,
+   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3,
+   -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3,
 ];
 
 // TODO: Must correct the issue of balls overlaping. 
 
 
-export function Sattelite_rotation(_pos=[0,0]){
+export function Sattelite_rotation(_pos = [0, 0]) {
 
-   
+
    let total_height = 20;
    const pad = 10;
    const panel_height = 150;
-   
+
+   const feather = 2;
+   const rcorners = 10;
+
    /**********************************************************************************************************************************************/
    // Controls
-   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4,4], [_pos[0]+pad, _pos[1]+total_height*2, 0], [0, 0], GREY[1]);
-   if(!PLATFORM.ANY_SMARTPHONE_DEVICE) controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [_pos[0] + pad, _pos[1] + total_height * 2, 0], [0, 0], GREY[1]);
+   controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    controls_section.SetName('Sattelite_rotation->controls_section');
    controls_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   
+
    const flags = {
       unif: SID.UNIF.ROOT_WPOS2,
       pass: SID.PASS.WPOS2,
@@ -71,17 +77,21 @@ export function Sattelite_rotation(_pos=[0,0]){
    const slider_dim = [300, 10];
    // Rotation slider
    const rot_slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Rotation');
+   rot_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   rot_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    controls_section.AddItem(rot_slider);
    rot_slider.SetInitialValue(0);
    rot_slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   
+
    // Speed slider
    const spd_slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Speed');
+   spd_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   spd_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    controls_section.AddItem(spd_slider);
    spd_slider.SetInitialValue(0);
    spd_slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   
-   
+
+
    // Render
    controls_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
    controls_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
@@ -91,60 +101,63 @@ export function Sattelite_rotation(_pos=[0,0]){
    controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
    Construct_listen_events_from_mesh_tree(controls_section)
    Construct_listen_events_relations_from_mesh_tree(controls_section);
-   
+
    total_height += controls_section.geom.dim[1] + pad;
 
 
    /*********************************************************************************************************************************************/
    // Main Panel Section
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [_pos[0]+pad, _pos[1]+total_height*2, 0], [panel_height, panel_height], GREY[1]);
-   if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [_pos[0] + pad, _pos[1] + total_height * 2, 0], [panel_height, panel_height], GREY[1]);
+   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
    section.SetName('Sattelite_rotation->panel');
-   
-
-   const balls_buffer=[], physics=[];
 
 
-   for(let i=0; i<1; i++){
-      
+   const balls_buffer = [], physics = [];
+
+
+   for (let i = 0; i < 1; i++) {
+
       /*********************************************************************************************************************************************/
       // Balls
       const size = 30;
       const dim = [size, size]
-      const pos = [(panel_height-size), (panel_height-size)];
+      const pos = [(panel_height - size), (panel_height - size)];
 
 
       const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, BLUEL[9], 'Ball', [0, dim[0], 2]);
       ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_BORDER);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
       section.AddItem(ball);
-      
+
       balls_buffer[i] = ball;
-      
+
       // Physics
-      const velocity=[random_velocities[i], random_velocities[i+1]]; 
-      const mass=ball.geom.dim[0]; 
-      const momentum=[velocity[0]*mass, velocity[1] * mass];
+      const velocity = [random_velocities[i], random_velocities[i + 1]];
+      const mass = ball.geom.dim[0];
+      const momentum = [velocity[0] * mass, velocity[1] * mass];
       const acceleration = [0, 0];
       const speed = .5;
 
       physics[i] = {
-         vel:velocity,
-         mass:mass,
+         vel: velocity,
+         mass: mass,
          mom: momentum,
          accel: acceleration,
-         speed:speed,
+         speed: speed,
       }
 
    }
-   
+
    const sat = Create_rect_mesh(_, _, [6, 12], YELLOWL[9]);
    sat.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   section.AddItem(sat)
+   // sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   // sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   section.AddItem(sat);
 
    // Render
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -155,7 +168,7 @@ export function Sattelite_rotation(_pos=[0,0]){
 
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
-   
+
    total_height += panel_height + pad;
 
 
@@ -173,32 +186,32 @@ export function Sattelite_rotation(_pos=[0,0]){
       const phys = physics[0];
       const params = {
          section: section,
-         ball:ball, 
+         ball: ball,
          phys: phys,
-         sat:sat,
+         sat: sat,
       }
 
       Slider_connect(rot_slider, (params, slider_val) => {
-   
+
          const ball = params.clbk_params.ball;
          const phys = params.clbk_params.phys;
-         
-         phys.vel[0] = Math.sin(slider_val*Math.PI*2);
-         phys.vel[1] = Math.cos(slider_val*Math.PI*2);
+
+         phys.vel[0] = Math.sin(slider_val * Math.PI * 2);
+         phys.vel[1] = Math.cos(slider_val * Math.PI * 2);
 
          const section = params.clbk_params.section;
          const top_bound = 0;
          const bot_bound = section.geom.dim[1] * 2;
          const left_bound = 0;
          const right_bound = section.geom.dim[0] * 2;
-         
+
          // Check boundaries
          const ball_radius = ball.geom.dim[0];
          const ball_top = ball.geom.pos[1];
          const ball_bot = ball.geom.pos[1] + ball_radius * 2;
          const ball_left = ball.geom.pos[0];
          const ball_right = ball.geom.pos[0] + ball_radius * 2;
-         
+
          if (ball_bot > bot_bound) phys.vel[1] *= -1; // Reverse velocity
          else if (ball_top < top_bound) phys.vel[1] *= -1;
          if (ball_right > right_bound) phys.vel[0] *= -1;
@@ -207,25 +220,25 @@ export function Sattelite_rotation(_pos=[0,0]){
       }, params);
 
       Slider_connect(spd_slider, (params, slider_val) => {
-   
+
          const ball = params.clbk_params.ball;
          const phys = params.clbk_params.phys;
-         
-         phys.speed = slider_val *2;
+
+         phys.speed = slider_val * 2;
 
          const section = params.clbk_params.section;
          const top_bound = 0;
          const bot_bound = section.geom.dim[1] * 2;
          const left_bound = 0;
          const right_bound = section.geom.dim[0] * 2;
-         
+
          // Check boundaries
          const ball_radius = ball.geom.dim[0];
          const ball_top = ball.geom.pos[1];
          const ball_bot = ball.geom.pos[1] + ball_radius * 2;
          const ball_left = ball.geom.pos[0];
          const ball_right = ball.geom.pos[0] + ball_radius * 2;
-         
+
          if (ball_bot > bot_bound) phys.vel[1] *= -1; // Reverse velocity
          else if (ball_top < top_bound) phys.vel[1] *= -1;
          if (ball_right > right_bound) phys.vel[0] *= -1;
@@ -241,21 +254,23 @@ export function Sattelite_rotation(_pos=[0,0]){
       section: section,
       balls_buffer: balls_buffer,
       physics: physics,
-      controls_section:controls_section,
-      prev_pos:[0,0],
-      hits:0, // TODO: Create info-ui displaying the wall-hit value
+      controls_section: controls_section,
+      prev_pos: [0, 0],
+      hits: 0, // TODO: Create info-ui displaying the wall-hit value
    }
 
 
    Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_sattelite, params);
 
-   
+
 
    /**********************************************************************************************************************************************/
    // Create Info Panel
    {
-      const info_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [_pos[0]+pad, _pos[1]+total_height*2, 0], [0, 0], GREY[1]);
-      if(!PLATFORM.ANY_SMARTPHONE_DEVICE) info_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+      const info_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [_pos[0] + pad, _pos[1] + total_height * 2, 0], [0, 0], GREY[1]);
+      sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+      if (!PLATFORM.ANY_SMARTPHONE_DEVICE) info_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       info_section.SetName('Sattelite_rotation->InfoUi-panel');
 
 
@@ -271,17 +286,17 @@ export function Sattelite_rotation(_pos=[0,0]){
          info_section.AddItem(nfo);
 
          nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
-         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, ()=>{return physics[0].vel[0];}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return physics[0].vel[0]; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-         nfo.CreateNewText('Vely:', font_size, WHITE, pad2, .9, );
+         nfo.CreateNewText('Vely:', font_size, WHITE, pad2, .9,);
          nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
-         nfo.SetDynamicText(`ms${ms} -`, ms, ()=>{ return physics[0].vel[1]; }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} -`, ms, () => { return physics[0].vel[1]; }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-         nfo.CreateNewText('Sum:', font_size, WHITE, pad2, .9, );
+         nfo.CreateNewText('Sum:', font_size, WHITE, pad2, .9,);
          nfo.CreateNewText('00000', font_size, ORANGER[9], pad2, .9);
-         nfo.SetDynamicText(`ms${ms} -`, ms, ()=>{ return Abs(physics[0].vel[0])+Abs(physics[0].vel[1]); }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} -`, ms, () => { return Abs(physics[0].vel[0]) + Abs(physics[0].vel[1]); }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       }
@@ -293,17 +308,17 @@ export function Sattelite_rotation(_pos=[0,0]){
          info_section.AddItem(nfo);
 
          nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
-         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return  Math.atan2(physics[0].vel[0], physics[0].vel[1]); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return Math.atan2(physics[0].vel[0], physics[0].vel[1]); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
          nfo.CreateNewText('a:', font_size, WHITE, pad2, .9,);
          nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
-         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return  Abs(sat.geom.pos[0] + (ball.geom.dim[0] * Math.cos(Math.atan2(physics[0].vel[0], physics[0].vel[1])))); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return Abs(sat.geom.pos[0] + (ball.geom.dim[0] * Math.cos(Math.atan2(physics[0].vel[0], physics[0].vel[1])))); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
          nfo.CreateNewText('b:', font_size, WHITE, pad2, .9,);
          nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
-         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return  Abs(sat.geom.pos[1] + (ball.geom.dim[1] * Math.sin(Math.atan2(physics[0].vel[0], physics[0].vel[1])))); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return Abs(sat.geom.pos[1] + (ball.geom.dim[1] * Math.sin(Math.atan2(physics[0].vel[0], physics[0].vel[1])))); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       }
@@ -317,8 +332,8 @@ export function Sattelite_rotation(_pos=[0,0]){
 
          // Cache the ball 1 and ball 2 center positions
          const p1 = [
-            (ball.geom.pos[0] + ball.geom.dim[0]) ,
-            (ball.geom.pos[1] + ball.geom.dim[1]) 
+            (ball.geom.pos[0] + ball.geom.dim[0]),
+            (ball.geom.pos[1] + ball.geom.dim[1])
          ];
          // Calc the vector of the impact line and the magnitude of that vector...
          const impact_vector = [p1[0], p1[1]];
@@ -326,7 +341,7 @@ export function Sattelite_rotation(_pos=[0,0]){
 
 
          nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
-         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return  impact_mag; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return impact_mag; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       }
@@ -352,7 +367,7 @@ export function Sattelite_rotation(_pos=[0,0]){
       total_height += info_section.geom.dim[1] + pad;
    }
 
-} 
+}
 
 
 
@@ -360,25 +375,25 @@ function Animate_sattelite(params) {
 
    const section = params.params.section;
 
-   
+
    const len = params.params.balls_buffer.length;
    for (let i = 0; i < len; i++) {
-      
+
       const ball = params.params.balls_buffer[i];
       const phys = params.params.physics[i];
       const sat = section.children.buffer[1];
       const controls_section = params.params.controls_section;
       const slider = controls_section.children.buffer[0];
 
-      
+
       // Move the ball
       const x = phys.mass * (phys.vel[0] + phys.accel[0]) * phys.speed * .1;
       const y = phys.mass * (phys.vel[1] + phys.accel[1]) * phys.speed * .1;
-      
+
       ball.geom.pos[0] += x;
       ball.geom.pos[1] += y;
-      
-      
+
+
       // Check boundaries
       let hit = false;
       const top_bound = 0;
@@ -397,22 +412,22 @@ function Animate_sattelite(params) {
       if (ball_bot > bot_bound) {
          phys.vel[1] *= -1; // Reverse velocity
          // ball.geom.pos[1] = bot_bound-ball_radius*2; // Puut back inside the panel area
-         hit=true;
+         hit = true;
       }
       else if (ball_top < top_bound) {
          phys.vel[1] *= -1;
          // ball.geom.pos[1] = 0;
-         hit=true;
+         hit = true;
       }
       if (ball_right > right_bound) {
          phys.vel[0] *= -1;
          // ball.geom.pos[0] =  right_bound-ball_radius*2-3;
-         hit=true;
+         hit = true;
       }
       else if (ball_left < left_bound) {
          phys.vel[0] *= -1;
          // ball.geom.pos[0] = 0;
-         hit=true;
+         hit = true;
       }
 
       ball.geom.AddWposXY(ball.gfx, x, y);
@@ -430,12 +445,12 @@ function Animate_sattelite(params) {
       // const cy = sat.geom.pos[1] - sat.geom.dim[1]
       /* Use for rendering sattelite without GFX.ATTR_STYLE */
       const cx = sat.geom.pos[0]; // Center to sattelites position
-      const cy = sat.geom.pos[1] 
+      const cy = sat.geom.pos[1]
       const r = ball.geom.dim[0] + sat.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
       const a = (cx + (r * Math.sin(angle))); // The rotation is the tangent of the outer ball's perimeter, and we add the   
       const b = (cy + (r * Math.cos(angle)));
-      
-      sat.geom.SetWposXY(sat.gfx, ball.geom.pos[0]+ball.geom.dim[0], ball.geom.pos[1]+ball.geom.dim[1]);
+
+      sat.geom.SetWposXY(sat.gfx, ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]);
       sat.geom.AddWposXY(sat.gfx, a, b);
 
 
@@ -443,20 +458,20 @@ function Animate_sattelite(params) {
       // This value gives: from [0..1] of the right semicircle rotation, and [-1..0] for the left semicircle rotation
       // (The right semicircle starts pointing down, and ends up. The left starts pointing up and ends down (counter clockwise))
       let val = angle / Math.PI;
-      
+
       // Interpolate the above value to slider's [0..1] span.
-      if(val < 0){ // If val [0..1] for the right semicircle, 
-         val = (val * .5) +1; // give us a value of [0..0.5]
+      if (val < 0) { // If val [0..1] for the right semicircle, 
+         val = (val * .5) + 1; // give us a value of [0..0.5]
       }
       else { // If val [-1..0] for the left semicircle, 
          val = (val * .5); // give us a value of [0.5..1]
       }
-      
-      
+
+
       const bar = slider.children.buffer[1];
       Slider_simple_set_value(bar, val);
 
-      
+
    }
 }
 
@@ -480,40 +495,40 @@ function Animate_sattelite(params) {
 
 
 const elastic_cllisions_panel_dim = [120, 200];
-const num_balls = 8;
-const ball_dim = 10;
+const num_balls = 5;
+const ball_dim = 20;
 const pad = 15;
 
 const random_positions = [
    [0, 0],
-   [ball_dim*2  +pad, 0],
-   [ball_dim*2*2+pad, 0],
-   [ball_dim*2*3+pad, ball_dim],
-   [ball_dim*2*4+pad, 0],
-   [ball_dim*2*5+pad, ball_dim],
-   [ball_dim*2*6+pad, 0],
-   [ball_dim*2*7+pad, 0],
-   [ball_dim*2  +pad, ball_dim*2+pad],
-   [ball_dim*2*2+pad, ball_dim*2+pad],
-   [ball_dim*2*3+pad, ball_dim*2+pad],
-   [ball_dim*2*4+pad, ball_dim*2+pad],
-   [ball_dim*2*5+pad, ball_dim*2+pad],
-   [ball_dim*2*6+pad, ball_dim*2+pad],
-   [ball_dim*2*7+pad, ball_dim*2+pad],
-   [ball_dim*2  +pad, ball_dim*2*2+pad],
-   [ball_dim*2*2+pad, ball_dim*2*2+pad],
-   [ball_dim*2*3+pad, ball_dim*2*2+pad],
-   [ball_dim*2*4+pad, ball_dim*2*2+pad],
-   [ball_dim*2*5+pad, ball_dim*2*2+pad],
-   [ball_dim*2*6+pad, ball_dim*2*2+pad],
-   [ball_dim*2*7+pad, ball_dim*2*2+pad],
-   [ball_dim*2  +pad, ball_dim*2*3+pad],
-   [ball_dim*2*2+pad, ball_dim*2*3+pad],
-   [ball_dim*2*3+pad, ball_dim*2*3+pad],
-   [ball_dim*2*4+pad, ball_dim*2*3+pad],
-   [ball_dim*2*5+pad, ball_dim*2*3+pad],
-   [ball_dim*2*6+pad, ball_dim*2*3+pad],
-   [ball_dim*2*7+pad, ball_dim*2*3+pad],
+   [ball_dim * 2 + pad, 0],
+   [ball_dim * 2 * 2 + pad, 0],
+   [ball_dim * 2 * 3 + pad, ball_dim],
+   [ball_dim * 2 * 4 + pad, 0],
+   [ball_dim * 2 * 5 + pad, ball_dim],
+   [ball_dim * 2 * 6 + pad, 0],
+   [ball_dim * 2 * 7 + pad, 0],
+   [ball_dim * 2 + pad, ball_dim * 2 + pad],
+   [ball_dim * 2 * 2 + pad, ball_dim * 2 + pad],
+   [ball_dim * 2 * 3 + pad, ball_dim * 2 + pad],
+   [ball_dim * 2 * 4 + pad, ball_dim * 2 + pad],
+   [ball_dim * 2 * 5 + pad, ball_dim * 2 + pad],
+   [ball_dim * 2 * 6 + pad, ball_dim * 2 + pad],
+   [ball_dim * 2 * 7 + pad, ball_dim * 2 + pad],
+   [ball_dim * 2 + pad, ball_dim * 2 * 2 + pad],
+   [ball_dim * 2 * 2 + pad, ball_dim * 2 * 2 + pad],
+   [ball_dim * 2 * 3 + pad, ball_dim * 2 * 2 + pad],
+   [ball_dim * 2 * 4 + pad, ball_dim * 2 * 2 + pad],
+   [ball_dim * 2 * 5 + pad, ball_dim * 2 * 2 + pad],
+   [ball_dim * 2 * 6 + pad, ball_dim * 2 * 2 + pad],
+   [ball_dim * 2 * 7 + pad, ball_dim * 2 * 2 + pad],
+   [ball_dim * 2 + pad, ball_dim * 2 * 3 + pad],
+   [ball_dim * 2 * 2 + pad, ball_dim * 2 * 3 + pad],
+   [ball_dim * 2 * 3 + pad, ball_dim * 2 * 3 + pad],
+   [ball_dim * 2 * 4 + pad, ball_dim * 2 * 3 + pad],
+   [ball_dim * 2 * 5 + pad, ball_dim * 2 * 3 + pad],
+   [ball_dim * 2 * 6 + pad, ball_dim * 2 * 3 + pad],
+   [ball_dim * 2 * 7 + pad, ball_dim * 2 * 3 + pad],
 
 
 ];
@@ -524,44 +539,50 @@ let collision = false;
 
 
 
-export function Elastic_collisions(_pos=[0,0]) {
+export function Elastic_collisions(_pos = [0, 0]) {
 
    let total_height = 20;
 
+   const scale_down = .5;
+   const feather = 2;
+   const rcorners = 10;
+
    const pad = 10;
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [_pos[0]+pad, _pos[1]+total_height*2, 0], elastic_cllisions_panel_dim, GREY[1]);
-   if(!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [_pos[0] + pad, _pos[1] + total_height * 2, 0], elastic_cllisions_panel_dim, GREY[1]);
+   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
    section.SetName('Elastic_collisions');
 
 
    const balls_buffer = [], physics = [], info_buffer = [];
 
-   const test = Create_widget_text(_, `Normal Vector Calculation: n is computed as the difference between positions x1 and x2.`, [0, 400, 10], _, WHITE, _, _, TEXTURES.CONSOLAS_12px );
+   const test = Create_widget_text(_, `Normal Vector Calculation: n is computed as the difference between positions x1 and x2.`, [0, 400, 10], _, WHITE, _, _, TEXTURES.CONSOLAS_12px);
    test.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.AddItem(test);
 
-   console.log(random_positions)
 
    for (let i = 0; i < num_balls; i++) {
 
       /**************************************************************************************************************************************/
       // Balls
+      const size = GetRandomInt(ball_dim, ball_dim * 2)
       // const size = ball_dim;
-      const size = GetRandomInt(ball_dim, ball_dim*2)
       const dim = [size, size]
       const pos = random_positions[i];
 
 
       let zpos = 1;
 
-      // const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, GetSequencedColor(), 'Ball', [0, dim[0], 2]);
-      const ball = Create_widget_section(_, SECTION.VERTICAL, [5,5], [pos[0], pos[1], zpos++], dim, GetSequencedColor(9), 'Ball'+i, [0, dim[0], 2]);
-      // ball.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+      const ball = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [pos[0], pos[1], zpos++], dim, GetSequencedColor(9), 'Ball' + i, [0, dim[0], 2]);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
       ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [0, size, 2]);
+      ball.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      ball.EnableGfxUniforms({ fx: SID.FX.FS_GLOW_VEC3 }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       section.AddItem(ball);
-      
+
       balls_buffer[i] = ball;
 
 
@@ -575,20 +596,79 @@ export function Elastic_collisions(_pos=[0,0]) {
 
       // Physics
       const velocity = [random_velocities[i], random_velocities[i + 1]];
-      const mass = ball.geom.dim[0];
+      const mass = ball.geom.dim[0] * scale_down;
       const momentum = [velocity[0] * mass, velocity[1] * mass];
       const acceleration = [0, 0];
       // const speed = GetRandomInt(1, 1);
-      const speed = 2.5;
+      const speed = 1.5;
       physics[i] = {
          vel: velocity,
          mass: mass,
          mom: momentum,
          accel: acceleration,
          speed: speed,
-         overlap: [0,0], // The overlap distance of the collision
+         overlap: [0, 0], // The overlap distance of the collision
       }
    }
+
+
+
+
+   const slider_feather = 2;
+   const slider_rcorners = 10;
+   const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
+   const u_wpos_flags = {
+      unif: SID.UNIF.ROOT_WPOS2,
+      pass: SID.PASS.WPOS2,
+   }
+
+   // { // SHADER UNIFORMS: Distance
+   //    const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
+   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
+   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
+   //    section.AddItem(slider);
+   //    slider.SetInitialValue(.36);
+   //    slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+   //    balls_buffer[0].GfxUniformsSetClbk('u_scale2', ()=>{ return [scale_down, 1] }, emitter.gfx.vb.groupidx);
+   //    // Particles_gfx_uniforms_set_clbk(emitter1_idx, 'u_glow_params', Slider_get_slider_val, slider, 0);
+   //    Slider_connect(slider, (params, slider_val) => {
+
+   //       emitter.GfxUniformsSetClbk('u_scale2', ()=>{ return [scale_down, 1] }, emitter.gfx.vb.groupidx);
+   //       return slider_val;
+   //    }, _);
+   // }
+   // { // SHADER UNIFORMS: Brightness
+   //    const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
+   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
+   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
+   //    section.AddItem(slider);
+   //    slider.SetInitialValue(1.);
+   //    slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+   //    // Particles_gfx_uniforms_set_clbk(emitter1_idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
+   // }
+   // { // SHADER UNIFORMS: Intensity
+   //    const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
+   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
+   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
+   //    section.AddItem(slider);
+   //    slider.SetInitialValue(.12);
+   //    slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+   //    // Particles_gfx_uniforms_set_clbk(emitter1_idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
+   // }
+   // SHADER UNIFORMS: Particle Scale
+   const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Particle Scale');
+   slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
+   slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
+   section.AddItem(slider);
+   slider.SetInitialValue(scale_down);
+   slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // Particles_gfx_uniforms_set_clbk(emitter1_idx, 'u_scale2', Slider_get_slider_val, slider, 0)
+
+
+
 
 
 
@@ -602,47 +682,72 @@ export function Elastic_collisions(_pos=[0,0]) {
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
 
+   balls_buffer[0].SetClbkGfxUniforms('u_scale2', () => { return [scale_down, 1]; }, balls_buffer[0].gfx.vb.groupidx);
+   balls_buffer[0].SetClbkGfxUniforms('u_glow_params', () => { return [.7, 1., .4] }, { vb_grouidx: balls_buffer[0].gfx.vb.groupidx, val_idx: null, start_val: .5, });
 
    total_height += elastic_cllisions_panel_dim[1];
 
 
 
-   const params = {
+   const animation_params = {
       section: section,
       balls_buffer: balls_buffer,
       physics: physics,
-      info_buffer: info_buffer
+      info_buffer: info_buffer,
+      scale_down: scale_down,
    }
 
-   Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_elastic_collisions_balls, params);
+   Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_elastic_collisions_balls, animation_params);
 
 
-   
 
-   
+
+   // Connect uniforms callback with the slider callback
+   balls_buffer[0].GfxUniformsSetClbk(
+      'u_scale2',
+      (params) => {
+
+         const slider = params.slider;
+         const slider_val = slider.GetValue();
+
+         params.animation_params.scale_down = slider_val;
+         return slider_val;
+      },
+      { animation_params: animation_params, slider: slider, val_idx: 0, }
+   );
+
+
+
+
+
+
 
    /**********************************************************************************************************************************************/
    // Info Panel
    let y = 0;
    const pos = [
-      section.geom.pos[0] + section.geom.dim[0]*2 + pad, 
-      section.GetPosY()+y, 
+      section.geom.pos[0] + section.geom.dim[0] * 2 + pad,
+      section.GetPosY() + y,
       0
    ];
    const info_section_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [5, 5], pos, [0, 0], GREY[1]);
-   if(!PLATFORM.ANY_SMARTPHONE_DEVICE) info_section_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   info_section_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   info_section_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) info_section_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    info_section_panel.SetName(`InfoUi-info_section_panel`);
    for (let i = 0; i < num_balls; i++) {
-      
+
       const pos = [
-         section.geom.pos[0] + section.geom.dim[0]*2 + pad + pad, 
-         section.GetPosY()+y, 
+         section.geom.pos[0] + section.geom.dim[0] * 2 + pad + pad,
+         section.GetPosY() + y,
          0
       ];
       const info_section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [0, 0], GREY[2]);
+      info_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      info_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
       info_section.SetName(`InfoUi-panel${i}`);
       const ball = balls_buffer[i];
-      
+
       y += 40
 
 
@@ -660,12 +765,12 @@ export function Elastic_collisions(_pos=[0,0]) {
          info_section.AddItem(nfo);
 
          nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
-         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, ()=>{return ball.geom.pos[0];}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return ball.geom.pos[0]; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-         nfo.CreateNewText('py:', font_size, WHITE, pad2, .9, );
+         nfo.CreateNewText('py:', font_size, WHITE, pad2, .9,);
          nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
-         nfo.SetDynamicText(`ms${ms} -`, ms, ()=>{ return ball.geom.pos[1]; }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} -`, ms, () => { return ball.geom.pos[1]; }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
          info_text_mesh = nfo;
@@ -675,12 +780,12 @@ export function Elastic_collisions(_pos=[0,0]) {
          info_section.AddItem(nfo);
 
          nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
-         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, ()=>{return physics[i].vel[0];}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return physics[i].vel[0]; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-         nfo.CreateNewText('vy:', font_size, WHITE, pad2, .9, );
+         nfo.CreateNewText('vy:', font_size, WHITE, pad2, .9,);
          nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
-         nfo.SetDynamicText(`ms${ms} -`, ms, ()=>{ return physics[i].vel[1]; }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} -`, ms, () => { return physics[i].vel[1]; }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       }
       { // Info
@@ -688,12 +793,12 @@ export function Elastic_collisions(_pos=[0,0]) {
          info_section.AddItem(nfo);
 
          nfo.CreateNewText('000', font_size, COLOR, pad2, .9);
-         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, ()=>{return physics[i].accel[0];}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return physics[i].accel[0]; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-         nfo.CreateNewText('y:', font_size, WHITE, pad2, .9, );
+         nfo.CreateNewText('y:', font_size, WHITE, pad2, .9,);
          nfo.CreateNewText('000', font_size, COLOR, pad2, .9);
-         nfo.SetDynamicText(`ms${ms} -`, ms, ()=>{ return physics[i].accel[1]; }, _, _, _); 
+         nfo.SetDynamicText(`ms${ms} -`, ms, () => { return physics[i].accel[1]; }, _, _, _);
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       }
       { // Info
@@ -703,7 +808,7 @@ export function Elastic_collisions(_pos=[0,0]) {
          info_section.AddItem(nfo);
 
          nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
-         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, ()=>{return Magnitude(ball.geom.pos[0], ball.geom.pos[1]);}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
+         nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return Magnitude(ball.geom.pos[0], ball.geom.pos[1]); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       }
@@ -725,21 +830,19 @@ export function Elastic_collisions(_pos=[0,0]) {
 
    info_section_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, info_section_panel.gfx.vb.groupidx);
 
-   // View_build_group_from_root_mesh(info_section_panel);
-
 
    Construct_listen_events_from_mesh_tree(info_section_panel)
    Construct_listen_events_relations_from_mesh_tree(info_section_panel);
 
 
-   const scroller_component = Components_create_scroller_component(10, elastic_cllisions_panel_dim[1], info_section_panel, info_section_panel.GetPosY(), );
+   const scroller_component = Components_create_scroller_component(10, elastic_cllisions_panel_dim[1], info_section_panel, info_section_panel.GetPosY(),);
    Scoller_component_gengfx_and_render(scroller_component, info_section_panel);
-   Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(info_section_panel.root_posidx , scroller_component.root_posidx);
+   Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(info_section_panel.root_posidx, scroller_component.root_posidx);
    Listeners_set_priority(E.C, scroller_component.listeners)
    info_section_panel.AddChildScrollerIdx(info_section_panel.scroller_comp_idx);
    Scroller_component_calculate_handle_pos_dim(info_section_panel, scroller_component);
 
-   
+
 
    // Set scissor box
    const mx = info_section_panel.mesh_bufferidx;
@@ -767,12 +870,14 @@ function Animate_elastic_collisions_balls(params) {
 
 
    // STATE.loop.paused = true;
-   if(collision===true){
+   if (collision === true) {
       STATE.loop.paused = true;
-      collision=false
+      collision = false
    }
 
    const section = params.params.section;
+   const scale_down = params.params.scale_down;
+   // console.log(scale_down)
 
    const top_bound = 0;
    const bot_bound = section.geom.dim[1] * 2;
@@ -782,60 +887,75 @@ function Animate_elastic_collisions_balls(params) {
    let overlap = 0;
 
    const len = params.params.balls_buffer.length;
-   for (let i = 0; i < len-1; i++) {
-      for (let j = i+1; j < len; j++) {
-         
+   for (let i = 0; i < len - 1; i++) {
+      for (let j = i + 1; j < len; j++) {
+
          const ball = params.params.balls_buffer[i];
          const ball2 = params.params.balls_buffer[j];
-         
+
          const phys1 = params.params.physics[i];
          const phys2 = params.params.physics[j];
-  
-   
+
+
+         // Calculate the scaled ball size
+         const ball_size = ball.geom.dim[0] * scale_down;
+         const ball2_size = ball2.geom.dim[0] * scale_down;
+
+         // Calculate position relative to the new scaled size
+         const ball_pos = [
+            (ball.geom.pos[0] + ball.geom.dim[0]) - ball_size,
+            (ball.geom.pos[1] + ball.geom.dim[1]) - ball_size,
+         ];
+         const ball2_pos = [
+            (ball2.geom.pos[0] + ball2.geom.dim[0]) - ball2_size,
+            (ball2.geom.pos[1] + ball2.geom.dim[1]) - ball2_size,
+         ];
+
+
          // Cache the ball 1 and ball 2 center positions
          const p1 = [
-            (ball.geom.pos[0] + ball.geom.dim[0]) ,
-            (ball.geom.pos[1] + ball.geom.dim[1]) 
+            (ball_pos[0] + ball_size),
+            (ball_pos[1] + ball_size)
          ];
          const p2 = [
-            (ball2.geom.pos[0] + ball2.geom.dim[0]),
-            (ball2.geom.pos[1] + ball2.geom.dim[1])
+            (ball2_pos[0] + ball2_size),
+            (ball2_pos[1] + ball2_size)
          ];
-         const radii = (ball.geom.dim[0] + ball2.geom.dim[0]);
-   
-         
+         const radii = (ball_size + ball2_size);
+
+
          // Calc the vector of the impact line and the magnitude of that vector...
-         const impact_vector = [p1[0]-p2[0], p1[1]-p2[1]];
+         const impact_vector = [p1[0] - p2[0], p1[1] - p2[1]];
          const impact_mag = Magnitude(impact_vector[0], impact_vector[1]);
-         
+
          // If the vector magnitude is less than the 2 radii of the balls, we have a collision
-         if (impact_mag <= radii)  {
-   
+         if (impact_mag <= radii) {
+
             // The overlap distance of the 2 balls, coinciding with the line of impact 
-            overlap = (impact_mag-radii);
+            overlap = (impact_mag - radii);
 
             const n = [impact_vector[0] / impact_mag, impact_vector[1] / impact_mag];
             const d = radii - impact_mag;
             // console.log('n', n, 'd', d)
-            
-            phys1.overlap[0] = .5*d*n[0];
-            phys1.overlap[1] = .5*d*n[1];
-            phys2.overlap[0] = -.5*d*n[0];
-            phys2.overlap[1] = -.5*d*n[1];
-            
 
-            
+            phys1.overlap[0] = .5 * d * n[0];
+            phys1.overlap[1] = .5 * d * n[1];
+            phys2.overlap[0] = -.5 * d * n[0];
+            phys2.overlap[1] = -.5 * d * n[1];
+
+            // STATE.loop.paused = true
+
             /****************************************************************************************/
             // Handle info text
             {
-                  
+
                // const info_text1 = params.params.info_buffer[i];
                // const info_text2 = params.params.info_buffer[j];
 
                // info_text1.pos.RenderTextFromString(`p:x${Floor(p1[0])}y${Floor(p1[1])}`);
                // info_text1.overlap.RenderTextFromString(`overlap:${overlap.toFixed(2)}`);
                // info_text1.dir.RenderTextFromString(`dir:x${dir1[0].toFixed(2)}y${dir1[1].toFixed(2)}`);
-               
+
                // info_text2.pos.RenderTextFromString(`p:x${Floor(p2[0])}y${Floor(p2[1])}`);
                // info_text2.overlap.RenderTextFromString(`overlap:${overlap.toFixed(2)}`);
                // info_text2.dir.RenderTextFromString(`dir:x${dir2[0].toFixed(2)}y${dir2[1].toFixed(2)}`);
@@ -846,39 +966,33 @@ function Animate_elastic_collisions_balls(params) {
             // Caution! Must copy the values 
             const velx1 = phys1.vel[0], vely1 = phys1.vel[1];
             const velx2 = phys2.vel[0], vely2 = phys2.vel[1];
-            
-            
+
+
             /**
-             * Elastic collision Resoluution
+             * Elastic collision Resolution
              * u1` = u1+ ( ( (u2-u1) DOT (x2-x1) ) / (|x2-x1|)^2 ) * (x2-x1)
              * x:vector position, |x2-x1|)^2 : the magnitude of the resulted vector
             */
-           
-           // Get the distance vector of the 2 balls
+
+            // Get the distance vector of the 2 balls
             // Must check for equal positions, and set to small value, to avoid devide by 0)
             const dx = (p2[0] === p1[0]) ? .0001 : (p2[0] - p1[0]);
             const dy = (p2[1] === p1[1]) ? .0001 : (p2[1] - p1[1]);
             const mag = Magnitude_2vectors(p2, p1)
             { // Ball 1: velocity calculation
-               const dot_product = Dot(velx2-velx1, vely2-vely1, dx, dy);
-               phys1.vel[0] = velx1 +  (( dot_product / (mag*mag) ) * dx); 
-               phys1.vel[1] = vely1 +  (( dot_product / (mag*mag) ) * dy);
-               
+               const dot_product = Dot(velx2 - velx1, vely2 - vely1, dx, dy);
+               phys1.vel[0] = velx1 + ((dot_product / (mag * mag)) * dx);
+               phys1.vel[1] = vely1 + ((dot_product / (mag * mag)) * dy);
+
             }
             { // Ball 2: velocity calculation
-               const dot_product = Dot(velx1-velx2, vely1-vely2, -dx, -dy);
-               phys2.vel[0] = velx2 +  (( dot_product / (mag*mag) ) * -dx); 
-               phys2.vel[1] = vely2 +  (( dot_product / (mag*mag) ) * -dy);
+               const dot_product = Dot(velx1 - velx2, vely1 - vely2, -dx, -dy);
+               phys2.vel[0] = velx2 + ((dot_product / (mag * mag)) * -dx);
+               phys2.vel[1] = vely2 + ((dot_product / (mag * mag)) * -dy);
             }
-            
-            // phys1.accel[0] = 2;
-            // phys1.accel[1] = 2;
-            // phys2.accel[0] = 2;
-            // phys2.accel[1] = 2;
-            
+
             // STATE.loop.paused = true;
-            // collision = true;
-            
+
          }
       }
    }
@@ -891,48 +1005,230 @@ function Animate_elastic_collisions_balls(params) {
       const ball = params.params.balls_buffer[i];
       const phys1 = params.params.physics[i];
 
+
+      // Calculate the scaled ball size
+      const ball_size = ball.geom.dim[0] * scale_down;
+
+      // Calculate position relative to the new scaled size
+      const ball_pos = [
+         (ball.geom.pos[0] + ball.geom.dim[0]) - ball_size,
+         (ball.geom.pos[1] + ball.geom.dim[1]) - ball_size,
+      ];
+
+      ball_pos[0] += phys1.overlap[0];
+      ball_pos[1] += phys1.overlap[1];
       ball.geom.pos[0] += phys1.overlap[0];
       ball.geom.pos[1] += phys1.overlap[1];
 
       // Move the ball
-      const x = (phys1.vel[0]) * (phys1.speed+ phys1.accel[0]);
-      const y = (phys1.vel[1]) * (phys1.speed+ phys1.accel[1]);
+      const x = (phys1.vel[0]) * (phys1.speed + phys1.accel[0]);
+      const y = (phys1.vel[1]) * (phys1.speed + phys1.accel[1]);
+      ball_pos[0] += x;
+      ball_pos[1] += y;
       ball.geom.pos[0] += x;
       ball.geom.pos[1] += y;
 
       // Check boundaries
-      const ball_radius = ball.geom.dim[0];
-      const ball_top = ball.geom.pos[1] + y;
-      const ball_bot = ball.geom.pos[1] + ball_radius * 2 + y;
-      const ball_left = ball.geom.pos[0] + x;
-      const ball_right = ball.geom.pos[0] + ball_radius * 2 + x;
-
+      const ball_top    = ball_pos[1] + y;
+      const ball_bot    = ball_pos[1] + (ball_size * 2) + y;
+      const ball_left   = ball_pos[0] + x;
+      const ball_right  = ball_pos[0] + (ball_size * 2) + x;
 
       if (ball_bot > bot_bound) {
          phys1.vel[1] *= -1; // Reverse velocity
-         ball.geom.pos[1] =  bot_bound-ball_radius*2-3; // Puut back inside the panel area
+         ball_pos[1] = bot_bound - (ball_size * 2) - 3; // Put back inside the panel area
+         // STATE.loop.paused = true
       }
       else if (ball_top < top_bound) {
          phys1.vel[1] *= -1;
-         ball.geom.pos[1] = 0;
+         ball_pos[1] = 0;
+         // STATE.loop.paused = true
       }
       if (ball_right > right_bound) {
          phys1.vel[0] *= -1;
-         ball.geom.pos[0] =  right_bound-ball_radius*2-3;
+         ball_pos[0] = right_bound - (ball_size * 2) - 3;
+         // STATE.loop.paused = true
       }
       else if (ball_left < left_bound) {
          phys1.vel[0] *= -1;
-         ball.geom.pos[0] = 0;
+         ball_pos[0] = 0;
+         // STATE.loop.paused = true
       }
 
 
       ball.geom.SetWposXY(ball.gfx, ball.geom.pos[0], ball.geom.pos[1]);
-      
+
       phys1.overlap[0] = 0;
       phys1.overlap[1] = 0;
 
-      if(phys1.accel[0] > 0) phys1.accel[0] -= .05;
-      if(phys1.accel[1] > 0) phys1.accel[1] -= .05;
+      if (phys1.accel[0] > 0) phys1.accel[0] -= .05;
+      if (phys1.accel[1] > 0) phys1.accel[1] -= .05;
    }
 
 }
+
+/**SAVE!!! */
+
+// /****************************************************************************************************************/
+// // Create the ball's animation callback
+// function Animate_elastic_collisions_balls(params) {
+
+
+
+//    // STATE.loop.paused = true;
+//    if(collision===true){
+//       STATE.loop.paused = true;
+//       collision=false
+//    }
+
+//    const section = params.params.section;
+//    const scale_down = params.params.scale_down;
+
+//    const top_bound = 0;
+//    const bot_bound = section.geom.dim[1] * 2;
+//    const left_bound = 0;
+//    const right_bound = section.geom.dim[0] * 2;
+
+//    let overlap = 0;
+
+//    const len = params.params.balls_buffer.length;
+//    for (let i = 0; i < len-1; i++) {
+//       for (let j = i+1; j < len; j++) {
+         
+//          const ball = params.params.balls_buffer[i];
+//          const ball2 = params.params.balls_buffer[j];
+         
+//          const phys1 = params.params.physics[i];
+//          const phys2 = params.params.physics[j];
+
+//          const ball_size = ball.geom.dim[0] * scale_down;
+//          const ball2_size = ball2.geom.dim[0] * scale_down;
+  
+   
+//          // Cache the ball 1 and ball 2 center positions
+//          const p1 = [
+//             (ball.geom.pos[0] + ball_size) ,
+//             (ball.geom.pos[1] + ball_size) 
+//          ];
+//          const p2 = [
+//             (ball2.geom.pos[0] + ball2.geom.dim[0]),
+//             (ball2.geom.pos[1] + ball2.geom.dim[1])
+//          ];
+//          const radii = (ball_size + ball2_size);
+   
+         
+//          // Calc the vector of the impact line and the magnitude of that vector...
+//          const impact_vector = [p1[0]-p2[0], p1[1]-p2[1]];
+//          const impact_mag = Magnitude(impact_vector[0], impact_vector[1]);
+         
+//          // If the vector magnitude is less than the 2 radii of the balls, we have a collision
+//          if (impact_mag <= radii)  {
+   
+//             // The overlap distance of the 2 balls, coinciding with the line of impact 
+//             overlap = (impact_mag-radii);
+
+//             const n = [impact_vector[0] / impact_mag, impact_vector[1] / impact_mag];
+//             const d = radii - impact_mag;
+//             // console.log('n', n, 'd', d)
+            
+//             phys1.overlap[0] = .5*d*n[0];
+//             phys1.overlap[1] = .5*d*n[1];
+//             phys2.overlap[0] = -.5*d*n[0];
+//             phys2.overlap[1] = -.5*d*n[1];
+            
+
+            
+//             // Cache the current velocity vectors of the 2 balls to be compared
+//             // Caution! Must copy the values 
+//             const velx1 = phys1.vel[0], vely1 = phys1.vel[1];
+//             const velx2 = phys2.vel[0], vely2 = phys2.vel[1];
+            
+            
+//             /**
+//              * Elastic collision Resoluution
+//              * u1` = u1+ ( ( (u2-u1) DOT (x2-x1) ) / (|x2-x1|)^2 ) * (x2-x1)
+//              * x:vector position, |x2-x1|)^2 : the magnitude of the resulted vector
+//             */
+           
+//            // Get the distance vector of the 2 balls
+//             // Must check for equal positions, and set to small value, to avoid devide by 0)
+//             const dx = (p2[0] === p1[0]) ? .0001 : (p2[0] - p1[0]);
+//             const dy = (p2[1] === p1[1]) ? .0001 : (p2[1] - p1[1]);
+//             const mag = Magnitude_2vectors(p2, p1)
+//             { // Ball 1: velocity calculation
+//                const dot_product = Dot(velx2-velx1, vely2-vely1, dx, dy);
+//                phys1.vel[0] = velx1 +  (( dot_product / (mag*mag) ) * dx); 
+//                phys1.vel[1] = vely1 +  (( dot_product / (mag*mag) ) * dy);
+               
+//             }
+//             { // Ball 2: velocity calculation
+//                const dot_product = Dot(velx1-velx2, vely1-vely2, -dx, -dy);
+//                phys2.vel[0] = velx2 +  (( dot_product / (mag*mag) ) * -dx); 
+//                phys2.vel[1] = vely2 +  (( dot_product / (mag*mag) ) * -dy);
+//             }
+            
+//             // phys1.accel[0] = 2;
+//             // phys1.accel[1] = 2;
+//             // phys2.accel[0] = 2;
+//             // phys2.accel[1] = 2;
+            
+//             // STATE.loop.paused = true;
+//             // collision = true;
+            
+//          }
+//       }
+//    }
+
+//    // TODO: Combine the 2 for loops
+//    // Check Boundary Collisions
+//    for (let i = 0; i < len; i++) {
+
+
+//       const ball = params.params.balls_buffer[i];
+//       const phys1 = params.params.physics[i];
+
+//       ball.geom.pos[0] += phys1.overlap[0];
+//       ball.geom.pos[1] += phys1.overlap[1];
+
+//       // Move the ball
+//       const x = (phys1.vel[0]) * (phys1.speed+ phys1.accel[0]);
+//       const y = (phys1.vel[1]) * (phys1.speed+ phys1.accel[1]);
+//       ball.geom.pos[0] += x;
+//       ball.geom.pos[1] += y;
+
+//       // Check boundaries
+//       const ball_radius = ball.geom.dim[0] * scale_down;
+//       const ball_top = ball.geom.pos[1] + y;
+//       const ball_bot = ball.geom.pos[1] + ball_radius * 2 + y;
+//       const ball_left = ball.geom.pos[0] + x;
+//       const ball_right = ball.geom.pos[0] + ball_radius * 2 + x;
+
+
+//       if (ball_bot > bot_bound) {
+//          phys1.vel[1] *= -1; // Reverse velocity
+//          ball.geom.pos[1] =  bot_bound-ball_radius*2-3; // Puut back inside the panel area
+//       }
+//       else if (ball_top < top_bound) {
+//          phys1.vel[1] *= -1;
+//          ball.geom.pos[1] = 0;
+//       }
+//       if (ball_right > right_bound) {
+//          phys1.vel[0] *= -1;
+//          ball.geom.pos[0] =  right_bound-ball_radius*2-3;
+//       }
+//       else if (ball_left < left_bound) {
+//          phys1.vel[0] *= -1;
+//          ball.geom.pos[0] = 0;
+//       }
+
+
+//       ball.geom.SetWposXY(ball.gfx, ball.geom.pos[0], ball.geom.pos[1]);
+      
+//       phys1.overlap[0] = 0;
+//       phys1.overlap[1] = 0;
+
+//       if(phys1.accel[0] > 0) phys1.accel[0] -= .05;
+//       if(phys1.accel[1] > 0) phys1.accel[1] -= .05;
+//    }
+
+// }

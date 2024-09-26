@@ -49,6 +49,13 @@ vec4 Glow(float alpha, float scale_down)
         float intensity = 0.2;
     #endif
 
+    
+    #ifdef A_TIME
+        float time = v_time;
+    #else
+        float time = 0.;
+    #endif
+
    vec2 res = u_screen_res;
    vec2 dim = vec2(v_dim2_x, v_dim2_y);
    
@@ -69,18 +76,15 @@ vec4 Glow(float alpha, float scale_down)
    
    
     float r = dim.y*scale_down;
-    // float r = dim.y;
-    // float d = smoothstep(dim.y, r,  length(uv));
     float d = smoothstep(dim.y*outer, r*inner,  length(uv));
 
     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
-    vec3 color = src_color.rgb*d*intensity;
+    vec3 color = src_color.rgb*d*intensity*(1. - time);
+
     // color.rgb *= d;
-    // color.rgb *= original_a;
-    // alpha *= original_a;
-    // vec3 color = vec3(d*intensity);
-    // color = min(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
-    // color = max(v_col.rgb, d*intensity); // WEIRD NICE EFFECT!!!
+    // color.rgb *= alpha;
+    // alpha *= alpha;
+    // color = min(src_color.rgb, d*intensity); // WEIRD NICE EFFECT!!!
    
    
     // return vec4(color, alpha);

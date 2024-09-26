@@ -6,7 +6,7 @@ import { Create_widget_section } from "../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { YELLOW } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { Get_fasma_color, WHITE, YELLOW } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { GetSequencedColor } from "../../Helpers/Helpers.js";
@@ -23,7 +23,8 @@ import { Abs, Magnitude } from "../../Helpers/Math/MathOperations.js";
 
 
 const size = 15;
-const count = 40;
+const feather = 2.8;
+const count = 24*2;
 
 
 
@@ -38,16 +39,19 @@ export function Demo_chain_link() {
 
 
    const style = [size, 0, 1.8];
-   const color = GetSequencedColor(9);
+   // const color = GetSequencedColor(9);
+   const color = WHITE;
    const tr = .9;
    
    let next_posx = 300;
    
    // const head = Create_widget_section(_, _, [0,0], [next_posx, 20, 1], [size,size], ORANGEL[9], 'head', [0, size, 2]);
-   const head = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], TRANSPARENCY(color,tr), 'head', style);
-   head.SetName('head')
+   const head = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], TRANSPARENCY(color,tr), 'head', _);
    head.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    head.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   head.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   head.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, size);
+   head.SetName('head');
    
    head.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
    head.GenGfxCtx();
@@ -65,18 +69,26 @@ export function Demo_chain_link() {
    // Body mesh (parent for all other body meshes)
    next_posx -= size*2;
    
-   const body = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], TRANSPARENCY(GetSequencedColor(9),tr), 'head', style);
-   body.SetName('body');
+   const body = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], WHITE, 'head', style);
+   // const body = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], TRANSPARENCY(GetSequencedColor(9),tr), 'head', style);
    body.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   body.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   body.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, size);
+   body.SetName('body');
    
    for(let i=0; i < count; i++){
       
       next_posx -= size*2 + next_posx;
       // next_posx = body.geom.pos[0];
       
-      const body_child = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 0, 1], [size,size], TRANSPARENCY(YELLOW[9],tr), 'head', style);
-      body_child.SetName('body_child 2');
+      const c = Get_fasma_color(i, count);
+      // const body_child = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 0, 1], [size,size], TRANSPARENCY(YELLOW[9],tr), 'head', style);
+      // const body_child = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 0, 1], [size,size], TRANSPARENCY(GetSequencedColor(9),tr), 'head', style);
+      const body_child = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 0, 1], [size,size], TRANSPARENCY(c,tr), 'head', style);
       body_child.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      body_child.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      body_child.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, size);
+      body_child.SetName('body_child 2');
       
       body.AddItem(body_child);
    }

@@ -357,17 +357,19 @@ export function Detect_host_platform() {
     PLATFORM.WIN_PHONE_IMPL = true;
     PLATFORM.ANY_SMARTPHONE_DEVICE = true;
     console.log('-- Windows Phone Platform --');
+    alert('-- Windows Phone Platform --');
   }
   else if (/Android/i.test(wn.userAgent)) {
     PLATFORM.ANDROID_IMPL = true;
     PLATFORM.ANY_SMARTPHONE_DEVICE = true;
     console.log('-- Android Phone Platform --')
-    // alert('-- Android Phone Platform --')
+    alert('-- Android Phone Platform --')
   }
   else if (/iPhone|iPad|iPod/i.test(wn.userAgent)) {
     PLATFORM.I_PHONE_IMPL = true;
     PLATFORM.ANY_SMARTPHONE_DEVICE = true;
     console.log('-- Iphone Phone Platform --')
+    // alert('-- Iphone Phone Platform --')
   }
   /** Windows NT
    * Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0 

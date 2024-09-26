@@ -48,9 +48,15 @@ export class Widget_Color_Picker extends Section {
       this.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       this.options |= SECTION.RESIZE_PARENT;
 
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       // this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+
+      let has_feather_enabled = false;
+      let has_rcornners_enabled = false;
+      if(style[0]) has_rcornners_enabled = true;
+      if(style[1]) ;
+      if(style[2]) has_feather_enabled = true;
+
 
 
       this.label_r = null;
@@ -68,7 +74,7 @@ export class Widget_Color_Picker extends Section {
       const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10*scale, 10*scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
       panel.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel.options |= SECTION.RESIZE_PARENT;
-      panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+
       this.AddItem(panel)
 
 
@@ -80,7 +86,6 @@ export class Widget_Color_Picker extends Section {
       // Create the color picker panel
       const color_pick = Create_rect_mesh(_, [20, 20, 2], [150*scale, 150*scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
       color_pick.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       // color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
       color_pick.state.mask &= ~MESH_STATE.ACTIVE;
@@ -93,10 +98,8 @@ export class Widget_Color_Picker extends Section {
       const panel2 = Create_widget_section(_, SECTION.VERTICAL, [10*scale, 10*scale], [0, 0, 1], _, [BLACK, BLACK, BLACK, BLACK], 'Inner Panel 1', style, 1, _, is_debug_mesh);
       panel2.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel2.options |= SECTION.RESIZE_PARENT;
-      panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       panel2.StylesSetMargin([10, 0]);
       temp_panel2_idx = panel.AddItem(panel2)
-      
 
 
 
@@ -105,7 +108,6 @@ export class Widget_Color_Picker extends Section {
       // const color_present_mesh = Create_rect_mesh(_, [20, 20, 2], [80, 60], [YELLOW[9], YELLOW[9],YELLOW[9], YELLOW[9]], 'Color Present', style, [0, 0], 1, is_debug_mesh);
       const color_present_mesh = Create_rect_mesh(_, [20, 20, 2], [80*scale, 60*scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
       color_present_mesh.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      color_present_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       color_present_mesh.StylesSetMargin([0, 0]);
 
       this.color_pick_click_pos = [color_pick.geom.dim[0]*2, 0];
@@ -122,52 +124,44 @@ export class Widget_Color_Picker extends Section {
          {
             const label = Create_widget_label(_, 'R', _, [0, 0, 3], fontsize, REDL[5], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
 
             this.label_r = Create_widget_label(_, 'RRRRR', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
             this.label_r.temp_align |= SECTION.HORIZONTAL;
-            this.label_r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
             this.label_r.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_r);
          }
          {
             const label = Create_widget_label(_, 'G', _, [0, 0, 3], fontsize, GREEN[4], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
 
             this.label_g = Create_widget_label(_, 'GGGGG', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
             this.label_g.temp_align |= SECTION.HORIZONTAL;
-            this.label_g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
             this.label_g.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_g);
          }
          {
             const label = Create_widget_label(_, 'B', _, [0, 0, 3], fontsize, BLUEL[6], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
 
             this.label_b = Create_widget_label(_, 'BBBBB', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
             this.label_b.temp_align |= SECTION.HORIZONTAL;
-            this.label_b.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
             this.label_b.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_b);
          }
          {
             const label = Create_widget_label(_, 'A', _, [0, 0, 3], fontsize, GREY[6], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
 
             this.label_a = Create_widget_label(_, 'AAAAA', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
             this.label_a.temp_align |= SECTION.HORIZONTAL;
-            this.label_a.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
             this.label_a.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_a);
          }
@@ -189,8 +183,7 @@ export class Widget_Color_Picker extends Section {
       const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12*scale, 150*scale], TRANSPARENCY_BAR_COLOR, [0, 0], [16*scale, 3*scale], WHITE, 1);
       slider_tran.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
-      slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      slider_tran.SetStyle(12*scale, [0, 2]);
+      slider_tran.SetStyle([12*scale, 0, 2]);
       slider_tran.StylesSetMargin([10, 0]);
       slider_tran.SetName('Slider Transparency');
 
@@ -219,12 +212,43 @@ export class Widget_Color_Picker extends Section {
       
       slider.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       slider.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
-      slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       slider.StylesSetMargin([0, 20]);
       slider.SetStyle([20*scale, style[1], style[2]]);
       slider.SetName('Slider Hue');
       temp_hue_pick_idx = this.AddItem(slider);
 
+
+            
+      if(has_feather_enabled){
+
+         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
+         panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
+         color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
+         panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
+         color_present_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
+         slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2], style[2]);
+         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2], style[2]);
+
+         for(let i = temp_color_present_idx+1; i < panel2.children.boundary; i++){
+            const label = panel2.children.buffer[i];
+            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, label_style[2])
+         }
+      }
+      if(has_rcornners_enabled){
+
+         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
+         panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
+         color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
+         panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
+         color_present_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
+         slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0], style[0]);
+         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0], style[0]);
+         
+         for(let i = temp_color_present_idx+1; i < panel2.children.boundary; i++){
+            const label = panel2.children.buffer[i];
+            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, label_style[0])
+         }
+      }
 
 
       console.log(
@@ -434,7 +458,7 @@ export class Widget_Color_Picker extends Section {
             color_pick_mesh: color_pick_mesh,
             color_present_mesh: color_present_mesh,
          }
-         hue_mesh.SetInitialValue(17);
+         hue_mesh.SetInitialValue(.17);
          Slider_simple_connect(hue_mesh, mesh.OnClickHuePick, clbk_params);
          
       }
@@ -459,7 +483,7 @@ export class Widget_Color_Picker extends Section {
             color_present_mesh: color_present_mesh,
             target_mesh: null,
          }
-         transp_slider_mesh.SetInitialValue(100);
+         transp_slider_mesh.SetInitialValue(1);
          Slider_simple_connect(transp_slider_mesh, mesh.OnClickTranpsarencyPick, clbk_params_transparency_slider)
 
       }

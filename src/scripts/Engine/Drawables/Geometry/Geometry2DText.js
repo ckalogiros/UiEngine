@@ -38,15 +38,13 @@ export class Geometry2D_Text extends Geometry2D {
    /*******************************************************************************************************************************************************/
    // 
 
-   AddWposXY(gfx, x, y) {
-      super.AddWposXY(gfx, x, y, this.num_faces)
-   }
+   AddWposXY(gfx, x, y) { super.AddWposXY(gfx, x, y, this.num_faces) }
+   AddWposX(gfx, x) { super.AddWposX(gfx, x, this.num_faces) }
+   AddWposY(gfx, y) { super.AddWposY(gfx, y, this.num_faces) }
 
-   SetWposXY(pos, gfx) {
-      super.SetWposXY(gfx, pos[0], pos[1], this.num_faces)
-   }
+   SetWposXY(gfx, x, y) { super.SetWposXY(gfx, x, y, this.num_faces) }
 
-   SetPosY(y, gfx) {
+   SetPosY(gfx, y) {
       this.pos[1] = y;
       Gl_set_wpos_y(gfx, y, this.num_faces);
    }

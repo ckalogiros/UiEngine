@@ -32,7 +32,13 @@ export function Screen_wpos_get_x() { return _screen_wpos[0]; }
 export function Screen_wpos_get_y() { return _screen_wpos[1]; }
 
 
+export function Screen_wpos_add_x(x) { _screen_wpos[0] += x; }
+
+
 export function Screen_wpos_add_y(y) { _screen_wpos[1] += y; }
+
+
+export function Screen_wpos_set_x(x) { _screen_wpos[0] = x; }
 
 
 export function Screen_wpos_set_y(y) { _screen_wpos[1] = y; }
@@ -215,15 +221,20 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
       mesh_pos[1] = 0;
    }
 
-   const unif_wpos = _per_vb_mesh_unif_wpos.buffer[vb_groupidx];
-   unif_wpos.wpos[0] = wpos[0];
-   unif_wpos.wpos[1] = wpos[1];
-   unif_wpos.meshidx = meshidx;
-   unif_wpos.parent_posidx = parent_posidx;
-   unif_wpos.debug_vb_groupidx = vb_groupidx;
-   unif_wpos.has_absolute_pos = HAS_ABSOLUTE_POS;
-   unif_wpos.sticky_pos = HAS_STICKY_POS;
-   unif_wpos.scroll_bar = INT_NULL;
+
+   // If it is the case the vertex buffer is not created but is re-used, then we need to re-initialize the unif_wpos 
+   if(mesh_parent === null){
+
+      const unif_wpos = _per_vb_mesh_unif_wpos.buffer[vb_groupidx];
+      unif_wpos.wpos[0] = wpos[0];
+      unif_wpos.wpos[1] = wpos[1];
+      unif_wpos.meshidx = meshidx;
+      unif_wpos.parent_posidx = parent_posidx;
+      unif_wpos.debug_vb_groupidx = vb_groupidx;
+      unif_wpos.has_absolute_pos = HAS_ABSOLUTE_POS;
+      unif_wpos.sticky_pos = HAS_STICKY_POS;
+      unif_wpos.scroll_bar = INT_NULL;
+   }
 
 
    const dbg_for_unifwpos = _debug_names_per_vb_mesh_unif_wpos.buffer[vb_groupidx];

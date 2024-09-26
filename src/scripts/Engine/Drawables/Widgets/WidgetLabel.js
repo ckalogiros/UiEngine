@@ -43,7 +43,6 @@ export class Widget_Label extends Rect_Mesh {
         const dim = [
             dimentions.w + pad[0] * 2,
             dimentions.h + pad[1] * 2,
-            // text_mesh.geom.dim[1] + pad[1] * 2,
         ];
 
 
@@ -62,9 +61,6 @@ export class Widget_Label extends Rect_Mesh {
 
 
         this.mesh_bufferidx = mesh_bufferidx;
-
-        this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-
 
         // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
         this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -320,8 +316,17 @@ export class Widget_Label extends Rect_Mesh {
 
     AddWposY(y) {
 
+        this.geom.pos[1] += y;
         this.geom.AddWposY(this.gfx, y, );
+        this.text_mesh.geom.pos[1] += y;
         this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y, );
+        // if(this.state.mask & MESH_STATE.ACTIVE) {
+        //     this.geom.AddWposY(this.gfx, y, );
+        // }
+        // this.text_mesh.geom.pos[1] += y;
+        // if(this.text_mesh.state.mask & MESH_STATE.ACTIVE) {
+        //     this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y, );
+        // }
     }
 
 
@@ -425,18 +430,21 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    SetPosX(x) {
-
-        // const dx = this.geom.pos[0] - x;
-        super.SetPosX(x);
-        
-        // this.text_mesh.MoveXNoGfxUpdate(dx);
-        // this.text_mesh.geom.AddWposX(this.text_mesh.gfx, -dx, this.text_mesh.geom.num_faces);
-        // this.text_mesh.SetPosX(dx);
-        
-        // const dx = this.text_mesh.geom.pos[0]-this.geom.pos[0];
-        // console.log(x, dx)
-        // this.text_mesh.AddWposX(dx);
+    SetWposXY(x, y) {
+        super.SetWposXY(x, y);
+        this.text_mesh.AddWposXY(x, y);
+    }
+    
+    
+    SetWposX(x) {
+        super.SetWposX(x);
+        this.text_mesh.AddWposX(x);
+    }
+    
+    
+    SetWposY(y) {
+        super.SetWposY(y);
+        this.text_mesh.AddWposY(y);
     }
 
 
