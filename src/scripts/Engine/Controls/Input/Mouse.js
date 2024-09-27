@@ -306,7 +306,7 @@ export function OnMouseWheel(e){
                
                Scene_camera_scroll_add(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
                Vertex_buffer_group_update_scissorbox_all_vb();
-               console.log(temp_scroll_speed, params.wheel_delta)
+               // console.log(temp_scroll_speed, params.wheel_delta)
 
                return true;
             }
@@ -314,7 +314,7 @@ export function OnMouseWheel(e){
             return false;
          }, 
          ()=>{
-            console.log('END')
+            // console.log('END')
             
             in_scolling = false;
             temp_scroll_speed = .5;

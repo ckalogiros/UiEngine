@@ -1,5 +1,5 @@
 "use strict";
-import { FloorArr2, FloorArr3 } from '../Helpers/Math/MathOperations.js';
+import { FloorArr2, FloorArr3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
 
 
 import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
@@ -350,46 +350,9 @@ export function TestWidgetsGeneric(createId=1) {
     // Demo_snake_animation();
     // Demo_chain_link();
 
-    // Game_snake();
-
-    {
-
-        
-        // const glow = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [100,100,0], [40,40], BLUEL[9], 'Glow Mesh', [0, 40, 2]);
-        // // const emitter = Particles_get_particle_system(emitter_idx1);
-        // // emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
-        
-        // glow.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
-        // // glow.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, [0, 40, 2]);
-        // glow.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        // glow.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-        // glow.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC3,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-        
-        
-        
-        // glow.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
-        // glow.GenGfxCtx();
-        // glow.options = SECTION.INHERIT|SECTION.HORIZONTAL|SECTION.RESIZE_PARENT;
-        // glow.Render();
-        
-        
-        // Root_group_activate_all_vbs_in_renderqueue(glow.root_bufferidx);
-        // Construct_listen_events_from_mesh_tree(glow);
-        // Construct_listen_events_relations_from_mesh_tree(glow);
-        
-        
-        // const scale_down = .2;
-        // glow.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, glow.gfx.vb.groupidx);
-        // glow.GfxUniformsSetClbk('u_scale2', function () { return [scale_down, 1] }, glow.gfx.vb.groupidx);
-        
-        // const clbk_params_0 = { vb_grouidx: glow.gfx.vb.groupidx, val_idx: 0, start_val: .5, }
-        // glow.SetClbkGfxUniforms('u_glow_params', ()=>{return .5}, clbk_params_0);
-        // const clbk_params_1 = { vb_grouidx: glow.gfx.vb.groupidx, val_idx: 2, start_val: .5, }
-        // glow.SetClbkGfxUniforms('u_glow_params', ()=>{return 1.}, clbk_params_1);
-    }
+    Game_snake();
 
 
-    
     { // Reload
 
         // const reload_btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Reload', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 140, 10, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
@@ -520,24 +483,26 @@ export function TestWidgetsGeneric(createId=1) {
 
     { // Widget: Colorpicker
         
-        // TODO: Enable multi vertex color in 'Widget_Slider_Simple' constructor
-        // const colorpicker = Demo_widgets_colorpicker(_, _, _, ROOT_WIDGETS.CREATE_ROOT);
-        
         // /* Test change color of a mesh using the colorpicker */
-        // const cp = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 600, 0], [200, 80], TRANSPARENCY(GREEN[2], 1.), 'ColorPicker');
-        // cp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-        // cp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        // cp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        // cp.Render();
+        // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [100, 600, 0], [200, 80], TRANSPARENCY(GREEN[2], 1.), 'ColorPicker');
+        // rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+        // rect.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        // rect.Render();
 
 
-        // Root_group_activate_all_vbs_in_renderqueue(cp.root_bufferidx);
-        // cp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, cp.gfx.vb.groupidx);
-        // Construct_listen_events_from_mesh_tree(cp);
-        // Construct_listen_events_relations_from_mesh_tree(cp);
+        // Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
+        // rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
+        // Construct_listen_events_from_mesh_tree(rect);
+        // Construct_listen_events_relations_from_mesh_tree(rect);
 
-        const color_picker = Demo_widgets_colorpicker(0, 0, 0x0, ROOT_WIDGETS.CREATE_ROOT)
-        // picker.AssignTargetMesh(line);
+        // const color_picker = Demo_widgets_colorpicker(0, 0, 0x0, ROOT_WIDGETS.CREATE_ROOT)
+        // color_picker.AssignTargetMeshClbk((params)=>{
+            
+        //     const color = params;
+        //     const c = Mult_arr3_scalar(color, color[3]);
+        //     Gl_set_rgba(rect.gfx, c);
+        // });
         
 
         /** Colorpicker Instanced Geometry*/
@@ -1605,7 +1570,7 @@ function CreateDropdown3(pos, dim) {
 
     dp.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-    dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
+    dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
     dp.Calc_no_gfx_update();
     dp.Render();
     Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);

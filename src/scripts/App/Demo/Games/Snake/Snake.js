@@ -194,7 +194,7 @@ export function Game_snake() {
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [board_pad, vertical_space, 0], [board_width-board_pad,board_height], board_color, 'section', style);
    section.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,);
+   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, );
 
 
 
@@ -270,7 +270,7 @@ export function Game_snake() {
       const body_mesh = Create_widget_section(_, _, [0,0], [next_posx, next_posy, MAX_BODY_MESHES-i+1], [calc_size, calc_size], snake.color, 'body_mesh', [calc_size, snake.style[1], snake.style[2]]);
       body_mesh.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      body_mesh.EnableGfxUniforms({unif: SID.UNIF.FS_RCORNERS_FLOAT,}, 'u_rcorners_1f', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
+      body_mesh.EnableGfxUniforms({unif: SID.UNIF.FS_RCORNERS_VEC3,}, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, snake.style[1]);
       body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
       // body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY);
@@ -385,7 +385,7 @@ export function Game_snake() {
    
    const head = snake.body.buffer[0].mesh;
    head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, head.gfx.vb.groupidx);
-   head.SetClbkGfxUniforms('u_rcorners_1f', ()=>{ return .3}, { val_idx: null, start_val: .0, });
+   head.SetClbkGfxUniforms('u_rcorners', ()=>{ return  [.0, .0, .0]}, { val_idx: null, start_val: .0, });
 
 
 
@@ -1166,10 +1166,10 @@ function Animation_scale_down_stop(params){
       
       body_mesh.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      body_mesh.EnableGfxUniforms({unif: SID.UNIF.FS_RCORNERS_FLOAT,}, 'u_rcorners_1f', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
+      body_mesh.EnableGfxUniforms({unif: SID.UNIF.FS_RCORNERS_VEC3,}, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
       body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, snake.style[1]);
-      body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,);
 
 
 
@@ -1196,7 +1196,7 @@ function Animation_scale_down_stop(params){
       /*************************************************************************************************/
       const head = snake.body.buffer[0].mesh;
       head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, head.gfx.vb.groupidx);
-      head.SetClbkGfxUniforms('u_rcorners_1f', ()=>{ return .0; }, { val_idx: null, start_val: .0, } );
+      // head.SetClbkGfxUniforms('u_rcorners', ()=>{ return [1, 1, 1]; }, { val_idx: null, start_val: .0, } );
       
 
       const bodyidx = snake.body.Add(new Body_mesh_properties(body_mesh));

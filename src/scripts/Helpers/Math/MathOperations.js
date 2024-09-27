@@ -26,7 +26,7 @@ export function Set_mat4_collumn(mat, scalar, colidx){
     ];
 }
 
-export function Mult_arr3_scalar2(arr, scalar){
+export function Mult_arr3_scalar(arr, scalar){
     return[
         arr[0] * scalar,
         arr[1] * scalar,

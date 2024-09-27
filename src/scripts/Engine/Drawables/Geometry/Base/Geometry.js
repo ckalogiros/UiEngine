@@ -28,8 +28,8 @@ export class Geometry2D {
         
         this.sid = {
             shad: SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
-            // attr: (SID.ATTR.POS2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2),
-            attr: (SID.ATTR.POS2 | SID.ATTR.WPOS3),
+            // attr: (SID.ATTR.VPOS2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2),
+            attr: (SID.ATTR.VPOS2 | SID.ATTR.WPOS3),
             // inst: SID.ATTR.WPOS3,
             inst: 0x0,
             unif: 0,

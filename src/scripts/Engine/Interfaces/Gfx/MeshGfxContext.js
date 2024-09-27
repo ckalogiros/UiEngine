@@ -190,7 +190,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
       if (vb_info.sid & SID.ATTR.COL4) { gfx_ctx.vb.which_vb.col_buf = i; }
       if (vb_info.sid & SID.ATTR.WPOS3) { gfx_ctx.vb.which_vb.wpos_buf = i; }
       if (vb_info.sid & SID.ATTR.STYLE) { gfx_ctx.vb.which_vb.generic_attr1_buf = i; }
-      if (vb_info.sid & SID.ATTR.POS2) { gfx_ctx.vb.which_vb.dim_buf = i; }
+      if (vb_info.sid & SID.ATTR.VPOS2) { gfx_ctx.vb.which_vb.dim_buf = i; }
       if (vb_info.sid & SID.ATTR.TEX2) { gfx_ctx.vb.which_vb.tex_buf = i; }
 
 
@@ -207,7 +207,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i;
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = i;
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = i;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.POS2) gfx_ctx.vb.which_attrib.dim_idx = i;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = i;
       if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i;
    }
 

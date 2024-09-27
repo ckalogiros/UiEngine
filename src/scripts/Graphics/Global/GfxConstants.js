@@ -120,19 +120,19 @@ const SID = {
 
     ATTR: {
         COL4: BIT2,
-        POS2: BIT2 <<= 1,
-        DIM2: BIT2 <<= 1,
-        SCALE2: BIT2 <<= 1,
-        TEX2: BIT2 <<= 1,
         WPOS3: BIT2 <<= 1,
+        VPOS2: BIT2 <<= 1,
+        DIM2: BIT2 <<= 1,
         TIME: BIT2 <<= 1,
+        R_CORNERS: BIT2 <<= 1,
+        BORDER: BIT2 <<= 1,
+        FEATHER: BIT2 <<= 1,
+        GLOW_INTENSITY: BIT2 <<= 1,
+        TEX2: BIT2 <<= 1,
+        SCALE2: BIT2 <<= 1,
         SDF: BIT2 <<= 1,
         MSDF: BIT2 <<= 1,
         STYLE: BIT2 <<= 1,
-        BORDER: BIT2 <<= 1,
-        R_CORNERS: BIT2 <<= 1,
-        FEATHER: BIT2 <<= 1,
-        GLOW_INTENSITY: BIT2 <<= 1,
         COL4_PER_VERTEX: BIT2 <<= 1,
         EMPTY: BIT2 <<= 1,
         TEST_MULTI_VERTEX: BIT2 <<= 1,
@@ -140,7 +140,7 @@ const SID = {
 
     INST:{
         COL4: BIT3,
-        POS2: BIT3 <<= 1,
+        VPOS2: BIT3 <<= 1,
         TEX2: BIT3 <<= 1,
         WPOS3: BIT3 <<= 1,
         TIME: BIT3 <<= 1,
@@ -165,7 +165,8 @@ const SID = {
         ROOT_WPOS2: BIT5 <<= 0x1,   // u_wposxy
         TIME: BIT5 <<= 0x1,         // u_time
         FS_RCORNERS_FLOAT: BIT5<<=0x1,
-        // UNIF_SPEED: BIT5 <<= 0x1, // u_speed
+        FS_RCORNERS_VEC2: BIT5<<=0x1,
+        FS_RCORNERS_VEC3: BIT5<<=0x1,
 
     },
     
@@ -184,7 +185,7 @@ const SID = {
     PASS: {
         COL4: BIT4,
         COL4_PER_VERTEX: BIT4<<= 1,
-        POS2: BIT4 <<= 1,
+        VPOS2: BIT4 <<= 1,
         DIM2: BIT4 <<= 1,
         TEX2: BIT4 <<= 1,
         WPOS2: BIT4 <<= 1,
@@ -277,7 +278,7 @@ const SID = {
         if (sid.attr) str[k] += 'Attribs:'
         if (sid.attr & SID.ATTR.COL4) str[k] += 'col4, '
         if (sid.attr & SID.ATTR.COL4_PER_VERTEX) str[k] += 'col4_per_vertex, '
-        if (sid.attr & SID.ATTR.POS2) str[k] += 'pos2, '
+        if (sid.attr & SID.ATTR.VPOS2) str[k] += 'pos2, '
         if (sid.attr & SID.ATTR.DIM2) str[k] += 'dim2, '
         if (sid.attr & SID.ATTR.SCALE2) str[k] += 'scale2, '
         if (sid.attr & SID.ATTR.TEX2) str[k] += 'tex2, '
@@ -289,7 +290,7 @@ const SID = {
         k++;
         if (sid.inst) str[k] += 'InstancedGeometry:'
         if (sid.inst & SID.INST.COL4) str[k] += 'cal4, '
-        if (sid.inst & SID.INST.POS2) str[k] += 'pos2, '
+        if (sid.inst & SID.INST.VPOS2) str[k] += 'pos2, '
         if (sid.inst & SID.INST.TEX2) str[k] += 'tex2, '
         if (sid.inst & SID.INST.WPOS3) str[k] += 'wpos4, '
         if (sid.inst & SID.INST.TIME) str[k] += 'time, '
@@ -318,7 +319,7 @@ const SID = {
         k++;
         if (sid.pass) str[k] += 'Passes:'
         if (sid.pass & SID.PASS.COL4) str[k] += 'col4, '
-        if (sid.pass & SID.PASS.POS2) str[k] += 'pos2, '
+        if (sid.pass & SID.PASS.VPOS2) str[k] += 'pos2, '
         if (sid.pass & SID.PASS.DIM2) str[k] += 'dim2, '
         if (sid.pass & SID.PASS.WPOS2) str[k] += 'wpos2, '
         if (sid.pass & SID.PASS.TEX2) str[k] += 'tex2, '

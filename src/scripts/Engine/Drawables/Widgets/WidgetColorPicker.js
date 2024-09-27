@@ -17,12 +17,29 @@ import { Slider_simple_connect } from "./WidgetSlider.js";
 
 
 
-// TODO: Deal with these global variables, especially if we need to cob=nstruct a second Colorpicker widget
-let temp_panel2_idx = INT_NULL;
-let temp_hue_pick_idx = INT_NULL;
-let temp_color_pick_idx = INT_NULL;
-let temp_color_present_idx = INT_NULL;
-let temp_tran_slider_idx = INT_NULL;
+// TODO: Deal with these global variables, especially if we need to construct a second Colorpicker widget
+let panel_idx = INT_NULL;
+let panel2_idx = INT_NULL;
+let slider_hue_idx = INT_NULL;
+let color_pick_idx = INT_NULL;
+let color_present_idx = INT_NULL;
+let slider_trans_idx = INT_NULL;
+
+
+
+/**
+ * Colorpicker mesh tree structure
+ * 
+ * Colorpicker panel
+ * ->    slider hue
+ * ->    panel
+ * ->->     color pick
+ * ->->     slider transarency
+ * ->->     panel2
+ * ->->->      color present
+ * ->->->      labels
+ */
+
 
 
 
@@ -49,14 +66,6 @@ export class Widget_Color_Picker extends Section {
       this.options |= SECTION.RESIZE_PARENT;
 
       this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      // this.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-
-      let has_feather_enabled = false;
-      let has_rcornners_enabled = false;
-      if(style[0]) has_rcornners_enabled = true;
-      if(style[1]) ;
-      if(style[2]) has_feather_enabled = true;
-
 
 
       this.label_r = null;
@@ -74,8 +83,7 @@ export class Widget_Color_Picker extends Section {
       const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10*scale, 10*scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
       panel.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel.options |= SECTION.RESIZE_PARENT;
-
-      this.AddItem(panel)
+      panel_idx = this.AddItem(panel)
 
 
 
@@ -89,7 +97,7 @@ export class Widget_Color_Picker extends Section {
       // color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
       color_pick.state.mask &= ~MESH_STATE.ACTIVE;
-      temp_color_pick_idx = panel.AddItem(color_pick);
+      color_pick_idx = panel.AddItem(color_pick);
 
 
 
@@ -99,7 +107,7 @@ export class Widget_Color_Picker extends Section {
       panel2.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel2.options |= SECTION.RESIZE_PARENT;
       panel2.StylesSetMargin([10, 0]);
-      temp_panel2_idx = panel.AddItem(panel2)
+      panel2_idx = panel.AddItem(panel2)
 
 
 
@@ -111,12 +119,12 @@ export class Widget_Color_Picker extends Section {
       color_present_mesh.StylesSetMargin([0, 0]);
 
       this.color_pick_click_pos = [color_pick.geom.dim[0]*2, 0];
-      temp_color_present_idx = panel2.AddItem(color_present_mesh);
+      color_present_idx = panel2.AddItem(color_present_mesh);
 
 
       const fontsize = 10*scale*1.2;
       const label_pad = [10*scale*scale, 6*scale*scale];
-      const label_style = [0, 10*scale, 1.2];
+      const label_style = [10*scale, 0, 1.2];
 
       /******************************************************************************/
       // Create Label Info meshes
@@ -183,11 +191,10 @@ export class Widget_Color_Picker extends Section {
       const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12*scale, 150*scale], TRANSPARENCY_BAR_COLOR, [0, 0], [16*scale, 3*scale], WHITE, 1);
       slider_tran.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
-      slider_tran.SetStyle([12*scale, 0, 2]);
       slider_tran.StylesSetMargin([10, 0]);
       slider_tran.SetName('Slider Transparency');
 
-      temp_tran_slider_idx = panel.AddItem(slider_tran);
+      slider_trans_idx = panel.AddItem(slider_tran);
 
 
 
@@ -207,56 +214,23 @@ export class Widget_Color_Picker extends Section {
       ];
 
       const vertices_count = (HUE_COLOR.length / 2) - 1;
-      //                            ROOT_WIDGET_FLAGS, pos, dim, col, hover_margin, handle_dim, handle_col, faces, is_debug_mesh
-      const slider = Create_widget_slider_simple(_, [0, 0, 2], [dim[0]*scale, 20*scale], HUE_COLOR, [0, 0], [4*scale, 24*scale], WHITE, vertices_count);
+      const slider_hue = Create_widget_slider_simple(_, [0, 0, 2], [dim[0]*scale, 20*scale], HUE_COLOR, [0, 0], [4*scale, 24*scale], WHITE, vertices_count);
       
-      slider.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      slider.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
-      slider.StylesSetMargin([0, 20]);
-      slider.SetStyle([20*scale, style[1], style[2]]);
-      slider.SetName('Slider Hue');
-      temp_hue_pick_idx = this.AddItem(slider);
+      slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
+      slider_hue.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
+      slider_hue.StylesSetMargin([0, 20]);
+      slider_hue.SetName('Slider Hue');
+      slider_hue_idx = this.AddItem(slider_hue);
 
 
-            
-      if(has_feather_enabled){
-
-         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
-         panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
-         color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
-         panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
-         color_present_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2]);
-         slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2], style[2]);
-         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style[2], style[2]);
-
-         for(let i = temp_color_present_idx+1; i < panel2.children.boundary; i++){
-            const label = panel2.children.buffer[i];
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, label_style[2])
-         }
-      }
-      if(has_rcornners_enabled){
-
-         this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
-         panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
-         color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
-         panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
-         color_present_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0]);
-         slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0], style[0]);
-         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style[0], style[0]);
-         
-         for(let i = temp_color_present_idx+1; i < panel2.children.boundary; i++){
-            const label = panel2.children.buffer[i];
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, label_style[0])
-         }
-      }
 
 
       console.log(
-         '\ntemp_panel2_idx' , temp_panel2_idx,
-         '\ntemp_hue_pick_idx' , temp_hue_pick_idx,
-         '\ntemp_color_pick_idx' , temp_color_pick_idx,
-         '\ntemp_color_present_idx' , temp_color_present_idx,
-         '\ntemp_tran_slider_idx' , temp_tran_slider_idx,
+         '\npanel2_idx' , panel2_idx,
+         '\nhue_pick_idx' , slider_hue_idx,
+         '\ncolor_pick_idx' , color_pick_idx,
+         '\ncolor_present_idx' , color_present_idx,
+         '\nslider_trans_idx' , slider_trans_idx,
 
       );
 
@@ -310,6 +284,33 @@ export class Widget_Color_Picker extends Section {
 
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].StateDisable(MASK);
+      }
+   }
+
+
+   EnableGfxAttributes(which, self_params=null, panel_params=null, color_pick_params=null, pane2_params=null, color_present_params=null, slider_trans_params=null, slider_hue_params=null, labels_params=null) {
+      
+      super.EnableGfxAttributes(which, self_params);
+      
+      const slider_hue = this.children.buffer[slider_hue_idx];
+      slider_hue.EnableGfxAttributes(which, slider_hue_params, 1);
+
+      const panel = this.children.buffer[panel_idx];
+      panel.EnableGfxAttributes(which, panel_params);
+      const color_pick = panel.children.buffer[color_pick_idx];
+      color_pick.EnableGfxAttributes(which, color_pick_params);
+      const slider_trans = panel.children.buffer[slider_trans_idx];
+      slider_trans.EnableGfxAttributes(which, slider_trans_params, 1);
+
+      const panel2 = panel.children.buffer[panel2_idx];
+      panel2.EnableGfxAttributes(which, pane2_params);
+      const color_present = panel2.children.buffer[color_present_idx];
+      color_present.EnableGfxAttributes(which, color_present_params);
+      
+
+      for(let i = color_present_idx+1; i <= panel2.children.boundary; i++){
+         const label = panel2.children.buffer[i];
+         label.EnableGfxAttributes(which, labels_params);
       }
    }
 
@@ -414,11 +415,11 @@ export class Widget_Color_Picker extends Section {
       const parent_listeners = mesh.listeners.buffer;
       
       const panel = mesh.children.buffer[0];
-      const panel2 = panel.children.buffer[temp_panel2_idx];
-      const color_pick_mesh = panel.children.buffer[temp_color_pick_idx];
-      const hue_mesh = mesh.children.buffer[temp_hue_pick_idx];
-      const transp_slider_mesh = panel.children.buffer[temp_tran_slider_idx];
-      const color_present_mesh = panel2.children.buffer[temp_color_present_idx];
+      const panel2 = panel.children.buffer[panel2_idx];
+      const color_pick_mesh = panel.children.buffer[color_pick_idx];
+      const hue_mesh = mesh.children.buffer[slider_hue_idx];
+      const transp_slider_mesh = panel.children.buffer[slider_trans_idx];
+      const color_present_mesh = panel2.children.buffer[color_present_idx];
       
       { // Color Pick Panel
          color_pick_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
@@ -748,8 +749,8 @@ export class Widget_Color_Picker extends Section {
       // const panel = params.evt_params.target_mesh;
       const widget = params.evt_params.target_mesh;
       const panel = widget.children.buffer[0]; // HACk: we do not have a dedicated idx var for the panel, but we know its the first child
-      const color_pick_mesh = panel.children.buffer[temp_color_pick_idx];
-      const panel2 = panel.children.buffer[temp_panel2_idx]; // HACk: we do not have a dedicated idx var for the panel, but we know its the first child
+      const color_pick_mesh = panel.children.buffer[color_pick_idx];
+      const panel2 = panel.children.buffer[panel2_idx]; // HACk: we do not have a dedicated idx var for the panel, but we know its the first child
 
       const click_pos = params.click_pos;
       const x = click_pos[0] - color_pick_mesh.GetPosX(); // Tranform to mesh coordinates (0 t0 mesh dim)
@@ -777,7 +778,7 @@ export class Widget_Color_Picker extends Section {
       /*****************************************************************************************************/
       // Assign the color to the top vertices of the transparency slider
 
-      const transp_slider = panel.children.buffer[temp_tran_slider_idx];
+      const transp_slider = panel.children.buffer[slider_trans_idx];
       CopyArr3(transp_slider.mat.col[1], intensity);
       CopyArr3(transp_slider.mat.col[3], intensity);
       if(transp_slider.gfx) Gl_set_rgba_per_vertex(transp_slider.gfx, transp_slider.mat.col)
@@ -791,7 +792,7 @@ export class Widget_Color_Picker extends Section {
       /*****************************************************************************************************/
       // Set the new color picked in the color present panel of the widget
 
-      const color_present_mesh = panel2.children.buffer[temp_color_present_idx];
+      const color_present_mesh = panel2.children.buffer[color_present_idx];
       // CopyArr4(color_present_mesh.mat.col[3], intensity); 
       CopyArr4(color_present_mesh.mat.col, intensity); 
       Gl_set_rgba(color_present_mesh.gfx, intensity, color_present_mesh.geom.num_faces);
@@ -830,10 +831,10 @@ export class Widget_Color_Picker extends Section {
 
       const mesh = this;
       const panel = mesh.children.buffer[0];
-      const panel2 = panel.children.buffer[temp_panel2_idx];
-      const color_pick_mesh = panel.children.buffer[temp_color_pick_idx];
-      const transp_slider_mesh = panel.children.buffer[temp_tran_slider_idx];
-      const color_present_mesh = panel2.children.buffer[temp_color_present_idx];
+      const panel2 = panel.children.buffer[panel2_idx];
+      const color_pick_mesh = panel.children.buffer[color_pick_idx];
+      const transp_slider_mesh = panel.children.buffer[slider_trans_idx];
+      const color_present_mesh = panel2.children.buffer[color_present_idx];
 
 
       const params = {
@@ -860,11 +861,11 @@ export class Widget_Color_Picker extends Section {
 
       const mesh = this;
       const panel = mesh.children.buffer[0];
-      const panel2 = panel.children.buffer[temp_panel2_idx];
-      const color_pick_mesh = panel.children.buffer[temp_color_pick_idx];
-      const transp_slider_mesh = panel.children.buffer[temp_tran_slider_idx];
-      const color_present_mesh = panel2.children.buffer[temp_color_present_idx];
-      const hue_mesh = mesh.children.buffer[temp_hue_pick_idx];
+      const panel2 = panel.children.buffer[panel2_idx];
+      const color_pick_mesh = panel.children.buffer[color_pick_idx];
+      const transp_slider_mesh = panel.children.buffer[slider_trans_idx];
+      const color_present_mesh = panel2.children.buffer[color_present_idx];
+      const hue_mesh = mesh.children.buffer[slider_hue_idx];
 
 
       const params = {

@@ -1,6 +1,6 @@
 "use strict";
 
-import { Abs, AddArr3, Clamp, CopyArr4, Lerp, Mix_vec3_float32Array, Mix_vec4_float32Array, Mult_arr3_scalar2, Mult_arr4_scalar2 } from "../../../../Helpers/Math/MathOperations.js";
+import { Abs, AddArr3, Clamp, CopyArr4, Lerp, Mix_vec3_float32Array, Mix_vec4_float32Array, Mult_arr3_scalar, Mult_arr4_scalar2 } from "../../../../Helpers/Math/MathOperations.js";
 
 
 

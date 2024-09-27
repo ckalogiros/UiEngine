@@ -75,6 +75,8 @@ export function Sattelite_rotation(_pos = [0, 0]) {
    };
 
    const slider_dim = [300, 10];
+   if (PLATFORM.ANY_SMARTPHONE_DEVICE) slider_dim[0] = VIEWPORT.WIDTH/2 - 10;
+
    // Rotation slider
    const rot_slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Rotation');
    rot_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);

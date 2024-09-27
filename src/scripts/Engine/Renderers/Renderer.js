@@ -167,6 +167,7 @@ function Renderer_create_webgl_context(canvas) {
    const gfxctx = canvas.getContext("webgl2", {
       alpha: true, //If the value is true, the drawing buffer has an alpha channel for the purposes of performing OpenGL destination alpha operations and compositing with the page. If the value is false, no alpha buffer is available. 
       premultipliedAlpha: true, // If the value is true the page compositor will assume the drawing buffer contains colors with premultiplied alpha.
+      // premultipliedAlpha: false, // If the value is true the page compositor will assume the drawing buffer contains colors with premultiplied alpha.
       antialias: false,
       // colorSpace: 'srgb',
       // alpha: true,

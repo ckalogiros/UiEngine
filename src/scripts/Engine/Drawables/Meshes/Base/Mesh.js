@@ -662,19 +662,19 @@ export class Mesh {
             case MESH_ENABLE.GFX.ATTR_R_CORNERS: { 
               this.sid.attr |= SID.ATTR.R_CORNERS| SID.ATTR.DIM2;  
               this.sid.pass |= SID.PASS.R_CORNERS| SID.PASS.DIM2; 
-              if(params) this.mat.style[0] = params; 
+              if(params !== null) this.mat.style[0] = params; 
               break; 
            }
            case MESH_ENABLE.GFX.ATTR_BORDER: { 
               this.sid.attr |= SID.ATTR.BORDER| SID.ATTR.DIM2;  
               this.sid.pass |= SID.PASS.BORDER| SID.PASS.DIM2;  
-              if(params) this.mat.style[1] = params; 
+              if(params !== null) this.mat.style[1] = params; 
               break; 
            }
            case MESH_ENABLE.GFX.ATTR_FEATHER: { 
               this.sid.attr |= SID.ATTR.FEATHER| SID.ATTR.DIM2;  
               this.sid.pass |= SID.PASS.FEATHER| SID.PASS.DIM2; 
-              if(params) this.mat.style[2] = params; 
+              if(params !== null) this.mat.style[2] = params; 
               break; 
            }
 

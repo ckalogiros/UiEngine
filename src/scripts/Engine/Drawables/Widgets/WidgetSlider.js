@@ -1315,20 +1315,22 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
-   AddWposΥ(y) {
+   AddWposY(y) {
 
-      if (x === 0) return;
+      if (y === 0) return;
 
-      this.geom.pos[1] += [y];
+      this.geom.pos[1] += y;
       this.geom.AddWposY(this.gfx, y);
 
       const bar = this.children.buffer[this.bar_idx];
+      bar.geom.pos[1] += y;
       bar.geom.AddWposY(bar.gfx, y);
 
       const name_text = this.text_mesh;
       name_text.geom.AddWposY(name_text.gfx, y);
 
       const handle = bar.children.buffer[0];
+      handle.geom.pos[1] += y;
       handle.geom.AddWposY(handle.gfx, y);
 
       const value_text = this.children.buffer[this.value_text_idx];

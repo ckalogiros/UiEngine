@@ -14,35 +14,35 @@ import { Shader_attributes_get_attribs } from "../ShaderAttributes.js";
 
 _CNT = 0;
 const FUNCTION_TABLE_IDXS = {
-   COL4_WPOS3_POS2_RCORNERS1_FEATHER1: INT_NULL,
-   COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1_GLOW_INTENSITY: INT_NULL,
-   COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_GLOW_INTENSITY: INT_NULL,
-   COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1: INT_NULL,
-   COL4_WPOS3_DIM2_RCORNERS1_FEATHER1_BORDER1: INT_NULL,
-   COL4_WPOS3_DIM2_RCORNERS1_FEATHER1: INT_NULL,
-   COL4_WPOS3_POS2_DIM2_FEATHER1: INT_NULL,
-   COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1: INT_NULL,
-   COL4_WPOS3_POS2_DIM2_TEX2_RCORNERS1_FEATHER1: INT_NULL,
-   COL4_WPOS3_POS2_TEX2_RCORNERS1_FEATHER1: INT_NULL,
-   COL4_WPOS3_TIME_POS2_DIM2_TEX2_TIME: INT_NULL,
-   COL4_WPOS3_POS2_DIM2_TEX2: INT_NULL,
-   COL4_WPOS3_TIME_POS2_DIM2: INT_NULL,
-   COL4_WPOS3_POS2_DIM2: INT_NULL,
-   COL4PERVERTEX_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1: INT_NULL,
-   COL4PERVERTEX_WPOS3_POS2_RCORNERS1_FEATHER1: INT_NULL,
-   COL4PERVERTEX_WPOS3_POS2: INT_NULL,
-   COL4_WPOS3_POS2_TEX2: INT_NULL,
+   COL4_WPOS3_VPOS2_RCORNERS_FEATHER: INT_NULL,
+   COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY: INT_NULL,
+   COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSITY: INT_NULL,
+   COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER_BORDER: INT_NULL,
+   COL4_WPOS3_DIM2_RCORNERS_FEATHER_BORDER: INT_NULL,
+   COL4_WPOS3_DIM2_RCORNERS_FEATHER: INT_NULL,
+   COL4_WPOS3_VPOS2_DIM2_FEATHER: INT_NULL,
+   COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER: INT_NULL,
+   COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS_FEATHER: INT_NULL,
+   COL4_WPOS3_VPOS2_TEX2_RCORNERS_FEATHER: INT_NULL,
+   COL4_WPOS3_TIME_VPOS2_DIM2_TEX2_TIME: INT_NULL,
+   COL4_WPOS3_VPOS2_DIM2_TEX2: INT_NULL,
+   COL4_WPOS3_TIME_VPOS2_DIM2: INT_NULL,
+   COL4_WPOS3_VPOS2_DIM2: INT_NULL,
+   COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER: INT_NULL,
+   COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER: INT_NULL,
+   COL4PERVERTEX_WPOS3_VPOS2: INT_NULL,
+   COL4_WPOS3_VPOS2_TEX2: INT_NULL,
    COL4_WPOS3_TEX2: INT_NULL,
-   COL4_WPOS3_POS2: INT_NULL,
-   WPOS3_POS2_RCORNERS1_FEATHER1: INT_NULL,
-   WPOS3_POS2: INT_NULL,
+   COL4_WPOS3_VPOS2: INT_NULL,
+   WPOS3_VPOS2_RCORNERS_FEATHER: INT_NULL,
+   WPOS3_VPOS2: INT_NULL,
    WPOS3_DIM2: INT_NULL,
-   POS2_RCORNERS1_FEATHER1: INT_NULL,
-   POS2: INT_NULL,
+   POS2_RCORNERS_FEATHER: INT_NULL,
+   VPOS2: INT_NULL,
    POS2_TEX2: INT_NULL,
-   COL4PERVERTEX_POS2_RCORNERS1_FEATHER1: INT_NULL,
+   COL4PERVERTEX_VPOS2_RCORNERS_FEATHER: INT_NULL,
    // Instaned Geometry
-   INST_COL4_WPOS3_POS2: INT_NULL,
+   INST_COL4_WPOS3_VPOS2: INT_NULL,
    INST_COL4_WPOS3: INT_NULL,
    INST_WPOS3_DIM2: INT_NULL,
    INST_WPOS3: INT_NULL,
@@ -56,32 +56,32 @@ const FUNCTION_TABLE_IDXS = {
 
 
 const Vertex_buffer_fn_table_operation_add = [
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_TEX2,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1_TEX2,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1_GLOW_INTENSITY,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_GLOW_INTENSITY,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATHER1_BORDER1,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATHER1,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_FEATHER1,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_TEX2,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_TEX2,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2,
-   FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1,
-   FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_RCORNERS1_FEATHER1,
-   FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_TEX2,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_TEX2,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TEX2,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSITY,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER_BORDER,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_COL4_WPOS3_DIM2_RCORNERS_FEATHER_BORDER,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_COL4_WPOS3_DIM2_RCORNERS_FEATHER,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_FEATHER,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_TEX2,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2,
+   FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER,
+   FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER,
+   FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TEX2,
    FILL_VERTEX_BUFFER_COL4_WPOS3_TEX2,
-   FILL_VERTEX_BUFFER_COL4_WPOS3_POS2,
-   FILL_VERTEX_BUFFER_WPOS3_POS2_RCORNERS1_FEATHER1,
-   FILL_VERTEX_BUFFER_WPOS3_POS2,
-   FILL_VERTEX_BUFFER_POS2_RCORNERS1_FEATHER1,
-   FILL_VERTEX_BUFFER_POS2,
-   FILL_VERTEX_BUFFER_POS2_TEX2,
-   FILL_VERTEX_BUFFER_COL4PERVERTEX_POS2_RCORNERS1_FEATHER1,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2,
+   FILL_VERTEX_BUFFER_WPOS3_VPOS2_RCORNERS_FEATHER,
+   FILL_VERTEX_BUFFER_WPOS3_VPOS2,
+   FILL_VERTEX_BUFFER_VPOS2_RCORNERS_FEATHER,
+   FILL_VERTEX_BUFFER_VPOS2,
+   FILL_VERTEX_BUFFER_VPOS2_TEX2,
+   FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER,
    FILL_VERTEX_BUFFER_WPOS3_DIM2,
    // Instanced Geometry
    INST_FILL_VERTEX_BUFFER_COL4_WPOS3,
@@ -98,33 +98,33 @@ function Set_up_fn_table() {
    const len = Vertex_buffer_fn_table_operation_add.length;
    for (let i = 0; i < len; i++) {
 
-      if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_RCORNERS1_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1) FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_TEX2_RCORNERS1_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_TEX2_RCORNERS1_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1_GLOW_INTENSITY) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1_GLOW_INTENSITY = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_GLOW_INTENSITY) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_GLOW_INTENSITY = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1) FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATHER1_BORDER1) FUNCTION_TABLE_IDXS.COL4_WPOS3_DIM2_RCORNERS1_FEATHER1_BORDER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATHER1) FUNCTION_TABLE_IDXS.COL4_WPOS3_DIM2_RCORNERS1_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_FEATHER1) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_POS2_DIM2_TEX2_TIME = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_TEX2 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2) FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_POS2_DIM2 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1) FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_RCORNERS1_FEATHER1) FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_POS2_RCORNERS1_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2) FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_POS2 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_TEX2 = i;
+      if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_RCORNERS_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_TEX2_RCORNERS_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSITY) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSITY = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER_BORDER) FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER_BORDER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_COL4_WPOS3_DIM2_RCORNERS_FEATHER_BORDER) FUNCTION_TABLE_IDXS.COL4_WPOS3_DIM2_RCORNERS_FEATHER_BORDER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_COL4_WPOS3_DIM2_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.COL4_WPOS3_DIM2_RCORNERS_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_FEATHER) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2_TEX2_TIME = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_TEX2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2) FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2) FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_VPOS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_TEX2 = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_TEX2 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_POS2) FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_WPOS3_POS2_RCORNERS1_FEATHER1) FUNCTION_TABLE_IDXS.WPOS3_POS2_RCORNERS1_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_WPOS3_POS2) FUNCTION_TABLE_IDXS.WPOS3_POS2 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_POS2_RCORNERS1_FEATHER1) FUNCTION_TABLE_IDXS.POS2_RCORNERS1_FEATHER1 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_POS2_RCORNERS1_FEATHER1) FUNCTION_TABLE_IDXS.COL4PERVERTEX_POS2_RCORNERS1_FEATHER1 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_WPOS3_VPOS2_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.WPOS3_VPOS2_RCORNERS_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_WPOS3_VPOS2) FUNCTION_TABLE_IDXS.WPOS3_VPOS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_VPOS2_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.POS2_RCORNERS_FEATHER = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.COL4PERVERTEX_VPOS2_RCORNERS_FEATHER = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_WPOS3_DIM2) FUNCTION_TABLE_IDXS.WPOS3_DIM2 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_POS2) FUNCTION_TABLE_IDXS.POS2 = i;
-      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_POS2_TEX2) FUNCTION_TABLE_IDXS.POS2_TEX2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_VPOS2) FUNCTION_TABLE_IDXS.VPOS2 = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_VPOS2_TEX2) FUNCTION_TABLE_IDXS.POS2_TEX2 = i;
       // Instanced Geometry
       else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_COL4_WPOS3) FUNCTION_TABLE_IDXS.INST_COL4_WPOS3 = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_WPOS3_DIM2) FUNCTION_TABLE_IDXS.INST_WPOS3_DIM2 = i;
@@ -160,7 +160,7 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
       if (inst & SHADER_ATTRIBUTES.DIM2) clean_inst |= SHADER_ATTRIBUTES.DIM2;
       if (inst & SHADER_ATTRIBUTES.TEX2) clean_inst |= SHADER_ATTRIBUTES.TEX2;
 
-      if (clean_inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS3_POS2;
+      if (clean_inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS3_VPOS2;
       if (clean_inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS3;
       if (clean_inst === (SID.ATTR.WPOS3 | SID.ATTR.DIM2)) return FUNCTION_TABLE_IDXS.INST_WPOS3_DIM2;
       if (clean_inst === (SID.ATTR.WPOS3)) return FUNCTION_TABLE_IDXS.INST_WPOS3;
@@ -176,7 +176,7 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
       if (attr & SHADER_ATTRIBUTES.COL4_PER_VERTEX) clean_attr |= SHADER_ATTRIBUTES.COL4_PER_VERTEX;
       if (attr & SHADER_ATTRIBUTES.WPOS3) clean_attr |= SHADER_ATTRIBUTES.WPOS3;
       if (attr & SHADER_ATTRIBUTES.TIME) clean_attr |= SHADER_ATTRIBUTES.TIME;
-      if (attr & SHADER_ATTRIBUTES.POS2) clean_attr |= SHADER_ATTRIBUTES.POS2;
+      if (attr & SHADER_ATTRIBUTES.VPOS2) clean_attr |= SHADER_ATTRIBUTES.VPOS2;
       if (attr & SHADER_ATTRIBUTES.DIM2) clean_attr |= SHADER_ATTRIBUTES.DIM2;
       if (attr & SHADER_ATTRIBUTES.R_CORNERS) clean_attr |= SHADER_ATTRIBUTES.R_CORNERS;
       if (attr & SHADER_ATTRIBUTES.FEATHER) clean_attr |= SHADER_ATTRIBUTES.FEATHER;
@@ -184,35 +184,35 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
       if (attr & SHADER_ATTRIBUTES.TEX2) clean_attr |= SHADER_ATTRIBUTES.TEX2;
       if (attr & SHADER_ATTRIBUTES.GLOW_INTENSITY) clean_attr |= SHADER_ATTRIBUTES.GLOW_INTENSITY;
 
-      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.WPOS3 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.POS2 | SID.ATTR.DIM2)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.BORDER | SID.ATTR.GLOW_INTENSITY)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1_GLOW_INTENSITY;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.GLOW_INTENSITY)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_GLOW_INTENSITY;
+      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.WPOS3 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.VPOS2 | SID.ATTR.DIM2)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.BORDER | SID.ATTR.GLOW_INTENSITY)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.GLOW_INTENSITY)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSITY;
 
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.BORDER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.BORDER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_DIM2_RCORNERS1_FEATHER1_BORDER1;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_DIM2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_FEATHER1;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.BORDER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER_BORDER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.BORDER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_DIM2_RCORNERS_FEATHER_BORDER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_DIM2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_FEATHER;
 
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.TEX2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_TEX2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.TEX2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_TEX2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.TEX2 | SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_POS2_DIM2_TEX2_TIME;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2_TEX2;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2 | SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_POS2_DIM2;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.DIM2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_DIM2;
-      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_POS2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.WPOS3 | SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_POS2;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2_TEX2;
-      if (clean_attr === (SID.ATTR.WPOS3 | SID.ATTR.POS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.WPOS3_POS2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_POS2;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.TEX2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.TEX2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_TEX2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.TEX2 | SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2_TEX2_TIME;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_TEX2;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2;
+      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.WPOS3 | SID.ATTR.VPOS2)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_WPOS3_VPOS2;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_TEX2;
+      if (clean_attr === (SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.WPOS3_VPOS2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2;
       if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TEX2;
-      if (clean_attr === (SID.ATTR.POS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.POS2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.WPOS3 | SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.WPOS3_POS2;
-      if (clean_attr === (SID.ATTR.POS2 | SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.POS2_TEX2;
+      if (clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.POS2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.WPOS3 | SID.ATTR.VPOS2)) return FUNCTION_TABLE_IDXS.WPOS3_VPOS2;
+      if (clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.TEX2)) return FUNCTION_TABLE_IDXS.POS2_TEX2;
       if (clean_attr === (SID.ATTR.WPOS3 | SID.ATTR.DIM2)) return FUNCTION_TABLE_IDXS.WPOS3_DIM2;
-      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.POS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_POS2_RCORNERS1_FEATHER1;
-      if (clean_attr === (SID.ATTR.POS2)) return FUNCTION_TABLE_IDXS.POS2;
+      if (clean_attr === (SID.ATTR.COL4_PER_VERTEX | SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4PERVERTEX_VPOS2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.VPOS2)) return FUNCTION_TABLE_IDXS.VPOS2;
    }
 
 
@@ -248,13 +248,13 @@ export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, st
  * Also the name of each function shoul represent the sequence of the attributes.
  * 
  * SEQUENCE:
- *    (COL4) (WPOS3) (TIME) (POS2) (DIM2) (R_CORNERS) (BORDER) (FEATHER) (TEX2) (GLOW_INTENSITY) (SDF) (MSDF) {
+ *    (COL4) (WPOS3) (TIME) (VPOS2) (DIM2) (R_CORNERS) (BORDER) (FEATHER) (TEX2) (GLOW_INTENSITY) (SDF) (MSDF) {
 
  * 
  **************************************************************************************************************************************/
 
 
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -265,19 +265,19 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2(vb_data, geom, mat, start, 
    const posy = geom.dim[1] * 2;
 
    for (let i = 0; i < num_faces + 1; i++) {
-
-      // Case some meshes have one color for all vertices, but still use color per vertex buffer.
-      const col = (mat.col[k].constructor === Float32Array) ? mat.col[k] : mat.col;
-
+      
       for (let j = 0; j < 2; j++) {
+   
+         // Case some meshes have one color for all vertices, but still use color per vertex buffer.
+         const col = (mat.col[k].constructor === Float32Array) ? mat.col[k] : mat.col;
 
          // COLOR
-         vb_data[index++] = col[k][0];
-         vb_data[index++] = col[k][1];
-         vb_data[index++] = col[k][2];
-         vb_data[index++] = col[k][3];
+         vb_data[index++] = col[0];
+         vb_data[index++] = col[1];
+         vb_data[index++] = col[2];
+         vb_data[index++] = col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -290,7 +290,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2(vb_data, geom, mat, start, 
          k++; // Switch to the next color for this vertex
          attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
       }
-
+      
       vpos_x += posx; // Increment the vertex position for the next 2 verts (face)
 
    }
@@ -298,7 +298,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2(vb_data, geom, mat, start, 
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -309,19 +309,19 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data,
    const posy = geom.dim[1] * 2;
 
    for (let i = 0; i < num_faces + 1; i++) {
-
-      // Case some meshes have one color for all vertices, but still use color per vertex buffer.
-      const col = (mat.col[k].constructor === Float32Array) ? mat.col[k] : mat.col;
-
+      
       for (let j = 0; j < 2; j++) {
+   
+         // Case some meshes have one color for all vertices, but still use color per vertex buffer.
+         const col = (mat.col[k].constructor === Float32Array) ? mat.col[k] : mat.col;
 
          // COLOR
-         vb_data[index++] = col[k][0];
-         vb_data[index++] = col[k][1];
-         vb_data[index++] = col[k][2];
-         vb_data[index++] = col[k][3];
+         vb_data[index++] = col[0];
+         vb_data[index++] = col[1];
+         vb_data[index++] = col[2];
+         vb_data[index++] = col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -338,7 +338,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data,
          k++; // Switch to the next color for this vertex
          attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
       }
-
+      
       vpos_x += posx; // Increment the vertex position for the next 2 verts (face)
 
    }
@@ -346,7 +346,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data,
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride) {
 
 
    let attribs_count = 0;
@@ -371,7 +371,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1(vb_
          vb_data[index++] = col[2];
          vb_data[index++] = col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -392,7 +392,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1(vb_
          k++; // Switch to the next color for this vertex
          attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
       }
-
+      
       vpos_x += posx; // Increment the vertex position for the next 2 verts (face)
 
    }
@@ -400,7 +400,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1(vb_
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -419,7 +419,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data, geom, ma
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -443,7 +443,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data, geom, ma
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_TEX2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_TEX2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -465,7 +465,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_TEX2(vb_data
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -501,7 +501,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_TEX2(vb_data
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1_TEX2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TEX2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -523,7 +523,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1_TEX2(vb_data, geo
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -555,7 +555,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_RCORNERS1_FEATHER1_TEX2(vb_data, geo
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_TEX2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_TEX2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -577,7 +577,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_TEX2(vb_data, geom, mat, s
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -613,7 +613,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_TEX2(vb_data, geom, mat, s
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_TEX2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -635,7 +635,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_TEX2(vb_data, geom, mat, start,
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -668,7 +668,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_TEX2(vb_data, geom, mat, start,
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER_BORDER(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
 
    let attribs_count = 0;
    let index = start;
@@ -687,7 +687,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -719,7 +719,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATHER1_BORDER1(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_COL4_WPOS3_DIM2_RCORNERS_FEATHER_BORDER(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
 
    let attribs_count = 0;
    let index = start;
@@ -738,7 +738,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATH
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -767,7 +767,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATH
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATHER1(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_COL4_WPOS3_DIM2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
 
    let attribs_count = 0;
    let index = start;
@@ -786,7 +786,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATH
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -814,7 +814,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_COL4_WPOS3_DIM2_RCORNERS1_FEATH
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_FEATHER1(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_FEATHER(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
 
    let attribs_count = 0;
    let index = start;
@@ -833,7 +833,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_FEATHER1(vb_data, geom, mat, st
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -860,7 +860,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_FEATHER1(vb_data, geom, mat, st
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -879,7 +879,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1_GLOW
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -911,7 +911,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_BORDER1_GLOW
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -930,7 +930,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_GLOW_INTENSI
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -961,7 +961,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2_RCORNERS1_FEATHER1_GLOW_INTENSI
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -980,7 +980,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1(vb_data
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -1011,7 +1011,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2_RCORNERS1_FEATHER1(vb_data
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -1030,7 +1030,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2(vb_data, geom, mat, start,
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -1057,7 +1057,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_POS2_DIM2(vb_data, geom, mat, start,
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -1076,7 +1076,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2(vb_data, geom, mat, start, num_
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -1103,7 +1103,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_DIM2(vb_data, geom, mat, start, num_
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_TEX2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TEX2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -1125,7 +1125,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_TEX2(vb_data, geom, mat, start, num_
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -1153,7 +1153,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2_TEX2(vb_data, geom, mat, start, num_
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, stride, attribs_info) {
 
    let attribs_count = 0;
    let index = start;
@@ -1173,7 +1173,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2(vb_data, geom, mat, start, num_faces
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -1194,7 +1194,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_POS2(vb_data, geom, mat, start, num_faces
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -1210,7 +1210,7 @@ function FILL_VERTEX_BUFFER_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data, geom, mat, st
 
       for (let j = 0; j < 2; j++) {
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -1238,7 +1238,7 @@ function FILL_VERTEX_BUFFER_WPOS3_POS2_RCORNERS1_FEATHER1(vb_data, geom, mat, st
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_WPOS3_POS2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -1254,7 +1254,7 @@ function FILL_VERTEX_BUFFER_WPOS3_POS2(vb_data, geom, mat, start, num_faces, str
 
       for (let j = 0; j < 2; j++) {
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -1278,7 +1278,7 @@ function FILL_VERTEX_BUFFER_WPOS3_POS2(vb_data, geom, mat, start, num_faces, str
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_POS2_RCORNERS1_FEATHER1(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -1317,7 +1317,7 @@ function FILL_VERTEX_BUFFER_POS2_RCORNERS1_FEATHER1(vb_data, geom, mat, start, n
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_POS2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_VPOS2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -1370,7 +1370,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TEX2() {
          vb_data[index++] = mat.col[2];
          vb_data[index++] = mat.col[3];
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -1391,7 +1391,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TEX2() {
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_POS2_TEX2(vb_data, geom, mat, start, num_faces, stride) {
+function FILL_VERTEX_BUFFER_VPOS2_TEX2(vb_data, geom, mat, start, num_faces, stride) {
 
    let attribs_count = 0;
    let index = start;
@@ -1443,7 +1443,7 @@ function FILL_VERTEX_BUFFER_WPOS3_DIM2() {
 
       for (let j = 0; j < 2; j++) {
 
-         // WPOS
+         // WORLD POSITION
          vb_data[index++] = geom.pos[0];
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
@@ -1467,7 +1467,7 @@ function FILL_VERTEX_BUFFER_WPOS3_DIM2() {
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_POS2_RCORNERS1_FEATHER1(vb_data, geom, mat, start, num_faces, stride, verts_per_rect = 4) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect = 4) {
 
    let attribs_count = 0;
    let index = start;
@@ -1478,18 +1478,19 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_POS2_RCORNERS1_FEATHER1(vb_data, geom,
    const posy = geom.dim[1] * 2;
 
    for (let i = 0; i < num_faces + 1; i++) {
-
-      // Case some meshes have one color for all vertices, but still use color per vertex buffer.
-      const col = (mat.col[k].constructor === Float32Array) ? mat.col[k] : mat.col;
+      
       let uv_vindex = 3; // Must alternate on every vertex
-
+      
       for (let j = 0; j < 2; j++) {
+   
+         // Case some meshes have one color for all vertices, but still use color per vertex buffer.
+         const col = (mat.col[k].constructor === Float32Array) ? mat.col[k] : mat.col;
 
          // COLOR
-         vb_data[index++] = col[k][0];
-         vb_data[index++] = col[k][1];
-         vb_data[index++] = col[k][2];
-         vb_data[index++] = col[k][3];
+         vb_data[index++] = col[0];
+         vb_data[index++] = col[1];
+         vb_data[index++] = col[2];
+         vb_data[index++] = col[3];
 
          // VERTEX POSITION
          vb_data[index++] = vpos_x;
@@ -1502,6 +1503,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_POS2_RCORNERS1_FEATHER1(vb_data, geom,
 
          attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
 
+         k++;
          uv_vindex--;
       }
 
@@ -1552,7 +1554,7 @@ function INST_FILL_VERTEX_BUFFER_WPOS3_DIM2(vb_data, geom, mat, start, num_faces
 
    for (let i = 0; i < num_faces; i++) {
 
-      // WPOS
+      // WORLD POSITION
       vb_data[index++] = geom.pos[0];
       vb_data[index++] = geom.pos[1];
       vb_data[index++] = geom.pos[2];
@@ -1576,7 +1578,7 @@ function INST_FILL_VERTEX_BUFFER_WPOS3(vb_data, geom, mat, start, num_faces, str
 
    for (let i = 0; i < num_faces; i++) {
 
-      // WPOS
+      // WORLD POSITION
       vb_data[index++] = geom.pos[0];
       vb_data[index++] = geom.pos[1];
       vb_data[index++] = geom.pos[2];
@@ -1602,7 +1604,7 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3(vb_data, geom, mat, start, num_faces
       vb_data[index++] = mat.col[2];
       vb_data[index++] = mat.col[3];
 
-      // WPOS
+      // WORLD POSITION
       vb_data[index++] = geom.pos[0];
       vb_data[index++] = geom.pos[1];
       vb_data[index++] = geom.pos[2];

@@ -1,13 +1,14 @@
 "use strict";
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
-import { Create_widget_button, Create_widget_section, Create_widget_slider } from "../Engine/Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
+import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_slider } from "../Engine/Core/CreateWidget.js";
+import { View_build_group_from_root_mesh } from "../Engine/Core/MeshBufferViews.js";
+import { Mesh_unif_get_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../Engine/Core/Views/RootView.js";
 import { Debug_info_ui, Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { BLUEL, GREY, YELLOW } from "../Engine/Drawables/Material/Base/Colors.js";
+import { BLUEL, GREENL, GREY, WHITE, YELLOW } from "../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Drawables/Operations/Recursions.js";
-import { Slider_connect } from "../Engine/Drawables/Widgets/WidgetSlider.js";
+import { Dropdown_roots_set_root } from "../Engine/Drawables/Widgets/Widget_Dropdown.js";
 import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
 import { Scene_camera_scroll_add, Scene_camera_scroll_set } from "../Engine/Scenes.js";
 import { AppReset } from "./App.js";
@@ -27,25 +28,103 @@ export function Demo_page(create_demo_id = 1) {
 
    
    /*********************************************************************************************************************************************/
-   // Create Slider for controling the uniform
+   // Create Slider for controling the uniforms
+
+   // const slider_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [VIEWPORT.RIGHT-230, 60, 0], [0, 0], TRANSPARENCY(GREY[5], 1.),);
+   // slider_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   // slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
+   // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // slider_section.SetName('slider_section');
    
+   // const slider_section = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `Shade`, [VIEWPORT.RIGHT-230, 60, 0], GREY[4], TRANSPARENCY(GREENL[5], .6), WHITE, [6, 4], _, _, _, _, [8, 8]);
+   const slider_section = Create_widget_dropdown(_, `Shade`, [0, 0, 0], GREY[4], TRANSPARENCY(GREENL[5], .6), WHITE, [6, 4], _, _, _, _, [8, 8]);
+   slider_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   // if(!PLATFORM.ANY_SMARTPHONE_DEVICE) slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+   slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   slider_section.SetName('slider_section');
+   slider_section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+   Dropdown_roots_set_root(slider_section, slider_section);
+   slider_section.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx);
+
+
    const slider_dim = [100, 12];
-   // Rotation slider
-   const slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [VIEWPORT.RIGHT-slider_dim[0]*2 - 30, 100, 10], slider_dim, GREY[3], _, 'Inner Shadow');
-   slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   slider.SetInitialValue(.4);
+   
+   // Create Slider for controling the uniform 'Distance'
+   const slider_distance = Create_widget_slider(_, [0, 0, 10], slider_dim, GREY[3], _, 'Distance');
+   slider_distance.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   slider_distance.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   slider_distance.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
+   slider_distance.SetInitialValue(.11);
+   // slider_section.AddItem(slider_distance);
+   slider_section.AddToMenu(slider_distance);
+   
+   
+   
+   
+   // Create Slider for controling the uniform 'Smoothness'
+   const slider_smoothness = Create_widget_slider(_, [0, 0, 10], slider_dim, GREY[3], _, 'Smoothness');
+   slider_smoothness.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,2);
+   slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,1);
+   slider_smoothness.SetInitialValue(.11);
+   // slider_section.AddItem(slider_smoothness);
+   slider_section.AddToMenu(slider_smoothness);
+   
+   
+   
+   
+   // Create Slider for controling the uniform 'Intensity'
+   const slider_intensity = Create_widget_slider(_, [0, 0, 10], slider_dim, GREY[3], _, 'Intensity');
+   slider_intensity.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,2);
+   slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,1);
+   slider_intensity.SetInitialValue(1.);
+   // slider_section.AddItem(slider_intensity);
+   slider_section.AddToMenu(slider_intensity);
 
 
 
+   // Render
+   // slider_section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
+   // slider_section.GenGfxCtx();
+   // slider_section.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
+   // slider_section.Calc_no_gfx_update();
+   // slider_section.Render();
+
+   // slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx)
+   
+   // Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
+
+   // Construct_listen_events_from_mesh_tree(slider_section)
+   // Construct_listen_events_relations_from_mesh_tree(slider_section);
 
    
-   /*********************************************************************************************************************************************/
-   // Set slider callback
+   // slider_section.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   // slider_section.Calc_no_gfx_update();
+   // slider_section.Render();
+   // Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
 
-   Slider_connect(slider, (params, slider_val) => {
-         return slider_val;
-      }, null
-   );
+   // slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx)
+     
+   // Construct_listen_events_from_mesh_tree(slider_section)
+   // Construct_listen_events_relations_from_mesh_tree(slider_section);
+
+   // // Create Group for this dropdown, to easily remove meshes from their vertex buffers and rebuild the vertex buffer
+   // View_build_group_from_root_mesh(slider_section);
+
+
+
+
+
+
+
+
+
 
 
 
@@ -57,22 +136,22 @@ export function Demo_page(create_demo_id = 1) {
 
       /* section/rect move */
       /* sections - hovering (no moving so that for android devices can hover on touch) */
-      const sections = Demo_widgets_sections(_, [0, total_height], slider);
+      const sections = Demo_widgets_sections(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity);
       total_height += sections.geom.dim[1] * 2 + pad;
 
 
       /* Button Switces  Slider */
-      const btn = Demo_widgets_button(_, [0, total_height,], slider);
+      const btn = Demo_widgets_button(_, [0, total_height,], slider_distance, slider_smoothness, slider_intensity);
       total_height += btn.geom.dim[1] * 2 + pad;
 
 
       /* scrolling */
-      const scroller = Demo_widgets_scrolled_labels(_, [0, total_height], _, slider);
+      const scroller = Demo_widgets_scrolled_labels(_, [0, total_height], _, slider_distance, slider_smoothness, slider_intensity);
       total_height += scroller.geom.dim[1] * 2 + pad;
 
 
       /* dropdown - move - hover */
-      const dp = Demo_widgets_dropdown(_, [0, total_height], slider,)
+      const dp = Demo_widgets_dropdown(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity)
       total_height += dp.geom.dim[1] * 2 + pad;
 
 
@@ -166,7 +245,7 @@ export function Demo_page(create_demo_id = 1) {
 
 
    /*******************************************************************************************/
-   // Page 1 button
+   // Page 2 button
    const page2_btn = Create_widget_button(_, 'Page2', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, GREY[10], text_col, [5, 5], .5, [0, rcorners, 1.8], font);
    page2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    page2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -199,7 +278,7 @@ export function Demo_page(create_demo_id = 1) {
 
 
    /*******************************************************************************************/
-   // Page 1 button
+   // Page 3 button
    // const page1_btn = Create_widget_button(_, 'Reload', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 140, 10, 10], _, GREY[10], text_col, [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
    const page3_btn = Create_widget_button(_, 'Page3', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, GREY[10], text_col, [5, 5], .5, [0, rcorners, 1.8], font);
    page3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -232,8 +311,12 @@ export function Demo_page(create_demo_id = 1) {
    );
 
 
+   load_page_panel.AddItem(slider_section);
+
 
    load_page_panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
+   // load_page_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, load_page_panel.mesh_bufferidx);
+
    load_page_panel.GenGfxCtx();
    load_page_panel.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENTY;
    load_page_panel.Calc_no_gfx_update();
@@ -246,6 +329,7 @@ export function Demo_page(create_demo_id = 1) {
    Construct_listen_events_relations_from_mesh_tree(load_page_panel);
    
    // Listeners_set_priority(E.C, load_page_panel.listeners);
+   // Listeners_set_priority(E.C, slider_section.listeners);
    Listeners_set_priority(E.C, page1_btn.listeners);
    Listeners_set_priority(E.C, page2_btn.listeners);
    Listeners_set_priority(E.C, page3_btn.listeners);
@@ -257,10 +341,13 @@ export function Demo_page(create_demo_id = 1) {
    
 
    // const info_ui = Debug_info_ui_static(_, [0, load_page_panel.geom.dim[1]*2 + 4]);
-   Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT); 
+   // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT); 
    // load_page_panel.AddItem(info_ui);
    
    
+
+
+   View_build_group_from_root_mesh(slider_section);
    
    
    
@@ -317,20 +404,90 @@ export function Demo_page(create_demo_id = 1) {
 
 
    /****************************************************************************************************************************************************/
-   // Render uniform control slider
-   slider.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-   slider.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider.mesh_bufferidx);
+   // Render uniform control sliders
+   // slider.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+   // slider.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider.mesh_bufferidx);
 
-   slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
-   slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
-   slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
-   slider.Render();
-   Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
-   slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+   // slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+   // slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+   // slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   // slider.Render();
+   // Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
+   // slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
-   Construct_listen_events_from_mesh_tree(slider)
-   Construct_listen_events_relations_from_mesh_tree(slider);
+   // Construct_listen_events_from_mesh_tree(slider);
+   // Construct_listen_events_relations_from_mesh_tree(slider);
+   // slider.AddWposY(100);
+
+
+
+   // // Secont uniform slider
+   // slider_smoothness.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+   // slider_smoothness.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_smoothness.mesh_bufferidx);
+
+   // slider_smoothness.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+   // slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+   // slider_smoothness.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   // slider_smoothness.Render();
+   // Root_group_activate_all_vbs_in_renderqueue(slider_smoothness.root_bufferidx);
+   // slider_smoothness.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_smoothness.gfx.vb.groupidx)
+
+   // Construct_listen_events_from_mesh_tree(slider_smoothness);
+   // Construct_listen_events_relations_from_mesh_tree(slider_smoothness);
+
+   // slider_smoothness.AddWposY(155);
+
+
+
+   // // Secont uniform slider
+   // slider_intensity.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+   // slider_intensity.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_intensity.mesh_bufferidx);
+
+   // slider_intensity.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+   // slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+   // slider_intensity.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   // slider_intensity.Render();
+   // Root_group_activate_all_vbs_in_renderqueue(slider_intensity.root_bufferidx);
+   // slider_intensity.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_intensity.gfx.vb.groupidx)
+
+   // Construct_listen_events_from_mesh_tree(slider_intensity);
+   // Construct_listen_events_relations_from_mesh_tree(slider_intensity);
+
+
+
+   // Secont uniform slider
+   // slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+   // // slider_section.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx);
+
+   // slider_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // // slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+   // // slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+   // // slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
+   // // slider_section.Render();
+   // // Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
+   // // slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
+   
+   // // Construct_listen_events_from_mesh_tree(slider_section);
+   // // Construct_listen_events_relations_from_mesh_tree(slider_section);
+
+
+   // // slider_section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
+   // slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
+   // slider_section.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+   // slider_section.Calc_no_gfx_update();
+
+   // slider_section.Render();
+   
+   // Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
+
+   // Construct_listen_events_from_mesh_tree(slider_section);
+   // Construct_listen_events_relations_from_mesh_tree(slider_section);
+
+   // slider_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_section.gfx.vb.groupidx);
+
 
 
 }

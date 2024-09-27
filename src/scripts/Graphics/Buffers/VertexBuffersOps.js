@@ -441,7 +441,7 @@ export function Gl_set_dim_x(gfxInfo, x, num_faces = 1) {
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
    
    // const attr_idx = vb_info.attribs_indexing.DIM2;
-   const attr_idx = vb_info.attribs_indexing.POS2;
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
    const a_offset = vb_info.attribs_info.offsets[attr_idx];
    const a_size = vb_info.attribs_info.sizes[attr_idx] - 1;
 
@@ -617,8 +617,8 @@ export function Gl_add_vpos_xy(gfxInfo, x, y, num_faces = 1) {
    
    const start = gfxInfo.vb.starts.buffer[vbidx];
    
-   const a_offset = attribs_info.offsets[attribs_indexing.POS2];
-   const a_size = attribs_info.sizes[attribs_indexing.POS2];
+   const a_offset = attribs_info.offsets[attribs_indexing.VPOS2];
+   const a_size = attribs_info.sizes[attribs_indexing.VPOS2];
    
 
    let index = start + a_offset;
@@ -1189,7 +1189,7 @@ export function Gl_set_alpha_from_offset(gfxInfo, val, from_offset, num_faces) {
 export function Gl_set_dim_XY2(vbidx, start, attribsidx, attribsPerVertex, x, y, num_faces = 1) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
-   const a = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.POS2);
+   const a = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.VPOS2);
 
    let index = start + a.offset;
    let faces = num_faces;
@@ -1223,7 +1223,7 @@ export function Gl_set_dim_XY2(vbidx, start, attribsidx, attribsPerVertex, x, y,
 // export function Gl_set_dim_xy(gfxInfo, dim, num_faces = 1) {
 
 //    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-//    const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.POS2);
+//    const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.VPOS2);
 
 //    let index = gfxInfo.vb.start + a.offset;
 //    let faces = num_faces;
@@ -1259,7 +1259,7 @@ export function Gl_set_dim_XY2(vbidx, start, attribsidx, attribsPerVertex, x, y,
 // export function Gl_set_dim_x(gfxInfo, x, num_faces = 1) {
 
 //    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-//    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.POS2);
+//    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.VPOS2);
 
 //    let index = gfxInfo.vb.start + offset;
 //    let faces = num_faces;
@@ -1288,7 +1288,7 @@ export function Gl_set_dim_XY2(vbidx, start, attribsidx, attribsPerVertex, x, y,
 // export function Gl_set_dim_y(gfxInfo, y, num_faces = 1) {
 
 //    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-//    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.POS2);
+//    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.VPOS2);
 
 //    let index = gfxInfo.vb.start + offset + GRAPHICS_LAYOUT.ATTR_SELF_OFFSETS.DIM_Y;
 //    let faces = num_faces;

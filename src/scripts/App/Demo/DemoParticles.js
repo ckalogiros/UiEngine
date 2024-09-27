@@ -412,7 +412,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.C
 
 
 
-export function Create_ball_tail_particles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10, height=VIEWPORT.HEIGHT/2 - 150, num_balls = 3, root_widget = ROOT_WIDGETS.CREATE_ROOT) { // Particles Bouncing Ball Tail
+export function Create_ball_tail_particles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-10, height=VIEWPORT.HEIGHT/2 - 150, num_balls = 1, root_widget = ROOT_WIDGETS.CREATE_ROOT) { // Particles Bouncing Ball Tail
 
    let balls_buffer = [];
    let dirs_buffer = [];
@@ -602,8 +602,8 @@ export function Create_ball_tail_particles(x = 0, y = 0, width=VIEWPORT.WIDTH/2-
                   const color = params;
                   Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
 
-                  CopyArr4(tail_particles_buffer[0].col, color);
-                  CopyArr4(glow_particles_buffer[0].col, color);
+                  CopyArr4(tail_particles_buffer[0].mat.col, color);
+                  CopyArr4(glow_particles_buffer[0].mat.col, color);
                   // For control of all ball's tail particles
                   // for(let i=0; i<num_balls; i++){
                   //     CopyArr4(tail_particles_buffer[i].col, color);
@@ -1125,7 +1125,7 @@ export function Create_smoke_particles(x = 0, y = 0) {
                const color = params;
                Gl_set_rgba(slider_section.gfx, color, slider_section.geom.num_faces);
 
-               CopyArr4(emitters[0].col, color);
+               CopyArr4(emitters[0].mat.col, color);
             });
             switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
          }
@@ -1421,7 +1421,7 @@ export function Test_noise_shader() {
                   // CopyArr4(controls_dp.mat.col, color);
                   // CopyArr4(controls_dp.mat.defCol, color);
                   // Gl_set_rgba(controls_dp.gfx, color, controls_dp.geom.num_faces);
-                  CopyArr4(emitters[0].col, color);
+                  CopyArr4(emitters[0].mat.col, color);
                });
                switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker'section index somewhere so that this callback can destroy it
             }
@@ -2526,8 +2526,8 @@ export function Demo_ball_tail() { // Side Panel
                colorpicker.AssignTargetMeshClbk((params) => {
 
                   const color = params;
-                  CopyArr4(tail_particles_buffer[0].col, color);
-                  CopyArr4(glow_particles_buffer[0].col, color);
+                  CopyArr4(tail_particles_buffer[0].mat.col, color);
+                  CopyArr4(glow_particles_buffer[0].mat.col, color);
                });
 
                switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
@@ -3046,8 +3046,8 @@ export function Demo_smoke_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 
                   CopyArr4(ctrl_dp_emitt12.mat.col, color);
                   CopyArr4(ctrl_dp_emitt12.mat.defCol, color);
                   Gl_set_rgba(ctrl_dp_emitt12.gfx, color, ctrl_dp_emitt12.geom.num_faces);
-                  CopyArr4(emitters[0].col, color);
-                  CopyArr4(emitters[1].col, color);
+                  CopyArr4(emitters[0].mat.col, color);
+                  CopyArr4(emitters[1].mat.col, color);
 
                });
                switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
@@ -3935,8 +3935,8 @@ export function Demo_ball_tail_2(root_widget = ROOT_WIDGETS.CREATE_ROOT, width, 
                colorpicker.AssignTargetMeshClbk((params) => {
 
                   const color = params;
-                  CopyArr4(tail_particles_buffer[0].col, color);
-                  CopyArr4(glow_particles_buffer[0].col, color);
+                  CopyArr4(tail_particles_buffer[0].mat.col, color);
+                  CopyArr4(glow_particles_buffer[0].mat.col, color);
                });
                switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
             }

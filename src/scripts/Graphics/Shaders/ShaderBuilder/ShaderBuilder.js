@@ -350,11 +350,11 @@ function Vertex_shader_resolve_attributes_in(sid) {
       attribs_indexing.TIME = attribs_idx++;
    }
 
-   if (sid.attr & SID.ATTR.POS2) {
+   if (sid.attr & SID.ATTR.VPOS2) {
 
       const mesh_attribute = new Mesh_attribute();
       mesh_attribute.name = 'pos2';
-      mesh_attribute.nameid |= SID.ATTR.POS2;
+      mesh_attribute.nameid |= SID.ATTR.VPOS2;
       mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
 
       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
@@ -363,18 +363,18 @@ function Vertex_shader_resolve_attributes_in(sid) {
       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
 
 
-      loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.POS2,);
+      loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.VPOS2,);
       vec_idx++;
       mesh_attribute.size++;
 
       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.POS2,);
+      loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.VPOS2,);
       vec_idx++;
       mesh_attribute.size++;
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.POS2 = attribs_idx++;
+      attribs_indexing.VPOS2 = attribs_idx++;
    }
 
    if (sid.attr & SID.ATTR.DIM2) {
@@ -844,6 +844,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       '#include <out_frag_color>',
       (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
       (sid.unif & SID.UNIF.FS_RCORNERS_FLOAT) ? '#define U_RCORNERS_FLOAT 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
+      (sid.unif & SID.UNIF.FS_RCORNERS_VEC2) ? '#define U_RCORNERS_VEC2 1' : '', 
+      (sid.unif & SID.UNIF.FS_RCORNERS_VEC3) ? '#define U_RCORNERS_VEC3 1' : '', 
       (sid.fx & SID.FX.FS_GLOW_VEC3) ? '#define U_GLOW_PARAMS_VEC3 1' : '', 
       (sid.fx & SID.FX.FS_GLOW_VEC2) ? '#define U_GLOW_PARAMS_VEC2 1' : '', 
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '', 
@@ -954,8 +956,9 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
       /********************************************************************************************************/
       // Color fragment
+      (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   color.rgb *= color.a; ' : '',
       '   frag_color = color;',
-      (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   frag_color.rgb *= v_col.a; ' : '',
+      // (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   if(color.a < .6) frag_color.rgb *= color.a; ' : '',
       // true ? '  frag_color.rgb *= color.a;' : '',
 
 

@@ -16,7 +16,7 @@ export class Attributes_indexing { // Attributes indexing based on attribute typ
 
       this.COL4 = INT_NULL;
       this.WPOS3 = INT_NULL;
-      this.POS2 = INT_NULL;
+      this.VPOS2 = INT_NULL;
       this.DIM2 = INT_NULL;
       this.BORDER = INT_NULL;
       this.R_CORNERS = INT_NULL;
@@ -44,8 +44,8 @@ export class Attributes_indexing { // Attributes indexing based on attribute typ
          this.TIME = index;
       }
       
-      else if (attrib_nameid & SID.ATTR.POS2) {
-         this.POS2 = index;
+      else if (attrib_nameid & SID.ATTR.VPOS2) {
+         this.VPOS2 = index;
       }
       
       else if (attrib_nameid & SID.ATTR.DIM2) {
