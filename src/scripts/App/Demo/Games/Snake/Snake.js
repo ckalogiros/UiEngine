@@ -199,11 +199,6 @@ export function Game_snake() {
 
 
 
-   // const physics = [];
-
-
-
-
 
 
 
@@ -372,22 +367,22 @@ export function Game_snake() {
    /*************************************************************************************************/
    // Set Uniforms Callbacks
    
-   collectable.SetClbkGfxUniforms('u_scale2', ()=>{ return [collectable_scale, 1]; }, collectable.gfx.vb.groupidx);
-   collectable.SetClbkGfxUniforms('u_glow_params', ()=>{ return .7}, { val_idx: 0, start_val: .8, });
-   collectable.SetClbkGfxUniforms('u_glow_params', ()=>{ return .3}, { val_idx: 1, start_val: .0, });
+
+   collectable.GfxUniformSetAndUpdate('u_scale2', [collectable_scale, 1]);
+   collectable.GfxUniformSetAndUpdate('u_glow_params', [.7, .7,]);
+   // Initialize shader attribute
    Gl_set_glow_intensity(collectable.gfx, 1.);
    
    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, collectable, .01, .35, .75, _, .35, false)
    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, collectable, .01, .35, .75, _, .35, false)
-   Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RB, collectable, .01, .35, .75, _, .35, true)
+   // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RB, collectable, .01, .35, .75, _, .35, true)
    // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, collectable, .1, -1., 1., 0);
    // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.ROT, collectable, .5, -5., 5., 0);
    
    const head = snake.body.buffer[0].mesh;
-   head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, head.gfx.vb.groupidx);
-   head.SetClbkGfxUniforms('u_rcorners', ()=>{ return  [.0, .0, .0]}, { val_idx: null, start_val: .0, });
 
-
+   head.GfxUniformSetAndUpdate('u_scale2', [snake.glow_scale_down_factor, 1]);
+   head.GfxUniformSetAndUpdate('u_rcorners', [.0, .0, .0]);
 
 
 
@@ -676,7 +671,6 @@ export function Game_snake() {
    Construct_listen_events_relations_from_mesh_tree(options);
 
    Listeners_set_priority(E.C, options.listeners);
-
 
 
 
@@ -1195,8 +1189,8 @@ function Animation_scale_down_stop(params){
 
       /*************************************************************************************************/
       const head = snake.body.buffer[0].mesh;
-      head.GfxUniformsSetClbk('u_scale2', function () { return [snake.glow_scale_down_factor, 1] }, head.gfx.vb.groupidx);
-      // head.SetClbkGfxUniforms('u_rcorners', ()=>{ return [1, 1, 1]; }, { val_idx: null, start_val: .0, } );
+      head.GfxUniformSetAndUpdate('u_scale2', [snake.glow_scale_down_factor, 1]);
+      head.GfxUniformSetAndUpdate('u_rcorners', [.0, .0, .0]);
       
 
       const bodyidx = snake.body.Add(new Body_mesh_properties(body_mesh));

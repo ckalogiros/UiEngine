@@ -4,13 +4,13 @@ import { Create_rect_mesh, Create_widget_multi_text, Create_widget_section, Crea
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, WHITE, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
-import { Slider_connect, Slider_get_slider_val, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
+import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
-import { Particles_gfx_uniforms_set_clbk } from "../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
-import { Vertex_buffer_group_create_scissorbox } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
 import { GlRotateZ2D } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
@@ -624,42 +624,7 @@ export function Elastic_collisions(_pos = [0, 0]) {
       pass: SID.PASS.WPOS2,
    }
 
-   // { // SHADER UNIFORMS: Distance
-   //    const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Distance');
-   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
-   //    section.AddItem(slider);
-   //    slider.SetInitialValue(.36);
-   //    slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-   //    balls_buffer[0].GfxUniformsSetClbk('u_scale2', ()=>{ return [scale_down, 1] }, emitter.gfx.vb.groupidx);
-   //    // Particles_gfx_uniforms_set_clbk(emitter1_idx, 'u_glow_params', Slider_get_slider_val, slider, 0);
-   //    Slider_connect(slider, (params, slider_val) => {
-
-   //       emitter.GfxUniformsSetClbk('u_scale2', ()=>{ return [scale_down, 1] }, emitter.gfx.vb.groupidx);
-   //       return slider_val;
-   //    }, _);
-   // }
-   // { // SHADER UNIFORMS: Brightness
-   //    const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Brighter');
-   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
-   //    section.AddItem(slider);
-   //    slider.SetInitialValue(1.);
-   //    slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-   //    // Particles_gfx_uniforms_set_clbk(emitter1_idx, 'u_glow_params', Slider_get_slider_val, slider, 1)
-   // }
-   // { // SHADER UNIFORMS: Intensity
-   //    const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Intensity');
-   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-   //    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
-   //    section.AddItem(slider);
-   //    slider.SetInitialValue(.12);
-   //    slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-   //    // Particles_gfx_uniforms_set_clbk(emitter1_idx, 'u_glow_params', Slider_get_slider_val, slider, 2)
-   // }
    // SHADER UNIFORMS: Particle Scale
    const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Particle Scale');
    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
@@ -667,7 +632,6 @@ export function Elastic_collisions(_pos = [0, 0]) {
    section.AddItem(slider);
    slider.SetInitialValue(scale_down);
    slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // Particles_gfx_uniforms_set_clbk(emitter1_idx, 'u_scale2', Slider_get_slider_val, slider, 0)
 
 
 
@@ -684,8 +648,9 @@ export function Elastic_collisions(_pos = [0, 0]) {
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
 
-   balls_buffer[0].SetClbkGfxUniforms('u_scale2', () => { return [scale_down, 1]; }, balls_buffer[0].gfx.vb.groupidx);
-   balls_buffer[0].SetClbkGfxUniforms('u_glow_params', () => { return [.7, 1., .4] }, { vb_grouidx: balls_buffer[0].gfx.vb.groupidx, val_idx: null, start_val: .5, });
+   // Initialize values to uniforms
+   balls_buffer[0].GfxUniformSetAndUpdate('u_scale2', [scale_down, 1]);
+   balls_buffer[0].GfxUniformSetAndUpdate('u_glow_params', [.7, 1., .4]);
 
    total_height += elastic_cllisions_panel_dim[1];
 
@@ -704,19 +669,19 @@ export function Elastic_collisions(_pos = [0, 0]) {
 
 
 
-   // Connect uniforms callback with the slider callback
-   balls_buffer[0].GfxUniformsSetClbk(
-      'u_scale2',
-      (params) => {
+   // Connect sliders to gfx program uniforms 
+   Slider_connect(slider, (params, slider_val) => {
 
-         const slider = params.slider;
-         const slider_val = slider.GetValue();
+      const target_mesh = params.clbk_params.target_mesh;
+      const val_idx = params.clbk_params.val_idx;
+      // Find the ubidx
+      const ubidx = Mesh_get_uniform_ubidx_from_name(target_mesh.uniforms, 'u_scale2');
+      Vertex_buffer_set_and_update_uniform(target_mesh.gfx.vb.groupidx, ubidx, slider_val, val_idx);
+      
+      params.clbk_params.animation_params.scale_down = slider_val;
 
-         params.animation_params.scale_down = slider_val;
-         return slider_val;
-      },
-      { animation_params: animation_params, slider: slider, val_idx: 0, }
-   );
+   }, { animation_params: animation_params, target_mesh: balls_buffer[0], val_idx: 0, });
+
 
 
 

@@ -114,7 +114,6 @@ export function Root_group_view_buffer_get_root_unif_wpos(idx) {
 
 
 
-
 export function Root_group_view_buffer_get_mesh_by_rootidx(idx) {
 
    const mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[idx].buffer[0]);
@@ -243,8 +242,6 @@ export function Root_group_view_buffer_add_mesh(root_bufferidx, mesh_bufferidx) 
 
    root_group_view_buffer.buffer[root_bufferidx].Add(mesh_bufferidx);
 }
-
-
 
 
 

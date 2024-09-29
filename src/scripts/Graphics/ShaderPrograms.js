@@ -285,6 +285,15 @@ export function Program_use_program(shader_program, progidx) {
 
 
 
+export function Program_use_program2(progidx) {
+	const prog = _programs.buffer[progidx];
+	gfxCtx.gl.useProgram(prog.shader_program);
+	GL_STATE.BOUND_PROG_IDX = progidx;
+	GL_STATE.BOUND_PROG = prog.shader_program;
+}
+
+
+
 
 
 

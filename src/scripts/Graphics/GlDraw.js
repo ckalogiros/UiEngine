@@ -2,7 +2,7 @@ import { Texture_get_texture_byidx } from '../Engine/Loaders/Textures/Texture.js
 import { Renderqueue_get_active, Renderqueue_active_get_count } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
-import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniform } from './Buffers/VertexBuffers.js';
+import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_gfx_binding } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
 
 
@@ -52,9 +52,18 @@ export function Gl_draw(gl) {
             GL_STATE.BOUND_VAO = vb_group.vao;
         }
         
-        // TODO: Distinguish uniforms that will update with uniforms with constant value
-        Vertex_buffer_set_and_update_uniform(vb_groupidx); // OLD: Update via Vertex buffer
         
+        
+        
+        // TODO: Distinguish uniforms that will update with uniforms with constant value
+        Vertex_buffer_set_and_update_uniforms_no_gfx_binding(vb_groupidx); // OLD: Update via Vertex buffer
+
+
+        // Uniforms_buffer_update_uniforms_all();
+        
+
+
+
         if(vb_group.has_scissorbox){
             gl.enable(gl.SCISSOR_TEST);
             gl.scissor(vb_group.scissorbox[0], vb_group.scissorbox[1], vb_group.scissorbox[2], vb_group.scissorbox[3]);

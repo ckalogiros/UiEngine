@@ -381,7 +381,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
                uniforms[i].ubidx = ubidx;
-               console.log(uniforms[i].name, 'ubidx', ubidx)
+               console.log('### UNIFORM CREATED\n vb_groupidx', vb_groupidx, 'name',  uniforms[i].name, 'ubidx', ubidx)
 
                // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
                if(uniforms[i].name === 'u_wposxy'){
@@ -395,7 +395,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                   // Create the uniform position that will update the vertexbuffer's uniform
                   mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
 
-                  // root_posidx must be equal to the vertex buffer index. Every vertexbuffer has a uniform wpos.
                   if (mesh.root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
                   
                }

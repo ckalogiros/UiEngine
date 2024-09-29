@@ -10,7 +10,9 @@ import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_create, Styles_remove_byidx, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy, Screen_wpos_get_y } from "../../../Core/MeshUniformsBuffer.js";
-import { Vertex_buffer_set_uniform_value_callback } from "../../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
+import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../../../Graphics/Buffers/UniformBuffers.js";
+import { Mesh_find_unif_idx_from_unif_name } from "../../Operations/MeshHelperFunctions.js";
 
 
 
@@ -746,7 +748,13 @@ export class Mesh {
             if (this.uniforms[found_idx].ubidx === INT_NULL) {
 
                 // console.error('ubidx is INT_NULL. SEE if the uniform of this mesh has already been initialized for the vertex buffer.');
-                return;
+
+                this.uniforms[found_idx].ubidx = Uniforms_buffer_find_ubidx_from_name(this.uniforms[found_idx].name, this.gfx.prog.idx, this.gfx.vb.groupidx)
+                
+                if(this.uniforms[found_idx].ubidx === INT_NULL) {
+                    // alert('51998712223 \nUniform Not Found')
+                    return;
+                }
             }
 
             // this.uniforms[found_idx].vertex_buffer_store_idx = Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
@@ -754,10 +762,9 @@ export class Mesh {
             return;
         }
 
+        
+        // Alert if the current mesh system does not have the uniform enabled.
         console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
-
-        // Alert if the current mesh has the uniform enabled but failed to find it in the 'this.uniforms' buffer
-        // else this mesh will be stored in a vertex buffer program with the analogous uniforms
         if(SID.CheckSidUnifByName(this.sid.unif, unif_name) === true){
 
             alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
@@ -765,6 +772,20 @@ export class Mesh {
 
 
     }
+
+    GfxUniformSetAndUpdate(unif_name, value, value_idx = null) {
+
+        /**ERROR */ if (this.gfx === null) alert('Try to update uniform befor mesh has gfx.')
+  
+        const len = this.uniforms.length;
+        for (let i = 0; i < len; i++) {
+           if (this.uniforms[i].name === unif_name) {
+              const ubidx = this.uniforms[i].ubidx;
+              Vertex_buffer_set_and_update_uniform(this.gfx.vb.groupidx, ubidx, value, value_idx);
+              break;
+           }
+        }
+     }
 
 
     AddChildScrollerIdx(scroller_comp_idx){

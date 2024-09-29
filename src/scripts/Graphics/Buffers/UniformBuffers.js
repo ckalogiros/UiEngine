@@ -8,6 +8,9 @@ import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilde
 
 const DISABLE_DEBUG = true;
 
+// let any_needs_update = false;
+// let to_update_counter = 0;
+
 
 
 
@@ -71,6 +74,14 @@ function SetValueV4ui(gl, loc, val) { gl.uniform4uiv(loc, val); }
 // gl.UNIFORM_MATRIX_STRIDE   Returns an Array of GLint indicating the strides between columns of a column-major matrix or a row-major matrix.
 // gl.UNIFORM_IS_ROW_MAJOR    Returns an Array of GLboolean indicating whether each of the uniforms is a row-major matrix or not.
 
+
+
+
+/**
+ * // TODO:
+ * // IMPORTANT: The folowing fields are unecessary-> {UpdateUniform(), clbk_params}
+ * 
+ */
 class Uniform {
 
 
@@ -92,10 +103,11 @@ class Uniform {
       this.name = name; // Uniform name
       this.needs_update = false;
       this.UpdateUniform = null; // Gl specific type function for updating the uniform.
-      this.GetValClbk = null; // Function callback for getting the uniform value.
-      this.clbk_params = null; // Params for the Get value callback
-
-      this.is_bound = false;
+      
+      
+      // this.GetValClbk = null; // Function callback for getting the uniform value.
+      // this.clbk_params = null; // Params for the Get value callback
+      // this.is_bound = false;
 
 
       switch (type) {
@@ -134,7 +146,8 @@ class Uniform {
          this.val[idx] = val;
       else this.val = val;
       this.needs_update = true;
-      any_needs_update = true;
+      // any_needs_update = true;
+      // to_update_counter++;
       // console.log('{$$$$$} UNIFORMS SET FROM INDEX', this.val, 'name:', this.name, 'progidx:', this.progidx)
    }
 
@@ -142,7 +155,8 @@ class Uniform {
    Set(val) {
       this.val = val;
       this.needs_update = true;
-      any_needs_update = true;
+      // any_needs_update = true;
+      // to_update_counter++;
       // console.log('{$$$$$} UNIFORMS SET', this.val, 'name:', this.name, 'progidx:', this.progidx)
    }
 
@@ -150,20 +164,38 @@ class Uniform {
    Update() {
       this.UpdateUniform(gfxCtx.gl, this.loc, this.val);
       this.needs_update = false;
+      
+      
+      // to_update_counter--;
+      // if(to_update_counter === 0) {
+      //    any_needs_update = false;
+      //    return true;
+      // }
+      
+      // if(to_update_counter < 0) alert('487653990 \nUniforms counter is negative');
+
+      return false;
+
       // console.log('{$$$$$} UNIFORMS UPDATE', this.val, 'name:', this.name, 'progidx:', this.progidx)
    }
 }
 
 
 const _uniforms_buffer = New_generic_buffer(_, 'GFX Uniforms');
-let any_needs_update = false; // 
+
 export function Uniforms_buffer_reset() { _uniforms_buffer.ResetFull(); }
+
+
+export function Uniforms_buffer_destroy_uniform(ubidx) {
+
+   _uniforms_buffer.RemoveByIdx(ubidx); // Add new unifor to local buffer
+
+}
 
 
 export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, progidx, vb_groupidx) {
 
    const uniform = new Uniform(gl, shader_program, type, name, progidx, vb_groupidx);
-   // if(uniform === null) return INT_NULL;
    const ubidx = _uniforms_buffer.Add(uniform); // Add new unifor to local buffer
 
    return ubidx;
@@ -193,15 +225,6 @@ export function Uniforms_buffer_set_uniform_val_from_index(ubidx, val, idx) {
 
 
 
-export function Uniforms_buffer_set_uniform_value_from_callback(ubidx) {
-   if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
-   const clbk_params = _uniforms_buffer.buffer[ubidx].clbk_params;
-   const val = _uniforms_buffer.buffer[ubidx].GetValClbk(clbk_params);
-   _uniforms_buffer.buffer[ubidx].Set(val);
-}
-
-
-
 
 export function Uniforms_buffer_update_uniform(ubidx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
@@ -210,65 +233,39 @@ export function Uniforms_buffer_update_uniform(ubidx) {
 
 
 
-export function Uniforms_buffer_set_value_callback(ubidx, Clbk, clbk_params) {
-   if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
-
-   if(_uniforms_buffer.buffer[ubidx].GetValClbk !== null) { 
-      console.error('Set uniform value Callback already been set'); }
-
-   const params = {
-      ubidx:ubidx,
-      params:clbk_params
-   }
-
-   _uniforms_buffer.buffer[ubidx].GetValClbk = Clbk;
-   _uniforms_buffer.buffer[ubidx].clbk_params = params;
-}
-
-
-
-// export function Uniforms_buffer_set_and_update_uniform(ubidx) {
-//    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
-
-//    if(_uniforms_buffer.buffer[ubidx].GetValClbk === null) { 
-//       console.error('Forgot to set uniform value Callback?'); return; }
-
-//    const params = _uniforms_buffer.buffer[ubidx].clbk_params;
-//    const val = _uniforms_buffer.buffer[ubidx].GetValClbk(params);
-//    _uniforms_buffer.buffer[ubidx].Set(val);
-//    _uniforms_buffer.buffer[ubidx].Update();
-// }
-
-
-
 // export function Uniforms_buffer_update_uniforms_all() {
 
 //    if(!any_needs_update) return;
 
 //    for(let i=0; i <= _uniforms_buffer.boundary; i++){
-//       // if(_uniforms_buffer.buffer[i].needs_update) 
-//          _uniforms_buffer.buffer[i].Update();
+//       // console.log(_uniforms_buffer.buffer[i])
+//       if(_uniforms_buffer.buffer[i].needs_update) {
+
+//          const no_more = _uniforms_buffer.buffer[i].Update();
+//          if(no_more) break;
+//       }
 //    }
 
 //    // All uniforms have been updated
 //    any_needs_update = false;
+//    to_update_counter = 0;
 // }
 
 
 
-export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', progidx) {
+export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', progidx, vb_groupidx) {
 
    // Find uniform by name
    for (let i = 0; i <= _uniforms_buffer.boundary; i++) {
 
       const unif = _uniforms_buffer.buffer[i];
 
-      if (unif.name === unif_name && unif.progidx === progidx){
+      if (unif.name === unif_name && unif.vb_groupidx === vb_groupidx){
          return i;
       }
    }
 
-   console.error('NO uniform with name found\n', unif_name, 'in program:', progidx)
+   console.error('NO uniform with name found\n', unif_name, 'in program:', vb_groupidx)
    return INT_NULL;
 
    alert('NO uniform with name found\nSEE CONSOLE ERROR\nMaybe forgot to Create the uniform with GfxUniformsEnable()')
@@ -646,8 +643,6 @@ export function Uniforms_buffer_print() {
          'val', _uniforms_buffer.buffer[i].val,
          'progidx', _uniforms_buffer.buffer[i].progidx,
          'vb_groupidx', _uniforms_buffer.buffer[i].vb_groupidx,
-         // 'Clbk', 'For Clbk seek in VertexBufferGroup.Unif_set_val_clbk()',
-         // 'clbk_params', 'For clbk_params seek in VertexBufferGroup.unif_set_val_clbk_params()',
       );
    }
 }

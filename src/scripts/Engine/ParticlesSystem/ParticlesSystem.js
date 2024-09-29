@@ -1,7 +1,8 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_particles_batch_set_col4_wpos4_pos2, Gl_particles_batch_set_col4_wpos4_pos2_dim2_rot4, Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_pos2_style3 } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
+import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Gl_particles_batch_set_col4_wpos4_pos2, Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_pos2_style3 } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Abs, Hash, Max } from "../../Helpers/Math/MathOperations.js";
 import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
@@ -9,6 +10,7 @@ import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
 import { Material, Texture_Material } from "../Drawables/Material/Base/Material.js";
+import { Mesh_find_unif_idx_from_unif_name, Mesh_get_uniform_ubidx_from_name } from "../Drawables/Operations/MeshHelperFunctions.js";
 import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 
@@ -108,6 +110,7 @@ class Emitter {
       this.gfx = null;
       this.type = MESH_TYPE.PARTICLES;
       this.idx = INT_NULL;
+      this.name = name;
       this.nameidx = Str_buffer_store(name);
       // this.col = new Float32Array(col); // a uniform color for the gfx
       this.pos = [pos[0], pos[1], pos[2]];
@@ -265,7 +268,7 @@ class Emitter {
          // Effect Shaders
          case MESH_ENABLE.GFX.FX_GLOW: { this.sid.fx |= SID.FX.FS_GLOW_VEC3; break; }
          case MESH_ENABLE.GFX.FX_NOISE: { this.sid.fx |= SID.FX.FS_NOISE; break; }
-         case MESH_ENABLE.GFX.FX_SMOKE: { this.sid.fx |= SID.FX.FS_SMOKE; break; }
+         case MESH_ENABLE.GFX.FX_SMOKE: { this.sid.fx |= SID.FX.FS_SMOKE_VEC3; break; }
 
          default: console.error('Enable material\'s shader param failed. @ Material.js');
       }
@@ -330,15 +333,43 @@ class Emitter {
 
       if (found_idx !== INT_NULL) {
 
-         Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
+         if (this.uniforms[found_idx].ubidx === INT_NULL) {
+
+            // Case the mesh is new but the vertex buffer already created and owns the uniform
+            this.uniforms[found_idx].ubidx = Uniforms_buffer_find_ubidx_from_name(this.uniforms[found_idx].name, this.gfx.prog.idx, this.gfx.vb.groupidx);
+
+            if (this.uniforms[found_idx].ubidx === INT_NULL) {
+               return;
+            }
+         }
+
+         // this.uniforms[found_idx].vertex_buffer_store_idx = Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
+         Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx, this.uniforms[found_idx].name);
          return;
       }
 
-      console.error('No Uniform Found', unif_name, this.GetName())
-      alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js')
+
+      // Alert if the current particle system does not have the uniform enabled.
+      console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
+      if (SID.CheckSidUnifByName(this.sid.unif, unif_name) === true) {
+         alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
+      }
 
    }
 
+   GfxUniformSetAndUpdate(unif_name, value, value_idx = null) {
+
+      /**ERROR */ if (this.gfx === null) alert('Try to update uniform befor mesh has gfx.')
+
+      const len = this.uniforms.length;
+      for (let i = 0; i < len; i++) {
+         if (this.uniforms[i].name === unif_name) {
+            const ubidx = this.uniforms[i].ubidx;
+            Vertex_buffer_set_and_update_uniform(this.gfx.vb.groupidx, ubidx, value, value_idx);
+            break;
+         }
+      }
+   }
 
 
    // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)

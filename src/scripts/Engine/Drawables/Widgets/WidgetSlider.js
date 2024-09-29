@@ -498,7 +498,9 @@ function Slider_horizontal_calculate_value(bar, handle) {
    const x = handle.geom.pos[0] - bar.geom.pos[0]; // Tranform to mesh coordinates (0 t0 mesh dim)
    const percentage = (x / barwidth); // Calc the percentage 
 
-   return percentage;
+   const final = (percentage < 0.001) ? 0.0 : (percentage > .999) ? 1.0 : percentage;
+
+   return final;
 }
 
 
@@ -507,10 +509,13 @@ function Slider_vertical_calculate_value(bar, handle) {
 
    const bar_length = (bar.geom.dim[1] * 2 * bar.geom.num_faces) - (handle.geom.dim[1] * 2);
    const y = handle.geom.pos[1] - bar.geom.pos[1]; // Tranform to mesh coordinates (0 t0 mesh dim)
+   
    // Interpolate pos to 0-1 
    const percentage = 1 - (y / bar_length); // Calc the percentage 
-   
-   return percentage;
+
+   const final = (percentage < 0.001) ? 0.0 : (percentage > .999) ? 1.0 : percentage;
+
+   return final;
 }
 
 

@@ -402,14 +402,6 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
 
       // Lopp for all meshidxs for this vb
       for(let j=0; j <= view.vb.buffer[i].data.boundary; j++){
-
-         
-         // if(meshidx === INT_NULL) 
-         //    alert('3094716442');
-         // if((mesh.state.mask & MESH_STATE.ACTIVE)===0)
-         //    console.error('DEACTIVATED mesh', mesh.GetName(), mesh)
-         // if(mesh.per_vb_bufferidx===INT_NULL)
-         //    console.error('per_vb_bufferidx = -1', mesh.GetName(), mesh)
          
          const meshidx = view.vb.buffer[i].data.buffer[j];
          const mesh = Mesh_buffer_get_mesh_byidx(meshidx);

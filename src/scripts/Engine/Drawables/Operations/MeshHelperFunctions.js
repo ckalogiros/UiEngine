@@ -4,6 +4,17 @@ import { Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/
 import { Root_group_vbidx_view_view_get } from "../../Core/Views/RootView.js";
 
 
+export function Mesh_find_unif_idx_from_unif_name(mesh_unif_buffer, unif_name) {
+
+    const len = mesh_unif_buffer.length;
+    for (let i = 0; i < len; i++) {
+       if (mesh_unif_buffer[i].name === unif_name) {
+          return i;
+       }
+    }
+ 
+    alert('Find_mesh_ubidx_from_unif_name(ubidx, unif_name)\nNo uniform found with name:', unif_name, mesh_unif_buffer)
+ }
 
 export function Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, unif_name) {
 
@@ -20,12 +31,12 @@ export function Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, unif_name) {
 
 
 
-export function Mesh_get_uniform_ubidx_from_name(uniforms, unif_name) {
+export function Mesh_get_uniform_ubidx_from_name(uniforms_buffer, unif_name) {
 
-   const len = uniforms.length;
+   const len = uniforms_buffer.length;
    for (let i = 0; i < len; i++) {
-       if (uniforms[i].name === unif_name) {
-           return uniforms[i].ubidx;
+       if (uniforms_buffer[i].name === unif_name) {
+           return uniforms_buffer[i].ubidx;
        }
    }
 

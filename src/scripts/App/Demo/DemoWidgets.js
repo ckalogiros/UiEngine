@@ -136,80 +136,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-   // section.SetClbkGfxUniforms('u_rcorners', 
-   //    ()=>{
-   //       const slider_val = control_slider_distance.GetValue();
-   //       return slider_val;
-   //    }, 
-   //    { vb_grouidx: section.gfx.vb.groupidx, val_idx: null, start_val: .0, },
-   // );
-   section.SetClbkGfxUniforms('u_rcorners', 
-      ()=>{
-         const slider_val = control_slider_distance.GetValue();
-         return slider_val;
-      }, 
-      { vb_grouidx: section.gfx.vb.groupidx, val_idx: 0, start_val: .0, }
-   );
 
-   if(control_slider_smoothness !== null){
-
-      section.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_smoothness.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: section.gfx.vb.groupidx, val_idx: 1, start_val: .0, }
-      );
-   }
-
-   if(control_slider_intensity !== null){
-
-      section.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_intensity.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: section.gfx.vb.groupidx, val_idx: 2, start_val: .0, }
-      );
-   }
-   
-   scrolled_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scrolled_section.gfx.vb.groupidx);
-   // scrolled_section.SetClbkGfxUniforms('u_rcorners', 
-   //    ()=>{
-   //       const slider_val = control_slider_distance.GetValue();
-   //       return slider_val;
-   //    }, 
-   //    { vb_grouidx: scrolled_section.gfx.vb.groupidx, val_idx: null, start_val: .0, },
-   // );
-   scrolled_section.SetClbkGfxUniforms('u_rcorners', 
-      ()=>{
-         const slider_val = control_slider_distance.GetValue();
-         return slider_val;
-      }, 
-      { vb_grouidx: scrolled_section.gfx.vb.groupidx, val_idx: 0, start_val: .0, }
-   );
-
-   if(control_slider_smoothness !== null){
-
-      scrolled_section.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_smoothness.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: scrolled_section.gfx.vb.groupidx, val_idx: 1, start_val: .0, }
-      );
-   }
-
-   if(control_slider_intensity !== null){
-
-      scrolled_section.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_intensity.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: scrolled_section.gfx.vb.groupidx, val_idx: 2, start_val: .0, }
-      );
-   }
 
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
@@ -255,17 +182,6 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
 
    if(!control_slider_distance) alert('control_slider_distance param is missing');
 
-   /**
-    * Each section can be assigned any kind and number of widgets
-    * Each section can self align, based on VERTICAL-HORIZONTAL
-    * The structure is a tree structuure, where each parent section incorporates other sections as children
-    * Each section can be assigned an event. The structure of the events is again a tree structure for efficient search
-    * The 
-    * 
-    * move is happening on a uniform, that is then added to each vertex position at the shader stage
-    */
-
-   
    const tr = 1.;
    const min_size = [10, 10];
    const pad = 10;
@@ -292,10 +208,6 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 50);
    root_s.AddItem(info);
    
-   
-   
-   // root_s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
-   // root_s.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3)
    
    const l1_s = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(GREY[1], tr));
    l1_s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -674,14 +586,12 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    // blu_1.AddItem(gry2_4);
 
 
-// TODO: Set the return of the 'SetClbkGfxUniforms()' to the slider _val
 
    root_s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    root_s.EnableGfxUniforms({unif: SID.UNIF.FS_RCORNERS_VEC3,}, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
    // root_s.EnableGfxUniforms({unif: SID.UNIF.FS_SMOOTHNESS_FLOAT,}, 'u_smoothness_1f', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
    root_s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-   // root_s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE);
    root_s.options = SECTION.INHERIT | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
    root_s.Calc_no_gfx_update();
    View_build_group_from_root_mesh(root_s);
@@ -689,113 +599,11 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    Root_group_activate_all_vbs_in_renderqueue(root_s.root_bufferidx);
    
    root_s.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root_s.gfx.vb.groupidx);
-   
-   root_s.SetClbkGfxUniforms('u_rcorners', 
-      ()=>{
-         const slider_val = control_slider_distance.GetValue();
-         return slider_val;
-      }, 
-      { vb_grouidx: root_s.gfx.vb.groupidx, val_idx: 0, start_val: .0, }
-   );
 
-   if(control_slider_smoothness !== null){
-
-      root_s.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_smoothness.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: root_s.gfx.vb.groupidx, val_idx: 1, start_val: .0, }
-      );
-   }
-
-   if(control_slider_intensity !== null){
-
-      root_s.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_intensity.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: root_s.gfx.vb.groupidx, val_idx: 2, start_val: .0, }
-      );
-   }
 
    Construct_listen_events_from_mesh_tree(root_s);
    Construct_listen_events_relations_from_mesh_tree(root_s);
 
-   // root_s.StateEnable(MESH_STATE.IS_RESIZEABLE);
-   // root_s.OnResize =  function(params){
-
-   //    const root = params.params;
-
-   //    // NOTE: We use the same element of the mesh's interval buffer for the resize event as the move event, they cannot both exist at the same time. 
-   //    if (root.StateCheck(MESH_STATE.IN_GRAB) === 0 && root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
-
-   //       const intervalIdx = root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
-   //       Time_intervals_destroy_byidx(intervalIdx);
-   //       root.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
-
-   //       return;
-   //    }
-
-   //    const mouse_pos = MouseGetPos();
-
-
-   //    // Set min dimentions. // TODO: Who decides for the minimum dimentions??????
-   //    const pos = root.GetPosXY();
-   //    const min_sizex = pos[0] + 80;
-   //    const min_sizey = pos[1] + 80;
-   //    let changes_hapened = false;
-
-
-
-   //    if (mouse_pos[0] > min_sizex) {
-
-   //       const sizex = mouse_pos[0] - pos[0];
-   //       root.geom.dim[0] = sizex / 2;
-   //       changes_hapened = true;
-   //    }
-
-   //    if (mouse_pos[1] > min_sizey) {
-
-   //       const sizey = mouse_pos[1] - pos[1];
-   //       root.geom.dim[1] = sizey / 2;
-   //       changes_hapened = true;
-   //    }
-
-
-
-   //    if (changes_hapened) {
-
-
-   //       Root_group_reset_gfxs(root.root_bufferidx)
-
-   //       const root_pos = root.GetPosXY();
-   //       const clip_left = root_pos[0];
-   //       const clip_right = root_pos[0] + root.geom.dim[0] * 2;
-   //       const clip_top = root_pos[1];
-   //       const clip_bottom = root_pos[1] + root.geom.dim[1] * 2;
-
-   //       // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-   //       // for (let i = 0; i <= root.children.boundary; i++) {
-
-   //       //    Clipy_from_tree_recursive(root.children.buffer[i], clip_top, clip_bottom);
-   //       // }
-   //       Clipx_from_group(root.group_bufferidxs[0], clip_left, clip_right);
-   //       Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom) 
-
-   //       // First reset the buffer that holds all meshes(per vertex buffer), because the 'AddFromGfx' is gonna populate the buuffer with the added mesh
-   //       Root_group_vbidx_view_reset_mesh_per_vb_buffer(root.root_bufferidx);
-
-   //       // root.Recalc_no_gfx_update();
-
-
-   //       // const mouse_dif = MouseGetPosDif()
-   //       // const dif = { x: mouse_dif.x / 2, y: -mouse_dif.y / 2 };
-   //       // Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
-   //       Root_group_rerender_from_root_reconstruct_listeners(root.root_bufferidx)
-   //    }
-   // }
 
    return root_s;
 }
@@ -1213,46 +1021,11 @@ export function Demo_widgets_dropdown(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
 
 
-
-
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
 
    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
    View_build_group_from_root_mesh(section);
-
-
-
-   section.SetClbkGfxUniforms('u_rcorners', 
-      ()=>{
-         const slider_val = control_slider_distance.GetValue();
-         return slider_val;
-      }, 
-      { vb_grouidx: section.gfx.vb.groupidx, val_idx: 0, start_val: .0, }
-   );
-
-   if(control_slider_smoothness !== null){
-
-      section.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_smoothness.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: section.gfx.vb.groupidx, val_idx: 1, start_val: .0, }
-      );
-   }
-
-   if(control_slider_intensity !== null){
-
-      section.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_intensity.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: section.gfx.vb.groupidx, val_idx: 2, start_val: .0, }
-      );
-   }
-
 
    return section;
 }
@@ -1425,63 +1198,12 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos=
    section.Render()
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
-   
-
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-   section.SetClbkGfxUniforms('u_rcorners', 
-      ()=>{
-         const slider_val = control_slider_distance.GetValue();
-         return slider_val;
-      }, 
-      { vb_grouidx: section.gfx.vb.groupidx, val_idx: 0, start_val: .0, }
-   );
-
-   if(control_slider_smoothness !== null){
-
-      section.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_smoothness.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: section.gfx.vb.groupidx, val_idx: 1, start_val: .0, }
-      );
-   }
-
-   if(control_slider_intensity !== null){
-
-      section.SetClbkGfxUniforms('u_rcorners', 
-         ()=>{
-            const slider_val = control_slider_intensity.GetValue();
-            return slider_val;
-         }, 
-         { vb_grouidx: section.gfx.vb.groupidx, val_idx: 2, start_val: .0, }
-      );
-   }
 
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
    
-   { // Animations
-      // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-      // View_build_group_from_root_mesh(section);
-      
-      // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, btn, .001, 0.6, .6, 0)
-      // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .002, 0.4, .8, .4)
-      // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, btn, .003, 0.2, .8, .8)
-      
-      // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, btn, .01, 0.6, 1.)
-      // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGBA, btn, .01, 0.4, 1.)
-      // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, btn, .01, 0.0, 1., 0)
-      // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.A, btn, .01, .0, 1., .0)
-      
-      // // btn.text_mesh.SetColorRGB(BLUE_10_120_220);
-      
-      // // btn.Align(ALIGN.LEFT | ALIGN.TOP, [0, 0]);
-      // // btn.Align(ALIGN.RIGHT | ALIGN.BOTTOM, [15, 5]);
-      // text.text_mesh.RenderTextFromNumber(0);
-   }
-   
+  
    return section;
 }
 

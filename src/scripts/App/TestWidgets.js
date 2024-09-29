@@ -342,7 +342,7 @@ export function TestWidgetsGeneric(createId=1) {
 
     // Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
     // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
-    // Demo_page();
+    Demo_page();
 
     // Clbk_animations_circle_scale();
     // Clbk_animations_circle_flip();
@@ -350,7 +350,7 @@ export function TestWidgetsGeneric(createId=1) {
     // Demo_snake_animation();
     // Demo_chain_link();
 
-    Game_snake();
+    // Game_snake();
 
 
     { // Reload

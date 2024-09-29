@@ -6,6 +6,7 @@ import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../
 import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
 import { WHITE } from '../Material/Base/Colors.js';
+import { Mesh_get_uniform_ubidx_from_name } from './MeshHelperFunctions.js';
 
 
 
@@ -14,22 +15,13 @@ import { WHITE } from '../Material/Base/Colors.js';
 
 /*******************************************************************************************************************************************/
 // HELPER FUNCTIONS
-function Find_mesh_ubidx_from_unif_name(unif_name, mesh_unif_buffer) {
 
-   const len = mesh_unif_buffer.length;
-   for (let i = 0; i < len; i++) {
-      if (mesh_unif_buffer[i].name === unif_name) {
-         return mesh_unif_buffer[i].ubidx;
-      }
-   }
 
-   alert('Find_mesh_ubidx_from_unif_name(ubidx, unif_name)\nNo uniform found with name:', unif_name, mesh_unif_buffer)
-}
 
 
 function Set_mesh_uniform_color(mesh_unif_buffer, color){
 
-   const ubidx = Find_mesh_ubidx_from_unif_name('u_col4', mesh_unif_buffer);
+   const ubidx = Mesh_get_uniform_ubidx_from_name('u_col4', mesh_unif_buffer);
    Uniforms_buffer_set_uniform(ubidx, color);
    Uniforms_buffer_update_uniform(ubidx);
 }

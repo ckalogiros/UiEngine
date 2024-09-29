@@ -3,13 +3,13 @@
 
 import { New_generic_buffer, New_int8_buffer } from "../../Engine/Core/Buffers.js";
 import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex, Vertex_buffer_create_attribs_info_per_vb_instanced } from "../ShaderAttributes.js";
-import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index } from "../ShaderPrograms.js";
+import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index, Program_use_program, Program_use_program2 } from "../ShaderPrograms.js";
 import { Typed_array_create_from_type } from "./TypedArrayBuffersInterface.js";
 import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays.js";
 import { Floor } from "../../Helpers/Math/MathOperations.js";
 import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
+import { Uniforms_buffer_destroy_uniform, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
 import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBufferFillOps.js";
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Engine/Core/MeshBuffer.js";
@@ -249,7 +249,7 @@ class Vertex_Buffer_Info {
         this.type = type;   // The type of the typed array buffer
 
         this.attribs_info = null; // TODO: create a local object, instead of a refference
-        this.attribs_indexing = null; 
+        this.attribs_indexing = null;
 
         this.add_to_vb_fnidx = null; // Function pointer. Each vertex buffer has a function that knows how to add attributes to the buffer
     }
@@ -392,15 +392,8 @@ class Vertex_Buffer_Group {
 
         this.vb_idxs = New_int8_buffer(_, 'NEW VertexBufferGroup-VBIDXS');
 
-        // TODO: We probably need only the unif name and ubidx, not the whole uniforms. BUT if doing so, then on any uniform changes, we need to uupdate here too.
-        // this.uniforms = uniforms; // A refference to the mesh uniforms(stores from the first mesh to create the vertex buffer)
+        this.uniform_bindings = New_generic_buffer(_, 'uniform_bindings');
 
-
-        // TODO: Create a more apropriate struct for uniform callbacks
-        this.Unif_set_val_clbk = []; // Function to call for getting the uniform value.
-        this.unif_set_val_clbk_params = []; // The params of the above function callback.
-        this.unif_ubidxs = []; // The params of the above function callback.
-        this.unif_names = []; // Uniforms names. Helper, to locate which element is what uniform
     }
 
     CreateScissorBox(mx, my, mw, mh) {
@@ -440,7 +433,7 @@ export function Vertex_buffer_group_get_size() {
 
 
 
-export function Vertex_buffer_set_name_for_debuging(vb_groupidx, name) { 
+export function Vertex_buffer_set_name_for_debuging(vb_groupidx, name) {
     if (!DISABLE_DEBUG) (_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
     _vertex_buffer_groups.buffer[vb_groupidx].name = name;
 }
@@ -524,19 +517,19 @@ export function Vertex_buffer_group_create_scissorbox(vb_groupidx, mx, my, mw, m
 
 //     const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
 
-   
+
 //     const mx = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[0]);
 //     const my = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[1]);
 //     const mw = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[2]);
 //     const mh = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[3]);
-    
+
 //     const x = mx.GetPosX();
 //     const y = my.GetPosY();
 //     const w = mw.geom.dim[0] * 2;
 //     const h = mh.geom.dim[1] * 2;
-    
+
 //     const root_vb_groupidxs = Root_group_vbidx_view_view_get(mx.root_bufferidx);
-    
+
 //     // Run for all vertex buffer groups that belong to the root widget
 //     const H = VIEWPORT.HEIGHT;
 //     for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
@@ -550,13 +543,13 @@ export function Vertex_buffer_group_create_scissorbox(vb_groupidx, mx, my, mw, m
 
 
 export function Vertex_buffer_group_update_scissorbox_all_vb() {
-    
+
     // Run for all vertex buffer groups that belong to the root widget
     for (let i = 0; i <= _vertex_buffer_groups.boundary; i++) {
-        
+
         const vb_group = _vertex_buffer_groups.buffer[i];
-        if(vb_group.has_scissorbox){
-    
+        if (vb_group.has_scissorbox) {
+
             Vertex_buffer_group_update_scissorbox(i)
         }
     }
@@ -565,22 +558,22 @@ export function Vertex_buffer_group_update_scissorbox_all_vb() {
 
 
 export function Vertex_buffer_group_update_scissorbox(vb_groupidx) {
-    
+
     /**
      * 1. Get the meshes for scissor box x, y, width and height values.
      * 2. Extract these values
      * 3. Run a loop for all vertex buffers that belong to the same root widget
      * 4. Update the scissor box values of the group   
     */
-   
-   const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
 
-   
+    const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
+
+
     const mx = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[0]);
     const my = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[1]);
     const mw = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[2]);
     const mh = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[3]);
-    
+
     const x = mx.GetPosX();
     const y = my.GetPosY();
     const w = mw.geom.dim[0] * 2;
@@ -588,7 +581,7 @@ export function Vertex_buffer_group_update_scissorbox(vb_groupidx) {
     const H = VIEWPORT.HEIGHT;
 
     vb_group.SetScissorBox(x, (H - y) - h, w, h);
-    
+
 }
 
 
@@ -603,43 +596,74 @@ export function Vertex_buffer_group_has_scissorbox(vb_groupidx) {
 
 export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, params, ubidx, unif_name) {
 
-    // Avoid adding callbacks if they have already been added for this vertex buffer
-    // const len = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs.length;
-    // for(let i=0; i < len; i++){
-    //     const ubidx1 = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
-    //     // if(ubidx === ubidx1) 
-    //     // console.error('Duplicate functions for ubidx:', ubidx, 'vb_groupidx', vb_groupidx, 
-    //     // '\nFound at ubidx:', i, '\nValue set at uniform index:', params.val_idx, 'Found uniform value index:', _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[i])
-    //     return;
-    // }
+    // Avoid adding callbacks if they have already been created for this vertex buffer
+    const uniform_bindings = _vertex_buffer_groups.buffer[vb_groupidx].uniform_bindings;
+    for (let i = 0; i <= uniform_bindings.boundary; i++) {
 
-    _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk.push(Clbk);
-    _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params.push(params);
-    _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs.push(ubidx);
-    _vertex_buffer_groups.buffer[vb_groupidx].unif_names.push(unif_name);
+        // Check all uniforms of this vertex buffer group, if any mathces found, skip adding and update the found 
+        if (uniform_bindings.buffer[i].ubidx === ubidx) {
+            uniform_bindings.buffer[i].Clbk = Clbk;
+            uniform_bindings.buffer[i].params = params;
+
+            return;
+        }
+    }
+
+    // Else register the uniform
+    uniform_bindings.Add({
+        Clbk: Clbk,
+        params: params,
+        ubidx: ubidx,
+        unif_name: unif_name,
+    });
 
 }
 
 
 
-export function Vertex_buffer_set_and_update_uniform(vb_groupidx) {
+export function Vertex_buffer_remove_uniforms(vb_groupidx) {
 
-    const len = _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk.length;
-    for (let i = 0; i < len; i++) {
 
-        // 'params' is an index to the '_per_vb_mesh_unif_wpos' buffer, that holds all root unif wpositions
-        const params = _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[i];
-        const val = _vertex_buffer_groups.buffer[vb_groupidx].Unif_set_val_clbk[i](params);
-        const ubidx = _vertex_buffer_groups.buffer[vb_groupidx].unif_ubidxs[i];
+    const uniform_bindings = _vertex_buffer_groups.buffer[vb_groupidx].uniform_bindings;
+    for (let i = 0; i < uniform_bindings.boundary; i++) {
+        uniform_bindings.buffer[i].Clbk = null;
+        uniform_bindings.buffer[i].params = null;
+    }
 
-        // const val_idx = (params.val_idx !== undefined) ? params.val_idx : null;
+}
 
-        // Uniforms_buffer_set_uniform(ubidx, val, val_idx)
-        // Uniforms_buffer_set_uniform_val_from_index(ubidx, val, val_idx);
-        Uniforms_buffer_set_uniform_val_from_index(ubidx, val,  params.val_idx);
+
+
+export function Vertex_buffer_set_and_update_uniforms_no_gfx_binding(vb_groupidx) {
+
+
+    const uniform_bindings = _vertex_buffer_groups.buffer[vb_groupidx].uniform_bindings;
+    for (let i = 0; i <= uniform_bindings.boundary; i++) {
+
+        const params = uniform_bindings.buffer[i].params;
+        const val = uniform_bindings.buffer[i].Clbk(params);
+        const ubidx = uniform_bindings.buffer[i].ubidx;
+
+        Uniforms_buffer_set_uniform_val_from_index(ubidx, val, params.val_idx);
         Uniforms_buffer_update_uniform(ubidx);
+    }
 
-    } ``
+}
+
+
+
+export function Vertex_buffer_set_and_update_uniform(vb_groupidx, ubidx, unif_val, unif_val_idx=null) {
+
+    Program_use_program2(_vertex_buffer_groups.buffer[vb_groupidx].progidx);
+    
+    const vao = _vertex_buffer_groups.buffer[vb_groupidx].vao;
+    if (GL_STATE.BOUND_VAO !== vao){
+        gfxCtx.gl.bindVertexArray(vao);
+        GL_STATE.BOUND_VAO = vao;
+    }
+
+    Uniforms_buffer_set_uniform_val_from_index(ubidx, unif_val, unif_val_idx);
+    Uniforms_buffer_update_uniform(ubidx);
 }
 
 
@@ -1125,10 +1149,13 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces) {
 
             // Deactivate the vertex buffer rendering in the render queue
             Renderqueue_set_active(gfx.vb.groupidx, false);
-            
+
             // Reset the wpos uniform in the wpos uniforms buffer
             Mesh_unif_set_vb_root_wposx(gfx.vb.groupidx, 0);
             Mesh_unif_set_vb_root_wposy(gfx.vb.groupidx, 0);
+
+            // Remove any uniform callback functions
+            Vertex_buffer_remove_uniforms(gfx.vb.groupidx);
 
         }
         else vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
