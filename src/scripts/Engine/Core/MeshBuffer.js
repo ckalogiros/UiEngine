@@ -50,6 +50,9 @@ export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.b
 
 export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
 
+if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === undefined)
+   console.log()
+
    const hover_margin = _mesh_buffer.buffer[mesh_bufferidx].StylesGetHoverMargin();
    const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
    temp_no_allocation_buffer[0][0] = pos[0] - hover_margin[0];
@@ -115,6 +118,8 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx, root_bufferidx) {
 
    if (mesh.nameidx !== INT_NULL) Str_buffer_mesh_names_remove_by_idx(mesh.nameidx);
    _mesh_buffer.RemoveByIdx(mesh_bufferidx);
+
+
 }
 
 
@@ -231,7 +236,8 @@ export function Mesh_per_vb_create_vb(vb_groupidx) {
 export function Mesh_per_vb_store_mesh(vb_groupidx, mesh_bufferidx) {
    const idx = _mesh_per_vertex_buffer.buffer[vb_groupidx].Add(mesh_bufferidx);
    
-   /*only for debug*/const mesh = Mesh_buffer_get_mesh_byidx(mesh_bufferidx)
+   // /*only for debug*/const mesh_buffer = Mesh_buffer_get(); 
+   // /*only for debug*/const mesh = Mesh_buffer_get_mesh_byidx(mesh_bufferidx)
    // console.log('Store', mesh.GetName(), mesh_bufferidx, idx)
    
    return idx;
@@ -246,33 +252,55 @@ export function Mesh_per_vb_reset_buffer(vb_groupidx) {
 
 
 
+
+// export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
+
+//    console.log('REMOVING MESH FROM PER_VB_BUFFER', 'vb_group', vb_groupidx, 'meshidx', _mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[per_vb_bufferidx]  )
+//    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdx(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
+
+
+//    // if (NOTIFICATIONS_ON)
+//    //    Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, vb_groupidx);
+
+// }
+
 /**
  * Can remove meshidx from the '_mesh_per_vertex_buffer' OneByOne, 
  * via the meshe's .per_vb_bufferidx, which is the index of that mesh in the '_mesh_per_vertex_buffer'.
  */
+// export function Mesh_per_vb_remove_mesh_sorted(vb_groupidx, per_vb_bufferidx) {
 export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
 
+   if (per_vb_bufferidx === INT_NULL || per_vb_bufferidx === null) alert('556188772354'); 
    
-   // Get the mesh (from the mesh_buffer), that is the last element of the '_mesh_per_vertex_buffer'.
-   const last_elem_idx = _mesh_per_vertex_buffer.buffer[vb_groupidx].boundary;
-   const swaped_mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[last_elem_idx]];
+   _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdx(per_vb_bufferidx);
+   
+   // // Remove the mesh from the buffer, and sort by swaping with the last mesh
+   // _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxSortedVersion(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
    
    
-   if (per_vb_bufferidx === INT_NULL) alert('556188772354'); 
-   // Case the vb buffer is empty
-   if(swaped_mesh == _){
-      console.log('last_elem_idx', last_elem_idx, 'per_vb_bufferidx', per_vb_bufferidx)
-      console.log('buuffer', _mesh_per_vertex_buffer.buffer[vb_groupidx].buffer)
-      console.log('mesh to be removed', mesh.GetName())
-   }
+   // // Get the mesh (from the mesh_buffer), that is the last element of the '_mesh_per_vertex_buffer'.
+   // const last_elem_idx = _mesh_per_vertex_buffer.buffer[vb_groupidx].boundary;
+   // const swaped_mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[last_elem_idx]];
+   // // Case the vb buffer is empty
+   // if(swaped_mesh === _ || swaped_mesh===null){
+   //    // console.log('last_elem_idx', last_elem_idx, 'per_vb_bufferidx', per_vb_bufferidx)
+   //    // console.log('buuffer', _mesh_per_vertex_buffer.buffer[vb_groupidx].buffer)
+      
+   //    // console.log('mesh to be removed', mesh.GetName())
+   //    _mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[per_vb_bufferidx] = INT_NULL;
+   //    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxSortedVersion(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
+
+   //    // const mesh
+   //    // if(_mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[per_vb_bufferidx]])
 
 
-   // Remove the mesh from the buffer, and sort by swaping with the last mesh
-   _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxSortedVersion(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
+   //    return;
+   // }
 
-
-   // Update the swaped mesh's .per_vb_bufferidx value to point to it's new place
-   if(last_elem_idx !== per_vb_bufferidx) swaped_mesh.per_vb_bufferidx = per_vb_bufferidx; // Case the removed mesh is last in the _mesh_per_vertex_buffer, then there is no replacement and no need for setting the 'mesh.per_vb_bufferidx'
+   // // Update the swaped mesh's .per_vb_bufferidx value to point to it's new place
+   // if(last_elem_idx !== per_vb_bufferidx) 
+   //    swaped_mesh.per_vb_bufferidx = per_vb_bufferidx; // Case the removed mesh is last in the _mesh_per_vertex_buffer, then there is no replacement and no need for setting the 'mesh.per_vb_bufferidx'
 
 
    // if (NOTIFICATIONS_ON)
@@ -451,6 +479,7 @@ export function Mesh_buffer_print_loop() {
          console.log(i,
             'mbidx:', _mesh_buffer.buffer[i].mesh_bufferidx,
             'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
+            'vbgroupidx:', _mesh_buffer.buffer[i].gfx.vb.groupidx,
             'per_vb_idx', _mesh_buffer.buffer[i].per_vb_bufferidx,
             // 'gfxidx', _widget_root_gfx.buffer[_mesh_buffer.buffer[i].root_bufferidx],
             'batchidx:', _mesh_buffer.buffer[i].batch_buffer_vbidx,
@@ -496,10 +525,13 @@ export function Mesh_per_vb_print_loop() {
          for (let j = 0; j <= _mesh_per_vertex_buffer.buffer[i].boundary; j++) {
 
             const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[i].buffer[j]];
+            if(mesh && mesh !== undefined)
             console.log(j,
                ' mbidx:', mesh.mesh_bufferidx,
-               'start:', mesh.gfx.vb.start,
+               'start:', mesh.gfx.vb.starts.buffer,
+               'name:', mesh.GetName(),
             );
+            else console.log(mesh)
          }
       }
       else console.log(i, 'NULL')

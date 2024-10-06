@@ -19,6 +19,7 @@ import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } fro
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_set_in_focus } from "../../Core/Views/RootView.js";
 import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
+import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 
 
 
@@ -542,10 +543,9 @@ export class Section extends Mesh {
 
             section.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS;
             STATE.mesh.SetGrabed(section);
-            STATE.mesh.SetFocused(section);
+            // STATE.mesh.SetFocused(section);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
-            Root_group_set_in_focus(section.root_bufferidx);
-
+            Mesh_set_root_in_focus(section.root_bufferidx);
 
             return true;
          }
@@ -564,7 +564,9 @@ export class Section extends Mesh {
             STATE.mesh.SetFocused(section);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
             section.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-            Root_group_set_in_focus(section.root_bufferidx);
+            // Root_group_set_in_focus(section.root_bufferidx);
+            // Mesh_set_root_in_focus(section.root_bufferidx);
+
          }
 
       }

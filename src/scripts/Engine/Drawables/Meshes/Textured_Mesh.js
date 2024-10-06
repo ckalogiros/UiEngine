@@ -11,6 +11,7 @@ import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_set_in_focus } from "../../Core/Views/RootView.js";
+import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 
 
 
@@ -171,7 +172,7 @@ export class Textured_Mesh extends Mesh {
                STATE.mesh.SetGrabed(mesh);
                STATE.mesh.SetFocused(mesh);
                mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-               Root_group_set_in_focus(mesh.root_bufferidx);
+               // Mesh_set_root_in_focus(mesh.root_bufferidx);
             }
 
          }

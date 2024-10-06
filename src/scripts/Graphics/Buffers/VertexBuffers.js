@@ -591,6 +591,12 @@ export function Vertex_buffer_group_has_scissorbox(vb_groupidx) {
 }
 
 
+
+export function Vertex_buffer_group_remove_scissorbox(vb_groupidx) {
+    _vertex_buffer_groups.buffer[vb_groupidx].has_scissorbox = false;
+}
+
+
 /*************************************************************************************************************************/
 // Uniforms
 
@@ -636,6 +642,8 @@ export function Vertex_buffer_remove_uniforms(vb_groupidx) {
 
 export function Vertex_buffer_set_and_update_uniforms_no_gfx_binding(vb_groupidx) {
 
+    if(vb_groupidx === 10)
+        console.log
 
     const uniform_bindings = _vertex_buffer_groups.buffer[vb_groupidx].uniform_bindings;
     for (let i = 0; i <= uniform_bindings.boundary; i++) {
@@ -1094,40 +1102,43 @@ export function Vertex_buffer_update_vertices_explicit_Params(vb_groupidx, start
 
 
 
-export function Vertex_buffer_remove_geometry(gfx, num_faces) {
-
+export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
 
     const vb_group = _vertex_buffer_groups.buffer[gfx.vb.groupidx];
-
+    
     for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
-
+        
         // console.log('-----------------------------------------------------------------\ngfx.vb.counts.active_count', gfx.vb.counts.buffer[i], 'num_faces', num_faces)
-
+        
         const vb_info = _vertex_buffer_infos.buffer[gfx.vb.groupidx];
-
+        
         const attribsidx = Program_get_shader_attributes_index(vb_group.progidx);
         const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
-
-        const removed_attribs = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X)
-            ? attribs_per_vertex * ((2 * num_faces) + 2) // For meshes with rects vertex conection
-            : attribs_per_vertex * 4 * num_faces; // For meshes with separate rects 
-
-
+        
+        const removed_attribs = attribs_per_vertex * 4 * num_faces
+        // const removed_attribs = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X)
+        // ? attribs_per_vertex * ((2 * num_faces) + 2) // For meshes with rects vertex conection
+        // : attribs_per_vertex * 4 * num_faces; // For meshes with separate rects 
+        
         let start = gfx.vb.starts.buffer[i];
         const end = start + removed_attribs;
 
+        
         // console.log('Remove:', gfx.vb.groupidx, 'removed_attribs', removed_attribs, 'counts', gfx.vb.counts.buffer[i], 'num_faces', num_faces, 'vbcount', vb_info.count)
-
-
+        
+        
         // Shift all attributes left to fil the gap of the removed attributes. 
         const vb_data = _vertex_buffers_data.buffer[gfx.vb.groupidx];
         for (let j = end; j < vb_info.count; j++) {
             vb_data[start++] = vb_data[j];
         }
-
+        
         vb_info.count -= removed_attribs;
         const vCount = removed_attribs / gfx.vb.counts.buffer[i];
         vb_info.vCount -= vCount;
+        
+        // if(gfx.vb.groupidx===12) console.log('    vb_info.count', vb_info.count, 'removed_attribs', removed_attribs)
+
 
         /**DEBUG*/ if (vb_info.count < 0) {
             console.error('!!!!!!!!!!!!!!!!!!!!!!!!!',

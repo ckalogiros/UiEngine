@@ -124,31 +124,6 @@ class RenderQueue {
    }
 
 
-   // #Find(vb_groupidx) {
-
-   //    if (!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
-   //    for (let i = 0; i < this.size; i++) {
-   //       if (this.buffer[i].vb_groupidx === vb_groupidx){
-   //          return i;
-   //       }
-   //    }
-   //    return INT_NULL;
-   // }
-
-
-   // FindAllBuffersFromProgram(progidx) {
-
-   //    if (!this.count) return INT_NULL; // Case RenderQueue hasn't been initialized
-   //    let idxs = [];
-   //    for (let i = 0; i < this.size; i++) {
-   //       if (this.buffer[i].progidx === progidx) {
-   //          idxs.push(i);
-   //       }
-   //    }
-   //    return idxs;
-   // }
-
-
    Swap(obj1, obj2) {
 
       const temp = new RenderQueueData;
@@ -183,6 +158,9 @@ class RenderQueue {
          this.buffer[0].Set(temp);
          Vertex_buffer_group_set_render_queueidx(this.buffer[0].vb_groupidx, 0);
 
+         // Enable renderqueue's self-update the active queue
+         _render_queue.needs_update = true;
+         // this.RebuildActiveQueue(); // EFFICIENCY: The rebuild should happen maximum once per frame OR via callback 
       }
       else if (flag === LAST && idx < this.count - 1) {
 
@@ -196,6 +174,10 @@ class RenderQueue {
          // Store back prioritized element
          this.buffer[this.count - 1].Set(temp);
          Vertex_buffer_group_set_render_queueidx(this.buffer[this.count - 1].vb_groupidx, this.count - 1);
+
+         // Enable renderqueue's self-update the active queue
+         _render_queue.needs_update = true;
+         // this.RebuildActiveQueue(); // EFFICIENCY: The rebuild should happen maximum once per frame OR via callback 
       }
    }
 

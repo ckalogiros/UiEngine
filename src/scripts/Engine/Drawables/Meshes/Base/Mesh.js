@@ -10,9 +10,11 @@ import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_create, Styles_remove_byidx, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy, Screen_wpos_get_y } from "../../../Core/MeshUniformsBuffer.js";
-import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_group_remove_scissorbox } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../../../Graphics/Buffers/UniformBuffers.js";
 import { Mesh_find_unif_idx_from_unif_name } from "../../Operations/MeshHelperFunctions.js";
+import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
+import { View_remove_view } from "../../../Core/MeshBufferViews.js";
 
 
 
@@ -250,18 +252,17 @@ export class Mesh {
         // Remove event listeners
         if (this.listeners) {
             this.RemoveAllListenEvents();
-            Free_generic_buffer(this.listeners)
+            Free_generic_buffer(this.listeners);
+            // this.listeners = null;
         }
 
 
 
-
+        
         /*************************************************************************************/
         // Remove time intervals
         if (this.timeIntervalsIdxBuffer.active_count) {
-
             for (let i = 0; i <= this.timeIntervalsIdxBuffer.boundary; i++) {
-
                 const intervalIdx = this.timeIntervalsIdxBuffer.buffer[i];
                 if (intervalIdx !== INT_NULL) {
                     Time_intervals_destroy_byidx(intervalIdx);
@@ -269,6 +270,9 @@ export class Mesh {
                 }
             }
         }
+
+
+
 
         // Styles_batch_destroy_store(this.styles);
         // BUG: There seems to be a bug in the removal of the styles from the M_Buffer, so as to the '.active_count' isn't incremented/Decremented correctly
@@ -278,6 +282,36 @@ export class Mesh {
 
 
 
+        
+        /*************************************************************************************/
+        // Destroy any scrollers
+        if(this.scroller_comp) {
+
+            Scoller_component_destroy(this.scroller_comp);
+            Vertex_buffer_group_remove_scissorbox(this.gfx.vb.groupidx);
+            this.scroller_comp = null;
+
+            // In order 'this' will be removed from the mesh_buffer, needs to have no scrollers enebled
+            this.components = 0x0;
+        }
+
+
+
+        
+        /*************************************************************************************/
+        // Remove from any View
+        if(this.group_bufferidxs[0] !== INT_NULL) {
+
+            View_remove_view(this.group_bufferidxs);
+            this.group_bufferidxs[0] = INT_NULL;
+            this.group_bufferidxs[1] = INT_NULL;
+            this.group_bufferidxs[2] = INT_NULL;
+
+        }
+
+
+
+        // console.log('{{{MESH DESTROY}}}',this.mesh_bufferidx,  this.GetName())
 
         /*************************************************************************************/
         // Remove from gfx buffers.
@@ -295,32 +329,32 @@ export class Mesh {
             }
 
             // Remove from 'mesh_per_vb_buffer'
-            Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx)
-
+            
         }
+        
+        Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx)
 
-        // Case 'this' is a child, remove it from parent's children buffer.
+
+        
         /**
+         * Case 'this' is a child, remove it from parent's children buffer.
          * Because this function probably is called by the parent's 'Destroy()' function, 
          * if we remove the 'this' in here, then we must notify parent so as not to reduce it's children count.
          */
-
-
         let shift_children = false; // The caller will reduce the i from the loop by 1.
         if (this.parent && this.parent !== NO_MESH_PARENT && this.idx !== INT_NULL) {
-
             shift_children = this.parent.RemoveChildByIdx(this.idx); // Remove the current mesh from the parent
-
         }
 
 
 
-
+        
         /*************************************************************************************/
         // Remove from widget root buffer.
         // Mesh_buffer_batch_destroy_store(this.mesh_bufferidx);
         // Command_buffer_store(Mesh_buffer_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
         if((this.components & COMPONENTS.SCROLLER)===0) Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
+        else alert()
 
         // Destroy Generic Buffers
         if (this.eventCallbacks) Free_generic_buffer(this.eventCallbacks);
@@ -334,6 +368,7 @@ export class Mesh {
 
 
 
+        
         /*************************************************************************************/
         // Remove mesh from STATE.
         STATE.mesh.CheckAllAndRemove(this)
@@ -464,8 +499,6 @@ export class Mesh {
                 this.listeners.buffer[i] = INT_NULL;
             }
         }
-
-        // Command_buffer_store(Listener_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
     }
 
 

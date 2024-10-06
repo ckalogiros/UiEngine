@@ -877,7 +877,7 @@ export function Gl_set_round_corners(gfxInfo, r, num_faces = 1) {
 // TODO: We get the vb_infohere and in 'Vertex_buffer_remove_geometry()'
 export function Gl_remove_geometry(gfx, num_faces = 1, start_index = 0, debug_mesh = null) {
 
-   Vertex_buffer_remove_geometry(gfx, num_faces);
+   Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh);
 
 }
 

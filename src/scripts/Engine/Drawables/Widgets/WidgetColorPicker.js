@@ -12,7 +12,8 @@ import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timer
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { BLACK, BLUE, BLUEL, GREEN, GREY, RED, REDL, TRANSPARENT, WHITE, YELLOW } from "../Material/Base/Colors.js";
 import { Section } from "../Meshes/Section.js";
-import { Slider_simple_connect } from "./WidgetSlider.js";
+import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
+import { Slider_simple_connect, Slider_simple_set_value } from "./WidgetSlider.js";
 
 
 
@@ -74,6 +75,7 @@ export class Widget_Color_Picker extends Section {
       this.label_a = null;
 
       this.temp_target_mesh_clbk = null;
+      this.temp_target_mesh_params = null;
 
 
 
@@ -92,7 +94,8 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create the color picker panel
-      const color_pick = Create_rect_mesh(_, [20, 20, 2], [150*scale, 150*scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
+      // const color_pick = Create_rect_mesh(_, [20, 20, 2], [150*scale, 150*scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
+      const color_pick = Create_rect_mesh(_, [0, 0, 2], [150*scale, 150*scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
       color_pick.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       // color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
@@ -113,8 +116,8 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create the color present mesh
-      // const color_present_mesh = Create_rect_mesh(_, [20, 20, 2], [80, 60], [YELLOW[9], YELLOW[9],YELLOW[9], YELLOW[9]], 'Color Present', style, [0, 0], 1, is_debug_mesh);
-      const color_present_mesh = Create_rect_mesh(_, [20, 20, 2], [80*scale, 60*scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
+      // const color_present_mesh = Create_rect_mesh(_, [20, 20, 2], [80*scale, 60*scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
+      const color_present_mesh = Create_rect_mesh(_, [0, 0, 2], [80*scale, 60*scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
       color_present_mesh.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       color_present_mesh.StylesSetMargin([0, 0]);
 
@@ -454,7 +457,7 @@ export class Widget_Color_Picker extends Section {
          const clbk_params = {
             target_mesh: null,
             src_mesh: mesh,
-            slider_mesh: hue_mesh,
+            slider_hue: hue_mesh,
             slider_transp_mesh: transp_slider_mesh,
             color_pick_mesh: color_pick_mesh,
             color_present_mesh: color_present_mesh,
@@ -480,6 +483,7 @@ export class Widget_Color_Picker extends Section {
          const clbk_params_transparency_slider = {
             src_mesh: mesh,
             slider_tran: transp_slider_mesh,
+            slider_hue: hue_mesh,
             color_pick_mesh: color_pick_mesh,
             color_present_mesh: color_present_mesh,
             target_mesh: null,
@@ -516,7 +520,7 @@ export class Widget_Color_Picker extends Section {
             STATE.mesh.SetFocused(widget);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
             widget.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-            Root_group_set_in_focus(widget.root_bufferidx);
+            // Mesh_set_root_in_focus(widget.root_bufferidx);
          }
 
       }
@@ -539,8 +543,9 @@ export class Widget_Color_Picker extends Section {
    OnClickHuePick(params, slider_val) {
 
       const widget = params.clbk_params.src_mesh;
-      const slider = params.clbk_params.slider_mesh;
+      // const slider = params.clbk_params.slider_mesh;
       const slider_tran = params.clbk_params.slider_transp_mesh;
+      const slider_hue = params.clbk_params.slider_hue;
       const color_pick_mesh = params.clbk_params.color_pick_mesh;
       const color_present_mesh = params.clbk_params.color_present_mesh;
 
@@ -569,7 +574,7 @@ export class Widget_Color_Picker extends Section {
       // Calculate the color for the color pick panel
 
       // Get the number of color parts of the hue bar
-      const parts = slider.geom.num_faces;
+      const parts = slider_hue.geom.num_faces;
       
       // Calculate the index of the part, the handle is currently located 
       // Calculate handle pos percentage to be 1 whole unit for every part. E.x: For part1:0-1, part2:1-2, part3:2-3, ...
@@ -586,8 +591,8 @@ export class Widget_Color_Picker extends Section {
 
       
       // Cache the vertex colors of the current part of the hue bar
-      const c1 = slider.mat.col[color_indices[0]];
-      const c2 = slider.mat.col[color_indices[1]];
+      const c1 = slider_hue.mat.col[color_indices[0]];
+      const c2 = slider_hue.mat.col[color_indices[1]];
       // Get the fraction of the percentage so that it always is 0-1 for any part
       const fract = part_ratio - Floor(part_ratio);
       const c = Mix_vec4_float32Array(c1, c2, fract);
@@ -668,18 +673,19 @@ export class Widget_Color_Picker extends Section {
       // Update target meshes
 
       if(widget.temp_target_mesh_clbk){
-         // widget.temp_target_mesh_clbk(new Float32Array([
-         //    final_color[0],
-         //    final_color[1],
-         //    final_color[2],
-         //    final_color[3],
-         // ]));
-         widget.temp_target_mesh_clbk(new Float32Array([
-            intensity[0],
-            intensity[1],
-            intensity[2],
-            final_color[3],
-         ]));
+         
+         widget.temp_target_mesh_params.mnemonics.transparency = slider_tran.slider_val;
+         widget.temp_target_mesh_params.mnemonics.hue = slider_hue.slider_val;
+         
+         widget.temp_target_mesh_clbk(
+            new Float32Array([
+               intensity[0],
+               intensity[1],
+               intensity[2],
+               final_color[3],
+            ]), 
+            widget.temp_target_mesh_params,
+         );
       }
 
    }
@@ -689,6 +695,7 @@ export class Widget_Color_Picker extends Section {
 
       const widget = params.clbk_params.src_mesh;
       const slider_tran = params.clbk_params.slider_tran;
+      const slider_hue = params.clbk_params.slider_hue;
       const num_faces = slider_tran.geom.num_faces; // Face Index:The first one
       const alphaidx = 3;
 
@@ -733,13 +740,21 @@ export class Widget_Color_Picker extends Section {
       // Update target meshes
 
       if(widget.temp_target_mesh_clbk){
-         widget.temp_target_mesh_clbk(new Float32Array([
-            color_present_mesh.mat.col[0],
-            color_present_mesh.mat.col[1],
-            color_present_mesh.mat.col[2],
-            slider_val,
-         ]));
+         
+         widget.temp_target_mesh_params.mnemonics.transparency = slider_tran.slider_val;
+         widget.temp_target_mesh_params.mnemonics.hue = slider_hue.slider_val;
+         
+         widget.temp_target_mesh_clbk(
+            new Float32Array([
+               color_present_mesh.mat.col[0],
+               color_present_mesh.mat.col[1],
+               color_present_mesh.mat.col[2],
+               slider_val,
+            ],),
+            widget.temp_target_mesh_params,
+         );
       }
+
       
    }
 
@@ -817,13 +832,19 @@ export class Widget_Color_Picker extends Section {
       // Update target meshes
 
       if(widget.temp_target_mesh_clbk){
-         widget.temp_target_mesh_clbk(intensity);
+                  
+         // widget.temp_target_mesh_params.mnemonics.transparency = slider_tran.slider_val;
+         // widget.temp_target_mesh_params.mnemonics.hue = slider_hue.slider_val;
+         // widget.temp_target_mesh_params.mnemonics.hue = slider_hue.slider_val;
+         
+         widget.temp_target_mesh_clbk(intensity, widget.temp_target_mesh_params);
       }
    }
 
    
-   AssignTargetMeshClbk(Clbk){
+   AssignTargetMeshClbk(Clbk, params){
       this.temp_target_mesh_clbk = Clbk;
+      this.temp_target_mesh_params = params;
    }
 
 
@@ -849,9 +870,17 @@ export class Widget_Color_Picker extends Section {
 
       };
 
+      if(transp_slider_mesh.gfx !== null) {
 
-      const interpolated_slider_val = transp_slider_mesh.SetInitialValue(slider_val);
-      this.OnClickTranpsarencyPick(params, interpolated_slider_val)
+         Slider_simple_set_value(transp_slider_mesh, slider_val);
+         this.OnClickTranpsarencyPick(params, slider_val)
+      }
+      else {
+
+         const interpolated_slider_val = transp_slider_mesh.SetInitialValue(slider_val);
+         this.OnClickTranpsarencyPick(params, interpolated_slider_val)
+      }
+
 
       
    }
@@ -872,7 +901,7 @@ export class Widget_Color_Picker extends Section {
          clbk_params:{
 
             src_mesh: mesh,
-            slider_mesh: hue_mesh,
+            slider_hue: hue_mesh,
             slider_transp_mesh: transp_slider_mesh,
             color_pick_mesh: color_pick_mesh,
             color_present_mesh: color_present_mesh,
@@ -881,9 +910,16 @@ export class Widget_Color_Picker extends Section {
 
       };
 
+      if(hue_mesh.gfx !== null) {
 
-      const interpolated_slider_val = hue_mesh.SetInitialValue(slider_val);
-      this.OnClickHuePick(params, interpolated_slider_val)
+         Slider_simple_set_value(hue_mesh, slider_val);
+         this.OnClickHuePick(params, slider_val)
+      }
+      else {
+
+         const interpolated_slider_val = hue_mesh.SetInitialValue(slider_val);
+         this.OnClickHuePick(params, interpolated_slider_val)
+      }
 
    }
 

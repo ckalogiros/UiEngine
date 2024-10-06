@@ -5,7 +5,7 @@ import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBu
 import { Vertex_buffer_create_attribs_info_per_vb_instanced } from "../../../Graphics/ShaderAttributes.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Drawables/Operations/Recursions.js";
 import { Relative_pos_comp_move_right_buffer } from "../../Drawables/Operations/RelativePosComponent.js";
-import { Renderqueue_set_active, Renderqueue_set_flags } from "../../Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb_remove_all_from_index } from "../MeshBuffer.js";
 import { Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
@@ -210,7 +210,8 @@ export function Root_group_view_buffer_remove_element_byidx(root_bufferidx, batc
          root_group_view_buffer.buffer[root_bufferidx].RemoveByIdxSortedVersion(elem_found, root_bufferidx, 'Root_group_view_buffer_remove_element_byidx');
 
       }
-      else console.error('Widget root FAILED to remove element. root idx:', root_bufferidx, 'mesh_bufferidx', mesh_bufferidx, ' element idx:', elem_found,);
+      else 
+         console.error('Widget root FAILED to remove element. root idx:', root_bufferidx, 'mesh_bufferidx', mesh_bufferidx, ' element idx:', elem_found,);
 
    }
 }
@@ -803,8 +804,8 @@ export function Root_group_set_render_queue_flags(root_bufferidx, flags) {
 
 
 
+// TODO: Implement faste->Get the widget root gfx that hass only the vb indexes of the root view
 export function Root_group_set_render_queue_priority(root_bufferidx) {
-
 
    const vb_mesh_roots = Root_group_per_vb_meshidx_view_get_all_roots(root_bufferidx);
    const len = vb_mesh_roots.length;
@@ -838,6 +839,77 @@ export function Root_group_activate_all_vbs_in_renderqueue(root_bufferidx) {
       Renderqueue_set_active(mesh.gfx.vb.groupidx, true)
    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*******************************************************************************************************************************************************************************/
 // DEBUG-PRINT

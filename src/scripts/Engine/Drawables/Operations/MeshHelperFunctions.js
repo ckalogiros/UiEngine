@@ -1,7 +1,11 @@
 "use strict";
 
 import { Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Root_group_vbidx_view_view_get } from "../../Core/Views/RootView.js";
+import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx, Mesh_per_vb_get_vb_byidx } from "../../Core/MeshBuffer.js";
+import { Root_group_vbidx_view_view_get, Root_group_view_buffer_get_byidx, Root_group_view_buffer_get_mesh_by_rootidx, Root_group_view_buffer_get_root_meshidx } from "../../Core/Views/RootView.js";
+import { Listeners_set_priority, TEMP_LISTENERS } from "../../Events/EventListeners.js";
+import { Renderqueue_Add, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
+import { Components_get_scroller_component } from "../Widgets/ScrollerComponent.js";
 
 
 export function Mesh_find_unif_idx_from_unif_name(mesh_unif_buffer, unif_name) {
@@ -71,20 +75,6 @@ export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshid
 
 
 
-// export function Mesh_set_scissorbox(root_bufferidx, x, y, w, h) {
-
-//     const root_vb_groupidxs = Root_group_vbidx_view_view_get(root_bufferidx);
-
-//     // Run for all vertex buffer groups that belong to the root widget
-//     for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
-
-//         // Set scissor box
-//         Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], x, y, w, h)
-//         Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], x, y, w, h)
-//     }
-// }
-
-
 
 
 export function Mesh_calc_pos_dif(mesh1, mesh2) {
@@ -97,4 +87,94 @@ export function Mesh_calc_pos_dif(mesh1, mesh2) {
         m1_posx - m2_posx,
         m1_posy - m2_posy,
     ];
+}
+
+
+
+
+
+// export function Mesh_set_root_in_focus(mesh, root_bufferidx) {
+export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx=INT_NULL) {
+
+    // Get all vertex buffers of all the root grouped meshes.
+    const gfx_buffers = Root_group_vbidx_view_view_get(root_bufferidx);
+
+    let scrollers = []
+    
+    for( let i=0; i <= gfx_buffers.boundary; i++){
+        
+        // Reorder renderqueue
+        Renderqueue_set_priority_by_vb(LAST, gfx_buffers.buffer[i]);
+        
+        // const a = Root_group_view_buffer_get_mesh_by_rootidx(root_bufferidx);
+        const root_mesh_idx = Mesh_per_vb_get_vb_byidx(gfx_buffers.buffer[i]);
+        
+        // Check for any scroller component and reorder its Draw
+        if(root_mesh_idx !== null && root_mesh_idx !== undefined){
+            for(let j=0; j<=root_mesh_idx.boundary; j++){
+                
+                const mesh_idx = root_mesh_idx.buffer[j];
+                
+                if(mesh_idx !== INT_NULL){
+                    
+                    const mesh = Mesh_buffer_get_mesh_byidx(mesh_idx);
+                    // if(mesh===null || mesh===_){
+                    //     const mesh_buffer = Mesh_buffer_get();
+                    //     console.log(
+                    //         'CONSOLE ERROR',
+                    //         '\n gfx_buffers:', gfx_buffers, 
+                    //         '\n vbidx:', gfx_buffers.buffer[i], 
+                    //         '\n mesh idx from Mesh_per_vb:', root_mesh_idx.buffer[j], 
+                    //         '\n Mesh_per_vb buffer:', root_mesh_idx, 
+                    //         '\n mesh_buffer', mesh_buffer 
+                    //     )
+                    // }
+                    if(mesh && mesh.scroller_comp_idx !== INT_NULL){
+        
+                        const scroller = Components_get_scroller_component(mesh.scroller_comp_idx);
+                        scrollers.push(scroller)
+        
+                        // Reorder renderqueue
+                        Renderqueue_set_priority_by_vb(LAST, scroller.gfx.vb.groupidx);
+    
+                    }
+                }
+    
+            }
+        }
+        else {
+            console.error('129917330298 \nRoot mesh is missing\nfor setting the scroller\'s render priority.');
+        }
+
+
+    }
+
+    
+    // Reorder listeners buffer
+    const root = Root_group_view_buffer_get_mesh_by_rootidx(root_bufferidx);
+    // TODO: We need to insure that there is a root widget liste event in all root widgets
+    if(root.listeners) {
+        Listeners_set_priority(E.H, root.listeners);
+        Listeners_set_priority(E.C, root.listeners);
+    }
+
+
+    // Do the same for any scrollers
+    
+    for(let j=0; j<scrollers.length; j++){
+
+        const scroller = scrollers[j];
+
+        // Reorder renderqueue
+        Renderqueue_set_priority_by_vb(LAST, scroller.gfx.vb.groupidx);
+
+        if(scroller.listeners) {
+            Listeners_set_priority(E.H, scroller.listeners);
+            Listeners_set_priority(E.C, scroller.listeners);
+        }
+    }
+    
+    
+    // Set the global state
+    STATE.mesh.SetFocused(root);
 }

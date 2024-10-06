@@ -14,7 +14,7 @@ import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
 import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_set_from_existing_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
-import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add } from "../../Core/Views/RootView.js";
+import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
 
 
 
@@ -233,7 +233,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
    // Cash
    const sid = SID.CreateCopy(mesh.sid)
-   // sid.fx = 0x0;
    const sceneidx = mesh.sceneidx;
    const mesh_count = mesh.geom.num_faces;
    const root_bufferidx = mesh.root_bufferidx;
@@ -371,7 +370,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
          /*******************************************************************************************************************/
          // Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms block buffer.
-         console.log('vb_groupidx', vb_groupidx)
+         // console.log('vb_groupidx', vb_groupidx)
          for (let i = 0; i < uniforms.length; i++) {
 
             const shader_program = Progarm_get_webgl_program_object(progidx);
@@ -381,7 +380,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
                uniforms[i].ubidx = ubidx;
-               console.log('### UNIFORM CREATED\n vb_groupidx', vb_groupidx, 'name',  uniforms[i].name, 'ubidx', ubidx)
+               // console.log('### UNIFORM CREATED\n vb_groupidx', vb_groupidx, 'name',  uniforms[i].name, 'ubidx', ubidx)
 
                // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
                if(uniforms[i].name === 'u_wposxy'){
@@ -390,7 +389,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                   const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
                   // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
                   const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
-                  // Choose to assign the mesh as the rrot uniform position, or the mesh and any mesh of this vertexbuffer should use it's Move function to be moved 
+                  // Choose to assign the mesh as the root uniform position, or the mesh and any mesh of this vertexbuffer should use it's Move function to be moved 
                   const COPY_MESH_POS = (flags) ? true : false;
                   // Create the uniform position that will update the vertexbuffer's uniform
                   mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
@@ -406,9 +405,16 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       }
       else {
+         
+         const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+         const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
+         // const IS_ROOT_WIDGET = Root_group_view_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx);
+         const IS_VB_ROOT = true;
+
          // If the vertex buffer already exists and is reused from the pool
          // get the unif wpos that has already been created for this vb
-         mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx);
+         mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, 
+            mesh.nameidx, mesh.parent, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, IS_VB_ROOT);
          // Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, 'u_wposxy', mesh.root_posidx);
 
       }
@@ -589,9 +595,13 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
 
       }
       else {
+         
+         const HAS_ABSOLUTE_POS = FLAGS & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+         const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
+         const COPY_MESH_POS = (FLAGS) ? true : false;
 
          // Get the unif wpos that is already created for this vb
-         Mesh_unif_set_from_existing_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx);
+         Mesh_unif_set_from_existing_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS);
 
       }
 

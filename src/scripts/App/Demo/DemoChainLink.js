@@ -6,7 +6,7 @@ import { Create_widget_section } from "../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { Get_fasma_color, WHITE, YELLOW } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { Get_fasma_color, GREY, WHITE, YELLOW } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { GetSequencedColor } from "../../Helpers/Helpers.js";
@@ -69,7 +69,7 @@ export function Demo_chain_link() {
    // Body mesh (parent for all other body meshes)
    next_posx -= size*2;
    
-   const body = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], WHITE, 'head', style);
+   const body = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], GREY[4], 'head', style);
    // const body = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [next_posx, 100, 1], [size,size], TRANSPARENCY(GetSequencedColor(9),tr), 'head', style);
    body.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    body.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -121,6 +121,8 @@ export function Demo_chain_link() {
 
    Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_chain_link, params);
 
+
+   return head;
 }
 
 

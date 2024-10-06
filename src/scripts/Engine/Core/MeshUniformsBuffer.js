@@ -79,7 +79,8 @@ export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; 
 
 // IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
-export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent, debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, COPY_MESH_POS) {
+export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent, 
+                               debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT) {
 
 
 
@@ -91,60 +92,30 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
    const wpos = [0, 0];
 
-   if(COPY_MESH_POS){
+   if(IS_VB_ROOT){
       wpos[0] = mesh_pos[0];
       wpos[1] = mesh_pos[1];
    }
 
 
-   // This is where we relate uniform positions to 'add' their position to a 'parent' uniform position. 
-   // ??? Only Section classes are allowed to have offset position to another uniform position
    if (mesh_parent !== null){
-
 
       parent_meshidx = mesh_parent.mesh_bufferidx;
       parent_posidx = mesh_parent.root_posidx;
 
-   }
+      if (mesh_type & MESH_TYPE.TEXT_MESH) {
 
-   // If the mesh is a text mesh, we want to relate it(its wpos offset) from the 'root wpos' that the parent of the text mesh takes its offset position.
-   // See code below for explanation
-   if (mesh_parent !== null && mesh_type & MESH_TYPE.TEXT_MESH) {
-
-      const root_posidx = mesh_parent.root_posidx;
-
-      // Here we want to get the 'root wpos' of the 'root wpos' that the text mesh's parent its connected to.
-      let parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
-
-      /**
-       * For Example: there are 3 meshes:{rect, label and label text}. 
-       * What we want for the label text is to have as a parent 'root wpos' the parent 'root wpos' of the label. 
-       * That is the rect's 'root wpos' in this example.  
-       * Other wise the text will draw its offset pos from label, which in its turn will draw its offset pos from the rect.
-       * The correct is both label and text have offset positions to rect.
-       */
-      // if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
-      //    parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_wpos.parent_posidx];
-      // }
-      
-      // Now, because we are gonna need the 'mesh_bufferidx' of the 'root wpos', we need to get the mesh from the mesh buffer.
-      const mesh_that_has_the_root_wpos = Mesh_buffer_get_mesh_byidx(parent_root_wpos.meshidx);
-      // const mesh_that_has_the_root_wpos = _mesh_buffer.buffer[parent_root_wpos.meshidx];
-      parent_meshidx = mesh_that_has_the_root_wpos.mesh_bufferidx;
-      parent_posidx = mesh_that_has_the_root_wpos.root_posidx;
-
-      // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
-      wpos[0] = 0;
-      wpos[1] = 0;
-   }
-   else{
-
-      // 
-      if(COPY_MESH_POS){
-         mesh_pos[0] = 0;
-         mesh_pos[1] = 0;
+         // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
+         wpos[0] = 0;
+         wpos[1] = 0;
       }
    }
+   else if(IS_VB_ROOT){
+      mesh_pos[0] = 0;
+      mesh_pos[1] = 0;
+   }
+
+
 
    const entry = {
       wpos: [wpos[0], wpos[1]],
@@ -171,8 +142,11 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
 
 
-export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, vb_groupidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0) {
+export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, 
+                                                vb_groupidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT) {
    // TODO: check NULL object
+
+console.log('unif_wpos', vb_groupidx)
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
    let meshidx = mesh_bufferidx;
@@ -180,50 +154,41 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
    const wpos = [0, 0];
 
-   wpos[0] = mesh_pos[0];
-   wpos[1] = mesh_pos[1];
+   // wpos[0] = mesh_pos[0];
+   // wpos[1] = mesh_pos[1];
  
+   if(IS_VB_ROOT){
+      wpos[0] = mesh_pos[0];
+      wpos[1] = mesh_pos[1];
+   }
 
-   if (mesh_parent !== null && mesh_parent.type & MESH_TYPE.SECTION_MESH) { // Only Section classes are allowed to have offset 'root wpos' to another 'root wpos'
-
-
+   
+   // if (mesh_parent !== null){
+   if (mesh_parent !== null && vb_groupidx !== mesh_parent.root_posidx) {
+         
+      if(vb_groupidx === mesh_parent.gfx.vb.groupidx && IS_VB_ROOT) {
+   
+         alert('47119181716 \nroot wpos ERROR. mesh is root and are on the same VB parent')
+      }
       parent_meshidx = mesh_parent.mesh_bufferidx;
       parent_posidx = mesh_parent.root_posidx;
 
+      if (mesh_type & MESH_TYPE.TEXT_MESH) {
+
+         // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
+         wpos[0] = 0;
+         wpos[1] = 0;
+      }
    }
-
-   // If the mesh is a text mesh, we want to connect it(take its wpos offset) from any 'root wpos' that the parent of the text mesh takes its offset position.
-   // See code below for explanation
-   if (mesh_parent !== null && mesh_type & MESH_TYPE.TEXT_MESH) {
-
-      const root_posidx = mesh_parent.root_posidx;
-      // console.log('/////////////////////////////////////////////////////////', root_posidx)
-
-      // Here we want to get the 'root wpos' of the 'root wpos' that the text mesh's parent its connected to.
-      let parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx]; // Get the text's parent's 'root wpos'{text->lebel->label-parent}
-      // if (parent_root_wpos.parent_posidx !== INT_NULL) { // If parents 'root wpos' has a parent wpos, use it instead.
-      //    parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_wpos.parent_posidx];
-      // }
-      
-      // Now, because we are gonna need the 'mesh_bufferidx' of the 'root wpos', we need to get the mesh from the mesh buffer.
-      const mesh_that_has_the_root_wpos = Mesh_buffer_get_mesh_byidx(parent_root_wpos.meshidx);
-      // const mesh_that_has_the_root_wpos = _mesh_buffer.buffer[parent_root_wpos.meshidx];
-      parent_meshidx = mesh_that_has_the_root_wpos.mesh_bufferidx;
-      parent_posidx = mesh_that_has_the_root_wpos.root_posidx;
-
-      // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
-      wpos[0] = 0;
-      wpos[1] = 0;
-   }
-   else{
-
+   else if(IS_VB_ROOT){
       mesh_pos[0] = 0;
       mesh_pos[1] = 0;
    }
 
 
+
    // If it is the case the vertex buffer is not created but is re-used, then we need to re-initialize the unif_wpos 
-   if(mesh_parent === null){
+   if(IS_VB_ROOT){
 
       const unif_wpos = _per_vb_mesh_unif_wpos.buffer[vb_groupidx];
       unif_wpos.wpos[0] = wpos[0];
@@ -234,6 +199,8 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
       unif_wpos.has_absolute_pos = HAS_ABSOLUTE_POS;
       unif_wpos.sticky_pos = HAS_STICKY_POS;
       unif_wpos.scroll_bar = INT_NULL;
+      if(unif_wpos.scroll_bar!==INT_NULL)
+         console.log()
    }
 
 
@@ -265,6 +232,12 @@ export function Mesh_unif_is_vb_root_wpos(root_posidx, meshidx) {
 
 
 
+export function Mesh_unif_remove_root_wpos(root_posidx) {
+   _per_vb_mesh_unif_wpos.buffer.RemoveByIdx(root_posidx);
+}
+
+
+
 
 
 /*********************************************************************************************************/
@@ -289,6 +262,8 @@ export function Mesh_unif_get_vb_root_wpos(root_posidx) {
 function Mesh_unif_get_vb_root_wpos_recursive(root_posidx) {
 
    const _this = _per_vb_mesh_unif_wpos.buffer[root_posidx];
+   if(_this === undefined || _this===null)
+      console.log()
    let pos = [_this.wpos[0], _this.wpos[1]];
 
    // If this relative position has a parent position, add it
@@ -415,9 +390,6 @@ export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
     */
    for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
       
-      // const elem = _per_vb_mesh_unif_wpos.buffer[i];
-
-
       /********************************************************************************************************************/
       // Set any scissor box
       // TODO: Where to update any scissor box??? 1. at the update functions(Move, resize, etc)? At the 'mesh uniform' file(for move)???
@@ -425,30 +397,6 @@ export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
          Vertex_buffer_group_update_scissorbox(i);
       }
 
-
-   //    // console.log(i)
-   //    if(elem.scroll_bar !== INT_NULL && 
-   //       ( _per_vb_mesh_unif_wpos.buffer[i].parent_posidx === root_posidx || // Meaning the unif that has a scrollbar(i) must be child of the current moved unif (root_posidx)
-   //       i === root_posidx ) // Or the current i is the one that has the scrollbar 
-   //    ){
-
-   //       // _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[0] += x;
-   //       // _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[1] += y;
-
-   //       /** MOVE THE SCROLLBAR MESH INSTEAD OF IT'S UNIF WPOS. This impl is for storing scrollbars in the same vertex buffer */
-   //       // TODO: It is not correct to set the mesh pos here, but is the easiest way to have access to all scrollbars.
-   //       const scrollbaridx = _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].meshidx;
-   //       const scrollbar = Mesh_buffer_get_mesh_byidx(scrollbaridx);
-
-   //       const handle = scrollbar.children.buffer[0];
-   //       scrollbar.geom.pos[0] += x;
-   //       scrollbar.geom.pos[1] += y;
-   //       scrollbar.geom.AddWposXY(scrollbar.gfx, x, y);
-   //       handle.geom.pos[0] += x;
-   //       handle.geom.pos[1] += y;
-   //       handle.geom.AddWposXY(handle.gfx, x, y);
-   //       console.log(scrollbar.mesh_bufferidx, scrollbar.GetName())
-   //    }
    }
 }
 
@@ -458,32 +406,6 @@ export function Mesh_unif_add_vb_root_wposx(root_posidx, x) {
 
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
    
-   // /**
-   //  * Move any scroll bars that belong to any unif_wpos below current unif_wpos(in the tree structure, children-tree)
-   //  */
-   // for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
-   //    const elem = _per_vb_mesh_unif_wpos.buffer[i];
-      
-   //    // console.log(i)
-   //    if(elem.scroll_bar !== INT_NULL && 
-   //       ( _per_vb_mesh_unif_wpos.buffer[i].parent_posidx === root_posidx || //Meaning the unif that has a scrollbar(i) must be child of the current moved unif (root_posidx)
-   //       i === root_posidx ) // Or the current i is the one that has the scrollbar 
-   //    ){
-            
-   //       _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[0] += x;
-
-   //       /** MOVE THE SCROLLBAR MESH INSTEAD OF IT'S UNIF WPOS. This impl is for storing scrollbars in the same vertex buffer */
-   //       // TODO: It is not correct to set the mesh pos here, but is the easiest way to have access to all scrollbars.
-   //       const scrollbaridx = _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].meshidx;
-   //       const scrollbar = Mesh_buffer_get_mesh_byidx(scrollbaridx);
-
-   //       const handle = scrollbar.children.buffer[0];
-   //       scrollbar.geom.pos[0] += x;
-   //       scrollbar.geom.AddWposX(scrollbar.gfx, x);
-   //       handle.geom.pos[0] += x;
-   //       handle.geom.AddWposX(handle.gfx, x);
-   //    }
-   // }
 }
 
 
@@ -491,33 +413,9 @@ export function Mesh_unif_add_vb_root_wposx(root_posidx, x) {
 export function Mesh_unif_add_vb_root_wposy(root_posidx, y) {
 
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
-      
-   // /**
-   //  * Move any scroll bars that belong to any unif_wpos below current unif_wpos(in the tree structure, children-tree)
-   //  */
-   // for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
-   //    const elem = _per_vb_mesh_unif_wpos.buffer[i];
-      
-   //    // console.log(i)
-   //    if(elem.scroll_bar !== INT_NULL && 
-   //       ( _per_vb_mesh_unif_wpos.buffer[i].parent_posidx === root_posidx || //Meaning the unif that has a scrollbar(i) must be child of the current moved unif (root_posidx)
-   //       i === root_posidx ) // Or the current i is the one that has the scrollbar 
-   //    ){
-            
-   //       _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].wpos[1] += y;
+   for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
+   }
 
-   //       /** MOVE THE SCROLLBAR MESH INSTEAD OF IT'S UNIF WPOS. This impl is for storing scrollbars in the same vertex buffer */
-   //       // TODO: It is not correct to set the mesh pos here, but is the easiest way to have access to all scrollbars.
-   //       const scrollbaridx = _per_vb_mesh_unif_wpos.buffer[elem.scroll_bar].meshidx;
-   //       const scrollbar = Mesh_buffer_get_mesh_byidx(scrollbaridx);
-
-   //       const handle = scrollbar.children.buffer[0];
-   //       scrollbar.geom.pos[1] += y;
-   //       scrollbar.geom.AddWposX(scrollbar.gfx, y);
-   //       handle.geom.pos[1] += y;
-   //       handle.geom.AddWposX(handle.gfx, y);
-   //    }
-   // }
 }
 
 
@@ -719,14 +617,14 @@ export function Root_uniforms_for_wpos() {
       const parent_name = (parent) ? Str_buffer_mesh_names_get_by_idx(parent.nameidx) : 'NULL'
 
       console.log(i,
-         'ABSOLUTE_POSITION:', (_per_vb_mesh_unif_wpos.buffer[i].has_absolute_pos & GFX_CTX_FLAGS.ABSOLUTE_POSITION) ? true : false,
-         'STICKY_POSX:', (_per_vb_mesh_unif_wpos.buffer[i].sticky_pos & MESH_STATE.STICKY_POSX) ? true : false,
-         'pos:', _per_vb_mesh_unif_wpos.buffer[i].wpos,
-         'name:', Str_buffer_mesh_names_get_by_idx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].nameidx),
-         '||| parent:', parent_name,
-         'parent_posidx:', _per_vb_mesh_unif_wpos.buffer[i].parent_posidx,
-         'vbidx:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
-         'scrollbar:', _per_vb_mesh_unif_wpos.buffer[i].scroll_bar,
+         'ABS:', (_per_vb_mesh_unif_wpos.buffer[i].has_absolute_pos & GFX_CTX_FLAGS.ABSOLUTE_POSITION) ? true : false,
+         '| STICK:', (_per_vb_mesh_unif_wpos.buffer[i].sticky_pos & MESH_STATE.STICKY_POSX) ? true : false,
+         '| par_idx:', _per_vb_mesh_unif_wpos.buffer[i].parent_posidx,
+         '| vbidx:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
+         '| scroll:', _per_vb_mesh_unif_wpos.buffer[i].scroll_bar,
+         '| pos:', _per_vb_mesh_unif_wpos.buffer[i].wpos,
+         '| name:', Str_buffer_mesh_names_get_by_idx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].nameidx),
+         '| parent:', parent_name,
       );
    }
 }
