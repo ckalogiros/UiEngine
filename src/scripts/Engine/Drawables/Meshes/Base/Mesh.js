@@ -2,7 +2,7 @@
 import { Timer_get_global_timer } from "../../../Timers/Timers.js";
 import { Time_intervals_destroy_byidx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
-import { GlRotateZ2D, Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_rotate_z_2d, Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_change_child_event, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
@@ -14,7 +14,7 @@ import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_
 import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../../../Graphics/Buffers/UniformBuffers.js";
 import { Mesh_find_unif_idx_from_unif_name } from "../../Operations/MeshHelperFunctions.js";
 import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
-import { View_remove_view } from "../../../Core/MeshBufferViews.js";
+import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
 
 
 
@@ -99,7 +99,7 @@ export class Mesh {
 
     rel_comp; // A component to position this mesh's children relative to the position of one of 'LEFT-CENTER-RIGHT' and relative all other children's position
     root_posidx; // An index to the root position buffer. 
-    
+
     scroller_comp;  // Pointer to scroller mesh.
     scroller_comp_idx;  // An index to scroller buffer.
     children_scrollers_buffer; // A buffer to store all scrollers this mesh is the root for. (For Move() functionality etc) 
@@ -138,12 +138,13 @@ export class Mesh {
             unif: this.mat.sid.unif,
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
             fx: 0x0,
+            blend_options: 0x0,
             gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
         };
 
 
         this.gfx_ctx_flags = 0x0;
-        this.gfx_ctx_parent = null;
+        this.gfx_ctx_parent = INT_NULL;
 
 
 
@@ -183,7 +184,7 @@ export class Mesh {
         this.eventCallbacks = null;
         this.children = New_generic_buffer(_, 'Mesh children');
         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'Mesh time_intervals');
-        
+
         this.rel_comp = null;
         this.root_posidx = INT_NULL;
         this.scroller_comp = null;
@@ -258,7 +259,7 @@ export class Mesh {
 
 
 
-        
+
         /*************************************************************************************/
         // Remove time intervals
         if (this.timeIntervalsIdxBuffer.active_count) {
@@ -282,10 +283,10 @@ export class Mesh {
 
 
 
-        
+
         /*************************************************************************************/
         // Destroy any scrollers
-        if(this.scroller_comp) {
+        if (this.scroller_comp) {
 
             Scoller_component_destroy(this.scroller_comp);
             Vertex_buffer_group_remove_scissorbox(this.gfx.vb.groupidx);
@@ -297,10 +298,10 @@ export class Mesh {
 
 
 
-        
+
         /*************************************************************************************/
         // Remove from any View
-        if(this.group_bufferidxs[0] !== INT_NULL) {
+        if (this.group_bufferidxs[0] !== INT_NULL) {
 
             View_remove_view(this.group_bufferidxs);
             this.group_bufferidxs[0] = INT_NULL;
@@ -329,13 +330,13 @@ export class Mesh {
             }
 
             // Remove from 'mesh_per_vb_buffer'
-            
+
         }
-        
+
         Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx)
 
 
-        
+
         /**
          * Case 'this' is a child, remove it from parent's children buffer.
          * Because this function probably is called by the parent's 'Destroy()' function, 
@@ -348,12 +349,12 @@ export class Mesh {
 
 
 
-        
+
         /*************************************************************************************/
         // Remove from widget root buffer.
         // Mesh_buffer_batch_destroy_store(this.mesh_bufferidx);
         // Command_buffer_store(Mesh_buffer_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
-        if((this.components & COMPONENTS.SCROLLER)===0) Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
+        if ((this.components & COMPONENTS.SCROLLER) === 0) Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
         else alert()
 
         // Destroy Generic Buffers
@@ -368,7 +369,7 @@ export class Mesh {
 
 
 
-        
+
         /*************************************************************************************/
         // Remove mesh from STATE.
         STATE.mesh.CheckAllAndRemove(this)
@@ -546,30 +547,30 @@ export class Mesh {
 
 
     // TODO: Update the .pos of the mesh for the rest of the methods
-    SetWposXY(x, y) { 
-        this.SetUpdateFrameBuffer(); 
+    SetWposXY(x, y) {
+        this.SetUpdateFrameBuffer();
         this.geom.pos[0] = x;
         this.geom.pos[1] = y;
-        this.geom.SetWposXY(this.gfx, x, y); 
+        this.geom.SetWposXY(this.gfx, x, y);
     }
-    SetWposX(x) { 
-        this.SetUpdateFrameBuffer(); 
+    SetWposX(x) {
+        this.SetUpdateFrameBuffer();
         this.geom.pos[0] = x;
-        this.geom.SetWposX(this.gfx, x); 
+        this.geom.SetWposX(this.gfx, x);
     }
-    SetWposY(y) { 
-        this.SetUpdateFrameBuffer(); 
+    SetWposY(y) {
+        this.SetUpdateFrameBuffer();
         this.geom.pos[1] = y;
-        this.geom.SetWposY(this.gfx, y); 
+        this.geom.SetWposY(this.gfx, y);
     }
 
 
     SetPosXY(x, y) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, x, y); }
     SetPosX(x) { this.SetUpdateFrameBuffer(); this.geom.SetWposX(this.gfx, x, this.geom.num_faces); }
-    SetPosY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y, ); }
+    SetPosY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y,); }
 
 
-    SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY( this.gfxdim[0], dim[1],); }
+    SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY(this.gfxdim[0], dim[1],); }
 
 
     GetName() { return Str_buffer_mesh_names_get_by_idx(this.nameidx); }
@@ -610,9 +611,7 @@ export class Mesh {
 
     GetPosY() {
 
-        let p = Mesh_unif_get_vb_root_wposy(this.root_posidx) + Screen_wpos_get_y();
-        // let p = Mesh_unif_get_vb_root_wposy(this.root_posidx);
-
+        let p = Mesh_unif_get_vb_root_wposy(this.root_posidx);
         return p + this.geom.pos[1];
     }
 
@@ -631,7 +630,7 @@ export class Mesh {
     }
 
 
-    RotateZ(angle) { GlRotateZ2D(this.gfx, this.geom.dim, angle); }
+    RotateZ(angle) { Gl_rotate_z_2d(this.gfx, this.geom.dim, angle); }
 
 
     StylesGetMargin(axis = STYLES.AXIS.ALL) { return Styles_margin_get(axis, this.styles); }
@@ -663,58 +662,65 @@ export class Mesh {
     }
 
 
-    /** Enable the .shad flags */
-    EnableGfxShadAttributes(SID_FLAGS) {
-
-        this.sid.shad |= SID_FLAGS;
-    }
-
-
     /**
      * Enable shader properties.
      * In order for a mesh to be drawn in a certain way, specific shaders must be build.
      * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
      */
-    EnableGfxAttributes(which, params=null) {
+    EnableGfxAttributes(which, params = null) {
 
         switch (which) {
 
             case MESH_ENABLE.GFX.ATTR_STYLE: {
 
-                this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)  | SID.ATTR.STYLE | SID.ATTR.DIM2;
-                this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER  | SID.PASS.WPOS2 | SID.PASS.DIM2;
+                this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.STYLE | SID.ATTR.DIM2;
+                this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER | SID.PASS.WPOS2 | SID.PASS.DIM2;
                 if (Array.isArray(params)) this.SetStyle(params);
                 break;
             }
 
             case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.attr |= SID.PASS.TEX2; break; }
-            case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME;  this.sid.pass |= SID.PASS.TIME; break; }
-            case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY;  this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
-            case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; this.sid.pass |= SID.PASS.COL4_PER_VERTEX; break; }
+            case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; this.sid.pass |= SID.PASS.TIME; break; }
+            case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
-            
-            case MESH_ENABLE.GFX.ATTR_R_CORNERS: { 
-              this.sid.attr |= SID.ATTR.R_CORNERS| SID.ATTR.DIM2;  
-              this.sid.pass |= SID.PASS.R_CORNERS| SID.PASS.DIM2; 
-              if(params !== null) this.mat.style[0] = params; 
-              break; 
-           }
-           case MESH_ENABLE.GFX.ATTR_BORDER: { 
-              this.sid.attr |= SID.ATTR.BORDER| SID.ATTR.DIM2;  
-              this.sid.pass |= SID.PASS.BORDER| SID.PASS.DIM2;  
-              if(params !== null) this.mat.style[1] = params; 
-              break; 
-           }
-           case MESH_ENABLE.GFX.ATTR_FEATHER: { 
-              this.sid.attr |= SID.ATTR.FEATHER| SID.ATTR.DIM2;  
-              this.sid.pass |= SID.PASS.FEATHER| SID.PASS.DIM2; 
-              if(params !== null) this.mat.style[2] = params; 
-              break; 
-           }
+
+            case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
+                this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
+                this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
+                if (params !== null) this.mat.col = params;
+                break;
+            }
+            case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
+                this.sid.attr |= SID.ATTR.R_CORNERS | SID.ATTR.DIM2;
+                this.sid.pass |= SID.PASS.R_CORNERS | SID.PASS.DIM2;
+                if (params !== null) this.mat.style[0] = params;
+                break;
+            }
+            case MESH_ENABLE.GFX.ATTR_BORDER: {
+                this.sid.attr |= SID.ATTR.BORDER | SID.ATTR.DIM2;
+                this.sid.pass |= SID.PASS.BORDER | SID.PASS.DIM2;
+                if (params !== null) this.mat.style[1] = params;
+                break;
+            }
+            case MESH_ENABLE.GFX.ATTR_FEATHER: {
+                this.sid.attr |= SID.ATTR.FEATHER | SID.ATTR.DIM2;
+                this.sid.pass |= SID.PASS.FEATHER | SID.PASS.DIM2;
+                if (params !== null) this.mat.style[2] = params;
+                break;
+            }
+
+
+            // Shader Color Functions
+            case MESH_ENABLE.GFX.FN_GLOW_SPHERE: { this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break; }
+
+
+
+            case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.VS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
+            case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.VS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
 
         }
-        
+
     }
 
 
@@ -757,7 +763,7 @@ export class Mesh {
             });
 
 
-            this.temp_unif_wpos = idx - 1;
+            // this.temp_unif_wpos = idx - 1;
 
         }
 
@@ -782,9 +788,9 @@ export class Mesh {
 
                 // console.error('ubidx is INT_NULL. SEE if the uniform of this mesh has already been initialized for the vertex buffer.');
 
-                this.uniforms[found_idx].ubidx = Uniforms_buffer_find_ubidx_from_name(this.uniforms[found_idx].name, this.gfx.prog.idx, this.gfx.vb.groupidx)
-                
-                if(this.uniforms[found_idx].ubidx === INT_NULL) {
+                this.uniforms[found_idx].ubidx = Uniforms_buffer_find_ubidx_from_name(this.uniforms[found_idx].name, this.gfx.vb.groupidx)
+
+                if (this.uniforms[found_idx].ubidx === INT_NULL) {
                     // alert('51998712223 \nUniform Not Found')
                     return;
                 }
@@ -795,10 +801,10 @@ export class Mesh {
             return;
         }
 
-        
+
         // Alert if the current mesh system does not have the uniform enabled.
         console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
-        if(SID.CheckSidUnifByName(this.sid.unif, unif_name) === true){
+        if (SID.CheckSidUnifByName(this.sid.unif, unif_name) === true) {
 
             alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
         }
@@ -806,22 +812,23 @@ export class Mesh {
 
     }
 
+
     GfxUniformSetAndUpdate(unif_name, value, value_idx = null) {
 
         /**ERROR */ if (this.gfx === null) alert('Try to update uniform befor mesh has gfx.')
-  
+
         const len = this.uniforms.length;
         for (let i = 0; i < len; i++) {
-           if (this.uniforms[i].name === unif_name) {
-              const ubidx = this.uniforms[i].ubidx;
-              Vertex_buffer_set_and_update_uniform(this.gfx.vb.groupidx, ubidx, value, value_idx);
-              break;
-           }
+            if (this.uniforms[i].name === unif_name) {
+                const ubidx = this.uniforms[i].ubidx;
+                Vertex_buffer_set_and_update_uniform(this.gfx.vb.groupidx, ubidx, value, value_idx);
+                break;
+            }
         }
-     }
+    }
 
 
-    AddChildScrollerIdx(scroller_comp_idx){
+    AddChildScrollerIdx(scroller_comp_idx) {
         /**
          * In order for a root widget to have access to all scrollers of any of it's children meshes,
          * we need a storage buffer to store all scrollers indexes.

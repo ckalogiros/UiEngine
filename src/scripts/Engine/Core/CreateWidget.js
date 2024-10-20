@@ -3,7 +3,6 @@ import { Section } from "../Drawables/Meshes/Section.js";
 import { Widget_Label } from "../Drawables/Widgets/WidgetLabel.js";
 import { Widget_Button, Widget_Switch } from "../Drawables/Widgets/WidgetButton.js";
 import { Widget_Multi_Text, Widget_Text } from "../Drawables/Widgets/WidgetText.js";
-import { Widget_Scroller } from "../Drawables/Widgets/WidgetScrollerOLD.js";
 import { Widget_Slider_XX1, Widget_Slider_Simple } from "../Drawables/Widgets/WidgetSlider.js";
 import { Widget_Dropdown } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Rect_Mesh } from "../Drawables/Meshes/Rect_Mesh.js";

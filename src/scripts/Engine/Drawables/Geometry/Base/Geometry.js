@@ -39,8 +39,7 @@ export class Geometry2D {
         const dim1 = dim;
         
         if(num_faces>1) dim1[0] = dim[0]/num_faces; // (Example: color hue)
-
-        math.CopyArr3(this.pos, pos);
+        math.CopyArr3(this.pos, math.FloorArr3(pos));
         math.CopyArr2(this.dim, dim1);
         math.CopyArr2(this.scale, scale);
 
@@ -48,7 +47,7 @@ export class Geometry2D {
         // Keep a copy of the starting dimention and position
         math.CopyArr2(this.defDim, dim1);
         math.CopyArr2(this.defScale, scale);
-        math.CopyArr3(this.defPos, pos);
+        math.CopyArr3(this.defPos, this.pos);
 
 
     }
@@ -58,6 +57,7 @@ export class Geometry2D {
     AddDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_dim_xy(gfx, x, y, num_faces); }
     AddDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_dim_x( gfx, x, num_faces); }
     AddDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_dim_y( gfx, y, num_faces); }
+    SetDimPlusXY(gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_dim_plus_xy(gfx, x, y, num_faces); }
     SetDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_dim_xy(gfx, x, y, num_faces); }
     SetDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_dim_x( gfx, x, num_faces); }
     SetDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_dim_y( gfx, y, num_faces); }

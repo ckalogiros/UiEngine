@@ -13,7 +13,7 @@ import { Uniforms_buffer_destroy_uniform, Uniforms_buffer_set_uniform_val_from_i
 import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBufferFillOps.js";
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Engine/Core/MeshBuffer.js";
-import { Root_group_vbidx_view_view_get } from "../../Engine/Core/Views/RootView.js";
+import { Root_group_vbidx_view_get } from "../../Engine/Core/Views/RootView.js";
 import { Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Screen_wpos_get, Screen_wpos_get_y } from "../../Engine/Core/MeshUniformsBuffer.js";
 
 
@@ -528,7 +528,7 @@ export function Vertex_buffer_group_create_scissorbox(vb_groupidx, mx, my, mw, m
 //     const w = mw.geom.dim[0] * 2;
 //     const h = mh.geom.dim[1] * 2;
 
-//     const root_vb_groupidxs = Root_group_vbidx_view_view_get(mx.root_bufferidx);
+//     const root_vb_groupidxs = Root_group_vbidx_view_get(mx.root_bufferidx);
 
 //     // Run for all vertex buffer groups that belong to the root widget
 //     const H = VIEWPORT.HEIGHT;
@@ -556,7 +556,7 @@ export function Vertex_buffer_group_update_scissorbox_all_vb() {
 }
 
 
-
+let a = 1;
 export function Vertex_buffer_group_update_scissorbox(vb_groupidx) {
 
     /**
@@ -568,17 +568,23 @@ export function Vertex_buffer_group_update_scissorbox(vb_groupidx) {
 
     const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
 
+    if((vb_group.state.mask & BUFFER_STATE.IS_ACTIVE)===0) return;
+
 
     const mx = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[0]);
     const my = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[1]);
     const mw = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[2]);
     const mh = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[3]);
 
+    // if(a==1 && mx.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION) {a=0;return;}
+
     const x = mx.GetPosX();
     const y = my.GetPosY();
     const w = mw.geom.dim[0] * 2;
     const h = mh.geom.dim[1] * 2;
     const H = VIEWPORT.HEIGHT;
+
+    // console.log(H, y, x, (H - y) - h, w, h, my.GetName(), my.GetPosY())
 
     vb_group.SetScissorBox(x, (H - y) - h, w, h);
 
@@ -704,6 +710,21 @@ export function Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, unif
     _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[foundidx] = unif_wpos_idx
 }
 
+
+
+export function Vertex_buffer_get_uniform_ubidx_from_name(vb_groupidx, ubidx, unif_val, unif_val_idx=null) {
+
+    Program_use_program2(_vertex_buffer_groups.buffer[vb_groupidx].progidx);
+    
+    const vao = _vertex_buffer_groups.buffer[vb_groupidx].vao;
+    if (GL_STATE.BOUND_VAO !== vao){
+        gfxCtx.gl.bindVertexArray(vao);
+        GL_STATE.BOUND_VAO = vao;
+    }
+
+    Uniforms_buffer_set_uniform_val_from_index(ubidx, unif_val, unif_val_idx);
+    Uniforms_buffer_update_uniform(ubidx);
+}
 
 
 
@@ -1108,7 +1129,6 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
     
     for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
         
-        // console.log('-----------------------------------------------------------------\ngfx.vb.counts.active_count', gfx.vb.counts.buffer[i], 'num_faces', num_faces)
         
         const vb_info = _vertex_buffer_infos.buffer[gfx.vb.groupidx];
         

@@ -395,13 +395,101 @@ export function Gl_set_wpos_y(gfxInfo, y, num_faces = 1) {
 // VERTEX POSITION ATTRIBUTES
 /**************************************************************************************************************************************/
 
+export function Gl_set_dim_plus_xy(gfxInfo, x, y, num_faces = 1) {
+
+   const vbidx = gfxInfo.vb.which_vb.dim_buf;
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+   const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
+   const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
+   const a_vpos_size = vb_info.attribs_info.sizes[attr_vpos_idx];
+   
+   const attr_dim_idx = vb_info.attribs_indexing.DIM2;
+   const a_dim_offset = vb_info.attribs_info.offsets[attr_dim_idx]; 
+   const a_dim_size = vb_info.attribs_info.sizes[attr_dim_idx];
+
+   const start = gfxInfo.vb.starts.buffer[vbidx];
+
+   let index_vpos = start + a_vpos_offset;
+   let index_dim = start + a_dim_offset;
+
+   let vpos_stride = vb_info.attribs_info.count - a_vpos_size;
+   let dim_stride = vb_info.attribs_info.count - a_dim_size;
+
+   const xx = x/2;
+   const yy = y/2;
+
+   vb_data[index_vpos++] = 0;
+   vb_data[index_vpos++] = y;
+   vb_data[index_dim++] = 0;
+   vb_data[index_dim++] = yy;
+   index_vpos += vpos_stride;
+   index_dim += dim_stride;
+   
+   vb_data[index_vpos++] = 0;
+   vb_data[index_vpos++] = 0;
+   vb_data[index_dim++] = 0;
+   vb_data[index_dim++] = 0;
+   index_vpos += vpos_stride;
+   index_dim += dim_stride;
+   
+   vb_data[index_vpos++] = x;
+   vb_data[index_vpos++] = y;
+   vb_data[index_dim++] = xx;
+   vb_data[index_dim++] = yy;
+   index_vpos += vpos_stride;
+   index_dim += dim_stride;
+
+   vb_data[index_vpos++] = x;
+   vb_data[index_vpos++] = 0;
+   vb_data[index_dim++] = xx;
+   vb_data[index_dim++] = 0;
+
+
+   /**Contol point of resize center */
+   
+   // vb_data[index_vpos++] = -xx;
+   // vb_data[index_vpos++] = yy;
+   // vb_data[index_dim++] = 0;
+   // vb_data[index_dim++] = yy;
+   // index_vpos += vpos_stride;
+   // index_dim += dim_stride;
+   
+   // vb_data[index_vpos++] = -xx;
+   // vb_data[index_vpos++] = -yy;
+   // vb_data[index_dim++] = 0;
+   // vb_data[index_dim++] = 0;
+   // index_vpos += vpos_stride;
+   // index_dim += dim_stride;
+   
+   // vb_data[index_vpos++] = xx;
+   // vb_data[index_vpos++] = yy;
+   // vb_data[index_dim++] = xx;
+   // vb_data[index_dim++] = yy;
+   // index_vpos += vpos_stride;
+   // index_dim += dim_stride;
+
+   // vb_data[index_vpos++] = xx;
+   // vb_data[index_vpos++] = -yy;
+   // vb_data[index_dim++] = xx;
+   // vb_data[index_dim++] = 0;
+
+
+
+      
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
+}
+
 export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
 
    const vbidx = gfxInfo.vb.which_vb.dim_buf;
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
-   const attr_idx = vb_info.attribs_indexing.DIM2;
+   // const attr_idx = vb_info.attribs_indexing.DIM2;
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
    const a_offset = vb_info.attribs_info.offsets[attr_idx];
    const a_size = vb_info.attribs_info.sizes[attr_idx];
 
@@ -409,18 +497,48 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
 
    let index = start + a_offset;
    let loop_count = num_faces;
-   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
 
+   
+   /**Contol point of resize center */
+   
+   // const xx = x;
+   // const yy = y;
+   
+   // vb_data[index++] = -xx;
+   // vb_data[index++] = yy;
+   // index += stride;
+   
+   // vb_data[index++] = -xx;
+   // vb_data[index++] = -yy;
+   // index += stride;
+   
+   // vb_data[index++] = xx;
+   // vb_data[index++] = yy;
+   // index += stride;
 
-   while (loop_count) {
+   // vb_data[index++] = xx;
+   // vb_data[index++] = -yy;
 
-      vb_data[index++] = x;
-      vb_data[index++] = y;
+
+
+   /**Contol point of resize left-top */
+   vb_data[index++] = 0;
+   vb_data[index++] = y;
+   index += stride;
+   
+   vb_data[index++] = 0;
+   vb_data[index++] = 0;
+   index += stride;
+   
+   vb_data[index++] = x;
+   vb_data[index++] = y;
+   index += stride;
+
+   vb_data[index++] = x;
+   vb_data[index++] = 0;
       
-      index += stride;
-      loop_count--;
-   }
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -449,15 +567,12 @@ export function Gl_set_dim_x(gfxInfo, x, num_faces = 1) {
 
    let index = start + a_offset;
    let loop_count = num_faces;
-   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
 
 
    while (loop_count) {
 
-      // vb_data[index++] = x;
-      // index += stride;
-      
       vb_data[index++] = 0;
       index += stride;
       
@@ -1966,7 +2081,7 @@ export function GlSetAttrSdfParamsOuter(gfxInfo, val) {
 
 
 
-export function GlRotateZ2D(gfxInfo, dim, angle, num_faces = 1) {
+export function Gl_rotate_z_2d(gfxInfo, dim, angle, num_faces = 1) {
 
 
    const vbidx = gfxInfo.vb.which_vb.dim_buf;
@@ -1994,4 +2109,8 @@ export function GlRotateZ2D(gfxInfo, dim, angle, num_faces = 1) {
    
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 }
+
+
+
+
 

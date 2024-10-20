@@ -1081,8 +1081,6 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2(vb_data, geom, mat, start, num
          vb_data[index++] = geom.pos[1];
          vb_data[index++] = geom.pos[2];
 
-         // TIME
-         vb_data[index++] = geom.time;
 
          // VERTEX POSITION
          vb_data[index++] = vpos_x;

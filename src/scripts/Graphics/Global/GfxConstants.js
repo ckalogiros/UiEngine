@@ -103,7 +103,7 @@ const SID_ATTR_NAMES_BUFFER = [
 
 ];
 
-let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1, BITTEST = 0x1;
+let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1, BIT7 = 0x1, BITTEST = 0x1;
 const SID = {
 
     SHAD: {
@@ -113,9 +113,13 @@ const SID = {
         INDEXED_PATT_DISCONTINUE_6: BIT1 <<= 1, // Break vertex indices
         PRE_MULTIPLIED_ALPHA: BIT1 <<= 1,
 
+        // Color Manipulation Functions
+        FN_GLOW_SPHERE: BIT1 <<= 1,
+
         // Test Shaders
         FS_TEST1: BIT1 <<= 1,
         VS_TEST1: BIT1 <<= 1,
+        FS_TEST2: BIT1 <<= 1,
     },
 
     ATTR: {
@@ -167,19 +171,13 @@ const SID = {
         FS_RCORNERS_FLOAT: BIT5<<=0x1,
         FS_RCORNERS_VEC2: BIT5<<=0x1,
         FS_RCORNERS_VEC3: BIT5<<=0x1,
+        // Generic Uniforms
+        FS_GENERIC_FLOAT: BIT5<<=0x1,
+        FS_GENERIC_VEC2: BIT5<<=0x1,
+        FS_GENERIC_VEC3: BIT5<<=0x1,
+        FS_GENERIC_VEC4: BIT5<<=0x1,
 
-    },
-    
 
-    CheckSidUnifByName(sid_unif, unif_name) {unif: SID.UNIF.FS_RCORNERS_FLOAT
-
-        if(unif_name === 'u_col4') return (sid_unif & this.UNIF.COL4) ? true : false;
-        else if(unif_name === 'u_dim2') return (sid_unif & this.UNIF.DIM2) ? true : false;
-        else if(unif_name === 'u_scale2') return (sid_unif & this.UNIF.SCALE2) ? true : false;
-        else if(unif_name === 'u_wposxy') return (sid_unif & this.UNIF.ROOT_WPOS2) ? true : false;
-        else if(unif_name === 'u_time') return (sid_unif & this.UNIF.TIME) ? true : false;
-
-        return false;
     },
 
     PASS: {
@@ -207,6 +205,21 @@ const SID = {
         FS_NOISE: BIT6<<=0x1,
         FS_SMOKE_VEC3: BIT6<<=0x1,
         FS_SMOKE_VEC2: BIT6<<=0x1,
+    },
+
+    BLEND_OPTIONS: {
+        // BLEND_MODE_ACTIVE: BIT7 <<= 0x1, 
+        BLEND_MODE_ADD: BIT7 <<= 0x1, 
+        BLEND_MODE_LIGHTEN: BIT7 <<= 0x1, 
+        BLEND_MODE_MULTIPLY: BIT7 <<= 0x1, 
+        BLEND_MODE_DEVIDE: BIT7 <<= 0x1, 
+        BLEND_MODE_SUBTRACT: BIT7 <<= 0x1, 
+        BLEND_MODE_DARKEN: BIT7 <<= 0x1, 
+        BLEND_MODE_COLOR_BURN: BIT7 <<= 0x1, 
+        BLEND_MODE_COLOR_DODGE: BIT7 <<= 0x1, 
+        BLEND_MODE_SCREEN: BIT7 <<= 0x1, 
+        BLEND_MODE_OVERLAY: BIT7 <<= 0x1, 
+        BLEND_MODE_MIX: BIT7 <<= 0x1, 
     },
 
 
@@ -331,8 +344,18 @@ const SID = {
         // if (sid.pass) str[k] += '\n'
     
         return str;
-    }
+    },
 
+    CheckSidUnifByName(sid_unif, unif_name) {unif: SID.UNIF.FS_RCORNERS_FLOAT
+
+        if(unif_name === 'u_col4') return (sid_unif & this.UNIF.COL4) ? true : false;
+        else if(unif_name === 'u_dim2') return (sid_unif & this.UNIF.DIM2) ? true : false;
+        else if(unif_name === 'u_scale2') return (sid_unif & this.UNIF.SCALE2) ? true : false;
+        else if(unif_name === 'u_wposxy') return (sid_unif & this.UNIF.ROOT_WPOS2) ? true : false;
+        else if(unif_name === 'u_time') return (sid_unif & this.UNIF.TIME) ? true : false;
+
+        return false;
+    },
 };
 
 if(SID.ATTR > MAX_BIT_MASK) alert('SID ATTR exceeding javascript\'s max number value');
@@ -418,6 +441,12 @@ const MESH_ENABLE = {
         PASS_DIM2: _CNT <<= 1,
         PASS_TIME1: _CNT <<= 1,
         PASS_RES2: _CNT <<= 1,
+
+        // Shader Color Functions
+        FN_GLOW_SPHERE: _CNT <<= 1,
+
+        TEST_SHADERS_1: _CNT <<= 1,
+        TEST_SHADERS_2: _CNT <<= 1,
 
 
         NONE: 0,

@@ -54,7 +54,8 @@ export class Widget_Label extends Rect_Mesh {
 
         this.text_mesh = text_mesh;
 
-        Align_text_in_rect_parent(Align, this)
+        const text_pos = ((ROOT_WIDGET_FLAGS&ROOT_WIDGETS.CREATE_ROOT)===0) ? [_pos[0], _pos[1]] : [0, 0]; // If label is NOT root, add the position offset to its text
+        Align_text_in_rect_parent(Align, this, text_pos)
 
 
         text_mesh.sceneidx = this.sceneidx;
@@ -166,9 +167,9 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    GfxCtxSetFlag(FLAGS, gfx_ctx_parent) {
+    GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
-        if (!this.gfx_ctx_parent) {
+        if (this.gfx_ctx_parent === INT_NULL) {
 
             this.gfx_ctx_flags = FLAGS;
             this.gfx_ctx_parent = gfx_ctx_parent;
@@ -178,10 +179,10 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    GfxCtxAddFlag(FLAGS, gfx_ctx_parent) {
+    GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
-        if (!this.gfx_ctx_parent) {
-
+        if (this.gfx_ctx_parent === INT_NULL) { // Set for the first time, if gfx_ctx_parent=INT_NULL from initialization
+                
             this.gfx_ctx_flags |= FLAGS;
             this.gfx_ctx_parent = gfx_ctx_parent;
             this.text_mesh.gfx_ctx_flags |= FLAGS;
@@ -205,14 +206,12 @@ export class Widget_Label extends Rect_Mesh {
         
         if (this.text_mesh.gfx_ctx_flags) 
             this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh);
-        else if (text_specific_vb_groupidx === INT_NULL){
-            
-            // this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, this.text_mesh);
-            // this.text_mesh.gfx = Gfx_generate_context(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, this.text_mesh);
+        else if (text_specific_vb_groupidx !== INT_NULL){
+            this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
+        }
+        else {
             this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh);
         }
-        // else
-        //     this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
 
         return this.gfx;
     }

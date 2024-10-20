@@ -349,6 +349,9 @@ const SECTION = {
 	HORIZONTAL: _CNT <<= 0x1,
 	INHERIT: _CNT <<= 0x1,
 
+	HORIZONTAL_CENTER: _CNT <<= 0x1,
+	// VERTICAL_CENTER: _CNT <<= 0x1,
+
 	RESIZE_PARENT: _CNT <<= 0x1,
 	RESIZE_PARENTX: _CNT <<= 0x1,
 	RESIZE_PARENTY: _CNT <<= 0x1,
@@ -363,6 +366,7 @@ const SECTION = {
 	NO_ITEMS_CALC: _CNT <<= 0x1,
 	TOP_DOWN: _CNT <<= 0x1,
 	LEFT_RIGHT: _CNT <<= 0x1,
+	// STICK_TO_BOTTOM: _CNT <<= 0x1,
 
 	INDEPENDENT: _CNT <<= 0x1,
 
@@ -1216,7 +1220,7 @@ const DEBUG = {
 	CAMERA: true,
 
 	TEXTURE: false,
-	UVS: false,
+	UVS: true,
 
 	// Graphics
 	WEB_GL: false,

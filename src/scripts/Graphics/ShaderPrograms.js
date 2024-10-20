@@ -310,6 +310,42 @@ export function Program_use_program2(progidx) {
 
 
 /****************************************************************************************************************************************************/
+// Uniforms
+/****************************************************************************************************************************************************/
+
+
+
+export function Program_find_uniform_ubidx_from_name(progidx, unif_name) {
+
+	const program_uniforms = _programs.buffer[progidx].uniforms;
+	const len = program_uniforms.length;
+	for (let i = 0; i < len; i++) {
+		 if (program_uniforms[i].name === unif_name) {
+			  return program_uniforms[i].ubidx;
+		 }
+	}
+
+	console.error('Program_find_uniform_ubidx_from_name() \nNo uniform found with name:', unif_name, 'progidx:', progidx, 'programs buffer:', _programs, )
+	alert('Program_find_uniform_ubidx_from_name() \nNo uniform found.')
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************************************************************************************************************************************/
 // DEBUG
 /****************************************************************************************************************************************************/
 

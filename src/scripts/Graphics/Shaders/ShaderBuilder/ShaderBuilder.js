@@ -1,14 +1,15 @@
 // https://computergraphics.stackexchange.com/questions/100/sharing-code-between-multiple-glsl-shaders
 
 
-import { vertex_shader_chunks, fragment_shader_chunks } from './ShaderChunks/ShaderChunks.js'
+import { shader_chunks } from './ShaderChunks/ShaderChunks.js'
 import { frag_feather, frag_feather_call, frag_round_corners, frag_round_corners_call, frag_style_call, frag_style_corners } from './Functions/fragment.roundcorners.js'
 import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './Functions/fragment.texture.js'
 import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
 import { frag_noise, frag_noise_call } from './Functions/fragment.noise.js';
 import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
-import { frag_test1 } from './Functions/fragment.tests.js';
+import { frag_test1, frag_test1_call, frag_test2, frag_test2_call } from './Functions/fragment.tests.js';
 import { Attributes_indexing, Shader_attributes_create } from '../../ShaderAttributes.js';
+import { frag_glow_sphere, frag_glow_sphere_call } from './Functions/fragment.misc.js';
 
 
 
@@ -16,31 +17,21 @@ import { Attributes_indexing, Shader_attributes_create } from '../../ShaderAttri
 
 // Resolve Includes to build the correct shaders
 const pattern_includes = /^[ \t]*#include +<([\w\d./]+)>/gm;
-function Vertex_shader_includes_replace(matchPattern, key) {
-   const string = vertex_shader_chunks[key];
+
+
+function Shader_includes_replace(matchPattern, key) {
+   const string = shader_chunks[key];
    if (string === undefined) { throw new Error('Can not resolve #include <' + key + '> in Vertex Shader'); }
-   return Vertex_shader_includes_resolve(string);
+   return Shader_includes_resolve(string);
 }
 
 
 
-function Vertex_shader_includes_resolve(string) {
-   return string.replace(pattern_includes, Vertex_shader_includes_replace);
+function Shader_includes_resolve(string) {
+   return string.replace(pattern_includes, Shader_includes_replace);
 }
 
 
-
-function Fragment_shader_includes_replace(matchPattern, key) {
-   const string = fragment_shader_chunks[key];
-   if (string === undefined) { throw new Error('Can not resolve #include <' + key + '> in Fragment Shader'); }
-   return Fragment_shader_includes_resolve(string);
-}
-
-
-
-function Fragment_shader_includes_resolve(string) {
-   return string.replace(pattern_includes, Fragment_shader_includes_replace);
-}
 
 
 
@@ -684,16 +675,20 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    Vertex_shader_resolve_attributes_out_assignment();
 
    const vs_chunks = [
-
-      '#version 300 es   /*** Vertex Shader ***/\n',
-
-      '#include <precision_medium>\n',
+      '#version 300 es \n',
+      `
+/********************************************************************************************/
+// VERTEX SHADER
+/********************************************************************************************/
+      `,
+      '#include <precision_high>\n',
 
       /********************************************************************************************************/
       // Defines
       /********************************************************************************************************/
       '\n// Defines',
       ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
+      ((sid.unif & SID.UNIF.SCREEN_RESOLUTION)) ? '#define U_SCREEN_RESOLUTION 1' : '',
 
 
 
@@ -718,6 +713,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
       /********************************************************************************************************/
       '\n// Out variables',
       attributes_out_code,
+      // 'out vec2 DIM;',
 
 
 
@@ -736,6 +732,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
       // Assignments
       '   // Assignments',
       attributes_assign_code,
+      // '   DIM = vec2(abs(v_pos2_x)*2., abs(v_pos2_y)*2.);',
 
 
 
@@ -773,9 +770,15 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
 
 
       (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-         ? '   gl_Position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
-         : '   gl_Position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+         ? '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
+         : '   vec4 position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
 
+         // Creates text char movement on Move() and ReDraw()
+   //       `   #ifdef U_SCREEN_RESOLUTION
+   //    position.xy = floor(position.xy * u_screen_res) / u_screen_res; 
+   //    // position.xy = roundEven(position.xy * u_screen_res) / u_screen_res; 
+   // #endif`,
+         '   gl_Position = position;',
 
       '}',
 
@@ -783,7 +786,8 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
 
    const vertex_shader = vs_chunks.filter(filterEmptyLine).join('\n')
 
-   const vs = Vertex_shader_includes_resolve(vertex_shader);
+   // const vs = Vertex_shader_includes_resolve(vertex_shader);
+   const vs = Shader_includes_resolve(vertex_shader);
 
    const attribsidx = Shader_attributes_create(ret.attribs_info);
 
@@ -829,8 +833,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
    Fragment_shader_resolve_attributes_in();
 
    const fs_chunks = [
-
-      '#version 300 es   /*** Fragment Shader ***/\n',
+      '#version 300 es\n',
+      `
+/********************************************************************************************/
+// FRAGMENT SHADER
+/********************************************************************************************/
+      `,
 
 
 
@@ -840,8 +848,9 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       /********************************************************************************************************/
       // DEFINES
       '\n',
-      '#include <precision_medium>',
+      '#include <precision_high>',
       '#include <out_frag_color>',
+      '#include <blend_mode_functions>',
       (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
       (sid.unif & SID.UNIF.FS_RCORNERS_FLOAT) ? '#define U_RCORNERS_FLOAT 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       (sid.unif & SID.UNIF.FS_RCORNERS_VEC2) ? '#define U_RCORNERS_VEC2 1' : '', 
@@ -854,7 +863,35 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.attr & SID.ATTR.TEX2) ? '#define A_TEX_COORD 1' : '',
       (sid.attr & SID.ATTR.TIME) ? '#define A_TIME 1' : '',
       (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '#define A_GLOW_INTENSITY_FLOAT' : '',
+      
+      // Include Funcions Defines
+      (sid.blend_options) ? '#define BLEND_MODE 1' : '#define BLEND_MODE 1\n#define BLEND_MODE_MULTIPLY 1',  // If any 'blend_options', enable, else enable default blend 'multiply'
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_ADD) ? '#define BLEND_MODE_ADD 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_LIGHTEN) ? '#define BLEND_MODE_LIGHTEN 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY) ? '#define BLEND_MODE_MULTIPLY 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_DEVIDE) ? '#define BLEND_MODE_DEVIDE 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_SUBTRACT) ? '#define BLEND_MODE_SUBTRACT 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_DARKEN) ? '#define BLEND_MODE_DARKEN 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_COLOR_BURN) ? '#define BLEND_MODE_COLOR_BURN 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_COLOR_DODGE) ? '#define BLEND_MODE_COLOR_DODGE 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_SCREEN) ? '#define BLEND_MODE_SCREEN 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_OVERLAY) ? '#define BLEND_MODE_OVERLAY 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MIX) ? '#define BLEND_MODE_MIX 1' : '', 
+
+
+      // Generic Uniforms
+      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC2)  ? '#define U_GENERIC_VEC2 1' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC3)  ? '#define U_GENERIC_VEC3 1' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC4)  ? '#define U_GENERIC_VEC4 1' : '', 
+
+
+      // Uniforms for testing
+      // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
+      // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '#define U_GENERIC_VEC2 1' : '', 
+      // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '#define U_GENERIC_VEC3 1' : '', 
  
+
 
 
 
@@ -892,7 +929,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
 
       /********************************************************************************************************/
-      // Function definitions
+      // Misc Functions
       '\n',
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_corners : 
                                        ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners : 
@@ -911,15 +948,18 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke : '',
-
-
-
-
+      
+      
+      
+      /********************************************************************************************************/
+      // Shader Color Functions
+      (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere : '',
 
 
       /********************************************************************************************************/
       // Test shader functions
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1 : '',
+      (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2 : '',
 
 
 
@@ -928,6 +968,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
       /********************************************************************************************************/
       // Main
+      `
+/********************************************************************************************/
+// FRAGMENT: MAIN()
+/********************************************************************************************/
+      `,
       true ? 'void main(void) ' : '',
       '{',
 
@@ -948,6 +993,14 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '',
+      
+      // Shader Color Functions
+      (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere_call : '',
+      (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere_call : '',
+
+      // Test Shaders
+      (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
+      (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2_call : '',
 
 
 
@@ -968,8 +1021,16 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
       /********************************************************************************************************/
       // TESTS
-      // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', // HACK: prevent optimizer from removing the uniform u_scale2
-      (sid.unif & SID.UNIF.TIME) ? '   if(u_time == 0.) ;' : '',
+      // HACK: prevent optimizer from removing the uniform u_scale2
+      // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', 
+      (sid.unif & SID.UNIF.TIME) ? '   if(u_time == 0.) ;' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '   if(u_generic_vec4.x == 0.) ;' : '', 
+      // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
+      // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '', 
+      // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
       // (sid.unif & SID.UNIF.SCALE2) ? '  frag_color.xyz *= u_scale2.x;' : '',
       // true ? 'frag_color = vec4(1.);' : '',
@@ -980,7 +1041,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
    const fragment_shader = fs_chunks.filter(filterEmptyLine).join('\n')
 
-   const fs = Fragment_shader_includes_resolve(fragment_shader);
+   // const fs = Fragment_shader_includes_resolve(fragment_shader);
+   const fs = Shader_includes_resolve(fragment_shader);
 
 
    // Reset for the next Shader Program build

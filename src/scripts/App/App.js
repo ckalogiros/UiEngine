@@ -18,7 +18,7 @@ import { Mesh_unif_wpos_debug_names_reset, Mesh_unif_wpos_reset, Mesh_unif_wpos_
 import { Mesh_animations_reset } from '../Engine/Animations/MeshAnimations.js';
 import { Mesh_buffer_reset, Mesh_per_vb_reset } from '../Engine/Core/MeshBuffer.js';
 import { Str_buffer_mesh_names_index_buffer_reset, Str_buffer_mesh_names_reset, Str_buffer_reset } from '../Engine/Core/StringBuffer.js';
-import { View_buffer_reset } from '../Engine/Core/MeshBufferViews.js';
+import { View_buffer_reset } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Dropdown_roots_reset } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Particles_system_reset } from '../Engine/ParticlesSystem/ParticlesSystem.js';
 import { Styles_hover_margin_reset, Styles_margin_reset, Styles_pad_reset } from '../Engine/Styles.js';
@@ -130,16 +130,16 @@ export function AppReset(){
     Time_intervals_destroy();
     Listener_reset_event_storage_buffers();
     Notifications_reset();
-    // Callback_animations_destroy();
     Renderqueue_reset();
-
+    
     Gfx_pool_vb_reset();
-
+    
     Mesh_unif_wpos_reset();
     Mesh_unif_wpos_ubidxs_reset();
     Mesh_unif_wpos_debug_names_reset();
-
-
+    
+    
+    Callback_animations_destroy();
     Mesh_animations_reset();
 
     Str_buffer_reset();

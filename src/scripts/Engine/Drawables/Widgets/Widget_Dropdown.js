@@ -8,7 +8,7 @@ import { Create_widget_button, Create_widget_section } from "../../Core/CreateWi
 import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_get } from "../../Core/MeshBuffer.js";
 import { Calculate_sizes_recursive, Expand, Section, Section_on_move_clbk } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
-import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/MeshBufferViews.js";
+import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/Views/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
 import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
@@ -314,10 +314,39 @@ export class Widget_Dropdown extends Section {
       
    }
    
-   // GfxCtxSetFlag(FLAGS){
-   //    alert('-1 DROPDOWN')
-   // }
 
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) {
+
+         this.gfx_ctx_flags = FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+
+         if(recurse){
+            if(this.menu) this.menu.GfxCtxSetFlag(FLAGS, gfx_ctx_parent, recurse);
+         }
+
+         const btn = this.children.buffer[0];
+         btn.GfxCtxSetFlag(FLAGS, gfx_ctx_parent, recurse);
+      }
+   }
+   
+
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) {
+
+         this.gfx_ctx_flags |= FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+
+         if(recurse){
+            if(this.menu) this.menu.GfxCtxAddFlag(FLAGS, gfx_ctx_parent, recurse);
+         }
+
+         const btn = this.children.buffer[0];
+         btn.GfxCtxAddFlag(FLAGS, gfx_ctx_parent, recurse);
+      }
+   }
 
 
    
@@ -598,13 +627,36 @@ export class Widget_Dropdown extends Section {
 
       const pad = this.StylesGetPad();
       btn.TEMP_recalc(x + dx + pad[0], y + dy + pad[1]);
-      // btn.TEMP_recalc(x + dx, y + dy);
-      // btn.SetPosXYNoGfxUpdate(x + dx + pad[0], y + dy + pad[1]);
-      // btn.SetPosXYNoGfxUpdate(x + dx, y + dy);
 
-      // if(this.isOn & DP_MENU_STATE.ON){
-      //    this.menu.SetPosXYNoGfxUpdate(x, y)
-      // }
+
+      if(this.isOn & DP_MENU_STATE.ON){
+
+         // this.menu.SetPosXYNoGfxUpdate(x, y)
+         // this.menu.TEMP_recalc(x, y);
+         
+         const widget_root = Dropdown_roots_get_root_by_idx(this.rootidx)
+         Calculate_sizes_recursive(widget_root, widget_root.options, );
+      
+      
+         if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+            CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
+            CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
+         }
+         else {
+            if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
+            else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
+            else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
+         }
+         
+         widget_root.SectionSetPad();
+         
+         // Calculate positions for dropdown
+         const cur_pos = [0,0];
+         cur_pos[0] = this.geom.pos[0]; 
+         cur_pos[1] = this.geom.pos[1]; 
+         
+         tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+      }
    }
 
 
@@ -946,7 +998,7 @@ export class Widget_Dropdown extends Section {
       this.isOn |= DP_MENU_STATE.ON;
       this.isOn &= ~DP_MENU_STATE.OFF;
 
-      View_reset_from_view_all_buffers(root.group_bufferidxs[0]); // Reset the vertex buuffer and the mesh_per_vb, before the adition of the 'menu's' meshes to the view group
+      View_reset_from_view_all_buffers(root.group_bufferidxs[0]); // Reset the vertex buffer and the mesh_per_vb, before the adition of the 'menu's' meshes to the view group
 
       this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
 
@@ -1059,6 +1111,11 @@ export class Widget_Dropdown extends Section {
       // Re-create listen events 
       Construct_listen_events_from_mesh_tree(this.menu)
       Construct_listen_events_relations_from_mesh_tree(this.menu);
+
+      // Set menu in focus
+      // Mesh_set_root_in_focus(widget_root.root_bufferidx, widget_root.scroller_comp_idx);
+      // Mesh_set_root_in_focus(widget_root.root_bufferidx);
+      Mesh_set_root_in_focus(root.root_bufferidx);
       
       
 

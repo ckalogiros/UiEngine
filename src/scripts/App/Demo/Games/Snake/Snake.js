@@ -12,7 +12,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Slider_connect, Slider_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Listeners_set_priority } from "../../../../Engine/Events/EventListeners.js";
 import { Time_intervals_create } from "../../../../Engine/Timers/TimeIntervals.js";
-import { Gl_set_round_corners, Gl_add_vpos_xy, Gl_set_glow_intensity, GlRotateZ2D, GlSetAttrBorderFeather } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_round_corners, Gl_add_vpos_xy, Gl_set_glow_intensity, Gl_rotate_z_2d, GlSetAttrBorderFeather } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomPos } from "../../../../Helpers/Helpers.js";
 import { Slope_function_logarithmic } from "../../../../Helpers/Math/MathFunction.js";
 import { Abs, Magnitude } from "../../../../Helpers/Math/MathOperations.js";
@@ -169,9 +169,9 @@ class Body_mesh_properties {
 /**************************************************************************************************************************************************************/
 // 
 
-export function Game_snake() {
+export function Game_snake(y) {
 
-   const vertical_space = 35;
+   const vertical_space = 35 + y;
    let board_width =  (VIEWPORT.WIDTH/2);
    let board_height = (VIEWPORT.HEIGHT/2) - vertical_space;
    
@@ -879,7 +879,7 @@ function Animate_snake(params) {
    // Nose move
 
    const angle = Math.atan2(x*.5, y*.5); // !!! Get the angle of rotation from two [x,y] vector points with ATAN2 !!!
-   GlRotateZ2D(nose.gfx, nose.geom.dim, angle, 1);
+   Gl_rotate_z_2d(nose.gfx, nose.geom.dim, angle, 1);
    /* Use for rendering sattelite with GFX.ATTR_STYLE */
    // const cx = nose.geom.pos[0] - nose.geom.dim[0] 
    // const cy = nose.geom.pos[1] - nose.geom.dim[1]

@@ -7,5 +7,5 @@
     },
     "exclude": ["node_modules", "images", "saves"],
     // "include": ["src/**/*"]
-    "include": ["src", "resources", "UnusedCode/UNUSED/DemoPhysicsCollisions.js"]
+    "include": ["src", "resources", "UnusedCode/UNUSED/DemoPhysicsCollisions.js", "UnusedCode/UNUSED/DemoSnakeAnimation.js", ]
 }

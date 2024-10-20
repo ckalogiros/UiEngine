@@ -101,6 +101,8 @@ class RenderQueue {
 
    Add(progidx, vb_groupidx, ibidx, isActive) {
 
+      if(this.count >= MAX_DRAWQUEUE_COUNT) alert('5412231432 \nRenderqueue buffer overflow')
+
       const obj = {
          progidx: progidx,
          vb_groupidx: vb_groupidx,

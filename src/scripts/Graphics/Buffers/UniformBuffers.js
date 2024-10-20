@@ -253,7 +253,7 @@ export function Uniforms_buffer_update_uniform(ubidx) {
 
 
 
-export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', progidx, vb_groupidx) {
+export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', vb_groupidx) {
 
    // Find uniform by name
    for (let i = 0; i <= _uniforms_buffer.boundary; i++) {

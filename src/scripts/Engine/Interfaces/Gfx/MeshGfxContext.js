@@ -392,7 +392,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                   // Choose to assign the mesh as the root uniform position, or the mesh and any mesh of this vertexbuffer should use it's Move function to be moved 
                   const COPY_MESH_POS = (flags) ? true : false;
                   // Create the uniform position that will update the vertexbuffer's uniform
-                  mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
+                  mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
 
                   if (mesh.root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
                   
@@ -414,7 +414,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          // If the vertex buffer already exists and is reused from the pool
          // get the unif wpos that has already been created for this vb
          mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, 
-            mesh.nameidx, mesh.parent, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, IS_VB_ROOT);
+            mesh.nameidx, mesh.parent, progidx, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, IS_VB_ROOT);
          // Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, 'u_wposxy', mesh.root_posidx);
 
       }
@@ -583,7 +583,7 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
 
                   // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, ubidx);
                   const HAS_ABSOLUTE_POS = 0x0, HAS_STICKY_POS = 0x0, COPY_MESH_POS = false;
-                  emitter.root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
+                  emitter.root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
                   if (emitter.root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
                   
                }
@@ -601,7 +601,7 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
          const COPY_MESH_POS = (FLAGS) ? true : false;
 
          // Get the unif wpos that is already created for this vb
-         Mesh_unif_set_from_existing_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS);
+         Mesh_unif_set_from_existing_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, progidx, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS);
 
       }
 
@@ -637,7 +637,7 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
 
       if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
 
-         const ubidx = Uniforms_buffer_find_ubidx_from_name(uniforms[i].name, progidx);
+         const ubidx = Uniforms_buffer_find_ubidx_from_name(uniforms[i].name, vb_groupidx);
          if (ubidx !== INT_NULL) Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, uniforms[i].name);
       }
    }

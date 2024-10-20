@@ -333,20 +333,38 @@ export class Rect_Mesh extends Rect {
 
 
    // TODO: This is wrong, cause we assume the children are NOT widgets with more children/meshes in them
-   GfxCtxSetFlag(FLAGS) {
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
-      this.gfx_ctx_flags = FLAGS;
-      for (let i = 0; i <= this.children.boundary; i++) {
-         if (this.children.buffer[i]) this.children.buffer[i].gfx_ctx_flags = FLAGS;
+      if(this.gfx_ctx_parent === INT_NULL) {
+         
+         this.gfx_ctx_flags = FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+   
+         if(recurse){
+            for (let i = 0; i <= this.children.boundary; i++) {
+               if (this.children.buffer[i]) {
+                  this.children.buffer[i].gfx_ctx_flags = FLAGS;
+                  this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
+               }
+            }
+         }
       }
    }
-
-
-   GfxCtxAddFlag(FLAGS) {
-
-      this.gfx_ctx_flags |= FLAGS;
-      for (let i = 0; i <= this.children.boundary; i++) {
-         if (this.children.buffer[i]) this.children.buffer[i].gfx_ctx_flags |= FLAGS;
+   
+   
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+      
+      if(this.gfx_ctx_parent === INT_NULL) {
+         
+         this.gfx_ctx_flags |= FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+         
+         if(recurse){
+            for (let i = 0; i <= this.children.boundary; i++) {
+               if (this.children.buffer[i]) this.children.buffer[i].gfx_ctx_flags |= FLAGS;
+               this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
+            }
+         }
       }
    }
 

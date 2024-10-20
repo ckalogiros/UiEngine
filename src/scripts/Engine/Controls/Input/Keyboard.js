@@ -12,9 +12,9 @@ import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js
 import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/VertexArrays.js";
 import { Gl_program_print } from "../../../Graphics/ShaderPrograms.js";
 import { Shader_attributes_print } from "../../../Graphics/ShaderAttributes.js";
-import { View_buffer_print, View_buffer_print_loop } from "../../Core/MeshBufferViews.js";
+import { View_buffer_print, View_buffer_print_loop } from "../../Core/Views/MeshBufferViews.js";
 import { Styles_hover_margin_print, Styles_hover_margin_print_loop, Styles_margin_print, Styles_margin_print_loop, Styles_pad_buffer_print, Styles_pad_buffer_print_loop } from "../../Styles.js";
-import { TEMP_dbg_info_ui_print_entries_table, TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
+import { Dbg_info_ui_print_entries_table, TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
 import { DEBUG_INFO_BUFFERS_PRINT, DEBUG_INFO_BUFFERS_PRINT2 } from "../../Core/Buffers.js";
 import { Uniforms_buffer_block_print, Uniforms_buffer_print } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Mesh_animations_print } from "../../Animations/MeshAnimations.js";
@@ -484,10 +484,10 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'y1',
-      discr: 'TEMP_dbg_info_ui_print_entries_table()',
+      discr: 'Dbg_info_ui_print_entries_table()',
       func: (e)=>{
-         console.log('------------------ TEMP_dbg_info_ui_print_entries_table() ------------------');
-         TEMP_dbg_info_ui_print_entries_table();
+         console.log('------------------ Dbg_info_ui_print_entries_table() ------------------');
+         Dbg_info_ui_print_entries_table();
       },
    },
    {

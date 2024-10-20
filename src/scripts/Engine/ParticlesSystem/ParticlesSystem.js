@@ -152,6 +152,7 @@ class Emitter {
          unif: 0x0,
          pass: SID.PASS.COL4,
          // pass: SID.PASS.COL4 | SID.PASS.DIM2 | SID.PASS.TIME,
+         blend_options: 0x0,
          fx: 0x0,
       };
 
@@ -218,12 +219,6 @@ class Emitter {
       this.variation_emission.ydir_neg = ydir_neg;
    }
 
-
-   /** Enable the .shad flags */
-   EnableGfxShadAttributes(SID_FLAGS) {
-
-      this.sid.shad |= SID_FLAGS;
-   }
 
    EnableGfxAttributes(which, params = null) {
 
@@ -312,7 +307,7 @@ class Emitter {
             shader: shader_flags,
          });
 
-         this.temp_unif_wpos = idx - 1;
+         // this.temp_unif_wpos = idx - 1;
 
       }
 
@@ -336,7 +331,7 @@ class Emitter {
          if (this.uniforms[found_idx].ubidx === INT_NULL) {
 
             // Case the mesh is new but the vertex buffer already created and owns the uniform
-            this.uniforms[found_idx].ubidx = Uniforms_buffer_find_ubidx_from_name(this.uniforms[found_idx].name, this.gfx.prog.idx, this.gfx.vb.groupidx);
+            this.uniforms[found_idx].ubidx = Uniforms_buffer_find_ubidx_from_name(this.uniforms[found_idx].name, this.gfx.vb.groupidx);
 
             if (this.uniforms[found_idx].ubidx === INT_NULL) {
                return;
@@ -423,7 +418,7 @@ export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clb
 
 
 
-export function TEMP_PARTICLES_GEN_GFX(emitter, parent = null, specific_vb_groupidx) {
+export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupidx) {
 
    if (!parent) console.error('4431623 \nEmmiter should have a parent mesh.')
 
@@ -744,7 +739,7 @@ export function Particle_system_print_info() {
          '\nindex:', emitter.idx,
          'sid:', emitter.sid,
          '\nroot_pos:', emitter.root_posidx,
-         'temp_unif_wpos:', emitter.temp_unif_wpos,
+         // 'temp_unif_wpos:', emitter.temp_unif_wpos,
          '\nprog:', emitter.gfx.prog.idx, 'vb:', emitter.gfx.vb.groupidx, 'ib:', emitter.gfx.ib.idx, 'attribsPerVertex:', emitter.gfx.attribsPerVertex,
          '\nparent:', parent,
          '\ncolor:', emitter.mat.col,

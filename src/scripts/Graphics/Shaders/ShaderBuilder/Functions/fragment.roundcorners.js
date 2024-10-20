@@ -76,10 +76,25 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 export const frag_round_corners_call = '  color = Round_corners(scale_down);';
 export const frag_round_corners = `
 
+/********************************************************************************************/
+// SHADER UNIT: frag_round_corners
+/********************************************************************************************/
+
 
 #ifndef UV_READY
     vec2 uv = vec2(0,0);
 #endif
+
+float smoothmin(float a, float b, float k)
+{
+  if (k != 0.0) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * h * k * (1.0 / 6.0);
+  }
+  else {
+    return min(a, b);
+  }
+}
 
 vec4 Round_corners(float scale_down)
 {
@@ -132,6 +147,10 @@ vec4 Round_corners(float scale_down)
 
     float d = length(max((abs_uv - dim) + rCorners.x, 0.0)) - rCorners.x;
     
+
+    // float c = smoothmin(abs(uv.x), abs(uv.y), 30.01);
+    // return vec4(vec3(c), 1.);
+
     float wb = clamp(-d / feather, 0.0, 1.0);
     float alpha = src_color.a * wb;
     vec3 color = src_color.rgb * alpha;
@@ -555,6 +574,7 @@ vec4 Round_corners(float scale_down)
 export const frag_feather_call = '  color *= Feather(scale_down);';
 export const frag_feather = `
 
+// in vec2 DIM;
 
 #ifndef UV_READY
     vec2 uv = vec2(0,0);
@@ -564,24 +584,27 @@ float Feather(float scale_down)
 {
     vec2 res = u_screen_res;
     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
+    // vec2 dim = DIM * scale_down;
     float feather = (v_feather <= 0.0) ? 0.00001 : v_feather;
     float scale_up = 1./scale_down;
 
-    // #ifndef UV_READY
-    //     #define UV_READY 1
+    #ifndef UV_READY
+        #define UV_READY 1
         
-    //     uv = (gl_FragCoord.xy-(res*.5));
-    //     uv.x += (res.x*.5); // Center mesh to screen
-    //     uv.y -= (res.y*.5); // Center mesh to screen
+        uv = (gl_FragCoord.xy-(res*.5));
+        uv.x += (res.x*.5); // Center mesh to screen
+        uv.y -= (res.y*.5); // Center mesh to screen
         
-    //     // To move with mesh position
-    //     uv.x -= v_wpos3_x;
-    //     uv.y += v_wpos3_y;
+        // To move with mesh position
+        uv.x -= v_wpos3_x;
+        uv.y += v_wpos3_y;
         
-    //     // Subtract constant dimention
-    //     uv.x -= dim.x*scale_up; 
-    //     uv.y -= -dim.y*scale_up;
-    // #endif   
+        // Subtract constant dimention
+        uv.x -= dim.x*scale_up; 
+        uv.y -= -dim.y*scale_up;
+    #endif   
+
+
 
     float width = feather;
     vec2 q = (abs(uv) - dim) + width;
@@ -591,6 +614,47 @@ float Feather(float scale_down)
     return alpha;
 }
 `;
+/**SAVE */
+// export const frag_feather = `
+
+
+// #ifndef UV_READY
+//     vec2 uv = vec2(0,0);
+// #endif
+
+// float Feather(float scale_down)
+// {
+//     vec2 res = u_screen_res;
+//     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
+//     float feather = (v_feather <= 0.0) ? 0.00001 : v_feather;
+//     float scale_up = 1./scale_down;
+
+//     // #ifndef UV_READY
+//     //     #define UV_READY 1
+        
+//     //     uv = (gl_FragCoord.xy-(res*.5));
+//     //     uv.x += (res.x*.5); // Center mesh to screen
+//     //     uv.y -= (res.y*.5); // Center mesh to screen
+        
+//     //     // To move with mesh position
+//     //     uv.x -= v_wpos3_x;
+//     //     uv.y += v_wpos3_y;
+        
+//     //     // Subtract constant dimention
+//     //     uv.x -= dim.x*scale_up; 
+//     //     uv.y -= -dim.y*scale_up;
+//     // #endif   
+
+
+
+//     float width = feather;
+//     vec2 q = (abs(uv) - dim) + width;
+//     float d = length(max(q, 0.0)) - width;
+//     float alpha = clamp(-d/feather, 0.0, 1.0);
+
+//     return alpha;
+// }
+// `;
 
 
 export const frag_style_call = '  color = Stylize(scale_down);';

@@ -9,7 +9,7 @@ import { Section } from "../Meshes/Section.js";
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 import { Styles_pad_set } from "../../Styles.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
-import { View_get_view_vb_root_meshidx } from "../../Core/MeshBufferViews.js";
+import { View_get_view_vb_root_meshidx } from "../../Core/Views/MeshBufferViews.js";
 import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
 
 
@@ -215,10 +215,7 @@ export class Widget_Menu_Bar extends Section {
    // Resize menu bar. Keep the menu elements to their relative positions 
    Resize(x) {
 
-      // this.geom.pos[0] += x;
       this.geom.dim[0] += x;
-
-      // Relative_pos_comp_recalc_right(this);
    }
 
 
@@ -370,7 +367,6 @@ export class Widget_Menu_Bar extends Section {
 
                   const child = this.children.buffer[i];
                   child.geom.dim[1] = this.geom.dim[1];
-                  // child.geom.dim[0] = child.geom.dim[1];
 
                   // Because we changed the size of the button, we need to realign the text
                   Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
@@ -455,8 +451,6 @@ export class Close_Button extends Widget_Button {
       root.Destroy(root);
 
       if(root.eventCallbacks){
-         // alert()
-
          root.eventCallbacks.buffer[0].evt_clbks();
       }
 
@@ -468,7 +462,6 @@ export class Close_Button extends Widget_Button {
 export class Widget_Minimize extends Widget_Button {
 
    // toggle; // On/Off
-   // stored_children_meshes; // Store all children meshes of the root, to maximize the widget back to normal. 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = [4, 0, 1.8], font, is_debug_mesh) {
 
@@ -486,9 +479,6 @@ export class Widget_Minimize extends Widget_Button {
          evt_params: root,
       }
 
-      // The eventCallbacks are going to run from the OnClick() in Widget_Button class.
-      // this.eventCallbacks.Add(params); 
-      // Pass the root and the callback for destroying the parent widget
       this.CreateEventCallback(params);
 
    }
@@ -633,11 +623,7 @@ export class Widget_Minimize extends Widget_Button {
             const group_root = Mesh_buffer_get_mesh_byidx(group_rootidx);
             const clip_top = group_root.GetPosY();
             const clip_bottom = clip_top + group_root.geom.dim[1] * 2;
-            // Clipy_from_group(group_root.group_bufferidxs[0], clip_top, clip_bottom);
             Clipy_from_tree_recursive(group_root, clip_top, clip_bottom);
-
-            // Calculate_positions_no_gfx_update_recursive(root, SECTION.TOP_DOWN | SECTION.INHERIT | SECTION.VERTICAL, [this.geom.pos[0], this.geom.pos[1]])
-            // Calculate_positions_no_gfx_update_recursive(root, SECTION.TOP_DOWN | SECTION.INHERIT | SECTION.VERTICAL, [0, 0])
 
 
             root.Rerender();

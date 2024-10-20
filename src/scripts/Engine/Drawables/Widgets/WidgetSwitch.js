@@ -48,7 +48,8 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       
       const switch_pos = [pad, pad, pos[2] + 1];
-      const switch0 = Create_rect_mesh(_, switch_pos, [size - pad, size - pad], GREY[9], _, _, _, _, is_debug_mesh);
+      // const switch_pos = [pad/2, pad/2, pos[2] + 1];
+      const switch0 = Create_rect_mesh(_, switch_pos, [size-pad, size-pad], GREY[9], _, _, _, _, is_debug_mesh);
       this.AddChild(switch0);
       switch0.SetStyle([size * (1-ratio), style[1], style[2]]);
       switch0.SetName('switch');
@@ -130,14 +131,13 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      // super.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
       super.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
    }
 
    
-   GfxCtxSetFlag(FLAGS, gfx_ctx_parent){
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false){
       
-      if(!this.gfx_ctx_parent) {
+      if(this.gfx_ctx_parent === INT_NULL) {
          
          this.gfx_ctx_flags = FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
@@ -147,9 +147,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
    
-   GfxCtxAddFlag(FLAGS, gfx_ctx_parent){
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false){
       
-      if(!this.gfx_ctx_parent) {
+      if(this.gfx_ctx_parent === INT_NULL) {
          
          this.gfx_ctx_flags |= FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
@@ -316,7 +316,6 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.geom.pos[1] = y;
       this.children.buffer[0].geom.pos[0] = x + dx;
       this.children.buffer[0].geom.pos[1] = y + dy;
-      // console.log('1', this.children.buffer[0].geom.pos,this.GetName())
    }
 
    

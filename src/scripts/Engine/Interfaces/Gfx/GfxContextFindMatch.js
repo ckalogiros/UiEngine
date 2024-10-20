@@ -1,7 +1,8 @@
 "use strict";
 
 import { Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Root_group_vbidx_view_view_get } from "../../Core/Views/RootView.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
+import { Root_group_vbidx_view_get } from "../../Core/Views/RootView.js";
 
 
 
@@ -21,7 +22,9 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
    let vb_groupidx = INT_NULL;
 
    // If a parent is set, use gfx_ctx_parent as parent
-   const parent = (mesh.gfx_ctx_parent) ? mesh.gfx_ctx_parent : mesh.parent;
+   const parent = (mesh.gfx_ctx_parent !== INT_NULL) ? Mesh_buffer_get_mesh_byidx(mesh.gfx_ctx_parent) : mesh.parent;
+
+   if(mesh.gfx_ctx_parent === null) alert('11111111111111111')
 
 
    // If 'PRIVATE' then one of the folowing FLAGS shouuld be also present
@@ -45,17 +48,20 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
 
             vb_groupidx = Find_match_gfx_from_parent_ascending(mesh, mesh.parent);
 
-            if (vb_groupidx === INT_NULL) { // Fallback to search all ascending-descending until root is reached.
-               vb_groupidx = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
-            }
+            // if (vb_groupidx === INT_NULL) { // Fallback to search all ascending-descending until root is reached.
+            //    vb_groupidx = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
+            // }
          }
       }
       else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_DSC) {
-         vb_groupidx = Find_match_gfx_from_parent_descending_search_all(mesh, parent)
+         if(parent) vb_groupidx = Find_match_gfx_from_parent_descending_search_all(mesh, parent)
       }
       else {
          // console.warn(mesh.parent.GetName())
-         console.error('NO CORRECT GenGfxCtx FLAG found for generating gfx.\nProbably forgot to pass one of the flags \'FROM_ROOT_WIDGET, FROM_PARENT_ASC, FROM_PARENT_CHILDREN_DESC, ...\'');
+         console.error(
+            'NO CORRECT GenGfxCtx FLAG found for generating gfx.\nProbably forgot to pass one of the flags \'FROM_ROOT_WIDGET, FROM_PARENT_ASC, FROM_PARENT_CHILDREN_DESC, ...\'',
+            'mesh', mesh.GetName(), 'parent', parent.GetName(),
+         );
          // alert('SEE console.error');
       }
    }
@@ -79,12 +85,16 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
             }
          }
          else {
-            vb_groupidx = Find_gfx_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
+            // For text meshes, find any match from the root.   
+            if (mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH) {
+               vb_groupidx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid, mesh.mat.texidx);
+            }
+            else vb_groupidx = Find_gfx_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
          }
       }
-      else { // If for some reason fails, re-call recursive this to resolve
+      else { // If for some reason fails, re-call recursively this function to resolve
          // We need to pass different flags, to avoid infinite loop, since the _vb_groupidx are always null
-         vb_groupidx = Find_gfx_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
+         vb_groupidx = Find_gfx_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
       }
    }
    // // Case we want to pick a generic vb (NOT private). If the order is to create a NEW vb, then skip searching and return  'vb_groupidx=INT_NULL'
@@ -147,7 +157,7 @@ function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid, mesh_texidx
    }
 
    // Find match from SID
-   const gfx_idxs = Root_group_vbidx_view_view_get(root_bufferidx);
+   const gfx_idxs = Root_group_vbidx_view_get(root_bufferidx);
 
    for (let i = 0; i <= gfx_idxs.boundary; i++) {
 

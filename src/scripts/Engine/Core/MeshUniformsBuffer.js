@@ -7,7 +7,9 @@
 
 "use strict";
 
-import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_get, Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../Graphics/Buffers/VertexBuffers.js";
+import { AddArr2, CopyArr2 } from "../../Helpers/Math/MathOperations.js";
+import { Mesh_set_and_update_wpos_uniform } from "../Drawables/Operations/MeshHelperFunctions.js";
 import { New_generic_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer.js";
@@ -80,7 +82,7 @@ export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; 
 // IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
 export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent, 
-                               debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT) {
+                              progidx, debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT) {
 
 
 
@@ -96,15 +98,18 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
       wpos[0] = mesh_pos[0];
       wpos[1] = mesh_pos[1];
    }
+   
 
-
+   let root_wpos = [wpos[0], wpos[1]];
    if (mesh_parent !== null){
-
+      
+      // CopyArr2(root_wpos, Mesh_unif_get_vb_root_wpos(mesh_parent.root_posidx));  console.log('2', root_wpos);
+      
       parent_meshidx = mesh_parent.mesh_bufferidx;
       parent_posidx = mesh_parent.root_posidx;
-
+      
       if (mesh_type & MESH_TYPE.TEXT_MESH) {
-
+         
          // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
          wpos[0] = 0;
          wpos[1] = 0;
@@ -114,9 +119,9 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
       mesh_pos[0] = 0;
       mesh_pos[1] = 0;
    }
-
-
-
+   
+   
+   
    const entry = {
       wpos: [wpos[0], wpos[1]],
       meshidx: meshidx, // Is needed to have a ref to the mesh from inside the '_per_vb_mesh_unif_wpos' buffer
@@ -126,15 +131,17 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
       sticky_pos: HAS_STICKY_POS,
       scroll_bar: INT_NULL, // unif_wpos index for any scrollbar. Use: Move the scrollbar with the root mesh move (seperately), because the scrollbars aren't children of any root unif
    }
-
+   
    _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
-
+   
    const idx = _per_vb_mesh_unif_wpos.Add(entry);
-
-
+   
+   
    // Store the uniform's index, for updating the uuniforms on position change
    const wpos_ubidx_idx = _per_vb_mesh_unif_wpos_ubidxs.Add(ubidx);
    if(wpos_ubidx_idx !== idx) alert('unif wpos idx does not match the ubidx wpos idx');
+   
+   // Mesh_set_and_update_wpos_uniform(progidx, debug_vb_groupidx, root_wpos, null)
 
 
    return idx;
@@ -143,10 +150,9 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
 
 export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, 
-                                                vb_groupidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT) {
+                                                progidx, vb_groupidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT) {
    // TODO: check NULL object
 
-console.log('unif_wpos', vb_groupidx)
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
    let meshidx = mesh_bufferidx;
@@ -188,9 +194,10 @@ console.log('unif_wpos', vb_groupidx)
 
 
    // If it is the case the vertex buffer is not created but is re-used, then we need to re-initialize the unif_wpos 
+   const unif_wpos = _per_vb_mesh_unif_wpos.buffer[vb_groupidx];
+
    if(IS_VB_ROOT){
 
-      const unif_wpos = _per_vb_mesh_unif_wpos.buffer[vb_groupidx];
       unif_wpos.wpos[0] = wpos[0];
       unif_wpos.wpos[1] = wpos[1];
       unif_wpos.meshidx = meshidx;
@@ -210,16 +217,10 @@ console.log('unif_wpos', vb_groupidx)
    dbg_for_unifwpos.vbidx = vb_groupidx;
    // _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
 
+
+   Mesh_set_and_update_wpos_uniform(progidx, vb_groupidx, unif_wpos.wpos, null)
+
    return vb_groupidx; // Return this unif wpos index(which matches the vb_groupidx)
-}
-
-
-
-export function Mesh_unif_store_vb_root_wpos(root_posidx, x, y) {
-   // TODO: check NULL object
-
-   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] = x;
-   _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] = y;
 }
 
 
@@ -279,8 +280,13 @@ function Mesh_unif_get_vb_root_wpos_recursive(root_posidx) {
 
 
 export function Mesh_unif_get_vb_root_wposx(root_posidx) {
-   const pos = Mesh_unif_get_vb_root_wposx_recursive(root_posidx);
-   return pos + _screen_wpos[0];
+
+   let pos = Mesh_unif_get_vb_root_wposx_recursive(root_posidx);
+
+   if( _per_vb_mesh_unif_wpos.buffer[root_posidx].has_absolute_pos === 0){
+      pos += _screen_wpos[0];
+   }
+   return pos;
 }
 function Mesh_unif_get_vb_root_wposx_recursive(root_posidx) {
 
@@ -299,7 +305,12 @@ function Mesh_unif_get_vb_root_wposx_recursive(root_posidx) {
 
 
 export function Mesh_unif_get_vb_root_wposy(root_posidx) {
-   const pos = Mesh_unif_get_vb_root_wposy_recursive(root_posidx);
+   
+   let pos = Mesh_unif_get_vb_root_wposy_recursive(root_posidx);
+
+   if( _per_vb_mesh_unif_wpos.buffer[root_posidx].has_absolute_pos === 0){
+      pos += _screen_wpos[1];
+   }
    return pos;
 }
 function Mesh_unif_get_vb_root_wposy_recursive(root_posidx) {
@@ -335,6 +346,7 @@ export function Mesh_unif_set_vb_root_wpos_all_siblings(root_posidx, x, y){
          _per_vb_mesh_unif_wpos.buffer[i].wpos[0] = x;
          _per_vb_mesh_unif_wpos.buffer[i].wpos[1] = y;
       }
+
    }
 }
 
@@ -342,12 +354,14 @@ export function Mesh_unif_set_vb_root_wpos_all_siblings(root_posidx, x, y){
 export function Mesh_unif_set_vb_root_wpos(root_posidx, x, y) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] = x;
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] = y;
+   
 }
 
 
 
 export function Mesh_unif_set_vb_root_wposx(root_posidx, x) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] = x;
+   
 }
 
 
@@ -359,7 +373,7 @@ export function Mesh_unif_set_vb_root_wposx_all_siblings(root_posidx, x) {
    
    const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[root_posidx].parent_posidx;
    if(parent_rootidx === INT_NULL) return;
-
+   
    
    // Run from parent root_posidx to the end of buffer, and add the pos to any elem that is a sibling(same parent)
    // BUG: Assuming the parent always is before any children, which probably it is not the case when root wpos's are removed and new are replacing existing elements
@@ -376,6 +390,7 @@ export function Mesh_unif_set_vb_root_wposx_all_siblings(root_posidx, x) {
 
 export function Mesh_unif_set_vb_root_wposy(root_posidx, y) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] = y;
+   
 }
 
 
@@ -384,6 +399,7 @@ export function Mesh_unif_set_vb_root_wposy(root_posidx, y) {
 export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
+   
 
    /**
     * Move any scroll bars that belong to any unif_wpos below current unif_wpos(in the tree structure, children-tree)
@@ -403,7 +419,7 @@ export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
 
 
 export function Mesh_unif_add_vb_root_wposx(root_posidx, x) {
-
+   
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
    
 }
@@ -411,7 +427,7 @@ export function Mesh_unif_add_vb_root_wposx(root_posidx, x) {
 
 
 export function Mesh_unif_add_vb_root_wposy(root_posidx, y) {
-
+   
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
    for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
    }
@@ -421,7 +437,7 @@ export function Mesh_unif_add_vb_root_wposy(root_posidx, y) {
 
 
 export function Mesh_unif_add_vb_root_wpos_all_siblings(root_posidx, x, y){
-
+   
    const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[root_posidx].parent_posidx;
    
    // Run from parent root_posidx to the end of buffer, and add the pos to any elem that is a sibling(same parent)
@@ -456,6 +472,15 @@ export function Mesh_unif_update_sticky_pos(xdif, ydif){
          _per_vb_mesh_unif_wpos.buffer[i].wpos[1] += ydif;
       }
    }
+}
+
+
+
+/**Get all vertex buffers from a root via the unif wpos struct */
+export function Mesh_unif_get_all_root_wpos_indexes(root_posidx){
+
+   // return _per_vb_mesh_unif_wpos.buffer[root_posidx];
+   return _per_vb_mesh_unif_wpos.buffer;
 }
 
 
@@ -610,19 +635,27 @@ export function Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(root_pos
 // Print the widget groups buffer
 export function Root_uniforms_for_wpos() {
 
-   console.log('_per_vb_mesh_unif_wpos:')
+
+   const vb_groups = Vertex_buffer_group_get();
+
+   console.log('_per_vb_mesh_unif_wpos:');
    for (let i = 0; i <= _per_vb_mesh_unif_wpos.boundary; i++) {
 
       const parent = Mesh_buffer_get_mesh_byidx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].parent_meshidx);
-      const parent_name = (parent) ? Str_buffer_mesh_names_get_by_idx(parent.nameidx) : 'NULL'
+      const parent_name = (parent) ? Str_buffer_mesh_names_get_by_idx(parent.nameidx) : 'NULL';
+
+      const unif_obj = _per_vb_mesh_unif_wpos.buffer[i];
 
       console.log(i,
-         'ABS:', (_per_vb_mesh_unif_wpos.buffer[i].has_absolute_pos & GFX_CTX_FLAGS.ABSOLUTE_POSITION) ? true : false,
-         '| STICK:', (_per_vb_mesh_unif_wpos.buffer[i].sticky_pos & MESH_STATE.STICKY_POSX) ? true : false,
-         '| par_idx:', _per_vb_mesh_unif_wpos.buffer[i].parent_posidx,
-         '| vbidx:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
-         '| scroll:', _per_vb_mesh_unif_wpos.buffer[i].scroll_bar,
-         '| pos:', _per_vb_mesh_unif_wpos.buffer[i].wpos,
+         '| meshidx:', unif_obj.meshidx,
+         'vbidx:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
+         'draw_count:', vb_groups.buffer[i].draw_count,
+         // 'ABS:', (unif_obj.has_absolute_pos & GFX_CTX_FLAGS.ABSOLUTE_POSITION) ? true : false,
+         // '| STICK:', (unif_obj.sticky_pos & MESH_STATE.STICKY_POSX) ? true : false,
+         // '| scroll:', unif_obj.scroll_bar,
+         'par_posidx:', unif_obj.parent_posidx,
+         '| pos:', unif_obj.wpos,
+         '| vb_groups:', vb_groups.buffer[i].name,
          '| name:', Str_buffer_mesh_names_get_by_idx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].nameidx),
          '| parent:', parent_name,
       );

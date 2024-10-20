@@ -39,10 +39,10 @@ export function Components_get_scroller_component(scroller_comp_idx=INT_NULL){
 
 export function Components_create_scroller_component(width = 12, height=100, mesh=null, abs_ypos=0, col_bar=GREY[0], col_handle=GREY[4]){
 
-   const pos = [0,0,0];
+   const pos = [0,0,20];
 
 
-   const bar = Create_rect_mesh(_, pos, [width, height], col_bar, )
+   const bar = Create_rect_mesh(_, pos, [width, height], col_bar )
    bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
@@ -95,6 +95,8 @@ export function Components_create_scroller_component(width = 12, height=100, mes
 
 export function Scoller_component_destroy(bar, ){
    const handle = bar.children.buffer[0];
+   if(handle===null)
+      console.error('881762221331')
    handle.Destroy();
    bar.Destroy();
 }
@@ -286,8 +288,6 @@ function Scroller_component_on_update_handle(_params) {
    const scrolled_section = bar.scrolled_section;
    Scroller_component_move_handle(bar, handle);
    Scroller_component_update_scrolled_section_pos_from_handle(scrolled_section, bar);
-
-   console.log(scrolled_section.GetName())
 
    Scroller_clip_scrolled_section(scrolled_section, bar.GetPosY(), bar.geom.dim[1]);
 

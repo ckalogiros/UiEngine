@@ -77,6 +77,30 @@ vec4 Msdf() {
  * So we compare if the rgb color is = to the transparent color, we set the alha to 0.
  * Because of the floating point error, we check above and below the transparent color.
  */
+// export const frag_tex = `
+
+//   vec4 texel = texture( u_sampler0, v_tex_coord);
+  
+//   // color *= texel;
+//   // color.rgb *= color.a;
+
+
+
+//   float pxRange = 50.01;
+//   float dist = max(min(color.r, color.g), min(max(color.r, color.g), color.b));
+  
+//   vec2 unitRange = vec2(pxRange) / vec2( textureSize( u_sampler0, 0 ) );
+//   vec2 screenTexSize = vec2(1.0) / fwidth(v_tex_coord);
+
+//   float pxDist = max(0.5*dot(unitRange, screenTexSize), 1.0) * (dist - 0.5);
+//   float opacity = clamp(pxDist + .5, 0.0, 1.0);
+  
+//   color = vec4(1.0, 1.0, 1.0, opacity);
+//   // color.a = opacity;
+  
+// `;
+
+
 export const frag_tex = `
 
   vec4 texel = texture( u_sampler0, v_tex_coord);
@@ -84,8 +108,19 @@ export const frag_tex = `
   color *= texel;
   color.rgb *= color.a;
   
+  float distance = max(texture(u_sampler0, v_tex_coord).r, max(texture(u_sampler0, v_tex_coord).g, texture(u_sampler0, v_tex_coord).b));
+  float pixelDist = 1. - distance;
+  // float alpha = 1. - smoothstep(0., 1., pixelDist);
+  // color.a *= alpha;
+  
+  float alpha = smoothstep(0.5 - 0.1, 0.5 + 0.1, distance);
+  // color.a *= alpha;
   // Remove all black color and render only the colored texture
-  color.a *= texel.r;
-  // if(texel.r <= 0.8) color.a *= texel.r;
+  color.a *= distance;
+  // color.rgb *= color.a+.5;
+
+  // if(distance < .1) color.rgb += .1;
+
+
 
   `;

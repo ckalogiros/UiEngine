@@ -209,6 +209,15 @@ export function FloorArr2(arr){
 export function FloorArr3(arr){
     return [~~arr[0], ~~arr[1], ~~arr[2]]
 }
+export function Round(val){
+    return Math.round(val);
+}
+export function RoundArr2(arr){
+    return [Math.round(arr[0]), Math.round(arr[1])];
+}
+export function RoundArr3(arr){
+    return [Math.round(arr[0]), Math.round(arr[1]), Math.round(arr[2])];
+}
 export function Abs(a){
     return a > 0 ? a : -a;
 }
@@ -403,6 +412,20 @@ export function Normalize_vec2(vx, vy){
 export function Range(val, min, max){
 
     return min + (val * (max - min));
+}
+
+
+
+
+export function Fract(f) {
+    return f % 1;
+}
+
+
+
+
+export function Mod(a, b) {
+    return a % b;
 }
 
 

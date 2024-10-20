@@ -118,10 +118,7 @@ export function FontGetFontDimRatio(font_idx) {
 
 export function Font_metrics_get_advancex(font_idx) { return _fontMetricsBuffer[font_idx].advancex; }
 export function Font_metrics_get_width(font_idx) { return _fontMetricsBuffer[font_idx].texWidth; }
-export function Font_metrics_get_char_width(font_idx, ch) { 
-	if(_fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET] === undefined)
-		console.log()
-	return _fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
+export function Font_metrics_get_char_width(font_idx, ch) { return _fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
 export function Font_metrics_get_height(font_idx) { return _fontMetricsBuffer[font_idx].texHeight; }
 export function Font_metrics_get_row_height(font_idx) { return _fontMetricsBuffer[font_idx].row_height; }
 export function Font_metrics_get_interpolated_x(font_idx) { return 1.0 / _fontMetricsBuffer[font_idx].texWidth; } // Transform to 0-1 coords 
@@ -249,48 +246,42 @@ function Create_uv_map(font_idx) {
 	const uvmap = _fontsUvMap[font_idx];
 
 	let transormedU = 1.0 / metrics.texWidth;	// Transform to 0-1 coords
-	if (metrics.advancex % 2) {
-		metrics.advancex++;
-		transormedU = 1.0 / (metrics.texWidth);	// Deal with odd width. 
-	}
-
+	// if (metrics.advancex % 2) {
+	// 	metrics.advancex++;
+	// 	transormedU = 1.0 / (metrics.texWidth);	// Deal with odd width. 
+	// }
+	
 	let transormedV = 1.0 / metrics.texHeight;	// Transform to 0-1 coords
-	if (metrics.texHeight % 2) {
-		metrics.texHeight++;
-		transormedV = 1.0 / (metrics.texHeight);	// Deal with odd width. 
-	}
+	// if (metrics.texHeight % 2) {
+	// 	metrics.texHeight++;
+	// 	transormedV = 1.0 / (metrics.texHeight);	// Deal with odd height. 
+	// }
 
+	// transormedU = Math.round(transormedU * round) / round;
+	// transormedV = Math.round(transormedV * round) / round;
+	
 	const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
 	for (let j = 0; j < metrics.size; j++) {
-
+		
 		const uv = metrics.ch[j]; // Get a characters pixel position in the font texture.
-
+		
 		// and store them to the uvmap
 		uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new array for each character
 		uvmap[j][U1] = transormedU * uv.left;
 		uvmap[j][U2] = transormedU * uv.right;
-
-		/** Sqeeze the uv left and right, by the left and right emty space of the font */
-		// let scalex = (metrics.advancex - uv.width) / 2;
-		// uvmap[j][U1] -= transormedU * scalex * .5; // HACK: The correct calculation is to remove the *.5
-		// uvmap[j][U2] += transormedU * scalex * .5; // HACK: The correct calculation is to remove the *.5
-
-
-		/** Transformations for the top-bottom */
-		// uvmap[j][V1] = transormedV * uv.top;
-		// uvmap[j][V2] = transormedV * uv.bottom;
-
-		// let scaley = (metrics.row_height - uv.height) / 2;
-		// uvmap[j][V1] -= transormedU * scaley;
-		// uvmap[j][V2] += transormedU * scaley;
-
+		
 		uvmap[j][V1] = metrics.row_height * transormedV * (uv.row_num);
 		uvmap[j][V2] = uvmap[j][V1] + (metrics.row_height * transormedV);
-		// uvmap[j][V2] = (metrics.row_height * transormedV * (uv.row_num+1));
-		// console.log(j, 'uv.row_num+1', uv.row_num+1)
-
-		if (metrics.texHeight % 2)
-			uvmap[j][V1] += transormedV;
+		
+		// if (metrics.texHeight % 2)
+		// 	uvmap[j][V1] += transormedV;
+		
+		// Round for any potential floating-point rounding errors
+		const round = 100000;
+		uvmap[j][V1] = Math.round(uvmap[j][V1] * round) / round;
+		uvmap[j][V2] = Math.round(uvmap[j][V2] * round) / round;
+		uvmap[j][U1] = Math.round(uvmap[j][U1] * round) / round;
+		uvmap[j][U2] = Math.round(uvmap[j][U2] * round) / round;
 	}
 
 	if(DEBUG.UVS){ console.log('uvmap:', uvmap); }

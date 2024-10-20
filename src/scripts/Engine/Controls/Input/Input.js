@@ -140,9 +140,12 @@ export function Input_create_user_input_listeners() {
 
 export function Device_set_up() {
 
+  // const dpr = window.devicePixelRatio || 1;
+  const dpr = 1.;
+
   // const canvas = document.getElementById("canvas");
-  DEVICE.width = window.innerWidth;
-  DEVICE.height = window.innerHeight;
+  DEVICE.width = window.innerWidth*dpr;
+  DEVICE.height = window.innerHeight*dpr;
   console.log('DEVICE width: ', DEVICE.width, ' height: ', DEVICE.height)
   // console.log('WINDOW: ', window)
 

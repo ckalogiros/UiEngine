@@ -86,6 +86,27 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) {
+
+         this.gfx_ctx_flags |= FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+
+      }
+   }
+
+
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) {
+
+         this.gfx_ctx_flags = FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+
+      }
+   }
+
 
 	/*******************************************************************************************************************************************************/
 	// Alignment
@@ -361,21 +382,41 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	GfxCtxSetFlag(FLAGS, gfx_ctx_parent) {
-		// alert('-1 -1 -1 -1 -1')
+	GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
-		if (!this.gfx_ctx_parent) {
+		if (this.gfx_ctx_parent === INT_NULL) {
+
 			this.gfx_ctx_flags = FLAGS;
 			this.gfx_ctx_parent = gfx_ctx_parent;
-			for (let i = 0; i <= this.children.boundary; i++) {
-				if (this.children.buffer[i]) {
 
-					this.children.buffer[i].gfx_ctx_flags = FLAGS;
-					this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
+			if(recurse){
+				for (let i = 0; i <= this.children.boundary; i++) {
+					if (this.children.buffer[i]) {
+						this.children.buffer[i].gfx_ctx_flags = FLAGS;
+						this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
+					}
 				}
 			}
 		}
+	}
 
+
+	GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+
+		if (this.gfx_ctx_parent === INT_NULL) {
+
+			this.gfx_ctx_flags |= FLAGS;
+			this.gfx_ctx_parent = gfx_ctx_parent;
+			
+			if(recurse){
+				for (let i = 0; i <= this.children.boundary; i++) {
+					if (this.children.buffer[i]) {
+						this.children.buffer[i].gfx_ctx_flags |= FLAGS;
+						this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
+					}
+				}
+			}
+		}
 	}
 
 

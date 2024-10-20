@@ -218,14 +218,17 @@ export class Section extends Mesh {
    }
 
 
-   GfxCtxSetFlag(FLAGS, gfx_ctx_parent) {
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
-      if (!this.gfx_ctx_parent) {
+      if (this.gfx_ctx_parent === INT_NULL) {
 
          this.gfx_ctx_flags = FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
-         for (let i = 0; i <= this.children.boundary; i++) {
-            if (this.children.buffer[i]) this.children.buffer[i].GfxCtxSetFlag(FLAGS, gfx_ctx_parent);
+
+         if(recurse){
+            for (let i = 0; i <= this.children.boundary; i++) {
+               if (this.children.buffer[i]) this.children.buffer[i].GfxCtxSetFlag(FLAGS, gfx_ctx_parent, recurse);
+            }
          }
       }
    }
@@ -236,15 +239,17 @@ export class Section extends Mesh {
     * @param {*} FLAGS 
     * @param {*} gfx_ctx_parent Pass a parent to which the GenGfx will run to, preventing any search above parent mesh in the widget root tree structure
     */
-   GfxCtxAddFlag(FLAGS, gfx_ctx_parent) {
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
-      if (!this.gfx_ctx_parent) {
+      if (this.gfx_ctx_parent === INT_NULL) {
 
          this.gfx_ctx_flags |= FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
-         for (let i = 0; i <= this.children.boundary; i++) {
-            // if (this.children.buffer[i]) this.children.buffer[i].GfxCtxSetFlag(FLAGS, gfx_ctx_parent);
-            if (this.children.buffer[i]) this.children.buffer[i].GfxCtxAddFlag(FLAGS, gfx_ctx_parent);
+
+         if(recurse){
+            for (let i = 0; i <= this.children.boundary; i++) {
+               if (this.children.buffer[i]) this.children.buffer[i].GfxCtxAddFlag(FLAGS, gfx_ctx_parent, recurse);
+            }
          }
       }
    }
@@ -1364,6 +1369,11 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
       curr[1] + parent.StylesGetPad(STYLES.AXIS.Y),
    ];
 
+   if(options & SECTION.HORIZONTAL_CENTER){
+      cur_pos[0] += parent.geom.dim[0];
+   }
+
+
    const start_posx = cur_pos[0];
 
 
@@ -1384,10 +1394,18 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
 
          cur_pos[0] += marg[0];
          cur_pos[1] += marg[1];
+
+         // If center horizontal, then subtract the meshes half dimention
+         if(options & SECTION.HORIZONTAL_CENTER){
+            cur_pos[0] -= mesh.geom.dim[0];
+         }
+
          
          
          const rel_pos = [cur_pos[0], cur_pos[1]];
          // console.log('##########', mesh.GetName(), rel_pos)
+
+         if(mesh)
          
          if (mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC) {
             
@@ -1429,6 +1447,11 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
             continue_recur = false;
          }
 
+         // Remove any added dimention from this mesh to the current position tracker
+         if(options & SECTION.HORIZONTAL_CENTER){
+            cur_pos[0] += mesh.geom.dim[0];
+         }
+
          if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
             Calculate_positions_no_gfx_update_recursive(mesh, opt, cur_pos, _);
          }
@@ -1443,6 +1466,7 @@ export function Calculate_positions_no_gfx_update_recursive(parent, options, cur
          else if (next_mesh && next_mesh.temp_align & SECTION.VERTICAL) {
             cur_pos[1] += mesh.geom.dim[1] * 2;
             cur_pos[0] = start_posx;
+
          }
          else if (parent.options & SECTION.VERTICAL) {
             cur_pos[1] += mesh.geom.dim[1] * 2;

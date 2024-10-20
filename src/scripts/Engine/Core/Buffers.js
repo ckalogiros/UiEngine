@@ -378,7 +378,8 @@ export class Int16Buffer extends ArrayBufferInterface {
             if (this.buffer[this.boundary] !== null) break;
             this.boundary--;
          }
-         if (this.boundary < INT_NULL) alert('M_Buffer boundary = -1')
+         if (this.boundary < INT_NULL) 
+            alert('M_Buffer boundary = -1')
          ERROR_NULL(this.active_count);
 
          if (this.active_count === 0) this.boundary = INT_NULL

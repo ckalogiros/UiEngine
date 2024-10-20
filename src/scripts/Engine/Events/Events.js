@@ -126,6 +126,14 @@ export function Events_handle_immidiate(e) {
             STATE.mesh.SetHovered(e.params.mesh);
             TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.COUNT++;
 
+            if(e.params.mesh.eventCallbacks !== null){
+                const Clbk = e.params.mesh.eventCallbacks.buffer[0].Clbk;
+                if(Clbk !== undefined){
+                    const clbk_params = e.params.mesh.eventCallbacks.buffer[0].clbk_params;
+                    Clbk(clbk_params);
+                }
+            }
+
         }
 
     }

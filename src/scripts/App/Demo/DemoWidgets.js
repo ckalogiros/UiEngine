@@ -1,7 +1,7 @@
 "use strict";
 
 import { Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
-import { View_build_group_from_root_mesh } from '../../Engine/Core/MeshBufferViews.js';
+import { View_build_group_from_root_mesh } from '../../Engine/Core/Views/MeshBufferViews.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from '../../Engine/Core/Views/RootView.js';
 import { BLUE, BLUEL, BLUER, GREEN, GREENL, GREENR, GREY, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, TRANSPARENT, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
@@ -92,7 +92,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    scrolled_section.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
    scrolled_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    scrolled_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC,);
+   scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section.mesh_bufferidx, true);
    scrolled_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE; // Remove the PRIVATE flag so that the scrolled section will
    scrolled_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
    scrolled_section.SetName('scrolled_section');
@@ -113,7 +113,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
       label.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
       label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
-      label.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled_section);
+      label.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled_section.mesh_bufferidx);
       scrolled_section.AddItem(label);
       label.SetName(`${i}`);
       label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -136,7 +136,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
    // Render
    // section.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENTX;
-   section.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX;
+   section.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX ;
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
 
    section.Calc_no_gfx_update();
@@ -219,7 +219,7 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    info.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
    // info.EnableGfxUniforms({unif: SID.UNIF.FS_SMOOTHNESS_FLOAT,}, 'u_smoothness_1f', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
    info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
-   info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 50);
+   info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    root_s.AddItem(info);
 
 
@@ -1023,7 +1023,8 @@ export function Demo_widgets_dropdown(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, section.mesh_bufferidx, true);
+   section.GenGfxCtx();
 
    // dp.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
    section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
@@ -1115,35 +1116,35 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos 
       );
    }
 
-
    // Create Switch Widget
    {
       const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4),);
       s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       s.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-      s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+      s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
       s.SetName('Switch panel');
       section.AddItem(s);
 
-      const switch1 = Create_widget_switch_simple(_, [0, 0, 1], 20, _, _, 4);
+      // const switch1 = Create_widget_switch_simple(_, [0, 0, 1], 20, _, _, 4);
+      const switch1 = Create_widget_switch_simple(_, [0, 0, 0], 18, YELLOWR[8], _, 2, _, );
       switch1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       switch1.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-      switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+      switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, switch1.geom.dim[1]);
       s.AddItem(switch1);
 
       const label = Create_widget_label(_, 'off', _, _, _, GREY[2], GREY[5],);
       label.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
-      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,2);
+      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,switch1.geom.dim[1]);
       s.AddItem(label);
 
       switch1.Bind(
          () => {
 
             const state = (switch1.isOn & 0x1) ? 'on' : 'off';
-            const color = (switch1.isOn & 0x1) ? ORANGEL[9] : GREY[5];
+            const color = (switch1.isOn & 0x1) ? REDL[9] : GREY[5];
             label.text_mesh.RenderTextFromString(state);
             label.text_mesh.SetColorRGB(color);
          },
@@ -1162,7 +1163,6 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos 
       s.SetName('Slider panel');
       section.AddItem(s);
 
-      // const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [200, 500, 0] : [0, 0, 0]
       const slider = Create_widget_slider(_, [0, 0, 1], [100, 10], TRANSPARENCY(GREY[2], .6), _, 'Test slider',);
       slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       slider.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
@@ -1204,7 +1204,8 @@ export function Demo_widgets_button(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos 
    // Render
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, section.mesh_bufferidx, true);
+   section.GenGfxCtx();
 
    section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
    section.Calc_no_gfx_update();
@@ -1336,6 +1337,8 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
    picker.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 2, 2, 2, 2, 2, 2, 2, 2);
    picker.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1, 1, 1, 1, 1, 1, 2, 2);
 
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+
 
    picker.sid.inst = render_instanced_flags;
 
@@ -1348,8 +1351,8 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
 
 
       // picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
-
-      picker.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+      picker.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, picker.mesh_bufferidx, true);
+      picker.GenGfxCtx();
 
       picker.Calc_no_gfx_update();
       picker.Render();

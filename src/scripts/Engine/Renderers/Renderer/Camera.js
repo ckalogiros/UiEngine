@@ -152,7 +152,7 @@ export class CameraOrthographic extends Camera {
 
 	Init(width, height) {
 
-		const near = 0, far = -1000;
+		const near = 0, far = -100;
 
 		this.makeOrthographic( 0, width, 0, height, near, far );
 		this.isSet = true;

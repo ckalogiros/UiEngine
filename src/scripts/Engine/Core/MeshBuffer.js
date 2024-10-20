@@ -271,7 +271,12 @@ export function Mesh_per_vb_reset_buffer(vb_groupidx) {
 // export function Mesh_per_vb_remove_mesh_sorted(vb_groupidx, per_vb_bufferidx) {
 export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
 
-   if (per_vb_bufferidx === INT_NULL || per_vb_bufferidx === null) alert('556188772354'); 
+   if (per_vb_bufferidx === INT_NULL || per_vb_bufferidx === null) {
+
+      console.error('556188772354 \n per_vb_bufferidx is null'); 
+      // alert('556188772354'); 
+      return;
+   }
    
    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdx(per_vb_bufferidx);
    

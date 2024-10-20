@@ -86,9 +86,6 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
       view: null,
    });
 
-   // if(event_idx === 9 || event_idx === 10)
-   if(event_idx === 18)
-      console.log()
 
    // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx].event_idx = event_idx;
 
@@ -195,8 +192,6 @@ export function Listener_assign_parent_event(TYPE_IDX, event_idx, parent_event_i
       parent_event.view.children = New_generic_buffer(_, `Listeners->parent_event.view.children:${parent_event.name}`);
    }
 
-   if (event === _)
-      console.log('debug_mesh', debug_mesh, '\nparent_event', parent_event)
 
    // Avoid duplicate views on a recostruction. If the current event already exists as a view node, Skip
    if (parent_event.view && event.view) {
@@ -216,16 +211,6 @@ export function Listener_assign_parent_event(TYPE_IDX, event_idx, parent_event_i
       children: null,
    });
 
-   // if(event_idx === 9 || event_idx === 10)
-   if(event_idx === 18)
-   console.log('2 =====================================================\n', 
-      'view_idx', view_idx, 
-      'meshidx', event.meshidx, 
-      'event_idx', event_idx, 
-      'parent_event', parent_event.name, 
-      event.meshidx, event.name
-   )
-   // console.log('ADDED index', view_idx, 'event', event.name, 'parent', parent_event.name)
 
    event.parent_idx = parent_event_idx;
 
@@ -242,7 +227,6 @@ export function Listener_assign_parent_event(TYPE_IDX, event_idx, parent_event_i
 
    // Store a reference of view back to listeners storage buffer. Can't have an index cause the view is tree buffer structure.
    event.view = parent_event.view.children.buffer[view_idx];
-   // console.log('<<<<<<<<<<<<<<<<<<< ', event, parent_event);
 
 
 }
@@ -308,7 +292,6 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
 
 
    // Remove event from the listeners storage buffer
-   // console.log('Set view children to null', event, )
    event.view = null;
 
    _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(event_idx);
@@ -747,14 +730,13 @@ function Check_child_events_recursive(view_children, point) {
       const child_evt = view_children.buffer[i];
       if (child_evt) {
 
-         const name = Mesh_buffer_get_mesh_name_byidx(child_evt.meshidx)
-         const mesh = Mesh_buffer_get_mesh_byidx(child_evt.meshidx)
+         // const name = Mesh_buffer_get_mesh_name_byidx(child_evt.meshidx)
+         // const mesh = Mesh_buffer_get_mesh_byidx(child_evt.meshidx)
 
          const bounding_box = Mesh_buffer_get_mesh_bounding_box(child_evt.meshidx);
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          const intersects = Intersection_point_rect(point, bounding_box);
-         // console.log(mesh.GetName(), 'intersects', intersects)
 
          if (intersects) {
 
@@ -780,7 +762,6 @@ function Check_child_events_recursive(view_children, point) {
       }
 
    }
-   console.log('-----------------------------------------')
    return null;
 }
 
@@ -841,8 +822,6 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
    // Case there is no prev elem from the current. Meaning it is already first in priority
    if(idx === INT_NULL) return;
 
-   if(buffer[idx]===null || buffer[idx]===undefined)
-      console.log()
 
    // Store the element to be shifted first
    const temp = {
@@ -919,15 +898,15 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
 
    if(last_prev_elem_idx === INT_NULL) return;
 
-   if(buffer[last_prev_elem_idx]===_ || buffer[last_prev_elem_idx]===null){
+   // if(buffer[last_prev_elem_idx]===_ || buffer[last_prev_elem_idx]===null){
 
-      console.log(
-         'last_prev_elem_idx', last_prev_elem_idx,
-         'buffer(of which the last_prev_elem_idx is taking of)', buffer,
-         'temp', temp,
-         _listeners_buffer_storage.buffer[TYPE_IDX]
-      );
-   }
+   //    console.log(
+   //       'last_prev_elem_idx', last_prev_elem_idx,
+   //       'buffer(of which the last_prev_elem_idx is taking of)', buffer,
+   //       'temp', temp,
+   //       _listeners_buffer_storage.buffer[TYPE_IDX]
+   //    );
+   // }
 
    if (!abort) {
 
@@ -938,8 +917,6 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
       _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[last_prev_elem_idx].event_idx].view = buffer[last_prev_elem_idx];
    }
 
-   
-   console.log()
 
    // TODO: Implement the parent_idx substitution
    // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[0].event_idx].parent_idx = ??????; 

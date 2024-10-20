@@ -2,7 +2,7 @@
 
 import { Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { GetSign } from "../../../Helpers/Helpers.js";
-import { Abs, Floor } from "../../../Helpers/Math/MathOperations.js";
+import { Abs, Floor, FloorArr2, Round, RoundArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Callback_animations_create } from "../../Animations/CallbackAnimations.js";
 import { Info_listener_dispatch_event } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { RegisterEvent } from "../../Events/Events.js";
@@ -28,21 +28,21 @@ const mouse = {
       xdiff: 0, ydiff: 0, // Mouse pos difference form previous pos (in pixels)
 
       GetPos(){
-         return [
+         return RoundArr2([
             this.x,
             this.y,
-         ];
+         ]);
       },
       GetDif(){
          return {
-            x:Floor(this.xdiff),
-            y:Floor(this.ydiff),
+            x:Round(this.xdiff),
+            y:Round(this.ydiff),
          };
       },
       GetPrevPos(){
          return {
-            x:this.xprev,
-            y:this.yprev,
+            x:Round(this.xprev),
+            y:Round(this.yprev),
          };
       },
       SetPos(x, y){
@@ -50,12 +50,12 @@ const mouse = {
          this.y = y;
       },
       SetDif(x, y){
-         this.xdiff = x;
-         this.ydiff = y;
+         this.xdiff = Round(x);
+         this.ydiff = Round(y);
       },
       SetPrevPos(x, y){
-         this.xprev = x;
-         this.yprev = y;
+         this.xprev = Round(x);
+         this.yprev = Round(y);
       },
       ResetPos(){
          this.x = 0;

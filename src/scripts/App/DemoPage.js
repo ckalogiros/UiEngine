@@ -1,57 +1,107 @@
 "use strict";
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
-import { Create_widget_button, Create_widget_close_btn, Create_widget_dropdown, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from "../Engine/Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx } from "../Engine/Core/MeshBuffer.js";
-import { View_build_group_from_root_mesh } from "../Engine/Core/MeshBufferViews.js";
+import { Create_widget_button, Create_widget_close_btn, Create_widget_dropdown, Create_widget_section, Create_widget_slider } from "../Engine/Core/CreateWidget.js";
+import { View_build_group_from_root_mesh } from "../Engine/Core/Views/MeshBufferViews.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs, Root_group_vbidx_view_view_get } from "../Engine/Core/Views/RootView.js";
-import { Debug_info_ui, Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
+import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs, Root_group_vbidx_view_get } from "../Engine/Core/Views/RootView.js";
+import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
 import { BLUEL, GREENL, GREY, WHITE, YELLOW } from "../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Dropdown_roots_set_root } from "../Engine/Drawables/Widgets/Widget_Dropdown.js";
-import { Slider_connect, Slider_set_listeners_priority } from "../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Listeners_set_priority, TEMP_LISTENERS } from "../Engine/Events/EventListeners.js";
+import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
 import { Renderqueue_set_active } from "../Engine/Renderers/Renderer/RenderQueue.js";
 import { Scene_camera_scroll_add, Scene_camera_scroll_set } from "../Engine/Scenes.js";
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from "../Graphics/Buffers/VertexBuffers.js";
-import { Gl_set_rgba } from "../Graphics/Buffers/VertexBuffersOps.js";
-import { Abs, CopyArr4 } from "../Helpers/Math/MathOperations.js";
+import { Abs } from "../Helpers/Math/MathOperations.js";
 import { AppReset } from "./App.js";
+import { Demo_animations, Demo_animations_with_slider_slope } from "./Demo/DemoAnimations.js";
 import { Demo_chain_link } from "./Demo/DemoChainLink.js";
-import { Create_ball_tail_glow_contols, Create_ball_tail_particles, Create_ball_tail_particles_contols, Create_glow_particles, Create_glow_particles_controls, Demo_all, Demo_ball_tail_2 } from "./Demo/DemoParticles.js";
-import { Elastic_collisions, Sattelite_rotation } from "./Demo/DemoPhysics.js";
-import { Demo_widgets_button, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from "./Demo/DemoWidgets.js";
+import { Create_comet_glow_contols, Create_comet_particles, Create_comet_noise_contols, Create_glow_particles, Create_glow_particles_controls, Create_smoke_particles, Create_smoke_particles_controls, } from "./Demo/DemoParticles.js";
+import { Create_elastic_collisions_controls, Elastic_collisions, Sattelite_rotation } from "./Demo/DemoPhysics.js";
+import { Demo_widgets_button, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from "./Demo/DemoWidgets.js";
 import { Game_snake } from "./Demo/Games/Snake/Snake.js";
+import { Slider_connect } from "../Engine/Drawables/Widgets/WidgetSlider.js";
 
 
 
 
 
-const page1_text = 'Demo Widgets';
-const page2_text = 'Demo Ball-Tail Particles';
-const page3_text = 'Demo Glow Particles';
-const page4_text = 'Demo Physics';
-const page5_text = 'Demo Physics - Chain Link';
-const page6_text = 'Demo - Snake';
+let bit = 0x1;
+const category_widgets = {name:'Widgets', id:bit};
+
+const category_particles = {name:'Particles', id:bit<<=0x1};
+const subcategory_comet = {name:'Comet', id:bit<<=0x1};
+const subcategory_glow = {name:'Glow', id:bit<<=0x1};
+const subcategory_smoke = {name:'Smoke', id:bit<<=0x1};
+
+const category_physics = {name:'Physics', id:bit<<=0x1};
+const subcategory_elastic_collisions = {name:'Elastic Collisions', id:bit<<=0x1};
+const subcategory_perimetric_rotation = {name:'Perimetric Rotation', id:bit<<=0x1};
+const subcategory_velocity_verlet = {name:'Velocity Verlet', id:bit<<=0x1};
+
+const category_animations = {name:'Animations', id:bit<<=0x1};
+const subcategory_animations1 = {name:'Animations1', id:bit<<=0x1};
+const subcategory_animations2 = {name:'Animations2', id:bit<<=0x1}; // 2048
+
+const category_games = {name:'In Practise', id:bit<<=0x1};
+const subcategory_snake = {name:'Snake', id:bit<<=0x1};
 
 
 
 
-export function Demo_page(create_demo_id = 2) {
+
+
+
+function Bind_menu_button(btn, params, any_id, id){
+
+   btn.Bind(
+      (params) => {
+
+         const demo_id = params.params.mnemonics.demo_id;
+
+         if((demo_id & any_id)===0){
+            
+            AppReset(); // Reset all 
+            Scene_camera_scroll_set(_, 0);
+
+            // Create new page
+            Demo_page(id);
+            params.params.mnemonics.demo_id = id;
+         }
+         return false;
+      }, _, {mnemonics:params.mnemonics}, _,
+   );
+}
 
 
 
 
-   
-   /*********************************************************************************************************************************************/
-   // Create Slider for controling the uniforms
-   
+
+
+
+
+
+
+const glow_slider_values = new Float32Array([0.36, 1, 0.12, 0.2, .48, .59, .19, 0.08, 0.4, 0.05, 0.05, 0.55]);
+const comet_noise_slider_values = new Float32Array([0, 0, 0, .12]);
+const comet_glow_slider_values = new Float32Array([0, 1, 0.03, 0.2]);
+
+
+
+export function Demo_page(create_demo_id = subcategory_comet.id) {
+// export function Demo_page(create_demo_id = 0x0) {
+
+   let comet_particles_struct = null;
+   let glow_particles_struct = null;
+   let smoke_particles_struct = null;
+   let ellastic_collisions_struct = null;
+
+
+      
    const slider_dim = [100, 12];
-
-   const shade_menu_btn = Create_widget_dropdown(_, `Shade`, [0, 0, 0], GREENL[5], GREY[3], WHITE, [6, 4], _, _, _, _, [8, 8]);
    // Create Slider for controling the uniform 'Distance'
    const slider_distance = Create_widget_slider(_, [0, 0, 10], slider_dim, GREY[3], _, 'Distance');
    // Create Slider for controling the uniform 'Smoothness'
@@ -59,59 +109,116 @@ export function Demo_page(create_demo_id = 2) {
    // Create Slider for controling the uniform 'Intensity'
    const slider_intensity = Create_widget_slider(_, [0, 0, 10], slider_dim, GREY[3], _, 'Intensity');
 
-   {
-      shade_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      shade_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      shade_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      shade_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      shade_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      shade_menu_btn.SetName('shade_menu_btn');
-      shade_menu_btn.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-      Dropdown_roots_set_root(shade_menu_btn, shade_menu_btn);
-      shade_menu_btn.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.PRIVATE, shade_menu_btn.mesh_bufferidx);
+
+
+
+
+
+
+
+
+   const pad = 10;
+
+   /****************************************************************************************************************************************************/
+   // Create the load demo button
+
+   const window_menu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [pad, pad], [0, 0, 0], [VIEWPORT.WIDTH/2 - pad-1, 0], TRANSPARENCY(GREY[5], 1.),);
+   window_menu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   window_menu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   window_menu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
+   window_menu.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true); // Create fake event so we can set the focus on any window_menu child.
+   window_menu.SetName('window_menu');
+
+
+
+
+   /*******************************************************************************************/
+   // Load menu button
+   const Load_menu_btn = Create_widget_button(_, 'Demos', _, [0, 0, 1], 20, GREENL[5], WHITE, [8, 8], .5);
+   Load_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   Load_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   Load_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+   // Load_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, Load_menu_btn.geom.dim[1]);
+   Load_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   window_menu.AddItem(Load_menu_btn);
+
+   // Setup Load Menu Panel callback on lod button click
+   const load_clbk_params = { 
+
+      menu_panel:null, // A pointer to the future created menu panel
+      Create_menu_items_clbk:Create_menu_items_demos,
+      mnemonics:{ demo_id:create_demo_id, }, // Remember variable values between different pages
+   }; 
+   
+   Load_menu_btn.Bind(
+      // Load_menu_callback,
+      Create_menu_popup,
+      _, load_clbk_params, _,
+   );
+
+
+
+
+
+
+   
+
+   
+   /*******************************************************************************************/
+   // Shade dropdown menu
+
+   const shade_menu_btn = Create_widget_dropdown(_, `Shade`, [0, 0, 0], GREENL[5], GREY[3], WHITE, [6, 4], _, _, _, _, [8, 8]);
+   shade_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   shade_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   shade_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   shade_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+   shade_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   shade_menu_btn.SetName('shade_menu_btn');
+   shade_menu_btn.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+   shade_menu_btn.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, shade_menu_btn.mesh_bufferidx, false);
+   Dropdown_roots_set_root(shade_menu_btn, shade_menu_btn);
    
    
-      
-      slider_distance.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider_distance.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      slider_distance.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
-      slider_distance.SetInitialValue(.11);
-      shade_menu_btn.AddToMenu(slider_distance);
-      
-      
-      
-      slider_smoothness.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,2);
-      slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,1);
-      slider_smoothness.SetInitialValue(.11);
-      shade_menu_btn.AddToMenu(slider_smoothness);
-      
-      
-      
-      slider_intensity.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,2);
-      slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,1);
-      slider_intensity.SetInitialValue(1.);
-      shade_menu_btn.AddToMenu(slider_intensity);
-   }
+
+   slider_distance.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   slider_distance.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   slider_distance.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
+   slider_distance.SetInitialValue(.5);
+   shade_menu_btn.AddToMenu(slider_distance);
+   slider_distance.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, shade_menu_btn.mesh_bufferidx, true);
+   
+   
+   
+   slider_smoothness.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,2);
+   slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,1);
+   slider_smoothness.SetInitialValue(.6);
+   shade_menu_btn.AddToMenu(slider_smoothness);
+   slider_smoothness.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, shade_menu_btn.mesh_bufferidx, true);
+   
+   
+   
+   slider_intensity.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,2);
+   slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,1);
+   slider_intensity.SetInitialValue(.6);
+   shade_menu_btn.AddToMenu(slider_intensity);
+   slider_intensity.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, shade_menu_btn.mesh_bufferidx, true);
 
 
-
-   let ball_tail_particles_struct = null;
-   let glow_particles_struct = null;
-
-
-
-
-
-
+   
 
    /*********************************************************************************************************************************************/
    // Create Demos Functions
 
-   if (create_demo_id === 1) { // Demos Widgets
+   let total_height = 80; 
+   const info_ui = Debug_info_ui_static(_, 0, total_height);
+   total_height += info_ui.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
-      let total_height = 80; // For the debug_info ui
+   /*****************************************************************************************************************************/
+   // Widgets
+   if (create_demo_id & category_widgets.id) { // Demos Widgets
+
       const pad = 50;
 
 
@@ -149,13 +256,11 @@ export function Demo_page(create_demo_id = 2) {
 
 
 
-      // Debug_info_ui_static();
 
-
-      const sections_all_vbidxs = Root_group_vbidx_view_view_get(sections.root_bufferidx)
-      const widgets_all_vbidxs = Root_group_vbidx_view_view_get(widgets.root_bufferidx)
-      const scroller_all_vbidxs = Root_group_vbidx_view_view_get(scroller.root_bufferidx)
-      const dp_all_vbidxs = Root_group_vbidx_view_view_get(dp.root_bufferidx)
+      const sections_all_vbidxs = Root_group_vbidx_view_get(sections.root_bufferidx)
+      const widgets_all_vbidxs = Root_group_vbidx_view_get(widgets.root_bufferidx)
+      const scroller_all_vbidxs = Root_group_vbidx_view_get(scroller.root_bufferidx)
+      const dp_all_vbidxs = Root_group_vbidx_view_get(dp.root_bufferidx)
 
       // Connect sliders to gfx program uniforms 
       Slider_connect(slider_distance, (params, slider_val) => {
@@ -199,162 +304,165 @@ export function Demo_page(create_demo_id = 2) {
          const dp_ubidx = Mesh_get_uniform_ubidx_from_name(dp.uniforms, 'u_rcorners');
          for(let i = 0; i <= dp_all_vbidxs.boundary; i++)
             Vertex_buffer_set_and_update_uniform(dp_all_vbidxs.buffer[i], dp_ubidx, slider_val, val_idx);
-
+         
       }, _);
-
+      
       Slider_connect(slider_intensity, (params, slider_val) => {
-
+         
          const val_idx = 2;
          // Find the ubidx
          const sections_ubidx = Mesh_get_uniform_ubidx_from_name(sections.uniforms, 'u_rcorners');
          for(let i = 0; i <= sections_all_vbidxs.boundary; i++)
             Vertex_buffer_set_and_update_uniform(sections_all_vbidxs.buffer[i], sections_ubidx, slider_val, val_idx);
-
+         
          const widgets_ubidx = Mesh_get_uniform_ubidx_from_name(widgets.uniforms, 'u_rcorners');
          for(let i = 0; i <= widgets_all_vbidxs.boundary; i++)
             Vertex_buffer_set_and_update_uniform(widgets_all_vbidxs.buffer[i], widgets_ubidx, slider_val, val_idx);
-
+         
          const scroller_ubidx = Mesh_get_uniform_ubidx_from_name(scroller.uniforms, 'u_rcorners');
          for(let i = 0; i <= scroller_all_vbidxs.boundary; i++)
             Vertex_buffer_set_and_update_uniform(scroller_all_vbidxs.buffer[i], scroller_ubidx, slider_val, val_idx);
-
+         
          const dp_ubidx = Mesh_get_uniform_ubidx_from_name(dp.uniforms, 'u_rcorners');
          for(let i = 0; i <= dp_all_vbidxs.boundary; i++)
             Vertex_buffer_set_and_update_uniform(dp_all_vbidxs.buffer[i], dp_ubidx, slider_val, val_idx);
-
+         
       }, _);
-
-   }
-   if (create_demo_id === 2) { // Demo Particles - Ball tail particles 
-
-      ball_tail_particles_struct  = Create_ball_tail_particles(_, 100, _, _, _, ROOT_WIDGETS.CREATE_ROOT, false);
-
-   }
-   if (create_demo_id === 3) { // Demo Particles - Glow particles 
-
-      glow_particles_struct  = Create_glow_particles(_, _, ROOT_WIDGETS.CREATE_ROOT, false);
-      Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, );
-
-   }
-   if (create_demo_id === 4) { // Demos Physics
       
-      let total_height = 60; // Fo the debug_info ui
-
-      total_height += Elastic_collisions([0, total_height]);
-
-
-      Sattelite_rotation([0, total_height * 2 + 100]);
-
-      // Debug_info_ui_static();
    }
-   if (create_demo_id === 5) { // Demos Physics - Chain link
+   /*****************************************************************************************************************************/
+   // Particles
+   else if (create_demo_id & (category_particles.id|subcategory_comet.id)) { // Demo Particles - Ball tail particles 
+
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_paricles_demo, subcategory_comet.id, window_menu);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
+
+      comet_particles_struct  = Create_comet_particles(0, total_height, _, _, _, ROOT_WIDGETS.CREATE_ROOT, false);
+
+      comet_particles_struct.controls_section = Create_comet_noise_contols(comet_particles_struct.noise_particles_buffer, TRANSPARENCY(GREY[1], .6), comet_noise_slider_values);
+      const comet_glow_contols = Create_comet_glow_contols(comet_particles_struct.glow_particles_buffer, TRANSPARENCY(GREY[1], .6), comet_glow_slider_values);
+      for(let i = 0; i < comet_glow_contols.length; i++){
+         // controls_section.push(comet_glow_contols[i]);
+         comet_particles_struct.controls_section.push(comet_glow_contols[i]);
+      }
       
-      let total_height = 60; // Space for the debug_info ui
-
-      const chain = Demo_chain_link();
-      // total_height += ;
-
-      // Debug_info_ui_static();
    }
-   if (create_demo_id === 6) { // Demos Physics - Chain link
+   else if (create_demo_id & subcategory_glow.id) { // Demo Particles - Glow particles 
       
-      let total_height = 60; // Space for the debug_info ui
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_paricles_demo, create_demo_id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
-      Game_snake();
+      glow_particles_struct  = Create_glow_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false);
+      // const o = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, );
 
-      // Debug_info_ui_static();
+      glow_particles_struct.controls_section = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, glow_slider_values);
+
+
    }
+   else if (create_demo_id & subcategory_smoke.id) { // Demos Particles - Smoke particles
+      
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_paricles_demo, create_demo_id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
+      smoke_particles_struct = Create_smoke_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false);
+      Create_smoke_particles_controls(smoke_particles_struct.emitter, );
+   }
+   /*****************************************************************************************************************************/
+   // Physics
+   else if (create_demo_id & (category_physics.id|subcategory_elastic_collisions.id)) { // Demos Physics
+      
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, subcategory_elastic_collisions.id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
+      ellastic_collisions_struct = Elastic_collisions(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false);
 
+   }
+   else if (create_demo_id & subcategory_perimetric_rotation.id) { // Demos Physics
+      
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, create_demo_id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
+      total_height += Sattelite_rotation(0, total_height);
 
+   }
+   else if (create_demo_id & subcategory_velocity_verlet.id) { // Demos Physics - Chain link
+      
+            
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, create_demo_id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
+      Demo_chain_link(_, total_height);
 
+   }
+   /*****************************************************************************************************************************/
+   // Animations
+   else if (create_demo_id & (category_animations.id|subcategory_animations1.id)) { // Demos Physics - Chain link
+      
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations1.id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
+      total_height += Demo_animations(0, total_height);
+      total_height += 20;
 
+   }
+   else if (create_demo_id & (subcategory_animations2.id)) { // Demos Physics - Chain link
+      
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations2.id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
+      Demo_animations_with_slider_slope(0, total_height);
 
+   }
+   else if (create_demo_id & (category_games.id|subcategory_snake.id)) { // Demos Physics - Snake
+      
+      Game_snake(total_height);
 
-   const pad = 10;
-
-   /****************************************************************************************************************************************************/
-   // Create the load demo button
-
-   const window_menu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [pad, pad], [0, 0, 0], [VIEWPORT.WIDTH/2 - pad-1, 0], TRANSPARENCY(GREY[5], 1.),);
-   window_menu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   window_menu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   window_menu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
-   window_menu.SetName('window_menu');
-
-
+   }
 
 
    /*******************************************************************************************/
-   // Load menu button
-   const Load_menu_btn = Create_widget_button(_, 'Load Demos', _, [0, 0, 1], 20, GREENL[5], WHITE, [8, 8], .5);
-   Load_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   Load_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   Load_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-   // Load_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, Load_menu_btn.geom.dim[1]);
-   Load_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   window_menu.AddItem(Load_menu_btn);
+   // Options menu button
+   
+   const options_menu_btn = Create_widget_button(_, 'Options', _, [0, 0, 1], 20, GREENL[5], WHITE, [8, 8], .5);
+   options_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   options_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   options_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+   // options_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, options_menu_btn.geom.dim[1]);
+   options_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   window_menu.AddItem(options_menu_btn);
 
    // Setup Load Menu Panel callback on lod button click
-   const load_clbk_params = { 
+   const options_clbk_params = { 
 
       menu_panel:null, // A pointer to the future created menu panel
-      mnemonics:{ demo_id:create_demo_id, }, // Remember variable values between different pages
+      mnemonics:{
+         demo_id:create_demo_id,
+         comet_noise_slider_values:comet_noise_slider_values,
+         comet_glow_slider_values:comet_glow_slider_values,
+         glow_slider_values:glow_slider_values,
+      }, // Remember variable values between different pages
+      comet_particles_struct:comet_particles_struct,
+      glow_particles_struct:glow_particles_struct,
+      smoke_particles_struct:smoke_particles_struct,
+      ellastic_collisions_struct:ellastic_collisions_struct,
    }; 
    
-   Load_menu_btn.Bind(
-      Load_menu_callback,
-      _, load_clbk_params, _,
+   options_menu_btn.Bind(
+      Options_menu_callback,
+      _, options_clbk_params, _,
    );
 
 
 
 
    /*******************************************************************************************/
-   // Options menu button
-   {
-
-      const options_menu_btn = Create_widget_button(_, 'Options', _, [0, 0, 1], 20, GREENL[5], WHITE, [8, 8], .5);
-      options_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      options_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      options_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-      // options_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, options_menu_btn.geom.dim[1]);
-      options_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      window_menu.AddItem(options_menu_btn);
-   
-      // Setup Load Menu Panel callback on lod button click
-      const options_clbk_params = { 
-   
-         menu_panel:null, // A pointer to the future created menu panel
-         mnemonics:{
-            demo_id:create_demo_id,
-            ball_tail_parameters:new Float32Array([0, 0, 0, .12]),
-            ball_glow_parameters:new Float32Array([0, 1, 0.03, 0.2]),
-            glow_parameters:new Float32Array([0.36, 1, 0.12, 0.2, .48, .59, .19, 0.08, 0.4, 0.05, 0.05, 0.55]),
-         }, // Remember variable values between different pages
-         ball_tail_particles_struct:ball_tail_particles_struct,
-         glow_particles_struct:glow_particles_struct,
-      }; 
-      
-      options_menu_btn.Bind(
-         Options_menu_callback,
-         _, options_clbk_params, _,
-      );
-   }
-
-   
-   /*******************************************************************************************/
    // Render Menu Bar
    {
       window_menu.AddItem(shade_menu_btn);
    
       window_menu.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
-      // window_menu.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, window_menu.mesh_bufferidx);
+      // window_menu.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      // window_menu.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
    
       window_menu.GenGfxCtx();
       window_menu.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENTY;
@@ -421,13 +529,19 @@ export function Demo_page(create_demo_id = 2) {
    }
 
 
+   // Set focus
+   Mesh_set_root_in_focus(info_ui.root_bufferidx);
+   Mesh_set_root_in_focus(window_menu.root_bufferidx);
+   // Mesh_set_root_in_focus(info_ui.root_bufferidx, info_ui.scroller_comp_idx);
+
 }
 
 
 
 
 
-function Load_menu_callback(params){
+/**This is a generic function for creating this type of menu. The menu items are created from a callback function passed in 'params' from the caller function */
+function Create_menu_popup(params){
 
    if (params.params.menu_panel !== null) return;
 
@@ -435,14 +549,20 @@ function Load_menu_callback(params){
       (VIEWPORT.WIDTH/2  >= 180) ? 180 : VIEWPORT.WIDTH/2 - 10, 
       (VIEWPORT.HEIGHT/2 >= 250) ? 250 : VIEWPORT.HEIGHT/2 - 10,
    ];
+
    let zpos = 10;
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section', );
+   
+   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section', );
    menu_panel.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0]/10);
    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    menu_panel.SetName('MenuLoadPanel');
+   
+   menu_panel.options = SECTION.VERTICAL|SECTION.INHERIT|SECTION.HORIZONTAL_CENTER;
+   // menu_panel.options = SECTION.VERTICAL|SECTION.INHERIT|SECTION.HORIZONTAL_CENTER|SECTION.EXPAND;
    
    params.params.menu_panel = menu_panel;
 
@@ -452,251 +572,35 @@ function Load_menu_callback(params){
 
 
 
-
    /*************************************************************************************************/
    // Menu Options
 
-   const feather = 2;
-   const rcorners = 8;
-   const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
-   const text_col = WHITE;
    const btn_col = TRANSPARENCY(GREY[1], .8);
-   const tr = .4;
 
    // Calculate dimentions for small width device
    const dif = Abs((VIEWPORT.WIDTH/2-10) - dim[0]);
    let log = (dif>0) ? Math.log(dif) : .2;
    (log > 1) ? log = 1 : log = log;
-   const pad = (20 * log);
+   const pad = (20 * log)
 
-   let ypos = 100;
+   // let ypos = 100;
+
+
+
+   // Setup Load Menu Panel callback on lod button click
+   const load_clbk_params = { 
+      mnemonics:params.params.mnemonics, // Remember variable values between different pages
+   };
+   const menu_items = params.params.Create_menu_items_clbk(load_clbk_params);
+   const len = menu_items.length;
+   for(let i=0; i<len; i++){
+
+      menu_panel.AddItem(menu_items[i]); 
+   }
+
+
    
 
-   /*******************************************************************************************/
-   // Load Demo Button
-   const page1_btn = Create_widget_button(_, page1_text, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, [0, rcorners, 1.8], font);
-   page1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   page1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   page1_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   page1_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
-   menu_panel.AddItem(page1_btn);
-
-   page1_btn.Bind(
-      (params) => {
-
-         Callback_animations_create( // Scroll Up
-            (params) => { // Run Animation
-               
-               const demo_id = params.mnemonics.demo_id;
-
-               if(demo_id !== 1){
-                  
-                  AppReset(); // Reset all 
-                  Scene_camera_scroll_set(_, 0);
-
-                  // Create new page
-                  Demo_page(1);
-                  params.mnemonics.demo_id = 1;
-               }
-               return false;
-            },
-            () => { // Stop Animation
-               return false;
-            },
-            {mnemonics:params.params.mnemonics},
-         );
-      },
-      _, {mnemonics:params.params.mnemonics}, _,
-   );
-
-   /*******************************************************************************************/
-   // Page 2 button
-   const page2_btn = Create_widget_button(_, page2_text, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, [0, rcorners, 1.8], font);
-   page2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   page2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   page2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   page2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
-   menu_panel.AddItem(page2_btn);
-
-   page2_btn.Bind(
-      (params) => {
-
-         Callback_animations_create( // Scroll Up
-            (params) => { // Run Animation
-               
-               const demo_id = params.mnemonics.demo_id;
-
-               if(demo_id !== 2){
-                  
-                  AppReset(); // Reset all 
-                  Scene_camera_scroll_set(_, 0);
-
-                  // Create new page
-                  Demo_page(2);
-                  params.mnemonics.demo_id = 2;
-               }
-               return false;
-            },
-            () => { // Stop Animation
-               return false;
-            },
-            {mnemonics:params.params.mnemonics},
-         );
-      },
-      _, {mnemonics:params.params.mnemonics}, _,
-   );
-
-
-   /*******************************************************************************************/
-   // Page 3 button
-   const page3_btn = Create_widget_button(_, page3_text, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, [0, rcorners, 1.8], font);
-   page3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   page3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   page3_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   page3_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
-   menu_panel.AddItem(page3_btn);
-
-   page3_btn.Bind(
-      (params) => {
-
-         Callback_animations_create( // Scroll Up
-            (params) => { // Run Animation
-               
-               const demo_id = params.mnemonics.demo_id;
-
-               if(demo_id !== 3){
-                  
-                  AppReset(); // Reset all 
-                  Scene_camera_scroll_set(_, 0);
-
-                  // Create new page
-                  Demo_page(3);
-                  params.mnemonics.demo_id = 3;
-               }
-               return false;
-            },
-            () => { // Stop Animation
-               return false;
-            },
-            {mnemonics:params.params.mnemonics},
-         );
-      },
-      _, {mnemonics:params.params.mnemonics}, _,
-   );
-
-
-   /*******************************************************************************************/
-   // Page 4 button
-   const page4_btn = Create_widget_button(_, page4_text, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, [0, rcorners, 1.8], font);
-   page4_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   page4_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   page4_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   page4_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
-   menu_panel.AddItem(page4_btn);
-
-   page4_btn.Bind(
-      (params) => {
-
-         Callback_animations_create( // Scroll Up
-            (params) => { // Run Animation
-               
-               const demo_id = params.mnemonics.demo_id;
-
-               if(demo_id !== 4){
-                  
-                  AppReset(); // Reset all 
-                  Scene_camera_scroll_set(_, 0);
-
-                  // Create new page
-                  Demo_page(4);
-                  params.mnemonics.demo_id = 4;
-               }
-               return false;
-            },
-            () => { // Stop Animation
-               return false;
-            },
-            {mnemonics:params.params.mnemonics},
-         );
-      },
-      _, {mnemonics:params.params.mnemonics}, _,
-   );
-
-
-   /*******************************************************************************************/
-   // Page 5 button
-   const page5_btn = Create_widget_button(_, page5_text, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, [0, rcorners, 1.8], font);
-   page5_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   page5_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   page5_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   page5_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
-   menu_panel.AddItem(page5_btn);
-
-   page5_btn.Bind(
-      (params) => {
-
-         Callback_animations_create( // Scroll Up
-            (params) => { // Run Animation
-               
-               const demo_id = params.mnemonics.demo_id;
-
-               if(demo_id !== 5){
-                  
-                  AppReset(); // Reset all 
-                  Scene_camera_scroll_set(_, 0);
-
-                  // Create new page
-                  Demo_page(5);
-                  params.mnemonics.demo_id = 5;
-               }
-               return false;
-            },
-            () => { // Stop Animation
-               return false;
-            },
-            {mnemonics:params.params.mnemonics},
-         );
-      },
-      _, {mnemonics:params.params.mnemonics}, _,
-   );
-
-
-   /*******************************************************************************************/
-   // Page 6 button
-   const page6_btn = Create_widget_button(_, page6_text, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, [0, rcorners, 1.8], font);
-   page6_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   page6_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   page6_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   page6_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
-   menu_panel.AddItem(page6_btn);
-
-   page6_btn.Bind(
-      (params) => {
-
-         Callback_animations_create( // Scroll Up
-            (params) => { // Run Animation
-               
-               const demo_id = params.mnemonics.demo_id;
-
-               if(demo_id !== 6){
-                  
-                  AppReset(); // Reset all 
-                  Scene_camera_scroll_set(_, 0);
-
-                  // Create new page
-                  Demo_page(6);
-                  params.mnemonics.demo_id = 6;
-               }
-               return false;
-            },
-            () => { // Stop Animation
-               return false;
-            },
-            {mnemonics:params.params.mnemonics},
-         );
-      },
-      _, {mnemonics:params.params.mnemonics}, _,
-   );
 
 
    /*******************************************************************************************/
@@ -708,22 +612,16 @@ function Load_menu_callback(params){
    close_btn.SetName('close_btn');         
    menu_panel.AddItem(close_btn);
 
-   // Must recalculate all children meshes position offsets
-   page1_btn.MoveNoGfxUpdate(dim[0] - page1_btn.geom.dim[0], ypos); ypos += page1_btn.geom.dim[1]*2 + 10;
-   page2_btn.MoveNoGfxUpdate(dim[0] - page2_btn.geom.dim[0], ypos ); ypos += page2_btn.geom.dim[1]*2 + 10;
-   page3_btn.MoveNoGfxUpdate(dim[0] - page3_btn.geom.dim[0], ypos ); ypos += page3_btn.geom.dim[1]*2 + 10;
-   page4_btn.MoveNoGfxUpdate(dim[0] - page4_btn.geom.dim[0], ypos ); ypos += page4_btn.geom.dim[1]*2 + 10;
-   page5_btn.MoveNoGfxUpdate(dim[0] - page5_btn.geom.dim[0], ypos ); ypos += page5_btn.geom.dim[1]*2 + 10;
-   page6_btn.MoveNoGfxUpdate(dim[0] - page6_btn.geom.dim[0], ypos ); ypos += page6_btn.geom.dim[1]*2 + 10;
-   close_btn.MoveNoGfxUpdate(dim[0] - close_btn.geom.dim[0] , dim[1]*2-close_btn.geom.dim[1]*2-pad);
 
-
-
-
+   
+   
    /*************************************************************************************************/
-   // Render Section 
-   menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx);
+   // Render Menu 
+   menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
+   menu_panel.Calc_no_gfx_update();
+   // close_btn.MoveNoGfxUpdate( 0, dim[1]*2-close_btn.geom.dim[1]*2-pad);
+   close_btn.MoveNoGfxUpdate( 0, (dim[1]*2) - (close_btn.GetPosY()-menu_panel.GetPosY()));
    menu_panel.Render();
    
 
@@ -731,26 +629,171 @@ function Load_menu_callback(params){
    Construct_listen_events_from_mesh_tree(menu_panel);
    Construct_listen_events_relations_from_mesh_tree(menu_panel);
    
-   
    menu_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, menu_panel.gfx.vb.groupidx);
-   
-   
-   
 
    // Set menu in focus
    Mesh_set_root_in_focus(menu_panel.root_bufferidx, menu_panel.scroller_comp_idx);
 
 
-   // Create event callback for when the close menu button has been pressed
+   // Create event callback for the close menu button
    const evt_clbk_params = {
       evt_clbks: ()=>{ params.params.menu_panel = null; }, 
    }
 
    menu_panel.CreateEventCallback(evt_clbk_params);
-
 }
 
 
+
+/**This is a generic function for creating this type of menu. The menu items are created from a callback function passed in 'params' from the caller function */
+function Create_menu_horizontal_buttons(x=0, y=0, Create_menu_items_callback, demo_id, parent_menu){
+
+
+   const dim = [
+      (VIEWPORT.WIDTH/2  >= 180) ? 180 : VIEWPORT.WIDTH/2 - 10, 
+      (VIEWPORT.HEIGHT/2 >= 250) ? 250 : VIEWPORT.HEIGHT/2 - 10,
+   ];
+
+   let zpos = 10;
+   
+   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 10], [0,0], TRANSPARENCY(GREENL[5], .9), 'section', );
+   menu_panel.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
+   menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+   menu_panel.SetName('MenuLoadPanel');
+   
+   menu_panel.options = SECTION.HORIZONTAL|SECTION.INHERIT|SECTION.RESIZE_PARENT;
+   
+   zpos++;
+
+
+
+
+   /*************************************************************************************************/
+   // Menu Options
+
+   // Setup Load Menu Panel callback on lod button click
+   const params = { 
+
+      menu_panel:menu_panel, // A pointer to the future created menu panel
+      mnemonics:{ demo_id:demo_id, }, // Remember variable values between different pages
+   }; 
+   const menu_items = Create_menu_items_callback(params, demo_id);
+   const len = menu_items.length;
+   for(let i=0; i<len; i++){
+
+      // menu_items[i].GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, parent_menu.mesh_bufferidx, true);
+      menu_panel.AddItem(menu_items[i]); 
+   }
+
+
+
+   
+   
+   /*************************************************************************************************/
+   // Render Menu 
+   menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
+   menu_panel.GenGfxCtx();
+   menu_panel.Calc_no_gfx_update();
+   menu_panel.Render();
+
+   Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
+   Construct_listen_events_from_mesh_tree(menu_panel);
+   Construct_listen_events_relations_from_mesh_tree(menu_panel);
+   
+   menu_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, menu_panel.gfx.vb.groupidx);
+
+
+   return menu_panel;
+}
+
+
+
+/**This is the callback function to create specific menu items. */
+function Create_menu_items_demos(params){
+
+
+   const menu_items_array = [];
+
+   /*************************************************************************************************/
+   // Menu Items
+
+   const feather = 2;
+   const rcorners = 8;
+   const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
+   const text_col = WHITE;
+   const btn_col = TRANSPARENCY(GREY[1], .8);
+
+
+   /*******************************************************************************************/
+   // Button 1
+   const button1 = Create_widget_button(_, category_widgets.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   button1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   button1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   button1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   button1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(button1);
+
+   Bind_menu_button(button1, params, category_widgets.id, category_widgets.id);
+ 
+
+
+   /*******************************************************************************************/
+   // Button 2
+   const button2 = Create_widget_button(_, category_particles.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   button2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   button2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   button2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   button2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(button2);
+   
+   Bind_menu_button(button2, params, (category_particles.id|subcategory_comet.id|subcategory_glow.id|subcategory_smoke.id), subcategory_comet.id);
+
+
+
+   /*******************************************************************************************/
+   // Button 3
+   const button3 = Create_widget_button(_, category_physics.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   button3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   button3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   button3.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   button3.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(button3);
+
+   Bind_menu_button(button3, params, (category_physics.id|subcategory_elastic_collisions.id|subcategory_perimetric_rotation.id|subcategory_velocity_verlet.id), category_physics.id);
+
+
+
+   /*******************************************************************************************/
+   // Button 4
+   const button4 = Create_widget_button(_, category_animations.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   button4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   button4.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   button4.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   button4.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(button4);
+
+   Bind_menu_button(button4, params, (category_animations.id|subcategory_animations1.id), category_animations.id);
+
+
+
+   /*******************************************************************************************/
+   // Button 5
+   const button5 = Create_widget_button(_, category_games.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   button5.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   button5.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   button5.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(button5);
+   
+   Bind_menu_button(button5, params, (category_games.id), category_games.id);
+
+
+
+   return menu_items_array;
+}
 
 
 
@@ -770,7 +813,7 @@ function Options_menu_callback(params){
    // Menu Options
 
    const btn_col = TRANSPARENCY(GREY[1], .8);
-   const tr = .4;
+   const tr = .7;
    
    // Calculate dimentions for small width device
    const dif = Abs((VIEWPORT.WIDTH/2-10) - dim[0]);
@@ -783,12 +826,12 @@ function Options_menu_callback(params){
 
 
    const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[3], tr), 'section', );
-   // menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    menu_panel.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0]/10);
    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    menu_panel.SetName('MenuOptionsPanel');
    
    params.params.menu_panel = menu_panel;
@@ -796,12 +839,11 @@ function Options_menu_callback(params){
 
    let controls_section = null;
 
-   // Create demo pages options menu that has unique controls per page
-   if(demo_id === 2)
+
+   // Create items for the menu 'options'.
+   if(demo_id & subcategory_comet.id)
    {
 
-      
-      const slider_dim = [120*DEVICE.device_scale, 10*DEVICE.device_scale];
       const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection', );
       slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
@@ -817,46 +859,52 @@ function Options_menu_callback(params){
       
       /****************************************************************************************************************/
       // 
-      // const controls_section  = params.params.ball_tail_particles_struct.controls_section;
-      const ball_tail_glow  = params.params.ball_tail_particles_struct.glow_particles_buffer;
-      const ball_tail_noise = params.params.ball_tail_particles_struct.tail_particles_buffer;
-      const ball_tail_parameters = params.params.mnemonics.ball_tail_parameters;
-      const ball_tail_noise_contols = Create_ball_tail_particles_contols(ball_tail_noise, TRANSPARENCY(GREY[2], tr), ball_tail_parameters);
-      const ball_glow_parameters = params.params.mnemonics.ball_glow_parameters;
+      const comet_glow  = params.params.comet_particles_struct.glow_particles_buffer;
+      const comet_noise = params.params.comet_particles_struct.noise_particles_buffer;
+      const comet_noise_slider_values = params.params.mnemonics.comet_noise_slider_values;
+      const comet_glow_slider_values = params.params.mnemonics.comet_glow_slider_values;
       
-      for(let i = 0; i < ball_tail_noise_contols.length; i++){
-         slider_section.AddItem(ball_tail_noise_contols[i]);
+      let comet_contols = params.params.comet_particles_struct.controls_section;
+      
+      const scale_down = .2;
+      const comet_slider_values = params.params.mnemonics.glow_slider_values;
+
+      if(comet_contols === null){
+         comet_contols = Create_comet_noise_contols(comet_noise, TRANSPARENCY(GREY[1], .6), comet_noise_slider_values);
+         const comet_glow_contols = Create_comet_glow_contols(comet_glow, TRANSPARENCY(GREY[1], .6), comet_glow_slider_values, scale_down);
+         for(let i = 0; i < comet_glow_contols.length; i++){
+            comet_contols.push(comet_glow_contols[i]);
+         }
       }
-      
-      
-      const ball_tail_glow_contols = Create_ball_tail_glow_contols(ball_tail_glow, _, ball_glow_parameters);
-      for(let i = 0; i < ball_tail_glow_contols.length; i++){
-         slider_section.AddItem(ball_tail_glow_contols[i]);
+
+      const len = comet_contols.length;
+      for(let i = 0; i < len; i++){
+         slider_section.AddItem(comet_contols[i]);
       }
       
       
       menu_panel.AddItem(slider_section);
       
       slider_section.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
-      slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC,);
+      slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
+      // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
       slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE ;
       slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW ;
       
       controls_section = slider_section;
       
    }
-   if(demo_id === 3)
+   if(demo_id & subcategory_glow.id)
    {
 
       const emitter  = params.params.glow_particles_struct.emitter;
-      const controls  = params.params.glow_particles_struct.controls_section;
+      let glow_particles_contols  = params.params.glow_particles_struct.controls_section;
       
       const u_wpos_flags = {
          unif: SID.UNIF.ROOT_WPOS2,
          pass: SID.PASS.WPOS2,
       }
       
-      const slider_dim = [120*DEVICE.device_scale, 10*DEVICE.device_scale];
       const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection', );
       slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -866,8 +914,10 @@ function Options_menu_callback(params){
       
       
       const scale_down = .2;
-      const glow_parameters = params.params.mnemonics.glow_parameters;
-      const glow_particles_contols = Create_glow_particles_controls(emitter, scale_down, _, glow_parameters);
+      const glow_slider_values = params.params.mnemonics.glow_slider_values;
+      if(glow_particles_contols === null){
+         glow_particles_contols = Create_glow_particles_controls(emitter, scale_down, _, glow_slider_values);
+      }
       for(let i = 0; i < glow_particles_contols.length; i++){
          slider_section.AddItem(glow_particles_contols[i]);
       }
@@ -877,7 +927,85 @@ function Options_menu_callback(params){
       menu_panel.AddItem(slider_section);
 
       slider_section.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
-      slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC,);
+      slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
+      // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
+      slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE ;
+      slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW ;
+
+
+      controls_section = slider_section;
+
+   }
+   if(demo_id & subcategory_smoke.id)
+   {
+
+      const emitter  = params.params.smoke_particles_struct.emitter;
+      const controls  = params.params.smoke_particles_struct.controls_section;
+      
+      const u_wpos_flags = {
+         unif: SID.UNIF.ROOT_WPOS2,
+         pass: SID.PASS.WPOS2,
+      }
+      
+      const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection', );
+      slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      
+      
+      
+      const scale_down = .2;
+      const glow_slider_values = params.params.mnemonics.glow_slider_values;
+      const glow_particles_contols = Create_smoke_particles_controls(emitter, );
+      for(let i = 0; i < glow_particles_contols.length; i++){
+         slider_section.AddItem(glow_particles_contols[i]);
+      }
+
+
+
+      menu_panel.AddItem(slider_section);
+
+      slider_section.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
+      slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
+      // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
+      slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE ;
+      slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW ;
+
+
+      controls_section = slider_section;
+
+   }
+   if(demo_id & subcategory_elastic_collisions.id)
+   {
+
+      const ellastic_collisions_balls  = params.params.ellastic_collisions_struct.ellastic_collisions_balls;
+      const mnemonics  = params.params.ellastic_collisions_struct.mnemonics;
+      
+      const u_wpos_flags = {
+         unif: SID.UNIF.ROOT_WPOS2,
+         pass: SID.PASS.WPOS2,
+      }
+      
+      const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection', );
+      slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      
+      const ell_coll_params = {
+         mnemonics: mnemonics,
+      }
+      const contols = Create_elastic_collisions_controls(ellastic_collisions_balls, GREY[2], [mnemonics.scale_down, .2], ell_coll_params)
+      for(let i = 0; i < contols.length; i++){
+         slider_section.AddItem(contols[i]);
+      }
+
+
+
+      menu_panel.AddItem(slider_section);
+
+      slider_section.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
+      slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
+      // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
       slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE ;
       slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW ;
 
@@ -888,38 +1016,37 @@ function Options_menu_callback(params){
    
    
    /*******************************************************************************************/
-   // Close button
+   // Create close button
    const close_btn = Create_widget_close_btn(_, menu_panel, 'CLOSE', [0, 0, zpos], 30, btn_col, WHITE, [dim[0]/2-pad*2, 6], _, _, _);
    close_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    close_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    close_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, close_btn.geom.dim[1]);
-   close_btn.SetName('close_btn');         
+   close_btn.SetName('close_btn');   
+   close_btn.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
+   // close_btn.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, menu_panel.mesh_bufferidx, true);
    menu_panel.AddItem(close_btn);
 
-
-
-   close_btn.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET,);
-
-   
    // Must recalculate all children meshes position offsets
    close_btn.MoveNoGfxUpdate(dim[0] - close_btn.geom.dim[0] , dim[1]*2-close_btn.geom.dim[1]*2-pad);
    
-
-
+   
 
    /*************************************************************************************************/
    // Render Section 
-   menu_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC);
-
+   menu_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, false);
+   // menu_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, menu_panel.mesh_bufferidx, false);
+   menu_panel.GenGfxCtx();
+   
+   // Build a group view of the scrolled section for the scroller
    if(controls_section !== null) {
 
       View_build_group_from_root_mesh(controls_section);
       controls_section.Calc_no_gfx_update();
       const center = (menu_panel.geom.dim[0] - controls_section.geom.dim[0]);
       controls_section.MoveNoGfxUpdate(center, ypos); ypos += controls_section.geom.dim[1]*2 + 10;
+
    }
-
-
+   
    menu_panel.Render();
 
    Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
@@ -934,48 +1061,240 @@ function Options_menu_callback(params){
    
 
    // Create scroller
-   const needs_scroller = true; // TODO: Create scroller if needed
-   if(controls_section !== null){ 
+   const clean_height = menu_panel.geom.dim[1] - (close_btn.geom.dim[1]*2 + 10);
+   const needs_scroller = (controls_section !== null) 
+                        ? (controls_section.geom.dim[1] > clean_height) ? true : false 
+                        : false;
+   if(needs_scroller){ 
 
 
-      const scroller_height = menu_panel.geom.dim[1]   - (close_btn.geom.dim[1]*2 + 10);
-      // const scroller_height = 100;
+      const scroller_height = menu_panel.geom.dim[1] - (close_btn.geom.dim[1]*2 + 10);
       const scroller_component = Components_create_scroller_component(10, scroller_height, controls_section, 100);
-      Scoller_component_gengfx_and_render(scroller_component, controls_section);
+      Scoller_component_gengfx_and_render(scroller_component, controls_section, GFX_CTX_FLAGS.ABSOLUTE_POSITION);
       Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(controls_section.root_posidx, scroller_component.root_posidx);
       Listeners_set_priority(E.C, scroller_component.listeners);
       menu_panel.AddChildScrollerIdx(controls_section.scroller_comp_idx);
 
-      // controls_section.Calc_no_gfx_update();
       Scroller_component_calculate_handle_pos_dim(controls_section, scroller_component);
    
+
+      /**************************************************************************************************************************/
       // Set scissor box
       const mx = controls_section.mesh_bufferidx;
       const my = scroller_component.mesh_bufferidx;
       const mw = controls_section.mesh_bufferidx;
       const mh = scroller_component.mesh_bufferidx;
       Vertex_buffer_group_create_scissorbox(controls_section.gfx.vb.groupidx, mx, my, mw, mh);
-      // Vertex_buffer_group_create_scissorbox(label_text_mesh.gfx.vb.groupidx, mx, my, mw, mh);
-   
    
       // Unfortunately must Re-render the menu_panel for the clipping of the scroller to take place
       Root_group_reset_gfxs(controls_section.root_bufferidx);
       Root_group_rerender_from_root_reconstruct_listeners(controls_section.root_bufferidx);
 
       Renderqueue_set_active(scroller_component.gfx.vb.groupidx, true);
+
    }
 
 
 
 
    // Set menu in focus
-   Mesh_set_root_in_focus(menu_panel.root_bufferidx);
+   Mesh_set_root_in_focus(menu_panel.root_bufferidx, menu_panel.scroller_comp_idx);
 
 
    // Create event callback for the close menu button to run
    const evt_clbk_params = {
-      evt_clbks: ()=>{ params.params.menu_panel = null; }, 
+      evt_clbks: ()=>{ 
+         params.params.menu_panel = null; 
+         if(params.params.glow_particles_struct !== null)
+            params.params.glow_particles_struct.controls_section = null; 
+         if(params.params.comet_particles_struct !== null) 
+            params.params.comet_particles_struct.controls_section = null; 
+      }, 
    }
 
    menu_panel.CreateEventCallback(evt_clbk_params);
 }
+
+
+
+/*************************************************************************************************************************************************************/
+/*************************************************************************************************************************************************************/
+// Dedicated Functions For Creating Items For The Menus
+
+function Create_menu_items_paricles_demo(params, demo_id){
+
+   // if (params.menu_panel !== null) return;
+   
+   const menu_items_array = [];
+
+   /*************************************************************************************************/
+   // Menu Items
+
+   const feather = 2;
+   const rcorners = 8;
+   const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
+   const text_col = WHITE;
+
+   
+   
+   /*******************************************************************************************/
+   // Item 1 button
+   const c1 = (demo_id & subcategory_comet.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item2_btn = Create_widget_button(_, subcategory_comet.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
+   item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item2_btn);
+
+   Bind_menu_button(item2_btn, params, (subcategory_comet.id), subcategory_comet.id);
+
+
+
+   /*******************************************************************************************/
+   // Item 2 button
+   const c2 = (demo_id & subcategory_glow.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item3_btn = Create_widget_button(_, subcategory_glow.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item3_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item3_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item3_btn);
+   Bind_menu_button(item3_btn, params, (subcategory_glow.id), subcategory_glow.id);
+
+
+   
+   /*******************************************************************************************/
+   //  Item 3 button
+   const c3 = (demo_id & subcategory_smoke.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item4_btn = Create_widget_button(_, subcategory_smoke.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
+   item4_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item4_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item4_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item4_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item4_btn);
+   Bind_menu_button(item4_btn, params, (subcategory_smoke.id), subcategory_smoke.id);
+
+
+
+   return menu_items_array;
+}
+
+
+
+function Create_menu_items_physics_demo(params, demo_id){
+
+   // if (params.menu_panel !== null) return;
+   
+   const menu_items_array = [];
+
+   /*************************************************************************************************/
+   // Menu Items
+
+   const feather = 2;
+   const rcorners = 8;
+   const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
+   const text_col = WHITE;
+
+   
+   
+   /*******************************************************************************************/
+   // Item 1 button
+   const c1 = (demo_id & subcategory_elastic_collisions.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item1_btn = Create_widget_button(_, subcategory_elastic_collisions.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
+   item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item1_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item1_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item1_btn);
+   Bind_menu_button(item1_btn, params, (subcategory_elastic_collisions.id), subcategory_elastic_collisions.id);
+
+
+
+   /*******************************************************************************************/
+   // Item 2 button
+   const c2 = (demo_id & subcategory_perimetric_rotation.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item2_btn = Create_widget_button(_, subcategory_perimetric_rotation.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item2_btn);
+   Bind_menu_button(item2_btn, params, (subcategory_perimetric_rotation.id), subcategory_perimetric_rotation.id);
+
+
+   
+   /*******************************************************************************************/
+   //  Item 3 button
+   const c3 = (demo_id & subcategory_velocity_verlet.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item3_btn = Create_widget_button(_, subcategory_velocity_verlet.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
+   item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item3_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item3_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item3_btn);
+   Bind_menu_button(item3_btn, params, (subcategory_velocity_verlet.id), subcategory_velocity_verlet.id);
+
+
+
+
+
+   return menu_items_array;
+}
+
+
+
+function Create_menu_items_animations_demo(params, demo_id){
+
+   // if (params.menu_panel !== null) return;
+   
+   const menu_items_array = [];
+
+   /*************************************************************************************************/
+   // Menu Items
+
+   const feather = 2;
+   const rcorners = 8;
+   const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
+   const text_col = WHITE;
+
+   
+   
+   /*******************************************************************************************/
+   // Item 1 button
+   const c1 = (demo_id & subcategory_animations1.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item1_btn = Create_widget_button(_, subcategory_animations1.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
+   item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item1_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item1_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item1_btn);
+   Bind_menu_button(item1_btn, params, (category_animations.id|subcategory_animations1.id), subcategory_animations1.id);
+   
+   
+   /*******************************************************************************************/
+   // Item 1 button
+   const c2 = (demo_id & subcategory_animations2.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item2_btn = Create_widget_button(_, subcategory_animations1.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item2_btn);
+   Bind_menu_button(item2_btn, params, (subcategory_animations2.id), subcategory_animations2.id);
+
+
+
+
+
+
+
+   return menu_items_array;
+}
+
+
+
+
+
+
+

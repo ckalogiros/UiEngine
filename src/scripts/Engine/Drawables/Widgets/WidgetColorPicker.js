@@ -51,22 +51,22 @@ export class Widget_Color_Picker extends Section {
    label_g;
    label_b;
    label_a;
-   
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin, pos, dim=[100, 100], col=GREY[1], name = 'Color Picker', style=[0, 10, 2], num_faces, is_debug_mesh) {
-      
+
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin, pos, dim = [100, 100], col = GREY[1], name = 'Color Picker', style = [0, 10, 2], num_faces, is_debug_mesh) {
+
 
       const scale = .6;
       style[1] = 15
-      
-      if(col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, [margin[0]*scale, margin[1]*scale], pos, [dim[0]*scale, dim[1]*scale], col, name, style, num_faces, _, is_debug_mesh);
-      
-      
+
+      if (col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, [margin[0] * scale, margin[1] * scale], pos, [dim[0] * scale, dim[1] * scale], col, name, style, num_faces, _, is_debug_mesh);
+
+
       // Multi color vertex
       this.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       this.options |= SECTION.RESIZE_PARENT;
 
-      this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
 
       this.label_r = null;
@@ -82,7 +82,7 @@ export class Widget_Color_Picker extends Section {
       /******************************************************************************/
       // Create panel to align further meshes
       style[1] = 10;
-      const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10*scale, 10*scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
+      const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10 * scale, 10 * scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
       panel.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel.options |= SECTION.RESIZE_PARENT;
       panel_idx = this.AddItem(panel)
@@ -95,7 +95,7 @@ export class Widget_Color_Picker extends Section {
       /******************************************************************************/
       // Create the color picker panel
       // const color_pick = Create_rect_mesh(_, [20, 20, 2], [150*scale, 150*scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
-      const color_pick = Create_rect_mesh(_, [0, 0, 2], [150*scale, 150*scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
+      const color_pick = Create_rect_mesh(_, [0, 0, 2], [150 * scale, 150 * scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
       color_pick.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       // color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
@@ -106,7 +106,7 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create panel for the color presentation and info labels
-      const panel2 = Create_widget_section(_, SECTION.VERTICAL, [10*scale, 10*scale], [0, 0, 1], _, [BLACK, BLACK, BLACK, BLACK], 'Inner Panel 1', style, 1, _, is_debug_mesh);
+      const panel2 = Create_widget_section(_, SECTION.VERTICAL, [10 * scale, 10 * scale], [0, 0, 1], _, [BLACK, BLACK, BLACK, BLACK], 'Inner Panel 1', style, 1, _, is_debug_mesh);
       panel2.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel2.options |= SECTION.RESIZE_PARENT;
       panel2.StylesSetMargin([10, 0]);
@@ -117,17 +117,17 @@ export class Widget_Color_Picker extends Section {
       /******************************************************************************/
       // Create the color present mesh
       // const color_present_mesh = Create_rect_mesh(_, [20, 20, 2], [80*scale, 60*scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
-      const color_present_mesh = Create_rect_mesh(_, [0, 0, 2], [80*scale, 60*scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
+      const color_present_mesh = Create_rect_mesh(_, [0, 0, 2], [80 * scale, 60 * scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
       color_present_mesh.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       color_present_mesh.StylesSetMargin([0, 0]);
 
-      this.color_pick_click_pos = [color_pick.geom.dim[0]*2, 0];
+      this.color_pick_click_pos = [color_pick.geom.dim[0] * 2, 0];
       color_present_idx = panel2.AddItem(color_present_mesh);
 
 
-      const fontsize = 10*scale*1.2;
-      const label_pad = [10*scale*scale, 6*scale*scale];
-      const label_style = [10*scale, 0, 1.2];
+      const fontsize = 10 * scale * 1.2;
+      const label_pad = [10 * scale * scale, 6 * scale * scale];
+      const label_style = [10 * scale, 0, 1.2];
 
       /******************************************************************************/
       // Create Label Info meshes
@@ -185,13 +185,13 @@ export class Widget_Color_Picker extends Section {
       // Create the tranparency slider
 
       const TRANSPARENCY_BAR_COLOR = [
-         GREY[3], 
+         GREY[3],
          RED[9],
-         GREY[3], 
+         GREY[3],
          YELLOW[9],
       ];
 
-      const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12*scale, 150*scale], TRANSPARENCY_BAR_COLOR, [0, 0], [16*scale, 3*scale], WHITE, 1);
+      const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12 * scale, 150 * scale], TRANSPARENCY_BAR_COLOR, [0, 0], [16 * scale, 3 * scale], WHITE, 1);
       slider_tran.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider_tran.StylesSetMargin([10, 0]);
@@ -217,8 +217,8 @@ export class Widget_Color_Picker extends Section {
       ];
 
       const vertices_count = (HUE_COLOR.length / 2) - 1;
-      const slider_hue = Create_widget_slider_simple(_, [0, 0, 2], [dim[0]*scale, 20*scale], HUE_COLOR, [0, 0], [4*scale, 24*scale], WHITE, vertices_count);
-      
+      const slider_hue = Create_widget_slider_simple(_, [0, 0, 2], [dim[0] * scale, 20 * scale], HUE_COLOR, [0, 0], [4 * scale, 24 * scale], WHITE, vertices_count);
+
       slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       slider_hue.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider_hue.StylesSetMargin([0, 20]);
@@ -229,11 +229,11 @@ export class Widget_Color_Picker extends Section {
 
 
       console.log(
-         '\npanel2_idx' , panel2_idx,
-         '\nhue_pick_idx' , slider_hue_idx,
-         '\ncolor_pick_idx' , color_pick_idx,
-         '\ncolor_present_idx' , color_present_idx,
-         '\nslider_trans_idx' , slider_trans_idx,
+         '\npanel2_idx', panel2_idx,
+         '\nhue_pick_idx', slider_hue_idx,
+         '\ncolor_pick_idx', color_pick_idx,
+         '\ncolor_present_idx', color_present_idx,
+         '\nslider_trans_idx', slider_trans_idx,
 
       );
 
@@ -251,7 +251,7 @@ export class Widget_Color_Picker extends Section {
    // INHERITED METHODS
    /****************************************************************************************************************************************************/
 
-   Destroy(){
+   Destroy() {
       // alert('Implement Destroy()\nColorpicker Widget');
 
       super.Destroy();
@@ -291,10 +291,10 @@ export class Widget_Color_Picker extends Section {
    }
 
 
-   EnableGfxAttributes(which, self_params=null, panel_params=null, color_pick_params=null, pane2_params=null, color_present_params=null, slider_trans_params=null, slider_hue_params=null, labels_params=null) {
-      
+   EnableGfxAttributes(which, self_params = null, panel_params = null, color_pick_params = null, pane2_params = null, color_present_params = null, slider_trans_params = null, slider_hue_params = null, labels_params = null) {
+
       super.EnableGfxAttributes(which, self_params);
-      
+
       const slider_hue = this.children.buffer[slider_hue_idx];
       slider_hue.EnableGfxAttributes(which, slider_hue_params, 1);
 
@@ -309,9 +309,9 @@ export class Widget_Color_Picker extends Section {
       panel2.EnableGfxAttributes(which, pane2_params);
       const color_present = panel2.children.buffer[color_present_idx];
       color_present.EnableGfxAttributes(which, color_present_params);
-      
 
-      for(let i = color_present_idx+1; i <= panel2.children.boundary; i++){
+
+      for (let i = color_present_idx + 1; i <= panel2.children.boundary; i++) {
          const label = panel2.children.buffer[i];
          label.EnableGfxAttributes(which, labels_params);
       }
@@ -320,14 +320,11 @@ export class Widget_Color_Picker extends Section {
 
    /** Must run for every mesh */
    GfxUniformsEnable(flags, name, type, shader_flags) {
-      // alert('+++\nGfxUniformsEnable')
+
       super.EnableGfxUniforms(flags, name, type, shader_flags);
       for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
-         // if (child) child.EnableGfxUniforms(flags, name, type, shader_flags);
          if (child) child.GfxUniformsEnable(flags, name, type, shader_flags);
-         // if(this.children.buffer[i].GfxUniformsEnable === null)
-         // if (this.children.buffer[i]) this.children.buffer[i].GfxUniformsEnable(flags, name, type, shader_flags);
       }
    }
 
@@ -336,27 +333,55 @@ export class Widget_Color_Picker extends Section {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-      
-      if(unif_name === 'u_wposxy'){
+
+      if (unif_name === 'u_wposxy') {
 
          // Call for each root mesh in every vertex buffer
          const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
          const len = root_meshes.length;
-         for(let i=1; i < len; i++){
-      
+         for (let i = 1; i < len; i++) {
+
             const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
             root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
-      
+
          }
       }
 
    }
 
 
-   GfxCtxSetFlag(FLAGS) {
-      alert('-1 COLORPICKER')
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
+      
+      if (this.gfx_ctx_parent === INT_NULL) { // Set for the first time, if gfx_ctx_parent=INT_NULL from initialization
+
+         this.gfx_ctx_flags = FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+
+         if(recurse){
+            for (let i = 0; i <= this.children.boundary; i++) {
+               const child = this.children.buffer[i];
+               if (child) child.GfxCtxSetFlag(FLAGS, gfx_ctx_parent, recurse);
+            }
+         }
+      }
    }
 
+
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) { // Set for the first time, if gfx_ctx_parent=INT_NULL from initialization
+
+         this.gfx_ctx_flags |= FLAGS;
+         this.gfx_ctx_parent = gfx_ctx_parent;
+
+         if(recurse){
+            for (let i = 0; i <= this.children.boundary; i++) {
+               const child = this.children.buffer[i];
+               if (child) child.GfxCtxAddFlag(FLAGS, gfx_ctx_parent, recurse);
+            }
+         }
+      }
+   }
 
 
 
@@ -383,7 +408,7 @@ export class Widget_Color_Picker extends Section {
          super.AddToGfx();
          for (let i = 0; i <= this.children.boundary; i++) {
             const child = this.children.buffer[i];
-            
+
             if (child) child.Render();
          }
       }
@@ -409,21 +434,21 @@ export class Widget_Color_Picker extends Section {
    /*******************************************************************************************************************************************************/
 
 
-   ColorpickerCreateListeners(){
+   ColorpickerCreateListeners() {
 
       const mesh = this; // If in recursion, use as the current mesh the passed param. 
       // mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      
+
       const parent_listeners = mesh.listeners.buffer;
-      
+
       const panel = mesh.children.buffer[0];
       const panel2 = panel.children.buffer[panel2_idx];
       const color_pick_mesh = panel.children.buffer[color_pick_idx];
       const hue_mesh = mesh.children.buffer[slider_hue_idx];
       const transp_slider_mesh = panel.children.buffer[slider_trans_idx];
       const color_present_mesh = panel2.children.buffer[color_present_idx];
-      
+
       { // Color Pick Panel
          color_pick_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
          const evt_params = { // Create the parameters to pass for the switch's click event. 
@@ -434,7 +459,7 @@ export class Widget_Color_Picker extends Section {
          };
          color_pick_mesh.AddListenEvent(E.C, mesh.OnClickColorPick, evt_params, parent_listeners[E.C]);
       }
-      
+
       { // Hue Slider
 
          // For the hue slider, we create a click event from the Widget Slider class, so that on slider huue click we run the sliders click event.
@@ -464,9 +489,9 @@ export class Widget_Color_Picker extends Section {
          }
          hue_mesh.SetInitialValue(.17);
          Slider_simple_connect(hue_mesh, mesh.OnClickHuePick, clbk_params);
-         
+
       }
-      
+
       { // Tranparency Slider
 
          // Create the click event on the slider class
@@ -575,7 +600,7 @@ export class Widget_Color_Picker extends Section {
 
       // Get the number of color parts of the hue bar
       const parts = slider_hue.geom.num_faces;
-      
+
       // Calculate the index of the part, the handle is currently located 
       // Calculate handle pos percentage to be 1 whole unit for every part. E.x: For part1:0-1, part2:1-2, part3:2-3, ...
       slider_val += 0.000001; // Must be > 0 in order to choose the first part and not the -1 part which does not exist
@@ -589,59 +614,59 @@ export class Widget_Color_Picker extends Section {
       // Calulate the indices of the colors, that the left and right vertices (from the handles position) represent
       const color_indices = [(c_idx * 2), (c_idx * 2) + 2];
 
-      
+
       // Cache the vertex colors of the current part of the hue bar
       const c1 = slider_hue.mat.col[color_indices[0]];
       const c2 = slider_hue.mat.col[color_indices[1]];
       // Get the fraction of the percentage so that it always is 0-1 for any part
       const fract = part_ratio - Floor(part_ratio);
       const c = Mix_vec4_float32Array(c1, c2, fract);
-      
+
       // console.log((x/w)*parts, (slider_val*parts))
-      
+
       const num_faces = color_pick_mesh.geom.num_faces; // Face Index:The first one
       const vidx = 3; // Vertex Index: Top-Right
       // CAUTION: Make sure the vertex count is not surpassing the mesh and starts updating the color of the next mesh in the vertex buffer 
       const vertex_count = 1; // How many vertices of the mesh to update 
-      
+
       // Store the calculated color to the color pick mesh 
       for (let i = 0; i < vertex_count; i++)
          CopyArr4(color_pick_mesh.mat.col[i + vidx], c);
-         // color_pick_mesh.mat.col[i + vidx] = c;
-      
-         // Update the vertex buffer
-      if(color_pick_mesh.gfx) 
+      // color_pick_mesh.mat.col[i + vidx] = c;
+
+      // Update the vertex buffer
+      if (color_pick_mesh.gfx)
          Gl_set_rgba_per_vertex_specify_vertex(color_pick_mesh.gfx, c, num_faces, vidx, vertex_count);
 
-      
-      
-      
-      
+
+
+
+
       /*****************************************************************************************************/
       // Calculate the color for the color present panel
-      
+
       // Set the new color picked in the color present panel of the widget
-   
-      
+
+
       // Adjust the new hue to the color present panel
       const xx = widget.color_pick_click_pos[0]; // The x coord of the selected area of the color pick panel
       const y = widget.color_pick_click_pos[1]; // The y coord of the selected area of the color pick panel
-      
+
       // TODO: We need to update only the top-right vertex color, NOT all vertices colors
       const percentagex = (xx / color_pick_mesh.geom.dim[0] / 2); // Calc the percentage, x coord
       const percentagey = 1 - (y / color_pick_mesh.geom.dim[1] / 2); // Calc the percentage, y coord
       const hue = Mix_vec3_float32Array(WHITE, c, percentagex);
       const intensity = Mix_vec3_float32Array(BLACK, hue, percentagey);
-      
+
       const alpha = slider_tran.slider_val; // Get the alpha from the transparency slider
       // Contruct the final color
       const final_color = new Float32Array([intensity[0], intensity[1], intensity[2], alpha]);
       CopyArr4(color_present_mesh.mat.col, final_color);
-      if(color_present_mesh.gfx) Gl_set_rgba(color_present_mesh.gfx, final_color, color_present_mesh.geom.num_faces);
+      if (color_present_mesh.gfx) Gl_set_rgba(color_present_mesh.gfx, final_color, color_present_mesh.geom.num_faces);
 
 
 
-      
+
 
 
 
@@ -652,7 +677,7 @@ export class Widget_Color_Picker extends Section {
 
       CopyArr4(slider_tran.mat.col[1], c);
       CopyArr4(slider_tran.mat.col[3], c);
-      if(slider_tran.gfx) Gl_set_rgba_per_vertex(slider_tran.gfx, slider_tran.mat.col)
+      if (slider_tran.gfx) Gl_set_rgba_per_vertex(slider_tran.gfx, slider_tran.mat.col)
 
 
 
@@ -672,18 +697,18 @@ export class Widget_Color_Picker extends Section {
       /*****************************************************************************************************/
       // Update target meshes
 
-      if(widget.temp_target_mesh_clbk){
-         
+      if (widget.temp_target_mesh_clbk) {
+
          widget.temp_target_mesh_params.mnemonics.transparency = slider_tran.slider_val;
          widget.temp_target_mesh_params.mnemonics.hue = slider_hue.slider_val;
-         
+
          widget.temp_target_mesh_clbk(
             new Float32Array([
                intensity[0],
                intensity[1],
                intensity[2],
                final_color[3],
-            ]), 
+            ]),
             widget.temp_target_mesh_params,
          );
       }
@@ -719,10 +744,10 @@ export class Widget_Color_Picker extends Section {
       else color_present_mesh.mat.col[alphaidx] = slider_val;
 
       const vertex_idx = 0, vcount = 4;
-      if(color_present_mesh.gfx) Gl_set_rgba_specify_attribute(color_present_mesh.gfx, slider_val, num_faces, vertex_idx, vcount, alphaidx);
+      if (color_present_mesh.gfx) Gl_set_rgba_specify_attribute(color_present_mesh.gfx, slider_val, num_faces, vertex_idx, vcount, alphaidx);
 
 
-      
+
 
 
       /*****************************************************************************************************/
@@ -732,18 +757,18 @@ export class Widget_Color_Picker extends Section {
       widget.label_g.text_mesh.RenderTextFromNumber(color_present_mesh.mat.col[1])
       widget.label_b.text_mesh.RenderTextFromNumber(color_present_mesh.mat.col[2])
       widget.label_a.text_mesh.RenderTextFromNumber(slider_val)
-      
+
 
 
 
       /*****************************************************************************************************/
       // Update target meshes
 
-      if(widget.temp_target_mesh_clbk){
-         
+      if (widget.temp_target_mesh_clbk) {
+
          widget.temp_target_mesh_params.mnemonics.transparency = slider_tran.slider_val;
          widget.temp_target_mesh_params.mnemonics.hue = slider_hue.slider_val;
-         
+
          widget.temp_target_mesh_clbk(
             new Float32Array([
                color_present_mesh.mat.col[0],
@@ -755,7 +780,7 @@ export class Widget_Color_Picker extends Section {
          );
       }
 
-      
+
    }
 
 
@@ -796,7 +821,7 @@ export class Widget_Color_Picker extends Section {
       const transp_slider = panel.children.buffer[slider_trans_idx];
       CopyArr3(transp_slider.mat.col[1], intensity);
       CopyArr3(transp_slider.mat.col[3], intensity);
-      if(transp_slider.gfx) Gl_set_rgba_per_vertex(transp_slider.gfx, transp_slider.mat.col)
+      if (transp_slider.gfx) Gl_set_rgba_per_vertex(transp_slider.gfx, transp_slider.mat.col)
       intensity[3] = transp_slider.slider_val;
 
 
@@ -809,11 +834,11 @@ export class Widget_Color_Picker extends Section {
 
       const color_present_mesh = panel2.children.buffer[color_present_idx];
       // CopyArr4(color_present_mesh.mat.col[3], intensity); 
-      CopyArr4(color_present_mesh.mat.col, intensity); 
+      CopyArr4(color_present_mesh.mat.col, intensity);
       Gl_set_rgba(color_present_mesh.gfx, intensity, color_present_mesh.geom.num_faces);
 
 
-      
+
 
 
       /*****************************************************************************************************/
@@ -824,31 +849,31 @@ export class Widget_Color_Picker extends Section {
       widget.label_b.text_mesh.RenderTextFromNumber(intensity[2])
       widget.label_a.text_mesh.RenderTextFromNumber(intensity[3])
 
-      
+
 
 
 
       /*****************************************************************************************************/
       // Update target meshes
 
-      if(widget.temp_target_mesh_clbk){
-                  
+      if (widget.temp_target_mesh_clbk) {
+
          // widget.temp_target_mesh_params.mnemonics.transparency = slider_tran.slider_val;
          // widget.temp_target_mesh_params.mnemonics.hue = slider_hue.slider_val;
          // widget.temp_target_mesh_params.mnemonics.hue = slider_hue.slider_val;
-         
+
          widget.temp_target_mesh_clbk(intensity, widget.temp_target_mesh_params);
       }
    }
 
-   
-   AssignTargetMeshClbk(Clbk, params){
+
+   AssignTargetMeshClbk(Clbk, params) {
       this.temp_target_mesh_clbk = Clbk;
       this.temp_target_mesh_params = params;
    }
 
 
-   SetTransparencySliderSetInitialValue(slider_val){
+   SetTransparencySliderSetInitialValue(slider_val) {
 
       const mesh = this;
       const panel = mesh.children.buffer[0];
@@ -859,7 +884,7 @@ export class Widget_Color_Picker extends Section {
 
 
       const params = {
-         clbk_params:{
+         clbk_params: {
 
             src_mesh: mesh,
             slider_tran: transp_slider_mesh,
@@ -870,7 +895,7 @@ export class Widget_Color_Picker extends Section {
 
       };
 
-      if(transp_slider_mesh.gfx !== null) {
+      if (transp_slider_mesh.gfx !== null) {
 
          Slider_simple_set_value(transp_slider_mesh, slider_val);
          this.OnClickTranpsarencyPick(params, slider_val)
@@ -882,11 +907,11 @@ export class Widget_Color_Picker extends Section {
       }
 
 
-      
+
    }
 
 
-   SetHueSliderSetInitialValue(slider_val){
+   SetHueSliderSetInitialValue(slider_val) {
 
       const mesh = this;
       const panel = mesh.children.buffer[0];
@@ -898,7 +923,7 @@ export class Widget_Color_Picker extends Section {
 
 
       const params = {
-         clbk_params:{
+         clbk_params: {
 
             src_mesh: mesh,
             slider_hue: hue_mesh,
@@ -910,7 +935,7 @@ export class Widget_Color_Picker extends Section {
 
       };
 
-      if(hue_mesh.gfx !== null) {
+      if (hue_mesh.gfx !== null) {
 
          Slider_simple_set_value(hue_mesh, slider_val);
          this.OnClickHuePick(params, slider_val)
@@ -923,7 +948,7 @@ export class Widget_Color_Picker extends Section {
 
    }
 
-   
+
 
 }
 

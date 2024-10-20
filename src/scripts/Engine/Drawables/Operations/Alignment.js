@@ -6,7 +6,7 @@
 
 
 /** Uses exact algorithm as the Widget_Label class for alignment */
-export function Align_text_in_rect_parent(Align, parent) {
+export function Align_text_in_rect_parent(Align, parent, pos=[0,0]) {
 
     if(!parent || !parent.text_mesh) {
         console.error('Handles only text as text_mesh of a mesh\nAlign_text_in_rect_parent()\nAlignment.js');
@@ -25,55 +25,32 @@ export function Align_text_in_rect_parent(Align, parent) {
     
 
     if(Align & ALIGN.RIGHT){
-        const d = parent.geom.dim[0]*2 - text_width - pad[0];
+        const d = pos[0] + parent.geom.dim[0]*2 - text_width - pad[0];
         text_mesh.geom.pos[0] = d;
     }
     else if(Align & ALIGN.LEFT){
-        const d = pad[0];
+        const d = pos[0] + pad[0];
         text_mesh.geom.pos[0] = d;
     }
     else if(Align & ALIGN.HOR_CENTER){
         const d = (parent.geom.dim[0]*2 -text_width);
-        text_mesh.geom.pos[0] = d/2;
+        text_mesh.geom.pos[0] = pos[0] + d/2;
     }
     if(Align & ALIGN.VERT_CENTER){
         // const d = (parent.geom.dim[1] - text_mesh.geom.dim[1])
         const d = (parent.geom.dim[1]*2 - text_height);
         // text_mesh.geom.pos[1] = d;
-        text_mesh.geom.pos[1] = d/2;
+        text_mesh.geom.pos[1] = pos[1] + d/2;
     }
     else if(Align & ALIGN.BOTTOM){
-        const d = parent.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1];
+        const d = pos[1] + parent.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1];
         text_mesh.geom.pos[1] = d;
     }
     else if(Align & ALIGN.TOP){
-        text_mesh.geom.pos[1] = pad[1];
+        text_mesh.geom.pos[1] = pos[1] + pad[1];
     }
     
 
-    // if(Align & ALIGN.RIGHT){
-    //     const d = parent.geom.dim[0]*2 - text_width - pad[0]
-    //     text_mesh.geom.pos[0] = d
-    // }
-    // else if(Align & ALIGN.LEFT){
-    //     const d = pad[0]
-    //     text_mesh.geom.pos[0] = d
-    // }
-    // else if(Align & ALIGN.HOR_CENTER){
-    //     const d = parent.geom.pos[0] + (parent.geom.dim[0]*2 -text_width)
-    //     text_mesh.geom.pos[0] = d/2
-    // }
-    // if(Align & ALIGN.VERT_CENTER){
-    //     const d = parent.geom.pos[1] + (parent.geom.dim[1] - text_mesh.geom.dim[1])
-    //     text_mesh.geom.pos[1] = d
-    // }
-    // else if(Align & ALIGN.BOTTOM){
-    //     const d = parent.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1]
-    //     text_mesh.geom.pos[1] = d
-    // }
-    // else if(Align & ALIGN.TOP){
-    //     text_mesh.geom.pos[1] = pad[1]
-    // }
 }
 
 

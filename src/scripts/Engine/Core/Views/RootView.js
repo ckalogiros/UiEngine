@@ -288,7 +288,7 @@ _root_vbidx_buffer.Init(1);
 
 
 // Returns an array [progidx:INT, vbidx:INT, ...]
-export function Root_group_vbidx_view_view_get(root_bufferidx) {
+export function Root_group_vbidx_view_get(root_bufferidx) {
    return _root_vbidx_buffer.buffer[root_bufferidx];
 }
 
@@ -493,7 +493,7 @@ export function Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_buffe
 
    if (root_bufferidx === INT_NULL) return;
 
-   const gfxidxs = Root_group_vbidx_view_view_get(root_bufferidx);
+   const gfxidxs = Root_group_vbidx_view_get(root_bufferidx);
 
    let stored = false;
    for (let i = 0; i <= gfxidxs.boundary; i++) {
@@ -622,7 +622,7 @@ export function Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_buffe
 /** Reset all gfx buffers, from start index 0, for the widget_root buffer, via it's widget_root_gfx buffer */
 export function Root_group_reset_gfxs(root_bufferidx) {
 
-   const rootgfx = Root_group_vbidx_view_view_get(root_bufferidx);
+   const rootgfx = Root_group_vbidx_view_get(root_bufferidx);
 
    for (let i = 0; i <= rootgfx.boundary; i++) {
 
@@ -827,7 +827,7 @@ export function Root_group_activate_all_vbs_in_renderqueue(root_bufferidx) {
 
 
    // Get all vbs of the the root mesh and all its children
-   const rootgfxs = Root_group_vbidx_view_view_get(root_bufferidx);
+   const rootgfxs = Root_group_vbidx_view_get(root_bufferidx);
 
    for (let i = 0; i <= rootgfxs.boundary; i++) {
 
