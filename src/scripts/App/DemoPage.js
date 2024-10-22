@@ -16,7 +16,7 @@ import { Renderqueue_set_active } from "../Engine/Renderers/Renderer/RenderQueue
 import { Scene_camera_scroll_add, Scene_camera_scroll_set } from "../Engine/Scenes.js";
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from "../Graphics/Buffers/VertexBuffers.js";
 import { Abs } from "../Helpers/Math/MathOperations.js";
-import { AppReset } from "./App.js";
+import { App_reinitialize, App_reset } from "./App.js";
 import { Demo_animations, Demo_animations_with_slider_slope } from "./Demo/DemoAnimations.js";
 import { Demo_chain_link } from "./Demo/DemoChainLink.js";
 import { Create_comet_glow_contols, Create_comet_particles, Create_comet_noise_contols, Create_glow_particles, Create_glow_particles_controls, Create_smoke_particles, Create_smoke_particles_controls, } from "./Demo/DemoParticles.js";
@@ -64,8 +64,9 @@ function Bind_menu_button(btn, params, any_id, id){
 
          if((demo_id & any_id)===0){
             
-            AppReset(); // Reset all 
+            App_reset(); // Reset all 
             Scene_camera_scroll_set(_, 0);
+            App_reinitialize();
 
             // Create new page
             Demo_page(id);
@@ -337,7 +338,7 @@ export function Demo_page(create_demo_id = subcategory_comet.id) {
       const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_paricles_demo, subcategory_comet.id, window_menu);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
-      comet_particles_struct  = Create_comet_particles(0, total_height, _, _, _, ROOT_WIDGETS.CREATE_ROOT, false);
+      comet_particles_struct  = Create_comet_particles(0, total_height, _, _, 2, ROOT_WIDGETS.CREATE_ROOT, false);
 
       comet_particles_struct.controls_section = Create_comet_noise_contols(comet_particles_struct.noise_particles_buffer, TRANSPARENCY(GREY[1], .6), comet_noise_slider_values);
       const comet_glow_contols = Create_comet_glow_contols(comet_particles_struct.glow_particles_buffer, TRANSPARENCY(GREY[1], .6), comet_glow_slider_values);

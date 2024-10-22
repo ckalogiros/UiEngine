@@ -1,5 +1,5 @@
 export const frag_noise_call = `
-   color = Noise(scale_down);
+   color = Noise_procedural(scale_down);
 `;
 export const frag_noise = `\
 
@@ -7,51 +7,23 @@ export const frag_noise = `\
 #define MAX_SPEED 19.
 
 #ifndef UV_READY
-    vec2 uv = vec2(0,0);
+  vec2 uv = vec2(0,0);
 #endif
 
 
-// procedural FS_NOISE from IQ
-vec2 hash(vec2 p)
-{
-    p = vec2( dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)) );
-    return -1.0 + 2.0*fract(sin(p)*43758.5453123);
-}
+#ifndef HASH_FUNCTION 
+  #include <hash_function>
+#endif
+#ifndef NOISE_HASH 
+  #include <noise_hash>
+#endif
+#ifndef NOISE_FBM 
+  #include <noise_fbm>
+#endif
 
 
-float FS_NOISE(in vec2 p)
-{
-    const float K1 = 0.366025404; // (sqrt(3)-1)/2;
-    const float K2 = 0.211324861; // (3-sqrt(3))/6;
-    
-    vec2 i = floor( p + (p.x+p.y)*K1 );
-    vec2 a = p - i + (i.x+i.y)*K2;
-    vec2 o = (a.x>a.y) ? vec2(1.0,0.0) : vec2(0.0,1.0);
-    vec2 b = a - o + K2;
-    vec2 c = a - 1.0 + 2.0*K2;
-    
-    vec3 h = max( 0.5-vec3(dot(a,a), dot(b,b), dot(c,c) ), 0.0 );
-    
-    vec3 n = h*h*h*h*h*vec3( dot(a,hash(i+0.0)), dot(b,hash(i+o)), dot(c,hash(i+1.0)));
-    return dot( n, vec3(100.0) );
-}
 
-
-float fbm(vec2 uv)
-{
-    float f; float n = 1.4; float a = 0.1;
-    mat2 m = mat2( n, -n, n,  n );
-    f  = 0.5000 * FS_NOISE(uv); uv = m*uv; f += 0.2500 * FS_NOISE(uv); uv = m*uv; f += 0.1250 * FS_NOISE(uv); uv = m*uv; f += 0.0625 * FS_NOISE(uv); uv = m*uv; f = 0.55 + 0.5*f; 
-    return f;
-}
-
-
-#define PowVec3(c, P) vec3(pow(c.r, P), pow(c.g, P), pow(c.b, P))
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#define MinVec3F(a, f)  vec3(MIN(a.x, f), MIN(a.y, f), MIN(a.z, f))
-
-
-vec4 Noise(float scale_down)
+vec4 Noise_procedural(float scale_down)
 {
 
     #ifdef U_NOISE_PARAMS
@@ -67,19 +39,11 @@ vec4 Noise(float scale_down)
     float time  = v_time;
     float revT  = 1.-time; // Reverse time to be from 1 to 0
     
-   
     #ifndef UV_READY
-        #define UV_READY 1
-        uv = (gl_FragCoord.xy-(res*.5));
-        uv.x += (res.x*.5); // Center mesh to screen
-        uv.y -= (res.y*.5); // Center mesh to screen
-        
-        uv.x -= v_wpos3_x; // To move with mesh position
-        uv.y += v_wpos3_y; // To move with mesh position
-        
-        uv.x -= dim.x; // Subtract constant dimention
-        uv.y -= -dim.y; // Subtract constant dimention
-    #endif
+      #define UV_READY 1
+      uv = gl_FragCoord.xy;
+      pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+    #endif  
     
     vec2 uv2 = (gl_FragCoord.xy-(res*.5))/res;
     float res_ratio = res.y/res.x;
@@ -184,12 +148,12 @@ vec4 Noise(float scale_down)
 
 
 /****************************************************************************************************************************/
-export const frag_worley_noise_call = '   color = blend_color( color, frag_worley_noise() );'
+export const frag_worley_noise_call = '   color = blend_color_multiply( color, frag_worley_noise() );'
 
 export const frag_worley_noise = `
 
 /********************************************************************************************/
-// SHADER UNIT: worley_noise
+// SHADER UNIT: frag_worley_noise
 /********************************************************************************************/
 
 /*****************************************************/
@@ -201,9 +165,7 @@ export const frag_worley_noise = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifndef SMOOTH_MIN 
-  #include <smoothmin>
-#endif
+
 
 /*****************************************************/
 // BLEND MODES FUNCTION DECLERATIONS
@@ -241,7 +203,7 @@ vec2 cellular2x2(vec2 P, float ctrl1, float ctrl2) {
 
 
 
-vec4 frag_test1()
+vec4 frag_worley_noise()
 {
 
 #ifdef U_GENERIC_VEC3
@@ -254,19 +216,21 @@ vec4 frag_test1()
 
 
   vec2 res = u_screen_res;
-  vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
-  vec2 uv1 = (gl_FragCoord.xy / local_res);               // Map pixel: from {0 -> dim} to {0 -> 1} 
   vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
-
-
   
-  uv1.x -= v_wpos3_x / local_res.x;             // Invalidate any mesh world position, so that 'first' gl_FragCoord is always the meshes 'first' pixel
-  uv1.y -= (res.y - (v_wpos3_y+local_res.y)) / local_res.y; // Invalidate any mesh world position.
-
   
-  vec2 st = uv1; // Texture coordinates
-  vec2 F = cellular2x2(st*10., control1, control2);
+  
+
+  #ifndef UV_READY
+    #define UV_READY 1
+    uv = gl_FragCoord.xy;
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+    uv_map_coordinates_zero_one(uv, dim);
+  #endif  
+  
+  vec2 st = uv; // Texture coordinates
+  vec2 F = cellular2x2(st*5., control1, control2);
   float n = 1.0 - 1.5 * F.x * control1;
   // float n = 1.0 - F.x * F.x * control1;
   

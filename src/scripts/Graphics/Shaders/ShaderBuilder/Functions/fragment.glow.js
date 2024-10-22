@@ -13,81 +13,66 @@
  */
 
 export const frag_glow_call = `
-
-    vec4 glowcol = Glow(color.a, scale_down);
-    // Removes any previous functions calculations. Must be combined with:'color = glowcol'
-    // glowcol.rgb *= (1.-alpha); 
-    color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
+  vec4 glowcol = Glow(color.a, scale_down);
+  color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
 `;
 
 export const frag_glow = `
 
 #ifndef UV_READY
-   vec2 uv = vec2(0,0);
+  vec2 uv = vec2(0,0);
 #endif
 
 vec4 Glow(float alpha, float scale_down)
 {
-
-    #ifdef U_GLOW_PARAMS_VEC3
-        vec3 controls = u_glow_params;
-        float outer = controls.x+.4;
-        float inner = controls.y;
-        float intensity = controls.z;
-    #elif defined(U_GLOW_PARAMS_VEC2)
-        vec2 controls = u_glow_params;
-        float outer = controls.x+.4;
-        float inner = controls.y;
-        #ifdef A_GLOW_INTENSITY_FLOAT
-            float intensity = v_glow_intensity;
-        #else
-            float intensity = .5;
-        #endif
-    #else
-        float outer = .8;
-        float inner = 1.;
-        float intensity = 0.2;
-    #endif
-
-    
-    #ifdef A_TIME
-        float time = v_time;
-    #else
-        float time = 0.;
-    #endif
-
-   vec2 res = u_screen_res;
-   vec2 dim = vec2(v_dim2_x, v_dim2_y);
-   
-    #ifndef UV_READY
-        #define UV_READY 1
-        uv = (gl_FragCoord.xy-(res*.5));
-        uv.x += (res.x*.5); // Center mesh to screen
-        uv.y -= (res.y*.5); // Center mesh to screen
-        
-        vec2 wpos = vec2(v_wpos3_x, v_wpos3_y);
-        uv.x -= wpos.x; // To move with mesh position
-        uv.y += wpos.y; // To move with mesh position
-        
-        uv.x -= dim.x; // Subtract constant dimention
-        uv.y -= -dim.y; // Subtract constant dimention
-    #endif
-   
-   
-   
-    float r = dim.y*scale_down;
-    float d = smoothstep(dim.y*outer, r*inner,  length(uv));
-
-    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
-    vec3 color = src_color.rgb*d*intensity*(1. - time);
-
-    // color.rgb *= d;
-    // color.rgb *= alpha;
-    // alpha *= alpha;
-    // color = min(src_color.rgb, d*intensity); // WEIRD NICE EFFECT!!!
-   
-   
-    // return vec4(color, alpha);
-    return vec4(color, d);
+  #ifdef U_GLOW_PARAMS_VEC3
+    #include <u_glow_params_vec3>
+  #endif
+  
+  #ifdef U_GENERIC_VEC3
+    include <u_generic_vec3>
+  #elif defined(U_GENERIC_VEC2)
+    #include <u_generic_vec2>
+  #elif defined(U_GENERIC_FLOAT)
+    #include <u_generic_float>
+  #endif
+  
+  
+  #ifdef A_TIME
+    float time = v_time;
+  #else
+    float time = 0.;
+  #endif
+  
+  
+  vec2 res = u_screen_res;
+  vec2 dim = vec2(v_dim2_x, v_dim2_y);
+  
+  
+  #ifndef UV_READY
+    #define UV_READY 1
+    uv = gl_FragCoord.xy;
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+  #endif  
+  
+  
+  
+  // uv_map_coordinates_zero_one( uv, dim );
+  
+  float r = dim.y*scale_down;
+  float d = smoothstep(dim.y*outer, r*inner,  length(uv));
+  
+  vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+  vec3 color = src_color.rgb*d*intensity*(1. - time);
+  
+  // color.rgb *= d;
+  // color.rgb *= alpha;
+  // alpha *= alpha;
+  // color = min(src_color.rgb, d*intensity); // WEIRD NICE EFFECT!!!
+  
+  // return RED+vec4(color.r);
+  
+  // return vec4(color, alpha);
+  return vec4(color, d);
 }
 `;

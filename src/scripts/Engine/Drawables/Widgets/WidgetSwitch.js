@@ -162,7 +162,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    EnableGfxAttributes(which, params=null){
       
       super.EnableGfxAttributes(which, params);
-      if(which & MESH_ENABLE.GFX.ATTR_R_CORNERS) params = this.children.buffer[0].geom.dim[1];
+      if(which === MESH_ENABLE.GFX.ATTR_R_CORNERS) params = this.children.buffer[0].geom.dim[1];
       this.children.buffer[0].EnableGfxAttributes(which, params);
    }
 

@@ -2,7 +2,7 @@
 
 import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_particles_batch_set_col4_wpos4_pos2, Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_pos2_style3 } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_particles_batch_set_col4_wpos4_pos2, Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_pos2_style2 } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Abs, Hash, Max } from "../../Helpers/Math/MathOperations.js";
 import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
@@ -435,7 +435,7 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
 
    // TODO: Temporary implementation of assigning the correct gfx update function pointer
    if (emitter.sid.fx & SID.FX.FS_GLOW_VEC3) {
-      emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2_style3;
+      emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2_style2;
    }
    else if (emitter.sid.fx & SID.FX.FS_NOISE) {
       emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_pos2;

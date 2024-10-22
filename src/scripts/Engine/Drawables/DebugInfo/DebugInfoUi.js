@@ -22,6 +22,7 @@ import { Floor } from "../../../Helpers/Math/MathOperations.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_destroy, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Widgets/ScrollerComponent.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_view_buffer_get, Root_group_view_buffer_get_byidx, Root_group_view_buffer_get_count, Root_group_rerender, Root_group_reset_gfxs, Root_group_set_render_queue_flags } from "../../Core/Views/RootView.js";
+import { Renderer_get_performance_timer_query_avaraged } from "../../Renderers/Renderer.js";
 
 
 
@@ -68,7 +69,7 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x=0
    
    const fontsize = 7;
    const fontsizedynamic = 7.5;
-   let pad1 = [0, 1];
+   let pad1 = [4, 0];
    let pad2 = [4, 0];
    const g_ms = 0;
    let ms = 500;
@@ -101,6 +102,11 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x=0
       timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
       // timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Vertex_buffer_get_Active_count, _, _, generic_time_interval)
       timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Renderqueue_get_count, _, _, generic_time_interval)
+
+      timer.CreateNewText('GPU:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
+      timer.CreateNewText('0000000', fontsizedynamic, ORANGE_240_160_10, pad2, .9);
+      timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Renderer_get_performance_timer_query_avaraged, gfxCtx, _, generic_time_interval)
+      timer.CreateNewText('ms', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
    }
    { // Device Info
       /**

@@ -628,6 +628,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		const pos_dif = Align_self_get_dif(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
 		AddArr2(new_text.geom.pos, pos_dif);
+		// AddArr2(new_text.geom.pos, [0, 0]);
 
 
 		return idx;

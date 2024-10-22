@@ -56,7 +56,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
       pass: SID.PASS.WPOS2,
    }
    const scale_down = .2;
-   const particles_size = 40;
+   const particles_size = 140;
 
 
 
@@ -71,9 +71,9 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
-
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+   
    emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
    emitter.EnableGfxUniforms({ fx: SID.FX.FS_GLOW_VEC3, }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
@@ -84,10 +84,6 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    /****************************************************************************************************************/
    // Create Particles Control Panel
 
-   const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
-
-
-   // const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [VIEWPORT.WIDTH - slider_dim[0] * 2 - 40, 60, 1], [0, 0], BLACK, 'Emitter Window Panel', [0, 10, 2],);
    const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], BLACK, 'Emitter Window Panel', [0, 10, 2],);
    controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -118,7 +114,6 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
       
       // Create label
       const label = Create_widget_label(_, 'Emitt', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, YELLOWR[8], WHITE, [5, 5], _, _, _, _);
-      // const label = Create_widget_label(_, 'Emitt', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, ORANGER[8], WHITE, [5, 5], _, _, _, _);
       label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);

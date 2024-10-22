@@ -4,6 +4,11 @@ import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_gfx_binding } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
+import { Renderer_webgl_begin_timer_query, Renderer_webgl_check_query_results, Renderer_webgl_end_timer_query } from '../Engine/Renderers/Renderer.js';
+
+
+
+
 
 
 // rgb(38, 27, 37)
@@ -16,15 +21,18 @@ const B = (1/255) * 32;
 
 export function Gl_draw(gl) {
 
+    Renderer_webgl_begin_timer_query(gfxCtx);
+
+
     const drawQueue = Renderqueue_get_active();
     const drawQueueCount = Renderqueue_active_get_count();
 
     // console.log(Hash(TimerGetGlobalTimerCycle()).toFixed(1))
 
-
     gl.clearColor(R, G, B, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
+
     
     
     for (let i = 0; i < drawQueueCount; i++) {
@@ -131,6 +139,8 @@ export function Gl_draw(gl) {
         if(vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
     }
 
+    Renderer_webgl_end_timer_query(gfxCtx);
+    
 }
 
 

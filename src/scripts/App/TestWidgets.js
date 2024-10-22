@@ -40,6 +40,7 @@ import { Demo_chain_link } from './Demo/DemoChainLink.js';
 import { Game_snake } from './Demo/Games/Snake/Snake.js';
 import { Mesh_set_root_in_focus } from '../Engine/Drawables/Operations/MeshHelperFunctions.js';
 import { Slope_function_logarithmic } from '../Helpers/Math/MathFunction.js';
+import { App_reinitialize } from './App.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -650,9 +651,7 @@ export function TestWidgetsGeneric(createId = 1) {
     // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
 
 
-    // Demo_page();
-
-
+    Demo_page();
 
     // Demo_chain_link();
 
@@ -735,7 +734,8 @@ export function TestWidgetsGeneric(createId = 1) {
 
         //                 // window.location.reload(false, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<sjksjhjdks>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'); 
 
-        //                 AppReset();
+        //                 App_reset();
+                            // App_reinitialize();
         //                 // const label = CreateLabel('1');
         //                 // Demo_ball_tail();
         //                 // const dbg_dp = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);
@@ -1030,11 +1030,12 @@ export function TestWidgetsGeneric(createId = 1) {
 
     { // Shaders Tests
         // Test_shaders_test1();
-        Test_shaders_test2();
+        // Test_shaders_test2();
     }
 
     { // Shader Color Functions
         // Shader_color_functions_glow_sphere();
+        // Shader_color_functions_worley_noise();
     }
 
 
@@ -3338,100 +3339,80 @@ function Create3DCubes(scene) {
 
 function Test_shaders_test1() { // Shaders Tests
 
+    const dim=200
+    const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT-dim*2, 0], [dim, dim], BLACK, 'TEST-SHADERS',);
+    // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
+    rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+    rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+    rect.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_1);
+    rect.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_2);
+
+    // Use u_time to quicly establish a uniform for the testing
+    rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+
+    // Render
+    rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+
+    rect.Render();
+    Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
+
+
+    rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
+    rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1, 1]);
+
+    Construct_listen_events_from_mesh_tree(rect);
+    Construct_listen_events_relations_from_mesh_tree(rect);
+
+
+
+    { // Slider: unif 1
+        const slider = CreateSlider(_, 10, 20, .02,'Smooth');
         
-    { // This is a test rect to linear interpolate black to white, left to right
-        const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 50, 0], [100, 100], [BLACK,BLACK, WHITE, WHITE,], 'TEST-SHADERS',);
-        // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, 0, 0], [500, 500], [BLUE[1], BLUE[1], BLUE[1], BLUE[1],], 'TEST-SHADERS',);
-        // rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        
-        rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX);
-
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-        
-        rect.Render();
-        Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
-        
-        rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
-        
-        Construct_listen_events_from_mesh_tree(rect);
-        Construct_listen_events_relations_from_mesh_tree(rect);
-    }
-    {
-        const dim=200
-        const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT-dim*2, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
-        // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
-        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-        rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
-        rect.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_1);
-
-        // Use u_time to quicly establish a uniform for the testing
-        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-
-        // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-  
-        rect.Render();
-        Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
-  
-
-        rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
-        rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1, 1]);
-  
-        Construct_listen_events_from_mesh_tree(rect);
-        Construct_listen_events_relations_from_mesh_tree(rect);
-
-
-
-        { // Slider: unif 1
-            const slider = CreateSlider(_, 10, 20, .02,'Smooth');
+        const params = {
+            target_mesh: rect,
+        };
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
             
-            const params = {
-                target_mesh: rect,
-            };
-            // Connect sliders to gfx program uniforms 
-            Slider_connect(slider, (params, slider_val) => {
-                
-                const target_mesh = params.clbk_params.target_mesh;
-                target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val*2, 0);
-                
-                }, params,
-            );
-        }
-        { // Slider: unif 2
-            const slider = CreateSlider(_, 10, 60, .18, 'Range');
-    
-            const params = {
-                target_mesh: rect,
-            };
-            // Connect sliders to gfx program uniforms 
-            Slider_connect(slider, (params, slider_val) => {
-                
-                const target_mesh = params.clbk_params.target_mesh;
-                target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
-    
-                }, params,
-            );
-        }
-        { // Slider: unif 2
-            const slider = CreateSlider(_, 10, 100, .18, 'Brightness/Contrast');
-    
-            const params = {
-                target_mesh: rect,
-            };
-            // Connect sliders to gfx program uniforms 
-            Slider_connect(slider, (params, slider_val) => {
-                
-                const target_mesh = params.clbk_params.target_mesh;
-                target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
-    
-                }, params,
-            );
-        }
+            const target_mesh = params.clbk_params.target_mesh;
+            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val*2, 0);
+            
+            }, params,
+        );
+    }
+    { // Slider: unif 2
+        const slider = CreateSlider(_, 20, 100, .18, 'Range');
 
-    }   
+        const params = {
+            target_mesh: rect,
+        };
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
+            
+            const target_mesh = params.clbk_params.target_mesh;
+            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
+
+            }, params,
+        );
+    }
+    { // Slider: unif 2
+        const slider = CreateSlider(_, 30, 200, .18, 'Brightness/Contrast');
+
+        const params = {
+            target_mesh: rect,
+        };
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
+            
+            const target_mesh = params.clbk_params.target_mesh;
+            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
+
+            }, params,
+        );
+    }
+
 }
 function Test_shaders_test2() { // Shaders Tests
 
@@ -3456,14 +3437,94 @@ function Test_shaders_test2() { // Shaders Tests
     // }
     {
         // const dim=300
+        const dim=180
+        // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT-dim*2, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
+        const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], BLACK, 'TEST-SHADERS',);
+        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+        // rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+        rect.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_2);
+
+        // Use u_time to quicly establish a uniform for the testing
+        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+
+        // Render
+        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+  
+        rect.Render();
+        Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
+  
+
+        rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
+        rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1]);
+  
+        Construct_listen_events_from_mesh_tree(rect);
+        Construct_listen_events_relations_from_mesh_tree(rect);
+
+
+
+        { // Slider: unif 1
+            const slider = CreateSlider(_, 10, 20, 1.,'Smooth');
+            
+            const params = {
+                target_mesh: rect,
+            };
+            // Connect sliders to gfx program uniforms 
+            Slider_connect(slider, (params, slider_val) => {
+                
+                const target_mesh = params.clbk_params.target_mesh;
+                target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val*2, 0);
+                
+                }, params,
+            );
+        }
+        { // Slider: unif 2
+            const slider = CreateSlider(_, 10, 60, 1., 'Range');
+    
+            const params = {
+                target_mesh: rect,
+            };
+            // Connect sliders to gfx program uniforms 
+            Slider_connect(slider, (params, slider_val) => {
+                
+                const target_mesh = params.clbk_params.target_mesh;
+                target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
+    
+                }, params,
+            );
+        }
+        { // Slider: unif 3
+            const slider = CreateSlider(_, 10, 100, .18, '...');
+    
+            const params = {
+                target_mesh: rect,
+            };
+            // Connect sliders to gfx program uniforms 
+            Slider_connect(slider, (params, slider_val) => {
+                
+                const target_mesh = params.clbk_params.target_mesh;
+                target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
+    
+                }, params,
+            );
+        }
+
+    }   
+}
+function Shader_color_functions_worley_noise() { // Shaders Tests
+
+    {
+        // const dim=300
         const dim=300
         // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT-dim*2, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
-        const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
+        const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], BLUEL[9], 'SHADER_FN:WORLEY-NOISE',);
         rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
         rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
-        rect.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_2);
+        rect.EnableGfxAttributes(MESH_ENABLE.GFX.FN_NOISE_WORLEY);
 
         // Use u_time to quicly establish a uniform for the testing
         rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
@@ -3536,11 +3597,13 @@ function Shader_color_functions_glow_sphere() { // Shaders Tests
     {
         // const dim=300
         const dim=100
-        const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT/2, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
+        const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT/2, 0], [dim, dim], BLUEL[9], 'SHADER_FN:GLOW-SPHERE',);
         rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
         rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+        rect.EnableGfxAttributes(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+        // rect.EnableGfxAttributes(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_MIX);
         rect.EnableGfxAttributes(MESH_ENABLE.GFX.FN_GLOW_SPHERE);
 
         // Use u_time to quicly establish a uniform for the testing

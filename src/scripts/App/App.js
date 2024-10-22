@@ -1,13 +1,13 @@
 "use strict";
 import { Scene_set_projection_matrix, Scenes_create_scene } from '../Engine/Scenes.js'
 import { Renderqueue_init, Renderqueue_reset } from '../Engine/Renderers/Renderer/RenderQueue.js';
-import { Renderer_create_renderer } from '../Engine/Renderers/Renderer.js';
+import { Renderer_create_renderer, Renderer_webgl_check_query_results } from '../Engine/Renderers/Renderer.js';
 import { CameraOrthographic } from '../Engine/Renderers/Renderer/Camera.js';
 import { Texture_init_texture_storage_buffer } from '../Engine/Loaders/Textures/Texture.js';
 
 import { Detect_host_platform, Device_set_up, Input_create_user_input_listeners } from '../Engine/Controls/Input/Input.js';
 import { TestWidgetsGeneric } from './TestWidgets.js';
-import { Time_intervals_init_time, Time_intervals_destroy, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
+import { Time_intervals_init_time, Time_intervals_destroy, Time_intervals_initialize, Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { Dbg_ui_info_all_reset, Debug_info_ui_performance_set_initial_position_screen_right } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Performance_timers_init_all } from '../Engine/Timers/PerformanceTimers.js';
 import { Listener_init_event_storage_buffers, Listener_reset_event_storage_buffers } from '../Engine/Events/EventListeners.js';
@@ -87,6 +87,8 @@ export function AppInit() {
 
     Debug_info_ui_performance_set_initial_position_screen_right()
 
+    Time_intervals_create(100, 'GPU performance timer query', TIME_INTERVAL_REPEAT_ALWAYS, Renderer_webgl_check_query_results, _);
+
     // If camera is static, update projection matrix uniform only once
     // camera.UpdateProjectionUniformAll(renderer.gl);
 
@@ -105,7 +107,7 @@ export function Application_loop() {
 }
 
 
-export function AppReset(){
+export function App_reset(){
 
     
     /** RESET
@@ -170,5 +172,12 @@ export function AppReset(){
     GFX_VBIDX_RENAME_ME.Reset();
 
     Generic_buffers_container_reset();
+
+}
+
+
+export function App_reinitialize(){
+
+    Time_intervals_create(100, 'GPU performance timer query', TIME_INTERVAL_REPEAT_ALWAYS, Renderer_webgl_check_query_results, _);
 
 }

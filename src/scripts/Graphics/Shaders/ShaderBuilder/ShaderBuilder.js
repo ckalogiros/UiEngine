@@ -5,7 +5,7 @@ import { shader_chunks } from './ShaderChunks/ShaderChunks.js'
 import { frag_feather, frag_feather_call, frag_round_corners, frag_round_corners_call, frag_style_call, frag_style_corners } from './Functions/fragment.roundcorners.js'
 import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './Functions/fragment.texture.js'
 import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
-import { frag_noise, frag_noise_call } from './Functions/fragment.noise.js';
+import { frag_noise, frag_noise_call, frag_worley_noise, frag_worley_noise_call } from './Functions/fragment.noise.js';
 import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
 import { frag_test1, frag_test1_call, frag_test2, frag_test2_call } from './Functions/fragment.tests.js';
 import { Attributes_indexing, Shader_attributes_create } from '../../ShaderAttributes.js';
@@ -13,6 +13,9 @@ import { frag_glow_sphere, frag_glow_sphere_call } from './Functions/fragment.mi
 
 
 
+
+
+let ID = 0;
 
 
 // Resolve Includes to build the correct shaders
@@ -101,7 +104,7 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
    if (block_created) uniforms_code += '};\n';
 
 
-   uniforms_code += '\n// Uniforms\n';
+   // uniforms_code += '\n// ---------- UNIFORMS ----------\n';
    for (let i = 0; i < len; i++) {
       if ((_uniforms_info[i].shader & UNIFORM.IN_VS && (which_shader & UNIFORM.IN_VS))) {
 
@@ -675,114 +678,97 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    Vertex_shader_resolve_attributes_out_assignment();
 
    const vs_chunks = [
-      '#version 300 es \n',
+      '#version 300 es',
       `
 /********************************************************************************************/
-// VERTEX SHADER
 /********************************************************************************************/
-      `,
-      '#include <precision_high>\n',
-
-      /********************************************************************************************************/
-      // Defines
-      /********************************************************************************************************/
-      '\n// Defines',
-      ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
-      ((sid.unif & SID.UNIF.SCREEN_RESOLUTION)) ? '#define U_SCREEN_RESOLUTION 1' : '',
-
-
-
-      /********************************************************************************************************/
-      // UNIFORMS
-      /********************************************************************************************************/
-      '\n// Uniforms Block',
-      Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_VS),
-
-
-
-      /********************************************************************************************************/
-      // Attributes In
-      /********************************************************************************************************/
-      '\n// Input Attributes',
-      attributes_in_code,
-
-
-
-      /********************************************************************************************************/
-      // OUTS
-      /********************************************************************************************************/
-      '\n// Out variables',
-      attributes_out_code,
-      // 'out vec2 DIM;',
-
-
-
-
-
-
-      /********************************************************************************************************/
-      // Main Function
-      /********************************************************************************************************/
-      'void main(void) ',
-      '{',
-
-
-
-      /********************************************************************************************************/
-      // Assignments
-      '   // Assignments',
-      attributes_assign_code,
-      // '   DIM = vec2(abs(v_pos2_x)*2., abs(v_pos2_y)*2.);',
-
-
-
-      /********************************************************************************************************/
-      // Scale in Vertex Shader
-      (sid.shad & SID.SHAD.VS_TEST1) ? '   // HI FROM VS_TEST1' : '',
-
-
-
-      /********************************************************************************************************/
-      // Calculate vertex position-rotation-scale
-      '   // Vertex Shader Logic',
-
-      /**
-       * Current vertex: gl_VertexID.
-       * Use to set the vertex position.
-       * Use #directives to enable vertex pos by the vertex id we are currently on.
-       * Example:
-       *    Vertex pos: V1:[0,y], V2:[0,0], V3:[x,y], V4:[x,0]
-       * That way we can pass 2 attributes as the mesh dimention
-       * and create the vertex position from them. No need to pass 8 values
-       * for vertex pos and another 2 for dimention
-       */
-
-
-
-      // 'float v1pos = 0.;',
-      // 'if(gl_VertexID==0) v1pos = v_pos2_x;',
+// VERTEX SHADER {{ ${ID} }}
+/********************************************************************************************/
+/********************************************************************************************/`,
       
-      // 'float vposx = v_pos2_x + float(gl_VertexID)*float(gl_VertexID);',
-      // 'float vposy = v_pos2_y + float(gl_VertexID)*float(gl_VertexID);',
-      // (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-      //    ? '  gl_Position = u_projection * vec4(vposx + v_wpos3_x, vposy + v_wpos3_y, v_wpos3_z, 1.0);'
-      //    : '  gl_Position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+   '#include <precision_high>\n',
+
+   /********************************************************************************************************/
+   // Defines
+   '\n// DIRECTIVES',
+   ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
+   ((sid.unif & SID.UNIF.SCREEN_RESOLUTION)) ? '#define U_SCREEN_RESOLUTION 1' : '',
 
 
-      (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-         ? '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
-         : '   vec4 position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
 
-         // Creates text char movement on Move() and ReDraw()
-   //       `   #ifdef U_SCREEN_RESOLUTION
-   //    position.xy = floor(position.xy * u_screen_res) / u_screen_res; 
-   //    // position.xy = roundEven(position.xy * u_screen_res) / u_screen_res; 
-   // #endif`,
-         '   gl_Position = position;',
+   /********************************************************************************************************/
+   // UNIFORMS
+   '\n// UNIFORMS',
+   Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_VS),
 
-      '}',
 
-   ];
+
+   /********************************************************************************************************/
+   // Attributes In
+   /********************************************************************************************************/
+   '\n// INPUT',
+   attributes_in_code,
+
+
+
+   /********************************************************************************************************/
+   // OUTS
+   /********************************************************************************************************/
+   '\n// OUTPUT',
+   attributes_out_code,
+   // 'out vec2 DIM;',
+
+
+
+
+
+
+   /********************************************************************************************************/
+   // Main Function
+   /********************************************************************************************************/
+   'void main(void) ',
+   '{',
+
+
+
+   /********************************************************************************************************/
+   // Assignments
+   '  // Assignments',
+   attributes_assign_code,
+   // '   DIM = vec2(abs(v_pos2_x)*2., abs(v_pos2_y)*2.);',
+
+
+
+   /********************************************************************************************************/
+   // Scale in Vertex Shader
+
+
+
+   /********************************************************************************************************/
+   // Calculate vertex position-rotation-scale
+   '   // Vertex Shader Logic',
+
+   /**
+    * Current vertex: gl_VertexID.
+    * Use to set the vertex position.
+    * Use #directives to enable vertex pos by the vertex id we are currently on.
+    * Example:
+    *    Vertex pos: V1:[0,y], V2:[0,0], V3:[x,y], V4:[x,0]
+    * That way we can pass 2 attributes as the mesh dimention
+    * and create the vertex position from them. No need to pass 8 values
+    * for vertex pos and another 2 for dimention
+    */
+
+
+   (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
+   ? '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
+   : '   vec4 position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+
+   '   gl_Position = position;',
+
+'}',
+
+];
 
    const vertex_shader = vs_chunks.filter(filterEmptyLine).join('\n')
 
@@ -833,24 +819,24 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
    Fragment_shader_resolve_attributes_in();
 
    const fs_chunks = [
-      '#version 300 es\n',
+      '#version 300 es',
       `
 /********************************************************************************************/
-// FRAGMENT SHADER
 /********************************************************************************************/
-      `,
-
-
-
-
-
-
+// FRAGMENT SHADER {{ ${ID} }}
+/********************************************************************************************/
+/********************************************************************************************/`,
+      
+      
+      
+      
+      
+      
       /********************************************************************************************************/
       // DEFINES
-      '\n',
+      '\n// ---------- DIRECTIVES ----------',
       '#include <precision_high>',
-      '#include <out_frag_color>',
-      '#include <blend_mode_functions>',
+      
       (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
       (sid.unif & SID.UNIF.FS_RCORNERS_FLOAT) ? '#define U_RCORNERS_FLOAT 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       (sid.unif & SID.UNIF.FS_RCORNERS_VEC2) ? '#define U_RCORNERS_VEC2 1' : '', 
@@ -865,7 +851,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '#define A_GLOW_INTENSITY_FLOAT' : '',
       
       // Include Funcions Defines
-      (sid.blend_options) ? '#define BLEND_MODE 1' : '#define BLEND_MODE 1\n#define BLEND_MODE_MULTIPLY 1',  // If any 'blend_options', enable, else enable default blend 'multiply'
+      // (sid.blend_options) ? '#define BLEND_MODE 1' : '#define BLEND_MODE 1\n#define BLEND_MODE_MULTIPLY 1',  // If any 'blend_options', enable, else enable default blend 'multiply'
+      (sid.blend_options) ? '#define BLEND_MODE 1' : '',  // If any 'blend_options', enable, 
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_ADD) ? '#define BLEND_MODE_ADD 1' : '', 
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_LIGHTEN) ? '#define BLEND_MODE_LIGHTEN 1' : '', 
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY) ? '#define BLEND_MODE_MULTIPLY 1' : '', 
@@ -879,27 +866,16 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MIX) ? '#define BLEND_MODE_MIX 1' : '', 
 
 
-      // Generic Uniforms
-      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC2)  ? '#define U_GENERIC_VEC2 1' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC3)  ? '#define U_GENERIC_VEC3 1' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC4)  ? '#define U_GENERIC_VEC4 1' : '', 
-
-
-      // Uniforms for testing
-      // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
-      // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '#define U_GENERIC_VEC2 1' : '', 
-      // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '#define U_GENERIC_VEC3 1' : '', 
- 
-
-
-
-
-
-
+      
+      
+      
+      
+      
+      
+      
       /********************************************************************************************************/
       // In
-      '\n',
+      '\n// ---------- INPUTS ----------',
       fs_attribs_in_code,
       
       
@@ -908,39 +884,59 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       
       
       /********************************************************************************************************/
+      // Out
+      '\n// ---------- OUTPUTS ----------',
+      '#include <out_frag_color>',
+            
+      
+      
+      
+      
+      
+      
+      /********************************************************************************************************/
       // UNIFORMS
-      '\n',
+      '\n// ---------- UNIFORMS ----------',
+      
       Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_FS),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
+      
+      // Generic Uniforms
+      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC2)  ? '#define U_GENERIC_VEC2 1' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC3)  ? '#define U_GENERIC_VEC3 1' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC4)  ? '#define U_GENERIC_VEC4 1' : '', 
 
-
-
-
-
-
-      /********************************************************************************************************/
-      // Defines
-      // '#ifdef U_SCALE\n  float scale_down = u_scale2.x;\n#else\n  float scale_down = 1.;\n#endif\n',
-      // '#ifdef U_SCALE\n  float scale_down = 1.;\n  \n#else\n  float scale_down = 1.;\n#endif\n',
-
-
-
-
-
-
+      // Uniforms for testing
+      // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
+      // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '#define U_GENERIC_VEC2 1' : '', 
+      // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '#define U_GENERIC_VEC3 1' : '', 
+      
+      
+      
+      
+      
+      
       /********************************************************************************************************/
       // Misc Functions
-      '\n',
+      '\n// ---------- FUNCTION DECLERATIONS ----------',
+      
+      '#define RED vec4(1.0, 0.0, 0.0, 1.0)',
+      '#define GREEN vec4(0.0, 1.0, 0.0, 1.0)',
+      '#define YELLOW vec4(1.0, 1.0, 0.0, 1.0)',
+      '#define CYAN vec4(0.0, 0.5, 1.0, 1.0)',
+
+      '#include <coordinate_system_functions>',
+
+      '#include <blend_mode_functions>',
+      
+      '\n#include <blend_color_functions_overloads>',
+
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_corners : 
                                        ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners : 
                                        (sid.attr & SID.ATTR.FEATHER) ? frag_feather : '',
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
       (sid.attr & SID.ATTR.MSDF) ? frag_msdf : '',
-      // (sid.attr & (SID.ATTR.GLOW_INTENSITY)) ? frag_glow : '',
-
-
-
-
 
 
       /********************************************************************************************************/
@@ -948,31 +944,28 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke : '',
-      
-      
-      
+
+
       /********************************************************************************************************/
       // Shader Color Functions
       (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere : '',
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY) ? frag_worley_noise : '',
 
 
-      /********************************************************************************************************/
+      /********************************************************** **********************************************/
       // Test shader functions
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1 : '',
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2 : '',
-
-
-
-
-
-
+      
+      
+      
+      
+      
+      
       /********************************************************************************************************/
       // Main
-      `
-/********************************************************************************************/
-// FRAGMENT: MAIN()
-/********************************************************************************************/
-      `,
+      '\n/********************************************************************************************/\n// FRAGMENT: MAIN()\n/********************************************************************************************/',
+
       true ? 'void main(void) ' : '',
       '{',
 
@@ -996,11 +989,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       
       // Shader Color Functions
       (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere_call : '',
-      (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere_call : '',
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY) ? frag_worley_noise_call : '',
 
       // Test Shaders
-      (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2_call : '',
+      (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
 
 
 
@@ -1055,6 +1048,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
    attribs_info.mesh_attribs = [];
    attribs_info.attribs_loc = [];
 
+   ID++;
 
    if (DEBUG.SHADERS) console.info(fs);
    return fs;

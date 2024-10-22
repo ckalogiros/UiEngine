@@ -17,7 +17,7 @@ import { Callback_animations_run } from "../Animations/CallbackAnimations.js";
 
 
 
-
+const WEB_GL_PERFORMANCE_MEASURE_ENABLED = false;
 
 
 
@@ -164,7 +164,7 @@ function Renderer_create_webgl_context(canvas) {
 
    /** Create Graphics Context */
    // https://registry.khronos.org/webgl/specs/1.0/#WEBGLCONTEXTATTRIBUTES
-   const gfxctx = canvas.getContext("webgl2", {
+   const gl = canvas.getContext("webgl2", {
       alpha: true, //If the value is true, the drawing buffer has an alpha channel for the purposes of performing OpenGL destination alpha operations and compositing with the page. If the value is false, no alpha buffer is available. 
       premultipliedAlpha: true, // If the value is true the page compositor will assume the drawing buffer contains colors with premultiplied alpha.
       // premultipliedAlpha: false, // If the value is true the page compositor will assume the drawing buffer contains colors with premultiplied alpha.
@@ -173,22 +173,22 @@ function Renderer_create_webgl_context(canvas) {
       // alpha: true,
       // preserveDrawingBuffer: true,
    });
-   if (!gfxctx) alert('Unable to initialize WebGL.');
+   if (!gl) alert('Unable to initialize WebGL.');
 
-   console.log('WebGl version: ', gfxctx.getParameter(gfxctx.SHADING_LANGUAGE_VERSION));
-   console.log('WebGl renderer info: ', gfxctx.getParameter(gfxctx.RENDERER));
+   console.log('WebGl version: ', gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
+   console.log('WebGl renderer info: ', gl.getParameter(gl.RENDERER));
 
-   console.log('Suported line widths:', gfxctx.getParameter(gfxctx.ALIASED_LINE_WIDTH_RANGE));
-   console.log('Max vertex attributes:', gfxctx.getParameter(gfxctx.MAX_VERTEX_ATTRIBS));
+   console.log('Suported line widths:', gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE));
+   console.log('Max vertex attributes:', gl.getParameter(gl.MAX_VERTEX_ATTRIBS));
 
-   const extensions = gfxctx.getSupportedExtensions();
-   // gfxctx.getExtension('OES_standard_derivatives');
-   // gfxctx.getExtension('EXT_shader_texture_lod');
+   const extensions = gl.getSupportedExtensions();
+   // gl.getExtension('OES_standard_derivatives');
+   // gl.getExtension('EXT_shader_texture_lod');
 
-   // gfxctx.enable(gfxctx.DEPTH_TEST);
-   // gfxctx.depthFunc(gfxctx.LEQUAL)
-   // gfxctx.depthFunc(gfxctx.GEQUAL)
-   // gfxctx.depthMask(true);
+   // gl.enable(gl.DEPTH_TEST);
+   // gl.depthFunc(gl.LEQUAL)
+   // gl.depthFunc(gl.GEQUAL)
+   // gl.depthMask(true);
 
    /**
     gl.ZERO 	                        Multiplies all colors by 0.
@@ -207,38 +207,49 @@ function Renderer_create_webgl_context(canvas) {
     gl.ONE_MINUS_CONSTANT_ALPHA 	   Multiplies all colors by 1 minus a constant alpha value.
     gl.SRC_ALPHA_SATURATE 	         Multiplies the RGB colors by the smaller of either the source alpha value or the value of 1 minus the destination alpha value. The alpha value is multiplied by 1. 
     */
-   gfxctx.enable(gfxctx.BLEND);
-   gfxctx.blendFunc(gfxctx.DST_ALPHA, gfxctx.ONE_MINUS_SRC_ALPHA);
-   // gfxctx.blendFunc(gfxctx.SRC_ALPHA, gfxctx.ONE_MINUS_SRC_ALPHA);
+   gl.enable(gl.BLEND);
+   gl.blendFunc(gl.DST_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+   // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
    {
-      // gfxctx.blendFunc(gfxctx.SRC_ALPHA, gfxctx.ONE_MINUS_SRC_ALPHA);
-      // gfxctx.blendFunc(gfxctx.SRC_ALPHA, gfxctx.ONE_MINUS_DST_ALPHA);
-      // gfxctx.blendFunc(gfxctx.DST_ALPHA, gfxctx.ONE_MINUS_DST_ALPHA);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_DST_ALPHA);
+      // gl.blendFunc(gl.DST_ALPHA, gl.ONE_MINUS_DST_ALPHA);
 
-      // gfxctx.blendFunc(gfxctx.ONE_MINUS_SRC_ALPHA, gfxctx.DST_ALPHA);
-      // gfxctx.blendFunc(gfxctx.ONE_MINUS_DST_ALPHA, gfxctx.DST_ALPHA);
-      // gfxctx.blendFunc(gfxctx.ONE_MINUS_SRC_ALPHA, gfxctx.SRC_ALPHA);
-      // gfxctx.blendFunc(gfxctx.ONE_MINUS_DST_ALPHA,gfxctx.SRC_ALPHA) ;
+      // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.DST_ALPHA);
+      // gl.blendFunc(gl.ONE_MINUS_DST_ALPHA, gl.DST_ALPHA);
+      // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.SRC_ALPHA);
+      // gl.blendFunc(gl.ONE_MINUS_DST_ALPHA,gl.SRC_ALPHA) ;
 
 
-      // gfxctx.enable(gfxctx.SAMPLE_COVERAGE);
-      // gfxctx.sampleCoverage(2.2, false);
+      // gl.enable(gl.SAMPLE_COVERAGE);
+      // gl.sampleCoverage(2.2, false);
    }
 
 
 
    // Measure GPU time. Not working in all browsers
-   const ext_gpu_timer_query = gfxctx.getExtension('EXT_disjoint_timer_query');
+   const ext_gpu_timer_query = gl.getExtension('EXT_disjoint_timer_query');
+   let gl_timer_query_obj = null;
+   // const ext_gpu_timer_query = gl.getExtension('EXT_disjoint_timer_query_webgl2');
    if (!ext_gpu_timer_query) {
       
-      // const ext_gpu_timer_query2 = gfxctx.getExtension('disjoint_timer_query_webgl2');
+      // const ext_gpu_timer_query2 = gl.getExtension('disjoint_timer_query_webgl2');
       // if (!ext_gpu_timer_query2) {
-         
       //    console.error('EXT_disjoint_timer_query 2 is not supported');
       //    return
       // }
       console.error('EXT_disjoint_timer_query is not supported');
+      
+   }
+   else {
+
+      console.error('ext_gpu_timer_query', ext_gpu_timer_query);
+      
+      if(WEB_GL_PERFORMANCE_MEASURE_ENABLED){
+   
+         gl_timer_query_obj = ext_gpu_timer_query.createQueryEXT();
+      }
    }
 
 
@@ -247,8 +258,7 @@ function Renderer_create_webgl_context(canvas) {
 
 
 
-
-   console.error(gfxctx.isContextLost());
+   console.error(gl.isContextLost());
 
    canvas.addEventListener('webglcontextlost', function (event) {
       event.preventDefault();
@@ -262,18 +272,100 @@ function Renderer_create_webgl_context(canvas) {
    });
 
 
-   gfxCtx.gl = gfxctx;
-   gfxCtx.ext = extensions;
+   gfxCtx.gl = gl;
+   gfxCtx.extentions_string = extensions;
+   gfxCtx.ext = {
+      ext_gpu_timer_query: ext_gpu_timer_query,
+      timer_query_obj:gl_timer_query_obj, 
+      elapsed:0,
+      accum_timer:0,
+      counter:0,
+   };
+
+   
+   // if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) setInterval(()=>{Renderer_get_performance_timer_query_avaraged(gfxCtx);}, 100)
+   // if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) setInterval(()=>{Renderer_get_performance_timer_query_avaraged(gfxCtx);}, 100)
+   // if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) setInterval(()=>{Renderer_webgl_check_query_results(gfxCtx);}, 20)
 
    // NOTE: Gets the maximum allowed attributes count
    // const MAX_VERTEX_ATTRIBS = gfxCtx.gl.getParameter(gfxCtx.gl.MAX_VERTEX_ATTRIBS); // Get the max available attributes for a shader.
 
 
    // Print some gl info
-   var maxTextureSize = gfxctx.getParameter(gfxctx.MAX_TEXTURE_SIZE);
+   var maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
    console.log("Maximum Texture Size: " + maxTextureSize);
+   console.log("Extensions: ",  extensions);
 
-   return { gfxctx: gfxctx, extensions: extensions };
+
+   return { 
+      gfxctx: gl, 
+      extentions_string: extensions, 
+      ext:gfxCtx.ext,
+   };
+}
+
+
+export function Renderer_webgl_check_query_results() {
+
+   if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) {
+      
+      const ext_gpu_timer_query = gfxCtx.ext.ext_gpu_timer_query;
+      const timer_query = gfxCtx.ext.timer_query_obj;
+      const gl = gfxCtx.gl;
+
+      const available = ext_gpu_timer_query.getQueryObjectEXT(timer_query, ext_gpu_timer_query.QUERY_RESULT_AVAILABLE_EXT);
+      const disjoint = gl.getParameter(ext_gpu_timer_query.GPU_DISJOINT_EXT);
+   
+      if (available && !disjoint) 
+      {
+         // Retrieve the result (in nanoseconds)
+         const timeElapsed = ext_gpu_timer_query.getQueryObjectEXT(timer_query, ext_gpu_timer_query.QUERY_RESULT_EXT);
+         gfxCtx.ext.elapsed = timeElapsed;
+         gfxCtx.ext.accum_timer += timeElapsed;
+         gfxCtx.ext.counter++;
+         // console.log("Time elapsed: " + (timeElapsed / 1000000.0) + " ms");
+         // console.log("Time elapsed: " + (timeElapsed / 1000000.0) + " ms", 'avarage', (avarage / 1000000.0) + " ms", 'accum_timer', gfxctx.ext.accum_timer/ 1000000.0, 'counter', gfxctx.ext.counter);
+      } 
+
+   }
+
+}
+
+export function Renderer_get_performance_timer_query_avaraged(gfxctx) {
+
+   const avarage_time = gfxctx.ext.accum_timer / gfxctx.ext.counter;
+   gfxctx.ext.accum_timer = 0; 
+   gfxctx.ext.counter = 0;
+   return avarage_time * NANOSEC;
+
+}
+
+export function Renderer_get_performance_timer_query(gfxctx) {
+
+   return gfxctx.ext.elapsed;
+}
+
+
+export function Renderer_webgl_begin_timer_query(gfxctx) {
+
+   const ext_gpu_timer_query = gfxctx.ext.ext_gpu_timer_query;
+   if(WEB_GL_PERFORMANCE_MEASURE_ENABLED && ext_gpu_timer_query) {
+      const timer_query = gfxctx.ext.timer_query_obj;
+      ext_gpu_timer_query.beginQueryEXT(ext_gpu_timer_query.TIME_ELAPSED_EXT, timer_query);
+   }
+   
+}
+
+
+export function Renderer_webgl_end_timer_query(gfxctx) {
+   
+   const ext_gpu_timer_query = gfxctx.ext.ext_gpu_timer_query;
+   if(WEB_GL_PERFORMANCE_MEASURE_ENABLED && ext_gpu_timer_query) {
+      ext_gpu_timer_query.endQueryEXT(ext_gpu_timer_query.TIME_ELAPSED_EXT);
+      // gfxctx.ext.counter++;
+   }
+
+
 }
 
 

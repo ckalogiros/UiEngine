@@ -35,18 +35,134 @@ float control2 = u_generic_vec2.y;`;
 const u_generic_float = 
 `float control1 = u_generic_float`;
 
+const u_glow_params_vec3 = 
+`float outer = u_glow_params.x + .4;
+float inner  = u_glow_params.y;
+float intensity  = u_glow_params.z;`;
+
+const u_round_corners_params_vec3 = 
+`float outer = u_rcorners.x + .4;
+float inner  = u_rcorners.y;
+float intensity  = u_rcorners.z;`;
+
+
 /**************************************************************************************************************************************/
 // Misc Shader Functions
+
+
+const coordinate_system_functions = 
+`// Coordinate System Functions
+#define pixel_apply_world_position_offset_x(m_uv, wpos) ( (m_uv) -= (wpos) )
+#define pixel_apply_world_position_offset_y(m_uv, wpos) ( (m_uv) -= (wpos) )
+#define pixel_apply_reverse_y_coordinates(m_uv, resolution_height) ( (m_uv) = (resolution_height) - (m_uv) )
+#define uv_map_coordinates_zero_one( m_uv, dimentions ) ( (m_uv) /= (dimentions) )
+#define uv_map_coordinates_minusone_one( m_uv, dimentions ) ( (((m_uv) /= (dimentions)) * 2.0) - 1.0 )
+
+void pixel_map_model_space_coordinates( inout vec2 m_uv, in vec2 screen_dimentions, in float wposx, in float wposy, in vec2 model_dimentions ) {
+  
+  pixel_apply_world_position_offset_x(m_uv.x, wposx); 
+  pixel_apply_reverse_y_coordinates(m_uv.y, screen_dimentions.y); 
+  pixel_apply_world_position_offset_y(m_uv.y, wposy); 
+  m_uv -= model_dimentions;
+}
+
+void pixel_map_screen_space_coordinates_zero_one( inout vec2 m_uv, in vec2 screen_dimentions, in float wposx, in float wposy ) {
+  
+  pixel_apply_world_position_offset_x(m_uv.x, wposx); 
+  pixel_apply_reverse_y_coordinates(m_uv.y, screen_dimentions.y); 
+  pixel_apply_world_position_offset_y(m_uv.y, wposy); 
+  uv_map_coordinates_zero_one(m_uv, screen_dimentions);
+}
+void pixel_map_model_space_coordinates_zero_one( inout vec2 m_uv, in vec2 screen_dimentions, in float wposx, in float wposy, in vec2 model_dimentions ) {
+   
+  pixel_apply_world_position_offset_x(m_uv.x, wposx); 
+  pixel_apply_reverse_y_coordinates(m_uv.y, screen_dimentions.y); 
+  pixel_apply_world_position_offset_y(m_uv.y, wposy); 
+  m_uv.x -= model_dimentions.x;
+  m_uv.y -= -model_dimentions.y;
+  uv_map_coordinates_zero_one(m_uv, model_dimentions);
+}
+
+void pixel_map_screen_space_coordinates_minusone_one( inout vec2 m_uv, in vec2 screen_dimentions, in float wposx, in float wposy, in vec2 model_dimentions ) {
+   
+  pixel_apply_world_position_offset_x(m_uv.x, wposx); 
+  pixel_apply_reverse_y_coordinates(m_uv.y, screen_dimentions.y); 
+  pixel_apply_world_position_offset_y(m_uv.y, wposy); 
+  m_uv -= model_dimentions;
+  uv_map_coordinates_minusone_one(m_uv, screen_dimentions);
+}
+void pixel_map_model_space_coordinates_minusone_one( inout vec2 m_uv, in vec2 screen_dimentions, in float wposx, in float wposy, in vec2 model_dimentions ) {
+   
+  pixel_apply_world_position_offset_x(m_uv.x, wposx); 
+  pixel_apply_reverse_y_coordinates(m_uv.y, screen_dimentions.y); 
+  pixel_apply_world_position_offset_y(m_uv.y, wposy); 
+  m_uv -= model_dimentions;
+  // uv_map_coordinates_minusone_one(m_uv, model_dimentions);
+}`;
+
+
 const smoothmin = `
 #define SMOOTH_MIN 1
-float smoothmin(float a, float b, float k) {
-   if (k != 0.0) {
-      float h = max(k - abs(a - b), 0.0) / k;
-      return min(a, b) - h * h * h * k * (1.0 / 6.0);
-   }
-   else {
-      return min(a, b);
-   }
+float smoothmin(in float a, in float b, in float k) {
+  if (k != 0.0) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * h * k * (1.0 / 6.0);
+  }
+  else {
+    return min(a, b);
+  }
+}`;
+const brightness_contrast = `
+#define BRIGHTNESS_CONTRAST 1
+vec3 brightness_contrast(vec3 color, float brightness, float contrast) {
+  float a = 1.0 + contrast;
+  float b = brightness - contrast * 0.5f;
+  color.x = max(a * color.x + b, 0.0f);
+  color.y = max(a * color.y + b, 0.0f);
+  color.z = max(a * color.z + b, 0.0f);
+  return color;
+}`;
+const gamma_correction = `
+#define GAMMA_CORRECTION 1
+float gamma_correction(float c1) {
+   if (c1 < 0.04045f)
+      return (c1 < 0.0f) ? 0.0f : c1 * (1.0f / 12.92f);
+   return pow((c1 + 0.055f) * (1.0f / 1.055f), 2.4f);
+}
+vec3 gamma_correction(vec3 c) {
+  float r = gamma_correction(c.r);
+  float g = gamma_correction(c.g);
+  float b = gamma_correction(c.b);
+  return vec3(r, g, b);
+}`;
+const hash_function = `
+#define HASH_FUNCTION 1
+// procedural Noise from IQ
+vec2 hash_function(vec2 p) {
+   p = vec2( dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)) );
+   return -1.0 + 2.0*fract(sin(p)*43758.5453123);
+}`;
+const noise_hash = `
+#define NOISE_HASH 1
+float noise_hash(in vec2 p) {
+  const float K1 = 0.366025404; // (sqrt(3)-1)/2;
+  const float K2 = 0.211324861; // (3-sqrt(3))/6;
+  vec2 i = floor( p + (p.x+p.y)*K1 );
+  vec2 a = p - i + (i.x+i.y)*K2;
+  vec2 o = (a.x>a.y) ? vec2(1.0,0.0) : vec2(0.0,1.0);
+  vec2 b = a - o + K2;
+  vec2 c = a - 1.0 + 2.0*K2;
+  vec3 h = max( 0.5-vec3(dot(a,a), dot(b,b), dot(c,c) ), 0.0 );
+  vec3 n = h*h*h*h*h*vec3( dot(a,hash_function(i+0.0)), dot(b,hash_function(i+o)), dot(c,hash_function(i+1.0)));
+  return dot( n, vec3(100.0) );
+}`;
+const noise_fbm = `
+#define NOISE_FBM 1
+float fbm(vec2 p){
+  float f; float n = 1.4; float a = 0.1;
+  mat2 m = mat2( n, -n, n,  n );
+  f  = 0.5000 * noise_hash(p); p = m*p; f += 0.2500 * noise_hash(p); p = m*p; f += 0.1250 * noise_hash(p); p = m*p; f += 0.0625 * noise_hash(p); p = m*p; f = 0.55 + 0.5*f; 
+  return f;
 }`;
 
 /**************************************************************************************************************************************
@@ -66,174 +182,152 @@ float smoothmin(float a, float b, float k) {
  * Edit: changed the color dodge formula to match what wikipedia 1 says about it.
  */
 
-const blend_mode_add          = '      ( (a)+(b) )';
-const blend_mode_subtract     = '      ( (a)-(b) )';
-const blend_mode_multiply     = '      ( (a)*(b) )';
-const blend_mode_devide       = '      ( (a)/(b) )';
-const blend_mode_lighten      = '      max(a,b)';
-const blend_mode_darken       = '      min(a,b)';
-const blend_mode_color_burn   = '      ( 1.-(1.-(a))/(b) )';
-const blend_mode_color_dodge  = '      ( (a)/(1.-(b)) )';
-const blend_mode_screen       = '      ( 1.-(1.-(a))*(1.-(b)) )';
-const blend_mode_overlay      = `      ( (a)<=0.5 ) ? ( (2.*(a))*(b) ) : ( 1.-(1.-2.*((a)-0.5))*(1.-(b)) )`;
-const blend_mode_mix          = `      ( ((a)*(1.-(c))) + ((b)*(c)) )`;
+const blend_mode_add          = '( (a)+(b) )';
+const blend_mode_subtract     = '( (a)-(b) )';
+const blend_mode_multiply     = '( (a)*(b) )';
+const blend_mode_devide       = '( (a)/(b) )';
+const blend_mode_lighten      = 'max(a,b)';
+const blend_mode_darken       = 'min(a,b)';
+const blend_mode_color_burn   = '( 1.-(1.-(a))/(b) )';
+const blend_mode_color_dodge  = '( (a)/(1.-(b)) )';
+const blend_mode_screen       = '( 1.-(1.-(a))*(1.-(b)) )';
+const blend_mode_overlay      = `( (a)<=0.5 ) ? ( (2.*(a))*(b) ) : ( 1.-(1.-2.*((a)-0.5))*(1.-(b)) )`;
+const blend_mode_mix          = `( ((a)*(1.-(c))) + ((b)*(c)) )`;
+// Blend functions oveloads
+const blend_color_multiply_vec4    = `vec4( blm_multiply(a.r, b.r), blm_multiply(a.g, b.g), blm_multiply(a.b, b.b), blm_multiply(a.a, b.a) )`;
+const blend_color_multiply_vec3    = `vec3( blm_multiply(a.r, b.r), blm_multiply(a.g, b.g), blm_multiply(a.b, b.b) )`;
+const blend_color_multiply_vec4_3  = `vec4( blm_multiply(a.r, b.r), blm_multiply(a.g, b.g), blm_multiply(a.b, b.b), a.a )`;
+const blend_color_add_vec4    = `vec4( blm_add(a.r, b.r), blm_add(a.g, b.g), blm_add(a.b, b.b), blm_add(a.a, b.a) )`;
+const blend_color_add_vec3    = `vec3( blm_add(a.r, b.r), blm_add(a.g, b.g), blm_add(a.b, b.b) )`;
+const blend_color_add_vec4_3  = `vec4( blm_add(a.r, b.r), blm_add(a.g, b.g), blm_add(a.b, b.b), a.a )`;
+const blend_color_darken_vec4    = `vec4( blm_darken(a.r, b.r), blm_darken(a.g, b.g), blm_darken(a.b, b.b), blm_darken(a.a, b.a) )`;
+const blend_color_darken_vec3    = `vec3( blm_darken(a.r, b.r), blm_darken(a.g, b.g), blm_darken(a.b, b.b) )`;
+const blend_color_darken_vec4_3  = `vec4( blm_darken(a.r, b.r), blm_darken(a.g, b.g), blm_darken(a.b, b.b), a.a )`;
+const blend_color_mix_vec4    = `vec4( blm_mix(a.r, b.r, c), blm_mix(a.g, b.g, c), blm_mix(a.b, b.b, c), blm_mix(a.a, b.a, c) )`;
+const blend_color_mix_vec3    = `vec3( blm_mix(a.r, b.r, c), blm_mix(a.g, b.g, c), blm_mix(a.b, b.b, c) )`;
+const blend_color_mix_vec4_3  = `vec4( blm_mix(a.r, b.r, c), blm_mix(a.g, b.g, c), blm_mix(a.b, b.b, c), a.a )`;
 
 
+// #define blm_multiply(a, b) \\
+// #include <blend_mode_multiply>
 const blend_mode_functions   = 
 `
-#define blm_multiply(a, b) \\
-#include <blend_mode_multiply>
-#define blm_lighten(a, b) \\
-#include <blend_mode_lighten>
-#define blm_devide(a, b) \\
-#include <blend_mode_devide>
-#define blm_overlay(a, b) \\
-#include <blend_mode_overlay>
-#define blm_add(a, b) \\
-#include <blend_mode_add>
-#define blm_subtract(a, b) \\
-#include <blend_mode_subtract>
-#define blm_darken(a, b) \\
-#include <blend_mode_darken>
-#define blm_color_burn(a, b) \\
-#include <blend_mode_color_burn>
-#define blm_color_dodge(a, b) \\
-#include <blend_mode_color_dodge>
-#define blm_screen(a, b) \\
-#include <blend_mode_screen>
-#define blm_mix(a, b, c) \\
-#include <blend_mode_mix>`;
+#define blm_add(a, b)         ${blend_mode_add}
+#define blm_subtract(a, b)    ${blend_mode_subtract}
+#define blm_multiply(a, b)    ${blend_mode_multiply}
+#define blm_devide(a, b)      ${blend_mode_devide}
+#define blm_lighten(a, b)     ${blend_mode_lighten}
+#define blm_darken(a, b)      ${blend_mode_darken}
+#define blm_color_burn(a, b)  ${blend_mode_color_burn}
+#define blm_color_dodge(a, b) ${blend_mode_color_dodge}
+#define blm_screen(a, b)      ${blend_mode_screen}
+#define blm_overlay(a, b)     ${blend_mode_screen}
+#define blm_mix(a, b, c)      ${blend_mode_mix}`;
 
 
+// To be called from fragment shader functions, not the fragment shader builder
 const blend_mode_directives   = 
-`   #ifdef BLEND_MODE_MULTIPLY 
-      #define blend_mode(a, b) blm_multiply(a,b)
-   #elif defined(BLEND_MODE_LIGHTEN)
-      #define blend_mode(a, b) blm_lighten(a, b)
-   #elif defined(BLEND_MODE_DEVIDE)
-      #define blend_mode(a, b) blm_devide(a, b)
-   #elif defined(BLEND_MODE_OVERLAY)
-      #define blend_mode(a, b) blm_overlay(a, b)
-   #elif defined(BLEND_MODE_ADD)
-      #define blend_mode(a, b) blm_add(a, b)
-   #elif defined(BLEND_MODE_SUBTRACT)
-      #define blend_mode(a, b) blm_subtract(a, b)
-   #elif defined(BLEND_MODE_DARKEN)
-      #define blend_mode(a, b) blm_darken(a, b)
-   #elif defined(BLEND_MODE_COLOR_BURN)
-      #define blend_mode(a, b) blm_color_burn(a, b)
-   #elif defined(BLEND_MODE_COLOR_DODGE)
-      #define blend_mode(a, b) blm_color_dodge(a, b)
-   #elif defined(BLEND_MODE_SCREEN)
-      #define blend_mode(a, b) blm_screen(a, b)
-   #elif defined(BLEND_MODE_MIX)
-      #define blend_mode(a, b) blm_mix(a, b)
-   #else // Default
-      #define blend_mode(a, b) blm_add(a, b)
-   #endif
-   vec3 blend_color(vec3 a, vec3 b) {
-      return vec3(
-         blend_mode(a.r, b.r),
-         blend_mode(a.g, b.g),
-         blend_mode(a.b, b.b)
-      );
-   }
-   vec4 blend_color(vec4 a, vec4 b) {
-      return vec4(
-         blend_mode(a.r, b.r),
-         blend_mode(a.g, b.g),
-         blend_mode(a.b, b.b),
-         blend_mode(a.a, b.a)
-      );
-   }`;
+`   
+#ifdef BLEND_MODE_ADD
+   #define blend_mode(a, b) blm_add(a, b)
+   #define blend_mode_vec4(a, b) blend_color_add(a, b)
+#elif defined(BLEND_MODE_SUBTRACT)
+   #define blend_mode(a, b) blm_subtract(a, b)
+#elif defined (BLEND_MODE_MULTIPLY) 
+   #define blend_mode(a, b) blm_multiply(a,b)
+   #define blend_mode_vec4(a, b) blend_color_multiply(a, b)
+#elif defined(BLEND_MODE_DEVIDE)
+#define blend_mode(a, b) blm_devide(a, b)
 
-      /** SAVE-BLEND FUNCTIONS(NOT DEFINES) */
-// const blend_mode_multiply = `
-// #define BLEND_MODE_ADD 1
-// float blend_mode_add(float a, float b) {
-//    return a*b;
-// }`;
-// const blend_mode_multiply = '      ( (a)*(b) )';
-// const blend_mode_add = `
-// float blend_mode_add(float a, float b) {
-//    return a+b;
-// }`;
-// const blend_mode_subtract = `
-// float blend_mode_add(float a, float b) {
-//    return a-b;
-// }`;
-// const blend_mode_devide = `
-// float blend_mode_add(float a, float b) {
-//    return a/b;
-// }`;
-// const blend_mode_lighten = `
-// float blend_mode_add(float a, float b) {
-//    return max(a,b);
-// }`;
-// const blend_mode_darken = `
-// float blend_mode_add(float a, float b) {
-//    return min(a,b);
-// }`;
-// const blend_mode_color_burn = `
-// float blend_mode_add(float a, float b) {
-//    return 1.-(1.-a)/b;
-// }`;
-// const blend_mode_color_dodge = `
-// float blend_mode_add(float a, float b) {
-//    return a/(1.-b);
-// }`;
-// const blend_mode_screen = `
-// float blend_mode_add(float a, float b) {
-//    return 1.-(1.-a)*(1.-b);
-// }`;
-// const blend_mode_overlay = `
-// float blend_mode_add(float a, float b) {
-//    if (a<=0.5) return (2.*a)*b; 
-//    else return 1.-(1.-2.*(a-0.5))*(1.-b);
-// }`;
+#elif defined(BLEND_MODE_LIGHTEN)
+#define blend_mode(a, b) blm_lighten(a, b)
 
-/**
- * vec3 blend_mode_add(vec3 a, vec3 b) {
-   return vec3(
-      blend_mode_add(a.r, b.r),
-      blend_mode_add(a.g, b.g),
-      blend_mode_add(a.b, b.b)
-   );
- */
+#elif defined(BLEND_MODE_DARKEN)
+#define blend_mode(a, b) blm_darken(a, b)
+
+#elif defined(BLEND_MODE_COLOR_BURN)
+#define blend_mode(a, b) blm_color_burn(a, b)
+
+#elif defined(BLEND_MODE_COLOR_DODGE)
+#define blend_mode(a, b) blm_color_dodge(a, b)
+
+#elif defined(BLEND_MODE_SCREEN)
+#define blend_mode(a, b) blm_screen(a, b)
+
+#elif defined(BLEND_MODE_OVERLAY)
+#define blend_mode(a, b) blm_overlay(a, b)
+
+#elif defined(BLEND_MODE_MIX)
+#define blend_mode(a, b) blm_mix(a, b)
+
+#else // Default
+#define blend_mode(a, b) blm_add(a, b)
+#define blend_mode_vec4(a, b) blend_color_multiply(a, b)
+#endif
+`;
+
+
+
+
+const blend_color_functions_overloads = 
+`
+vec4 blend_color_multiply(vec4 a, vec4 b) { return ${blend_color_multiply_vec4  }; }
+vec4 blend_color_multiply(vec4 a, vec3 b) { return ${blend_color_multiply_vec4_3}; }
+vec3 blend_color_multiply(vec3 a, vec3 b) { return ${blend_color_multiply_vec3  }; }
+vec4 blend_color_add(vec4 a, vec4 b) { return ${blend_color_add_vec4  }; }
+vec4 blend_color_add(vec4 a, vec3 b) { return ${blend_color_add_vec4_3}; }
+vec3 blend_color_add(vec3 a, vec3 b) { return ${blend_color_add_vec3  }; }
+vec4 blend_color_darken(vec4 a, vec4 b) { return ${blend_color_darken_vec4  }; }
+vec4 blend_color_darken(vec4 a, vec3 b) { return ${blend_color_darken_vec4_3}; }
+vec3 blend_color_darken(vec3 a, vec3 b) { return ${blend_color_darken_vec3  }; }
+vec4 blend_color_mix(vec4 a, vec4 b, float c) { return ${blend_color_mix_vec4   }; }
+vec4 blend_color_mix(vec4 a, vec3 b, float c) { return ${blend_color_mix_vec4_3 }; }
+vec3 blend_color_mix(vec3 a, vec3 b, float c) { return ${blend_color_mix_vec3   }; }
+`;
+
 
 
 
 
 export const shader_chunks = {
-   version                 : version,
-   precision_medium        : precision_medium,
-   precision_high          : precision_high,
-   u_orthoProj_in          : u_orthoProj_in,
+  version                 : version,
+  precision_medium        : precision_medium,
+  precision_high          : precision_high,
+  u_orthoProj_in          : u_orthoProj_in,
 
-   out_frag_color    : out_frag_color   ,
-   frag_u_sampler0   : frag_u_sampler0  ,
+  out_frag_color    : out_frag_color  ,
+  frag_u_sampler0   : frag_u_sampler0 ,
 
-   u_generic_vec4: u_generic_vec4,
-   u_generic_vec3: u_generic_vec3,
-   u_generic_vec2: u_generic_vec2,
-   u_generic_float: u_generic_float,
+  u_generic_vec4: u_generic_vec4,
+  u_generic_vec3: u_generic_vec3,
+  u_generic_vec2: u_generic_vec2,
+  u_generic_float: u_generic_float,
+  u_round_corners_params_vec3: u_round_corners_params_vec3,
+  u_glow_params_vec3: u_glow_params_vec3,
 
-   smoothmin  : smoothmin ,
+  coordinate_system_functions  : coordinate_system_functions,
+  blend_color_functions_overloads  : blend_color_functions_overloads,
+  smoothmin  : smoothmin,
+  brightness_contrast  : brightness_contrast,
+  gamma_correction  : gamma_correction,
+  hash_function  : hash_function,
+  noise_hash  : noise_hash,
+  noise_fbm  : noise_fbm,
 
-   
-   blend_mode_functions: blend_mode_functions, // Include all color blending modes to every fragment shader, to blend each subsequent color change of any different color functions.
-   blend_mode_directives: blend_mode_directives, // Set conditionaly a blending function for use to blend the product color INTERNALY of a color function(NOT the src-new colors). 
-   blend_mode_multiply: blend_mode_multiply,
-   blend_mode_add: blend_mode_add,
-   blend_mode_subtract: blend_mode_subtract,
-   blend_mode_devide: blend_mode_devide,
-   blend_mode_lighten: blend_mode_lighten,
-   blend_mode_darken: blend_mode_darken,
-   blend_mode_color_burn: blend_mode_color_burn,
-   blend_mode_color_dodge: blend_mode_color_dodge,
-   blend_mode_screen: blend_mode_screen,
-   blend_mode_overlay: blend_mode_overlay,
-   blend_mode_mix: blend_mode_mix,
+  
+  blend_mode_functions: blend_mode_functions, // Include all color blending modes to every fragment shader, to blend each subsequent color change of any different color functions.
+  blend_mode_directives: blend_mode_directives, // Set conditionaly a blending function for use to blend the product color INTERNALY of a color function(NOT the src-new colors). 
+  blend_mode_multiply: blend_mode_multiply,
+  blend_mode_add: blend_mode_add,
+  blend_mode_subtract: blend_mode_subtract,
+  blend_mode_devide: blend_mode_devide,
+  blend_mode_lighten: blend_mode_lighten,
+  blend_mode_darken: blend_mode_darken,
+  blend_mode_color_burn: blend_mode_color_burn,
+  blend_mode_color_dodge: blend_mode_color_dodge,
+  blend_mode_screen: blend_mode_screen,
+  blend_mode_overlay: blend_mode_overlay,
+  blend_mode_mix: blend_mode_mix,
 };
 
 

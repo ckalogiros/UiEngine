@@ -6,6 +6,7 @@
 
 const gfxCtx = {
     gl: null,
+    extentions_string: '', 
     ext: null,
 };
 
@@ -115,10 +116,10 @@ const SID = {
 
         // Color Manipulation Functions
         FN_GLOW_SPHERE: BIT1 <<= 1,
+        FN_NOISE_WORLEY: BIT1 <<= 1,
 
         // Test Shaders
         FS_TEST1: BIT1 <<= 1,
-        VS_TEST1: BIT1 <<= 1,
         FS_TEST2: BIT1 <<= 1,
     },
 
@@ -171,6 +172,7 @@ const SID = {
         FS_RCORNERS_FLOAT: BIT5<<=0x1,
         FS_RCORNERS_VEC2: BIT5<<=0x1,
         FS_RCORNERS_VEC3: BIT5<<=0x1,
+        FS_GLOW_VEC3: BIT5<<=0x1,
         // Generic Uniforms
         FS_GENERIC_FLOAT: BIT5<<=0x1,
         FS_GENERIC_VEC2: BIT5<<=0x1,
@@ -258,6 +260,7 @@ const SID = {
         dst.unif = 0x0;        dst.unif |= src.unif;
         dst.pass = 0x0;        dst.pass |= src.pass;
         dst.fx   = 0x0;        dst.fx   |= src.fx;
+        dst.blend_options = 0x0;  dst.blend_options   |= src.blend_options;
         dst.gfx_group = 0x0;
     },
 
@@ -268,6 +271,7 @@ const SID = {
             unif: src.unif,
             pass: src.pass,
             fx:   src.fx,
+            blend_options:   src.blend_options,
             gfx_group: 0x0,
         };
     },
@@ -413,40 +417,45 @@ const V_BORDER_FEATHER_STRIDE = 2;
 
 
 
-_CNT = 0x1;
+_CNT = 1;
 const MESH_ENABLE = {
 
     GFX: {
 
-        UNIF_RESOLUTION: 1,
-        UNIFORM: _CNT <<= 1,
-        UNIF_TIMER: _CNT <<= 1,
-        ATTR_DIM2: _CNT <<= 1,
-        ATTR_TEX2: _CNT <<= 1,
-        ATTR_TIME: _CNT <<= 1,
-        ATTR_STYLE: _CNT <<= 1,
-        ATTR_R_CORNERS: _CNT <<= 1,
-        ATTR_FEATHER: _CNT <<= 1,
-        ATTR_BORDER: _CNT <<= 1,
-        ATTR_GLOW_INTENSITY: _CNT <<= 1,
-        ATTR_COL4_PER_VERTEX: _CNT <<= 1,
+        ATTR_DIM2: _CNT++,
+        ATTR_TEX2: _CNT++,
+        ATTR_TIME: _CNT++,
+        ATTR_STYLE: _CNT++,
+        ATTR_R_CORNERS: _CNT++,
+        ATTR_FEATHER: _CNT++,
+        ATTR_BORDER: _CNT++,
+        ATTR_GLOW_INTENSITY: _CNT++,
+        ATTR_COL4_PER_VERTEX: _CNT++,
         
-        FX_GLOW: _CNT <<= 1,
-        FX_NOISE: _CNT <<= 1,
-        FX_SMOKE: _CNT <<= 1,
+        UNIF_RESOLUTION: _CNT++,
+        UNIFORM: _CNT++,
+        UNIF_TIMER: _CNT++,
+        
+        FX_GLOW: _CNT++,
+        FX_NOISE: _CNT++,
+        FX_SMOKE: _CNT++,
 
         // Pass from vertex to fragment shader
-        PASS_COL4: _CNT <<= 1,
-        PASS_WPOS2: _CNT <<= 1,
-        PASS_DIM2: _CNT <<= 1,
-        PASS_TIME1: _CNT <<= 1,
-        PASS_RES2: _CNT <<= 1,
+        PASS_COL4: _CNT++,
+        PASS_WPOS2: _CNT++,
+        PASS_DIM2: _CNT++,
+        PASS_TIME1: _CNT++,
+        PASS_RES2: _CNT++,
+
+        // Enable blending function for blending colors in fragment shader 
+        BLEND_OPTIONS: _CNT++, 
 
         // Shader Color Functions
-        FN_GLOW_SPHERE: _CNT <<= 1,
+        FN_GLOW_SPHERE: _CNT++,
+        FN_NOISE_WORLEY: _CNT++,
 
-        TEST_SHADERS_1: _CNT <<= 1,
-        TEST_SHADERS_2: _CNT <<= 1,
+        TEST_SHADERS_1: _CNT++,
+        TEST_SHADERS_2: _CNT++,
 
 
         NONE: 0,

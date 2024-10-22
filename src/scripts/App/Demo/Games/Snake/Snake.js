@@ -169,7 +169,7 @@ class Body_mesh_properties {
 /**************************************************************************************************************************************************************/
 // 
 
-export function Game_snake(y) {
+export function Game_snake(y=0) {
 
    const vertical_space = 35 + y;
    let board_width =  (VIEWPORT.WIDTH/2);
@@ -193,6 +193,7 @@ export function Game_snake(y) {
    // const board_color = TRANSPARENCY(Interpolate_rgb_to_01(160, 250, 255), .2);
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [board_pad, vertical_space, 0], [board_width-board_pad,board_height], board_color, 'section', style);
    section.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // section.EnableGfxUniforms({unif: SID.UNIF.FS_RCORNERS_VEC3,}, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, );
 
@@ -217,7 +218,8 @@ export function Game_snake(y) {
    
    collectable.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    collectable.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   collectable.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC2,}, 'u_glow_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   // collectable.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC2,}, 'u_glow_params', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   collectable.EnableGfxUniforms({fx: SID.FX.FS_GLOW_VEC3,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
    collectable.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 0);
    collectable.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,);
    collectable.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY);
@@ -266,6 +268,7 @@ export function Game_snake(y) {
       body_mesh.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       body_mesh.EnableGfxUniforms({unif: SID.UNIF.FS_RCORNERS_VEC3,}, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      // body_mesh.EnableGfxUniforms({unif: SID.UNIF.FS_GLOW_VEC3,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, snake.style[1]);
       body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
       // body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY);
@@ -369,7 +372,7 @@ export function Game_snake(y) {
    
 
    collectable.GfxUniformSetAndUpdate('u_scale2', [collectable_scale, 1]);
-   collectable.GfxUniformSetAndUpdate('u_glow_params', [.7, .7,]);
+   collectable.GfxUniformSetAndUpdate('u_glow_params', [.7, .7, 1.]);
    // Initialize shader attribute
    Gl_set_glow_intensity(collectable.gfx, 1.);
    
@@ -938,7 +941,7 @@ function Animation_scale_up_run(params){
    Gl_add_vpos_xy(body.mesh.gfx, res, res);
 
    body.mesh.mat.style[0] =  body.mesh.geom.dim[0];
-         Gl_set_round_corners(body.mesh.gfx, body.mesh.geom.dim[0]);
+   Gl_set_round_corners(body.mesh.gfx, body.mesh.geom.dim[0]);
    
    
    body.glow_intensity +=  snake.glow_intensity_step;
@@ -963,9 +966,8 @@ function Animation_scale_up_run(params){
 
    
    if(bodyidx + 1 < snake.count && !body.in_animation){
-   // if(body.mesh.geom.dim[0] > (body.size * body.max_scale_factor) *.8){
-      // if(body.mesh.geom.dim[0] > (body.size * body.max_scale_factor) *1.098){
-   if(body.mesh.geom.dim[0] > (body.size + snake.start_next_anim)){
+
+      if(body.mesh.geom.dim[0] > (body.size + snake.start_next_anim)){
 
          // Create scale up for the next body mesh
          const params2 = {
@@ -974,7 +976,6 @@ function Animation_scale_up_run(params){
             body_mesh_idx:params.body_mesh_idx + 1,
             physics: params.physics,
          };
-// console.log(bodyidx,body.idx, body.mesh.geom.dim[0], body.size * body.max_scale_factor)
          if(bodyidx <= snake.body.boundary){
             snake.in_scale_animation = true;
             body.in_animation = true;
@@ -989,35 +990,16 @@ function Animation_scale_up_run(params){
    // While the scaled mesh is less than the max scaled constant, continue scaling
    if(body.mesh.geom.dim[0] < body.size * body.max_scale_factor) return true;
    else return false;
-   // else { // Else scale max reached, return false to continue with the scale down AND create the next body scale up animation
-      // if(bodyidx + 1 < snake.count){
-
-      //    // Create scale up for the next body mesh
-      //    const params2 = {
-      //       section:section,
-      //       nose:params.nose,
-      //       body_mesh_idx:params.body_mesh_idx + 1,
-      //       physics: params.physics,
-      //    };
-            
-      //    if(bodyidx <= snake.body.boundary){
-      //       Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params2);
-      //       // Callback_animations_print_size();
-      //    }
-      // }
-      
-   //    return false;
-   // }
-
 
 }
 
 function Animation_scale_up_stop(params){
    
-   setTimeout(
-      ()=>{ Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params); /*Callback_animations_print_size();*/ },
-      100, 
-   );
+   Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params); /*Callback_animations_print_size();*/ 
+   // setTimeout(
+   //    ()=>{ Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params); /*Callback_animations_print_size();*/ },
+   //    100, 
+   // );
 
    snake.body.buffer[params.body_mesh_idx].t = 0.0;
    snake.body.buffer[params.body_mesh_idx].slope = Slope_function_logarithmic(0.0, slopec) +1;
@@ -1082,12 +1064,12 @@ function Animation_scale_down_run(params){
    
    else {
 
+      
       // Avoid smaller than snake.min_size body meshes
       body.mesh.geom.dim[0] = body.size;
       body.mesh.geom.dim[1] = body.size;
       body.mesh.geom.SetDimXY(body.mesh.gfx, body.size, body.size);
-
-
+      
       // Reposition mesh after setting initial dimention on the axis of the prev and next body meshes
       if(bodyidx > 0 && bodyidx < snake.count-1){
 

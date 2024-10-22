@@ -1665,8 +1665,8 @@ export function Gl_set_wpos_time(gfxInfo, val) {
 /**************************************************************************************************************/
 // Particle System: Batch Update Particles
 
-
-export function Gl_particles_batch_set_col4_wpos4_pos2_style3(vbidx, start, colors, positions, time) {
+// TODO: Implement correctly all fill functions for particles
+export function Gl_particles_batch_set_col4_wpos4_pos2_style2(vbidx, start, colors, positions, time) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')
 
    const vb_info = VBI_get_byidx(vbidx);

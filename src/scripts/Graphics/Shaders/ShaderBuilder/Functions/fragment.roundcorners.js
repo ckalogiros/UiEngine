@@ -73,6 +73,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 
 
+// export const frag_round_corners_call = '  color = blend_color_multiply( color, Round_corners(scale_down) );';
 export const frag_round_corners_call = '  color = Round_corners(scale_down);';
 export const frag_round_corners = `
 
@@ -85,20 +86,9 @@ export const frag_round_corners = `
     vec2 uv = vec2(0,0);
 #endif
 
-float smoothmin(float a, float b, float k)
-{
-  if (k != 0.0) {
-    float h = max(k - abs(a - b), 0.0) / k;
-    return min(a, b) - h * h * h * k * (1.0 / 6.0);
-  }
-  else {
-    return min(a, b);
-  }
-}
 
 vec4 Round_corners(float scale_down)
 {
-
     #ifdef U_RCORNERS_VEC3
         float slider = u_rcorners.x;
         float smoothness = u_rcorners.y;
@@ -116,7 +106,9 @@ vec4 Round_corners(float scale_down)
         float smoothness = .5;
         float power = 1.;
     #endif
-
+//   #ifdef U_GLOW_PARAMS_VEC3
+//     #include <u_round_corners_params_vec3>
+//   #endif
 
     float scale_up = 1./scale_down;
     vec2 rCorners = vec2(v_rcorners) * scale_down;
@@ -128,20 +120,9 @@ vec4 Round_corners(float scale_down)
 
     #ifndef UV_READY
         #define UV_READY 1
-        
-        uv = (gl_FragCoord.xy-(res*.5));
-        uv.x += (res.x*.5); // Center mesh to screen
-        uv.y -= (res.y*.5); // Center mesh to screen
-        
-        // To move with mesh position
-        uv.x -= v_wpos3_x;
-        uv.y += v_wpos3_y;
-        
-        // Subtract constant dimention
-        uv.x -= dim.x*scale_up; 
-        uv.y -= -dim.y*scale_up;
-    #endif    
-
+        uv = gl_FragCoord.xy;
+        pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
+    #endif   
 
     vec2 abs_uv = abs(uv);
 
@@ -186,395 +167,19 @@ vec4 Round_corners(float scale_down)
     // if(shad_len > 10.) return vec4(1., 0., 0., 1.);
 
 
-    strength = power*min(balance_dim_ratio*.1, 1.);
+    // strength = power*min(balance_dim_ratio*.1, 1.);
+    strength = power*blm_darken(balance_dim_ratio*.1, 1.);
 
     color = mix( color, pow(color, vec3(strength)), g );
     
     return vec4(color, alpha);
 }
 `;
-/**SAVE 3 */
-// export const frag_round_corners = `
 
 
-// #ifndef UV_READY
-//     vec2 uv = vec2(0,0);
-// #endif
 
-// vec4 Round_corners(float scale_down)
-// {
-
-//     #ifdef U_RCORNERS_VEC3
-//         float slider = u_rcorners.x;
-//         float smoothness = u_rcorners.y;
-//         float power = u_rcorners.z;
-//     #elif defined(U_RCORNERS_VEC2)
-//         float slider = u_rcorners.x;
-//         float smoothness = u_rcorners.y;
-//         float power = 6.;
-//     #elif defined(U_RCORNERS_FLOAT)
-//         float slider = u_rcorners;
-//         float smoothness = .5;
-//         float power = 6.;
-//     #else
-//         float slider = .3;
-//         float smoothness = .5;
-//         float power = 6.;
-//     #endif
-
-//     // #ifdef U_SMOOTHNESS_FLOAT // Values {0 (hard), 1 (smooth)}.
-//     //     float smoothness = u_smoothness_1f;
-//     // #else
-//     //     float smoothness = .9;
-//     // #endif
-
-//     float scale_up = 1./scale_down;
-//     vec2 rCorners = vec2(v_rcorners) * scale_down;
-//     float feather = v_feather;
-//     vec2 res = u_screen_res;
-//     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-//     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
-    
-
-//     #ifndef UV_READY
-//         #define UV_READY 1
-        
-//         uv = (gl_FragCoord.xy-(res*.5));
-//         uv.x += (res.x*.5); // Center mesh to screen
-//         uv.y -= (res.y*.5); // Center mesh to screen
-        
-//         // To move with mesh position
-//         uv.x -= v_wpos3_x;
-//         uv.y += v_wpos3_y;
-        
-//         // Subtract constant dimention
-//         uv.x -= dim.x*scale_up; 
-//         uv.y -= -dim.y*scale_up;
-//     #endif    
-
-
-//     vec2 abs_uv = abs(uv);
-    
-    
-//     float d = length(max((abs_uv - dim) + rCorners.x, 0.0)) - rCorners.x;
-    
-    
-//     float wb = clamp(-d / feather, 0.0, 1.0);
-//     float alpha = src_color.a * wb;
-//     // float alpha = src_color.a * d;
-//     vec3 color = src_color.rgb * alpha;
-
-
-//     float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
-//     float strength = 2.2 * ((slider+1.)*.5);                        /* Creates a stronger shadow on full slider */
-//     // float strength = 2.2;
-    
-//     /* The greater the power, the bigger the distance of the effect. pow:min=0.0, max=1.0*/
-    
-//     // float smoothness = .2; // Values {0 (hard), 1 (smooth)}. 
-    
-//     // float balance_dim_ratio = max(min_dim * .035, 1.);
-//     // float balance_dim_ratio = max(min_dim * .1, 1.);
-//     // float balance_dim_ratio = max(min_dim * .05, 1.);
-//     float fff = min(max(min_dim * (1.-slider) , 0.05), .07);
-//     float balance_dim_ratio = max(min_dim * fff, 1.);
-    
-//     power *= 6.;
-
-//     float depth = balance_dim_ratio * power; // Balance the shadow depth to the mesh dimentions
-//     // depth *= balance_dim_ratio * 1. * ((smoothness+1.)*4.*smoothness); // Balance the shadow depth to the mesh dimentions
-//     // depth *= balance_dim_ratio * ((smoothness+1.)*2.); // Balance the shadow depth to the mesh dimentions
-
-//     depth *= slider;
-
-//     /* Shadow effect depth */
-//     // rCorners.x -= rCorners.x * .45;
-//     rCorners.x -= rCorners.x * smoothness;
-//     float shad_len = length(max((abs_uv - dim) + rCorners.x + depth, 0.0))  - rCorners.x;
-//     // float shad_len = length(max((abs_uv - dim) + rCorners.x + depth, 0.0))  - rCorners.x - depth;
-    
-    
-//     float g = smoothstep(.0, min_dim * smoothness, shad_len); // Always returns interpolated value {0, 1}
-
-
-//     // if(g > 0.5) return vec4(1., 0., 0., 1.);
-
-
-//     // strength = min(4.8*min_dim, 4.);
-//     // strength = 14.8*min_dim;
-//     // strength *= min_dim;
-//     // strength *= min(4.8*min_dim, 6.);
-//     strength = 1.8;
-
-//     // color = mix( color, pow(color, vec3(strength)), g );
-//     color = mix( color, pow(color, vec3(strength)), g );
-//     // color = mix( color, pow(color, vec3(2.)), (1.-g) );
-//     // color = color * (g);
-    
-//     return vec4(color, alpha);
-// }
-// `;
-/**SAVE 1 */
-// export const frag_round_corners = `
-
-
-// #ifndef UV_READY
-//     vec2 uv = vec2(0,0);
-// #endif
-
-// vec4 Round_corners(float scale_down)
-// {
-
-//     #ifdef U_RCORNERS_FLOAT
-//         float slider = u_rcorners;
-//     #else
-//         float slider = .3;
-//     #endif
-
-//     float scale_up = 1./scale_down;
-//     vec2 rCorners = vec2(v_rcorners) * scale_down;
-//     float feather = v_feather;
-//     vec2 res = u_screen_res;
-//     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-//     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
-    
-
-//     #ifndef UV_READY
-//         #define UV_READY 1
-        
-//         uv = (gl_FragCoord.xy-(res*.5));
-//         uv.x += (res.x*.5); // Center mesh to screen
-//         uv.y -= (res.y*.5); // Center mesh to screen
-        
-//         // To move with mesh position
-//         uv.x -= v_wpos3_x;
-//         uv.y += v_wpos3_y;
-        
-//         // Subtract constant dimention
-//         uv.x -= dim.x*scale_up; 
-//         uv.y -= -dim.y*scale_up;
-//     #endif    
-
-
-//     vec2 abs_uv = abs(uv);
-    
-    
-//     float d = length(max((abs_uv - dim) + rCorners.x, 0.0)) - rCorners.x;
-    
-    
-//     float wb = clamp(-d / feather, 0.0, 1.0);
-//     float alpha = src_color.a * wb;
-//     // float alpha = src_color.a * d;
-//     vec3 color = src_color.rgb * alpha;
-
-
-//     float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
-//     float strength = 2.2 * ((slider+1.)*.5);                        /* Creates a stronger shadow on full slider */
-//     // float strength = 2.2;
-    
-//     /* The greater the power, the bigger the distance of the effect. pow:min=0.0, max=1.0*/
-//     float depth = slider;
-
-//     float smoothness = .9; // Values {0 (hard), 1 (smooth)}. 
-
-//     // float balance_dim_ratio = max(min_dim * .035, 1.);
-//     float balance_dim_ratio = max(min_dim * .07, 1.);
-//     depth *= balance_dim_ratio * 4. * (smoothness+1.); // Balance the shadow depth to the mesh dimentions
-//     // depth *= balance_dim_ratio / (smoothness+1.); // Balance the shadow depth to the mesh dimentions
-
-//     // depth = min(depth, min_dim-rCorners.x*14.);
-
-//     /* Shadow effect depth */
-//     // rCorners.x *= 1.-smoothness;
-//     rCorners.x *= 2.1;
-//     float shad_len = length(max((abs_uv - dim) + rCorners.x + depth, 0.0))  - rCorners.x;
-    
-    
-//     float g = smoothstep(.0, min_dim * smoothness, shad_len); // Always returns interpolated value {0, 1}
-
-//     // if(g > 0.5) return vec4(1., 0., 0., 1.);
-
-
-//     // strength = min(4.8*min_dim, 4.);
-//     // strength = 14.8*min_dim;
-//     // strength *= min_dim;
-//     // strength *= min(4.8*min_dim, 6.);
-//     strength = 14.;
-
-//     // color = mix( color, pow(color, vec3(strength)), g );
-//     color = mix( color, pow(color, vec3(strength)), g );
-//     // color = mix( color, pow(color, vec3(2.)), (1.-g) );
-//     // color = color * (g);
-    
-//     return vec4(color, alpha);
-// }
-// `;
-/**SAVE ORIGINAL */
-// export const frag_round_corners = `
-
-
-// #ifndef UV_READY
-//     vec2 uv = vec2(0,0);
-// #endif
-
-// vec4 Round_corners(float scale_down)
-// {
-
-//     #ifdef U_RCORNERS_FLOAT
-//         float slider = u_rcorners;
-//     #else
-//         float slider = .3;
-//     #endif
-
-//     float scale_up = 1./scale_down;
-//     vec2 rCorners = vec2(v_rcorners) * scale_down;
-//     float feather = v_feather;
-//     vec2 res = u_screen_res;
-//     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-//     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
-    
-
-//     #ifndef UV_READY
-//         #define UV_READY 1
-        
-//         uv = (gl_FragCoord.xy-(res*.5));
-//         uv.x += (res.x*.5); // Center mesh to screen
-//         uv.y -= (res.y*.5); // Center mesh to screen
-        
-//         // To move with mesh position
-//         uv.x -= v_wpos3_x;
-//         uv.y += v_wpos3_y;
-        
-//         // Subtract constant dimention
-//         uv.x -= dim.x*scale_up; 
-//         uv.y -= -dim.y*scale_up;
-//     #endif    
-    
-    
-//     vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention
-//     float d = length(max(q, 0.0)) - rCorners.x;
-    
-    
-//     float wb = clamp(-d / feather, 0.0, 1.0);
-//     float alpha = src_color.a * wb;
-//     vec3 color = src_color.rgb * alpha;
-
-
-//     float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
-//     // float strength = 2.2 * ((1. + 1.8*.5) - ((slider+1.)*.5));   /* Creates a lighter shadow on full slider */
-//     float strength = 2.2 * (((slider+1.)*.5));                      /* Creates a stronger shadow on full slider */
-//     // float strength = 2.2;
-    
-//     /* The greater the power, the bigger the distance of the effect. pow:min=0.0, max=1.0*/
-//     float ratio = pow(min_dim, .6) * .46;                           /* More in large lengths and less in small */
-//     // float ratio = pow(min_dim, .36) * 1.;                        /* More in small lengths and less in large */
-//     float depth = rCorners.x * ratio * slider;
-
-//     /* Shadow effect depth */
-//     float shad_len = length(max((abs(uv) - dim) + depth, 0.0));
-
-//     float g = smoothstep(.0, min_dim, shad_len);
-
-
-//     // if(g>=1.) color = vec3(1.);
-//     // else if(g<=0.) color = vec3(.0, 1., 1.);
-//     color = mix( color, pow(color, vec3(strength)), g );
-//     // color = mix( color, pow(color, vec3(strength)), 0. );
-    
-//     return vec4(color, alpha);
-// }
-// `;
-
-// export const frag_round_corners = `
-
-
-// #ifndef UV_READY
-//     vec2 uv = vec2(0,0);
-// #endif
-
-// vec4 Round_corners(float scale_down)
-// {
-
-//     #ifdef U_RCORNERS_FLOAT
-//         float distance = u_rcorners*.1;
-//     #else
-//         float distance = .3;
-//     #endif
-
-//     float scale_up = 1./scale_down;
-//     vec2 rCorners = vec2(v_rcorners) * scale_down;
-//     float feather = v_feather;
-//     vec2 res = u_screen_res;
-//     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-//     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
-    
-
-//     #ifndef UV_READY
-//         #define UV_READY 1
-        
-//         uv = (gl_FragCoord.xy-(res*.5));
-//         uv.x += (res.x*.5); // Center mesh to screen
-//         uv.y -= (res.y*.5); // Center mesh to screen
-        
-//         // To move with mesh position
-//         uv.x -= v_wpos3_x;
-//         uv.y += v_wpos3_y;
-        
-//         // Subtract constant dimention
-//         uv.x -= dim.x*scale_up; 
-//         uv.y -= -dim.y*scale_up;
-//     #endif    
-    
-    
-//     vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention
-//     float d = length(max(q, 0.0)) - rCorners.x;
-    
-    
-//     float wb = clamp(-d / feather, 0.0, 1.0);
-//     float alpha = src_color.a * wb;
-    
-
-//     vec3 color = src_color.rgb * alpha;
-    
-//     /*** Shaded Color ***/
-//     // float wide = dim.x*.03; 
-//     // float wide = dim.x*.4; 
-//     // float wide = dim.x*.1; 
-//     // float max_dist = 1.; 
-//     // float strength = 3.8; 
-//     // color = mix( color, pow(color, vec3(strength)), max_dist-smoothstep(0.0, dim.x, abs(d)*wide) );
-
-
-//     float dist = (dim.x < dim.y) ? dim.x : dim.y;
-//     float wide = 1.; 
-//     // float wide = dist*.01; 
-//     float strength = 14.2; 
-//     // float g = 1.0 - clamp(smoothstep(0.0, distance, abs(d)*wide), 0.0, 1.0);
-//     // float g = clamp(smoothstep(distance, 0.0, abs(d)*wide), 0., 1.9);
-//     // float g = clamp(smoothstep(10., 0.0, abs(d))*distance, 0., 1.9);
-//     // float g = smoothstep(1., .0, abs(d * (dim.x+dim.y))*distance);
-//     float g = smoothstep(1., .0, abs(d)*distance);
-    
-//     float ddd = 15.;
-//     float jjj = length(max((abs(uv) - dim)+ ddd, 0.0)) - ddd;
-//     // float jjj = length((abs(uv) - dim) + dim);
-//     // float jjj = length((abs(uv) - dim));
-//     // float g = smoothstep(1., .0, abs(jjj)*distance); // + (dim.x*dim.y);
-//     // float g = 1.-smoothstep(.0, 1.0, abs(jjj)*distance);
-//     // float g = smoothstep(.0, 1.0, abs(jjj)*wide);
-    
-//     color = mix( color, pow(color, vec3(strength)), g+g );
-
-    
-//     return vec4(color, alpha);
-// }
-// `;
-
-
-export const frag_feather_call = '  color *= Feather(scale_down);';
+export const frag_feather_call = '  color = blend_color_multiply( color, Feather(scale_down) );';
 export const frag_feather = `
-
-// in vec2 DIM;
 
 #ifndef UV_READY
     vec2 uv = vec2(0,0);
@@ -588,21 +193,12 @@ float Feather(float scale_down)
     float feather = (v_feather <= 0.0) ? 0.00001 : v_feather;
     float scale_up = 1./scale_down;
 
+
     #ifndef UV_READY
         #define UV_READY 1
-        
-        uv = (gl_FragCoord.xy-(res*.5));
-        uv.x += (res.x*.5); // Center mesh to screen
-        uv.y -= (res.y*.5); // Center mesh to screen
-        
-        // To move with mesh position
-        uv.x -= v_wpos3_x;
-        uv.y += v_wpos3_y;
-        
-        // Subtract constant dimention
-        uv.x -= dim.x*scale_up; 
-        uv.y -= -dim.y*scale_up;
-    #endif   
+        uv = gl_FragCoord.xy;
+        pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
+    #endif  
 
 
 
@@ -614,50 +210,9 @@ float Feather(float scale_down)
     return alpha;
 }
 `;
-/**SAVE */
-// export const frag_feather = `
 
 
-// #ifndef UV_READY
-//     vec2 uv = vec2(0,0);
-// #endif
-
-// float Feather(float scale_down)
-// {
-//     vec2 res = u_screen_res;
-//     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-//     float feather = (v_feather <= 0.0) ? 0.00001 : v_feather;
-//     float scale_up = 1./scale_down;
-
-//     // #ifndef UV_READY
-//     //     #define UV_READY 1
-        
-//     //     uv = (gl_FragCoord.xy-(res*.5));
-//     //     uv.x += (res.x*.5); // Center mesh to screen
-//     //     uv.y -= (res.y*.5); // Center mesh to screen
-        
-//     //     // To move with mesh position
-//     //     uv.x -= v_wpos3_x;
-//     //     uv.y += v_wpos3_y;
-        
-//     //     // Subtract constant dimention
-//     //     uv.x -= dim.x*scale_up; 
-//     //     uv.y -= -dim.y*scale_up;
-//     // #endif   
-
-
-
-//     float width = feather;
-//     vec2 q = (abs(uv) - dim) + width;
-//     float d = length(max(q, 0.0)) - width;
-//     float alpha = clamp(-d/feather, 0.0, 1.0);
-
-//     return alpha;
-// }
-// `;
-
-
-export const frag_style_call = '  color = Stylize(scale_down);';
+export const frag_style_call = '  color = blend_color_multiply( color, Stylize(scale_down) );';
 export const frag_style_corners = `
 
 vec2 pos = vec2(.0);
@@ -683,23 +238,12 @@ vec4 Stylize(float scale_down)
     float clarity = 40.4;
     ScreenH = min(res.x, res.y)*clarity;
     AA = ScreenH*0.5;
-
-#ifndef UV_READY
-    #define UV_READY 1
     
-    uv = (gl_FragCoord.xy-(res*.5));
-    uv.x += (res.x*.5); // Center mesh to screen
-    uv.y -= (res.y*.5); // Center mesh to screen
-    
-    // To move with mesh position
-    uv.x -= v_wpos3_x;
-    uv.y += v_wpos3_y;
-    
-    // Subtract constant dimention
-    uv.x -= dim.x*scale_up; 
-    uv.y -= -dim.y*scale_up;
-#endif    
-    
+    #ifndef UV_READY
+        #define UV_READY 1
+        uv = gl_FragCoord.xy;
+        pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
+    #endif 
     
     vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention
     float d = length(max(q, 0.0)) - rCorners.x;

@@ -712,12 +712,19 @@ export class Mesh {
 
 
             // Shader Color Functions
-            case MESH_ENABLE.GFX.FN_GLOW_SPHERE: { this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break; }
+            case MESH_ENABLE.GFX.FN_GLOW_SPHERE: { 
+                if(this.sid.blend_options===0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
+                // if(params===null) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
+                this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break; 
+            }
+            case MESH_ENABLE.GFX.FN_NOISE_WORLEY: { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY; break; }
+
+            case MESH_ENABLE.GFX.BLEND_OPTIONS: { if(params===null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
 
 
 
-            case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.VS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
-            case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.VS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
+            case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
+            case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
 
         }
 
