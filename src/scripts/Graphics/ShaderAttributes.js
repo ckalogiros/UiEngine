@@ -2,6 +2,7 @@
 
 import { New_generic_buffer  } from "../Engine/Core/Buffers.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Engine/Core/StringBuffer.js";
+import { Program_get_shader_attribs_indexing, Program_get_shader_attributes_index } from "./ShaderPrograms.js";
 
 
 
@@ -30,54 +31,54 @@ export class Attributes_indexing { // Attributes indexing based on attribute typ
       this.COL4_PER_VERTEX = INT_NULL;
    }
 
-   FindByNameAndStoreIndex(attrib_nameid, index){
+   FindByNameAndStoreIndex(attrib_nameid, attributes_index){
 
       if (attrib_nameid & SID.ATTR.COL4) {
-         this.COL4 = index;
+         this.COL4 = attributes_index.COL4;
       }
       
       else if (attrib_nameid & SID.ATTR.WPOS3) {
-         this.WPOS3 = index;
+         this.WPOS3 = attributes_index.WPOS3;
       }
       
       else if (attrib_nameid & SID.ATTR.TIME) {
-         this.TIME = index;
+         this.TIME = attributes_index.TIME;
       }
       
       else if (attrib_nameid & SID.ATTR.VPOS2) {
-         this.VPOS2 = index;
+         this.VPOS2 = attributes_index.VPOS2;
       }
       
       else if (attrib_nameid & SID.ATTR.DIM2) {
-         this.DIM2 = index;
+         this.DIM2 = attributes_index.DIM2;
       }
       
       else if (attrib_nameid & SID.ATTR.R_CORNERS) {
-         this.R_CORNERS = index;
+         this.R_CORNERS = attributes_index.R_CORNERS;
       }
       
       else if (attrib_nameid & SID.ATTR.BORDER) {
-         this.BORDER = index;
+         this.BORDER = attributes_index.BORDER;
       }
       
       else if (attrib_nameid & SID.ATTR.FEATHER) {
-         this.FEATHER = index;
+         this.FEATHER = attributes_index.FEATHER;
       }
       
       else if (attrib_nameid & SID.ATTR.TEX2) {
-         this.TEX2 = index;
+         this.TEX2 = attributes_index.TEX2;
       }
       
       else if (attrib_nameid & SID.ATTR.GLOW_INTENSITY) {
-         this.GLOW_INTENSITY = index;
+         this.GLOW_INTENSITY = attributes_index.GLOW_INTENSITY;
       }
       
       else if (attrib_nameid & SID.ATTR.SDF) {
-         this.SDF = index;
+         this.SDF = attributes_index.SDF;
       }
       
       else if (attrib_nameid & SID.ATTR.MSDF) {
-         this.MSDF = index;
+         this.MSDF = attributes_index.MSDF;
       }
    }
 }
@@ -287,37 +288,205 @@ export function Shader_attributes_create(attribs_info) {
 
 
 
+/**WITH PARAM attribs_info from create vertex buffer*/
+// export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_info, vbidx) {
 
-export function Shader_attributes_enable(attribsidx, attribs_divisor) {
+//    console.log('-------------------------------------------------------------------------')
+//    console.log('VERTEX ATTRIBUTES ENABLE')
+//    const gl_type = gfxCtx.gl.FLOAT; // TODO: store the gl.type inside the shaderinfo???
 
+//    // let stride = _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.attribs_per_vertex;
+//    const vb_attribs = _shader_attribs_buffer.buffer[attribsidx].attribs_loc;
+   
+//    const len = attribs_info.locs.length;
+//    let stride = 0;
+//    for (let i = 0; i < len; i++) {
+//       stride += attribs_info.sizes[i];
+//    }
+
+//    /** THE LOCATIONS ARE THE ISSUE !!! */
+   
+//    for (let i = 0; i < len; i++) {
+
+//       /** The attrib divisor denotes the frequency at wich the different meshes will be drawn out of the vertex buffer.
+//        * For example: An intanced vb has 4 wpos. If we set divisor to 1, then each instanced geometry will use 1 wpos.
+//        * If the divisor is set to 2, then 2 instanced geometries will use 1 wpos.
+//        * So if we draw 8 instances of a mesh and we need lets say 4 wpos, 
+//        * then we set the divisor to 2, so that 2 meshes will consume 1 wpos => 8/4=2(divisor)
+//        */
+
+//       gfxCtx.gl.enableVertexAttribArray(attribs_info.locs[i]);
+//       gfxCtx.gl.vertexAttribPointer(attribs_info.locs[i], attribs_info.sizes[i], gl_type, false, stride * FLOAT32_BYTE_SIZE, attribs_info.offsets[i] * FLOAT32_BYTE_SIZE);
+//       gfxCtx.gl.vertexAttribDivisor(attribs_info.locs[i], attribs_divisor);
+//       // gfxCtx.gl.enableVertexAttribArray(locat[loc_i]);
+//       // gfxCtx.gl.vertexAttribPointer(locat[loc_i], attribs_info.sizes[i], gl_type, false, stride * FLOAT32_BYTE_SIZE, attribs_info.offsets[i] * FLOAT32_BYTE_SIZE);
+//       // gfxCtx.gl.vertexAttribDivisor(locat[loc_i], attribs_divisor);
+//       // loc_i++;
+
+//       console.log(
+//          'loc', attribs_info.locs[i],
+//          // 'loc', locat,
+//          'size', attribs_info.sizes[i],
+//          'offset', attribs_info.offsets[i],
+//          'vbidx', vbidx,
+//          'stride', stride,
+//          'divisor', attribs_divisor,
+//       );
+
+//    }
+//    // VERTEX ATTRIBUTES ENABLE 
+//    // loc 0 size 4 offset 0 vbidx 0 stride 7 divisor 1 
+//    // loc 1 size 3 offset 4 vbidx 0 stride 7 divisor 1 
+//    // ------------------------------------------------------------------------- 
+//    // VERTEX ATTRIBUTES ENABLE 
+//    // loc 1 size 2 offset 0 vbidx 1 stride 2 divisor 0 
+// }
+
+let len1 = 2, cnt1=0, stride1=8, offset1=[0,4], loc1=[0,1], size1=[4,4]
+let len2 = 1, cnt2 = 2, stride2=4, offset2=[0], loc2=[2], size2=[4]
+let bool = true
+
+
+// export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_info, vbidx) {
+
+//    console.log('-------------------------------------------------------------------------')
+//    console.log('VERTEX ATTRIBUTES ENABLE')
+//    const gl_type = gfxCtx.gl.FLOAT; // TODO: store the gl.type inside the shaderinfo???
+
+   
+//    // const len = vb_attribs.length;
+//    let len = len1, cnt = cnt1, offset=offset1, stride=stride1, loc=loc1, size=size1;
+//    if(bool) bool = false
+//    else len = len2, cnt = cnt2, offset=offset2, stride=stride2, loc=loc2, size=size2
+
+//    /** THE LOCATIONS ARE THE ISSUE !!! */
+   
+//    for (let i = 0; i < len; i++) {
+
+
+//       gfxCtx.gl.enableVertexAttribArray(loc[i]);
+//       gfxCtx.gl.vertexAttribPointer(loc[i], size[i], gl_type, false, stride * FLOAT32_BYTE_SIZE, offset[i] * FLOAT32_BYTE_SIZE);
+//       gfxCtx.gl.vertexAttribDivisor(loc[i], attribs_divisor);
+//       // gfxCtx.gl.enableVertexAttribArray(vb_attribs[cnt].locs);
+//       // gfxCtx.gl.vertexAttribPointer(vb_attribs[cnt].locs, vb_attribs[cnt].sizes, gl_type, false, stride * FLOAT32_BYTE_SIZE, vb_attribs[cnt].offsets * FLOAT32_BYTE_SIZE);
+//       // gfxCtx.gl.vertexAttribDivisor(vb_attribs[cnt].locs, attribs_divisor);
+      
+//       console.log(
+//          'loc', loc[i],
+//          'size', size[i],
+//          'offset', offset[i],
+//          'stride', stride,
+//          'vbidx', vbidx,
+//          'divisor', attribs_divisor,
+//       );
+//       cnt++;
+      
+//    }
+//    console.log('attribs_info', attribs_info)
+
+// }
+/*SAVE ORIGINAL*/
+export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_info, vbidx) {
+
+   console.log('-------------------------------------------------------------------------')
+   console.log('VERTEX ATTRIBUTES ENABLE')
    const gl_type = gfxCtx.gl.FLOAT; // TODO: store the gl.type inside the shaderinfo???
 
-   const stride = _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.attribs_per_vertex;
+   let stride = _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.attribs_per_vertex;
    const vb_attribs = _shader_attribs_buffer.buffer[attribsidx].attribs_loc;
+   
    const len = vb_attribs.length;
+   // let stride = 0;
+   // for (let i = 0; i < len; i++) {
+   //    stride += attribs_info.sizes[i];
+   // }
+
+   /** THE LOCATIONS ARE THE ISSUE !!! */
+   
    for (let i = 0; i < len; i++) {
 
-      /** The attrib divisor is denotes the frequency at wich the different meshes will be drawn out of the vertex buffer.
+      /** The attrib divisor denotes the frequency at wich the different meshes will be drawn out of the vertex buffer.
        * For example: An intanced vb has 4 wpos. If we set divisor to 1, then each instanced geometry will use 1 wpos.
        * If the divisor is set to 2, then 2 instanced geometries will use 1 wpos.
-       * So if we draw 8 instances of a mesh and we need lets sy 4 wpos, 
-       * then we set the divisor to 2, so that 2 meshes will consume 1 wpo => 8/4=2(divisor)
+       * So if we draw 8 instances of a mesh and we need lets say 4 wpos, 
+       * then we set the divisor to 2, so that 2 meshes will consume 1 wpos => 8/4=2(divisor)
        */
 
+      // gfxCtx.gl.enableVertexAttribArray(attribs_info.locs[i]);
+      // gfxCtx.gl.vertexAttribPointer(attribs_info.locs[i], attribs_info.sizes[i], gl_type, false, stride * FLOAT32_BYTE_SIZE, attribs_info.offsets[i] * FLOAT32_BYTE_SIZE);
+      // gfxCtx.gl.vertexAttribDivisor(attribs_info.locs[i], attribs_divisor);
       gfxCtx.gl.enableVertexAttribArray(vb_attribs[i].locs);
       gfxCtx.gl.vertexAttribPointer(vb_attribs[i].locs, vb_attribs[i].sizes, gl_type, false, stride * FLOAT32_BYTE_SIZE, vb_attribs[i].offsets * FLOAT32_BYTE_SIZE);
-      // gfxCtx.gl.vertexAttribPointer(vb_attribs[i].locs, 2, gl_type, false, stride * FLOAT32_BYTE_SIZE, vb_attribs[i].offsets * FLOAT32_BYTE_SIZE);
       gfxCtx.gl.vertexAttribDivisor(vb_attribs[i].locs, attribs_divisor);
+      // gfxCtx.gl.enableVertexAttribArray(locat[loc_i]);
+      // gfxCtx.gl.vertexAttribPointer(locat[loc_i], attribs_info.sizes[i], gl_type, false, stride * FLOAT32_BYTE_SIZE, attribs_info.offsets[i] * FLOAT32_BYTE_SIZE);
+      // gfxCtx.gl.vertexAttribDivisor(locat[loc_i], attribs_divisor);
+      // loc_i++;
+
+      console.log(
+         'loc', vb_attribs[i].locs,
+         'size', vb_attribs[i].sizes,
+         'offset', vb_attribs[i].offsets,
+         'stride', stride,
+         'vbidx', vbidx,
+         'divisor', attribs_divisor,
+      );
 
    }
+   // VERTEX ATTRIBUTES ENABLE 
+   // loc 0 size 4 offset 0 vbidx 0 stride 7 divisor 1 
+   // loc 1 size 3 offset 4 vbidx 0 stride 7 divisor 1 
+   // ------------------------------------------------------------------------- 
+   // VERTEX ATTRIBUTES ENABLE 
+   // loc 1 size 2 offset 0 vbidx 1 stride 2 divisor 0 
 }
+
+/** */
+// export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_info, vbidx) {
+
+//    console.log('-------------------------------------------------------------------------')
+//    console.log('VERTEX ATTRIBUTES ENABLE')
+//    const gl_type = gfxCtx.gl.FLOAT; // TODO: store the gl.type inside the shaderinfo???
+
+//    // const stride = _shader_attribs_buffer.buffer[attribsidx].mesh_attribs.attribs_per_vertex;
+//    const vb_attribs = _shader_attribs_buffer.buffer[attribsidx].attribs_loc;
+//    const len = vb_attribs.length;
+
+//    let stride = 0;
+//    for (let i = 0; i < len; i++) {
+//       stride += attribs_info.sizes[i];
+//    }
+//    for (let i = 0; i < len; i++) {
+
+//       /** The attrib divisor denotes the frequency at wich the different meshes will be drawn out of the vertex buffer.
+//        * For example: An intanced vb has 4 wpos. If we set divisor to 1, then each instanced geometry will use 1 wpos.
+//        * If the divisor is set to 2, then 2 instanced geometries will use 1 wpos.
+//        * So if we draw 8 instances of a mesh and we need lets say 4 wpos, 
+//        * then we set the divisor to 2, so that 2 meshes will consume 1 wpos => 8/4=2(divisor)
+//        */
+
+//       gfxCtx.gl.enableVertexAttribArray(vb_attribs[i].locs);
+//       gfxCtx.gl.vertexAttribPointer(vb_attribs[i].locs, vb_attribs[i].sizes, gl_type, false, stride * FLOAT32_BYTE_SIZE, vb_attribs[i].offsets * FLOAT32_BYTE_SIZE);
+//       gfxCtx.gl.vertexAttribDivisor(vb_attribs[i].locs, attribs_divisor);
+
+//       console.log(
+//          'loc', vb_attribs[i].locs,
+//          'size', vb_attribs[i].sizes,
+//          'offset', vb_attribs[i].offsets,
+//          'vbidx', vbidx,
+//          'stride', stride,
+//          'divisor', attribs_divisor,
+//       );
+
+//    }
+// }
 
 
 
 
 
 /** Calculate the attributes info for a vb that consumes some of the total Program's attributes */
-export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid, attrib_divisor) {
+export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid, attrib_divisor, progidx) {
 
    // Get the Programs already created attributes info
    const shader_attribs = Shader_attributes_get_attribs(attribsidx);
@@ -336,6 +505,8 @@ export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, s
 
    let offset = 0;
 
+   const attributes_index = Program_get_shader_attribs_indexing(progidx);
+
    // Select and build the info from the attributes that the vertex buffer has
    const len = shader_attribs.nameids.length;
    for (let i=0; i<len; i++){
@@ -351,7 +522,8 @@ export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, s
          attribs_info.offsets.push(offset);
          offset += shader_attribs.sizes[i];
 
-         attribs_indexing.FindByNameAndStoreIndex(shader_attribs.nameids[i], i)
+         // attribs_indexing.FindByNameAndStoreIndex(shader_attribs.nameids[i], i)
+         attribs_indexing.FindByNameAndStoreIndex(shader_attribs.nameids[i], attributes_index)
       }
 
    }

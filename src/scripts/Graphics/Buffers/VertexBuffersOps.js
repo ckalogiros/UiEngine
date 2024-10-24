@@ -395,92 +395,92 @@ export function Gl_set_wpos_y(gfxInfo, y, num_faces = 1) {
 // VERTEX POSITION ATTRIBUTES
 /**************************************************************************************************************************************/
 
-export function Gl_set_dim_plus_xy(gfxInfo, x, y, num_faces = 1) {
+// export function Gl_set_dim_plus_xy(gfxInfo, x, y, num_faces = 1) {
 
-   const vbidx = gfxInfo.vb.which_vb.dim_buf;
-   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
-   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+//    const vbidx = gfxInfo.vb.which_vb.dim_buf;
+//    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+//    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
-   const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
-   const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
-   const a_vpos_size = vb_info.attribs_info.sizes[attr_vpos_idx];
+//    const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
+//    const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
+//    const a_vpos_size = vb_info.attribs_info.sizes[attr_vpos_idx];
    
-   const attr_dim_idx = vb_info.attribs_indexing.DIM2;
-   const a_dim_offset = vb_info.attribs_info.offsets[attr_dim_idx]; 
-   const a_dim_size = vb_info.attribs_info.sizes[attr_dim_idx];
+//    const attr_dim_idx = vb_info.attribs_indexing.DIM2;
+//    const a_dim_offset = vb_info.attribs_info.offsets[attr_dim_idx]; 
+//    const a_dim_size = vb_info.attribs_info.sizes[attr_dim_idx];
 
-   const start = gfxInfo.vb.starts.buffer[vbidx];
+//    const start = gfxInfo.vb.starts.buffer[vbidx];
 
-   let index_vpos = start + a_vpos_offset;
-   let index_dim = start + a_dim_offset;
+//    let index_vpos = start + a_vpos_offset;
+//    let index_dim = start + a_dim_offset;
 
-   let vpos_stride = vb_info.attribs_info.count - a_vpos_size;
-   let dim_stride = vb_info.attribs_info.count - a_dim_size;
+//    let vpos_stride = vb_info.attribs_info.count - a_vpos_size;
+//    let dim_stride = vb_info.attribs_info.count - a_dim_size;
 
-   const xx = x/2;
-   const yy = y/2;
+//    const xx = x/2;
+//    const yy = y/2;
 
-   vb_data[index_vpos++] = 0;
-   vb_data[index_vpos++] = y;
-   vb_data[index_dim++] = 0;
-   vb_data[index_dim++] = yy;
-   index_vpos += vpos_stride;
-   index_dim += dim_stride;
+//    vb_data[index_vpos++] = 0;
+//    vb_data[index_vpos++] = y;
+//    vb_data[index_dim++] = 0;
+//    vb_data[index_dim++] = yy;
+//    index_vpos += vpos_stride;
+//    index_dim += dim_stride;
    
-   vb_data[index_vpos++] = 0;
-   vb_data[index_vpos++] = 0;
-   vb_data[index_dim++] = 0;
-   vb_data[index_dim++] = 0;
-   index_vpos += vpos_stride;
-   index_dim += dim_stride;
+//    vb_data[index_vpos++] = 0;
+//    vb_data[index_vpos++] = 0;
+//    vb_data[index_dim++] = 0;
+//    vb_data[index_dim++] = 0;
+//    index_vpos += vpos_stride;
+//    index_dim += dim_stride;
    
-   vb_data[index_vpos++] = x;
-   vb_data[index_vpos++] = y;
-   vb_data[index_dim++] = xx;
-   vb_data[index_dim++] = yy;
-   index_vpos += vpos_stride;
-   index_dim += dim_stride;
+//    vb_data[index_vpos++] = x;
+//    vb_data[index_vpos++] = y;
+//    vb_data[index_dim++] = xx;
+//    vb_data[index_dim++] = yy;
+//    index_vpos += vpos_stride;
+//    index_dim += dim_stride;
 
-   vb_data[index_vpos++] = x;
-   vb_data[index_vpos++] = 0;
-   vb_data[index_dim++] = xx;
-   vb_data[index_dim++] = 0;
+//    vb_data[index_vpos++] = x;
+//    vb_data[index_vpos++] = 0;
+//    vb_data[index_dim++] = xx;
+//    vb_data[index_dim++] = 0;
 
 
-   /**Contol point of resize center */
+//    /**Contol point of resize center */
    
-   // vb_data[index_vpos++] = -xx;
-   // vb_data[index_vpos++] = yy;
-   // vb_data[index_dim++] = 0;
-   // vb_data[index_dim++] = yy;
-   // index_vpos += vpos_stride;
-   // index_dim += dim_stride;
+//    // vb_data[index_vpos++] = -xx;
+//    // vb_data[index_vpos++] = yy;
+//    // vb_data[index_dim++] = 0;
+//    // vb_data[index_dim++] = yy;
+//    // index_vpos += vpos_stride;
+//    // index_dim += dim_stride;
    
-   // vb_data[index_vpos++] = -xx;
-   // vb_data[index_vpos++] = -yy;
-   // vb_data[index_dim++] = 0;
-   // vb_data[index_dim++] = 0;
-   // index_vpos += vpos_stride;
-   // index_dim += dim_stride;
+//    // vb_data[index_vpos++] = -xx;
+//    // vb_data[index_vpos++] = -yy;
+//    // vb_data[index_dim++] = 0;
+//    // vb_data[index_dim++] = 0;
+//    // index_vpos += vpos_stride;
+//    // index_dim += dim_stride;
    
-   // vb_data[index_vpos++] = xx;
-   // vb_data[index_vpos++] = yy;
-   // vb_data[index_dim++] = xx;
-   // vb_data[index_dim++] = yy;
-   // index_vpos += vpos_stride;
-   // index_dim += dim_stride;
+//    // vb_data[index_vpos++] = xx;
+//    // vb_data[index_vpos++] = yy;
+//    // vb_data[index_dim++] = xx;
+//    // vb_data[index_dim++] = yy;
+//    // index_vpos += vpos_stride;
+//    // index_dim += dim_stride;
 
-   // vb_data[index_vpos++] = xx;
-   // vb_data[index_vpos++] = -yy;
-   // vb_data[index_dim++] = xx;
-   // vb_data[index_dim++] = 0;
+//    // vb_data[index_vpos++] = xx;
+//    // vb_data[index_vpos++] = -yy;
+//    // vb_data[index_dim++] = xx;
+//    // vb_data[index_dim++] = 0;
 
 
 
       
 
-   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
-}
+//    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
+// }
 
 export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
 
@@ -488,7 +488,6 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
-   // const attr_idx = vb_info.attribs_indexing.DIM2;
    const attr_idx = vb_info.attribs_indexing.VPOS2;
    const a_offset = vb_info.attribs_info.offsets[attr_idx];
    const a_size = vb_info.attribs_info.sizes[attr_idx];
@@ -496,40 +495,16 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
    const start = gfxInfo.vb.starts.buffer[vbidx];
 
    let index = start + a_offset;
-   let loop_count = num_faces;
-   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
-
-   
-   /**Contol point of resize center */
-   
-   // const xx = x;
-   // const yy = y;
-   
-   // vb_data[index++] = -xx;
-   // vb_data[index++] = yy;
-   // index += stride;
-   
-   // vb_data[index++] = -xx;
-   // vb_data[index++] = -yy;
-   // index += stride;
-   
-   // vb_data[index++] = xx;
-   // vb_data[index++] = yy;
-   // index += stride;
-
-   // vb_data[index++] = xx;
-   // vb_data[index++] = -yy;
-
 
 
    /**Contol point of resize left-top */
-   vb_data[index++] = 0;
+   vb_data[index++] = -x;
    vb_data[index++] = y;
    index += stride;
    
-   vb_data[index++] = 0;
-   vb_data[index++] = 0;
+   vb_data[index++] = -x;
+   vb_data[index++] = -y;
    index += stride;
    
    vb_data[index++] = x;
@@ -537,7 +512,7 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
    index += stride;
 
    vb_data[index++] = x;
-   vb_data[index++] = 0;
+   vb_data[index++] = -y;
       
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
@@ -558,7 +533,6 @@ export function Gl_set_dim_x(gfxInfo, x, num_faces = 1) {
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
    
-   // const attr_idx = vb_info.attribs_indexing.DIM2;
    const attr_idx = vb_info.attribs_indexing.VPOS2;
    const a_offset = vb_info.attribs_info.offsets[attr_idx];
    const a_size = vb_info.attribs_info.sizes[attr_idx] - 1;
@@ -567,16 +541,15 @@ export function Gl_set_dim_x(gfxInfo, x, num_faces = 1) {
 
    let index = start + a_offset;
    let loop_count = num_faces;
-   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
 
 
    while (loop_count) {
 
-      vb_data[index++] = 0;
+      vb_data[index++] = -x;
       index += stride;
       
-      vb_data[index++] = 0;
+      vb_data[index++] = -x;
       index += stride;
       
       vb_data[index++] = x;
@@ -598,7 +571,7 @@ export function Gl_set_dim_y(gfxInfo, y, num_faces = 1) {
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
    
-   const attr_idx = vb_info.attribs_indexing.DIM2;
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
    const a_offset = vb_info.attribs_info.offsets[attr_idx] + 1;
    const a_size = vb_info.attribs_info.sizes[attr_idx] - 1;
 
@@ -612,9 +585,18 @@ export function Gl_set_dim_y(gfxInfo, y, num_faces = 1) {
 
    while (loop_count) {
 
-      vb_data[index++] = y;
-      
+      vb_data[index++] = -y;
       index += stride;
+      
+      vb_data[index++] = -y;
+      index += stride;
+      
+      vb_data[index++] = y;
+      index += stride;
+      
+      vb_data[index++] = y;
+      index += stride;
+
       loop_count--;
    }
 
@@ -629,7 +611,7 @@ export function Gl_add_dim_xy(gfxInfo, x, y, num_faces = 1) {
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
    
-   const attr_idx = vb_info.attribs_indexing.DIM2;
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
    const a_offset = vb_info.attribs_info.offsets[attr_idx];
    const a_size = vb_info.attribs_info.sizes[attr_idx];
 
@@ -637,16 +619,27 @@ export function Gl_add_dim_xy(gfxInfo, x, y, num_faces = 1) {
 
    let index = start + a_offset;
    let loop_count = num_faces;
-   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
    
 
    while (loop_count) {
+
+      vb_data[index++] += -x;
+      vb_data[index++] += y;
+      index += stride;
+      
+      vb_data[index++] += -x;
+      vb_data[index++] += -y;
+      index += stride;
       
       vb_data[index++] += x;
       vb_data[index++] += y;
-      
       index += stride;
+   
+      vb_data[index++] += x;
+      vb_data[index++] += -y;
+      index += stride;
+
       loop_count--;
    }
 
@@ -660,7 +653,7 @@ export function Gl_add_dim_x(gfxInfo, x, num_faces = 1) {
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
    
-   const attr_idx = vb_info.attribs_indexing.DIM2;
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
    const a_offset = vb_info.attribs_info.offsets[attr_idx];
    const a_size = vb_info.attribs_info.sizes[attr_idx] - 1;
 
@@ -668,12 +661,22 @@ export function Gl_add_dim_x(gfxInfo, x, num_faces = 1) {
 
    let index = start + a_offset;
    let loop_count = num_faces;
-   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
 
    while (loop_count) {
       
+      vb_data[index++] += -x;
+      index += stride;
+      
+      vb_data[index++] += -x;
+      index += stride;
+      
       vb_data[index++] += x;
+      index += stride;
+   
+      vb_data[index++] += x;
+      index += stride;
       
       index += stride;
       loop_count--;
@@ -689,7 +692,7 @@ export function Gl_add_dim_y(gfxInfo, y, num_faces = 1) {
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
    
-   const attr_idx = vb_info.attribs_indexing.DIM2;
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
    const a_offset = vb_info.attribs_info.offsets[attr_idx] + 1;
    const a_size = vb_info.attribs_info.sizes[attr_idx] - 1;
 
@@ -697,12 +700,21 @@ export function Gl_add_dim_y(gfxInfo, y, num_faces = 1) {
 
    let index = start + a_offset;
    let loop_count = num_faces;
-   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
 
    while (loop_count) {
 
       vb_data[index++] += y;
+      index += stride;
+      
+      vb_data[index++] += -y;
+      index += stride;
+      
+      vb_data[index++] += y;
+      index += stride;
+   
+      vb_data[index++] += -y;
       
       index += stride;
       loop_count--;
@@ -720,56 +732,56 @@ export function Gl_add_dim_y(gfxInfo, y, num_faces = 1) {
 
 
 
-export function Gl_add_vpos_xy(gfxInfo, x, y, num_faces = 1) {
+// export function Gl_add_vpos_xy(gfxInfo, x, y, num_faces = 1) {
 
-   const vbidx = gfxInfo.vb.which_vb.dim_buf; // Case for 'instanced' geometries
-   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
-   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+//    const vbidx = gfxInfo.vb.which_vb.dim_buf; // Case for 'instanced' geometries
+//    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+//    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
    
    
-   const attribs_info = Shader_attributes_get_attribs(gfxInfo.prog.attribsidx);
-   const attribs_indexing = Program_get_shader_attribs_indexing(gfxInfo.prog.idx);
+//    const attribs_info = Shader_attributes_get_attribs(gfxInfo.prog.attribsidx);
+//    const attribs_indexing = Program_get_shader_attribs_indexing(gfxInfo.prog.idx);
    
-   const start = gfxInfo.vb.starts.buffer[vbidx];
+//    const start = gfxInfo.vb.starts.buffer[vbidx];
    
-   const a_offset = attribs_info.offsets[attribs_indexing.VPOS2];
-   const a_size = attribs_info.sizes[attribs_indexing.VPOS2];
-   
-
-   let index = start + a_offset;
-   let loop_count = num_faces;
-   let stride = vb_info.attribs_info.count - a_size;
-   
-   const vpos = [x*2, y*2];
+//    const a_offset = attribs_info.offsets[attribs_indexing.VPOS2];
+//    const a_size = attribs_info.sizes[attribs_indexing.VPOS2];
    
 
-   while (loop_count) {
+//    let index = start + a_offset;
+//    let loop_count = num_faces;
+//    let stride = vb_info.attribs_info.count - a_size;
+   
+//    const vpos = [x*2, y*2];
+   
+
+//    while (loop_count) {
       
-      vb_data[index++] += 0;
-      vb_data[index++] += vpos[1];
-      index += stride;
-      
-      
-      vb_data[index++] += 0;
-      vb_data[index++] += 0;
-      index += stride;
-      
-      
-      vb_data[index++] += vpos[0];
-      vb_data[index++] += vpos[1];
-      index += stride;
+//       vb_data[index++] += 0;
+//       vb_data[index++] += vpos[1];
+//       index += stride;
       
       
-      vb_data[index++] += vpos[0];
-      vb_data[index++] += 0;
-      index += stride;
+//       vb_data[index++] += 0;
+//       vb_data[index++] += 0;
+//       index += stride;
+      
+      
+//       vb_data[index++] += vpos[0];
+//       vb_data[index++] += vpos[1];
+//       index += stride;
+      
+      
+//       vb_data[index++] += vpos[0];
+//       vb_data[index++] += 0;
+//       index += stride;
       
 
-      loop_count--;
-   }
+//       loop_count--;
+//    }
 
-   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
-}
+//    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
+// }
 
 
 
@@ -796,24 +808,28 @@ export function Gl_set_uv(gfxInfo, uvs, num_faces = 1) {
    let loop_count = num_faces;
    let stride = vb_info.attribs_info.count - a_size;
 
+   const u0 = uvs[0];
+   const u1 = uvs[1];
+   const v0 = uvs[2];
+   const v1 = uvs[3];
 
 
    while (loop_count) {
 
-      vb_data[index++] = uvs[0];
-      vb_data[index++] = uvs[3];
+      vb_data[index++] = u0;
+      vb_data[index++] = v0;
       index += stride;
 
-      vb_data[index++] = uvs[0];
-      vb_data[index++] = uvs[2];
+      vb_data[index++] = u0;
+      vb_data[index++] = v1;
       index += stride;
 
-      vb_data[index++] = uvs[1];
-      vb_data[index++] = uvs[3];
+      vb_data[index++] = u1;
+      vb_data[index++] = v0;
       index += stride;
-
-      vb_data[index++] = uvs[1];
-      vb_data[index++] = uvs[2];
+      
+      vb_data[index++] = u1;
+      vb_data[index++] = v1;
       index += stride;
 
       loop_count--;
@@ -1301,132 +1317,6 @@ export function Gl_set_alpha_from_offset(gfxInfo, val, from_offset, num_faces) {
 
 
 
-export function Gl_set_dim_XY2(vbidx, start, attribsidx, attribsPerVertex, x, y, num_faces = 1) {
-
-   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
-   const a = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.VPOS2);
-
-   let index = start + a.offset;
-   let faces = num_faces;
-   let stride = attribsPerVertex - a.size;
-
-
-   while (faces) {
-
-      vb_data[index++] = -x;
-      vb_data[index++] = y;
-      index += stride;
-
-      vb_data[index++] = -x;
-      vb_data[index++] = -y;
-      index += stride;
-
-      vb_data[index++] = x;
-      vb_data[index++] = y;
-      index += stride;
-
-      vb_data[index++] = x;
-      vb_data[index++] = -y;
-      index += stride;
-
-      faces--;
-   }
-
-   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
-}
-/**ΣΑΩΕ */
-// export function Gl_set_dim_xy(gfxInfo, dim, num_faces = 1) {
-
-//    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-//    const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.VPOS2);
-
-//    let index = gfxInfo.vb.start + a.offset;
-//    let faces = num_faces;
-//    let stride = gfxInfo.attribsPerVertex - a.size;
-
-
-//    while (faces) {
-
-//       vb_data[index++] = -dim[0];
-//       vb_data[index++] = dim[1];
-//       index += stride;
-
-//       vb_data[index++] = -dim[0];
-//       vb_data[index++] = -dim[1];
-//       index += stride;
-
-//       vb_data[index++] = dim[0];
-//       vb_data[index++] = dim[1];
-//       index += stride;
-
-//       vb_data[index++] = dim[0];
-//       vb_data[index++] = -dim[1];
-//       index += stride;
-
-//       faces--;
-//    }
-
-//    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
-// }
-
-
-
-// export function Gl_set_dim_x(gfxInfo, x, num_faces = 1) {
-
-//    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-//    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.VPOS2);
-
-//    let index = gfxInfo.vb.start + offset;
-//    let faces = num_faces;
-//    let stride = gfxInfo.attribsPerVertex;
-
-//    while (faces) {
-
-//       vb_data[index] = -x;
-//       index += stride;
-//       vb_data[index] = -x;
-//       index += stride;
-//       vb_data[index] = x;
-//       index += stride;
-//       vb_data[index] = x;
-//       index += stride;
-
-//       faces--;
-
-//    }
-
-//    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
-// }
-
-
-
-// export function Gl_set_dim_y(gfxInfo, y, num_faces = 1) {
-
-//    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-//    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.VPOS2);
-
-//    let index = gfxInfo.vb.start + offset + GRAPHICS_LAYOUT.ATTR_SELF_OFFSETS.DIM_Y;
-//    let faces = num_faces;
-//    let stride = gfxInfo.attribsPerVertex;
-
-//    while (faces) {
-
-//       vb_data[index] = y;
-//       index += stride;
-//       vb_data[index] = -y;
-//       index += stride;
-//       vb_data[index] = y;
-//       index += stride;
-//       vb_data[index] = -y;
-//       index += stride;
-
-//       faces--;
-//    }
-//    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
-// }
-
-
-
 export function Gl_add_wpos_xyz(gfxInfo, x, y, z, num_faces = 1) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
@@ -1448,29 +1338,6 @@ export function Gl_add_wpos_xyz(gfxInfo, x, y, z, num_faces = 1) {
    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
 }
 
-
-
-export function Gl_set_wpos_XY2(vbidx, start, attribsidx, attribsPerVertex, vertsPerRect, x, y, num_faces = 1) {
-
-   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
-   const offset = Shader_attributes_get_attrib_offset_by_nameid(attribsidx, SHADER_ATTRIBUTES.WPOS3);
-
-
-   let index = start + offset;
-   let verts = num_faces * vertsPerRect;
-   let stride = attribsPerVertex - GRAPHICS_LAYOUT.ATTR_SIZES.XY;
-
-   while (verts) {
-
-      vb_data[index++] = x; // Move mesh's x pos by amt
-      vb_data[index++] = y; // Move mesh's y pos by amt
-
-      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
-      verts--;
-   }
-
-   Vertex_buffer_state_enable(vbidx, BUFFER_STATE.NEEDS_UPDATE);
-}
 
 
 
@@ -1574,73 +1441,6 @@ export function GlSetAttrBorderFeather(gfxInfo, val, num_faces=1) {
 
 
 
-// export function Gl_set_uv(gfxInfo, uvs, num_faces = 1) {
-
-//    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-//    const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.TEX2);
-
-//    let index = gfxInfo.vb.start + a.offset;
-//    // let numTimes = num_faces;
-//    let stride = gfxInfo.attribsPerVertex - a.size;
-
-//    while (num_faces) {
-
-//       vb_data[index++] = uvs[0];
-//       vb_data[index++] = uvs[3];
-//       index += stride;
-
-//       vb_data[index++] = uvs[0];
-//       vb_data[index++] = uvs[2];
-//       index += stride;
-
-//       vb_data[index++] = uvs[1];
-//       vb_data[index++] = uvs[3];
-//       index += stride;
-
-//       vb_data[index++] = uvs[1];
-//       vb_data[index++] = uvs[2];
-//       index += stride;
-
-//       num_faces--;
-//    }
-
-//    Vertex_buffer_state_enable(gfxInfo.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
-// }
-
-
-
-// export function Gl_set_uv(vbidx, uvs, start, attr_offset, attr_size, attribs_per_vertex, num_faces = 1) {
-
-//    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
-
-//    let index = start + attr_offset;
-//    // let numTimes = num_faces;
-//    let stride = attribs_per_vertex - attr_size;
-
-//    while (num_faces) {
-
-//       vb_data[index++] = uvs[0];
-//       vb_data[index++] = uvs[3];
-//       index += stride;
-
-//       vb_data[index++] = uvs[0];
-//       vb_data[index++] = uvs[2];
-//       index += stride;
-
-//       vb_data[index++] = uvs[1];
-//       vb_data[index++] = uvs[3];
-//       index += stride;
-
-//       vb_data[index++] = uvs[1];
-//       vb_data[index++] = uvs[2];
-//       index += stride;
-
-//       num_faces--;
-//    }
-
-// }
-
-
 export function Gl_set_wpos_time(gfxInfo, val) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
@@ -1666,7 +1466,7 @@ export function Gl_set_wpos_time(gfxInfo, val) {
 // Particle System: Batch Update Particles
 
 // TODO: Implement correctly all fill functions for particles
-export function Gl_particles_batch_set_col4_wpos4_pos2_style2(vbidx, start, colors, positions, time) {
+export function Gl_particles_batch_set_col4_wpos4_dim2_style2(vbidx, start, colors, positions, time) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')
 
    const vb_info = VBI_get_byidx(vbidx);
@@ -1691,11 +1491,11 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style2(vbidx, start, colo
    vb_data[index++] = pos[1];
    vb_data[index++] = pos[2];
    vb_data[index++] = t;
-   cnt+=8;
+   index+=V_POS_COUNT+2;
    
-   // TODO: Add the stride properly
-   index += vb_info.attribs_info.count - cnt;
-   cnt = 0
+   // // TODO: Add the stride properly
+   // index += vb_info.attribs_info.count - cnt;
+   // cnt = 0
    
    
    // V2
@@ -1708,10 +1508,10 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style2(vbidx, start, colo
    vb_data[index++] = pos[1];
    vb_data[index++] = pos[2];
    vb_data[index++] = t;
-   cnt+=8;
+   index+=V_POS_COUNT+2;
    
-   index += vb_info.attribs_info.count - cnt;
-   cnt = 0
+   // index += vb_info.attribs_info.count - cnt;
+   // cnt = 0
    
    
    // V3
@@ -1724,10 +1524,10 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style2(vbidx, start, colo
    vb_data[index++] = pos[1];
    vb_data[index++] = pos[2];
    vb_data[index++] = t;
-   cnt+=8;
+   index+=V_POS_COUNT+2;
    
-   index += vb_info.attribs_info.count - cnt;
-   cnt = 0
+   // index += vb_info.attribs_info.count - cnt;
+   // cnt = 0
    
    
    // V4
@@ -1740,12 +1540,11 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_style2(vbidx, start, colo
    vb_data[index++] = pos[1];
    vb_data[index++] = pos[2];
    vb_data[index++] = t;
-   cnt+=8;
+   index+=V_POS_COUNT+2;
    
-   index += vb_info.attribs_info.count - cnt;
-   cnt = 0
+   // index += vb_info.attribs_info.count - cnt;
+   // cnt = 0
 }
-
 
 export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_rot4(vbidx, start, colors, positions, time, p, r) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')
@@ -1831,7 +1630,7 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_rot4(vbidx, start, c
 }
 
 
-export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4(vbidx, start, colors, positions, time, p, r, uvs) {
+export function Gl_particles_batch_set_col4_wpos4_dim2_tex2_rot4(vbidx, start, colors, positions, time, p, r, uvs) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
 
@@ -1843,7 +1642,6 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4(vbidx, sta
       const col = colors;
       const pos = positions;
       const t = time;
-      // const dim = dim;
 
       // V1
       // VERTEX COLOR
@@ -1862,12 +1660,9 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4(vbidx, sta
       vb_data[index++] = -p[0]*r[0] + p[1]*r[2];
       vb_data[index++] = -p[0]*r[1] + p[1]*r[3];
       
-      // index+=2
-      index+=2
       // TEXTURE COORDS
       vb_data[index++] = uvs[0];
       vb_data[index++] = uvs[2];
-      // index+=2
 
 		
 
@@ -1884,13 +1679,10 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4(vbidx, sta
       
       vb_data[index++] = -p[0]*r[0] + -p[1]*r[2];
       vb_data[index++] = -p[0]*r[1] + -p[1]*r[3];
-      // index+=2
-      index+=2
       
       // TEXTURE COORDS
       vb_data[index++] = uvs[0];
       vb_data[index++] = uvs[3];
-      // index+=2
 
       
       
@@ -1908,7 +1700,7 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4(vbidx, sta
       vb_data[index++] = p[0]*r[0] + p[1]*r[2];
       vb_data[index++] = p[0]*r[1] + p[1]*r[3];
       
-      index+=2
+      // index+=2
       // index+=2
       // TEXTURE COORDS
       vb_data[index++] = uvs[1];
@@ -1931,19 +1723,16 @@ export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_tex2_rot4(vbidx, sta
       vb_data[index++] =  p[0]*r[0] + -p[1]*r[2]; //console.log(r)
       vb_data[index++] =  p[0]*r[1] + -p[1]*r[3];
 
-      // index+=2
-      index+=2
       // TEXTURE COORDS
       vb_data[index++] = uvs[1];
       vb_data[index++] = uvs[3];
-      // index+=2
 
    }
 
 }
 
 
-export function Gl_particles_batch_set_col4_wpos4_pos2(vbidx, start, colors, positions, time) {
+export function Gl_particles_batch_set_col4_wpos4_dim2(vbidx, start, colors, positions, time) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
 
@@ -1967,7 +1756,7 @@ export function Gl_particles_batch_set_col4_wpos4_pos2(vbidx, start, colors, pos
       vb_data[index++] = pos[2]; 
       vb_data[index++] = t;
       
-      index+=4
+      index+=V_POS_COUNT;
       
       
       // V2
@@ -1981,7 +1770,7 @@ export function Gl_particles_batch_set_col4_wpos4_pos2(vbidx, start, colors, pos
       vb_data[index++] = pos[2];
       vb_data[index++] = t;
       
-      index+=4
+      index+=V_POS_COUNT;
       
       
       // V3
@@ -1995,7 +1784,7 @@ export function Gl_particles_batch_set_col4_wpos4_pos2(vbidx, start, colors, pos
       vb_data[index++] = pos[2];
       vb_data[index++] = t;
       
-      index+=4
+      index+=V_POS_COUNT;
       
       
       // V4
@@ -2009,7 +1798,7 @@ export function Gl_particles_batch_set_col4_wpos4_pos2(vbidx, start, colors, pos
       vb_data[index++] = pos[2];
       vb_data[index++] = t;
       
-      index+=4
+      index+=V_POS_COUNT;
    }
 
 }
@@ -2095,17 +1884,24 @@ export function Gl_rotate_z_2d(gfxInfo, dim, angle, num_faces = 1) {
 
    const newPos = RotateZ(dim, angle)
    
+   // vb_data[index++] = newPos[0]+dim[0]/2;
+   // vb_data[index++] = newPos[1]+dim[1]/2; index += stride;
+   // vb_data[index++] = newPos[2]+dim[0]/2;
+   // vb_data[index++] = newPos[3]+dim[1]/2; index += stride;
+   // vb_data[index++] = newPos[4]+dim[0]/2;
+   // vb_data[index++] = newPos[5]+dim[1]/2; index += stride;
+   // vb_data[index++] = newPos[6]+dim[0]/2;
+   // vb_data[index++] = newPos[7]+dim[1]/2;
    vb_data[index++] = newPos[0];
-   vb_data[index++] = newPos[1];
-   index += stride;
+   vb_data[index++] = newPos[1]; index += stride;
    vb_data[index++] = newPos[2];
-   vb_data[index++] = newPos[3];
-   index += stride;
+   vb_data[index++] = newPos[3]; index += stride;
    vb_data[index++] = newPos[4];
-   vb_data[index++] = newPos[5];
-   index += stride;
+   vb_data[index++] = newPos[5]; index += stride;
    vb_data[index++] = newPos[6];
    vb_data[index++] = newPos[7];
+
+
    
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 }

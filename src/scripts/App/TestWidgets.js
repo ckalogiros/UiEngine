@@ -23,7 +23,7 @@ import { TimerGetGlobalTimerCycle, Timer_get_global_timer } from '../Engine/Time
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
-import { Gl_set_rgba, Gl_rotate_z_2d, Gl_set_round_corners, Gl_add_vpos_xy } from '../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba, Gl_rotate_z_2d, Gl_set_round_corners } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Callback_animations_create, Callback_animations_destroy_byidx, Callback_animations_is_animation_active, Callback_animations_is_animation_in_play } from '../Engine/Animations/CallbackAnimations.js';
 import { Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
@@ -570,7 +570,7 @@ function Animation_scale_up_run(params) {
     const posy = target_mesh.geom.pos[1] - (slope * scale);
 
     // target_mesh.geom.SetDimXY(target_mesh.gfx, sizex, sizey);
-    target_mesh.geom.SetDimPlusXY(target_mesh.gfx, sizex, sizey);
+    // target_mesh.geom.SetDimPlusXY(target_mesh.gfx, sizex, sizey);
     target_mesh.geom.SetWposXY(target_mesh.gfx, posx, posy);
 
     // Gl_add_vpos_xy(target_mesh.gfx, val, val);
@@ -613,7 +613,7 @@ function Animation_scale_down_run(params) {
     const posx = target_mesh.geom.pos[0] + (slope * scale);
     const posy = target_mesh.geom.pos[1] + (slope * scale);
 
-    target_mesh.geom.SetDimPlusXY(target_mesh.gfx, sizex, sizey);
+    // target_mesh.geom.SetDimPlusXY(target_mesh.gfx, sizex, sizey);
     target_mesh.geom.SetWposXY(target_mesh.gfx, posx, posy);
 
     // if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
@@ -643,6 +643,31 @@ export function TestWidgetsGeneric(createId = 1) {
 
     let ypos = 500
 
+    console.log(
+        '##############################################################################',
+        '\nSID.ATTR.COL4', SID.ATTR.COL4, Math.log2(SID.ATTR.COL4),
+        '\nSID.ATTR.WPOS3', SID.ATTR.WPOS3, Math.log2(SID.ATTR.WPOS3),
+        '\nSID.ATTR.VPOS2', SID.ATTR.VPOS2, Math.log2(SID.ATTR.VPOS2),
+        '\nSID.ATTR.DIM2', SID.ATTR.DIM2, Math.log2(SID.ATTR.DIM2),
+        '\nSID.ATTR.TIME', SID.ATTR.TIME, Math.log2(SID.ATTR.TIME),
+        '\n32', 32, Math.log2(32),
+        '\n64', 64, Math.log2(64),
+        '\n128', 128, Math.log2(128),
+        '\n256', 256, Math.log2(256),
+    );
+    console.log(
+        '##############################################################################',
+        '\nSID.ATTR.COL4', SID.ATTR.COL4, Math.log2(SID.ATTR.COL4),
+        '\nSID.ATTR.WPOS3', SID.ATTR.WPOS3, Math.log2(SID.ATTR.WPOS3),
+        '\nSID.ATTR.VPOS2', SID.ATTR.VPOS2, Math.log2(SID.ATTR.VPOS2),
+        '\nSID.ATTR.DIM2', SID.ATTR.DIM2, Math.log2(SID.ATTR.DIM2),
+        '\nSID.ATTR.TIME', SID.ATTR.TIME, Math.log2(SID.ATTR.TIME),
+        '\n32', 32, (32>>1),
+        '\n64', 64, (64>>1),
+        '\n128', 128, (128>>1),
+        '\n256', 256, (256>>1),
+    );
+
     // const device_info = Create_widget;
 
 
@@ -651,7 +676,7 @@ export function TestWidgetsGeneric(createId = 1) {
     // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
 
 
-    Demo_page();
+    // Demo_page();
 
     // Demo_chain_link();
 
@@ -681,42 +706,22 @@ export function TestWidgetsGeneric(createId = 1) {
 
     { // Annimations - With Slope
 
-        // Demo_animations();
-        {
+        { // Demo_animations();
             // const scale = 20, size = 40, num_items = 11, pad = 10;
             // let offset = 0;
 
             // // Scale
             // let color = Get_fasma_color(offset, num_items, 2); Clbk_animations_scale(ROOT_WIDGETS.CREATE_ROOT, ((size+scale+pad)*2)*offset++ +pad, 100, size, 0.01, 0.05, scale, color);
             // color = Get_fasma_color(offset, num_items, 2); Clbk_animations_scale(((size+scale+pad)*2)*offset++ +pad, 100, size, 0.01, 0.10, scale, color);
-            // color = Get_fasma_color(offset, num_items, 2); Clbk_animations_scale(((size+scale+pad)*2)*offset++ +pad, 100, size, 0.01, 0.20, scale, color);
-            // color = Get_fasma_color(offset, num_items, 2); Clbk_animations_scale(((size+scale+pad)*2)*offset++ +pad, 100, size, 0.01, 0.40, scale, color);
-            // color = Get_fasma_color(offset, num_items, 2); Clbk_animations_scale(((size+scale+pad)*2)*offset++ +pad, 100, size, 0.01, 0.80, scale, color);
-            // color = Get_fasma_color(offset, num_items, 2); Clbk_animations_scale(((size+scale+pad)*2)*offset++ +pad, 100, size, 0.01, 1.00, scale, color);
         }
 
-        // // Rotation
-        {
-            //     const size = 30, pad = 10, num_items = 11;
-            //     // const angle = Math.PI/2;
-            //     const angle = 1.6;
-            //     let offset = 0;
-            //     let color = Get_fasma_color(offset, num_items, 2); Clbk_animations_rotate(ROOT_WIDGETS.CREATE_ROOT, ((size+pad)*2)*offset++ +pad, 280, size*2, _, 0.05, angle, color); 
-            //         color = Get_fasma_color(offset, num_items, 2); Clbk_animations_rotate(((size+pad)*2)*offset++ +pad, 280, size, _, 0.10, angle, color); 
-            //         color = Get_fasma_color(offset, num_items, 2); Clbk_animations_rotate(((size+pad)*2)*offset++ +pad, 280, size, _, 0.20, angle, color); 
-            //         color = Get_fasma_color(offset, num_items, 2); Clbk_animations_rotate(((size+pad)*2)*offset++ +pad, 280, size, _, 0.40, angle, color); 
-            //         color = Get_fasma_color(offset, num_items, 2); Clbk_animations_rotate(((size+pad)*2)*offset++ +pad, 280, size, _, 0.80, angle, color); 
-            //         color = Get_fasma_color(offset, num_items, 2); Clbk_animations_rotate(((size+pad)*2)*offset++ +pad, 280, size, _, 1.00, angle, color); 
-            //     // color = Get_fasma_color(offset-1, num_items, 2); Clbk_animations_rotate(((size*2)+pad)*offset++, 280, size, _, 0.90, angle, color); 
-            //     // color = Get_fasma_color(offset-1, num_items, 2); Clbk_animations_rotate(((size*2)+pad)*offset++, 280, size, _, 0.80, angle, color); 
-            //     // color = Get_fasma_color(offset-1, num_items, 2); Clbk_animations_rotate(((size*2)+pad)*offset++, 280, size, _, 0.70, angle, color); 
-            //     // color = Get_fasma_color(offset-1, num_items, 2); Clbk_animations_rotate(((size*2)+pad)*offset++, 280, size, _, 0.60, angle, color); 
-            //     // color = Get_fasma_color(offset-1, num_items, 2); Clbk_animations_rotate(((size*2)+pad)*offset++, 280, size, _, 0.50, angle, color); 
-            //     // color = Get_fasma_color(offset-1, num_items, 2); Clbk_animations_rotate(((size*2)+pad)*offset++, 280, size, _, 0.40, angle, color); 
-            //     // color = Get_fasma_color(offset-1, num_items, 2); Clbk_animations_rotate(((size*2)+pad)*offset++, 280, size, _, 0.30, angle, color); 
-            //     // color = Get_fasma_color(offset-1, num_items, 2); Clbk_animations_rotate(((size*2)+pad)*offset++, 280, size, _, 0.20, angle, color); 
-            //     // color = Get_fasma_color(offset-1, num_items, 2); Clbk_animations_rotate(((size*2)+pad)*offset++, 280, size, _, 0.10, angle, color); 
-
+        { // Rotation
+            // const size = 50, pad = 10, num_items = 11;
+            // const angle = Math.PI/2;
+            // // const angle = .784;
+            // let offset = 0;
+            // // let color = Get_fasma_color(offset, num_items, 2); Clbk_animations_rotate(ROOT_WIDGETS.CREATE_ROOT, true, ((size+pad)*2)*offset++ +pad, 280, size*2, _, 1., angle, color); 
+            // let color = Get_fasma_color(offset, num_items, 2); Clbk_animations_rotate(ROOT_WIDGETS.CREATE_ROOT, true, 0, 0, size*2, _, 1., angle, color); 
         }
     }
 
@@ -794,7 +799,7 @@ export function TestWidgetsGeneric(createId = 1) {
     }
 
     { // Test sdf lines
-        // const line1 = SdfLine(YELLOW[7], [300, 300, 5], [200, 10]);
+        // const line1 = SdfLine(YELLOW[7], [2, 2, 1], [100, 10]);
     }
 
     { // Rotation: Rotate sdf line. Dont forget to disable the 'style' attribu\te
@@ -884,7 +889,7 @@ export function TestWidgetsGeneric(createId = 1) {
 
     { // Widget: Label-buttons
 
-        // const label = CreateLabel(_, '12.345$%^&*}');
+        // const label = CreateLabel(_, 'Ajks', TEXTURES.CONSOLAS_32px, 200, 300);
         // const label = CreateLabel('!@#$%^&*\'\n(12345678)\n[abdf],\n{LPARREA}');
 
         // const label = CreateLabel('1');
@@ -1039,9 +1044,8 @@ export function TestWidgetsGeneric(createId = 1) {
     }
 
 
-    /** Section Synthesizes */
-    {
-        // Section([20, 20, 0]);
+    { // Section Synthesizes 
+        Section([300, 300, 0]);
 
         // SectionResizable([350, 350, 0])
 
@@ -1264,41 +1268,65 @@ function CreatePanel(is_root_widget = undefined) {
 function Section(pos) {
 
     const marg = [10, 10];
-    const dim = [200, 200];
+    const dim = [200, 100];
+    pos[0] = 200;
+    pos[1] = 100;
+    // pos[0] = 0;
+    // pos[1] = 0;
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, BLUEL[5], _, [dim[0], 0, 15]);
+    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     section.SetName(`section${grey_cnt++}`);
 
-    const s = Create_widget_section(_, _, marg, [0, 0, 1], [50, 50], YELLOW[5], _, [10, 0, 1]);
-    s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    section.AddItem(s);
+    // section.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+    // section.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3|SID.ATTR.TIME);
 
+    section.GfxUniformsEnable({ unif: SID.UNIF.FS_GENERIC_FLOAT, pass: SID.PASS.WPOS2, }, 'u_generic_float', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
-    // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    // section.Render();
-    // Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-    // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-    // Construct_listen_events_relations_from_mesh_tree(section);
-
+    
     section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
     section.GenGfxCtx();
     section.Render();
 
+
+    // section.RotateZ(2);
+    
 
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section);
     Construct_listen_events_relations_from_mesh_tree(section);
 
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+    section.GfxUniformSetAndUpdate('u_generic_float', Math.PI);
+
+
+    // {
+    //     const slider = CreateSlider(_, 10, 20, 1.,'Smooth');
+            
+    //     const params = {
+    //         target_mesh: section,
+    //     };
+    //     // Connect sliders to gfx program uniforms 
+    //     Slider_connect(slider, (params, slider_val) => {
+            
+    //         const rot = slider_val * Math.PI * 2 + Math.PI/2;
+
+    //         const target_mesh = params.clbk_params.target_mesh;
+    //         target_mesh.GfxUniformSetAndUpdate('u_generic_float', rot, _);
+
+    //         target_mesh.RotateZ(rot);
+            
+    //         }, params,
+    //     );
+    // }
 
     return section;
 }
-
-
 function SectionResizable(pos) {
 
     const tr = 1.;
@@ -1323,9 +1351,6 @@ function SectionResizable(pos) {
 
     return grey;
 }
-
-
-
 function CreateSectionedWidgets(pos, name = 'NO NAME') {
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [40, 10], pos, [0, 0], GREY[1], name,);
@@ -1382,50 +1407,15 @@ function CreateSectionedWidgets(pos, name = 'NO NAME') {
 
     return section;
 }
-
-
-
-
-
-
-function Widget_label(root_widget = ROOT_WIDGETS, x = 0, y = 0, name = 'Label ', font, color = GREY[1]) {
-
-    const pos = [x, y, 2];
-    const label = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, name, _, pos, 0, color, WHITE, [5, 5], .5, _, font);
-    label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    // label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    // label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-
-    // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
-    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
-    // label.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
-
-    if (vb_groupidx !== INT_NULL) label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, vb_groupidx);
-    else label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    label.Render()
-    Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
-    label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
-
-
-    // label.text_mesh.SetColorRGB(REDL);
-    // label.text_mesh.RenderTextFromString('REDL');
-
-    // label.Align(ALIGN.BOTTOM | ALIGN.LEFT, [0, 0]);
-    // label.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
-    // label.Align(ALIGN.TOP | ALIGN.LEFT, [0, 0]);
-    // label.Align(ALIGN.TOP | ALIGN.RIGHT, [0, 0]);
-
-    return label;
-}
-function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, color = GREY[1], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
+function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
 
     const pos = [x, y, 2];
     const label = Create_widget_label(root_widget, name, _, pos, 0, color, WHITE, [5, 5], .5, _, font);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-    // label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    // label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
     // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
@@ -1434,8 +1424,12 @@ function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', fo
     if (vb_groupidx !== INT_NULL) label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
     else label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     label.Render()
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+
     label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
+    
+    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(label);
+    Construct_listen_events_relations_from_mesh_tree(label);
 
 
 
@@ -1662,7 +1656,7 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0) {
     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
-
+    line.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
     line.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     line.Render();

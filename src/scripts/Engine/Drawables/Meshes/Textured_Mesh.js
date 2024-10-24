@@ -90,14 +90,7 @@ export class Textured_Mesh extends Mesh {
    UpdateGfx() {
 
       alert('Implement me\nUpdateGfx() @ Textured_Mesh.js')
-      // if(this.is_gfx_inserted) 
-      //    Vertex_buffer_update_vertices(this.gfx, this.geom, this.mat, this.GetName())
-      // else {
-      //    this.gfx.vb.start = Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, this.GetName(), this.idx);
-      //    this.is_gfx_inserted = true;
-      // }
 
-      // return this.gfx.vb.start;
    }
 
 

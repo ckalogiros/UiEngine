@@ -36,8 +36,6 @@ function Shader_includes_resolve(string) {
 
 
 
-
-
 function Generate_defines(defines) {
 
    const chunks = [];
@@ -168,13 +166,14 @@ const attribs_info = { mesh_attribs: [], attribs_loc: [] };
 
 function Create_new_attrib_location(loc, loc_idx) {
 
-   if (loc_idx >= 0 && loc[loc_idx].is_active) {
+   if(loc_idx > 4) 
+      console.error('8144325 \nloc_idx excceding max')
 
+   if (loc_idx >= 0 && loc[loc_idx].is_active) {
       attributes_in_code += `in vec4 a_generic_${loc_idx};\n`;
    }
 
    loc_idx++;
-   // attributes_in_code += `in vec4 a_generic_${loc_idx};\n`;
    loc[loc_idx].name = `a_generic_${loc_idx}`;
    loc[loc_idx].is_active = true;
 
@@ -249,9 +248,13 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
    const attribs_indexing = new Attributes_indexing();
    let attribs_idx = 0;
+   let inst_attribs_idx = 0; // dedicated index counter for instanced vertex buffers
 
    let loc_idx = -1;
    let vec_idx = 0;
+
+   let is_instanced_buffer_enabled = false; // To create a new location(instanced vb must start at new location) when the first instanced attribute is going to be registered.
+   let is_per_vertex_buffer_enabled = false; 
 
    loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0;
 
@@ -288,7 +291,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.COL4 = attribs_idx++;
+      // attribs_indexing.COL4 = attribs_idx++;
+      if (sid.inst & SID.ATTR.COL4) {attribs_indexing.COL4 = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.COL4 = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
    if (sid.attr & SID.ATTR.WPOS3) {
@@ -319,7 +324,8 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.WPOS3 = attribs_idx++;
+      if (sid.inst & SID.ATTR.WPOS3) {attribs_indexing.WPOS3 = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.WPOS3 = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
    if (sid.attr & SID.ATTR.TIME) {
@@ -341,7 +347,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.TIME = attribs_idx++;
+      // attribs_indexing.TIME = attribs_idx++;
+      if (sid.inst & SID.ATTR.TIME) {attribs_indexing.TIME = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.TIME = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
    if (sid.attr & SID.ATTR.VPOS2) {
@@ -368,36 +376,38 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.VPOS2 = attribs_idx++;
+      // attribs_indexing.VPOS2 = attribs_idx++;
+      if (sid.inst & SID.ATTR.VPOS2) {attribs_indexing.VPOS2 = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.VPOS2 = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
-   if (sid.attr & SID.ATTR.DIM2) {
+   // if (sid.attr & SID.ATTR.DIM2) {
 
 
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'dim2';
-      mesh_attribute.nameid |= SID.ATTR.DIM2;
-      mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
+   //    const mesh_attribute = new Mesh_attribute();
+   //    mesh_attribute.name = 'dim2';
+   //    mesh_attribute.nameid |= SID.ATTR.DIM2;
+   //    mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
 
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+   //    if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
 
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+   //    mesh_attribute.loc = loc_idx;
+   //    mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
 
 
-      loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2,);
-      vec_idx++;
-      mesh_attribute.size++;
+   //    loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2,);
+   //    vec_idx++;
+   //    mesh_attribute.size++;
 
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2);
-      vec_idx++;
-      mesh_attribute.size++;
+   //    if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+   //    loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2);
+   //    vec_idx++;
+   //    mesh_attribute.size++;
 
-      attribs_info.mesh_attribs.push(mesh_attribute);
+   //    attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.DIM2 = attribs_idx++;
-   }
+   //    attribs_indexing.DIM2 = attribs_idx++;
+   // }
 
    if (sid.attr & SID.ATTR.R_CORNERS) {
 
@@ -419,7 +429,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.R_CORNERS = attribs_idx++;
+      // attribs_indexing.R_CORNERS = attribs_idx++;
+      if (sid.inst & SID.ATTR.R_CORNERS) {attribs_indexing.R_CORNERS = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.R_CORNERS = attribs_idx++; is_per_vertex_buffer_enabled=true;}
 
    }
 
@@ -443,7 +455,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.BORDER = attribs_idx++;
+      // attribs_indexing.BORDER = attribs_idx++;
+      if (sid.inst & SID.ATTR.BORDER) {attribs_indexing.BORDER = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.BORDER = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
    if (sid.attr & SID.ATTR.FEATHER) {
@@ -466,7 +480,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.FEATHER = attribs_idx++;
+      // attribs_indexing.FEATHER = attribs_idx++;
+      if (sid.inst & SID.ATTR.FEATHER) {attribs_indexing.FEATHER = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.FEATHER = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
    if (sid.attr & SID.ATTR.TEX2) {
@@ -494,7 +510,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.TEX2 = attribs_idx++;
+      // attribs_indexing.TEX2 = attribs_idx++;
+      if (sid.inst & SID.ATTR.TEX2) {attribs_indexing.TEX2 = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.TEX2 = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
    if (sid.attr & SID.ATTR.GLOW_INTENSITY) {
@@ -517,7 +535,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.GLOW_INTENSITY = attribs_idx++;
+      // attribs_indexing.GLOW_INTENSITY = attribs_idx++;
+      if (sid.inst & SID.ATTR.GLOW_INTENSITY) {attribs_indexing.GLOW_INTENSITY = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.GLOW_INTENSITY = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
    if (sid.attr & SID.ATTR.SDF) {
@@ -540,7 +560,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.SDF = attribs_idx++;
+      // attribs_indexing.SDF = attribs_idx++;
+      if (sid.inst & SID.ATTR.SDF) {attribs_indexing.SDF = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.SDF = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
    if (sid.attr & SID.ATTR.MSDF) {
@@ -563,7 +585,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
       attribs_info.mesh_attribs.push(mesh_attribute);
 
-      attribs_indexing.MSDF = attribs_idx++;
+      // attribs_indexing.MSDF = attribs_idx++;
+      if (sid.inst & SID.ATTR.MSDF) {attribs_indexing.MSDF = inst_attribs_idx++; is_instanced_buffer_enabled = true}
+      else {attribs_indexing.MSDF = attribs_idx++; is_per_vertex_buffer_enabled=true;}
    }
 
 
@@ -571,29 +595,19 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
 
 
-
-
-   /**
-    * 
-    */
-
    if (vec_idx === 1) {
       attributes_in_code += `in float a_generic_${loc_idx};\n`;
       loc[loc_idx].attr[0].in_name = `${loc[loc_idx].name}`
    }
    else attributes_in_code += `in vec${vec_idx} a_generic_${loc_idx};\n`;
 
-   /** 
-    *  
-    */
-   // attribs_info.mesh_attribs.push(mesh_attribute);
+
    let offset = 0;
    let size = 0;
    for (let i = 0; i < locations.length; i++) {
 
       if (locations[i].is_active) {
 
-         let location = i;
          offset += size;
          size = 0;
 
@@ -691,6 +705,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    /********************************************************************************************************/
    // Defines
    '\n// DIRECTIVES',
+   '#define PI 3.14159',
    ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
    ((sid.unif & SID.UNIF.SCREEN_RESOLUTION)) ? '#define U_SCREEN_RESOLUTION 1' : '',
 
@@ -716,7 +731,13 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    /********************************************************************************************************/
    '\n// OUTPUT',
    attributes_out_code,
-   // 'out vec2 DIM;',
+   `
+      #define PASS_A_DIM2
+      out float v_dim2_x;
+      out float v_dim2_y;
+      // out vec2 v_pos;
+
+   `,
 
 
 
@@ -735,7 +756,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    // Assignments
    '  // Assignments',
    attributes_assign_code,
-   // '   DIM = vec2(abs(v_pos2_x)*2., abs(v_pos2_y)*2.);',
 
 
 
@@ -747,6 +767,29 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    /********************************************************************************************************/
    // Calculate vertex position-rotation-scale
    '   // Vertex Shader Logic',
+
+   `
+      #ifdef PASS_A_DIM2
+         // v_dim2_x = abs(v_pos2_x);
+         // v_dim2_y = abs(v_pos2_y);
+         v_dim2_x = v_pos2_x;
+         v_dim2_y = v_pos2_y;
+      #endif
+      // if(v_pos2_x < 0.0){
+      //    v_pos2_x = 0.0;
+      // }
+      // else {
+      //    v_pos2_x = v_pos2_x * 2.0;
+      // }
+      // if(v_pos2_y < 0.0){
+      //    v_pos2_y = 0.0;
+      // }
+      // else {
+      //    v_pos2_y = v_pos2_y * 2.0;
+      // }
+      
+   `,
+
 
    /**
     * Current vertex: gl_VertexID.
@@ -877,6 +920,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // In
       '\n// ---------- INPUTS ----------',
       fs_attribs_in_code,
+
+      `
+      in float v_dim2_x;
+      in float v_dim2_y;
+      `,
       
       
       
@@ -1013,8 +1061,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
 
       /********************************************************************************************************/
-      // TESTS
       // HACK: prevent optimizer from removing the uniform u_scale2
+      ' ////////////////////////// HACK: prevent optimizer from removing the uniform u_scale2',
       // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', 
       (sid.unif & SID.UNIF.TIME) ? '   if(u_time == 0.) ;' : '', 
       (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 

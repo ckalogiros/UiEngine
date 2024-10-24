@@ -33,7 +33,9 @@ const u_generic_vec2 =
 `float control1 = u_generic_vec2.x;
 float control2 = u_generic_vec2.y;`;
 const u_generic_float = 
-`float control1 = u_generic_float`;
+`float control1 = u_generic_float;`;
+// const u_generic_default = 
+// `float control1 = 1.0;`;
 
 const u_glow_params_vec3 = 
 `float outer = u_glow_params.x + .4;
@@ -63,7 +65,7 @@ void pixel_map_model_space_coordinates( inout vec2 m_uv, in vec2 screen_dimentio
   pixel_apply_world_position_offset_x(m_uv.x, wposx); 
   pixel_apply_reverse_y_coordinates(m_uv.y, screen_dimentions.y); 
   pixel_apply_world_position_offset_y(m_uv.y, wposy); 
-  m_uv -= model_dimentions;
+  // m_uv -= model_dimentions;
 }
 
 void pixel_map_screen_space_coordinates_zero_one( inout vec2 m_uv, in vec2 screen_dimentions, in float wposx, in float wposy ) {
@@ -302,6 +304,8 @@ export const shader_chunks = {
   u_generic_vec3: u_generic_vec3,
   u_generic_vec2: u_generic_vec2,
   u_generic_float: u_generic_float,
+  // u_generic_default: u_generic_default,
+
   u_round_corners_params_vec3: u_round_corners_params_vec3,
   u_glow_params_vec3: u_glow_params_vec3,
 

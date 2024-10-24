@@ -87,6 +87,8 @@ export const frag_round_corners = `
 #endif
 
 
+
+
 vec4 Round_corners(float scale_down)
 {
     #ifdef U_RCORNERS_VEC3
@@ -106,9 +108,16 @@ vec4 Round_corners(float scale_down)
         float smoothness = .5;
         float power = 1.;
     #endif
-//   #ifdef U_GLOW_PARAMS_VEC3
-//     #include <u_round_corners_params_vec3>
-//   #endif
+
+    #ifdef U_GENERIC_VEC3
+        include <u_generic_vec3>
+    #elif defined(U_GENERIC_VEC2)
+        #include <u_generic_vec2>
+    #elif defined(U_GENERIC_FLOAT)
+        #include <u_generic_float>
+    #else
+        float control1 = 1.;
+    #endif
 
     float scale_up = 1./scale_down;
     vec2 rCorners = vec2(v_rcorners) * scale_down;
@@ -124,57 +133,186 @@ vec4 Round_corners(float scale_down)
         pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
     #endif   
 
-    vec2 abs_uv = abs(uv);
 
-    float d = length(max((abs_uv - dim) + rCorners.x, 0.0)) - rCorners.x;
-    
+    vec2 vdim = vec2(100.);
 
-    // float c = smoothmin(abs(uv.x), abs(uv.y), 30.01);
-    // return vec4(vec3(c), 1.);
 
-    float wb = clamp(-d / feather, 0.0, 1.0);
-    float alpha = src_color.a * wb;
+    // Re-create the rotation matrix
+    float angle = control1;
+    float c = cos(angle);
+	float s = sin(angle);
+    mat2 rot = mat2(s, -c, c, s);
+
+    // Invert the rotation, to correctly calculate the distance on rotated objects
+    mat2 inv_rot = transpose(rot);
+
+    // Invert the rotation for every pxel
+    vec2 localPos = abs(dim*inv_rot);
+
+
+    // Create the render distance limit 
+    float d = length(max((localPos - vdim) + rCorners.x, 0.0)) - rCorners.x;
+
+
+    float alpha = clamp(-d / feather, 0.0, 1.0);
+    src_color.a *= alpha;
     vec3 color = src_color.rgb * alpha;
 
 
-    float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
-    // float strength = 2.2 * ((slider+1.)*.5);                        /* Creates a stronger shadow on full slider */
-    float strength = 1.;
-    
-    power *= 2.;
-    power += 1.;
-    
-    float balance_dim_ratio = max(min_dim, 1.);
-    // float round_preserv = rCorners.x * .5;
-    float round_preserv = rCorners.x - (1.-(smoothness))*4.;
-
-    float depth = balance_dim_ratio * 1.; // Balance the shadow depth to the mesh dimentions
-    // depth *= balance_dim_ratio * ((smoothness+1.)*4.*smoothness); // Balance the shadow depth to the mesh dimentions
-
-    // depth *= slider / rCorners.x * 4.;
-    // depth *= slider * round_preserv * 1.;
-    depth *= slider;
-
-    /* Shadow effect depth */
-    // float shad_len = length(max((abs_uv - dim) + rCorners.x + depth, 0.0))  - rCorners.x;
-    float shad_len = length(max((abs_uv - dim) + round_preserv + depth, 0.0))  - round_preserv;
-    
-    
-    float g = smoothstep(.0, min_dim * smoothness, shad_len); // Always returns interpolated value {0, 1}
-
-
-    // if(g > 0.5) return vec4(1., 0., 0., 1.);
-    // if(shad_len > 10.) return vec4(1., 0., 0., 1.);
-
-
-    // strength = power*min(balance_dim_ratio*.1, 1.);
-    strength = power*blm_darken(balance_dim_ratio*.1, 1.);
-
-    color = mix( color, pow(color, vec3(strength)), g );
-    
     return vec4(color, alpha);
 }
 `;
+/**SAVE */
+// export const frag_round_corners = `
+
+// /********************************************************************************************/
+// // SHADER UNIT: frag_round_corners
+// /********************************************************************************************/
+
+
+// #ifndef UV_READY
+//     vec2 uv = vec2(0,0);
+// #endif
+
+// #define PI 3.14159
+// #define PI4 (PI)/(4.)
+
+
+// vec4 Round_corners(float scale_down)
+// {
+//     #ifdef U_RCORNERS_VEC3
+//         float slider = u_rcorners.x;
+//         float smoothness = u_rcorners.y;
+//         float power = u_rcorners.z;
+//     #elif defined(U_RCORNERS_VEC2)
+//         float slider = u_rcorners.x;
+//         float smoothness = u_rcorners.y;
+//         float power = 1.;
+//     #elif defined(U_RCORNERS_FLOAT)
+//         float slider = u_rcorners;
+//         float smoothness = .5;
+//         float power = 1.;
+//     #else
+//         float slider = .2;
+//         float smoothness = .5;
+//         float power = 1.;
+//     #endif
+
+
+//     float scale_up = 1./scale_down;
+//     vec2 rCorners = vec2(v_rcorners) * scale_down;
+//     float feather = v_feather;
+//     vec2 res = u_screen_res;
+//     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
+//     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+    
+
+//     #ifndef UV_READY
+//         #define UV_READY 1
+//         uv = gl_FragCoord.xy;
+//         pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
+//     #endif   
+
+//     vec2 abs_uv = abs(uv);
+//     // vec2 abs_uv = abs(uv);
+//     // vec2 abs_uv = uv;
+
+//     vec2 vpos = abs(dim);
+//     vec2 vdim = vec2(200.);
+
+//     // pixel_apply_world_position_offset_x(vpos.x, v_wpos3_x); 
+//     // pixel_apply_reverse_y_coordinates(vpos.y, res.y); 
+//     // pixel_apply_world_position_offset_y(vpos.y, v_wpos3_y); 
+//     // vpos -= vdim;
+
+//     // float angle = 0.786;
+//     // float angle = 0.64;
+//     float angle = PI4;
+//     // float angle = 1.5;
+//     float c = cos(angle);
+// 	float s = sin(angle);
+//     mat2 rot = mat2(s, -c, c, s);
+//     mat2 inv_rot = transpose(rot);
+
+//     vec2 localPos = abs(vpos*inv_rot);
+
+    
+//     // pixel_apply_world_position_offset_x(localPos.x, v_wpos3_x); 
+//     // pixel_apply_reverse_y_coordinates(localPos.y, res.y); 
+//     // pixel_apply_world_position_offset_y(localPos.y, v_wpos3_y); 
+//     // localPos -= vdim;
+
+//     // float d = length(max((abs_uv - dim) + rCorners.x, 0.0)) - rCorners.x;
+//     // float d = length(max((abs_uv - abs(dim)) + rCorners.x, 0.0)) - rCorners.x;
+//     // float d = length((abs_uv - abs(vpos)) + rCorners.x) - rCorners.x;
+//     // float d = length((abs_uv - abs(dim)) + rCorners.x) - rCorners.x;
+//     // float d = length((vpos - vdim) + rCorners.x) - rCorners.x;
+//     // float d = length((vpos - vdim) + rCorners.x) - rCorners.x;
+    
+//     float d = length( max( (localPos - vdim) + rCorners.x, 0.0 )) - rCorners.x;
+//     // float d = length( max( (localPos - vpos) + rCorners.x, 0.0 )) - rCorners.x;
+//     // float d = length((localPos - vdim) + rCorners.x) - rCorners.x;
+
+//     // vec2 distToEdges = vdim - vpos;
+//     // // Example: create a color based on the edge distance
+//     // float edgeDistance = min(distToEdges.x, distToEdges.y);
+//     // return vec4(vec3(edgeDistance), 1.0);
+
+//     // // float c = smoothmin(abs(uv.x), abs(uv.y), 30.01);
+//     // // return vec4(vec3(c), 1.);
+
+//     // float wb = clamp(-d / feather, 0.0, 1.0);
+//     float wb = -d;
+//     float alpha = src_color.a * wb;
+//     // vec3 color = src_color.rgb * alpha;
+//     vec3 color = src_color.rgb;
+
+//     // if(abs(dim.x) > 0.) return YELLOW;
+//     // if(d > 10.) return YELLOW;
+//     // if(d < 1.) return RED;
+
+//     return vec4(color, alpha);
+
+
+//     // float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
+//     // // float strength = 2.2 * ((slider+1.)*.5);                        /* Creates a stronger shadow on full slider */
+//     // float strength = 1.;
+    
+//     // power *= 2.;
+//     // power += 1.;
+    
+//     // float balance_dim_ratio = max(min_dim, 1.);
+//     // // float round_preserv = rCorners.x * .5;
+//     // float round_preserv = rCorners.x - (1.-(smoothness))*4.;
+
+//     // float depth = balance_dim_ratio * 1.; // Balance the shadow depth to the mesh dimentions
+//     // // depth *= balance_dim_ratio * ((smoothness+1.)*4.*smoothness); // Balance the shadow depth to the mesh dimentions
+
+//     // // depth *= slider / rCorners.x * 4.;
+//     // // depth *= slider * round_preserv * 1.;
+//     // depth *= slider;
+
+//     // /* Shadow effect depth */
+//     // // float shad_len = length(max((abs_uv - dim) + rCorners.x + depth, 0.0))  - rCorners.x;
+//     // float shad_len = length(max((abs_uv - dim) + round_preserv + depth, 0.0))  - round_preserv;
+    
+    
+//     // float g = smoothstep(.0, min_dim * smoothness, shad_len); // Always returns interpolated value {0, 1}
+
+
+//     // // if(g > 0.5) return vec4(1., 0., 0., 1.);
+//     // // if(shad_len > 10.) return vec4(1., 0., 0., 1.);
+
+
+//     // // strength = power*min(balance_dim_ratio*.1, 1.);
+//     // strength = power*blm_darken(balance_dim_ratio*.1, 1.);
+
+//     // color = mix( color, pow(color, vec3(strength)), g );
+    
+//     // return vec4(color, alpha);
+//     return vec4(color, alpha);
+// }
+// `;
 
 
 

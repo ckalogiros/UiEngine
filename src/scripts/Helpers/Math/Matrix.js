@@ -256,7 +256,7 @@ export function RotateZ(dim, angle) {
 
 	const c = Math.cos(angle);
 	const s = Math.sin(angle);
-	// const p = CreateRectVertexPos2D(dim);
+	// const p = [dim[0]/2, dim[1]/2];
 	const p = [dim[0], dim[1]];
 	const r = [ c, -s, s, c, ];
 
@@ -273,19 +273,6 @@ export function RotateZ(dim, angle) {
 		p[0]*r[0] + -p[1]*r[2],
 		p[0]*r[1] + -p[1]*r[3],
 	];
-	// const newPos = [
-	// 	-p[0]*r[0] + p[1]*r[2],
-	// 	-p[0]*r[1] + p[1]*r[3],
-		
-	// 	-p[0]*r[0] + -p[1]*r[2],
-	// 	-p[0]*r[1] + -p[1]*r[3],
-		
-	// 	p[0]*r[0] + p[1]*r[2],
-	// 	p[0]*r[1] + p[1]*r[3],
-		
-	// 	p[0]*r[0] + -p[1]*r[2],
-	// 	p[0]*r[1] + -p[1]*r[3],
-	// ];
 
 	return newPos;
 };

@@ -4,7 +4,7 @@
 import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx, Vertex_buffer_change_uniform_value_clbk_params, Vertex_buffer_set_name_for_debuging } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
-import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object } from "../../../Graphics/ShaderPrograms.js";
+import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_get_shader_attribs_indexing } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
@@ -200,15 +200,22 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
 
    /********************************************************************/
    // Set attributes info for vertex buffer
-   const prog_attribs = Shader_attributes_get_attribs(prog.attribsidx)
+   const prog_attribs = Shader_attributes_get_attribs(prog.attribsidx);
+   const attribs_indexing = Program_get_shader_attribs_indexing(progidx);
    const len = prog_attribs.nameids.length;
    for (let i = 0; i < len; i++) {
 
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = i;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = i;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = i;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i;
+      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i;
+      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = i;
+      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = i;
+      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = i;
+      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i;
+
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = attribs_indexing.COL4;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = attribs_indexing.WPOS3;
+      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = attribs_indexing.;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = attribs_indexing.VPOS2;
+      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = attribs_indexing.TEX2;
    }
 
    gfx_ctx.ib.idx = ibidx; // Stores the programs index for the indexbuffer.
@@ -344,6 +351,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          const is_private = ((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) ? BUFFER_STATE.IS_PRIVATE : 0x0;
          vb_group = Vertex_buffer_create(sid, _, progidx, is_private);
 
+
          // For debugging only 
          Vertex_buffer_set_name_for_debuging(vb_group.idx, mesh.GetName());
 
@@ -414,7 +422,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          // If the vertex buffer already exists and is reused from the pool
          // get the unif wpos that has already been created for this vb
          mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, 
-            mesh.nameidx, mesh.parent, progidx, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, IS_VB_ROOT);
+         mesh.nameidx, mesh.parent, progidx, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, IS_VB_ROOT);
          // Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, 'u_wposxy', mesh.root_posidx);
 
       }

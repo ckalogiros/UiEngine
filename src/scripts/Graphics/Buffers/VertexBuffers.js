@@ -74,12 +74,12 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 
         const attrib_divisor = 1; // run per instance
         // Calculate the attributes info specific for the attributes of this vertex buffer.
-        const ret = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.inst, attrib_divisor);
+        const ret = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.inst, attrib_divisor, progidx);
         vbinfo.attribs_info = ret.attribs_info;
         vbinfo.attribs_indexing = ret.attribs_indexing;
 
 
-        Shader_attributes_enable(attribsidx, attrib_divisor)
+        Shader_attributes_enable(attribsidx, attrib_divisor, vbinfo.attribs_info, vbidx)
 
         // Store the vbidx to the group
         vb_group.vb_idxs.Add(vbidx);
@@ -110,11 +110,11 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 
         const attrib_divisor = 0; // run per instance
         // Calculate the attributes info specific for the attributes of this vertex buffer.
-        const ret = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.attr & ~sid.inst, attrib_divisor);
+        const ret = Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, sid.attr & ~sid.inst, attrib_divisor, progidx);
         vbinfo.attribs_info = ret.attribs_info;
         vbinfo.attribs_indexing = ret.attribs_indexing;
 
-        Shader_attributes_enable(attribsidx, attrib_divisor);
+        Shader_attributes_enable(attribsidx, attrib_divisor, vbinfo.attribs_info, vbidx);
 
         // Store the vbidx to the group
         vb_group.vb_idxs.Add(vbidx);
@@ -948,9 +948,12 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
 
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
-        // const attribs_count = vb_info.attribs_info.count * verts_per_rect * num_faces;
+        const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
+        const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
+        const attr_uv_idx = vb_info.attribs_indexing.TEX2;
+        const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
         const attribs_count = vb_info.attribs_info.count;
-        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, attribs_info);
+        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
         // vb_info.count += attribs_count;
         vb_info.count += attribs_count * verts_per_rect * num_faces;
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
@@ -1015,14 +1018,13 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces
 
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
-        // // const stride = vb_info.attribs_info.count * verts_per_rect;
-        // const stride = vb_info.attribs_info.count;
-        // // Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
-        // vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
 
-        // const attribs_count = vb_info.attribs_info.count * verts_per_rect * num_faces;
+        const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
+        const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
         const attribs_count = vb_info.attribs_info.count;
-        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, attribs_info);
+        const attr_uv_idx = vb_info.attribs_indexing.TEX2;
+        const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
+        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
         vb_info.count += attribs_count * verts_per_rect * num_faces;
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
 
@@ -1083,9 +1085,15 @@ export function Vertex_buffer_update_vertices(gfx, geom, mat, dbg_mesh_name) {
 
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
+        const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
+        const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
+        const attribs_count = vb_info.attribs_info.count;
+        const attr_uv_idx = vb_info.attribs_indexing.TEX2;
+        const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
         const verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
-        const stride = vb_info.attribs_info.count * verts_per_rect;
-        vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
+        vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
+        // const stride = vb_info.attribs_info.count * verts_per_rect;
+        // vb_info.count += Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset);
 
 
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
@@ -1113,9 +1121,16 @@ export function Vertex_buffer_update_vertices_explicit_Params(vb_groupidx, start
     // const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.groupidx);
 
+    const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
+    const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
+    const attribs_count = vb_info.attribs_info.count;
+    const attr_uv_idx = vb_info.attribs_indexing.TEX2;
+    const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
     const verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
-    const stride = vb_info.attribs_info.count * verts_per_rect;
-    Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
+    Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
+    // const verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
+    // const stride = vb_info.attribs_info.count * verts_per_rect;
+    // Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
 
     vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 

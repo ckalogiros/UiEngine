@@ -259,6 +259,7 @@ const SID = {
         dst.attr = 0x0;        dst.attr |= src.attr;
         dst.unif = 0x0;        dst.unif |= src.unif;
         dst.pass = 0x0;        dst.pass |= src.pass;
+        dst.inst = 0x0;        dst.inst |= src.inst;
         dst.fx   = 0x0;        dst.fx   |= src.fx;
         dst.blend_options = 0x0;  dst.blend_options   |= src.blend_options;
         dst.gfx_group = 0x0;
@@ -270,6 +271,7 @@ const SID = {
             attr: src.attr,
             unif: src.unif,
             pass: src.pass,
+            inst: src.inst,
             fx:   src.fx,
             blend_options:   src.blend_options,
             gfx_group: 0x0,

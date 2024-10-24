@@ -7,7 +7,7 @@ import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Vi
 import { BLACK, BLUEL, Get_fasma_color, GREEN, GREENL, GREY, ORANGEL, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Gl_add_vpos_xy, Gl_set_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Slope_function_logarithmic } from "../../Helpers/Math/MathFunction.js";
 
 
@@ -16,7 +16,6 @@ import { Slope_function_logarithmic } from "../../Helpers/Math/MathFunction.js";
 
 
 const MULTI_COLOR = [BLUEL[9], RED[9], GREEN[9], YELLOW[9], ];
-
 
 
 
@@ -423,12 +422,12 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
          total_height += slider.geom.dim[1] * 2 +10;
       }
 
-      const circle = Create_rect_mesh(_, [x, y, 0], [size, size], color, 'circle', );
-      circle.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      circle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, MULTI_COLOR);
+      const mesh = Create_rect_mesh(_, [x, y, 0], [size, size], color, 'mesh', );
+      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, MULTI_COLOR);
 
       
-      total_height += circle.geom.dim[1] * 2;
+      total_height += mesh.geom.dim[1] * 2;
 
       if(root_widget&ROOT_WIDGETS.CREATE_ROOT) {
 
@@ -442,14 +441,14 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
             // Construct_listen_events_from_mesh_tree(slider)
             // Construct_listen_events_relations_from_mesh_tree(slider);
          }
-         circle.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
-         circle.GenGfxCtx();
-         circle.Render();
+         mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
+         mesh.GenGfxCtx();
+         mesh.Render();
    
-         Root_group_activate_all_vbs_in_renderqueue(circle.root_bufferidx);
-         Construct_listen_events_from_mesh_tree(circle);
-         Construct_listen_events_relations_from_mesh_tree(circle);
-         circle.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, circle.gfx.vb.groupidx);
+         Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
+         Construct_listen_events_from_mesh_tree(mesh);
+         Construct_listen_events_relations_from_mesh_tree(mesh);
+         mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
 
       }
 
@@ -468,14 +467,14 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
 
 
       const params = {
-         circle: circle,
+         mesh: mesh,
          function_slope: slope_params_pointer,
       };
 
       Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params, `Run:${params.function_slope.slope_constant}`);
 
       return {
-         target_mesh:circle,
+         target_mesh:mesh,
          slider_mesh:slider,
          total_height:total_height,
       };
@@ -484,7 +483,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
 
    function Animation_scale_up_run(params) {
 
-      const circle = params.circle;
+      const mesh = params.mesh;
       const slope_constant = params.function_slope.GetSlope();
       const scale = params.function_slope.GetScale();
       params.function_slope.IncrementTimer();
@@ -495,16 +494,17 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
 
       const slope = Slope_function_logarithmic(timer, slope_constant);
 
-      const size = circle.geom.dim[0] * 2 + (slope * scale * 2);
-      // console.log(slope_constant1, slope.toFixed(3), scale.toFixed(3), 'dim',  circle.geom.dim[0], 'size', size)
+      // const size = mesh.geom.dim[0] * 2 + (slope * scale * 2);
+      const size = mesh.geom.dim[0] + (slope * scale);
+      // console.log(slope_constant1, slope.toFixed(3), scale.toFixed(3), 'dim',  mesh.geom.dim[0], 'size', size)
 
-      // circle.geom.dim[0] = size;
-      // circle.geom.dim[1] = size;
-      circle.geom.SetDimXY(circle.gfx, size, size);
+      // mesh.geom.dim[0] = size;
+      // mesh.geom.dim[1] = size;
+      mesh.geom.SetDimXY(mesh.gfx, size, size);
 
-      if (circle.sid.attr & SID.ATTR.R_CORNERS) {
-         circle.mat.style[0] = circle.geom.dim[0];
-         Gl_set_round_corners(circle.gfx, size);
+      if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
+         mesh.mat.style[0] = mesh.geom.dim[0];
+         Gl_set_round_corners(mesh.gfx, size);
       }
 
       if (slope < 1.) return true;
@@ -523,7 +523,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
 
    function Animation_scale_down_run(params) {
 
-      const circle = params.circle;
+      const mesh = params.mesh;
       const slope_constant = params.function_slope.GetSlope();
       const scale = params.function_slope.GetScale();
       params.function_slope.IncrementTimer();
@@ -532,17 +532,17 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
 
       const slope = Slope_function_logarithmic(timer, slope_constant);
 
-      const size = circle.geom.dim[0] * 2 + ((1. - slope) * scale * 2);
-      // const size = circle.geom.dim[0] - scale;
-      // console.log(slope_constant1, slope.toFixed(3), scale.toFixed(3), 'dim',  circle.geom.dim[0], 'size', size)
+      const size = mesh.geom.dim[0] + ((1. - slope) * scale);
+      // const size = mesh.geom.dim[0] - scale;
+      // console.log(slope_constant1, slope.toFixed(3), scale.toFixed(3), 'dim',  mesh.geom.dim[0], 'size', size)
 
-      // circle.geom.dim[0] = size;
-      // circle.geom.dim[1] = size;
-      circle.geom.SetDimXY(circle.gfx, size, size);
+      // mesh.geom.dim[0] = size;
+      // mesh.geom.dim[1] = size;
+      mesh.geom.SetDimXY(mesh.gfx, size, size);
 
-      if (circle.sid.attr & SID.ATTR.R_CORNERS) {
-         circle.mat.style[0] = circle.geom.dim[0];
-         Gl_set_round_corners(circle.gfx, size);
+      if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
+         mesh.mat.style[0] = mesh.geom.dim[0];
+         Gl_set_round_corners(mesh.gfx, size);
       }
 
 
@@ -590,9 +590,10 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
          slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [x, y, 0], slider_dim, _, _, 'Log Function Slope');
          slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
+         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 15);
          // slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[2], GREY[5], GREY[2], GREY[7], ]);
          slider.SetInitialValue(slope_const);
+         // slider.GfxUniformsEnable({ unif: SID.UNIF.FS_GENERIC_FLOAT, pass: SID.PASS.WPOS2, }, 'u_generic_float', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
    
          total_height += slider.geom.dim[1] * 2;
    
@@ -608,46 +609,55 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
       // Rotated mesh
       // if(create_slider) y += slider.geom.dim[1] * 2 + size  +10;
       // x += size;
-      // const circle = Create_widget_section(root_widget, _, [0, 0], [x, y, 0], [size, size], color, 'circle', [size, 2, 0]);
-      // circle.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // circle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, MULTI_COLOR);
+      // const mesh = Create_widget_section(root_widget, _, [0, 0], [x, y, 0], [size, size], color, 'mesh', [size, 2, 0]);
+      // mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, MULTI_COLOR);
       
       if(create_slider) {
-         y += slider.geom.dim[1] * 2 +10;
-         total_height += slider.geom.dim[1] * 2 +10;
-         y += size;
-         x += size;
+         // y += slider.geom.dim[1] * 2 +10;
+         // total_height += slider.geom.dim[1] * 2 +10;
+         // y += size;
+         // x += size;
       }
 
-      const circle = Create_rect_mesh(_, [x, y, 0], [size, size], color, 'circle', );
-      circle.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      circle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, MULTI_COLOR);
+      // const mesh = Create_rect_mesh(root_widget, [x, y, 0], [size, size], color, 'mesh', );
+      const mesh = Create_widget_section(root_widget, _, [0,0], [x, y, 0], [size, size], color, 'mesh', );
+      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, MULTI_COLOR);
+      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1);
+      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 20);
+      
+      mesh.GfxUniformsEnable({ unif: SID.UNIF.FS_GENERIC_FLOAT, pass: SID.PASS.WPOS2, }, 'u_generic_float', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
       
-      total_height += circle.geom.dim[1] * 2;
+      total_height += mesh.geom.dim[1] * 2;
 
-      // if(root_widget&ROOT_WIDGETS.CREATE_ROOT){
+      if(root_widget&ROOT_WIDGETS.CREATE_ROOT){
 
-      //    if(create_slider) {
+         if(create_slider) {
             
-      //       // slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-      //       // slider.Render();
-      //       // Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
-      //       // slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+            slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+            slider.Render();
+            Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
+            slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+            // slider.GfxUniformSetAndUpdate('u_generic_float', Math.PI);
             
-      //       // Construct_listen_events_from_mesh_tree(slider)
-      //       // Construct_listen_events_relations_from_mesh_tree(slider);
-      //    }
+            Construct_listen_events_from_mesh_tree(slider)
+            Construct_listen_events_relations_from_mesh_tree(slider);
+         }
 
-      //    circle.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
-      //    circle.GenGfxCtx();
-      //    circle.Render();
-      
-      //    Root_group_activate_all_vbs_in_renderqueue(circle.root_bufferidx);
-      //    Construct_listen_events_from_mesh_tree(circle);
-      //    Construct_listen_events_relations_from_mesh_tree(circle);
-      //    circle.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, circle.gfx.vb.groupidx);
-      // }
+         mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
+         mesh.GenGfxCtx();
+         mesh.Render();
+         
+         
+         Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
+         Construct_listen_events_from_mesh_tree(mesh);
+         Construct_listen_events_relations_from_mesh_tree(mesh);
+         mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+         // mesh.GfxUniformSetAndUpdate('u_generic_float', Math.PI);
+         mesh.GfxUniformsSetClbk('u_generic_float', ()=>{return rotation}, mesh.gfx.vb.groupidx);
+      }
 
 
       const slope_params_pointer = new Function_Slope(slope_const, time_step, angle);
@@ -662,7 +672,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
 
 
       const params = {
-         circle: circle,
+         mesh: mesh,
          function_slope: slope_params_pointer,
       };
 
@@ -671,7 +681,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
 
       
       return {
-         target_mesh:circle,
+         target_mesh:mesh,
          slider_mesh:slider,
          total_height:total_height,
       };
@@ -679,7 +689,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
 
    function Animation_rotate_run(params) {
 
-      const circle = params.circle;
+      const mesh = params.mesh;
       const slope_constant = params.function_slope.GetSlope();
       const angle = params.function_slope.GetScale();
       params.function_slope.IncrementTimer();
@@ -688,9 +698,11 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
       const slope = Slope_function_logarithmic(timer, slope_constant);
 
       const rot = (slope * angle);
+      // const rot = .786;
       // console.log(rot);
 
-      circle.RotateZ(rot);
+      mesh.RotateZ(rot);
+      rotation = rot;
 
       if (slope < 1.) return true;
       else return false
@@ -707,7 +719,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
 
    function Animation_rotate_back_run(params) {
 
-      const circle = params.circle;
+      const mesh = params.mesh;
       const slope_constant = params.function_slope.GetSlope();
       const angle = params.function_slope.GetScale();
       params.function_slope.IncrementTimer();
@@ -716,9 +728,10 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
       const slope = Slope_function_logarithmic(timer, slope_constant);
       
       const rot = ((1.-slope) * angle);
-      // console.log(rot);
+      // const rot = .786;
       
-      circle.RotateZ(rot);
+      mesh.RotateZ(rot);
+      rotation = rot;
 
       if (slope < 1.) return true;
       else return false

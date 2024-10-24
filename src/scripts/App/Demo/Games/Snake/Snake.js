@@ -12,7 +12,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Slider_connect, Slider_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Listeners_set_priority } from "../../../../Engine/Events/EventListeners.js";
 import { Time_intervals_create } from "../../../../Engine/Timers/TimeIntervals.js";
-import { Gl_set_round_corners, Gl_add_vpos_xy, Gl_set_glow_intensity, Gl_rotate_z_2d, GlSetAttrBorderFeather } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_round_corners, Gl_set_glow_intensity, Gl_rotate_z_2d, GlSetAttrBorderFeather } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomPos } from "../../../../Helpers/Helpers.js";
 import { Slope_function_logarithmic } from "../../../../Helpers/Math/MathFunction.js";
 import { Abs, Magnitude } from "../../../../Helpers/Math/MathOperations.js";
@@ -938,7 +938,7 @@ function Animation_scale_up_run(params){
    body.mesh.geom.pos[1] += -res;
    body.mesh.geom.AddWposXY(body.mesh.gfx, -res, -res);
 
-   Gl_add_vpos_xy(body.mesh.gfx, res, res);
+   // Gl_add_vpos_xy(body.mesh.gfx, res, res);
 
    body.mesh.mat.style[0] =  body.mesh.geom.dim[0];
    Gl_set_round_corners(body.mesh.gfx, body.mesh.geom.dim[0]);
@@ -1039,7 +1039,7 @@ function Animation_scale_down_run(params){
       body.mesh.geom.pos[1] += res;
       body.mesh.geom.AddWposXY(body.mesh.gfx, res, res);
 
-      Gl_add_vpos_xy(body.mesh.gfx, res, res);
+      // Gl_add_vpos_xy(body.mesh.gfx, res, res);
 
       
       body.mesh.mat.style[0] =  body.mesh.geom.dim[0];

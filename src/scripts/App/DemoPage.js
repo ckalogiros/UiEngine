@@ -92,7 +92,7 @@ const comet_glow_slider_values = new Float32Array([0, 1, 0.03, 0.2]);
 
 
 
-export function Demo_page(create_demo_id = subcategory_comet.id) {
+export function Demo_page(create_demo_id = subcategory_animations1.id) {
 // export function Demo_page(create_demo_id = 0x0) {
 
    let comet_particles_struct = null;
@@ -338,12 +338,11 @@ export function Demo_page(create_demo_id = subcategory_comet.id) {
       const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_paricles_demo, subcategory_comet.id, window_menu);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
-      comet_particles_struct  = Create_comet_particles(0, total_height, _, _, 2, ROOT_WIDGETS.CREATE_ROOT, false);
+      comet_particles_struct  = Create_comet_particles(0, total_height, _, _, 1, ROOT_WIDGETS.CREATE_ROOT, false);
 
       comet_particles_struct.controls_section = Create_comet_noise_contols(comet_particles_struct.noise_particles_buffer, TRANSPARENCY(GREY[1], .6), comet_noise_slider_values);
       const comet_glow_contols = Create_comet_glow_contols(comet_particles_struct.glow_particles_buffer, TRANSPARENCY(GREY[1], .6), comet_glow_slider_values);
       for(let i = 0; i < comet_glow_contols.length; i++){
-         // controls_section.push(comet_glow_contols[i]);
          comet_particles_struct.controls_section.push(comet_glow_contols[i]);
       }
       
@@ -354,8 +353,6 @@ export function Demo_page(create_demo_id = subcategory_comet.id) {
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       glow_particles_struct  = Create_glow_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false);
-      // const o = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, );
-
       glow_particles_struct.controls_section = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, glow_slider_values);
 
 

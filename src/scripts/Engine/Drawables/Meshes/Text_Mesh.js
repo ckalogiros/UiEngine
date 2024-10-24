@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_group_set_texidx, Vertex_buffer_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D_Text } from "../Geometry/Geometry2DText.js";
@@ -477,7 +477,7 @@ p
          // TODO: For efficiency, create a dedicated Gl_ function to update all values
          Gl_set_uv(this.gfx, this.mat.uv);
          const w = Font_metrics_get_char_width(this.mat.uvIdx, c[i]);
-         Gl_set_dim_x(this.gfx, w, 1);
+         Gl_set_dim_x(this.gfx, w/2, 1);
          Gl_set_wpos_x(this.gfx, xpos); 
          
          xpos += w; //+1;
@@ -490,7 +490,6 @@ p
          
          Gl_set_uv(this.gfx, space_char_uv);
          
-         // const width = Font_metrics_get_char_width(this.mat.uvIdx, c[i]);
          const width = Font_metrics_get_advancex(this.mat.uvIdx);
          Gl_set_dim_x(this.gfx, width, 1);
          
