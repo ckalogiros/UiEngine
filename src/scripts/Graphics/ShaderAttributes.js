@@ -195,7 +195,7 @@ export function Shader_attributes_get_attrib_idx_by_nameid(attribsidx, nameid) {
          return i;
    }
 
-   console.error('Attribute with name id:', nameid, ' from ids:', SHADER_ATTRIBUTES, ' was not found in program attris:', attribs)
+   console.error('Attribute with name id:', nameid, ' from ids:', SID.ATTR, ' was not found in program attris:', attribs)
    alert('NO ATTRIBUTE FOUND\n SEE CONSOLE ERROR')
 }
 

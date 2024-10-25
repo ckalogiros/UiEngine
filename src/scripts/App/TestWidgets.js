@@ -41,6 +41,9 @@ import { Game_snake } from './Demo/Games/Snake/Snake.js';
 import { Mesh_set_root_in_focus } from '../Engine/Drawables/Operations/MeshHelperFunctions.js';
 import { Slope_function_logarithmic } from '../Helpers/Math/MathFunction.js';
 import { App_reinitialize } from './App.js';
+import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
+import { PerformanceTimersGetMilisec, PerformanceTimersGetNanosec, PerformanceTimersGetWorstFps } from '../Engine/Timers/PerformanceTimers.js';
+import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -638,6 +641,13 @@ function Animation_scale_down_stop(params) {
     return false;
 }
 
+
+function LOG2_PRINT(params){
+    const ms = PerformanceTimersGetMilisec([PERFORMANCE_TIMERS_IDXS.MiscTest1, 0])
+    const ns = PerformanceTimersGetNanosec([PERFORMANCE_TIMERS_IDXS.MiscTest1, 0])
+    const worst = PerformanceTimersGetWorstFps([PERFORMANCE_TIMERS_IDXS.MiscTest1, 0])
+    console.log('ms', ms, 'ns', ns, 'worst', worst)
+}
 export function TestWidgetsGeneric(createId = 1) {
 
 
@@ -667,6 +677,13 @@ export function TestWidgetsGeneric(createId = 1) {
         '\n128', 128, (128>>1),
         '\n256', 256, (256>>1),
     );
+
+    const d = Shader_bit_flags_build_SID_ATTR();
+
+
+    // const interval = Time_intervals_create(500, 'TEST LOG2', TIME_INTERVAL_REPEAT_ALWAYS, LOG2_PRINT, [PERFORMANCE_TIMERS_IDXS.MiscTest1, 0])
+
+
 
     // const device_info = Create_widget;
 

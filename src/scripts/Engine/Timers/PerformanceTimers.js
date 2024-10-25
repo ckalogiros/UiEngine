@@ -152,8 +152,8 @@ export function PerformanceTimersGetFps(timer_idxs) {
 export function PerformanceTimersGetMilisec(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
    const ret = (timer.accum / timer.cnt);
-   timer.accum = 0.0;
-   timer.cnt = 0;
+   // timer.accum = 0.0;
+   // timer.cnt = 0;
    return ret;
    // return (timer.accum / timer.cnt).toFixed(4);
 }
@@ -269,6 +269,10 @@ export function Performance_timers_init_all() {
    {
       const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'Particles');
       PERFORMANCE_TIMERS_IDXS.Particles = idx;
+   }
+   {
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest1');
+      PERFORMANCE_TIMERS_IDXS.MiscTest1 = idx;
    }
    {
       const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest2');

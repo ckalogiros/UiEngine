@@ -132,12 +132,12 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
    if (inst) {
 
       let clean_inst = 0x0;
-      if (inst & SHADER_ATTRIBUTES.COL4) clean_inst |= SHADER_ATTRIBUTES.COL4;
-      if (attr & SHADER_ATTRIBUTES.COL4_PER_VERTEX) clean_inst |= SHADER_ATTRIBUTES.COL4_PER_VERTEX;
-      if (inst & SHADER_ATTRIBUTES.WPOS3) clean_inst |= SHADER_ATTRIBUTES.WPOS3;
-      if (inst & SHADER_ATTRIBUTES.STYLE) clean_inst |= SHADER_ATTRIBUTES.STYLE;
-      if (inst & SHADER_ATTRIBUTES.TEX2) clean_inst |= SHADER_ATTRIBUTES.TEX2;
-      if (inst & SHADER_ATTRIBUTES.TIME) clean_inst |= SHADER_ATTRIBUTES.TIME;
+      if (inst & SID.ATTR.COL4) clean_inst |= SID.ATTR.COL4;
+      if (attr & SID.ATTR.COL4_PER_VERTEX) clean_inst |= SID.ATTR.COL4_PER_VERTEX;
+      if (inst & SID.ATTR.WPOS3) clean_inst |= SID.ATTR.WPOS3;
+      if (inst & SID.ATTR.STYLE) clean_inst |= SID.ATTR.STYLE;
+      if (inst & SID.ATTR.TEX2) clean_inst |= SID.ATTR.TEX2;
+      if (inst & SID.ATTR.TIME) clean_inst |= SID.ATTR.TIME;
 
       if (clean_inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS3_TIME;
       if (clean_inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS3;
@@ -146,19 +146,19 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
    else {
 
       let clean_attr = 0x0;
-      if (attr & SHADER_ATTRIBUTES.COL4) {
-         if (attr & SHADER_ATTRIBUTES.COL4_PER_VERTEX) clean_attr |= SHADER_ATTRIBUTES.COL4_PER_VERTEX;
-         else clean_attr |= SHADER_ATTRIBUTES.COL4;
+      if (attr & SID.ATTR.COL4) {
+         if (attr & SID.ATTR.COL4_PER_VERTEX) clean_attr |= SID.ATTR.COL4_PER_VERTEX;
+         else clean_attr |= SID.ATTR.COL4;
       }
-      if (attr & SHADER_ATTRIBUTES.COL4_PER_VERTEX) clean_attr |= SHADER_ATTRIBUTES.COL4_PER_VERTEX;
-      if (attr & SHADER_ATTRIBUTES.WPOS3) clean_attr |= SHADER_ATTRIBUTES.WPOS3;
-      if (attr & SHADER_ATTRIBUTES.TIME) clean_attr |= SHADER_ATTRIBUTES.TIME;
-      if (attr & SHADER_ATTRIBUTES.VPOS2) clean_attr |= SHADER_ATTRIBUTES.VPOS2;
-      if (attr & SHADER_ATTRIBUTES.R_CORNERS) clean_attr |= SHADER_ATTRIBUTES.R_CORNERS;
-      if (attr & SHADER_ATTRIBUTES.FEATHER) clean_attr |= SHADER_ATTRIBUTES.FEATHER;
-      if (attr & SHADER_ATTRIBUTES.BORDER) clean_attr |= SHADER_ATTRIBUTES.BORDER;
-      if (attr & SHADER_ATTRIBUTES.TEX2) clean_attr |= SHADER_ATTRIBUTES.TEX2;
-      if (attr & SHADER_ATTRIBUTES.GLOW_INTENSITY) clean_attr |= SHADER_ATTRIBUTES.GLOW_INTENSITY;
+      if (attr & SID.ATTR.COL4_PER_VERTEX) clean_attr |= SID.ATTR.COL4_PER_VERTEX;
+      if (attr & SID.ATTR.WPOS3) clean_attr |= SID.ATTR.WPOS3;
+      if (attr & SID.ATTR.TIME) clean_attr |= SID.ATTR.TIME;
+      if (attr & SID.ATTR.VPOS2) clean_attr |= SID.ATTR.VPOS2;
+      if (attr & SID.ATTR.R_CORNERS) clean_attr |= SID.ATTR.R_CORNERS;
+      if (attr & SID.ATTR.FEATHER) clean_attr |= SID.ATTR.FEATHER;
+      if (attr & SID.ATTR.BORDER) clean_attr |= SID.ATTR.BORDER;
+      if (attr & SID.ATTR.TEX2) clean_attr |= SID.ATTR.TEX2;
+      if (attr & SID.ATTR.GLOW_INTENSITY) clean_attr |= SID.ATTR.GLOW_INTENSITY;
 
       if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.TIME | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.BORDER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_RCORNERS_FEATHER_BORDER;
       if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.GLOW_INTENSITY)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_RCORNERS_FEATHER_GLOW_INTENSITY;
@@ -188,7 +188,7 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
    }
 
 
-   console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names, shader_attribs.nameids, SHADER_ATTRIBUTES);
+   console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names, shader_attribs.nameids, SID.ATTR);
    // alert('SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:')
    alert(`${inst} SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:`)
    return -1;

@@ -205,17 +205,17 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
    const len = prog_attribs.nameids.length;
    for (let i = 0; i < len; i++) {
 
-      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = i;
-      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = i;
-      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = i;
-      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = i;
-      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i;
+      // if (prog_attribs.nameids[i] & SID.ATTR.COL4) gfx_ctx.vb.which_attrib.col_idx = i;
+      // if (prog_attribs.nameids[i] & SID.ATTR.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = i;
+      // if (prog_attribs.nameids[i] & SID.ATTR.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = i;
+      // if (prog_attribs.nameids[i] & SID.ATTR.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = i;
+      // if (prog_attribs.nameids[i] & SID.ATTR.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i;
 
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.COL4) gfx_ctx.vb.which_attrib.col_idx = attribs_indexing.COL4;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = attribs_indexing.WPOS3;
-      // if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = attribs_indexing.;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = attribs_indexing.VPOS2;
-      if (prog_attribs.nameids[i] & SHADER_ATTRIBUTES.TEX2) gfx_ctx.vb.which_attrib.tex_idx = attribs_indexing.TEX2;
+      if (prog_attribs.nameids[i] & SID.ATTR.COL4) gfx_ctx.vb.which_attrib.col_idx = attribs_indexing.COL4;
+      if (prog_attribs.nameids[i] & SID.ATTR.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = attribs_indexing.WPOS3;
+      // if (prog_attribs.nameids[i] & SID.ATTR.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = attribs_indexing.;
+      if (prog_attribs.nameids[i] & SID.ATTR.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = attribs_indexing.VPOS2;
+      if (prog_attribs.nameids[i] & SID.ATTR.TEX2) gfx_ctx.vb.which_attrib.tex_idx = attribs_indexing.TEX2;
    }
 
    gfx_ctx.ib.idx = ibidx; // Stores the programs index for the indexbuffer.

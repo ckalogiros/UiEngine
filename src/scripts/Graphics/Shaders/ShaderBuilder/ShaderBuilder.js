@@ -10,6 +10,7 @@ import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
 import { frag_test1, frag_test1_call, frag_test2, frag_test2_call } from './Functions/fragment.tests.js';
 import { Attributes_indexing, Shader_attributes_create } from '../../ShaderAttributes.js';
 import { frag_glow_sphere, frag_glow_sphere_call } from './Functions/fragment.misc.js';
+import { Attribute_get_type_extension, Attribute_get_type_size, Shader_bit_flags_get_attr_info_from_index, Shader_bit_flags_get_attr_size } from '../../ShaderBitFlags.js';
 
 
 
@@ -132,12 +133,17 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
 
 
 
-const attribs_xyzw = ['.x', '.y', '.z', '.w'];
+const attribs_xyzw = ['x', 'y', 'z', 'w'];
 let locations = null;
 let attributes_in_code = '';
 let attributes_out_code = '';
 let attributes_assign_code = '';
 let fs_attribs_in_code = '';
+let moc_locations = null;
+let moc_attributes_in_code = '';
+let moc_attributes_out_code = '';
+let moc_attributes_assign_code = '';
+let moc_fs_attribs_in_code = '';
 
 
 
@@ -182,13 +188,31 @@ function Create_new_attrib_location(loc, loc_idx) {
 }
 
 
+function Create_new_attrib_location2(loc, loc_idx) {
+
+   if(loc_idx > 4) 
+      console.error('8144325 \nloc_idx excceding max')
+
+   if (loc_idx >= 0 && loc[loc_idx].is_active) {
+      moc_attributes_in_code += `in vec4 a_generic_${loc_idx};\n`;
+   }
+
+   loc_idx++;
+   loc[loc_idx].name = `a_generic_${loc_idx}`;
+   loc[loc_idx].is_active = true;
+
+
+   return loc_idx;
+}
+
+
 
 function Create_attribute(name, location_name, attr_idx, pass_to_fs = 0x0) {
 
    let extra = '';
    if (pass_to_fs & (SID.PASS.WPOS3 | SID.PASS.WPOS2)) {
       // For every WPOS passing, create the code of the uniform wposition 
-      extra = ` + u_wposxy${attribs_xyzw[attr_idx]}`;
+      extra = ` + u_wposxy.${attribs_xyzw[attr_idx]}`;
    }
 
    return {
@@ -196,14 +220,192 @@ function Create_attribute(name, location_name, attr_idx, pass_to_fs = 0x0) {
       is_passing: pass_to_fs, // Is this attrib passing to the fragment shader 
       name: name,
       out_name: `v_${name}`,
-      in_name: `${location_name}${attribs_xyzw[attr_idx]}`,
+      in_name: `${location_name}.${attribs_xyzw[attr_idx]}`,
       extra: extra,
    };
 }
 
 
 
+function Create_attribute2(name, location_name, extension, pass_to_fs = 0x0) {
+
+   let extra = '';
+   if (pass_to_fs & (SID.PASS.WPOS3 | SID.PASS.WPOS2)) {
+      // For every WPOS passing, create the code of the uniform wposition 
+      extra = ` + u_wposxy.${extension}`;
+   }
+
+   return {
+      is_occupied: true,
+      is_passing: pass_to_fs, // Is this attrib passing to the fragment shader 
+      name: name,
+      out_name: `v_${name}`,
+      in_name: `${location_name}.${extension}`,
+      extra: extra,
+   };
+}
+
+
+
+function Vertex_shader_resolve_attributes_in2(sid) {
+
+   moc_attributes_in_code += ''
+
+   const loc = [
+      {
+         is_active: false,
+         name: '',
+         attr: [{}, {}, {}, {},],
+      },
+      {
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+   ];
+
+
+   const attribs_indexing = new Attributes_indexing(); // Specific to gl Program. Store the connection of shader attrib location to the SID flag(E.x. .COL4:loc=2)
+   let attribs_idx = 0;
+   let loc_idx = -1;
+   let vec_idx = 0;
+
+
+   loc_idx = Create_new_attrib_location(loc, loc_idx, moc_attributes_in_code); vec_idx = 0;
+
+   console.log('----------------------------------------------------------------------------------------------------------------------------------------------')
+
+   
+   //
+   const attributes_len = Shader_bit_flags_get_attr_size();
+   for(let i=0; i<attributes_len; i++){
+      
+      const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
+      if (sid.attr & attr_info.FLAG) {
+         
+         const attr_flag = attr_info.FLAG;
+         const attr_name = attr_info.NAME;
+         const attr_type = attr_info.TYPE;
+         const attr_type_size = attr_info.TYPE_SIZE;
+         console.log(attr_info)
+         
+         
+         const pass_to_fs = sid.pass & SID.PASS.COL4;
+         
+         // Run for type size
+         for(let j=0; j<attr_type_size; j++){
+            
+            // TODO: Look if the nameid or any other info is already accessible from the ShaderBitFlags file
+            const mesh_attribute = new Mesh_attribute();
+            mesh_attribute.loc = loc_idx;
+            mesh_attribute.name = attr_name;
+            mesh_attribute.nameid |= attr_flag;
+            mesh_attribute.type = attr_type;
+            mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc)
+            const ext = Attribute_get_type_extension(j); // Get the extension [.x, .y, .z, .w]
+            // console.log(ext)
+
+            const vshader_attr_name = (attr_type_size > 1) ? `${attr_name}.${ext}` : attr_name; // Only vec's need extension
+            
+            if(vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location2(loc, loc_idx, moc_attributes_in_code); vec_idx = 0; } // Check for full attrib location
+            loc[loc_idx].attr[vec_idx] = Create_attribute2(vshader_attr_name, loc[loc_idx].name, ext, pass_to_fs,);
+            vec_idx++;
+            mesh_attribute.size++;
+   
+   
+            attribs_info.mesh_attribs.push(mesh_attribute);
+            
+         }
+
+         // TODO: Probably we must set the 'attribs_indexing' as an array, and index all with attrib_flag 
+         if(attr_flag & SID.ATTR.COL4) attribs_indexing.COL4 = attribs_idx++;
+         if(attr_flag & SID.ATTR.COL4) attribs_indexing.WPOS3 = attribs_idx++;
+      }
+   }
+
+
+
+   
+   // //       // attribs_indexing.COL4 = attribs_idx++;
+
+
+
+   moc_locations = loc;
+
+
+
+   if (vec_idx === 1) {
+      moc_attributes_in_code += `in float a_generic_${loc_idx};\n`;
+      loc[loc_idx].attr[0].in_name = `${loc[loc_idx].name}`
+   }
+   else moc_attributes_in_code += `in vec${vec_idx} a_generic_${loc_idx};\n`;
+
+
+   let offset = 0;
+   let size = 0;
+   for (let i = 0; i < moc_locations.length; i++) {
+
+      if (moc_locations[i].is_active) {
+
+         offset += size;
+         size = 0;
+
+         for (let j = 0; j < moc_locations[i].attr.length; j++) {
+            if (moc_locations[i].attr[j].is_occupied) size++;
+         }
+
+         attribs_info.attribs_loc.push({
+            locs: i,
+            sizes: size,
+            offsets: offset,
+         });
+      }
+   }
+
+
+
+   // DEBUG-PRINT
+   // for (let i = 0; i < mesh_attributes.length; i++) console.log('names:', mesh_attributes[i].name);
+   console.log('loc', loc, '\nattribs_info', attribs_info, '\nattribs_indexing', attribs_indexing)
+
+
+   return {
+      attribs_info:attribs_info,
+      attribs_indexing:attribs_indexing,
+   }
+
+
+}
+
+
 function Vertex_shader_resolve_attributes_in(sid) {
+
+   Vertex_shader_resolve_attributes_in2(sid);
 
    attributes_in_code += ''
 

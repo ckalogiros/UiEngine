@@ -35,7 +35,7 @@ export function Gl_set_rgba(gfxInfo, color, num_faces = 1) {
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
-   // const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.COL4);
+   // const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SID.ATTR.COL4);
 
    let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[vbidx];
    let loop_count = num_faces;
@@ -67,7 +67,7 @@ export function Gl_set_alpha(gfxInfo, alpha, num_faces = 1) {
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
-   // const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.COL4);
+   // const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SID.ATTR.COL4);
 
    let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[vbidx] + 3;
    let loop_count = num_faces;
@@ -1109,7 +1109,7 @@ export function Gl_set_vb_mesh_priority(progidx, vbIdx, meshIdx, meshCount) {
 //    /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_rgba()'); }
 
 //    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-//    const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.COL4);
+//    const a = Shader_attributes_get_attribs_offset_size(gfxInfo.prog.attribsidx, SID.ATTR.COL4);
 
 //    let index = gfxInfo.vb.start + a.offset;
 //    let verts = num_faces * gfxInfo.vertsPerRect;
@@ -1177,7 +1177,7 @@ export function Gl_set_vb_mesh_priority(progidx, vbIdx, meshIdx, meshCount) {
 
 //    const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
 //    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
-//    const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.COL4);
+//    const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SID.ATTR.COL4);
 
 //    let stride = shader_attribs_info.attribs_per_vertex - colors_len;
 
@@ -1204,7 +1204,7 @@ export function Gl_batch_set_RGBA(vb_groupidx, starts, colors, color_indices, co
 
    // const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
    const vb_data = Vertex_buffer_get_by_vbidx(vb_groupidx);
-   const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.COL4);
+   const shader_attribs_info = Shader_attributes_get_attribs_offset_attribs_per_vertex(attribsidx, SID.ATTR.COL4);
 
    // let stride = shader_attribs_info.attribs_per_vertex - colors_len;
    // let stride = shader_attribs_info.attribs_per_vertex;
@@ -1236,7 +1236,7 @@ export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_l
 
    
    const vb_data = Vertex_buffer_get_by_vbidx(vb_groupidx);
-   const shader_attribs_info = Shader_attributes_get_attribs_offset_size_attribs_per_vertex(attribsidx, SHADER_ATTRIBUTES.WPOS3);
+   const shader_attribs_info = Shader_attributes_get_attribs_offset_size_attribs_per_vertex(attribsidx, SID.ATTR.WPOS3);
 
    // let stride = shader_attribs_info.attribs_per_vertex - (shader_attribs_info.size - 3);
    // let stride = shader_attribs_info.attribs_per_vertex;
@@ -1271,7 +1271,7 @@ export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_l
 // export function Gl_set_alpha(gfxInfo, val, num_faces) {
 
 //    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-//    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS3);
+//    const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SID.ATTR.WPOS3);
 
 //    let index = gfxInfo.vb.start + offset;
 //    let verts = num_faces * gfxInfo.vertsPerRect;
@@ -1294,7 +1294,7 @@ export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_l
 export function Gl_set_alpha_from_offset(gfxInfo, val, from_offset, num_faces) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.COL4);
+   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SID.ATTR.COL4);
 
    // The 'from_offset' is in number of faces, so we convert to attributes
    const attr_offset = from_offset * gfxInfo.vertsPerRect * gfxInfo.prog.attribsidx;
@@ -1320,7 +1320,7 @@ export function Gl_set_alpha_from_offset(gfxInfo, val, from_offset, num_faces) {
 export function Gl_add_wpos_xyz(gfxInfo, x, y, z, num_faces = 1) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS3);
+   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SID.ATTR.WPOS3);
 
    let index = gfxInfo.vb.start + offset;
    let verts = num_faces * gfxInfo.vertsPerRect;
@@ -1344,7 +1344,7 @@ export function Gl_add_wpos_xyz(gfxInfo, x, y, z, num_faces = 1) {
 export function Gl_set_wpos_Z(gfxInfo, z, num_faces = 1) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS3);
+   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SID.ATTR.WPOS3);
 
    let index = gfxInfo.vb.start + offset + GRAPHICS_LAYOUT.ATTR_SELF_OFFSETS.WPOS_Z;
    let faces = num_faces; // Number of vertices
@@ -1371,7 +1371,7 @@ export function Gl_set_wpos_Z(gfxInfo, z, num_faces = 1) {
 export function GlSetAttrRoundCorner(gfxInfo, val) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.STYLE);
+   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SID.ATTR.STYLE);
 
    let index = gfxInfo.vb.start + offset + V_ROUND_CORNER_STRIDE;
    let verts = num_faces * gfxInfo.vertsPerRect;
@@ -1392,7 +1392,7 @@ export function GlSetAttrRoundCorner(gfxInfo, val) {
 export function GlSetAttrBorderWidth(gfxInfo, val) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.STYLE);
+   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SID.ATTR.STYLE);
 
    let index = gfxInfo.vb.start + offset + V_BORDER_WIDTH_STRIDE;
    let verts = num_faces * gfxInfo.vertsPerRect;
@@ -1444,7 +1444,7 @@ export function GlSetAttrBorderFeather(gfxInfo, val, num_faces=1) {
 export function Gl_set_wpos_time(gfxInfo, val) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES.WPOS3);
+   const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SID.ATTR.WPOS3);
 
    let index = gfxInfo.vb.start + offset + GRAPHICS_LAYOUT.ATTR_SELF_OFFSETS.WPOS4_TIME;
    let verts = num_faces * gfxInfo.vertsPerRect;
@@ -1812,7 +1812,7 @@ export function Gl_particles_batch_set_col4_wpos4_dim2(vbidx, start, colors, pos
 export function GlSetAttrSdfParams(gfxInfo, val) {
    alert("IMPLEMENT ME")
    // const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-   // const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES
+   // const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SID.ATTR
 
    // let index = gfxInfo.vb.start + progs.buffer[gfxInfo.prog.idx].shaderinfo.attributes.offset.sdf;
    // let verts = num_faces * gfxInfo.vertsPerRect;
@@ -1831,7 +1831,7 @@ export function GlSetAttrSdfParams(gfxInfo, val) {
 export function GlSetAttrSdfParamsOuter(gfxInfo, val) {
    alert("IMPLEMENT ME")
    // const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idx);
-   // const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SHADER_ATTRIBUTES
+   // const offset = Shader_attributes_get_attrib_offset_by_nameid(gfxInfo.prog.attribsidx, SID.ATTR
 
    // let index = gfxInfo.vb.start + progs.buffer[gfxInfo.prog.idx].shaderinfo.attributes.offset.sdf;
    // let verts = num_faces * gfxInfo.vertsPerRect;

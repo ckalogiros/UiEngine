@@ -1211,6 +1211,7 @@ const INTERVALS = {
 
 const DEBUG = {
 
+	DEFENSIVE: true, // For code that will slow down the app, but essential for critical errors
 	CORE: false,
 	MATERIAL: false,
 	GEOMETRY: false,

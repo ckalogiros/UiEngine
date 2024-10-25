@@ -29,7 +29,7 @@ const DISABLE_DEBUG = true;
 
 
 
-
+// TODO: The VAO must be created per Program and not per Vertex buffer
 export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx, IS_PRIVATE) {
 
     /***********************************************************************************************/
@@ -1296,7 +1296,7 @@ function Vertex_to_string(flags, progidx, vbidx, count) {
 
     const attribsidx = Program_get_shader_attributes_index(progidx);
     const stride = Program_get_shader_attribute_attribs_per_vertex(progidx);
-    const wpos_attr = Shader_attributes_get_attribs_offset_size(attribsidx, SHADER_ATTRIBUTES.WPOS3);
+    const wpos_attr = Shader_attributes_get_attribs_offset_size(attribsidx, SID.ATTR.WPOS3);
 
     const arr = [];
     const faces = count / (stride * 4);

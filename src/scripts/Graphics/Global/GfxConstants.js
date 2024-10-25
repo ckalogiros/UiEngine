@@ -124,23 +124,23 @@ const SID = {
     },
 
     ATTR: {
-        COL4: BIT2,
-        WPOS3: BIT2 <<= 1,
-        VPOS2: BIT2 <<= 1,
-        DIM2: BIT2 <<= 1,
-        TIME: BIT2 <<= 1,
-        R_CORNERS: BIT2 <<= 1,
-        BORDER: BIT2 <<= 1,
-        FEATHER: BIT2 <<= 1,
-        GLOW_INTENSITY: BIT2 <<= 1,
-        TEX2: BIT2 <<= 1,
-        SCALE2: BIT2 <<= 1,
-        SDF: BIT2 <<= 1,
-        MSDF: BIT2 <<= 1,
-        STYLE: BIT2 <<= 1,
-        COL4_PER_VERTEX: BIT2 <<= 1,
-        EMPTY: BIT2 <<= 1,
-        TEST_MULTI_VERTEX: BIT2 <<= 1,
+        // COL4: BIT2,
+        // WPOS3: BIT2 <<= 1,
+        // VPOS2: BIT2 <<= 1,
+        // DIM2: BIT2 <<= 1,
+        // TIME: BIT2 <<= 1,
+        // R_CORNERS: BIT2 <<= 1,
+        // BORDER: BIT2 <<= 1,
+        // FEATHER: BIT2 <<= 1,
+        // GLOW_INTENSITY: BIT2 <<= 1,
+        // TEX2: BIT2 <<= 1,
+        // SCALE2: BIT2 <<= 1,
+        // SDF: BIT2 <<= 1,
+        // MSDF: BIT2 <<= 1,
+        // STYLE: BIT2 <<= 1,
+        // COL4_PER_VERTEX: BIT2 <<= 1,
+        // EMPTY: BIT2 <<= 1,
+        // TEST_MULTI_VERTEX: BIT2 <<= 1,
     },
 
     INST:{
@@ -364,12 +364,9 @@ const SID = {
     },
 };
 
-if(SID.ATTR > MAX_BIT_MASK) alert('SID ATTR exceeding javascript\'s max number value');
-if(SID.UNIF > MAX_BIT_MASK) alert('SID UNIF exceeding javascript\'s max number value');
-if(SID.PASS > MAX_BIT_MASK) alert('SID PASS exceeding javascript\'s max number value');
-
-
-
+// if(SID.ATTR > MAX_BIT_MASK) alert('SID ATTR exceeding javascript\'s max number value');
+// if(SID.UNIF > MAX_BIT_MASK) alert('SID UNIF exceeding javascript\'s max number value');
+// if(SID.PASS > MAX_BIT_MASK) alert('SID PASS exceeding javascript\'s max number value');
 
 
 
@@ -377,7 +374,7 @@ if(SID.PASS > MAX_BIT_MASK) alert('SID PASS exceeding javascript\'s max number v
 
 
 // Create a copy of the SID.ATTR, so we can compare with 'sid'
-const SHADER_ATTRIBUTES = SID.ATTR;
+// const SID.ATTR = SID.ATTR;
 
 
 

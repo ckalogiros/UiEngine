@@ -7,13 +7,14 @@ import { Time_intervals_update } from "../Timers/TimeIntervals.js";
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
 import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Performance_timer_start, Performance_timer_stop, Performance_timers_update_tick } from "../Timers/PerformanceTimers.js";
+import { Performance_timer_start, Performance_timer_stop, Performance_timers_update_tick, PerformanceTimersGetFps, PerformanceTimersGetMilisec } from "../Timers/PerformanceTimers.js";
 import { Command_buffer_run } from "../Core/Commandbuffer.js";
 import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../Scenes.js";
 import { Input_reset } from "../Controls/Input/Input.js";
 import { Mesh_animations_run } from "../Animations/MeshAnimations.js";
 import { Particle_system_update } from "../ParticlesSystem/ParticlesSystem.js";
 import { Callback_animations_run } from "../Animations/CallbackAnimations.js";
+import { Hash } from "../../Helpers/Math/MathOperations.js";
 
 
 
@@ -130,6 +131,10 @@ export class Renderer {
 
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
 
+         
+         // Test_log2_performance();
+
+
          Performance_timers_update_tick();
 
          TimeSample();
@@ -144,6 +149,42 @@ export class Renderer {
 
 
 }
+
+// function log2(val){
+//    return Math.log2(val);
+// }
+// function sqrt(val){
+//    return Math.sqrt(val);
+// }
+
+// function Test_log2_performance(){
+
+//    const len = BIT_FLAGS_SIZE;
+//    let moc = 0;
+//    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest1);
+
+
+//    for(let i=0; i<len; i++){
+
+//       const res = log2(BIT_FLAGS[i]);
+//       moc += res;
+//       // const res2 = sqrt(BIT_FLAGS[i]);
+//       // moc += res2;
+//       // const res3 = Hash(i);
+//       // moc += res3;
+//       // console.log(res)
+//    }
+
+
+//    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest1);
+
+
+//    // const fps = PerformanceTimersGetFps([PERFORMANCE_TIMERS_IDXS.MiscTest1, 0])
+//    // const fps = PerformanceTimersGetMilisec([PERFORMANCE_TIMERS_IDXS.MiscTest1, 0])
+
+//    return moc
+
+// }
 
 
 
