@@ -8,9 +8,9 @@ import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
 import { frag_noise, frag_noise_call, frag_worley_noise, frag_worley_noise_call } from './Functions/fragment.noise.js';
 import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
 import { frag_test1, frag_test1_call, frag_test2, frag_test2_call } from './Functions/fragment.tests.js';
-import { Attributes_indexing, Shader_attributes_create } from '../../ShaderAttributes.js';
+import { Shader_attributes_create } from '../../ShaderAttributes.js';
 import { frag_glow_sphere, frag_glow_sphere_call } from './Functions/fragment.misc.js';
-import { Attribute_get_type_extension, Attribute_get_type_size, Shader_bit_flags_get_attr_info_from_index, Shader_bit_flags_get_attr_size } from '../../ShaderBitFlags.js';
+import { Attribute_get_type_extension, Shader_Attributes, Shader_bit_flags_get_attr_info_from_flag, Shader_bit_flags_get_attr_info_from_index, Shader_bit_flags_get_attr_key_name_from_flag, Shader_bit_flags_get_attr_size } from '../../ShaderBitFlags.js';
 
 
 
@@ -139,11 +139,6 @@ let attributes_in_code = '';
 let attributes_out_code = '';
 let attributes_assign_code = '';
 let fs_attribs_in_code = '';
-let moc_locations = null;
-let moc_attributes_in_code = '';
-let moc_attributes_out_code = '';
-let moc_attributes_assign_code = '';
-let moc_fs_attribs_in_code = '';
 
 
 
@@ -158,7 +153,7 @@ class Mesh_attribute { // Attributes info struct
       this.size = size;
       this.type = type;
       this.name = name;
-      this.nameid = 0x0;
+      this.attrib_flag = 0x0;
    }
 };
 
@@ -172,7 +167,7 @@ const attribs_info = { mesh_attribs: [], attribs_loc: [] };
 
 function Create_new_attrib_location(loc, loc_idx) {
 
-   if(loc_idx > 4) 
+   if (loc_idx > 4)
       console.error('8144325 \nloc_idx excceding max')
 
    if (loc_idx >= 0 && loc[loc_idx].is_active) {
@@ -183,28 +178,8 @@ function Create_new_attrib_location(loc, loc_idx) {
    loc[loc_idx].name = `a_generic_${loc_idx}`;
    loc[loc_idx].is_active = true;
 
-
    return loc_idx;
 }
-
-
-function Create_new_attrib_location2(loc, loc_idx) {
-
-   if(loc_idx > 4) 
-      console.error('8144325 \nloc_idx excceding max')
-
-   if (loc_idx >= 0 && loc[loc_idx].is_active) {
-      moc_attributes_in_code += `in vec4 a_generic_${loc_idx};\n`;
-   }
-
-   loc_idx++;
-   loc[loc_idx].name = `a_generic_${loc_idx}`;
-   loc[loc_idx].is_active = true;
-
-
-   return loc_idx;
-}
-
 
 
 function Create_attribute(name, location_name, attr_idx, pass_to_fs = 0x0) {
@@ -227,195 +202,51 @@ function Create_attribute(name, location_name, attr_idx, pass_to_fs = 0x0) {
 
 
 
-function Create_attribute2(name, location_name, extension, pass_to_fs = 0x0) {
+function Create_attribute2(name, extension, location_name, attr_idx, pass_to_fs = 0x0) {
 
    let extra = '';
    if (pass_to_fs & (SID.PASS.WPOS3 | SID.PASS.WPOS2)) {
       // For every WPOS passing, create the code of the uniform wposition 
-      extra = ` + u_wposxy.${extension}`;
+      extra = ` + u_wposxy.${attribs_xyzw[attr_idx]}`;
    }
 
-   return {
+   const o = {
       is_occupied: true,
       is_passing: pass_to_fs, // Is this attrib passing to the fragment shader 
       name: name,
-      out_name: `v_${name}`,
-      in_name: `${location_name}.${extension}`,
+      out_name: `v_${name}${extension}`,
+      in_name: `${location_name}.${attribs_xyzw[attr_idx]}`,
       extra: extra,
    };
+
+   return o;
+}
+
+
+
+function Create_pass_to_frag_attributes(name, extension,) {
+
+   const out_name = `v_${name}${extension}`;
+   return out_name;
 }
 
 
 
 function Vertex_shader_resolve_attributes_in2(sid) {
 
-   moc_attributes_in_code += ''
-
-   const loc = [
-      {
-         is_active: false,
-         name: '',
-         attr: [{}, {}, {}, {},],
-      },
-      {
-         is_active: false,
-         name: '',
-         attr: [
-            { is_occupied: false, name: '', in_name: '', },
-            { is_occupied: false, name: '', in_name: '', },
-            { is_occupied: false, name: '', in_name: '', },
-            { is_occupied: false, name: '', in_name: '', },
-         ],
-      },
-      {
-         is_active: false,
-         name: '',
-         attr: [
-            { is_occupied: false, name: '', in_name: '', },
-            { is_occupied: false, name: '', in_name: '', },
-            { is_occupied: false, name: '', in_name: '', },
-            { is_occupied: false, name: '', in_name: '', },
-         ],
-      },
-      {
-         is_active: false,
-         name: '',
-         attr: [
-            { is_occupied: false, name: '', in_name: '', },
-            { is_occupied: false, name: '', in_name: '', },
-            { is_occupied: false, name: '', in_name: '', },
-            { is_occupied: false, name: '', in_name: '', },
-         ],
-      },
-   ];
-
-
-   const attribs_indexing = new Attributes_indexing(); // Specific to gl Program. Store the connection of shader attrib location to the SID flag(E.x. .COL4:loc=2)
-   let attribs_idx = 0;
-   let loc_idx = -1;
-   let vec_idx = 0;
-
-
-   loc_idx = Create_new_attrib_location(loc, loc_idx, moc_attributes_in_code); vec_idx = 0;
-
-   console.log('----------------------------------------------------------------------------------------------------------------------------------------------')
-
-   
-   //
-   const attributes_len = Shader_bit_flags_get_attr_size();
-   for(let i=0; i<attributes_len; i++){
-      
-      const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
-      if (sid.attr & attr_info.FLAG) {
-         
-         const attr_flag = attr_info.FLAG;
-         const attr_name = attr_info.NAME;
-         const attr_type = attr_info.TYPE;
-         const attr_type_size = attr_info.TYPE_SIZE;
-         console.log(attr_info)
-         
-         
-         const pass_to_fs = sid.pass & SID.PASS.COL4;
-         
-         // Run for type size
-         for(let j=0; j<attr_type_size; j++){
-            
-            // TODO: Look if the nameid or any other info is already accessible from the ShaderBitFlags file
-            const mesh_attribute = new Mesh_attribute();
-            mesh_attribute.loc = loc_idx;
-            mesh_attribute.name = attr_name;
-            mesh_attribute.nameid |= attr_flag;
-            mesh_attribute.type = attr_type;
-            mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc)
-            const ext = Attribute_get_type_extension(j); // Get the extension [.x, .y, .z, .w]
-            // console.log(ext)
-
-            const vshader_attr_name = (attr_type_size > 1) ? `${attr_name}.${ext}` : attr_name; // Only vec's need extension
-            
-            if(vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location2(loc, loc_idx, moc_attributes_in_code); vec_idx = 0; } // Check for full attrib location
-            loc[loc_idx].attr[vec_idx] = Create_attribute2(vshader_attr_name, loc[loc_idx].name, ext, pass_to_fs,);
-            vec_idx++;
-            mesh_attribute.size++;
-   
-   
-            attribs_info.mesh_attribs.push(mesh_attribute);
-            
-         }
-
-         // TODO: Probably we must set the 'attribs_indexing' as an array, and index all with attrib_flag 
-         if(attr_flag & SID.ATTR.COL4) attribs_indexing.COL4 = attribs_idx++;
-         if(attr_flag & SID.ATTR.COL4) attribs_indexing.WPOS3 = attribs_idx++;
-      }
-   }
-
-
-
-   
-   // //       // attribs_indexing.COL4 = attribs_idx++;
-
-
-
-   moc_locations = loc;
-
-
-
-   if (vec_idx === 1) {
-      moc_attributes_in_code += `in float a_generic_${loc_idx};\n`;
-      loc[loc_idx].attr[0].in_name = `${loc[loc_idx].name}`
-   }
-   else moc_attributes_in_code += `in vec${vec_idx} a_generic_${loc_idx};\n`;
-
-
-   let offset = 0;
-   let size = 0;
-   for (let i = 0; i < moc_locations.length; i++) {
-
-      if (moc_locations[i].is_active) {
-
-         offset += size;
-         size = 0;
-
-         for (let j = 0; j < moc_locations[i].attr.length; j++) {
-            if (moc_locations[i].attr[j].is_occupied) size++;
-         }
-
-         attribs_info.attribs_loc.push({
-            locs: i,
-            sizes: size,
-            offsets: offset,
-         });
-      }
-   }
-
-
-
-   // DEBUG-PRINT
-   // for (let i = 0; i < mesh_attributes.length; i++) console.log('names:', mesh_attributes[i].name);
-   console.log('loc', loc, '\nattribs_info', attribs_info, '\nattribs_indexing', attribs_indexing)
-
-
-   return {
-      attribs_info:attribs_info,
-      attribs_indexing:attribs_indexing,
-   }
-
-
-}
-
-
-function Vertex_shader_resolve_attributes_in(sid) {
-
-   Vertex_shader_resolve_attributes_in2(sid);
-
    attributes_in_code += ''
 
    const loc = [
       {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
          is_active: false,
          name: '',
          attr: [{}, {}, {}, {},],
       },
       {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
          is_active: false,
          name: '',
          attr: [
@@ -426,6 +257,8 @@ function Vertex_shader_resolve_attributes_in(sid) {
          ],
       },
       {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
          is_active: false,
          name: '',
          attr: [
@@ -436,6 +269,8 @@ function Vertex_shader_resolve_attributes_in(sid) {
          ],
       },
       {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
          is_active: false,
          name: '',
          attr: [
@@ -448,354 +283,154 @@ function Vertex_shader_resolve_attributes_in(sid) {
    ];
 
 
-   const attribs_indexing = new Attributes_indexing();
+   // const prog_attribs_indexing = new Attributes_indexing(); // Specific to gl Program. Store the connection of shader attrib location to the SID flag(E.x. .COL4:loc=2)
+   const prog_attribs_indexing = new Shader_Attributes(true, INT_NULL); // Specific to gl Program. Store the connection of shader attrib location to the SID flag(E.x. .COL4:loc=2)
    let attribs_idx = 0;
-   let inst_attribs_idx = 0; // dedicated index counter for instanced vertex buffers
-
    let loc_idx = -1;
    let vec_idx = 0;
 
-   let is_instanced_buffer_enabled = false; // To create a new location(instanced vb must start at new location) when the first instanced attribute is going to be registered.
-   let is_per_vertex_buffer_enabled = false; 
 
-   loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0;
+   loc_idx = Create_new_attrib_location(loc, loc_idx, sid.inst); vec_idx = 0;
+   loc[loc_idx].attrib_data_on_different_vb = false;
+   loc[loc_idx].is_instanced_buffer = true;
+   
+   console.log('----------------------------------------------------------------------------------------------------------------------------------------------')
+   
+   // TODO: Create separate for for constructing the pass attribute in_name and out_name
+   /**
+    * ISSUE: We need to pass the x and y fields of the the wpos3 attribute,
+    *  but the code gets complicated, so it will be nice to have a separate loop for the passes,
+    * so that we can get the  attr_info for pass attributes specificaly 
+    * if (sid.pass & attr_info.FLAG)
+   */
+  
+  //
+  const attributes_len = Shader_bit_flags_get_attr_size();
+  for (let i = 0; i < attributes_len; i++) {
+     
+     const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
+     if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG)) {
+        
+        const attr_flag = attr_info.FLAG;
+        const attr_name = attr_info.ATTR_NAME;
+        const attr_type = attr_info.TYPE;
+        const attr_type_size = attr_info.TYPE_SIZE;
+        
+        
+        const pass_to_fs = (attr_flag & SID.ATTR.WPOS3) ? ((sid.pass & attr_info.FLAG) | (sid.pass & SID.PASS.WPOS2)) : sid.pass & attr_info.FLAG;
+        
+        
+        if (vec_idx >= max_val_in_loc) {
+           loc_idx = Create_new_attrib_location(loc, loc_idx, sid.inst); vec_idx = 0;
+           loc[loc_idx].is_instanced_buffer = true;
+         }
+         
+         // TODO: Look if the attrib_flag or any other info is already accessible from the ShaderBitFlags file for efficiency
+         const mesh_attribute = new Mesh_attribute();
+         mesh_attribute.name = attr_name;
+         mesh_attribute.attrib_flag |= attr_flag;
+         mesh_attribute.type = attr_type;
+         mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc)
+         mesh_attribute.loc = loc_idx;
+         
+         
+         // Run for type size
+         for (let j = 0; j < attr_type_size; j++) {
+            const ext = (attr_type_size > 1) ? `_${Attribute_get_type_extension(j)}` : ''; // Get the extension [.x, .y, .z, .w]
+            
+            const vshader_attr_name = attr_name
+            
+            
+            // HACK: TODO: Should the pass attributes be set by the user on root mesh creation? 
+            if (attr_flag & SID.ATTR.WPOS3 && j === 2)
+               loc[loc_idx].attr[vec_idx] = Create_attribute2(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, 0x0,);
+            else loc[loc_idx].attr[vec_idx] = Create_attribute2(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, pass_to_fs,);
+            
+            vec_idx++;
+            mesh_attribute.size++;
+            
+         }
+         
+         attribs_info.mesh_attribs.push(mesh_attribute);
+         
+         // Enable attribute in the Program's attrib_indexing, by setting to the attribute key it's shader location index. E.x. prog_attribs_indexing.COL4 = 0 (loc)
+         const obj_key = Shader_bit_flags_get_attr_key_name_from_flag(attr_flag);
+         prog_attribs_indexing[obj_key] = attribs_idx++;
+         
+      }
+   }
+   
+   // Case there is no Instanced buffer, we have already created the first attribute location 
+   if(loc_idx !== 0) {
+      loc_idx = Create_new_attrib_location(loc, loc_idx, false); 
+      vec_idx = 0;
+   }
+   loc[loc_idx].attrib_data_on_different_vb = true;
+   loc[loc_idx].is_instanced_buffer = false;
+   
+   // FIX HERE: The offset of the per vertex attributes should start from 0, cause its a different vertex buffer
+   let hack_loc_ = 0;
+   for (let i = 0; i < attributes_len; i++) {
+      
+      const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
+      if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG) === 0) {
+         
+         const attr_flag = attr_info.FLAG;
+         const attr_name = attr_info.ATTR_NAME;
+         const attr_type = attr_info.TYPE;
+         const attr_type_size = attr_info.TYPE_SIZE;
+         
+         
+         const pass_to_fs = (attr_flag & SID.ATTR.WPOS3) ? ((sid.pass & attr_info.FLAG) | (sid.pass & SID.PASS.WPOS2)) : sid.pass & attr_info.FLAG;
+         
+         
+         // TODO: Look if the attrib_flag or any other info is already accessible from the ShaderBitFlags file for efficiency
+         const mesh_attribute = new Mesh_attribute();
+         
+         
+         // Run for type size
+         for (let j = 0; j < attr_type_size; j++) {
 
-   if (sid.attr & SID.ATTR.COL4) {
+            const ext = (attr_type_size > 1) ? `_${Attribute_get_type_extension(j)}` : ''; // Get the extension [.x, .y, .z, .w]
+            
+            const vshader_attr_name = attr_name;
+            
+            // Check for full attrib location
+            if (vec_idx >= max_val_in_loc) {
+               loc_idx = Create_new_attrib_location(loc, loc_idx, sid.inst); vec_idx = 0;
+               loc[loc_idx].is_instanced_buffer = false;
+               hack_loc_++;
+            } 
+            
+            // HACK: TODO: Should the pass attributes be set by the user on root mesh creation? 
+            if (attr_flag & SID.ATTR.WPOS3 && j === 2)
+               loc[loc_idx].attr[vec_idx] = Create_attribute2(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, 0x0,);
+            else loc[loc_idx].attr[vec_idx] = Create_attribute2(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, pass_to_fs,);
 
-      const pass_to_fs = sid.pass & SID.PASS.COL4;
+            vec_idx++;
+            mesh_attribute.size++;
 
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.name = 'col4';
-      mesh_attribute.nameid |= SID.ATTR.COL4;
-      mesh_attribute.type = GL_TYPES.FLOAT_VEC4;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+         }
 
-      // if(vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('col4_r', loc[loc_idx].name, vec_idx, pass_to_fs,);
-      vec_idx++;
-      mesh_attribute.size++;
+         mesh_attribute.loc = loc_idx;
+         mesh_attribute.name = attr_name;
+         mesh_attribute.attrib_flag |= attr_flag;
+         mesh_attribute.type = attr_type;
+         // mesh_attribute.offset = vec_idx + (loc_idx * hack_loc_ * max_val_in_loc);
+         mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
 
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('col4_g', loc[loc_idx].name, vec_idx, pass_to_fs,);
-      vec_idx++;
-      mesh_attribute.size++;
+         attribs_info.mesh_attribs.push(mesh_attribute);
 
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('col4_b', loc[loc_idx].name, vec_idx, pass_to_fs,);
-      vec_idx++;
-      mesh_attribute.size++;
+         // Enable attribute in the Program's attrib_indexing, by setting to the attribute key it's shader location index. E.x. prog_attribs_indexing.COL4 = 0 (loc)
+         const obj_key = Shader_bit_flags_get_attr_key_name_from_flag(attr_flag);
+         prog_attribs_indexing[obj_key] = attribs_idx++;
 
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('col4_a', loc[loc_idx].name, vec_idx, pass_to_fs,);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.COL4 = attribs_idx++;
-      if (sid.inst & SID.ATTR.COL4) {attribs_indexing.COL4 = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.COL4 = attribs_idx++; is_per_vertex_buffer_enabled=true;}
+      }
    }
 
-   if (sid.attr & SID.ATTR.WPOS3) {
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'wpos3';
-      mesh_attribute.nameid |= SID.ATTR.WPOS3;
-      mesh_attribute.type = GL_TYPES.FLOAT_VEC3;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_x', loc[loc_idx].name, vec_idx, sid.pass & (SID.PASS.WPOS3 | SID.PASS.WPOS2),);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_y', loc[loc_idx].name, vec_idx, sid.pass & (SID.PASS.WPOS3 | SID.PASS.WPOS2),);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_z', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.WPOS3,);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      if (sid.inst & SID.ATTR.WPOS3) {attribs_indexing.WPOS3 = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.WPOS3 = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-   }
-
-   if (sid.attr & SID.ATTR.TIME) {
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'time';
-      mesh_attribute.nameid |= SID.ATTR.TIME;
-      mesh_attribute.type = GL_TYPES.FLOAT;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('time', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.TIME,);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.TIME = attribs_idx++;
-      if (sid.inst & SID.ATTR.TIME) {attribs_indexing.TIME = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.TIME = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-   }
-
-   if (sid.attr & SID.ATTR.VPOS2) {
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'pos2';
-      mesh_attribute.nameid |= SID.ATTR.VPOS2;
-      mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.VPOS2,);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.VPOS2,);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.VPOS2 = attribs_idx++;
-      if (sid.inst & SID.ATTR.VPOS2) {attribs_indexing.VPOS2 = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.VPOS2 = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-   }
-
-   // if (sid.attr & SID.ATTR.DIM2) {
-
-
-   //    const mesh_attribute = new Mesh_attribute();
-   //    mesh_attribute.name = 'dim2';
-   //    mesh_attribute.nameid |= SID.ATTR.DIM2;
-   //    mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
-
-   //    if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-   //    mesh_attribute.loc = loc_idx;
-   //    mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-   //    loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2,);
-   //    vec_idx++;
-   //    mesh_attribute.size++;
-
-   //    if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-   //    loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2);
-   //    vec_idx++;
-   //    mesh_attribute.size++;
-
-   //    attribs_info.mesh_attribs.push(mesh_attribute);
-
-   //    attribs_indexing.DIM2 = attribs_idx++;
-   // }
-
-   if (sid.attr & SID.ATTR.R_CORNERS) {
-
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'rcorners';
-      mesh_attribute.nameid |= SID.ATTR.R_CORNERS;
-      mesh_attribute.type = GL_TYPES.FLOAT;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('rcorners', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.R_CORNERS,);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.R_CORNERS = attribs_idx++;
-      if (sid.inst & SID.ATTR.R_CORNERS) {attribs_indexing.R_CORNERS = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.R_CORNERS = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-
-   }
-
-   if (sid.attr & SID.ATTR.BORDER) {
-
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'border';
-      mesh_attribute.nameid |= SID.ATTR.BORDER;
-      mesh_attribute.type = GL_TYPES.FLOAT;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('border', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.BORDER,);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.BORDER = attribs_idx++;
-      if (sid.inst & SID.ATTR.BORDER) {attribs_indexing.BORDER = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.BORDER = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-   }
-
-   if (sid.attr & SID.ATTR.FEATHER) {
-
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'feather';
-      mesh_attribute.nameid |= SID.ATTR.FEATHER;
-      mesh_attribute.type = GL_TYPES.FLOAT;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('feather', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.FEATHER,);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.FEATHER = attribs_idx++;
-      if (sid.inst & SID.ATTR.FEATHER) {attribs_indexing.FEATHER = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.FEATHER = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-   }
-
-   if (sid.attr & SID.ATTR.TEX2) {
-
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'tex2';
-      mesh_attribute.nameid |= SID.ATTR.TEX2;
-      mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('tex2_u', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.TEX2);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-      loc[loc_idx].attr[vec_idx] = Create_attribute('tex2_v', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.TEX2);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.TEX2 = attribs_idx++;
-      if (sid.inst & SID.ATTR.TEX2) {attribs_indexing.TEX2 = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.TEX2 = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-   }
-
-   if (sid.attr & SID.ATTR.GLOW_INTENSITY) {
-
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'glow_intensity';
-      mesh_attribute.nameid |= SID.ATTR.GLOW_INTENSITY;
-      mesh_attribute.type = GL_TYPES.FLOAT;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('glow_intensity', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.GLOW_INTENSITY);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.GLOW_INTENSITY = attribs_idx++;
-      if (sid.inst & SID.ATTR.GLOW_INTENSITY) {attribs_indexing.GLOW_INTENSITY = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.GLOW_INTENSITY = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-   }
-
-   if (sid.attr & SID.ATTR.SDF) {
-
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'sdf';
-      mesh_attribute.nameid |= SID.ATTR.SDF;
-      mesh_attribute.type = GL_TYPES.FLOAT;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('sdf', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.SDF);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.SDF = attribs_idx++;
-      if (sid.inst & SID.ATTR.SDF) {attribs_indexing.SDF = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.SDF = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-   }
-
-   if (sid.attr & SID.ATTR.MSDF) {
-
-
-      const mesh_attribute = new Mesh_attribute();
-      mesh_attribute.name = 'msdf';
-      mesh_attribute.nameid |= SID.ATTR.MSDF;
-      mesh_attribute.type = GL_TYPES.FLOAT;
-
-      if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
-
-      mesh_attribute.loc = loc_idx;
-      mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
-
-
-      loc[loc_idx].attr[vec_idx] = Create_attribute('msdf', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.MSDF);
-      vec_idx++;
-      mesh_attribute.size++;
-
-      attribs_info.mesh_attribs.push(mesh_attribute);
-
-      // attribs_indexing.MSDF = attribs_idx++;
-      if (sid.inst & SID.ATTR.MSDF) {attribs_indexing.MSDF = inst_attribs_idx++; is_instanced_buffer_enabled = true}
-      else {attribs_indexing.MSDF = attribs_idx++; is_per_vertex_buffer_enabled=true;}
-   }
-
+   console.log('{{{{{{PROGRAMS LOC INDEXING}}}}}} prog_attribs_indexing', prog_attribs_indexing);
 
    locations = loc;
-
-
 
    if (vec_idx === 1) {
       attributes_in_code += `in float a_generic_${loc_idx};\n`;
@@ -804,7 +439,9 @@ function Vertex_shader_resolve_attributes_in(sid) {
    else attributes_in_code += `in vec${vec_idx} a_generic_${loc_idx};\n`;
 
 
+   // Create the generic attribute locations info
    let offset = 0;
+   let devisor = 0;
    let size = 0;
    for (let i = 0; i < locations.length; i++) {
 
@@ -813,14 +450,21 @@ function Vertex_shader_resolve_attributes_in(sid) {
          offset += size;
          size = 0;
 
+         // FIX HERE: For the generic location where the instanced buffer begins, we need to reset the offset to 0.
          for (let j = 0; j < locations[i].attr.length; j++) {
             if (locations[i].attr[j].is_occupied) size++;
          }
+
+         if(loc[i].is_instanced_buffer === true) devisor = 1;
+         else  devisor = 0;
+         if(loc[i].attrib_data_on_different_vb === true)
+            offset = 0;
 
          attribs_info.attribs_loc.push({
             locs: i,
             sizes: size,
             offsets: offset,
+            devisor: devisor,
          });
       }
    }
@@ -828,14 +472,452 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
 
    // DEBUG-PRINT
-   for (let i = 0; i < mesh_attributes.length; i++) console.log('names:', mesh_attributes[i].name);
+   // for (let i = 0; i < mesh_attributes.length; i++) console.log('names:', mesh_attributes[i].name);
+   // console.log('{{{{{{NEW BULDER}}}}}} loc', loc, '\nattribs_info', attribs_info, '\nattribs_indexing', prog_attribs_indexing)
 
 
    return {
-      attribs_info:attribs_info,
-      attribs_indexing:attribs_indexing,
+      attribs_info: attribs_info,
+      attribs_indexing: prog_attribs_indexing,
    }
+
+
 }
+
+
+// function Vertex_shader_resolve_attributes_in(sid) {
+
+//    // Vertex_shader_resolve_attributes_in2(sid);
+
+//    attributes_in_code += ''
+
+//    const loc = [
+//       {
+//          is_active: false,
+//          name: '',
+//          attr: [{}, {}, {}, {},],
+//       },
+//       {
+//          is_active: false,
+//          name: '',
+//          attr: [
+//             { is_occupied: false, name: '', in_name: '', },
+//             { is_occupied: false, name: '', in_name: '', },
+//             { is_occupied: false, name: '', in_name: '', },
+//             { is_occupied: false, name: '', in_name: '', },
+//          ],
+//       },
+//       {
+//          is_active: false,
+//          name: '',
+//          attr: [
+//             { is_occupied: false, name: '', in_name: '', },
+//             { is_occupied: false, name: '', in_name: '', },
+//             { is_occupied: false, name: '', in_name: '', },
+//             { is_occupied: false, name: '', in_name: '', },
+//          ],
+//       },
+//       {
+//          is_active: false,
+//          name: '',
+//          attr: [
+//             { is_occupied: false, name: '', in_name: '', },
+//             { is_occupied: false, name: '', in_name: '', },
+//             { is_occupied: false, name: '', in_name: '', },
+//             { is_occupied: false, name: '', in_name: '', },
+//          ],
+//       },
+//    ];
+
+
+//    const attribs_indexing = new Attributes_indexing();
+//    let attribs_idx = 0;
+//    let inst_attribs_idx = 0; // dedicated index counter for instanced vertex buffers
+
+//    let loc_idx = -1;
+//    let vec_idx = 0;
+
+//    let is_instanced_buffer_enabled = false; // To create a new location(instanced vb must start at new location) when the first instanced attribute is going to be registered.
+//    let is_per_vertex_buffer_enabled = false;
+
+//    loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0;
+
+//    if (sid.attr & SID.ATTR.COL4) {
+
+//       const pass_to_fs = sid.pass & SID.PASS.COL4;
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.name = 'col4';
+//       mesh_attribute.attrib_flag |= SID.ATTR.COL4;
+//       mesh_attribute.type = GL_TYPES.FLOAT_VEC4;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+//       // if(vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('col4_x', loc[loc_idx].name, vec_idx, pass_to_fs,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('col4_y', loc[loc_idx].name, vec_idx, pass_to_fs,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('col4_z', loc[loc_idx].name, vec_idx, pass_to_fs,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('col4_w', loc[loc_idx].name, vec_idx, pass_to_fs,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       // attribs_indexing.COL4 = attribs_idx++;
+//       if (sid.inst & SID.ATTR.COL4) { attribs_indexing.COL4 = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.COL4 = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+//    if (sid.attr & SID.ATTR.WPOS3) {
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'wpos3';
+//       mesh_attribute.attrib_flag |= SID.ATTR.WPOS3;
+//       mesh_attribute.type = GL_TYPES.FLOAT_VEC3;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_x', loc[loc_idx].name, vec_idx, sid.pass & (SID.PASS.WPOS3 | SID.PASS.WPOS2),);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_y', loc[loc_idx].name, vec_idx, sid.pass & (SID.PASS.WPOS3 | SID.PASS.WPOS2),);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+//       // loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_z', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.WPOS3,);
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('wpos3_z', loc[loc_idx].name, vec_idx, 0x0,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       if (sid.inst & SID.ATTR.WPOS3) { attribs_indexing.WPOS3 = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.WPOS3 = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+//    if (sid.attr & SID.ATTR.TIME) {
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'time';
+//       mesh_attribute.attrib_flag |= SID.ATTR.TIME;
+//       mesh_attribute.type = GL_TYPES.FLOAT;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('time', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.TIME,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       // attribs_indexing.TIME = attribs_idx++;
+//       if (sid.inst & SID.ATTR.TIME) { attribs_indexing.TIME = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.TIME = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+//    if (sid.attr & SID.ATTR.VPOS2) {
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'pos2';
+//       mesh_attribute.attrib_flag |= SID.ATTR.VPOS2;
+//       mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.VPOS2,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('pos2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.VPOS2,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       // attribs_indexing.VPOS2 = attribs_idx++;
+//       if (sid.inst & SID.ATTR.VPOS2) { attribs_indexing.VPOS2 = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.VPOS2 = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+//    // if (sid.attr & SID.ATTR.DIM2) {
+
+
+//    //    const mesh_attribute = new Mesh_attribute();
+//    //    mesh_attribute.name = 'dim2';
+//    //    mesh_attribute.attrib_flag |= SID.ATTR.DIM2;
+//    //    mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
+
+//    //    if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//    //    mesh_attribute.loc = loc_idx;
+//    //    mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//    //    loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_x', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2,);
+//    //    vec_idx++;
+//    //    mesh_attribute.size++;
+
+//    //    if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+//    //    loc[loc_idx].attr[vec_idx] = Create_attribute('dim2_y', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.DIM2);
+//    //    vec_idx++;
+//    //    mesh_attribute.size++;
+
+//    //    attribs_info.mesh_attribs.push(mesh_attribute);
+
+//    //    attribs_indexing.DIM2 = attribs_idx++;
+//    // }
+
+//    if (sid.attr & SID.ATTR.R_CORNERS) {
+
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'rcorners';
+//       mesh_attribute.attrib_flag |= SID.ATTR.R_CORNERS;
+//       mesh_attribute.type = GL_TYPES.FLOAT;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('rcorners', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.R_CORNERS,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       // attribs_indexing.R_CORNERS = attribs_idx++;
+//       if (sid.inst & SID.ATTR.R_CORNERS) { attribs_indexing.R_CORNERS = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.R_CORNERS = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+
+//    }
+
+//    if (sid.attr & SID.ATTR.BORDER) {
+
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'border';
+//       mesh_attribute.attrib_flag |= SID.ATTR.BORDER;
+//       mesh_attribute.type = GL_TYPES.FLOAT;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('border', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.BORDER,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       // attribs_indexing.BORDER = attribs_idx++;
+//       if (sid.inst & SID.ATTR.BORDER) { attribs_indexing.BORDER = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.BORDER = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+//    if (sid.attr & SID.ATTR.FEATHER) {
+
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'feather';
+//       mesh_attribute.attrib_flag |= SID.ATTR.FEATHER;
+//       mesh_attribute.type = GL_TYPES.FLOAT;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('feather', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.FEATHER,);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       // attribs_indexing.FEATHER = attribs_idx++;
+//       if (sid.inst & SID.ATTR.FEATHER) { attribs_indexing.FEATHER = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.FEATHER = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+//    if (sid.attr & SID.ATTR.TEX2) {
+
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'tex2';
+//       mesh_attribute.attrib_flag |= SID.ATTR.TEX2;
+//       mesh_attribute.type = GL_TYPES.FLOAT_VEC2;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('tex2_u', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.TEX2);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('tex2_v', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.TEX2);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       // attribs_indexing.TEX2 = attribs_idx++;
+//       if (sid.inst & SID.ATTR.TEX2) { attribs_indexing.TEX2 = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.TEX2 = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+//    if (sid.attr & SID.ATTR.GLOW_INTENSITY) {
+
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'glow_intensity';
+//       mesh_attribute.attrib_flag |= SID.ATTR.GLOW_INTENSITY;
+//       mesh_attribute.type = GL_TYPES.FLOAT;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('glow_intensity', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.GLOW_INTENSITY);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       // attribs_indexing.GLOW_INTENSITY = attribs_idx++;
+//       if (sid.inst & SID.ATTR.GLOW_INTENSITY) { attribs_indexing.GLOW_INTENSITY = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.GLOW_INTENSITY = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+//    if (sid.attr & SID.ATTR.SDF) {
+
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'sdf';
+//       mesh_attribute.attrib_flag |= SID.ATTR.SDF;
+//       mesh_attribute.type = GL_TYPES.FLOAT;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('sdf', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.SDF);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       if (sid.inst & SID.ATTR.SDF) { attribs_indexing.SDF = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.SDF = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+//    if (sid.attr & SID.ATTR.MSDF) {
+
+
+//       const mesh_attribute = new Mesh_attribute();
+//       mesh_attribute.name = 'msdf';
+//       mesh_attribute.attrib_flag |= SID.ATTR.MSDF;
+//       mesh_attribute.type = GL_TYPES.FLOAT;
+
+//       if (vec_idx >= max_val_in_loc) { loc_idx = Create_new_attrib_location(loc, loc_idx, attributes_in_code); vec_idx = 0; } // Check for full attrib location
+
+//       mesh_attribute.loc = loc_idx;
+//       mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+//       loc[loc_idx].attr[vec_idx] = Create_attribute('msdf', loc[loc_idx].name, vec_idx, sid.pass & SID.PASS.MSDF);
+//       vec_idx++;
+//       mesh_attribute.size++;
+
+//       attribs_info.mesh_attribs.push(mesh_attribute);
+
+//       // attribs_indexing.MSDF = attribs_idx++;
+//       if (sid.inst & SID.ATTR.MSDF) { attribs_indexing.MSDF = inst_attribs_idx++; is_instanced_buffer_enabled = true }
+//       else { attribs_indexing.MSDF = attribs_idx++; is_per_vertex_buffer_enabled = true; }
+//    }
+
+
+//    locations = loc;
+
+
+
+//    if (vec_idx === 1) {
+//       attributes_in_code += `in float a_generic_${loc_idx};\n`;
+//       loc[loc_idx].attr[0].in_name = `${loc[loc_idx].name}`
+//    }
+//    else attributes_in_code += `in vec${vec_idx} a_generic_${loc_idx};\n`;
+
+
+//    let offset = 0;
+//    let size = 0;
+//    for (let i = 0; i < locations.length; i++) {
+
+//       if (locations[i].is_active) {
+
+//          offset += size;
+//          size = 0;
+
+//          for (let j = 0; j < locations[i].attr.length; j++) {
+//             if (locations[i].attr[j].is_occupied) size++;
+//          }
+
+//          attribs_info.attribs_loc.push({
+//             locs: i,
+//             sizes: size,
+//             offsets: offset,
+//          });
+//       }
+//    }
+
+
+
+//    // DEBUG-PRINT
+//    for (let i = 0; i < mesh_attributes.length; i++) console.log('names:', mesh_attributes[i].name);
+
+
+//    return {
+//       attribs_info: attribs_info,
+//       attribs_indexing: attribs_indexing,
+//    }
+// }
 
 
 
@@ -889,7 +971,8 @@ function Vertex_shader_resolve_attributes_out_assignment() {
 export function Shaders_build_vertex_shader(sid, uniforms_info) {
 
 
-   const ret = Vertex_shader_resolve_attributes_in(sid);
+   // const ret = Vertex_shader_resolve_attributes_in(sid);
+   const ret = Vertex_shader_resolve_attributes_in2(sid);
    Vertex_shader_resolve_attributes_out();
    Vertex_shader_resolve_attributes_out_assignment();
 
@@ -901,39 +984,39 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
 // VERTEX SHADER {{ ${ID} }}
 /********************************************************************************************/
 /********************************************************************************************/`,
-      
-   '#include <precision_high>\n',
 
-   /********************************************************************************************************/
-   // Defines
-   '\n// DIRECTIVES',
-   '#define PI 3.14159',
-   ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
-   ((sid.unif & SID.UNIF.SCREEN_RESOLUTION)) ? '#define U_SCREEN_RESOLUTION 1' : '',
+      '#include <precision_high>\n',
 
-
-
-   /********************************************************************************************************/
-   // UNIFORMS
-   '\n// UNIFORMS',
-   Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_VS),
+      /********************************************************************************************************/
+      // Defines
+      '\n// DIRECTIVES',
+      '#define PI 3.14159',
+      ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
+      ((sid.unif & SID.UNIF.SCREEN_RESOLUTION)) ? '#define U_SCREEN_RESOLUTION 1' : '',
 
 
 
-   /********************************************************************************************************/
-   // Attributes In
-   /********************************************************************************************************/
-   '\n// INPUT',
-   attributes_in_code,
+      /********************************************************************************************************/
+      // UNIFORMS
+      '\n// UNIFORMS',
+      Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_VS),
 
 
 
-   /********************************************************************************************************/
-   // OUTS
-   /********************************************************************************************************/
-   '\n// OUTPUT',
-   attributes_out_code,
-   `
+      /********************************************************************************************************/
+      // Attributes In
+      /********************************************************************************************************/
+      '\n// INPUT',
+      attributes_in_code,
+
+
+
+      /********************************************************************************************************/
+      // OUTS
+      /********************************************************************************************************/
+      '\n// OUTPUT',
+      attributes_out_code,
+      `
       #define PASS_A_DIM2
       out float v_dim2_x;
       out float v_dim2_y;
@@ -946,31 +1029,31 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
 
 
 
-   /********************************************************************************************************/
-   // Main Function
-   /********************************************************************************************************/
-   'void main(void) ',
-   '{',
+      /********************************************************************************************************/
+      // Main Function
+      /********************************************************************************************************/
+      'void main(void) ',
+      '{',
 
 
 
-   /********************************************************************************************************/
-   // Assignments
-   '  // Assignments',
-   attributes_assign_code,
+      /********************************************************************************************************/
+      // Assignments
+      '  // Assignments',
+      attributes_assign_code,
 
 
 
-   /********************************************************************************************************/
-   // Scale in Vertex Shader
+      /********************************************************************************************************/
+      // Scale in Vertex Shader
 
 
 
-   /********************************************************************************************************/
-   // Calculate vertex position-rotation-scale
-   '   // Vertex Shader Logic',
+      /********************************************************************************************************/
+      // Calculate vertex position-rotation-scale
+      '   // Vertex Shader Logic',
 
-   `
+      `
       #ifdef PASS_A_DIM2
          // v_dim2_x = abs(v_pos2_x);
          // v_dim2_y = abs(v_pos2_y);
@@ -993,27 +1076,27 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    `,
 
 
-   /**
-    * Current vertex: gl_VertexID.
-    * Use to set the vertex position.
-    * Use #directives to enable vertex pos by the vertex id we are currently on.
-    * Example:
-    *    Vertex pos: V1:[0,y], V2:[0,0], V3:[x,y], V4:[x,0]
-    * That way we can pass 2 attributes as the mesh dimention
-    * and create the vertex position from them. No need to pass 8 values
-    * for vertex pos and another 2 for dimention
-    */
+      /**
+       * Current vertex: gl_VertexID.
+       * Use to set the vertex position.
+       * Use #directives to enable vertex pos by the vertex id we are currently on.
+       * Example:
+       *    Vertex pos: V1:[0,y], V2:[0,0], V3:[x,y], V4:[x,0]
+       * That way we can pass 2 attributes as the mesh dimention
+       * and create the vertex position from them. No need to pass 8 values
+       * for vertex pos and another 2 for dimention
+       */
 
 
-   (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-   ? '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
-   : '   vec4 position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+      (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
+         ? '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
+         : '   vec4 position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
 
-   '   gl_Position = position;',
+      '   gl_Position = position;',
 
-'}',
+      '}',
 
-];
+   ];
 
    const vertex_shader = vs_chunks.filter(filterEmptyLine).join('\n')
 
@@ -1026,7 +1109,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    return {
       vs: vs,
       attribsidx: attribsidx,
-      attribs_indexing:ret.attribs_indexing,
+      attribs_indexing: ret.attribs_indexing,
    };
 }
 
@@ -1071,53 +1154,53 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 // FRAGMENT SHADER {{ ${ID} }}
 /********************************************************************************************/
 /********************************************************************************************/`,
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
       /********************************************************************************************************/
       // DEFINES
       '\n// ---------- DIRECTIVES ----------',
       '#include <precision_high>',
-      
+
       (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
       (sid.unif & SID.UNIF.FS_RCORNERS_FLOAT) ? '#define U_RCORNERS_FLOAT 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
-      (sid.unif & SID.UNIF.FS_RCORNERS_VEC2) ? '#define U_RCORNERS_VEC2 1' : '', 
-      (sid.unif & SID.UNIF.FS_RCORNERS_VEC3) ? '#define U_RCORNERS_VEC3 1' : '', 
-      (sid.fx & SID.FX.FS_GLOW_VEC3) ? '#define U_GLOW_PARAMS_VEC3 1' : '', 
-      (sid.fx & SID.FX.FS_GLOW_VEC2) ? '#define U_GLOW_PARAMS_VEC2 1' : '', 
-      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '', 
-      (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '', 
+      (sid.unif & SID.UNIF.FS_RCORNERS_VEC2) ? '#define U_RCORNERS_VEC2 1' : '',
+      (sid.unif & SID.UNIF.FS_RCORNERS_VEC3) ? '#define U_RCORNERS_VEC3 1' : '',
+      (sid.fx & SID.FX.FS_GLOW_VEC3) ? '#define U_GLOW_PARAMS_VEC3 1' : '',
+      (sid.fx & SID.FX.FS_GLOW_VEC2) ? '#define U_GLOW_PARAMS_VEC2 1' : '',
+      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '',
+      (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '',
       (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '',
       (sid.attr & SID.ATTR.TEX2) ? '#define A_TEX_COORD 1' : '',
       (sid.attr & SID.ATTR.TIME) ? '#define A_TIME 1' : '',
       (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '#define A_GLOW_INTENSITY_FLOAT' : '',
-      
+
       // Include Funcions Defines
       // (sid.blend_options) ? '#define BLEND_MODE 1' : '#define BLEND_MODE 1\n#define BLEND_MODE_MULTIPLY 1',  // If any 'blend_options', enable, else enable default blend 'multiply'
       (sid.blend_options) ? '#define BLEND_MODE 1' : '',  // If any 'blend_options', enable, 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_ADD) ? '#define BLEND_MODE_ADD 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_LIGHTEN) ? '#define BLEND_MODE_LIGHTEN 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY) ? '#define BLEND_MODE_MULTIPLY 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_DEVIDE) ? '#define BLEND_MODE_DEVIDE 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_SUBTRACT) ? '#define BLEND_MODE_SUBTRACT 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_DARKEN) ? '#define BLEND_MODE_DARKEN 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_COLOR_BURN) ? '#define BLEND_MODE_COLOR_BURN 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_COLOR_DODGE) ? '#define BLEND_MODE_COLOR_DODGE 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_SCREEN) ? '#define BLEND_MODE_SCREEN 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_OVERLAY) ? '#define BLEND_MODE_OVERLAY 1' : '', 
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MIX) ? '#define BLEND_MODE_MIX 1' : '', 
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_ADD) ? '#define BLEND_MODE_ADD 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_LIGHTEN) ? '#define BLEND_MODE_LIGHTEN 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY) ? '#define BLEND_MODE_MULTIPLY 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_DEVIDE) ? '#define BLEND_MODE_DEVIDE 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_SUBTRACT) ? '#define BLEND_MODE_SUBTRACT 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_DARKEN) ? '#define BLEND_MODE_DARKEN 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_COLOR_BURN) ? '#define BLEND_MODE_COLOR_BURN 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_COLOR_DODGE) ? '#define BLEND_MODE_COLOR_DODGE 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_SCREEN) ? '#define BLEND_MODE_SCREEN 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_OVERLAY) ? '#define BLEND_MODE_OVERLAY 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MIX) ? '#define BLEND_MODE_MIX 1' : '',
 
 
-      
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
+
       /********************************************************************************************************/
       // In
       '\n// ---------- INPUTS ----------',
@@ -1127,50 +1210,50 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       in float v_dim2_x;
       in float v_dim2_y;
       `,
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
       /********************************************************************************************************/
       // Out
       '\n// ---------- OUTPUTS ----------',
       '#include <out_frag_color>',
-            
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
+
       /********************************************************************************************************/
       // UNIFORMS
       '\n// ---------- UNIFORMS ----------',
-      
+
       Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_FS),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
-      
+
       // Generic Uniforms
-      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC2)  ? '#define U_GENERIC_VEC2 1' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC3)  ? '#define U_GENERIC_VEC3 1' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC4)  ? '#define U_GENERIC_VEC4 1' : '', 
+      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '#define U_GENERIC_VEC2 1' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '#define U_GENERIC_VEC3 1' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '#define U_GENERIC_VEC4 1' : '',
 
       // Uniforms for testing
       // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '#define U_GENERIC_VEC2 1' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '#define U_GENERIC_VEC3 1' : '', 
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
       /********************************************************************************************************/
       // Misc Functions
       '\n// ---------- FUNCTION DECLERATIONS ----------',
-      
+
       '#define RED vec4(1.0, 0.0, 0.0, 1.0)',
       '#define GREEN vec4(0.0, 1.0, 0.0, 1.0)',
       '#define YELLOW vec4(1.0, 1.0, 0.0, 1.0)',
@@ -1179,12 +1262,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       '#include <coordinate_system_functions>',
 
       '#include <blend_mode_functions>',
-      
+
       '\n#include <blend_color_functions_overloads>',
 
-      ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_corners : 
-                                       ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners : 
-                                       (sid.attr & SID.ATTR.FEATHER) ? frag_feather : '',
+      ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_corners :
+         ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners :
+            (sid.attr & SID.ATTR.FEATHER) ? frag_feather : '',
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
       (sid.attr & SID.ATTR.MSDF) ? frag_msdf : '',
 
@@ -1206,12 +1289,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // Test shader functions
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1 : '',
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2 : '',
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
       /********************************************************************************************************/
       // Main
       '\n/********************************************************************************************/\n// FRAGMENT: MAIN()\n/********************************************************************************************/',
@@ -1224,19 +1307,19 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
 
 
-      '   vec4 color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);',
-      
-      ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_call : 
-                                       ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
-                                       (sid.attr & SID.ATTR.FEATHER) ? frag_feather_call : '',
+      '   vec4 color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);',
+
+      ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_call :
+         ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
+            (sid.attr & SID.ATTR.FEATHER) ? frag_feather_call : '',
       // (sid.attr & (SID.ATTR.GLOW_INTENSITY)) ? frag_glow_call : '',
-      
+
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '   float alpha = color.a;' : '',
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '',
-      
+
       // Shader Color Functions
       (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY) ? frag_worley_noise_call : '',
@@ -1266,11 +1349,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // HACK: prevent optimizer from removing the uniform u_scale2
       ' ////////////////////////// HACK: prevent optimizer from removing the uniform u_scale2',
       // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', 
-      (sid.unif & SID.UNIF.TIME) ? '   if(u_time == 0.) ;' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '', 
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '   if(u_generic_vec4.x == 0.) ;' : '', 
+      (sid.unif & SID.UNIF.TIME) ? '   if(u_time == 0.) ;' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '   if(u_generic_float == 0.) ;' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '   if(u_generic_vec4.x == 0.) ;' : '',
       // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '', 

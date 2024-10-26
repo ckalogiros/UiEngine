@@ -157,6 +157,24 @@ const SID = {
         EMPTY: BIT3 <<= 1,
     },
     
+    PASS: {
+        COL4: BIT4,
+        COL4_PER_VERTEX: BIT4<<= 1,
+        VPOS2: BIT4 <<= 1,
+        DIM2: BIT4 <<= 1,
+        TEX2: BIT4 <<= 1,
+        WPOS2: BIT4 <<= 1,
+        WPOS3: BIT4 <<= 1,
+        TIME: BIT4 <<= 1,
+        BORDER: BIT2 <<= 1,
+        R_CORNERS: BIT2 <<= 1,
+        FEATHER: BIT2 <<= 1,
+        GLOW_INTENSITY: BIT2 <<= 1,
+        RES2: BIT4 <<= 1,
+        STYLE3: BIT4 <<= 1,
+        SDF2: BIT4 <<= 1,
+    },
+
     UNIF: {
         
         // Block Uniforms
@@ -180,24 +198,6 @@ const SID = {
         FS_GENERIC_VEC4: BIT5<<=0x1,
 
 
-    },
-
-    PASS: {
-        COL4: BIT4,
-        COL4_PER_VERTEX: BIT4<<= 1,
-        VPOS2: BIT4 <<= 1,
-        DIM2: BIT4 <<= 1,
-        TEX2: BIT4 <<= 1,
-        WPOS2: BIT4 <<= 1,
-        WPOS3: BIT4 <<= 1,
-        TIME: BIT4 <<= 1,
-        BORDER: BIT2 <<= 1,
-        R_CORNERS: BIT2 <<= 1,
-        FEATHER: BIT2 <<= 1,
-        GLOW_INTENSITY: BIT2 <<= 1,
-        RES2: BIT4 <<= 1,
-        STYLE3: BIT4 <<= 1,
-        SDF2: BIT4 <<= 1,
     },
 
     // FX

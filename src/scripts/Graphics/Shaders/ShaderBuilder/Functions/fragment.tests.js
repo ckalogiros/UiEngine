@@ -77,7 +77,7 @@ vec4 frag_test1()
 
   vec2 res = u_screen_res;
   vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
-  vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   
   
   // #ifndef UV_READY
@@ -349,7 +349,7 @@ vec4 frag_test2()
   vec2 res = u_screen_res;
   vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
-  vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   
   vec2 iMouse = vec2(100., 150.);
   float time = control1*4.;

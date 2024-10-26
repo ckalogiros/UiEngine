@@ -60,13 +60,13 @@ export class GfxInfoMesh {
          },
          // WRONG:If this gfx has attributes scattered between vertex buffers, we need the index of the buffer for each attribute(index to:{idxs,starts,counts,...})
          // Specifies the sequence of attributes, start fro 0 the first one, and add 1 for each next.
-         which_attrib: {
-            col_idx: INT_NULL,   // The index of the color attribute
-            wpos_idx: INT_NULL,  // The index of the wpos attribute
-            generic1_idx: INT_NULL,  // The index of the wpos attribute
-            dim_idx: INT_NULL,   // The index of the vertex pos attribute
-            tex_idx: INT_NULL,   // The index of the texture attribute
-         },
+         // which_attrib: {
+         //    col_idx: INT_NULL,   // The index of the color attribute
+         //    wpos_idx: INT_NULL,  // The index of the wpos attribute
+         //    generic1_idx: INT_NULL,  // The index of the wpos attribute
+         //    dim_idx: INT_NULL,   // The index of the vertex pos attribute
+         //    tex_idx: INT_NULL,   // The index of the texture attribute
+         // },
          is_per_vertex: New_int8_buffer(_, 'NEW GfxInfo-is_vertex_buffer'), // 
       };
 
@@ -107,13 +107,13 @@ export class GfxInfoMesh {
             dim_buf: this.vb.which_vb.dim_buf,
             tex_buf: this.vb.which_vb.tex_buf,
          },
-         which_attrib: {
-            col_idx: this.vb.which_attrib.col_idx,
-            wpos_idx: this.vb.which_attrib.wpos_idx,
-            generic1_idx: this.vb.which_attrib.generic1_idx,
-            dim_idx: this.vb.which_attrib.dim_idx,
-            tex_idx: this.vb.which_attrib.tex_idx,
-         },
+         // which_attrib: {
+         //    col_idx: this.vb.which_attrib.col_idx,
+         //    wpos_idx: this.vb.which_attrib.wpos_idx,
+         //    generic1_idx: this.vb.which_attrib.generic1_idx,
+         //    dim_idx: this.vb.which_attrib.dim_idx,
+         //    tex_idx: this.vb.which_attrib.tex_idx,
+         // },
          is_per_vertex: New_int8_buffer(_, 'NEW GfxInfo-Copy-is_vertex_buffer'), // 
       };
 
@@ -193,30 +193,22 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
       if (vb_info.sid & SID.ATTR.VPOS2) { gfx_ctx.vb.which_vb.dim_buf = i; }
       if (vb_info.sid & SID.ATTR.TEX2) { gfx_ctx.vb.which_vb.tex_buf = i; }
 
+      // /********************************************************************/
+      // // Set attributes info for vertex buffer
+      // const prog_attribs = Shader_attributes_get_attribs(prog.attribsidx);
+      // // const attribs_indexing = Program_get_shader_attribs_indexing(progidx);
+      // const attribs_indexing = vb_info.attribs_indexing;
+      // const len = prog_attribs.attribute_flag.length;
+      // for (let i = 0; i < len; i++) {
 
+      //    if (prog_attribs.attribute_flag[i] & SID.ATTR.COL4) gfx_ctx.vb.which_attrib.col_idx = attribs_indexing.COL4;
+      //    if (prog_attribs.attribute_flag[i] & SID.ATTR.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = attribs_indexing.WPOS3;
+      //    if (prog_attribs.attribute_flag[i] & SID.ATTR.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = attribs_indexing.VPOS2;
+      //    if (prog_attribs.attribute_flag[i] & SID.ATTR.TEX2) gfx_ctx.vb.which_attrib.tex_idx = attribs_indexing.TEX2;
+      // }
    }
 
 
-
-   /********************************************************************/
-   // Set attributes info for vertex buffer
-   const prog_attribs = Shader_attributes_get_attribs(prog.attribsidx);
-   const attribs_indexing = Program_get_shader_attribs_indexing(progidx);
-   const len = prog_attribs.nameids.length;
-   for (let i = 0; i < len; i++) {
-
-      // if (prog_attribs.nameids[i] & SID.ATTR.COL4) gfx_ctx.vb.which_attrib.col_idx = i;
-      // if (prog_attribs.nameids[i] & SID.ATTR.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = i;
-      // if (prog_attribs.nameids[i] & SID.ATTR.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = i;
-      // if (prog_attribs.nameids[i] & SID.ATTR.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = i;
-      // if (prog_attribs.nameids[i] & SID.ATTR.TEX2) gfx_ctx.vb.which_attrib.tex_idx = i;
-
-      if (prog_attribs.nameids[i] & SID.ATTR.COL4) gfx_ctx.vb.which_attrib.col_idx = attribs_indexing.COL4;
-      if (prog_attribs.nameids[i] & SID.ATTR.WPOS3) gfx_ctx.vb.which_attrib.wpos_idx = attribs_indexing.WPOS3;
-      // if (prog_attribs.nameids[i] & SID.ATTR.STYLE) gfx_ctx.vb.which_attrib.generic1_idx = attribs_indexing.;
-      if (prog_attribs.nameids[i] & SID.ATTR.VPOS2) gfx_ctx.vb.which_attrib.dim_idx = attribs_indexing.VPOS2;
-      if (prog_attribs.nameids[i] & SID.ATTR.TEX2) gfx_ctx.vb.which_attrib.tex_idx = attribs_indexing.TEX2;
-   }
 
    gfx_ctx.ib.idx = ibidx; // Stores the programs index for the indexbuffer.
    gfx_ctx.ib.count = ib.count;

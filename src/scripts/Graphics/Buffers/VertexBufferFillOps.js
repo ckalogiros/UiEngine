@@ -37,6 +37,7 @@ const FUNCTION_TABLE_IDXS = {
    POS2_TEX2: INT_NULL,
    VPOS2: INT_NULL,
    // Instaned Geometry
+   INST_COL4_WPOS3_RCORNERS_FEATHER: INT_NULL,
    INST_COL4_WPOS3_TIME: INT_NULL,
    INST_COL4_WPOS3: INT_NULL,
    INST_WPOS3: INT_NULL,
@@ -71,6 +72,7 @@ const Vertex_buffer_fn_table_operation_add = [
    FILL_VERTEX_BUFFER_VPOS2_TEX2,
    FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER,
    // Instanced Geometry
+   INST_FILL_VERTEX_BUFFER_COL4_WPOS3_RCORNERS_FEATHER,
    INST_FILL_VERTEX_BUFFER_COL4_WPOS3_TIME,
    INST_FILL_VERTEX_BUFFER_COL4_WPOS3,
    INST_FILL_VERTEX_BUFFER_WPOS3,
@@ -106,6 +108,7 @@ function Set_up_fn_table() {
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_VPOS2) FUNCTION_TABLE_IDXS.VPOS2 = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_VPOS2_TEX2) FUNCTION_TABLE_IDXS.POS2_TEX2 = i;
       // Instanced Geometry
+      else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_COL4_WPOS3_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.INST_COL4_WPOS3_RCORNERS_FEATHER = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_COL4_WPOS3_TIME) FUNCTION_TABLE_IDXS.INST_COL4_WPOS3_TIME = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_COL4_WPOS3) FUNCTION_TABLE_IDXS.INST_COL4_WPOS3 = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === INST_FILL_VERTEX_BUFFER_WPOS3) FUNCTION_TABLE_IDXS.INST_WPOS3 = i;
@@ -135,16 +138,21 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
       if (inst & SID.ATTR.COL4) clean_inst |= SID.ATTR.COL4;
       if (attr & SID.ATTR.COL4_PER_VERTEX) clean_inst |= SID.ATTR.COL4_PER_VERTEX;
       if (inst & SID.ATTR.WPOS3) clean_inst |= SID.ATTR.WPOS3;
-      if (inst & SID.ATTR.STYLE) clean_inst |= SID.ATTR.STYLE;
       if (inst & SID.ATTR.TEX2) clean_inst |= SID.ATTR.TEX2;
       if (inst & SID.ATTR.TIME) clean_inst |= SID.ATTR.TIME;
+      if (inst & SID.ATTR.R_CORNERS) clean_inst |= SID.ATTR.R_CORNERS;
+      if (inst & SID.ATTR.FEATHER) clean_inst |= SID.ATTR.FEATHER;
+      if (inst & SID.ATTR.BORDER) clean_inst |= SID.ATTR.BORDER;
 
+      if (clean_inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS3_RCORNERS_FEATHER;
       if (clean_inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS3_TIME;
       if (clean_inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3)) return FUNCTION_TABLE_IDXS.INST_COL4_WPOS3;
       if (clean_inst === (SID.ATTR.WPOS3)) return FUNCTION_TABLE_IDXS.INST_WPOS3;
    }
    else {
 
+      // TODO: Should we dijoint the COL4 from the per vertex color?
+      // todo: Also the COL4 in a per vertex buffer is also a per vertex color in gfx buffers. So the name COL4 is only valid in the mesh perspective.  
       let clean_attr = 0x0;
       if (attr & SID.ATTR.COL4) {
          if (attr & SID.ATTR.COL4_PER_VERTEX) clean_attr |= SID.ATTR.COL4_PER_VERTEX;
@@ -188,7 +196,7 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
    }
 
 
-   console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names, shader_attribs.nameids, SID.ATTR);
+   console.error('NO function (pointer) was set for adding meshes to Vertex buffer. attrib names:', names, shader_attribs.attr_flag, SID.ATTR);
    // alert('SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:')
    alert(`${inst} SEE CONOLE ERROR.\nNO add function pointer was set. attrib names:`)
    return -1;
@@ -974,18 +982,27 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER(vb_data, geom, 
 // Fill - Instanced Attributes - Vertex Buffer Functions
 /**************************************************************************************************************************************/
 
-function INST_FILL_VERTEX_BUFFER_WPOS3(vb_data, geom, mat, start, num_faces, stride , verts_per_rect, a_vpos_offset) {
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride , verts_per_rect, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
 
    for (let i = 0; i < num_faces; i++) {
 
+      // COLOR
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
       // WORLD POSITION
       vb_data[index++] = geom.pos[0] + geom.dim[0];
       vb_data[index++] = geom.pos[1] + geom.dim[1];
       vb_data[index++] = geom.pos[2];
-      vb_data[index++] = 0;
+      
+      // STYLE
+      vb_data[index++] = mat.style[0];
+      vb_data[index++] = mat.style[2];
 
       attribs_count += stride;
       
@@ -1019,3 +1036,23 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3(vb_data, geom, mat, start, num_faces
    return attribs_count;
 
 }
+function INST_FILL_VERTEX_BUFFER_WPOS3(vb_data, geom, mat, start, num_faces, stride , verts_per_rect, a_vpos_offset) {
+
+   let attribs_count = 0;
+   let index = start;
+
+   for (let i = 0; i < num_faces; i++) {
+
+      // WORLD POSITION
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+
+      attribs_count += stride;
+      
+   }
+
+   return attribs_count;
+
+}
+

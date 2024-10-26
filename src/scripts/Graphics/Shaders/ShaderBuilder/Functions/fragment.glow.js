@@ -62,7 +62,7 @@ vec4 Glow(float alpha, float scale_down)
   float r = dim.y*scale_down;
   float d = smoothstep(dim.y*outer, r*inner,  length(uv));
   
-  vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   vec3 color = src_color.rgb*d*intensity*(1. - time);
   
   // color.rgb *= d;

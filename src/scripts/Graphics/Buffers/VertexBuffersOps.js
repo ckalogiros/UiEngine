@@ -163,6 +163,8 @@ export function Gl_set_rgba_specify_attribute(gfxInfo, value, num_faces = 1, ver
 
    /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_rgba_per_vertex()'); }
 
+   console.error('SEE the implementation of Gl_set_rgba_specify_attribute() function for color picker')
+
    const vbidx = gfxInfo.vb.which_vb.col_buf;
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
@@ -204,7 +206,6 @@ export function Gl_set_rgba_specify_attribute(gfxInfo, value, num_faces = 1, ver
 export function Gl_add_wpos_xy(gfxInfo, x, y, num_faces = 1) {
 
    const vbidx = gfxInfo.vb.which_vb.wpos_buf;
-   const wposidx = gfxInfo.vb.which_attrib.wpos_idx; // An index to access the wpos elements
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
    
@@ -1874,24 +1875,16 @@ export function Gl_rotate_z_2d(gfxInfo, dim, angle, num_faces = 1) {
 
 
    const vbidx = gfxInfo.vb.which_vb.dim_buf;
-   const dimidx = gfxInfo.vb.which_attrib.dim_idx; // An index to access the wpos elements
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vpos_attr_idx = vb_info.attribs_indexing.VPOS2; // The index of the offset to access the correct attribute.
    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
 
-   let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[dimidx];
-   let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[dimidx];
+   let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[vpos_attr_idx];
+   let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[vpos_attr_idx];
 
    const newPos = RotateZ(dim, angle)
    
-   // vb_data[index++] = newPos[0]+dim[0]/2;
-   // vb_data[index++] = newPos[1]+dim[1]/2; index += stride;
-   // vb_data[index++] = newPos[2]+dim[0]/2;
-   // vb_data[index++] = newPos[3]+dim[1]/2; index += stride;
-   // vb_data[index++] = newPos[4]+dim[0]/2;
-   // vb_data[index++] = newPos[5]+dim[1]/2; index += stride;
-   // vb_data[index++] = newPos[6]+dim[0]/2;
-   // vb_data[index++] = newPos[7]+dim[1]/2;
    vb_data[index++] = newPos[0];
    vb_data[index++] = newPos[1]; index += stride;
    vb_data[index++] = newPos[2];

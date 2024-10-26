@@ -40,7 +40,7 @@ vec4 Smoke(float scale_down)
     float rand = controls.x*2.;
     vec2 res = u_screen_res;
     vec2 dim = vec2(v_dim2_x, v_dim2_y);  
-    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);  
+    vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);  
 
     #ifndef UV_READY
         #define UV_READY 1

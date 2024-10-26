@@ -1664,13 +1664,6 @@ function Ui_focused_create_info_gfx(mesh, zpos){
             dim_buf
             tex_buf
          },
-         which_attrib: {
-            col_idx
-            wpos_idx
-            generic1_idx
-            dim_idx
-            tex_idx
-         },
          is_per_vertex
       };
 

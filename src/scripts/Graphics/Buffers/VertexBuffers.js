@@ -123,6 +123,8 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 
     }
 
+    // Shader_attributes_enable(attribsidx, 0, _, 0);
+
 
     const vb_groupidx = _vertex_buffer_groups.Add(vb_group);
     vb_group.idx = vb_groupidx;
@@ -1225,8 +1227,37 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
 
 
 
+/****************************************************************************************************************************************************/
+// Attributes Indexing Getters
+/****************************************************************************************************************************************************/
+
+export function Vertex_buffer_get_attrib_index_col(vb_groupidx, start, geom, mat) {
+
+    // const vb_info = Vertex_buffer_group_get_byidx(vb_groupidx);
+
+    // const num_faces = 1;
+
+    // if ((vb_info.vCount % 1) !== 0)
+    //     console.error('index buffer count mismatch')
 
 
+    // // const shader_attribs = Shader_attributes_get_attribs(prog.attribsidx);
+    // const vb_data = Vertex_buffer_get_by_vbidx(vb_info.groupidx);
+
+    // const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
+    // const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
+    // const attribs_count = vb_info.attribs_info.count;
+    // const attr_uv_idx = vb_info.attribs_indexing.TEX2;
+    // const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
+    // const verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
+    // Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
+    // // const verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
+    // // const stride = vb_info.attribs_info.count * verts_per_rect;
+    // // Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, stride);
+
+    // vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+
+}
 
 
 

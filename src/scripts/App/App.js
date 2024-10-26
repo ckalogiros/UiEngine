@@ -24,7 +24,7 @@ import { Particles_system_reset } from '../Engine/ParticlesSystem/ParticlesSyste
 import { Styles_hover_margin_reset, Styles_margin_reset, Styles_pad_reset } from '../Engine/Styles.js';
 import { Generic_buffers_container_reset } from '../Engine/Core/Buffers.js';
 import { Root_group_batch_buffer_reset, Root_group_buffer_reset, Root_group_gfx_buffer_reset } from '../Engine/Core/Views/RootView.js';
-import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
+import { Shader_bit_flags_build_SID_ATTR, Shader_bit_flags_build_SID_ATTR_PASS } from '../Graphics/ShaderBitFlags.js';
 
 
 // var osu = require('node-os-utils')
@@ -38,6 +38,8 @@ let renderer = null;
 export function AppInit() {
 
     SID.ATTR = Shader_bit_flags_build_SID_ATTR();
+    SID.PASS = Shader_bit_flags_build_SID_ATTR();
+    // SID.PASS = Shader_bit_flags_build_SID_ATTR_PASS();
 
     Time_intervals_init_time();
 

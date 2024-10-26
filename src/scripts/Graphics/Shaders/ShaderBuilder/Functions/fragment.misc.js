@@ -67,7 +67,7 @@ vec4 frag_glow_sphere()
   vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
   vec2 uv1 = (gl_FragCoord.xy / local_res);               // Map pixel: from {0 -> dim} to {0 -> 1} 
-  vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   
   
   

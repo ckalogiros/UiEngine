@@ -124,7 +124,7 @@ vec4 Round_corners(float scale_down)
     float feather = v_feather;
     vec2 res = u_screen_res;
     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+    vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
     
 
     #ifndef UV_READY
@@ -204,7 +204,7 @@ vec4 Round_corners(float scale_down)
 //     float feather = v_feather;
 //     vec2 res = u_screen_res;
 //     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-//     vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+//     vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
     
 
 //     #ifndef UV_READY
@@ -371,7 +371,7 @@ vec4 Stylize(float scale_down)
     vec2 blur = vec2(0.0, feather);
     vec2 res = u_screen_res;
     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down; // v_dim is the abs(a_pos), and is an interpolated value for every fragment in the span of min-a_pos to max-a_pos
-    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+    vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
     
     float clarity = 40.4;
     ScreenH = min(res.x, res.y)*clarity;

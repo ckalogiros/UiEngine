@@ -43,7 +43,7 @@ import { Slope_function_logarithmic } from '../Helpers/Math/MathFunction.js';
 import { App_reinitialize } from './App.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { PerformanceTimersGetMilisec, PerformanceTimersGetNanosec, PerformanceTimersGetWorstFps } from '../Engine/Timers/PerformanceTimers.js';
-import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
+import { Shader_Attributes, Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -653,39 +653,11 @@ export function TestWidgetsGeneric(createId = 1) {
 
     let ypos = 500
 
-    console.log(
-        '##############################################################################',
-        '\nSID.ATTR.COL4', SID.ATTR.COL4, Math.log2(SID.ATTR.COL4),
-        '\nSID.ATTR.WPOS3', SID.ATTR.WPOS3, Math.log2(SID.ATTR.WPOS3),
-        '\nSID.ATTR.VPOS2', SID.ATTR.VPOS2, Math.log2(SID.ATTR.VPOS2),
-        '\nSID.ATTR.DIM2', SID.ATTR.DIM2, Math.log2(SID.ATTR.DIM2),
-        '\nSID.ATTR.TIME', SID.ATTR.TIME, Math.log2(SID.ATTR.TIME),
-        '\n32', 32, Math.log2(32),
-        '\n64', 64, Math.log2(64),
-        '\n128', 128, Math.log2(128),
-        '\n256', 256, Math.log2(256),
-    );
-    console.log(
-        '##############################################################################',
-        '\nSID.ATTR.COL4', SID.ATTR.COL4, Math.log2(SID.ATTR.COL4),
-        '\nSID.ATTR.WPOS3', SID.ATTR.WPOS3, Math.log2(SID.ATTR.WPOS3),
-        '\nSID.ATTR.VPOS2', SID.ATTR.VPOS2, Math.log2(SID.ATTR.VPOS2),
-        '\nSID.ATTR.DIM2', SID.ATTR.DIM2, Math.log2(SID.ATTR.DIM2),
-        '\nSID.ATTR.TIME', SID.ATTR.TIME, Math.log2(SID.ATTR.TIME),
-        '\n32', 32, (32>>1),
-        '\n64', 64, (64>>1),
-        '\n128', 128, (128>>1),
-        '\n256', 256, (256>>1),
-    );
-
-    const d = Shader_bit_flags_build_SID_ATTR();
-
-
-    // const interval = Time_intervals_create(500, 'TEST LOG2', TIME_INTERVAL_REPEAT_ALWAYS, LOG2_PRINT, [PERFORMANCE_TIMERS_IDXS.MiscTest1, 0])
-
-
-
-    // const device_info = Create_widget;
+    { // Test the new Shader attributes struct
+        // const d = new Shader_Attributes(true, INT_NULL);
+        // const a = new Shader_Attributes();
+        // const c = new Shader_Attributes(true, a);
+    }
 
 
 
@@ -1292,7 +1264,9 @@ function Section(pos) {
     // pos[1] = 0;
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, BLUEL[5], _, [dim[0], 0, 15]);
-    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    section.EnableGfxPass(SID.PASS.WPOS3);
+
     // section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
     section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
@@ -1302,6 +1276,7 @@ function Section(pos) {
 
     // section.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
     // section.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3|SID.ATTR.TIME);
+    section.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3|SID.ATTR.R_CORNERS|SID.ATTR.FEATHER);
 
     section.GfxUniformsEnable({ unif: SID.UNIF.FS_GENERIC_FLOAT, pass: SID.PASS.WPOS2, }, 'u_generic_float', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
@@ -1309,9 +1284,9 @@ function Section(pos) {
     section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
     section.GenGfxCtx();
     section.Render();
+    
+    // section.RotateZ(1);
 
-
-    // section.RotateZ(2);
     
 
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);

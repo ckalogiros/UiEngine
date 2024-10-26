@@ -12,7 +12,6 @@ import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfo
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy, Screen_wpos_get_y } from "../../../Core/MeshUniformsBuffer.js";
 import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_group_remove_scissorbox } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../../../Graphics/Buffers/UniformBuffers.js";
-import { Mesh_find_unif_idx_from_unif_name } from "../../Operations/MeshHelperFunctions.js";
 import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
 import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
 
@@ -672,11 +671,11 @@ export class Mesh {
         switch (which) {
 
             case MESH_ENABLE.GFX.ATTR_STYLE: {
-
-                this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.STYLE | SID.ATTR.DIM2;
-                this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER | SID.PASS.WPOS2 | SID.PASS.DIM2;
-                if (Array.isArray(params)) this.SetStyle(params);
-                break;
+                alert('33149981083 \n MESH_ENABLE Style is not implemented ')
+                // this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.STYLE | SID.ATTR.DIM2;
+                // this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER | SID.PASS.WPOS2 | SID.PASS.DIM2;
+                // if (Array.isArray(params)) this.SetStyle(params);
+                // break;
             }
 
             case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
@@ -692,20 +691,26 @@ export class Mesh {
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
-                this.sid.attr |= SID.ATTR.R_CORNERS | SID.ATTR.DIM2;
-                this.sid.pass |= SID.PASS.R_CORNERS | SID.PASS.DIM2;
+                // this.sid.attr |= SID.ATTR.R_CORNERS | SID.ATTR.DIM2;
+                // this.sid.pass |= SID.PASS.R_CORNERS | SID.PASS.DIM2;
+                this.sid.attr |= SID.ATTR.R_CORNERS;
+                this.sid.pass |= SID.PASS.R_CORNERS;
                 if (params !== null) this.mat.style[0] = params;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_BORDER: {
-                this.sid.attr |= SID.ATTR.BORDER | SID.ATTR.DIM2;
-                this.sid.pass |= SID.PASS.BORDER | SID.PASS.DIM2;
+                // this.sid.attr |= SID.ATTR.BORDER | SID.ATTR.DIM2;
+                // this.sid.pass |= SID.PASS.BORDER | SID.PASS.DIM2;
+                this.sid.attr |= SID.ATTR.BORDER;
+                this.sid.pass |= SID.PASS.BORDER;
                 if (params !== null) this.mat.style[1] = params;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_FEATHER: {
-                this.sid.attr |= SID.ATTR.FEATHER | SID.ATTR.DIM2;
-                this.sid.pass |= SID.PASS.FEATHER | SID.PASS.DIM2;
+                // this.sid.attr |= SID.ATTR.FEATHER | SID.ATTR.DIM2;
+                // this.sid.attr |= SID.ATTR.FEATHER | SID.PASS.DIM2;
+                this.sid.attr |= SID.PASS.FEATHER;
+                this.sid.pass |= SID.PASS.FEATHER;
                 if (params !== null) this.mat.style[2] = params;
                 break;
             }
@@ -774,6 +779,11 @@ export class Mesh {
 
         }
 
+    }
+
+    EnableGfxPass(flags){
+        
+        this.sid.pass |= flags;
     }
 
 

@@ -35,7 +35,7 @@ vec4 Noise_procedural(float scale_down)
 
     vec2 res = u_screen_res;
     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-    vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+    vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
     float time  = v_time;
     float revT  = 1.-time; // Reverse time to be from 1 to 0
     
@@ -217,7 +217,7 @@ vec4 frag_worley_noise()
 
   vec2 res = u_screen_res;
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
-  vec4 src_color = vec4(v_col4_r, v_col4_g, v_col4_b, v_col4_a);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   
   
   
