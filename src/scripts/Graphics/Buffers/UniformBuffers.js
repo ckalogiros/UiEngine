@@ -91,7 +91,7 @@ class Uniform {
       // const t = gl.getActiveUniform(shader_program, 1)
       /**DEBUG */if (loc > 0xffff || loc === null) {
 
-         console.error('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.\n', 'name', name, 'progidx', progidx);
+         console.error('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.\n', 'name', name, 'progidx', progidx, 'vb_groupidx', vb_groupidx);
          alert('invalid uniform loc. name does not exist OR uniform is not enabled in the shader.');
       }
 

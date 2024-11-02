@@ -43,7 +43,7 @@ if(BIT_FLAGS[BIT_FLAGS_SIZE] > MAX_BIT_MASK || BIT_FLAGS[BIT_FLAGS_SIZE] <= 0 ) 
 
 
 _CNT = 0;
-// This structure declares applications ALL shader attributes as bit flags(sequence of object fields DOES matter)
+// This structure declares applications ALL shader attributes as bit flags
 export class Shader_Attributes {
 
    constructor(initialize_for_indexing=false, init_val={}){
@@ -52,20 +52,20 @@ export class Shader_Attributes {
 
       const default_values = {
          COL4: BIT_FLAGS[_CNT++],
+         COL4_PER_VERTEX: BIT_FLAGS[_CNT++],
          WPOS3: BIT_FLAGS[_CNT++],
-         // WPOS2: BIT_FLAGS[_CNT++],
          VPOS2: BIT_FLAGS[_CNT++],
          DIM2: BIT_FLAGS[_CNT++],
-         TIME: BIT_FLAGS[_CNT++],
-         R_CORNERS: BIT_FLAGS[_CNT++],
-         BORDER: BIT_FLAGS[_CNT++],
-         FEATHER: BIT_FLAGS[_CNT++],
-         GLOW_INTENSITY: BIT_FLAGS[_CNT++],
          TEX2: BIT_FLAGS[_CNT++],
+         R_CORNERS: BIT_FLAGS[_CNT++],
+         FEATHER: BIT_FLAGS[_CNT++],
+         TIME: BIT_FLAGS[_CNT++],
+         ANGLE: BIT_FLAGS[_CNT++],
+         GLOW_INTENSITY: BIT_FLAGS[_CNT++],
          SCALE2: BIT_FLAGS[_CNT++],
+         BORDER: BIT_FLAGS[_CNT++],
          SDF: BIT_FLAGS[_CNT++],
          MSDF: BIT_FLAGS[_CNT++],
-         COL4_PER_VERTEX: BIT_FLAGS[_CNT++],
       };
 
 
@@ -86,15 +86,7 @@ export class Shader_Attributes {
    }
 
 
-   // SetAttributeLocIdx(key_, value_) {
 
-   //    for (let [key, value] of Object.entries(this)) {
-         
-   //       if(key === key_){
-   //          this[key] = value_;
-   //       }
-   //    }
-   // }
    SetAttributeLocIdx(attr_flag, attribs_loc_idx) {
 
       for (let [key, value] of Object.entries(this)) {
@@ -102,21 +94,19 @@ export class Shader_Attributes {
          const sample = Shader_bit_flags_get_attr_info_from_flag(attr_flag)
          if(key === sample.KEY_NAME){
             this[key] = attribs_loc_idx;
-            // return attribs_loc_idx + 1; // Increment indexing to point to the next attribute location.
          }
       }
    }
-   // SetAttributeLocIdx(attr_flag, attribs_loc_idx) {
 
-   //    for (let [key, value] of Object.entries(this)) {
+   PrintEnabled(info=null) {
+
+      if(info) console.log(info);
+      for (let [key] of Object.entries(this)) {
          
-   //       const sample = Shader_bit_flags_get_attr_info_from_flag(attr_flag)
-   //       if(value === attr_flag){
-   //          this[key] = attribs_loc_idx;
-   //          return attribs_loc_idx + 1; // Increment indexing to point to the next attribute location.
-   //       }
-   //    }
-   // }
+         if(this[key] !== INT_NULL) console.log(key, this[key]);
+      }
+   }
+
 } 
 const SID_ATTR = new Shader_Attributes();
 const SID_ATTR_SIZE = _CNT;
@@ -131,22 +121,20 @@ _CNT = 0;
 // This structure is for retrieving info like type, name etc(sequence of array elements does NOT matter)
 const ATTRIBUTES = [
    {FLAG:SID_ATTR.COL4,               IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC4,   TYPE_SIZE:4,    KEY_NAME:'COL4',            ATTR_NAME:'col4'},
-   // {FLAG:SID_ATTR.WPOS3,           IDX:_CNT++,       TYPE:GL_TYPES.FLOAT_VEC3,   TYPE_SIZE:3,    KEY_NAME:'WPOS3',           ATTR_NAME:'wpos3', PASS:{FIELD:[0,0,0], Enabled:Pass_enabled}, pass_fn_set:pass3_fn_set, pass_fn_get:pass3_fn_get, },
-   // {FLAG:SID_ATTR.WPOS3,              IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC3,   TYPE_SIZE:3,    KEY_NAME:'WPOS3',           ATTR_NAME:'wpos3', PASS:{FIELD:[0,0,0], Enabled:Pass_is_enabled}},
-   {FLAG:SID_ATTR.WPOS3,           IDX:_CNT++,       TYPE:GL_TYPES.FLOAT_VEC3,   TYPE_SIZE:3,    KEY_NAME:'WPOS3',           ATTR_NAME:'wpos3'},
-   // {FLAG:SID_ATTR.WPOS2,              IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'WPOS2',           ATTR_NAME:'wpos2'},
+   {FLAG:SID_ATTR.COL4_PER_VERTEX,    IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC4,   TYPE_SIZE:4,    KEY_NAME:'COL4_PER_VERTEX', ATTR_NAME:'col4'},
+   {FLAG:SID_ATTR.WPOS3,              IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC3,   TYPE_SIZE:3,    KEY_NAME:'WPOS3',           ATTR_NAME:'wpos3'},
    {FLAG:SID_ATTR.VPOS2,              IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'VPOS2',           ATTR_NAME:'pos2'},
    {FLAG:SID_ATTR.DIM2,               IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'DIM2',            ATTR_NAME:'dim2'},
-   {FLAG:SID_ATTR.TIME,               IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'TIME',            ATTR_NAME:'time'},
-   {FLAG:SID_ATTR.R_CORNERS,          IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'R_CORNERS',       ATTR_NAME:'rcorners'},
-   {FLAG:SID_ATTR.BORDER,             IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'BORDER',          ATTR_NAME:'border'},
-   {FLAG:SID_ATTR.FEATHER,            IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'FEATHER',         ATTR_NAME:'feather'},
-   {FLAG:SID_ATTR.GLOW_INTENSITY,     IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'GLOW_INTENSITY',  ATTR_NAME:'glow_intensity'},
    {FLAG:SID_ATTR.TEX2,               IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'TEX2',            ATTR_NAME:'tex2'},
+   {FLAG:SID_ATTR.R_CORNERS,          IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'R_CORNERS',       ATTR_NAME:'rcorners'},
+   {FLAG:SID_ATTR.FEATHER,            IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'FEATHER',         ATTR_NAME:'feather'},
+   {FLAG:SID_ATTR.TIME,               IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'TIME',            ATTR_NAME:'time'},
+   {FLAG:SID_ATTR.ANGLE,              IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'ANGLE',           ATTR_NAME:'angle'},
+   {FLAG:SID_ATTR.GLOW_INTENSITY,     IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'GLOW_INTENSITY',  ATTR_NAME:'glow_intensity'},
    {FLAG:SID_ATTR.SCALE2,             IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'SCALE2',          ATTR_NAME:'scale2'},
+   {FLAG:SID_ATTR.BORDER,             IDX:_CNT++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'BORDER',          ATTR_NAME:'border'},
    {FLAG:SID_ATTR.SDF,                IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'SDF',             ATTR_NAME:'sdf'},
    {FLAG:SID_ATTR.MSDF,               IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'MSDF',            ATTR_NAME:'msdf'},
-   {FLAG:SID_ATTR.COL4_PER_VERTEX,    IDX:_CNT++,    TYPE:GL_TYPES.FLOAT_VEC4,   TYPE_SIZE:4,    KEY_NAME:'COL4_PER_VERTEX', ATTR_NAME:'col4'},
 ];
 const ATTRIBUTES_SIZE = ATTRIBUTES.length;
 console.log('$$$ ATTRIBUTES', ATTRIBUTES);
@@ -163,6 +151,16 @@ export function Shader_bit_flags_get_attr_key_name_from_flag(attr_flag){
    
    const idx = MASKS_GET_INDEX_FROM_FLAG(attr_flag);
    return ATTRIBUTES[idx].KEY_NAME;
+}
+export function Shader_bit_flags_print_enabled_attributes(attr_flags, info){
+   
+   console.log(info);
+   for(let i=0; i<SID_ATTR_SIZE;  i++) {
+
+      if(attr_flags & ATTRIBUTES[i].FLAG)
+         console.log(ATTRIBUTES[i].KEY_NAME);
+   }
+   console.log('-------------------------------------------------------------');
 }
 
 

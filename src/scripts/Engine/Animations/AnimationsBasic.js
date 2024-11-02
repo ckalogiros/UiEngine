@@ -1,6 +1,6 @@
 "use strict";
 
-import { GlSetAttrSdfParamsOuter, Gl_set_wpos_x, Gl_set_dim_xy, Gl_set_rgba } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { GlSetAttrSdfParamsOuter, Gl_set_wpos_x, Gl_set_vpos_xy, Gl_set_rgba } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { CalculateSdfOuterFromDim } from "../../Helpers/Helpers.js";
 import { GfxInfoMesh } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Mesh_animations_get } from "./MeshAnimations.js";
@@ -170,7 +170,7 @@ function Helper_scale_rect(_mesh, scaleFactor) {
       mesh.geom.dim[0] *= scaleFactor; 
       mesh.geom.dim[1] *= scaleFactor; 
 
-      Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
+      Gl_set_vpos_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
    }
 }
 
@@ -205,7 +205,7 @@ function Helper_scale_text(mesh, scaleFactor, flag) {
       posx = (mesh.geom.pos[0] - mesh.geom.dim[0]) + extraWidth + accumTextWidth;
       Gl_set_wpos_x(_gfx, posx);
       accumTextWidth += advance;
-      Gl_set_dim_xy(_gfx, textMesh.geom.dim[0], textMesh.geom.dim[1])
+      Gl_set_vpos_xy(_gfx, textMesh.geom.dim[0], textMesh.geom.dim[1])
 
       const sdfOuter = CalculateSdfOuterFromDim(textMesh.geom.dim[0]);
       GlSetAttrSdfParamsOuter(_gfx, sdfOuter);

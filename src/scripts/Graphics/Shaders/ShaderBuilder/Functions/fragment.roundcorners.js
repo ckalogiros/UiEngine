@@ -91,24 +91,6 @@ export const frag_round_corners = `
 
 vec4 Round_corners(float scale_down)
 {
-    #ifdef U_RCORNERS_VEC3
-        float slider = u_rcorners.x;
-        float smoothness = u_rcorners.y;
-        float power = u_rcorners.z;
-    #elif defined(U_RCORNERS_VEC2)
-        float slider = u_rcorners.x;
-        float smoothness = u_rcorners.y;
-        float power = 1.;
-    #elif defined(U_RCORNERS_FLOAT)
-        float slider = u_rcorners;
-        float smoothness = .5;
-        float power = 1.;
-    #else
-        float slider = .2;
-        float smoothness = .5;
-        float power = 1.;
-    #endif
-
     #ifdef U_GENERIC_VEC3
         include <u_generic_vec3>
     #elif defined(U_GENERIC_VEC2)
@@ -116,14 +98,20 @@ vec4 Round_corners(float scale_down)
     #elif defined(U_GENERIC_FLOAT)
         #include <u_generic_float>
     #else
-        float control1 = 1.;
+        float control1 = 0.;
+    #endif
+
+    #ifdef A_ANGLE
+        control1 = v_angle;
     #endif
 
     float scale_up = 1./scale_down;
     vec2 rCorners = vec2(v_rcorners) * scale_down;
+    // vec2 rCorners = vec2(v_rcorners) ;
     float feather = v_feather;
     vec2 res = u_screen_res;
     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
+    vec2 vpos = vec2(v_pos2_x, v_pos2_y);
     vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
     
 
@@ -131,38 +119,45 @@ vec4 Round_corners(float scale_down)
         #define UV_READY 1
         uv = gl_FragCoord.xy;
         pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
+        // pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
     #endif   
 
-
-    vec2 vdim = vec2(100.);
-
+    vec2 localPos;
 
     // Re-create the rotation matrix
     float angle = control1;
-    float c = cos(angle);
-	float s = sin(angle);
-    mat2 rot = mat2(s, -c, c, s);
+    // float angle = 1.2;
+    float c = 0.0;
+    float s = 0.0;
+    if(angle > 0.) {
+        float c = cos(angle);
+        float s = sin(angle);
+        mat2 rot = mat2(s, -c, c, s);
+        localPos = abs(vpos.yx*rot);
+    }
+    else localPos = abs(vpos);
 
     // Invert the rotation, to correctly calculate the distance on rotated objects
-    mat2 inv_rot = transpose(rot);
+    // mat2 inv_rot = transpose(rot);
 
-    // Invert the rotation for every pxel
-    vec2 localPos = abs(dim*inv_rot);
-
-
+    // Invert the rotation for every pixel
+    // localPos = abs(vpos.yx*rot);
+    // vec2 localPos = abs(vpos.yx*inv_rot);
+    
+    
     // Create the render distance limit 
-    float d = length(max((localPos - vdim) + rCorners.x, 0.0)) - rCorners.x;
-
-
+    float d = length(max((localPos - dim) + rCorners.x, 0.0)) - rCorners.x;
+    
     float alpha = clamp(-d / feather, 0.0, 1.0);
     src_color.a *= alpha;
-    vec3 color = src_color.rgb * alpha;
+    vec3 color = src_color.rgb * alpha * src_color.a;
 
-
-    return vec4(color, alpha);
+    // return vec4(src_color);
+    return vec4(color, alpha * src_color.a);
+    // return vec4(color, src_color.a);
 }
 `;
-/**SAVE */
+/**SAVE: WITH SHADE IMPLEMENTATION*/
 // export const frag_round_corners = `
 
 // /********************************************************************************************/
@@ -180,23 +175,23 @@ vec4 Round_corners(float scale_down)
 
 // vec4 Round_corners(float scale_down)
 // {
-//     #ifdef U_RCORNERS_VEC3
-//         float slider = u_rcorners.x;
-//         float smoothness = u_rcorners.y;
-//         float power = u_rcorners.z;
-//     #elif defined(U_RCORNERS_VEC2)
-//         float slider = u_rcorners.x;
-//         float smoothness = u_rcorners.y;
-//         float power = 1.;
-//     #elif defined(U_RCORNERS_FLOAT)
-//         float slider = u_rcorners;
-//         float smoothness = .5;
-//         float power = 1.;
-//     #else
-//         float slider = .2;
-//         float smoothness = .5;
-//         float power = 1.;
-//     #endif
+    // #ifdef U_RCORNERS_VEC3
+    //     float slider = u_rcorners.x;
+    //     float smoothness = u_rcorners.y;
+    //     float power = u_rcorners.z;
+    // #elif defined(U_RCORNERS_VEC2)
+    //     float slider = u_rcorners.x;
+    //     float smoothness = u_rcorners.y;
+    //     float power = 1.;
+    // #elif defined(U_RCORNERS_FLOAT)
+    //     float slider = u_rcorners;
+    //     float smoothness = .5;
+    //     float power = 1.;
+    // #else
+    //     float slider = .2;
+    //     float smoothness = .5;
+    //     float power = 1.;
+    // #endif
 
 
 //     float scale_up = 1./scale_down;

@@ -8,7 +8,7 @@ import { AddArr2, CopyArr4, Min } from '../../../Helpers/Math/MathOperations.js'
 import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } from '../../Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
-import { BLUEL, GREY, WHITE } from '../Material/Base/Colors.js';
+import { BLUEL, GREY, REDL, WHITE, YELLOW } from '../Material/Base/Colors.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_per_vb_meshidx_view_get_all_roots } from '../../Core/Views/RootView.js';
@@ -41,7 +41,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       this.type |= MESH_TYPE.WIDGET_SLIDER | MESH_TYPE.WIDGET_SLIDER_BAR | this.geom | this.mat;
 
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.SetStyle([2, 0, .6]);
+      this.SetStyle([2, .6, 0]);
 
 
       this.slider_val = 0;
@@ -50,7 +50,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
 
       // handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      handle.SetStyle([Min(handle_dim[0], handle_dim[1]), 5, 1.5]);
+      handle.SetStyle([Min(handle_dim[0], handle_dim[1]), 3., 4]);
 
 
 
@@ -412,7 +412,8 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       // If horizontal slider
       if (this.geom.dim[0] > this.geom.dim[1]) {
 
-         const pos = ((this.geom.dim[0] * 2 * this.geom.num_faces)) * val;
+         // const pos = this.geom.pos[0] + ((this.geom.dim[0] * 2 * this.geom.num_faces) * val);
+         const pos = this.geom.pos[0] + ((this.geom.dim[0] * 2) * val);
          const handle = this.children.buffer[0];
          handle.geom.pos[0] = pos - (handle.geom.dim[0] * 2 * this.slider_val); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
       }
@@ -445,7 +446,8 @@ function Slider_horizontal_move_handle(bar, handle) {
    const x = MouseGetPosDif().x;
    if (x === 0) return;
 
-   const bar_length = bar.geom.dim[0] * 2 * bar.geom.num_faces;
+   // const bar_length = bar.geom.dim[0] * 2 * bar.geom.num_faces;
+   const bar_length = bar.geom.dim[0] * 2;
    if (handle.geom.pos[0] + x >= bar.geom.pos[0] && handle.geom.pos[0] + handle.geom.dim[0] * 2 + x <= bar.geom.pos[0] + bar_length) {
       handle.geom.pos[0] += x;
       handle.geom.AddWposX(handle.gfx, x,);
@@ -480,7 +482,8 @@ function Slider_vertical_move_handle(bar, handle) {
 function Slider_horizontal_calculate_value(bar, handle) {
 
 
-   const barwidth = (bar.geom.dim[0] * 2 * bar.geom.num_faces) - (handle.geom.dim[0] * 2);
+   // const barwidth = (bar.geom.dim[0] * 2 * bar.geom.num_faces) - (handle.geom.dim[0] * 2);
+   const barwidth = (bar.geom.dim[0] * 2) - (handle.geom.dim[0] * 2);
 
    // Interpolate pos to 0-1 
    const x = handle.geom.pos[0] - bar.geom.pos[0]; // Tranform to mesh coordinates (0 t0 mesh dim)
@@ -495,7 +498,8 @@ function Slider_horizontal_calculate_value(bar, handle) {
 
 function Slider_vertical_calculate_value(bar, handle) {
 
-   const bar_length = (bar.geom.dim[1] * 2 * bar.geom.num_faces) - (handle.geom.dim[1] * 2);
+   // const bar_length = (bar.geom.dim[1] * 2 * bar.geom.num_faces) - (handle.geom.dim[1] * 2);
+   const bar_length = (bar.geom.dim[1] * 2) - (handle.geom.dim[1] * 2);
    const y = handle.geom.pos[1] - bar.geom.pos[1]; // Tranform to mesh coordinates (0 t0 mesh dim)
 
    // Interpolate pos to 0-1 
@@ -627,7 +631,8 @@ export function Slider_simple_set_value(slider_bar, new_value) {
 
    if (bar.geom.dim[0] > bar.geom.dim[1]) {
 
-      const pos = ((bar.geom.dim[0] * 2 * bar.geom.num_faces)) * new_value;
+      // const pos = ((bar.geom.dim[0] * 2 * bar.geom.num_faces)) * new_value;
+      const pos = ((bar.geom.dim[0] * 2)) * new_value;
       handle.geom.pos[0] = pos - (handle.geom.dim[0] * 2 * bar.slider_val - extra_padd); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
       handle.geom.UpdateSetWposX(handle.gfx)
    }
@@ -744,7 +749,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
-      const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, name, pos, fontSize, WHITE, .4, _, _, is_debug_mesh);
+      const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, name, pos, fontSize, GREY[8], .4, _, _, is_debug_mesh);
 
 
       /** Label area mesh */
@@ -756,14 +761,18 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
 
-      this.SetStyle([6, 0, 2]);
+      this.SetStyle([6, 2, 0]);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
 
       /*****************************************************************************************************************/
       // Slider Bar: Bar is child of the slider mesh
-      const bar = Create_widget_slider_simple(_, [0, dim[1] * 4, _pos[2] + 1], [dim[0], 2], GREY[8], hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
+      const bar_width = dim[0] - 8;
+      const bar_posx = 8;
+      const bar = Create_widget_slider_simple(_, [bar_posx, dim[1] * 4, _pos[2] + 1], [bar_width, 2], GREY[8], hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
+      // const bar = Create_widget_slider_simple(_, [0, dim[1] * 4, _pos[2] + 1], [dim[0], 2], GREY[8], hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
+      bar.SetStyle([2, .6, 0]);
 
 
       /*****************************************************************************************************************/

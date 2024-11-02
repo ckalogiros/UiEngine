@@ -373,9 +373,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          // console.log('vb_groupidx', vb_groupidx)
          for (let i = 0; i < uniforms.length; i++) {
 
-            const shader_program = Progarm_get_webgl_program_object(progidx);
             if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
-
+               
+               const shader_program = Progarm_get_webgl_program_object(progidx);
                const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx, vb_groupidx);
 
 
@@ -394,7 +394,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                   // Create the uniform position that will update the vertexbuffer's uniform
                   mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
 
-                  if (mesh.root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
+                  if (mesh.root_posidx !== vb_groupidx) 
+                     alert('root_posidx is NOT equal to vbidx');
                   
                }
             }

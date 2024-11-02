@@ -548,18 +548,18 @@ export class Mesh {
     // TODO: Update the .pos of the mesh for the rest of the methods
     SetWposXY(x, y) {
         this.SetUpdateFrameBuffer();
-        this.geom.pos[0] = x;
-        this.geom.pos[1] = y;
-        this.geom.SetWposXY(this.gfx, x, y);
+        this.geom.pos[0] = x-this.geom.dim[0];
+        this.geom.pos[1] = y-this.geom.dim[1];
+        this.geom.SetWposXY(this.gfx, x, y, );
     }
     SetWposX(x) {
         this.SetUpdateFrameBuffer();
-        this.geom.pos[0] = x;
+        this.geom.pos[0] = x-this.geom.dim[0];
         this.geom.SetWposX(this.gfx, x);
     }
     SetWposY(y) {
         this.SetUpdateFrameBuffer();
-        this.geom.pos[1] = y;
+        this.geom.pos[1] = y-this.geom.dim[1];
         this.geom.SetWposY(this.gfx, y);
     }
 
@@ -624,6 +624,7 @@ export class Mesh {
     SetAttrTime() {
         if (this.sid.attr & SID.ATTR.TIME) {
             this.geom.timer = Timer_get_global_timer();
+            alert('71143322110098 \n IMPLEMENT Gl_set_wpos_time()')
             Gl_set_wpos_time(this.gfx, this.geom.timer);
         }
     }
@@ -679,8 +680,9 @@ export class Mesh {
             }
 
             case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
-            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.attr |= SID.PASS.TEX2; break; }
+            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
             case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; this.sid.pass |= SID.PASS.TIME; break; }
+            case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.PASS.ANGLE; break; }
             case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
 
@@ -691,26 +693,24 @@ export class Mesh {
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
-                // this.sid.attr |= SID.ATTR.R_CORNERS | SID.ATTR.DIM2;
-                // this.sid.pass |= SID.PASS.R_CORNERS | SID.PASS.DIM2;
-                this.sid.attr |= SID.ATTR.R_CORNERS;
-                this.sid.pass |= SID.PASS.R_CORNERS;
+                this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.PASS.R_CORNERS;
+                this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
+                this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
+                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
                 if (params !== null) this.mat.style[0] = params;
                 break;
             }
-            case MESH_ENABLE.GFX.ATTR_BORDER: {
-                // this.sid.attr |= SID.ATTR.BORDER | SID.ATTR.DIM2;
-                // this.sid.pass |= SID.PASS.BORDER | SID.PASS.DIM2;
-                this.sid.attr |= SID.ATTR.BORDER;
-                this.sid.pass |= SID.PASS.BORDER;
+            case MESH_ENABLE.GFX.ATTR_FEATHER: {
+                this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.PASS.FEATHER;
+                this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
+                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
                 if (params !== null) this.mat.style[1] = params;
                 break;
             }
-            case MESH_ENABLE.GFX.ATTR_FEATHER: {
-                // this.sid.attr |= SID.ATTR.FEATHER | SID.ATTR.DIM2;
-                // this.sid.attr |= SID.ATTR.FEATHER | SID.PASS.DIM2;
-                this.sid.attr |= SID.PASS.FEATHER;
-                this.sid.pass |= SID.PASS.FEATHER;
+            case MESH_ENABLE.GFX.ATTR_BORDER: {
+                this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.PASS.BORDER;
+                this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
+                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
                 if (params !== null) this.mat.style[2] = params;
                 break;
             }

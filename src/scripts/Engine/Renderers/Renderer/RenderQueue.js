@@ -99,6 +99,12 @@ class RenderQueue {
    }
 
 
+   // SetActive() {
+
+   //    this.active[this.activeCount++] = this.buffer[i];
+   // }
+
+
    Add(progidx, vb_groupidx, ibidx, isActive) {
 
       if(this.count >= MAX_DRAWQUEUE_COUNT) alert('5412231432 \nRenderqueue buffer overflow')

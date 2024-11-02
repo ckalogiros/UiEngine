@@ -10,7 +10,7 @@ import { Root_group_set_in_focus, Root_group_per_vb_meshidx_view_get_all_roots }
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
-import { BLACK, BLUE, BLUEL, GREEN, GREY, RED, REDL, TRANSPARENT, WHITE, YELLOW } from "../Material/Base/Colors.js";
+import { BLACK, BLUE, BLUEL, CYAN, GREEN, GREY, MAGENTA, RED, REDL, TRANSPARENT, WHITE, YELLOW } from "../Material/Base/Colors.js";
 import { Section } from "../Meshes/Section.js";
 import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 import { Slider_simple_connect, Slider_simple_set_value } from "./WidgetSlider.js";
@@ -56,6 +56,7 @@ export class Widget_Color_Picker extends Section {
 
 
       const scale = .6;
+      // const scale = 1.;
       style[1] = 15
 
       if (col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
@@ -82,6 +83,7 @@ export class Widget_Color_Picker extends Section {
       /******************************************************************************/
       // Create panel to align further meshes
       style[1] = 10;
+      
       const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10 * scale, 10 * scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
       panel.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       panel.options |= SECTION.RESIZE_PARENT;
@@ -94,8 +96,7 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create the color picker panel
-      // const color_pick = Create_rect_mesh(_, [20, 20, 2], [150*scale, 150*scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
-      const color_pick = Create_rect_mesh(_, [0, 0, 2], [150 * scale, 150 * scale], [BLACK, WHITE, BLACK, YELLOW[9]], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
+      const color_pick = Create_rect_mesh(_, [0, 0, 2], [150 * scale, 150 * scale], [WHITE, BLACK, YELLOW[9], BLACK,], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
       color_pick.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       // color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
@@ -185,10 +186,10 @@ export class Widget_Color_Picker extends Section {
       // Create the tranparency slider
 
       const TRANSPARENCY_BAR_COLOR = [
-         GREY[3],
          RED[9],
          GREY[3],
          YELLOW[9],
+         GREY[3],
       ];
 
       const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12 * scale, 150 * scale], TRANSPARENCY_BAR_COLOR, [0, 0], [16 * scale, 3 * scale], WHITE, 1);
@@ -208,15 +209,25 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create the hue picker mesh
+      // const HUE_COLOR = [
+      //    RED[9], RED[9],
+      //    YELLOW[9], YELLOW[9], // v1-v2
+      //    GREEN[9], GREEN[9],   // v3-v4
+      //    BLUE[9], BLUE[9],   // v5-v6
+      //    RED[9], RED[9],
+      // ];
       const HUE_COLOR = [
          RED[9], RED[9],
          YELLOW[9], YELLOW[9], // v1-v2
          GREEN[9], GREEN[9],   // v3-v4
+         CYAN, CYAN,          // v3-v4
          BLUE[9], BLUE[9],   // v5-v6
+         MAGENTA, MAGENTA,   // v3-v4
          RED[9], RED[9],
       ];
 
       const vertices_count = (HUE_COLOR.length / 2) - 1;
+      // const slider_hue = Create_widget_slider_simple(_, [0, 0, 2], [dim[0] * scale, 20 * scale], HUE_COLOR, [0, 0], [4 * scale, 24 * scale], WHITE, vertices_count);
       const slider_hue = Create_widget_slider_simple(_, [0, 0, 2], [dim[0] * scale, 20 * scale], HUE_COLOR, [0, 0], [4 * scale, 24 * scale], WHITE, vertices_count);
 
       slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
@@ -224,19 +235,6 @@ export class Widget_Color_Picker extends Section {
       slider_hue.StylesSetMargin([0, 20]);
       slider_hue.SetName('Slider Hue');
       slider_hue_idx = this.AddItem(slider_hue);
-
-
-
-
-      console.log(
-         '\npanel2_idx', panel2_idx,
-         '\nhue_pick_idx', slider_hue_idx,
-         '\ncolor_pick_idx', color_pick_idx,
-         '\ncolor_present_idx', color_present_idx,
-         '\nslider_trans_idx', slider_trans_idx,
-
-      );
-
 
 
    }
@@ -605,7 +603,10 @@ export class Widget_Color_Picker extends Section {
       // Calculate handle pos percentage to be 1 whole unit for every part. E.x: For part1:0-1, part2:1-2, part3:2-3, ...
       slider_val += 0.000001; // Must be > 0 in order to choose the first part and not the -1 part which does not exist
       if (slider_val >= 1) slider_val = .999999; // CAUTION: If the value is greater or equal to 1, then we will advance to the next part of 2 left and rigth vertices which does no exist
-      const part_ratio = slider_val * parts
+      const part_ratio = slider_val * parts;
+      // const part_ratio = slider_val * ((parts*parts)-1);
+      // const part_ratio = slider_val * (parts*(parts-1));
+      // const part_ratio = slider_val * ((parts*parts));
 
 
       let c_idx = Math.ceil(part_ratio);
@@ -625,14 +626,13 @@ export class Widget_Color_Picker extends Section {
       // console.log((x/w)*parts, (slider_val*parts))
 
       const num_faces = color_pick_mesh.geom.num_faces; // Face Index:The first one
-      const vidx = 3; // Vertex Index: Top-Right
+      const vidx = 2; // Vertex Index: Top-Right
       // CAUTION: Make sure the vertex count is not surpassing the mesh and starts updating the color of the next mesh in the vertex buffer 
       const vertex_count = 1; // How many vertices of the mesh to update 
 
       // Store the calculated color to the color pick mesh 
       for (let i = 0; i < vertex_count; i++)
          CopyArr4(color_pick_mesh.mat.col[i + vidx], c);
-      // color_pick_mesh.mat.col[i + vidx] = c;
 
       // Update the vertex buffer
       if (color_pick_mesh.gfx)
@@ -675,8 +675,10 @@ export class Widget_Color_Picker extends Section {
       /*****************************************************************************************************/
       // Assign the color to the top vertices of the transparency slider
 
-      CopyArr4(slider_tran.mat.col[1], c);
-      CopyArr4(slider_tran.mat.col[3], c);
+      // CopyArr4(slider_tran.mat.col[1], c);
+      // CopyArr4(slider_tran.mat.col[3], c);
+      CopyArr4(slider_tran.mat.col[0], c);
+      CopyArr4(slider_tran.mat.col[2], c);
       if (slider_tran.gfx) Gl_set_rgba_per_vertex(slider_tran.gfx, slider_tran.mat.col)
 
 
@@ -808,7 +810,7 @@ export class Widget_Color_Picker extends Section {
        * The y axis controls the color intensity. That is black on the bottom and full color to the top
        */
 
-      const color = color_pick_mesh.mat.col[3]; // The 4-th is the v4 or the upper right vertex
+      const color = color_pick_mesh.mat.col[2]; // The 4-th is the v4 or the upper right vertex
       const hue = Mix_vec4_float32Array(WHITE, color, percentagex);
       const intensity = Mix_vec4_float32Array(BLACK, hue, percentagey);
 
@@ -819,8 +821,8 @@ export class Widget_Color_Picker extends Section {
       // Assign the color to the top vertices of the transparency slider
 
       const transp_slider = panel.children.buffer[slider_trans_idx];
-      CopyArr3(transp_slider.mat.col[1], intensity);
-      CopyArr3(transp_slider.mat.col[3], intensity);
+      CopyArr3(transp_slider.mat.col[0], intensity);
+      CopyArr3(transp_slider.mat.col[2], intensity);
       if (transp_slider.gfx) Gl_set_rgba_per_vertex(transp_slider.gfx, transp_slider.mat.col)
       intensity[3] = transp_slider.slider_val;
 

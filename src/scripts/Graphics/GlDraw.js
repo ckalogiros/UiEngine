@@ -33,15 +33,15 @@ export function Gl_draw(gl) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
 
-    
+    let progidx = INT_NULL;
+    let progs = Program_get_programs();
     
     for (let i = 0; i < drawQueueCount; i++) {
         
-        const progidx = drawQueue[i].progidx;
+        progidx = drawQueue[i].progidx;
         const vb_groupidx = drawQueue[i].vb_groupidx;
         const ibidx = drawQueue[i].ibidx;
         
-        const progs = Program_get_programs();
         
         if (GL_STATE.BOUND_PROG_IDX !== progidx){
             gfxCtx.gl.useProgram(progs.buffer[progidx].shader_program);
@@ -53,14 +53,11 @@ export function Gl_draw(gl) {
         
         const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
         const ib_info = Index_buffer_info_get_by_ibidx(ibidx);
-        
-        
+     
         if (GL_STATE.BOUND_VAO !== vb_group.vao){
             gl.bindVertexArray(vb_group.vao);
             GL_STATE.BOUND_VAO = vb_group.vao;
         }
-        
-        
         
         
         // TODO: Distinguish uniforms that will update with uniforms with constant value
@@ -96,20 +93,20 @@ export function Gl_draw(gl) {
                     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
                     gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
                     // TODO: Set bufferData instead
-                    gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.STATIC_DRAW);
+                    // gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.STATIC_DRAW);
+                    gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
                     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
                     GL_STATE.BOUND_VBO = vb_info.vbo;
                     GL_STATE.BOUND_VBIDX = vb_info.vbidx;
                 }
-                // gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 2)
             }
             vb_group.needs_any_update = false;
         }
 
         
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_info.ibo);
         if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) 
         {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_info.ibo);
             const ib_data = Index_buffer_get_by_ibidx(ib_info.ibidx);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib_data, gl.STATIC_DRAW, 0);
             ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
@@ -118,6 +115,7 @@ export function Gl_draw(gl) {
         }
 
 
+        
         /** The last param is the instance count.
          * That means: draw that many instances ONLY from the vertex buffer of the instanced geometry,
          * If instance count is 1, draw the first instanced geometry attributes. 
@@ -125,11 +123,15 @@ export function Gl_draw(gl) {
          * So in order to use more than one meshe's attributes from any instanced buffer, the instance count is responsible 
          */
         
-        // gl.drawElementsInstanced(gl.LINES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
-        // gl.drawElementsInstanced(gl.POINTS, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
-        // gl.drawElements(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0);
+        // gl.LINES, gl.POINTS, gl.TRIANGLES
         
-        gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, 0, 1)
+        const index_elements_offset = 0;
+        const instance_count = 1;
+        gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, index_elements_offset, instance_count)
+        // gl.drawElementsInstanced(gl.LINES, vb_group.draw_count, gl.UNSIGNED_SHORT, index_elements_offset, instance_count)
+        // gl.drawElementsInstanced(gl.TRIANGLES, 40, gl.UNSIGNED_SHORT, index_elements_offset, instance_count)
+        // gl.drawElements(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, index_elements_offset)
+        // gl.drawArrays(gl.TRIANGLES, 0, 3)
 
         if(vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
     }

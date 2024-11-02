@@ -5,7 +5,7 @@ import { New_generic_buffer, New_int8_buffer } from "../../Engine/Core/Buffers.j
 import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex, Vertex_buffer_create_attribs_info_per_vb_instanced } from "../ShaderAttributes.js";
 import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index, Program_use_program, Program_use_program2 } from "../ShaderPrograms.js";
 import { Typed_array_create_from_type } from "./TypedArrayBuffersInterface.js";
-import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays.js";
+import { Gl_vertex_array_object_create, Gl_vertex_array_object_find_compatible, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays.js";
 import { Floor } from "../../Helpers/Math/MathOperations.js";
 import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js";
@@ -37,6 +37,7 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 
     let vaoidx = INT_NULL;
 
+    // vaoidx = Gl_vertex_array_object_find_compatible(sid);
     if (vaoidx === INT_NULL) {
         vaoidx = Gl_vertex_array_object_create(sid);
     }
@@ -67,7 +68,6 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
         // Create vertex buffer info
         const vbinfo = new Vertex_Buffer_Info(size, vbo, vbidx, type, sid.inst);
         vbinfo.SetAddFn(attribsidx, 0x0, sid.inst);
-        // vbinfo.state.mask |= IS_PRIVATE;
         const vb_infoidx = _vertex_buffer_infos.Add(vbinfo);
 
 
@@ -103,7 +103,6 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
         // Create vertex buffer info
         const vbinfo = new Vertex_Buffer_Info(size, vbo, vbidx, type, sid.attr & ~sid.inst);
         vbinfo.SetAddFn(attribsidx, sid.attr & ~sid.inst, 0x0);
-        // vbinfo.state.mask |= IS_PRIVATE;
         const vb_infoidx = _vertex_buffer_infos.Add(vbinfo);
 
 
@@ -123,7 +122,6 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 
     }
 
-    // Shader_attributes_enable(attribsidx, 0, _, 0);
 
 
     const vb_groupidx = _vertex_buffer_groups.Add(vb_group);

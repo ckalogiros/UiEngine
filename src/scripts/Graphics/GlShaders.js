@@ -75,6 +75,12 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 
 function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 
+	// if (DEBUG.SHADERS) {
+
+	// 	const s = {sid:sid, VertexShader:vertex_shader, FragmentShader:fragment_shader}
+	// 	console.info(s);
+	// } 
+
 	const vShader = Load_shader(gl, gl.VERTEX_SHADER, vertex_shader, 'Vertex');
 	const fShader = Load_shader(gl, gl.FRAGMENT_SHADER, fragment_shader, 'Fragment');
 
@@ -88,7 +94,8 @@ function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 	console.log('Validate program', msg);
 	
 	// Bind attribute locations before linking the program
-	Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid);
+	// Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid);
+	console.error('881766293 Bind_attributes_at_specific_locations_based_on_sid() has been deactivated')
 
 	gl.linkProgram(shader_program);
 
@@ -96,7 +103,7 @@ function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 	if (!status) {
 		console.error('Unable to LINK the shader program: ' + gl.getProgramInfoLog(shader_program));
 		gl.deleteProgram(shader_program);
-		shader_program = 0;
+		shader_program = null;
 		return null;
 	} 
 	else {
@@ -114,8 +121,6 @@ function Load_shader(gl, shaderType, source, type) {
 
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
-
-	// console.log('Load_shader', source)
 
 	const status = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
 	if (!status) {

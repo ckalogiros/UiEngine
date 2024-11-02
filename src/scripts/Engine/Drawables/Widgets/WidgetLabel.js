@@ -6,7 +6,7 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Alignment.js";
-import { Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_per_vb_remove_mesh } from "../../Core/MeshBuffer.js";
@@ -628,7 +628,7 @@ export class Widget_Label extends Rect_Mesh {
             }
 
 
-            Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1], mesh.geom.num_faces)
+            Gl_set_vpos_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1], mesh.geom.num_faces)
             Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces)
 
 

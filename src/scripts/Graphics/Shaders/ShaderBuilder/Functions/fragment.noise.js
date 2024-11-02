@@ -140,7 +140,6 @@ vec4 Noise_procedural(float scale_down)
     // return vec4(noise1);
     // return vec4(vec3(noise1), .0);
     return c;
-    // return vec4(1.,1.,1.,.0);
 
 }
 `;

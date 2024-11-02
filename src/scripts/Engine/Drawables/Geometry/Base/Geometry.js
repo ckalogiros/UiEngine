@@ -28,9 +28,7 @@ export class Geometry2D {
         
         this.sid = {
             shad: SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
-            // attr: (SID.ATTR.VPOS2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2),
             attr: (SID.ATTR.VPOS2 | SID.ATTR.WPOS3),
-            // inst: SID.ATTR.WPOS3,
             inst: 0x0,
             unif: 0,
             pass: 0,
@@ -38,7 +36,7 @@ export class Geometry2D {
 
         const dim1 = dim;
         
-        if(num_faces>1) dim1[0] = dim[0]/num_faces; // (Example: color hue)
+        // if(num_faces>1) dim1[0] = dim[0]/num_faces; // (Example: for color hue)
         math.CopyArr3(this.pos, math.FloorArr3(pos));
         math.CopyArr2(this.dim, dim1);
         math.CopyArr2(this.scale, scale);
@@ -54,20 +52,20 @@ export class Geometry2D {
 
     SetDefaultPosXY(gfx)    { glBufferOps.Gl_set_wpos_xy    (gfx, this.pos[0], this.pos[1], this.pos[2]); }
 
-    AddDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_dim_xy(gfx, x, y, num_faces); }
-    AddDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_dim_x( gfx, x, num_faces); }
-    AddDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_dim_y( gfx, y, num_faces); }
+    AddDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_vpos_xy(gfx, x, y, num_faces); }
+    AddDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_vpos_x( gfx, x, num_faces); }
+    AddDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_vpos_y( gfx, y, num_faces); }
     // SetDimPlusXY(gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_dim_plus_xy(gfx, x, y, num_faces); }
-    SetDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_dim_xy(gfx, x, y, num_faces); }
-    SetDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_dim_x( gfx, x, num_faces); }
-    SetDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_dim_y( gfx, y, num_faces); }
+    SetDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_vpos_xy(gfx, x, y, num_faces); }
+    SetDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_vpos_x( gfx, x, num_faces); }
+    SetDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_vpos_y( gfx, y, num_faces); }
 
-    UpdateAddDimXY  (gfx, num_faces=1)  { glBufferOps.Gl_add_dim_xy(gfx, this.dim[0], this.dim[1], num_faces); }
-    UpdateAddDimX   (gfx, num_faces=1)  { glBufferOps.Gl_add_dim_x( gfx, this.dim[0], num_faces); }
-    UpdateAddDimY   (gfx, num_faces=1)  { glBufferOps.Gl_add_dim_y( gfx, this.dim[1], num_faces); }
-    UpdateSetDimXY  (gfx, num_faces=1)  { glBufferOps.Gl_set_dim_xy(gfx, this.dim[0], this.dim[1], num_faces); }
-    UpdateSetDimX   (gfx, num_faces=1)  { glBufferOps.Gl_set_dim_x( gfx, this.dim[0], num_faces); }
-    UpdateSetDimY   (gfx, num_faces=1)  { glBufferOps.Gl_set_dim_y( gfx, this.dim[1], num_faces); }
+    UpdateAddDimXY  (gfx, num_faces=1)  { glBufferOps.Gl_add_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
+    UpdateAddDimX   (gfx, num_faces=1)  { glBufferOps.Gl_add_vpos_x( gfx, this.dim[0], num_faces); }
+    UpdateAddDimY   (gfx, num_faces=1)  { glBufferOps.Gl_add_vpos_y( gfx, this.dim[1], num_faces); }
+    UpdateSetDimXY  (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
+    UpdateSetDimX   (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_x( gfx, this.dim[0], num_faces); }
+    UpdateSetDimY   (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_y( gfx, this.dim[1], num_faces); }
 
     UpdateAddWposXY (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_xy(gfx, this.pos[0], this.pos[1], num_faces); }
     UpdateAddWposX  (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_x( gfx, this.pos[0], num_faces); }
@@ -95,7 +93,7 @@ export class Geometry2D {
         else dimentions[1] = this.dim[1];
 
         math.CopyArr2(this.dim, dimentions);
-        glBufferOps.Gl_set_dim_xy(gfx, dimentions[0], dimentions[1]);
+        glBufferOps.Gl_set_vpos_xy(gfx, dimentions[0], dimentions[1]);
     }
 
 

@@ -93,6 +93,8 @@ export function RGB(int) {
 export const TRANSPARENT = new Float32Array([0.0, 0.0, 0.0, 0.0]);
 export const WHITE = new Float32Array([1.0, 1.0, 1.0, 1.0]);
 export const BLACK = new Float32Array([0.04, 0.04, 0.04, 1.0]);
+export const CYAN = new Float32Array([0.0, 1.0, 1.0, 1.0]);
+export const MAGENTA = new Float32Array([1.0, 0.0, 1.0, 1.0]);
 
 // export function CHECK_WHITE(){
 // 	if(WHITE[3] < 1)
@@ -599,3 +601,18 @@ const ORANGE_240_75_10 = Interpolate_rgb_to_01(255, 75, 10);
 
 // const BLUE_LIGHT = Interpolate_rgb_to_01(76, 171, 254);
 
+
+
+/***************************************************************************************************************************************************/
+// GRADIENT Colors (Only for per vertex color)
+/***************************************************************************************************************************************************/
+
+export function COLOR_GRADIENT_HORIZONTAL(color1, color2) {
+
+	return [color1, color1, color2, color2];
+}
+
+export function COLOR_GRADIENT_VERTICAL(color1, color2) {
+
+	return [color2, color1, color2, color1];
+}

@@ -87,10 +87,14 @@ export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshid
 
 export function Mesh_calc_pos_dif(mesh1, mesh2) {
 
-    const m1_posx = mesh1.geom.pos[0] + mesh1.geom.dim[0];
-    const m1_posy = mesh1.geom.pos[1] + mesh1.geom.dim[1];
-    const m2_posx = mesh2.geom.pos[0] + mesh2.geom.dim[0];
-    const m2_posy = mesh2.geom.pos[1] + mesh2.geom.dim[1];
+    // const m1_posx = mesh1.geom.pos[0] - mesh1.geom.dim[0];
+    // const m1_posy = mesh1.geom.pos[1] - mesh1.geom.dim[1];
+    // const m2_posx = mesh2.geom.pos[0] + mesh2.geom.dim[0];
+    // const m2_posy = mesh2.geom.pos[1] + mesh2.geom.dim[1];
+    const m1_posx = mesh1.geom.pos[0] ;
+    const m1_posy = mesh1.geom.pos[1] ;
+    const m2_posx = mesh2.geom.pos[0] ;
+    const m2_posy = mesh2.geom.pos[1] ;
     return [
         m1_posx - m2_posx,
         m1_posy - m2_posy,

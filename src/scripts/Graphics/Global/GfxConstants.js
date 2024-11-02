@@ -158,21 +158,21 @@ const SID = {
     },
     
     PASS: {
-        COL4: BIT4,
-        COL4_PER_VERTEX: BIT4<<= 1,
-        VPOS2: BIT4 <<= 1,
-        DIM2: BIT4 <<= 1,
-        TEX2: BIT4 <<= 1,
-        WPOS2: BIT4 <<= 1,
-        WPOS3: BIT4 <<= 1,
-        TIME: BIT4 <<= 1,
-        BORDER: BIT2 <<= 1,
-        R_CORNERS: BIT2 <<= 1,
-        FEATHER: BIT2 <<= 1,
-        GLOW_INTENSITY: BIT2 <<= 1,
-        RES2: BIT4 <<= 1,
-        STYLE3: BIT4 <<= 1,
-        SDF2: BIT4 <<= 1,
+        // COL4: BIT4,
+        // COL4_PER_VERTEX: BIT4<<= 1,
+        // VPOS2: BIT4 <<= 1,
+        // DIM2: BIT4 <<= 1,
+        // TEX2: BIT4 <<= 1,
+        // WPOS2: BIT4 <<= 1,
+        // WPOS3: BIT4 <<= 1,
+        // TIME: BIT4 <<= 1,
+        // BORDER: BIT2 <<= 1,
+        // R_CORNERS: BIT2 <<= 1,
+        // FEATHER: BIT2 <<= 1,
+        // GLOW_INTENSITY: BIT2 <<= 1,
+        // RES2: BIT4 <<= 1,
+        // STYLE3: BIT4 <<= 1,
+        // SDF2: BIT4 <<= 1,
     },
 
     UNIF: {
@@ -301,6 +301,8 @@ const SID = {
         if (sid.attr & SID.ATTR.COL4_PER_VERTEX) str[k] += 'col4_per_vertex, '
         if (sid.attr & SID.ATTR.VPOS2) str[k] += 'pos2, '
         if (sid.attr & SID.ATTR.DIM2) str[k] += 'dim2, '
+        if (sid.attr & SID.ATTR.TIME) str[k] += 'time, '
+        if (sid.attr & SID.ATTR.ANGLE) str[k] += 'angle, '
         if (sid.attr & SID.ATTR.SCALE2) str[k] += 'scale2, '
         if (sid.attr & SID.ATTR.TEX2) str[k] += 'tex2, '
         if (sid.attr & SID.ATTR.WPOS3) str[k] += 'wpos4, '
@@ -424,7 +426,7 @@ const MESH_ENABLE = {
         ATTR_DIM2: _CNT++,
         ATTR_TEX2: _CNT++,
         ATTR_TIME: _CNT++,
-        ATTR_STYLE: _CNT++,
+        ATTR_ANGLE: _CNT++,
         ATTR_R_CORNERS: _CNT++,
         ATTR_FEATHER: _CNT++,
         ATTR_BORDER: _CNT++,

@@ -15,6 +15,8 @@
 export const frag_glow_call = `
   vec4 glowcol = Glow(color.a, scale_down);
   color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
+  // color = blend_color_multiply( color, glowcol ); 
+  // color += blend_color_add( color, glowcol ); 
 `;
 
 export const frag_glow = `
@@ -56,23 +58,15 @@ vec4 Glow(float alpha, float scale_down)
   #endif  
   
   
-  
-  // uv_map_coordinates_zero_one( uv, dim );
-  
   float r = dim.y*scale_down;
   float d = smoothstep(dim.y*outer, r*inner,  length(uv));
   
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   vec3 color = src_color.rgb*d*intensity*(1. - time);
   
-  // color.rgb *= d;
-  // color.rgb *= alpha;
-  // alpha *= alpha;
+  
   // color = min(src_color.rgb, d*intensity); // WEIRD NICE EFFECT!!!
   
-  // return RED+vec4(color.r);
-  
-  // return vec4(color, alpha);
   return vec4(color, d);
 }
 `;

@@ -67,11 +67,11 @@ export function Sattelite_rotation(x=0, y=0) {
    controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    controls_section.SetName('Sattelite_rotation->controls_section');
-   controls_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   controls_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    const flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS2,
+      pass: SID.PASS.WPOS3,
    };
 
    const slider_dim = [300, 10];
@@ -131,7 +131,7 @@ export function Sattelite_rotation(x=0, y=0) {
 
 
       const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, BLUEL[9], 'Ball', [0, dim[0], 2]);
-      ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
       ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
       section.AddItem(ball);
@@ -156,13 +156,13 @@ export function Sattelite_rotation(x=0, y=0) {
    }
 
    const sat = Create_rect_mesh(_, _, [6, 12], YELLOWL[9]);
-   sat.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   sat.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
    // sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    section.AddItem(sat);
 
    // Render
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -350,7 +350,7 @@ export function Sattelite_rotation(x=0, y=0) {
 
 
       // Render
-      info_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
       info_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
 
@@ -504,14 +504,13 @@ const ball_dim = 20;
 const pad = 15;
 
 const random_positions = [
-   [0, 0],
-   [ball_dim * 2 + pad, 0],
-   [ball_dim * 2 * 2 + pad, 0],
-   [ball_dim * 2 * 3 + pad, ball_dim],
-   [ball_dim * 2 * 4 + pad, 0],
-   [ball_dim * 2 * 5 + pad, ball_dim],
-   [ball_dim * 2 * 6 + pad, 0],
-   [ball_dim * 2 * 7 + pad, 0],
+   [ball_dim * 2 + pad, ball_dim*2],
+   [ball_dim * 2 * 2 + pad, ball_dim*2],
+   [ball_dim * 2 * 3 + pad, ball_dim*2],
+   [ball_dim * 2 * 4 + pad, ball_dim*2],
+   [ball_dim * 2 * 5 + pad, ball_dim*2],
+   [ball_dim * 2 * 6 + pad, ball_dim*2],
+   [ball_dim * 2 * 7 + pad, ball_dim*2],
    [ball_dim * 2 + pad, ball_dim * 2 + pad],
    [ball_dim * 2 * 2 + pad, ball_dim * 2 + pad],
    [ball_dim * 2 * 3 + pad, ball_dim * 2 + pad],
@@ -566,7 +565,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    const balls_buffer = [], physics = [], info_buffer = [];
 
    const test = Create_widget_text(_, `Normal Vector Calculation: n is computed as the difference between positions x1 and x2.`, [0, 400, 10], _, WHITE, _, _, TEXTURES.CONSOLAS_12px);
-   test.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   test.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.AddItem(test);
 
 
@@ -585,7 +584,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       const ball = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [pos[0], pos[1], zpos++], dim, GetSequencedColor(9), 'Ball' + i, [0, dim[0], 2]);
       ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
       ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
-      ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       ball.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       ball.EnableGfxUniforms({ fx: SID.FX.FS_GLOW_VEC3 }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       section.AddItem(ball);
@@ -626,7 +625,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
    const u_wpos_flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS2,
+      pass: SID.PASS.WPOS3,
    }
 
    const mnemonics = {
@@ -654,7 +653,8 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-      const controls_buffer = Create_elastic_collisions_controls(balls_buffer[0], YELLOWL[3], [scale_down], mnemonics);
+      // const controls_buffer = Create_elastic_collisions_controls(balls_buffer[0], YELLOWL[3], [scale_down], mnemonics);
+      const controls_buffer = Create_elastic_collisions_controls(balls_buffer, YELLOWL[3], [scale_down], params);
       
       const len = controls_buffer.length;
       for(let i=0; i<len; i++){
@@ -689,7 +689,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
    /****************************************************************************************************************/
    // Render
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -819,7 +819,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    
    
       // Render
-      info_section_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info_section_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    
       info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    
@@ -836,7 +836,8 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       Construct_listen_events_relations_from_mesh_tree(info_section_panel);
    
    
-      const scroller_component = Components_create_scroller_component(10, elastic_cllisions_panel_dim[1], info_section_panel, info_section_panel.GetPosY(),);
+      // const scroller_component = Components_create_scroller_component(10, elastic_cllisions_panel_dim[1], info_section_panel, info_section_panel.GetPosY(),);
+      const scroller_component = Components_create_scroller_component(10, elastic_cllisions_panel_dim[1], info_section_panel, 50,);
       Scoller_component_gengfx_and_render(scroller_component, info_section_panel);
       Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(info_section_panel.root_posidx, scroller_component.root_posidx);
       Listeners_set_priority(E.C, scroller_component.listeners)
@@ -878,7 +879,7 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
 
    const u_wpos_flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS2,
+      pass: SID.PASS.WPOS3,
    }
 
 
@@ -980,12 +981,16 @@ function Animate_elastic_collisions_balls(params) {
 
          // Calculate position relative to the new scaled size
          const ball_pos = [
-            (ball.geom.pos[0] + ball.geom.dim[0]) - ball_size,
-            (ball.geom.pos[1] + ball.geom.dim[1]) - ball_size,
+            // (ball.geom.pos[0] + ball.geom.dim[0]) - ball_size,
+            // (ball.geom.pos[1] + ball.geom.dim[1]) - ball_size,
+            (ball.geom.pos[0]),
+            (ball.geom.pos[1]),
          ];
          const ball2_pos = [
-            (ball2.geom.pos[0] + ball2.geom.dim[0]) - ball2_size,
-            (ball2.geom.pos[1] + ball2.geom.dim[1]) - ball2_size,
+            // (ball2.geom.pos[0] + ball2.geom.dim[0]) - ball2_size,
+            // (ball2.geom.pos[1] + ball2.geom.dim[1]) - ball2_size,
+            (ball2.geom.pos[0]),
+            (ball2.geom.pos[1]),
          ];
 
 
@@ -1088,8 +1093,10 @@ function Animate_elastic_collisions_balls(params) {
 
       // Calculate position relative to the new scaled size
       const ball_pos = [
-         (ball.geom.pos[0] + ball.geom.dim[0]) - ball_size,
-         (ball.geom.pos[1] + ball.geom.dim[1]) - ball_size,
+         // (ball.geom.pos[0] + ball.geom.dim[0]) - ball_size,
+         // (ball.geom.pos[1] + ball.geom.dim[1]) - ball_size,
+         ball.geom.pos[0],
+         ball.geom.pos[1],
       ];
 
       ball_pos[0] += phys1.overlap[0];
@@ -1106,10 +1113,14 @@ function Animate_elastic_collisions_balls(params) {
       ball.geom.pos[1] += y;
 
       // Check boundaries
-      const ball_top    = ball_pos[1] + y;
-      const ball_bot    = ball_pos[1] + (ball_size * 2) + y;
-      const ball_left   = ball_pos[0] + x;
-      const ball_right  = ball_pos[0] + (ball_size * 2) + x;
+      // const ball_top    = ball_pos[1] + y;
+      // const ball_bot    = ball_pos[1] + (ball_size * 2) + y;
+      // const ball_left   = ball_pos[0] + x;
+      // const ball_right  = ball_pos[0] + (ball_size * 2) + x;
+      const ball_top    = ball_pos[1] - (ball_size) + y;
+      const ball_bot    = ball_pos[1] + (ball_size) + y;
+      const ball_left   = ball_pos[0] - (ball_size) + x;
+      const ball_right  = ball_pos[0] + (ball_size) + x;
 
       if (ball_bot > bot_bound) {
          phys1.vel[1] *= -1; // Reverse velocity

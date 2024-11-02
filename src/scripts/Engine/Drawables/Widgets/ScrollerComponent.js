@@ -43,7 +43,7 @@ export function Components_create_scroller_component(width = 12, height=100, mes
 
 
    const bar = Create_rect_mesh(_, pos, [width, height], col_bar )
-   bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
    bar.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -65,9 +65,10 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    // const handle_pad = [0, 0];
    const handle_width = bar.geom.dim[0] - handle_pad[0];
    const handle_height = bar.geom.dim[1] - handle_pad[1];
-   const handle_pos = [handle_pad[0], handle_pad[1], pos[2]+1]
+   // const handle_pos = [handle_pad[0], handle_pad[1], pos[2]+1]
+   const handle_pos = [handle_height+handle_pad[0], handle_pad[1], pos[2]+1]
    const handle = Create_rect_mesh(_, handle_pos, [handle_width, handle_height], col_handle, )
-   handle.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   handle.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
    handle.SetName('Handle');
@@ -125,6 +126,8 @@ export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags=0x0, pa
    const handle_pad = handle.StylesGetPad();
    handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
    handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
+   // handle.geom.pos[0] = bar.geom.pos[0] + handle.geom.dim[0] + handle_pad[0];
+   // handle.geom.pos[1] = bar.geom.pos[1] + handle.geom.dim[1] + handle_pad[1];
    
    /** Set scrolled section's pos */
    Scroller_component_update_scrolled_section_pos_from_handle(mesh, bar);
@@ -176,14 +179,17 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
    if (a < bar.geom.dim[1]) handle.geom.dim[1] = a - handle_pad[1];
    else handle.geom.dim[1] = clean_bar_height - handle_pad[1];
 
-   const handle_bot = handle.geom.pos[1] + handle.geom.dim[1] * 2
+   // const handle_bot = handle.geom.pos[1] + handle.geom.dim[1] * 2
 
 
    /* Set handle position */
-   if (handle.geom.pos[1] <= bar.geom.pos[1] + handle_pad[1]) handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
-   else if (handle_bot >= bar.geom.pos[1] + bar.geom.dim[1] * 2 - handle_pad[1]) handle.geom.pos[1] = (bar.geom.pos[1] + (bar.geom.dim[1] * 2)) - (handle.geom.dim[1]*2 + handle_pad[1]);
+   // if (handle.geom.pos[1] <= bar.geom.pos[1] + handle_pad[1]) handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
+   // else if (handle_bot >= bar.geom.pos[1] + bar.geom.dim[1] * 2 - handle_pad[1]) handle.geom.pos[1] = (bar.geom.pos[1] + (bar.geom.dim[1] * 2)) - (handle.geom.dim[1]*2 + handle_pad[1]);
+   // if (handle.geom.pos[1] <= bar.geom.pos[1] + handle_pad[1]) handle.geom.pos[1] = bar.geom.pos[1] + handle.geom.dim[1] + handle_pad[1];
+   // else if (handle_bot >= bar.geom.pos[1] + bar.geom.dim[1] * 2 - handle_pad[1]) handle.geom.pos[1] = (bar.geom.pos[1] + (bar.geom.dim[1] * 2)) - (handle.geom.dim[1] + handle_pad[1]);
 
-   handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
+   // handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
+   handle.geom.pos[0] = bar.geom.pos[0];
 
    handle.geom.UpdateSetDimY(handle.gfx);
    handle.geom.UpdateSetWposXY(handle.gfx);
@@ -227,7 +233,8 @@ function Scroller_component_update_handle_pos_from_scrolled_section(scrolled_sec
    
    // We need the size of the bar without the size of the handle
    const bar_clean_size = bar.geom.dim[1]*2-handle.geom.dim[1]*2 ;
-   handle.geom.pos[1] = bar.geom.pos[1] + bar_clean_size*res;
+   // handle.geom.pos[1] = bar.geom.pos[1] + bar_clean_size*res;
+   handle.geom.pos[1] = bar.geom.pos[1] + handle.geom.dim[1] + bar_clean_size*res;
 
    const pos_dim_ratio = Scroller_component_calculate_handle_position_ratio(bar, handle); // Calculate handles's ratio based on the handles position in the scrollbar and the dimention of the handle.
    const pad_ratio = (pos_dim_ratio * 2 - 1);
@@ -313,8 +320,8 @@ function Scroller_component_move_handle(bar, handle) {
 
    const bar_length = bar.geom.dim[1] * 2 * bar.geom.num_faces;
 
-   if (handle.geom.pos[1] + y >= bar.geom.pos[1] + handle_pad &&
-      handle.geom.pos[1] + handle.geom.dim[1] * 2 + y <= bar.geom.pos[1] + bar_length - handle_pad) {
+   if (handle.geom.pos[1] - handle.geom.dim[1] + y >= bar.geom.pos[1] + handle_pad &&
+      handle.geom.pos[1] + handle.geom.dim[1] * 2 + y <= bar.geom.pos[1]+ handle.geom.dim[1] + bar_length - handle_pad) {
       handle.geom.pos[1] += y;
       handle.geom.AddWposY(handle.gfx, y, );
    }
@@ -325,7 +332,7 @@ function Scroller_component_move_handle(bar, handle) {
 function Scroller_component_calculate_handle_position_ratio(bar, handle) {
 
    const handle_pad = handle.StylesGetPad(STYLES.AXIS.Y);
-   const handletop = handle.geom.pos[1]-handle_pad; // Must add the pad for correct align of top-scroller with top-scrolled
+   const handletop = handle.geom.pos[1] - handle.geom.dim[1]-handle_pad; // Must add the pad for correct align of top-scroller with top-scrolled
    const handledim = handle.geom.dim[1]*2+handle_pad*2; // Must add the pad for correct align of top-scroller with top-scrolled
    const bartop = bar.geom.pos[1];
    const dim_dif = (bar.geom.dim[1]*2) - handledim;
@@ -431,8 +438,8 @@ function Scroller_clip_scrolled_section(scrolled_section, clip_top, height) {
       Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
    }
    else {
-      console.error('SCROLLER ERROR \nThe current scrolled section does not have a \'group\'. create a group for the scrolled mesh so that the scroller can clip.');
-      console.log(scrolled_section.scroller_comp.GetName(), scrolled_section.scroller_comp.mesh_bufferidx)
+      // console.error('SCROLLER ERROR \nThe current scrolled section does not have a \'group\'. create a group for the scrolled mesh so that the scroller can clip.');
+      // console.log(scrolled_section.scroller_comp.GetName(), scrolled_section.scroller_comp.mesh_bufferidx)
    }
 }
 
@@ -460,6 +467,7 @@ function Scroller_component_update_scrolled_section_pos_from_handle(scrolled_sec
     */
    const pad_ratio = (pos_dim_ratio * 2 - 1);
    const ydif = (posy - scrolled_posy) + handle.StylesGetPad(STYLES.AXIS.Y) * -pad_ratio;
+   // const ydif = (posy - scrolled_posy) + handle.geom.dim[1] + handle.StylesGetPad(STYLES.AXIS.Y) * -pad_ratio;
  
    // Add the move difference to all vb's root positions.
    Mesh_unif_add_vb_root_wposy(scrolled_section.root_posidx, ydif);

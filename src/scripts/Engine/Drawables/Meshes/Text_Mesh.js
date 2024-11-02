@@ -11,7 +11,7 @@ import { WHITE } from "../Material/Base/Colors.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Font_get_uv_coords, Font_metrics_get_advancex, Font_metrics_get_char_width, Font_metrics_get_row_height } from "../../Loaders/Font/Font.js";
-import { Gl_set_dim_x, Gl_set_uv, Gl_set_wpos_x } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_vpos_x, Gl_set_uv, Gl_set_wpos_x } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 
 
 
@@ -477,7 +477,7 @@ p
          // TODO: For efficiency, create a dedicated Gl_ function to update all values
          Gl_set_uv(this.gfx, this.mat.uv);
          const w = Font_metrics_get_char_width(this.mat.uvIdx, c[i]);
-         Gl_set_dim_x(this.gfx, w/2, 1);
+         Gl_set_vpos_x(this.gfx, w/2, 1);
          Gl_set_wpos_x(this.gfx, xpos); 
          
          xpos += w; //+1;
@@ -491,7 +491,7 @@ p
          Gl_set_uv(this.gfx, space_char_uv);
          
          const width = Font_metrics_get_advancex(this.mat.uvIdx);
-         Gl_set_dim_x(this.gfx, width, 1);
+         Gl_set_vpos_x(this.gfx, width, 1);
          
          this.gfx.vb.starts.buffer[0] += attribs_count;
       }

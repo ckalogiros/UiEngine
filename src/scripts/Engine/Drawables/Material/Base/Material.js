@@ -151,7 +151,6 @@ export class FontMaterial extends Material {
       math.CopyArr2(this.sdf_params, sdf_params);
       this.textureid = textureid;
       
-      // this.sid.attr |= SID.ATTR.TEX2 | SID.ATTR.MSDF; // 
       this.sid.attr |= SID.ATTR.TEX2; // 
       this.sid.pass |= SID.PASS.TEX2; // 
       this.type |= MESH_TYPE.FONT_MATERIAL;

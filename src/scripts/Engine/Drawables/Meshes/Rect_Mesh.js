@@ -9,7 +9,7 @@ import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vert
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Mesh_unif_is_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { BLUEL } from "../Material/Base/Colors.js";
-import { Root_group_view_buffer_add_mesh } from "../../Core/Views/RootView.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 
 
 export class Rect extends Mesh {
@@ -265,12 +265,12 @@ export class Rect_Mesh extends Rect {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS,
       pos = [0, 0, 0], dim = [10, 10],
       col = TRANSPARENCY(BLUEL[6], .6), name = 'Rect_Mesh UNNAMED',
-      style = [10, 0, 2], pad = [4, 4], num_faces = 1, is_debug_mesh) {
+      style = [10, 2, 0], pad = [4, 4], num_faces = 1, is_debug_mesh) {
 
       super(pos, dim, col, num_faces, is_debug_mesh);
 
-      this.sid.unif |= SID.UNIF.ROOT_WPOS2
-      this.sid.pass |= SID.PASS.WPOS2
+      this.sid.unif |= SID.UNIF.ROOT_WPOS2;
+      // this.sid.pass |= SID.PASS.WPOS2
 
       this.mesh_bufferidx = mesh_bufferidx;
 
@@ -279,6 +279,9 @@ export class Rect_Mesh extends Rect {
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
+      if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) {
+         this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
+      }
    }
 
 
