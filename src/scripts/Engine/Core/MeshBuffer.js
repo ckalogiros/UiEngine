@@ -392,7 +392,7 @@ export function Widget_root_create_text_info() {
    // s.Calc()
 
    const margin = [4, 4];
-   const style = [0, 3, 1];;
+   const style = {rcorners:3, feather:1, border:0};
    const gr = _widget_groups_buffer;
 
    const grw = Create_widget_dropdown(_, 'Widget Groups', [100, 100, 0], col_dp, col_menu, _, _, _, _, _, margin);

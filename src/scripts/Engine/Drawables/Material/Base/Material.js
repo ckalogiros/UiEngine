@@ -1,7 +1,7 @@
 "use strict";
 
 import * as math from '../../../../Helpers/Math/MathOperations.js'
-import { Gl_set_rgba } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgb, Gl_set_rgba } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 import { New_generic_char_buffer } from '../../../Core/Buffers.js';
 
@@ -31,19 +31,15 @@ export class Material {
    constructor(col = [1, 1, 1, 1]) {
 
       this.sid = {
-         shad:  SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
+         shad: SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          attr: SID.ATTR.COL4,
          inst: 0x0,
          unif: 0,
          pass: 0,
       };
 
-      // this.col = [0, 0, 0, 1];
-      // math.CopyArr4(this.col, col);
-      // this.defCol = [0, 0, 0, 0];
-      // math.CopyArr4(this.defCol, col);
       this.type = MESH_TYPE.MATERIAL;
-      this.style = [0, 0, 0]; // Initialize style: []
+      this.style = {rcorners:0, feather:0, border:0};
       this.uv = [0, 1, 0, 1];
       this.uvIdx = INT_NULL;
       this.textureid = INT_NULL;
@@ -58,7 +54,7 @@ export class Material {
          this.defCol = new Array(len);
 
 
-         for (let i = 0; i < len; i++){
+         for (let i = 0; i < len; i++) {
             this.col[i] = new Float32Array(col[i]);
             this.defCol[i] = new Float32Array(col[i]);
          }
@@ -72,29 +68,50 @@ export class Material {
 
    }
 
+   
    SetColorRGB(col, gfx, num_faces) {
       math.CopyArr3(this.col, col);
+      Gl_set_rgb(gfx, this.col, num_faces);
+   }
+
+
+   SetColorRGBA(col, gfx, num_faces) {
+      math.CopyArr4(this.col, col);
       Gl_set_rgba(gfx, this.col, num_faces);
    }
 
 
    SetStyle(style) {
-      if (!Array.isArray(style)) console.error('335188764');
-      math.CopyArr3(this.style, style);
-   }
 
-   SetCopyColor(col){
+      this.style.rcorners = style.rcorners;
+      this.style.feather = style.feather;
+      this.style.border = style.border;
+   }
+   // SetStyle(rcornners, feather, border) {
+   //    const o = {
+   //       rcornners:rcornners,
+   //       feather:feather,
+   //       border:border,
+   //   };
+   //   return o;
+   // }
+   // SetStyle(style) {
+   //    if (!Array.isArray(style)) console.error('335188764');
+   //    math.CopyArr3(this.style, style);
+   // }
+
+   SetCopyColor(col) {
 
       // if((this.sid.attr & SID.ATTR.COL4_PER_VERTEX) && !Array.isArray(col[0])){
-      if((this.sid.attr & SID.ATTR.COL4_PER_VERTEX) && !(col[0].constructor === Float32Array)){
+      if ((this.sid.attr & SID.ATTR.COL4_PER_VERTEX) && !(col[0].constructor === Float32Array)) {
          alert('8816772');
          return;
       }
 
       const len = this.col.length;
-      for (let i = 0; i < len; i++){
+      for (let i = 0; i < len; i++) {
          const len2 = this.col[i].length;
-         for (let j = 0; j < len2; j++){
+         for (let j = 0; j < len2; j++) {
             this.col[i][j] = col[i][j];
             this.defCol[i][j] = col[i][j];
          }
@@ -104,7 +121,7 @@ export class Material {
 
 
    Copy(mat = {}) {
-alert('00188723')
+      alert('00188723')
       if (mat instanceof Material) {
 
          this.shad = mat.sid.shad;
@@ -138,23 +155,23 @@ export class FontMaterial extends Material {
 
       super(col, textureid);
 
-      
+
       const len = text.length;
       this.char_buffer = New_generic_char_buffer(_, `Material - ${text}`);
       this.char_buffer.Init(len, text);
-      
+
       this.temp_max_chars_inserted_in_gfx = 0;
-      
-      
+
+
       this.text = text;
       this.sdf_params = [0, 0];
       math.CopyArr2(this.sdf_params, sdf_params);
       this.textureid = textureid;
-      
+
       this.sid.attr |= SID.ATTR.TEX2; // 
       this.sid.pass |= SID.PASS.TEX2; // 
       this.type |= MESH_TYPE.FONT_MATERIAL;
-      
+
       // Load texture and uv map, via indexes to the actual buffers
       const texture = Texture_load_texture_byid(this.textureid, TEXTURE_TYPE.TYPE_FONT);
       this.texidx = texture.texidx;

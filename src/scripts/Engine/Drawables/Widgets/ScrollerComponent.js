@@ -57,15 +57,12 @@ export function Components_create_scroller_component(width = 12, height=100, mes
 
    bar.GfxUniformsSetClbk = Scroller_component_gfx_uniforms_set_clbk;
    
-   // bar.ListenEventConstruct();
    bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    
    
    const handle_pad = [3, 3];
-   // const handle_pad = [0, 0];
    const handle_width = bar.geom.dim[0] - handle_pad[0];
    const handle_height = bar.geom.dim[1] - handle_pad[1];
-   // const handle_pos = [handle_pad[0], handle_pad[1], pos[2]+1]
    const handle_pos = [handle_height+handle_pad[0], handle_pad[1], pos[2]+1]
    const handle = Create_rect_mesh(_, handle_pos, [handle_width, handle_height], col_handle, )
    handle.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);

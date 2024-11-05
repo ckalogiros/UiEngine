@@ -179,3 +179,14 @@ export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_N
     // Set the global state
     STATE.mesh.SetFocused(root);
 }
+
+
+
+export function Mesh_create_style_from_values(rcorners=0, feather=0, border=0){
+
+    return {
+       rcorners:rcorners,
+       feather:feather,
+       border:border,
+    };
+ }

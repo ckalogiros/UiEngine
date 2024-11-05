@@ -44,18 +44,28 @@ function hsv2rgb3(int){
 	// return kHer( khsv(int) ); 
 }
 
-export function RGB(int) { 
+export function RGB(int, widness=0, color_offset=5, brightness=1.3) { 
 	
 	// const o = .945
 	// const color_wideness = (1-o) + 1;
-	const color_wideness = .2 + 1;
+	// const color_wideness = .2 + 1;
 	// const color_wideness = 1.083;
-	let final = hsv2rgb3( Fract( int* ( u5(Math.sqrt(color_wideness) ) ) ) );
+	// const color_wideness = (widness>=0) ? widness : 1.053;
+	// const color_wideness = .001;
+	// const color_wideness = .0001;
+	// const color_wideness = .00001;
+	// const color_wideness = .00000001;
+	const color_wideness = widness;
 
-	const brightness = .0;
-	const b = [brightness, brightness, brightness]; 
+	const offset = .13
+	let final = hsv2rgb3( Fract( int* ( u5(Math.sqrt(color_wideness) ) ) ) + offset*color_offset);
+	// let final = hsv2rgb3( Fract( int* ( u5(Math.sin(color_wideness) ) ) ) + offset*color_offset);
+	// let final = hsv2rgb3( Fract( int* ( u5(Math.cos(color_wideness) ) ) + color_offset*3 ) );
+
+	const b = [1-brightness, 1-brightness, 1-brightness]; 
 	
-	final = Mix_vec3_float32Array(b, final, .5); 
+	// final = Mix_vec3_float32Array(b, final, .5); 
+	Mult_arr3_scalar(final, brightness); 
 	return final;
 } 
 
@@ -324,15 +334,25 @@ const PURPLER9 = new Float32Array([1.0, 0.0, 0.5, 1.0]);
 export const PURPLER = [PURPLER0, PURPLER1, PURPLER2, PURPLER3, PURPLER4, PURPLER5, PURPLER6, PURPLER7, PURPLER8, PURPLER9,];
 
 
+// export const COLOR_ARRAY1 = [
+// 	BLUEL,
+// 	PURPLEB,
+// 	PURPLER,
+// 	YELLOW,
+// 	GREEN,
+// 	ORANGE,
+// 	ORANGEL,
+// 	REDL,
+// ];
 export const COLOR_ARRAY3 = [
 	BLUEL,
 	PURPLEB,
 	PURPLER,
-	REDL,
 	YELLOW,
+	GREEN,
 	ORANGE,
 	ORANGEL,
-	GREEN,
+	REDL,
 ];
 // export const COLOR_ARRAY = {
 

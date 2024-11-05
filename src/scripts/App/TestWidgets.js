@@ -5,7 +5,7 @@ import { FloorArr2, FloorArr3, Mult_arr3_scalar } from '../Helpers/Math/MathOper
 import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
 
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Debug_info_create_ui_focused, Debug_info_ui, Debug_info_ui_static } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Debug_info_create_ui_focused, Debug_info_create_ui_mouse, Debug_info_ui, Debug_info_ui_static } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { GetRandomColor, GetRandomInt, GetRandomPos, GetSequencedColor } from '../Helpers/Helpers.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
@@ -23,7 +23,7 @@ import { TimerGetGlobalTimerCycle, Timer_get_global_timer } from '../Engine/Time
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
-import { Gl_set_rgba, Gl_rotate_z_2d, Gl_set_round_corners, Gl_set_angle } from '../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba, Gl_rotate_z_2d, Gl_set_attr_round_corners, Gl_set_angle } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Callback_animations_create, Callback_animations_destroy_byidx, Callback_animations_is_animation_active, Callback_animations_is_animation_in_play } from '../Engine/Animations/CallbackAnimations.js';
 import { Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
@@ -39,12 +39,13 @@ import { Clbk_animations_rotate, Clbk_animations_scale, Demo_animations, Demo_an
 import { Demo_chain_link } from './Demo/DemoChainLink.js';
 import { Game_snake } from './Demo/Games/Snake/Snake.js';
 import { Mesh_set_root_in_focus } from '../Engine/Drawables/Operations/MeshHelperFunctions.js';
-import { Slope_function_logarithmic } from '../Helpers/Math/MathFunction.js';
+import { Logarithmic_interpolation } from '../Helpers/Math/MathFunctions.js';
 import { App_reinitialize } from './App.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { PerformanceTimersGetMilisec, PerformanceTimersGetNanosec, PerformanceTimersGetWorstFps } from '../Engine/Timers/PerformanceTimers.js';
 import { Shader_Attributes, Shader_bit_flags_build_SID_ATTR, Shader_bit_flags_print_enabled_attributes } from '../Graphics/ShaderBitFlags.js';
 import { Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
+import { Board_rotations } from './Demo/DemoBoardRotations.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -565,7 +566,7 @@ function Animation_scale_up_run(params) {
     const timer = params.function_slope.GetTimer();
 
 
-    const slope = Slope_function_logarithmic(timer, slope_constant);
+    const slope = Logarithmic_interpolation(timer, slope_constant);
 
     const val = (slope * scale * 2);
     const sizex = target_mesh.geom.dim[0] * 2 + val;
@@ -580,8 +581,8 @@ function Animation_scale_up_run(params) {
     // Gl_add_vpos_xy(target_mesh.gfx, val, val);
 
     // if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
-    //     target_mesh.mat.style[0] = target_mesh.geom.dim[0];
-    //     Gl_set_round_corners(target_mesh.gfx, 10);
+    //     target_mesh.mat.style.rcorners = target_mesh.geom.dim[0];
+    //     Gl_set_attr_round_corners(target_mesh.gfx, 10);
     // }
 
     if (slope < 1.) return true;
@@ -609,7 +610,7 @@ function Animation_scale_down_run(params) {
     const timer = params.function_slope.GetTimer();
 
 
-    const slope = Slope_function_logarithmic(timer, slope_constant);
+    const slope = Logarithmic_interpolation(timer, slope_constant);
 
     const val = ((1. - slope) * scale * 2);
     const sizex = target_mesh.geom.dim[0] * 2 + val;
@@ -621,8 +622,8 @@ function Animation_scale_down_run(params) {
     target_mesh.geom.SetWposXY(target_mesh.gfx, posx, posy);
 
     // if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
-    //     target_mesh.mat.style[0] = target_mesh.geom.dim[0];
-    //     Gl_set_round_corners(target_mesh.gfx, 10);
+    //     target_mesh.mat.style.rcorners = target_mesh.geom.dim[0];
+    //     Gl_set_attr_round_corners(target_mesh.gfx, 10);
     // }
 
 
@@ -664,13 +665,13 @@ export function TestWidgetsGeneric(createId = 1) {
 
     // Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
     // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
-
-
-    // Demo_page();
-
+    
+    Demo_page();
+    
     // Demo_chain_link();
-
+    
     // Game_snake();
+    // Debug_info_create_ui_mouse();
 
 
     // Test: Set Focused
@@ -977,104 +978,111 @@ export function TestWidgetsGeneric(createId = 1) {
 
     }
 
-    { // Demo Particles 
+    { // DEMOS
+    
+        { // Demo Particles 
+    
+            // Create_glow_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT)
+    
+            // Create_smoke_particles();
+    
+            // Create_comet_particles(_, _, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true);
+    
+        }
+    
+        { // Demos Physics
+    
+            // const total_height = Elastic_collisions(0, 0, ROOT_WIDGETS.CREATE_ROOT, false);
+    
+            // Sattelite_rotation([0, 100]);
+    
+        }
+    
+        { // Demos Widgets
+    
+            let y = 0;
+            const pad = 50;
+            /* section/rect move */
+            /* sections - hovering (no moving so that for android devices can hover on touch) */
+            // const sections = Demo_widgets_sections(_, [0, y]);
+            // y += sections.geom.dim[1]*2 + pad;
+    
+    
+            /* label - move - hover */
+            /* Button - click(with counter?) */
+            /* Switces */
+            /* Slider */
+            // const btn = Demo_widgets(_, [0, y]);
+            // y += btn.geom.dim[1]*2 + pad;
+    
+    
+            // /* scrolling */
+            // const scroller = Demo_widgets_scrolled_labels(_, [0, y]);
+            // y += scroller.geom.dim[1]*2 + pad;
+    
+    
+            // /* dropdown - move - hover */
+            // const dp = Demo_widgets_dropdown(_, [0, y], )
+            // y += dp.geom.dim[1]*2 + pad;
+    
+    
+            // /* Colorpicker */
+            // const colorpicker = Demo_widgets_colorpicker_demo_with_info(_, 0);
+    
+            // /* Coloring per vertex */
+    
+            // /* Resizable widgets */
+    
+    
+            // { // Create the button for going to the top
+    
+            //     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Up', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
+            //     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            //     btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    
+            //     btn.Bind(
+            //         (params) => {
+    
+            //             Callback_animations_create( // Scroll Up
+            //                 (params) => { // Run Animation
+    
+            //                     const unif_wpos = Screen_wpos_get_y();
+            //                     if (unif_wpos < 0) {
+    
+            //                         const ypos = unif_wpos/2;
+            //                         Screen_wpos_set_y(ypos);
+            //                         console.log('ypos', ypos, 'unif_wpos', unif_wpos)
+            //                         return true;
+            //                     }
+    
+            //                     return false;
+            //                 },
+            //                 () => { // Stop Animation
+            //                     return false;
+            //                 },
+            //             );
+            //         },
+            //         _, _, _,
+            //     );
+    
+    
+            //     btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+            //     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+            //     btn.Render()
+            //     Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
+    
+            //     btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
+    
+            //     Construct_listen_events_from_mesh_tree(btn)
+            //     Construct_listen_events_relations_from_mesh_tree(btn);
+    
+            // }
+    
+        }
 
-        // Create_glow_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT)
-
-        // Create_smoke_particles();
-
-        Create_comet_particles(_, _, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true);
-
-    }
-
-    { // Demos Physics
-
-        // const total_height = Elastic_collisions(0, 0, ROOT_WIDGETS.CREATE_ROOT, false);
-
-        // Sattelite_rotation([0, 100]);
-
-    }
-
-    { // Demos Widgets
-
-        let y = 0;
-        const pad = 50;
-        /* section/rect move */
-        /* sections - hovering (no moving so that for android devices can hover on touch) */
-        // const sections = Demo_widgets_sections(_, [0, y]);
-        // y += sections.geom.dim[1]*2 + pad;
-
-
-        /* label - move - hover */
-        /* Button - click(with counter?) */
-        /* Switces */
-        /* Slider */
-        // const btn = Demo_widgets(_, [0, y]);
-        // y += btn.geom.dim[1]*2 + pad;
-
-
-        // /* scrolling */
-        // const scroller = Demo_widgets_scrolled_labels(_, [0, y]);
-        // y += scroller.geom.dim[1]*2 + pad;
-
-
-        // /* dropdown - move - hover */
-        // const dp = Demo_widgets_dropdown(_, [0, y], )
-        // y += dp.geom.dim[1]*2 + pad;
-
-
-        // /* Colorpicker */
-        // const colorpicker = Demo_widgets_colorpicker_demo_with_info(_, 0);
-
-        // /* Coloring per vertex */
-
-        // /* Resizable widgets */
-
-
-        // { // Create the button for going to the top
-
-        //     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Up', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
-        //     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-        //     btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-        //     btn.Bind(
-        //         (params) => {
-
-        //             Callback_animations_create( // Scroll Up
-        //                 (params) => { // Run Animation
-
-        //                     const unif_wpos = Screen_wpos_get_y();
-        //                     if (unif_wpos < 0) {
-
-        //                         const ypos = unif_wpos/2;
-        //                         Screen_wpos_set_y(ypos);
-        //                         console.log('ypos', ypos, 'unif_wpos', unif_wpos)
-        //                         return true;
-        //                     }
-
-        //                     return false;
-        //                 },
-        //                 () => { // Stop Animation
-        //                     return false;
-        //                 },
-        //             );
-        //         },
-        //         _, _, _,
-        //     );
-
-
-        //     btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-        //     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-        //     btn.Render()
-        //     Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
-
-        //     btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
-
-        //     Construct_listen_events_from_mesh_tree(btn)
-        //     Construct_listen_events_relations_from_mesh_tree(btn);
-
-        // }
-
+        { // Demo Rotating Rectangles on mouse hover
+            // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT, true);
+        }
     }
 
     { // Coloring
@@ -1242,7 +1250,7 @@ function Test_hsv_color_sequence_from_integer_input() {
 // Create a right hand side panel
 function CreatePanel(is_root_widget = undefined) {
 
-    const style = [0, 10, 2]
+    const style = {rcorners:10, feather:2, border:0}
     const scrolled = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [30, 0], REDL[7], 'RightPanelScrolledSection', style, _, 1);
 
 
@@ -1806,7 +1814,7 @@ function CreateSlider(root_widget = ROOT_WIDGETS.CREATE_ROOT, x=0, y=0, initial_
     const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [x, y, 0] : [0, 0, 0]
     const slider = Create_widget_slider(root_widget, pos, [250, 10], _, _, name);
     slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, );
-    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+    slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
     slider.SetInitialValue(initial_val);
@@ -1907,7 +1915,7 @@ function CreateDropdown(pos = [0, 0, 0], root_widget = ROOT_WIDGETS.CREATE_ROOT)
 
     const pad = [10, 4];
     const margin = [5, 5];
-    const style = [10, 2, 2];
+    const style = {rcorners:10, feather:2, border:0};
     const dp = Create_widget_dropdown(root_widget, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, style, margin);
     dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
@@ -2452,7 +2460,7 @@ function CreateSceneMenuBar(items = null) {
 
     const pos = [0, 0, 0]
     const margin = [6, 6];
-    const style = [0, 8, 2];
+    const style = {rcorners:8, feather:2, border:0};
 
     const dim = [VIEWPORT.WIDTH / 2 - margin[0], 100];
 

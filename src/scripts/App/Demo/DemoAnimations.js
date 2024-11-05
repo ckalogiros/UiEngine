@@ -7,9 +7,9 @@ import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Vi
 import { BLACK, BLUEL, BLUER, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Get_fasma_color, GREEN, GREENL, GREY, ORANGEL, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Gl_set_angle, Gl_set_dim_xy, Gl_set_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Shader_attributes_print } from "../../Graphics/ShaderAttributes.js";
-import { Slope_function_logarithmic } from "../../Helpers/Math/MathFunction.js";
+import { Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 
 
 
@@ -528,7 +528,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
       params.function_slope.IncrementTimer();
       const timer = params.function_slope.GetTimer();
 
-      const slope = Slope_function_logarithmic(timer, slope_constant);
+      const slope = Logarithmic_interpolation(timer, slope_constant);
       const aaa = 1.;
       const size = mesh.geom.dim[0] + (slope * scale * aaa);
 
@@ -540,7 +540,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
       mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
 
       if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-         Gl_set_round_corners(mesh.gfx, mesh.mat.style[0]*(slope+1));
+         Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners*(slope+1));
       }
 
       if (slope < 1.) return true;
@@ -564,7 +564,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
       params.function_slope.IncrementTimer();
       const timer = params.function_slope.GetTimer();
 
-      const slope = Slope_function_logarithmic(timer, slope_constant);
+      const slope = Logarithmic_interpolation(timer, slope_constant);
       const aaa = 1.;
       const size = mesh.geom.dim[0] + ((1. - slope) * scale * aaa);
       mesh.geom.SetDimXY(mesh.gfx, size, size);
@@ -575,7 +575,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
       mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
 
       if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-         Gl_set_round_corners(mesh.gfx, mesh.mat.style[0]*((1.-slope)+1));
+         Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners*((1.-slope)+1));
       }
 
 
@@ -717,7 +717,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
       params.function_slope.IncrementTimer();
       const timer = params.function_slope.GetTimer();
 
-      const slope = Slope_function_logarithmic(timer, slope_constant);
+      const slope = Logarithmic_interpolation(timer, slope_constant);
 
       const rot = (slope * angle);
       // const rot = .786;
@@ -748,7 +748,7 @@ export function Demo_animations_with_slider_slope(x=0, y=0){
       params.function_slope.IncrementTimer();
       const timer = params.function_slope.GetTimer();
 
-      const slope = Slope_function_logarithmic(timer, slope_constant);
+      const slope = Logarithmic_interpolation(timer, slope_constant);
       
       const rot = ((1.-slope) * angle);
       

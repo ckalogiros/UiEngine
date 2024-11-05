@@ -5,6 +5,7 @@ import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
+import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { GREEN, GREY } from "../Material/Base/Colors.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
@@ -22,12 +23,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    color_active;
    pad; // int, not array for x-y pad
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = [15, 2, 0], is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = {rcorners:15, feather:2, border:0}, is_debug_mesh) {
 
       const ratio = .2;
       const pad = (_pad !== 0) ? _pad : size*ratio;
       const switch_dim = [size * 2, size]
-      style[0] = size;
+      style.rcorners = size;
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, switch_dim, col, _, style, _pad, 1, is_debug_mesh)
 
@@ -51,7 +52,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       // const switch_pos = [pad/2, pad/2, pos[2] + 1];
       const switch0 = Create_rect_mesh(_, switch_pos, [size-pad, size-pad], GREY[10], _, _, _, _, is_debug_mesh);
       this.AddChild(switch0);
-      switch0.SetStyle([size * (1-ratio), style[1], style[2]]);
+      switch0.SetStyle([size * (1-ratio), style.feather, style.border]);
       switch0.SetName('switch');
       switch0.state.mask &= ~MESH_STATE.ACTIVE;
       
@@ -455,6 +456,24 @@ export function Switch_simple_time_interval_callback(params){
       const idx = Time_intervals_create(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, Clbk, params.params);
       this_switch.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
    }
+}
+
+
+export function Switch_set_listeners_priority(switch1) {
+
+   const handle = switch1.children.buffer[0];
+
+   if(switch1.listeners!==null ) {
+
+      if(switch1.listeners.buffer[E.H]!==INT_NULL) Listeners_set_priority(E.H, switch1.listeners);
+      if(switch1.listeners.buffer[E.C]!==INT_NULL) Listeners_set_priority(E.C, switch1.listeners);
+   } 
+   // if(handle.listeners!==null ) {
+
+   //    if(handle.listeners.buffer[E.H]!==INT_NULL) Listeners_set_priority(E.H, handle.listeners);
+   //    if(handle.listeners.buffer[E.C]!==INT_NULL) Listeners_set_priority(E.C, handle.listeners);
+   // } 
+
 }
 
 

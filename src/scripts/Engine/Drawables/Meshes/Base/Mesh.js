@@ -2,7 +2,7 @@
 import { Timer_get_global_timer } from "../../../Timers/Timers.js";
 import { Time_intervals_destroy_byidx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
-import { Gl_rotate_z_2d, Gl_set_wpos_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_rotate_add_z_2d, Gl_rotate_y_2d, Gl_rotate_z_2d } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_change_child_event, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
@@ -115,10 +115,6 @@ export class Mesh {
     nameidx; // Index to Str buffer:
 
 
-    // Array: A way to render a larger area in order to have space for rendering effects. The mesh dim remains the initial one.
-    gfx_scale; // The logic is to pass scaled dimentions to the vertex buffer, while keeping meshes original dimentions, and scale down at the fragment shader.
-
-
     temp_align;
 
 
@@ -156,7 +152,6 @@ export class Mesh {
 
         this.type = MESH_TYPE.MESH;
         this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
-        // this.state = { mask: 0x0 }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
         this.gfx_pool_request = GFX_POOL_REQUESTS.ANY;
 
 
@@ -196,15 +191,13 @@ export class Mesh {
         this.styles = Styles_create();
         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]]; // TODO: do the same for the clamx too
 
-
-        this.gfx_scale = [1, 1];
-
-
-        this.menu_options_idx = INT_NULL;
-        this.menu_options = {
-            Clbk: null,
-            idx: INT_NULL,
+        // TODO: IMPLEMENT
+        this.properties = {
+            padd:{x:0, y:0},
+            margin:{x:0, y:0},
+            hover_margin:{x:0, y:0},
         };
+
 
         // IMIDIATELY: the .data is used only 3 times by DebugInfoUi.js. Same with .evtidx field. So maybe those 2 are separated to the DebugInfoUi.js file
         this.debug_info = {
@@ -537,6 +530,7 @@ export class Mesh {
 
 
     SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
+    SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
 
 
     SetStyle(style) { this.SetUpdateFrameBuffer(); this.mat.SetStyle(style); }
@@ -621,16 +615,9 @@ export class Mesh {
     }
 
 
-    SetAttrTime() {
-        if (this.sid.attr & SID.ATTR.TIME) {
-            this.geom.timer = Timer_get_global_timer();
-            alert('71143322110098 \n IMPLEMENT Gl_set_wpos_time()')
-            Gl_set_wpos_time(this.gfx, this.geom.timer);
-        }
-    }
-
-
     RotateZ(angle) { Gl_rotate_z_2d(this.gfx, this.geom.dim, angle); }
+    RotateAddZ(angle) { Gl_rotate_add_z_2d(this.gfx, this.geom.dim, angle); }
+    RotateY(angle) { Gl_rotate_y_2d(this.gfx, this.geom.dim, angle); }
 
 
     StylesGetMargin(axis = STYLES.AXIS.ALL) { return Styles_margin_get(axis, this.styles); }
@@ -697,21 +684,21 @@ export class Mesh {
                 this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
                 this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
                 this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
-                if (params !== null) this.mat.style[0] = params;
+                if (params !== null) this.mat.style.rcorners = params;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_FEATHER: {
                 this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.PASS.FEATHER;
                 this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
                 this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
-                if (params !== null) this.mat.style[1] = params;
+                if (params !== null) this.mat.style.feather = params;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_BORDER: {
                 this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.PASS.BORDER;
                 this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
                 this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
-                if (params !== null) this.mat.style[2] = params;
+                if (params !== null) this.mat.style.border = params;
                 break;
             }
 

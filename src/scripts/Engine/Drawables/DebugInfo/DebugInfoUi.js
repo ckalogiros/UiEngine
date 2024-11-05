@@ -1147,7 +1147,7 @@ function Debug_info_create_ui_performance_timers() {
 // Mouse Info
 /************************************************************************************************************************************************/
 
-function Debug_info_create_ui_mouse() {
+export function Debug_info_create_ui_mouse() {
 
 
    if (DEBUG_INFO.UI_MOUSE.IS_ON) {
@@ -1267,9 +1267,7 @@ export function Debug_info_create_ui_focused() {
 
 
    const fontsize = _font_size;
-   // const pad = [6,6];
-   // const style = [0,8,2];
-
+   
    const section = Create_widget_section(_, SECTION.HORIZONTAL, [10, 8], [0, 0, DEBUG_INFO.UI_FOCUSED.POS[2]], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui mouse info panel');
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -1597,7 +1595,6 @@ function Ui_focused_create_info_geom(mesh, zpos){
 
 function Ui_focused_create_info_mat(mesh, zpos){
 
-   // this.mat = {
    //    this.col = [0, 0, 0, 1];
    //    math.CopyArr4(this.col, col);
    //    this.defCol = [0, 0, 0, 0];
@@ -1620,7 +1617,7 @@ function Ui_focused_create_info_mat(mesh, zpos){
    
    const info_text = Create_widget_multi_text(_, `col:[${mesh.mat.col[0]}, ${mesh.mat.col[1]}, ${mesh.mat.col[2]}, ${mesh.mat.col[3]}]`, align, [0, 0, zpos], fontsize, WHITE, .5, extra_pad1, _, MESH_TYPE.DEBUG_MESH);
 
-   info_text.CreateNewText(`style:[${mesh.mat.style[0]}, ${mesh.mat.style[1]}, ${mesh.mat.style[2]}]`, fontsizedynamic, ORANGE_240_160_10, extra_pad2, .9);
+   info_text.CreateNewText(`style:[${mesh.mat.style.rcorners}, ${mesh.mat.style.feather}, ${mesh.mat.style.border}]`, fontsizedynamic, ORANGE_240_160_10, extra_pad2, .9);
    info_text.CreateNewText(`uv:[${mesh.mat.uv[0]}, ${mesh.mat.uv[1]}, ${mesh.mat.uv[2]}, ${mesh.mat.uv[3]}]`, fontsizedynamic, ORANGE_240_160_10, extra_pad2, .9);
    info_text.CreateNewText(`uvIdx:${mesh.mat.uvIdx}`, fontsizedynamic, ORANGE_240_160_10, extra_pad2, .9);
    info_text.CreateNewText(`texidx:${mesh.mat.textureid}`, fontsizedynamic, ORANGE_240_160_10, extra_pad2, .9);
@@ -2320,7 +2317,7 @@ export function Dbg_ui_reset_buffer_entries() {
 function Dbg_info_ui_create_ui(pos, name) {
 
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
-   const pad = [6, 6], style = [0, 3, 2], fontsize = 9.8;
+   const pad = [6, 6], style = {rcorners:3, feather:2, border:0}, fontsize = 9.8;
    // const pad = [6, 6], style = [0, 1, 0], fontsize = 9.8;
 
    pos[0] = 0;
@@ -2578,7 +2575,7 @@ function Dbg_ui_mesh_tree_create_entry(params) {
 
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
    const margin = [root_dp.StylesGetPad(STYLES.AXIS.X), root_dp.StylesGetPad(STYLES.AXIS.Y)];
-   const style = [0, 3, 1];
+   const style = {rcorners:3, feather:1, border:0};
    const zindex = root_dp.menu.geom.pos[2];
 
    
@@ -2679,7 +2676,7 @@ function TEMPORARY(mesh, parent, root_entry_dp){
    
       // const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
       // const margin = [root_dp.StylesGetPad(STYLES.AXIS.X), root_dp.StylesGetPad(STYLES.AXIS.Y)];
-      // const style = [0, 3, 1];
+      // const style = {rcorners:3, feather:1, border:0};
       // const zindex = root_dp.menu.geom.pos[2]
 
       // // flags.buffer[i] |= NOTIFICATION_TYPE.FLAGS.IS_INSERTED; // Set flag for current entry to 'INSERTED'
@@ -2889,7 +2886,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
 
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
    const margin = [root_dp.StylesGetPad(STYLES.AXIS.X), root_dp.StylesGetPad(STYLES.AXIS.Y)];
-   const style = [0, 3, 1];
+   const style = {rcorners:3, feather:1, border:0};
    const zindex = root_dp.menu.geom.pos[2]
 
    const len = new_entries.boundary; // Avoid infinite loop (Avoid creating info for self debug UI's)
@@ -3130,7 +3127,7 @@ function Dbg_ui_string_buffer_create_entry(params) {
 
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
    const margin = [root_dp.StylesGetPad(STYLES.AXIS.X), root_dp.StylesGetPad(STYLES.AXIS.Y)];
-   const style = [0, 3, 1];
+   const style = {rcorners:3, feather:1, border:0};
    const zindex = root_dp.menu.geom.pos[2]
 
    const len = new_entries.boundary; // Avoid infinite loop (Avoid creating info for dubug UI's)
@@ -3351,7 +3348,7 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
 
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
    const margin = [root_dp.StylesGetPad(STYLES.AXIS.X), root_dp.StylesGetPad(STYLES.AXIS.Y)];
-   const style = [0, 3, 1];
+   const style = {rcorners:3, feather:1, border:0};
    // const style = [0, 0, 0];
    const zindex = root_dp.menu.geom.pos[2]
 
@@ -3588,7 +3585,7 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
 
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
    const margin = [root_dp.StylesGetPad(STYLES.AXIS.X), root_dp.StylesGetPad(STYLES.AXIS.Y)];
-   const style = [0, 3, 1];
+   const style = {rcorners:3, feather:1, border:0};
    const zindex = root_dp.menu.geom.pos[2];
 
    const VERTEX_BUFFER_INFO = 0; // The index of the entries buffer that caries info from the vertex buffers Notification call
@@ -3776,7 +3773,7 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
 
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
    const margin = [root_dp.StylesGetPad(STYLES.AXIS.X), root_dp.StylesGetPad(STYLES.AXIS.Y)];
-   const style = [3, 3, 1];
+   const style = {rcorners:3, feather:3, border:1};
    const zindex = root_dp.menu.geom.pos[2]
 
    const len = new_entries.boundary; // Avoid infinite loop (Avoid creating info for dubug UI's)

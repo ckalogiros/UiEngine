@@ -12,7 +12,7 @@ import { Widget_Label } from './WidgetLabel.js';
 
 export class Widget_Button extends Widget_Label {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad = [20, 15], bold = .4, style = [6, 0, 2], font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad = [20, 15], bold = .4, style = {rcorners:6, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh)
       this.type |= MESH_TYPE.WIDGET_BUTTON;
@@ -157,7 +157,7 @@ export class Widget_Switch extends Widget_Button {
    // state_text;
    // evt_params;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize = 5, col = GREY[1], text_col = WHITE, pad = [fontsize, fontsize], bold, style = [6, 3, 2], font, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize = 5, col = GREY[1], text_col = WHITE, pad = [fontsize, fontsize], bold, style = {rcorners:6, feather:2, border:3}, font, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_off, _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh)
 

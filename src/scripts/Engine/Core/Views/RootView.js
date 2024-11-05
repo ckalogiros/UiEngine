@@ -963,7 +963,7 @@ export function Root_group_buffer_print_w1() {
                      // 'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
                      // 'state', mesh.state.mask,
                      'start', mesh.gfx.vb.starts.buffer[0],
-                     'upos', mesh.GetPosX(), mesh.GetPosY(),
+                     'realpos', mesh.GetPosX(), mesh.GetPosY(),
                      'pos', mesh.geom.pos,
                      // 'dim', mesh.geom.dim,
                      // 'rel pos', mesh.geom.pos, 

@@ -33,7 +33,7 @@ const count = 24*2;
 
 export function Demo_chain_link(x=0, y=0) {
 
-   const style = [size, 0, 1.8];
+   const style = {rcorners:size, feather:0, border:1.8};
    const color = WHITE;
    const tr = .9;
    

@@ -27,12 +27,9 @@ export function Set_mat4_collumn(mat, scalar, colidx){
 }
 
 export function Mult_arr3_scalar(arr, scalar){
-    return[
-        arr[0] * scalar,
-        arr[1] * scalar,
-        arr[2] * scalar,
-    ]
-
+    arr[0] *= scalar;
+    arr[1] *= scalar;
+    arr[2] *= scalar;
 }
 export function Mult_arr4_scalar2(arr, scalar){
     return[
@@ -315,6 +312,13 @@ export function Lerp2D( p0, p1, t ) {
 }
 
 
+
+export function Map(min, max, t) {
+    return min + (t * (max-min));
+}
+
+
+
 // http://en.wikipedia.org/wiki/Smoothstep
 export function Smoothstep( x, min, max ) {
 
@@ -383,7 +387,6 @@ export function Magnitude_2vectors(v1, v2){
     const x = v1[0]-v2[0];
     const y = v1[1]-v2[1];
     const length = Math.sqrt(( (x*x) + (y*y) ));
-    // console.log(length)
 
     return length;
 }
@@ -393,8 +396,6 @@ export function Magnitude_2vectors(v1, v2){
 
 export function Dot(vx1, vy1, vx2, vy2){
     return (vx1*vx2) + (vy1*vy2);
-    // const norm = Normalize_vec2(vx2, vy2)
-    // return (vx1*norm[0]) + (vy1*norm[1]);
 }
 
 
@@ -427,5 +428,6 @@ export function Fract(f) {
 export function Mod(a, b) {
     return a % b;
 }
+
 
 

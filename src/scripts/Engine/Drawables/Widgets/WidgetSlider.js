@@ -13,6 +13,7 @@ import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb
 import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_per_vb_meshidx_view_get_all_roots } from '../../Core/Views/RootView.js';
 import { Listeners_set_priority } from '../../Events/EventListeners.js';
+import { Mesh_create_style_from_values } from '../Operations/MeshHelperFunctions.js';
 
 
 
@@ -41,7 +42,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       this.type |= MESH_TYPE.WIDGET_SLIDER | MESH_TYPE.WIDGET_SLIDER_BAR | this.geom | this.mat;
 
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.SetStyle([2, .6, 0]);
+      this.SetStyle(Mesh_create_style_from_values(2, .6, 0));
 
 
       this.slider_val = 0;
@@ -50,7 +51,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
 
       // handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-      handle.SetStyle([Min(handle_dim[0], handle_dim[1]), 3., 4]);
+      handle.SetStyle(Mesh_create_style_from_values(Min(handle_dim[0], handle_dim[1]), 3., 4));
 
 
 
@@ -724,7 +725,6 @@ export function Slider_connect(slider, Clbk, clbk_params, call_immediately=true)
 
 
 
-
 // export class Widget_Slider_XX1 extends Rect {
 export class Widget_Slider_XX1 extends Rect_Mesh {
 
@@ -761,7 +761,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
 
-      this.SetStyle([6, 2, 0]);
+      this.SetStyle(Mesh_create_style_from_values(6, 2, 0));
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -772,7 +772,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       const bar_posx = 8;
       const bar = Create_widget_slider_simple(_, [bar_posx, dim[1] * 4, _pos[2] + 1], [bar_width, 2], GREY[8], hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
       // const bar = Create_widget_slider_simple(_, [0, dim[1] * 4, _pos[2] + 1], [dim[0], 2], GREY[8], hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
-      bar.SetStyle([2, .6, 0]);
+      bar.SetStyle(Mesh_create_style_from_values(2, .6, 0));
 
 
       /*****************************************************************************************************************/
@@ -1569,14 +1569,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
-
-   SetMenuOptionsClbk(ClbkFunction) {
-
-      const bar = this.children.buffer[this.bar_idx].children.buffer[0];
-      bar.menu_options.Clbk = ClbkFunction;
-   }
-
-
    SetPosZNoGfxUpdate(z) {
       this.geom.pos[2] = z;
 
@@ -1666,7 +1658,7 @@ export function Slider_set_listeners_priority(slider) {
 
    const bar = slider.children.buffer[slider.bar_idx];
 
-   Listeners_set_priority(E.C, bar.listeners);
+   if(bar.listeners!==null && bar.listeners.buffer[E.C]!==INT_NULL) Listeners_set_priority(E.C, bar.listeners);
 
 }
 

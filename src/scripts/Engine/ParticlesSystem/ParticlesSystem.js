@@ -14,6 +14,10 @@ import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/Mesh
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 
+/**
+ * // TODO: Implement correctly the fillOp functions
+ * // TODO: Implement the rotation,jiggle,etc, to be enabled exclusively by the user
+ */
 
 
 const speed = 4;
@@ -101,7 +105,7 @@ class Particle {
 
 class Emitter {
 
-   constructor(name, col, pos, dim, t_step = .1, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, textureId = INT_NULL) {
+   constructor(name, col, pos, dim, t_step = .1, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, textureId = INT_NULL, temp_has_rotation=false) {
 
       this.sid = 0x0;
       this.sceneidx = STATE.scene.active_idx;
@@ -130,6 +134,8 @@ class Emitter {
       this.gravity = gravity;
 
 
+
+
       this.UpdateGfxBuffersFn = null; // Function pointer to update the vertex buffer of the particle system
 
       // Set the cone of variation vector direction. Diagonals are -.5 and +.5 
@@ -155,7 +161,6 @@ class Emitter {
          fx: 0x0,
       };
 
-      // this.style = [Max(dim[0], dim[1]), 0, 1.5];
 
       const mat = (this.textureId === INT_NULL) ? new Material(col) : new Texture_Material(col, this.textureId);
       this.mat = mat;
@@ -173,7 +178,10 @@ class Emitter {
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       this.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-
+      /**
+       * // HACK Temporary implementation of enable rotations of particle system emitter
+       */
+      this.temp_has_rotation = temp_has_rotation;
 
    }
 
@@ -249,21 +257,21 @@ class Emitter {
             this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
             this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
-            if (params !== null) this.mat.style[0] = params;
+            if (params !== null) this.mat.style.rcorners = params;
             break;
         }
         case MESH_ENABLE.GFX.ATTR_FEATHER: {
             this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.PASS.FEATHER;
             this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
-            if (params !== null) this.mat.style[1] = params;
+            if (params !== null) this.mat.style.feather = params;
             break;
         }
         case MESH_ENABLE.GFX.ATTR_BORDER: {
             this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.PASS.BORDER;
             this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
-            if (params !== null) this.mat.style[2] = params;
+            if (params !== null) this.mat.style.border = params;
             break;
         }
 
@@ -303,22 +311,22 @@ class Emitter {
       //    case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
       //       this.sid.attr |= SID.ATTR.R_CORNERS | SID.ATTR.DIM2;
       //       this.sid.pass |= SID.PASS.R_CORNERS | SID.PASS.DIM2;
-      //       if (params) this.mat.style[0] = params;
-      //       else this.mat.style[0] = 0;
+      //       if (params) this.mat.style.rcorners = params;
+      //       else this.mat.style.rcorners = 0;
       //       break;
       //    }
       //    case MESH_ENABLE.GFX.ATTR_BORDER: {
       //       this.sid.attr |= SID.ATTR.BORDER | SID.ATTR.DIM2;
       //       this.sid.pass |= SID.PASS.BORDER | SID.PASS.DIM2;
-      //       if (params) this.mat.style[1] = params;
-      //       else this.mat.style[1] = 0;
+      //       if (params) this.mat.style.feather = params;
+      //       else this.mat.style.feather = 0;
       //       break;
       //    }
       //    case MESH_ENABLE.GFX.ATTR_FEATHER: {
       //       this.sid.attr |= SID.ATTR.FEATHER | SID.ATTR.DIM2;
       //       this.sid.pass |= SID.PASS.FEATHER | SID.PASS.DIM2;
-      //       if (params) this.mat.style[2] = params;
-      //       else this.mat.style[2] = 0;
+      //       if (params) this.mat.style.border = params;
+      //       else this.mat.style.border = 0;
       //       break;
       //    }
 
@@ -512,9 +520,9 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
 
 
 // TODO: pass an already created sid, for selecting from a gama of shader particles
-export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId) {
+export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId, temp_has_rotation) {
 
-   const emitter = new Emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId);
+   const emitter = new Emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId, temp_has_rotation);
 
    const idx = _emitters.Add(emitter);
 
@@ -718,11 +726,14 @@ export function Particle_system_update() {
                }
             }
 
-            let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
-               ? (emitter.life_time - (particle.time + .8) * .9) * .1
-               : (((particle.time + .8) * .9) * .1) - emitter.life_time;
-            if (rotspeed > 0) particle.angle -= rotspeed;
-            particle.rot = Rotation_z_get_2D_matrix(particle.angle);
+            if(emitter.temp_has_rotation){
+
+               let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
+                  ? (emitter.life_time - (particle.time + .8) * .9) * .1
+                  : (((particle.time + .8) * .9) * .1) - emitter.life_time;
+               if (rotspeed > 0) particle.angle -= rotspeed;
+               particle.rot = Rotation_z_get_2D_matrix(particle.angle);
+            }
 
 
             emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time, particle.dim, particle.rot, particle.uv);

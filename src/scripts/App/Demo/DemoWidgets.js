@@ -22,7 +22,7 @@ const l_pad = 10;
 const t_pad = 20;
 
 const text_sample_scroller = `\
-WIDGET SCROLLER
+WIDGET SCROLLER\
 `;
 const text_sample_sections = `\
 WIDGET: SECTIONS
@@ -31,8 +31,8 @@ kinds of widgets inside them, as children,
 in a tree like structure.
 Sections are able to auto-align their
 items in a simplistic algorithm on a
-horizontal-vertical manner.
-------------------------------------------`;
+horizontal-vertical manner.\
+`;
 const text_sample_dropdown = `\
 WIDGET: DROPDOWN MENU
 Dropdown menus also have auto-resize and
@@ -42,11 +42,10 @@ They also have the capability to re-organize
 based on other dropdown menus that are siblings.
 They don't need to be opened from scratch,
 because they are able to 'remember the state
-of any child dropdown. 
-
+of any child dropdown.\
 `;
 const text_sample_widgets = `\
-GENERIC WIDGETS
+GENERIC WIDGETS\
 `;
 const text_sample_colorpicker = `\
 WIDGET: COLOR-PICKER\
@@ -75,13 +74,14 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
       PURPLER[0], PURPLER[1], PURPLER[2], PURPLER[3], PURPLER[4], PURPLER[5], PURPLER[6], PURPLER[7], PURPLER[8],
    ];
    const fontsize = 1;
-   const style = [10, 0, 2];
+   const style = {rcorners:10, feather:2, border:0};
+
 
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [20, 20], [pos[0] + l_pad, pos[1] + t_pad * 2, 0], [0, scroller_height], TRANSPARENCY(GREY[3], .4), _, style);
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // section.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('Demo_widgets_scrolled_labels');
    
@@ -111,8 +111,8 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
       const label = Create_widget_label(_, `${i}`, _, [0, 0, 2], fontsize, TRANSPARENCY(GetRandomColor(), 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
       label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // label.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
-      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       label.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled_section.mesh_bufferidx);
       scrolled_section.AddItem(label);
       label.SetName(`${i}`);
@@ -202,7 +202,7 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
 
    const root_s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [pos[0] + l_pad, pos[1] + t_pad, 0], [100, 100], TRANSPARENCY(GREY[3], tr));
    root_s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   root_s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,);
+   root_s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    root_s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    root_s.SetName('Demo_widgets_sections');
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) root_s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -216,7 +216,7 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
    /** Create the info for the uuser */
    const info = Create_widget_label(_, text_sample_sections, _, [0, 0, 0], _, GREY[4], WHITE, [10, 10], _, _, TEXTURES.CONSOLAS_12px,);
    info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
+   info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    root_s.AddItem(info);
 
@@ -1056,19 +1056,19 @@ export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0
       const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
       s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER);
-      s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       s.SetName('Button panel');
       section.AddItem(s);
 
       const btn = Create_widget_button(_, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, BLUEL[7], WHITE, [5, 5], .5);
       btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,);
+      btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       s.AddItem(btn);
 
       const label = Create_widget_label(_, '000', _, _, _, GREY[2], GREENL[9],);
       label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       s.AddItem(label);
 
       const params = { counter: 0, }
@@ -1089,7 +1089,7 @@ export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0
       const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4),);
       s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       s.SetName('Switches panel');
       section.AddItem(s);
 
@@ -1097,7 +1097,7 @@ export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0
          const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[4], .4),);
          s1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+         s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
          s1.SetName('One Switch panel');
          s.AddItem(s1);
          const switch1 = Create_widget_switch_simple(_, [0, 0, 0], 18, YELLOWR[7], _, 3, _, );
@@ -1124,7 +1124,7 @@ export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0
          const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[4], .4),);
          s1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+         s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
          s1.SetName('One Switch panel');
          s.AddItem(s1);
          const switch1 = Create_widget_switch_simple(_, [0, 0, 0], 18, PURPLER[7], _, 3, _, );
@@ -1151,7 +1151,7 @@ export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0
          const s1 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[4], .4),);
          s1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+         s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
          s1.SetName('One Switch panel');
          s.AddItem(s1);
          const switch1 = Create_widget_switch_simple(_, [0, 0, 0], 18, BLUEL[7], _, 3, _, );
@@ -1185,20 +1185,20 @@ export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0
       const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
       s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       s.SetName('Slider panel');
       section.AddItem(s);
 
       const slider = Create_widget_slider(_, [0, 0, 1], [100, 10], TRANSPARENCY(GREY[2], .6), _, 'Test slider',);
       slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 2);
       slider.SetInitialValue(0);
       s.AddItem(slider);
 
       const label = Create_widget_label(_, 'Move slider', _, _, _, GREY[2], GREY[5],);
       label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS);
+      label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       s.AddItem(label);
 
       const clbk_params = { label: label, slider: slider };

@@ -41,24 +41,6 @@ import { Widget_Color_Picker } from "../Drawables/Widgets/WidgetColorPicker.js";
 const NOTIFICATIONS_ON = true;
 
 
-// export function Create_rect_mesh(pos, dim, col, num_faces, is_debug_mesh=0x0) {
-
-//    const _mesh_buffer = Mesh_buffer_get();
-//    // Create a new mesh_buffer element and add a new section mesh
-//    const mesh_bufferidx = _mesh_buffer.Add(new Rect(pos, dim, col, num_faces, is_debug_mesh));
-
-//    // Store the meshbuffer's index to the newly created mesh.
-//    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-
-//    // if(NOTIFICATIONS_ON && (_mesh_buffer.buffer[mesh_bufferidx].type & MESH_TYPE.DEBUG_MESH)===0) 
-//    if(NOTIFICATIONS_ON && !is_debug_mesh) 
-//       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
-
-
-//    return _mesh_buffer.buffer[mesh_bufferidx];
-// }
-
-
 export function Create_rect_mesh(ROOT_WIDGET_FLAGS=0x0, pos, dim, col, name, style, margin, num_faces, is_debug_mesh=0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();

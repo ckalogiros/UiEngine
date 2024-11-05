@@ -100,7 +100,7 @@ export class Widget_Dropdown extends Section {
 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col_menu = PURPLER[7], text_col = WHITE, 
-               btn_pad = [3, 3], bold = .6, font = TEXTURES.DEFAULT_FONT, fontsize, style = [5, 2, 2], pad = [10, 10], is_debug_mesh) {
+               btn_pad = [3, 3], bold = .6, font = TEXTURES.DEFAULT_FONT, fontsize, style = {rcorners:5, feather:2, border:2}, pad = [10, 10], is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, pad, pos, [10, 10], col1, _, style, _, _, is_debug_mesh);
 

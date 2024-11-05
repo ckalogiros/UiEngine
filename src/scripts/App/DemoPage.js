@@ -24,6 +24,7 @@ import { Create_elastic_collisions_controls, Elastic_collisions, Sattelite_rotat
 import { Demo_widgets, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_scrolled_labels, Demo_widgets_sections } from "./Demo/DemoWidgets.js";
 import { Game_snake } from "./Demo/Games/Snake/Snake.js";
 import { Slider_connect } from "../Engine/Drawables/Widgets/WidgetSlider.js";
+import { Board_rotations } from "./Demo/DemoBoardRotations.js";
 
 
 
@@ -46,8 +47,9 @@ const category_animations = {name:'Animations', id:bit<<=0x1};
 const subcategory_animations1 = {name:'Animations1', id:bit<<=0x1};
 const subcategory_animations2 = {name:'Animations2', id:bit<<=0x1}; // 2048
 
-const category_games = {name:'In Practise', id:bit<<=0x1};
+const category_in_practise = {name:'In Practise', id:bit<<=0x1};
 const subcategory_snake = {name:'Snake', id:bit<<=0x1};
+const subcategory_rotating_rects = {name:'Rotating Rectangles', id:bit<<=0x1};
 
 
 
@@ -88,7 +90,7 @@ function Bind_menu_button(btn, params, any_id, id){
 
 const glow_slider_values = new Float32Array([0.36, 1, 0.12, 0.2, .48, .59, .19, 0.08, 0.4, 0.05, 0.05, 0.55]);
 const comet_noise_slider_values = new Float32Array([0, 0, 0, .12]);
-const comet_glow_slider_values = new Float32Array([0, 1, 0.03, 0.2]);
+const comet_glow_slider_values = new Float32Array([0, 0, 0.08, 0.1]);
 
 
 
@@ -411,9 +413,25 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
       Demo_animations_with_slider_slope(0, total_height);
 
    }
-   else if (create_demo_id & (category_games.id|subcategory_snake.id)) { // Demos Physics - Snake
+   else if (create_demo_id & (category_in_practise.id|subcategory_snake.id)) { // Demos Physics - Snake
       
-      Game_snake(total_height);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_snake.id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
+
+      total_height += Game_snake(total_height);
+      total_height += 20;
+      
+      // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT);
+
+   }
+   else if (create_demo_id & (subcategory_rotating_rects.id)) { // Demos Physics - Snake
+      
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_rotating_rects.id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
+
+      Board_rotations(0, total_height, ROOT_WIDGETS.CREATE_ROOT);
+      
+      total_height += 20;
 
    }
 
@@ -779,14 +797,14 @@ function Create_menu_items_demos(params){
 
    /*******************************************************************************************/
    // Button 5
-   const button5 = Create_widget_button(_, category_games.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button5 = Create_widget_button(_, category_in_practise.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
    button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    button5.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    button5.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
    button5.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    menu_items_array.push(button5);
    
-   Bind_menu_button(button5, params, (category_games.id), category_games.id);
+   Bind_menu_button(button5, params, (category_in_practise.id), category_in_practise.id);
 
 
 
@@ -827,7 +845,7 @@ function Options_menu_callback(params){
    menu_panel.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0]/10);
-   menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   // menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    menu_panel.SetName('MenuOptionsPanel');
@@ -928,7 +946,7 @@ function Options_menu_callback(params){
       slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
       // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
       slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE ;
-      slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW ;
+      slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
 
 
       controls_section = slider_section;
@@ -1280,6 +1298,56 @@ function Create_menu_items_animations_demo(params, demo_id){
    item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    menu_items_array.push(item2_btn);
    Bind_menu_button(item2_btn, params, (subcategory_animations2.id), subcategory_animations2.id);
+
+
+
+
+
+
+
+   return menu_items_array;
+}
+
+
+
+function Create_menu_items_in_practise_demo(params, demo_id){
+
+   // if (params.menu_panel !== null) return;
+   
+   const menu_items_array = [];
+
+   /*************************************************************************************************/
+   // Menu Items
+
+   const feather = 2;
+   const rcorners = 8;
+   const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
+   const text_col = WHITE;
+
+   
+   
+   /*******************************************************************************************/
+   // Item 1 button
+   const c1 = (demo_id & subcategory_snake.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item1_btn = Create_widget_button(_, subcategory_snake.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
+   item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item1_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item1_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item1_btn);
+   Bind_menu_button(item1_btn, params, (category_in_practise.id|subcategory_snake.id), subcategory_snake.id);
+   
+   
+   /*******************************************************************************************/
+   // Item 2 button
+   const c2 = (demo_id & subcategory_rotating_rects.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item2_btn = Create_widget_button(_, subcategory_rotating_rects.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item2_btn);
+   Bind_menu_button(item2_btn, params, (subcategory_rotating_rects.id), subcategory_rotating_rects.id);
 
 
 

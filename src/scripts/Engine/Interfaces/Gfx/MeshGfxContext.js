@@ -409,8 +409,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          
          const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
          const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
-         // const IS_ROOT_WIDGET = Root_group_view_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx);
-         const IS_VB_ROOT = true;
+         const IS_ROOT_WIDGET = Root_group_view_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx);
+         const IS_VB_ROOT = IS_ROOT_WIDGET;
 
          // If the vertex buffer already exists and is reused from the pool
          // get the unif wpos that has already been created for this vb

@@ -64,7 +64,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    /****************************************************************************************************************/
    // Create Particles Particles Emitter
 
-   const emitter1_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .6, 1, 4, .98, .1, 4);
+   const emitter1_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .6, 1, 4, .98, .1, 4, );
    const emitter = Particles_get_particle_system(emitter1_idx);
    emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
 
@@ -629,7 +629,8 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       /****************************************************************************************************************/
       // Secondary particles
 
-      const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], 1, 1., 2, .989, 0, 2);
+      // const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .5, 1., 2, .989, 0, 8);
+      const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .5, 1., 1.8, .99, 0, 16);
       const glow_emitter = Particles_get_particle_system(glow_emitter_idx);
       glow_emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
 
@@ -818,6 +819,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
          controls_section.AddItem(ctrl);
       }
 
+      controls_section.MoveNoGfxUpdate(VIEWPORT.WIDTH-250, 400)
 
 
 
@@ -1030,7 +1032,7 @@ export function Create_comet_noise_contols(noise_particles_buffer, color = GREY[
    return contols_buffer;
 }
 /** For rendering the slider controls seperately from the ball tail particles */
-export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2], parameters=null, scale_down=.2) {
+export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2], parameters=null, scale_down=.1) {
 
 
    const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
@@ -1063,7 +1065,7 @@ export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2]
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
          contols_buffer.push(slider);
-         slider.SetInitialValue(parameters?parameters[0]:0);
+         slider.SetInitialValue(parameters?parameters[0]:0.04);
 
          slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -1085,7 +1087,7 @@ export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2]
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
          contols_buffer.push(slider);
-         slider.SetInitialValue(parameters?parameters[1]:1);
+         slider.SetInitialValue(parameters?parameters[1]:0);
 
          slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -1107,7 +1109,7 @@ export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2]
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
          contols_buffer.push(slider);
-         slider.SetInitialValue(parameters?parameters[2]:.03);
+         slider.SetInitialValue(parameters?parameters[2]:.08);
 
          slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -1190,9 +1192,9 @@ function Animate_comet(params) {
       ball.geom.pos[0] += x;
       ball.geom.pos[1] += y;
 
-      const pos = [ball.geom.pos[0], ball.geom.pos[1]];
-      tail_emitter.pos[0] = pos[0] + ball.geom.dim[0];
-      tail_emitter.pos[1] = pos[1] + ball.geom.dim[1];
+      const pos = [ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]];
+      tail_emitter.pos[0] = pos[0];
+      tail_emitter.pos[1] = pos[1];
 
 
       // Check boundaries
@@ -1234,8 +1236,8 @@ function Animate_comet(params) {
       Particle_system_emitt(particles_params);
       /*********************************************************************************************************/
       // Secondary Particles
-      glow_particles.pos[0] = pos[0] + ball.geom.dim[0];
-      glow_particles.pos[1] = pos[1] + ball.geom.dim[0];
+      glow_particles.pos[0] = pos[0];
+      glow_particles.pos[1] = pos[1];
 
       Particle_system_emitt({ params: { target_params: [glow_particles.idx], } });
    }
@@ -1283,7 +1285,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget=ROOT_WIDGETS.CR
    // Create Particle emitters
    // Emitter 1
    // const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', YELLOWR[9], [-90, y + 530, 0], dim, 1.5, 1, 2, .98, -.1, 3, TEXTURES.SMOKE_1);
-   const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', YELLOWR[9], [x, y, 0], dim, 1.5, 1, 2, .98, -.1, 3, TEXTURES.SMOKE_1);
+   const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', YELLOWR[9], [x, y, 0], dim, 1.5, 1, 2, .98, -.1, 3, TEXTURES.SMOKE_1, true);
    const emitter = Particles_get_particle_system(emitter_idx);
    emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
    emitter.speed = speed;

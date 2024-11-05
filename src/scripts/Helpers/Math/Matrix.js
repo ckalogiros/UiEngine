@@ -256,7 +256,6 @@ export function RotateZ(dim, angle) {
 
 	const c = Math.cos(angle);
 	const s = Math.sin(angle);
-	// const p = [dim[0]/2, dim[1]/2];
 	const p = [dim[0], dim[1]];
 	const r = [ c, -s, s, c, ];
 
@@ -298,28 +297,58 @@ export function RotateZ(dim, angle) {
 	];
  */
 export function RotateY(dim, angle) {
-alert('61544312 \nIMPLEMENT ME')
+
 	const c = Math.cos(angle);
 	const s = Math.sin(angle);
-	const p = [dim[0], dim[1]];
-	const r = [ c, s, -s, c, ];
+	const p = [dim[0], dim[1], 0]; // Adding a z-coordinate, set to 0 for a 2D shape in 3D
 
 	const newPos = [
-		-p[0]*r[0] + p[1]*r[2],
-		-p[0]*r[1] + p[1]*r[3],
-		
-		-p[0]*r[0] + -p[1]*r[2],
-		-p[0]*r[1] + -p[1]*r[3],
-		
-		p[0]*r[0] + p[1]*r[2],
-		p[0]*r[1] + p[1]*r[3],
-		
-		p[0]*r[0] + -p[1]*r[2],
-		p[0]*r[1] + -p[1]*r[3],
+		// Bottom-left vertex
+		p[0] * c + p[2] * s,
+		p[1],
+		-p[0] * s + p[2] * c,
+
+		// Bottom-right vertex
+		p[0] * c - p[2] * s,
+		p[1],
+		-p[0] * s - p[2] * c,
+
+		// Top-right vertex
+		p[0] * c + p[2] * s,
+		-p[1],
+		-p[0] * s + p[2] * c,
+
+		// Top-left vertex
+		p[0] * c - p[2] * s,
+		-p[1],
+		-p[0] * s - p[2] * c,
 	];
 
 	return newPos;
 };
+// export function RotateY(dim, angle) {
+
+// 	const c = Math.cos(angle);
+// 	const s = Math.sin(angle);
+// 	const p = [dim[0], dim[1]];
+// 	const r = [ c, -s, s, c, ];
+
+// 	const newPos = [
+// 		-p[0]*r[0] + p[1]*r[2],
+// 		-p[0]*r[1] + p[1]*r[3],
+		
+// 		-p[0]*r[0] + -p[1]*r[2],
+// 		-p[0]*r[1] + -p[1]*r[3],
+		
+// 		p[0]*r[0] + p[1]*r[2],
+// 		p[0]*r[1] + p[1]*r[3],
+		
+// 		p[0]*r[0] + -p[1]*r[2],
+// 		p[0]*r[1] + -p[1]*r[3],
+// 	];
+
+// 	return newPos;
+// };
 
 export function Matrix4x3_3x3Mult(m1, m2){
 

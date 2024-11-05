@@ -6,7 +6,6 @@ import { Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComp
 
 export function Ui_create_label_switch(name, fontsize, switch_size, switch_fn, callback_params, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex){
 
-   const style = [0, 4, 2];
    const feather = 2;
    const rcorners = 4;
 

@@ -313,7 +313,7 @@ export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, st
 //    }
 
 // }
-function Set_vertex_position_VPOS2(vb_data, start, stride, dimx, dimy, num_faces) {
+export function Set_vertex_position_VPOS2(vb_data, start, stride, dimx, dimy, num_faces) {
 
    let index = start;
 
@@ -338,17 +338,13 @@ function Set_vertex_position_VPOS2(vb_data, start, stride, dimx, dimy, num_faces
       index += stride;
       
       vb_data[index++] = r;
-      // vb_data[index++] = t-10;
       vb_data[index++] = t;
       index += stride;
       
       vb_data[index++] = r;
-      // vb_data[index++] = b+10;
       vb_data[index++] = b;
       index += stride;
 
-      // l = r+width*2;
-      // r = l+width*2;
       l = r+width;
       r = l+width;
       // t -= 20;
@@ -461,8 +457,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat
       index += V_POS_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
 
@@ -502,8 +498,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS_FEATHER(vb_data,
       index += V_TEX_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
 
@@ -537,8 +533,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TEX2(vb_data, geom
       index += V_POS_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       // TEXTURE COORDS
       index += V_TEX_COUNT;
@@ -746,9 +742,9 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_RCORNERS_FEATHER_BORDER(vb_dat
       index += V_POS_COUNT;
       
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
-      vb_data[index++] = mat.style[2];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
+      vb_data[index++] = mat.style.border;
 
       // TIME
       vb_data[index++] = geom.time;
@@ -789,8 +785,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER(vb_data, geom
       vb_data[index++] = geom.dim[1];
       
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
       
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
       
@@ -825,7 +821,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER(vb_data, geom, mat, start, 
       index += V_POS_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
 
@@ -858,9 +854,9 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_BORDER_GLOW_INTENS
       index += V_POS_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
-      vb_data[index++] = mat.style[2];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
+      vb_data[index++] = mat.style.border;
 
       // GLOW_INTENSITY
       vb_data[index++] = .0;
@@ -900,8 +896,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSIT
       vb_data[index++] = geom.dim[1];
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       // GLOW_INTENSITY
       vb_data[index++] = .0;
@@ -937,11 +933,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_GLOW_INTENSITY(vb_
       index += V_POS_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       // GLOW_INTENSITY
-      vb_data[index++] = mat.style[2]; // HACK: this attribute must have its own field variable in the mesh class
+      vb_data[index++] = mat.style.border; // HACK: this attribute must have its own field variable in the mesh class
 
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
 
@@ -978,8 +974,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_ANGLE(vb_data
       vb_data[index++] = geom.dim[1];
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       // ANGLE
       vb_data[index++] = 0
@@ -1019,8 +1015,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER(vb_data,
       vb_data[index++] = geom.dim[1];
       
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       // TIME
       vb_data[index++] = geom.time;
@@ -1060,8 +1056,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_TIME(vb_data,
       vb_data[index++] = geom.dim[1];
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       // TIME
       vb_data[index++] = geom.time;
@@ -1097,8 +1093,8 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TIME(vb_data, geom
       index += V_POS_COUNT;
       
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       // TIME
       vb_data[index++] = geom.time;
@@ -1158,8 +1154,8 @@ function FILL_VERTEX_BUFFER_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, sta
       index += V_POS_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
 
@@ -1205,8 +1201,8 @@ function FILL_VERTEX_BUFFER_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, nu
       index += V_POS_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
 
@@ -1281,8 +1277,8 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER(vb_data, geom, 
       index += V_POS_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
       k++;
@@ -1358,8 +1354,8 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, 
       index += V_POS_COUNT;
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
       k++;
@@ -1402,8 +1398,8 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER_ANGL
       vb_data[index++] = geom.dim[1];
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
       
       // ANGLE
       vb_data[index++] = 0;
@@ -1450,8 +1446,8 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER(vb_d
       vb_data[index++] = geom.dim[1];
 
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
       k++;
@@ -1496,8 +1492,8 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_DIM2_RCORNERS_FEATHER_ANGLE(vb_data,
       vb_data[index++] = geom.dim[1];
       
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
       
       // ΑΝΓΛΕ
       vb_data[index++] = 0;
@@ -1532,8 +1528,8 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_DIM2_RCORNERS_FEATHER(vb_data, geom,
       vb_data[index++] = geom.dim[1];
       
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride;
       
@@ -1561,8 +1557,8 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_RCORNERS_FEATHER(vb_data, geom, mat,
       vb_data[index++] = geom.pos[2];
       
       // STYLE
-      vb_data[index++] = mat.style[0];
-      vb_data[index++] = mat.style[1];
+      vb_data[index++] = mat.style.rcorners;
+      vb_data[index++] = mat.style.feather;
 
       attribs_count += stride;
       

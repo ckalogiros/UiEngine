@@ -52,12 +52,12 @@ export class Widget_Color_Picker extends Section {
    label_b;
    label_a;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin, pos, dim = [100, 100], col = GREY[1], name = 'Color Picker', style = [0, 10, 2], num_faces, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), margin, pos, dim = [100, 100], col = GREY[1], name = 'Color Picker', style = {rcorners:10, feather:2, border:0}, num_faces, is_debug_mesh) {
 
 
       const scale = .6;
       // const scale = 1.;
-      style[1] = 15
+      style.feather = 15
 
       if (col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, [margin[0] * scale, margin[1] * scale], pos, [dim[0] * scale, dim[1] * scale], col, name, style, num_faces, _, is_debug_mesh);
@@ -82,7 +82,7 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create panel to align further meshes
-      style[1] = 10;
+      style.feather = 10;
       
       const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10 * scale, 10 * scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
       panel.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
@@ -167,7 +167,7 @@ export class Widget_Color_Picker extends Section {
             panel2.AddItem(this.label_b);
          }
          {
-            const label = Create_widget_label(_, 'A', _, [0, 0, 3], fontsize, GREY[6], WHITE, label_pad, _, label_style);
+            const label = Create_widget_label(_, 'A', _, [0, 0, 3], fontsize, GREY[8], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);

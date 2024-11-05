@@ -39,11 +39,11 @@ vec4 Noise_procedural(float scale_down)
     float time  = v_time;
     float revT  = 1.-time; // Reverse time to be from 1 to 0
     
-    #ifndef UV_READY
+    // #ifndef UV_READY
       #define UV_READY 1
       uv = gl_FragCoord.xy;
       pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
-    #endif  
+    // #endif  
     
     vec2 uv2 = (gl_FragCoord.xy-(res*.5))/res;
     float res_ratio = res.y/res.x;
@@ -140,6 +140,7 @@ vec4 Noise_procedural(float scale_down)
     // return vec4(noise1);
     // return vec4(vec3(noise1), .0);
     return c;
+    // return RED;
 
 }
 `;

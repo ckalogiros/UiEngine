@@ -55,7 +55,6 @@ export class Geometry2D {
     AddDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_vpos_xy(gfx, x, y, num_faces); }
     AddDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_vpos_x( gfx, x, num_faces); }
     AddDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_vpos_y( gfx, y, num_faces); }
-    // SetDimPlusXY(gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_dim_plus_xy(gfx, x, y, num_faces); }
     SetDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_vpos_xy(gfx, x, y, num_faces); }
     SetDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_vpos_x( gfx, x, num_faces); }
     SetDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_vpos_y( gfx, y, num_faces); }

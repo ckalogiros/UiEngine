@@ -263,8 +263,6 @@ export function Mesh_unif_get_vb_root_wpos(root_posidx) {
 function Mesh_unif_get_vb_root_wpos_recursive(root_posidx) {
 
    const _this = _per_vb_mesh_unif_wpos.buffer[root_posidx];
-   if(_this === undefined || _this===null)
-      console.log()
    let pos = [_this.wpos[0], _this.wpos[1]];
 
    // If this relative position has a parent position, add it
@@ -598,6 +596,7 @@ export function Mesh_unif_add_vb_root_col(idx, rgba) {
 
 /*************************************************************************************************************/
 // Connect scrollbars unif_wpos with their scrolled section unif_wpos
+// Use: Move the scrollbar with the root mesh move (seperately), because the scrollbars aren't children of any root unif
 export function Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(root_posidx, scrollbar_posidx) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].scroll_bar = scrollbar_posidx;
 }
