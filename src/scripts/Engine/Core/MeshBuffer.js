@@ -51,7 +51,7 @@ export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.b
 export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
 
 if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === undefined)
-   console.log()
+   alert('441552413332')
 
    const hover_margin = _mesh_buffer.buffer[mesh_bufferidx].StylesGetHoverMargin();
    const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();

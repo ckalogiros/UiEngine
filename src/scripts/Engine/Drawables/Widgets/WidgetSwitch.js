@@ -7,12 +7,21 @@ import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
-import { GREEN, GREY } from "../Material/Base/Colors.js";
+import { COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, GREEN, GREY } from "../Material/Base/Colors.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_create_style_from_values } from "../Operations/MeshHelperFunctions.js";
 
 
-
+/**
+ * // TODO:
+ * There is an issue with rendering PER_VERTEX_COLOR.
+ * If it is the case that the color array is not set on widget switch creation,
+ * then the col and defCol are set to a simple color.
+ * The user calls 'EnableGfxAttributes' to enable the PER_VERTEX_COLOR, passint the new color array.
+ * But the default color remains a simple color.
+ * // FIXME
+ */
 
 
 // export class Widget_Switch_Simple extends Rect {
@@ -35,6 +44,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.color_active = [0, 0, 0, 0];
       CopyArr4(this.color_active, col2);
 
+
       this.mesh_bufferidx = mesh_bufferidx;
       this.isOn = 0x0;
       this.type |= MESH_TYPE.WIDGET_SWITCH;
@@ -46,14 +56,14 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+
       
       const switch_pos = [pad, pad, pos[2] + 1];
-      // const switch_pos = [pad/2, pad/2, pos[2] + 1];
       const switch0 = Create_rect_mesh(_, switch_pos, [size-pad, size-pad], GREY[10], _, _, _, _, is_debug_mesh);
       this.AddChild(switch0);
-      switch0.SetStyle([size * (1-ratio), style.feather, style.border]);
+      switch0.SetStyle(Mesh_create_style_from_values(size * (1-ratio), style.feather, style.border));
       switch0.SetName('switch');
+      switch0.mat.style.rcorners = size-pad;
       switch0.state.mask &= ~MESH_STATE.ACTIVE;
       
       this.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
@@ -160,11 +170,18 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 
-   EnableGfxAttributes(which, params=null){
+   EnableGfxAttributes(which, params=null, params2=null){
       
       super.EnableGfxAttributes(which, params);
-      if(which === MESH_ENABLE.GFX.ATTR_R_CORNERS) params = this.children.buffer[0].geom.dim[1];
-      this.children.buffer[0].EnableGfxAttributes(which, params);
+      
+      // HACK: We must chnge the switch's color_active color to a PER_VERTEX_COLOR, ONLY if the user hasn't pass a PER_VERTEX_COLOR in the switch creation
+      // if(!(this.color_active[0] instanceof Float32Array))
+      // this.color_active = COLOR_GRADIENT_HORIZONTAL(GREEN[3], GREEN[1]);
+      // this.color_active = COLOR_GRADIENT_VERTICAL(GREEN[4], GREEN[2]);
+      
+      if(which === MESH_ENABLE.GFX.ATTR_R_CORNERS) params2 = this.children.buffer[0].geom.dim[1];
+
+      this.children.buffer[0].EnableGfxAttributes(which, params2);
    }
 
 

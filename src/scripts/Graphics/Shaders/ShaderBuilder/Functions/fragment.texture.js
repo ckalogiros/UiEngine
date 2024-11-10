@@ -106,21 +106,12 @@ export const frag_tex = `
   vec4 texel = texture( u_sampler0, v_tex_coord);
   
   color *= texel;
-  color.rgb *= color.a;
-
-  float distance = max(texture(u_sampler0, v_tex_coord).r, max(texture(u_sampler0, v_tex_coord).g, texture(u_sampler0, v_tex_coord).b));
-  float pixelDist = 1. - distance;
-  // float alpha = 1. - smoothstep(0., 1., pixelDist);
-  // color.a *= alpha;
+  color.rgb *= color.a; // Include alpha from user input color
   
-  float alpha = smoothstep(0.5 - 0.1, 0.5 + 0.1, distance);
-  // color.a *= alpha;
+  float distance = max(texture(u_sampler0, v_tex_coord).r, max(texture(u_sampler0, v_tex_coord).g, texture(u_sampler0, v_tex_coord).b));
+  
   // Remove all black color and render only the colored texture
   color.a *= distance;
-  // // color.rgb *= color.a+.5;
-  
-  // if(distance < .1) color.rgb += .1;
-  // color = RED;
-  // color = vec4(uv.x);
+  // color.a = distance;
 
   `;

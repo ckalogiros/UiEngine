@@ -1419,8 +1419,11 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER(vb_d
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   const len = num_faces * verts_per_rect;
+   let len = num_faces * verts_per_rect;
    const col_len = mat.col.length-1;
+
+   // if(index >= 780)
+   //    len = 14
 
    for (let i = 0; i < len; i++) {
    

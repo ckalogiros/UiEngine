@@ -116,10 +116,11 @@ export function FontGetFontDimRatio(font_idx) {
 
 
 
-export function Font_metrics_get_advancex(font_idx) { return _fontMetricsBuffer[font_idx].advancex; }
-export function Font_metrics_get_width(font_idx) { return _fontMetricsBuffer[font_idx].texWidth; }
+export function Font_metrics_get_face_advancex(font_idx) { return _fontMetricsBuffer[font_idx].advancex; }
+export function Font_metrics_get_texture_width(font_idx) { return _fontMetricsBuffer[font_idx].texWidth; }
+export function Font_metrics_get_texture_height(font_idx) { return _fontMetricsBuffer[font_idx].texHeight; }
 export function Font_metrics_get_char_width(font_idx, ch) { return _fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
-export function Font_metrics_get_height(font_idx) { return _fontMetricsBuffer[font_idx].texHeight; }
+export function Font_metrics_get_char_height(font_idx, ch) { return _fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].height; }
 export function Font_metrics_get_row_height(font_idx) { return _fontMetricsBuffer[font_idx].row_height; }
 export function Font_metrics_get_interpolated_x(font_idx) { return 1.0 / _fontMetricsBuffer[font_idx].texWidth; } // Transform to 0-1 coords 
 

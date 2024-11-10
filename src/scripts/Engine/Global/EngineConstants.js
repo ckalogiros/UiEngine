@@ -800,6 +800,7 @@ const TEST_MSDF_FONT_1 = 'msdf_a_char';
 const TEST_MTSDF_FONT_TEST_1024DIM = 'consola_mtsdf_test_1024';
 const TEXTURE_SMOKE1 = 'smoke';
 const TEXTURE_TEST = 'Coin_1_64x64';
+const TEXTURE_TEST_APPLE = 'apple1_64x73';
 
 
 
@@ -864,6 +865,12 @@ const TEXTURE_PATHS = [
 		imgType: 'png',
 		metrics: null, 
 	},
+	{
+		imgPath: 'textures',
+		imgName: TEXTURE_TEST_APPLE,
+		imgType: 'png',
+		metrics: null, 
+	},
 ];
 
 
@@ -894,6 +901,7 @@ const TEXTURES = {
 	// Image Textures
 	SMOKE_1:g_cnt++, // g_cnt must be the index of the element in 'TEXTURE_PATHS'. // TODO: Either create the 'TEXTURE_PATHS' element at g_cnt OR set the g_cnt equual to the index this texture represents
 	TEST:g_cnt++, 
+	TEST_APPLE:g_cnt++, 
 
 	COUNT: g_cnt,
 }
@@ -976,6 +984,16 @@ const ANIMATIONS = {
 			Y: cnt3 <<= 0x1,
 		},
 	},
+};
+
+
+_CNT = 0x1;
+const CLBK_ANIMATIONS = {
+
+	TEXT_TRANSLATE_X:_CNT,
+	TEXT_TRANSLATE_Y:_CNT<<=0x1,
+	TEXT_SQUEEZE_X:_CNT<<=0x1,
+	TEXT_SQUEEZE_Y:_CNT<<=0x1,
 };
 
 

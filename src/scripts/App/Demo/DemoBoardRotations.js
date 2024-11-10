@@ -1,14 +1,13 @@
 "use strict"
 
-import { Callback_animations_create } from "../../Engine/Animations/CallbackAnimations";
-import { Create_widget_section } from "../../Engine/Core/CreateWidget";
-import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView";
-import { GREY, PURPLEB } from "../../Engine/Drawables/Material/Base/Colors";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions";
-import { Gl_add_angle, Gl_set_angle, Gl_set_attr_round_corners, Gl_set_dim_xy } from "../../Graphics/Buffers/VertexBuffersOps";
-import { GetSequencedColor } from "../../Helpers/Helpers";
-import { Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions";
+import { Callback_animations_create } from "../../Engine/Animations/CallbackAnimations.js";
+import { Create_widget_section } from "../../Engine/Core/CreateWidget.js";
+import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
+import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
+import { GREY } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
+import { Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 
 
 
@@ -238,80 +237,3 @@ function Animation_rotate_back_stop(params) {
 }
 
 
-
-
-
-
-
-
-// function Animation_scale_up_run(params) {
-
-//    const mesh = params.mesh;
-//    const slope_constant = params.function_slope.GetSlope();
-//    const scale = params.function_slope.GetAngle();
-//    params.function_slope.IncrementTimer();
-//    const timer = params.function_slope.GetTimer();
-
-//    const slope = Logarithmic_interpolation(timer, slope_constant);
-//    const aaa = 1.;
-//    const size = mesh.geom.dim[0] + (slope * scale * aaa);
-
-//    mesh.geom.SetDimXY(mesh.gfx, size, size);
-//    Gl_set_dim_xy(mesh.gfx, size, size);
-
-//    const diffx = mesh.geom.pos[0] + (slope * scale)*aaa;
-//    const diffy = mesh.geom.pos[1] + (slope * scale)*aaa;
-//    mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
-
-//    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-//       Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners*(slope+1));
-//    }
-
-//    if (slope < 1.) return true;
-//    else return false
-
-// }
-
-// function Animation_scale_up_stop(params) {
-
-//    Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params, `Stop`)
-//    params.function_slope.SetTimer(0);
-
-//    return false;
-// }
-
-// function Animation_scale_down_run(params) {
-
-//    const mesh = params.mesh;
-//    const slope_constant = params.function_slope.GetSlope();
-//    const scale = params.function_slope.GetAngle();
-//    params.function_slope.IncrementTimer();
-//    const timer = params.function_slope.GetTimer();
-
-//    const slope = Logarithmic_interpolation(timer, slope_constant);
-//    const aaa = 1.;
-//    const size = mesh.geom.dim[0] + ((1. - slope) * scale * aaa);
-//    mesh.geom.SetDimXY(mesh.gfx, size, size);
-//    Gl_set_dim_xy(mesh.gfx, size, size);
-
-//    const diffx = mesh.geom.pos[0] + ((1. - slope) * scale)*aaa;
-//    const diffy = mesh.geom.pos[1] + ((1. - slope) * scale)*aaa;
-//    mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
-
-//    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-//       Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners*((1.-slope)+1));
-//    }
-
-
-
-//    if (slope < 1.) return true;
-//    else return false
-// }
-
-// function Animation_scale_down_stop(params) {
-
-//    Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params, `Stop`);
-//    params.function_slope.SetTimer(0);
-
-//    return false;
-// }

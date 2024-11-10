@@ -17,7 +17,7 @@ import { Scene_camera_scroll_add, Scene_camera_scroll_set } from "../Engine/Scen
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from "../Graphics/Buffers/VertexBuffers.js";
 import { Abs } from "../Helpers/Math/MathOperations.js";
 import { App_reinitialize, App_reset } from "./App.js";
-import { Demo_animations, Demo_animations_with_slider_slope } from "./Demo/DemoAnimations.js";
+import { Clbk_animations_text_create_contols, Demo_animations, Demo_animations_text, Demo_animations_with_slider_slope } from "./Demo/DemoAnimations.js";
 import { Demo_chain_link } from "./Demo/DemoChainLink.js";
 import { Create_comet_glow_contols, Create_comet_particles, Create_comet_noise_contols, Create_glow_particles, Create_glow_particles_controls, Create_smoke_particles, Create_smoke_particles_controls, } from "./Demo/DemoParticles.js";
 import { Create_elastic_collisions_controls, Elastic_collisions, Sattelite_rotation } from "./Demo/DemoPhysics.js";
@@ -46,6 +46,7 @@ const subcategory_velocity_verlet = {name:'Velocity Verlet', id:bit<<=0x1};
 const category_animations = {name:'Animations', id:bit<<=0x1};
 const subcategory_animations1 = {name:'Animations1', id:bit<<=0x1};
 const subcategory_animations2 = {name:'Animations2', id:bit<<=0x1}; // 2048
+const subcategory_animations_text = {name:'AnimationsText', id:bit<<=0x1}; // 2048
 
 const category_in_practise = {name:'In Practise', id:bit<<=0x1};
 const subcategory_snake = {name:'Snake', id:bit<<=0x1};
@@ -94,13 +95,13 @@ const comet_glow_slider_values = new Float32Array([0, 0, 0.08, 0.1]);
 
 
 
-export function Demo_page(create_demo_id = subcategory_animations1.id) {
-// export function Demo_page(create_demo_id = 0x0) {
+export function Demo_page(create_demo_id = category_widgets.id) {
 
    let comet_particles_struct = null;
    let glow_particles_struct = null;
    let smoke_particles_struct = null;
    let ellastic_collisions_struct = null;
+   let animations_text_struct = null;
 
 
       
@@ -215,7 +216,7 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
    // Create Demos Functions
 
    let total_height = 80; 
-   const info_ui = Debug_info_ui_static(_, 0, total_height);
+   const info_ui = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, total_height);
    total_height += info_ui.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
    /*****************************************************************************************************************************/
@@ -225,19 +226,19 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
       const pad = 50;
 
 
-      /* section/rect move */
-      const sections = Demo_widgets_sections(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity);
-      total_height += sections.geom.dim[1] * 2 + pad;
+      // /* section/rect move */
+      // const sections = Demo_widgets_sections(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity);
+      // total_height += sections.geom.dim[1] * 2 + pad;
 
 
-      /* Button Switces  Slider */
-      const widgets = Demo_widgets(_, [0, total_height,], slider_distance, slider_smoothness, slider_intensity);
-      total_height += widgets.geom.dim[1] * 2 + pad;
+      // /* Button Switces  Slider */
+      // const widgets = Demo_widgets(_, [0, total_height,], slider_distance, slider_smoothness, slider_intensity);
+      // total_height += widgets.geom.dim[1] * 2 + pad;
 
 
-      /* scrolling */
-      const scroller = Demo_widgets_scrolled_labels(_, [0, total_height], _, slider_distance, slider_smoothness, slider_intensity);
-      total_height += scroller.geom.dim[1] * 2 + pad;
+      // /* scrolling */
+      // const scroller = Demo_widgets_scrolled_labels(_, [0, total_height], _, slider_distance, slider_smoothness, slider_intensity);
+      // total_height += scroller.geom.dim[1] * 2 + pad;
       
       
       /* Colorpicker */
@@ -245,9 +246,9 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
       total_height += colorpicker.geom.dim[1] * 2 + pad;
 
 
-      /* dropdown - move - hover */
-      const dp = Demo_widgets_dropdown(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity)
-      total_height += dp.geom.dim[1] * 2 + pad;
+      // /* dropdown - move - hover */
+      // const dp = Demo_widgets_dropdown(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity)
+      // total_height += dp.geom.dim[1] * 2 + pad;
 
 
 
@@ -355,7 +356,7 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       glow_particles_struct  = Create_glow_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false);
-      glow_particles_struct.controls_section = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, glow_slider_values);
+      // glow_particles_struct.controls_section = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, glow_slider_values);
 
 
    }
@@ -413,6 +414,14 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
       Demo_animations_with_slider_slope(0, total_height);
 
    }
+   else if (create_demo_id & (subcategory_animations_text.id)) { // Demos Physics - Chain link
+      
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations_text.id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
+
+      animations_text_struct = Demo_animations_text(0, total_height, false);
+
+   }
    else if (create_demo_id & (category_in_practise.id|subcategory_snake.id)) { // Demos Physics - Snake
       
       const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_snake.id);
@@ -461,6 +470,7 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
       glow_particles_struct:glow_particles_struct,
       smoke_particles_struct:smoke_particles_struct,
       ellastic_collisions_struct:ellastic_collisions_struct,
+      animations_text_struct:animations_text_struct,
    }; 
    
    options_menu_btn.Bind(
@@ -1029,7 +1039,46 @@ function Options_menu_callback(params){
       controls_section = slider_section;
 
    }
+   if(demo_id & subcategory_animations_text.id)
+      {
    
+         // const controls  = params.params.smoke_particles_struct.controls_section;
+         const slope_params_pointer  = params.params.animations_text_struct.slope_params_pointer;
+         const animation_properties  = params.params.animations_text_struct.animation_properties;
+         
+         const u_wpos_flags = {
+            unif: SID.UNIF.ROOT_WPOS2,
+            pass: SID.PASS.WPOS3,
+         }
+         
+         const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection', );
+         slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+         slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+         slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+         
+         
+         
+         const scale_down = .2;
+         const glow_slider_values = params.params.mnemonics.glow_slider_values;
+         const animation_text_contols = Clbk_animations_text_create_contols(slope_params_pointer, animation_properties);
+         for(let i = 0; i < animation_text_contols.length; i++){
+            slider_section.AddItem(animation_text_contols[i]);
+         }
+   
+   
+   
+         menu_panel.AddItem(slider_section);
+   
+         slider_section.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
+         slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
+         // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
+         slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE ;
+         slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW ;
+   
+   
+         controls_section = slider_section;
+   
+      }
    
    /*******************************************************************************************/
    // Create close button
@@ -1291,13 +1340,25 @@ function Create_menu_items_animations_demo(params, demo_id){
    /*******************************************************************************************/
    // Item 1 button
    const c2 = (demo_id & subcategory_animations2.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
-   const item2_btn = Create_widget_button(_, subcategory_animations1.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   const item2_btn = Create_widget_button(_, subcategory_animations2.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
    item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    menu_items_array.push(item2_btn);
    Bind_menu_button(item2_btn, params, (subcategory_animations2.id), subcategory_animations2.id);
+   
+   
+   /*******************************************************************************************/
+   // Item 3 button
+   const c3 = (demo_id & subcategory_animations_text.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item3_btn = Create_widget_button(_, subcategory_animations_text.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
+   item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item3_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item3_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item3_btn);
+   Bind_menu_button(item3_btn, params, (subcategory_animations_text.id), subcategory_animations_text.id);
 
 
 

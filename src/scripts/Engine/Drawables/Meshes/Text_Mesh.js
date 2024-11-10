@@ -10,7 +10,7 @@ import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
-import { Font_get_uv_coords, Font_metrics_get_advancex, Font_metrics_get_char_width, Font_metrics_get_row_height } from "../../Loaders/Font/Font.js";
+import { Font_get_uv_coords, Font_metrics_get_face_advancex, Font_metrics_get_char_width, Font_metrics_get_row_height } from "../../Loaders/Font/Font.js";
 import { Gl_set_vpos_x, Gl_set_uv, Gl_set_wpos_x } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 
 
@@ -48,7 +48,7 @@ export class Text_Mesh extends Mesh {
       this.type |= MESH_TYPE.TEXT_MESH | is_debug_mesh;
       this.fontsize = fontsize;
 
-      const advancex = Font_metrics_get_advancex(mat.uvIdx)/2;
+      const advancex = Font_metrics_get_face_advancex(mat.uvIdx)/2;
       this.advancex = advancex;
       
       this.CalculateTextWidth()
@@ -454,7 +454,9 @@ p
 
 
    RenderText(text) {
-      if (!this.gfx) { console.error('98776\nTrying to Render Text before vertex buffer creation\ntext:', this.mat.char_buffer.buffer); return; }
+      if (!this.gfx) { 
+         console.error('98776\nTrying to Render Text before vertex buffer creation\ntext:', this.mat.char_buffer.buffer); return; 
+      }
 
       const store_start = this.gfx.vb.starts.buffer[0];
       const attribs_count = this.gfx.vb.counts.buffer[0];
@@ -462,7 +464,11 @@ p
       const c = this.mat.char_buffer.buffer;
       const space_char_uv = Font_get_uv_coords(this.mat.uvIdx, ' ');
 
-      let xpos = this.geom.pos[0];
+      let xpos = this.geom.pos[0]+this.geom.dim[0];
+      // let xpos = this.geom.pos[0];
+      // const width = Font_metrics_get_char_width(this.mat.uvIdx, c[0]);
+      // let xpos = this.geom.pos[0]+width;
+      // let xpos = this.geom.pos[0];
       
       
       // Update text faces
@@ -490,7 +496,7 @@ p
          
          Gl_set_uv(this.gfx, space_char_uv);
          
-         const width = Font_metrics_get_advancex(this.mat.uvIdx);
+         const width = Font_metrics_get_face_advancex(this.mat.uvIdx);
          Gl_set_vpos_x(this.gfx, width, 1);
          
          this.gfx.vb.starts.buffer[0] += attribs_count;

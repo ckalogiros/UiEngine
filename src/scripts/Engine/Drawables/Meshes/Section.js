@@ -838,6 +838,9 @@ export class Section extends Mesh {
 
    Calc_no_gfx_update(options, target_child_idx) {
 
+      if(!this.gfx) 
+         alert('6655119982 \n First GenGfxCtx() and then call Calc_no_gfx_update()')
+
       const section = this;
       if (options === _) options = section.options; // Here set as options: the passed options(de-activates any mesh self-set-options), or the mesh self-options
 

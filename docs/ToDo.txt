@@ -6,19 +6,19 @@
 +Android Phone
 +Instancing and gl_VertexID, gl_InstanceID, gl_DrawID: SEE https://www.khronos.org/opengl/wiki/Vertex_Shader/Defined_Inputs
 +Create colorpicker Widget
++Horizontal scrolling
++Dynamic Creation and Connection of sliders to utilities
++Pass font texture via Uniform Shared Block
 
 -Convert all mesh attribs to indexes in a vertex buffer ???
--Horizontal scrolling
 -Set draw STATIC/DYNAMIC for vertex buffers
 -Set draw STATIC/DYNAMIC for meshes through frame buffers
--Dynamic Creation and Connection of sliders to utilities
 -DragNdrop
--A quick type of drawing with out necessarely creating all the boiler plate of mesh creation. Create once and render. Destroy on event.
+-A quick type of drawing with out neccesserely creating all the boiler plate of mesh creation. Create once and render. Destroy on event.
 -Save 
 -Undo
 -Implement shaders with INT attributes: Color, wposition
 -3D
--Pass font texture via Uniform Shared Block
 
 -Depth Buffer
 -REDUCE THE ATTRIBUTES AND ALSO THE TYPE BITS
@@ -28,6 +28,7 @@
 
 -Lines, Connect widgets with Lines
 -Selection tool
+-Also we need to break up most of the core functionality, to take place in more than one time frame
 
 -Draw 
 
@@ -47,7 +48,6 @@
   it would be great if we Rerendered the buffer FROM the point of text update.
   That means the text meshes have a sequence or hierarchy
 !!!!!!!!! TODO:
-  Also we need to break up most of the core functionality, to take place in more than one time frame
 
 
 --------------------------------------------------- Nice Animation Color Effect!

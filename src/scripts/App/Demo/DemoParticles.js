@@ -20,12 +20,13 @@ import { Listeners_set_priority } from '../../Engine/Events/EventListeners.js';
 import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gen_gfx_ctx } from '../../Engine/ParticlesSystem/ParticlesSystem.js';
 import { Renderqueue_set_priority_by_vb } from '../../Engine/Renderers/Renderer/RenderQueue.js';
 import { Time_intervals_create } from '../../Engine/Timers/TimeIntervals.js';
-import { TimerGetGlobalTimerCycle } from '../../Engine/Timers/Timers.js';
+import { Timer_get_global_timer, TimerGetGlobalTimerCycle } from '../../Engine/Timers/Timers.js';
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from '../../Graphics/Buffers/VertexBuffers.js';
 import { Gl_set_rgba } from '../../Graphics/Buffers/VertexBuffersOps.js';
 import { GetRandomPos, GetSequencedColor } from '../../Helpers/Helpers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
 import { Demo_widgets_colorpicker } from './DemoWidgets.js';
+import { Linear_interpolation } from '../../Helpers/Math/MathFunctions.js';
 
 
 
@@ -200,7 +201,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
          null, {mnemonics:{transparency:0.5, hue:0.5, color:null},}, _,
       );
    
-      panel.Calc_no_gfx_update();
+      // panel.Calc_no_gfx_update();
    }
 
 
@@ -560,7 +561,7 @@ export function Create_glow_particles_controls(emitter, scale_down, color = GREY
 /**
  * // TODO: I think the for loop to initialize the u_noise_params its unecessary if the vertex buffer is the same for all balls
  */
-export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 - 10, height = VIEWPORT.HEIGHT / 2 - 150, num_balls = 1, root_widget = ROOT_WIDGETS.CREATE_ROOT, controls_create_but_not_render = true) { // Particles Bouncing Ball Tail
+export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 - 10, height = VIEWPORT.HEIGHT / 2 - 150, num_balls = 1, root_widget = ROOT_WIDGETS.CREATE_ROOT, controls_create_but_not_render = true, comet_size=30) { // Particles Bouncing Ball Tail
 
    let balls_buffer = [];
    let dirs_buffer = [];
@@ -588,8 +589,9 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
 
       /****************************************************************************************************************/
       // Balltail particles
-      const dim = [30, 30]
-      const pos = GetRandomPos([0, 0], [particles_panel.geom.dim[0], particles_panel.geom.dim[1]])
+      const dim = [comet_size, comet_size]
+      // const pos = GetRandomPos([0, 0], [particles_panel.geom.dim[0], particles_panel.geom.dim[1]])
+      const pos = [100, 100]
 
       const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, WHITE, 'Ball', [0, dim[0], 2]);
       ball.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -798,7 +800,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
          null, cp_params, _,
       );
    
-      panel.Calc_no_gfx_update();
+      // panel.Calc_no_gfx_update();
    }
 
 
@@ -873,6 +875,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    }
 
    Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_comet, params);
+   // Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_comet_perimetric, params);
 
 
    return {
@@ -916,16 +919,15 @@ export function Create_comet_noise_contols(noise_particles_buffer, color = GREY[
          const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, color, _, 'Speed');
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
-         slider.SetInitialValue(parameters?parameters[0]:0);
+         slider.SetInitialValue(parameters!==null?parameters[0]:0);
          contols_buffer.push(slider);
-
-
+         
+         
          slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-
+         
          Slider_connect(slider, (params, slider_val) => {
-
-            let min = .8; // The min value gives the prolonged emitter
+            
+            let min = .6; // The min value gives the prolonged emitter
             let max = 1.; // Calculate that the max value will be +1+min
             const rev_slider_val = 1 - slider_val;
             emitter.t_step = rev_slider_val + min + ((max - slider_val) * (rev_slider_val));
@@ -1185,8 +1187,8 @@ function Animate_comet(params) {
 
       // Move the ball
       const variation = TimerGetGlobalTimerCycle() * .3 + .5;
-      const x = 1 * dir[0] * tail_emitter.speed * variation;
-      const y = 1 * dir[1] * tail_emitter.speed * .5;
+      const x = dir[0] * tail_emitter.speed * variation;
+      const y = dir[1] * tail_emitter.speed * .5;
 
       ball.geom.AddWposXY(ball.gfx, x, y);
       ball.geom.pos[0] += x;
@@ -1240,6 +1242,93 @@ function Animate_comet(params) {
       glow_particles.pos[1] = pos[1];
 
       Particle_system_emitt({ params: { target_params: [glow_particles.idx], } });
+   }
+
+}
+function Animate_comet_perimetric(params) {
+
+
+   const particles_panel = params.params.particles_panel;
+
+
+   const top_bound = 0;
+   const bot_bound = particles_panel.geom.dim[1] * 2;
+   const left_bound = 0;
+   const right_bound = particles_panel.geom.dim[0] * 2;
+
+   const len = params.params.ball.length;
+   for (let i = 0; i < len; i++) {
+
+      const ball = params.params.ball[i];
+      const tail_emitter = params.params.noise_particles_buffer[i];
+      const tail_emitter_idx = tail_emitter.idx;
+      const dir = params.params.dir[i];
+
+      // Secondary Particles
+      const glow_particles = params.params.glow_particles[i];
+
+
+      // Move the ball
+      const variation = TimerGetGlobalTimerCycle() * .3 + .5;
+      // const x = 1 * dir[0] * tail_emitter.speed * variation;
+      // const x = (i+.3)*(dir[0] * tail_emitter.speed ) * Math.sin(Timer_get_global_timer() * 6);
+      const x = (dir[0] * tail_emitter.speed ) * Math.sin(Timer_get_global_timer() * 6);
+      const y = (dir[1] * tail_emitter.speed ) * Math.cos(Timer_get_global_timer() * 6);
+      // const y = Math.cos(1 * dir[1] * tail_emitter.speed )* 1;
+
+
+      ball.geom.AddWposXY(ball.gfx, x, y);
+      ball.geom.pos[0] += x;
+      ball.geom.pos[1] += y;
+
+      const pos = [ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]];
+      tail_emitter.pos[0] = pos[0];
+      tail_emitter.pos[1] = pos[1];
+
+
+      // // Check boundaries
+      // const ball_top = ball.geom.pos[1] + y;
+      // const ball_bot = ball.geom.pos[1] + ball.geom.dim[1] * 2 + y;
+      // const ball_left = ball.geom.pos[0] + x;
+      // const ball_right = ball.geom.pos[0] + ball.geom.dim[0] * 2 + x;
+
+
+
+      // if (ball_bot > bot_bound) {
+      //    dir[1] *= -1;
+      //    tail_emitter.SetDir(0, dir[1])
+      //    glow_particles.dir[1] = 1;
+      // }
+      // else if (ball_top < top_bound) {
+      //    dir[1] *= -1;
+      //    tail_emitter.SetDir(0, dir[1])
+      //    glow_particles.dir[1] = -1;
+      // }
+      // if (ball_right > right_bound) {
+      //    dir[0] *= -1;
+      //    tail_emitter.SetDir(dir[0], 0)
+      //    glow_particles.dir[0] = 1;
+      // }
+      // else if (ball_left < left_bound) {
+      //    dir[0] *= -1;
+      //    tail_emitter.SetDir(dir[0], 0)
+      //    glow_particles.dir[0] = -1;
+      // }
+
+
+
+      const particles_params = {
+         params: {
+            target_params: [tail_emitter_idx],
+         }
+      }
+      Particle_system_emitt(particles_params);
+      /*********************************************************************************************************/
+      // // Secondary Particles
+      // glow_particles.pos[0] = pos[0];
+      // glow_particles.pos[1] = pos[1];
+
+      // Particle_system_emitt({ params: { target_params: [glow_particles.idx], } });
    }
 
 }
@@ -1435,7 +1524,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget=ROOT_WIDGETS.CR
          null, {mnemonics:{transparency:0.5, hue:0.5, color:null},}, _,
       );
    
-      panel.Calc_no_gfx_update();
+      // panel.Calc_no_gfx_update();
    }
 
 

@@ -2,7 +2,7 @@
 
 import * as math from '../../../../Helpers/Math/MathOperations.js'
 import { Gl_set_rgb, Gl_set_rgba } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
-import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
+import { Texture_get_texture_byidx, Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 import { New_generic_char_buffer } from '../../../Core/Buffers.js';
 
 
@@ -87,18 +87,7 @@ export class Material {
       this.style.feather = style.feather;
       this.style.border = style.border;
    }
-   // SetStyle(rcornners, feather, border) {
-   //    const o = {
-   //       rcornners:rcornners,
-   //       feather:feather,
-   //       border:border,
-   //   };
-   //   return o;
-   // }
-   // SetStyle(style) {
-   //    if (!Array.isArray(style)) console.error('335188764');
-   //    math.CopyArr3(this.style, style);
-   // }
+
 
    SetCopyColor(col) {
 
@@ -199,13 +188,13 @@ export class Texture_Material extends Material {
       super(col);
 
       this.sid.attr |= SID.ATTR.TEX2; // Enable texture coordinates for the vertex shader
+      this.sid.pass |= SID.PASS.TEX2;
       this.type |= MESH_TYPE.TEXTURE_MATERIAL;
 
       const texture = Texture_load_texture_byid(textureid, TEXTURE_TYPE.TYPE_TEXTURE);
       this.texidx = texture.texidx;
       this.textureId = textureid;
       // NOTE: Simple texture does not have a uvmap
-
 
 
       { // Debug

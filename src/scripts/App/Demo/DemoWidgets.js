@@ -14,6 +14,7 @@ import { Vertex_buffer_group_create_scissorbox } from '../../Graphics/Buffers/Ve
 import { Gl_set_rgba } from '../../Graphics/Buffers/VertexBuffersOps.js';
 import { GetRandomColor, GetSequencedColor } from '../../Helpers/Helpers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
+import { Mesh_create_style_from_values } from '../../Engine/Drawables/Operations/MeshHelperFunctions.js';
 
 
 
@@ -1356,10 +1357,10 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
    if (c3 === null) c3 = c1;
    if (c4 === null) c4 = c2;
 
-   const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y, 0], [w, h], [c1, c2, c3, c4], _, [35, 0, 2]);
+   const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y, 0], [w, h], [c1, c2, c3, c4], _, Mesh_create_style_from_values(10, 2, 0));
    picker.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   picker.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 2, 2, 2, 2, 2, 2, 2, 2);
-   picker.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1, 1, 1, 1, 1, 1, 2, 2);
+   picker.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8, 8, 6, 4, 4, 4, 4, 4);
+   picker.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2, 2, 2, 2, 2, 2, 2, 2);
 
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
@@ -1379,6 +1380,7 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
       picker.GenGfxCtx();
 
       picker.Calc_no_gfx_update();
+      
       picker.Render();
       Root_group_activate_all_vbs_in_renderqueue(picker.root_bufferidx);
       picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)

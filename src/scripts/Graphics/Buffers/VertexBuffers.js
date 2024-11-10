@@ -942,8 +942,12 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         gfx.vb.starts.buffer[i] = start;
 
         // Reallocate vertex buffer if it has no more space
-        const verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
+        let verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
+        if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) 
+            verts_per_rect = 2
+        
         const meshSize = vb_info.attribs_info.count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for intanced geom. Better use the gfx.vb.counts 
+        
         if (vb_info.count + meshSize >= vb_info.size) vb_info.Realloc(meshSize);
 
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);

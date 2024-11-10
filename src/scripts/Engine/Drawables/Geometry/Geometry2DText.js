@@ -1,7 +1,7 @@
 "use strict";
 
 import { Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Font_metrics_get_advancex, Font_metrics_get_char_width, Font_metrics_get_interpolated_x, Font_metrics_get_row_height } from "../../Loaders/Font/Font.js";
+import { Font_metrics_get_face_advancex, Font_metrics_get_char_width, Font_metrics_get_row_height } from "../../Loaders/Font/Font.js";
 import { Geometry2D } from "./Base/Geometry.js";
 
 
@@ -18,7 +18,7 @@ export class Geometry2D_Text extends Geometry2D {
    constructor(pos=[0,0,0], fontSize=4, scale=[0,0], text='', textureid = INT_NULL, uv_mapidx) {
 
 
-      const advancex = Font_metrics_get_advancex(uv_mapidx)/2;
+      const advancex = Font_metrics_get_face_advancex(uv_mapidx)/2;
       const width = Font_metrics_get_char_width(uv_mapidx, text[0])/2;
       const font_height = Font_metrics_get_row_height(uv_mapidx)/2;
 

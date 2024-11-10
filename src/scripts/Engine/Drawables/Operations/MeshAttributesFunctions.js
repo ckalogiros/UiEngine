@@ -88,8 +88,6 @@ export function Set_hover_color_rgba(mesh) {
    else if (mesh.gfx.sid.attr & SID.ATTR.COL4) {
       math.Mult_arr4_scalar(mesh.mat.col, intensity);
       Gl_set_rgba(mesh.gfx, mesh.mat.col);
-      // math.Mult_arr4_scalar(mesh.color_active, intensity);
-      // Gl_set_rgba(mesh.gfx, mesh.color_active);
    }
    else if (mesh.gfx.sid.unif & SID.UNIF.COL4) { // Handle uniform color 
       math.Mult_arr4_scalar(mesh.mat.col, intensity);

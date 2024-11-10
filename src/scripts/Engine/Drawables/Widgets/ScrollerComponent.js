@@ -116,6 +116,7 @@ export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags=0x0, pa
    // Set positions after 'GenGfxCtx' so that the bar's
    /** Set bar pos */
    bar.geom.pos[0] = mesh.GetPosX()+mesh.geom.dim[0]*2
+   // bar.geom.pos[0] = mesh.GetPosX()
    bar.geom.pos[1] = mesh.GetPosY();
    
    /** Set handle pos */

@@ -230,19 +230,25 @@ const SID = {
 
         // Remove all Block Uniforms flags. Better to reuse a program than to create a duplicate only because some meshes dont use Blocked Uniforms. 
         // For individual uniforms we must include for the match, since a Program's shaders may be compiled before the creation of other meshes with the same sid except an extra uniform
-        const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
-        const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION)
+        const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION);
+        const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION);
+        
         // const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
         // const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
-        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX)
-        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX)
+        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
+        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
+
+        const  shad1 = sid1.shad;
+        const  shad2 = sid2.shad;
+        // const  shad1 = sid1.shad & ~(this.SHAD.INDEXED_PATT_CONNECTED_FACES_X);
+        // const  shad2 = sid2.shad & ~(this.SHAD.INDEXED_PATT_CONNECTED_FACES_X);
         /**
          * // TODO:
          * I have deactivated the 'gfx_group' check.
          * Also for the uniforms i exclude the projection matrix and resolution uniforms
          */
         if (
-            sid1.shad === sid2.shad &&
+            shad1 === shad2 &&
             attr1 === attr2 &&
             unif1 === unif2 && 
             sid1.pass === sid2.pass

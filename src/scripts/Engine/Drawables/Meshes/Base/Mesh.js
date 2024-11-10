@@ -611,8 +611,11 @@ export class Mesh {
 
     AddWposXY(x, y) {
         this.SetUpdateFrameBuffer();
+        this.geom.pos[0] = x-this.geom.dim[0];
+        this.geom.pos[1] = y-this.geom.dim[1];
         this.geom.AddWposXY(this.gfx, x, y, _, this.state.mask & MESH_STATE.ACTIVE); // console.log('Mesh AddWposXY')
     }
+    
 
 
     RotateZ(angle) { Gl_rotate_z_2d(this.gfx, this.geom.dim, angle); }
@@ -676,7 +679,10 @@ export class Mesh {
             case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
                 this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
                 this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
-                if (params !== null) this.mat.col = params;
+                if (params !== null) {
+                    this.mat.col = params;
+                    // this.mat.defCol = params;
+                }
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_R_CORNERS: {

@@ -257,7 +257,7 @@ export function Device_set_up() {
     // document.activeElement.style.cursor = url("https://img.icons8.com/doodle/48/000000/cancel-2.png"), auto;
 
     /** Default mouse pointers */
-    document.activeElement.style.cursor = "alias";
+    // document.activeElement.style.cursor = "alias";
     // document.activeElement.style.cursor = "all-scroll";
     // document.activeElement.style.cursor = "auto";
     // document.activeElement.style.cursor = "cell";
@@ -294,10 +294,9 @@ export function Device_set_up() {
     // document.activeElement.style.cursor = "zoom-out";
     
     /**Custom  mouse pointers */
-    // document.activeElement.style.cursor =  new URL("App/move.cur");
     // document.activeElement.style.cursor = 'url("../resources/icons/cursor/move.cur"), auto';
     // document.activeElement.style.cursor = 'url("../resources/icons/cursor/ubuntu/rinux_real_nswe-resize.cur"), auto';
-    document.activeElement.style.cursor = 'url("../resources/icons/cursor/small-windows/move.cur"), auto';
+    // document.activeElement.style.cursor = 'url("../resources/icons/cursor/small-windows/move.cur"), auto';
     
     // const url = new URL("../App/move.cur", document.baseURI);
     // const url = new URL("../App/move.cur", document.baseURI);

@@ -47,7 +47,9 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
       this.slider_val = 0;
 
-      const handle = Create_rect_mesh(_, [pos[0] - handle_dim[0] + dim[0], pos[1] - handle_dim[1] + dim[1], pos[2] + 1], handle_dim, handle_col, _, _, _, 1, is_debug_mesh);
+      const handle_color = (col[0] instanceof Float32Array) ? [handle_col, handle_col, handle_col, handle_col] : handle_col;
+
+      const handle = Create_rect_mesh(_, [pos[0] - handle_dim[0] + dim[0], pos[1] - handle_dim[1] + dim[1], pos[2] + 1], handle_dim, handle_color, _, _, _, 1, is_debug_mesh);
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
 
       // handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
@@ -732,12 +734,14 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    value_text_idx; // Slider's value text mesh index in children buffer
    bar_idx; // Slider's bar and handle mesh index in children buffer
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos = [0, 0, 0], dim = [120, 10], col = TRANSPARENCY(GREY[0], .6), hover_margin = [5, 16], name = 'SLIDER UNAMED', is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS=0x0, _pos = [0, 0, 0], dim = [120, 10], col = TRANSPARENCY(GREY[0], .6), hover_margin = [5, 16], name = 'SLIDER UNAMED', is_debug_mesh) {
 
       // Calculate the bar's and handle's horizontal pading.
       const ratio = dim[0] / dim[1];
       const pad = [dim[0] * 0.5, dim[1] / 2.8];
       pad[0] /= ratio;
+
+      const outside_pad = 8;
 
       // Calculate the font size of the sliders texts, base on the sliders dimentions
       const min_font_size = 7, max_font_size = 25;
@@ -761,6 +765,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
 
+      // this.SetStyle(Mesh_create_style_from_values(6, 2, 0));
       this.SetStyle(Mesh_create_style_from_values(6, 2, 0));
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -769,8 +774,8 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       /*****************************************************************************************************************/
       // Slider Bar: Bar is child of the slider mesh
       const bar_width = dim[0] - 8;
-      const bar_posx = 8;
-      const bar = Create_widget_slider_simple(_, [bar_posx, dim[1] * 4, _pos[2] + 1], [bar_width, 2], GREY[8], hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
+      const bar_color = (col[0] instanceof Float32Array) ? [GREY[8], GREY[8], GREY[8], GREY[8]] : GREY[8];
+      const bar = Create_widget_slider_simple(_, [outside_pad, dim[1] * 4, _pos[2] + 1], [bar_width, 2], bar_color, hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
       // const bar = Create_widget_slider_simple(_, [0, dim[1] * 4, _pos[2] + 1], [dim[0], 2], GREY[8], hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
       bar.SetStyle(Mesh_create_style_from_values(2, .6, 0));
 
@@ -795,12 +800,12 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       value_text.geom.pos[0] = this.geom.dim[0] * 2 - (value_text.GetMaxWidth() * 2);
-      value_text.geom.pos[1] = 4;
+      value_text.geom.pos[1] = outside_pad;
       value_text.geom.pos[2] = bar.geom.pos[2] + 1;
 
 
-      name_text.geom.pos[0] = 0;
-      name_text.geom.pos[1] = 4;
+      name_text.geom.pos[0] = outside_pad*2;
+      name_text.geom.pos[1] = outside_pad;
       name_text.geom.pos[2] = this.geom.pos[2] + 1;
       name_text.parent = this;
 
@@ -1055,7 +1060,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       const handle = bar.children.buffer[0];
       handle.EnableGfxAttributes(which, handle_params);
-
    }
 
 

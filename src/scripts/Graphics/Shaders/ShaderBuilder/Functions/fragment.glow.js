@@ -68,5 +68,6 @@ vec4 Glow(float alpha, float scale_down)
   // color = min(src_color.rgb, d*intensity); // WEIRD NICE EFFECT!!!
   
   return vec4(color, d);
+  // return RED*d;
 }
 `;

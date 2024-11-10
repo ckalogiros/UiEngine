@@ -430,6 +430,9 @@ export class Widget_Label extends Rect_Mesh {
 
 
     SetWposXY(x, y) {
+        // const xx = x-this.geom.dim[0];
+        // const yy = y-this.geom.dim[1];
+        // super.SetWposXY(xx, yy);
         super.SetWposXY(x, y);
         this.text_mesh.AddWposXY(x, y);
     }

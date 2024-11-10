@@ -152,6 +152,53 @@ vec4 Round_corners(float scale_down)
     src_color.a *= alpha;
     vec3 color = src_color.rgb * alpha * src_color.a;
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    float slider = .2;
+    float smoothness = 2.;
+    float power = 1.;
+    vec2 abs_uv = abs(uv);
+
+    float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
+    float strength = 2.2 * ((slider+1.)*.5);                        /* Creates a stronger shadow on full slider */
+    //     // float strength = 1.;
+        
+    //     // power *= 2.;
+    //     // power += 1.;
+        
+    float balance_dim_ratio = max(min_dim, 1.);
+    float round_preserv = rCorners.x * .5;
+    // float round_preserv = rCorners.x - (1.-(smoothness))*4.;
+
+    float depth = balance_dim_ratio * 1.; // Balance the shadow depth to the mesh dimentions
+    // depth *= balance_dim_ratio * ((smoothness+1.)*4.*smoothness); // Balance the shadow depth to the mesh dimentions
+    // // depth *= slider / rCorners.x * 4.;
+    // // depth *= slider * round_preserv * 1.;
+    // depth *= slider;
+
+
+    /* Shadow effect depth */
+    // float shad_len = length(max((abs_uv - dim) + rCorners.x + depth, 0.0))  - rCorners.x;
+    float shad_len = length(max((abs_uv - dim) + round_preserv + depth, 0.0))  - round_preserv;
+
+
+    float g = smoothstep(.0, min_dim * smoothness, shad_len); // Always returns interpolated value {0, 1}
+
+
+    // if(g > 0.5) return vec4(1., 0., 0., 1.);
+    // // if(shad_len > 10.) return vec4(1., 0., 0., 1.);
+
+
+    // strength = power*min(balance_dim_ratio*.1, 1.);
+    strength = power*blm_darken(balance_dim_ratio*.1, 1.);
+
+    color = mix( color, pow(color, vec3(strength)), g );
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
     // return vec4(src_color);
     return vec4(color, alpha * src_color.a);
     // return vec4(color, src_color.a);
@@ -232,18 +279,6 @@ vec4 Round_corners(float scale_down)
 //     vec2 localPos = abs(vpos*inv_rot);
 
     
-//     // pixel_apply_world_position_offset_x(localPos.x, v_wpos3_x); 
-//     // pixel_apply_reverse_y_coordinates(localPos.y, res.y); 
-//     // pixel_apply_world_position_offset_y(localPos.y, v_wpos3_y); 
-//     // localPos -= vdim;
-
-//     // float d = length(max((abs_uv - dim) + rCorners.x, 0.0)) - rCorners.x;
-//     // float d = length(max((abs_uv - abs(dim)) + rCorners.x, 0.0)) - rCorners.x;
-//     // float d = length((abs_uv - abs(vpos)) + rCorners.x) - rCorners.x;
-//     // float d = length((abs_uv - abs(dim)) + rCorners.x) - rCorners.x;
-//     // float d = length((vpos - vdim) + rCorners.x) - rCorners.x;
-//     // float d = length((vpos - vdim) + rCorners.x) - rCorners.x;
-    
 //     float d = length( max( (localPos - vdim) + rCorners.x, 0.0 )) - rCorners.x;
 //     // float d = length( max( (localPos - vpos) + rCorners.x, 0.0 )) - rCorners.x;
 //     // float d = length((localPos - vdim) + rCorners.x) - rCorners.x;
@@ -261,12 +296,6 @@ vec4 Round_corners(float scale_down)
 //     float alpha = src_color.a * wb;
 //     // vec3 color = src_color.rgb * alpha;
 //     vec3 color = src_color.rgb;
-
-//     // if(abs(dim.x) > 0.) return YELLOW;
-//     // if(d > 10.) return YELLOW;
-//     // if(d < 1.) return RED;
-
-//     return vec4(color, alpha);
 
 
 //     // float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
