@@ -106,6 +106,21 @@ export const BLACK = new Float32Array([0.04, 0.04, 0.04, 1.0]);
 export const CYAN = new Float32Array([0.0, 1.0, 1.0, 1.0]);
 export const MAGENTA = new Float32Array([1.0, 0.0, 1.0, 1.0]);
 
+// sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 )
+let scale = 2.5
+// export const RED_LUM_ADJ = new Float32Array([(1.0-0.329)*scale, 0.0, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const GREEN_LUM_ADJ = new Float32Array([0.0, (1.0-0.587)*scale, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const BLUE_LUM_ADJ = new Float32Array([0.0, 0.0, (1.0-0.114)*scale, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const RED_LUM_ADJ = new Float32Array([.5, 0.0, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const GREEN_LUM_ADJ = new Float32Array([0.0, .5, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const BLUE_LUM_ADJ = new Float32Array([0.0, 0.0, .5, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const BLUE_LUM_ADJ = new Float32Array([0.0, 0.0, Math.sqrt((1.0-0.114)*(1.0-0.114))*scale, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const RED_LUM_ADJ = new Float32Array([Math.sqrt((0.299)*(0.299)), 0.0, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const GREEN_LUM_ADJ = new Float32Array([0.0, Math.sqrt((0.587)*(0.587)), 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const BLUE_LUM_ADJ = new Float32Array([0.0, 0.0, Math.sqrt((0.114)*(0.114)), 1.0]); //  A full yellow color with human perception luminance adasted
+// export const YELLOW_LUM_ADJ = new Float32Array([Math.sqrt((1.0-0.299)*(1.0-0.299)), Math.sqrt((1.0-0.587)*(1.0-0.587)), 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
+// export const YELLOW_ = new Float32Array([.9, .9, 0.1, .9]);
+
 // export function CHECK_WHITE(){
 // 	if(WHITE[3] < 1)
 // 		console.log()
@@ -634,5 +649,11 @@ export function COLOR_GRADIENT_HORIZONTAL(color1, color2) {
 
 export function COLOR_GRADIENT_VERTICAL(color1, color2) {
 
-	return [color2, color1, color2, color1];
+	const ret = [
+		new Float32Array([ color1[0], color1[1], color1[2], color1[3] ]), 
+		new Float32Array([ color2[0], color2[1], color2[2], color2[3] ]), 
+		new Float32Array([ color1[0], color1[1], color1[2], color1[3] ]), 
+		new Float32Array([ color2[0], color2[1], color2[2], color2[3] ])
+	];
+	return ret;
 }

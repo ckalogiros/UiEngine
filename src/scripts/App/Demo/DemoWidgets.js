@@ -4,7 +4,7 @@ import { Create_widget_button, Create_widget_color_picker, Create_widget_dropdow
 import { View_build_group_from_root_mesh } from '../../Engine/Core/Views/MeshBufferViews.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from '../../Engine/Core/Views/RootView.js';
-import { BLUE, BLUEL, BLUER, GREEN, GREENL, GREENR, GREY, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, TRANSPARENT, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
+import { BLUE, BLUEL, BLUER, CYAN, GREEN, GREENL, GREENR, GREY, MAGENTA, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, TRANSPARENT, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Drawables/Operations/Recursions.js';
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
@@ -487,6 +487,52 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
       }
    }
 
+   const l1_s4 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(GREY[2], tr));
+   l1_s4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   l1_s4.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); l1_s4.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+   l1_s.AddItem(l1_s4);
+   {
+      const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, RED[9]);
+      r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+      l1_s4.AddItem(r);
+      const rg = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[9]);
+      rg.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      rg.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); rg.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+      l1_s4.AddItem(rg);
+      const g = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, GREEN[9]);
+      g.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+      l1_s4.AddItem(g);
+      const gb = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, CYAN);
+      gb.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      gb.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); gb.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+      l1_s4.AddItem(gb);
+      const b = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, BLUE[9]);
+      b.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      b.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); b.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+      l1_s4.AddItem(b);
+      const br = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, MAGENTA);
+      br.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      br.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); br.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+      l1_s4.AddItem(br);
+   }
+   const l1_s5 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(GREY[2], tr));
+   l1_s5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   l1_s5.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); l1_s5.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+   l1_s.AddItem(l1_s5);
+   {
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[0]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[1]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[2]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[3]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[4]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[5]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[6]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[7]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[8]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+      {const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[9]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   }
 
    // {
 
@@ -1380,7 +1426,7 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
       picker.GenGfxCtx();
 
       picker.Calc_no_gfx_update();
-      
+
       picker.Render();
       Root_group_activate_all_vbs_in_renderqueue(picker.root_bufferidx);
       picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)

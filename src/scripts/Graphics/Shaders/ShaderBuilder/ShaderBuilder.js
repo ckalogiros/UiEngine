@@ -867,9 +867,24 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       /********************************************************************************************************/
       // Color fragment
       (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   color.rgb *= color.a; ' : '',
-      '   frag_color = color;',
-      // (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   if(color.a < .6) frag_color.rgb *= color.a; ' : '',
-      // true ? '  frag_color.rgb *= color.a;' : '',
+
+      /**
+       * Human Perception Luminance Formulas
+       * 1. (0.2126*R + 0.7152*G + 0.0722*B)
+       * 2. (0.299*R + 0.587*G + 0.114*B)
+       * 3. sqrt( 0.241*R^2 + 0.691*G^2 + 0.068*B^2 ) 
+       *    sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 )
+       */
+
+      '   float make_up = 2.;',
+      // '   vec4 final_with_lum = vec4(0.701*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
+      '   vec4 final_with_lum = vec4(0.759*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
+      '   float mx = max(color.r,max(color.g,color.b));',
+      '   float mn = min(color.r,min(color.g,color.b));',
+      '   float balance = ( (mx-mn) / mx );',
+      '   frag_color = mix(color, final_with_lum, smoothstep(0., 1., balance));',
+      // '   frag_color = final_with_lum;',
+      // '   frag_color = color;',
 
 
 
@@ -878,7 +893,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
       /********************************************************************************************************/
       // HACK: prevent optimizer from removing the uniform u_scale2
-      ' ////////////////////////// HACK: prevent optimizer from removing the uniform u_scale2',
+      '    // HACK: prevent optimizer from removing the uniform u_scale2',
       // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', 
       (sid.unif & SID.UNIF.TIME) ? '   if(u_time == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '   if(u_generic_float == 0.) ;' : '',

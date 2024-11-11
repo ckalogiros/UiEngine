@@ -88,28 +88,41 @@ export function Mult_mat4_scalar(mat, scalar){
     mat[k][2] *=  scalar;
     mat[k][3] *=  scalar;
 }
+export function CopyMat4_arr4(dst, src){
+    dst[0][0] = src[0];
+    dst[0][1] = src[1];
+    dst[0][2] = src[2];
+    dst[0][3] = src[3];
+    dst[1][0] = src[0];
+    dst[1][1] = src[1];
+    dst[1][2] = src[2];
+    dst[1][3] = src[3];
+    dst[2][0] = src[0];
+    dst[2][1] = src[1];
+    dst[2][2] = src[2];
+    dst[2][3] = src[3];
+    dst[3][0] = src[0];
+    dst[3][1] = src[1];
+    dst[3][2] = src[2];
+    dst[3][3] = src[3];
+}
 export function CopyMat4(dst, src){
-    let k = 0;
-    dst[k][0] = src[k][0];
-    dst[k][1] = src[k][1];
-    dst[k][2] = src[k][2];
-    dst[k][3] = src[k][3];
-    k++;
-    dst[k][0] = src[k][0];
-    dst[k][1] = src[k][1];
-    dst[k][2] = src[k][2];
-    dst[k][3] = src[k][3];
-    k++;
-    dst[k][0] = src[k][0];
-    dst[k][1] = src[k][1];
-    dst[k][2] = src[k][2];
-    dst[k][3] = src[k][3];
-    k++;
-    dst[k][0] = src[k][0];
-    dst[k][1] = src[k][1];
-    dst[k][2] = src[k][2];
-    dst[k][3] = src[k][3];
-
+    dst[0][0] = src[0][0];
+    dst[0][1] = src[0][1];
+    dst[0][2] = src[0][2];
+    dst[0][3] = src[0][3];
+    dst[1][0] = src[1][0];
+    dst[1][1] = src[1][1];
+    dst[1][2] = src[1][2];
+    dst[1][3] = src[1][3];
+    dst[2][0] = src[2][0];
+    dst[2][1] = src[2][1];
+    dst[2][2] = src[2][2];
+    dst[2][3] = src[2][3];
+    dst[3][0] = src[3][0];
+    dst[3][1] = src[3][1];
+    dst[3][2] = src[3][2];
+    dst[3][3] = src[3][3];
 }
 export function CopyArr(dst, src){
     

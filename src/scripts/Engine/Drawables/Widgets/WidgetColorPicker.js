@@ -1,7 +1,7 @@
 "use strict"
 
 import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { CopyArr3, CopyArr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations.js";
+import { CopyArr3, CopyArr4, CopyMat4_arr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations.js";
 import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_widget_slider_simple } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
@@ -10,7 +10,7 @@ import { Root_group_set_in_focus, Root_group_per_vb_meshidx_view_get_all_roots }
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
-import { BLACK, BLUE, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREY, MAGENTA, RED, REDL, TRANSPARENT, WHITE, YELLOW } from "../Material/Base/Colors.js";
+import { BLACK, BLUE, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREY, MAGENTA, PURPLE, RED, REDL, TRANSPARENT, WHITE, YELLOW } from "../Material/Base/Colors.js";
 import { Section } from "../Meshes/Section.js";
 import { Mesh_create_style_from_values, Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 import { Slider_simple_connect, Slider_simple_set_value } from "./WidgetSlider.js";
@@ -100,7 +100,8 @@ export class Widget_Color_Picker extends Section {
       // Create the color picker panel
       const color_pick = Create_rect_mesh(_, [0, 0, 2], [150 * scale, 150 * scale], [WHITE, BLACK, YELLOW[9], BLACK,], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
       // color_pick.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [WHITE, BLACK, YELLOW[9], BLACK,]);
+      // color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [WHITE, BLACK, YELLOW[9], BLACK,]);
+      color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       // color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
       color_pick.state.mask &= ~MESH_STATE.ACTIVE;
@@ -110,9 +111,9 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create panel for the color presentation and info labels
-      const panel2 = Create_widget_section(_, SECTION.VERTICAL, [10 * scale, 10 * scale], [0, 0, 1], _, [BLACK, BLACK, BLACK, BLACK], 'Inner Panel 1', style, 1, _, is_debug_mesh);
+      const panel2 = Create_widget_section(_, SECTION.VERTICAL, [10 * scale, 10 * scale], [0, 0, 1], _, COLOR_GRADIENT_VERTICAL(GREY[2], GREY[4]), 'Inner Panel 1', style, 1, _, is_debug_mesh);
       // panel2.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[2], GREY[4]));
+      panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       panel2.options |= SECTION.RESIZE_PARENT;
       panel2.StylesSetMargin([10, 0]);
       panel2_idx = panel.AddItem(panel2)
@@ -122,9 +123,9 @@ export class Widget_Color_Picker extends Section {
       /******************************************************************************/
       // Create the color present mesh
       // const color_present_mesh = Create_rect_mesh(_, [20, 20, 2], [80*scale, 60*scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
-      const color_present_mesh = Create_rect_mesh(_, [0, 0, 2], [75 * scale, 45 * scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
+      const color_present_mesh = Create_rect_mesh(_, [0, 0, 2], [75 * scale, 45 * scale], [YELLOW[9], YELLOW[9], YELLOW[9], YELLOW[9]], 'Color Present', style, [0, 0], 1, is_debug_mesh);
       // color_present_mesh.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      color_present_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [YELLOW[9], YELLOW[9], YELLOW[9], YELLOW[9]]);
+      color_present_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       color_present_mesh.StylesSetMargin([0, 0]);
       
       this.color_pick_click_pos = [color_pick.geom.dim[0] * 2, 0];
@@ -140,54 +141,54 @@ export class Widget_Color_Picker extends Section {
       {
          const grad_grey = {_1:GREY[4], _2:GREY[2]};
          {
-            const label = Create_widget_label(_, 'R', _, [0, 0, 3], fontsize, REDL[5], WHITE, label_pad, _, label_style);
+            const label = Create_widget_label(_, 'R', _, [0, 0, 3], fontsize, [REDL[5], REDL[5], REDL[5], REDL[5]], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [REDL[5], REDL[5], REDL[5], REDL[5]]);
+            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             // label.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
             
-            this.label_r = Create_widget_label(_, 'R1111', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
-            this.label_r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2));
+            this.label_r = Create_widget_label(_, 'R1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style);
+            this.label_r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             this.label_r.temp_align |= SECTION.HORIZONTAL;
             this.label_r.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_r);
          }
          {
-            const label = Create_widget_label(_, 'G', _, [0, 0, 3], fontsize, GREEN[4], WHITE, label_pad, _, label_style);
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREEN[4], GREEN[4], GREEN[4], GREEN[4]]);
+            const label = Create_widget_label(_, 'G', _, [0, 0, 3], fontsize, [GREEN[4], GREEN[4], GREEN[4], GREEN[4]], WHITE, label_pad, _, label_style);
+            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             label.temp_align |= SECTION.VERTICAL;
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
             
-            this.label_g = Create_widget_label(_, 'G1111', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
-            this.label_g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2));
+            this.label_g = Create_widget_label(_, 'G1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style);
+            this.label_g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             this.label_g.temp_align |= SECTION.HORIZONTAL;
             this.label_g.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_g);
          }
          {
-            const label = Create_widget_label(_, 'B', _, [0, 0, 3], fontsize, BLUEL[6], WHITE, label_pad, _, label_style);
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [BLUEL[6], BLUEL[6], BLUEL[6], BLUEL[6]]);
+            const label = Create_widget_label(_, 'B', _, [0, 0, 3], fontsize, [BLUEL[6], BLUEL[6], BLUEL[6], BLUEL[6]], WHITE, label_pad, _, label_style);
+            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             label.temp_align |= SECTION.VERTICAL;
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
             
-            this.label_b = Create_widget_label(_, 'B1111', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
-            this.label_b.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2));
+            this.label_b = Create_widget_label(_, 'B1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style);
+            this.label_b.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             this.label_b.temp_align |= SECTION.HORIZONTAL;
             this.label_b.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_b);
          }
          {
-            const label = Create_widget_label(_, 'A', _, [0, 0, 3], fontsize, GREY[8], WHITE, label_pad, _, label_style);
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[8], GREY[8], GREY[8], GREY[8]]);
+            const label = Create_widget_label(_, 'A', _, [0, 0, 3], fontsize, [GREY[8], GREY[8], GREY[8], GREY[8]], WHITE, label_pad, _, label_style);
+            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             label.temp_align |= SECTION.VERTICAL;
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
             
-            this.label_a = Create_widget_label(_, 'A1111', _, [0, 0, 3], fontsize, GREY[2], WHITE, label_pad, _, label_style);
-            this.label_a.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2));
+            this.label_a = Create_widget_label(_, 'A1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style);
+            this.label_a.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             this.label_a.temp_align |= SECTION.HORIZONTAL;
             this.label_a.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_a);
@@ -210,7 +211,7 @@ export class Widget_Color_Picker extends Section {
       const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12 * scale, 150 * scale], TRANSPARENCY_BAR_COLOR, [0, 0], [16 * scale, 3 * scale], WHITE, 1);
       // slider_tran.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       // slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
-      slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, TRANSPARENCY_BAR_COLOR);
+      slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       slider_tran.StylesSetMargin([10, 0]);
       slider_tran.SetName('Slider Transparency');
 
@@ -225,20 +226,13 @@ export class Widget_Color_Picker extends Section {
 
       /******************************************************************************/
       // Create the hue picker mesh
-      // const HUE_COLOR = [
-      //    RED[9], RED[9],
-      //    YELLOW[9], YELLOW[9], // v1-v2
-      //    GREEN[9], GREEN[9],   // v3-v4
-      //    BLUE[9], BLUE[9],   // v5-v6
-      //    RED[9], RED[9],
-      // ];
       const HUE_COLOR = [
          RED[9], RED[9],
          YELLOW[9], YELLOW[9], // v1-v2
          GREEN[9], GREEN[9],   // v3-v4
          CYAN, CYAN,          // v3-v4
          BLUE[9], BLUE[9],   // v5-v6
-         MAGENTA, MAGENTA,   // v3-v4
+         PURPLE[9], PURPLE[9],   // v3-v4
          RED[9], RED[9],
       ];
 
@@ -248,7 +242,6 @@ export class Widget_Color_Picker extends Section {
 
       slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       slider_hue.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX);
-      // slider_hue.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider_hue.StylesSetMargin([0, 20]);
       slider_hue.SetName('Slider Hue');
       slider_hue_idx = this.AddItem(slider_hue);
@@ -406,23 +399,6 @@ export class Widget_Color_Picker extends Section {
 
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      // if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
-
-      // this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
-
-      // for (let i = 0; i <= this.children.boundary; i++) {
-      //    if (this.children.buffer[i]) this.children.buffer[i].GenGfxCtx(FLAGS, specific_vb_groupidx);
-      // }
-
-      /**********************************************************************************/
-      // Per mesh Implementation
-      const mesh = this;
-      const panel = mesh.children.buffer[0];
-      const panel2 = panel.children.buffer[panel2_idx];
-      const color_pick_mesh = panel.children.buffer[color_pick_idx];
-      const transp_slider_mesh = panel.children.buffer[slider_trans_idx];
-      const color_present_mesh = panel2.children.buffer[color_present_idx];
-
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
@@ -430,6 +406,7 @@ export class Widget_Color_Picker extends Section {
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
+
    }
 
 
@@ -689,14 +666,15 @@ export class Widget_Color_Picker extends Section {
       // TODO: We need to update only the top-right vertex color, NOT all vertices colors
       const percentagex = (xx / color_pick_mesh.geom.dim[0] / 2); // Calc the percentage, x coord
       const percentagey = 1 - (y / color_pick_mesh.geom.dim[1] / 2); // Calc the percentage, y coord
-      const hue = Mix_vec3_float32Array(WHITE, c, percentagex);
-      const intensity = Mix_vec3_float32Array(BLACK, hue, percentagey);
+      const hue = Mix_vec3_float32Array([1,1,1,1], c, percentagex);
+      const intensity = Mix_vec3_float32Array([0,0,0,1], hue, percentagey);
 
       const alpha = slider_tran.slider_val; // Get the alpha from the transparency slider
       // Contruct the final color
       const final_color = new Float32Array([intensity[0], intensity[1], intensity[2], alpha]);
-      CopyArr4(color_present_mesh.mat.col, final_color);
-      if (color_present_mesh.gfx) Gl_set_rgba(color_present_mesh.gfx, final_color, color_present_mesh.geom.num_faces);
+      CopyMat4_arr4(color_present_mesh.mat.col, final_color);
+      if (color_present_mesh.gfx) 
+         Gl_set_rgba(color_present_mesh.gfx, final_color, color_present_mesh.geom.num_faces);
 
 
 
@@ -709,11 +687,10 @@ export class Widget_Color_Picker extends Section {
       /*****************************************************************************************************/
       // Assign the color to the top vertices of the transparency slider
 
-      // CopyArr4(slider_tran.mat.col[1], c);
-      // CopyArr4(slider_tran.mat.col[3], c);
-      CopyArr4(slider_tran.mat.col[0], c);
-      CopyArr4(slider_tran.mat.col[2], c);
-      if (slider_tran.gfx) Gl_set_rgba_per_vertex(slider_tran.gfx, slider_tran.mat.col)
+      CopyArr4(slider_tran.mat.col[0], final_color);
+      CopyArr4(slider_tran.mat.col[2], final_color);
+      if (slider_tran.gfx) 
+         Gl_set_rgba_per_vertex(slider_tran.gfx, slider_tran.mat.col)
 
 
 
@@ -789,9 +766,9 @@ export class Widget_Color_Picker extends Section {
       /*****************************************************************************************************/
       // Update the labels
 
-      widget.label_r.text_mesh.RenderTextFromNumber(color_present_mesh.mat.col[0])
-      widget.label_g.text_mesh.RenderTextFromNumber(color_present_mesh.mat.col[1])
-      widget.label_b.text_mesh.RenderTextFromNumber(color_present_mesh.mat.col[2])
+      widget.label_r.text_mesh.RenderTextFromNumber(color_present_mesh.mat.col[0][0])
+      widget.label_g.text_mesh.RenderTextFromNumber(color_present_mesh.mat.col[0][1])
+      widget.label_b.text_mesh.RenderTextFromNumber(color_present_mesh.mat.col[0][2])
       widget.label_a.text_mesh.RenderTextFromNumber(slider_val)
 
 
@@ -807,9 +784,9 @@ export class Widget_Color_Picker extends Section {
 
          widget.temp_target_mesh_clbk(
             new Float32Array([
-               color_present_mesh.mat.col[0],
-               color_present_mesh.mat.col[1],
-               color_present_mesh.mat.col[2],
+               color_present_mesh.mat.col[0][0],
+               color_present_mesh.mat.col[0][1],
+               color_present_mesh.mat.col[0][2],
                slider_val,
             ],),
             widget.temp_target_mesh_params,
@@ -835,25 +812,24 @@ export class Widget_Color_Picker extends Section {
 
       const percentagex = (x / color_pick_mesh.geom.dim[0] / 2); // Calc the percentage 
       const percentagey = 1 - (y / color_pick_mesh.geom.dim[1] / 2); // Calc the percentage 
-      console.log('percentagex', percentagex, 'percentagey', percentagey)
-
-
+      // console.log('percentagex', percentagex, 'percentagey', percentagey)
+      
+      
       // Finally calculate the interpolated rgb values from the percenage of the click and the colors of all 4 vertices of the color pick mesh
       /**
        * The x axis controls the color hue. That is white on the left and the right's vertex color to the right
        * The y axis controls the color intensity. That is black on the bottom and full color to the top
-       */
-
-      const color = color_pick_mesh.mat.col[2]; // The 4-th is the v4 or the upper right vertex
-      const hue = Mix_vec4_float32Array(WHITE, color, percentagex);
-      const intensity = Mix_vec4_float32Array(BLACK, hue, percentagey);
-
-
-
-
-      /*****************************************************************************************************/
+      */
+     
+     const color = color_pick_mesh.mat.col[2]; // is the v4 or the upper right vertex
+     const hue = Mix_vec4_float32Array(WHITE, color, percentagex);
+     const intensity = Mix_vec4_float32Array(BLACK, hue, percentagey);
+     
+     
+     
+     /*****************************************************************************************************/
       // Assign the color to the top vertices of the transparency slider
-
+      
       const transp_slider = panel.children.buffer[slider_trans_idx];
       CopyArr3(transp_slider.mat.col[0], intensity);
       CopyArr3(transp_slider.mat.col[2], intensity);
@@ -869,8 +845,7 @@ export class Widget_Color_Picker extends Section {
       // Set the new color picked in the color present panel of the widget
 
       const color_present_mesh = panel2.children.buffer[color_present_idx];
-      // CopyArr4(color_present_mesh.mat.col[3], intensity); 
-      CopyArr4(color_present_mesh.mat.col, intensity);
+      CopyMat4_arr4(color_present_mesh.mat.col, intensity);
       Gl_set_rgba(color_present_mesh.gfx, intensity, color_present_mesh.geom.num_faces);
 
 

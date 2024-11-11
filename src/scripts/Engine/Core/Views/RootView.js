@@ -804,7 +804,7 @@ export function Root_group_set_render_queue_flags(root_bufferidx, flags) {
 
 
 
-// TODO: Implement faste->Get the widget root gfx that hass only the vb indexes of the root view
+// TODO: Implement fast-> Get the widget root gfx that only has the vb indexes of the root view
 export function Root_group_set_render_queue_priority(root_bufferidx) {
 
    const vb_mesh_roots = Root_group_per_vb_meshidx_view_get_all_roots(root_bufferidx);

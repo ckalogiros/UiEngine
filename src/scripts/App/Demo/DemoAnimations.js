@@ -89,7 +89,7 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       panel_scale.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[3], GREY[2]));
       panel.AddItem(panel_scale);
 
-      // xpos += pad2;
+      xpos += pad2;
 
       let s_height = 0;
       let inner_panel_width = 0;
@@ -98,11 +98,11 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
          const xxx = (size * 2 + scale * 2 + pad * 2) * i;
 
-         const l = Create_widget_label(_, `${slope}`, _, [xpos + xxx, ypos + pad2, 1], _, GREENL[4], _, [2, 3]);
+         const l = Create_widget_label(_, `${slope.toFixed(2)}`, _, [xpos + xxx, ypos + pad2, 1], _, COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), _, [2, 3]);
          l.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
          l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
-         l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREENL[4], GREENL[3]));
+         l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
          l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, panel_scale.gfx_ctx_parent, true);
          panel_scale.AddItem(l);
 
@@ -117,7 +117,6 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
          // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
          slope *= 2;
-         // slope = (1/(num_meshes-1)) * (i+1); 
       }
 
       panel_scale.geom.dim[0] = inner_panel_width + pad;
@@ -192,11 +191,11 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
          const xxx = (rot_mesh_size * 2 + pad * 2) * i;
 
-         const l = Create_widget_label(_, `${slope.toFixed(2)}`, _, [xpos + xxx, ypos + pad, 1], _, GREENL[4], _, [2, 3]);
+         const l = Create_widget_label(_, `${slope.toFixed(2)}`, _, [xpos + xxx, ypos + pad, 1], _, COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), _, [2, 3]);
          l.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
          l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
-         l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREENL[4], GREENL[3]));
+         l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
          l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, panel_rot.gfx_ctx_parent, true);
          panel_rot.AddItem(l);
 
@@ -626,18 +625,19 @@ function Animation_scale_up_run(params) {
    const timer = params.function_slope.GetTimer();
 
    const slope = Logarithmic_interpolation(timer, slope_constant);
-   const aaa = 1.;
-   const size = mesh.geom.dim[0] + (slope * scale * aaa);
+   const size = mesh.geom.dim[0] + (slope * scale);
 
    mesh.geom.SetDimXY(mesh.gfx, size, size);
    Gl_set_dim_xy(mesh.gfx, size, size);
 
-   const diffx = mesh.geom.pos[0] + (slope * scale) * aaa;
-   const diffy = mesh.geom.pos[1] + (slope * scale) * aaa;
-   mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
+   const diffx = mesh.geom.pos[0] + (slope * scale);
+   const diffy = mesh.geom.pos[1] + (slope * scale);
+   // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
 
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-      Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * (slope + 1));
+      // mesh.mat.style.rcorners = size;
+      // Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners);
+      // Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * (slope + 1));
    }
 
    if (slope < 1.) return true;
@@ -662,17 +662,16 @@ function Animation_scale_down_run(params) {
    const timer = params.function_slope.GetTimer();
 
    const slope = Logarithmic_interpolation(timer, slope_constant);
-   const aaa = 1.;
-   const size = mesh.geom.dim[0] + ((1. - slope) * scale * aaa);
+   const size = mesh.geom.dim[0] + ((1. - slope) * scale);
    mesh.geom.SetDimXY(mesh.gfx, size, size);
    Gl_set_dim_xy(mesh.gfx, size, size);
 
-   const diffx = mesh.geom.pos[0] + ((1. - slope) * scale) * aaa;
-   const diffy = mesh.geom.pos[1] + ((1. - slope) * scale) * aaa;
-   mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
+   // const diffx = mesh.geom.pos[0] + ((1. - slope) * scale);
+   // const diffy = mesh.geom.pos[1] + ((1. - slope) * scale);
+   // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
 
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-      Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * ((1. - slope) + 1));
+      // Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * ((1. - slope) + 1));
    }
 
 

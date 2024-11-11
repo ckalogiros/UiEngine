@@ -14,6 +14,7 @@ import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_
 import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../../../Graphics/Buffers/UniformBuffers.js";
 import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
 import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
+import { CopyArr4, CopyMat4 } from "../../../../Helpers/Math/MathOperations.js";
 
 
 
@@ -680,7 +681,17 @@ export class Mesh {
                 this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
                 this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
                 if (params !== null) {
-                    this.mat.col = params;
+                    if((params[0] instanceof Float32Array)=== false) alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
+                    if(this.mat.col[0] instanceof Float32Array) CopyMat4(this.mat.col, params);
+                    else {
+                        this.mat.col = params;
+                        // this.mat.col = new Float32Array([
+                        //     new Float32Array(params[0]),
+                        //     new Float32Array(params[1]),
+                        //     new Float32Array(params[2]),
+                        //     new Float32Array(params[3]),
+                        // ]);
+                    }
                     // this.mat.defCol = params;
                 }
                 break;

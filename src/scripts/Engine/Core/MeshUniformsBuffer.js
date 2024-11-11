@@ -150,7 +150,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
 
 export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, 
-                                                progidx, vb_groupidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT) {
+                                                progidx, vb_groupidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT, IS_VB_USED) {
    // TODO: check NULL object
 
 
@@ -169,7 +169,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    }
 
    
-   // if (mesh_parent !== null){
+   // Set the parent pos from which to draw this vb unif position (if this vb is not an root unif position)
    if (mesh_parent !== null && vb_groupidx !== mesh_parent.root_posidx) {
          
       if(vb_groupidx === mesh_parent.gfx.vb.groupidx && IS_VB_ROOT) {
@@ -196,7 +196,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    // If it is the case the vertex buffer is not created but is re-used, then we need to re-initialize the unif_wpos 
    const unif_wpos = _per_vb_mesh_unif_wpos.buffer[vb_groupidx];
 
-   if(IS_VB_ROOT){
+   if(IS_VB_ROOT || IS_VB_USED){
 
       unif_wpos.wpos[0] = wpos[0];
       unif_wpos.wpos[1] = wpos[1];
@@ -206,8 +206,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
       unif_wpos.has_absolute_pos = HAS_ABSOLUTE_POS;
       unif_wpos.sticky_pos = HAS_STICKY_POS;
       unif_wpos.scroll_bar = INT_NULL;
-      if(unif_wpos.scroll_bar!==INT_NULL)
-         console.log()
+
    }
 
 

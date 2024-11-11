@@ -56,7 +56,6 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 
         const type = BUFFER_TYPE.FLOAT32;
 
-
         // Create vertex buffer data
         const vb_buffer = Typed_array_create_from_type(type, size);
         const vbo = gfxCtx.gl.createBuffer();
@@ -260,11 +259,12 @@ class Vertex_Buffer_Info {
     }
 
 
-    // TODOD: This must be moved to VertexBufferInfo class
+    // TODO: This must be moved to VertexBufferInfo class
     // EFFICIENCY: Can pass an aproximation of all the meshes count (extra_size) from the root caller where the widget is constructed
     Realloc(extra_size = 0) {
 
-        this.size = this.#CalculateMemoryPaddedSize(this.size, extra_size);
+        // this.size = this.#CalculateMemoryPaddedSize(this.size, extra_size);
+        this.size = this.#CalculateMemoryPaddedSize(this.count, extra_size);
         const new_data = Typed_array_create_from_type(this.type, this.size)
 
         const old_data = _vertex_buffers_data.buffer[this.vbidx];
@@ -296,7 +296,7 @@ class Vertex_Buffer_Info {
             new_size += stride;
         }
 
-        if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
+        // if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
 
         new_size += stride; // Make it greater than the target_size
         return new_size;
@@ -943,10 +943,15 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
 
         // Reallocate vertex buffer if it has no more space
         let verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
-        if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) 
-            verts_per_rect = 2
+        let meshSize = 0;
+        if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
+            verts_per_rect = 2;
+        }
+        if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
+            meshSize = vb_info.attribs_info.count * ((verts_per_rect * num_faces) + 2); // BUG: Mesh attrib size is not for intanced geom. Better use the gfx.vb.counts 
+        }
+        else meshSize = vb_info.attribs_info.count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for intanced geom. Better use the gfx.vb.counts 
         
-        const meshSize = vb_info.attribs_info.count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for intanced geom. Better use the gfx.vb.counts 
         
         if (vb_info.count + meshSize >= vb_info.size) vb_info.Realloc(meshSize);
 
@@ -959,7 +964,8 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         const attribs_count = vb_info.attribs_info.count;
         Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
         // vb_info.count += attribs_count;
-        vb_info.count += attribs_count * verts_per_rect * num_faces;
+        // vb_info.count += attribs_count * verts_per_rect * num_faces;
+        vb_info.count += meshSize;
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
 
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
@@ -970,6 +976,8 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         // Store the texture index in the vertex
         vb_info.texidx = mat.textureid;
         gfx.vb.counts.buffer[i] = verts_per_rect * vb_info.attribs_info.count;
+
+        // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 
     }
 
@@ -1154,10 +1162,10 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
         const attribsidx = Program_get_shader_attributes_index(vb_group.progidx);
         const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
         
-        const removed_attribs = attribs_per_vertex * 4 * num_faces
-        // const removed_attribs = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X)
-        // ? attribs_per_vertex * ((2 * num_faces) + 2) // For meshes with rects vertex conection
-        // : attribs_per_vertex * 4 * num_faces; // For meshes with separate rects 
+        // const removed_attribs = attribs_per_vertex * 4 * num_faces
+        const removed_attribs = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X)
+        ? attribs_per_vertex * ((2 * num_faces) + 2) // For meshes with rects vertex conection
+        : attribs_per_vertex * 4 * num_faces; // For meshes with separate rects 
         
         let start = gfx.vb.starts.buffer[i];
         const end = start + removed_attribs;

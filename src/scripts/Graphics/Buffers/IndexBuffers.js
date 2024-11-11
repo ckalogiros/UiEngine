@@ -213,7 +213,7 @@ class Index_Buffer_Info {
 
    Realloc(extra_size = 0) {
 
-      this.size = this.#CalculateMemoryPaddedSize(this.size, extra_size)
+      this.size = this.#CalculateMemoryPaddedSize(this.count, extra_size)
       const new_data = Typed_array_create_from_type(this.type, this.size);
 
       const old_data = _index_buffers.buffer[this.ibidx];
@@ -247,7 +247,7 @@ class Index_Buffer_Info {
          new_size += stride;
       }
       // console.warn('stride:', stride, ' cursize:', cur_size, ' newsize:', new_size, ' extra_size:', extra_size)
-      if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
+      // if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
 
       new_size += stride; // Make it greater than the target_size
       return new_size;
@@ -311,7 +311,7 @@ export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, nu
 
       // Check for buffer realloc
       if (total_draw_count > ib_info.size) {
-         ib_info.Realloc();
+         ib_info.Realloc(total_draw_count);
       }
 
       Index_buffer_add_indices(ibidx, num_faces_to_insert);

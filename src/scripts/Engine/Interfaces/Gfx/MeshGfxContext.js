@@ -6,7 +6,7 @@ import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_get_shader_attribs_indexing } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
-import { Renderqueue_Add } from "../../Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_Add, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name, Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
@@ -321,7 +321,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
    /** If no vbidx found from the mesh tree, search the vb pool if any apropriate vb exists. If none found, create a new one */
    let is_vertex_buffer_created = false;
-   let vertex_buffer_from_pool_is_used = false;
+   let is_vertex_buffer_from_pool_used = false;
 
    const pool_request_flags = mesh.gfx_pool_request;
 
@@ -333,9 +333,18 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       if((flags & GFX_CTX_FLAGS.SCROLLER_VB) === 0){
 
          // Find any unused vb
-         if((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, mesh.gfx_ctx_flags);
+         if((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) {
+            vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, mesh.gfx_ctx_flags);
+            if(vb_groupidx!==INT_NULL) {
+
+               is_vertex_buffer_from_pool_used = true; // Denote that an unused vb is found
+               Renderqueue_set_priority_by_vb(LAST, vb_groupidx);
+            }
+         }
          // Here we must check for all vb's that are stored globaly(like for scrollers) 
-         else if((flags & GFX_CTX_FLAGS.PRIVATE)===0 || (flags & GFX_CTX_FLAGS.SCROLLER_VB)===0) vb_groupidx = Gfx_pool_find_vb_notPrivate(sid, pool_request_flags);
+         else if((flags & GFX_CTX_FLAGS.PRIVATE)===0 || (flags & GFX_CTX_FLAGS.SCROLLER_VB)===0) {
+            vb_groupidx = Gfx_pool_find_vb_notPrivate(sid, pool_request_flags);
+         }
       }
 
       if (vb_groupidx === INT_NULL) {
@@ -409,13 +418,13 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          
          const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
          const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
-         const IS_ROOT_WIDGET = Root_group_view_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx);
-         const IS_VB_ROOT = IS_ROOT_WIDGET;
+         const IS_VB_ROOT = Root_group_view_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx);
+         const IS_VB_USED = is_vertex_buffer_from_pool_used;
 
          // If the vertex buffer already exists and is reused from the pool
          // get the unif wpos that has already been created for this vb
          mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, 
-         mesh.nameidx, mesh.parent, progidx, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, IS_VB_ROOT);
+         mesh.nameidx, mesh.parent, progidx, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, IS_VB_ROOT, IS_VB_USED);
          // Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, 'u_wposxy', mesh.root_posidx);
 
       }

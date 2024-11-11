@@ -435,31 +435,33 @@ export function Gl_set_vpos_xy(gfxInfo, x, y, num_faces = 1) {
 
    const start = gfxInfo.vb.starts.buffer[vbidx];
 
+   
    let index = start + a_offset;
    let stride = vb_info.attribs_info.count - a_size;
-
+   
    // Devide cause we use twice the x and y, once for minus and once for plus
    const xx = x;
    const yy = y;
+   
+   // const len = (num_faces * gfxInfo.verts_per_rect)+2;
+   // Set_vertex_position_VPOS2(vb_data, start + a_offset, vb_info.attribs_info.count, xx, yy, num_faces, len)
 
-   Set_vertex_position_VPOS2(vb_data, start + a_offset, vb_info.attribs_info.count, xx, yy, num_faces)
 
+   /**Contol point of resize left-top */
+   vb_data[index++] = -xx;
+   vb_data[index++] = -yy;
+   index += stride;
 
-   // /**Contol point of resize left-top */
-   // vb_data[index++] = -xx;
-   // vb_data[index++] = -yy;
-   // index += stride;
+   vb_data[index++] = -xx;
+   vb_data[index++] = yy;
+   index += stride;
 
-   // vb_data[index++] = -xx;
-   // vb_data[index++] = yy;
-   // index += stride;
+   vb_data[index++] = xx;
+   vb_data[index++] = -yy;
+   index += stride;
 
-   // vb_data[index++] = xx;
-   // vb_data[index++] = -yy;
-   // index += stride;
-
-   // vb_data[index++] = xx;
-   // vb_data[index++] = yy;
+   vb_data[index++] = xx;
+   vb_data[index++] = yy;
 
 
    // Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
@@ -687,16 +689,16 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
    const xx = x;
    const yy = y;
 
+   // console.log(xx, yy)
    while (loop_count) {
-
+      
       vb_data[index++] = xx;
+      // console.log(vb_data[index-1])
       vb_data[index++] = yy;
 
       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       loop_count--;
    }
-
-
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }

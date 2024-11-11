@@ -6,7 +6,7 @@ import { View_build_group_from_root_mesh } from "../Engine/Core/Views/MeshBuffer
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs, Root_group_vbidx_view_get } from "../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { BLUEL, GREENL, GREY, WHITE, YELLOW } from "../Engine/Drawables/Material/Base/Colors.js";
+import { BLUEL, GREEN, GREENL, GREENR, GREY, WHITE, YELLOW, YELLOWL, YELLOWR } from "../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Engine/Drawables/Widgets/ScrollerComponent.js";
@@ -95,7 +95,7 @@ const comet_glow_slider_values = new Float32Array([0, 0, 0.08, 0.1]);
 
 
 
-export function Demo_page(create_demo_id = category_widgets.id) {
+export function Demo_page(create_demo_id = subcategory_animations1.id) {
 
    let comet_particles_struct = null;
    let glow_particles_struct = null;
@@ -138,7 +138,7 @@ export function Demo_page(create_demo_id = category_widgets.id) {
 
    /*******************************************************************************************/
    // Load menu button
-   const Load_menu_btn = Create_widget_button(_, 'Demos', _, [0, 0, 1], 20, GREENL[5], WHITE, [8, 8], .5);
+   const Load_menu_btn = Create_widget_button(_, 'Demos', _, [0, 0, 1], 20, GREEN[7], WHITE, [8, 8], .5);
    Load_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Load_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    Load_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
@@ -160,54 +160,7 @@ export function Demo_page(create_demo_id = category_widgets.id) {
       _, load_clbk_params, _,
    );
 
-
-
-
-
-
    
-
-   
-   /*******************************************************************************************/
-   // Shade dropdown menu
-
-   // const shade_menu_btn = Create_widget_dropdown(_, `Shade`, [0, 0, 0], GREENL[5], GREY[3], WHITE, [6, 4], _, _, _, _, [8, 8]);
-   // shade_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // shade_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   // shade_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   // shade_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-   // shade_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   // shade_menu_btn.SetName('shade_menu_btn');
-   // shade_menu_btn.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-   // shade_menu_btn.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, shade_menu_btn.mesh_bufferidx, false);
-   // Dropdown_roots_set_root(shade_menu_btn, shade_menu_btn);
-   
-   
-
-   // slider_distance.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // slider_distance.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   // slider_distance.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
-   // slider_distance.SetInitialValue(.5);
-   // shade_menu_btn.AddToMenu(slider_distance);
-   // slider_distance.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, shade_menu_btn.mesh_bufferidx, true);
-   
-   
-   
-   // slider_smoothness.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,2);
-   // slider_smoothness.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,1);
-   // slider_smoothness.SetInitialValue(.6);
-   // shade_menu_btn.AddToMenu(slider_smoothness);
-   // slider_smoothness.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, shade_menu_btn.mesh_bufferidx, true);
-   
-   
-   
-   // slider_intensity.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER,2);
-   // slider_intensity.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS,1);
-   // slider_intensity.SetInitialValue(.6);
-   // shade_menu_btn.AddToMenu(slider_intensity);
-   // slider_intensity.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, shade_menu_btn.mesh_bufferidx, true);
 
 
    
@@ -226,19 +179,19 @@ export function Demo_page(create_demo_id = category_widgets.id) {
       const pad = 50;
 
 
-      // /* section/rect move */
-      // const sections = Demo_widgets_sections(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity);
-      // total_height += sections.geom.dim[1] * 2 + pad;
+      /* section/rect move */
+      const sections = Demo_widgets_sections(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity);
+      total_height += sections.geom.dim[1] * 2 + pad;
 
 
-      // /* Button Switces  Slider */
-      // const widgets = Demo_widgets(_, [0, total_height,], slider_distance, slider_smoothness, slider_intensity);
-      // total_height += widgets.geom.dim[1] * 2 + pad;
+      /* Button Switces  Slider */
+      const widgets = Demo_widgets(_, [0, total_height,], slider_distance, slider_smoothness, slider_intensity);
+      total_height += widgets.geom.dim[1] * 2 + pad;
 
 
-      // /* scrolling */
-      // const scroller = Demo_widgets_scrolled_labels(_, [0, total_height], _, slider_distance, slider_smoothness, slider_intensity);
-      // total_height += scroller.geom.dim[1] * 2 + pad;
+      /* scrolling */
+      const scroller = Demo_widgets_scrolled_labels(_, [0, total_height], _, slider_distance, slider_smoothness, slider_intensity);
+      total_height += scroller.geom.dim[1] * 2 + pad;
       
       
       /* Colorpicker */
@@ -246,93 +199,15 @@ export function Demo_page(create_demo_id = category_widgets.id) {
       total_height += colorpicker.geom.dim[1] * 2 + pad;
 
 
-      // /* dropdown - move - hover */
-      // const dp = Demo_widgets_dropdown(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity)
-      // total_height += dp.geom.dim[1] * 2 + pad;
-
-
-
+      /* dropdown - move - hover */
+      const dp = Demo_widgets_dropdown(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity)
+      total_height += dp.geom.dim[1] * 2 + pad;
 
 
       /* Coloring per vertex */
 
       /* Resizable widgets */
 
-
-
-
-      // const sections_all_vbidxs = Root_group_vbidx_view_get(sections.root_bufferidx)
-      // const widgets_all_vbidxs = Root_group_vbidx_view_get(widgets.root_bufferidx)
-      // const scroller_all_vbidxs = Root_group_vbidx_view_get(scroller.root_bufferidx)
-      // const dp_all_vbidxs = Root_group_vbidx_view_get(dp.root_bufferidx)
-
-      // // Connect sliders to gfx program uniforms 
-      // Slider_connect(slider_distance, (params, slider_val) => {
-
-      //    const val_idx = 0;
-      //    // Find the ubidx
-      //    const sections_ubidx = Mesh_get_uniform_ubidx_from_name(sections.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= sections_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(sections_all_vbidxs.buffer[i], sections_ubidx, slider_val, val_idx);
-
-      //    const widgets_ubidx = Mesh_get_uniform_ubidx_from_name(widgets.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= widgets_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(widgets_all_vbidxs.buffer[i], widgets_ubidx, slider_val, val_idx);
-
-      //    const scroller_ubidx = Mesh_get_uniform_ubidx_from_name(scroller.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= scroller_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(scroller_all_vbidxs.buffer[i], scroller_ubidx, slider_val, val_idx);
-
-      //    const dp_ubidx = Mesh_get_uniform_ubidx_from_name(dp.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= dp_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(dp_all_vbidxs.buffer[i], dp_ubidx, slider_val, val_idx);
-
-      // }, _);
-
-      // Slider_connect(slider_smoothness, (params, slider_val) => {
-
-      //    const val_idx = 1;
-      //    // Find the ubidx
-      //    const sections_ubidx = Mesh_get_uniform_ubidx_from_name(sections.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= sections_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(sections_all_vbidxs.buffer[i], sections_ubidx, slider_val, val_idx);
-
-      //    const widgets_ubidx = Mesh_get_uniform_ubidx_from_name(widgets.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= widgets_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(widgets_all_vbidxs.buffer[i], widgets_ubidx, slider_val, val_idx);
-
-      //    const scroller_ubidx = Mesh_get_uniform_ubidx_from_name(scroller.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= scroller_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(scroller_all_vbidxs.buffer[i], scroller_ubidx, slider_val, val_idx);
-
-      //    const dp_ubidx = Mesh_get_uniform_ubidx_from_name(dp.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= dp_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(dp_all_vbidxs.buffer[i], dp_ubidx, slider_val, val_idx);
-         
-      // }, _);
-      
-      // Slider_connect(slider_intensity, (params, slider_val) => {
-         
-      //    const val_idx = 2;
-      //    // Find the ubidx
-      //    const sections_ubidx = Mesh_get_uniform_ubidx_from_name(sections.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= sections_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(sections_all_vbidxs.buffer[i], sections_ubidx, slider_val, val_idx);
-         
-      //    const widgets_ubidx = Mesh_get_uniform_ubidx_from_name(widgets.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= widgets_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(widgets_all_vbidxs.buffer[i], widgets_ubidx, slider_val, val_idx);
-         
-      //    const scroller_ubidx = Mesh_get_uniform_ubidx_from_name(scroller.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= scroller_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(scroller_all_vbidxs.buffer[i], scroller_ubidx, slider_val, val_idx);
-         
-      //    const dp_ubidx = Mesh_get_uniform_ubidx_from_name(dp.uniforms, 'u_rcorners');
-      //    for(let i = 0; i <= dp_all_vbidxs.boundary; i++)
-      //       Vertex_buffer_set_and_update_uniform(dp_all_vbidxs.buffer[i], dp_ubidx, slider_val, val_idx);
-         
-      // }, _);
-      
    }
    /*****************************************************************************************************************************/
    // Particles
@@ -356,7 +231,8 @@ export function Demo_page(create_demo_id = category_widgets.id) {
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       glow_particles_struct  = Create_glow_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false);
-      // glow_particles_struct.controls_section = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, glow_slider_values);
+
+      glow_particles_struct.controls_section = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, glow_slider_values);
 
 
    }
@@ -448,7 +324,7 @@ export function Demo_page(create_demo_id = category_widgets.id) {
    /*******************************************************************************************/
    // Options menu button
    
-   const options_menu_btn = Create_widget_button(_, 'Options', _, [0, 0, 1], 20, GREENL[5], WHITE, [8, 8], .5);
+   const options_menu_btn = Create_widget_button(_, 'Options', _, [0, 0, 1], 20, GREENR[7], WHITE, [8, 8], .5);
    options_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    options_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    options_menu_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
@@ -510,7 +386,7 @@ export function Demo_page(create_demo_id = category_widgets.id) {
    /****************************************************************************************************************************************************/
    { // Create the button for going to the top
 
-      const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, '^', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 10], _, GREY[4], GREENL[8], [12, 7], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
+      const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, '^', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 10], _, GREY[4], GREEN[9], [12, 7], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
       btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
@@ -682,7 +558,7 @@ function Create_menu_horizontal_buttons(x=0, y=0, Create_menu_items_callback, de
 
    let zpos = 10;
    
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 10], [0,0], TRANSPARENCY(GREENL[5], .9), 'section', );
+   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 10], [0,0], TRANSPARENCY(YELLOW[9], .9), 'section', );
    menu_panel.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);

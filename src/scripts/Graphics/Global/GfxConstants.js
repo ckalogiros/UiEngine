@@ -233,10 +233,10 @@ const SID = {
         const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION);
         const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION);
         
-        // const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
-        // const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
-        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
-        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
+        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
+        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
+        // const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
+        // const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
 
         const  shad1 = sid1.shad;
         const  shad2 = sid2.shad;
