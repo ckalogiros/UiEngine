@@ -38,7 +38,7 @@ import { Clbk_animations_create_transition_slope, Clbk_animations_rotate, Clbk_a
 import { Demo_chain_link } from './Demo/DemoChainLink.js';
 import { Game_snake } from './Demo/Games/Snake/Snake.js';
 import { Mesh_set_root_in_focus } from '../Engine/Drawables/Operations/MeshHelperFunctions.js';
-import { Digitize, Logarithmic_interpolation } from '../Helpers/Math/MathFunctions.js';
+import { Digitize, Function_Slope, Logarithmic_interpolation } from '../Helpers/Math/MathFunctions.js';
 import { App_reinitialize } from './App.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { PerformanceTimersGetMilisec, PerformanceTimersGetNanosec, PerformanceTimersGetWorstFps } from '../Engine/Timers/PerformanceTimers.js';
@@ -47,6 +47,8 @@ import { Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_w
 import { Board_rotations } from './Demo/DemoBoardRotations.js';
 import { Demo_text_number_animation } from './Demo/DemoTextAnimations.js';
 import { Font_metrics_get_char_width, Font_metrics_get_face_advancex, Font_metrics_get_row_height } from '../Engine/Loaders/Font/Font.js';
+import { Tetris } from './Demo/Games/Snake/Tetris.js';
+import { Bitwise_operations_run_test } from './Demo/Games/Snake/BitwiseOps.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -338,50 +340,50 @@ function TestScrollerComponent3() {
 
 
 
-class Function_Slope {
-    constructor(slope_constant = 1.0, time_step = 0.1, scale = 100, name = 0) {
+// class Function_Slope {
+//     constructor(slope_constant = 1.0, time_step = 0.1, scale = 100, name = 0) {
 
-        this.slope_constant = slope_constant;
-        this.time_step = time_step;
-        this.timer = 0.0;
-        this.scale = scale;
+//         this.slope_constant = slope_constant;
+//         this.time_step = time_step;
+//         this.timer = 0.0;
+//         this.scale = scale;
 
-        //    if (name) this.name = name;
-        //    else name = Get_ID();
-    }
+//         //    if (name) this.name = name;
+//         //    else name = Get_ID();
+//     }
 
-    GetSlope() {
-        return this.slope_constant;
-    }
+//     GetSlope() {
+//         return this.slope_constant;
+//     }
 
-    SetSlope(val) {
-        this.slope_constant = val;
-    }
+//     SetSlope(val) {
+//         this.slope_constant = val;
+//     }
 
-    // GetTimeStep(){
-    //    return this.time_step;
-    // }
+//     // GetTimeStep(){
+//     //    return this.time_step;
+//     // }
 
-    GetTimer() {
-        return this.timer;
-    }
+//     GetTimer() {
+//         return this.timer;
+//     }
 
-    SetTimer(val) {
-        this.timer = val;
-    }
+//     SetTimer(val) {
+//         this.timer = val;
+//     }
 
-    IncrementTimer() {
-        this.timer += this.time_step;
-    }
+//     IncrementTimer() {
+//         this.timer += this.time_step;
+//     }
 
-    GetScale() {
-        return this.scale;
-    }
+//     GetValueChange() {
+//         return this.scale;
+//     }
 
-    SetScale(val) {
-        this.scale = val;
-    }
-}
+//     SetValueChange(val) {
+//         this.scale = val;
+//     }
+// }
 function TEMP_Create_menu_popup() {
 
 
@@ -562,7 +564,7 @@ function Animation_scale_up_run(params) {
 
     const target_mesh = params.target_mesh;
     const slope_constant = params.function_slope.GetSlope();
-    const scale = params.function_slope.GetScale();
+    const scale = params.function_slope.GetValueChange();
     params.function_slope.IncrementTimer();
     const timer = params.function_slope.GetTimer();
 
@@ -606,7 +608,7 @@ function Animation_scale_down_run(params) {
 
     const target_mesh = params.target_mesh;
     const slope_constant = params.function_slope.GetSlope();
-    const scale = params.function_slope.GetScale();
+    const scale = params.function_slope.GetValueChange();
     params.function_slope.IncrementTimer();
     const timer = params.function_slope.GetTimer();
 
@@ -662,16 +664,20 @@ export function TestWidgetsGeneric(createId = 1) {
         // const c = new Shader_Attributes(true, a);
     }
 
+    Bitwise_operations_run_test();
+
 
 
     // Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
     // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
 
-    Demo_page();
+    // Demo_page();
+
+    Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 60);
 
     // Demo_chain_link();
 
-    // Game_snake();
+    // Game_snake(45, true);
 
 
     // Debug_info_create_ui_mouse();
@@ -904,133 +910,6 @@ export function TestWidgetsGeneric(createId = 1) {
         // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 0, 100, _, _, _, _, _, _, SID.ATTR.WPOS3|SID.ATTR.DIM2)
         // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 0, 100, _, _, _, _, _, _, SID.ATTR.DIM2)
 
-
-        // { // TEST MULTI VERTEX MESH
-        //     /******************************************************************************/
-        //     // Create the hue picker mesh
-        //     const HUE_COLOR = [
-        //         // RED_LUM_ADJ, RED_LUM_ADJ,
-        //         // GREEN_LUM_ADJ, GREEN_LUM_ADJ,
-        //         // BLUE_LUM_ADJ, BLUE_LUM_ADJ,
-        //         // RED_LUM_ADJ, RED_LUM_ADJ,
-        //         // GREEN_LUM_ADJ, GREEN_LUM_ADJ,
-        //         // BLUE_LUM_ADJ, BLUE_LUM_ADJ,
-        //         // YELLOW_LUM_ADJ, YELLOW_LUM_ADJ,
-
-        //         RED[9], RED[9],
-        //         YELLOW[9], YELLOW[9],   // v3-v4
-        //         GREEN[9], GREEN[9],   // v3-v4
-        //         CYAN, CYAN,   // v3-v4
-        //         BLUE[9], BLUE[9],   // v5-v6
-        //         BLACK, BLACK,
-        //         WHITE, WHITE,
-        //         MAGENTA, MAGENTA,   // v3-v4
-        //         RED[9], RED[9],
-        //         YELLOW[9], YELLOW[9],   // v3-v4
-        //         // GREEN[9], GREEN[9],   // v3-v4
-        //         // CYAN, CYAN,   // v3-v4
-        //         // BLUE[9], BLUE[9],   // v5-v6
-        //         // MAGENTA, MAGENTA,   // v3-v4
-        //         // RED[9], RED[9],
-
-        //         // GREEN[9], GREEN[9],   // v3-v4
-        //         // BLUE[9], BLUE[9],   // v5-v6
-        //         // RED[9], RED[9],
-        //         // GREEN[9], GREEN[9],   // v3-v4
-        //         // BLUE[9], BLUE[9],   // v5-v6
-        //         // YELLOW_, YELLOW_, // v1-v2
-        //         // YELLOW[9], YELLOW[9], // v1-v2
-        //         // CYAN, CYAN,   // v3-v4
-        //         // MAGENTA, MAGENTA,   // v3-v4
-        //         // RED[9], RED[9],
-        //         // YELLOW[9], YELLOW[9], // v1-v2
-        //         // GREEN[9], GREEN[9],   // v3-v4
-        //         // CYAN, CYAN,   // v3-v4
-        //         // BLUE[9], BLUE[9],   // v5-v6
-        //         // MAGENTA, MAGENTA,   // v3-v4
-        //         // RED[9], RED[9],
-        //     ];
-
-        //     const scale = 1;
-        //     // const dim = [300, 120]
-        //     const dim = [VIEWPORT.WIDTH/2, VIEWPORT.HEIGHT/2]
-        //     const vertices_count = (HUE_COLOR.length / 2) - 1;
-        //     const slider_hue = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [0, 0, 2], dim, HUE_COLOR, _, _, vertices_count);
-        //     // const slider_hue = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [0, 0, 2], [dim[0], 20], HUE_COLOR, _, _, 4);
-        //     // const slider_hue = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, [0, 0, 2], [dim[0], 20], HUE_COLOR, _, _, _, vertices_count);
-        //     // const slider_hue = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, [100, 0, 2], [dim[0], 20], HUE_COLOR, _, _, _, 4);
-        //     slider_hue.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        //     // slider_hue.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
-        //     // slider_hue.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
-
-        //     slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-        //     // slider_hue.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
-        //     slider_hue.StylesSetMargin([0, 20]);
-        //     slider_hue.SetName('Slider Hue');
-
-        //     slider_hue.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        //     slider_hue.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-
-        //     slider_hue.Render();
-
-        //     Root_group_activate_all_vbs_in_renderqueue(slider_hue.root_bufferidx);
-        //     slider_hue.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_hue.gfx.vb.groupidx);
-        //     Construct_listen_events_from_mesh_tree(slider_hue);
-        //     Construct_listen_events_relations_from_mesh_tree(slider_hue);
-
-        // }
-        // { // TEST MULTI VERTEX MESH
-        //     /******************************************************************************/
-        //     // Create the hue picker mesh
-        //     const HUE_COLOR = [
-        //         RED[9], RED[9],
-        //         YELLOW[9], YELLOW[9], // v1-v2
-        //         GREEN[9], GREEN[9],   // v3-v4
-        //         CYAN, CYAN,   // v3-v4
-        //         BLUE[9], BLUE[9],   // v5-v6
-        //         MAGENTA, MAGENTA,   // v3-v4
-        //         RED[9], RED[9],
-        //         YELLOW[9], YELLOW[9], // v1-v2
-        //         GREEN[9], GREEN[9],   // v3-v4
-        //         CYAN, CYAN,   // v3-v4
-        //         BLUE[9], BLUE[9],   // v5-v6
-        //         MAGENTA, MAGENTA,   // v3-v4
-        //         RED[9], RED[9],
-        //         // YELLOW[9], YELLOW[9], // v1-v2
-        //         // GREEN[9], GREEN[9],   // v3-v4
-        //         // CYAN, CYAN,   // v3-v4
-        //         // BLUE[9], BLUE[9],   // v5-v6
-        //         // MAGENTA, MAGENTA,   // v3-v4
-        //         // RED[9], RED[9],
-        //     ];
-
-        //     const scale = 1;
-        //     const dim = [300, 120]
-        //     const vertices_count = (HUE_COLOR.length / 2) - 1;
-        //     const slider_hue = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [0, 400, 2], dim, HUE_COLOR, _, _, vertices_count);
-        //     // const slider_hue = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [0, 0, 2], [dim[0], 20], HUE_COLOR, _, _, 4);
-        //     // const slider_hue = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, [0, 0, 2], [dim[0], 20], HUE_COLOR, _, _, _, vertices_count);
-        //     // const slider_hue = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, [100, 0, 2], [dim[0], 20], HUE_COLOR, _, _, _, 4);
-        //     slider_hue.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        //     // slider_hue.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
-        //     // slider_hue.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
-
-        //     slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-        //     // slider_hue.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
-        //     slider_hue.StylesSetMargin([0, 20]);
-        //     slider_hue.SetName('Slider Hue');
-
-        //     slider_hue.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        //     slider_hue.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-
-        //     slider_hue.Render();
-
-        //     Root_group_activate_all_vbs_in_renderqueue(slider_hue.root_bufferidx);
-        //     slider_hue.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_hue.gfx.vb.groupidx);
-        //     Construct_listen_events_from_mesh_tree(slider_hue);
-        //     Construct_listen_events_relations_from_mesh_tree(slider_hue);
-
-        // }
     }
 
     { // Widget: Slider-switch
@@ -1194,7 +1073,61 @@ export function TestWidgetsGeneric(createId = 1) {
     }
 
     { // Coloring
-        // Test_hsv_color_sequence_from_integer_input()
+        // Test_hsv_color_sequence_from_integer_input();
+
+        // { // TEST MULTI VERTEX MESH
+        //     /******************************************************************************/
+        //     // Create the hue picker mesh
+        //     const HUE_COLOR = [
+        //         RED[9], RED[9],
+        //         YELLOW[9], YELLOW[9],   // v3-v4
+        //         GREEN[9], GREEN[9],   // v3-v4
+        //         CYAN[9], CYAN[9],   // v3-v4
+        //         BLUE[9], BLUE[9],   // v5-v6
+        //         MAGENTA, MAGENTA,   // v3-v4
+        //         RED[9], RED[9],
+        //         YELLOW[9], YELLOW[9],   // v3-v4
+        //         GREEN[9], GREEN[9],   // v3-v4
+        //         CYAN[9], CYAN[9],   // v3-v4
+        //         BLUE[9], BLUE[9],   // v5-v6
+        //         MAGENTA, MAGENTA,   // v3-v4
+        //         RED[9], RED[9],
+                
+        //         BLUE[9], BLUE[9],   // v5-v6
+        //         GREEN[9], GREEN[9],   // v3-v4
+        //         RED[9], RED[9],
+        //         BLACK, BLACK,
+        //         WHITE, WHITE,
+        //     ];
+
+        //     const scale = 1;
+        //     // const dim = [300, 120]
+        //     const dim = [VIEWPORT.WIDTH/2, VIEWPORT.HEIGHT/2]
+        //     const vertices_count = (HUE_COLOR.length / 2) - 1;
+        //     const slider_hue = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [0, 0, 2], dim, HUE_COLOR, _, _, vertices_count);
+        //     // const slider_hue = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,0], [0, 0, 2], [dim[0], 20], HUE_COLOR, _, _, 4);
+        //     // const slider_hue = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, [0, 0, 2], [dim[0], 20], HUE_COLOR, _, _, _, vertices_count);
+        //     // const slider_hue = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, [100, 0, 2], [dim[0], 20], HUE_COLOR, _, _, _, 4);
+        //     slider_hue.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        //     // slider_hue.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
+        //     // slider_hue.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
+
+        //     slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
+        //     // slider_hue.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
+        //     slider_hue.StylesSetMargin([0, 20]);
+        //     slider_hue.SetName('Slider Hue');
+
+        //     slider_hue.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass:SID.PASS.WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        //     slider_hue.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+
+        //     slider_hue.Render();
+
+        //     Root_group_activate_all_vbs_in_renderqueue(slider_hue.root_bufferidx);
+        //     slider_hue.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_hue.gfx.vb.groupidx);
+        //     Construct_listen_events_from_mesh_tree(slider_hue);
+        //     Construct_listen_events_relations_from_mesh_tree(slider_hue);
+
+        // }
     }
 
     { // Shaders Tests
@@ -1389,8 +1322,8 @@ function Test_text_clbk_animations_with_counter(x, y, text_pad_x=10, text_pad_y=
             const text_substitution = `${cnt++}`
 
             let limit = 0;
-            if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh.text_mesh.mat.texidx, text_substitution) / 2;
-            else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh.text_mesh.mat.texidx) / 2;
+            if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh.text_mesh.mat.uvIdx, text_substitution) / 2;
+            else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh.text_mesh.mat.uvIdx) / 2;
 
             if(clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_X) Clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_X, text_substitution);
             if(clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) Clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, text_substitution);
@@ -1460,8 +1393,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x=10, te
                 params.params.counter1 = 0;
                 let limit_ = 0;
                 const text_substitution_ = `${params.params.counter2++}`
-                if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(mesh1.text_mesh.mat.texidx, text_substitution_) / 2;
-                else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(mesh1.text_mesh.mat.texidx) / 2;
+                if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(mesh1.text_mesh.mat.uvIdx, text_substitution_) / 2;
+                else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(mesh1.text_mesh.mat.uvIdx) / 2;
                 Clbk_animations_text_create(mesh2, slope_params_pointer, limit_, 'TEST_text_animation_2', clbk_anim_flag, text_substitution_);
             }
             if (params.params.counter2 > 9) { params.params.counter2 = 0; }
@@ -1469,8 +1402,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x=10, te
             const text_substitution = `${params.params.counter1++}`
 
             let limit = 0;
-            if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh1.text_mesh.mat.texidx, text_substitution) / 2;
-            else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh1.text_mesh.mat.texidx) / 2;
+            if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh1.text_mesh.mat.uvIdx, text_substitution) / 2;
+            else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh1.text_mesh.mat.uvIdx) / 2;
             
             Clbk_animations_text_create(mesh1, slope_params_pointer, limit, 'TEST_text_animation_1', clbk_anim_flag, text_substitution);
         }, 

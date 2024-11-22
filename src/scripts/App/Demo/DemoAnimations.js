@@ -13,7 +13,7 @@ import { Particle_system_create_emitter, Particles_gen_gfx_ctx, Particles_get_pa
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomPos } from "../../Helpers/Helpers.js";
-import { Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
+import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 import { Create_comet_glow_contols, Create_comet_noise_contols } from "./DemoParticles.js";
 import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, squeeze_y_to_bottom_vertices_move_to_bottom, squeeze_y_to_top_vertices_move_to_top, text_animation_gfx_vertex_set_sqeeze_x_axis, text_animation_gfx_vertex_set_vpos_x_default, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value } from "./DemoTextAnimations.js";
 
@@ -443,63 +443,7 @@ export function Demo_animations_text(x = 0, y = 0, create_controls=true) {
 
 
 
-let ID = 0;
-function Get_ID() { return ID++; }
 
-
-// TODO: Maybe have a buffer of 'Function_Slope' objects, and recycle through unused
-
-class Function_Slope {
-   constructor(slope_constant = 1.0, time_step = 0.1, scale = 100, name = ID) {
-
-      this.slope_constant = slope_constant;
-      this.time_step = time_step;
-      this.timer = 0.0;
-      this.scale = scale;
-
-      if (name) this.name = name;
-      else name = Get_ID();
-   }
-
-   GetSlope() {
-      return this.slope_constant;
-   }
-
-   SetSlope(val) {
-      this.slope_constant = val;
-   }
-
-   // GetTimeStep(){
-   //    return this.time_step;
-   // }
-
-   GetTimer() {
-      return this.timer;
-   }
-
-   SetTimer(val) {
-      this.timer = val;
-   }
-
-   IncrementTimer() {
-      this.timer += this.time_step;
-   }
-
-   GetScale() {
-      return this.scale;
-   }
-
-   SetScale(val) {
-      this.scale = val;
-   }
-   GetSpeed() {
-      return this.scale;
-   }
-
-   SetSpeed(val) {
-      this.scale = val;
-   }
-}
 
 export function Clbk_animations_create_transition_slope(time_step = 0.01, slope_const = .2, speed = 20) {
    const slope_params_pointer = new Function_Slope(slope_const, time_step, speed);
@@ -596,7 +540,8 @@ export function Clbk_animations_scale(root_widget = 0x0, create_slider = false, 
       // Connect slider to control the slope_constant1 value
       const slider_params = slope_params_pointer;
       Slider_connect(slider, (params, slider_val) => {
-         params.clbk_params.SetSlope(slider_val);
+         const val = Linear_interpolation(.01, 1, slider_val);
+         params.clbk_params.SetSlope(val);
       }, slider_params);
    }
 
@@ -620,7 +565,7 @@ function Animation_scale_up_run(params) {
 
    const mesh = params.mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const scale = params.function_slope.GetScale();
+   const scale = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
 
@@ -632,12 +577,10 @@ function Animation_scale_up_run(params) {
 
    const diffx = mesh.geom.pos[0] + (slope * scale);
    const diffy = mesh.geom.pos[1] + (slope * scale);
-   // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
+   mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
 
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-      // mesh.mat.style.rcorners = size;
-      // Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners);
-      // Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * (slope + 1));
+      Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * (slope + 1));
    }
 
    if (slope < 1.) return true;
@@ -657,7 +600,7 @@ function Animation_scale_down_run(params) {
 
    const mesh = params.mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const scale = params.function_slope.GetScale();
+   const scale = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
 
@@ -666,12 +609,12 @@ function Animation_scale_down_run(params) {
    mesh.geom.SetDimXY(mesh.gfx, size, size);
    Gl_set_dim_xy(mesh.gfx, size, size);
 
-   // const diffx = mesh.geom.pos[0] + ((1. - slope) * scale);
-   // const diffy = mesh.geom.pos[1] + ((1. - slope) * scale);
-   // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
+   const diffx = mesh.geom.pos[0] + ((1. - slope) * scale);
+   const diffy = mesh.geom.pos[1] + ((1. - slope) * scale);
+   mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
 
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-      // Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * ((1. - slope) + 1));
+      Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * ((1. - slope) + 1));
    }
 
 
@@ -785,7 +728,8 @@ export function Clbk_animations_rotate(root_widget = 0x0, create_slider = false,
 
       const slider_params = slope_params_pointer;
       Slider_connect(slider, (params, slider_val) => {
-         params.clbk_params.SetSlope(slider_val);
+         const val = Linear_interpolation(.01, 1, slider_val);
+         params.clbk_params.SetSlope(val);
       }, slider_params);
    }
 
@@ -810,7 +754,7 @@ function Animation_rotate_run(params) {
 
    const mesh = params.mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const angle = params.function_slope.GetScale();
+   const angle = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
 
@@ -839,7 +783,7 @@ function Animation_rotate_back_run(params) {
 
    const mesh = params.mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const angle = params.function_slope.GetScale();
+   const angle = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
 
@@ -1025,8 +969,8 @@ export function Clbk_animations_text_counter(root_widget = 0x0, create_contols =
 
             let limit_ = 0;
             const text_substitution_ = `${params.params.counter2++}`
-            if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(digit2_mesh.text_mesh.mat.texidx, text_substitution_) / 2;
-            else if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(digit2_mesh.text_mesh.mat.texidx) / 2;
+            if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(digit2_mesh.text_mesh.mat.uvIdx, text_substitution_) / 2;
+            else if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(digit2_mesh.text_mesh.mat.uvIdx) / 2;
             
             const anim_idx = Clbk_animations_text_create(digit2_mesh, slope_params_pointer, limit_, 'TEST_text_animation_2', anim_flag, text_substitution_);
             params.params.counter1 = 0;
@@ -1039,8 +983,8 @@ export function Clbk_animations_text_counter(root_widget = 0x0, create_contols =
          const text_substitution = `${params.params.counter1++}`
 
          let limit = 0;
-         if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(digit1_mesh.text_mesh.mat.texidx, text_substitution) / 2;
-         else if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(digit1_mesh.text_mesh.mat.texidx) / 2;
+         if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(digit1_mesh.text_mesh.mat.uvIdx, text_substitution) / 2;
+         else if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(digit1_mesh.text_mesh.mat.uvIdx) / 2;
          
          const anim_idx = Clbk_animations_text_create(digit1_mesh, slope_params_pointer, limit, 'TEST_text_animation_1', anim_flag, text_substitution);
       }, 
@@ -1231,14 +1175,14 @@ export function Clbk_animations_text_create_contols(slope_params_pointer, animat
       // animation_properties:animation_properties
       const slider_params = {
          slope_params_pointer:slope_params_pointer,
-         min:slope_params_pointer.GetSpeed()/2, 
-         max:slope_params_pointer.GetSpeed()*3,
+         min:slope_params_pointer.GetValueChange()/2, 
+         max:slope_params_pointer.GetValueChange()*3,
       }
       Slider_connect(slider, (params, slider_val) => {
          const min = params.clbk_params.min, max = params.clbk_params.max;
          const val = Linear_interpolation(min, max, slider_val);
          console.log(val)
-         params.clbk_params.slope_params_pointer.SetSpeed(val);
+         params.clbk_params.slope_params_pointer.SetValueChange(val);
       }, slider_params);
    }
 
@@ -1384,7 +1328,7 @@ function Animation_text_run_squeeze_x(params) {
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const speed = params.function_slope.GetScale();
+   const speed = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
    const limit = params.limit;
@@ -1430,7 +1374,7 @@ function Animation_text_back_run_squeeze_x(params) {
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const speed = params.function_slope.GetScale();
+   const speed = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
    const limit = params.limit;
@@ -1466,7 +1410,7 @@ function Animation_text_run_squeeze_y(params) {
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const speed = params.function_slope.GetScale();
+   const speed = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
    const limit = params.limit;
@@ -1513,7 +1457,7 @@ function Animation_text_back_run_squeeze_y(params) {
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const speed = params.function_slope.GetScale();
+   const speed = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
    const limit = params.limit;
@@ -1558,7 +1502,7 @@ function Animation_text_run_translation_x(params) {
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const speed = params.function_slope.GetScale();
+   const speed = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
    // Substitution text
@@ -1603,7 +1547,7 @@ function Animation_text_back_run_translation_x(params) {
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const speed = params.function_slope.GetScale();
+   const speed = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
 
@@ -1637,7 +1581,7 @@ function Animation_text_run_translation_y(params) {
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const speed = params.function_slope.GetScale();
+   const speed = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
    // Substitution text
@@ -1681,7 +1625,7 @@ function Animation_text_back_run_translation_y(params) {
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const speed = params.function_slope.GetScale();
+   const speed = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
 
@@ -2053,7 +1997,7 @@ function Animation_text_back_stop_translation_y(params) {
 
 //    const mesh = params.mesh;
 //    const slope_constant = params.function_slope.GetSlope();
-//    const angle = params.function_slope.GetScale();
+//    const angle = params.function_slope.GetValueChange();
 //    params.function_slope.IncrementTimer();
 //    const timer = params.function_slope.GetTimer();
 
@@ -2082,7 +2026,7 @@ function Animation_text_back_stop_translation_y(params) {
 
 //    const mesh = params.mesh;
 //    const slope_constant = params.function_slope.GetSlope();
-//    const angle = params.function_slope.GetScale();
+//    const angle = params.function_slope.GetValueChange();
 //    params.function_slope.IncrementTimer();
 //    const timer = params.function_slope.GetTimer();
 

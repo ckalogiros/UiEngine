@@ -88,7 +88,7 @@ export function Timer_update_global_timer_cosine(){ g_timer_cosine = Math.cos(g_
  * Later maybe create a realocated buffer.
  */
 
-const MAX_TIMERS_COUNT = 350;
+const MAX_TIMERS_COUNT = 100;
 
 class Timer {
 

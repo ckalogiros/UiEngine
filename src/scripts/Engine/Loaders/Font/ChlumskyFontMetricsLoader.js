@@ -12,7 +12,6 @@ import { Abs } from "../../../Helpers/Math/MathOperations.js";
 
 
 const _font_metrics_buffer = [];
-let _font_metrics_buffer_count = 0;
 
 
 function Font_get_metrics_by_texid(texture_id){
@@ -32,8 +31,7 @@ function Font_get_metrics_by_texid(texture_id){
 
 export function Font_create_uvmap(texture_id){
 
-   const json_metrics_object = Font_get_metrics_by_texid(texture_id); 
-   // _font_metrics_buffer[_font_metrics_buffer_count++] = Parse_json_metrics(json_metrics_object); 
+   Font_get_metrics_by_texid(texture_id); 
 }
 
 

@@ -113,5 +113,6 @@ export const frag_tex = `
   // Remove all black color and render only the colored texture
   color.a *= distance;
   // color.a = distance;
+  // color.r += .2;
 
   `;

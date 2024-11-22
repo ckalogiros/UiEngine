@@ -464,7 +464,7 @@ export function Gl_set_vpos_xy(gfxInfo, x, y, num_faces = 1) {
    vb_data[index++] = yy;
 
 
-   // Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /**
  * ISSUE:
@@ -523,7 +523,6 @@ export function Gl_set_vpos_y(gfxInfo, y, num_faces = 1) {
 
    let index = start + a_offset;
    let loop_count = num_faces;
-   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
 
 
@@ -686,15 +685,10 @@ export function Gl_set_dim_xy(gfxInfo, x, y, num_faces = 1) {
    let loop_count = num_faces;
    if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
 
-   const xx = x;
-   const yy = y;
-
-   // console.log(xx, yy)
    while (loop_count) {
       
-      vb_data[index++] = xx;
-      // console.log(vb_data[index-1])
-      vb_data[index++] = yy;
+      vb_data[index++] = x;
+      vb_data[index++] = y;
 
       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       loop_count--;
@@ -718,23 +712,14 @@ export function Gl_set_dim_x(gfxInfo, x, num_faces = 1) {
    let loop_count = num_faces;
    let stride = vb_info.attribs_info.count - a_size;
 
-
    while (loop_count) {
-
-      vb_data[index++] = -x;
-      index += stride;
-
-      vb_data[index++] = -x;
-      index += stride;
-
+      
       vb_data[index++] = x;
-      index += stride;
 
-      vb_data[index++] = x;
-      index += stride;
-
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       loop_count--;
    }
+
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
@@ -755,21 +740,11 @@ export function Gl_set_dim_y(gfxInfo, y, num_faces = 1) {
    if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
 
-
    while (loop_count) {
-
-      vb_data[index++] = -y;
-      index += stride;
-
-      vb_data[index++] = -y;
-      index += stride;
-
+      
       vb_data[index++] = y;
-      index += stride;
 
-      vb_data[index++] = y;
-      index += stride;
-
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       loop_count--;
    }
 
@@ -794,13 +769,10 @@ export function Gl_add_dim_xy(gfxInfo, x, y, num_faces = 1) {
    if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
 
-   const xx = x;
-   const yy = y;
-
    while (loop_count) {
 
-      vb_data[index++] += xx;
-      vb_data[index++] += yy;
+      vb_data[index++] += x;
+      vb_data[index++] += y;
 
       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       loop_count--;
@@ -822,16 +794,12 @@ export function Gl_add_dim_x(gfxInfo, x, num_faces = 1) {
 
    let index = start + a_offset;
    let loop_count = num_faces;
-   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
-
-   const xx = x;
-   const yy = y;
 
    while (loop_count) {
 
-      vb_data[index++] += xx;
-      vb_data[index++] += yy;
+      vb_data[index++] += x;
 
       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       loop_count--;
@@ -853,16 +821,12 @@ export function Gl_add_dim_y(gfxInfo, y, num_faces = 1) {
 
    let index = start + a_offset;
    let loop_count = num_faces;
-   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - a_size;
-
-   const xx = x;
-   const yy = y;
 
    while (loop_count) {
 
-      vb_data[index++] += xx;
-      vb_data[index++] += yy;
+      vb_data[index++] += y;
 
       index += stride; // Go to next vertice's pos. +1 for skipping pos.z
       loop_count--;

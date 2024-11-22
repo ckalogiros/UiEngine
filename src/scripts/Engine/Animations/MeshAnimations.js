@@ -185,7 +185,11 @@ const _mesh_animations_mesh_refs_buffer = New_generic_buffer(_, 'Animations Mesh
 const _mesh_animations_buffer = New_generic_buffer(_, 'Animations Buffer');
 
 
-export function Mesh_animations_reset() { _mesh_animations_buffer.ResetFull(); }
+export function Mesh_animations_reset() { 
+
+    _mesh_animations_buffer.ResetFull(); 
+    ANIMATIONS.Reset();
+}
 
 
 export function Mesh_animations_get(){ return _mesh_animations_buffer; }

@@ -65,13 +65,14 @@ export class ArrayBufferInterface {
       if (idx >= this.size) {
          this.Realloc(); // buffer is full.
          this.boundary = idx; // Assuming after the realloc, the max-used elem is the 'idx' we just used to store
-         this.active_count++;
+         // this.active_count++;
       }
       else if (idx > this.boundary) {
          this.boundary = idx;
-         this.active_count++;
+         // this.active_count++;
       }
-
+      
+      this.active_count++;
       this.buffer[idx] = elem; // We need to add At index
 
       return idx;
@@ -436,6 +437,52 @@ export class Int16Buffer extends ArrayBufferInterface {
       else { // Remove last does not need sorting
          this.boundary--;
          return INT_NULL; // Shows that there was no element move
+      }
+   }
+
+   ShiftLeft(){
+
+      if(this.boundary >= 0) {
+
+         this.active_count = 0;
+         for (let i = 0; i <= this.boundary+1; i++) {
+
+            if(this.buffer[i+1] !== INT_NULL){
+               this.boundary = i;
+               this.active_count++;
+            }
+            this.buffer[i] = this.buffer[i+1];
+         }
+         
+         // this.active_count -= 1;
+      }
+   }
+   
+   /** Shift left all elements but from a specified index */
+   ShiftLeftFromBaseIndex(base_idx){
+      if(base_idx <= this.boundary) {
+
+         this.boundary = -1;
+
+         // Unfortunately we must recalculate the boundary 
+         for (let i = 0; i < base_idx; i++) {
+            if(this.buffer[i] !== INT_NULL){
+               this.boundary = i;
+            }
+         }
+
+         for (let i = base_idx; i < this.size-1; i++) {
+            
+            this.buffer[i] = this.buffer[i+1];
+            if(this.buffer[i+1] !== INT_NULL){
+               this.boundary = i;
+            }
+         }
+   
+         this.active_count -= 1;
+         if(this.active_count < 0) alert('66113322131312')
+
+         if(this.boundary > this.count) console.error('009988176651 \n Boundary > active_count', this.boundary, this.count)
       }
    }
 }

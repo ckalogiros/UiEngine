@@ -984,6 +984,10 @@ const ANIMATIONS = {
 			Y: cnt3 <<= 0x1,
 		},
 	},
+	Reset(){
+		this.INDEX.COLOR = INT_NULL;
+		this.INDEX.WPOS = INT_NULL;
+	},
 };
 
 
@@ -1442,6 +1446,22 @@ const DEBUG_INFO_STRUCTS = {
 };
 
 
+
+
+
+
+
+
+/***********************************************************************************************************************************************/
+// INPUT - KEYBOARD
+const INPUT_KEYCODE_LEFT = 37;
+const INPUT_KEYCODE_UP = 38;
+const INPUT_KEYCODE_RIGHT = 39;
+const INPUT_KEYCODE_DOWN = 40;
+const INPUT_KEYCODE_SPACE = 32;
+const INPUT_KEYCODE_A = 65;
+const INPUT_KEYCODE_D = 68;
+const INPUT_KEYCODE_PAUSE = 80;
 
 
 

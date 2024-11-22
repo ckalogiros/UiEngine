@@ -547,10 +547,24 @@ export const DEBUG_PRINT_KEYS = [
 
 let _keys_buffer = [];
 
+let On_key_down_callback = null;
+let On_key_up_callback = null;
+
 console.log(DEBUG_PRINT_KEYS)
 export function OnKeyDown(e){
 
    e.stopPropagation();
+
+   // Case the user needs keyboard input, shoyld bind a callback that will be called here.
+   if(On_key_down_callback) {
+
+      On_key_down_callback({
+         event: e,
+         key: e.key,
+      });
+
+      // return;
+   }
 
    if(!e.repeat){
 
@@ -559,12 +573,37 @@ export function OnKeyDown(e){
          ctrl:e.ctrlKey,
          shift:e.shiftKey,
          alt:e.altKey,
-      })
+      });
    }
 }
+
+export function Input_keyboard_bind_keydown_callback(Clbk){
+
+   On_key_down_callback = Clbk;
+}
+
+export function Input_keyboard_bind_keyup_callback(Clbk){
+
+   On_key_up_callback = Clbk;
+}
+
 export function OnKeyUp(e){
    
    e.stopPropagation();
+
+
+   // Case the user needs keyboard input, shoyld bind a callback that will be called here.
+   if(On_key_down_callback) {
+
+      On_key_up_callback({
+         event: e,
+         key: e.key,
+      });
+
+      // return;
+   }
+
+
 
    const len = _keys_buffer.length-1;
 

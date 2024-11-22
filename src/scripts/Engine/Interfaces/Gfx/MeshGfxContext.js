@@ -34,7 +34,7 @@ export class GfxInfoMesh {
       this.meshIdx = INT_NULL; // The index of the current mesh from scene's mesh buffer.
       this.vao = null;
 
-      this.verts_per_face = New_int8_buffer(1, 'NEW GfxInfo-verts_per_face');
+      // this.verts_per_face = New_int8_buffer(1, 'NEW GfxInfo-verts_per_face');
 
       this.prog = {
          idx: INT_NULL,
@@ -83,7 +83,7 @@ export class GfxInfoMesh {
    }
 
    Destroy(){
-      Free_int8_buffer(this.verts_per_face);
+      // Free_int8_buffer(this.verts_per_face);
       Free_int8_buffer(this.vb.idxs);
       Free_int8_buffer(this.vb.is_per_vertex);
 
@@ -133,6 +133,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
 
 
    // Cash values
+   // const vertsPerRect = (sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? 2 : 4; // HACK: How vertex buffer should conclude the vertices per face ????????????????
    const vertsPerRect = VERTS_PER_RECT_INDEXED; // TODO: Let the program creation decide for the vertices per rect
    const attribsPerVertex = Shader_attributes_get_attribs_per_vertex(prog.attribsidx);
 
@@ -154,19 +155,19 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
 
 
 
-   /********************************************************************/
-   // Set the vertices per face buffer
-   gfx_ctx.verts_per_face[0] = VERTS_PER_RECT_INDEXED; // HACK
-   // if(the type is of type connected vertex faces)
-   const face_type = 'connected'; // TODO: this must be a flag 
-   for (let i = 1; i < num_faces; i++) {
-      if (face_type === 'connected') {
-         gfx_ctx.verts_per_face[i] = 2; // HACK
-      }
-      else {
-         gfx_ctx.verts_per_face[i] = 4; // HACK
-      }
-   }
+   // /********************************************************************/
+   // // Set the vertices per face buffer
+   // gfx_ctx.verts_per_face[0] = VERTS_PER_RECT_INDEXED; // HACK
+   // // if(the type is of type connected vertex faces)
+   // const face_type = 'connected'; // TODO: this must be a flag 
+   // for (let i = 1; i < num_faces; i++) {
+   //    if (face_type === 'connected') {
+   //       gfx_ctx.verts_per_face[i] = 2; // HACK
+   //    }
+   //    else {
+   //       gfx_ctx.verts_per_face[i] = 4; // HACK
+   //    }
+   // }
 
 
 

@@ -39,7 +39,7 @@ export function Linear_interpolation(min, max, t) {
    return min + (t * (max-min));
 }
 
-
+// Analyze a number into discrete digits
 export function Digitize(n, base=10){
 
    // Analyze a decimal number to its digit components
@@ -68,4 +68,63 @@ export function Digitize(n, base=10){
    }
    return result;
 
+}
+
+
+
+/***************************************************************************************************************************************/
+let ID = 0;
+function Get_ID() { return ID++; }
+
+
+// TODO: Maybe have a buffer of 'Function_Slope' objects, and recycle through unused
+
+export class Function_Slope {
+   constructor(slope_constant = 1.0, time_step = 0.1, value_change = 100, name = ID) {
+
+      this.slope_constant = slope_constant;
+      this.time_step = time_step;
+      this.timer = 0.0;
+      this.value_change = value_change;
+      this.in_animation = false;
+
+      if (name) this.name = name;
+      else name = Get_ID();
+   }
+
+   GetSlope() {
+      return this.slope_constant;
+   }
+
+   SetSlope(val) {
+      this.slope_constant = val;
+   }
+
+   GetTimer() {
+      return this.timer;
+   }
+
+   SetTimer(val) {
+      this.timer = val;
+   }
+
+   IncrementTimer() {
+      this.timer += this.time_step;
+   }
+
+   GetValueChange() {
+      return this.value_change;
+   }
+
+   SetValueChange(val) {
+      this.value_change = val;
+   }
+   
+   GetInAnimation() {
+      return this.in_animation;
+   }
+
+   SetInAnimation(val) {
+      this.in_animation = val;
+   }
 }

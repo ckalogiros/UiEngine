@@ -464,40 +464,45 @@ p
       const c = this.mat.char_buffer.buffer;
       const space_char_uv = Font_get_uv_coords(this.mat.uvIdx, ' ');
 
-      let xpos = this.geom.pos[0]+this.geom.dim[0];
-      // let xpos = this.geom.pos[0];
-      // const width = Font_metrics_get_char_width(this.mat.uvIdx, c[0]);
-      // let xpos = this.geom.pos[0]+width;
-      // let xpos = this.geom.pos[0];
-      
+      const w = Font_metrics_get_char_width(this.mat.uvIdx, c[0]);
+      // let xpos = this.geom.pos[0]+w;
+      // let xpos = this.geom.pos[0]+this.geom.dim[0];
+      // let xpos = this.geom.pos[0]-w/4;
+      let xpos = this.geom.pos[0];
+
       
       // Update text faces
       for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
          
          // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
          this.mat.uv = space_char_uv;
+         const width = Font_metrics_get_char_width(this.mat.uvIdx, c[i])/2;
+         xpos += width; //+1;
          
          if (c[i] !== ' ') // If char=' ' space, just render [0,0] uv coordinates.
             this.mat.uv = Font_get_uv_coords(this.mat.uvIdx, c[i]);
          
          // TODO: For efficiency, create a dedicated Gl_ function to update all values
          Gl_set_uv(this.gfx, this.mat.uv);
-         const w = Font_metrics_get_char_width(this.mat.uvIdx, c[i]);
-         Gl_set_vpos_x(this.gfx, w/2, 1);
+         Gl_set_vpos_x(this.gfx, width, 1);
+
          Gl_set_wpos_x(this.gfx, xpos); 
+         xpos += width; //+1;
          
-         xpos += w; //+1;
          this.gfx.vb.starts.buffer[0] += attribs_count;
          
       }
       
+      // const width = Font_metrics_get_face_advancex(this.mat.uvIdx);
+      // const faces_left = this.mat.char_buffer.size - this.mat.char_buffer.count;
+      // if(faces_left > 0) Gl_set_vpos_x(this.gfx, width, faces_left);
       // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
       for (let i = this.mat.char_buffer.boundary + 1; i < this.mat.char_buffer.size; i++) {
          
          Gl_set_uv(this.gfx, space_char_uv);
          
-         const width = Font_metrics_get_face_advancex(this.mat.uvIdx);
-         Gl_set_vpos_x(this.gfx, width, 1);
+         // const width = Font_metrics_get_face_advancex(this.mat.uvIdx);
+         // Gl_set_vpos_x(this.gfx, width, 1);
          
          this.gfx.vb.starts.buffer[0] += attribs_count;
       }

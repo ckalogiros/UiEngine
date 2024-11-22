@@ -119,7 +119,7 @@ export function Styles_hover_margin_set(idx, margin){
 export function Styles_pad_set(idx, pad){
    // TODOD: DEBUG the idx if exists and in boundaries
    if(pad[0]===_)
-      console.log()
+      alert('11445999876 Styles_pad_set(): Padd is not an array')
    _pad_buffer.buffer[idx][0] = pad[0];
    _pad_buffer.buffer[idx][1] = pad[1];
 }

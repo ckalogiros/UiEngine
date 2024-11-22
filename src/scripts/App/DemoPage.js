@@ -95,13 +95,14 @@ const comet_glow_slider_values = new Float32Array([0, 0, 0.08, 0.1]);
 
 
 
-export function Demo_page(create_demo_id = subcategory_animations1.id) {
+export function Demo_page(create_demo_id = subcategory_rotating_rects.id) {
 
    let comet_particles_struct = null;
    let glow_particles_struct = null;
    let smoke_particles_struct = null;
    let ellastic_collisions_struct = null;
    let animations_text_struct = null;
+   let snake_struct = null;
 
 
       
@@ -251,7 +252,7 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
       const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, subcategory_elastic_collisions.id);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
-      ellastic_collisions_struct = Elastic_collisions(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false);
+      ellastic_collisions_struct = Elastic_collisions(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, false);
 
    }
    else if (create_demo_id & subcategory_perimetric_rotation.id) { // Demos Physics
@@ -303,7 +304,7 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
       const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_snake.id);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
-      total_height += Game_snake(total_height);
+      snake_struct = Game_snake(total_height, false);
       total_height += 20;
       
       // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT);
@@ -347,6 +348,7 @@ export function Demo_page(create_demo_id = subcategory_animations1.id) {
       smoke_particles_struct:smoke_particles_struct,
       ellastic_collisions_struct:ellastic_collisions_struct,
       animations_text_struct:animations_text_struct,
+      snake_struct:snake_struct,
    }; 
    
    options_menu_btn.Bind(
@@ -704,6 +706,22 @@ function Options_menu_callback(params){
 
    if (params.params.menu_panel !== null) return;
 
+   const demo_id = params.params.mnemonics.demo_id;
+
+   // HACK: Unfortunately the implementation of the snake's options need re-implementation in order to match this functions code structure.
+   if(demo_id & subcategory_snake.id)
+   {
+
+      // const controls  = params.params.smoke_particles_struct.controls_section;
+      const Snake_options_callback = params.params.snake_struct.Snake_options_callback;
+      const options_clbk_params = {params:params.params.snake_struct.options_clbk_params};
+
+      Snake_options_callback(options_clbk_params);
+
+      return;
+   
+   }
+
    const dim = [
       (VIEWPORT.WIDTH/2  >= 180) ? 180 : VIEWPORT.WIDTH/2 - 10, 
       (VIEWPORT.HEIGHT/2 >= 250) ? 250 : VIEWPORT.HEIGHT/2 - 10,
@@ -737,7 +755,7 @@ function Options_menu_callback(params){
    menu_panel.SetName('MenuOptionsPanel');
    
    params.params.menu_panel = menu_panel;
-   const demo_id = params.params.mnemonics.demo_id;
+   
 
    let controls_section = null;
 
@@ -877,7 +895,7 @@ function Options_menu_callback(params){
       controls_section = slider_section;
 
    }
-   if(demo_id & subcategory_elastic_collisions.id)
+   if((demo_id & subcategory_elastic_collisions.id) || demo_id & category_physics.id)
    {
 
       const ellastic_collisions_balls  = params.params.ellastic_collisions_struct.ellastic_collisions_balls;
@@ -916,45 +934,46 @@ function Options_menu_callback(params){
 
    }
    if(demo_id & subcategory_animations_text.id)
-      {
-   
-         // const controls  = params.params.smoke_particles_struct.controls_section;
-         const slope_params_pointer  = params.params.animations_text_struct.slope_params_pointer;
-         const animation_properties  = params.params.animations_text_struct.animation_properties;
-         
-         const u_wpos_flags = {
-            unif: SID.UNIF.ROOT_WPOS2,
-            pass: SID.PASS.WPOS3,
-         }
-         
-         const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection', );
-         slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-         slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         
-         
-         
-         const scale_down = .2;
-         const glow_slider_values = params.params.mnemonics.glow_slider_values;
-         const animation_text_contols = Clbk_animations_text_create_contols(slope_params_pointer, animation_properties);
-         for(let i = 0; i < animation_text_contols.length; i++){
-            slider_section.AddItem(animation_text_contols[i]);
-         }
-   
-   
-   
-         menu_panel.AddItem(slider_section);
-   
-         slider_section.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
-         slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
-         // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
-         slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE ;
-         slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW ;
-   
-   
-         controls_section = slider_section;
-   
+   {
+
+      // const controls  = params.params.smoke_particles_struct.controls_section;
+      const slope_params_pointer  = params.params.animations_text_struct.slope_params_pointer;
+      const animation_properties  = params.params.animations_text_struct.animation_properties;
+      
+      const u_wpos_flags = {
+         unif: SID.UNIF.ROOT_WPOS2,
+         pass: SID.PASS.WPOS3,
       }
+      
+      const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection', );
+      slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      slider_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      
+      
+      
+      const scale_down = .2;
+      const glow_slider_values = params.params.mnemonics.glow_slider_values;
+      const animation_text_contols = Clbk_animations_text_create_contols(slope_params_pointer, animation_properties);
+      for(let i = 0; i < animation_text_contols.length; i++){
+         slider_section.AddItem(animation_text_contols[i]);
+      }
+
+
+
+      menu_panel.AddItem(slider_section);
+
+      slider_section.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
+      slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
+      // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
+      slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE ;
+      slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW ;
+
+
+      controls_section = slider_section;
+   
+   }
+
    
    /*******************************************************************************************/
    // Create close button

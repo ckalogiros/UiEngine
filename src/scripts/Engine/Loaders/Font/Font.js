@@ -124,7 +124,17 @@ export function Font_metrics_get_char_height(font_idx, ch) { return _fontMetrics
 export function Font_metrics_get_row_height(font_idx) { return _fontMetricsBuffer[font_idx].row_height; }
 export function Font_metrics_get_interpolated_x(font_idx) { return 1.0 / _fontMetricsBuffer[font_idx].texWidth; } // Transform to 0-1 coords 
 
+export function Font_metrics_calculate_width_from_text(str, font_idx){
 
+   let width = 0;
+	const len = str.length;
+	for(let i=0; i<len; i++){
+
+		width += Font_metrics_get_char_width(font_idx, str[i]);
+	}
+
+   return width;
+}
 
 
 export function Font_load_uvs(textureid) {

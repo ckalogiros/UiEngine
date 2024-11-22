@@ -52,6 +52,12 @@ const text_sample_colorpicker = `\
 WIDGET: COLOR-PICKER\
 `;
 
+
+// Create Per vertex coloring demo
+
+// Create Gardient coloring demo
+
+
 export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0], scroller_height = 150, control_slider_distance = null, control_slider_smoothness = null, control_slider_intensity = null) {
 
    // if (!control_slider_distance) alert('control_slider_distance param is missing');
@@ -504,7 +510,7 @@ export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, po
       g.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
       l1_s4.AddItem(g);
-      const gb = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, CYAN);
+      const gb = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, CYAN[9]);
       gb.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       gb.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather); gb.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
       l1_s4.AddItem(gb);

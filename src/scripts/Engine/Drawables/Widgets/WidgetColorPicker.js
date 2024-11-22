@@ -230,7 +230,7 @@ export class Widget_Color_Picker extends Section {
          RED[9], RED[9],
          YELLOW[9], YELLOW[9], // v1-v2
          GREEN[9], GREEN[9],   // v3-v4
-         CYAN, CYAN,          // v3-v4
+         CYAN[9], CYAN[9],          // v3-v4
          BLUE[9], BLUE[9],   // v5-v6
          PURPLE[9], PURPLE[9],   // v3-v4
          RED[9], RED[9],

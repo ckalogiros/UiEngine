@@ -103,7 +103,7 @@ export function RGB(int, widness=0, color_offset=5, brightness=1.3) {
 export const TRANSPARENT = new Float32Array([0.0, 0.0, 0.0, 0.0]);
 export const WHITE = new Float32Array([1.0, 1.0, 1.0, 1.0]);
 export const BLACK = new Float32Array([0.04, 0.04, 0.04, 1.0]);
-export const CYAN = new Float32Array([0.0, 1.0, 1.0, 1.0]);
+// export const CYAN = new Float32Array([0.0, 1.0, 1.0, 1.0]);
 export const MAGENTA = new Float32Array([1.0, 0.0, 1.0, 1.0]);
 
 // sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 )
@@ -348,6 +348,18 @@ const PURPLER8 = new Float32Array([0.9, 0.0, 0.45, 1.0]);
 const PURPLER9 = new Float32Array([1.0, 0.0, 0.5, 1.0]);
 export const PURPLER = [PURPLER0, PURPLER1, PURPLER2, PURPLER3, PURPLER4, PURPLER5, PURPLER6, PURPLER7, PURPLER8, PURPLER9,];
 
+const CYAN0 = new Float32Array([0.0, 0.1, 0.1,  1.0]);
+const CYAN1 = new Float32Array([0.0, 0.2, 0.2, 1.0]);
+const CYAN2 = new Float32Array([0.0, 0.3, 0.3,  1.0]);
+const CYAN3 = new Float32Array([0.0, 0.4, 0.4, 1.0]);
+const CYAN4 = new Float32Array([0.0, 0.5, 0.5,  1.0]);
+const CYAN5 = new Float32Array([0.0, 0.6, 0.6, 1.0]);
+const CYAN6 = new Float32Array([0.0, 0.7, 0.7,  1.0]);
+const CYAN7 = new Float32Array([0.0, 0.8, 0.8, 1.0]);
+const CYAN8 = new Float32Array([0.0, 0.9, 0.9,  1.0]);
+const CYAN9 = new Float32Array([0.0, 1.0, 1.0, 1.0]);
+export const CYAN = [PURPLER0, CYAN1, CYAN2, CYAN3, CYAN4, CYAN5, CYAN6, CYAN7, CYAN8, CYAN9,];
+
 
 // export const COLOR_ARRAY1 = [
 // 	BLUEL,
@@ -361,13 +373,14 @@ export const PURPLER = [PURPLER0, PURPLER1, PURPLER2, PURPLER3, PURPLER4, PURPLE
 // ];
 export const COLOR_ARRAY3 = [
 	BLUEL,
-	PURPLEB,
-	PURPLER,
 	YELLOW,
+	PURPLEB,
 	GREEN,
+	PURPLER,
+	CYAN,
 	ORANGE,
 	ORANGEL,
-	REDL,
+	RED,
 ];
 // export const COLOR_ARRAY = {
 

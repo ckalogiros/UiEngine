@@ -1639,8 +1639,6 @@ function Ui_focused_create_info_gfx(mesh, zpos){
       meshIdx
       vao
 
-      verts_per_face
-
       prog = {
          idx
          progibidx

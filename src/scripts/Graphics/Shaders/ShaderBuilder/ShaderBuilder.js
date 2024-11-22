@@ -876,15 +876,25 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
        *    sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 )
        */
 
-      '   float make_up = 2.;',
-      // '   vec4 final_with_lum = vec4(0.701*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
-      '   vec4 final_with_lum = vec4(0.759*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
       '   float mx = max(color.r,max(color.g,color.b));',
       '   float mn = min(color.r,min(color.g,color.b));',
       '   float balance = ( (mx-mn) / mx );',
-      '   frag_color = mix(color, final_with_lum, smoothstep(0., 1., balance));',
+      '   float avg = ((color.r*0.901)+(color.g*0.513)+(color.b*0.906)) / 3.0;',
+      
+      '   float make_up = (1.-avg)*2.;',
+
+      // '   vec4 final_with_lum = vec4(1.*color.r*make_up, 1.*color.g*make_up,  1.*color.b*make_up, color.a);',
+      // '   vec4 final_with_lum = vec4(0.701*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
+      // '   vec4 final_with_lum = vec4(0.759*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
+      // '   vec4 final_with_lum = vec4(0.901*color.r*make_up, 0.513*color.g*make_up,  0.906*color.b*make_up, color.a);',
+      // '   vec4 final_with_lum = vec4(min(0.513*color.r*make_up, 1.), min(0.513*color.g*make_up, 1.),  min(0.513*color.b*make_up, 1.), color.a);',
+      // '   vec4 final_with_lum = vec4(min(0.701*color.r*make_up, 1.), min(0.613*color.g*make_up, 1.),  min(0.786*color.b*make_up, 1.), color.a);',
+      '   vec4 final_with_lum = vec4(min(0.901*color.r*make_up, 1.), min(0.513*color.g*make_up, 1.),  min(0.906*color.b*make_up, 1.), color.a);',
+
+      // '   frag_color = mix(color, final_with_lum, balance);',
+      // '   frag_color = mix(color, final_with_lum, smoothstep(0., 1., balance));',
       // '   frag_color = final_with_lum;',
-      // '   frag_color = color;',
+      '   frag_color = color;',
 
 
 

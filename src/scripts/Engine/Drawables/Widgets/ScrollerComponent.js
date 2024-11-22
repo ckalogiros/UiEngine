@@ -1,5 +1,6 @@
 "use strict";
 
+import { Gl_set_attr_round_corners, Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
@@ -177,20 +178,13 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
    if (a < bar.geom.dim[1]) handle.geom.dim[1] = a - handle_pad[1];
    else handle.geom.dim[1] = clean_bar_height - handle_pad[1];
 
-   // const handle_bot = handle.geom.pos[1] + handle.geom.dim[1] * 2
-
 
    /* Set handle position */
-   // if (handle.geom.pos[1] <= bar.geom.pos[1] + handle_pad[1]) handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
-   // else if (handle_bot >= bar.geom.pos[1] + bar.geom.dim[1] * 2 - handle_pad[1]) handle.geom.pos[1] = (bar.geom.pos[1] + (bar.geom.dim[1] * 2)) - (handle.geom.dim[1]*2 + handle_pad[1]);
-   // if (handle.geom.pos[1] <= bar.geom.pos[1] + handle_pad[1]) handle.geom.pos[1] = bar.geom.pos[1] + handle.geom.dim[1] + handle_pad[1];
-   // else if (handle_bot >= bar.geom.pos[1] + bar.geom.dim[1] * 2 - handle_pad[1]) handle.geom.pos[1] = (bar.geom.pos[1] + (bar.geom.dim[1] * 2)) - (handle.geom.dim[1] + handle_pad[1]);
-
-   // handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
    handle.geom.pos[0] = bar.geom.pos[0];
 
    handle.geom.UpdateSetDimY(handle.gfx);
    handle.geom.UpdateSetWposXY(handle.gfx);
+   Gl_set_dim_y(handle.gfx, handle.geom.dim[1], 1)
 
 
    Scroller_component_update_handle_pos_from_scrolled_section(scrolled_section, bar);
