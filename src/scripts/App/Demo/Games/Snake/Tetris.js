@@ -9,7 +9,7 @@ import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/C
 import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLE, PURPLEB, REDL, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Drawables/Operations/Recursions.js";
 import { Time_intervals_create, Time_intervals_destroy, Time_intervals_destroy_byidx, Time_intervals_reset_byidx } from "../../../../Engine/Timers/TimeIntervals.js";
-import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgb, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_add_dim_xy, Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_dim_y, Gl_set_rgb, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Gen_array_check_for_existing_element } from "../../../../Helpers/GenericFunctions.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Floor, Fract, Min3 } from "../../../../Helpers/Math/MathOperations.js";
@@ -51,9 +51,9 @@ const GRID = {
    top_row:0
 };
 
-const MAX_COLUMNS = 8;
+const MAX_COLUMNS = 5;
 const TOKEN_SIZE = 30;
-const MAX_TOKENS_IN_Y_AXIS = 14;
+const MAX_TOKENS_IN_Y_AXIS = 12;
 const TOP_ROW = MAX_TOKENS_IN_Y_AXIS-1;
 const ROW_HEIGHT = TOKEN_SIZE*2;
 const COL_WIDTH = TOKEN_SIZE*2;
@@ -62,12 +62,16 @@ const TETRIS_PANEL_WIDTH = TOKEN_SIZE*MAX_COLUMNS;
 const tetris_panel_pad = 10;
 let speed = .5;
 const def_speed = speed;
+const cell_round_corners = TOKEN_SIZE/2;
+
+const init_slope = .14;
 
 
 let in_remove_row_animation = false;
 let tetris_end = false;
 let game_loop_time_interval_idx = INT_NULL;
 
+// TODO: create Int16 buffers, to easily reset/reuse them
 let complete_rows_cell_idxs = [];
 let complete_rows_idxs = [];
 
@@ -135,15 +139,19 @@ class Cell_mesh_properties {
       this.mesh = _mesh;
       this.idx = INT_NULL;
       this.size = TOKEN_SIZE;
-
+      
       // A modifier for the calculation of the slope function that controls the next position 
-      this.t = 0; // Values = [0-1]
-      this.prev_slope = 1.;// Stores the current calculated 't' to be used on the next 'Move' calculation. 
-
-      this.in_scale_up_animation = false;
+      this.time = 0; // Values = [0-1]
+      this.time_step = 0.014; // Values = [0-1]
+      this.prev_slope_val = 0;// Stores the current calculated 'time' to be used on the next 'Move' calculation. 
+      
+      this.next_anim_start = .3; // The slope's value at which the next cell animation should start
+      
       this.in_animation = false;
-
+      
       this.glow_intensity = glow_intensity;
+
+      this.scale = 20;
    }
 }
 
@@ -277,7 +285,7 @@ function Grid_move_all_down(row_idxs) {
             let total_height = ROW_HEIGHT * num_rows;
             // let total_height = ROW_HEIGHT;
             if(cellidx !== INT_NULL) {
-               const mesh = _cells_buffer.buffer[cellidx];
+               const mesh = _cells_buffer.buffer[cellidx].mesh;
                mesh.geom.pos[1] += total_height;
                Gl_add_wpos_y(mesh.gfx, total_height, 1);
             }
@@ -311,7 +319,7 @@ function Grid_move_all_down(row_idxs) {
 //          const cellidx = col.buffer[j];
 //          let total_height = ROW_HEIGHT * num_rows;
 //          if(cellidx !== INT_NULL) {
-//             const mesh = _cells_buffer.buffer[cellidx];
+//             const mesh = _cells_buffer.buffer[cellidx].mesh;
 //             mesh.geom.pos[1] += total_height;
 //             Gl_add_wpos_y(mesh.gfx, total_height, 1);
 //          }
@@ -360,7 +368,7 @@ function Grid_move_all_down(row_idxs) {
 //                _grid_columns.buffer[j].buffer[first_row_to_move-row_idxs[i]] = _grid_columns.buffer[j].buffer[in_between_rows];
 //                _grid_columns.buffer[j].buffer[in_between_rows] = INT_NULL;
 
-//                const mesh = _cells_buffer.buffer[cellidx];
+//                const mesh = _cells_buffer.buffer[cellidx].mesh;
 //                const total_rows_height = (first_row_to_move) * ROW_HEIGHT;
 //                mesh.geom.pos[1] += total_rows_height;
 //                Gl_add_wpos_y(mesh.gfx, total_rows_height, 1);
@@ -408,7 +416,7 @@ function Grid_move_all_down(row_idxs) {
 //                //    col.buffer[k+1] = INT_NULL;
 //                // }
 //             }
-//             const mesh = _cells_buffer.buffer[cellidx];
+//             const mesh = _cells_buffer.buffer[cellidx].mesh;
 //             if(mesh===_) console.error('cellidx', cellidx, 'col.buffer[j]', col.buffer, 'j', j, 'rowidx', rowidx, 'last_elem', last_elem);
 //             mesh.geom.pos[1] += total_height;
 //             Gl_add_wpos_y(mesh.gfx, total_height, 1);
@@ -440,7 +448,7 @@ function Grid_add_cells_from_token(token){
    for(let i=0; i<token.num_cells; i++) {
 
       const cellidx = token.cells.buffer[i];
-      // const mesh = _cells_buffer.buffer[cellidx];
+      // const mesh = _cells_buffer.buffer[cellidx].mesh;
       const col_idx = token.cols[i];
       const row_idx = token.rows[i];
       console.log('i:', i, 'col_idx', col_idx, 'row_idx', row_idx, 'cellidx', cellidx);
@@ -535,18 +543,20 @@ function Grid_check_row_completion(token_cells_rows) {
 
 
 /*********************************************************************************************************/
-// Mesh functions
+// Cell functions
 function Cell_create(offsetx=0, offsety=0, col){
 
    const color = col!==undefined ? col : YELLOW[9];
    const mesh = Create_widget_section(_, _, [0, 0], [10+(TOKEN_SIZE*2*offsetx), 10+(TOKEN_SIZE*2*offsety),0], [TOKEN_SIZE, TOKEN_SIZE], color, 'mesh');
    mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, cell_round_corners);
 
    const cell = new Cell_mesh_properties(mesh);
+
+   console.log('CREATING NEW CELL', cell)
    
-   const cellidx = _cells_buffer.Add(mesh);
+   const cellidx = _cells_buffer.Add(cell);
 
    return {
       mesh:mesh,
@@ -555,6 +565,7 @@ function Cell_create(offsetx=0, offsety=0, col){
 }
 function Cell_store_free_cell(cellidx) {
    _free_cells_buffer.Add(cellidx);
+   console.log('FREE CELL STORE:', cellidx, _cells_buffer.buffer[cellidx])
 }
 function Cell_get_free_cell() {
 
@@ -563,6 +574,7 @@ function Cell_get_free_cell() {
 
       const free_cell_idx = _free_cells_buffer.buffer[last_elem];
       _free_cells_buffer.RemoveByIdxSortedVersionLastElemGuarantee();
+      console.log('USED CELL FOUND. free_cell_idx:', free_cell_idx, 'cell',  _cells_buffer.buffer[free_cell_idx])
       return free_cell_idx;
    }
 
@@ -583,11 +595,6 @@ function Cell_get_free_cell() {
  * Rotate horizontal: Take the ypos of the second cell, and occupy from -1 cell(being inside boundaries) to +3 cell
  * Rotate vertical: Take the ypos of the second cell, and occupy from -1 to +3
  */
-
-
-
-
-
 function Mat2_mult_vec2(mat, x, y){
 
    return [
@@ -816,7 +823,7 @@ class Token {
          const xx = Grid_get_posx_from_colidx(this.cols[i]);
          const yy = Grid_get_posx_from_colidx(TOP_ROW-this.rows[i]);
 
-         const mesh = _cells_buffer.buffer[this.cells.buffer[i]];
+         const mesh = _cells_buffer.buffer[this.cells.buffer[i]].mesh;
          mesh.geom.pos[1] = xx;
          mesh.geom.pos[1] = yy;
          Gl_set_wpos_xy(mesh.gfx, xx, yy, 1);
@@ -824,14 +831,14 @@ class Token {
    }
    AddPosY(y){
       for(let i=0; i<this.num_cells; i++){
-         const mesh = _cells_buffer.buffer[this.cells.buffer[i]];
+         const mesh = _cells_buffer.buffer[this.cells.buffer[i]].mesh;
          mesh.geom.pos[1] += y;
          Gl_add_wpos_y(mesh.gfx, y, 1);
       }
    }
    SetPosY(y){
       for(let i=0; i<this.num_cells; i++){
-         const mesh = _cells_buffer.buffer[this.cells.buffer[i]];
+         const mesh = _cells_buffer.buffer[this.cells.buffer[i]].mesh;
          mesh.geom.pos[1] = y;
          Gl_set_wpos_y(mesh.gfx, y, 1);
       }
@@ -843,6 +850,22 @@ class Token {
 
 let curr_token = null;
 
+function Cell_reset_mesh(mesh, colidx, rowidx){
+
+   mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+   mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+   Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+   mesh.geom.dim[0] = TOKEN_SIZE;
+   mesh.geom.dim[1] = TOKEN_SIZE;
+   Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
+
+   mesh.geom.SetDimXY(mesh.gfx, TOKEN_SIZE, TOKEN_SIZE);
+   
+   mesh.mat.style.rcorners = cell_round_corners;
+   Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners);
+   
+}
+
 function Tetris_create_token_square(section, token){
 
    {
@@ -852,15 +875,9 @@ function Tetris_create_token_square(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
-         
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
-         
-
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
@@ -881,14 +898,9 @@ function Tetris_create_token_square(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
-         
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
-         
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
 
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
@@ -910,12 +922,8 @@ function Tetris_create_token_square(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
-         
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
+         Cell_reset_mesh(mesh, colidx, rowidx);
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
@@ -939,12 +947,9 @@ function Tetris_create_token_square(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
-         
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         Cell_reset_mesh(mesh, colidx, rowidx);
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
@@ -972,12 +977,12 @@ function Tetris_create_token_shape_L(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
@@ -1001,12 +1006,12 @@ function Tetris_create_token_shape_L(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
@@ -1030,12 +1035,12 @@ function Tetris_create_token_shape_L(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
@@ -1059,12 +1064,12 @@ function Tetris_create_token_shape_L(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
@@ -1092,12 +1097,12 @@ function Tetris_create_token_shape_L_mirror(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
@@ -1121,12 +1126,12 @@ function Tetris_create_token_shape_L_mirror(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
@@ -1150,12 +1155,12 @@ function Tetris_create_token_shape_L_mirror(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
@@ -1179,12 +1184,12 @@ function Tetris_create_token_shape_L_mirror(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
@@ -1211,12 +1216,12 @@ function Tetris_create_token_line4(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
@@ -1240,12 +1245,12 @@ function Tetris_create_token_line4(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx)
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
@@ -1269,12 +1274,12 @@ function Tetris_create_token_line4(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx);
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
@@ -1298,12 +1303,12 @@ function Tetris_create_token_line4(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
+         // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
+         // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
+         // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
+         Cell_reset_mesh(mesh, colidx, rowidx);
          token.AddCell(free_cellidx, colidx, rowidx);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
@@ -1332,7 +1337,7 @@ function Tetris_create_token_test(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
          mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
@@ -1359,7 +1364,7 @@ function Tetris_create_token_test(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
          mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
@@ -1386,7 +1391,7 @@ function Tetris_create_token_test(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
          mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
@@ -1417,7 +1422,7 @@ function Tetris_create_token_line2(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
          mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
@@ -1444,7 +1449,7 @@ function Tetris_create_token_line2(section, token){
    
       if(free_cellidx !== INT_NULL){
             
-         const mesh = _cells_buffer.buffer[free_cellidx];
+         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          
          mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
@@ -1741,7 +1746,7 @@ function Animation_pound_run(params) {
 
    const len = complete_rows_cell_idxs.length;
    for(let i=0; i<len; i++){
-      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]];
+      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]].mesh;
       mesh.geom.pos[1] += y;
       Gl_add_wpos_y(mesh.gfx, y, 1);
    }
@@ -1761,7 +1766,7 @@ function Animation_pound_stop(params) {
 
    const len = complete_rows_cell_idxs.length;
    for(let i=0; i<len; i++){
-      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]];
+      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]].mesh;
       mesh.geom.pos[1] = target_posy;
       Gl_set_wpos_y(mesh.gfx, target_posy, 1);
    }
@@ -1770,10 +1775,11 @@ function Animation_pound_stop(params) {
 }
 
 
-// Create Remove Row Animation
 
+/******************************************************************************************************************************/
+// Create Remove Row Animation
 function Create_row_animation(complete_rows_cell_idxs, rowidxs) {
-   
+
    // // Color and move animation
    // const params = {
    //    complete_rows_cell_idxs: complete_rows_cell_idxs,
@@ -1781,25 +1787,26 @@ function Create_row_animation(complete_rows_cell_idxs, rowidxs) {
    //    rowidxs:rowidxs,
    // };
    
-   // in_remove_row_animation = true;
    
    // Callback_animations_create(Animation_row_run, Animation_row_stop, params, 'TetrisColor_MoveAnimation');
    
+   in_remove_row_animation = true;
    
    // Scale animation 
-   const time_step = 0.01, slope_const = 0.4, scale = 10;
-   const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
+   
    const params = {
-      complete_rows_cell_idxs: complete_rows_cell_idxs,
-      all_rgb_maxed:0x0,
+      // complete_rows_cell_idxs: complete_rows_cell_idxs,
       rowidxs:rowidxs,
-      function_slope: slope_params_pointer,
-      mesh_idx:complete_rows_cell_idxs[0],
+      cell_buffer_idx:0,
    };
    
    // Create scale animation
    Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params, 'TetrisScaleAnimation');
 }
+
+
+/******************************************************************************************************************************/
+// Color-intensity and Move animation
 function Animation_row_run(params) {
 
    // !! Runs for all tokens of a row, so 1 callback_animation that will call remove row once.
@@ -1811,7 +1818,7 @@ function Animation_row_run(params) {
    const len = complete_rows_cell_idxs.length;
    for(let i=0; i<len; i++){
       
-      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]];
+      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]].mesh;
 
       let r = mesh.mat.col[0];
       let g = mesh.mat.col[1];
@@ -1872,7 +1879,7 @@ function Animation_row_destroy_run(params) {
    const len = complete_rows_cell_idxs.length;
    for(let i=0; i<len; i++){
       
-      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]];
+      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]].mesh;
       mesh.geom.pos[1] += y;
       Gl_add_wpos_y(mesh.gfx, y, 1);
 
@@ -1916,171 +1923,218 @@ function Animation_row_destroy_stop(params) {
 
 
 
-
+/******************************************************************************************************************************/
+// Scale animation
 function Animation_scale_up_run(params) {
 
-   const slope_constant = params.function_slope.GetSlope();
-   const scale = params.function_slope.GetValueChange();
-   params.function_slope.IncrementTimer();
-   const timer = params.function_slope.GetTimer();
-   const mesh_idx = params.mesh_idx;
+   // const complete_rows_cell_idxs = params.complete_rows_cell_idxs;
+   const cell_buffer_idx = params.cell_buffer_idx;
+   const cell_idx = complete_rows_cell_idxs[cell_buffer_idx];
 
-   const complete_rows_cell_idxs = params.complete_rows_cell_idxs;
-   const slope = Logarithmic_interpolation(timer, slope_constant);
+   const cell = _cells_buffer.buffer[cell_idx];
+   const slope_constant = init_slope;
+   const prev_slope_val = cell.prev_slope_val;
+   const scale = cell.scale;
 
-   const mesh = _cells_buffer.buffer[mesh_idx];
-   const size = mesh.geom.dim[0] + (slope * scale);
 
-   // console.log('mesh', i, mesh.geom.pos)
+   cell.time += cell.time_step;
+   const slope = Logarithmic_interpolation(cell.time, slope_constant);
 
-   mesh.geom.SetDimXY(mesh.gfx, size, size);
-   Gl_set_dim_xy(mesh.gfx, size, size);
+   const mesh = cell.mesh;
+   const size = -(slope-prev_slope_val) * scale;
 
-   const diffx = mesh.geom.pos[0] + (slope * scale);
-   const diffy = mesh.geom.pos[1] + (slope * scale);
-   // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
+   mesh.geom.dim[0] += size;
+   mesh.geom.dim[1] += size;
+   mesh.geom.AddDimXY(mesh.gfx, size, size);
+   Gl_add_dim_xy(mesh.gfx, size, size);
 
+   
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-      Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * (slope + 1));
+      // mesh.mat.style.rcorners = (TOKEN_SIZE/2) * (slope-prev_slope_val) * scale;
+      mesh.mat.style.rcorners = mesh.geom.dim[0]/2;
+      Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners);
    }
-
-   // Create scale up for the next body mesh
-   // if (bodyidx + 1 < snake.count && !token.in_animation) {
-   // if (slope > .8) {
-
-   //    if (body.mesh.geom.dim[0] > (body.size + snake.start_next_anim)) {
-
-   //       const params2 = {
-   //          section: section,
-   //          snake: snake,
-   //          nose: params.nose,
-   //          body_mesh_idx: params.body_mesh_idx + 1,
-   //       };
-   //       if (bodyidx <= snake.body.boundary) {
-   //          snake.in_scale_animation = true;
-   //          body.in_animation = true;
-   //          body.in_scale_up_animation = true;
-   //          Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params2);
-   //       }
-   //    }
-   // }
-
-   // const len = complete_rows_cell_idxs.length;
-   // for(let i=0; i<len; i++){
-      
-   //    const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]];
-   //    const size = mesh.geom.dim[0] + (slope * scale);
    
-   //    // console.log('mesh', i, mesh.geom.pos)
+   cell.prev_slope_val = slope;
 
-   //    mesh.geom.SetDimXY(mesh.gfx, size, size);
-   //    Gl_set_dim_xy(mesh.gfx, size, size);
    
-   //    const diffx = mesh.geom.pos[0] + (slope * scale);
-   //    const diffy = mesh.geom.pos[1] + (slope * scale);
-   //    // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
-   
-   //    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-   //       Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * (slope + 1));
-   //    }
+   // Create scale up for the next cell mesh
+   const next_cell_idx = cell_buffer_idx+1; 
+   const next = complete_rows_cell_idxs[next_cell_idx]; // Get the next cell index from the 
+   const next_cell = _cells_buffer.buffer[next];
+   if (next_cell_idx < complete_rows_cell_idxs.length) {
+      if (slope > cell.next_anim_start && !next_cell.in_animation) {
 
-   // }
+         // Set the next cell in animation mode
+         next_cell.in_animation = true;
+
+         // Create animation for next cell
+         const params2 = {
+            // complete_rows_cell_idxs:params.complete_rows_cell_idxs,
+            rowidxs:params.rowidxs,
+            cell_buffer_idx:next_cell_idx,
+         };
+
+         Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params2);
+      }
+   }
 
 
 
    if (slope < 1.) return true;
-   else return false
+   else 
+      return false
 
 }
-// function Animation_scale_up_run(params) {
 
-//    const slope_constant = params.function_slope.GetSlope();
-//    const scale = params.function_slope.GetValueChange();
-//    params.function_slope.IncrementTimer();
-//    const timer = params.function_slope.GetTimer();
+function Animation_scale_up_stop(params) {
+
+   // Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params, `Run:TetrisScaleDownAnimation`)
+
+   const cell_buffer_idx = params.cell_buffer_idx;
+   const cell_idx = complete_rows_cell_idxs[cell_buffer_idx];
+   const cell = _cells_buffer.buffer[cell_idx];
+
+   // Reset Cell's properties
+   cell.time = 0;
+   cell.prev_slope_val = 0;
+   cell.in_animation = false;
+   
+   
+   // Reset mesh's properties
+   const mesh = cell.mesh;
+   mesh.geom.pos[1] = OUT_OF_VIEW;
+   Gl_set_wpos_y(mesh.gfx, OUT_OF_VIEW);
+
+
+   console.log('Cell cell_idx:', cell_idx, 'reseted. cell.in_animation=', cell.in_animation)
+
+
+   // Remove cell rows
+   const last_elem_idx = complete_rows_cell_idxs.length-1;
+   if(cell_idx === complete_rows_cell_idxs[last_elem_idx]) {
+
+      const rowidxs = params.rowidxs;
+      const boundary = rowidxs.length-1;
+   
+      for(let i=boundary; i>=0; i--){
+   
+         console.log('Removing Row:', rowidxs[i])
+         Grid_remove_row(rowidxs[i]);
+      }
+      Grid_move_all_down(rowidxs);
+
+      // Reset completed rows buffer
+      in_remove_row_animation = false;
+      complete_rows_cell_idxs = [];
+      complete_rows_idxs = [];
+
+      console.log('complete_rows_cell_idxs', complete_rows_cell_idxs, 'complete_rows_idxs', complete_rows_idxs);
+   }
+
+
+   return false;
+}
+
+// function Animation_scale_down_run(params) {
 
 //    const complete_rows_cell_idxs = params.complete_rows_cell_idxs;
-//    const slope = Logarithmic_interpolation(timer, slope_constant);
+//    const cell_buffer_idx = params.cell_buffer_idx;
+//    const cell_idx = complete_rows_cell_idxs[cell_buffer_idx];
 
-//    const len = complete_rows_cell_idxs.length;
-//    for(let i=0; i<len; i++){
-      
-//       const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]];
-//       const size = mesh.geom.dim[0] + (slope * scale);
-   
-//       // console.log('mesh', i, mesh.geom.pos)
+//    const cell = _cells_buffer.buffer[cell_idx];
+//    const slope_constant = init_slope;
+//    const prev_slope_val = cell.prev_slope_val;
+//    const scale = cell.scale;
 
-//       mesh.geom.SetDimXY(mesh.gfx, size, size);
-//       Gl_set_dim_xy(mesh.gfx, size, size);
-   
-//       const diffx = mesh.geom.pos[0] + (slope * scale);
-//       const diffy = mesh.geom.pos[1] + (slope * scale);
-//       // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
-   
-//       if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-//          Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * (slope + 1));
-//       }
 
-//    }
+//    cell.time += cell.time_step;
+//    const slope = Logarithmic_interpolation(cell.time, slope_constant);
+
+//    const mesh = _cells_buffer.buffer[cell_idx].mesh;
+//    const size = ((slope-prev_slope_val) * scale);
+
+//    mesh.geom.dim[0] -= size;
+//    mesh.geom.dim[1] -= size;
+//    mesh.geom.AddDimXY(mesh.gfx, -size, -size);
+//    Gl_add_dim_xy(mesh.gfx, -size, -size);
+   
+//    // if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
+//    //    mesh.mat.style.rcorners -= size;
+//    //    Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners);
+//    // }
+   
+//    cell.prev_slope_val = slope;
+
 
 
 
 //    if (slope < 1.) return true;
 //    else return false
-
 // }
 
-function Animation_scale_up_stop(params) {
+// function Animation_scale_down_stop(params) {
 
-   // Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params, `TetrisScaleDownAnimation`)
-   params.function_slope.SetTimer(0);
+//    // Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params, `Stop:TetrisScaleDownAnimation`);
 
-   return false;
-}
+//    const complete_rows_cell_idxs = params.complete_rows_cell_idxs;
+//    const cell_buffer_idx = params.cell_buffer_idx;
+//    const cell_idx = complete_rows_cell_idxs[cell_buffer_idx];
 
-function Animation_scale_down_run(params) {
+//    const cell = _cells_buffer.buffer[cell_idx];
 
-   const slope_constant = params.function_slope.GetSlope();
-   const scale = params.function_slope.GetValueChange();
-   params.function_slope.IncrementTimer();
-   const timer = params.function_slope.GetTimer();
+//    const mesh = _cells_buffer.buffer[cell_idx].mesh;
 
-   const complete_rows_cell_idxs = params.complete_rows_cell_idxs;
-   const slope = Logarithmic_interpolation(timer, slope_constant);
+//    // mesh.geom.pos[0] = OUT_OF_VIEW;
+//    mesh.geom.pos[1] = OUT_OF_VIEW;
+//    Gl_set_wpos_y(mesh.gfx, OUT_OF_VIEW);
+//    // mesh.geom.SetPosY(mesh.gfx, 1200);
+//    // Gl_add_dim_xy(mesh.gfx, -size, -size);
 
-   const len = complete_rows_cell_idxs.length;
-   for(let i=0; i<len; i++){
-      
-      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]];
+//    cell.time = 0;
+//    cell.prev_slope_val = Logarithmic_interpolation(cell.time, init_slope);
+//    cell.in_animation = false;
+//    cell.in_scale_up_animation = false;
 
-      const size = mesh.geom.dim[0] + ((1. - slope) * scale);
-      mesh.geom.SetDimXY(mesh.gfx, size, size);
-      Gl_set_dim_xy(mesh.gfx, size, size);
+//    // const rowidxs = params.rowidxs;
+//    // const boundary = rowidxs.length-1;
+
+//    // for(let i=boundary; i>=0; i--){
+
+//    //    console.log('Removing Row:', rowidxs[i])
+//    //    Grid_remove_row(rowidxs[i]);
+//    // }
+//    // Grid_move_all_down(rowidxs);
+
+//    // if(DEBUG_PRINT){
+//    //    console.log('#############################################################################################\nAfter grid row has been removed')   
+//    //    Debug_print()
+//    // }
+
    
-      const diffx = mesh.geom.pos[0] + ((1. - slope) * scale);
-      const diffy = mesh.geom.pos[1] + ((1. - slope) * scale);
-      // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
+//    const last_elem_idx = params.complete_rows_cell_idxs.length-1;
+//    console.log(cell_idx, params.complete_rows_cell_idxs[last_elem_idx])
+//    if(cell_idx === params.complete_rows_cell_idxs[last_elem_idx]) {
+
+//       const rowidxs = params.rowidxs;
+//       const boundary = rowidxs.length-1;
    
-      if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-         Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * ((1. - slope) + 1));
-      }
+//       for(let i=boundary; i>=0; i--){
+   
+//          console.log('Removing Row:', rowidxs[i])
+//          Grid_remove_row(rowidxs[i]);
+//       }
+//       Grid_move_all_down(rowidxs);
 
-   }
 
+//       in_remove_row_animation = false;
+//       params.complete_rows_cell_idxs = [];
+//       complete_rows_idxs = [];
+//    }
 
-
-
-   if (slope < 1.) return true;
-   else return false
-}
-
-function Animation_scale_down_stop(params) {
-
-   Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params, `Stop:${params.function_slope.slope_constant}`);
-   params.function_slope.SetTimer(0);
-
-   return false;
-}
+   
+//    return false;
+// }
 
 
 
@@ -2152,5 +2206,8 @@ function Debug_print(){
    }
    console.log('---------\nboundar', boundary)
    console.log('active_', active_count)
+   
+   
+   console.log('!!!!!!!!!!!!!!!!!!!!!!!!!', _cells_buffer.buffer[12])
 
 }
