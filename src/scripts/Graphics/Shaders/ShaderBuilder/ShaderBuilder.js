@@ -891,10 +891,10 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // '   vec4 final_with_lum = vec4(min(0.701*color.r*make_up, 1.), min(0.613*color.g*make_up, 1.),  min(0.786*color.b*make_up, 1.), color.a);',
       '   vec4 final_with_lum = vec4(min(0.901*color.r*make_up, 1.), min(0.513*color.g*make_up, 1.),  min(0.906*color.b*make_up, 1.), color.a);',
 
-      // '   frag_color = mix(color, final_with_lum, balance);',
+      '   frag_color = mix(color, final_with_lum, balance);',
       // '   frag_color = mix(color, final_with_lum, smoothstep(0., 1., balance));',
       // '   frag_color = final_with_lum;',
-      '   frag_color = color;',
+      // '   frag_color = color;',
 
 
 

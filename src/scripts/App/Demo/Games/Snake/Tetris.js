@@ -18,6 +18,7 @@ import { Abs, Floor, Fract, Min3 } from "../../../../Helpers/Math/MathOperations
 
 
 const DEBUG_PRINT = true;
+const DEBUG_PRINT2 = false;
 // const DEBUG_NOT_MOVE_DOWN = true;
 const DEBUG_NOT_MOVE_DOWN = false;
 
@@ -51,7 +52,7 @@ const GRID = {
    top_row:0
 };
 
-const MAX_COLUMNS = 5;
+const MAX_COLUMNS = 8;
 const TOKEN_SIZE = 30;
 const MAX_TOKENS_IN_Y_AXIS = 12;
 const TOP_ROW = MAX_TOKENS_IN_Y_AXIS-1;
@@ -63,6 +64,51 @@ const tetris_panel_pad = 10;
 let speed = .5;
 const def_speed = speed;
 const cell_round_corners = TOKEN_SIZE/2;
+
+// Indexes to a specific token's pivots
+const ROTATION_STATES = {
+   UP:0,
+   RIGHT:1,
+   DOWN:2,
+   LEFT:3,
+};
+
+const TOKEN_TYPE = {
+   RECT:0,
+   LINE:1,
+   L:2,
+   L_MIRRORED:3,
+};
+
+/**
+ * Predetermined
+ * Cell indexes of a token's cell pivot
+ * 
+ * Example:
+ * Token: Line [1, 2, 2, 0]
+ * 1 is the second cell of the line token.
+ * 1 is at index 0, which means is addressing the rotation state of 'ROTATION_STATES.UP'.
+ * In conclusion, for a line token, in the rotation state 'UP', the pivot is the cell with index 1. 
+ *    
+ */
+const _token_rotation_states_pivots = [
+   [3, 3, 3, 3], // Rotation state: Rect
+   [2, 2, 2, 2], // Rotation state: Line
+   [3, 3, 3, 3], // Rotation state: L
+   [0, 0, 0, 0], // Rotation state: L_mirrored
+];
+
+function DEBUG_rotations_state(rotation_state) {
+   if(rotation_state===0) return 'UP';
+   if(rotation_state===1) return 'RIGHT';
+   if(rotation_state===2) return 'DOWN';
+   if(rotation_state===3) return 'LEFT';
+   alert('991544444444')
+}
+
+
+
+
 
 const init_slope = .14;
 
@@ -188,7 +234,7 @@ function Grid_get_colidx_from_posx(xpos) {
    const x = xpos - tetris_panel_pad - TOKEN_SIZE;
    const col_idx = (x!==0) ? x / COL_WIDTH : 0;
    
-   if(Fract(col_idx))
+   if(DEBUG_PRINT2) if(Fract(col_idx))
       console.error('3312241544321 col_idx is not an int')
 
    return col_idx;
@@ -301,157 +347,16 @@ function Grid_move_all_down(row_idxs) {
    GRID.top_row -= move_rows;
 
 }
-/** */
-// function Grid_move_all_down(row_idxs) {
-   
-//    const num_rows = row_idxs.length;
-//    const from = TEMP_find_max_val_from_arr(row_idxs)+1;
-   
-//    for(let i=0; i<MAX_COLUMNS; i++){
-      
-//       const col = _grid_columns.buffer[i];
-//       const to = col.boundary;
-      
-//       for(let j=from; j <= to; j++){
-         
-//          col.buffer[j-num_rows] = col.buffer[j];
-         
-//          const cellidx = col.buffer[j];
-//          let total_height = ROW_HEIGHT * num_rows;
-//          if(cellidx !== INT_NULL) {
-//             const mesh = _cells_buffer.buffer[cellidx].mesh;
-//             mesh.geom.pos[1] += total_height;
-//             Gl_add_wpos_y(mesh.gfx, total_height, 1);
-//          }
-         
-//          col.buffer[j] = INT_NULL;
-//       }
-      
-//       console.error('num_rows', num_rows, 'from',from, 'to', to,);
-      
-//    }
-
-//    TEMP_recalc_boundary();
-
-// }
-/** */
-// function Grid_move_all_down(row_idxs) {
-   
-
-//    const num_rows = row_idxs.length;
-
-//    for(let i=0; i<num_rows; i++){
-
-//       let move_down_num_rows = 0;
-      
-//       // const row_idx = row_idxs[i];
-//       const first_row_to_move = row_idxs[i] + 1;
-//       let last_row_to_move = INT_NULL;
-      
-//       if(i+1 >= num_rows) { // Run until the end of columns buffer
-//          last_row_to_move = MAX_TOKENS_IN_Y_AXIS;
-//       }
-//       else {
-//          last_row_to_move = row_idxs[i+1]-1;
-//       }
-      
-//       for(let in_between_rows = first_row_to_move; in_between_rows < last_row_to_move; in_between_rows++) {
-         
-//          for(let j=0; j < MAX_COLUMNS; j++){
-
-//             const cellidx = _grid_columns.buffer[j].buffer[in_between_rows];
-            
-//             if(cellidx !== INT_NULL) {
-
-//                // _grid_columns.buffer[j].buffer[in_between_rows-1] = _grid_columns.buffer[j].buffer[in_between_rows];
-//                // _grid_columns.buffer[j].buffer[in_between_rows-first_row_to_move] = _grid_columns.buffer[j].buffer[in_between_rows];
-//                _grid_columns.buffer[j].buffer[first_row_to_move-row_idxs[i]] = _grid_columns.buffer[j].buffer[in_between_rows];
-//                _grid_columns.buffer[j].buffer[in_between_rows] = INT_NULL;
-
-//                const mesh = _cells_buffer.buffer[cellidx].mesh;
-//                const total_rows_height = (first_row_to_move) * ROW_HEIGHT;
-//                mesh.geom.pos[1] += total_rows_height;
-//                Gl_add_wpos_y(mesh.gfx, total_rows_height, 1);
-//             }
-//          }
-//       }
-//    }
-   
-//    for(let j=0; j < MAX_COLUMNS; j++){
-      
-//       const last_elem = _grid_columns.buffer[j].boundary;
-//       _grid_columns.buffer[j].buffer[last_elem] = INT_NULL;
-      
-//    }
-
-//    TEMP_recalc_boundary();
-
-// }
-/**OLD */
-// function Grid_move_all_down(rowidx) {
-   
-//    for(let i=0; i<MAX_COLUMNS; i++){
-      
-//       const col = _grid_columns.buffer[i];
-      
-//       const last_elem = col.boundary;
-//       for(let j=rowidx+1; j <= last_elem; j++){
-         
-//          let total_height = 0;
-//          const cellidx = col.buffer[j];
-         
-//          if(cellidx !== INT_NULL) {
-
-            
-//             total_height += ROW_HEIGHT;
-//             col.buffer[j-1] = col.buffer[j];
-            
-            
-//             for(let k=j-1; k>=0; k--) {
-                  
-//                // if(col.buffer[k] === INT_NULL) {
-                  
-//                //    total_height += ROW_HEIGHT;
-//                //    col.buffer[k] = col.buffer[k+1];
-//                //    col.buffer[k+1] = INT_NULL;
-//                // }
-//             }
-//             const mesh = _cells_buffer.buffer[cellidx].mesh;
-//             if(mesh===_) console.error('cellidx', cellidx, 'col.buffer[j]', col.buffer, 'j', j, 'rowidx', rowidx, 'last_elem', last_elem);
-//             mesh.geom.pos[1] += total_height;
-//             Gl_add_wpos_y(mesh.gfx, total_height, 1);
-//          }
-         
-//       }
-      
-//       if(rowidx+1 <= last_elem) col.buffer[last_elem] = INT_NULL;
-      
-      
-//       // Recalc the boundary
-//       _grid_columns.buffer[i].boundary = INT_NULL; 
-//       const start = _grid_columns.buffer[i].size-1;
-//       for(let j=start; j>=0; j--){
-//          if(_grid_columns.buffer[i].buffer[j] !== INT_NULL) { 
-//             _grid_columns.buffer[i].boundary = j; 
-//             break; 
-//          }
-//       }  
-
-//       // console.log('column:',  i, 'boundary', _grid_columns.buffer[i].boundary, 'active_count', _grid_columns.buffer[i].active_count );
-
-//    }
-
-// }
 function Grid_add_cells_from_token(token){
 
-   console.log('ADDING TOKEN:', 'token.cols[i]', token.cols, 'token.rows[i]', token.rows);
+   if(DEBUG_PRINT2) console.log('ADDING TOKEN:', 'token.cols[i]', token.cols, 'token.rows[i]', token.rows);
    for(let i=0; i<token.num_cells; i++) {
 
       const cellidx = token.cells.buffer[i];
       // const mesh = _cells_buffer.buffer[cellidx].mesh;
       const col_idx = token.cols[i];
       const row_idx = token.rows[i];
-      console.log('i:', i, 'col_idx', col_idx, 'row_idx', row_idx, 'cellidx', cellidx);
+      if(DEBUG_PRINT2) console.log('i:', i, 'col_idx', col_idx, 'row_idx', row_idx, 'cellidx', cellidx);
 
 
       if(row_idx >= MAX_TOKENS_IN_Y_AXIS) 
@@ -475,7 +380,7 @@ function Grid_check_row_completion(token_cells_rows) {
 
    if(in_remove_row_animation) return;
 
-   console.log('---- CHECKING ROWS ----')
+   if(DEBUG_PRINT) console.log('---- CHECKING ROWS ----')
 
    let complete_rows_cnt = 0; // A row counter to run for all completed rows
    
@@ -524,8 +429,8 @@ function Grid_check_row_completion(token_cells_rows) {
 
 
    if(is_row_complete) {
-      console.log('@#$@#$ @#$@#$ @#$@#$ @#$@#$ @#$@#$ @#$@#$');
-      console.log('complete_rows_cell_idxs', complete_rows_cell_idxs, 'complete_rows_idxs', complete_rows_idxs);
+      if(DEBUG_PRINT) console.log('@#$@#$ @#$@#$ @#$@#$ @#$@#$ @#$@#$ @#$@#$');
+      if(DEBUG_PRINT) console.log('complete_rows_cell_idxs', complete_rows_cell_idxs, 'complete_rows_idxs', complete_rows_idxs);
       Create_row_animation(complete_rows_cell_idxs, complete_rows_idxs);
    }
 }
@@ -554,7 +459,7 @@ function Cell_create(offsetx=0, offsety=0, col){
 
    const cell = new Cell_mesh_properties(mesh);
 
-   console.log('CREATING NEW CELL', cell)
+   if(DEBUG_PRINT2) console.log('CREATING NEW CELL', cell)
    
    const cellidx = _cells_buffer.Add(cell);
 
@@ -565,7 +470,7 @@ function Cell_create(offsetx=0, offsety=0, col){
 }
 function Cell_store_free_cell(cellidx) {
    _free_cells_buffer.Add(cellidx);
-   console.log('FREE CELL STORE:', cellidx, _cells_buffer.buffer[cellidx])
+   if(DEBUG_PRINT2) console.log('FREE CELL STORE:', cellidx, _cells_buffer.buffer[cellidx])
 }
 function Cell_get_free_cell() {
 
@@ -574,7 +479,7 @@ function Cell_get_free_cell() {
 
       const free_cell_idx = _free_cells_buffer.buffer[last_elem];
       _free_cells_buffer.RemoveByIdxSortedVersionLastElemGuarantee();
-      console.log('USED CELL FOUND. free_cell_idx:', free_cell_idx, 'cell',  _cells_buffer.buffer[free_cell_idx])
+      if(DEBUG_PRINT2) console.log('USED CELL FOUND. free_cell_idx:', free_cell_idx, 'cell',  _cells_buffer.buffer[free_cell_idx])
       return free_cell_idx;
    }
 
@@ -604,12 +509,12 @@ function Mat2_mult_vec2(mat, x, y){
 }
 
 const mat_rot_90_clockwise = [
-   [0, 1],
+   [ 0, 1],
    [-1, 0]
 ];
 const mat_rot_90_counterclockwise = [
    [0, -1],
-   [1, 0]
+   [1,  0]
 ];
 
 
@@ -635,10 +540,10 @@ function Token_get_lower_most_row(rows){
 
 /*********************************************************************************************************/
 // Tokens
-
+const temp_pivot = 1
 class Token {
    
-   constructor(){
+   constructor(rotation_state){
       
       this.num_cells = 0;
       this.cells = New_int16_buffer(4, 'TetrisTokenCells');
@@ -656,6 +561,10 @@ class Token {
       this.lower_row_idx = TOP_ROW;
 
       this.pivot_cell_idx = 0;
+
+      this.rotation_state = ROTATION_STATES.UP;
+
+      this.recurse_cnt = 0; // Count recursive calls
    }
    Reset(){
       this.cells.Reset();
@@ -669,7 +578,7 @@ class Token {
       this.lower_row_idx = TOP_ROW;
       this.num_cells = 0;
    }
-   AddCell(cellidx, colidx, rowidx, is_pivot=false){
+   AddCell(cellidx, colidx, rowidx, is_pivot=false, token_type=TOKEN_TYPE.LINE, rotation_state=ROTATION_STATES.UP){
 
       this.cells.Add(cellidx);
 
@@ -681,32 +590,45 @@ class Token {
 
       if(is_pivot) this.pivot_cell_idx = cellidx;
 
+      this.rotation_state = rotation_state;
+      this.token_type = token_type;
+
       this.num_cells++;
 
    }
    RotateLeft(){
 
-      // Pivot (x,y)
-      const px = this.cols[0], py = this.rows[0];
-      let needs_moving_left = false, needs_moving_right = false;
-      let move_cols = 1;
-      for(let i = 1; i < this.num_cells; i++) {
+      // Pivot cell for center of rotation
+      let pivot = _token_rotation_states_pivots[this.token_type][this.rotation_state];
+      
+      if(DEBUG_PRINT2) console.log('this.right_most_col', this.right_most_col);
 
-         const res = Mat2_mult_vec2(mat_rot_90_clockwise, this.cols[i]-px, this.rows[i]-py);
+      if(this.left_most_col <= 2) {
+         if(this.cols[0] > 0)
+            pivot = 2;
+         else pivot = 1
+      }
+
+      const px = this.cols[pivot], py = this.rows[pivot];
+
+
+      let needs_moving_left = false, needs_moving_right = false;
+      let move_cols = 0;
+      for(let i = 0; i < this.num_cells; i++) {
+
+         const res = Mat2_mult_vec2(mat_rot_90_counterclockwise, this.cols[i]-px, this.rows[i]-py);
 
          const new_col = res[0]+px;
          const new_row = res[1]+py;
 
-         // Case the rotaing token is out of boundaries
-         if(new_col < 0) {
+         // Case the rotating token is out of boundaries
+         if((new_col < 0) && (move_cols < Abs(new_col))) {
             needs_moving_right = true;
             move_cols = Abs(new_col);
-            console.error('<')
          }
-         if(new_col >= MAX_COLUMNS-1) {
+         if((new_col >= MAX_COLUMNS-1) && (move_cols < new_col - (MAX_COLUMNS-1))) {
             needs_moving_left = true;
             move_cols = new_col - (MAX_COLUMNS-1);
-            console.error('>', new_col)
          }
          
          this.cols[i] = new_col;
@@ -714,34 +636,47 @@ class Token {
 
       }
 
-      if(needs_moving_left) this.MoveLeft(move_cols);
-      if(needs_moving_right) this.MoveRight(move_cols);
+      if(needs_moving_left) 
+         this.MoveLeft(move_cols);
+      if(needs_moving_right) 
+         this.MoveRight(move_cols);
 
       this.left_most_col = Token_get_left_most_col(this.cols);
       this.right_most_col = Token_get_right_most_col(this.cols);
       this.lower_row_idx = Token_get_lower_most_row(this.rows);
-      // console.log( '\nthis.left_most_col', this.left_most_col, 'this.right_most_col', this.right_most_col, 'this.lower_row_idx',this.lower_row_idx)
+
+      this.rotation_state--;
+      if(this.rotation_state < 0) this.rotation_state = 3;
 
    }
    RotateRight(){
 
       // Pivot (x,y)
-      const px = this.cols[0], py = this.rows[0];
-      let needs_moving_left = false, needs_moving_right = false;
-      let move_cols = 1;
-      for(let i = 1; i < this.num_cells; i++) {
+      let pivot = _token_rotation_states_pivots[this.token_type][this.rotation_state];
 
-         const res = Mat2_mult_vec2(mat_rot_90_counterclockwise, (this.cols[i]-px), (this.rows[i]-py));
+      if(DEBUG_PRINT2) console.log('this.right_most_col', this.right_most_col);
+
+      if(this.left_most_col === 0) pivot = 1;
+      if(this.right_most_col === 0) pivot = 2;
+
+
+      const px = this.cols[pivot], py = this.rows[pivot];
+      let needs_moving_left = false, needs_moving_right = false;
+      let move_cols = 0;
+      for(let i = 0; i < this.num_cells; i++) {
+
+         const res = Mat2_mult_vec2(mat_rot_90_clockwise, this.cols[i]-px, this.rows[i]-py);
 
          const new_col = res[0]+px;
          const new_row = res[1]+py;
          
          // Case the rotaing token is out of boundaries
-         if(new_col < 0) {
+         if((new_col < 0) && (move_cols < Abs(new_col))) {
+
             needs_moving_right = true;
             move_cols = Abs(new_col);
          }
-         if(new_col >= MAX_COLUMNS-1) {
+         if((new_col >= MAX_COLUMNS-1) && (move_cols <  new_col - (MAX_COLUMNS-1))) {
             needs_moving_left = true;
             move_cols = new_col - (MAX_COLUMNS-1);
          }
@@ -750,7 +685,6 @@ class Token {
          this.rows[i] = new_row;
          
       }
-
       
       if(needs_moving_left) this.MoveLeft(move_cols);
       if(needs_moving_right) this.MoveRight(move_cols);
@@ -759,18 +693,52 @@ class Token {
       this.right_most_col = Token_get_right_most_col(this.cols);
       this.lower_row_idx = Token_get_lower_most_row(this.rows);
 
-      // console.log( '\nthis.left_most_col', this.left_most_col, 'this.right_most_col', this.right_most_col,)
+      this.rotation_state++;
+      if(this.rotation_state > 3) this.rotation_state = 0;
+
+      
+      // const grid_col = _grid_columns.buffer[this.left_most_col];
+      // const grid_row = grid_col.buffer[this.lower_row_idx];
+
+      // if(grid_row !== INT_NULL) {
+
+      //    console.error('HIT!!');
+      //    if(this.recurse_cnt <= 3) {
+      //       this.recurse_cnt++;
+      //       this.RotateRight();
+      //    }
+      // }
+
+      // this.recurse_cnt = 0;
+      // // console.log( '\nthis.left_most_col', this.left_most_col, 'this.right_most_col', this.right_most_col,)
    }
    MoveLeft(move_cols=1){
 
       const col_idx = this.left_most_col;
       if(col_idx > 0){
 
-         for(let i=0; i<this.num_cells; i++) {
+         // Check collisions with other grid cells
+         for (let i=0; i<4; i++) {
+            
+            const colidx = this.cols[i]-move_cols; // Hypotheticaly move to the left
+            if(_grid_columns.buffer[colidx].boundary !== INT_NULL) { // If the grid column has any cell
+            
+               const rowidx = this.rows[i];
+               if(rowidx < MAX_TOKENS_IN_Y_AXIS) { // Avoid ending the game if token is at top and beyond
 
-            if(this.num_cells < 3) alert('009989098 token should have 4 cells in this Move() implementation')
-            this.cols[i]-=move_cols;
+                   // If the grid cell exists at the hypothetical moved token cell position... don't move
+                  if(_grid_columns.buffer[colidx].buffer[rowidx] !== INT_NULL) {
+                     return;
+                  }
+               }
+            }
          }
+
+         // Move token cells
+         this.cols[0]-=move_cols;
+         this.cols[1]-=move_cols;
+         this.cols[2]-=move_cols;
+         this.cols[3]-=move_cols;
 
          this.right_most_col-=move_cols; // If we moved to the right, then increment the right most token's column index
          this.left_most_col-=move_cols; // If we moved to the right, then increment the left most token's column index
@@ -782,17 +750,33 @@ class Token {
       const col_idx = this.right_most_col;
       if(col_idx < MAX_COLUMNS-1){
 
-         for(let i=0; i<this.num_cells; i++) {
+         // Check collisions with other grid cells
+         for (let i=0; i<4; i++) {
+            
+            const colidx = this.cols[i]+move_cols; // Hypotheticaly move to the right
+            if(_grid_columns.buffer[colidx].boundary !== INT_NULL) { // If the grid column has any cell
+            
+               const rowidx = this.rows[i];
+               if(rowidx < MAX_TOKENS_IN_Y_AXIS) { // Avoid ending the game if token is at top and beyond
 
-            if(this.num_cells < 3) alert('009989098 token should have 4 cells in this Move() implementation')
-            this.cols[i]+=move_cols;
+                  // If the grid cell exists at the hypothetical moved token cell position... don't move
+                  if(_grid_columns.buffer[colidx].buffer[rowidx] !== INT_NULL) { 
+                     return;
+                  }
+               }
+            }
          }
+
+         // Move token cells
+         if(this.num_cells < 3) alert('009989098 token should have 4 cells in this Move() implementation')
+         this.cols[0]+=move_cols;
+         this.cols[1]+=move_cols;
+         this.cols[2]+=move_cols;
+         this.cols[3]+=move_cols;
 
          this.right_most_col+=move_cols; // If we moved to the right, then increment the right most token's column index
          this.left_most_col+=move_cols; // If we moved to the right, then increment the left most token's column index
       }
-
-      // console.log('MOVE_RIGHT: cols', this.cols);
 
    }
    MoveDown(move){
@@ -807,13 +791,10 @@ class Token {
          }
       }
 
-
       // Advance lower row counter
       if(this.dist >= ROW_HEIGHT) {
          this.lower_row_idx--;
          this.dist = 0;
-         // console.log( '\nthis.left_most_col', this.left_most_col, 'this.right_most_col', this.right_most_col, 'this.lower_row_idx',this.lower_row_idx)
-
       }
    }
    UpdatePos(){
@@ -829,22 +810,6 @@ class Token {
          Gl_set_wpos_xy(mesh.gfx, xx, yy, 1);
       }
    }
-   AddPosY(y){
-      for(let i=0; i<this.num_cells; i++){
-         const mesh = _cells_buffer.buffer[this.cells.buffer[i]].mesh;
-         mesh.geom.pos[1] += y;
-         Gl_add_wpos_y(mesh.gfx, y, 1);
-      }
-   }
-   SetPosY(y){
-      for(let i=0; i<this.num_cells; i++){
-         const mesh = _cells_buffer.buffer[this.cells.buffer[i]].mesh;
-         mesh.geom.pos[1] = y;
-         Gl_set_wpos_y(mesh.gfx, y, 1);
-      }
-   }
-
-
 }
 
 
@@ -877,7 +842,7 @@ function Tetris_create_token_square(section, token){
             
          const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
@@ -885,7 +850,7 @@ function Tetris_create_token_square(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.RECT);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -900,7 +865,7 @@ function Tetris_create_token_square(section, token){
             
          const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
 
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
@@ -909,7 +874,7 @@ function Tetris_create_token_square(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.RECT);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -924,7 +889,7 @@ function Tetris_create_token_square(section, token){
             
          const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          Cell_reset_mesh(mesh, colidx, rowidx);
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
 
@@ -934,7 +899,7 @@ function Tetris_create_token_square(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.RECT);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -950,7 +915,7 @@ function Tetris_create_token_square(section, token){
          const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx);
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
 
@@ -960,7 +925,7 @@ function Tetris_create_token_square(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.RECT);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -983,7 +948,7 @@ function Tetris_create_token_shape_L(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
 
@@ -993,7 +958,7 @@ function Tetris_create_token_shape_L(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1012,7 +977,7 @@ function Tetris_create_token_shape_L(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
 
@@ -1022,7 +987,7 @@ function Tetris_create_token_shape_L(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1041,7 +1006,7 @@ function Tetris_create_token_shape_L(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
 
@@ -1051,7 +1016,7 @@ function Tetris_create_token_shape_L(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1070,7 +1035,7 @@ function Tetris_create_token_shape_L(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
 
@@ -1080,7 +1045,7 @@ function Tetris_create_token_shape_L(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1103,7 +1068,7 @@ function Tetris_create_token_shape_L_mirror(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
 
@@ -1113,7 +1078,7 @@ function Tetris_create_token_shape_L_mirror(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L_MIRROR);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1132,7 +1097,7 @@ function Tetris_create_token_shape_L_mirror(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
 
@@ -1142,7 +1107,7 @@ function Tetris_create_token_shape_L_mirror(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L_MIRROR);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1161,7 +1126,7 @@ function Tetris_create_token_shape_L_mirror(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
 
@@ -1171,7 +1136,7 @@ function Tetris_create_token_shape_L_mirror(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L_MIRROR);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1190,7 +1155,7 @@ function Tetris_create_token_shape_L_mirror(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
 
@@ -1200,7 +1165,7 @@ function Tetris_create_token_shape_L_mirror(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L_MIRROR);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1222,7 +1187,7 @@ function Tetris_create_token_line4(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
 
@@ -1232,7 +1197,7 @@ function Tetris_create_token_line4(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.LINE);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1251,7 +1216,7 @@ function Tetris_create_token_line4(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx)
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
 
@@ -1261,7 +1226,7 @@ function Tetris_create_token_line4(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.LINE);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1280,7 +1245,7 @@ function Tetris_create_token_line4(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx);
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
 
@@ -1290,7 +1255,7 @@ function Tetris_create_token_line4(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.LINE);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1309,7 +1274,7 @@ function Tetris_create_token_line4(section, token){
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
          Cell_reset_mesh(mesh, colidx, rowidx);
-         token.AddCell(free_cellidx, colidx, rowidx);
+         token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);
          
          mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
 
@@ -1319,7 +1284,7 @@ function Tetris_create_token_line4(section, token){
       else {
          // Create new cells
          const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.LINE);
-         token.AddCell(cell.idx, colidx, rowidx);
+         token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
          cell.mesh.Render();
@@ -1516,8 +1481,8 @@ export function Tetris(root_widget=0x0, x, y){
 
    const token = new Token();
 
-   const row = TOP_ROW;
-   const col = 2;
+   const row = DEBUG_NOT_MOVE_DOWN ? TOP_ROW/2 : TOP_ROW;
+   const col = DEBUG_NOT_MOVE_DOWN ? MAX_COLUMNS/2 : 2;
    {
       const colidx = col;
       const rowidx = row;
@@ -1607,10 +1572,13 @@ function Tetris_game_loop(params) {
    
    let has_collide = false;
 
-   token.MoveDown(movey);
+   if(!DEBUG_NOT_MOVE_DOWN) {
 
-   token.UpdatePos();
+      token.MoveDown(movey);
+
+   }
    
+   token.UpdatePos();
    
    /*********************************************************************************/
    // Token mesh with grid bottom collision
@@ -1674,7 +1642,7 @@ function Tetris_game_loop(params) {
 
          if(token.rows[k] !== INT_NULL){
 
-            // Add only unique rows, starting from index 1 ofcourse
+            // Add only unique rows, starting from index 1 of course
             if(k > 0){
                const exists = Gen_array_check_for_existing_element(token_cells_rows, token.rows[k])
                if(!exists) token_cells_rows.push(token.rows[k]);

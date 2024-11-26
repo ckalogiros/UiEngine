@@ -183,7 +183,7 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
 
    for (let i = 0; i <= section.children.boundary; i++) { // Color animations
       
-      const mesh = section.children.buffer[i];
+      // const mesh = section.children.buffer[i];
       // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, mesh, (i+1)*.1*.005, .1, .85, 0.0, .3, true);
       // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, mesh, (i+1)*.1*.005, .1, .85, 0.0, .3, true);
       // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, mesh, (i+1)*.1*.004, .1, .85, 0.0, .3, true);

@@ -17,6 +17,21 @@ import { Timer_get_global_timer } from "../Timers/Timers.js";
 /**
  * // TODO: Implement correctly the fillOp functions
  * // TODO: Implement the rotation,jiggle,etc, to be enabled exclusively by the user
+ * 
+ * 
+ * Make particle system more Generic:
+ * Example: Implement an explosion effect.
+ * Prerequisites: 
+ *    1. Have many particles created at one frame, taht needs to position each particle differently in a for loop
+ *    2. // TODO: particles.OnUpdate() 
+ * 
+ * So, we need to implement a particles num_count per frame variable.
+ * Also we need a way for creating the 'directions' of the particles, 
+ * for per frame different particles -through dirx/diry-, as well as look the current 
+ * implementation of particle direction. Maybe create some flag for 'EXPOSION' 
+ * and create the direction conditionaly from a function.
+ * 
+ * 
  */
 
 
@@ -57,6 +72,7 @@ class Particle {
       this.start = INT_NULL; // The start index in the vertex buffer
 
       this.time = 0;
+      // Deep Copy values from emitter
       this.pos[0] = emitter.pos[0];
       this.pos[1] = emitter.pos[1];
       this.pos[2] = emitter.pos[2];
@@ -76,7 +92,6 @@ class Particle {
       // Create random rotation
       this.angle = (rnd * .5 + 2) * Math.PI * 2;
       this.rot = Rotation_z_get_2D_matrix(this.angle);
-      // this.rotation_speed = initial_rotation_speed
 
       if (emitter.flags & PARTICLES.HAS_START_POS_VARIATION) {
 
@@ -552,13 +567,11 @@ export function Particle_system_emitt(params) {
       for (let i = 0; i < 1; i++) {
          if (last_elem === INT_NULL) {
 
-            {
-               const particle = new Particle(emitter);
-               const particle_idx = emitter.particles_buffer.Add(particle);
-               particle.is_alive = true;
-               // Push particle to the gfx buffers
-               emitter.ParticleAddToGfx(particle_idx);
-            }
+            const particle = new Particle(emitter);
+            const particle_idx = emitter.particles_buffer.Add(particle);
+            particle.is_alive = true;
+            // Push particle to the gfx buffers
+            emitter.ParticleAddToGfx(particle_idx);
          }
          else {
 

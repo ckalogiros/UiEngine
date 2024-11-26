@@ -49,6 +49,7 @@ import { Demo_text_number_animation } from './Demo/DemoTextAnimations.js';
 import { Font_metrics_get_char_width, Font_metrics_get_face_advancex, Font_metrics_get_row_height } from '../Engine/Loaders/Font/Font.js';
 import { Tetris } from './Demo/Games/Snake/Tetris.js';
 import { Bitwise_operations_run_test } from './Demo/Games/Snake/BitwiseOps.js';
+import { Tetris_test } from './Demo/Games/Snake/Tetris_test.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -664,7 +665,7 @@ export function TestWidgetsGeneric(createId = 1) {
         // const c = new Shader_Attributes(true, a);
     }
 
-    Bitwise_operations_run_test();
+    // Bitwise_operations_run_test();
 
 
 
@@ -673,7 +674,8 @@ export function TestWidgetsGeneric(createId = 1) {
 
     // Demo_page();
 
-    Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 60);
+    // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 60);
+    // Tetris_test(ROOT_WIDGETS.CREATE_ROOT, 20, 60);
 
     // Demo_chain_link();
 
@@ -969,7 +971,7 @@ export function TestWidgetsGeneric(createId = 1) {
 
         { // Demo Particles 
 
-            // Create_glow_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT)
+            Create_glow_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT)
 
             // Create_smoke_particles();
 
