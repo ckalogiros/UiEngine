@@ -121,6 +121,7 @@ const SID = {
         // Test Shaders
         FS_TEST1: BIT1 <<= 1,
         FS_TEST2: BIT1 <<= 1,
+        FS_TEST3: BIT1 <<= 1,
     },
 
     ATTR: {
@@ -463,6 +464,7 @@ const MESH_ENABLE = {
 
         TEST_SHADERS_1: _CNT++,
         TEST_SHADERS_2: _CNT++,
+        TEST_SHADERS_3: _CNT++,
 
 
         NONE: 0,

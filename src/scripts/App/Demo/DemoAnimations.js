@@ -363,7 +363,7 @@ export function Demo_animations_text(x = 0, y = 0, create_controls=true) {
    panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    panel.SetName('Demo_animations_with_slider_slope');
 
-   const text = 'Use the slider to change the slope\nof the logarithmic function.';
+   const text = 'Use the "Options" menu to change properties.';
    const label = Create_widget_label(_, text, _, [0, 0, 1], _, GREENL[5]);
    label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);

@@ -7,7 +7,7 @@ import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './
 import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
 import { frag_noise, frag_noise_call, frag_worley_noise, frag_worley_noise_call } from './Functions/fragment.noise.js';
 import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
-import { frag_test1, frag_test1_call, frag_test2, frag_test2_call } from './Functions/fragment.tests.js';
+import { frag_test1, frag_test1_call, frag_test2, frag_test2_call, frag_test3, frag_test3_call } from './Functions/fragment.tests.js';
 import { Shader_attributes_create } from '../../ShaderAttributes.js';
 import { frag_glow_sphere, frag_glow_sphere_call } from './Functions/fragment.misc.js';
 import { Attribute_get_type_extension, Shader_Attributes, Shader_bit_flags_get_attr_info_from_index, Shader_bit_flags_get_attr_key_name_from_flag, Shader_bit_flags_get_attr_size } from '../../ShaderBitFlags.js';
@@ -820,6 +820,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // Test shader functions
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1 : '',
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2 : '',
+      (sid.shad & SID.SHAD.FS_TEST3) ? frag_test3 : '',
 
 
 
@@ -858,6 +859,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // Test Shaders
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2_call : '',
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
+      (sid.shad & SID.SHAD.FS_TEST3) ? frag_test3_call : '',
 
 
 

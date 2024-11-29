@@ -32,6 +32,7 @@ const FUNCTION_TABLE_IDXS = {
    COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TIME: INT_NULL,
    COL4_WPOS3_TIME_VPOS2_DIM2_TEX2_TIME: INT_NULL,
    COL4_WPOS3_VPOS2_DIM2_TIME: INT_NULL,
+   COL4_WPOS3_VPOS2_DIM2: INT_NULL,
    COL4_WPOS3_VPOS2_TIME: INT_NULL,
    COL4_WPOS3_TEX2: INT_NULL,
    POS2_RCORNERS_FEATHER: INT_NULL,
@@ -75,6 +76,7 @@ const Vertex_buffer_fn_table_operation_add = [
    FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER,
    FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER,
    FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_TIME,
+   FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2,
    FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TEX2,
    FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME,
    FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TIME,
@@ -122,6 +124,7 @@ function Set_up_fn_table() {
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER) FUNCTION_TABLE_IDXS.COL4_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_FEATHER = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_TIME) FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2_TEX2_TIME = i;
+      else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2 = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TEX2) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_TEX2 = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_TIME = i;
       else if (Vertex_buffer_fn_table_operation_add[i] === FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TIME) FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_TIME = i;
@@ -222,6 +225,7 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
       if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_RCORNERS_FEATHER;
       if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.TEX2 | SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_DIM2_TEX2_TIME;
       if (clean_attr === (SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.WPOS3_VPOS2_RCORNERS_FEATHER;
+      if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2;
       
       if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.FEATHER)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_FEATHER;
       if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_VPOS2_DIM2_TIME;
@@ -559,6 +563,40 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_TIME(vb_data, geom, mat, 
       // TIME
       vb_data[index++] = geom.time;
 
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
+
+   }
+   
+   Set_vertex_position_VPOS2(vb_data, start+a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
+   Set_vertex_uv_coordinates_TEX2(vb_data, start+a_uv_offset, stride, mat.uv);
+
+}
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2(vb_data, geom, mat, start, num_faces, stride , verts_per_rect, a_vpos_offset, a_uv_offset) {
+
+   let attribs_count = 0;
+   let index = start;
+   const len = num_faces * verts_per_rect;
+
+   for (let i = 0; i < len; i++) {
+
+      // COLOR
+      vb_data[index++] = mat.col[0];
+      vb_data[index++] = mat.col[1];
+      vb_data[index++] = mat.col[2];
+      vb_data[index++] = mat.col[3];
+
+      // WORLD POSITION
+      vb_data[index++] = geom.pos[0] + geom.dim[0];
+      vb_data[index++] = geom.pos[1] + geom.dim[1];
+      vb_data[index++] = geom.pos[2];
+      
+      // VERTEX POSITION
+      index += V_POS_COUNT;
+                  
+      // DIMENTION
+      vb_data[index++] = geom.dim[0];
+      vb_data[index++] = geom.dim[1];
+      
       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
 
    }

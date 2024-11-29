@@ -3,7 +3,7 @@
 import { Create_rect_mesh, Create_widget_multi_text, Create_widget_section, Create_widget_slider, Create_widget_text } from "../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
-import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, RGB, WHITE, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLER, RGB, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
@@ -90,7 +90,7 @@ export function Sattelite_rotation(x=0, y=0) {
    spd_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
    spd_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    controls_section.AddItem(spd_slider);
-   spd_slider.SetInitialValue(0);
+   spd_slider.SetInitialValue(0.01);
    spd_slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
@@ -262,7 +262,7 @@ export function Sattelite_rotation(x=0, y=0) {
    }
 
 
-   Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_sattelite, params);
+   Time_intervals_create(1, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_sattelite, params);
 
 
 
@@ -313,13 +313,20 @@ export function Sattelite_rotation(x=0, y=0) {
          nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return Math.atan2(physics[0].vel[0], physics[0].vel[1]); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-         nfo.CreateNewText('a:', font_size, WHITE, pad2, .9,);
-         nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
+      }
+      { // Info
+         const ball = balls_buffer[0];
+
+         const ms = 60;
+         const nfo = Create_widget_multi_text(_, 'Vel:cos(atan2):', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
+         info_section.AddItem(nfo);
+
+         nfo.CreateNewText('00000', font_size, YELLOW[9], pad2, .9);
          nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return Abs(sat.geom.pos[0] + (ball.geom.dim[0] * Math.cos(Math.atan2(physics[0].vel[0], physics[0].vel[1])))); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-         nfo.CreateNewText('b:', font_size, WHITE, pad2, .9,);
-         nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
+         nfo.CreateNewText('Vel:sin(atan2):', font_size, WHITE, pad2, .9,);
+         nfo.CreateNewText('00000', font_size, YELLOW[9], pad2, .9);
          nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return Abs(sat.geom.pos[1] + (ball.geom.dim[1] * Math.sin(Math.atan2(physics[0].vel[0], physics[0].vel[1])))); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
          generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 

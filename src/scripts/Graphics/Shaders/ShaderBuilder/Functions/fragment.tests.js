@@ -92,8 +92,8 @@ vec4 frag_test1()
 
   // if(uv.x > 10.1) return YELLOW;
 
-  float repeatx = 4.;
-  float repeaty = 4.;
+  float repeatx = 2.;
+  float repeaty = 2.;
 
   
   float c_vert = abs((fract(uv.x*repeatx) - .5)* 2.);
@@ -102,6 +102,136 @@ vec4 frag_test1()
   
   float c_hor = abs((fract(uv.y*repeaty) - .5)* 2.);
   c_hor = smoothstep(0., 1.3, c_hor);
+  c_hor = 1.-c_hor;
+  
+
+  
+  float c = smoothmin(c_vert, c_hor, control1);
+  
+
+
+  float to_min=0., to_max=1., from_min=0., from_max=(control2);
+  // float to_min=0., to_max=2., from_min=control2, from_max=control2+.3; // !!Intresting!!
+  float factor = (c - from_min) / (from_max - from_min);
+  float result = to_min + factor * (to_max - to_min);
+  // float result = smoothstep(control3, 2.*control3, to_min + factor * (to_max - to_min));
+
+  result = clamp(result, 0., 1.);
+  
+  vec3 color = vec3(mix(c, result, .5));
+  // vec3 color = vec3(max(c, result));
+  
+  color = brightness_contrast(color, control3*.5, control3*2.);
+  // color = gamma_correction(color);
+  
+  float alpha = min(color.r, min(color.b, color.g));
+
+  // return vec4(color*src_color.rgb, src_color.a);
+  // return vec4(color, src_color.a);
+  // return vec4(color, alpha);
+  return vec4(color*alpha, alpha);
+    
+}
+`;
+
+
+
+
+
+
+
+
+
+/*************************************************************************************************************************/
+/*************************************************************************************************************************/
+
+
+export const frag_test3_call = `
+  vec4 new_color = frag_test3();
+  // color = blend_color_mix( color, new_color, color.a );
+  color = blend_color_multiply( color, new_color );
+`;
+
+export const frag_test3 = `
+
+/********************************************************************************************/
+// SHADER UNIT: frag_test3
+/********************************************************************************************/
+
+
+/*****************************************************/
+// GENERIC GLOBAL VARIABLES DECLERATIONS
+#ifndef UV_READY
+  vec2 uv = vec2(0,0);
+#endif
+
+
+/*****************************************************/
+// FUNCTION DECLERATIONS
+#ifndef SMOOTH_MIN 
+  #include <smoothmin>
+#endif
+
+
+/*****************************************************/
+// BLEND MODES FUNCTION DECLERATIONS
+#ifdef BLEND_MODE 
+   #include <blend_mode_directives>
+#endif
+
+
+#ifndef GAMMA_CORRECTION 
+  #include <gamma_correction>
+#endif
+
+#ifndef BRIGHTNESS_CONTRAST 
+  #include <brightness_contrast>
+#endif
+
+
+
+
+
+
+vec4 frag_test3()
+{
+
+#ifdef U_GENERIC_VEC3
+  #include <u_generic_vec3>
+#elif defined(U_GENERIC_VEC2)
+  #include <u_generic_vec2>
+#elif defined(U_GENERIC_FLOAT)
+  #include <u_generic_float>
+#endif
+
+
+  vec2 res = u_screen_res;
+  vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
+  
+  
+  // #ifndef UV_READY
+    #define UV_READY 1
+    uv = gl_FragCoord.xy;
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
+  // #endif 
+  
+  // vec2 uv = uv;
+  uv_map_coordinates_zero_one( uv, local_res );
+  
+
+  // if(uv.x > 10.1) return YELLOW;
+
+  float repeatx = 1.;
+  float repeaty = 1.;
+
+  
+  float c_vert = abs((fract(uv.x*repeatx) - .5)* 2.);
+  // c_vert = smoothstep(0., 1.3, c_vert);
+  c_vert = 1.-c_vert;
+  
+  float c_hor = abs((fract(uv.y*repeaty) - .5)* 2.);
+  // c_hor = smoothstep(0., 1.3, c_hor);
   c_hor = 1.-c_hor;
   
 

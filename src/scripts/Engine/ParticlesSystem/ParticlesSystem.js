@@ -16,11 +16,18 @@ import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 /**
  * // TODO: Implement correctly the fillOp functions
- * // TODO: Implement the rotation,jiggle,etc, to be enabled exclusively by the user
  * 
+ * // TODO: Implement the rotation,jiggle,etc, to be enabled exclusively by the user
+ * Enable jiggle and create the contol slider to manage it
+ * 
+ * // TODO: Create a better random direction algorithm
  * 
  * Make particle system more Generic:
  * Example: Implement an explosion effect.
+ * 
+ * Create the correct controls + the number of particles per frame.
+ * 
+ * 
  * Prerequisites: 
  *    1. Have many particles created at one frame, taht needs to position each particle differently in a for loop
  *    2. // TODO: particles.OnUpdate() 
@@ -37,7 +44,7 @@ import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 const speed = 4;
 const speed_ratio = .01
-const max = 100;
+const max = 210;
 const interpolate = 1 / max;
 
 const initial_scale = 10
@@ -58,7 +65,8 @@ class Particle {
       this.is_alive = false;
 
       const rnd = Abs(this.random_val);
-      this.scale = initial_scale;
+      // this.scale = initial_scale;
+      this.scale = emitter.max_scale;
       this.accel = emitter.accel * (rnd * .5 + 1) * 1.4;
       this.deccel = emitter.deccel;
       this.grav = emitter.gravity;
@@ -93,7 +101,7 @@ class Particle {
       this.angle = (rnd * .5 + 2) * Math.PI * 2;
       this.rot = Rotation_z_get_2D_matrix(this.angle);
 
-      if (emitter.flags & PARTICLES.HAS_START_POS_VARIATION) {
+      if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
 
          const minx = emitter.variation_emission.xdir_neg * max
          const maxx = emitter.variation_emission.xdir_pos * max
@@ -120,7 +128,7 @@ class Particle {
 
 class Emitter {
 
-   constructor(name, col, pos, dim, t_step = .1, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, textureId = INT_NULL, temp_has_rotation=false) {
+   constructor(name, col, pos, dim, t_step = .0001, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, textureId = INT_NULL, num_particles_per_frame=1) {
 
       this.sid = 0x0;
       this.sceneidx = STATE.scene.active_idx;
@@ -143,10 +151,18 @@ class Emitter {
 
       this.parent = null;
 
+      this.is_active = false;
+
       this.accel = accel;
       this.max_speed = max_speed;
       this.deccel = deccel;
       this.gravity = gravity;
+      this.max_scale = max_speed;
+
+      this.properties_flags = 0x0; // Set from user by method: EnableProperties()
+      this.jigglex = 4;
+      this.jiggley = 3;
+      this.rotation = 0; // TODO: IMPLEMENT
 
 
 
@@ -196,7 +212,9 @@ class Emitter {
       /**
        * // HACK Temporary implementation of enable rotations of particle system emitter
        */
-      this.temp_has_rotation = temp_has_rotation;
+
+
+      this.num_particles_per_frame = num_particles_per_frame;
 
    }
 
@@ -452,6 +470,39 @@ class Emitter {
    }
 
 
+   EnableProperties(which, params = null) {
+
+      switch (which) {
+
+         case PARTICLES.HAS_START_POS_VARIATION: { 
+            this.properties_flags |= PARTICLES.HAS_START_POS_VARIATION; 
+            break;
+         }
+         case PARTICLES.HAS_SCALE: { 
+            this.properties_flags |= PARTICLES.HAS_SCALE; 
+            if(params) {
+               this.max_scale = params;
+            }
+            break;
+         }
+         case PARTICLES.HAS_ROTATION: { 
+            this.properties_flags |= PARTICLES.HAS_ROTATION; 
+            if(params) {
+               this.rotation = params;
+            }
+            break;
+         }
+         case PARTICLES.HAS_JIGGLE: { 
+            this.properties_flags |= PARTICLES.HAS_JIGGLE; 
+            if(params) {
+               this.jigglex = params.jigglex;
+               this.jiggley = params.jiggley;
+            }
+            break;
+         }
+      }
+   }
+
    // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)
 
 
@@ -535,9 +586,9 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
 
 
 // TODO: pass an already created sid, for selecting from a gama of shader particles
-export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId, temp_has_rotation) {
+export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId, num_particles_per_frame) {
 
-   const emitter = new Emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId, temp_has_rotation);
+   const emitter = new Emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId, num_particles_per_frame);
 
    const idx = _emitters.Add(emitter);
 
@@ -551,7 +602,7 @@ export function Particle_system_create_emitter(name, col, pos, dim, t_step, life
 
 
 
-export function Particle_system_emitt(params) {
+export function Particle_system_emitt(params, num_particles_=0) {
 
 
    const len = params.params.target_params.length;
@@ -563,8 +614,12 @@ export function Particle_system_emitt(params) {
       const emitter = _emitters.buffer[emitter_idx];
       let last_elem = emitter.free_particles_idxs_buffer.boundary;
 
+      emitter.is_active = true;
 
-      for (let i = 0; i < 1; i++) {
+      const num_particles = num_particles_ !== 0 ? num_particles_ : emitter.num_particles_per_frame;
+
+
+      for (let i = 0; i < num_particles; i++) {
          if (last_elem === INT_NULL) {
 
             const particle = new Particle(emitter);
@@ -595,27 +650,17 @@ export function Particle_system_emitt(params) {
                particle.col[2] = emitter.mat.col[2];
                particle.col[3] = emitter.mat.col[3];
 
-
-               if (emitter.dir[0] !== 0 && GetSign(particle.dirx) !== emitter.dir[0]) {
-                  particle.dirx *= -1;
-                  emitter.dirx_change = false;
-               }
-               if (emitter.dir[1] !== 0 && GetSign(particle.diry) !== emitter.dir[1]) {
-                  particle.diry *= -1;
-                  emitter.diry_change = false;
-               }
-
-               if (emitter.flags & PARTICLES.HAS_START_POS_VARIATION) {
+               if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
 
                   const minx = emitter.variation_emission.xdir_neg * max
                   const maxx = emitter.variation_emission.xdir_pos * max
                   const dx = GetRandomInt(minx, maxx);
-                  particle.dirx = interpolate * dx;
+                  particle.dirx = (interpolate * dx) + .01053;
 
                   const miny = emitter.variation_emission.ydir_neg * max
                   const maxy = emitter.variation_emission.ydir_pos * max
                   const dy = GetRandomInt(miny, maxy);
-                  particle.diry = interpolate * dy;
+                  particle.diry = (interpolate * dy) + .00953;
 
                }
 
@@ -635,20 +680,19 @@ export function Particle_system_emitt(params) {
 
 
 
-
-
+// TODO: Particles system update runs always for each particle and stops at 'particle.is_alive=false'. Avoid running if emitt is not active
 
 export function Particle_system_update() {
 
    if (_emitters.active_count === 0) return;
-
+   
    for (let i = 0; i <= _emitters.boundary; i++) {
-
+      
       const emitter = _emitters.buffer[i];
+      
+      if (!emitter.is_active) return;
+      
       let needs_update = false;
-
-      // console.log(emitter.speed)
-
 
       for (let j = 0; j <= emitter.particles_buffer.boundary; j++) {
 
@@ -656,62 +700,15 @@ export function Particle_system_update() {
 
          if (particle.is_alive) {
 
-            { // Effect:{Jiggle in}
-               // const x = GetRandomInt(1, 20);
-               // const y = GetRandomInt(1, 30);
-               // particle.pos[0] += (x-particle.pos[0]*.038)*.2;
-               // particle.pos[1] += (y-particle.pos[1]*.038)*.2;
-            }
-            { // Effect:{Siphon in}
-               // const x = GetRandomInt(1, 20);
-               // const y = GetRandomInt(1, 30);
-               // particle.pos[0] += (x-particle.pos[0]*.04)*.2;
-               // particle.pos[1] += (y-particle.pos[1]*.04)*.2;
-               // particle.pos[0] += (x-particle.pos[0])*.06;
-               // particle.pos[1] += (y-particle.pos[1])*.06;
-               // // particle.pos[0] += (x-particle.pos[0])*.07;
-               // // particle.pos[1] += (y-particle.pos[1])*.07;
-            }
-            { // Effect: {TESTS}
-               //    // const x = GetRandomInt(-2, 2)*particle.dirx;
-               //    // const x = GetRandomInt(-5, -2);
-               //    // const y = GetRandomInt(-5, -2);
-               //    const x = GetRandomInt(5, 20);
-               //    const y = GetRandomInt(5, 20);
-               //    // const x = GetRandomInt(0, 20);
-               //    // const y = GetRandomInt(-10, 10);
-               //    // particle.pos[0] += (x-particle.pos[0]*.04)*.2;
-               //    // particle.pos[1] += (y-particle.pos[0]*.04)*.2;
-               //    particle.pos[0] += (x-particle.pos[0]*.04)*.2;
-               //    particle.pos[1] += (y-particle.pos[1]*.04)*.2;
-               //    // particle.pos[0] += (x-particle.pos[0])*.06;
-               //    // particle.pos[1] += (y-particle.pos[1])*.06;
-               //    // particle.pos[0] += (x-particle.pos[0])*.02;
-               //    // particle.pos[1] += (y-particle.pos[1])*.02;
-            }
+            
 
-
-
-            // TODO: For efficiency create 2 loops, and check which case the particles are and run the for without if statement
-            if (emitter.flags & PARTICLES.HAS_START_POS_VARIATION) {
-               // const x = GetRandomInt(-4, 4);
-               // const y = GetRandomInt(-4, 4);
-               // particle.pos[0] += (x) * .17;
-               // particle.pos[1] += (y) * .17;
-               // // const x = GetRandomInt(-40, 40);
-               // // const y = GetRandomInt(-40, 40);
-               // // particle.pos[0] += (x)*.017;
-               // // particle.pos[1] += (y)*.017;
-               // // const x = GetRandomInt(-2, 2);
-               // // const y = GetRandomInt(-2, 2);
-               // // particle.pos[0] += (x)*.6;
-               // // particle.pos[1] += (y)*.09;
-
+            // TODO: For efficiency create 2 loops, and check which case is without if statement
+            if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) 
+            {
                const speed = emitter.speed * particle.accel;
                particle.pos[0] += speed * particle.dirx;
                particle.pos[1] += speed * particle.diry;
 
-               // particle.pos[1] += particle.grav * particle.accel;
                particle.pos[1] += particle.grav;
                particle.grav += emitter.gravity * emitter.deccel;
 
@@ -719,39 +716,98 @@ export function Particle_system_update() {
             }
 
 
-            if (particle.time > .5) {
-               // particle.col[3] *= .975;
-               particle.col[3] *= .915;
-            }
-            else if (particle.col[3] < .1) { // 
-               particle.col[3] *= 2.5;
+            if(emitter.properties_flags & PARTICLES.HAS_JIGGLE) {
+
+               // TODO: Make jiggle slower. Must include time, expand the jiggle throug frames
+               const jigglex = emitter.jigglex;
+               const jiggley = emitter.jiggley;
+               const x = GetRandomInt(particle.pos[0]-jigglex, particle.pos[0]+jigglex);
+               particle.pos[0] += (x-particle.pos[0])*.2;
+               const y = GetRandomInt(particle.pos[1]-jiggley, particle.pos[1]+jiggley);
+               particle.pos[1] += (y-particle.pos[1])*.2;
+               
+
+               { // Effect:{Jiggle in}
+                  // const x = GetRandomInt(1, 20);
+                  // const y = GetRandomInt(1, 30);
+                  // particle.pos[0] += (x-particle.pos[0]*.03)*.2;
+                  // particle.pos[1] += (y-particle.pos[1]*.038)*.2;
+                  
+                  // const x = GetRandomInt(-10, 20);
+                  // particle.pos[0] += (x-particle.pos[0]*.038)*.2;
+                  // const y = particle.pos[1] + GetRandomInt(-20, 20);
+                  // particle.pos[1] += (y-particle.pos[1]*1.)*1.;
+                  // particle.pos[0] += (x-particle.pos[0]*.1)*1.;
+               }
+               { // Effect:{Siphon in}
+                  // const x = GetRandomInt(1, 20);
+                  // const y = GetRandomInt(1, 30);
+                  // particle.pos[0] += (x-particle.pos[0]*.04)*.2;
+                  // particle.pos[1] += (y-particle.pos[1]*.04)*.2;
+                  // particle.pos[0] += (x-particle.pos[0])*.06;
+                  // particle.pos[1] += (y-particle.pos[1])*.06;
+                  // // particle.pos[0] += (x-particle.pos[0])*.07;
+                  // // particle.pos[1] += (y-particle.pos[1])*.07;
+               }
+               { // Effect: {TESTS}
+                  //    // const x = GetRandomInt(-2, 2)*particle.dirx;
+                  //    // const x = GetRandomInt(-5, -2);
+                  //    // const y = GetRandomInt(-5, -2);
+                  //    const x = GetRandomInt(5, 20);
+                  //    const y = GetRandomInt(5, 20);
+                  //    // const x = GetRandomInt(0, 20);
+                  //    // const y = GetRandomInt(-10, 10);
+                  //    // particle.pos[0] += (x-particle.pos[0]*.04)*.2;
+                  //    // particle.pos[1] += (y-particle.pos[0]*.04)*.2;
+                  //    particle.pos[0] += (x-particle.pos[0]*.04)*.2;
+                  //    particle.pos[1] += (y-particle.pos[1]*.04)*.2;
+                  //    // particle.pos[0] += (x-particle.pos[0])*.06;
+                  //    // particle.pos[1] += (y-particle.pos[1])*.06;
+                  //    // particle.pos[0] += (x-particle.pos[0])*.02;
+                  //    // particle.pos[1] += (y-particle.pos[1])*.02;
+               }
             }
 
-            if (particle.time >= .99) particle.col[3] = 0.0;
-
-            // if(particle.dim[0] < 1280)
-            {
-               // particle.scale = 2
+            
+            if(emitter.properties_flags & PARTICLES.HAS_ROTATION){
+               
+               // let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
+               let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
+               ? (emitter.life_time - (particle.time + .8) * .9) * .1
+               : (((particle.time + .8) * .9) * .1) - emitter.life_time;
+               if (rotspeed > 0) particle.angle -= rotspeed*1.;
+               particle.rot = Rotation_z_get_2D_matrix(particle.angle);
+            }
+            
+            if(emitter.properties_flags & PARTICLES.HAS_SCALE){
+               // For smoke enlarge effect 
                particle.dim[0] *= particle.scale * .0055 + 1;
                particle.dim[1] *= particle.scale * .0055 + 1;
+               // if(j===0) console.log(particle.dim[0])
                if (particle.scale > 1.00) {
                   particle.scale *= .98;
                }
             }
 
-            if(emitter.temp_has_rotation){
 
-               let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
-                  ? (emitter.life_time - (particle.time + .8) * .9) * .1
-                  : (((particle.time + .8) * .9) * .1) - emitter.life_time;
-               if (rotspeed > 0) particle.angle -= rotspeed;
-               particle.rot = Rotation_z_get_2D_matrix(particle.angle);
+
+            // Particle Fade
+            if (particle.time > .5) {
+               particle.col[3] *= .915;
+            }
+            else if (particle.col[3] < .1) { 
+               particle.col[3] *= 2.5;
             }
 
+            if (particle.time >= .99) particle.col[3] = 0.0;
 
+
+
+            // Render Particles
             emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time, particle.dim, particle.rot, particle.uv);
 
-            particle.time += emitter.t_step * speed_ratio;
+            // particle.time += emitter.t_step * speed_ratio;
+            particle.time += emitter.t_step;
 
             if (particle.time >= emitter.life_time) {
 
@@ -766,9 +822,13 @@ export function Particle_system_update() {
                particle.dim[1] = emitter.dim[1];
                // console.log(particle)
 
-               emitter.free_particles_idxs_buffer.Add(j)
+               emitter.free_particles_idxs_buffer.Add(j);
+
+               if(emitter.free_particles_idxs_buffer.boundary === emitter.particles_buffer.boundary) 
+                  emitter.is_active = false;
 
                // rotation_speed = initial_rotation_speed;
+
             }
 
             needs_update = true;
@@ -782,7 +842,14 @@ export function Particle_system_update() {
 
 
 
+/****************************************************************************************************************************************************************/
+// Function Pointers
+function Emitter_particles_set_direction_emission(emitter){
 
+}
+function Emitter_particles_set_direction_explosio(emitter){
+
+}
 
 
 

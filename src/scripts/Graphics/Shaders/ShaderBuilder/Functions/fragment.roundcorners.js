@@ -91,16 +91,17 @@ export const frag_round_corners = `
 
 vec4 Round_corners(float scale_down)
 {
-    #ifdef U_GENERIC_VEC3
-        include <u_generic_vec3>
-    #elif defined(U_GENERIC_VEC2)
-        #include <u_generic_vec2>
-    #elif defined(U_GENERIC_FLOAT)
-        #include <u_generic_float>
-    #else
-        float control1 = 0.;
-    #endif
-
+    // #ifdef U_GENERIC_VEC3
+    //     include <u_generic_vec3>
+    // #elif defined(U_GENERIC_VEC2)
+    //     #include <u_generic_vec2>
+    // #elif defined(U_GENERIC_FLOAT)
+    //     #include <u_generic_float>
+    // #else
+    //     float control1 = 0.;
+    // #endif
+    
+    float control1 = 0.;
     #ifdef A_ANGLE
         control1 = v_angle;
     #endif

@@ -69,6 +69,13 @@ export class Material {
    }
 
    
+   SetColorAllRGB(col, gfx, num_faces) {
+      math.CopyArr3(this.col, col);
+      math.CopyArr3(this.defCol, col);
+      Gl_set_rgb(gfx, this.col, num_faces);
+   }
+
+   
    SetColorRGB(col, gfx, num_faces) {
       math.CopyArr3(this.col, col);
       Gl_set_rgb(gfx, this.col, num_faces);

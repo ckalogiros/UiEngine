@@ -18,7 +18,7 @@ import { Font_metrics_calculate_width_from_text, Font_metrics_get_char_width, Fo
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Time_intervals_create } from "../../../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_group_create_scissorbox } from "../../../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_set_attr_round_corners, Gl_set_glow_intensity, Gl_rotate_z_2d, Gl_set_attr_feather, Gl_set_dim_xy, Gl_add_dim_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_attr_round_corners, Gl_set_glow_intensity, Gl_rotate_z_2d, Gl_set_attr_feather, Gl_set_dim_xy, Gl_add_dim_xy, Gl_add_vpos_xy, Gl_set_vpos_xy, Gl_set_vpos_x, Gl_set_vpos_y, Gl_add_vpos_y, Gl_add_vpos_x, Gl_add_wpos_x } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomColor, GetRandomPos, GetSequencedColor } from "../../../../Helpers/Helpers.js";
 import { Digitize, Linear_interpolation, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Magnitude, Max, Min } from "../../../../Helpers/Math/MathOperations.js";
@@ -160,10 +160,10 @@ export function Game_snake(y = 0, controls_create=true) {
       speed_slider: { init_val: SPEED, min: 0.2, max: 8.0 },
       slope_slider: { init_val: SLOPE_CONSTANT, min: .005, max: 1. },
       next_anim_slider: { init_val: START_NEXT_ANIM_SIZE, min: 2, max: 15 },
-      reduce_size_slider: { init_val: REDUCE_FACTOR, min: 0, max: 4 },
+      reduce_size_slider: { init_val: REDUCE_FACTOR, min: 0, max: .5 },
       distance_factor_slider: { init_val: DISTANCE_FACTOR, min: 0.3, max: 1.3 },
       max_scale_factor_slider: { init_val: SCALE_UP_FACTOR, min: 1.4, max: 2.2 },
-      anim_step_slider: { init_val: TIMER_STEP, min: 0.001, max: 0.01 },
+      anim_step_slider: { init_val: TIMER_STEP, min: 0.001, max: 0.007 },
 
 
       // colors:[GREY[2],GREY[6], BLUEL[9]],
@@ -553,7 +553,7 @@ export function Game_snake(y = 0, controls_create=true) {
       properties:{
          style:style,
       }
-   }; // Pass an object to storethe menu mesh on menu options button click
+   }; // Pass an object to store the menu mesh on menu options button click
 
    options_clbk_params.mnemonics.feather_slider.slider_val = options_clbk_params.mnemonics.feather_slider.slider_val / (options_clbk_params.mnemonics.feather_slider.max - options_clbk_params.mnemonics.feather_slider.min);
    options_clbk_params.mnemonics.speed_slider.slider_val = options_clbk_params.mnemonics.speed_slider.slider_val / (options_clbk_params.mnemonics.speed_slider.max - options_clbk_params.mnemonics.speed_slider.min);
@@ -1141,6 +1141,15 @@ function Animation_scale_down_stop(params) {
       const last_mesh = snake.body.buffer[last_elem_idx].mesh;
 
 
+      // Calculate body size according to body mesh index (the greater the index the smaller the size)
+      // let reduce_size = (snake.count - 1) * snake.reduce_mod;
+      let reduce_size = (last_elem_idx+1) * snake.reduce_mod;
+      let calc_size = snake.size - reduce_size;
+      if (calc_size < snake.min_size) {
+         calc_size = snake.min_size;
+         reduce_size = 0;
+      }
+
       // Calc the axis vector of the 2 last body meshes, and set the position of the new body mesh to that axis
       const second_last_mesh = snake.body.buffer[last_elem_idx - 1].mesh;
       const axis = [
@@ -1148,16 +1157,14 @@ function Animation_scale_down_stop(params) {
          last_mesh.geom.pos[1] - second_last_mesh.geom.pos[1],
       ];
 
-      let posx = last_mesh.geom.pos[0] + axis[0];
+      // const posx = last_mesh.geom.pos[0] + axis[0] - (last_mesh.geom.dim[0] - calc_size);
+      // const posx = (last_mesh.geom.pos[0] + (last_mesh.geom.dim[0] - calc_size)*2) + axis[0] ;
+      // const posy = last_mesh.geom.pos[1] + axis[1] + ((last_mesh.geom.dim[0] - calc_size)*2);
+      const posx = last_mesh.geom.pos[0] + axis[0];
       const posy = last_mesh.geom.pos[1] + axis[1];
 
-      // Calculate body size according to body mesh index (the greater the index the smaller the size)
-      let reduce_size = (snake.count - 1) * snake.reduce_mod;
-      let calc_size = snake.size - reduce_size;
-      if (calc_size < snake.min_size) {
-         calc_size = snake.min_size;
-         reduce_size = 0;
-      }
+      // console.log(last_mesh.geom.dim[0], calc_size, (last_mesh.geom.dim[0] - calc_size))
+      // console.log(last_mesh.geom.pos[0] + axis[0], (last_mesh.geom.dim[0] - calc_size))
 
 
       // const zpos = MAX_BODY_MESHES - snake.count;
@@ -1200,7 +1207,16 @@ function Animation_scale_down_stop(params) {
       snake.in_scale_animation = false;
 
       // INNEFFICIENCY: We only need to apply color to the new body, but we set color to all body meshes
-      snake.Color_set_fn(snake)
+      snake.Color_set_fn(snake);
+
+      const pos_dif = ((last_mesh.geom.dim[0] - calc_size)*1);
+      body.mesh.geom.pos[0] += pos_dif;
+      body.mesh.geom.pos[1] += pos_dif;
+      Gl_add_vpos_y(body.mesh.gfx, pos_dif);
+      Gl_add_vpos_x(body.mesh.gfx, pos_dif);
+
+      console.log('last_mesh.dim', last_mesh.geom.dim[0], 'calc_size', calc_size, (last_mesh.geom.dim[0] - calc_size))
+
    }
 
    // snake.in_scale_animation = false;
@@ -1577,7 +1593,8 @@ function Snake_options_callback(params) {
    
       }, { snake: snake, mnemonics: params.params.mnemonics.next_anim_slider });
    
-   
+      // TODO:
+      // IMPORTANT: Reducing the ratio-size of body meshes should NOT take place in 'scale animation'
       Slider_connect(reduce_size_slider, (params, slider_val) => {
    
          const snake = params.clbk_params.snake;
@@ -1593,22 +1610,29 @@ function Snake_options_callback(params) {
                calc_size = snake.min_size;
                // reduce_size = 0;
             }
+            
+            const pos_dif = body.mesh.geom.dim[0] - calc_size;
+            // console.log(pos_dif);
+            body.mesh.geom.pos[0] += pos_dif;
+            body.mesh.geom.pos[1] += pos_dif;
+            Gl_add_vpos_y(body.mesh.gfx, pos_dif);
+            Gl_add_vpos_x(body.mesh.gfx, pos_dif);
 
-            // body.mesh.geom.dim[0] = calc_size;
-            // body.mesh.geom.dim[1] = calc_size;
+            body.mesh.geom.dim[0] = calc_size;
+            body.mesh.geom.dim[1] = calc_size;
 
-            // body.size = calc_size;
-            // body.mesh.geom.SetDimXY(body.mesh.gfx, calc_size, calc_size);
-            // Gl_set_dim_xy(body.mesh.gfx, calc_size, calc_size);
+            body.size = calc_size;
+            body.mesh.geom.SetDimXY(body.mesh.gfx, calc_size, calc_size);
+            Gl_set_dim_xy(body.mesh.gfx, calc_size, calc_size);
 
 
-            // // // body.mesh.mat.style.rcorners = calc_size;
-            // Gl_set_attr_round_corners(body.mesh.gfx, calc_size)
+            body.mesh.mat.style.rcorners = calc_size;
+            Gl_set_attr_round_corners(body.mesh.gfx, calc_size)
          }
    
          params.clbk_params.mnemonics.slider_val = slider_val;
          // snake.in_scale_animation = false
-         console.log(val);
+         // console.log(val);
    
       }, { snake: snake, mnemonics: params.params.mnemonics.reduce_size_slider });
    

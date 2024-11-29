@@ -1096,7 +1096,17 @@ const BATCH_FN_IDX = {
 _CNT = 0x1;
 const PARTICLES = {
    HAS_START_POS_VARIATION: _CNT,
+   HAS_JIGGLE: _CNT<<=0x1,
+   HAS_ROTATION: _CNT<<=0x1,
+   HAS_SCALE: _CNT<<=0x1,
+
 }
+
+_CNT = 0;
+const PARTICLES_DIRECTION_CLBK_FN_IDX = {
+	EMISSION: _CNT++,
+	EXPLOSION: _CNT++,
+};
 
 
 

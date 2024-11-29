@@ -25,6 +25,7 @@ import { Demo_widgets, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dro
 import { Game_snake } from "./Demo/Games/Snake/Snake.js";
 import { Slider_connect } from "../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Board_rotations } from "./Demo/DemoBoardRotations.js";
+import { Tetris, Tetris_reset } from "./Demo/Games/Snake/Tetris.js";
 
 
 
@@ -47,10 +48,12 @@ const category_animations = {name:'Animations', id:bit<<=0x1};
 const subcategory_animations1 = {name:'Animations1', id:bit<<=0x1};
 const subcategory_animations2 = {name:'Animations2', id:bit<<=0x1}; // 2048
 const subcategory_animations_text = {name:'AnimationsText', id:bit<<=0x1}; // 2048
+const subcategory_rotating_rects = {name:'Rotating Rectangles', id:bit<<=0x1};
 
 const category_in_practise = {name:'In Practise', id:bit<<=0x1};
 const subcategory_snake = {name:'Snake', id:bit<<=0x1};
-const subcategory_rotating_rects = {name:'Rotating Rectangles', id:bit<<=0x1};
+const subcategory_tetris = {name:'Tetris', id:bit<<=0x1};
+// const subcategory_rotating_rects = {name:'Rotating Rectangles', id:bit<<=0x1};
 
 
 
@@ -95,7 +98,7 @@ const comet_glow_slider_values = new Float32Array([0, 0, 0.08, 0.1]);
 
 
 
-export function Demo_page(create_demo_id = subcategory_rotating_rects.id) {
+export function Demo_page(create_demo_id = subcategory_comet.id) {
 
    let comet_particles_struct = null;
    let glow_particles_struct = null;
@@ -299,20 +302,9 @@ export function Demo_page(create_demo_id = subcategory_rotating_rects.id) {
       animations_text_struct = Demo_animations_text(0, total_height, false);
 
    }
-   else if (create_demo_id & (category_in_practise.id|subcategory_snake.id)) { // Demos Physics - Snake
-      
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_snake.id);
-      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
-
-      snake_struct = Game_snake(total_height, false);
-      total_height += 20;
-      
-      // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT);
-
-   }
    else if (create_demo_id & (subcategory_rotating_rects.id)) { // Demos Physics - Snake
       
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_rotating_rects.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_rotating_rects.id);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       Board_rotations(0, total_height, ROOT_WIDGETS.CREATE_ROOT);
@@ -320,6 +312,27 @@ export function Demo_page(create_demo_id = subcategory_rotating_rects.id) {
       total_height += 20;
 
    }
+   else if (create_demo_id & (category_in_practise.id|subcategory_snake.id)) { // Demos Physics - Snake
+      
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_snake.id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
+
+      snake_struct = Game_snake(total_height, false);
+      total_height += 20;
+
+   }
+   else if (create_demo_id & (subcategory_tetris.id)) { // Demos Physics - Snake
+      
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_tetris.id);
+      total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
+
+      Tetris_reset();
+      Tetris(ROOT_WIDGETS.CREATE_ROOT, 0, total_height);
+      
+      total_height += 20;
+
+   }
+
 
 
    /*******************************************************************************************/
@@ -1254,6 +1267,18 @@ function Create_menu_items_animations_demo(params, demo_id){
    item3_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    menu_items_array.push(item3_btn);
    Bind_menu_button(item3_btn, params, (subcategory_animations_text.id), subcategory_animations_text.id);
+   
+   
+   /*******************************************************************************************/
+   // Item 4 button
+   const c4 = (demo_id & subcategory_rotating_rects.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item4_btn = Create_widget_button(_, subcategory_rotating_rects.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c4, text_col, [15, 8], .5, _, font);
+   item4_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   item4_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   item4_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   item4_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   menu_items_array.push(item4_btn);
+   Bind_menu_button(item4_btn, params, (subcategory_rotating_rects.id), subcategory_rotating_rects.id);
 
 
 
@@ -1296,14 +1321,14 @@ function Create_menu_items_in_practise_demo(params, demo_id){
    
    /*******************************************************************************************/
    // Item 2 button
-   const c2 = (demo_id & subcategory_rotating_rects.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
-   const item2_btn = Create_widget_button(_, subcategory_rotating_rects.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   const c2 = (demo_id & subcategory_tetris.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const item2_btn = Create_widget_button(_, subcategory_tetris.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
    item2_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    menu_items_array.push(item2_btn);
-   Bind_menu_button(item2_btn, params, (subcategory_rotating_rects.id), subcategory_rotating_rects.id);
+   Bind_menu_button(item2_btn, params, (subcategory_tetris.id), subcategory_tetris.id);
 
 
 

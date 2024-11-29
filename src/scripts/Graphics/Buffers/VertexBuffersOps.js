@@ -1337,6 +1337,7 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_style2_time(vbidx, start,
    vb_data[index++] = t;
 }
 
+
 export function Gl_particles_batch_set_col4_wpos4_pos2_dim2_rot4(vbidx, start, colors, positions, time, p, r) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);

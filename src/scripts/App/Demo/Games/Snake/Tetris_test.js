@@ -91,9 +91,9 @@ const TOKEN_TYPE = {
  *    
  */
 const _token_rotation_states_pivots = [
-   [3, 3, 3, 3], // Rotation state: Rect
+   [2, 2, 2, 2], // Rotation state: Rect
    [2, 2, 2, 2], // Rotation state: Line
-   [3, 3, 3, 3], // Rotation state: L
+   [2, 2, 2, 2], // Rotation state: L
    [0, 0, 0, 0], // Rotation state: L_mirrored
 ];
 
@@ -542,7 +542,9 @@ function Token_get_lower_most_row(rows){
 
 /*********************************************************************************************************/
 // Tokens
-const temp_pivot = 1
+
+const helper_arr_new_col = new Int16Array([INT_NULL, INT_NULL, INT_NULL, INT_NULL]);
+const helper_arr_new_row = new Int16Array([INT_NULL, INT_NULL, INT_NULL, INT_NULL]);
 class Token {
    
    constructor(rotation_state){
@@ -601,14 +603,18 @@ class Token {
       
       console.log('this.right_most_col', this.right_most_col)
 
-      if(this.left_most_col <= 2) {
-         if(this.cols[0] > 0)
-            pivot = 2;
-         else pivot = 1
-      }
+      // if(this.left_most_col <= 2) {
+      //    if(this.cols[0] > 0)
+      //       pivot = 2;
+      //    else pivot = 1
+      // }
 
       const px = this.cols[pivot], py = this.rows[pivot];
+      console.log(pivot)
 
+
+      // const helper_arr_new_col = [INT_NULL, INT_NULL, INT_NULL, INT_NULL];
+      // const helper_arr_new_row = [INT_NULL, INT_NULL, INT_NULL, INT_NULL];
 
       let needs_moving_left = false, needs_moving_right = false;
       let move_cols = 0;
@@ -619,7 +625,7 @@ class Token {
          const new_col = res[0]+px;
          const new_row = res[1]+py;
 
-         // Case the rotaing token is out of boundaries
+         // Case the rotating token is out of boundaries
          if((new_col < 0) && (move_cols < Abs(new_col))) {
             needs_moving_right = true;
             move_cols = Abs(new_col);
@@ -630,11 +636,39 @@ class Token {
             move_cols = new_col - (MAX_COLUMNS-1);
             console.error('>', new_col)
          }
-         
-         this.cols[i] = new_col;
-         this.rows[i] = new_row;
 
+         // Check collisions with other grid cells
+         if(new_col >= 0 && new_col < MAX_COLUMNS) {
+
+            const colidx = new_col; // Hypotheticaly move to the left
+            if(_grid_columns.buffer[colidx].boundary !== INT_NULL) { // If the grid column has any cell
+            
+               // const rowidx = this.rows[i];
+               const rowidx = new_row;
+               if(rowidx < MAX_TOKENS_IN_Y_AXIS) { // Avoid ending the game if token is at top and beyond
+
+                     // If the grid cell exists at the hypothetical moved token cell position... don't move
+                  if(_grid_columns.buffer[new_col].buffer[rowidx] !== INT_NULL) {
+                     return;
+                  }
+               }
+            }
+         }
+         
+         helper_arr_new_col[i] = new_col;
+         helper_arr_new_row[i] = new_row;
+         
       }
+
+      // If no restriction found, store the rotated token's cells coordinates
+      this.cols[0] = helper_arr_new_col[0];
+      this.cols[1] = helper_arr_new_col[1];
+      this.cols[2] = helper_arr_new_col[2];
+      this.cols[3] = helper_arr_new_col[3];
+      this.rows[0] = helper_arr_new_row[0];
+      this.rows[1] = helper_arr_new_row[1];
+      this.rows[2] = helper_arr_new_row[2];
+      this.rows[3] = helper_arr_new_row[3];
 
       if(needs_moving_left) this.MoveLeft(move_cols);
       if(needs_moving_right) this.MoveRight(move_cols);
@@ -679,11 +713,42 @@ class Token {
             needs_moving_left = true;
             move_cols = new_col - (MAX_COLUMNS-1);
          }
+
+         // Check collisions with other grid cells
+         if(new_col >= 0 && new_col < MAX_COLUMNS) {
+
+            const colidx = new_col; // Hypotheticaly move to the left
+            if(_grid_columns.buffer[colidx].boundary !== INT_NULL) { // If the grid column has any cell
+            
+               // const rowidx = this.rows[i];
+               const rowidx = new_row;
+               if(rowidx < MAX_TOKENS_IN_Y_AXIS) { // Avoid ending the game if token is at top and beyond
+
+                     // If the grid cell exists at the hypothetical moved token cell position... don't move
+                  if(_grid_columns.buffer[new_col].buffer[rowidx] !== INT_NULL) {
+                     return;
+                  }
+               }
+            }
+         }
          
-         this.cols[i] = new_col;
-         this.rows[i] = new_row;
+         helper_arr_new_col[i] = new_col;
+         helper_arr_new_row[i] = new_row;
+         
+         // this.cols[i] = new_col;
+         // this.rows[i] = new_row;
          
       }
+
+      // If no restriction found, store the rotated token's cells coordinates
+      this.cols[0] = helper_arr_new_col[0];
+      this.cols[1] = helper_arr_new_col[1];
+      this.cols[2] = helper_arr_new_col[2];
+      this.cols[3] = helper_arr_new_col[3];
+      this.rows[0] = helper_arr_new_row[0];
+      this.rows[1] = helper_arr_new_row[1];
+      this.rows[2] = helper_arr_new_row[2];
+      this.rows[3] = helper_arr_new_row[3];
       
       if(needs_moving_left) this.MoveLeft(move_cols);
       if(needs_moving_right) this.MoveRight(move_cols);

@@ -7,11 +7,15 @@ import { Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLE, PURPLEB, REDL, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Drawables/Operations/Recursions.js";
+import { Particle_system_create_emitter, Particle_system_emitt, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Time_intervals_create, Time_intervals_destroy, Time_intervals_destroy_byidx, Time_intervals_reset_byidx } from "../../../../Engine/Timers/TimeIntervals.js";
+import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_add_dim_xy, Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_dim_y, Gl_set_rgb, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Gen_array_check_for_existing_element } from "../../../../Helpers/GenericFunctions.js";
-import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
+import { Bubble_sort } from "../../../../Helpers/Helpers.js";
+import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Floor, Fract, Min3 } from "../../../../Helpers/Math/MathOperations.js";
 
 
@@ -52,9 +56,9 @@ const GRID = {
    top_row:0
 };
 
-const MAX_COLUMNS = 8;
+const MAX_COLUMNS = 7;
 const TOKEN_SIZE = 30;
-const MAX_TOKENS_IN_Y_AXIS = 12;
+const MAX_TOKENS_IN_Y_AXIS = 10;
 const TOP_ROW = MAX_TOKENS_IN_Y_AXIS-1;
 const ROW_HEIGHT = TOKEN_SIZE*2;
 const COL_WIDTH = TOKEN_SIZE*2;
@@ -63,7 +67,10 @@ const TETRIS_PANEL_WIDTH = TOKEN_SIZE*MAX_COLUMNS;
 const tetris_panel_pad = 10;
 let speed = .5;
 const def_speed = speed;
-const cell_round_corners = TOKEN_SIZE/2;
+// const cell_round_corners = TOKEN_SIZE;
+// const cell_round_corners = TOKEN_SIZE/2;
+const cell_round_corners = 10;
+const cell_feather = 2.6;
 
 // Indexes to a specific token's pivots
 const ROTATION_STATES = {
@@ -92,10 +99,10 @@ const TOKEN_TYPE = {
  *    
  */
 const _token_rotation_states_pivots = [
-   [3, 3, 3, 3], // Rotation state: Rect
+   [2, 2, 2, 2], // Rotation state: Rect
    [2, 2, 2, 2], // Rotation state: Line
-   [3, 3, 3, 3], // Rotation state: L
-   [0, 0, 0, 0], // Rotation state: L_mirrored
+   [2, 2, 2, 2], // Rotation state: L
+   [2, 2, 2, 2], // Rotation state: L_mirrored
 ];
 
 function DEBUG_rotations_state(rotation_state) {
@@ -110,7 +117,10 @@ function DEBUG_rotations_state(rotation_state) {
 
 
 
-const init_slope = .14;
+// const init_slope = .12;
+const init_slope = .28;
+// const init_slope = .4;
+// const init_slope = 8.4;
 
 
 let in_remove_row_animation = false;
@@ -120,6 +130,7 @@ let game_loop_time_interval_idx = INT_NULL;
 // TODO: create Int16 buffers, to easily reset/reuse them
 let complete_rows_cell_idxs = [];
 let complete_rows_idxs = [];
+let tetris_panel_pos = [0, 0];
 
 const grid_top_cells_row_idxs = new Int16Array(MAX_COLUMNS);
 
@@ -176,7 +187,7 @@ function Keyboard_input_keyup(params) {
 
 /*********************************************************************************************************/
 // Mesh-Cell Properties Class
-class Cell_mesh_properties {
+class Cell_properties {
 
    constructor(_mesh = null, glow_intensity = 1) {
 
@@ -191,13 +202,18 @@ class Cell_mesh_properties {
       this.time_step = 0.014; // Values = [0-1]
       this.prev_slope_val = 0;// Stores the current calculated 'time' to be used on the next 'Move' calculation. 
       
-      this.next_anim_start = .3; // The slope's value at which the next cell animation should start
+      this.next_anim_start = .3; // The slope's value at which the next cell animation should min
       
       this.in_animation = false;
       
       this.glow_intensity = glow_intensity;
 
-      this.scale = 20;
+      // this.scale = 26;
+      this.scale = 30;
+
+      this.colidx = INT_NULL;
+      this.rowidx = INT_NULL;
+
    }
 }
 
@@ -248,12 +264,14 @@ function Grid_get_rowidx_from_posy(ypos) {
 }
 function Grid_get_posy_from_rowidx(rowidx) {
 
-   const y = (TOP_ROW-rowidx) * ROW_HEIGHT;
+   // const y = tetris_panel_pos[1] + ((TOP_ROW-rowidx) * ROW_HEIGHT);
+   const y = ((TOP_ROW-rowidx) * ROW_HEIGHT);
    return y;
 }
 function Grid_get_posx_from_colidx(colidx) {
 
-   const x = (colidx * COL_WIDTH) + TOKEN_SIZE + 10;
+   // const x = tetris_panel_pos[0] + ((colidx * COL_WIDTH) + TOKEN_SIZE + 10);
+   const x = ((colidx * COL_WIDTH) + TOKEN_SIZE + tetris_panel_pad);
    return x;
 }
 function Grid_remove_row(row_idx) {
@@ -274,8 +292,8 @@ function TEMP_recalc_boundary(){
    // Recalc the boundary
    for(let i=0; i<MAX_COLUMNS; i++){
       _grid_columns.buffer[i].boundary = INT_NULL; 
-      const start = _grid_columns.buffer[i].size-1;
-      for(let j=start; j>=0; j--){
+      const min = _grid_columns.buffer[i].size-1;
+      for(let j=min; j>=0; j--){
          if(_grid_columns.buffer[i].buffer[j] !== INT_NULL) { 
             _grid_columns.buffer[i].boundary = j; 
             break; 
@@ -314,34 +332,44 @@ function Grid_move_all_down(row_idxs) {
    let move_rows = 0;
    let removed_cnt = 0;
 
-   // for(let i=0; i<MAX_TOKENS_IN_Y_AXIS; i++){
+   // const rows = Bubble_sort(row_idxs);
+   const rows = row_idxs;
+
    for(let i=0; i<=GRID.top_row; i++){
       
-      if(row_idxs[removed_cnt] === i && removed_cnt < num_rows) {
+      // Calculate how many rows to move down until next row to be removed
+      if(rows[removed_cnt] === i && removed_cnt < num_rows) {
 
          move_rows++;
          removed_cnt++;
       }
       else if(move_rows > 0){
-
    
          for(let k=0; k < MAX_COLUMNS; k++){
             
             const cellidx = _grid_columns.buffer[k].buffer[i];
-            let total_height = ROW_HEIGHT * num_rows;
-            // let total_height = ROW_HEIGHT;
+            // let total_height = ROW_HEIGHT * num_rows;
+            let total_height = ROW_HEIGHT * move_rows;
+
             if(cellidx !== INT_NULL) {
+
                const mesh = _cells_buffer.buffer[cellidx].mesh;
                mesh.geom.pos[1] += total_height;
                Gl_add_wpos_y(mesh.gfx, total_height, 1);
+
+               // Update the cell's row index variable
+               _cells_buffer.buffer[cellidx].rowidx -= move_rows;
+               // _cells_buffer.buffer[cellidx].rowidx -= num_rows;
+               
+               // Could be inside the if cell!==INT_NULL
+               _grid_columns.buffer[k].buffer[i-move_rows] = _grid_columns.buffer[k].buffer[i];
+               _grid_columns.buffer[k].buffer[i] = INT_NULL;
             }
-            
-            _grid_columns.buffer[k].buffer[i-move_rows] = _grid_columns.buffer[k].buffer[i];
-            _grid_columns.buffer[k].buffer[i] = INT_NULL;
          }
       }
    }
 
+   // TODO: Avoid recalc by correcting the whole proccess of cell rows removal
    TEMP_recalc_boundary();
 
    GRID.top_row -= move_rows;
@@ -356,6 +384,11 @@ function Grid_add_cells_from_token(token){
       // const mesh = _cells_buffer.buffer[cellidx].mesh;
       const col_idx = token.cols[i];
       const row_idx = token.rows[i];
+
+      // Update the cell's row-column index variables
+      _cells_buffer.buffer[cellidx].rowidx = row_idx;
+      _cells_buffer.buffer[cellidx].colidx = col_idx;
+      
       if(DEBUG_PRINT2) console.log('i:', i, 'col_idx', col_idx, 'row_idx', row_idx, 'cellidx', cellidx);
 
 
@@ -376,7 +409,7 @@ function Grid_add_cells_from_token(token){
    }
 
 }
-function Grid_check_row_completion(token_cells_rows) {
+function Grid_check_row_completion(token_cells_rows, emitter) {
 
    if(in_remove_row_animation) return;
 
@@ -431,7 +464,9 @@ function Grid_check_row_completion(token_cells_rows) {
    if(is_row_complete) {
       if(DEBUG_PRINT) console.log('@#$@#$ @#$@#$ @#$@#$ @#$@#$ @#$@#$ @#$@#$');
       if(DEBUG_PRINT) console.log('complete_rows_cell_idxs', complete_rows_cell_idxs, 'complete_rows_idxs', complete_rows_idxs);
-      Create_row_animation(complete_rows_cell_idxs, complete_rows_idxs);
+      const rows = Bubble_sort(complete_rows_idxs);
+      Create_row_animation(complete_rows_cell_idxs, rows, emitter);
+      // Create_row_animation(complete_rows_cell_idxs, complete_rows_idxs, emitter);
    }
 }
 
@@ -452,12 +487,18 @@ function Grid_check_row_completion(token_cells_rows) {
 function Cell_create(offsetx=0, offsety=0, col){
 
    const color = col!==undefined ? col : YELLOW[9];
-   const mesh = Create_widget_section(_, _, [0, 0], [10+(TOKEN_SIZE*2*offsetx), 10+(TOKEN_SIZE*2*offsety),0], [TOKEN_SIZE, TOKEN_SIZE], color, 'mesh');
+   const mesh = Create_widget_section(_, _, [0, 0], [tetris_panel_pad+(TOKEN_SIZE*2*offsetx), tetris_panel_pad+(TOKEN_SIZE*2*offsety),0], [TOKEN_SIZE, TOKEN_SIZE], color, 'mesh');
    mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, cell_feather);
    mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, cell_round_corners);
 
-   const cell = new Cell_mesh_properties(mesh);
+
+   // Test Shader
+   // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+   // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_3);
+   // mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+
+   const cell = new Cell_properties(mesh);
 
    if(DEBUG_PRINT2) console.log('CREATING NEW CELL', cell)
    
@@ -540,7 +581,9 @@ function Token_get_lower_most_row(rows){
 
 /*********************************************************************************************************/
 // Tokens
-const temp_pivot = 1
+// TODO: Implement token rotattions with being able to rotate at any state that is valid, when token is restricted left and right by grid cells
+const helper_arr_new_col = new Int16Array([INT_NULL, INT_NULL, INT_NULL, INT_NULL]);
+const helper_arr_new_row = new Int16Array([INT_NULL, INT_NULL, INT_NULL, INT_NULL]);
 class Token {
    
    constructor(rotation_state){
@@ -578,7 +621,7 @@ class Token {
       this.lower_row_idx = TOP_ROW;
       this.num_cells = 0;
    }
-   AddCell(cellidx, colidx, rowidx, is_pivot=false, token_type=TOKEN_TYPE.LINE, rotation_state=ROTATION_STATES.UP){
+   AddCell(cellidx, colidx, rowidx, token_type=TOKEN_TYPE.LINE, rotation_state=ROTATION_STATES.UP){
 
       this.cells.Add(cellidx);
 
@@ -587,8 +630,6 @@ class Token {
       
       if((colidx > this.right_most_col)) this.right_most_col = colidx
       if((colidx < this.left_most_col) || this.left_most_col===INT_NULL) this.left_most_col = colidx
-
-      if(is_pivot) this.pivot_cell_idx = cellidx;
 
       this.rotation_state = rotation_state;
       this.token_type = token_type;
@@ -603,11 +644,11 @@ class Token {
       
       if(DEBUG_PRINT2) console.log('this.right_most_col', this.right_most_col);
 
-      if(this.left_most_col <= 2) {
-         if(this.cols[0] > 0)
-            pivot = 2;
-         else pivot = 1
-      }
+      // if(this.left_most_col <= 2) {
+      //    if(this.cols[0] > 0)
+      //       pivot = 2;
+      //    else pivot = 1
+      // }
 
       const px = this.cols[pivot], py = this.rows[pivot];
 
@@ -631,15 +672,42 @@ class Token {
             move_cols = new_col - (MAX_COLUMNS-1);
          }
          
-         this.cols[i] = new_col;
-         this.rows[i] = new_row;
 
+         // Check collisions with other grid cells
+         if(new_col >= 0 && new_col < MAX_COLUMNS) {
+
+            const colidx = new_col; // Hypotheticaly move to the left
+            if(_grid_columns.buffer[colidx].boundary !== INT_NULL) { // If the grid column has any cell
+            
+               const rowidx = new_row;
+               if(rowidx < MAX_TOKENS_IN_Y_AXIS) { // Avoid ending the game if token is at top and beyond
+
+                     // If the grid cell exists at the hypothetical moved token cell position... don't move
+                  if(_grid_columns.buffer[new_col].buffer[rowidx] !== INT_NULL) {
+                     return;
+                  }
+               }
+            }
+         }
+         
+         helper_arr_new_col[i] = new_col;
+         helper_arr_new_row[i] = new_row;
+         
       }
 
-      if(needs_moving_left) 
-         this.MoveLeft(move_cols);
-      if(needs_moving_right) 
-         this.MoveRight(move_cols);
+      // If no restriction found, store the rotated token's cells coordinates
+      this.cols[0] = helper_arr_new_col[0];
+      this.cols[1] = helper_arr_new_col[1];
+      this.cols[2] = helper_arr_new_col[2];
+      this.cols[3] = helper_arr_new_col[3];
+      this.rows[0] = helper_arr_new_row[0];
+      this.rows[1] = helper_arr_new_row[1];
+      this.rows[2] = helper_arr_new_row[2];
+      this.rows[3] = helper_arr_new_row[3];
+
+      // Case bounaries restriction found and the token needs to be moved away from the boundary
+      if(needs_moving_left) this.MoveLeft(move_cols);
+      if(needs_moving_right) this.MoveRight(move_cols);
 
       this.left_most_col = Token_get_left_most_col(this.cols);
       this.right_most_col = Token_get_right_most_col(this.cols);
@@ -681,11 +749,39 @@ class Token {
             move_cols = new_col - (MAX_COLUMNS-1);
          }
          
-         this.cols[i] = new_col;
-         this.rows[i] = new_row;
+         // Check collisions with other grid cells
+         if(new_col >= 0 && new_col < MAX_COLUMNS) {
+
+            const colidx = new_col; // Hypotheticaly move to the left
+            if(_grid_columns.buffer[colidx].boundary !== INT_NULL) { // If the grid column has any cell
+            
+               const rowidx = new_row;
+               if(rowidx < MAX_TOKENS_IN_Y_AXIS) { // Avoid ending the game if token is at top and beyond
+
+                  // If the grid cell exists at the hypothetical moved token cell position... don't move
+                  if(_grid_columns.buffer[new_col].buffer[rowidx] !== INT_NULL) {
+                     return;
+                  }
+               }
+            }
+         }
+
+         helper_arr_new_col[i] = new_col;
+         helper_arr_new_row[i] = new_row;
          
       }
+
+      // If no restriction found, store the rotated token's cells coordinates
+      this.cols[0] = helper_arr_new_col[0];
+      this.cols[1] = helper_arr_new_col[1];
+      this.cols[2] = helper_arr_new_col[2];
+      this.cols[3] = helper_arr_new_col[3];
+      this.rows[0] = helper_arr_new_row[0];
+      this.rows[1] = helper_arr_new_row[1];
+      this.rows[2] = helper_arr_new_row[2];
+      this.rows[3] = helper_arr_new_row[3];
       
+      // Case bounaries restriction found and the token needs to be moved away from the boundary
       if(needs_moving_left) this.MoveLeft(move_cols);
       if(needs_moving_right) this.MoveRight(move_cols);
 
@@ -815,7 +911,7 @@ class Token {
 
 let curr_token = null;
 
-function Cell_reset_mesh(mesh, colidx, rowidx){
+function Cell_reset_mesh(mesh, colidx, rowidx, color){
 
    mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
    mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
@@ -825,7 +921,9 @@ function Cell_reset_mesh(mesh, colidx, rowidx){
    Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
 
    mesh.geom.SetDimXY(mesh.gfx, TOKEN_SIZE, TOKEN_SIZE);
-   
+
+   mesh.SetColorAllRGB(color);
+
    mesh.mat.style.rcorners = cell_round_corners;
    Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners);
    
@@ -841,9 +939,9 @@ function Tetris_create_token_square(section, token){
       if(free_cellidx !== INT_NULL){
             
          const mesh = _cells_buffer.buffer[free_cellidx].mesh;
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.RECT);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
+         
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -864,10 +962,9 @@ function Tetris_create_token_square(section, token){
       if(free_cellidx !== INT_NULL){
             
          const mesh = _cells_buffer.buffer[free_cellidx].mesh;
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.RECT);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
-
+         
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -888,11 +985,9 @@ function Tetris_create_token_square(section, token){
       if(free_cellidx !== INT_NULL){
             
          const mesh = _cells_buffer.buffer[free_cellidx].mesh;
-         Cell_reset_mesh(mesh, colidx, rowidx);
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.RECT);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -914,11 +1009,9 @@ function Tetris_create_token_square(section, token){
             
          const mesh = _cells_buffer.buffer[free_cellidx].mesh;
          Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx);
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.RECT);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.RECT, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.RECT);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -947,11 +1040,9 @@ function Tetris_create_token_shape_L(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.L);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -976,11 +1067,9 @@ function Tetris_create_token_shape_L(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.L);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1005,11 +1094,9 @@ function Tetris_create_token_shape_L(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.L);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1034,11 +1121,9 @@ function Tetris_create_token_shape_L(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.L);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1067,11 +1152,9 @@ function Tetris_create_token_shape_L_mirror(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.L_MIRROR);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1096,11 +1179,9 @@ function Tetris_create_token_shape_L_mirror(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.L_MIRROR);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1125,11 +1206,9 @@ function Tetris_create_token_shape_L_mirror(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.L_MIRROR);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1154,11 +1233,9 @@ function Tetris_create_token_shape_L_mirror(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.L_MIRROR);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.L_MIRRORED, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(TETRIS_TOKENS_COLORS.L_MIRROR);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1186,11 +1263,9 @@ function Tetris_create_token_line4(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.LINE);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1215,11 +1290,9 @@ function Tetris_create_token_line4(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx)
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.LINE);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1244,11 +1317,9 @@ function Tetris_create_token_line4(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx);
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.LINE);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1273,11 +1344,9 @@ function Tetris_create_token_line4(section, token){
          // mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
          // mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
          // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         Cell_reset_mesh(mesh, colidx, rowidx);
+         Cell_reset_mesh(mesh, colidx, rowidx, TETRIS_TOKENS_COLORS.LINE);
          token.AddCell(free_cellidx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);
          
-         mesh.SetColorRGB(TETRIS_TOKENS_COLORS.LINE);
-
          // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
          // else mesh.SetColorRGB(PURPLE[9]);
       }
@@ -1290,93 +1359,6 @@ function Tetris_create_token_line4(section, token){
          cell.mesh.Render();
       }
    }
-}
-function Tetris_create_token_test(section, token){
-
-
-   const row = 4;
-   {
-      const colidx = 1;
-      const rowidx = row;
-      const free_cellidx = Cell_get_free_cell();
-   
-      if(free_cellidx !== INT_NULL){
-            
-         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
-         
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
-         token.AddCell(free_cellidx, colidx, rowidx);
-         
-         // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
-         // else mesh.SetColorRGB(PURPLE[9]);
-      }
-      else {
-         // Create new cells
-         const cell = Cell_create(colidx, TOP_ROW-rowidx);
-         token.AddCell(cell.idx, colidx, rowidx);
-         section.AddItem(cell.mesh);
-         cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
-         cell.mesh.Render();
-      }
-   }
-   {
-      const colidx = 1;
-      const rowidx = row+1;
-      const free_cellidx = Cell_get_free_cell();
-   
-      if(free_cellidx !== INT_NULL){
-            
-         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
-         
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
-         token.AddCell(free_cellidx, colidx, rowidx);
-         
-         // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
-         // else mesh.SetColorRGB(PURPLE[9]);
-      }
-      else {
-         // Create new cells
-         const cell = Cell_create(colidx, TOP_ROW-rowidx);
-         token.AddCell(cell.idx, colidx, rowidx);
-         section.AddItem(cell.mesh);
-         cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
-         cell.mesh.Render();
-      }
-   }
-   {
-      const colidx = 2;
-      const rowidx = row+1;
-      const free_cellidx = Cell_get_free_cell();
-   
-      if(free_cellidx !== INT_NULL){
-            
-         const mesh = _cells_buffer.buffer[free_cellidx].mesh;
-         
-         mesh.geom.pos[0] = 10+(TOKEN_SIZE*2*colidx);
-         mesh.geom.pos[1] = 10+(TOKEN_SIZE*2*(TOP_ROW-rowidx));
-         Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+TOKEN_SIZE, mesh.geom.pos[1]+TOKEN_SIZE);
-         
-         token.AddCell(free_cellidx, colidx, rowidx);
-         
-         // if(free_cellidx.idx===6) mesh.SetColorRGB(REDL[9]);
-         // else mesh.SetColorRGB(PURPLE[9]);
-      }
-      else {
-         // Create new cells
-         const cell = Cell_create(colidx, TOP_ROW-rowidx);
-         token.AddCell(cell.idx, colidx, rowidx);
-         section.AddItem(cell.mesh);
-         cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
-         cell.mesh.Render();
-      }
-   }
-
 }
 function Tetris_create_token_line2(section, token){
 
@@ -1436,8 +1418,35 @@ function Tetris_create_token_line2(section, token){
    }
 }
 
+
+
+export function Tetris_reset(){
+
+   _grid_columns.ResetFull();
+   _cells_buffer.ResetFull();
+   _free_cells_buffer.Reset();
+
+   complete_rows_cell_idxs = [];
+   complete_rows_idxs = [];
+
+   in_remove_row_animation = false;
+   tetris_end = false;
+   game_loop_time_interval_idx = INT_NULL;
+
+   for(let i=0; i<helper_arr_new_row.length; i++){
+
+      helper_arr_new_col[i] = INT_NULL; 
+      helper_arr_new_row[i] = INT_NULL;
+   }
+
+}
+
+
 const token_cycle = [Tetris_create_token_line4, Tetris_create_token_shape_L_mirror, Tetris_create_token_shape_L, Tetris_create_token_square]
+// const token_cycle = [Tetris_create_token_line4, Tetris_create_token_square]
+// const token_cycle = [Tetris_create_token_square, Tetris_create_token_line4]
 let cycle_cnt = 0;
+const token_cycle_len = token_cycle.length-1;
 function Tetris_create_token(token_id, section) {
    
    const token = curr_token;
@@ -1445,13 +1454,14 @@ function Tetris_create_token(token_id, section) {
 
    const Create_token = token_cycle[cycle_cnt];
    cycle_cnt++;
-   if(cycle_cnt > 3) cycle_cnt = 0;
+   if(cycle_cnt > token_cycle_len) cycle_cnt = 0;
    Create_token(section, token)
 
    // Tetris_create_token_test(section, token);
    // Tetris_create_token_shape_L(section, token);
    // Tetris_create_token_square(section, token);
    // Tetris_create_token_line2(section, token);
+   // Tetris_create_token_line3(section, token);
    // Tetris_create_token_line4(section, token);
    
    curr_token = token;
@@ -1467,12 +1477,22 @@ export function Tetris(root_widget=0x0, x, y){
    // Create the columns to store any
    Tetris_initialize_grid();
 
+   tetris_panel_pos[0] = x;
+   tetris_panel_pos[1] = y;
+
 
 
    const section = Create_widget_section(root_widget, _, [10, 10], [x,y,0], [TETRIS_PANEL_WIDTH+tetris_panel_pad, TETRIS_PANEL_HEIGHT+tetris_panel_pad], GREY[0], 'TetrisSection');
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 20);
+
+   
+
+   // Test Shader
+   // section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+   // section.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_1);
+   // section.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
 
 
@@ -1487,7 +1507,7 @@ export function Tetris(root_widget=0x0, x, y){
       const colidx = col;
       const rowidx = row;
       const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.RECT);
-      token.AddCell(cell.idx, colidx, rowidx);
+      token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE);
       section.AddItem(cell.mesh);
       curr_token = token;
    }
@@ -1495,7 +1515,7 @@ export function Tetris(root_widget=0x0, x, y){
       const colidx = col;
       const rowidx = row+1;
       const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L);
-      token.AddCell(cell.idx, colidx, rowidx);
+      token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE);
       section.AddItem(cell.mesh);
       curr_token = token;
    }
@@ -1503,33 +1523,20 @@ export function Tetris(root_widget=0x0, x, y){
       const colidx = col;
       const rowidx = row+2;
       const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.LINE);
-      token.AddCell(cell.idx, colidx, rowidx);
+      token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE);
       section.AddItem(cell.mesh);
    }
-   // {
-   //    const colidx = col+1;
-   //    const rowidx = row+2;
-   //    const cell = Cell_create(colidx, TOP_ROW-rowidx);
-   //    token.AddCell(cell.idx, colidx, rowidx);
-   //    section.AddItem(cell.mesh);
-   // }
    {
       const colidx = col;
       const rowidx = row+3;
       const cell = Cell_create(colidx, TOP_ROW-rowidx, TETRIS_TOKENS_COLORS.L_MIRROR);
-      token.AddCell(cell.idx, colidx, rowidx);
+      token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE);
       section.AddItem(cell.mesh);
    }
       
       
    curr_token = token;
    
-   console.log(
-      '----------------------------------------------------------------------------------\nToken created',
-      'cols', token.cols,
-      'rows', token.rows,
-      '\n----------------------------------------------------------------------------------',
-   )
 
 
 
@@ -1545,12 +1552,19 @@ export function Tetris(root_widget=0x0, x, y){
    Construct_listen_events_relations_from_mesh_tree(section);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+   // section.GfxUniformSetAndUpdate('u_generic_vec3', [0.03, 0.02, 0.2]);
+   // _cells_buffer.buffer[0].mesh.GfxUniformSetAndUpdate('u_generic_vec3', [0.03, 0.02, 0.0]);
 
 
    /*************************************************************************************************/
-   // Create move for body meshes
+   // Create Tetris Game Loop
+   const emitter = Particles_explosion();
+
+   /*************************************************************************************************/
+   // Create Tetris Game Loop
    const params = {
       section: section,
+      emitter: emitter,
    }
    
    game_loop_time_interval_idx = Time_intervals_create(14, 'Tetris', TIME_INTERVAL_REPEAT_ALWAYS, Tetris_game_loop, params);
@@ -1585,9 +1599,6 @@ function Tetris_game_loop(params) {
    if(token.lower_row_idx <= 0 ) {
       
       has_collide = true;
-
-      // Create pound animation
-      // Create_pound_animation(token, section_bot- _cells_buffer.buffer[token.cells.buffer[i]].geom.dim[1]);
    }
    /*********************************************************************************/
    // Check collision with grid cells
@@ -1620,8 +1631,17 @@ function Tetris_game_loop(params) {
    // Resolve Collision
    if(has_collide) {
 
+      // Create pound animation
+      const section_bot = section.geom.pos[1] + section.geom.dim[1]*2;
+      for(let i = 0; i<token.cells.boundary; i++) {
 
+         // Create_pound_animation(token, section_bot- _cells_buffer.buffer[token.cells.buffer[0]].mesh.geom.dim[1]);
+         Create_pound_animation(token, section_bot);
+         // Create_pound_animation(token, _cells_buffer.buffer[token.cells.buffer[i]].mesh.geom.dim[1]);
+         // Create_pound_animation(token,Grid_get_posy_from_rowidx(0)+TOKEN_SIZE);
+      }
 
+      const emitter = params.params.emitter;
       Grid_add_cells_from_token(token);
 
       // END the game
@@ -1636,7 +1656,7 @@ function Tetris_game_loop(params) {
       }
          
       
-      // Store tokens rows that have a cell, for the check_row_compleyion before token reset 
+      // Store tokens rows that have a cell, for the check_row_completion before token reset 
       const token_cells_rows = [];
       for(let k=0; k<token.rows.length; k++){
 
@@ -1655,12 +1675,11 @@ function Tetris_game_loop(params) {
          
       Tetris_create_token(TETRIS_TOKEN_IDS.LINE, section);
          
-      Grid_check_row_completion(token_cells_rows)
+      Grid_check_row_completion(token_cells_rows, emitter);
+
    }
 
 }
-
-
 function Tetris_end() {
 
    Time_intervals_destroy_byidx(game_loop_time_interval_idx);
@@ -1715,7 +1734,7 @@ function Animation_pound_run(params) {
    const len = complete_rows_cell_idxs.length;
    for(let i=0; i<len; i++){
       const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]].mesh;
-      mesh.geom.pos[1] += y;
+      // mesh.geom.pos[1] += y;
       Gl_add_wpos_y(mesh.gfx, y, 1);
    }
 
@@ -1735,8 +1754,9 @@ function Animation_pound_stop(params) {
    const len = complete_rows_cell_idxs.length;
    for(let i=0; i<len; i++){
       const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]].mesh;
-      mesh.geom.pos[1] = target_posy;
-      Gl_set_wpos_y(mesh.gfx, target_posy, 1);
+      // mesh.geom.pos[1] = target_posy;
+      // Gl_set_wpos_y(mesh.gfx, target_posy, 1);
+      Gl_set_wpos_y(mesh.gfx, mesh.geom.pos[1], 1);
    }
 
    return false;
@@ -1746,148 +1766,23 @@ function Animation_pound_stop(params) {
 
 /******************************************************************************************************************************/
 // Create Remove Row Animation
-function Create_row_animation(complete_rows_cell_idxs, rowidxs) {
-
-   // // Color and move animation
-   // const params = {
-   //    complete_rows_cell_idxs: complete_rows_cell_idxs,
-   //    all_rgb_maxed:0x0,
-   //    rowidxs:rowidxs,
-   // };
+function Create_row_animation(complete_rows_cell_idxs, rowidxs, emitter) {
    
-   
-   // Callback_animations_create(Animation_row_run, Animation_row_stop, params, 'TetrisColor_MoveAnimation');
    
    in_remove_row_animation = true;
    
-   // Scale animation 
-   
+   // Create scale animation
    const params = {
       // complete_rows_cell_idxs: complete_rows_cell_idxs,
       rowidxs:rowidxs,
+      all_rgb_maxed:0x0,
+      emitter:emitter,
       cell_buffer_idx:0,
    };
    
-   // Create scale animation
    Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params, 'TetrisScaleAnimation');
 }
 
-
-/******************************************************************************************************************************/
-// Color-intensity and Move animation
-function Animation_row_run(params) {
-
-   // !! Runs for all tokens of a row, so 1 callback_animation that will call remove row once.
-
-   const complete_rows_cell_idxs = params.complete_rows_cell_idxs;
-   const c = .02;
-   let stop_anim = false;
-
-   const len = complete_rows_cell_idxs.length;
-   for(let i=0; i<len; i++){
-      
-      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]].mesh;
-
-      let r = mesh.mat.col[0];
-      let g = mesh.mat.col[1];
-      let b = mesh.mat.col[2];
-      
-      if(r <= 1.0) r += c;
-      else params.all_rgb_maxed |= 0x1;
-      if(g <= 1.0) g += c;
-      else params.all_rgb_maxed |= 0x2;
-      if(b <= 1.0) b += c;
-      else params.all_rgb_maxed |= 0x4;
-      
-      mesh.mat.col[0] = r;
-      mesh.mat.col[1] = g;
-      mesh.mat.col[2] = b;
-
-      // Check the minimum rgb to reach 1 in order to stop the animation
-      const min = Min3(r, g, b);
-      if(min>=1.0) stop_anim = true;
-
-      Gl_set_rgb(mesh.gfx, mesh.mat.col, 1);
-
-   }
-
-   // Stop animation when a certain threshold has been reached
-   if(stop_anim) 
-      return false
-
-
-   return true;
-
-}
-function Animation_row_stop(params) {
-
-   const complete_rows_cell_idxs = params.complete_rows_cell_idxs;
-
-   const params2 = {
-      complete_rows_cell_idxs: complete_rows_cell_idxs,
-      move_amt:3,
-      thershold:.2,
-      rowidxs:params.rowidxs,
-      all_finished:true,
-   }
-
-   // Create disperse tokens animation
-   Callback_animations_create(Animation_row_destroy_run, Animation_row_destroy_stop, params2);
-
-   return false;
-}
-function Animation_row_destroy_run(params) {
-
-   const complete_rows_cell_idxs = params.complete_rows_cell_idxs;
-   const move_amt = params.move_amt;
-   const thershold = params.thershold;
-
-   const y = 1 * move_amt;
-
-   const len = complete_rows_cell_idxs.length;
-   for(let i=0; i<len; i++){
-      
-      const mesh = _cells_buffer.buffer[complete_rows_cell_idxs[i]].mesh;
-      mesh.geom.pos[1] += y;
-      Gl_add_wpos_y(mesh.gfx, y, 1);
-
-      if( mesh.geom.pos[1] < DEVICE.MAX_HEIGHT+100) params.all_finished = false;
-   }
-
-   // params.move_amt *= .98;
-   params.move_amt *= 1.02;
-   // Stop animation when a certain threshold has been reached
-   // if(params.move_amt < thershold) 
-   if(params.all_finished) 
-      return false
-
-   params.all_finished = true;
-   return true;
-
-}
-function Animation_row_destroy_stop(params) {
-
-   const rowidxs = params.rowidxs;
-   const boundary = rowidxs.length-1;
-
-   for(let i=boundary; i>=0; i--){
-
-      console.log('Removing Row:', rowidxs[i])
-      Grid_remove_row(rowidxs[i]);
-   }
-   Grid_move_all_down(rowidxs);
-
-   if(DEBUG_PRINT){
-      console.log('#############################################################################################\nAfter grid row has been removed')   
-      Debug_print()
-   }
-
-   in_remove_row_animation = false;
-   complete_rows_cell_idxs = [];
-   complete_rows_idxs = [];
-
-   return false;
-}
 
 
 
@@ -1895,7 +1790,6 @@ function Animation_row_destroy_stop(params) {
 // Scale animation
 function Animation_scale_up_run(params) {
 
-   // const complete_rows_cell_idxs = params.complete_rows_cell_idxs;
    const cell_buffer_idx = params.cell_buffer_idx;
    const cell_idx = complete_rows_cell_idxs[cell_buffer_idx];
 
@@ -1911,15 +1805,44 @@ function Animation_scale_up_run(params) {
    const mesh = cell.mesh;
    const size = -(slope-prev_slope_val) * scale;
 
-   mesh.geom.dim[0] += size;
-   mesh.geom.dim[1] += size;
-   mesh.geom.AddDimXY(mesh.gfx, size, size);
-   Gl_add_dim_xy(mesh.gfx, size, size);
+   { // Scale Up animation
+      mesh.geom.dim[0] += size;
+      mesh.geom.dim[1] += size;
+      mesh.geom.AddDimXY(mesh.gfx, size, size);
+      Gl_add_dim_xy(mesh.gfx, size, size);
+   }
+
+   { // Color Intensity animation
+      const c = .03;
+      let r = mesh.mat.col[0];
+      let g = mesh.mat.col[1];
+      let b = mesh.mat.col[2];
+      
+      if(r <= 1.0) r += c;
+      else params.all_rgb_maxed |= 0x1;
+      if(g <= 1.0) g += c;
+      else params.all_rgb_maxed |= 0x2;
+      if(b <= 1.0) b += c;
+      else params.all_rgb_maxed |= 0x4;
+      
+      mesh.mat.col[0] = r;
+      mesh.mat.col[1] = g;
+      mesh.mat.col[2] = b;
+
+      Gl_set_rgb(mesh.gfx, mesh.mat.col, 1);
+   }
 
    
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
-      // mesh.mat.style.rcorners = (TOKEN_SIZE/2) * (slope-prev_slope_val) * scale;
-      mesh.mat.style.rcorners = mesh.geom.dim[0]/2;
+
+      // const roun_orig = mesh.geom.dim[0]/2;
+      const roun_orig = cell_round_corners;
+      const roun_circle = mesh.geom.dim[0] * slope;
+
+      // Interpolate between original roundess and circle roundess
+      const roundness = (roun_orig*(1.4-slope)) + (roun_circle);
+
+      mesh.mat.style.rcorners = roundness;
       Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners);
    }
    
@@ -1940,6 +1863,7 @@ function Animation_scale_up_run(params) {
          const params2 = {
             // complete_rows_cell_idxs:params.complete_rows_cell_idxs,
             rowidxs:params.rowidxs,
+            emitter:params.emitter,
             cell_buffer_idx:next_cell_idx,
          };
 
@@ -1947,22 +1871,23 @@ function Animation_scale_up_run(params) {
       }
    }
 
+   const rows_num = params.rowidxs.length;
+   const speed_mod = rows_num === 1 ? .15 : (rows_num*.1);
 
-
-   if (slope < 1.) return true;
-   else 
-      return false
+   // if (slope < .75) return true;
+   if (slope < 1 - speed_mod) return true;
+   else return false
 
 }
 
 function Animation_scale_up_stop(params) {
 
    // Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params, `Run:TetrisScaleDownAnimation`)
-
+   
+   
    const cell_buffer_idx = params.cell_buffer_idx;
    const cell_idx = complete_rows_cell_idxs[cell_buffer_idx];
    const cell = _cells_buffer.buffer[cell_idx];
-
    // Reset Cell's properties
    cell.time = 0;
    cell.prev_slope_val = 0;
@@ -1973,14 +1898,30 @@ function Animation_scale_up_stop(params) {
    const mesh = cell.mesh;
    mesh.geom.pos[1] = OUT_OF_VIEW;
    Gl_set_wpos_y(mesh.gfx, OUT_OF_VIEW);
+   
 
-
-   console.log('Cell cell_idx:', cell_idx, 'reseted. cell.in_animation=', cell.in_animation)
+   // Particles Emitter
+   const emitter = params.emitter;
+   // const posy = Grid_get_posy_from_rowidx(cell.rowidx-1);
+   const posy = Grid_get_posy_from_rowidx(cell.rowidx);
+   const posx = Grid_get_posx_from_colidx(cell.colidx)
+   // emitter.pos[0] = posx+TOKEN_SIZE; 
+   // emitter.pos[1] = posy+TOKEN_SIZE+10;
+   emitter.pos[0] = posx + tetris_panel_pos[0]; 
+   emitter.pos[1] = posy + tetris_panel_pos[1]+TOKEN_SIZE;
+   emitter.mat.col[0] = mesh.mat.defCol[0];
+   emitter.mat.col[1] = mesh.mat.defCol[1];
+   emitter.mat.col[2] = mesh.mat.defCol[2];
+   emitter.mat.col[3] = mesh.mat.defCol[3];
+   const emitter_idx = emitter.idx;
+   const emitter_params = {params:{target_params:[emitter_idx]},};
+   Particle_system_emitt(emitter_params);
+   
 
 
    // Remove cell rows
    const last_elem_idx = complete_rows_cell_idxs.length-1;
-   if(cell_idx === complete_rows_cell_idxs[last_elem_idx]) {
+   if(cell_buffer_idx === last_elem_idx) {
 
       const rowidxs = params.rowidxs;
       const boundary = rowidxs.length-1;
@@ -1990,7 +1931,13 @@ function Animation_scale_up_stop(params) {
          console.log('Removing Row:', rowidxs[i])
          Grid_remove_row(rowidxs[i]);
       }
+      
       Grid_move_all_down(rowidxs);
+
+      if(DEBUG_PRINT){
+         console.log('#############################################################################################\nAfter grid row has been removed')   
+         Debug_print()
+      }
 
       // Reset completed rows buffer
       in_remove_row_animation = false;
@@ -2104,6 +2051,119 @@ function Animation_scale_up_stop(params) {
 //    return false;
 // }
 
+
+
+/******************************************************************************************************************************/
+// Explosion particles
+export function Particles_explosion(x = 0, y = 0, num_particles_per_frame=4) { // 3 control Sliders 
+
+   const scale_down = 1.;
+   
+   
+   
+   /****************************************************************************************************************/
+   // Create Particles Particles Emitter
+   const particles_size = 30;
+   num_particles_per_frame=50;
+   
+   const emitter_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .03, 1, 4, .98, .1, 4, _, num_particles_per_frame);
+   // const emitter_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .014, 1, 1, .96, -.1, 3, TEXTURES.SMOKE_1, num_particles_per_frame);
+   const emitter = Particles_get_particle_system(emitter_idx);
+   emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+   emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:4, jiggley:3});
+   // emitter.EnableProperties(PARTICLES.HAS_SCALE, 20);
+   
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+   emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+   
+   
+   emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   emitter.EnableGfxUniforms({ fx: SID.FX.FS_GLOW_VEC3, }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+   
+   emitter.SetConeOfDirection(-.1, .1, .1, -.1);
+   // emitter.SetConeOfDirection(1, 1, -.1, .2);
+   
+   Particles_gen_gfx_ctx(emitter, );
+   
+   
+   // Set callback for uniform update
+   emitter.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
+   emitter.GfxUniformSetAndUpdate('u_glow_params', [.2, 1., .1]);
+   
+   
+   /****************************************************************************************************************/
+   // Create Smoke Particles
+   // const particles_size = 5;
+   // num_particles_per_frame=4;
+
+   // const emitter_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .014, 1, 1, .96, -.1, 3, TEXTURES.SMOKE_1, num_particles_per_frame);
+   // const emitter = Particles_get_particle_system(emitter_idx);
+
+   // emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+   // emitter.EnableProperties(PARTICLES.HAS_ROTATION);
+   // emitter.EnableProperties(PARTICLES.HAS_SCALE, 14);
+   // emitter.speed = .8;
+
+   // emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+   // emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+   // emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TEX2);
+
+   // emitter.SetConeOfDirection(-.1, .1, .1, -.1);
+
+   // Particles_gen_gfx_ctx(emitter, );
+
+
+
+
+
+
+   { // SHADER UNIFORMS: Distance
+      const val = 0.1;
+      const val_idx = 0;
+      // Find the ubidx
+      const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_glow_params');
+      Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, val, val_idx);
+   }
+   { // SHADER UNIFORMS: Brightness
+      const val = 0.0;
+      const val_idx = 1;
+      // Find the ubidx
+      const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_glow_params');
+      Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, val, val_idx);
+   }
+   { // SHADER UNIFORMS: Intensity
+      const val = 0.1;
+      const val_idx = 2;
+      // Find the ubidx
+      const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_glow_params');
+      Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, val, val_idx);
+   }
+   { // SHADER UNIFORMS: Particle Scale
+      const val = 0.02;
+      const val_idx = 0;
+      // Find the ubidx
+      const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_scale2');
+      Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, val, val_idx);
+   }
+   { // Gravity
+      const val = 0.;
+      emitter.gravity = val;
+   }
+   { // Acceleration
+      const val = 10.0;
+      emitter.accel = val;
+   }
+   { // Deccelerarion
+      const val = .98;
+      emitter.deccel = val;
+   }
+
+   return emitter;
+
+}
 
 
 
