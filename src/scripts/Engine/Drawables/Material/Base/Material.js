@@ -165,7 +165,12 @@ export class FontMaterial extends Material {
       this.textureid = textureid;
 
       this.sid.attr |= SID.ATTR.TEX2; // 
-      this.sid.pass |= SID.PASS.TEX2; // 
+      this.sid.pass |= SID.PASS.TEX2; //
+      if(textureid === TEXTURES.MSDF_CONSOLAS_1024) {
+         this.sid.attr |= SID.ATTR.MSDF; // 
+         // this.sid.pass |= SID.PASS.TEX2; //
+
+      } 
       this.type |= MESH_TYPE.FONT_MATERIAL;
 
       // Load texture and uv map, via indexes to the actual buffers

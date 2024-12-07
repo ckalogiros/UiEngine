@@ -6,9 +6,11 @@
 
 // TODO: Correct the Init logic of 'Buffer_Interface' and 'M_Buffer'. Currently if object is passed and elements are initialized, the boundary remains 0. 
 
+// TODO: IMPLEMENT FREEIDX OR FREE_BUFFER (Also impl at MeshBufferViews.js: at // IMPORTANT: After consolidation, the buffer's freeidx is not valid)
 
 
-const DEBUG_PRINT_ALLOCATIONS = true;
+
+const DEBUG_PRINT_ALLOCATIONS = false;
 
 
 
@@ -29,12 +31,28 @@ export class ArrayBufferInterface {
       this.boundary = INT_NULL;
       this.active_count = 0;
       this.size = INT_NULL;
-      this.freeidx = this.freeidx;
+      this.freeidx = 0;
       this.reserveidx = INT_NULL;
 
       /** ONLY FOR DEBUGING INFO */
       this.debug_name = null;
 
+   }
+   
+   Reset() {
+
+      for (let i = 0; i <= this.boundary; i++) {
+         this.buffer[i] = INT_NULL;
+         DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE--;
+      }
+
+      // INFO: Size is responsible for reallocation, so it shouldn't be reseted
+      // DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= this.size-1;
+      // DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= this.size-1;
+      this.boundary = -1;
+      this.active_count = 0;
+      this.freeidx = 0;
+      this.reserveidx = INT_NULL;
    }
 
    Add(elem) {
@@ -82,6 +100,7 @@ export class ArrayBufferInterface {
    GetNextFree() {
 
       if (this.active_count >= this.size) {
+         
          const idx = this.Realloc(); // buffer is full.
          this.boundary = idx;
 
@@ -99,22 +118,174 @@ export class ArrayBufferInterface {
          }
       }
    }
+   
+   
+   ShiftLeft(){
+
+      if(this.boundary >= 0) {
+
+         this.active_count = 0;
+         for (let i = 0; i <= this.boundary+1; i++) {
+
+            if(this.buffer[i+1] !== INT_NULL){
+               this.boundary = i;
+               this.active_count++;
+            }
+            this.buffer[i] = this.buffer[i+1];
+         }
+      }
+   }
+   /** Shift left all elements but from a specified index */
+   ShiftLeftFromBaseIndex(base_idx){
+      if(base_idx <= this.boundary) {
+
+         this.boundary = -1;
+
+         // Unfortunately we must recalculate the boundary 
+         for (let i = 0; i < base_idx; i++) {
+            if(this.buffer[i] !== INT_NULL){
+               this.boundary = i;
+            }
+         }
+
+         for (let i = base_idx; i < this.size-1; i++) {
+            
+            this.buffer[i] = this.buffer[i+1];
+            if(this.buffer[i+1] !== INT_NULL){
+               this.boundary = i;
+            }
+         }
+   
+         this.active_count -= 1;
+         if(this.active_count < 0) alert('66113322131312')
+
+         if(this.boundary > this.count) console.error('009988176651 \n Boundary > active_count', this.boundary, this.count)
+      }
+   }
 
 
-   Reset() {
+   RemoveByIdx(idx) {
 
-      for (let i = 0; i <= this.boundary; i++) {
-         this.buffer[i] = INT_NULL;
-         DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE--;
+      if (this.buffer[idx] !== INT_NULL) {
+
+         this.buffer[idx] = INT_NULL;
+         this.active_count--;
+         
+         
+         // Check if previous elements are empty, and reduce boundary to the last active.
+         while(this.buffer[this.boundary] === INT_NULL) {
+            this.boundary--;
+         }
+         
+         if (this.boundary < INT_NULL) alert('M_Buffer boundary = -1')
+         ERROR_NULL(this.active_count);
+
+         if(this.freeidx !== INT_NULL && this.buffer[this.freeidx] !== INT_NULL) alert('5545567556445 BUFFERS')
+
+         if (this.active_count === 0) this.boundary = INT_NULL
+
+         return;
+      }
+      // alert('877877877877 BUFFERS')
+      // console.error('877877877877 Buffer elem NOT exists', '\nidx', idx, '\nbuffer', this.buffer)
+      console.warn('877877877877 Buffer elem NOT exists', '\nidx', idx, '\nbuffer', this.buffer)
+   }
+
+
+   /** Fast Remove Last Item. Caller is responsible of making sure at least one element exists. No check happens */
+   RemoveByIdxSortedVersionLastElemGuarantee() {
+
+      this.buffer[this.boundary] = INT_NULL;
+      this.boundary--;
+      this.active_count--;
+      /**Debug */ if(this.boundary < INT_NULL) alert('0-Boundary is out of bounds\nBoundary <= -2');
+   }
+   RemoveByIdxNoGapsVersion(idx, debug_id, debug_name) {
+
+      if (this.buffer[idx] !== INT_NULL) {
+
+         this.buffer[idx] = INT_NULL;
+         this.active_count--;
+
+         const replacer_data = this.#ShortReplaceWithLast(idx);
+
+         if (this.active_count <= INT_NULL){
+            console.error(idx, debug_id, debug_name, this)
+            alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nInt32Buffer active_count <= -1');
+         }
+
+         return replacer_data;
+
       }
 
-      // INFO: Size is responsible for reallocation, so it shouldn't be reseted
-      // DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= this.size-1;
-      // DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= this.size-1;
-      this.boundary = -1;
-      this.active_count = 0;
-      this.freeidx = 0;
-      this.reserveidx = INT_NULL;
+      return INT_NULL
+   }
+   /**Returns -1 if there was no replacment(the removed element happens to be last) */
+   #ShortReplaceWithLast(removed_idx) {
+
+      if (removed_idx !== this.boundary) { // Handle removing any elements except the last
+
+         // REPLACE WITH LAST ELEM
+         this.buffer[removed_idx] = this.buffer[this.boundary];
+         // REMOVE LAST
+         this.buffer[this.boundary] = INT_NULL;
+
+         this.boundary--;
+         const replacer_data = this.buffer[removed_idx];
+         return replacer_data;
+      }
+      else { // Remove last does not need sorting
+         this.boundary--;
+         return INT_NULL; // Shows that there was no element move
+      }
+   }
+   /** Shift left all elements but from a specified index */
+   RemoveByIdxSortedVersion(idx, debug_id, debug_name) {
+
+      if (this.buffer[idx] !== INT_NULL) {
+
+         this.buffer[idx] = INT_NULL;
+         this.ShiftLeftFromBaseIndex(idx);
+
+      }
+   }
+   /** Fast Remove Last Item. Caller is responsible of making sure at least one element exists. No check happens */
+   RemoveByIdxSortedVersionLastElemGuarantee() {
+
+      this.buffer[this.boundary] = INT_NULL;
+      this.boundary--;
+      this.active_count--;
+      /**Debug */ if(this.boundary < INT_NULL) alert('0-Boundary is out of bounds\nBoundary <= -2');
+   }
+
+   
+   Consolidate() {
+
+      alert(' 00909987813245 IMPLEMENT CORRECTLY')
+      let leftidx=0, rightidx=0;
+
+      for (let i = 0; i < this.boundary; i++) {
+            
+         if(this.buffer[i] === INT_NULL) {
+
+            rightidx++;
+            while(this.buffer[rightidx] === INT_NULL) {
+
+               rightidx++;
+            }
+            
+            this.buffer[leftidx] = this.buffer[rightidx];
+            leftidx++;
+         }
+         else {
+
+            leftidx++;
+            rightidx++;
+         }
+      }
+
+      this.boundary = leftidx;
+      // this.count has been calculated in a remove_idx function;
    }
 
 
@@ -150,31 +321,11 @@ export class ArrayBufferInterface {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**********************************************************************************************************************************************/
 // Int8
 /**********************************************************************************************************************************************/
 // TODO: Instead use Uint8 and set the NULL value with uin8_max: 255-0xff
 export class Int8Buffer extends ArrayBufferInterface {
-
 
    constructor(size = 1, debug_name) {
 
@@ -207,47 +358,6 @@ export class Int8Buffer extends ArrayBufferInterface {
       }
 
       return old_size; // The new empty index.
-   }
-
-   RemoveByIdxSortedVersion(idx, debug_id, debug_name) {
-
-      if (this.buffer[idx] !== INT_NULL) {
-
-         this.buffer[idx] = INT_NULL;
-         this.active_count--;
-
-         const replacer_data = this.#ShortReplaceWithLast(idx);
-
-         if (this.active_count <= INT_NULL){
-            console.error(idx, debug_id, debug_name, this)
-            alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nInt8Buffer active_count <= -1');
-         }
-
-         return replacer_data;
-
-      }
-
-      return INT_NULL
-   }
-
-   /**Returns -1 if there was no replacment(the removed element happens to be last) */
-   #ShortReplaceWithLast(removed_idx) {
-
-      if (removed_idx !== this.boundary) { // Handle removing any elements except the last
-
-         // REPLACE WITH LAST ELEM
-         this.buffer[removed_idx] = this.buffer[this.boundary];
-         // REMOVE LAST
-         this.buffer[this.boundary] = INT_NULL;
-
-         this.boundary--;
-         const replacer_data = this.buffer[removed_idx];
-         return replacer_data;
-      }
-      else { // Remove last does not need sorting
-         this.boundary--;
-         return INT_NULL; // Shows that there was no element move
-      }
    }
 
 }
@@ -295,37 +405,10 @@ export function Free_int8_buffer(buffer){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**********************************************************************************************************************************************/
 // Int16
 /**********************************************************************************************************************************************/
 export class Int16Buffer extends ArrayBufferInterface {
-
 
    constructor(size = 1, debug_name) {
 
@@ -363,128 +446,6 @@ export class Int16Buffer extends ArrayBufferInterface {
       return old_size; // The new empty index. 
    }
 
-   RemoveByIdx(idx) {
-
-      if (this.buffer[idx] !== INT_NULL) {
-
-         this.buffer[idx] = INT_NULL;
-         this.active_count--;
-         if (idx === this.boundary) this.boundary--; // Case the we removed the last element in existance
-
-
-         // Check if previous elements are empty, and reduce boundary to the last active.
-         const boundary = this.boundary;
-         for (let i = boundary; i > 0; i--) {
-
-            if (this.buffer[this.boundary] !== null) break;
-            this.boundary--;
-         }
-         if (this.boundary < INT_NULL) 
-            alert('M_Buffer boundary = -1')
-         ERROR_NULL(this.active_count);
-
-         if (this.active_count === 0) this.boundary = INT_NULL
-
-         // Set freeidx
-         this.freeidx = idx;
-      }
-   }
-
-   /** Fast Remove Last Item. Caller is responsible of making sure at least one element exists. No check happens */
-   RemoveByIdxSortedVersionLastElemGuarantee() {
-
-      this.buffer[this.boundary] = INT_NULL;
-      this.boundary--;
-      this.active_count--;
-      /**Debug */ if(this.boundary < INT_NULL) alert('0-Boundary is out of bounds\nBoundary <= -2');
-   }
-
-   RemoveByIdxSortedVersion(idx, debug_id, debug_name) {
-
-      if (this.buffer[idx] !== INT_NULL) {
-
-         this.buffer[idx] = INT_NULL;
-         this.active_count--;
-
-         const replacer_data = this.#ShortReplaceWithLast(idx);
-
-         if (this.active_count <= INT_NULL){
-            console.error(idx, debug_id, debug_name, this)
-            alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nInt16Buffer active_count <= -1');
-         }
-
-         return replacer_data;
-
-      }
-
-      return INT_NULL
-   }
-
-   /**Returns -1 if there was no replacment(the removed element happens to be last) */
-   #ShortReplaceWithLast(removed_idx) {
-
-      if (removed_idx !== this.boundary) { // Handle removing any elements except the last
-
-         // REPLACE WITH LAST ELEM
-         this.buffer[removed_idx] = this.buffer[this.boundary];
-         // REMOVE LAST
-         this.buffer[this.boundary] = INT_NULL;
-
-         this.boundary--;
-         const replacer_data = this.buffer[removed_idx];
-         return replacer_data;
-      }
-      else { // Remove last does not need sorting
-         this.boundary--;
-         return INT_NULL; // Shows that there was no element move
-      }
-   }
-
-   ShiftLeft(){
-
-      if(this.boundary >= 0) {
-
-         this.active_count = 0;
-         for (let i = 0; i <= this.boundary+1; i++) {
-
-            if(this.buffer[i+1] !== INT_NULL){
-               this.boundary = i;
-               this.active_count++;
-            }
-            this.buffer[i] = this.buffer[i+1];
-         }
-         
-         // this.active_count -= 1;
-      }
-   }
-   
-   /** Shift left all elements but from a specified index */
-   ShiftLeftFromBaseIndex(base_idx){
-      if(base_idx <= this.boundary) {
-
-         this.boundary = -1;
-
-         // Unfortunately we must recalculate the boundary 
-         for (let i = 0; i < base_idx; i++) {
-            if(this.buffer[i] !== INT_NULL){
-               this.boundary = i;
-            }
-         }
-
-         for (let i = base_idx; i < this.size-1; i++) {
-            
-            this.buffer[i] = this.buffer[i+1];
-            if(this.buffer[i+1] !== INT_NULL){
-               this.boundary = i;
-            }
-         }
-   
-         this.active_count -= 1;
-         if(this.active_count < 0) alert('66113322131312')
-
-         if(this.boundary > this.count) console.error('009988176651 \n Boundary > active_count', this.boundary, this.count)
-      }
-   }
 }
 
 
@@ -517,137 +478,73 @@ export function Free_int16_buffer(buffer){
 
 
 
-
 /**********************************************************************************************************************************************/
-// Int8 2D
+// Int32
 /**********************************************************************************************************************************************/
-// export class Int8_2DBuffer {
+export class Int32Buffer extends ArrayBufferInterface {
 
-//    buffer;
-//    boundary; // CAUTION! Do not rely on the boundary variable. Its use is only for counting how many alements are in use(1 boundary for both rows and columns).
-//    size;
-//    numcols;
+   constructor(size = 1, debug_name) {
 
-//    constructor(numrows = 0, numcols = 0) {
+      super();
+      this.size = size;
+      this.buffer = new Int32Array(this.size);
+      this.boundary = INT_NULL;
+      this.freeidx = 0;
+      for (let i = 0; i < this.size; i++)
+         this.buffer[i] = INT_NULL;
 
-//       this.size = numcols * numrows;
-//       this.numcols = numcols;
-//       if (ERROR_NULL(this.size)) alert('Must initialize Int8_2dBuffer with a size > 1');
+      this.debug_name = debug_name;
+   }
 
-//       this.buffer = new Int8Array(this.size);
-//       this.boundary = 0;
+   Realloc() {
 
-//       this.Init(INT_NULL);
-//    }
+      DEBUG_INFO_STRUCTS.BUFFER.INT32.TOTAL_BUFFER_SIZE -= this.size;
+      const old_size = this.size;
 
+      if (this.size < 2) this.size *= 2 + 1;
+      else this.size *= 2;
+      DEBUG_INFO_STRUCTS.BUFFER.INT32.TOTAL_BUFFER_SIZE += this.size;
+      // console.log('0000', DEBUG_INFO_STRUCTS.BUFFER.INT32.TOTAL_BUFFER_SIZE, this.size)
 
-//    Init(val) {
-//       for (let i = 0; i < this.size; i++) {
-//          this.buffer[i] = val;
-//       }
-//    }
+      const oldData = this.buffer;
+      this.buffer = new Int32Array(this.size);
 
+      this.CopyFromBufferToStart(oldData);
 
-//    Add(rowidx, val) {
+      // Initialize the rest of buffer.
+      for (let i = old_size; i < this.size; i++) {
+         this.buffer[i] = INT_NULL;
+      }
 
-//       const idx = this.GetNextFree(rowidx);
-//       if (idx !== INT_NULL) {
-//          this.buffer[idx] = val;
-//          this.boundary++;
-//       }
-//    }
+      return old_size; // The new empty index. 
+   }
 
-
-//    GetElem(rowidx, colidx) {
-//       return this.buffer[this.numcols * rowidx + colidx];
-//    }
-
-
-//    GetRow(rowidx) {
-//       const row = [];
-//       for (let i = 0; i < this.numcols; i++) {
-
-//          const idx = this.numcols * rowidx + i;
-
-//          if (this.buffer[idx] !== INT_NULL)
-//             row[i] = this.buffer[idx];
-//       }
-//       return row;
-//    }
-
-
-//    GetNextFree(rowidx) {
-
-//       for (let i = 0; i <= this.size; i++) {
-
-//          const idx = this.numcols * rowidx + i;
-//          if (this.buffer[idx] === INT_NULL) {
-//             return idx;
-//          }
-//       }
-//       return INT_NULL;
-//    }
-
-
-//    RemoveByIdx(rowidx, i) {
-
-//       const idx = this.numcols * rowidx + i;
-
-//       if (idx > INT_NULL && idx < this.size) {
-//          this.buffer[idx] = INT_NULL;
-//          this.boundary--;
-//       }
-//    }
-
-
-//    RemoveAll() {
-
-//       for (let i = 0; i <= this.size; i++)
-//          this.buffer[i] = INT_NULL
-//       this.boundary = 0;
-//    }
-
-
-//    /** Debug */
-//    Print() {
-//       console.log('Count: ', this.boundary)
-//       console.log(this.buffer)
-//    }
-
-// }
+}
 
 
 
+export function New_int32_buffer(size=1, debug_name='INT32 DEBUB UNAMED') {
+
+   DEBUG_INFO_STRUCTS.BUFFER.INT32.BUFFER_COUNT++;
+   DEBUG_INFO_STRUCTS.BUFFER.INT32.TOTAL_BUFFER_SIZE += size;
+   // console.log('MemAlloc idx', debug_name, 'size', size)
+   // console.error('ppppppppppppppppppp', debug_name)
+
+   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:Int32. name', debug_name);
+   
+   return new Int32Buffer(size, debug_name);
+}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export function Free_int32_buffer(buffer){
+   
+   DEBUG_INFO_STRUCTS.BUFFER.INT32.TOTAL_BUFFER_SIZE -= buffer.size;
+   DEBUG_INFO_STRUCTS.BUFFER.INT32.BUFFER_COUNT--;
+   // console.warn('ppppppppppppppppppp', buffer.debug_name)
+   // console.log('Mem-DE-Alloc', buffer.debug_name, 'size', buffer.size)
+   buffer = null;
+}
 
 
 
@@ -944,7 +841,7 @@ export class M_Buffer {
    /*********************************************************************************************************************/
    // TEMP-TEST
    /*********************************************************************************************************************/
-   RemoveByIdxSortedVersion(idx, debug_id, debug_name) {
+   RemoveByIdxNoGapsVersion(idx, debug_id, debug_name) {
 
       if (this.buffer[idx] !== null) {
 
@@ -957,7 +854,7 @@ export class M_Buffer {
             alert('SEVERE_ERROR.\nRemoveByIdxSortedVersion().\nM_Buffer active_count <= -1');
          }
 
-         DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT--; //console.warn('RemoveByIdxSortedVersion')
+         DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT--; //console.warn('RemoveByIdxNoGapsVersion')
 
          return true;
 
@@ -1051,36 +948,6 @@ export function Free_generic_buffer(buffer) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 
 export class CharBuffer extends M_Buffer {
 
    constructor(char_buffer = null, name) {
@@ -1254,3 +1121,106 @@ export function DEBUG_INFO_BUFFERS_PRINT2() {
 }
 
 
+
+
+
+
+
+
+/**********************************************************************************************************************************************/
+// Int8 2D
+/**********************************************************************************************************************************************/
+// export class Int8_2DBuffer {
+
+//    buffer;
+//    boundary; // CAUTION! Do not rely on the boundary variable. Its use is only for counting how many alements are in use(1 boundary for both rows and columns).
+//    size;
+//    numcols;
+
+//    constructor(numrows = 0, numcols = 0) {
+
+//       this.size = numcols * numrows;
+//       this.numcols = numcols;
+//       if (ERROR_NULL(this.size)) alert('Must initialize Int8_2dBuffer with a size > 1');
+
+//       this.buffer = new Int8Array(this.size);
+//       this.boundary = 0;
+
+//       this.Init(INT_NULL);
+//    }
+
+
+//    Init(val) {
+//       for (let i = 0; i < this.size; i++) {
+//          this.buffer[i] = val;
+//       }
+//    }
+
+
+//    Add(rowidx, val) {
+
+//       const idx = this.GetNextFree(rowidx);
+//       if (idx !== INT_NULL) {
+//          this.buffer[idx] = val;
+//          this.boundary++;
+//       }
+//    }
+
+
+//    GetElem(rowidx, colidx) {
+//       return this.buffer[this.numcols * rowidx + colidx];
+//    }
+
+
+//    GetRow(rowidx) {
+//       const row = [];
+//       for (let i = 0; i < this.numcols; i++) {
+
+//          const idx = this.numcols * rowidx + i;
+
+//          if (this.buffer[idx] !== INT_NULL)
+//             row[i] = this.buffer[idx];
+//       }
+//       return row;
+//    }
+
+
+//    GetNextFree(rowidx) {
+
+//       for (let i = 0; i <= this.size; i++) {
+
+//          const idx = this.numcols * rowidx + i;
+//          if (this.buffer[idx] === INT_NULL) {
+//             return idx;
+//          }
+//       }
+//       return INT_NULL;
+//    }
+
+
+//    RemoveByIdx(rowidx, i) {
+
+//       const idx = this.numcols * rowidx + i;
+
+//       if (idx > INT_NULL && idx < this.size) {
+//          this.buffer[idx] = INT_NULL;
+//          this.boundary--;
+//       }
+//    }
+
+
+//    RemoveAll() {
+
+//       for (let i = 0; i <= this.size; i++)
+//          this.buffer[i] = INT_NULL
+//       this.boundary = 0;
+//    }
+
+
+//    /** Debug */
+//    Print() {
+//       console.log('Count: ', this.boundary)
+//       console.log(this.buffer)
+//    }
+
+// }

@@ -1,11 +1,12 @@
 "use strict";
 
-import { Gl_set_attr_round_corners, Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_unif_add_vb_root_wposy, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
+import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { GREY } from "../Material/Base/Colors.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
@@ -123,7 +124,7 @@ export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags=0x0, pa
    /** Set handle pos */
    const handle = bar.children.buffer[0];
    const handle_pad = handle.StylesGetPad();
-   handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
+   handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0] + bar.geom.dim[0];
    handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
    // handle.geom.pos[0] = bar.geom.pos[0] + handle.geom.dim[0] + handle_pad[0];
    // handle.geom.pos[1] = bar.geom.pos[1] + handle.geom.dim[1] + handle_pad[1];
@@ -163,14 +164,17 @@ export function Scroller_component_set_pos(bar, widget_root,  difx, dify){
 export function Scroller_component_calculate_handle_pos_dim(scrolled_section, bar) {
 
 
+   const handle = bar.children.buffer[0];
+   const handle_pad = handle.StylesGetPad();
+
 
    /* Set bar position */
-   bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2
+   // bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + bar.geom.dim[0];
+   bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + bar.geom.dim[0] - handle_pad[0];
+   // bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + bar.geom.dim[0] + handle_pad[0];
+   // bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + handle_pad[0];
    bar.geom.UpdateSetWposX(bar.gfx);
-
-   const handle = bar.children.buffer[0];
-   const handle_pad = handle.StylesGetPad()
-   const clean_bar_height = bar.geom.dim[1]
+   const clean_bar_height = bar.geom.dim[1];
    
    /* Set handle size */
    const clean_size = bar.geom.dim[1];
@@ -261,6 +265,14 @@ function Scroller_component_listen_event_construct() {
 
 
 
+export function Scroller_component_set_listeners_priority(scroller_component) {
+
+   // if(scroller_component.listeners!==null && bar.listeners.buffer[E.C]!==INT_NULL) Listeners_set_priority(E.C, bar.listeners);
+   Listeners_set_priority(E.H, scroller_component.listeners);
+   Listeners_set_priority(E.C, scroller_component.listeners);
+
+}
+
 
 
 
@@ -277,7 +289,7 @@ function Scroller_component_on_update_handle(_params) {
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       Time_intervals_destroy_byidx(intervalIdx);
-      bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
+      bar.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
 
       handle.state.mask &= ~MESH_STATE.IN_GRAB;
 

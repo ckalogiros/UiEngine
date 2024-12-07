@@ -2,8 +2,8 @@
 
 import { Gl_texture_unit_create } from "../../../Graphics/GlTextureUnit.js";
 import { Str_buffer_store } from "../../Core/StringBuffer.js";
-import { Font_create_uvmap } from "../Font/ChlumskyFontMetricsLoader.js";
-import { Font_load_uvs, Font_retrieve_fontidx, Font_texture_images_set_metrics_file } from "../Font/Font.js";
+// import { Font_create_uvmap } from "../Font/ChlumskyFontMetricsLoader.js";
+import { Font_load_uvs, Font_create_uvmap, Font_retrieve_fontidx, Font_texture_images_init_metrics_files } from "../Font/Font.js";
 import { ImageLoader } from "../ImageLoader.js";
 
 
@@ -76,7 +76,7 @@ export function Texture_init_texture_storage_buffer() { // Initialize a buffer t
 		_textureBuffer[i] = null;
 	}
 
-	Font_texture_images_set_metrics_file();
+	Font_texture_images_init_metrics_files();
 }
 
 

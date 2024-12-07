@@ -385,6 +385,7 @@ function Set_vertex_uv_coordinates_TEX2(vb_data, start, stride, uv) {
    const v1 = uv[3];
 
    // VERTEX POSITION
+
    vb_data[index++] = u0;
    vb_data[index++] = v0;
    index += stride;

@@ -39,6 +39,11 @@ export function Linear_interpolation(min, max, t) {
    return min + (t * (max-min));
 }
 
+export function Normalize(min, max, t) {
+   if(t===min) return 0;
+   return (t-min) / (max-min);
+}
+
 // Analyze a number into discrete digits
 export function Digitize(n, base=10){
 

@@ -192,7 +192,7 @@ function Create_attribute(name, extension, location_name, attr_idx, sid = 0x0, a
       name: name,
       out_name: `v_${name}${extension}`,
       in_name: `${location_name}.${attribs_xyzw[attr_idx]}`,
-      extra: '',
+      // extra: '',
    };
 
    return o;
@@ -200,7 +200,7 @@ function Create_attribute(name, extension, location_name, attr_idx, sid = 0x0, a
 
 
 
-function Vertex_shader_resolve_attributes_in2(sid) {
+function Vertex_shader_resolve_attributes_in(sid) {
 
    attributes_in_code += ''
 
@@ -306,7 +306,8 @@ function Vertex_shader_resolve_attributes_in2(sid) {
    for (let i = 0; i < attributes_len; i++) {
 
       const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
-      if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG)) {
+      // if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG)) {
+      if ((sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG)) && (attr_info.FLAG & SID.ATTR.MSDF)===0) {
 
          const attr_flag = attr_info.FLAG;
          const attr_name = attr_info.ATTR_NAME;
@@ -371,7 +372,11 @@ function Vertex_shader_resolve_attributes_in2(sid) {
 
       const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
       
-      if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG) === 0 && (attr_info.FLAG & SID.ATTR.COL4_PER_VERTEX)===0) {
+      // if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG) === 0 && (attr_info.FLAG & SID.ATTR.COL4_PER_VERTEX)===0) {
+      if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG) === 0 
+         && (attr_info.FLAG & SID.ATTR.COL4_PER_VERTEX)===0
+         && (attr_info.FLAG & SID.ATTR.MSDF)===0
+      ) {
 
          const attr_flag = attr_info.FLAG;
          const attr_name = attr_info.ATTR_NAME;
@@ -384,7 +389,7 @@ function Vertex_shader_resolve_attributes_in2(sid) {
 
          // TODO: Look if the attrib_flag or any other info is already accessible from the ShaderBitFlags file for efficiency
          const mesh_attribute = new Mesh_attribute();
-         mesh_attribute.name = attr_name; console.log(attr_name)
+         mesh_attribute.name = attr_name; // console.log(attr_name)
          mesh_attribute.attrib_flag |= attr_flag;
          mesh_attribute.type = attr_type;
          mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
@@ -509,8 +514,9 @@ function Vertex_shader_resolve_attributes_out_assignment() {
          const attrib = locations[i].attr[j];
 
          if (attrib.is_occupied) {
-            if (attrib.is_passing) {
-               attributes_assign_code += `  ${attrib.out_name} = ${attrib.in_name} ${attrib.extra};\n`;
+            if (attrib.is_passing) { // Case the attribute is passing the the next shader, has already been declared.
+               // attributes_assign_code += `  ${attrib.out_name} = ${attrib.in_name} ${attrib.extra};\n`;
+               attributes_assign_code += `  ${attrib.out_name} = ${attrib.in_name};\n`;
             }
             else {
                attributes_assign_code += `  float ${attrib.out_name} = ${attrib.in_name};\n`;
@@ -531,19 +537,18 @@ function Vertex_shader_resolve_attributes_out_assignment() {
 export function Shaders_build_vertex_shader(sid, uniforms_info) {
 
 
-   // const ret = Vertex_shader_resolve_attributes_in(sid);
-   const ret = Vertex_shader_resolve_attributes_in2(sid);
+   const ret = Vertex_shader_resolve_attributes_in(sid);
    Vertex_shader_resolve_attributes_out();
    Vertex_shader_resolve_attributes_out_assignment();
 
    const vs_chunks = [
       '#version 300 es',
-      `
-/********************************************************************************************/
-/********************************************************************************************/
-// VERTEX SHADER {{ ${ID} }}
-/********************************************************************************************/
-/********************************************************************************************/`,
+      
+      '/********************************************************************************************/',
+      '/********************************************************************************************/',
+      '// VERTEX SHADER {{ ${ID} }}',
+      '/********************************************************************************************/',
+      '/********************************************************************************************/',
 
       '#include <precision_high>\n',
 
@@ -683,12 +688,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
    const fs_chunks = [
       '#version 300 es',
-      `
-/********************************************************************************************/
-/********************************************************************************************/
-// FRAGMENT SHADER {{ ${ID} }}
-/********************************************************************************************/
-/********************************************************************************************/`,
+      
+      '/********************************************************************************************/',
+      '/********************************************************************************************/',
+      '// FRAGMENT SHADER {{ ${ID} }}',
+      '/********************************************************************************************/',
+      '/********************************************************************************************/',
 
 
 
@@ -869,6 +874,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       /********************************************************************************************************/
       // Color fragment
       (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   color.rgb *= color.a; ' : '',
+      // '   color.rgb *= color.a; ',
 
       /**
        * Human Perception Luminance Formulas
@@ -878,25 +884,26 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
        *    sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 )
        */
 
-      '   float mx = max(color.r,max(color.g,color.b));',
-      '   float mn = min(color.r,min(color.g,color.b));',
-      '   float balance = ( (mx-mn) / mx );',
-      '   float avg = ((color.r*0.901)+(color.g*0.513)+(color.b*0.906)) / 3.0;',
+      // '   float mx = max(color.r,max(color.g,color.b));',
+      // '   float mn = min(color.r,min(color.g,color.b));',
+      // '   float balance = ( (mx-mn) / mx );',
+      // '   float avg = ((color.r*0.901)+(color.g*0.513)+(color.b*0.906)) / 3.0;',
       
-      '   float make_up = (1.-avg)*2.;',
+      // '   float make_up = (1.-avg)*2.;',
 
-      // '   vec4 final_with_lum = vec4(1.*color.r*make_up, 1.*color.g*make_up,  1.*color.b*make_up, color.a);',
-      // '   vec4 final_with_lum = vec4(0.701*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
-      // '   vec4 final_with_lum = vec4(0.759*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
-      // '   vec4 final_with_lum = vec4(0.901*color.r*make_up, 0.513*color.g*make_up,  0.906*color.b*make_up, color.a);',
-      // '   vec4 final_with_lum = vec4(min(0.513*color.r*make_up, 1.), min(0.513*color.g*make_up, 1.),  min(0.513*color.b*make_up, 1.), color.a);',
-      // '   vec4 final_with_lum = vec4(min(0.701*color.r*make_up, 1.), min(0.613*color.g*make_up, 1.),  min(0.786*color.b*make_up, 1.), color.a);',
-      '   vec4 final_with_lum = vec4(min(0.901*color.r*make_up, 1.), min(0.513*color.g*make_up, 1.),  min(0.906*color.b*make_up, 1.), color.a);',
+      // // '   vec4 final_with_lum = vec4(1.*color.r*make_up, 1.*color.g*make_up,  1.*color.b*make_up, color.a);',
+      // // '   vec4 final_with_lum = vec4(0.701*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
+      // // '   vec4 final_with_lum = vec4(0.759*color.r*make_up, 0.413*color.g*make_up,  0.996*color.b*make_up, color.a);',
+      // // '   vec4 final_with_lum = vec4(0.901*color.r*make_up, 0.513*color.g*make_up,  0.906*color.b*make_up, color.a);',
+      // // '   vec4 final_with_lum = vec4(min(0.513*color.r*make_up, 1.), min(0.513*color.g*make_up, 1.),  min(0.513*color.b*make_up, 1.), color.a);',
+      // // '   vec4 final_with_lum = vec4(min(0.701*color.r*make_up, 1.), min(0.613*color.g*make_up, 1.),  min(0.786*color.b*make_up, 1.), color.a);',
+      // '   vec4 final_with_lum = vec4(min(0.901*color.r*make_up, 1.), min(0.513*color.g*make_up, 1.),  min(0.906*color.b*make_up, 1.), color.a);',
 
-      '   frag_color = mix(color, final_with_lum, balance);',
-      // '   frag_color = mix(color, final_with_lum, smoothstep(0., 1., balance));',
-      // '   frag_color = final_with_lum;',
-      // '   frag_color = color;',
+      // '   frag_color = mix(color, final_with_lum, balance);',
+      // // '   frag_color = mix(color, final_with_lum, smoothstep(0., 1., balance));',
+      // // '   frag_color = final_with_lum;',
+      // // '   color.rgb *= color.a; ',
+      '   frag_color = color;',
 
 
 

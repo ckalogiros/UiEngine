@@ -358,7 +358,7 @@ const CYAN6 = new Float32Array([0.0, 0.7, 0.7,  1.0]);
 const CYAN7 = new Float32Array([0.0, 0.8, 0.8, 1.0]);
 const CYAN8 = new Float32Array([0.0, 0.9, 0.9,  1.0]);
 const CYAN9 = new Float32Array([0.0, 1.0, 1.0, 1.0]);
-export const CYAN = [PURPLER0, CYAN1, CYAN2, CYAN3, CYAN4, CYAN5, CYAN6, CYAN7, CYAN8, CYAN9,];
+export const CYAN = [CYAN0, CYAN1, CYAN2, CYAN3, CYAN4, CYAN5, CYAN6, CYAN7, CYAN8, CYAN9,];
 
 
 // export const COLOR_ARRAY1 = [

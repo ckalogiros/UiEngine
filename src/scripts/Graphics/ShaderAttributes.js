@@ -7,60 +7,9 @@ import { Shader_Attributes } from "./ShaderBitFlags.js";
 
 
 const DISABLE_DEBUG = true;
+const DEBUG_IFO = false;
 
 
-
-
-// function TEMP_RENAME_MOVE_TO_SHADER_BIT_FLAGS_FindAttribByNameAndStoreLocIndex(attribs_indexing, attrib_nameid, attributes_index){
-
-//    if (attrib_nameid & SID.ATTR.COL4) {
-//       attribs_indexing.COL4 = attributes_index.COL4;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.WPOS3) {
-//       attribs_indexing.WPOS3 = attributes_index.WPOS3;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.TIME) {
-//       attribs_indexing.TIME = attributes_index.TIME;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.VPOS2) {
-//       attribs_indexing.VPOS2 = attributes_index.VPOS2;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.DIM2) {
-//       attribs_indexing.DIM2 = attributes_index.DIM2;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.R_CORNERS) {
-//       attribs_indexing.R_CORNERS = attributes_index.R_CORNERS;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.BORDER) {
-//       attribs_indexing.BORDER = attributes_index.BORDER;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.FEATHER) {
-//       attribs_indexing.FEATHER = attributes_index.FEATHER;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.TEX2) {
-//       attribs_indexing.TEX2 = attributes_index.TEX2;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.GLOW_INTENSITY) {
-//       attribs_indexing.GLOW_INTENSITY = attributes_index.GLOW_INTENSITY;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.SDF) {
-//       attribs_indexing.SDF = attributes_index.SDF;
-//    }
-   
-//    else if (attrib_nameid & SID.ATTR.MSDF) {
-//       attribs_indexing.MSDF = attributes_index.MSDF;
-//    }
-// }
 
 
 
@@ -206,7 +155,7 @@ export function Shader_attributes_create(attribs_info) {
 
       shader_attribs_typed_arrays.attribs_per_vertex += mesh_attribs[i].size;
 
-      /**DEBUG */ // IMPORTANT: Use the right Uint array size type for the attributes info. Checking is we overflow any type
+      /**DEBUG */ // IMPORTANT: Use the right Uint array size type for the attributes info. Checking is for any overflows of any type
       if (shader_attribs.locs[i] > MAX_UINT8) alert('Not enough bit depth of array to store a large int value. -locs- @ShaderAttributes.js, Shader_attributes_create().')
       if (shader_attribs.sizes[i] > MAX_UINT8) alert('Not enough bit depth of array to store a large int value. -sizes- @ShaderAttributes.js, Shader_attributes_create().')
       if (shader_attribs.offsets[i] > MAX_UINT8) alert('Not enough bit depth of array to store a large int value. -offsets- @ShaderAttributes.js, Shader_attributes_create().')
@@ -268,10 +217,7 @@ export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, s
 
 
    }
-   // console.log('{{{{{{{{{{  Vertex Buffer Attribs Info }}}}}}}}}}',
-   //    '\n   attribs_info', attribs_info,
-   // )
-   // vb_attribs_indexing.PrintEnabled('vb_attribs_indexing');
+
 
    return {
       attribs_info:attribs_info, 
@@ -285,8 +231,8 @@ export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, s
 /**WITH PARAM attribs_info from create vertex buffer*/
 export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_info, vbidx) {
 
-   console.log('-------------------------------------------------------------------------')
-   console.log('VERTEX ATTRIBUTES ENABLE')
+   if(DEBUG_IFO) console.log('-------------------------------------------------------------------------')
+      if(DEBUG_IFO) console.log('VERTEX ATTRIBUTES ENABLE')
    
    const gl_type = gfxCtx.gl.FLOAT; // TODO: store the gl.type inside the shaderinfo???
 
@@ -300,7 +246,7 @@ export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_in
    // for (let i = 0; i < len2; i++) {
    for (let i = start_loc; i < stop_loc; i++) {
 
-      /** The attrib divisor denotes the frequency at wich the different meshes will be drawn out of the vertex buffer.
+      /** The attrib divisor denotes the frequency at which the different meshes will be drawn out of the vertex buffer.
        * For example: An intanced vb has 4 wpos. If we set divisor to 1, then each instanced geometry will use 1 wpos.
        * If the divisor is set to 2, then 2 instanced geometries will use 1 wpos.
        * So if we draw 8 instances of a mesh and we need lets say 4 wpos, 
@@ -315,7 +261,7 @@ export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_in
       gfxCtx.gl.vertexAttribPointer(location, size, gl_type, false, stride * FLOAT32_BYTE_SIZE, offset * FLOAT32_BYTE_SIZE);
       gfxCtx.gl.vertexAttribDivisor(location, attribs_divisor);
 
-      console.log(
+      if(DEBUG_IFO) console.log(
          'loc', location,
          'size', size,
          'offset', offset,

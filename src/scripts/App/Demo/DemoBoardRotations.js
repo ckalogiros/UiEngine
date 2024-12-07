@@ -95,7 +95,7 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
-   section.SetName('Elastic_collisions');
+   section.SetName('BoardRotationsPanel');
 
 
 
@@ -169,7 +169,8 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
    /****************************************************************************************************************/
    // Render
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
@@ -215,18 +216,11 @@ function Animation_rotate_run(params) {
    const slope = Logarithmic_interpolation(timer, slope_constant);
 
    const rot = (slope * angle);
-   // const rot = slope*.05;
    
    mesh.RotateZ(rot);
-   // mesh.RotateY(rot);
    Gl_set_angle(mesh.gfx, rot);
-   // mesh.RotateAddZ(rot);
-   // Gl_add_angle(mesh.gfx, rot);
-
-   // console.log(rot)
    
    
-   // if (slope < 1.) return true;
    if (rot < Math.PI) return true;
    else {
       

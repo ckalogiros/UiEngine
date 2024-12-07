@@ -5,8 +5,10 @@ import { Shaders_build_vertex_shader, Shaders_build_fragment_shader } from './Sh
 
 
 
-/**
+/** 
  * How to add an attribute to a program
+ * OLD IMPLEMENTATION
+ * // TODO: Update with the new implementation
  * 
  * 	. Set the SID.attribute in GfxConstants
  * 	. Set the V_ attribute length in floats in GfxConstants
@@ -40,7 +42,7 @@ export function Shaders_load(gl, sid, uniforms_info) {
 }
 
 
-
+// Not used anymore. The predetermine attribute locations are in the ShaderBitFlags.js file
 function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid){
 
 	let loc = 0;
@@ -75,11 +77,6 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 
 function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 
-	// if (DEBUG.SHADERS) {
-
-	// 	const s = {sid:sid, VertexShader:vertex_shader, FragmentShader:fragment_shader}
-	// 	console.info(s);
-	// } 
 
 	const vShader = Load_shader(gl, gl.VERTEX_SHADER, vertex_shader, 'Vertex');
 	const fShader = Load_shader(gl, gl.FRAGMENT_SHADER, fragment_shader, 'Fragment');
@@ -95,7 +92,7 @@ function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 	
 	// Bind attribute locations before linking the program
 	// Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid);
-	console.error('881766293 Bind_attributes_at_specific_locations_based_on_sid() has been deactivated')
+	console.error('881766293 Bind_attributes_at_specific_locations_based_on_sid() has been deactivated \nThe new implementation of predetermine attribute locations are in the ShaderBitFlags.js file')
 
 	gl.linkProgram(shader_program);
 

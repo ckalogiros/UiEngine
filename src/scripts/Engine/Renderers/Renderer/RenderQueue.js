@@ -99,11 +99,6 @@ class RenderQueue {
    }
 
 
-   // SetActive() {
-
-   //    this.active[this.activeCount++] = this.buffer[i];
-   // }
-
 
    Add(progidx, vb_groupidx, ibidx, isActive) {
 
@@ -257,6 +252,15 @@ export function Renderqueue_get_active() {
 
    if(_render_queue.needs_update) _render_queue.RebuildActiveQueue(); // Create a new active buffer from the renderqueue
    return _render_queue.active; 
+}
+
+
+export function Renderqueue_is_vb_active(vb_groupidx) { 
+
+   const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
+   if (idx !== INT_NULL) {
+      return (_render_queue.buffer[idx].flags & RENDER_QUEUE_FLAGS.IS_ACTIVE);
+   }
 }
 
 

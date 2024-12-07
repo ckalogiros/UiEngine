@@ -4,13 +4,14 @@ import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/Uni
 import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos4_dim2_time, Gl_particles_batch_set_col4_wpos4_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_dim2_style2_time } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
-import { Abs, Hash } from "../../Helpers/Math/MathOperations.js";
+import { Abs, Hash, Max, Min } from "../../Helpers/Math/MathOperations.js";
 import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
-import { New_generic_buffer, New_int16_buffer } from "../Core/Buffers.js";
+import { New_generic_buffer, New_int16_buffer, New_int32_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
 import { Material, Texture_Material } from "../Drawables/Material/Base/Material.js";
 import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
+import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 
@@ -47,9 +48,31 @@ const speed_ratio = .01
 const max = 210;
 const interpolate = 1 / max;
 
-const initial_scale = 10
+const initial_scale = 10;
 
 
+
+function Polar_coordinates() {
+   const rand_angle =  GetRandomInt(0, 360);
+   const dirx = Math.sin(rand_angle);
+   const diry = Math.cos(rand_angle);
+   return {x:dirx, y:diry, };
+}
+function Random_coordinates(xdir_neg, xdir_pos, ydir_neg, ydir_pos) {
+
+   const minx = xdir_neg * max
+   const maxx = xdir_pos * max
+   const dx = GetRandomInt(minx, maxx);
+   const dirx = (interpolate * dx) + .01053;
+
+   const miny = ydir_neg * max
+   const maxy = ydir_pos * max
+   const dy = GetRandomInt(miny, maxy);
+   const diry = (interpolate * dy) + .00953;
+   return {x:dirx, y:diry, };
+}
+
+let counter = 0;
 
 class Particle {
 
@@ -61,57 +84,63 @@ class Particle {
       this.pos = [0, 0, 0];
       this.dim = [0, 0];
 
-      this.random_val = Hash(Timer_get_global_timer()); // This parameter is only for the Fragment Shader 
       this.is_alive = false;
 
+      this.random_val = Hash(Timer_get_global_timer()+counter++); // This parameter is only for the Fragment Shader 
       const rnd = Abs(this.random_val);
-      // this.scale = initial_scale;
+      
       this.scale = emitter.max_scale;
-      this.accel = emitter.accel * (rnd * .5 + 1) * 1.4;
+      this.accel = emitter.accel;
       this.deccel = emitter.deccel;
       this.grav = emitter.gravity;
-
-
+      
       // Emitter variables
       this.idx = INT_NULL; // Self index to the emitter's buffer
-      this.emitter = emitter;
-
+      // this.emitter = emitter;
+      
       // GFX variables
       this.start = INT_NULL; // The start index in the vertex buffer
-
+      
       this.time = 0;
       // Deep Copy values from emitter
       this.pos[0] = emitter.pos[0];
       this.pos[1] = emitter.pos[1];
       this.pos[2] = emitter.pos[2];
+
       this.dim[0] = emitter.dim[0];
       this.dim[1] = emitter.dim[1];
+      
       this.dirx = (emitter.dir[0] !== 0) ? emitter.dir[0] : 1;
       this.diry = (emitter.dir[1] !== 0) ? emitter.dir[1] : 1;
-
+      
       this.col[0] = emitter.mat.col[0];
       this.col[1] = emitter.mat.col[1];
       this.col[2] = emitter.mat.col[2];
       this.col[3] = emitter.mat.col[3];
-
-      this.uv = [0, 1, 0, 1]
-
+      
+      this.uv = [0, 1, 0, 1];
+      
       this.rot = [1, 1, 1, 1];
       // Create random rotation
       this.angle = (rnd * .5 + 2) * Math.PI * 2;
       this.rot = Rotation_z_get_2D_matrix(this.angle);
-
+      
       if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
+         
+         const dir = Random_coordinates(emitter.variation_emission.xdir_neg, emitter.variation_emission.xdir_pos, emitter.variation_emission.ydir_neg, emitter.variation_emission.ydir_pos);
+         this.dirx = dir.x;
+         this.diry = dir.y;
+         
+         this.accel = emitter.accel * (rnd * .5 + 1) * 1.4;
+         
+      }
+      if (emitter.properties_flags & PARTICLES.HAS_RANDOM_POLAR_COORD) {
 
-         const minx = emitter.variation_emission.xdir_neg * max
-         const maxx = emitter.variation_emission.xdir_pos * max
-         const dx = GetRandomInt(minx, maxx);
-         this.dirx *= interpolate * dx;
+         const dir =  Polar_coordinates()
+         this.dirx = dir.x;
+         this.diry = dir.y;
 
-         const miny = emitter.variation_emission.ydir_neg * max
-         const maxy = emitter.variation_emission.ydir_pos * max
-         const dy = GetRandomInt(miny, maxy);
-         this.diry *= interpolate * dy;
+         this.accel = emitter.accel * (this.random_val * 100 + 100) * .001;
 
       }
    }
@@ -178,7 +207,8 @@ class Emitter {
       }
 
       this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
-      this.free_particles_idxs_buffer = New_int16_buffer(_, 'ParticlesSystem-free_particles_idxs_buffer');
+      // this.free_particles_idxs_buffer = New_int16_buffer(_, 'ParticlesSystem-free_particles_idxs_buffer');
+      this.free_particles_idxs_buffer = New_int32_buffer(_, 'ParticlesSystem-free_particles_idxs_buffer');
 
 
       this.sid = {
@@ -455,6 +485,7 @@ class Emitter {
 
    }
 
+   
    GfxUniformSetAndUpdate(unif_name, value, value_idx = null) {
 
       /**ERROR */ if (this.gfx === null) alert('Try to update uniform befor mesh has gfx.')
@@ -476,6 +507,10 @@ class Emitter {
 
          case PARTICLES.HAS_START_POS_VARIATION: { 
             this.properties_flags |= PARTICLES.HAS_START_POS_VARIATION; 
+            break;
+         }
+         case PARTICLES.HAS_RANDOM_POLAR_COORD: { 
+            this.properties_flags |= PARTICLES.HAS_RANDOM_POLAR_COORD; 
             break;
          }
          case PARTICLES.HAS_SCALE: { 
@@ -614,19 +649,33 @@ export function Particle_system_emitt(params, num_particles_=0) {
       const emitter = _emitters.buffer[emitter_idx];
       let last_elem = emitter.free_particles_idxs_buffer.boundary;
 
-      emitter.is_active = true;
+      if(!emitter.is_active) {
+
+         emitter.is_active = true;
+         Renderqueue_set_active(emitter.gfx.vb.groupidx, true);
+         console.error('Renderqueue ACTIVATED')
+      }
 
       const num_particles = num_particles_ !== 0 ? num_particles_ : emitter.num_particles_per_frame;
 
-
+      
       for (let i = 0; i < num_particles; i++) {
          if (last_elem === INT_NULL) {
-
+            
             const particle = new Particle(emitter);
             const particle_idx = emitter.particles_buffer.Add(particle);
             particle.is_alive = true;
+            
+            // particle.scale = initial_scale;
+            // particle.scale = emitter.max_scale;
+            
+            // particle.pos[0] = emitter.pos[0];
+            // particle.pos[1] = emitter.pos[1];
+            
+            // console.log(particle.pos, emitter.pos)
             // Push particle to the gfx buffers
             emitter.ParticleAddToGfx(particle_idx);
+
          }
          else {
 
@@ -636,38 +685,49 @@ export function Particle_system_emitt(params, num_particles_=0) {
             if (particle !== undefined) {
 
                particle.is_alive = true;
-               particle.accel = emitter.accel * (Abs(particle.random_val * .5 + 1)) * 1.4;
+
                particle.deccel = emitter.deccel;
-               particle.gravity = emitter.gravity;
-
-               particle.scale = initial_scale;
-
+               particle.grav = emitter.gravity;
+               
+               // particle.scale = initial_scale;
+               particle.scale = emitter.max_scale;
+               
                particle.pos[0] = emitter.pos[0];
                particle.pos[1] = emitter.pos[1];
-
+               
+               particle.dim[0] = emitter.dim[0];
+               particle.dim[1] = emitter.dim[1];
+               
                particle.col[0] = emitter.mat.col[0];
                particle.col[1] = emitter.mat.col[1];
                particle.col[2] = emitter.mat.col[2];
                particle.col[3] = emitter.mat.col[3];
-
+               
                if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
+                  
+                  const dir = Random_coordinates(emitter.variation_emission.xdir_neg, emitter.variation_emission.xdir_pos, emitter.variation_emission.ydir_neg, emitter.variation_emission.ydir_pos);
+                  particle.dirx = dir.x;
+                  particle.diry = dir.y;
+                  particle.accel = emitter.accel * (Abs(particle.random_val) * .5 + 1) * 1.4;
+                  
+               }
+               if (emitter.properties_flags & PARTICLES.HAS_RANDOM_POLAR_COORD) {
 
-                  const minx = emitter.variation_emission.xdir_neg * max
-                  const maxx = emitter.variation_emission.xdir_pos * max
-                  const dx = GetRandomInt(minx, maxx);
-                  particle.dirx = (interpolate * dx) + .01053;
+                  const dir =  Polar_coordinates()
+                  particle.dirx = dir.x;
+                  particle.diry = dir.y;
 
-                  const miny = emitter.variation_emission.ydir_neg * max
-                  const maxy = emitter.variation_emission.ydir_pos * max
-                  const dy = GetRandomInt(miny, maxy);
-                  particle.diry = (interpolate * dy) + .00953;
-
+                  // particle.accel = emitter.accel * (particle.random_val * 100 + 100) * .001;
+                  particle.accel = emitter.accel * (particle.random_val * 50 + 50) * .002;
+         
                }
 
                emitter.free_particles_idxs_buffer.RemoveByIdx(last_elem);
                last_elem = emitter.free_particles_idxs_buffer.boundary
             }
-            else console.log('UNDEFINED')
+            else {
+               console.error('UNDEFINED')
+            }
          }
       }
    }
@@ -703,7 +763,7 @@ export function Particle_system_update() {
             
 
             // TODO: For efficiency create 2 loops, and check which case is without if statement
-            if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) 
+            if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION|PARTICLES.HAS_RANDOM_POLAR_COORD) 
             {
                const speed = emitter.speed * particle.accel;
                particle.pos[0] += speed * particle.dirx;
@@ -792,11 +852,15 @@ export function Particle_system_update() {
 
 
             // Particle Fade
-            if (particle.time > .5) {
-               particle.col[3] *= .915;
+            const random = Math.random()*.4 + .5;
+            if (particle.time > random) {
+            // if (particle.time > .5) {
+               // particle.col[3] *= .915;
+               particle.col[3] *= .85 ;
             }
             else if (particle.col[3] < .1) { 
-               particle.col[3] *= 2.5;
+               // particle.col[3] *= 2.5;
+               // particle.col[3] *= .2;
             }
 
             if (particle.time >= .99) particle.col[3] = 0.0;
@@ -814,18 +878,15 @@ export function Particle_system_update() {
                // Reset particle for reuse
                particle.is_alive = false;
                particle.time = 0;
-               particle.grav = emitter.gravity;
-               particle.pos[0] = 0
-               particle.pos[1] = 0
-               particle.col[3] = 1
-               particle.dim[0] = emitter.dim[0];
-               particle.dim[1] = emitter.dim[1];
-               // console.log(particle)
 
                emitter.free_particles_idxs_buffer.Add(j);
 
-               if(emitter.free_particles_idxs_buffer.boundary === emitter.particles_buffer.boundary) 
+               if(emitter.free_particles_idxs_buffer.boundary === emitter.particles_buffer.boundary) {
+
                   emitter.is_active = false;
+                  Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
+                  console.error('Renderqueue DEACTIVATED')
+               }
 
                // rotation_speed = initial_rotation_speed;
 

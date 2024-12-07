@@ -150,8 +150,11 @@ vec4 Round_corners(float scale_down)
     float d = length(max((localPos - dim) + rCorners.x, 0.0)) - rCorners.x;
     
     float alpha = clamp(-d / feather, 0.0, 1.0);
-    src_color.a *= alpha;
+    // src_color.a *= alpha;
     vec3 color = src_color.rgb * alpha * src_color.a;
+    // vec3 color = src_color.rgb * src_color.a;
+    // vec3 color = src_color.rgb ;
+    // vec3 color = RED.rgb ;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

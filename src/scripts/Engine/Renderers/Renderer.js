@@ -225,7 +225,19 @@ function Renderer_create_webgl_context(canvas) {
    // gl.getExtension('OES_standard_derivatives');
    // gl.getExtension('EXT_shader_texture_lod');
 
+   /**
+       gl.NEVER (never pass)
+      gl.LESS (pass if the incoming value is less than the depth buffer value)
+      gl.EQUAL (pass if the incoming value equals the depth buffer value)
+      gl.LEQUAL (pass if the incoming value is less than or equal to the depth buffer value)
+      gl.GREATER (pass if the incoming value is greater than the depth buffer value)
+      gl.NOTEQUAL (pass if the incoming value is not equal to the depth buffer value)
+      gl.GEQUAL (pass if the incoming value is greater than or equal to the depth buffer value)
+      gl.ALWAYS (always pass)
+    */
    // gl.enable(gl.DEPTH_TEST);
+   // gl.depthFunc(gl.ALWAYS)
+   // gl.depthFunc(gl.GREATER)
    // gl.depthFunc(gl.LEQUAL)
    // gl.depthFunc(gl.GEQUAL)
    // gl.depthMask(true);
@@ -250,16 +262,48 @@ function Renderer_create_webgl_context(canvas) {
    gl.enable(gl.BLEND);
    gl.blendFunc(gl.DST_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+   // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
 
    {
       // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_DST_ALPHA);
       // gl.blendFunc(gl.DST_ALPHA, gl.ONE_MINUS_DST_ALPHA);
+      // gl.blendFunc(gl.DST_ALPHA, gl.SRC_ALPHA);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_DST_ALPHA);
+      // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.ONE_MINUS_DST_ALPHA);
+      // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.ONE);
+      
+      // gl.blendFunc(gl.ONE, gl.ONE);
+      // gl.blendFunc(gl.ONE, gl.SRC_ALPHA);
+      // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+      // gl.blendFunc(gl.ONE, gl.DST_ALPHA);
+      // gl.blendFunc(gl.ONE, gl.ONE_MINUS_DST_ALPHA);
 
-      // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.DST_ALPHA);
-      // gl.blendFunc(gl.ONE_MINUS_DST_ALPHA, gl.DST_ALPHA);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.SRC_ALPHA);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_DST_ALPHA);
+
+      // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.ONE);
       // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.SRC_ALPHA);
-      // gl.blendFunc(gl.ONE_MINUS_DST_ALPHA,gl.SRC_ALPHA) ;
+      // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // INTRESTING
+      // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.DST_ALPHA);
+      // gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.ONE_MINUS_DST_ALPHA);
+
+      // gl.blendFunc(gl.DST_ALPHA, gl.ONE);
+      // gl.blendFunc(gl.DST_ALPHA, gl.SRC_ALPHA);
+      // gl.blendFunc(gl.DST_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // DEFAULT
+      // gl.blendFunc(gl.DST_ALPHA, gl.DST_ALPHA);
+      // gl.blendFunc(gl.DST_ALPHA, gl.ONE_MINUS_DST_ALPHA);
+
+      // gl.blendFunc(gl.ONE_MINUS_DST_ALPHA, gl.ONE);
+      // gl.blendFunc(gl.ONE_MINUS_DST_ALPHA, gl.SRC_ALPHA);
+      // gl.blendFunc(gl.ONE_MINUS_DST_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      // gl.blendFunc(gl.ONE_MINUS_DST_ALPHA, gl.DST_ALPHA);
+      // gl.blendFunc(gl.ONE_MINUS_DST_ALPHA, gl.ONE_MINUS_DST_ALPHA);
+
 
 
       // gl.enable(gl.SAMPLE_COVERAGE);

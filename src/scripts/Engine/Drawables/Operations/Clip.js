@@ -1,6 +1,6 @@
 "use strict";
 
-import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { View_get_view_byidx } from "../../Core/Views/MeshBufferViews.js";
 import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 
@@ -133,9 +133,12 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
       
       const meshshes_idx = group.vb.buffer[i].data;
    
+      // TODO: boundary is 1 more than it should (and active_count)
       for(let j=0; j <= meshshes_idx.boundary; j++){
-         
-         const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+const mb = Mesh_buffer_get();
+   const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+if(mesh === _)
+   console.log('j', j, 'view', meshshes_idx, 'mesh_buffer', mb)
          const top      = mesh.GetPosY();
          const bottom   = top + mesh.geom.dim[1]*2;
 

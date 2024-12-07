@@ -461,7 +461,7 @@ export function Switch_simple_time_interval_callback(params){
 
       const intervalIdx = this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       Time_intervals_destroy_byidx(intervalIdx);
-      this_switch.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
+      this_switch.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
 
       return;
    }

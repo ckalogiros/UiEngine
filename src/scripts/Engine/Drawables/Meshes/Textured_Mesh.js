@@ -188,7 +188,7 @@ export class Textured_Mesh extends Mesh {
 
          const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          Time_intervals_destroy_byidx(intervalIdx);
-         mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+         mesh.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
 
          return;
       }

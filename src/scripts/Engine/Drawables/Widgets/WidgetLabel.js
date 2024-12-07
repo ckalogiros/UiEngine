@@ -27,6 +27,7 @@ export class Widget_Label extends Rect_Mesh {
     // text_mesh;
 
     constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = {rcorners:4, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [0, 0], bold = .4, style = {rcorners:4, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -604,7 +605,7 @@ export class Widget_Label extends Rect_Mesh {
 
             const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
             Time_intervals_destroy_byidx(intervalIdx);
-            mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+            mesh.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
 
             return;
         }
@@ -659,7 +660,7 @@ function Label_on_move_clbk(params) {
 
         const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
         Time_intervals_destroy_byidx(intervalIdx);
-        mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+        mesh.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
 
         return;
     }

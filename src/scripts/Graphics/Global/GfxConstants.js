@@ -500,6 +500,7 @@ const GFX_CTX_FLAGS = {
     // So 'Private' is used along with one of the bellow: 
     FROM_ROOT_WIDGET: _CNT <<= 0x1, // Check from root descending
     FROM_PARENT_ASC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
+    FROM_PARENT_ASC_SEARCH_ALL: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree ascending.
     FROM_PARENT_DSC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent tree descending.
     FROM_PARENT_CHILDREN_DESC: _CNT <<= 0x1, // Choose the first match (sid match) from mesh's parent children
 
@@ -550,6 +551,7 @@ const GFX_POOL_REQUESTS = {
     // FIRST_LARGE: _CNT <<= 0x1,
     SMALLEST: _CNT <<= 0x1,
     LARGEST: _CNT <<= 0x1,
+    BEST_FIT: _CNT <<= 0x1,
 };
 
 

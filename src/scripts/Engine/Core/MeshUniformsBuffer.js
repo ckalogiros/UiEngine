@@ -248,6 +248,9 @@ export function Mesh_unif_remove_root_wpos(root_posidx) {
 export function Mesh_unif_get_vb_root_wpos_meshidx(root_posidx) {
    return _per_vb_mesh_unif_wpos.buffer[root_posidx].meshidx;
 }
+export function Mesh_unif_get_vb_root_wpos_has_absolute_pos(root_posidx) {
+   return _per_vb_mesh_unif_wpos.buffer[root_posidx].has_absolute_pos;
+}
 
 // TODO: 
 // EFFICIENCY: Pass a buffer to store the positions. Too much 'heat' of the js GarbageColector

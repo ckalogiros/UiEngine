@@ -534,7 +534,7 @@ export function Slider_horizontal_on_update_handle(_params) {
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       Time_intervals_destroy_byidx(intervalIdx);
-      bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
+      bar.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
 
       return;
    }
@@ -588,7 +588,7 @@ export function Slider_vertical_on_update_handle(_params) {
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       Time_intervals_destroy_byidx(intervalIdx);
-      bar.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
+      bar.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
 
       return;
    }
@@ -1270,7 +1270,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
          const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          Time_intervals_destroy_byidx(intervalIdx);
-         mesh.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+         mesh.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
 
          return;
       }

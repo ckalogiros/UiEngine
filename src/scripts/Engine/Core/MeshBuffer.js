@@ -1,6 +1,6 @@
 "use strict";
 
-import { New_generic_buffer, New_int16_buffer, New_int8_buffer } from "./Buffers.js";
+import { New_generic_buffer, New_int16_buffer } from "./Buffers.js";
 import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
@@ -50,8 +50,12 @@ export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.b
 
 export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
 
-if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === undefined)
+if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === undefined || mesh_bufferidx===INT_NULL) {
+
+   console.error('441552413332', 'mesh_bufferidx', mesh_bufferidx, '_mesh_buffer.buffer', _mesh_buffer.buffer)
+   // console.trace();
    alert('441552413332')
+}
 
    const hover_margin = _mesh_buffer.buffer[mesh_bufferidx].StylesGetHoverMargin();
    const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
@@ -281,7 +285,7 @@ export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdx(per_vb_bufferidx);
    
    // // Remove the mesh from the buffer, and sort by swaping with the last mesh
-   // _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxSortedVersion(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
+   // _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxNoGapsVersion(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
    
    
    // // Get the mesh (from the mesh_buffer), that is the last element of the '_mesh_per_vertex_buffer'.
@@ -294,7 +298,7 @@ export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
       
    //    // console.log('mesh to be removed', mesh.GetName())
    //    _mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[per_vb_bufferidx] = INT_NULL;
-   //    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxSortedVersion(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
+   //    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxNoGapsVersion(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
 
    //    // const mesh
    //    // if(_mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[per_vb_bufferidx]])
@@ -330,7 +334,7 @@ export function Mesh_per_vb_remove_all_from_index(vb_groupidx) {
    // if (mesh.per_vb_bufferidx === INT_NULL) return; // Avoid created but not active meshes(like deactivated)
 
    // for (let i = _mesh_per_vertex_buffer.buffer[vb_groupidx].boundary; i >= mesh.per_vb_bufferidx; i--) {
-   //    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxSortedVersion(mesh.per_vb_bufferidx, meshidx, 'Mesh_per_vb_remove_all_from_index');
+   //    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxNoGapsVersion(mesh.per_vb_bufferidx, meshidx, 'Mesh_per_vb_remove_all_from_index');
    // }
 }
 

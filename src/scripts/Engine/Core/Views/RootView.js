@@ -7,7 +7,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Relative_pos_comp_move_right_buffer } from "../../Drawables/Operations/RelativePosComponent.js";
 import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb_remove_all_from_index } from "../MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb_remove_all_from_index, Mesh_per_vb_reset_buffer } from "../MeshBuffer.js";
 import { Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
 
 
@@ -207,7 +207,7 @@ export function Root_group_view_buffer_remove_element_byidx(root_bufferidx, batc
 
          /*********************************************************************************************************************************/
          // Batch Remove
-         root_group_view_buffer.buffer[root_bufferidx].RemoveByIdxSortedVersion(elem_found, root_bufferidx, 'Root_group_view_buffer_remove_element_byidx');
+         root_group_view_buffer.buffer[root_bufferidx].RemoveByIdxNoGapsVersion(elem_found, root_bufferidx, 'Root_group_view_buffer_remove_element_byidx');
 
       }
       else 
@@ -453,7 +453,6 @@ export function Root_group_per_vb_meshidx_view_get_all_roots(root_bufferidx) {
 
 
 export function Root_group_per_vb_meshidx_view_remove_byidx(root_bufferidx) {
-   console.warn('widget root batch removing root batch by splice. IMPLEMENT correct: removing by .Removeidx()', _root_per_vb_meshidx_buffer.buffer[root_bufferidx]);
    _root_per_vb_meshidx_buffer.RemoveByIdx(root_bufferidx);
 }
 
@@ -656,9 +655,7 @@ export function Root_group_rerender_from_root_reconstruct_listeners(root_bufferi
 
          // mesh.AddToGfxFromReset();
          mesh.AddToGfx();
-         // console.log('Add mesh from reset', mesh.GetName(), mesh.gfx.vb.starts.buffer[0])
       }
-      // else console.log('INACTIVE', mesh.GetName())
    }
 
    // Reconstruct all listeners(from root, recursive(SLOW))

@@ -1,6 +1,8 @@
 "use strict";
 
 
+const PI = 3.14159;
+
 
 let _CNT = 0x1;
 
@@ -784,20 +786,23 @@ const TEXTURE_TYPE = {
 
 
 
-// Textures
 // Font textures
-// const FONT_CONSOLAS_20px = '../../../../resources/fonts/consolas_5/consolas_5.bmp';
 const FONT_CONSOLAS_12px = 'consolas_3';
 const FONT_CONSOLAS_16px = 'consolas_4';
 const FONT_CONSOLAS_20px = 'consolas_5';
 const FONT_CONSOLAS_24px = 'consolas_6';
 const FONT_CONSOLAS_28px = 'consolas_7';
 const FONT_CONSOLAS_32px = 'consolas_8';
-const FONT_CONSOLAS_SDF_LARGE = 'consolas_sdf_11115w';
-const FONT_CONSOLAS_SDF_SMALL = 'consolas_sdf_2048w';
-const COMIC_FONT_METRICS_PATH = '../../../../resources/fonts/consolas_sdf/metrics/consolas_sdf35.txt'
-const TEST_MSDF_FONT_1 = 'msdf_a_char';
+const FONT_CONSOLAS_40px = 'consolas_10';
+const FONT_CONSOLAS_49px = 'consolas_12';
+const FONT_CONSOLAS_58px = 'consolas_14';
+const FONT_CONSOLAS_66px = 'consolas_16';
+const FONT_CONSOLAS_116px = 'consolas_28';
+const FONT_CONSOLAS_157px = 'consolas_38';
 const TEST_MTSDF_FONT_TEST_1024DIM = 'consola_mtsdf_test_1024';
+const FONT_MSDF_COMIC = 'comicz';
+const TEST_MSDF_FONT_1 = 'msdf_a_char';
+// Textures
 const TEXTURE_SMOKE1 = 'smoke';
 const TEXTURE_TEST = 'Coin_1_64x64';
 const TEXTURE_TEST_APPLE = 'apple1_64x73';
@@ -811,48 +816,93 @@ const TEXTURE_TEST_APPLE = 'apple1_64x73';
 
 // IMPORTANT: Every texture image file above, must be stored to the FONT_PATHS below as shown.
 const TEXTURE_PATHS = [
-	{
-		imgPath: 'fonts/consolas_sdf',
-		imgName: TEST_MTSDF_FONT_TEST_1024DIM,
-		imgType: 'png',
-		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-	},
-	{
+
+	{ // 0
 		imgPath: 'fonts/consolas_3',
 		imgName: FONT_CONSOLAS_12px,
 		imgType: 'bmp',
 		metrics: null, 
 	},
-	{
+	{ // 1
 		imgPath: 'fonts/consolas_4',
 		imgName: FONT_CONSOLAS_16px,
 		imgType: 'bmp',
 		metrics: null, 
 	},
-	{
+	{ // 2
 		imgPath: 'fonts/consolas_5',
 		imgName: FONT_CONSOLAS_20px,
 		imgType: 'bmp',
 		metrics: null, 
 	},
-	{
+	{ // 3
 		imgPath: 'fonts/consolas_6',
 		imgName: FONT_CONSOLAS_24px,
 		imgType: 'bmp',
 		metrics: null, 
 	},
-	{
+	{ // 4
 		imgPath: 'fonts/consolas_7',
 		imgName: FONT_CONSOLAS_28px,
 		imgType: 'bmp',
 		metrics: null, 
 	},
-	{
+	{ // 5
 		imgPath: 'fonts/consolas_8',
 		imgName: FONT_CONSOLAS_32px,
 		imgType: 'bmp',
 		metrics: null, 
 	},
+	{ // 6
+		imgPath: 'fonts/consolas_10',
+		imgName: FONT_CONSOLAS_40px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{ // 7
+		imgPath: 'fonts/consolas_12',
+		imgName: FONT_CONSOLAS_49px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{ // 8
+		imgPath: 'fonts/consolas_14',
+		imgName: FONT_CONSOLAS_58px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{ // 9
+		imgPath: 'fonts/consolas_16',
+		imgName: FONT_CONSOLAS_66px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{ // 10
+		imgPath: 'fonts/consolas_28',
+		imgName: FONT_CONSOLAS_116px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{ // 11
+		imgPath: 'fonts/consolas_38',
+		imgName: FONT_CONSOLAS_157px,
+		imgType: 'bmp',
+		metrics: null, 
+	},
+	{ // 12
+		imgPath: 'fonts/consolas_sdf',
+		imgName: TEST_MTSDF_FONT_TEST_1024DIM,
+		imgType: 'png',
+		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
+	},
+	{ // 13
+		imgPath: 'fonts/comic_sans_ms',
+		imgName: FONT_MSDF_COMIC,
+		imgType: 'png',
+		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
+	},
+	/***************************************************************************************************/
+	// Textures
 	{
 		imgPath: 'textures',
 		imgName: TEXTURE_SMOKE1,
@@ -887,13 +937,20 @@ const TEXTURES = {
 	// IMPORTANT:Font textures MUST precede all other textures
 
 	// Font Textures
-	MSDF_CONSOLAS_1024: g_cnt++,
 	CONSOLAS_12px: g_cnt++,
 	CONSOLAS_16px: g_cnt++,
 	CONSOLAS_20px: g_cnt++,
 	CONSOLAS_24px: g_cnt++,
 	CONSOLAS_28px: g_cnt++,
 	CONSOLAS_32px: g_cnt++,
+	CONSOLAS_40px: g_cnt++,
+	CONSOLAS_49px: g_cnt++,
+	CONSOLAS_58px: g_cnt++,
+	CONSOLAS_66px: g_cnt++,
+	CONSOLAS_116px: g_cnt++,
+	CONSOLAS_157px: g_cnt++,
+	MSDF_CONSOLAS_1024: g_cnt++,
+	MSDF_COMIC_1024: g_cnt++,
 	FONT_COUNT: g_cnt,
 
 	DEFAULT_FONT: 0x0, 
@@ -1096,6 +1153,7 @@ const BATCH_FN_IDX = {
 _CNT = 0x1;
 const PARTICLES = {
    HAS_START_POS_VARIATION: _CNT,
+   HAS_RANDOM_POLAR_COORD: _CNT<<=0x1,
    HAS_JIGGLE: _CNT<<=0x1,
    HAS_ROTATION: _CNT<<=0x1,
    HAS_SCALE: _CNT<<=0x1,
@@ -1253,7 +1311,7 @@ const DEBUG = {
 	CAMERA: true,
 
 	TEXTURE: false,
-	UVS: true,
+	UVS: false,
 
 	// Graphics
 	WEB_GL: false,
@@ -1447,6 +1505,11 @@ const DEBUG_INFO_STRUCTS = {
 			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
 		},
 		INT16: {
+			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
+			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
+		},
+		INT32: {
 			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class
 			TOTAL_BUFFER_SIZE: 0,
 			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application

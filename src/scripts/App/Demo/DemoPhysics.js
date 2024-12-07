@@ -303,8 +303,6 @@ export function Sattelite_rotation(x=0, y=0) {
 
       }
       { // Info
-         const ball = balls_buffer[0];
-
          const ms = 60;
          const nfo = Create_widget_multi_text(_, 'Pi Angle:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
          info_section.AddItem(nfo);
@@ -816,8 +814,11 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    
       // Render
       info_section_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   
-      info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      
+      // info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC);
+      // info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, info_section_panel.mesh_bufferidx, true);
+
    
       info_section_panel.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
       info_section_panel.Calc_no_gfx_update();

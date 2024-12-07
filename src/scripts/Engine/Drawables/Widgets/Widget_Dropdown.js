@@ -5,7 +5,7 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_get } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Calculate_sizes_recursive, Expand, Section, Section_on_move_clbk } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/Views/MeshBufferViews.js";
@@ -15,8 +15,7 @@ import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Cor
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos } from "./ScrollerComponent.js";
 import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Mesh_set_root_in_focus, Mesh_set_scissorbox } from "../Operations/MeshHelperFunctions.js";
-import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_set_in_focus, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 
 
 
@@ -655,7 +654,7 @@ export class Widget_Dropdown extends Section {
          cur_pos[0] = this.geom.pos[0]; 
          cur_pos[1] = this.geom.pos[1]; 
          
-         tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+         Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
       }
    }
 
@@ -869,7 +868,7 @@ export class Widget_Dropdown extends Section {
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
       
-      tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+      Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
 
 
 
@@ -951,7 +950,7 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   #ActivateMenu(root) {
+   #ActivateMenu() {
       // TODO: SEE ### Dropdown Remove
       // Must remove listener
 
@@ -977,7 +976,7 @@ export class Widget_Dropdown extends Section {
                   const btn = item.children.buffer[0];
                   btn.text_mesh.SliceText(0, 1);
                   btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
-                  item.#ActivateMenu(root);
+                  item.#ActivateMenu();
                }
             }
          }
@@ -1005,12 +1004,13 @@ export class Widget_Dropdown extends Section {
 
       // Case its the first time this menu will be rendered
       if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
+         // View_add_to_group(menu, this.group_bufferidxs[0])
          View_add_to_group(menu, this.group_bufferidxs[0])
       }
 
 
       
-      this.#ActivateMenu(root); // Add dropdown to gfx buffers.
+      this.#ActivateMenu(); // Add dropdown to gfx buffers.
       // menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
       
 
@@ -1023,7 +1023,10 @@ export class Widget_Dropdown extends Section {
       if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
       
       
-      Calculate_sizes_recursive(widget_root, widget_root.options, );
+      // widget_root.Recalc_no_gfx_update(widget_root );
+      
+      
+      Calculate_sizes_recursive(widget_root, widget_root.options, this);
       
       
       if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
@@ -1043,14 +1046,7 @@ export class Widget_Dropdown extends Section {
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
       
-      tu(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-
-
-      // Special case for 'side-panels'
-      // if(SIDE_PANEL){
-      //    MOVE LEFT TO ACCOUNT FOR THE SIZE REDUCE/EXPAND FROM THE VIEWPORT RIGHT 
-      // } 
-
+      Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
 
 
 
@@ -1113,9 +1109,9 @@ export class Widget_Dropdown extends Section {
       Construct_listen_events_relations_from_mesh_tree(this.menu);
 
       // Set menu in focus
-      // Mesh_set_root_in_focus(widget_root.root_bufferidx, widget_root.scroller_comp_idx);
-      // Mesh_set_root_in_focus(widget_root.root_bufferidx);
-      Mesh_set_root_in_focus(root.root_bufferidx);
+      // // Mesh_set_root_in_focus(widget_root.root_bufferidx, widget_root.scroller_comp_idx);
+      // // Mesh_set_root_in_focus(widget_root.root_bufferidx);
+      // Mesh_set_root_in_focus(root.root_bufferidx);
       
       
 
@@ -1125,6 +1121,7 @@ export class Widget_Dropdown extends Section {
       // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
       // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
       View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
+      // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 
    }
 }
@@ -1260,12 +1257,12 @@ export function TEMP_DP_STEAL_THE_DP_RECALC(dp){
    const cur_pos = [0,0];
    cur_pos[0] = dp.geom.pos[0]; 
    cur_pos[1] = dp.geom.pos[1]; 
-   tu(dp, dp.options, cur_pos, _, _, dp.options & SECTION.INDEPENDENT);
+   Dp_calc_pos_tree_up_recursive(dp, dp.options, cur_pos, _, _, dp.options & SECTION.INDEPENDENT);
 }
 
 
 
-function tu(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0){
+function Dp_calc_pos_tree_up_recursive(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0){
 
    Temp_dp_calculate_positions(dp, options, curr, target_child_idx, is_for_build);
    
@@ -1286,7 +1283,7 @@ function tu(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0
       }
 
       if(continue_recur)
-         tu(parent, options, curr, dp.idx+1, true, (parent.options & SECTION.INDEPENDENT));
+         Dp_calc_pos_tree_up_recursive(parent, options, curr, dp.idx+1, true, (parent.options & SECTION.INDEPENDENT));
    }
 
 }
@@ -1379,23 +1376,22 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
             if(mesh.text_mesh) continue_recur = false;
          }
 
-         // // console.log(mesh.GetName(), mesh.scroller_comp)
-         // if(mesh.scroller_comp !== null){
-         //    console.log(mesh.GetName(), mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY())
-         //    console.log(mesh.GetName(), cur_pos[0], cur_pos[1])
+         if(mesh.scroller_comp !== null){
+            console.log(mesh.GetName(), mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY())
+            console.log(mesh.GetName(), cur_pos[0], cur_pos[1])
             
-         //    const root_meshidx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
-         //    // const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
-         //    const widget_root = mesh;
-         //    // const dx = mesh.geom.pos[0] - cur_pos[0];
-         //    // const dy = mesh.geom.pos[1] - cur_pos[1];
-         //    // Scroller_component_set_pos(mesh.scroller_comp, widget_root, dx, dy);
-         //    Scroller_component_set_pos(mesh.scroller_comp, widget_root, cur_pos[0], cur_pos[1]);
-         //    // Scroller_component_set_pos(mesh.scroller_comp, widget_root, mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY());
-         //    // Scroller_component_calculate_handle_pos_dim(mesh.scroller_comp, widget_root);
-         //    // Scroller_component_calculate_handle_pos_dim(mesh.scroller_comp, widget_root, cur_pos[0], cur_pos[1]);
-         //    // console.log(mesh.GetName())
-         // }
+            const root_meshidx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
+            // const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
+            const widget_root = mesh;
+            // const dx = mesh.geom.pos[0] - cur_pos[0];
+            // const dy = mesh.geom.pos[1] - cur_pos[1];
+            // Scroller_component_set_pos(mesh.scroller_comp, widget_root, dx, dy);
+            Scroller_component_set_pos(mesh.scroller_comp, widget_root, cur_pos[0], cur_pos[1]);
+            // Scroller_component_set_pos(mesh.scroller_comp, widget_root, mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY());
+            // Scroller_component_calculate_handle_pos_dim(mesh.scroller_comp, widget_root);
+            // Scroller_component_calculate_handle_pos_dim(mesh.scroller_comp, widget_root, cur_pos[0], cur_pos[1]);
+            // console.log(mesh.GetName())
+         }
    
    
          if(parent.rel_comp){

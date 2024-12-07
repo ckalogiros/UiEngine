@@ -31,7 +31,7 @@ import { Create_comet_particles, Create_explosion_particles, Create_glow_particl
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
 import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
-import { Demo_page } from './DemoPage.js';
+import { Demo_page, Demos_welcome_menu } from './DemoPage.js';
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from '../Engine/Core/Views/RootView.js';
 import { Clbk_animations_create_transition_slope, Clbk_animations_rotate, Clbk_animations_scale, Clbk_animations_text_counter, Clbk_animations_text_create, Demo_animations, Demo_animations_with_slider_slope } from './Demo/DemoAnimations.js';
 import { Demo_chain_link } from './Demo/DemoChainLink.js';
@@ -49,6 +49,7 @@ import { Font_metrics_get_char_width, Font_metrics_get_face_advancex, Font_metri
 import { Tetris } from './Demo/Games/Snake/Tetris.js';
 import { Bitwise_operations_run_test } from './Demo/Games/Snake/BitwiseOps.js';
 import { Tetris_test } from './Demo/Games/Snake/Tetris_test.js';
+import { Load_msdf_font_metrics } from '../Engine/Loaders/Font/ChlumskyFontMetricsLoader.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -671,7 +672,10 @@ export function TestWidgetsGeneric(createId = 1) {
     // Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
     // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
 
-    Demo_page();
+    // const m = Load_msdf_font_metrics();
+
+    // Demo_page();
+    // Demos_welcome_menu();
 
     // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
     // Tetris_test(ROOT_WIDGETS.CREATE_ROOT, 20, 60);
@@ -860,25 +864,6 @@ export function TestWidgetsGeneric(createId = 1) {
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .001, .2, 1.4, _, .4, true)
         }
 
-        // Demo_animations();
-        // Demo_animations_with_slider_slope();
-        // Clbk_animations_scale(ROOT_WIDGETS.CREATE_ROOT);
-        // Clbk_animations_scale(ROOT_WIDGETS.CREATE_ROOT)
-
-        { // Text Animations Testing
-            { // All
-                // Test_text_clbk_animations_with_counter(100, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, );
-                // Test_text_clbk_animations_with_counter(200, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, );
-                // Test_text_clbk_animations_with_counter(300, 100, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_X, );
-                // Test_text_clbk_animations_with_counter(400, 100, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, );
-            }
-            { // Counter with 2 text labels
-                // Test_text_clbk_animations_counter_2_text_meshes(100, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, );
-                // Test_text_clbk_animations_counter_2_text_meshes(100, 260, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_X);
-                // Test_text_clbk_animations_counter_2_text_meshes(300, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y);
-                // Test_text_clbk_animations_counter_2_text_meshes(300, 260, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y);
-            }
-        }
     }
 
     { // Widget: Colorpicker
@@ -925,7 +910,18 @@ export function TestWidgetsGeneric(createId = 1) {
 
     { // Widget: Label-buttons
 
-        // const label = CreateLabel(_, 'Ajks', TEXTURES.CONSOLAS_32px, 200, 300);
+        // CreateLabel(_, 'A', TEXTURES.MSDF_CONSOLAS_1024, 0, 250);
+        CreateLabel(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250);
+
+        // !\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+        // CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_28px, 0, 250);
+        // CreateLabel(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250);
+        // const label = CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`~~{|}0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_66px, 0, 300);
+        // const label = CreateLabel(_, 'Create_glow_particles(200, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1)', TEXTURES.CONSOLAS_32px, 0, 300);
+        // CreateLabel(_, 'Open-sans regular font', TEXTURES.CONSOLAS_32px, 0, 370);
+        // CreateLabel(_, 'WebGL warning: texParameter: pname 0x2802: Invalid param 0x0000.', TEXTURES.CONSOLAS_32px, 0, 440);
+        // CreateLabel(_, 'This is a test', TEXTURES.MSDF_CONSOLAS_1024, 320, 300);
+        // CreateLabel(_, 'CreateLabel(Crea', TEXTURES.MSDF_CONSOLAS_1024, 0, 300);
         // CreateLabel(_, 'AAAAAAAAAAA', TEXTURES.CONSOLAS_32px, 200, 400);
 
         // const label = CreateLabel('1');
@@ -1070,8 +1066,31 @@ export function TestWidgetsGeneric(createId = 1) {
 
         }
 
-        { // Demo Rotating Rectangles on mouse hover
-            // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT, true);
+        { // Animations
+
+            {
+                // Demo_animations();
+                // Demo_animations_with_slider_slope();
+
+                { // Text Animations Testing
+                    { // All
+                        // Test_text_clbk_animations_with_counter(100, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, );
+                        // Test_text_clbk_animations_with_counter(200, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, );
+                        // Test_text_clbk_animations_with_counter(300, 100, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_X, );
+                        // Test_text_clbk_animations_with_counter(400, 100, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, );
+                    }
+                    { // Counter with 2 text labels
+                        // Test_text_clbk_animations_counter_2_text_meshes(100, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, );
+                        // Test_text_clbk_animations_counter_2_text_meshes(100, 260, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_X);
+                        // Test_text_clbk_animations_counter_2_text_meshes(300, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y);
+                        // Test_text_clbk_animations_counter_2_text_meshes(300, 260, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y);
+                    }
+                }
+            }
+
+            { // Demo Rotating Rectangles on mouse hover
+                // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT, true);
+            }
         }
     }
 
@@ -1155,17 +1174,22 @@ export function TestWidgetsGeneric(createId = 1) {
         // Section(ROOT_WIDGETS.CREATE_ROOT, _, 300, 300, [70,40], _, _);
         // Section(ROOT_WIDGETS.CREATE_ROOT, _, 500, 500, [70,40], _, _);
 
-        // SectionResizable([350, 350, 0])
+        // SectionResizable([50, 150, 0])
 
         // TestSections1();
 
         // CreateManySections();
         // const blu = CreateManySectionsMinimal()
+    }
 
+    { // Framebuffer
 
+        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, helpui);
 
-
-        // const helpui = Help(scene);
+        // const meshinfo_mesh = MeshInfo(scene)
+        // Time_intervals_create(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
+        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh);
+        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh.children.buffer[0]);
 
 
         { // 
@@ -1175,19 +1199,8 @@ export function TestWidgetsGeneric(createId = 1) {
         }
     }
 
-    { // Misc
 
-        // Test_widgets(ypos);
-
-
-        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, helpui);
-
-        // const meshinfo_mesh = MeshInfo(scene)
-        // Time_intervals_create(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
-        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh);
-        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh.children.buffer[0]);
-    }
-
+    // const helpui = Help();
 
     // Must draw last so it is on top of everything
 
@@ -1764,6 +1777,8 @@ function SectionResizable(pos) {
     const dim = [200, 200];
 
     const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], tr), _, [, dim[1], 2]);
+    grey.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    grey.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     grey.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     grey.StateEnable(MESH_STATE.IS_RESIZEABLE);
@@ -1775,8 +1790,11 @@ function SectionResizable(pos) {
 
     grey.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     grey.Render();
-    Root_group_activate_all_vbs_in_renderqueue(grey.root_bufferidx);
+    
     grey.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, grey.gfx.vb.groupidx)
+    
+    Root_group_activate_all_vbs_in_renderqueue(grey.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(grey);
     Construct_listen_events_relations_from_mesh_tree(grey);
 
     return grey;
@@ -1840,12 +1858,12 @@ function CreateSectionedWidgets(pos, name = 'NO NAME') {
 function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
 
     const pos = [x, y, 2];
-    // const label = Create_widget_label(root_widget, name, _, pos, 0, color, WHITE, [5, 5], .5, _, font);
-    const label = Create_widget_label(root_widget, name, _, pos, 0, TRANSPARENCY(color, .2), WHITE, [5, 5], .5, _, font);
+    // const label = Create_widget_label(root_widget, name, _, pos, 0, TRANSPARENCY(color, .2), WHITE, [5, 5], .5, _, font);
+    const label = Create_widget_label(root_widget, name, _, pos, 0, TRANSPARENCY(color, .2), WHITE, [0, 0], .5, _, font);
     // label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    // label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-    // label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+    label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
@@ -1961,7 +1979,7 @@ function CreateSwitch() {
     const switch1 = Create_widget_switch(ROOT_WIDGETS.CREATE_ROOT, 'switch on', 'switch off', [100, ypos, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
+    // switch1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE, { style: [0, 4, 2] })
     switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
     switch1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -2116,39 +2134,15 @@ function CreateDropdown(pos = [0, 0, 0], root_widget = ROOT_WIDGETS.CREATE_ROOT)
     const pad = [10, 4];
     const margin = [5, 5];
     const style = { rcorners: 10, feather: 2, border: 0 };
-    const dp = Create_widget_dropdown(root_widget, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, style, margin);
+    const dp = Create_widget_dropdown(root_widget, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, _, margin);
+    dp.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    dp.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+
 
     Dropdown_roots_set_root(dp, dp);
 
     let zpos = 0;
-
-
-    // {
-    //     const l = Create_widget_label(_, 'HI!', );
-    //     dp.AddToMenu(l);
-    //     l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     // l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // }
-
-    // { // Test: Many section
-    //     const sections = CreateManySectionsMinimal(0x0);
-    //     dp.AddToMenu(sections);
-    //     sections.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // }
-
-    // { // Test: Slider
-    //     const slider = CreateSliderSimple(0x0);
-    //     // const slider = CreateSlider(0x0);
-    //     dp.AddToMenu(slider);
-    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     // slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // }
-    // { // Test: Slider
-    //     const switch1 = CreateSwitchSimple([0, 0, 2], 0x0);
-    //     dp.AddToMenu(switch1);
-    // }
-
 
 
     zpos++
@@ -2161,56 +2155,51 @@ function CreateDropdown(pos = [0, 0, 0], root_widget = ROOT_WIDGETS.CREATE_ROOT)
         for (let i = 0; i < sub_dp1_count; i++) {
 
             const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, zpos + 1], GREY[1], col, WHITE, pad, _, _, _, style, margin);
+            dpsub1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+            dpsub1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
             dp.AddToMenu(dpsub1);
-            // dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
             dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-            // { // Test: Labels
-            //     const l = Create_widget_label(_, 'HI!', );
-            //     dpsub1.AddToMenu(l);
-            //     l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-            //     // l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-            // }
-            { // Test: Rect_mesh
-                const rect = Create_rect_mesh(_,);
-                dpsub1.AddToMenu(rect);
-                // rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
-                rect.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-                // rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-            }
-
-
-
-            const col1 = GetSequencedColor(4)
+            // const col1 = GetSequencedColor(4)
+            const col1 = TRANSPARENCY(PURPLEB[6], 1.);
             for (let j = 0; j < sub_dp2_count; j++) {
 
-                const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, zpos + 2], GREY[1], col1, WHITE, pad, _, _, _, style, margin);
+                const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, zpos + 2], TRANSPARENCY(GREY[1], 1.), col1, WHITE, pad, _, _, _, style, margin);
                 dpsub1.AddToMenu(dpsub2);
+                dpsub2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+                dpsub2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
                 dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
                 // console.log()
 
-                const col2 = GetSequencedColor(3)
+                // const col2 = GetSequencedColor(3)
+                const col2 = TRANSPARENCY(GREEN[6], 1.)
+                
                 for (let k = 0; k < sub_dp2_count; k++) {
-
-                    const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, zpos + 3], GREY[1], col2, WHITE, pad, _, _, _, style, margin);
+                    
+                    const dpsub3 = Create_widget_dropdown(_, `${j}${k}`, [0, 0, zpos + 3], TRANSPARENCY(GREY[1], 1.), col2, WHITE, pad, _, _, _, style, margin);
                     dpsub2.AddToMenu(dpsub3);
+                    dpsub3.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+                    dpsub3.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
                     dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                     dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-
-                    const col3 = GetSequencedColor(3)
-                    for (let k = 0; k < sub_dp2_count; k++) {
-
-                        const dpsub4 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, zpos + 4], GREY[1], col3, WHITE, pad, _, _, _, style, margin);
+                    
+                    // const col3 = GetSequencedColor(3)
+                    const col3 = TRANSPARENCY(YELLOW[6], 1.)
+                    for (let n = 0; n < sub_dp2_count; n++) {
+                        
+                        const dpsub4 = Create_widget_dropdown(_, `${j}${k}${n}`, [0, 0, zpos + 4], GREY[1], col3, WHITE, pad, _, _, _, style, margin);
                         dpsub3.AddToMenu(dpsub4);
+                        dpsub4.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+                        dpsub4.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
                         dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                         dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
-                        const l = Create_widget_label(_, 'label testing' + j, _, _, _, YELLOWL[3], _, [5, 5], _, style);
-                        l.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-                        dpsub4.AddToMenu(l)
-                        // const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
-                        // dpsub4.AddToMenu(s)
+                        // const l = Create_widget_label(_, 'label testing' + j, _, _, _, YELLOWL[3], _, [5, 5], _, style);
+                        // l.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                        // dpsub4.AddToMenu(l);
+                        // l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+                        // l.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
 
                     }
 
@@ -2337,125 +2326,127 @@ function CreateDropdownWithScroller(pos = [0, 0, 0], id) {
     const margin = [5, 5]
     // const dp = Create_widget_dropdown(`DP${id}`, pos, GREY[2], BLUE_10_120_220, WHITE, pad);
     const dp = Create_widget_dropdown(ROOT_WIDGETS.CREATE_ROOT, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, [10, 2, 2], margin);
-    // dp.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    dp.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    dp.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+    // dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     Dropdown_roots_set_root(dp, dp);
 
 
 
 
-    const sub_dp1_count = 1;
+    const sub_dp1_count = 2;
     const sub_dp2_count = 1;
 
 
-    // let col = GetSequencedColor()
-    // for (let i = 0; i < sub_dp1_count; i++) {
+    let col = GetSequencedColor()
+    for (let i = 0; i < sub_dp1_count; i++) {
 
-    //     const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-    //     dp.AddToMenu(dpsub1);
-    //     dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+        dp.AddToMenu(dpsub1);
+        // dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        // dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-    //     { // Test: Labels
-    //         const l = Create_widget_label(_, 'HI!',);
-    //         dpsub1.AddToMenu(l);
-    //         l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //         l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     }
-
-
-    //     col = GetSequencedColor()
-    //     for (let j = 0; j < sub_dp2_count; j++) {
-
-    //         const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-    //         dpsub1.AddToMenu(dpsub2);
-    //         dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //         dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+        { // Test: Labels
+            const l = Create_widget_label(_, 'HI!',);
+            dpsub1.AddToMenu(l);
+            // l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            // l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        }
 
 
-    //         const col2 = GetSequencedColor()
-    //         for (let k = 0; k < sub_dp2_count; k++) {
+        col = GetSequencedColor()
+        for (let j = 0; j < sub_dp2_count; j++) {
 
-    //             const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
-    //             dpsub2.AddToMenu(dpsub3);
-    //             dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //             dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-
-    //             const col3 = GetSequencedColor()
-    //             for (let k = 0; k < sub_dp2_count; k++) {
-
-    //                 const dpsub4 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col3, WHITE, pad, _, _, _, margin);
-    //                 dpsub3.AddToMenu(dpsub4);
-    //                 dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //                 dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-
-    //                 // const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
-    //                 // dpsub4.AddToMenu(s)
-
-    //             }
-
-    //         }
-    //     }
-
-    // }
-
-    // {
-    //     const l = Create_widget_label(_, 'HI!', );
-    //     dp.AddToMenu(l);
-    //     l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // }
-
-    // { // Test: Many section
-    //     const sections = CreateManySectionsMinimal(0x0);
-    //     dp.AddToMenu(sections);
-    //     sections.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    // }
-
-    // { // Test: Slider
-    //     const slider = CreateSliderSimple(0x0);
-    //     // const slider = CreateSlider(0x0);
-    //     dp.AddToMenu(slider);
-    //     // slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // }
-
-    // { // Test: Scroller
-    //     const scroller = CreateScrollerClampAlphaTest(10, 0x0);
-    //     dp.AddToMenu(scroller);
-    //     // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // }
+            const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+            dpsub1.AddToMenu(dpsub2);
+            dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
 
+            const col2 = GetSequencedColor()
+            for (let k = 0; k < sub_dp2_count; k++) {
 
-    // col = GetSequencedColor()
-    // for (let i = 0; i < sub_dp1_count; i++) {
+                const dpsub3 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col2, WHITE, pad, _, _, _, margin);
+                dpsub2.AddToMenu(dpsub3);
+                dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
-    //     const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-    //     dp.AddToMenu(dpsub1);
-    //     dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                const col3 = GetSequencedColor()
+                for (let k = 0; k < sub_dp2_count; k++) {
 
-    //     // { // Test: Labels
-    //     //     const l = Create_widget_label(_, 'HI!', );
-    //     //     dpsub1.AddToMenu(l);
-    //     //     l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //     //     l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     // }
+                    const dpsub4 = Create_widget_dropdown(_, `${i}${j}${k}`, [0, 0, 0], GREY[1], col3, WHITE, pad, _, _, _, margin);
+                    dpsub3.AddToMenu(dpsub4);
+                    dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    dpsub4.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+                    // const s = Create_widget_section(_, SECTION.VERTICAL, [30,20], [0, 0, 4], [30, 10], GREY[1], 'sk1', [0, 5, 1.8]);
+                    // dpsub4.AddToMenu(s)
+
+                }
+
+            }
+        }
+
+    }
+
+    {
+        const l = Create_widget_label(_, 'HI!', );
+        dp.AddToMenu(l);
+        l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    }
+
+    { // Test: Many section
+        const sections = CreateManySectionsMinimal(0x0);
+        dp.AddToMenu(sections);
+        sections.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    }
+
+    { // Test: Slider
+        const slider = CreateSliderSimple(0x0);
+        // const slider = CreateSlider(0x0);
+        dp.AddToMenu(slider);
+        // slider.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    }
+
+    { // Test: Scroller
+        const scroller = CreateScrollerClampAlphaTest(10, 0x0);
+        dp.AddToMenu(scroller);
+        // scroller.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    }
 
 
-    //     col = GetSequencedColor()
-    //     for (let j = 0; j < sub_dp2_count; j++) {
 
-    //         const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
-    //         dpsub1.AddToMenu(dpsub2);
-    //         dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    //         dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-    //         // console.log()
-    //     }
+    col = GetSequencedColor()
+    for (let i = 0; i < sub_dp1_count; i++) {
 
-    // }
+        const dpsub1 = Create_widget_dropdown(_, `${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+        dp.AddToMenu(dpsub1);
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+        // { // Test: Labels
+        //     const l = Create_widget_label(_, 'HI!', );
+        //     dpsub1.AddToMenu(l);
+        //     l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        //     l.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        // }
+
+
+        col = GetSequencedColor()
+        for (let j = 0; j < sub_dp2_count; j++) {
+
+            const dpsub2 = Create_widget_dropdown(_, `${i}${j}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, margin);
+            dpsub1.AddToMenu(dpsub2);
+            dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+            // console.log()
+        }
+
+    }
 
     dp.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -2493,6 +2484,8 @@ function CreateDropdown3(pos, dim) {
     // dp.CreateMoveEvent();
     dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    dp.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    dp.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     // dp.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
 
@@ -2503,12 +2496,16 @@ function CreateDropdown3(pos, dim) {
     for (let i = 0; i < sub_dp1_count; i++) {
 
         const dpsub1 = Create_widget_dropdown(_, `0${i}`, [0, 0, 0], GREY[1], col, WHITE, pad, _, _, _, _, margin);
+        dpsub1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+        dpsub1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         dp.AddToMenu(dpsub1);
         dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
 
         for (let j = 0; j < sub_dp2_count; j++) {
             const s = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[7], 1.5), `0${i}${j}`)
+            s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+            s.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
             s.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
             dpsub1.AddToMenu(s);
         }
@@ -2543,6 +2540,8 @@ function CreateDropdown2InSection(pos, id) {
 
 
     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [5, 5], pos, [20, 10], TRANSPARENCY(GREEN[2], 1.5), 'S')
+    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
@@ -2562,6 +2561,8 @@ function CreateDropdown2InSection(pos, id) {
 
 
         const label = Create_widget_label(_, `sssdsdsdsdsLabel ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, pos[2]], fontsize, GREY[1], WHITE, [14, 4], .5,);
+        label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+        label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         dp.AddToMenu(label);
@@ -3054,12 +3055,18 @@ function CreateManySections(scene) {
 
     // const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
     const blu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [0, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
+    blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    blu.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE); blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
 
     // blu.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3)
 
     const red = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(REDL[7], tr));
+    red.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    red.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    red.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.EXPAND;
     red.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL;
@@ -3067,6 +3074,9 @@ function CreateManySections(scene) {
 
 
     const black1 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr));
+    black1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    black1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    black1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     black1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black1);
 
@@ -3367,19 +3377,32 @@ function TestSections1() {
     const pos = [0, 0, 0];
 
     const root = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, marg, pos, [0, 0], TRANSPARENCY(BLUEL[5], 1));
+    root.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    root.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    root.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     root.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     root.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     root.SetName('root_blue');
 
     { // Test 1
         const s1 = Sections4(_, SECTION.HORIZONTAL, pos);
+        s1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+        s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         root.AddItem(s1);
         const s2 = Sections4(_, SECTION.HORIZONTAL, pos);
+        s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        s2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+        s2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         root.AddItem(s2);
     }
 
     { // Test 2
-        const s1 = Sections2(_, SECTION.VERTICAL, pos); root.AddItem(s1);
+        const s1 = Sections2(_, SECTION.VERTICAL, pos); 
+        s1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+        s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+        root.AddItem(s1);
 
         // { // Test: one into another recursive 
         //     const s2 = Sections2(_, SECTION.HORIZONTAL, pos); s1.AddItem(s2);
@@ -3451,12 +3474,14 @@ function TestSections1() {
 
     root.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
     root.Calc_no_gfx_update();
-    root.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root.gfx.vb.groupidx)
 
     root.Render();
-    Root_group_activate_all_vbs_in_renderqueue(root.root_bufferidx);
 
-    root.ConstructListeners();
+    root.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root.gfx.vb.groupidx);
+
+    Root_group_activate_all_vbs_in_renderqueue(root.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(root)
+    Construct_listen_events_relations_from_mesh_tree(root);
 }
 let grey_cnt = 0;
 let green_cnt = 0;
@@ -3468,15 +3493,24 @@ function Sections2(is_root, align) {
     const dim = [10, 10];
 
     const grey = Create_widget_section(is_root, align, marg, [0, 0, 0], dim, TRANSPARENCY(GREY[0], tr));
+    // grey.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // grey.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    // grey.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     grey.SetName(`grey${grey_cnt++}`);
 
     const green = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(GREEN[3], tr));
+    // green.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // green.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    // green.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     green.SetName(`green${green_cnt++}`);
     grey.AddItem(green);
 
     const orange = Create_widget_section(_, SECTION.VERTICAL, marg, [0, 0, 0], dim, TRANSPARENCY(ORANGER[7], tr));
+    // orange.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // orange.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    // orange.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     orange.SetName(`orange${orange_cnt++}`);
     green.AddItem(orange);
@@ -3514,54 +3548,66 @@ function Sections4(is_root, align) {
 }
 
 
-function Help(scene) {
+function Help() {
 
 
     const flags = (SECTION.ITEM_FIT);
 
     //options, margin, pos, dim, col, name
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [200, 100, 0], [100, 100], TRANSPARENCY(GREY[1], .8));
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [200, 100, 0], [0, 0], TRANSPARENCY(GREY[1], .8));
+    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.SetName('Help section')
 
     // scene.StoreMesh(section)
-    const s1 = Create_widget_section(_, SECTION.VERTICAL, [15, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .6));
+    const s1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[2], .6));
+    s1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    s1.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     s1.SetName('Help section 2')
-    s1.options = SECTION.EXPAND | SECTION.VERTICAL;
+    // s1.options = SECTION.EXPAND | SECTION.VERTICAL;
 
     let msgs = [];
     for (let i = 0; i < DEBUG_PRINT_KEYS.length; i++) {
 
         msgs[i] = '\"' + DEBUG_PRINT_KEYS[i].key + '\": ' + DEBUG_PRINT_KEYS[i].discr
 
-        const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 7, TRANSPARENCY(GREY[1], .4), WHITE, [7, 3], .5, [0, 4, 3])
+        const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 7, TRANSPARENCY(YELLOWR[7], 1.), BLACK, [7, 3], .5, [0, 4, 3]);
+        label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+        label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         s1.AddItem(label)
     }
 
 
-    const minimizer = Create_widget_minimize_btn(_, section, section.geom.pos, 12);
-    minimizer.SetName('minimi')
+    // const minimizer = Create_widget_minimize_btn(_, section, section.geom.pos, 12);
+    // minimizer.SetName('minimi')
+    // section.AddItem(minimizer);
 
-    section.AddItem(minimizer);
     section.AddItem(s1)
 
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
 
     section.options = SECTION.EXPAND | SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
+    // section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT
     section.Calc_no_gfx_update();
 
 
     section.Render()
-    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-
-
-    View_build_group_from_root_mesh(section)
-    section.ConstructListeners();
 
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+
+    View_build_group_from_root_mesh(section)
+
+
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(section)
+    Construct_listen_events_relations_from_mesh_tree(section);
 
 
     // Create_root_widget_buffer(section);

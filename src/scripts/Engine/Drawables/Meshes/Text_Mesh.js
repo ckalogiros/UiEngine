@@ -603,7 +603,7 @@ p
             }
    
             // Advance to next free char position
-            geom_copy.pos[0] += (width*2);
+            geom_copy.pos[0] += (width*2)+0;
    
             // Reset geometry copy
             geom_copy.dim[0] = this.geom.dim[0]; 

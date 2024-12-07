@@ -977,7 +977,7 @@ function On_move_clbk(params) {
 
       const intervalIdx = widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       Time_intervals_destroy_byidx(intervalIdx);
-      widget.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+      widget.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
 
       return;
    }

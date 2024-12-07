@@ -15,8 +15,9 @@
 export const frag_glow_call = `
   vec4 glowcol = Glow(color.a, scale_down);
   color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
+  // color.rgb *= glowcol.rgb; // Adds the glow to the any previous function calculations
   // color = blend_color_multiply( color, glowcol ); 
-  // color += blend_color_add( color, glowcol ); 
+  // color = blend_color_add( color, glowcol ); 
 `;
 
 export const frag_glow = `
@@ -63,11 +64,14 @@ vec4 Glow(float alpha, float scale_down)
   
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   vec3 color = src_color.rgb*d*intensity*(1. - time);
+  // vec3 color = src_color.rgb*intensity*(1. - time);
   
   
   // color = min(src_color.rgb, d*intensity); // WEIRD NICE EFFECT!!!
   
-  return vec4(color, d);
+  // d = 1.0;
   // return RED*d;
+  return vec4(color, d);
+  // return vec4(color, 1.);
 }
 `;

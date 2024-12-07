@@ -39,11 +39,9 @@ vec4 Noise_procedural(float scale_down)
     float time  = v_time;
     float revT  = 1.-time; // Reverse time to be from 1 to 0
     
-    // #ifndef UV_READY
-      #define UV_READY 1
-      uv = gl_FragCoord.xy;
-      pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
-    // #endif  
+    uv = gl_FragCoord.xy;
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+
     
     vec2 uv2 = (gl_FragCoord.xy-(res*.5))/res;
     float res_ratio = res.y/res.x;
@@ -58,90 +56,58 @@ vec4 Noise_procedural(float scale_down)
     
     float complexity = 2.;
     vec2 ratio = vec2(dim.y,dim.x*2.)*controls.z*.25; 
-    // float noise1 = fbm(complexity * uv2 * vec2(2., 2.));
-    // float noise2 = fbm(5. * uv2 * vec2(2., 2.)*ratio);
     float noise1 = fbm(complexity * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) ;
     float noise2 = fbm(5. * uv2 * vec2(2.* ratio.x, 2.* ratio.x));
     float n1 = noise1*revT*d2; // +1 for non negative values
-    float n2 = noise2*revT*d2; // +1 for non negative values
-
     
-    float alpha = revT*d2;
 
 
-    float sum = 1.-((src_color.r + src_color.g + src_color.b)/3.); // Make equal src_color intensity for all rgb combinations
-    n1 *= sum * 2.0;
+
+    // float sum = 1.-((src_color.r + src_color.g + src_color.b)/3.); // Make equal src_color intensity for all rgb combinations
+    // n1 *= sum * 2.0;
+    n1 *= .66;
+
+
 
     vec3 col = src_color.rgb;
 
     
     float F = pow(noise2, 3.) *2.; // Characterizes the noize into the src_color.
-    // F *= d2 + (controls*.000000000001);
     F *= d2;
 
     
     // TODO: Create controls for: [pow(.., X1), F*X2, X3*(time+.4))]
-    // float mixer = pow((shape-n1)*F*4.5, 3.);
-    // float mixer = (shape-n1)*F*4.5;
-    // float mixer = pow((shape-n1)*F*4.5, 4.*(time+.4));
     float mixer = pow((shape-n1)*F*2.5, 2.*(time+.4));
     float mixer2 = pow((shape-n1)*F*2., 6.*(time+.4));
-    // return vec4(mixer);
     
 
-
-    /*
-        We want 0 alpha for the outer src_color(s1), and use 'F' for the alpha of the highlights(s2)
-    */
-
-
+    // We want 0 alpha for the outer src_color(s1), and use 'F' for the alpha of the highlights(s2)
+    
     // Color 1 
-    // vec4 s1 = vec4(vec3(n1*n1*col), F);
     vec4 s1 = vec4(vec3(n1*n1*col), 0.);
-    // return s1;
     
     
     // Color 2. Very Nice smoke like effect
     vec4 s2 = vec4(vec3(col*pow((n1)*F*4.5, 2.)), mixer); 
     // vec4 s2 = vec4(vec3(col*pow((n1)*F*4.5, 2.)), F); 
-    // return s2;
-    
-    // vec4 s4 = vec4(vec3(col*n1), F); 
     
     
     // Final Color
-    // vec4 c = mix(s1, s2, alpha);
     // vec4 c = mix(s1, s2, F);
-    // vec4 c = mix(s1, s2, mixer);
-    // vec4 c = mix(s1, s2, mixer2);
-    
-    
     vec4 c = mix(s1, s2, mixer);
     
     
-    
     /** CHOOSE ONE OF THE BELLOW: bright2 is good for purple src_color, bright 1 is good for a very bright fire ball */
-    vec4 bright2 = mix(s1, vec4(vec3(mixer2), 1.-F*2.6), mixer); // EFFECT VERY BRIGHT
-    // c += bright2*.5;
-    // c += bright2;
-    
+    vec4 bright2 = mix(s1, vec4(vec3(mixer2), 1.-F*3.3), mixer); // EFFECT VERY BRIGHT
+    // vec4 bright2 = mix(s1, vec4(vec3(mixer2), F*6.3), mixer); // EFFECT VERY BRIGHT
     c += mix(c, bright2, controls.x);
+
     
-    vec4 bright1 = mix(s1, vec4(vec3(mixer), F), mixer); // EFFECT VERY BRIGHT
-    // c += bright1*.3;
-    // c += bright1;
+    // vec4 bright1 = mix(s1, vec4(vec3(mixer), F), mixer); // EFFECT VERY BRIGHT
+    vec4 bright1 = mix(s1, vec4(vec3(mixer), F), F); // EFFECT VERY BRIGHT
     c += bright1*revT*revT*revT*revT*revT*revT*revT*revT*6.*controls.y;
     
-    // c += bright1*revT*revT*revT*revT;
-    // c += bright1*revT*revT*revT*revT*revT*revT*revT*revT;
-    
-
-    
-    // return vec4(noise1);
-    // return vec4(vec3(noise1), .0);
     return c;
-    // return RED;
-
 }
 `;
 

@@ -17,38 +17,6 @@ const _programs = New_generic_buffer(_, 'Shader Programs');
 export function Program_reset() { _programs.ResetFull(); }
 
 
-/***************************************************************************************************************************************************/
-// Groups
-/***************************************************************************************************************************************************/
-
-// export function Program_get_groups() { return _programs; }
-
-
-
-// export function Program_get_group(groupidx) {
-// 	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, groupidx, new Error().lineNumber)
-// 	return _programs.buffer[groupidx];
-// }
-
-
-
-// export function Program_group_exists(groupidx) {
-// 	if (groupidx < 0 || groupidx > _programs.boundary || _programs.buffer[groupidx] == undefined)
-// 		return INT_NULL;
-// 	return _programs.buffer[groupidx];
-// }
-
-
-
-// function Create_group() {
-
-// 	const groupidx = _programs.Add(New_generic_buffer());
-
-// 	Gfx_create_group_buffer(groupidx);
-
-// 	return groupidx; // Return the index of the newly created group buffer.
-// }
-
 
 
 

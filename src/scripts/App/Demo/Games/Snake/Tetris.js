@@ -1,15 +1,16 @@
 "use strict";
 
-import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
+import { Callback_animations_create, Callback_animations_destroy, Callback_animations_destroy_byidx } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Input_keyboard_bind_keydown_callback, Input_keyboard_bind_keyup_callback } from "../../../../Engine/Controls/Input/Keyboard.js";
 import { New_generic_buffer, New_int16_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_widget_close_btn, Create_widget_label, Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/RootView.js";
-import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLE, PURPLEB, REDL, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
+import { BLUE, BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, REDL, WHITE, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Drawables/Operations/Recursions.js";
 import { Particle_system_create_emitter, Particle_system_emitt, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
+import { Scene_camera_scroll_set } from "../../../../Engine/Scenes.js";
 import { Time_intervals_create, Time_intervals_destroy, Time_intervals_destroy_byidx, Time_intervals_reset_byidx } from "../../../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_add_dim_xy, Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_dim_y, Gl_set_rgb, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -17,6 +18,8 @@ import { Gen_array_check_for_existing_element } from "../../../../Helpers/Generi
 import { Bubble_sort } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Floor, Fract, Min3 } from "../../../../Helpers/Math/MathOperations.js";
+import { App_reinitialize, App_reset } from "../../../App.js";
+import { Demo_page } from "../../../DemoPage.js";
 
 
 
@@ -56,7 +59,7 @@ const GRID = {
    top_row:0
 };
 
-const MAX_COLUMNS = 7;
+const MAX_COLUMNS = 5;
 const TOKEN_SIZE = 30;
 const MAX_TOKENS_IN_Y_AXIS = 10;
 const TOP_ROW = MAX_TOKENS_IN_Y_AXIS-1;
@@ -126,11 +129,16 @@ const init_slope = .28;
 let in_remove_row_animation = false;
 let tetris_end = false;
 let game_loop_time_interval_idx = INT_NULL;
+let tetris_panel_posx = 0;
+let tetris_panel_posy = 0;
+let is_activated_by_demo=false, activation_id=0x0;
+
 
 // TODO: create Int16 buffers, to easily reset/reuse them
 let complete_rows_cell_idxs = [];
 let complete_rows_idxs = [];
-let tetris_panel_pos = [0, 0];
+
+
 
 const grid_top_cells_row_idxs = new Int16Array(MAX_COLUMNS);
 
@@ -264,13 +272,13 @@ function Grid_get_rowidx_from_posy(ypos) {
 }
 function Grid_get_posy_from_rowidx(rowidx) {
 
-   // const y = tetris_panel_pos[1] + ((TOP_ROW-rowidx) * ROW_HEIGHT);
+   // const y = tetris_panel_posy + ((TOP_ROW-rowidx) * ROW_HEIGHT);
    const y = ((TOP_ROW-rowidx) * ROW_HEIGHT);
    return y;
 }
 function Grid_get_posx_from_colidx(colidx) {
 
-   // const x = tetris_panel_pos[0] + ((colidx * COL_WIDTH) + TOKEN_SIZE + 10);
+   // const x = tetris_panel_posx + ((colidx * COL_WIDTH) + TOKEN_SIZE + 10);
    const x = ((colidx * COL_WIDTH) + TOKEN_SIZE + tetris_panel_pad);
    return x;
 }
@@ -392,8 +400,11 @@ function Grid_add_cells_from_token(token){
       if(DEBUG_PRINT2) console.log('i:', i, 'col_idx', col_idx, 'row_idx', row_idx, 'cellidx', cellidx);
 
 
-      if(row_idx >= MAX_TOKENS_IN_Y_AXIS) 
+      if(row_idx >= MAX_TOKENS_IN_Y_AXIS) {
+
          tetris_end = true;
+         return;
+      }
    
       _grid_columns.buffer[col_idx].AddAtIndex(row_idx, cellidx);
 
@@ -491,6 +502,7 @@ function Cell_create(offsetx=0, offsety=0, col){
    mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, cell_feather);
    mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, cell_round_corners);
+   mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
 
 
    // Test Shader
@@ -1420,28 +1432,6 @@ function Tetris_create_token_line2(section, token){
 
 
 
-export function Tetris_reset(){
-
-   _grid_columns.ResetFull();
-   _cells_buffer.ResetFull();
-   _free_cells_buffer.Reset();
-
-   complete_rows_cell_idxs = [];
-   complete_rows_idxs = [];
-
-   in_remove_row_animation = false;
-   tetris_end = false;
-   game_loop_time_interval_idx = INT_NULL;
-
-   for(let i=0; i<helper_arr_new_row.length; i++){
-
-      helper_arr_new_col[i] = INT_NULL; 
-      helper_arr_new_row[i] = INT_NULL;
-   }
-
-}
-
-
 const token_cycle = [Tetris_create_token_line4, Tetris_create_token_shape_L_mirror, Tetris_create_token_shape_L, Tetris_create_token_square]
 // const token_cycle = [Tetris_create_token_line4, Tetris_create_token_square]
 // const token_cycle = [Tetris_create_token_square, Tetris_create_token_line4]
@@ -1471,18 +1461,249 @@ function Tetris_create_token(token_id, section) {
 
 
 
-export function Tetris(root_widget=0x0, x, y){
+
+function Tetris_start_menu(section_, emitter_) {
+
+
+   const dim = [
+      (VIEWPORT.WIDTH/2  >= 180) ? 180 : VIEWPORT.WIDTH/2 - 10, 
+      (VIEWPORT.HEIGHT/2 >= 250) ? 250 : VIEWPORT.HEIGHT/2 - 10,
+   ];
+
+   let zpos = 10;
+   const r_corners = 12;
+   
+   // const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section', );
+   // const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20,20], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], [0,0], TRANSPARENCY(GREY[3], .9), 'section', );
+   // const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [section_.GetPosX(), section_.GetPosY(), 10], [0,0], TRANSPARENCY(GREY[3], .9), 'section', );
+   // const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [0, section_.GetPosY(), 10], [0,0], TRANSPARENCY(GREY[3], .9), 'section', );
+   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [VIEWPORT.WIDTH/2, section_.GetPosY(), 10], [0,0], TRANSPARENCY(GREY[3], .9), 'section', );
+   menu_panel.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
+   menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+   // if (!PLATFORM.ANY_SMARTPHONE_DEVICE) menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   menu_panel.SetName('MenuLoadPanel');
+   
+   menu_panel.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT;
+
+   zpos++;
+
+
+
+
+   /*************************************************************************************************/
+   // Menu Options
+
+   const btn_col = TRANSPARENCY(GREEN[5], .8);
+
+   // Calculate dimentions for small width device
+   const dif = Abs((VIEWPORT.WIDTH/2-10) - dim[0]);
+   let log = (dif>0) ? Math.log(dif) : .2;
+   (log > 1) ? log = 1 : log = log;
+   const pad = (30 * log)
+
+   const tr = .3;
+   const col_inner = GREY[0];
+
+   // const play_contols_info = Create_widget_section(_, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[5], .9), 'section', );
+   const play_contols_info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(GREEN[5], .9), 'section', );
+   play_contols_info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   play_contols_info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   play_contols_info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+   menu_panel.AddItem(play_contols_info);
+   
+   {
+      const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(col_inner, tr), 'section', );
+      // const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [100,10], TRANSPARENCY(BLUE[9], 1.3), 'section', );
+      info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENT|SECTION.EXPAND;
+      play_contols_info.AddItem(info);
+      
+      const col = PURPLER[7];
+      const ctrl = Create_widget_label(_, 'A', _, _, _, col, WHITE, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
+      ctrl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 31);
+      info.AddItem(ctrl);
+      
+      const expl = Create_widget_label(_, 'Rotate Left', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
+      expl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.AddItem(expl);
+   }
+   {
+      const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(col_inner, tr), 'section', );
+      info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENT|SECTION.EXPAND;
+      play_contols_info.AddItem(info);
+      
+      const col = PURPLEB[9];
+      const ctrl = Create_widget_label(_, 'D', _, _, _, col, WHITE, [12, 6], _, _, TEXTURES.CONSOLAS_32px);
+      ctrl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 32);
+      info.AddItem(ctrl);
+      
+      const expl = Create_widget_label(_, 'Rotate Right', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
+      expl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.AddItem(expl);
+
+   }
+   {
+      const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(col_inner, tr), 'section', );
+      info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENT|SECTION.EXPAND;
+      play_contols_info.AddItem(info);
+      
+      const col = BLUEL[9];
+      const ctrl = Create_widget_label(_, '<', _, _, _, col, WHITE, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
+      ctrl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 31);
+      info.AddItem(ctrl);
+      
+      const expl = Create_widget_label(_, 'Move Left', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
+      expl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.AddItem(expl);
+   }
+   {
+      const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(col_inner, tr), 'section', );
+      info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENT|SECTION.EXPAND;
+      play_contols_info.AddItem(info);
+      
+      const col = BLUEL[9];
+      const ctrl = Create_widget_label(_, '>', _, _, _, col, WHITE, [12, 6], _, _, TEXTURES.CONSOLAS_32px);
+      ctrl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 32);
+      info.AddItem(ctrl);
+      
+      const expl = Create_widget_label(_, 'Move Right', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
+      expl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.AddItem(expl);
+
+   }
+   {
+      const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(col_inner, tr), 'section', );
+      info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENT|SECTION.EXPAND;
+      play_contols_info.AddItem(info);
+      
+      const col = YELLOW[7];
+      const ctrl = Create_widget_label(_, 'V', _, _, _, col, WHITE, [12, 6], _, _, TEXTURES.CONSOLAS_32px);
+      ctrl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 32);
+      info.AddItem(ctrl);
+      
+      const expl = Create_widget_label(_, 'Move Down', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
+      expl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      expl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info.AddItem(expl);
+
+   }
+   
+   play_contols_info.options = SECTION.RESIZE_PARENT|SECTION.VERTICAL;
+   // play_contols_info.options = SECTION.RESIZE_PARENT|SECTION.VERTICAL|SECTION.INHERIT|SECTION.HORIZONTAL_CENTER;
+   
+   
+   
+   
+   /*******************************************************************************************/
+   // Start Game button
+   const start_btn = Create_widget_close_btn(_, menu_panel, 'PLAY', [0, 0, zpos], 30, btn_col, WHITE, [dim[0]/2-pad*2, 10], _, _, TEXTURES.CONSOLAS_32px);
+   start_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   start_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   start_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, start_btn.geom.dim[1]);
+   start_btn.SetName('start_btn');         
+   menu_panel.AddItem(start_btn);
+   
+   
+   
+   /*************************************************************************************************/
+   // Render Menu 
+   menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
+   menu_panel.GenGfxCtx();
+   
+   menu_panel.Calc_no_gfx_update();
+   // menu_panel.geom.dim[0] = VIEWPORT.WIDTH/2;
+
+   menu_panel.MoveNoGfxUpdate(-menu_panel.geom.dim[0], 0, );
+   start_btn.MoveNoGfxUpdate( 
+      (menu_panel.geom.pos[0]-start_btn.geom.pos[0]) + (menu_panel.geom.dim[0]-start_btn.geom.dim[0]), 
+      (menu_panel.geom.pos[1]-start_btn.geom.pos[1]) + (menu_panel.geom.dim[1]*2-(start_btn.geom.dim[1]*2+10)), 
+   );
+   play_contols_info.MoveNoGfxUpdate( 
+      (menu_panel.geom.pos[0]-play_contols_info.geom.pos[0]) + (menu_panel.geom.dim[0]-play_contols_info.geom.dim[0]), 
+      0,
+   );
+   
+   menu_panel.Render();
+   
+   
+   Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
+   Construct_listen_events_from_mesh_tree(menu_panel);
+   Construct_listen_events_relations_from_mesh_tree(menu_panel);
+   
+   menu_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, menu_panel.gfx.vb.groupidx);
+
+   // Set menu in focus
+   Mesh_set_root_in_focus(menu_panel.root_bufferidx, menu_panel.scroller_comp_idx);
+
+
+   // Create event callback for the close menu button
+   const evt_clbk_params = {
+      evt_clbks: ()=>{ 
+
+         /*************************************************************************************************/
+         // Create Tetris Game Loop
+         const params = {
+            section: section_,
+            emitter: emitter_,
+         }
+         
+         game_loop_time_interval_idx = Time_intervals_create(1, 'Tetris', TIME_INTERVAL_REPEAT_ALWAYS, Tetris_game_loop, params);
+      }, 
+   }
+
+   menu_panel.CreateEventCallback(evt_clbk_params);
+   
+}
+
+
+export function Tetris(root_widget=0x0, x, y, is_activated_by_demo_=false, activation_id_){
 
    /*************************************************************************************************/
    // Create the columns to store any
    Tetris_initialize_grid();
 
-   tetris_panel_pos[0] = x;
-   tetris_panel_pos[1] = y;
+   tetris_panel_posx = x;
+   tetris_panel_posy = y;
+   is_activated_by_demo=is_activated_by_demo_; 
+   activation_id=activation_id_;
 
 
-
-   const section = Create_widget_section(root_widget, _, [10, 10], [x,y,0], [TETRIS_PANEL_WIDTH+tetris_panel_pad, TETRIS_PANEL_HEIGHT+tetris_panel_pad], GREY[0], 'TetrisSection');
+   // const section = Create_widget_section(root_widget, _, [10, 10], [x,y,0], [TETRIS_PANEL_WIDTH+tetris_panel_pad, TETRIS_PANEL_HEIGHT+tetris_panel_pad], GREY[0], 'TetrisSection');
+   const section = Create_widget_section(root_widget, _, [10, 10], [VIEWPORT.WIDTH/2-(TETRIS_PANEL_WIDTH+tetris_panel_pad),y,0], [(TETRIS_PANEL_WIDTH+tetris_panel_pad), TETRIS_PANEL_HEIGHT+tetris_panel_pad], GREY[0], 'TetrisSection');
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 20);
@@ -1560,19 +1781,12 @@ export function Tetris(root_widget=0x0, x, y){
    // Create Tetris Game Loop
    const emitter = Particles_explosion();
 
-   /*************************************************************************************************/
-   // Create Tetris Game Loop
-   const params = {
-      section: section,
-      emitter: emitter,
-   }
-   
-   game_loop_time_interval_idx = Time_intervals_create(14, 'Tetris', TIME_INTERVAL_REPEAT_ALWAYS, Tetris_game_loop, params);
-
 
    // Bind Keyboard Controls
    Input_keyboard_bind_keydown_callback(Keyboard_input_keydown);
    Input_keyboard_bind_keyup_callback(Keyboard_input_keyup);
+
+   Tetris_start_menu(section, emitter);
 }
 function Tetris_game_loop(params) {
 
@@ -1646,7 +1860,7 @@ function Tetris_game_loop(params) {
 
       // END the game
       if(tetris_end) {
-         Tetris_end();
+         Tetris_end(section, emitter);
          return;
       }
 
@@ -1680,17 +1894,162 @@ function Tetris_game_loop(params) {
    }
 
 }
-function Tetris_end() {
+export function Tetris_reset(){
+
+   _grid_columns.ResetFull();
+   _cells_buffer.ResetFull();
+   _free_cells_buffer.Reset();
+
+   complete_rows_cell_idxs = [];
+   complete_rows_idxs = [];
+
+   in_remove_row_animation = false;
+   tetris_end = false;
+   game_loop_time_interval_idx = INT_NULL;
+
+   for(let i=0; i<helper_arr_new_row.length; i++){
+
+      helper_arr_new_col[i] = INT_NULL; 
+      helper_arr_new_row[i] = INT_NULL;
+   }
+
+   Callback_animations_destroy();
+
+}
+function Tetris_end(section, emitter) {
+   
+   console.log('------------------------------- END -------------------------------');
+
+   // Grey out token
 
    Time_intervals_destroy_byidx(game_loop_time_interval_idx);
-   console.log('------------------------------- END -------------------------------')
+
+   for(let i = MAX_TOKENS_IN_Y_AXIS-1; i >= 0; i--) {
+   
+      for(let j = 0; j < MAX_COLUMNS; j++) {
+         
+         if(_grid_columns.buffer[j].buffer[i] !== INT_NULL) {
+
+            const params = {
+               cell_col_idx:j,
+               cell_row_idx:i,
+               all_rgb_black: 0x0,
+               section:section,
+               emitter:emitter,
+         
+            };
+            Callback_animations_create(Animation_end_game, Animation_end_game_stop, params, 'TetrisEndAnimation');
+
+            return;
+         }
+      }
+   }
+
 }
 
 
 
 
+function Animation_end_game(params) {
+
+   const col_idx = params.cell_col_idx;
+   const row_idx = params.cell_row_idx;
 
 
+   const cell_idx = _grid_columns.buffer[col_idx].buffer[row_idx];
+   if(cell_idx !== INT_NULL) {
+      
+      const cell = _cells_buffer.buffer[cell_idx];
+
+      const mesh = cell.mesh;
+
+      // Color Intensity animation
+      const mod = 0.1;
+      const c = 0.25;
+      let r = mesh.mat.col[0];
+      let g = mesh.mat.col[1];
+      let b = mesh.mat.col[2];
+      
+      if(r > mod) r -= c;
+      else 
+         params.all_rgb_black |= 0x1;
+      if(g > mod) g -= c;
+      else 
+         params.all_rgb_black |= 0x2;
+      if(b > mod) b -= c;
+      else 
+         params.all_rgb_black |= 0x4;
+      
+      mesh.mat.col[0] = r;
+      mesh.mat.col[1] = g;
+      mesh.mat.col[2] = b;
+
+      Gl_set_rgb(mesh.gfx, mesh.mat.col, 1);
+
+      
+   }
+
+   if(params.all_rgb_black === (0x1|0x2|0x4)) {
+      return false;
+   }
+
+   return true;
+}
+
+
+function Animation_end_game_stop(params_) {
+
+   const col_idx = params_.cell_col_idx;
+   const row_idx = params_.cell_row_idx;
+
+   let col_continue = col_idx+1;
+
+   for(let i = row_idx; i >= 0; i--) {
+   
+      for(let j = col_continue; j < MAX_COLUMNS; j++) {
+         
+         if(_grid_columns.buffer[j].buffer[i] !== INT_NULL) {
+   
+            const valid_cell_idx = _grid_columns.buffer[j].buffer[i];
+   
+            if(valid_cell_idx !== INT_NULL) {
+
+               // console.log('col', j, 'row', i, 'valid_cell_idx', valid_cell_idx)
+
+               const params = {
+                  cell_col_idx:j,
+                  cell_row_idx:i,
+                  all_rgb_black: 0x0,
+                  section:params_.section,
+                  emitter:params_.emitter,
+            
+               };
+
+               Callback_animations_create(Animation_end_game, Animation_end_game_stop, params, 'TetrisEndAnimation');
+
+     
+               return false;
+            }
+         }
+      }
+
+      col_continue = 0
+   }
+
+   // Tetris_reset();
+   // App_reset();
+   // Tetris(ROOT_WIDGETS.CREATE_ROOT, tetris_panel_posx, tetris_panel_posy);
+   
+   Tetris_reset();
+   App_reset(); // Reset all 
+   Scene_camera_scroll_set(_, 0);
+   App_reinitialize();
+
+   if(is_activated_by_demo) Demo_page(activation_id);
+   else Tetris(ROOT_WIDGETS.CREATE_ROOT, tetris_panel_posx, tetris_panel_posy, false, activation_id);
+
+   return false;
+}
 
 
 
@@ -1893,7 +2252,10 @@ function Animation_scale_up_stop(params) {
    cell.prev_slope_val = 0;
    cell.in_animation = false;
    
-   
+   const section = cell.mesh.parent;
+   // const section_posx = section.geom.pos[0];
+   const section_posx = section.GetPosX();
+
    // Reset mesh's properties
    const mesh = cell.mesh;
    mesh.geom.pos[1] = OUT_OF_VIEW;
@@ -1904,15 +2266,16 @@ function Animation_scale_up_stop(params) {
    const emitter = params.emitter;
    // const posy = Grid_get_posy_from_rowidx(cell.rowidx-1);
    const posy = Grid_get_posy_from_rowidx(cell.rowidx);
-   const posx = Grid_get_posx_from_colidx(cell.colidx)
-   // emitter.pos[0] = posx+TOKEN_SIZE; 
-   // emitter.pos[1] = posy+TOKEN_SIZE+10;
-   emitter.pos[0] = posx + tetris_panel_pos[0]; 
-   emitter.pos[1] = posy + tetris_panel_pos[1]+TOKEN_SIZE;
+   const posx = section_posx + Grid_get_posx_from_colidx(cell.colidx);
+   
+   emitter.pos[0] = posx + tetris_panel_posx; 
+   emitter.pos[1] = posy + tetris_panel_posy+TOKEN_SIZE;
+
    emitter.mat.col[0] = mesh.mat.defCol[0];
    emitter.mat.col[1] = mesh.mat.defCol[1];
    emitter.mat.col[2] = mesh.mat.defCol[2];
    emitter.mat.col[3] = mesh.mat.defCol[3];
+   
    const emitter_idx = emitter.idx;
    const emitter_params = {params:{target_params:[emitter_idx]},};
    Particle_system_emitt(emitter_params);
@@ -2064,12 +2427,13 @@ export function Particles_explosion(x = 0, y = 0, num_particles_per_frame=4) { /
    /****************************************************************************************************************/
    // Create Particles Particles Emitter
    const particles_size = 30;
-   num_particles_per_frame=50;
+   num_particles_per_frame=128;
    
    const emitter_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .03, 1, 4, .98, .1, 4, _, num_particles_per_frame);
    // const emitter_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .014, 1, 1, .96, -.1, 3, TEXTURES.SMOKE_1, num_particles_per_frame);
    const emitter = Particles_get_particle_system(emitter_idx);
-   emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+   // emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+   emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
    emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:4, jiggley:3});
    // emitter.EnableProperties(PARTICLES.HAS_SCALE, 20);
    

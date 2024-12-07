@@ -22,9 +22,9 @@ export function Ui_create_label_switch(name, fontsize, switch_size, switch_fn, c
    label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    section.AddItem(label);
    
-   const ui_switch = Create_widget_switch_simple(_, [0, 0, zindex + 2], switch_size, switch_col, switch_col2, switch_pad, _, [6, 14, 2]);
+   const ui_switch = Create_widget_switch_simple(_, [0, 0, zindex + 2], switch_size, switch_col, switch_col2, switch_pad, _, );
    ui_switch.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   ui_switch.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, switch_size[0]);
+   ui_switch.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, switch_size);
    ui_switch.SetName(`DBG_UI ${name} switch`);
    
    // const callback_params = null; // Pass any params for the callback and get them at 'switch_fn' site

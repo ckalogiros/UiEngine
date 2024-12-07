@@ -1,11 +1,20 @@
 "use strict";
-import { COMIC_FONT_METRICS } from './ComicFontMetrics.js'
+import { comic_sans_ms_gras } from '../../../../../resources/fonts/comic_sans_ms/metrics/comicsansmsgras.js';
+import { comic_sans_cz } from '../../../../../resources/fonts/comic_sans_ms/comicz.js';
+import { CONSOLAS_40Hpx } from '../../../../../resources/fonts/consolas_10/metrics/consolas_10.js';
+import { CONSOLAS_49Hpx } from '../../../../../resources/fonts/consolas_12/metrics/consolas_12.js';
+import { CONSOLAS_58Hpx } from '../../../../../resources/fonts/consolas_14/metrics/consolas_14.js';
+import { CONSOLAS_66Hpx } from '../../../../../resources/fonts/consolas_16/metrics/consolas_16.js';
+import { CONSOLAS_116Hpx } from '../../../../../resources/fonts/consolas_28/metrics/consolas_28.js';
 import { CONSOLAS_12Hpx } from '../../../../../resources/fonts/consolas_3/metrics/consolas_3.js';
+import { CONSOLAS_157Hpx } from '../../../../../resources/fonts/consolas_38/metrics/consolas_38.js';
 import { CONSOLAS_16Hpx } from '../../../../../resources/fonts/consolas_4/metrics/consolas_4.js';
 import { CONSOLAS_20Hpx } from '../../../../../resources/fonts/consolas_5/metrics/consolas_5.js';
 import { CONSOLAS_24Hpx } from '../../../../../resources/fonts/consolas_6/metrics/consolas_6.js';
 import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metrics/consolas_7.js';
 import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
+import { consola_msdf_test_1024_metrics } from '../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js';
+import { Load_msdf_font_metrics } from './ChlumskyFontMetricsLoader.js';
 
 
 
@@ -29,15 +38,51 @@ const _activeFontTextures = new Int8Array(FONTS_MAX_COUNT);
 
 /** The 'metrics' variables are fixed, but because the 'TEXTURE_PATHS' is a global variable, the 'metrics' fiels must be set in a function enviroment */
 // Connect the image textures with their apropriate metrics file
-export function Font_texture_images_set_metrics_file() {
+let counter = 0;
+export function Font_texture_images_init_metrics_files() {
 
-	TEXTURE_PATHS[0].metrics = COMIC_FONT_METRICS;
-	TEXTURE_PATHS[1].metrics = CONSOLAS_12Hpx;
-	TEXTURE_PATHS[2].metrics = CONSOLAS_16Hpx;
-	TEXTURE_PATHS[3].metrics = CONSOLAS_20Hpx;
-	TEXTURE_PATHS[4].metrics = CONSOLAS_24Hpx;
-	TEXTURE_PATHS[5].metrics = CONSOLAS_28Hpx;
-	TEXTURE_PATHS[6].metrics = CONSOLAS_32Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_12Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_16Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_20Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_24Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_28Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_32Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_40Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_49Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_58Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_66Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_116Hpx;
+	TEXTURE_PATHS[counter++].metrics = CONSOLAS_157Hpx;
+	TEXTURE_PATHS[counter++].metrics = consola_msdf_test_1024_metrics;
+	TEXTURE_PATHS[counter++].metrics = comic_sans_cz;
+	// TEXTURE_PATHS[counter++].metrics = comic_sans_ms_gras;
+}
+
+function Font_get_metrics_by_texid(texture_id){
+   switch(texture_id){
+		case TEXTURES.CONSOLAS_12px: return CONSOLAS_12Hpx;
+      case TEXTURES.CONSOLAS_16px: return CONSOLAS_16Hpx;
+      case TEXTURES.CONSOLAS_20px: return CONSOLAS_20Hpx;
+      case TEXTURES.CONSOLAS_24px: return CONSOLAS_24Hpx;
+      case TEXTURES.CONSOLAS_28px: return CONSOLAS_28Hpx;
+      case TEXTURES.CONSOLAS_32px: return CONSOLAS_32Hpx;
+      case TEXTURES.CONSOLAS_40px: return CONSOLAS_40Hpx;
+      case TEXTURES.CONSOLAS_49px: return CONSOLAS_49Hpx;
+      case TEXTURES.CONSOLAS_58px: return CONSOLAS_58Hpx;
+      case TEXTURES.CONSOLAS_66px: return CONSOLAS_66Hpx;
+      case TEXTURES.CONSOLAS_116px: return CONSOLAS_116Hpx;
+      case TEXTURES.CONSOLAS_157px: return CONSOLAS_157Hpx;
+      case TEXTURES.MSDF_CONSOLAS_1024: return consola_msdf_test_1024_metrics;
+      case TEXTURES.MSDF_COMIC_1024: return comic_sans_cz;
+      default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_id:', texture_id);
+   }
+}
+
+
+
+export function Font_create_uvmap(texture_id){
+
+   Font_get_metrics_by_texid(texture_id); 
 }
 
 
@@ -151,19 +196,82 @@ export function Font_load_uvs(textureid) {
 	if(font_idx !== uvmap_idx) alert('6111282237 \nFont index and uvmap index must be equual.');
 
 
-	LoadMetrics(font_idx, textureid);
-	Create_uv_map(font_idx);
+	if(textureid === TEXTURES.MSDF_CONSOLAS_1024) {
+		
+		const msdf_uvmap = Load_metrics_msdf(font_idx, textureid);
+		// Load_metrics_msdf(font_idx, textureid);
+		// _fontsUvMap[font_idx] = msdf_uvmap;
+		Create_uv_map(font_idx);
+		// {
+		// 	imgPath: 'fonts/consolas_3',
+		// 	imgName: FONT_CONSOLAS_12px,
+		// 	imgType: 'bmp',
+		// 	metrics: null, 
+		// },
+		console.log(
+			'==========================================================================',
+			'Load Font:', TEXTURE_PATHS[textureid].imgName,
+		)
+	}
+	else {
+		
+		console.log(
+			'==========================================================================',
+			'Load Font:', TEXTURE_PATHS[textureid].imgName,
+		)
+		Load_metrics(font_idx, textureid);
+		Create_uv_map(font_idx);
+
+	}
 	
 	return font_idx;
 }
 
 
+function Load_metrics_msdf(font_idx, textureid) {
 
+	const msdf_metrics = Load_msdf_font_metrics(textureid);
+	const metrics = _fontMetricsBuffer[font_idx];
+
+
+	const len = metrics.ch.length;
+
+	// CAUTION: The Chlumsky msdf metrics gives advance value as a ratio
+	const advancex = msdf_metrics.texture.advance;
+
+	for(let i = 0; i < len; i++) {
+
+		metrics.ch[i].left = msdf_metrics.atlas_bounds[i].left; 
+		metrics.ch[i].right = msdf_metrics.atlas_bounds[i].right; 
+		metrics.ch[i].top = msdf_metrics.atlas_bounds[i].top; 
+		metrics.ch[i].bottom = msdf_metrics.atlas_bounds[i].bottom; 
+		metrics.ch[i].height = msdf_metrics.atlas_bounds[i].height; 
+		metrics.ch[i].width = msdf_metrics.atlas_bounds[i].width; 
+		metrics.ch[i].advancex = msdf_metrics.atlas_bounds[i].width; 
+		// metrics.ch[i].ratio = msdf_metrics.atlas_bounds[i].left; 
+		if(metrics.ch[i].row_num===undefined) metrics.ch[i].row_num = 1;  // HACK: temporary for drawing sdf font
+	}
+
+	metrics.texWidth = msdf_metrics.texture.width;
+	metrics.texHeight = msdf_metrics.texture.height;
+	metrics.advancex = 0;
+	metrics.size = msdf_metrics.atlas_bounds.length;
+	if(metrics.row_height===0) metrics.row_height = 148; // HACK: temporary for drawing sdf font
+	// metrics.ratio = metrics.texHeight / metrics.ch[0].advancex;
+	metrics.ratio = 1;
+	metrics.padding =  0;
+	metrics.isMonoSpace = false;
+
+	if(DEBUG.UVS){ console.log('metrics', metrics, '\nmsdf_metrics', msdf_metrics); }
+
+
+	return msdf_metrics.uvmap;
+}
 
 
 // Read the text file using 'filePos' as guide of word-line
 const filePos = { start: 0, end: 0, len: 0, line: 0 };
-function LoadMetrics(font_idx, textureid) {
+function Load_metrics(font_idx, textureid) {
 
 	const metrics = _fontMetricsBuffer[font_idx];
 
@@ -175,28 +283,28 @@ function LoadMetrics(font_idx, textureid) {
 	let size = 0;
 	// Get how many characters the font texture has 
 	// by retrieving the line: "NumCharacters		:	[94]"
-	file.pos = FindWord(file.content, "NumCharacters", file.pos);
-	if (file.pos.len) size = FindNextValue(file, "[]");
+	file.pos = Find_field_by_name(file.content, "NumCharacters", file.pos);
+	if (file.pos.len) size = Find_next_field(file, "[]");
 	size++; // +1 for the ' ' space char
 
 	metrics.size = size;
 	
 	
-	file.pos = FindWord(file.content, "Image Width", file.pos);
+	file.pos = Find_field_by_name(file.content, "Image Width", file.pos);
 	if (file.pos.len) {
-		metrics.texWidth = FindNextValue(file, "[]");
+		metrics.texWidth = Find_next_field(file, "[]");
 		// The next val inside [] is the height 
-		metrics.texHeight = FindNextValue(file, "[]");
-		metrics.row_height = FindNextValue(file, "[]");
+		metrics.texHeight = Find_next_field(file, "[]");
+		metrics.row_height = Find_next_field(file, "[]");
 	}
 
 	// In monospace {Only} the advance x is the same for every character
-	metrics.advancex = FindNextValue(file, "[]");
+	metrics.advancex = Find_next_field(file, "[]");
 	// Space between the characters in the texture font
-	metrics.padding = FindNextValue(file, "[]");
+	metrics.padding = Find_next_field(file, "[]");
 
-	file.pos = FindWord(file.content, "Mono Space", file.pos);
-	metrics.isMonoSpace = FindNextValue(file, "[]");
+	file.pos = Find_field_by_name(file.content, "Mono Space", file.pos);
+	metrics.isMonoSpace = Find_next_field(file, "[]");
 	metrics.ratio = metrics.texHeight / metrics.advancex;
 
 	let ii = 0;
@@ -225,22 +333,22 @@ function LoadMetrics(font_idx, textureid) {
 
 	// Load all property values to character map for each character
 	for (let i = ii; i < size; i++) {
-		file.pos = FindWord(file.content, "Face Left", file.pos);
+		file.pos = Find_field_by_name(file.content, "Face Left", file.pos);
 		if (file.pos.len)
-			metrics.ch[i].left = FindNextValue(file, "[]");
+			metrics.ch[i].left = Find_next_field(file, "[]");
 
 		// Because the file.pos retains the start position
-		// we just call FindNextValue() to  get the next val
-		metrics.ch[i].right 			= FindNextValue(file, "[]");
-		metrics.ch[i].top 			= FindNextValue(file, "[]");
-		metrics.ch[i].bottom 		= FindNextValue(file, "[]");
-		metrics.ch[i].width 			= FindNextValue(file, "[]");
-		metrics.ch[i].height 		= FindNextValue(file, "[]");
-		metrics.ch[i].row_num 		= FindNextValue(file, "[]");
-		metrics.ch[i].bearingleft 	= FindNextValue(file, "[]");
-		metrics.ch[i].bearingtop 	= FindNextValue(file, "[]");
+		// we just call Find_next_field() to  get the next val
+		metrics.ch[i].right 			= Find_next_field(file, "[]");
+		metrics.ch[i].top 			= Find_next_field(file, "[]");
+		metrics.ch[i].bottom 		= Find_next_field(file, "[]");
+		metrics.ch[i].width 			= Find_next_field(file, "[]");
+		metrics.ch[i].height 		= Find_next_field(file, "[]");
+		metrics.ch[i].row_num 		= Find_next_field(file, "[]");
+		metrics.ch[i].bearingleft 	= Find_next_field(file, "[]");
+		metrics.ch[i].bearingtop 	= Find_next_field(file, "[]");
 		if (!metrics.isMonoSpace) {
-			metrics.ch[i].advancex = FindNextValue(file, "[]");
+			metrics.ch[i].advancex = Find_next_field(file, "[]");
 			metrics.ch[i].ratio = metrics.ch[i].height / metrics.ch[i].width; // width to height ratio(and not the other way arround)
 		}
 	}
@@ -268,21 +376,22 @@ function Create_uv_map(font_idx) {
 	// 	transormedV = 1.0 / (metrics.texHeight);	// Deal with odd height. 
 	// }
 
-	// transormedU = Math.round(transormedU * round) / round;
-	// transormedV = Math.round(transormedV * round) / round;
-	
+
 	const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
 	for (let j = 0; j < metrics.size; j++) {
 		
 		const uv = metrics.ch[j]; // Get a characters pixel position in the font texture.
 		
 		// and store them to the uvmap
-		uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new array for each character
+		uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new uvs for each character
 		uvmap[j][U1] = transormedU * uv.left;
 		uvmap[j][U2] = transormedU * uv.right;
-		
 		uvmap[j][V1] = metrics.row_height * transormedV * (uv.row_num);
 		uvmap[j][V2] = uvmap[j][V1] + (metrics.row_height * transormedV);
+		// uvmap[j][U1] = transormedU * 0;
+		// uvmap[j][U2] = transormedU * 100;
+		// uvmap[j][V1] = transormedV * 0;
+		// uvmap[j][V2] = transormedV * 148;
 		
 		// if (metrics.texHeight % 2)
 		// 	uvmap[j][V1] += transormedV;
@@ -305,7 +414,7 @@ function Create_uv_map(font_idx) {
 /*
 	Finds text between delimiters, in a string buffer.
 */
-function FindNextValue(file, delim) {
+function Find_next_field(file, delim) {
 	/**
 	 * pos reference's indexes in the string buffer.
 	 * 		pos.start:   the start index of the searched text in the string buffer
@@ -358,7 +467,7 @@ function FindNextValue(file, delim) {
 
 
 
-function FindWord(file, word, pos) {
+function Find_field_by_name(file, word, pos) {
 
 	const wordpos = { start: -1, end: -1, len: 0, line: -1 };
 	const wordlen = word.length;

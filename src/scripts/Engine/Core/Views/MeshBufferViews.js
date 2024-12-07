@@ -122,8 +122,8 @@ export function View_get_view_vb_root_meshidx(group_bufferidxs) {
 export function View_is_group_root(group_bufferidxs, mesh_bufferidx) {
    // TODO: Buffer Error Check
    // The root mesh of the group 'sits' at inde
-   const rootidx =  _view_buffer.buffer[group_bufferidxs[0]].rootidx;
-   if(rootidx === mesh_bufferidx) return true; 
+   const rootidx = _view_buffer.buffer[group_bufferidxs[0]].rootidx;
+   if (rootidx === mesh_bufferidx) return true;
    return false;
 }
 
@@ -195,7 +195,11 @@ function View_add_mesh(groupidx, mesh) {
 
       const view_vb_buffer = view.vb.buffer[view_vbidx];
 
+      if (view_vb_buffer.data.active_count !== view_vb_buffer.data.boundary + 1)
+         console.log()
+
       const mesh_groupidx = view_vb_buffer.data.Add(mesh_bufferidx);
+
 
       // update num_faces
       view_vb_buffer.info[VIEW_INFO.NUM_FACES] += num_faces;
@@ -212,7 +216,8 @@ function View_add_mesh(groupidx, mesh) {
 
       const mesh_data = {
          info: new Int16Array(VIEW_INFO.SIZE),
-         data: New_int16_buffer(_, 'MeshBufferViews-mesh_data'), // TODO: widget root gfx already knows the number of meshes, so maybe have an aproximation of the mesh count(per vb buffer)
+         // TODO: widget root gfx already knows the number of meshes, so maybe have an aproximation of the mesh count(per vb buffer)
+         data: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
       };
 
       const vb_bufferidx = view.vb.Add(mesh_data);
@@ -229,12 +234,9 @@ function View_add_mesh(groupidx, mesh) {
 
 
 
-
-
 function Build_per_gfx_view_group_from_root_mesh_recursive(mesh, groupidx) {
 
-if(!mesh.gfx)
-   console.log
+
 
    // Connect the mesh with the View via indexes
    const info = View_add_mesh(groupidx, mesh);
@@ -242,7 +244,7 @@ if(!mesh.gfx)
    mesh.group_bufferidxs[1] = info[1]; // VB buffers index, which vb buffer the mesh belongs.
    mesh.group_bufferidxs[2] = info[2]; // Mesh's index in the group buffer  .
 
-   if(mesh.text_mesh){
+   if (mesh.text_mesh) {
 
       const text_info = View_add_mesh(groupidx, mesh.text_mesh);
       mesh.text_mesh.group_bufferidxs[0] = text_info[0]; // Groups buffer index.
@@ -260,6 +262,56 @@ if(!mesh.gfx)
 
 }
 
+
+function View_consolidate_buffer(groupidx, group_vbidx) {
+
+
+   const buffer = _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data
+   let leftidx = 0, rightidx = 0;
+   let consolidation_happened = false;
+
+   for (let i = 0; i <= buffer.boundary; i++) {
+
+      if (buffer.buffer[leftidx] === INT_NULL) {
+
+         rightidx++;
+         while (buffer.buffer[rightidx] === INT_NULL && rightidx <= buffer.boundary) {
+
+            rightidx++;
+         }
+
+         const right_mesh = Mesh_buffer_get_mesh_byidx(buffer.buffer[rightidx]);
+         right_mesh.group_bufferidxs[2] = leftidx;
+
+
+         // Move not null elem(right) to null elem(left) 
+         buffer.buffer[leftidx] = buffer.buffer[rightidx];
+         buffer.buffer[rightidx] = INT_NULL;
+
+         consolidation_happened = true;
+
+         if (rightidx >= buffer.boundary) break;
+
+         leftidx++;
+      }
+      else {
+
+         leftidx++;
+         rightidx++;
+      }
+   }
+
+   if (consolidation_happened) {
+
+      buffer.boundary = leftidx;
+      buffer.active_count = buffer.boundary + 1; // Since the buffer is consolidated, the active_count is guaranted to be boundary+1
+   }
+
+   // TODO: When freeidx has been implemented in Buffers.js
+   // IMPORTANT: After consolidation, the buffer's freeidx is not valid
+   // buffer.freeidx = buffer.boundary < buffer.size-1 ? buffer.boundary+1 : INT_NULL;
+   // buffer.freeidx = INT_NULL;
+}
 
 
 
@@ -281,23 +333,14 @@ function Remove_vb_data_from_view_recursive(mesh) {
    const group_vbidx = mesh.group_bufferidxs[1];
    const group_meshidx = mesh.group_bufferidxs[2];
 
-   /**DEBUG*/ if(groupidx===INT_NULL || group_vbidx===INT_NULL || group_meshidx===INT_NULL) console.error('MESH HAS NULL GROUP:', mesh.GetName(), ' mesh group idxs',  mesh.group_bufferidxs)
+   const buffer = _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data;
 
-   // If the last element is removed from .data buffer, the sort_happened is -1, meaning there was no element swap (sorting)
-   const sort_happend = _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data.RemoveByIdxSortedVersion(group_meshidx, mesh.mesh_bufferidx, 'Remove_vb_data_from_view_recursive1');
-   
+   /**DEBUG*/ if (groupidx === INT_NULL || group_vbidx === INT_NULL || group_meshidx === INT_NULL) console.error('MESH HAS NULL GROUP:', mesh.GetName(), ' mesh group idxs', mesh.group_bufferidxs)
+
+   buffer.RemoveByIdx(group_meshidx);
+
    // Update group's num_faces.
    _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].info[VIEW_INFO.NUM_FACES] -= mesh.geom.num_faces;
-
-   // Update the swaped(with the removed mesh) mesh's index. 
-   if(sort_happend !== INT_NULL){
-
-      // CAUTION: Because in the Int16Buffer the .RemoveByyIdx sorts the buffer by replacing the deleted element with the last active,
-      // we must update the mesh's index to the view's new elment location
-      const replacer_idx = _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data.buffer[group_meshidx];
-      const replacer_mesh = Mesh_buffer_get_mesh_byidx(replacer_idx);
-      replacer_mesh.group_bufferidxs[2] = group_meshidx; // Update the mesh's group meshidx with the current removed mesh's group meshidx.
-   }
 
 
    // Set null indexes to mesh
@@ -305,35 +348,26 @@ function Remove_vb_data_from_view_recursive(mesh) {
    mesh.group_bufferidxs[1] = INT_NULL;
    mesh.group_bufferidxs[2] = INT_NULL;
 
-   if(mesh.text_mesh){
+   if (mesh.text_mesh) {
 
       const text_groupidx = mesh.text_mesh.group_bufferidxs[0];
       const text_group_vbidx = mesh.text_mesh.group_bufferidxs[1];
       const text_group_meshidx = mesh.text_mesh.group_bufferidxs[2];
-   
-      /**DEBUG*/ if(text_groupidx===INT_NULL || text_group_vbidx===INT_NULL || text_group_meshidx===INT_NULL) console.error('MESH HAS NULL GROUP:', mesh.text_mesh.GetName(), ' mesh group idxs',  mesh.text_mesh.group_bufferidxs)
-     
-      // If the last element is removed from .data buffer, the sort_happened is -1, meaning there was no element swap (sorting)
-      const sort_happend = _view_buffer.buffer[text_groupidx].vb.buffer[text_group_vbidx].data.RemoveByIdxSortedVersion(text_group_meshidx, mesh.mesh_bufferidx, 'Remove_vb_data_from_view_recursive2');
-      
+
+      /**DEBUG*/ if (text_groupidx === INT_NULL || text_group_vbidx === INT_NULL || text_group_meshidx === INT_NULL) console.error('MESH HAS NULL GROUP:', mesh.text_mesh.GetName(), ' mesh group idxs', mesh.text_mesh.group_bufferidxs)
+
+      _view_buffer.buffer[text_groupidx].vb.buffer[text_group_vbidx].data.RemoveByIdx(text_group_meshidx);
+
       // Update group's num_faces.
       _view_buffer.buffer[text_groupidx].vb.buffer[text_group_vbidx].info[VIEW_INFO.NUM_FACES] -= mesh.text_mesh.geom.num_faces;
-      
-      // Update the swaped(with the removed mesh) mesh's index. 
-      if(sort_happend !== INT_NULL){
-   
-         // CAUTION: Because in the Int16Buffer the .RemoveByyIdx sorts the buffer by replacing the deleted element with the last active,
-         // we must update the mesh's index to the view's new element index
-         const replacer_idx = _view_buffer.buffer[text_groupidx].vb.buffer[text_group_vbidx].data.buffer[text_group_meshidx];
-         const replacer_mesh = Mesh_buffer_get_mesh_byidx(replacer_idx);
-         replacer_mesh.group_bufferidxs[2] = text_group_meshidx; // Update the mesh's group meshidx with the current removed mesh's group meshidx.
-      }
 
-      mesh.text_mesh.group_bufferidxs[0] = INT_NULL; 
-      mesh.text_mesh.group_bufferidxs[1] = INT_NULL; 
-      mesh.text_mesh.group_bufferidxs[2] = INT_NULL; 
+
+      mesh.text_mesh.group_bufferidxs[0] = INT_NULL;
+      mesh.text_mesh.group_bufferidxs[1] = INT_NULL;
+      mesh.text_mesh.group_bufferidxs[2] = INT_NULL;
    }
 }
+
 
 
 
@@ -365,7 +399,18 @@ export function View_remove_from_group(mesh) {
 
    // TODO: check error for wrong 'group_bufferidxs[0]' index. Make sure the group exists
 
+   const groupidx = mesh.group_bufferidxs[0];
+   // const group_vbidx = mesh.group_bufferidxs[1];
+   // const group_meshidx = mesh.group_bufferidxs[2];
+
    Remove_vb_data_from_view_recursive(mesh);
+
+   for (let i = 0; i <= _view_buffer.buffer[groupidx].vb.boundary; i++) {
+
+      const vbidx = _view_buffer.buffer[groupidx].vb.buffer[i].info[0]
+      View_consolidate_buffer(groupidx, i);
+      // console.log('Consolidating View buffer vb:', vbidx)
+   }
 
 }
 
@@ -400,13 +445,17 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
       const starts = mesh.gfx.vb.starts.buffer;
       Vertex_buffer_reset_to_index(vb_groupidx, starts);
 
-      // Lopp for all meshidxs for this vb
-      for(let j=0; j <= view.vb.buffer[i].data.boundary; j++){
-         
+      // Loop for all meshidxs for this vb
+      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++) {
+
          const meshidx = view.vb.buffer[i].data.buffer[j];
-         const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-         if(mesh.state.mask & MESH_STATE.ACTIVE)
-            Mesh_per_vb_remove_mesh(vb_groupidx, mesh.per_vb_bufferidx)
+
+         if (meshidx !== INT_NULL) {
+
+            const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
+            if (mesh.state.mask & MESH_STATE.ACTIVE)
+               Mesh_per_vb_remove_mesh(vb_groupidx, mesh.per_vb_bufferidx)
+         }
       }
    }
 
@@ -416,26 +465,27 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
 
 
 /** Render all group's meshes from all vertex buffers via AddToGfxFromReset()  */
-export function View_render_from_view_all_buffers(view_bufferidx, do_reconstruct_listeners=true) {
-
+export function View_render_from_view_all_buffers(view_bufferidx, do_reconstruct_listeners = true) {
+   // console.log('===========================================================================================================')
    const view = _view_buffer.buffer[view_bufferidx];
 
-   for (let i = 0; i <= view.vb.boundary; i++){ // All vertex buffer groups
-      
-      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){ // Vertex Attribute Buffering.
-         
+   for (let i = 0; i <= view.vb.boundary; i++) { // All vertex buffer groups
+
+      // console.log('view', i, view.vb.buffer[i].info, view.vb.buffer[i].data)
+      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++) { // Vertex Attribute Buffering.
+
          const meshidx = view.vb.buffer[i].data.buffer[j];
-         if(meshidx !== INT_NULL){
+         if (meshidx !== INT_NULL) {
 
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-            if (mesh.state.mask & MESH_STATE.ACTIVE) { 
-   
-               mesh.AddToGfx(); 
+            if (mesh.state.mask & MESH_STATE.ACTIVE) {
+
+               mesh.AddToGfx();
             }
          }
       }
    }
-   
+
    // Get the root mesh
    // const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
    // const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
@@ -450,26 +500,26 @@ export function View_render_from_view_all_buffers(view_bufferidx, do_reconstruct
 
 
 /** Render all group's meshes from all vertex buffers via AddToGfxFromReset()  */
-export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstruct_listeners=true) {
+export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstruct_listeners = true) {
 
    const view = _view_buffer.buffer[view_bufferidx];
 
-   for (let i = 0; i <= view.vb.boundary; i++){ // All vertex buffer groups
-      
-      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){ // Vertex Attribute Buffering.
-         
+   for (let i = 0; i <= view.vb.boundary; i++) { // All vertex buffer groups
+
+      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++) { // Vertex Attribute Buffering.
+
          const meshidx = view.vb.buffer[i].data.buffer[j];
-         if(meshidx !== INT_NULL){
+         if (meshidx !== INT_NULL) {
 
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-            if (mesh.state.mask & MESH_STATE.ACTIVE) { 
-   
-               mesh.AddToGfxFromReset(); 
+            if (mesh.state.mask & MESH_STATE.ACTIVE) {
+
+               mesh.AddToGfxFromReset();
             }
          }
       }
    }
-   
+
    // Get the root mesh
    const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
    const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
@@ -507,12 +557,16 @@ export function View_movey_group(view_bufferidx, ydif) {
 
    const view = _view_buffer.buffer[view_bufferidx];
 
-   for (let i = 0; i <= view.vb.boundary; i++){
+   for (let i = 0; i <= view.vb.boundary; i++) {
 
-      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++){
+      for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++) {
 
-         const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[j]);
-         mesh.geom.pos[1] += ydif; 
+         const meshidx = view.vb.buffer[i].data.buffer[j];
+
+         if (meshidx !== INT_NULL) {
+            const mesh = Mesh_buffer_get_mesh_byidx(view.vb.buffer[i].data.buffer[j]);
+            mesh.geom.pos[1] += ydif;
+         }
       }
    }
 }

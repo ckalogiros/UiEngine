@@ -386,7 +386,7 @@ class Vertex_Buffer_Group {
 
         this.has_scissorbox = false;
         this.scissorbox = [0, 0, 0, 0];
-        this.scissorbox_meshidx = [INT_NULL, INT_NULL, INT_NULL, INT_NULL]; // Store the mesh index for retrieving scissorbox values
+        this.scissorbox_meshidx = new Int16Array([INT_NULL, INT_NULL, INT_NULL, INT_NULL]); // Store the mesh index for retrieving scissorbox values
 
 
         this.render_queueidx = INT_NULL; // index to the Render queue buffer of the current vb 
@@ -397,20 +397,32 @@ class Vertex_Buffer_Group {
 
     }
 
-    CreateScissorBox(mx, my, mw, mh) {
+    CreateScissorBoxByMeshIdx(mx, my, mw, mh) {
         this.scissorbox_meshidx[0] = mx;
         this.scissorbox_meshidx[1] = my;
         this.scissorbox_meshidx[2] = mw;
         this.scissorbox_meshidx[3] = mh;
         this.has_scissorbox = true;
     }
-
+    
     SetScissorBox(x, y, w, h) {
         this.scissorbox[0] = x;
         this.scissorbox[1] = y;
         this.scissorbox[2] = w;
         this.scissorbox[3] = h;
-
+        this.has_scissorbox = true;
+    }
+    
+    ResetScissorBox() {
+        this.scissorbox[0] = 0;
+        this.scissorbox[1] = 0;
+        this.scissorbox[2] = 0;
+        this.scissorbox[3] = 0;
+        this.scissorbox_meshidx[0] = INT_NULL;
+        this.scissorbox_meshidx[1] = INT_NULL;
+        this.scissorbox_meshidx[2] = INT_NULL;
+        this.scissorbox_meshidx[3] = INT_NULL;
+        this.has_scissorbox = false;
     }
 }
 
@@ -481,6 +493,11 @@ export function Vertex_buffer_group_set_texidx(vb_groupidx, texidx) {
 
 
 
+export function Vertex_buffer_group_set_mesh_debug_name(vb_groupidx, name) {
+    _vertex_buffer_groups.buffer[vb_groupidx].name = name;
+}
+
+
 export function Vertex_buffer_group_get_texidx(vb_groupidx) {
     return _vertex_buffer_groups.buffer[vb_groupidx].texidx;
 }
@@ -501,7 +518,7 @@ export function Vertex_buffer_group_set_render_queueidx(vb_groupidx, render_queu
 
 /** Pass the mesh.bufferidx index of the meshes that the scissor box will draw values from. [posx, posy, width, height] */
 export function Vertex_buffer_group_create_scissorbox(vb_groupidx, mx, my, mw, mh) {
-    _vertex_buffer_groups.buffer[vb_groupidx].CreateScissorBox(mx, my, mw, mh);
+    _vertex_buffer_groups.buffer[vb_groupidx].CreateScissorBoxByMeshIdx(mx, my, mw, mh);
     Vertex_buffer_group_update_scissorbox(vb_groupidx);
 }
 
@@ -600,7 +617,8 @@ export function Vertex_buffer_group_has_scissorbox(vb_groupidx) {
 
 
 export function Vertex_buffer_group_remove_scissorbox(vb_groupidx) {
-    _vertex_buffer_groups.buffer[vb_groupidx].has_scissorbox = false;
+    _vertex_buffer_groups.buffer[vb_groupidx].ResetScissorBox();
+    // _vertex_buffer_groups.buffer[vb_groupidx].has_scissorbox = false;
 }
 
 
@@ -920,7 +938,7 @@ export function Vertex_buffer_reset(vb_groupidx, starts) {
  * The index buffer pattern ({123, 234} or fan{12,13,14,15})
  * probably will be dectating the vertex buffer build function,
  * as to how the attributes of a mesh(pos, dim, ...)
- * are gonna be stored inside the veertex buffer.
+ * are gonna be stored inside the vertex buffer.
  */
 export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_mesh_name) {
 
@@ -1220,6 +1238,8 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
 
             // Remove any uniform callback functions
             Vertex_buffer_remove_uniforms(gfx.vb.groupidx);
+
+            Vertex_buffer_group_remove_scissorbox(gfx.vb.groupidx)
 
         }
         else vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;

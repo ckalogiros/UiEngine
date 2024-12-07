@@ -17,7 +17,7 @@ import { Material, Texture_Material } from "../Material/Base/Material.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
-import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_set_in_focus } from "../../Core/Views/RootView.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_reset_gfxs, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_resize_and_rerender } from "../../Core/Views/RootView.js";
 import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 
@@ -583,7 +583,7 @@ export class Section extends Mesh {
 
          const intervalIdx = root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          Time_intervals_destroy_byidx(intervalIdx);
-         root.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+         root.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
 
          return;
       }
@@ -652,7 +652,7 @@ export class Section extends Mesh {
          alert('4177834776439 \nIssue with timeInterval\nPossible error: We overloaded the time intervals buffer\nThe buffer currently holds up to two intervals\nINTERVALS.UPDATE and INTERVALS.MOVE\nTry to dissable mesh Move event')
       }
       Time_intervals_destroy_byidx(intervalIdx);
-      this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(idx);
+      this.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(idx);
    }
 
 
@@ -994,7 +994,7 @@ export function Section_on_move_clbk(params) {
 
       const intervalIdx = section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       Time_intervals_destroy_byidx(intervalIdx);
-      section.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.MOVE);
+      section.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
 
       return;
    }

@@ -260,7 +260,7 @@ export class Mesh {
                 const intervalIdx = this.timeIntervalsIdxBuffer.buffer[i];
                 if (intervalIdx !== INT_NULL) {
                     Time_intervals_destroy_byidx(intervalIdx);
-                    this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(i);
+                    this.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(i);
                 }
             }
         }

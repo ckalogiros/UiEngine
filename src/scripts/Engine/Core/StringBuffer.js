@@ -177,9 +177,9 @@ export function Str_buffer_mesh_names_remove_by_idx(nameidx) {
    if(NOTIFICATIONS_ON) 
       Notifications_send(NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, _str_buffer_mesh_names_index_buffer.buffer[nameidx]);
 
-   _str_buffer_mesh_names.RemoveByIdxSortedVersion(nameidx);
+   _str_buffer_mesh_names.RemoveByIdxNoGapsVersion(nameidx);
 
-   _str_buffer_mesh_names_index_buffer.RemoveByIdxSortedVersion(nameidx);
+   _str_buffer_mesh_names_index_buffer.RemoveByIdxNoGapsVersion(nameidx);
    
    // Get the mesh index. 
    const replacer_meshidx = _str_buffer_mesh_names_index_buffer.buffer[nameidx];

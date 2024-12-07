@@ -3,27 +3,21 @@
 
 
 import { Callback_animations_create } from '../../Engine/Animations/CallbackAnimations.js';
-import { Mesh_animations_create } from '../../Engine/Animations/MeshAnimations.js';
-import { Create_rect_mesh, Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
+import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx } from '../../Engine/Core/MeshBuffer.js';
 import { View_build_group_from_root_mesh } from '../../Engine/Core/Views/MeshBufferViews.js';
-import { Mesh_unif_add_vb_root_wposx, Mesh_unif_add_vb_root_wposy, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from '../../Engine/Core/MeshUniformsBuffer.js';
-import { Root_group_activate_all_vbs_in_renderqueue, Root_group_set_render_queue_priority } from '../../Engine/Core/Views/RootView.js';
-import { BLACK, BLUEL, GREEN, GREENL, GREY, Interpolate_rgb_to_01, MAGENTA, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
+import { Mesh_unif_add_vb_root_wposx, Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx } from '../../Engine/Core/MeshUniformsBuffer.js';
+import { Root_group_activate_all_vbs_in_renderqueue } from '../../Engine/Core/Views/RootView.js';
+import { BLACK, BLUEL, GREEN, GREY, Interpolate_rgb_to_01, PURPLE, PURPLEB, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
 import { Mesh_get_uniform_ubidx_from_name } from '../../Engine/Drawables/Operations/MeshHelperFunctions.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Drawables/Operations/Recursions.js';
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Slider_connect, Slider_get_slider_val } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
+import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../../Engine/Drawables/Widgets/WidgetSwitch.js';
-import { Listeners_set_priority } from '../../Engine/Events/EventListeners.js';
 import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gen_gfx_ctx } from '../../Engine/ParticlesSystem/ParticlesSystem.js';
-import { Renderqueue_set_priority_by_vb } from '../../Engine/Renderers/Renderer/RenderQueue.js';
 import { Time_intervals_create } from '../../Engine/Timers/TimeIntervals.js';
 import { Timer_get_global_timer, TimerGetGlobalTimerCycle } from '../../Engine/Timers/Timers.js';
-import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from '../../Graphics/Buffers/VertexBuffers.js';
-import { Gl_set_rgba } from '../../Graphics/Buffers/VertexBuffersOps.js';
-import { GetRandomPos, GetSequencedColor } from '../../Helpers/Helpers.js';
+import { Vertex_buffer_set_and_update_uniform } from '../../Graphics/Buffers/VertexBuffers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
 import { Demo_widgets_colorpicker } from './DemoWidgets.js';
 import { Linear_interpolation } from '../../Helpers/Math/MathFunctions.js';
@@ -225,14 +219,15 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    }
 
 
-
+   controls_section.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
+   // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
 
 
    /****************************************************************************************************************/
    // Render 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
-      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
+      // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
       // controls_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
       controls_section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
@@ -571,8 +566,9 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
 
    const emitter1_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .006, 1, 4, .98, .1, 4, _, num_particles_per_frame);
    const emitter = Particles_get_particle_system(emitter1_idx);
-   emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
-   emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:4, jiggley:3});
+   // emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+   emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
+   // emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:2, jiggley:1});
    // emitter.EnableProperties(PARTICLES.HAS_SCALE, 10);
 
    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
@@ -750,14 +746,14 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    }
 
 
-
+   controls_section.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
 
 
    /****************************************************************************************************************/
    // Render 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
-      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
+      // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
       // controls_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
       controls_section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
@@ -1081,9 +1077,10 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
 
       const scale = 2.;
       const particles_size = dim[1] * scale;
-      // const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 0.01, 1, _, _, _, 8, _, 1);
+      // const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 0.005, 1, _, _, _, 8, _, 1);
       const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 0.015, 1, _, _, _, 4, _, 1);
       const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
+      // tail_emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
       // tail_emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
       // tail_emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:10, jiggley:10});
       
@@ -1097,7 +1094,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       
       
-      
+      // tail_emitter.SetConeOfDirection(-1, 1, 1, -1);
       
       
       
@@ -1315,6 +1312,9 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
 
    }
 
+   controls_section.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
+
+
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
@@ -1466,6 +1466,7 @@ export function Create_comet_noise_contols(noise_particles_buffer, color = GREY[
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
          slider.SetInitialValue(parameters?parameters[3]:.12);
+         // slider.SetInitialValue(parameters?parameters[3]:.05);
          slider.SetName('Noise Complexity');
          contols_buffer.push(slider);
 
@@ -1665,6 +1666,7 @@ function Animate_comet(params) {
       // Move the ball
       const variation = TimerGetGlobalTimerCycle() * .3 + .5;
       const x = dir[0] * tail_emitter.speed * variation;
+      // const x = dir[0] * tail_emitter.speed * .5;
       const y = dir[1] * tail_emitter.speed * .5;
 
       ball.geom.AddWposXY(ball.gfx, x, y);
@@ -1902,7 +1904,29 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget=ROOT_WIDGETS.CR
 
    const zpos = -1
 
-   { // Create emitt panel
+   { // Create emitt 
+      const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10,10], [x, y, zpos + 1], [0, 0], YELLOWL[4], 'glow_emitter_panel');
+      panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
+      panel.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+      controls_section.AddItem(panel);
+      
+      const emitt_btn = Create_widget_button(_,  'Emitt', _,  [0, 0, 1], 10, YELLOWR[8], _, [6, 4]);
+      emitt_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      emitt_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      emitt_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+      // emitt_btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+      emitt_btn.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      emitt_btn.SetName('glow_emitter_switch');
+      panel.AddItem(emitt_btn);
+      
+      const evt_params = { target_params: [emitter.idx] };
+      emitt_btn.Bind(Particle_system_emitt, _, evt_params);
+      emitt_btn.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+   }
+   { // Create emitt continuous
       const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10,10], [0, 0, zpos + 1], [0, 0], YELLOWL[4], 'glow_emitter_panel');
       panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
@@ -2023,6 +2047,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget=ROOT_WIDGETS.CR
 
 
 
+   controls_section.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
 
 
 

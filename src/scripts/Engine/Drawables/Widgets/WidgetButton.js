@@ -117,7 +117,7 @@ export class Widget_Button extends Widget_Label {
          alert('417772839 \nIssue with timeInterval\nPossible error: We overloaded the time intervals buffer\nThe buffer currently holds up to two intervals\nINTERVALS.UPDATE and INTERVALS.MOVE\nTry to dissable mesh Move event')
       }
       Time_intervals_destroy_byidx(intervalIdx);
-      this.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(idx);
+      this.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(idx);
    }
 
 
