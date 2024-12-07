@@ -971,8 +971,6 @@ TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_16px;
 
 
 
-const MENU_FONT_IDX = TEXTURES.MSDF_CONSOLAS_1024; // Set the font for the options menu
-const MENU_FONT_SIZE = 4; // Set the font size for the options menu
 
 
 

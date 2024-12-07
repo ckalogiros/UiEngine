@@ -14,7 +14,8 @@ import { CONSOLAS_24Hpx } from '../../../../../resources/fonts/consolas_6/metric
 import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metrics/consolas_7.js';
 import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
 import { consola_msdf_test_1024_metrics } from '../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js';
-import { Load_msdf_font_metrics } from './ChlumskyFontMetricsLoader.js';
+import { Load_msdf_font_metrics, Load_msdf_font_metrics_new } from './ChlumskyFontMetricsLoader.js';
+import { CONSOLAS_MSDF_FONT_METRICS } from '../../../../../resources/fonts/consolas_sdf/consola_msdf__metrics_temp.js';
 
 
 
@@ -54,6 +55,7 @@ export function Font_texture_images_init_metrics_files() {
 	TEXTURE_PATHS[counter++].metrics = CONSOLAS_116Hpx;
 	TEXTURE_PATHS[counter++].metrics = CONSOLAS_157Hpx;
 	TEXTURE_PATHS[counter++].metrics = consola_msdf_test_1024_metrics;
+	// TEXTURE_PATHS[counter++].metrics = CONSOLAS_MSDF_FONT_METRICS;
 	TEXTURE_PATHS[counter++].metrics = comic_sans_cz;
 	// TEXTURE_PATHS[counter++].metrics = comic_sans_ms_gras;
 }
@@ -73,6 +75,7 @@ function Font_get_metrics_by_texid(texture_id){
       case TEXTURES.CONSOLAS_116px: return CONSOLAS_116Hpx;
       case TEXTURES.CONSOLAS_157px: return CONSOLAS_157Hpx;
       case TEXTURES.MSDF_CONSOLAS_1024: return consola_msdf_test_1024_metrics;
+      // case TEXTURES.MSDF_CONSOLAS_1024: return CONSOLAS_MSDF_FONT_METRICS;
       case TEXTURES.MSDF_COMIC_1024: return comic_sans_cz;
       default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_id:', texture_id);
    }
@@ -198,16 +201,10 @@ export function Font_load_uvs(textureid) {
 
 	if(textureid === TEXTURES.MSDF_CONSOLAS_1024) {
 		
-		const msdf_uvmap = Load_metrics_msdf(font_idx, textureid);
-		// Load_metrics_msdf(font_idx, textureid);
-		// _fontsUvMap[font_idx] = msdf_uvmap;
-		Create_uv_map(font_idx);
-		// {
-		// 	imgPath: 'fonts/consolas_3',
-		// 	imgName: FONT_CONSOLAS_12px,
-		// 	imgType: 'bmp',
-		// 	metrics: null, 
-		// },
+		// const msdf_uvmap = Load_metrics_msdf(font_idx, textureid);
+		const msdf_uvmap = Load_msdf_font_metrics_new(textureid);
+		Create_uv_map_msdf(font_idx, msdf_uvmap);
+
 		console.log(
 			'==========================================================================',
 			'Load Font:', TEXTURE_PATHS[textureid].imgName,
@@ -221,8 +218,11 @@ export function Font_load_uvs(textureid) {
 		)
 		Load_metrics(font_idx, textureid);
 		Create_uv_map(font_idx);
-
+		
 	}
+
+	// Load_metrics(font_idx, textureid);
+	// Create_uv_map(font_idx);
 	
 	return font_idx;
 }
@@ -359,6 +359,40 @@ function Load_metrics(font_idx, textureid) {
 
 
 
+function Create_uv_map_msdf(font_idx, msdf_uvmap) {
+
+	const atlas = msdf_uvmap.atlas_bounds; 
+	const plane = msdf_uvmap.plane_bounds; 
+	const tex = msdf_uvmap.texture; 
+
+	const uvmap = _fontsUvMap[font_idx];
+
+	let transormedU = 1.0 / tex.width;	// Transform to 0-1 coords
+	let transormedV = 1.0 / tex.height;	// Transform to 0-1 coords
+
+
+	const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
+	const len = atlas.length;
+	for (let j = 0; j < len; j++) {
+		
+		const left = atlas[j].left;
+		const right = atlas[j].right;
+		const top = atlas[j].left;
+		const bottom = atlas[j].bottom;
+		
+		// and store them to the uvmap
+		uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new uvs for each character
+		uvmap[j][U1] = transormedU * left;
+		uvmap[j][U2] = transormedU * right;
+		uvmap[j][V1] = transormedV * top;
+		uvmap[j][V2] = transormedV * bottom;
+		
+	}
+
+	if(DEBUG.UVS){ console.log('uvmap:', uvmap); }
+	
+	return uvmap;
+}
 function Create_uv_map(font_idx) {
 
 	const metrics = _fontMetricsBuffer[font_idx]; 

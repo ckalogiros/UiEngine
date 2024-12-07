@@ -910,8 +910,8 @@ export function TestWidgetsGeneric(createId = 1) {
 
     { // Widget: Label-buttons
 
-        // CreateLabel(_, 'A', TEXTURES.MSDF_CONSOLAS_1024, 0, 250);
-        CreateLabel(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250);
+        CreateLabel(_, 'A', TEXTURES.MSDF_CONSOLAS_1024, 300, 250);
+        // CreateLabel(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250);
 
         // !\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
         // CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_28px, 0, 250);
