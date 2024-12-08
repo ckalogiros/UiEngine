@@ -1,6 +1,8 @@
 "use strict";
 
-import { consola_msdf_test_1024_metrics } from "../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics";
+import { consola_msdf_test_1024_metrics } from "../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js";
+// import { comicz_msdf_1024_metrics } from "../../../../../resources/fonts/comic_sans_ms/comicz.js";
+import { Abs } from "../../../Helpers/Math/MathOperations";
 
 
 const _font_metrics_buffer = [];
@@ -101,8 +103,33 @@ export function Parse_json_metrics(json_metrics_object){
          height:  m.height,
       };
 
+      console.log(
+         // String.fromCharCode(glyphs[0].unicode), 
+         String.fromCharCode(i + CHAR_ARRAY_START_OFFSET), 
+         // 'asc+desc', 
+         // 'top-bot', plane_bounds[i].top-plane_bounds[i].bottom,
+         'top', plane_bounds[i].top,
+         'bot', plane_bounds[i].bottom,
+         'top+bot', Abs(plane_bounds[i].top)+(plane_bounds[i].bottom),
+         'height', plane_bounds[i].height,
+      )
    }
 
+   console.log('-------------------\n', 
+      'asc', ascender, 
+      '\ndesc', descender
+   )
+   console.log('-------------------\n', Abs(ascender) + Abs(descender))
+   console.log('-------------------\n', Abs(ascender) - Abs(descender))
+   console.log('-------------------\n', obj.metrics.lineHeight - (Abs(ascender) + Abs(descender)))
+   console.log('------------------- baseline\n', 
+      descender + (obj.metrics.lineHeight - (Abs(ascender) + Abs(descender))/2)
+   )
+   console.log('-------------------\n',
+      'top: 0',  
+      'base:', -ascender ,
+      'bottom', (-ascender)+descender ,
+   )
    console.log('------------------- metrics:', _font_metrics_buffer)
 
    return {
@@ -115,9 +142,10 @@ export function Parse_json_metrics(json_metrics_object){
          height      : texture_height, 
          line_height : obj.metrics.lineHeight,
          ascender    : obj.metrics.ascender,
-         descender   : obj.metrics.descender,
+         descender   : descender,
          advance     : advance, // For monospace fonts
-
+         linespace   : obj.metrics.ascender - descender, // + linegap
+         baseline    : obj.metrics.lineHeight - (obj.metrics.ascender - descender), // + linegap
       },
    }
 }
@@ -148,7 +176,7 @@ export function Font_get_atlas_texture_metrics(fontIdx) {
 
 
 
-export function Font_get_font_ratio(fontIdx) {
+export function Font_get_font_line_height(fontIdx) {
 	return _font_metrics_buffer[fontIdx].texture.line_height;
 }
 
@@ -157,8 +185,40 @@ export function Font_get_font_ratio(fontIdx) {
 export function Font_get_font_advancex(fontIdx) {
 	return _font_metrics_buffer[fontIdx].texture.advance;
 }
+export function Font_get_font_ascender(fontIdx) {
+	return _font_metrics_buffer[fontIdx].texture.ascender;
+}
+export function Font_get_font_descender(fontIdx) {
+	return _font_metrics_buffer[fontIdx].texture.descender;
+}
 
-
+/**
+   left:    glyphs[i].planeBounds.left,
+   right:   glyphs[i].planeBounds.right,
+   top:     glyphs[i].planeBounds.top,
+   bottom:  glyphs[i].planeBounds.bottom,
+   width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
+   height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
+   yoffset: -((ascender-glyphs[i].planeBounds.top)+(descender-glyphs[i].planeBounds.bottom)) * scale,
+ */
+export function Font_get_char_atlas_bounds_width(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width;
+}
+export function Font_get_char_atlas_bounds_height(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].height;
+}
+export function Font_get_char_atlas_bounds_left(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].left;
+}
+export function Font_get_char_atlas_bounds_right(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].right;
+}
+export function Font_get_char_atlas_bounds_top(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].top;
+}
+export function Font_get_char_atlas_bounds_bottom(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].bottom;
+}
 
 // export function Font_calculate_string_width(str, fontidx, fontsize){
 

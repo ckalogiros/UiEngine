@@ -19,7 +19,7 @@ export class Geometry2D_Text extends Geometry2D {
       if (texidx !== INT_NULL) {
          
          // advancex = Font_get_font_advancex(texidx);
-         // var char_ratio = Font_get_font_ratio(texidx);
+         // var char_ratio = Font_get_font_line_height(texidx);
          pos[0] += fontSize; // Case pos is set to 0, then we must add half text face width.
       }
       let dim = [0, 0]

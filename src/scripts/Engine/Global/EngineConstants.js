@@ -589,6 +589,7 @@ const FONT_CONSOLAS_SDF_SMALL = 'consolas_sdf_2048w';
 const COMIC_FONT_METRICS_PATH = '../../../../resources/fonts/consolas_sdf/metrics/consolas_sdf35.txt'
 const TEST_MSDF_FONT_1 = 'msdf_a_char';
 const TEST_MTSDF_FONT_TEST_1024DIM = 'consola_mtsdf_test_1024';
+const comicz_msdf_1024_img = 'comicz';
 
 
 
@@ -602,6 +603,11 @@ const TEXTURE_PATHS = [
 	{
 		imgPath: 'fonts/consolas_sdf',
 		imgName: TEST_MTSDF_FONT_TEST_1024DIM,
+		imgType: 'png',
+	},
+	{
+		imgPath: 'fonts/comic_sans_ms',
+		imgName: comicz_msdf_1024_img,
 		imgType: 'png',
 	},
 ];
@@ -618,6 +624,7 @@ const TEXTURES = {
 	// POTENTIAL_BUG: 
 	// IMPORTANT:Font textures MUST precede all other textures
 	MSDF_CONSOLAS_1024: g_cnt++,
+	MSDF_TEST_1024: g_cnt++,
 	FONT_COUNT: g_cnt,
 
 	COUNT: g_cnt,

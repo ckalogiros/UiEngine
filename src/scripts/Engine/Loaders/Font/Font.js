@@ -1,5 +1,7 @@
 "use strict";
 import { COMIC_FONT_METRICS } from './ComicFontMetrics.js'
+// import { comicz_msdf_1024_metrics } from './comicz.js'
+
 
 
 
@@ -121,7 +123,8 @@ function LoadMetrics(metricsBuffer) {
 	const metrics = metricsBuffer[idx];
 
 	const file = { content: '', name: '', pos: filePos, size: 0, };
-	file.content = COMIC_FONT_METRICS; // IMIDIATELY: Load the metrics automaticaly (from a buffer of fileNames)
+	file.content = COMIC_FONT_METRICS;
+	// file.content = comicz_msdf_1024_metrics;
 	file.size = file.content.length;
 
 
@@ -230,6 +233,8 @@ function Create_uv_map(metrics, uvmap) {
 	}
 
 	if(DEBUG.UVS){ console.log('uvmap:', uvmap); }
+
+	console.log('=============================\nuvmap:', uvmap)
 	
 	return uvmap;
 }
