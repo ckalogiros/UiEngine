@@ -52,7 +52,7 @@ export class Widget_Label extends Rect {
         pos[2] += 1; // Text in front of the label's area.
 
         /** Label tex mesh */
-        const text_mesh = Create_text_mesh(text, pos, fontSize, text_col);
+        const text_mesh = Create_text_mesh(text, pos, fontSize, text_col, font);
 
         pos[2] -= 1; // Set z for area 'behind' this.text_mesh
 

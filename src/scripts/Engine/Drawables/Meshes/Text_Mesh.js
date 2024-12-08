@@ -21,7 +21,7 @@ export class Text_Mesh extends Mesh {
    advancex; // The advancex is a ratio with which we calculate the correct width of any text
    last_charidx; // An index to the last char of each state of the current text.(dynamic text changes, so it is good to always have the last char).
 
-   constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.MSDF_CONSOLAS_1024, scale = [1, 1]) {
+   constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, font = TEXTURES.MSDF_CONSOLAS_1024, bold = 4, scale = [1, 1]) {
 
       const sdfouter = CalculateSdfOuterFromDim(fontsize);
       if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -34,7 +34,7 @@ export class Text_Mesh extends Mesh {
 
       this.type |= MESH_TYPE.TEXT_MESH;
       this.fontsize = fontsize;
-      this.advancex = Font_get_font_advancex(font);
+      this.advancex = Font_get_font_advancex(mat.texidx);
    }
 
 
@@ -94,11 +94,12 @@ export class Text_Mesh extends Mesh {
       const face_count = this.mat.text.length; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
       const space_char_uv = Font_get_char_uv_coords(this.mat.uvIdx, ' ');
 
-      let prev_half_dim_x = 0;
+      // let posx = ((plane_bounds.width * ratio) * size) + left_offset;
       let posx = 0;
       const ratio = 1/advancex; // Normalize advance
 
-      prev_half_dim_x = geom_copy.dim[0];
+
+      geom_copy.pos[0] = 130;
 
       const size = this.geom.dim[0];
 
@@ -109,6 +110,7 @@ export class Text_Mesh extends Mesh {
          
          const plane_bounds = Font_get_char_plane_bounds(this.mat.uvIdx, this.mat.text[i]);
          const left_offset = (plane_bounds.left * ratio) * size;
+         const top_offset = (plane_bounds.top * ratio) * size;
 
 
          if (this.mat.text[i]) { // If there is a text, get char uv and metrics
@@ -122,8 +124,15 @@ export class Text_Mesh extends Mesh {
             geom_copy.dim[0] = (plane_bounds.width * size);
             geom_copy.dim[1] = plane_bounds.height * size;
             geom_copy.pos[1] += plane_bounds.yoffset * size;
+            // geom_copy.pos[1] += top_offset;
             
          }
+
+         console.log(
+            'char', this.mat.text[i],
+            'dim', geom_copy.dim,
+            'pos', geom_copy.pos,
+         );
          
          
          if (i === 0) {
@@ -144,10 +153,6 @@ export class Text_Mesh extends Mesh {
          geom_copy.pos[1] = this.geom.pos[1];
 
       }
-
-      // BUG: If one text has by mistake a different 'this.mat.uvIdx', then the vb will store that uv-map index. Cause a vertex buffer may use only one texture.
-      Vertex_buffer_set_texidx(this.gfx.vb.idx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
-
 
       this.is_gfx_inserted = true;
 

@@ -1,4 +1,4 @@
-const comicz_msdf_1024_metrics = `
+export const comicz_msdf_1024_metrics = `
 {
    "atlas": {
       "type": "mtsdf",

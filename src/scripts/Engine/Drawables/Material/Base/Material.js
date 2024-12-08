@@ -131,13 +131,13 @@ export class FontMaterial extends Material {
    text;
    sdf_params;
 
-   constructor(col = [1,1,1,1], texidx=INT_NULL, text='', sdf_params = [.5,.5]) {
+   constructor(col = [1,1,1,1], texid=INT_NULL, text='', sdf_params = [.5,.5]) {
 
-      super(col, texidx);
+      super(col, texid);
       this.text = text;
       this.sdf_params = [0, 0];
       math.CopyArr2(this.sdf_params, sdf_params);
-      this.texidx = texidx;
+      // this.texidx = texid;
       
       this.sid.shad |= SID.SHAD.PRE_MULTIPLIED_ALPHA; // E
       this.sid.attr |= SID.ATTR.TEX2; // 
@@ -145,7 +145,7 @@ export class FontMaterial extends Material {
       this.type |= MESH_TYPE.FONT_MATERIAL;
       
       // Load texture and uv map, via indexes to the actual buffers
-      const tex_idxs = Texture_load_texture_byid(this.texidx, TEXTURE_TYPE.TYPE_FONT);
+      const tex_idxs = Texture_load_texture_byid(texid, TEXTURE_TYPE.TYPE_FONT);
       this.texidx = tex_idxs.texidx;
       this.uvIdx = tex_idxs.uvmapidx;
       

@@ -1,5 +1,6 @@
 "use strict";
 
+import { comicz_msdf_1024_metrics } from "../../../../../resources/fonts/comic_sans_ms/comicz.js";
 import { consola_msdf_test_1024_metrics } from "../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js";
 // import { comicz_msdf_1024_metrics } from "../../../../../resources/fonts/comic_sans_ms/comicz.js";
 import { Abs } from "../../../Helpers/Math/MathOperations";
@@ -12,6 +13,7 @@ let _font_metrics_buffer_count = 0;
 function Font_get_metrics_by_texid(texture_id){
    switch(texture_id){
       case TEXTURES.MSDF_CONSOLAS_1024: return consola_msdf_test_1024_metrics;
+      case TEXTURES.MSDF_COMIC_1024: return comicz_msdf_1024_metrics;
       default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_id:', texture_id);
    }
 }
@@ -50,7 +52,8 @@ export function Parse_json_metrics(json_metrics_object){
    const descender   = obj.metrics.descender;
    const ascender    = obj.metrics.ascender;
 
-   const scale = 1.18; // A value that works at aligning the yoffset position for the mtsdf font texture(by Chlumsky) characters.(Probably I am missing something!!)
+   // const scale = obj.metrics.lineHeight; // A value that works at aligning the yoffset position for the mtsdf font texture(by Chlumsky) characters.(Probably I am missing something!!)
+   const scale = 1; // A value that works at aligning the yoffset position for the mtsdf font texture(by Chlumsky) characters.(Probably I am missing something!!)
 
    const uvmap = [];
    uvmap[0] = [0.0, 0.0, 0.0, 0.0];          // Set for space character
@@ -104,10 +107,7 @@ export function Parse_json_metrics(json_metrics_object){
       };
 
       console.log(
-         // String.fromCharCode(glyphs[0].unicode), 
          String.fromCharCode(i + CHAR_ARRAY_START_OFFSET), 
-         // 'asc+desc', 
-         // 'top-bot', plane_bounds[i].top-plane_bounds[i].bottom,
          'top', plane_bounds[i].top,
          'bot', plane_bounds[i].bottom,
          'top+bot', Abs(plane_bounds[i].top)+(plane_bounds[i].bottom),
@@ -115,22 +115,24 @@ export function Parse_json_metrics(json_metrics_object){
       )
    }
 
-   console.log('-------------------\n', 
-      'asc', ascender, 
-      '\ndesc', descender
-   )
-   console.log('-------------------\n', Abs(ascender) + Abs(descender))
-   console.log('-------------------\n', Abs(ascender) - Abs(descender))
-   console.log('-------------------\n', obj.metrics.lineHeight - (Abs(ascender) + Abs(descender)))
-   console.log('------------------- baseline\n', 
-      descender + (obj.metrics.lineHeight - (Abs(ascender) + Abs(descender))/2)
-   )
-   console.log('-------------------\n',
-      'top: 0',  
-      'base:', -ascender ,
-      'bottom', (-ascender)+descender ,
-   )
-   console.log('------------------- metrics:', _font_metrics_buffer)
+   { // Debug-Print
+      console.log('-------------------\n', 
+         'asc', ascender, 
+         '\ndesc', descender
+      )
+      console.log('-------------------\n', Abs(ascender) + Abs(descender))
+      console.log('-------------------\n', Abs(ascender) - Abs(descender))
+      console.log('-------------------\n', obj.metrics.lineHeight - (Abs(ascender) + Abs(descender)))
+      console.log('------------------- baseline\n', 
+         descender + (obj.metrics.lineHeight - (Abs(ascender) + Abs(descender))/2)
+      )
+      console.log('-------------------\n',
+         'top: 0',  
+         'base:', -ascender ,
+         'bottom', (-ascender)+descender ,
+      )
+      console.log('------------------- metrics:', _font_metrics_buffer)
+   }
 
    return {
       uvmap       : uvmap,
@@ -193,13 +195,41 @@ export function Font_get_font_descender(fontIdx) {
 }
 
 /**
-   left:    glyphs[i].planeBounds.left,
-   right:   glyphs[i].planeBounds.right,
-   top:     glyphs[i].planeBounds.top,
-   bottom:  glyphs[i].planeBounds.bottom,
-   width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
-   height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
-   yoffset: -((ascender-glyphs[i].planeBounds.top)+(descender-glyphs[i].planeBounds.bottom)) * scale,
+   plane_bounds[i]:
+      left:    glyphs[i].planeBounds.left,
+      right:   glyphs[i].planeBounds.right,
+      top:     glyphs[i].planeBounds.top,
+      bottom:  glyphs[i].planeBounds.bottom,
+      width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
+      height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
+ */
+export function Font_get_char_plane_bounds_width(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width;
+}
+export function Font_get_char_plane_bounds_height(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].height;
+}
+export function Font_get_char_plane_bounds_left(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].left;
+}
+export function Font_get_char_plane_bounds_right(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].right;
+}
+export function Font_get_char_plane_bounds_top(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].top;
+}
+export function Font_get_char_plane_bounds_bottom(fontIdx, ch) {
+	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].bottom;
+}
+/**
+   atlas_bounds[i]:
+      left:    glyphs[i].planeBounds.left,
+      right:   glyphs[i].planeBounds.right,
+      top:     glyphs[i].planeBounds.top,
+      bottom:  glyphs[i].planeBounds.bottom,
+      width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
+      height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
+      yoffset: -((ascender-glyphs[i].planeBounds.top)+(descender-glyphs[i].planeBounds.bottom)) * scale,
  */
 export function Font_get_char_atlas_bounds_width(fontIdx, ch) {
 	return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width;

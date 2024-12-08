@@ -624,7 +624,7 @@ const TEXTURES = {
 	// POTENTIAL_BUG: 
 	// IMPORTANT:Font textures MUST precede all other textures
 	MSDF_CONSOLAS_1024: g_cnt++,
-	MSDF_TEST_1024: g_cnt++,
+	MSDF_COMIC_1024: g_cnt++,
 	FONT_COUNT: g_cnt,
 
 	COUNT: g_cnt,

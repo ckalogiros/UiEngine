@@ -42,7 +42,7 @@ import { Index_buffer_info_create } from '../Graphics/Buffers/IndexBuffers.js';
  * reorganize the functions in GlVuffers.js 
  */
 
-const _fontsize = 10;
+// const _fontsize = 10;
 
 export function TestWidgetsGeneric(scene) {
 
@@ -131,8 +131,11 @@ export function TestWidgetsGeneric(scene) {
 
     /** Misc widgets */
 
-    CreateLabel('!{}()|||,./;1234567890');
-    CreateLabel('Case the text! changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char)');
+    CreateLabel('Welcome', 100, 100, 100);
+    // CreateLabel('!{absent texts}(graphics buffer)Q|WE|R|,./;1234567890', 10, 180, 20);
+    // CreateLabel('Case the text! changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char)', 10, 300, 10);
+
+
     // CreateLabel('Label2');
     // DEBUG_INFO.UI_MESH.IDX = label.idx;
     // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scene, label);
@@ -783,12 +786,12 @@ function Test_uniforms_uTime() {
 
 
 let labelCount = 1;
-function CreateLabel(name = 'Label ') {
+function CreateLabel(name = 'Label ', x, y, fontsize) {
 
-    const pos = [20, 310 + (labelCount * 35), 2];
+    const pos = [x, y, 2];
     // const pos = [80, 600, 2];
     // const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, 10, GREY[1], WHITE, [6, 4], .5);
-    const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY[1], WHITE, [5, 5], .5);
+    const label = Create_widget_label(_, name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos, fontsize, GREY[1], WHITE, [5, 5], .5, _, TEXTURES.MSDF_COMIC_1024);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);

@@ -1,7 +1,6 @@
 "use strict";
 import { COMIC_FONT_METRICS } from './ComicFontMetrics.js'
-// import { comicz_msdf_1024_metrics } from './comicz.js'
-
+import { comicz_msdf_1024_metrics } from '../../../../../resources/fonts/comic_sans_ms/comicz.js'
 
 
 
@@ -123,8 +122,8 @@ function LoadMetrics(metricsBuffer) {
 	const metrics = metricsBuffer[idx];
 
 	const file = { content: '', name: '', pos: filePos, size: 0, };
-	file.content = COMIC_FONT_METRICS;
-	// file.content = comicz_msdf_1024_metrics;
+	// file.content = COMIC_FONT_METRICS;
+	file.content = comicz_msdf_1024_metrics;
 	file.size = file.content.length;
 
 

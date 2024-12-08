@@ -29,7 +29,7 @@ export const frag_msdf = '\n\
 // set to distance fields pixel range\n\
 // uniform float pxRange;\n\
 // float pxRange = 22.5;\n\
-float pxRange = 11.5;\n\
+float pxRange = 18.5;\n\
 // float pxRange = 6.5; // minimum\n\
 \n\
 float median(float r, float g, float b) {\n\
