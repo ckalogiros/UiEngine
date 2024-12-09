@@ -382,7 +382,6 @@ export class Text_Mesh extends Mesh {
    }
 
 
-
    /** Pass array[] of { strings or arrays } */
    SetTextConcat(str_array) {
 

@@ -166,7 +166,7 @@ export class FontMaterial extends Material {
 
       this.sid.attr |= SID.ATTR.TEX2; // 
       this.sid.pass |= SID.PASS.TEX2; //
-      if(textureid === TEXTURES.MSDF_CONSOLAS_1024) {
+      if(FONT_IS_MSDF(textureid)) {
          this.sid.attr |= SID.ATTR.MSDF; // 
          // this.sid.pass |= SID.PASS.TEX2; //
 

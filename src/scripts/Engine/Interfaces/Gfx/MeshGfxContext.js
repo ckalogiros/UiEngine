@@ -34,8 +34,6 @@ export class GfxInfoMesh {
       this.meshIdx = INT_NULL; // The index of the current mesh from scene's mesh buffer.
       this.vao = null;
 
-      // this.verts_per_face = New_int8_buffer(1, 'NEW GfxInfo-verts_per_face');
-
       this.prog = {
          idx: INT_NULL,
          // progvbidx: INT_NULL,
@@ -49,8 +47,6 @@ export class GfxInfoMesh {
          idxs: New_int8_buffer(_, 'NEW GfxInfo-vbidxs'),	// The vertex buffer (float*) idx that this Mesh is stored to.
          starts: New_int16_buffer(_, 'GfxInfo-vb starts'),		// The current meshe's starting index in vertex buffer. 
          counts: New_int16_buffer(_, 'GfxInfo-vb counts'),		// Current size of the float buffer (in floats)
-         // vCount: New_int16_buffer(_, 'GfxInfo-vb counts'), // Total mesh vertices inserted in the vertex buffer
-
          which_vb: { // If this gfx has attributes scattered between vertex buffers, we need to specify which attribute belongs to which vertex buffer
             col_buf: INT_NULL,   // The index of the vertex buffer the color attribute is stored to
             wpos_buf: INT_NULL,  // The index of the vertex buffer the wpos attribute is stored to
@@ -58,15 +54,6 @@ export class GfxInfoMesh {
             dim_buf: INT_NULL,   // The index of the vertex buffer the vertex pos attribute is stored to
             tex_buf: INT_NULL,   // The index of the vertex buffer the texture attribute is stored to
          },
-         // WRONG:If this gfx has attributes scattered between vertex buffers, we need the index of the buffer for each attribute(index to:{idxs,starts,counts,...})
-         // Specifies the sequence of attributes, start fro 0 the first one, and add 1 for each next.
-         // which_attrib: {
-         //    col_idx: INT_NULL,   // The index of the color attribute
-         //    wpos_idx: INT_NULL,  // The index of the wpos attribute
-         //    generic1_idx: INT_NULL,  // The index of the wpos attribute
-         //    dim_idx: INT_NULL,   // The index of the vertex pos attribute
-         //    tex_idx: INT_NULL,   // The index of the texture attribute
-         // },
          is_per_vertex: New_int8_buffer(_, 'NEW GfxInfo-is_vertex_buffer'), // 
       };
 
@@ -107,13 +94,6 @@ export class GfxInfoMesh {
             dim_buf: this.vb.which_vb.dim_buf,
             tex_buf: this.vb.which_vb.tex_buf,
          },
-         // which_attrib: {
-         //    col_idx: this.vb.which_attrib.col_idx,
-         //    wpos_idx: this.vb.which_attrib.wpos_idx,
-         //    generic1_idx: this.vb.which_attrib.generic1_idx,
-         //    dim_idx: this.vb.which_attrib.dim_idx,
-         //    tex_idx: this.vb.which_attrib.tex_idx,
-         // },
          is_per_vertex: New_int8_buffer(_, 'NEW GfxInfo-Copy-is_vertex_buffer'), // 
       };
 

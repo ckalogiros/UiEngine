@@ -8,7 +8,7 @@ import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
-import { Create_text_mesh } from "../../Core/CreateWidget.js";
+import { Create_text_mesh, Create_text_mesh_msdf } from "../../Core/CreateWidget.js";
 import { Mesh_per_vb_remove_mesh } from "../../Core/MeshBuffer.js";
 import { GREY, WHITE } from "../Material/Base/Colors.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
@@ -24,10 +24,7 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } f
 // export class Widget_Label extends Rect {
 export class Widget_Label extends Rect_Mesh {
 
-    // text_mesh;
-
     constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = {rcorners:4, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
-    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [0, 0], bold = .4, style = {rcorners:4, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -36,14 +33,22 @@ export class Widget_Label extends Rect_Mesh {
         const text = _text;
 
         // Create the text, to calculate its dimensions, then createthe label
-        const text_mesh = Create_text_mesh(text, [0, 0, _pos[2]], fontSize, text_col, _, font, is_debug_mesh);
+        let text_mesh = null;
+        let dim = [0,0];
 
+        if((font === TEXTURES.MSDF_COMIC_1024) || (font === TEXTURES.MSDF_CONSOLAS_1024)) {
+            text_mesh = Create_text_mesh_msdf(text, [0, 0, _pos[2]], fontSize, text_col, _, font, is_debug_mesh);
+        }
+        else {
+            text_mesh = Create_text_mesh(text, [0, 0, _pos[2]], fontSize, text_col, _, font, is_debug_mesh);
+        }
+        
         _pos[2] -= 1; // Set z for area 'behind' this.text_mesh
-
+        
         const dimentions = text_mesh.CalculateTextWidth();
-        const dim = [
-            dimentions.w + pad[0] * 2,
-            dimentions.h + pad[1] * 2,
+        dim = [
+            dimentions.w + (pad[0] * 2),
+            dimentions.h + (pad[1] * 2),
         ];
 
 
@@ -269,7 +274,7 @@ export class Widget_Label extends Rect_Mesh {
 
     Align(flags, pad = [0, 0]) { // Align pre-added to the vertexBuffers
 
-        const move_dif = Align_self_get_dif(flags, this.geom, this.text_mesh.geom, _, this.text_mesh.geom.num_faces, this.StylesGetPad());
+        const move_dif = Align_self_get_dif(flags, this.geom, this.text_mesh.geom, pad, this.text_mesh.geom.num_faces, this.StylesGetPad());
 
         // Update vertex buffers
         if (this.is_gfx_inserted) {

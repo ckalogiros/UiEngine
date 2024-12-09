@@ -399,6 +399,7 @@ export function Game_snake(y = 0, controls_create=true) {
    const text_pad_x=7, text_pad_y=3;
    const digit_meshes_arr = [];
    const digit1_label = Create_widget_label(_, '0', _, [0, 0, 0], _, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
+   // const digit1_label = Create_widget_label(_, '0', _, [0, 0, 0], 24, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.MSDF_CONSOLAS_1024);
    {
       digit1_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       digit1_label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 12);
@@ -411,8 +412,9 @@ export function Game_snake(y = 0, controls_create=true) {
    }
 
    // Calculate score label width before creation. Works only if the font is already in use (loaded)
-   const font_idx = Font_retrieve_fontidx(TEXTURES.CONSOLAS_32px);
-   const label_width = Font_metrics_calculate_width_from_text('SCORE', font_idx) + digit1_label.geom.dim[0]*5 + 10;
+   // const font_idx = Font_retrieve_fontidx(TEXTURES.CONSOLAS_32px);
+   // const label_width = Font_metrics_calculate_width_from_text('SCORE', font_idx) + digit1_label.geom.dim[0]*5 + 10;
+   const label_width = digit1_label.text_mesh.text_width + digit1_label.geom.dim[0]*5 + 10;
    const score_label = Create_widget_label(_, 'score', _, [0, 0, 0], _, TRANSPARENCY(GREEN[7], 1.), WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
    {
       score_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -956,7 +958,8 @@ function Animate_snake(params) {
       const text_substitution = `${digits[k]}`
       k++;
 
-      const limit = Font_metrics_get_row_height(digit_label.text_mesh.mat.uvIdx) / 2;
+      // const limit = Font_metrics_get_row_height(digit_label.text_mesh.mat.uvIdx) / 2;
+      const limit = digit_label.text_mesh.text_width;
       Clbk_animations_text_create(digit_label, score_slope_params_pointer, limit, 'SnakeScore_anim1', clbk_anim_flag, text_substitution);
       
 
@@ -979,6 +982,7 @@ function Animate_snake(params) {
             pos[0] = last_digit_label.geom.pos[0] - (last_digit_label.geom.dim[0]*2) - pad; 
    
             const digit_label = Create_widget_label(_, '0', _, pos, _, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [7, 3], _, _, TEXTURES.CONSOLAS_32px);
+            // const digit_label = Create_widget_label(_, '0', _, pos, 24, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [7, 3], _, _, TEXTURES.MSDF_CONSOLAS_1024);
             digit_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             digit_label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 12); 
             digit_label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, digit_label.geom.dim[0]);
@@ -1001,7 +1005,8 @@ function Animate_snake(params) {
             // Dont update text or run animation if the digit hasn't change
             if(`${digits[k]}` !== digit_label.text_mesh.mat.char_buffer.buffer[0]){
          
-               const limit = Font_metrics_get_row_height(digit_label.text_mesh.mat.uvIdx) / 2;
+               // const limit = Font_metrics_get_row_height(digit_label.text_mesh.mat.uvIdx) / 2;
+               const limit = digit_label.text_mesh.text_width;
                Clbk_animations_text_create(digit_label, score_slope_params_pointer, limit, 'SnakeScore_anim', clbk_anim_flag, text_substitution);
 
                digit_label.text_mesh.mat.char_buffer.buffer[0] = text_substitution;

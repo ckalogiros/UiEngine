@@ -14,7 +14,7 @@ import { CONSOLAS_24Hpx } from '../../../../../resources/fonts/consolas_6/metric
 import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metrics/consolas_7.js';
 import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
 import { consola_msdf_test_1024_metrics } from '../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js';
-import { Load_msdf_font_metrics, Load_msdf_font_metrics_new } from './ChlumskyFontMetricsLoader.js';
+import { Load_msdf_font_metrics_new } from './ChlumskyFontMetricsLoader.js';
 import { CONSOLAS_MSDF_FONT_METRICS } from '../../../../../resources/fonts/consolas_sdf/consola_msdf__metrics_temp.js';
 
 
@@ -30,9 +30,9 @@ import { CONSOLAS_MSDF_FONT_METRICS } from '../../../../../resources/fonts/conso
 const ASCII_NUM_CHARACTERS = '~'.charCodeAt(0) - (' '.charCodeAt(0));
 const FONTS_MAX_COUNT = TEXTURES.FONT_COUNT; 
 
-const _fontMetricsBuffer = [];
-const _fontsUvMap = [];
-const _activeFontTextures = new Int8Array(FONTS_MAX_COUNT); 
+const _font_metrics_buffer = [];
+const _font_uvmaps_buffer = [];
+const _font_active_textures_buffer = new Int8Array(FONTS_MAX_COUNT); 
 
 
 
@@ -75,7 +75,6 @@ function Font_get_metrics_by_texid(texture_id){
       case TEXTURES.CONSOLAS_116px: return CONSOLAS_116Hpx;
       case TEXTURES.CONSOLAS_157px: return CONSOLAS_157Hpx;
       case TEXTURES.MSDF_CONSOLAS_1024: return consola_msdf_test_1024_metrics;
-      // case TEXTURES.MSDF_CONSOLAS_1024: return CONSOLAS_MSDF_FONT_METRICS;
       case TEXTURES.MSDF_COMIC_1024: return comic_sans_cz;
       default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_id:', texture_id);
    }
@@ -136,14 +135,14 @@ export function Font_create_storage_buffer_font() {
 
 
 export function Font_is_loaded(textureid) {
-	if (_activeFontTextures[textureid] === INT_NULL) return false;
+	if (_font_active_textures_buffer[textureid] === INT_NULL) return false;
 	return true;
 }
 
 
 
 export function Font_retrieve_fontidx(textureid) {
-	return _activeFontTextures[textureid];
+	return _font_active_textures_buffer[textureid];
 }
 
 
@@ -153,24 +152,33 @@ export function Font_retrieve_fontidx(textureid) {
  */
 export function Font_get_uv_coords(font_idx, ch) {
 	
-	return _fontsUvMap[font_idx][ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET];
+	return _font_uvmaps_buffer[font_idx][ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET];
 }
 
 
 
 export function FontGetFontDimRatio(font_idx) {
-	return _fontMetricsBuffer[font_idx].ratio;
+	return _font_metrics_buffer[font_idx].ratio;
 }
 
 
 
-export function Font_metrics_get_face_advancex(font_idx) { return _fontMetricsBuffer[font_idx].advancex; }
-export function Font_metrics_get_texture_width(font_idx) { return _fontMetricsBuffer[font_idx].texWidth; }
-export function Font_metrics_get_texture_height(font_idx) { return _fontMetricsBuffer[font_idx].texHeight; }
-export function Font_metrics_get_char_width(font_idx, ch) { return _fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
-export function Font_metrics_get_char_height(font_idx, ch) { return _fontMetricsBuffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].height; }
-export function Font_metrics_get_row_height(font_idx) { return _fontMetricsBuffer[font_idx].row_height; }
-export function Font_metrics_get_interpolated_x(font_idx) { return 1.0 / _fontMetricsBuffer[font_idx].texWidth; } // Transform to 0-1 coords 
+// export function Msdf_font_metrics_get_face_advancex(font_idx) { return _font_metrics_buffer[font_idx].advancex; }
+// export function Msdf_font_metrics_get_texture_width(font_idx) { return _font_metrics_buffer[font_idx].texWidth; }
+// export function Msdf_font_metrics_get_texture_height(font_idx) { return _font_metrics_buffer[font_idx].texHeight; }
+// export function Msdf_font_metrics_get_char_width(font_idx, ch) { return _font_metrics_buffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
+// export function Msdf_font_metrics_get_char_height(font_idx, ch) { return _font_metrics_buffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].height; }
+// export function Msdf_font_metrics_get_row_height(font_idx) { return _font_metrics_buffer[font_idx].row_height; }
+// export function Msdf_font_metrics_get_interpolated_x(font_idx) { return 1.0 / _font_metrics_buffer[font_idx].texWidth; } // Transform to 0-1 coords 
+
+
+export function Font_metrics_get_face_advancex(font_idx) { return _font_metrics_buffer[font_idx].advancex; }
+export function Font_metrics_get_texture_width(font_idx) { return _font_metrics_buffer[font_idx].texWidth; }
+export function Font_metrics_get_texture_height(font_idx) { return _font_metrics_buffer[font_idx].texHeight; }
+export function Font_metrics_get_char_width(font_idx, ch) { return _font_metrics_buffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
+export function Font_metrics_get_char_height(font_idx, ch) { return _font_metrics_buffer[font_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].row_height; }
+export function Font_metrics_get_row_height(font_idx) { return _font_metrics_buffer[font_idx].row_height; }
+export function Font_metrics_get_interpolated_x(font_idx) { return 1.0 / _font_metrics_buffer[font_idx].texWidth; } // Transform to 0-1 coords 
 
 export function Font_metrics_calculate_width_from_text(str, font_idx){
 
@@ -190,20 +198,20 @@ export function Font_load_uvs(textureid) {
 	// Create new font metrics and uvmap
 	const ret = Font_create_storage_buffer_font();
 
-	const font_idx = _fontMetricsBuffer.push(ret.metrics) -1;
-	_activeFontTextures[textureid] = font_idx; // Update the 'active' fonts
+	const font_idx = _font_metrics_buffer.push(ret.metrics) -1;
+	_font_active_textures_buffer[textureid] = font_idx; // Update the 'active' fonts
 
-	const uvmap_idx = _fontsUvMap.push(ret.uvMap) -1;
+	const uvmap_idx = _font_uvmaps_buffer.push(ret.uvMap) -1;
 
 
 	if(font_idx !== uvmap_idx) alert('6111282237 \nFont index and uvmap index must be equual.');
 
 
-	if(textureid === TEXTURES.MSDF_CONSOLAS_1024) {
+	// if(textureid === TEXTURES.MSDF_CONSOLAS_1024 || textureid === TEXTURES.MSDF_COMIC_1024) {
+	if(FONT_IS_MSDF(textureid)) {
 		
-		// const msdf_uvmap = Load_metrics_msdf(font_idx, textureid);
 		const msdf_uvmap = Load_msdf_font_metrics_new(textureid);
-		Create_uv_map_msdf(font_idx, msdf_uvmap);
+		_font_metrics_buffer[font_idx] = msdf_uvmap
 
 		console.log(
 			'==========================================================================',
@@ -228,52 +236,52 @@ export function Font_load_uvs(textureid) {
 }
 
 
-function Load_metrics_msdf(font_idx, textureid) {
+// function Load_metrics_msdf(font_idx, textureid) {
 
-	const msdf_metrics = Load_msdf_font_metrics(textureid);
-	const metrics = _fontMetricsBuffer[font_idx];
-
-
-	const len = metrics.ch.length;
-
-	// CAUTION: The Chlumsky msdf metrics gives advance value as a ratio
-	const advancex = msdf_metrics.texture.advance;
-
-	for(let i = 0; i < len; i++) {
-
-		metrics.ch[i].left = msdf_metrics.atlas_bounds[i].left; 
-		metrics.ch[i].right = msdf_metrics.atlas_bounds[i].right; 
-		metrics.ch[i].top = msdf_metrics.atlas_bounds[i].top; 
-		metrics.ch[i].bottom = msdf_metrics.atlas_bounds[i].bottom; 
-		metrics.ch[i].height = msdf_metrics.atlas_bounds[i].height; 
-		metrics.ch[i].width = msdf_metrics.atlas_bounds[i].width; 
-		metrics.ch[i].advancex = msdf_metrics.atlas_bounds[i].width; 
-		// metrics.ch[i].ratio = msdf_metrics.atlas_bounds[i].left; 
-		if(metrics.ch[i].row_num===undefined) metrics.ch[i].row_num = 1;  // HACK: temporary for drawing sdf font
-	}
-
-	metrics.texWidth = msdf_metrics.texture.width;
-	metrics.texHeight = msdf_metrics.texture.height;
-	metrics.advancex = 0;
-	metrics.size = msdf_metrics.atlas_bounds.length;
-	if(metrics.row_height===0) metrics.row_height = 148; // HACK: temporary for drawing sdf font
-	// metrics.ratio = metrics.texHeight / metrics.ch[0].advancex;
-	metrics.ratio = 1;
-	metrics.padding =  0;
-	metrics.isMonoSpace = false;
-
-	if(DEBUG.UVS){ console.log('metrics', metrics, '\nmsdf_metrics', msdf_metrics); }
+// 	const msdf_metrics = Load_msdf_font_metrics(textureid);
+// 	const metrics = _font_metrics_buffer[font_idx];
 
 
-	return msdf_metrics.uvmap;
-}
+// 	const len = metrics.ch.length;
+
+// 	// CAUTION: The Chlumsky msdf metrics gives advance value as a ratio
+// 	const advancex = msdf_metrics.texture.advance;
+
+// 	for(let i = 0; i < len; i++) {
+
+// 		metrics.ch[i].left = msdf_metrics.atlas_bounds[i].left; 
+// 		metrics.ch[i].right = msdf_metrics.atlas_bounds[i].right; 
+// 		metrics.ch[i].top = msdf_metrics.atlas_bounds[i].top; 
+// 		metrics.ch[i].bottom = msdf_metrics.atlas_bounds[i].bottom; 
+// 		metrics.ch[i].height = msdf_metrics.atlas_bounds[i].height; 
+// 		metrics.ch[i].width = msdf_metrics.atlas_bounds[i].width; 
+// 		metrics.ch[i].advancex = msdf_metrics.atlas_bounds[i].width; 
+// 		// metrics.ch[i].ratio = msdf_metrics.atlas_bounds[i].left; 
+// 		if(metrics.ch[i].row_num===undefined) metrics.ch[i].row_num = 1;  // HACK: temporary for drawing sdf font
+// 	}
+
+// 	metrics.texWidth = msdf_metrics.texture.width;
+// 	metrics.texHeight = msdf_metrics.texture.height;
+// 	metrics.advancex = 0;
+// 	metrics.size = msdf_metrics.atlas_bounds.length;
+// 	if(metrics.row_height===0) metrics.row_height = 148; // HACK: temporary for drawing sdf font
+// 	// metrics.ratio = metrics.texHeight / metrics.ch[0].advancex;
+// 	metrics.ratio = 1;
+// 	metrics.padding =  0;
+// 	metrics.isMonoSpace = false;
+
+// 	if(DEBUG.UVS){ console.log('metrics', metrics, '\nmsdf_metrics', msdf_metrics); }
+
+
+// 	return msdf_metrics.uvmap;
+// }
 
 
 // Read the text file using 'filePos' as guide of word-line
 const filePos = { start: 0, end: 0, len: 0, line: 0 };
 function Load_metrics(font_idx, textureid) {
 
-	const metrics = _fontMetricsBuffer[font_idx];
+	const metrics = _font_metrics_buffer[font_idx];
 
 	const file = { content: '', name: '', pos: filePos, size: 0, };
 	file.content = TEXTURE_PATHS[textureid].metrics; 
@@ -359,44 +367,45 @@ function Load_metrics(font_idx, textureid) {
 
 
 
-function Create_uv_map_msdf(font_idx, msdf_uvmap) {
 
-	const atlas = msdf_uvmap.atlas_bounds; 
-	const plane = msdf_uvmap.plane_bounds; 
-	const tex = msdf_uvmap.texture; 
+// function Create_uv_map_msdf(font_idx, msdf_uvmap) {
 
-	const uvmap = _fontsUvMap[font_idx];
+// 	const atlas = msdf_uvmap.atlas_bounds; 
+// 	const plane = msdf_uvmap.plane_bounds; 
+// 	const tex = msdf_uvmap.texture; 
 
-	let transormedU = 1.0 / tex.width;	// Transform to 0-1 coords
-	let transormedV = 1.0 / tex.height;	// Transform to 0-1 coords
+// 	const uvmap = _font_uvmaps_buffer[font_idx];
+
+// 	let transormedU = 1.0 / tex.width;	// Transform to 0-1 coords
+// 	let transormedV = 1.0 / tex.height;	// Transform to 0-1 coords
 
 
-	const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
-	const len = atlas.length;
-	for (let j = 0; j < len; j++) {
+// 	const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
+// 	const len = atlas.length;
+// 	for (let j = 0; j < len; j++) {
 		
-		const left = atlas[j].left;
-		const right = atlas[j].right;
-		const top = atlas[j].left;
-		const bottom = atlas[j].bottom;
+// 		const left = atlas[j].left;
+// 		const right = atlas[j].right;
+// 		const top = atlas[j].left;
+// 		const bottom = atlas[j].bottom;
 		
-		// and store them to the uvmap
-		uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new uvs for each character
-		uvmap[j][U1] = transormedU * left;
-		uvmap[j][U2] = transormedU * right;
-		uvmap[j][V1] = transormedV * top;
-		uvmap[j][V2] = transormedV * bottom;
+// 		// and store them to the uvmap
+// 		uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new uvs for each character
+// 		uvmap[j][U1] = transormedU * left;
+// 		uvmap[j][U2] = transormedU * right;
+// 		uvmap[j][V1] = transormedV * top;
+// 		uvmap[j][V2] = transormedV * bottom;
 		
-	}
+// 	}
 
-	if(DEBUG.UVS){ console.log('uvmap:', uvmap); }
+// 	if(DEBUG.UVS){ console.log('uvmap:', uvmap); }
 	
-	return uvmap;
-}
+// 	return uvmap;
+// }
 function Create_uv_map(font_idx) {
 
-	const metrics = _fontMetricsBuffer[font_idx]; 
-	const uvmap = _fontsUvMap[font_idx];
+	const metrics = _font_metrics_buffer[font_idx]; 
+	const uvmap = _font_uvmaps_buffer[font_idx];
 
 	let transormedU = 1.0 / metrics.texWidth;	// Transform to 0-1 coords
 	// if (metrics.advancex % 2) {
@@ -542,3 +551,88 @@ function Find_field_by_name(file, word, pos) {
 
 
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+   texture:
+      type        : obj.atlas.type,
+      width       : texture_width, 
+      height      : texture_height, 
+      ascender    : obj.metrics.ascender,
+      descender   : obj.metrics.descender,
+      advance     : advance, // For monospace fonts
+      line_height : obj.metrics.lineHeight,
+      base_line   : base_line,
+*/
+export function Msdf_Font_get_char_uv_coords(fontIdx, ch) { return _font_metrics_buffer[fontIdx].uvmap[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET]; }
+export function Msdf_Font_get_char_plane_bounds(fontIdx, ch) { return _font_metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET]; }
+export function Msdf_Font_get_char_atlas_bounds(fontIdx, ch) { return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET]; }
+export function Msdf_Font_get_atlas_texture_metrics(fontIdx) { return _font_metrics_buffer[fontIdx].texture; }
+export function Msdf_Font_get_font_line_height(fontIdx) { return _font_metrics_buffer[fontIdx].texture.line_height; }
+export function Msdf_Font_get_font_advancex(fontIdx) { return _font_metrics_buffer[fontIdx].texture.advance; }
+export function Msdf_Font_get_font_base_line(fontIdx) { return _font_metrics_buffer[fontIdx].texture.base_line; }
+
+
+
+
+/**
+   plane_bounds[i]:
+      left:    glyphs[i].planeBounds.left,
+      right:   glyphs[i].planeBounds.right,
+      top:     glyphs[i].planeBounds.top,
+      bottom:  glyphs[i].planeBounds.bottom,
+      width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
+      height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
+*/
+export function Msdf_ont_get_char_plane_bounds_width(fontIdx, ch) { 
+	return _font_metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; 
+}
+export function Msdf_ont_get_char_plane_bounds_height(fontIdx, ch) { 
+	return _font_metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].height; 
+}
+export function Msdf_ont_get_char_plane_bounds_left(fontIdx, ch) { 
+	return _font_metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].left; 
+}
+export function Msdf_ont_get_char_plane_bounds_right(fontIdx, ch) { 
+	return _font_metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].right; 
+}
+export function Msdf_ont_get_char_plane_bounds_top(fontIdx, ch) { 
+	return _font_metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].top; 
+}
+export function Msdf_ont_get_char_plane_bounds_bottom(fontIdx, ch) { 
+	return _font_metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].bottom; 
+}
+
+/**
+   atlas_bounds[i]:
+      left:    glyphs[i].planeBounds.left,
+      right:   glyphs[i].planeBounds.right,
+      top:     glyphs[i].planeBounds.top,
+      bottom:  glyphs[i].planeBounds.bottom,
+      width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
+      height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
+      yoffset: -((ascender-glyphs[i].planeBounds.top)+(descender-glyphs[i].planeBounds.bottom)) * scale,
+   */
+export function Msdf_ont_get_char_atlas_bounds_width(fontIdx, ch) { return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
+export function Msdf_ont_get_char_atlas_bounds_height(fontIdx, ch) { return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].height; }
+export function Msdf_ont_get_char_atlas_bounds_left(fontIdx, ch) { return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].left; }
+export function Msdf_ont_get_char_atlas_bounds_right(fontIdx, ch) { return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].right; }
+export function Msdf_ont_get_char_atlas_bounds_top(fontIdx, ch) { return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].top; }
+export function Msdf_ont_get_char_atlas_bounds_bottom(fontIdx, ch) { return _font_metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].bottom; }

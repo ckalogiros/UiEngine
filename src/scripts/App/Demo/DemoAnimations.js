@@ -1,21 +1,17 @@
 "use strict";
 
 import { Callback_animations_create } from "../../Engine/Animations/CallbackAnimations.js";
-import { Create_rect_mesh, Create_widget_button, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from "../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from "../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
-import { BLACK, BLUEL, BLUER, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Get_fasma_color, GREEN, GREENL, GREY, ORANGEL, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { BLACK, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Get_fasma_color, GREEN, GREENL, GREY, ORANGEL, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
-import { Widget_Button } from "../../Engine/Drawables/Widgets/WidgetButton.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Font_metrics_get_char_height, Font_metrics_get_char_width, Font_metrics_get_row_height } from "../../Engine/Loaders/Font/Font.js";
-import { Particle_system_create_emitter, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../Engine/ParticlesSystem/ParticlesSystem.js";
+import { Font_metrics_get_char_width, Font_metrics_get_row_height } from "../../Engine/Loaders/Font/Font.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
-import { GetRandomPos } from "../../Helpers/Helpers.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
-import { Create_comet_glow_contols, Create_comet_noise_contols } from "./DemoParticles.js";
-import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, squeeze_y_to_bottom_vertices_move_to_bottom, squeeze_y_to_top_vertices_move_to_top, text_animation_gfx_vertex_set_sqeeze_x_axis, text_animation_gfx_vertex_set_vpos_x_default, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value } from "./DemoTextAnimations.js";
+import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, text_animation_gfx_vertex_set_sqeeze_x_axis, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value } from "./DemoTextAnimations.js";
 
 
 

@@ -130,7 +130,7 @@ export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0]
  */
 
 // TODO: Rename the function name to something representative
-export function Align_self_get_dif(flags, src_mesh, dst_mesh, pad = [0, 0], advancex=1) {
+export function Align_self_get_dif(flags, src_mesh, dst_mesh, pad = [0, 0], advancex=1, src_pad) {
 
     const pos = [0,0];
     // Check if any of the acceptable ALIGN flags are passed.
@@ -139,44 +139,79 @@ export function Align_self_get_dif(flags, src_mesh, dst_mesh, pad = [0, 0], adva
         return pos;
     }
 
-    const src_num_faces=src_mesh.num_faces, dst_num_faces=dst_mesh.num_faces;
-
-
-    const s = {
-        x:src_mesh.pos[0], y:src_mesh.pos[1],
-        w:src_mesh.dim[0]*advancex*src_num_faces, h:src_mesh.dim[1],
-    };
-
-    const d = {
-        x:dst_mesh.pos[0], y:dst_mesh.pos[1],
-        d:dst_mesh.dim[0], h:dst_mesh.dim[1],
-        w:dst_mesh.dim[0]*advancex*dst_num_faces*2,
-    };
 
     if (flags & (ALIGN.VERT_CENTER)){
-        pos[0] = d.x;
+        pos[0] = src_pad[0];
     }
     if (flags & (ALIGN.HOR_CENTER)){
-        pos[1] = d.y;
+        pos[1] = src_pad[1];
     }
 
 
     if (flags & (ALIGN.LEFT)){
-        // pos[0] = ((b.x-b.w)-p.x) + p.w/2;
+        pos[0] =  -(src_pad[0]*2)+pad[0]*2;
     }
     else if (flags & (ALIGN.RIGHT)){
-        pos[0] = (s.x+s.w) - d.d - pad[0];
-        // pos[0] = (s.x);
+        pos[0] =  (src_pad[0]*2)-pad[0]*2;
     }
     if (flags & (ALIGN.TOP)){
-        pos[1] = d.y - ((s.y + s.h) - d.h);
+        // pos[1] = d.y - ((s.y + s.h) - d.h);
+        pos[1] = (-src_pad[0]) + pad[1];
     }
     else if (flags & (ALIGN.BOTTOM)){
-        pos[1] = d.y - ((s.y - s.h) + d.h);
+        pos[1] =  (src_pad[0]) - pad[1];
     }
 
 
     return pos;
 }
+// export function Align_self_get_dif(flags, src_mesh, dst_mesh, pad = [0, 0], advancex=1) {
+
+//     const pos = [0,0];
+//     // Check if any of the acceptable ALIGN flags are passed.
+//     if((flags & (ALIGN.TOP | ALIGN.BOTTOM | ALIGN.LEFT | ALIGN.RIGHT)) === 0) {
+//         console.warn('NO APROPRIATE ALIGN FLAG IS PASSED');
+//         return pos;
+//     }
+
+//     const src_num_faces=src_mesh.num_faces, dst_num_faces=dst_mesh.num_faces;
+
+
+//     const s = {
+//         x:src_mesh.pos[0], y:src_mesh.pos[1],
+//         w:src_mesh.dim[0]*advancex*src_num_faces, h:src_mesh.dim[1],
+//     };
+
+//     const d = {
+//         x:dst_mesh.pos[0], y:dst_mesh.pos[1],
+//         d:dst_mesh.dim[0], h:dst_mesh.dim[1],
+//         w:dst_mesh.dim[0]*advancex*dst_num_faces*2,
+//     };
+
+//     if (flags & (ALIGN.VERT_CENTER)){
+//         pos[0] = d.x;
+//     }
+//     if (flags & (ALIGN.HOR_CENTER)){
+//         pos[1] = d.y;
+//     }
+
+
+//     if (flags & (ALIGN.LEFT)){
+//         // pos[0] = ((b.x-b.w)-p.x) + p.w/2;
+//     }
+//     else if (flags & (ALIGN.RIGHT)){
+//         pos[0] = (s.x+s.w) - d.d - pad[0];
+//         // pos[0] = (s.x);
+//     }
+//     if (flags & (ALIGN.TOP)){
+//         pos[1] = d.y - ((s.y + s.h) - d.h);
+//     }
+//     else if (flags & (ALIGN.BOTTOM)){
+//         pos[1] = d.y - ((s.y - s.h) + d.h);
+//     }
+
+
+//     return pos;
+// }
 
 

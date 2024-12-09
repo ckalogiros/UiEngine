@@ -684,16 +684,7 @@ export class Mesh {
                 if (params !== null) {
                     if((params[0] instanceof Float32Array)=== false) alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
                     if(this.mat.col[0] instanceof Float32Array) CopyMat4(this.mat.col, params);
-                    else {
-                        this.mat.col = params;
-                        // this.mat.col = new Float32Array([
-                        //     new Float32Array(params[0]),
-                        //     new Float32Array(params[1]),
-                        //     new Float32Array(params[2]),
-                        //     new Float32Array(params[3]),
-                        // ]);
-                    }
-                    // this.mat.defCol = params;
+                    else { this.mat.col = params; }
                 }
                 break;
             }

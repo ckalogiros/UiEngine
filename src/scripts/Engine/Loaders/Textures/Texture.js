@@ -123,7 +123,7 @@ export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 		texture_idx = Texture_create_texture(gfxCtx.gl, textureid, img, TEXTURE_PATHS[textureid].imgName);
 
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) {
-			Font_create_uvmap(textureid);
+			// Font_create_uvmap(textureid);
 
 			uvmap_idx = Font_load_uvs(textureid);
 		}

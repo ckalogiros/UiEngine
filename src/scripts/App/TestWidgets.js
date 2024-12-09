@@ -22,7 +22,7 @@ import { TimerGetGlobalTimerCycle, Timer_get_global_timer } from '../Engine/Time
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect, Slider_get_slider_val } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../Engine/Drawables/Widgets/WidgetSwitch.js';
-import { Gl_set_rgba, Gl_rotate_z_2d, Gl_set_attr_round_corners, Gl_set_angle } from '../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba, Gl_rotate_z_2d, Gl_set_attr_round_corners, Gl_set_angle, Gl_set_dim_xy, Gl_add_vpos_xy, Gl_set_vpos_xy, Gl_set_wpos_xy } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Callback_animations_create, Callback_animations_destroy_byidx, Callback_animations_is_animation_active, Callback_animations_is_animation_in_play } from '../Engine/Animations/CallbackAnimations.js';
 import { Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree, Find_parent_listen_event } from '../Engine/Drawables/Operations/Recursions.js';
@@ -37,7 +37,7 @@ import { Clbk_animations_create_transition_slope, Clbk_animations_rotate, Clbk_a
 import { Demo_chain_link } from './Demo/DemoChainLink.js';
 import { Game_snake } from './Demo/Games/Snake/Snake.js';
 import { Mesh_set_root_in_focus } from '../Engine/Drawables/Operations/MeshHelperFunctions.js';
-import { Digitize, Function_Slope, Logarithmic_interpolation } from '../Helpers/Math/MathFunctions.js';
+import { Digitize, Function_Slope, Linear_interpolation, Logarithmic_interpolation } from '../Helpers/Math/MathFunctions.js';
 import { App_reinitialize } from './App.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { PerformanceTimersGetMilisec, PerformanceTimersGetNanosec, PerformanceTimersGetWorstFps } from '../Engine/Timers/PerformanceTimers.js';
@@ -49,7 +49,6 @@ import { Font_metrics_get_char_width, Font_metrics_get_face_advancex, Font_metri
 import { Tetris } from './Demo/Games/Snake/Tetris.js';
 import { Bitwise_operations_run_test } from './Demo/Games/Snake/BitwiseOps.js';
 import { Tetris_test } from './Demo/Games/Snake/Tetris_test.js';
-import { Load_msdf_font_metrics } from '../Engine/Loaders/Font/ChlumskyFontMetricsLoader.js';
 
 // import { getFile } from '../Engine/Core/FileSystem.js';
 // var osu = require('node-os-utils')
@@ -672,10 +671,8 @@ export function TestWidgetsGeneric(createId = 1) {
     // Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
     // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
 
-    // const m = Load_msdf_font_metrics();
-
     // Demo_page();
-    // Demos_welcome_menu();
+    Demos_welcome_menu();
 
     // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
     // Tetris_test(ROOT_WIDGETS.CREATE_ROOT, 20, 60);
@@ -910,12 +907,32 @@ export function TestWidgetsGeneric(createId = 1) {
 
     { // Widget: Label-buttons
 
-        CreateLabel(_, 'A', TEXTURES.MSDF_CONSOLAS_1024, 300, 250);
-        // CreateLabel(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250);
+        { // MSDF
+            
+            // CreateLabelMsdf(_, '.:| G', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 45, _, _, _, );
+            // CreateLabelMsdf(_, 'ABC|||R', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 45, _, _, _, true);
+            // CreateLabelMsdf(_, 'A', TEXTURES.MSDF_CONSOLAS_1024, 300, 150, 45, _, _, _, );
+            // CreateLabelMsdf(_, 'Absr', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 45, _, _, _, true);
+            // CreateLabelMsdf(_, '|1234567890.:,;\'\"(!?)+-*/=', TEXTURES.MSDF_CONSOLAS_1024, 0, 50, 50);
+            // CreateLabelMsdf(_, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.MSDF_CONSOLAS_1024, 0, 250, 20);
+            // CreateLabelMsdf(_, 'Bind_attributes_at_specific_location', TEXTURES.MSDF_CONSOLAS_1024, 0, 200, 20);
+            // CreateLabelMsdf(_, 'The quick brown fox jums over the', TEXTURES.MSDF_CONSOLAS_1024, 0, 250, 20);
+            // CreateLabelMsdf(_, '||_|{}', TEXTURES.MSDF_CONSOLAS_1024, 500, 150, 80);
+            
+            // CreateLabelMsdf(_, '|1234567890.:,;\'\"(!?)+-*/=', TEXTURES.MSDF_COMIC_1024, 0, 450, 50);
+            // CreateLabelMsdf(_, '1234567890.:,;\'\"(!?)+-*/=', TEXTURES.MSDF_COMIC_1024, 0, 450, 20);
+            // CreateLabelMsdf(_, 'Bind_attributes_at_specific_location', TEXTURES.MSDF_COMIC_1024, 0, 500, 20);
+            // CreateLabelMsdf(_, 'The quick brown fox jums over the', TEXTURES.MSDF_COMIC_1024, 0, 550, 20, _, _, _, true);
+            // CreateLabelMsdf(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250, 30);
+            // CreateLabelMsdf(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250, 30);
+            // CreateLabelMsdf(_, '|(lkjs)*{fdl}-|pq1560,[==-/]', TEXTURES.MSDF_COMIC_1024, 0, 250, 20);
+            // CreateLabelMsdf(_, '||_|{}', TEXTURES.MSDF_COMIC_1024, 500, 250, 80);
+            // CreateLabelMsdf(_, ',|;\'\"(!?)+-*/=012DEOPQRSTUVWXYZabcdhijkltuvz', TEXTURES.MSDF_COMIC_1024, 0, 250, 90);
+        }
 
         // !\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
         // CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_28px, 0, 250);
-        // CreateLabel(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250);
+        // CreateLabel(_, '()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_157px, 0, 250,);
         // const label = CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`~~{|}0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_66px, 0, 300);
         // const label = CreateLabel(_, 'Create_glow_particles(200, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1)', TEXTURES.CONSOLAS_32px, 0, 300);
         // CreateLabel(_, 'Open-sans regular font', TEXTURES.CONSOLAS_32px, 0, 370);
@@ -1900,6 +1917,109 @@ function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', fo
     // label.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
     // label.Align(ALIGN.TOP | ALIGN.LEFT, [0, 0]);
     // label.Align(ALIGN.TOP | ALIGN.RIGHT, [0, 0]);
+
+    return label;
+}
+function CreateLabelMsdf(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, font_size=20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, temp_flag=false) {
+
+    let slider = null
+
+    if(temp_flag){ // Scale Text
+
+        slider = CreateSlider(_, 10, 20, .06, 'ScaleText');
+    }
+
+    const pos = [x, y, 2];
+    const label = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, .3), WHITE, [0, 0], .5, _, font, );
+    label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+    label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+    label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+    // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
+    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+    // label.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+
+    if (vb_groupidx !== INT_NULL) label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
+    else label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    label.Render()
+
+    label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
+
+    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(label);
+    Construct_listen_events_relations_from_mesh_tree(label);
+
+    { // abilities
+        // Shader_bit_flags_print_enabled_attributes(label.sid.attr, `ATTR:  ${label.GetName()}`)
+        // Shader_bit_flags_print_enabled_attributes(label.sid.pass, `PASS:  ${label.GetName()}`)
+        // Shader_bit_flags_print_enabled_attributes(label.text_mesh.sid.attr, `ATTR:  ${label.text_mesh.GetName()}`)
+        // Shader_bit_flags_print_enabled_attributes(label.text_mesh.sid.pass, `PASS:  ${label.text_mesh.GetName()}`)
+    
+        // label.text_mesh.SetColorRGB(REDL);
+        // label.text_mesh.RenderTextFromString('REDL');
+        // if(temp_flag) label.text_mesh.RenderTextFromString('AA AS');
+    
+        // label.Align(ALIGN.BOTTOM | ALIGN.LEFT, [0, 0]);
+        // label.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
+        // label.Align(ALIGN.HOR_CENTER | ALIGN.RIGHT, [0, 0]);
+        // label.Align(ALIGN.TOP | ALIGN.LEFT, [10, 10]);
+        // label.Align(ALIGN.TOP | ALIGN.RIGHT, [0, 0]);
+        // label.Align(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0]);
+    }
+
+
+    if(slider){ // Scale Text
+
+        // const slider = CreateSlider(_, 10, 20, .0, 'ScaleText');
+
+        const params = {
+            target_mesh: label, 
+            mnemonics:{
+                sizex:label.geom.dim[0], 
+                sizey:label.geom.dim[1], 
+                rcorners:label.mat.style.rcorners
+            },
+        };
+
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
+
+            const target_mesh = params.clbk_params.target_mesh;
+            const rcorners = params.clbk_params.mnemonics.rcorners;
+
+            const max = 18, min = .1;
+            const val = Linear_interpolation(min, max, slider_val);
+
+            {
+                const sizex =  params.clbk_params.mnemonics.sizex * val;
+                const sizey =  params.clbk_params.mnemonics.sizey * val;
+    
+                target_mesh.geom.dim[0] = sizex;
+                target_mesh.geom.dim[1] = sizey;
+                target_mesh.geom.SetDimXY(target_mesh.gfx, sizex, sizey);
+                Gl_set_dim_xy(target_mesh.gfx, sizex, sizey);
+                
+                // target_mesh.geom.pos[0] = sizex;
+                // target_mesh.geom.pos[1] = sizey;
+                target_mesh.geom.SetWposXY(target_mesh.gfx, sizex, sizey);
+             
+                if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
+                    target_mesh.mat.style.rcorners = rcorners * val;
+                   Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners);
+                }        
+            }
+            
+            {
+                const text = target_mesh.text_mesh;
+                text.SetTextScale(val)
+            }
+
+
+           }, params,
+        );
+    }
 
     return label;
 }
