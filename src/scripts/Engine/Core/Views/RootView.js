@@ -8,16 +8,12 @@ import { Relative_pos_comp_move_right_buffer } from "../../Drawables/Operations/
 import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb_remove_all_from_index, Mesh_per_vb_reset_buffer } from "../MeshBuffer.js";
-import { Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
+import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
 
 
 
 
 
-/**
- * 'Root' stands for the meshes/widgets with parent the scene, so are characterized roots.
- * The 'view' stands for that it is a buffer of indexes, viewing different aspects of properties. 
- */
 
 
 
@@ -61,16 +57,15 @@ export function Root_group_batch_buffer_reset() { _root_per_vb_meshidx_buffer.Re
 
 /**
  * Widget root: [Int16]
+ * Structure:
+ * root_group_view
+ * root_group_vbidx_view
+ * root_group_per_vb_meshidx_vie
  */
 
 
 root_group_view_buffer.Init(8);
 
-/**
- * root_group_view
- * root_group_vbidx_view
- * root_group_per_vb_meshidx_view
- */
 
 
 export function Root_group_view_buffer_get() { return root_group_view_buffer; }
@@ -142,7 +137,6 @@ export function Root_group_view_buffer_remove_root_byidx(root_bufferidx) {
 
       Root_group_per_vb_meshidx_view_remove_byidx(root_bufferidx);
       Root_group_vbidx_view_remove_byidx(root_bufferidx)
-      // console.error('Removing widget root:', root_bufferidx, root_group_view_buffer.buffer[root_bufferidx]);
       root_group_view_buffer.RemoveByIdx(root_bufferidx);
    }
 }
@@ -165,7 +159,7 @@ export function Root_group_view_buffer_remove_element_byidx(root_bufferidx, batc
          /*********************************************************************************************************************************/
          // Batch Remove num_faces
 
-         // For widget_root, actove or inactive, the num_faces must be decrement, compare to widget_groups.
+         // For widget_root, active or inactive, the num_faces must be decrement, compare to widget_groups.
          // const is_batch_vb_empty = Widget_root_batch_update_decrement_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces);
          // // If batch-vb has 0 num_faces, set the batch-vb-meshidx to null.
          // if (is_batch_vb_empty) _root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = INT_NULL;
@@ -190,7 +184,6 @@ export function Root_group_view_buffer_remove_element_byidx(root_bufferidx, batc
                const mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[root_bufferidx].buffer[i]); // Get meshes through wigdet_root_buffer
 
 
-               // if (mesh && mesh.mesh_bufferidx !== mesh_bufferidx &&
                if (mesh &&
                   mesh.batch_buffer_vbidx === batch_buffer_vbidx &&
                   mesh.gfx.vb.starts[HACK_INDEX] < min_start) {
@@ -201,7 +194,6 @@ export function Root_group_view_buffer_remove_element_byidx(root_bufferidx, batc
 
             }
 
-            // _root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = new_root_meshidx;
          }
 
 
@@ -326,20 +318,6 @@ export function Root_group_vbidx_view_add(root_bufferidx, mesh_bufferidx, progid
    mesh.batch_buffer_vbidx = vb_dataidx; // Assign the 'batch_buffer_vbidx'
 
 }
-
-
-
-// /** Run through all vbs of the widget root, and set all root_pos's to the widget root pos */
-// export function Widget_root_gfx_set_unif_wpos_per_vb(root_bufferidx) {
-
-//    const root_mesh = _mesh_buffer.buffer[root_group_view_buffer.buffer[root_bufferidx].buffer[0]];
-//    const pos = Mesh_unif_get_vb_root_wpos(root_mesh.root_posidx);
-//    for (let j = 0; j <= _root_vbidx_buffer.buffer[root_bufferidx].boundary; j += 2) {
-//       const vbidx = _root_vbidx_buffer.buffer[root_bufferidx].buffer[j + 1];
-//       if (vbidx !== root_mesh.gfx.vb.idx) Mesh_unif_set_vb_root_wpos(vbidx, pos[0], pos[1]);
-//    }
-
-// }
 
 
 
@@ -531,54 +509,6 @@ export function Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_buffe
 
 
 
-/**
- * This sets all vb face accumulator of a root widget batch. 
- * Usualy to re-run the  'Widget_root_batch_create_from_root_children()' 
- * in the case new meshes have been added to the root widget during run time.
- */
-// export function Widget_root_batch_reset_accumulator(root_bufferidx) {
-
-//    const root_batch = _root_per_vb_meshidx_buffer.buffer[root_bufferidx];
-
-//    const len = root_batch.vb.length;
-//    for (let i = 0; i < len; i++) {
-
-//       // Get the first mesh, just to extract the num_faces
-//       const mesh = Mesh_buffer_get_mesh_byidx(root_batch.vb[i].meshidx);
-//       root_batch.vb[i].num_faces = mesh.geom.num_faces; // Leave the faces count for the first mesh of all vbs 
-//    }
-
-// }
-
-
-
-// export function Widget_root_batch_update_increment_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces) {
-
-//    _root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].num_faces += num_faces;
-// }
-
-
-
-// export function Widget_root_batch_update_decrement_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces) {
-
-//    if (root_bufferidx === INT_NULL)
-//       alert('55555')
-//    const batch_vb = _root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx];
-//    if (batch_vb === _ || !batch_vb)
-//       console.error('batch_vb NULL', 'root_bufferidx', root_bufferidx, 'batch_buffer_vbidx', batch_buffer_vbidx, '_root_per_vb_meshidx_buffer', _root_per_vb_meshidx_buffer)
-
-//    batch_vb.num_faces -= num_faces;
-
-//    if (batch_vb.num_faces < 0) {
-//       console.error('Root Batch num_faces negative. root_bufferidx:', root_bufferidx, 'batchidx', batch_buffer_vbidx, 'num_faces', batch_vb.num_faces);
-//    }
-
-//    if (batch_vb.num_faces === 0) return true
-
-//    return false;
-// }
-
-
 
 
 
@@ -663,8 +593,6 @@ export function Root_group_rerender_from_root_reconstruct_listeners(root_bufferi
 
       // Get the root mesh
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[0]);
-      // const parent_events = mesh.parent ? [mesh.parent.listeners.buffer[0], mesh.parent.listeners.buffer[1]] : [null, null];
-      // mesh.ConstructListeners(parent_events);
 
       /********************************************************************************************************************/
       // Re-create listen events 
@@ -693,14 +621,8 @@ export function Root_group_rerender(root_bufferidx) {
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
       if (mesh.state.mask & MESH_STATE.ACTIVE) {
 
-         // // Do: meshes with rel_comp. Move the children positioned relative right
-         // if (mesh.rel_comp) {
-         //    Relative_pos_comp_move_right_buffer(REL_POS.RIGHT, mesh, x * 2)
-         // }
-
          // Rerender
          mesh.AddToGfxFromReset();
-         // console.log(mesh.GetName())
       }
    }
 }
@@ -763,25 +685,11 @@ export function Root_group_set_in_focus(root_bufferidx) {
       const gfx = Mesh_buffer_get_mesh_gfx_byidx(vb_mesh_roots[i]);
       // Renderqueue_set_priority_by_vb(LAST, gfx.vb.groupidx);
       console.error('Implement: Root_group_set_in_focus()')
+      alert('Implement: Root_group_set_in_focus()')
    }
 
 }
 
-
-
-
-// /** A function to call 'SetClbkGfxUniforms()@Mesh class', only once per vertex buffer, using the root mesh of each vb that belongs to this widget root */
-// export function Root_group_per_vb_meshidx_view_get_all_roots(root_bufferidx, unif_name, Clbk, clbk_params) {
-
-//    // IMPORTANT : If a slider, which we want to cascade set the unif clbk belongs to a mesh that is the widget root, 
-//    // then it is not only the slider that are going to be effected rather all the meshes that belong to the widget root.
-
-//    // SEE: # UNIF PARAMS UPDATE ISSUE
-
-//    // Call for each root mesh in every vertex buffer
-//    const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(root_bufferidx);
-//    return root_meshes;
-// }
 
 
 

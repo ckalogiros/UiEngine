@@ -24,7 +24,8 @@ import { Particles_system_reset } from '../Engine/ParticlesSystem/ParticlesSyste
 import { Styles_hover_margin_reset, Styles_margin_reset, Styles_pad_reset } from '../Engine/Styles.js';
 import { Generic_buffers_container_reset } from '../Engine/Core/Buffers.js';
 import { Root_group_batch_buffer_reset, Root_group_buffer_reset, Root_group_gfx_buffer_reset } from '../Engine/Core/Views/RootView.js';
-import { Shader_bit_flags_build_SID_ATTR, Shader_bit_flags_build_SID_ATTR_PASS } from '../Graphics/ShaderBitFlags.js';
+import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
+import { Font_texture_init_buffers, Font_texture_reset_buffers } from '../Engine/Loaders/Font/Font.js';
 
 
 // var osu = require('node-os-utils')
@@ -32,6 +33,7 @@ import { Shader_bit_flags_build_SID_ATTR, Shader_bit_flags_build_SID_ATTR_PASS }
 // import {osu} from '../node-os-utils/index.js'
 // import * as os from "../node-os-utils/index.js"
 
+// window.location.reload(true)
 
 let renderer = null;
 
@@ -39,12 +41,13 @@ export function AppInit() {
 
     SID.ATTR = Shader_bit_flags_build_SID_ATTR();
     SID.PASS = Shader_bit_flags_build_SID_ATTR();
-    // SID.PASS = Shader_bit_flags_build_SID_ATTR_PASS();
+
 
     Time_intervals_init_time();
 
     // Create and initialize the buffers that will be storing texture-font-uv data. 
     Texture_init_texture_storage_buffer();
+    Font_texture_init_buffers();
 
     
 
@@ -140,6 +143,8 @@ export function App_reset(){
     Renderqueue_reset();
     
     Gfx_pool_vb_reset();
+
+    Font_texture_reset_buffers();
     
     Mesh_unif_wpos_reset();
     Mesh_unif_wpos_ubidxs_reset();
@@ -184,5 +189,7 @@ export function App_reset(){
 export function App_reinitialize(){
 
     Time_intervals_create(100, 'GPU performance timer query', TIME_INTERVAL_REPEAT_ALWAYS, Renderer_webgl_check_query_results, _);
+
+    Font_texture_init_buffers();
 
 }

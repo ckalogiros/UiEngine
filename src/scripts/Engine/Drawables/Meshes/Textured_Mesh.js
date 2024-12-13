@@ -10,8 +10,6 @@ import { Texture_Material } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
-import { Root_group_set_in_focus } from "../../Core/Views/RootView.js";
-import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 
 
 
@@ -60,16 +58,8 @@ export class Textured_Mesh extends Mesh {
       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
       this.is_gfx_inserted = true;
 
-
       // Add entry to Gfx Buffer
       this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
-
-
-
-      // If texture exists, store texture index, else if font texture exists, store font texture index, else store null
-      // BUG: Make sure the below statement makes sense for Texture_Material(it is copied from the Font_Material)
-      // this.gfx.tb.idx = (this.mat.texidxtextureid !== INT_NULL) ? this.mat.texidx : ((this.mat.uvIdx !== INT_NULL) ? this.mat.uvIdx : INT_NULL);
-      // Vertex_buffer_group_set_texidx(this.gfx.vb.groupidx, this.gfx.tb.idx); // Update the vertex buffer to store the texture index
 
       return this.gfx;
    }

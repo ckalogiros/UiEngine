@@ -113,34 +113,34 @@ export function Load_msdf_font_metrics_new(textureid){
          height:  m.height,
       };
 
-      console.log('ch', String.fromCharCode(i+CHAR_ARRAY_START_OFFSET),
-         '\nadvance:', glyphs[i].advance,  
-         '\nwidth:', plane_bounds[i].width,
-         '\ntop:', plane_bounds[i].top,
-         '\nbottom:', plane_bounds[i].bottom,
-         '\nheight:', plane_bounds[i].height,
-      )
+      // console.log('ch', String.fromCharCode(i+CHAR_ARRAY_START_OFFSET),
+      //    '\nadvance:', glyphs[i].advance,  
+      //    '\nwidth:', plane_bounds[i].width,
+      //    '\ntop:', plane_bounds[i].top,
+      //    '\nbottom:', plane_bounds[i].bottom,
+      //    '\nheight:', plane_bounds[i].height,
+      // )
       
    }
    
-   { // Debug-Print
-      console.log('-------------------', 
-         '\nlineH', obj.metrics.lineHeight,
-         '\nasc', ascender, 
-         '\ndesc', descender,
-         '\nABS(asc+desc)', Abs(ascender) + Abs(descender),
-         '\nABS(asc-desc)', Abs(ascender) - Abs(descender),
-         '\nlineH-ABS(asc+desc)', obj.metrics.lineHeight - (Abs(ascender) + Abs(descender)),
-         '\nlineH-ABS(asc-desc)', obj.metrics.lineHeight - (Abs(ascender) - Abs(descender)),
-         '\nbase: ', base_line,  
-      )
-      console.log('-------------------\n',
-         'base: ', base_line,  
-         '\nascender:', -ascender ,
-         '\n(-ascender)+descender', (-ascender)+descender ,
-      )
-      // console.log('------------------- metrics:', _font_metrics_buffer)
-   }
+   // { // Debug-Print
+   //    console.log('-------------------', 
+   //       '\nlineH', obj.metrics.lineHeight,
+   //       '\nasc', ascender, 
+   //       '\ndesc', descender,
+   //       '\nABS(asc+desc)', Abs(ascender) + Abs(descender),
+   //       '\nABS(asc-desc)', Abs(ascender) - Abs(descender),
+   //       '\nlineH-ABS(asc+desc)', obj.metrics.lineHeight - (Abs(ascender) + Abs(descender)),
+   //       '\nlineH-ABS(asc-desc)', obj.metrics.lineHeight - (Abs(ascender) - Abs(descender)),
+   //       '\nbase: ', base_line,  
+   //    )
+   //    console.log('-------------------\n',
+   //       'base: ', base_line,  
+   //       '\nascender:', -ascender ,
+   //       '\n(-ascender)+descender', (-ascender)+descender ,
+   //    )
+   //    // console.log('------------------- metrics:', _font_metrics_buffer)
+   // }
    
 
    

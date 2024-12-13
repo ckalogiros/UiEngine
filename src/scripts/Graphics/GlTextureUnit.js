@@ -13,8 +13,8 @@ export class Gl_Texture {
     /** The Graphic's texture unit object. */
     tbo = null; 
 	tex_unit_id = -1; // Graphic's unique 'unsigned integer' id. 
-    texidx = INT_NULL; // Self refference index to the texture buffer.
-    texid = INT_NULL; // The texture id from the 'TEXTURES.' global contant
+    textureid = INT_NULL; // The texture id from the 'TEXTURES.' global contant
+    texidx = INT_NULL; // Self refference index
 	width = 0;
 	height = 0;
 	level = -1;
@@ -41,14 +41,12 @@ export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=
     gl.RGBA32I
     gl.RGBA32UI */
     const texture = new Gl_Texture();
-    texture.tex_unit_id = gl.TEXTURE0 + idx; // Advance the texture ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
-    texture.texidx = idx; // Advance the texture ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
-    texture.texid = textureid; // Advance the texture ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
+    texture.tex_unit_id = gl.TEXTURE0 + idx; // WebGl texture id.Advance the texture ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
+    texture.textureid = textureid; // Id from TEXTURES global object
+    texture.texidx = idx; 
     texture.level = 0;
     texture.internalFormat = gl.RGBA;
     texture.srcFormat = gl.RGBA;
-    // texture.internalFormat = gl.RGBA16UI;
-    // texture.srcFormat = gl.RGBA16UI;
     texture.srcType = gl.UNSIGNED_BYTE;
     
     gl.activeTexture(texture.tex_unit_id);

@@ -6,7 +6,7 @@ import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_get_shader_attribs_indexing } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
-import { Renderqueue_Add, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_Add, Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name, Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
@@ -293,7 +293,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    else if(flags & GFX_CTX_FLAGS.SCROLLER_VB && GFX_VBIDX_RENAME_ME.SCROLLER_VB_IDX !== INT_NULL) {
       // Scroller meshes have their own vb. If none vb is initialized, 'SCROLLER_VB_IDX' will be = INT_NULL, and a new vb will be created for scrollers.
       vb_groupidx = GFX_VBIDX_RENAME_ME.SCROLLER_VB_IDX;
-      Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_ACTIVE)
+      Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_ACTIVE);
+      Renderqueue_set_active(vb_groupidx, true);
 
       // TODO: Update the vertex buffer info. Needs to have access to the vbidxs of the mesh.gfx.vb.?????
       // for() {

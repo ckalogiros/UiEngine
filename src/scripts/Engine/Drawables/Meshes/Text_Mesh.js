@@ -11,7 +11,7 @@ import { WHITE } from "../Material/Base/Colors.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Font_get_uv_coords, Font_metrics_get_face_advancex, Font_metrics_get_char_width, Font_metrics_get_row_height } from "../../Loaders/Font/Font.js";
-import { Gl_set_vpos_x, Gl_set_uv, Gl_set_wpos_x } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_vpos_x, Gl_set_uv, Gl_set_wpos_x, Gl_set_rgb_specific_index } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 
 
 
@@ -37,7 +37,7 @@ export class Text_Mesh extends Mesh {
       
       
       const mat = new FontMaterial(color, font, text, [bold, sdfouter])
-      const geom = new Geometry2D_Text(pos, fontsize, scale, text, font, mat.uvIdx);
+      const geom = new Geometry2D_Text(pos, fontsize, scale, text, font, mat.fontidx);
       
       super(geom, mat);
 
@@ -48,12 +48,12 @@ export class Text_Mesh extends Mesh {
       this.type |= MESH_TYPE.TEXT_MESH | is_debug_mesh;
       this.fontsize = fontsize;
 
-      const advancex = Font_metrics_get_face_advancex(mat.uvIdx)/2;
+      const advancex = Font_metrics_get_face_advancex(mat.fontidx)/2;
       this.advancex = advancex;
       
       this.CalculateTextWidth()
       // this.text_width = 0;
-      // this.text_height = Font_metrics_get_row_height(mat.uvIdx);
+      // this.text_height = Font_metrics_get_row_height(mat.fontidx);
 
    }
 
@@ -193,9 +193,7 @@ export class Text_Mesh extends Mesh {
 
    SetPosX(x) {
 
-      // THERE is no point setting all characters to the same position
-      console.error('implement me')
-      // this.geom.SetPosX(this.gfx, x, this.geom.num_faces);
+      this.geom.SetPosX(this.gfx, x, this.geom.num_faces);
 
    }
    AddWposX(x) {
@@ -339,6 +337,12 @@ export class Text_Mesh extends Mesh {
    }
 
 
+   SetColorRGBSpecificIndex(col, char_start, char_len = 0) {
+      const num_faces = (char_len) ? char_len : this.geom.num_faces;
+      Gl_set_rgb_specific_index(this.gfx, col, num_faces, char_start);
+   }
+
+
    SetFrameBufferIdx(fbidx) {
       this.isFramebufferRendered = fbidx;
    }
@@ -360,7 +364,7 @@ export class Text_Mesh extends Mesh {
       const face_count = this.mat.char_buffer.size; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
       let width = 0;
       let prevline_width = 0;
-      let height = Font_metrics_get_row_height(this.mat.uvIdx)/2;
+      let height = Font_metrics_get_row_height(this.mat.fontidx)/2;
       // let height = 0;
 
       for (let i = 0; i < face_count; i++) {
@@ -369,10 +373,10 @@ export class Text_Mesh extends Mesh {
             
             if(width > prevline_width) prevline_width = width;
             width = 0;
-            height += Font_metrics_get_row_height(this.mat.uvIdx)/2;
+            height += Font_metrics_get_row_height(this.mat.fontidx)/2;
          }
          else {
-            width += Font_metrics_get_char_width(this.mat.uvIdx, this.mat.char_buffer.buffer[i])/2;
+            width += Font_metrics_get_char_width(this.mat.fontidx, this.mat.char_buffer.buffer[i])/2;
          }
       }
 
@@ -452,21 +456,17 @@ p
 
 
 
-   RenderText(text) {
-      if (!this.gfx) { 
-         console.error('98776\nTrying to Render Text before vertex buffer creation\ntext:', this.mat.char_buffer.buffer); return; 
+   RenderText() {
+      if (!this.gfx) { // Case there is a timeInterval or some callback calling to render text before its 'root' widget called the '.Render()' function
+         return; 
       }
 
       const store_start = this.gfx.vb.starts.buffer[0];
       const attribs_count = this.gfx.vb.counts.buffer[0];
 
       const c = this.mat.char_buffer.buffer;
-      const space_char_uv = Font_get_uv_coords(this.mat.uvIdx, ' ');
+      const space_char_uv = Font_get_uv_coords(this.mat.fontidx, ' ');
 
-      const w = Font_metrics_get_char_width(this.mat.uvIdx, c[0]);
-      // let xpos = this.geom.pos[0]+w;
-      // let xpos = this.geom.pos[0]+this.geom.dim[0];
-      // let xpos = this.geom.pos[0]-w/4;
       let xpos = this.geom.pos[0];
 
       
@@ -475,11 +475,11 @@ p
          
          // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
          this.mat.uv = space_char_uv;
-         const width = Font_metrics_get_char_width(this.mat.uvIdx, c[i])/2;
+         const width = Font_metrics_get_char_width(this.mat.fontidx, c[i])/2;
          xpos += width; //+1;
          
          if (c[i] !== ' ') // If char=' ' space, just render [0,0] uv coordinates.
-            this.mat.uv = Font_get_uv_coords(this.mat.uvIdx, c[i]);
+            this.mat.uv = Font_get_uv_coords(this.mat.fontidx, c[i]);
          
          // TODO: For efficiency, create a dedicated Gl_ function to update all values
          Gl_set_uv(this.gfx, this.mat.uv);
@@ -492,17 +492,9 @@ p
          
       }
       
-      // const width = Font_metrics_get_face_advancex(this.mat.uvIdx);
-      // const faces_left = this.mat.char_buffer.size - this.mat.char_buffer.count;
-      // if(faces_left > 0) Gl_set_vpos_x(this.gfx, width, faces_left);
-      // If there are characters beyond the renderable, AND the are NOT EMPTY '', render empty char face
       for (let i = this.mat.char_buffer.boundary + 1; i < this.mat.char_buffer.size; i++) {
          
          Gl_set_uv(this.gfx, space_char_uv);
-         
-         // const width = Font_metrics_get_face_advancex(this.mat.uvIdx);
-         // Gl_set_vpos_x(this.gfx, width, 1);
-         
          this.gfx.vb.starts.buffer[0] += attribs_count;
       }
       
@@ -538,7 +530,7 @@ p
       }
 
       // Set the correct uv coordinates.
-      this.mat.uv = Font_get_uv_coords(this.mat.uvIdx, text);
+      this.mat.uv = Font_get_uv_coords(this.mat.fontidx, text);
       geom_copy.dim[0] = 12; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
       Gl_set_uv(this.gfx, this.mat.uv);
 
@@ -569,27 +561,27 @@ p
       // Run for buffer size so that the vertex buffers have the neccessary space for the whole char_buffer.
       const face_count = this.mat.char_buffer.size; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
       
-      const space_char_uv = Font_get_uv_coords(this.mat.uvIdx, ' ');
+      const space_char_uv = Font_get_uv_coords(this.mat.fontidx, ' ');
 
       for (let i = 0; i < face_count; i++) {
 
          const char = this.mat.char_buffer.buffer[i];
          if(char==='\n'){ // Case new line
             
-            geom_copy.pos[1] += Font_metrics_get_row_height(this.mat.uvIdx);
+            geom_copy.pos[1] += Font_metrics_get_row_height(this.mat.fontidx);
             geom_copy.pos[0] = this.geom.pos[0];
          }
          else {
             
             // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
             this.mat.uv = space_char_uv;
-            const width = Font_metrics_get_char_width(this.mat.uvIdx, char)/2;
+            const width = Font_metrics_get_char_width(this.mat.fontidx, char)/2;
    
             if (char !== '') { // If there is a text, get char uv and metrics
    
                
             }
-            this.mat.uv = Font_get_uv_coords(this.mat.uvIdx, char);
+            this.mat.uv = Font_get_uv_coords(this.mat.fontidx, char);
             
 
             geom_copy.dim[0] = width;

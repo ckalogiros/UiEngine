@@ -1,3 +1,10 @@
+/**
+ * This is the dispatch notifications mechanism
+ * for the 'Notifications' system.
+ * For example, if a mesh is created, at the site of creation we 
+ * dispatch a 'mesh creation' notification message.
+ */
+
 "use strict";
 
 import { New_generic_buffer } from "../../Core/Buffers.js";

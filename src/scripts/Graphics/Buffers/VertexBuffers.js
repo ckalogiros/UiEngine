@@ -376,7 +376,7 @@ class Vertex_Buffer_Group {
         this.progidx = progidx;     // Just for debuging.
         this.vao = vao;             // WebGl vertex array object.
         this.vaoidx = vaoidx;       // Index to the array of stored VAO's
-        this.texidx = INT_NULL;     // index to the array all textures are stored.
+        this.texidx = INT_NULL;     // webGl texture index.
         this.ibidx = INT_NULL;      // index ref to index buffer this vb uses.
         this.draw_count = 0;
         this.vertices_per_face = 4; // HACK: How vertex buffer should conclude the vertices per face ????????????????
@@ -990,7 +990,7 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
 
 
         // Store the texture index in the vertex
-        vb_info.texidx = mat.textureid;
+        vb_info.texidx = mat.texidx;
         gfx.vb.counts.buffer[i] = verts_per_rect * vb_info.attribs_info.count;
 
         // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
@@ -1072,7 +1072,7 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces
 
 
         // Store the texture index in the vertex
-        vb_info.texidx = mat.textureid;
+        vb_info.texidx = mat.texidx;
         gfx.vb.counts.buffer[i] = VERTS_PER_RECT_INDEXED * vb_info.attribs_info.count;
 
 
@@ -1193,6 +1193,9 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
         
         let start = gfx.vb.starts.buffer[i];
         const end = start + removed_attribs;
+
+        // if(end > vb_info.count)
+        //     console.error('vbidx', gfx.vb.groupidx, 'end', end, 'vb_info.count', vb_info.count, 'num_faces', num_faces)
 
         
         // console.log('Remove:', gfx.vb.groupidx, 'removed_attribs', removed_attribs, 'counts', gfx.vb.counts.buffer[i], 'num_faces', num_faces, 'vbcount', vb_info.count)

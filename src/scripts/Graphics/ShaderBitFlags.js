@@ -106,10 +106,10 @@ export class Shader_Attributes {
    PrintEnabled(info=null) {
 
       if(info) console.log(info);
-      for (let [key] of Object.entries(this)) {
+      // for (let [key] of Object.entries(this)) {
          
-         if(this[key] !== INT_NULL) console.log(key, this[key]);
-      }
+      //    if(this[key] !== INT_NULL) console.log(key, this[key]);
+      // }
    }
 
 } 

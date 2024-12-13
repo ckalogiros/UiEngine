@@ -234,7 +234,7 @@ export class Mesh {
             }
         }
 
-        if (print_res) console.log('sooadoasdlkls,d', msg)
+        if (print_res) console.log(msg)
         return ret
     }
 
@@ -315,7 +315,8 @@ export class Mesh {
 
             if (this.type & (MESH_TYPE.WIDGET_TEXT | MESH_TYPE.WIDGET_TEXT_DYNAMIC | MESH_TYPE.TEXT_MESH)) { // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
 
-                Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
+                // Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
+                Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
             }
             else {
 

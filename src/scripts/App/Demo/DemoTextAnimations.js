@@ -95,7 +95,7 @@ function TEST_all(slider, params){
 
       // const default_val = 
       const val = Linear_interpolation(-1, 1, slider_val);
-      const limit = Font_metrics_get_row_height(target.mat.uvIdx) / 2;
+      const limit = Font_metrics_get_row_height(target.mat.fontidx) / 2;
       // console.log(val)
 
       // Scale_x(target, val)

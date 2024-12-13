@@ -440,11 +440,9 @@ export class Close_Button extends Widget_Button {
 
    OnClose() {
 
-      console.log('OnClose', this);
-
       /** The Scema of the 'params', constructed for the 'eventCallbacks'
-         source_params: this,
-         evt_params: root,
+        * source_params: this,
+        * evt_params: root,
        */
       const params = this.eventCallbacks.buffer[0]; // HACK: We must set up an index clarification for eventCallbacks buffer. 
       const root = params.evt_params

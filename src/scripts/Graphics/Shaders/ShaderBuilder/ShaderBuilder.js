@@ -650,6 +650,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
       vs: vs,
       attribsidx: attribsidx,
       attribs_indexing: ret.attribs_indexing,
+      code:vs_chunks,
    };
 }
 
@@ -948,7 +949,10 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
    ID++;
 
    if (DEBUG.SHADERS) console.info(fs);
-   return fs;
+   return {
+      fs:fs,
+      code:fs_chunks,
+   };
 }
 
 

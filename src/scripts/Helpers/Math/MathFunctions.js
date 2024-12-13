@@ -61,17 +61,17 @@ export function Digitize(n, base=10){
    }
    return arr;
 
-   // Reverse order
-   const result = [];
-   const len = arr.length;
-   let k = len-1;
+   // // Reverse order
+   // const result = [];
+   // const len = arr.length;
+   // let k = len-1;
 
-   for(let i=0; i<len; i++){
+   // for(let i=0; i<len; i++){
       
-      result[i] = arr[k--];
+   //    result[i] = arr[k--];
  
-   }
-   return result;
+   // }
+   // return result;
 
 }
 

@@ -2,41 +2,28 @@ import { Callback_animations_create } from "../../../../Engine/Animations/Callba
 import { Mesh_animations_create } from "../../../../Engine/Animations/MeshAnimations.js";
 import { Android_deactivate_scrolling, MouseGetPosDifX } from "../../../../Engine/Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch, Create_widget_switch_simple } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_build_group_from_root_mesh } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../../../Engine/Core/Views/RootView.js";
-import { Debug_info_ui_static } from "../../../../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { BLACK, BLUEL, CYAN, GREEN, GREENL, GREY, Interpolate_rgb_to_01, ORANGEL, ORANGER, PURPLEB, PURPLER, RED, REDL, RGB, TRANSPARENT, WHITE, YELLOW, YELLOWL, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { BLACK, BLUEL, CYAN, GREEN, GREY, Interpolate_rgb_to_01, PURPLEB, PURPLER, REDL, RGB, TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_calc_pos_dif, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Slider_connect, Slider_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Switch_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSwitch.js";
 import { Listeners_set_priority } from "../../../../Engine/Events/EventListeners.js";
-import { Font_metrics_calculate_width_from_text, Font_metrics_get_char_width, Font_metrics_get_row_height, Font_retrieve_fontidx } from "../../../../Engine/Loaders/Font/Font.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Time_intervals_create } from "../../../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_group_create_scissorbox } from "../../../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_set_attr_round_corners, Gl_set_glow_intensity, Gl_rotate_z_2d, Gl_set_attr_feather, Gl_set_dim_xy, Gl_add_dim_xy, Gl_add_vpos_xy, Gl_set_vpos_xy, Gl_set_vpos_x, Gl_set_vpos_y, Gl_add_vpos_y, Gl_add_vpos_x, Gl_add_wpos_x, Gl_set_angle } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { GetRandomColor, GetRandomPos, GetSequencedColor } from "../../../../Helpers/Helpers.js";
+import { Gl_set_attr_round_corners, Gl_set_glow_intensity, Gl_rotate_z_2d, Gl_set_attr_feather, Gl_set_dim_xy, Gl_add_dim_xy, Gl_add_vpos_y, Gl_add_vpos_x, Gl_set_angle } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { GetRandomPos, GetSequencedColor } from "../../../../Helpers/Helpers.js";
 import { Digitize, Linear_interpolation, Logarithmic_interpolation, Normalize } from "../../../../Helpers/Math/MathFunctions.js";
-import { Abs, Magnitude, Magnitude_2vectors, Max, Min } from "../../../../Helpers/Math/MathOperations.js";
+import { Abs, Magnitude, Magnitude_2vectors } from "../../../../Helpers/Math/MathOperations.js";
 import { Clbk_animations_create_transition_slope, Clbk_animations_text_create } from "../../DemoAnimations.js";
 
 
 
-
-
-
-// TODO: Make the head another color
-// TODO: Create animation for the collectable
-// TODO: Create glow effect for the snake. ?When and Where?
-// TODO:
-// TODO: Create a better panel for user input
-// TODO:
-// TODO: Pass the snake through another shader for glow
-// TODO: Also on scale the glow effect should intensify
 
 
 
@@ -47,12 +34,9 @@ import { Clbk_animations_create_transition_slope, Clbk_animations_text_create } 
 
 const MAX_WIDTH = 400;
 const MAX_BODY_MESHES = 100;
-// const INITIAL_BODY_COUNT = 40;
 const INITIAL_BODY_COUNT = 20;
 const collectable_apple_dim = [64/2, 73/2];
 const collectable_dim = [64, 64];
-// const collectable_apple_dim = [64/1, 73/1];
-// const collectable_dim = [84, 84];
 const collectable_scale = .6;
 
 const SLOPE_CONSTANT = .14;
@@ -66,7 +50,9 @@ const DISTANCE_FACTOR = 1.; // The overlap between snake body meshes. The smalle
 const TIMER_STEP = .0015;
 const SCALE_UP_FACTOR = 1.7;
 
-
+// const score_font = TEXTURES.MSDF_CONSOLAS_1024;
+const score_font = TEXTURES.CONSOLAS_28px;
+const score_size = 12;
 
 
 
@@ -86,7 +72,6 @@ class Body_mesh_properties {
       // A modifier for the calculation of the slope function that controls the next position of a snake body mesh
       this.t = 0; // Values = [0-1]
       this.prev_slope = 1.;// Stores the current calculated 't' to be used on the next snake 'Move' calculation. 
-      // this.scale_factor = 1.8; // Max scale will be = 'scale_factor' times bigger to the original size
 
       this.in_scale_up_animation = false;
       this.in_animation = false;
@@ -162,7 +147,6 @@ export function Game_snake(y = 0, controls_create=true) {
 
       // colors:[GREY[3],GREY[5], GREY[9]],
       colors:[GREY[2],GREY[5], GREY[9]],
-      // colors:[GREY[2],GREY[4], GREY[6], GREY[9]],
 
       // Function Pointers
       Color_set_fn: Snake_body_set_color,
@@ -175,7 +159,6 @@ export function Game_snake(y = 0, controls_create=true) {
    if(snake.feather_slider.init_val < snake.feather_slider.min || snake.feather_slider.init_val > snake.feather_slider.max) alert('0099887766, feather_slider')
    if(snake.speed_slider.init_val < snake.speed_slider.min || snake.speed_slider.init_val > snake.speed_slider.max)   alert('0099887766, speed_slider')
    if(snake.slope_slider.init_val < snake.slope_slider.min || snake.slope_slider.init_val > snake.slope_slider.max)   alert('0099887766, slope_slider')
-   // if(snake.next_anim_slider.init_val < snake.next_anim_slider.min || snake.next_anim_slider.init_val > snake.next_anim_slider.max)  alert('0099887766, next_anim_slider')
    if(snake.reduce_size_slider.init_val < snake.reduce_size_slider.min || snake.reduce_size_slider.init_val > snake.reduce_size_slider.max)   alert('0099887766, reduce_size_slider')
    if(snake.distance_factor_slider.init_val < snake.distance_factor_slider.min || snake.distance_factor_slider.init_val > snake.distance_factor_slider.max)   alert('0099887766, reduce_size_slider')
    if(snake.max_scale_factor_slider.init_val < snake.max_scale_factor_slider.min || snake.max_scale_factor_slider.init_val > snake.max_scale_factor_slider.max) alert('0099887766, max_scale_factor_slider')
@@ -189,7 +172,6 @@ export function Game_snake(y = 0, controls_create=true) {
    const vertical_space = y;
    let board_width = ((VIEWPORT.WIDTH / 2) < MAX_WIDTH) ? (VIEWPORT.WIDTH / 2) : MAX_WIDTH;
    let board_height = (VIEWPORT.HEIGHT / 2) - vertical_space/2  - 10;
-   // let board_height = 200;
 
    // Calculate dimentions for small width device
    const dif = Abs((VIEWPORT.WIDTH / 2));
@@ -205,7 +187,8 @@ export function Game_snake(y = 0, controls_create=true) {
       board_height - DEVICE.info.canvas_top + DEVICE.info.canvas_bot;
    }
 
-   const board_color = TRANSPARENCY(Interpolate_rgb_to_01(26, 70, 30), 1.);
+   // const board_color = TRANSPARENCY(Interpolate_rgb_to_01(26, 70, 30), 1.);
+   const board_color = TRANSPARENCY(Interpolate_rgb_to_01(40, 50, 46), 1.);
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [VIEWPORT.WIDTH/2-board_width, vertical_space, 0], [board_width - board_pad, board_height], board_color, 'section', style);
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
@@ -220,7 +203,6 @@ export function Game_snake(y = 0, controls_create=true) {
    /*************************************************************************************************/
    // Create the Collectible mesh
 
-   // const collectable_size = snake.size*1.4;
    const collectable_size = 20;
 
    const collectable = Create_widget_section(_, _, [0, 0], [300, 300, 0], collectable_dim, REDL[3], 'section', [collectable_size, 6, 3]);
@@ -270,8 +252,6 @@ export function Game_snake(y = 0, controls_create=true) {
    /*************************************************************************************************/
    // Create snake body meshes
 
-   // let next_posx = snake.size;
-   // let next_posy = snake.size;
    let next_posx = 20;
    let next_posy = 40;
    let zpos = 1;
@@ -288,22 +268,13 @@ export function Game_snake(y = 0, controls_create=true) {
 
       style.rcorners = calc_size;
       style.feather = snake.style.feather;
-      // const col = i === 0 ? BLUEL[9] : GetSequencedColor(9);
       const col = GetSequencedColor(9);
-      // const body_mesh = Create_widget_section(_, _, [0,0], [next_posx, next_posy, MAX_BODY_MESHES-i+1], [calc_size, calc_size], snake.color, 'body_mesh', style);
-      // const body_mesh = Create_widget_section(_, _, [0, 0], [next_posx, next_posy, MAX_BODY_MESHES - i + 1], [calc_size, calc_size], col, 'body_mesh', style);
-      // const body_mesh = Create_widget_section(_, _, [0,0], [next_posx, next_posy, 1], [calc_size, calc_size], snake.color, 'body_mesh', style);
       const body_mesh = Create_widget_section(_, _, [0, 0], [next_posx, next_posy, 1], [calc_size, calc_size], col, 'body_mesh', style);
       body_mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
       body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
-      // body_mesh.EnableGfxUniforms({unif: SID.UNIF.FS_GLOW_VEC3,}, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-      // body_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY);
       section.AddItem(body_mesh);
-
-      // console.log(body_mesh.geom.pos)
-
 
       const bodyidx = snake.body.Add(new Body_mesh_properties(body_mesh, snake.glow_intensity));
       snake.body.buffer[bodyidx].idx = bodyidx; // Store the index for convinience
@@ -345,7 +316,6 @@ export function Game_snake(y = 0, controls_create=true) {
             const nose = params.params.target_params.nose;
 
             
-            // if(snake.body.buffer[0].in_scale_up_animation === false)
             if(snake.body.buffer[0].in_animation === false)
             { // Let user been able to rotate immidiately after user input, instead of waiting the snake animation to take place 
                
@@ -354,17 +324,15 @@ export function Game_snake(y = 0, controls_create=true) {
                snake.vel[0] = Math.sin(snake.rotation.amt);
                snake.vel[1] = Math.cos(snake.rotation.amt);
 
-               console.log(snake.body.buffer[0].in_scale_up_animation)
                const rot_amt = snake.rotation.amt; 
                Gl_rotate_z_2d(nose.gfx, nose.geom.dim, rot_amt, 1);
                
-               // Gl_set_angle(nose.gfx, Abs(rot_amt));
                const angle = Math.atan2(snake.vel[0], snake.vel[1]);
                const normalizedAngle = angle >= 0 ? angle : (2 * Math.PI + angle); // Normalize from -π,π to 0,π
                Gl_set_angle(nose.gfx, normalizedAngle);
 
 
-               // DO NOT DELETE: For some reason the sattelite rotation works without correcting its position
+               // Rotate nose
                const cx = nose.geom.pos[0]; // Center to sattelites position
                const cy = nose.geom.pos[1]
                const r = head.geom.dim[0] * snake.glow_scale_down_factor + nose.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
@@ -398,29 +366,25 @@ export function Game_snake(y = 0, controls_create=true) {
    
    const text_pad_x=7, text_pad_y=3;
    const digit_meshes_arr = [];
-   const digit1_label = Create_widget_label(_, '0', _, [0, 0, 0], _, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
-   // const digit1_label = Create_widget_label(_, '0', _, [0, 0, 0], 24, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.MSDF_CONSOLAS_1024);
+   const digit1_label = Create_widget_label(_, '0', _, [0, 0, 0], score_size, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [text_pad_x, text_pad_y], _, _, score_font);
    {
       digit1_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       digit1_label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 12);
       digit1_label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, digit1_label.geom.dim[0]);
        
-      digit1_label.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
+      digit1_label.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC;
       
       section.AddItem(digit1_label);
       digit_meshes_arr.push(digit1_label);
    }
 
    // Calculate score label width before creation. Works only if the font is already in use (loaded)
-   // const font_idx = Font_retrieve_fontidx(TEXTURES.CONSOLAS_32px);
-   // const label_width = Font_metrics_calculate_width_from_text('SCORE', font_idx) + digit1_label.geom.dim[0]*5 + 10;
-   const label_width = digit1_label.text_mesh.text_width + digit1_label.geom.dim[0]*5 + 10;
-   const score_label = Create_widget_label(_, 'score', _, [0, 0, 0], _, TRANSPARENCY(GREEN[7], 1.), WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
+   const score_label = Create_widget_label(_, 'score', _, [0, 0, 0], score_size, TRANSPARENCY(GREEN[7], 1.), WHITE, [text_pad_x, text_pad_y], _, _, score_font);
    {
       score_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       score_label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 12);
       score_label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, score_label.geom.dim[1]);
-      score_label.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
+      score_label.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC;
       section.AddItem(score_label);
    }
 
@@ -438,7 +402,6 @@ export function Game_snake(y = 0, controls_create=true) {
    section.GenGfxCtx();
 
 
-   // const digit_pos_x = section.GetPosX() + section.geom.dim[0]*2;
    const digit_pos_x = section.geom.pos[0] + section.geom.dim[0]*2;
    digit1_label.MoveNoGfxUpdate(digit_pos_x-(digit1_label.geom.dim[0]*2 + 10), 10);
    score_label.MoveNoGfxUpdate(digit_pos_x-(score_label.geom.dim[0]*2 + digit1_label.geom.dim[0]*6 + 10), 10);
@@ -463,9 +426,7 @@ export function Game_snake(y = 0, controls_create=true) {
    // Set Uniforms Callbacks
 
    collectable.GfxUniformSetAndUpdate('u_scale2', [collectable_scale, 1]);
-   // collectable.GfxUniformSetAndUpdate('u_glow_params', [.5, .5, .9]);
    collectable.GfxUniformSetAndUpdate('u_glow_params', [.5, .5, .9]);
-   // collectable.GfxUniformSetAndUpdate('u_glow_params', [1., .3, 1.]);
    // Initialize shader attribute
    Gl_set_glow_intensity(collectable.gfx, 1.);
 
@@ -494,7 +455,6 @@ export function Game_snake(y = 0, controls_create=true) {
    let options = null;
    if(controls_create) {
       
-      // options = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'OPTIONS', _, [(VIEWPORT.WIDTH / 2)-45, VIEWPORT.HEIGHT-50, 1], 20, BLUEL[6], WHITE, [12, 10], .5, _, TEXTURES.CONSOLAS_24px);
       options = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'OPTIONS', _, [100, 0, 1], 20, CYAN[6], WHITE, [32, 6], .5, _, TEXTURES.CONSOLAS_24px);
       options.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       options.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -563,11 +523,8 @@ export function Game_snake(y = 0, controls_create=true) {
       
    
       options.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-      // options.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC;
       options.GenGfxCtx();
       options.Render()
-   
-      // options.SetWposXY(-options.geom.dim[0], -options.geom.dim[1] * 2 - 4);
    
       options.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, options.gfx.vb.groupidx)
    
@@ -602,12 +559,8 @@ export function Game_snake(y = 0, controls_create=true) {
    }
 
    Snake_start_menu(params);
-   // Time_intervals_create(16, 'Snake', TIME_INTERVAL_REPEAT_ALWAYS, Animate_snake, params);
 
    snake.Color_set_fn(snake);
-
-
-   // Debug_info_ui_static();
 
    return {
       Snake_options_callback:Snake_options_callback,
@@ -631,9 +584,7 @@ function Snake_start_menu(params) {
    
    const tr = .75;
    
-   // const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section', );
-   // const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20,20], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], [0,0], TRANSPARENCY(GREY[3], tr), 'section', );
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20,20], [VIEWPORT.WIDTH/2, 20+VIEWPORT.HEIGHT/2-dim[1], 10], [0,0], TRANSPARENCY(GREY[3], tr), 'section', );
+   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20,20], [VIEWPORT.WIDTH/2, 100, 10], [0,0], TRANSPARENCY(GREY[3], tr), 'section', );
    menu_panel.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
@@ -658,6 +609,8 @@ function Snake_start_menu(params) {
    (log > 1) ? log = 1 : log = log;
    const pad = (30 * log)
 
+   const info_text_use_options = 'Click on the \'Options\' button\nto manipulate some parameters.';
+
    const info_text_rot_left = `Left click on the panel,
 move the mouse to the left
 while holding down the left
@@ -674,7 +627,7 @@ click mouse button.`;
    {
 
       // const play_contols_info = Create_widget_section(_, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[5], .9), 'section', );
-      const play_contols_info = Create_widget_section(_, _, [left_pad,10], [0, 0, 10], [0,0], TRANSPARENCY(GREY[5], tr), 'play_contols_info', );
+      const play_contols_info = Create_widget_section(_, _, [left_pad,10], [0, 0, 4], [0,0], TRANSPARENCY(GREY[5], tr), 'play_contols_info', );
       play_contols_info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       play_contols_info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       play_contols_info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
@@ -683,7 +636,23 @@ click mouse button.`;
       menu_panel.AddItem(play_contols_info);
       
       {
-         const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(GREY[1], 1.0), 'Controls section', );
+         const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(GREY[1], .0), 'Controls section', );
+         info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+         info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+         info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+         info.options = SECTION.HORIZONTAL|SECTION.RESIZE_PARENT;
+         play_contols_info.AddItem(info);
+         
+         // const col = BLUEL[9];
+         const col = BLACK;
+         const ctrl = Create_widget_label(_, info_text_use_options, _, _, _, TRANSPARENCY(WHITE, .5), col, [11, 6], _, _, TEXTURES.CONSOLAS_2);
+         ctrl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+         ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+         ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, ctrl.geom.dim[1]);
+         info.AddItem(ctrl);
+      }
+      {
+         const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(GREY[0], 1.0), 'Controls section', );
          info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
          info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0]/10);
@@ -691,15 +660,16 @@ click mouse button.`;
          play_contols_info.AddItem(info);
          
          const col = BLUEL[9];
-         // const ctrl = Create_widget_label(_, 'CONTROLS', _, _, _, TRANSPARENT, col, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
-         const ctrl = Create_widget_label(_, 'Controls', _, _, _, TRANSPARENCY(WHITE, .5), col, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
+         // const col = BLACK;
+         const ctrl = Create_widget_label(_, 'CONTROLS', _, _, _, TRANSPARENT, col, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
+         // const ctrl = Create_widget_label(_, 'Controls', _, _, _, TRANSPARENCY(WHITE, .5), col, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
          ctrl.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 16);
+         ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
          ctrl.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, ctrl.geom.dim[1]);
          info.AddItem(ctrl);
       }
       {
-         const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(GREY[1], .0), 'Rotate Left section', );
+         const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [0,0], TRANSPARENCY(GREY[0], 1.0), 'Rotate Left section', );
          info.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
          info.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0]/10);
@@ -760,7 +730,7 @@ click mouse button.`;
          // Start Game button
          start_btn = Create_widget_close_btn(_, menu_panel, 'START', [0, 0, zpos], 30, btn_col, WHITE, [dim[0]/2-pad*2, 10], _, _, TEXTURES.CONSOLAS_32px);
          start_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         start_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 16);
+         start_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
          start_btn.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, start_btn.geom.dim[1]);
          start_btn.SetName('start_btn');         
          play_contols_info.AddItem(start_btn);
@@ -805,8 +775,6 @@ click mouse button.`;
    const evt_clbk_params = {
       evt_clbks: ()=>{ 
          Time_intervals_create(16, 'Snake', TIME_INTERVAL_REPEAT_ALWAYS, Animate_snake, params);
-
-         // Destroy the menu_panel
       }, 
    }
 
@@ -831,7 +799,6 @@ function Animate_snake(params) {
    const collectable_apple = params.params.collectable_apple;
    const score_digit_meshes = params.params.score_digit_meshes;
    const score_slope_params_pointer = params.params.score_slope_params_pointer;
-   // const points_label = params.params.points_label;
 
    // Calculate move velocity
    const x = (snake.vel[0] + snake.accel[0]) * snake.speed ;
@@ -861,23 +828,18 @@ function Animate_snake(params) {
    let diry = 1;
    
    if (head_left < left_bound) {
-      // snake.vel[0] *= -1;
       dirx = -1; // Reverse velocity
       hit = true;
    }
    else if (head_right > right_bound) {
-      // snake.vel[0] *= -1;
       dirx = -1; // Reverse velocity
       hit = true;
    }
-   // else if (head_top < top_bound) {
    else if (head_top < top_bound) {
-      // snake.vel[1] *= -1;
       diry = -1; // Reverse velocity
       hit = true;
    }
    else if (head_bot > bot_bound) {
-      // snake.vel[1] *= -1; // Reverse velocity
       diry = -1; // Reverse velocity
       hit = true;
    }
@@ -941,7 +903,6 @@ function Animate_snake(params) {
 
       snake.body.buffer[0].in_scale_up_animation = true;
       Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params2);
-      // snake.body.buffer[0].in_animation = true;
 
 
 
@@ -952,13 +913,11 @@ function Animate_snake(params) {
       const digits = Digitize(snake.points_cnt);
       let k = 0; // The digits counter(in reverse order, first digit is last element)
 
-      // HACK: Create a loop to include more than 2 digit score
 
       const digit_label = score_digit_meshes[0];
       const text_substitution = `${digits[k]}`
       k++;
 
-      // const limit = Font_metrics_get_row_height(digit_label.text_mesh.mat.uvIdx) / 2;
       const limit = digit_label.text_mesh.text_width;
       Clbk_animations_text_create(digit_label, score_slope_params_pointer, limit, 'SnakeScore_anim1', clbk_anim_flag, text_substitution);
       
@@ -969,7 +928,6 @@ function Animate_snake(params) {
       const digit_meshes_len = score_digit_meshes.length;
       if(digits_len > digit_meshes_len) {
 
-         // const pad = 2;
          const pad = 0;
          const pos = [0,0,4];
 
@@ -981,7 +939,7 @@ function Animate_snake(params) {
             pos[1] = last_digit_label.geom.pos[1];
             pos[0] = last_digit_label.geom.pos[0] - (last_digit_label.geom.dim[0]*2) - pad; 
    
-            const digit_label = Create_widget_label(_, '0', _, pos, _, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [7, 3], _, _, TEXTURES.CONSOLAS_32px);
+            const digit_label = Create_widget_label(_, '0', _, pos, score_size, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [7, 3], _, _, score_font);
             // const digit_label = Create_widget_label(_, '0', _, pos, 24, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [7, 3], _, _, TEXTURES.MSDF_CONSOLAS_1024);
             digit_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             digit_label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 12); 
@@ -1005,7 +963,6 @@ function Animate_snake(params) {
             // Dont update text or run animation if the digit hasn't change
             if(`${digits[k]}` !== digit_label.text_mesh.mat.char_buffer.buffer[0]){
          
-               // const limit = Font_metrics_get_row_height(digit_label.text_mesh.mat.uvIdx) / 2;
                const limit = digit_label.text_mesh.text_width;
                Clbk_animations_text_create(digit_label, score_slope_params_pointer, limit, 'SnakeScore_anim', clbk_anim_flag, text_substitution);
 
@@ -1114,7 +1071,6 @@ function Animation_scale_up_run(params) {
 
    const snake = params.snake;
 
-   // if(params.body_mesh_idx === 0) snake.in_scale_animation = true;
    snake.in_scale_animation = true;
 
    const section = params.section;
@@ -1207,7 +1163,6 @@ function Animation_scale_up_stop(params) {
    Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params); /*Callback_animations_print_size();*/
    snake.body.buffer[params.body_mesh_idx].t = 0.0;
    snake.body.buffer[params.body_mesh_idx].prev_slope = Logarithmic_interpolation(0.0, snake.init_slope) + 1;
-   // snake.body.buffer[params.body_mesh_idx].prev_slope = Logarithmic_interpolation(0.01, .1) +1;
 
    return false;
 }
@@ -1225,8 +1180,6 @@ function Animation_scale_down_run(params) {
    body.t += snake.step; 
    const slope = Logarithmic_interpolation(body.t, snake.init_slope - mod) + 1;
 
-   // const res = (slope - body.prev_slope)*(body.mesh.idx+100); // Move faster on gerater mesh index
-   // const res = (slope - body.prev_slope);
    const res = (slope - body.prev_slope) * 100;
    body.prev_slope = slope;
 
@@ -1238,15 +1191,11 @@ function Animation_scale_down_run(params) {
 
    // Run scale down function until the snake body reaches the default size
    if (body.mesh.geom.dim[0] - res > body.size) {
-   // if (body.mesh.geom.dim[0]- res > (body.size + snake.start_next_anim)) {
 
       body.mesh.geom.dim[0] -= res;
       body.mesh.geom.dim[1] -= res;
       body.mesh.geom.AddDimXY(body.mesh.gfx, -res, -res);
       Gl_add_dim_xy(body.mesh.gfx, -res, -res)
-
-      // const posx =  (calc_size-last_mesh.geom.dim[0]);
-
 
       body.mesh.mat.style.rcorners = body.mesh.geom.dim[0];
       Gl_set_attr_round_corners(body.mesh.gfx, body.mesh.geom.dim[0]);
@@ -1367,8 +1316,6 @@ function Animation_scale_down_stop(params) {
       Gl_add_vpos_y(body.mesh.gfx, pos_dif);
       Gl_add_vpos_x(body.mesh.gfx, pos_dif);
 
-      console.log('last_mesh.dim', last_mesh.geom.dim[0], 'calc_size', calc_size, (last_mesh.geom.dim[0] - calc_size))
-
    }
 
    // snake.in_scale_animation = false;
@@ -1393,12 +1340,10 @@ function Snake_body_set_color(snake, params){
 
       const body = snake.body.buffer[i];
 
-      // const color = params.colors[colidx++];
       const color = snake.color_fn_params.fn1[colidx++];
 
       body.mesh.SetColorRGB(color);
 
-      // if(colidx > params.colors.length-1) colidx = 0
       if(colidx > snake.color_fn_params.fn1.length-1) colidx = 0
       
    }
@@ -1771,7 +1716,7 @@ function Snake_options_callback(params) {
          snake.speed = val;
    
          params.clbk_params.mnemonics.slider_val = slider_val;
-         console.log(val);
+         // console.log(val);
    
       }, { snake: snake, mnemonics: params.params.mnemonics.speed_slider });
    
@@ -1783,7 +1728,7 @@ function Snake_options_callback(params) {
          snake.init_slope = val;
    
          params.clbk_params.mnemonics.slider_val = slider_val;
-         console.log(val);
+         // console.log(val);
    
       }, { snake: snake, mnemonics: params.params.mnemonics.slope_slider });
    
@@ -1795,7 +1740,7 @@ function Snake_options_callback(params) {
          snake.start_next_anim = val;
    
          params.clbk_params.mnemonics.slider_val = slider_val;
-         console.log(val);
+         // console.log(val);
    
       }, { snake: snake, mnemonics: params.params.mnemonics.next_anim_slider });
    
@@ -1817,11 +1762,9 @@ function Snake_options_callback(params) {
             let calc_size = snake.size - reduce_size;
             if(calc_size < snake.min_size) {
                calc_size = snake.min_size;
-               // reduce_size = 0;
             }
             
             const pos_dif = body.mesh.geom.dim[0] - calc_size;
-            // console.log(pos_dif);
             body.mesh.geom.pos[0] += pos_dif;
             body.mesh.geom.pos[1] += pos_dif;
             Gl_add_vpos_y(body.mesh.gfx, pos_dif);
@@ -1840,7 +1783,6 @@ function Snake_options_callback(params) {
          }
    
          params.clbk_params.mnemonics.slider_val = slider_val;
-         // snake.in_scale_animation = false
          // console.log(val);
    
       }, { snake: snake, mnemonics: params.params.mnemonics.reduce_size_slider });
@@ -1856,7 +1798,6 @@ function Snake_options_callback(params) {
          snake.distance_factor = val;
    
          params.clbk_params.mnemonics.slider_val = slider_val;
-         // snake.in_scale_animation = false
          // console.log(val);
    
       }, { snake: snake, mnemonics: params.params.mnemonics.distance_factor_slider });
@@ -1869,7 +1810,7 @@ function Snake_options_callback(params) {
    
          const val = Linear_interpolation(params.clbk_params.mnemonics.min, params.clbk_params.mnemonics.max, slider_val);
          snake.scale_factor = val;
-         console.log(val);
+         // console.log(val);
    
          params.clbk_params.mnemonics.slider_val = slider_val;
    
@@ -1883,7 +1824,7 @@ function Snake_options_callback(params) {
          snake.step = val;
    
          params.clbk_params.mnemonics.slider_val = slider_val;
-         console.log(val);
+         // console.log(val);
    
       }, { snake: snake, mnemonics: params.params.mnemonics.anim_step_slider });
    
@@ -1893,21 +1834,10 @@ function Snake_options_callback(params) {
          const snake = params.clbk_params.snake;
          
          const wideness = params.clbk_params.mnemonics.wideness;
-         // const offset = params.clbk_params.mnemonics.offset;
-         // const brightness = params.clbk_params.mnemonics.brightness;
-
          const wideness_val = Linear_interpolation(wideness.min, wideness.max, slider_val);
-         // const offset_val = Linear_interpolation(offset.min, offset.max, offset.slider_val);
-         // const brightness_val = Linear_interpolation(brightness.min, brightness.max, brightness.slider_val);
-         
          wideness.val = wideness_val;
-         // snake.color_fn_params.fn2.wideness.slider_val = wideness.slider_val
-
          snake.Color_set_fn(snake);
-         // Snake_body_set_color_from_color_palete(snake, wideness_val, offset_val, brightness_val);
-         
          wideness.slider_val = slider_val;
-         console.log(wideness_val);
    
       }, { snake: snake, mnemonics: params.params.mnemonics.color_slider });
    
@@ -1939,7 +1869,7 @@ function Snake_options_callback(params) {
          snake.Color_set_fn(snake);
          
          brightness.slider_val = slider_val;
-         console.log(brightness_val);
+         // console.log(brightness_val);
    
       }, { snake: snake, mnemonics: params.params.mnemonics.color_slider });
 

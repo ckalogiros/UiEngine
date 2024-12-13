@@ -220,7 +220,6 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
 
 
    controls_section.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC|GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
-   // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
 
 
    /****************************************************************************************************************/
@@ -229,7 +228,6 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
 
       // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
-      // controls_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
       controls_section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
       controls_section.Calc_no_gfx_update();
 
@@ -500,7 +498,7 @@ export function Create_glow_particles_controls(emitter, scale_down, color = GREY
          );
       }
       { // Set Emitter Direction X Left
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, color, _, 'Direction X Left');
+         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, color, _, 'Direction in X');
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
          contols_buffer.push(slider);
@@ -1078,7 +1076,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       const scale = 2.;
       const particles_size = dim[1] * scale;
       // const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 0.005, 1, _, _, _, 8, _, 1);
-      const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 0.015, 1, _, _, _, 4, _, 1);
+      const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 0.015, 1, 0, _, _, 4, _, 1);
       const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
       // tail_emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
       // tail_emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
@@ -1611,7 +1609,7 @@ export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2]
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
          contols_buffer.push(slider);
-         slider.SetInitialValue(parameters?parameters[3]:scale_down);
+         slider.SetInitialValue(parameters ? parameters[3] : scale_down);
          slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          // Connect sliders to gfx program uniforms 
@@ -2079,7 +2077,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget=ROOT_WIDGETS.CR
 
 
 /** For rendering the slider controls seperately from the smoke particles */
-export function Create_smoke_particles_controls(emitter, color = GREY[2]) {
+export function Create_smoke_particles_controls(emitter, color = GREY[2], parameters=null, shader_parameters=null) {
    
    const contols_buffer = [];
 
@@ -2103,156 +2101,168 @@ export function Create_smoke_particles_controls(emitter, color = GREY[2]) {
    const slider_feather = 2;
    const slider_rcorners = 6;
 
-   
+   // [.71, .71, .78, .5, ]
+   // [.48, .08, .48, .0, .5]
    // Contols for shader params
    if (emitter.sid.unif & SID.UNIF.SCALE2) {
       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Scale');
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       contols_buffer.push(slider);
-      slider.SetInitialValue(.71);
+      slider.SetInitialValue(shader_parameters?shader_parameters[0]:.71);
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       Slider_connect(slider, (params, slider_val) => {
-
+         
          const val_idx = 0;
          // Find the ubidx
          const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_scale2');
          Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-
-      }, _);
+         
+      }, { mnemonics:{shader_parameters:shader_parameters}, }, );
    }
    if (emitter.sid.fx & SID.FX.FS_SMOKE_VEC3) {
       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Noise UV Coord');
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       contols_buffer.push(slider);
-      slider.SetInitialValue(.71);
+      slider.SetInitialValue(shader_parameters?shader_parameters[1]:.71);
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       Slider_connect(slider, (params, slider_val) => {
-
+         
          const val_idx = 0;
          // Find the ubidx
          const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_smoke_params');
          Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-
-      }, _);
+         
+      }, { mnemonics:{shader_parameters:shader_parameters}, }, );
    }
    if (emitter.sid.fx & SID.FX.FS_SMOKE_VEC3) {
       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Cone Wideness');
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       contols_buffer.push(slider);
-      slider.SetInitialValue(.78);
+      slider.SetInitialValue(shader_parameters?shader_parameters[2]:.78);
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       Slider_connect(slider, (params, slider_val) => {
-
+         
          const val_idx = 1;
          // Find the ubidx
          const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_smoke_params');
          Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-
-      }, _);
+         
+      }, { mnemonics:{shader_parameters:shader_parameters}, }, );
    }
    if (emitter.sid.fx & SID.FX.FS_SMOKE_VEC3) {
       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Complexity');
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       contols_buffer.push.AddToMenu(slider);
-      slider.SetInitialValue(.50);
+      slider.SetInitialValue(shader_parameters?shader_parameters[3]:.50);
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       Slider_connect(slider, (params, slider_val) => {
-
+         
          const val_idx = 2;
          // Find the ubidx
          const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_smoke_params');
          Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-
-      }, _);
+         
+      }, { mnemonics:{shader_parameters:shader_parameters}, }, );
    }
-
    // Contols for tarnsform and physics
    { // Gravity
       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Gravity');
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       contols_buffer.push(slider);
-      slider.SetInitialValue(.48);
+      slider.SetInitialValue(parameters ? parameters[0] : .48);
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
+      
       Slider_connect(slider, (params, slider_val) => {
-
+         
          // Linear Interpolation
          const max = 1, start = -.5;
          const y = (slider_val * max) + start;
          emitter.gravity = y;
+      
+         if(params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[0] = slider_val;
+
          // emitter[1].gravity = y;
-      }, _);
+      }, { mnemonics:{parameters:parameters}, }, );
    }
    { // Acceleration
       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Acceleration');
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       contols_buffer.push(slider);
-      slider.SetInitialValue(.08);
+      slider.SetInitialValue(parameters?parameters[1]:.08);
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
+      
       Slider_connect(slider, (params, slider_val) => {
-
+         
          emitter.accel = slider_val;
-
+         
          // Linear Interpolation
          const max = 15, start = 0;
          const y = (slider_val * max) + start;
          emitter.accel = y;
          emitter.max_speed = 4;
-         // emitter[1].accel = y;
-         // emitter[1].max_speed = 4;
-      }, _);
+
+         if(params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[1] = slider_val;
+
+      }, { mnemonics:{parameters:parameters}, }, );
    }
    { // Deccelerarion
       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Deccelerarion');
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       contols_buffer.push(slider);
-      slider.SetInitialValue(.48);
+      slider.SetInitialValue(parameters?parameters[2]:.48);
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
+      
       Slider_connect(slider, (params, slider_val) => {
-
+         
          /* Solve for y~={0.86, 1.0} => {h:1, k:-2.8, r:3.8} */
          const h = 1, k = -2.8, r = 3.8 * 3.8;
          const x = slider_val;
          let y = 0;
          y = Math.sqrt(-((x - h) * (x - h)) + r) + k;
          emitter.deccel = y;
+         
+         if(params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[2] = slider_val;
 
-      }, _);
+      }, { mnemonics:{parameters:parameters}, }, );
    }
    { // Set Emitter X Position
       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Emitter Position X');
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       contols_buffer.push(slider);
-      slider.SetInitialValue(0);
+      slider.SetInitialValue(parameters?parameters[3]:.0);
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       Slider_connect(slider, (params, slider_val) => {
-
+         
          emitter.pos[0] = slider_val * VIEWPORT.WIDTH;
-         // emitter[1].pos[0] = VIEWPORT.WIDTH - (slider_val * VIEWPORT.WIDTH);
-      }, _);
+         
+         if(params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[3] = slider_val;
+
+      }, { mnemonics:{parameters:parameters}, }, );
    }
    { // Set Emitter Y Position
       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Emitter Position Y');
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       contols_buffer.push(slider);
-      slider.SetInitialValue(.5);
+      // slider.SetInitialValue(.5);
+      slider.SetInitialValue(parameters?parameters[4]:.5);
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
       Slider_connect(slider, (params, slider_val) => {
 
          emitter.pos[1] = slider_val * VIEWPORT.HEIGHT;
-      }, _);
+         
+         if(params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[4] = slider_val;
+
+      }, { mnemonics:{parameters:parameters}, }, );
    }
 
 

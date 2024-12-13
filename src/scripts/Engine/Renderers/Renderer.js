@@ -342,7 +342,7 @@ function Renderer_create_webgl_context(canvas) {
 
 
 
-   console.error(gl.isContextLost());
+   // console.error(gl.isContextLost());
 
    canvas.addEventListener('webglcontextlost', function (event) {
       event.preventDefault();

@@ -772,6 +772,10 @@ export class Widget_Dropdown extends Section {
 
                // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
                if (item.type & MESH_TYPE.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
+
+                  const btn = item.children.buffer[0];
+                  btn.text_mesh.SliceText(0, 1);
+                  btn.text_mesh.SetTextAtIndex(this.dp_symbols[0], 0);
    
                   // item.RemoveFromMeshPerVbBuffer();
                   item.Deactivate();
@@ -801,13 +805,8 @@ export class Widget_Dropdown extends Section {
 
             menu.state.mask &= ~MESH_STATE.ACTIVE;
 
-            // Mesh_per_vb_remove_mesh(menu.gfx.vb.groupidx, menu.per_vb_bufferidx);
-            // menu.RemoveFromMeshPerVbBuffer();
-
             // Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
             menu.is_gfx_inserted = false;
-            // Remove menu's Fake listen events
-            // menu.RemoveAllListenEvents();
          }
       }
 
@@ -834,6 +833,9 @@ export class Widget_Dropdown extends Section {
       this.#DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 
+      const btn = this.children.buffer[0];
+      btn.text_mesh.SliceText(0, 1);
+      btn.text_mesh.SetTextAtIndex(this.dp_symbols[0], 0);
 
 
       
@@ -1013,6 +1015,10 @@ export class Widget_Dropdown extends Section {
       this.#ActivateMenu(); // Add dropdown to gfx buffers.
       // menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
       
+      
+      const btn = this.children.buffer[0];
+      btn.text_mesh.SliceText(0, 1);
+      btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
 
       const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);

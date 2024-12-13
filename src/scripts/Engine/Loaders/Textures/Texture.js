@@ -24,7 +24,6 @@ export function Texture_buffer_reset() {
 	_textureBufferCount = 0;
 }
 
-// TODOD: Name the texture index. Is it stored in meshes texidx???????
 function Gl_texture_unit_delete(NAME_ME) {
 
 	const tbo = _textureBuffer[NAME_ME];
@@ -92,12 +91,12 @@ function Texture_is_loaded(textureid, TEX_TYPE) {
 
 	for (let i = 0; i < _textureBufferCount; i++) {
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) {
-			if (_textureBuffer[i] && _textureBuffer[i].texid === textureid)
+			if (_textureBuffer[i] && _textureBuffer[i].textureid === textureid)
 				return i
 		}
 		// TODO: Maybe create a spesific to framebuffers TEXTURE_TYPE constant
 		else if (TEX_TYPE & TEXTURE_TYPE.TYPE_TEXTURE) {
-			if (_textureBuffer[i] && _textureBuffer[i].texid === textureid)
+			if (_textureBuffer[i] && _textureBuffer[i].textureid === textureid)
 				return i
 
 		}
@@ -109,32 +108,31 @@ function Texture_is_loaded(textureid, TEX_TYPE) {
 
 export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 
-	let texture_idx = INT_NULL; 	// The index of the texture, that is stored(upon texture creation) in a buffer.
-	let uvmap_idx = INT_NULL; 		// The index of the uv coordinates. All coordinates for all , 
+	let webGl_texture_idx = INT_NULL; 	// The index of the texture, that is stored(upon texture creation) in a buffer.
+	let fontidx = INT_NULL; 		// The index of the uv coordinates. All coordinates for all , 
 
-	const texidx = Texture_is_loaded(textureid, TEX_TYPE);
+	const texture_idx = Texture_is_loaded(textureid, TEX_TYPE);
 
-	if (texidx === INT_NULL) {
+	if (texture_idx === INT_NULL) {
 
 		// Load the texture image
 		const img = ImageLoader.Load(TEXTURE_PATHS[textureid].imgPath, TEXTURE_PATHS[textureid].imgName, TEXTURE_PATHS[textureid].imgType);
 
 		// Create webGl texture
-		texture_idx = Texture_create_texture(gfxCtx.gl, textureid, img, TEXTURE_PATHS[textureid].imgName);
+		webGl_texture_idx = Texture_create_texture(gfxCtx.gl, textureid, img, TEXTURE_PATHS[textureid].imgName);
 
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) {
-			// Font_create_uvmap(textureid);
-
-			uvmap_idx = Font_load_uvs(textureid);
+			fontidx = Font_load_uvs(textureid);
 		}
 	}
 	else {
-		texture_idx = texidx;
+		webGl_texture_idx = texture_idx;
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT)
-			uvmap_idx = Font_retrieve_fontidx(textureid);// the index for the texture metrics in the font metrics buffer
+			fontidx = Font_retrieve_fontidx(textureid);// the index for the texture metrics in the font metrics buffer
+			// uvmap_idx = Font_retrieve_fontidx(webGl_texture_idx);// the index for the texture metrics in the font metrics buffer
 	}
 
-	return { texidx: texture_idx, uvmapidx: uvmap_idx };
+	return { webGl_texture_idx: webGl_texture_idx, fontidx: fontidx };
 }
 
 
@@ -150,9 +148,9 @@ export function Texture_create_renderbuffer_texture(gl, textureid, width, height
 
 
 
-export function Texture_set_texture_name(texidx, name = 'UNAMED') {
+export function Texture_set_texture_name(idx, name = 'UNAMED') {
 
-	_textureBuffer[texidx].nameidx = Str_buffer_store(name);
+	_textureBuffer[idx].nameidx = Str_buffer_store(name);
 }
 
 

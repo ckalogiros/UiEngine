@@ -233,25 +233,6 @@ export function Uniforms_buffer_update_uniform(ubidx) {
 
 
 
-// export function Uniforms_buffer_update_uniforms_all() {
-
-//    if(!any_needs_update) return;
-
-//    for(let i=0; i <= _uniforms_buffer.boundary; i++){
-//       // console.log(_uniforms_buffer.buffer[i])
-//       if(_uniforms_buffer.buffer[i].needs_update) {
-
-//          const no_more = _uniforms_buffer.buffer[i].Update();
-//          if(no_more) break;
-//       }
-//    }
-
-//    // All uniforms have been updated
-//    any_needs_update = false;
-//    to_update_counter = 0;
-// }
-
-
 
 export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', vb_groupidx) {
 
@@ -266,9 +247,9 @@ export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', vb_groupidx
    }
 
    console.error('NO uniform with name found\n', unif_name, 'in program:', vb_groupidx)
-   return INT_NULL;
 
-   alert('NO uniform with name found\nSEE CONSOLE ERROR\nMaybe forgot to Create the uniform with GfxUniformsEnable()')
+   // alert('NO uniform with name found\nSEE CONSOLE ERROR\nMaybe forgot to Create the uniform with GfxUniformsEnable()')
+   return INT_NULL;
 
 }
 

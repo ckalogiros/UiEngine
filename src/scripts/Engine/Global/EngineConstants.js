@@ -954,7 +954,7 @@ const TEXTURES = {
 	FONT_COUNT: g_cnt,
 
 	// IS_MSDF: 0x0, 
-	// DEFAULT_FONT: 0x0, 
+	DEFAULT_FONT: 0x0, 
 
 	// Image Textures
 	SMOKE_1:g_cnt++, // g_cnt must be the index of the element in 'TEXTURE_PATHS'. // TODO: Either create the 'TEXTURE_PATHS' element at g_cnt OR set the g_cnt equual to the index this texture represents
@@ -966,6 +966,7 @@ const TEXTURES = {
 
 // Set default font texture
 TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_16px;
+// TEXTURES.DEFAULT_FONT = TEXTURES.MSDF_CONSOLAS_1024;
 
 
 function FONT_IS_MSDF(texture_id) {

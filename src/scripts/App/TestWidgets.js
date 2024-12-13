@@ -42,7 +42,7 @@ import { App_reinitialize } from './App.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { PerformanceTimersGetMilisec, PerformanceTimersGetNanosec, PerformanceTimersGetWorstFps } from '../Engine/Timers/PerformanceTimers.js';
 import { Shader_Attributes, Shader_bit_flags_build_SID_ATTR, Shader_bit_flags_print_enabled_attributes } from '../Graphics/ShaderBitFlags.js';
-import { Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
+import { Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_msdf_text_rendering, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
 import { Board_rotations } from './Demo/DemoBoardRotations.js';
 import { Demo_text_number_animation } from './Demo/DemoTextAnimations.js';
 import { Font_metrics_get_char_width, Font_metrics_get_face_advancex, Font_metrics_get_row_height } from '../Engine/Loaders/Font/Font.js';
@@ -674,6 +674,7 @@ export function TestWidgetsGeneric(createId = 1) {
     // Demo_page();
     Demos_welcome_menu();
 
+
     // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
     // Tetris_test(ROOT_WIDGETS.CREATE_ROOT, 20, 60);
 
@@ -909,42 +910,23 @@ export function TestWidgetsGeneric(createId = 1) {
 
         { // MSDF
             
-            // CreateLabelMsdf(_, '.:| G', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 45, _, _, _, );
-            // CreateLabelMsdf(_, 'ABC|||R', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 45, _, _, _, true);
-            // CreateLabelMsdf(_, 'A', TEXTURES.MSDF_CONSOLAS_1024, 300, 150, 45, _, _, _, );
-            // CreateLabelMsdf(_, 'Absr', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 45, _, _, _, true);
-            // CreateLabelMsdf(_, '|1234567890.:,;\'\"(!?)+-*/=', TEXTURES.MSDF_CONSOLAS_1024, 0, 50, 50);
-            // CreateLabelMsdf(_, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.MSDF_CONSOLAS_1024, 0, 250, 20);
-            // CreateLabelMsdf(_, 'Bind_attributes_at_specific_location', TEXTURES.MSDF_CONSOLAS_1024, 0, 200, 20);
-            // CreateLabelMsdf(_, 'The quick brown fox jums over the', TEXTURES.MSDF_CONSOLAS_1024, 0, 250, 20);
-            // CreateLabelMsdf(_, '||_|{}', TEXTURES.MSDF_CONSOLAS_1024, 500, 150, 80);
+            // Demo_widgets_msdf_text_rendering(10, 100);
+
             
-            // CreateLabelMsdf(_, '|1234567890.:,;\'\"(!?)+-*/=', TEXTURES.MSDF_COMIC_1024, 0, 450, 50);
-            // CreateLabelMsdf(_, '1234567890.:,;\'\"(!?)+-*/=', TEXTURES.MSDF_COMIC_1024, 0, 450, 20);
-            // CreateLabelMsdf(_, 'Bind_attributes_at_specific_location', TEXTURES.MSDF_COMIC_1024, 0, 500, 20);
-            // CreateLabelMsdf(_, 'The quick brown fox jums over the', TEXTURES.MSDF_COMIC_1024, 0, 550, 20, _, _, _, true);
-            // CreateLabelMsdf(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250, 30);
-            // CreateLabelMsdf(_, 'A', TEXTURES.MSDF_COMIC_1024, 0, 250, 30);
-            // CreateLabelMsdf(_, '|(lkjs)*{fdl}-|pq1560,[==-/]', TEXTURES.MSDF_COMIC_1024, 0, 250, 20);
-            // CreateLabelMsdf(_, '||_|{}', TEXTURES.MSDF_COMIC_1024, 500, 250, 80);
-            // CreateLabelMsdf(_, ',|;\'\"(!?)+-*/=012DEOPQRSTUVWXYZabcdhijkltuvz', TEXTURES.MSDF_COMIC_1024, 0, 250, 90);
+            // CreateLabelMsdf(_, 'Absr', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 45, _, _, _, true);
+            
+            // CreateLabelMsdf(_, 'The quick brown foxjums over the', TEXTURES.MSDF_COMIC_1024, 0, 550, 20, _, _, _, true);
+            // CreateLabelMsdfWithScale(_, 'The quick\nbrown fox\njumps over', TEXTURES.MSDF_COMIC_1024, 0, 550, 20, _, _, _, true);
+
+
         }
 
         // !\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
         // CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_28px, 0, 250);
         // CreateLabel(_, '()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_157px, 0, 250,);
         // const label = CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`~~{|}0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_66px, 0, 300);
-        // const label = CreateLabel(_, 'Create_glow_particles(200, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1)', TEXTURES.CONSOLAS_32px, 0, 300);
-        // CreateLabel(_, 'Open-sans regular font', TEXTURES.CONSOLAS_32px, 0, 370);
-        // CreateLabel(_, 'WebGL warning: texParameter: pname 0x2802: Invalid param 0x0000.', TEXTURES.CONSOLAS_32px, 0, 440);
-        // CreateLabel(_, 'This is a test', TEXTURES.MSDF_CONSOLAS_1024, 320, 300);
-        // CreateLabel(_, 'CreateLabel(Crea', TEXTURES.MSDF_CONSOLAS_1024, 0, 300);
-        // CreateLabel(_, 'AAAAAAAAAAA', TEXTURES.CONSOLAS_32px, 200, 400);
 
         // const label = CreateLabel('1');
-        // const label = CreateLabel('AAAAAA', 120);
-        // // CreateLabel('\\/+0');
-        // const label = CreateLabel('CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line););CreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, lineCreateLabel(Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line');
         // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
 
         // CreateLabel(_, 'Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);');
@@ -1356,8 +1338,8 @@ function Test_text_clbk_animations_with_counter(x, y, text_pad_x=10, text_pad_y=
             const text_substitution = `${cnt++}`
 
             let limit = 0;
-            if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh.text_mesh.mat.uvIdx, text_substitution) / 2;
-            else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh.text_mesh.mat.uvIdx) / 2;
+            if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh.text_mesh.mat.fontidx, text_substitution) / 2;
+            else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh.text_mesh.mat.fontidx) / 2;
 
             if(clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_X) Clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_X, text_substitution);
             if(clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) Clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, text_substitution);
@@ -1427,8 +1409,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x=10, te
                 params.params.counter1 = 0;
                 let limit_ = 0;
                 const text_substitution_ = `${params.params.counter2++}`
-                if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(mesh1.text_mesh.mat.uvIdx, text_substitution_) / 2;
-                else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(mesh1.text_mesh.mat.uvIdx) / 2;
+                if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(mesh1.text_mesh.mat.fontidx, text_substitution_) / 2;
+                else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(mesh1.text_mesh.mat.fontidx) / 2;
                 Clbk_animations_text_create(mesh2, slope_params_pointer, limit_, 'TEST_text_animation_2', clbk_anim_flag, text_substitution_);
             }
             if (params.params.counter2 > 9) { params.params.counter2 = 0; }
@@ -1436,8 +1418,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x=10, te
             const text_substitution = `${params.params.counter1++}`
 
             let limit = 0;
-            if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh1.text_mesh.mat.uvIdx, text_substitution) / 2;
-            else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh1.text_mesh.mat.uvIdx) / 2;
+            if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh1.text_mesh.mat.fontidx, text_substitution) / 2;
+            else if(clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh1.text_mesh.mat.fontidx) / 2;
             
             Clbk_animations_text_create(mesh1, slope_params_pointer, limit, 'TEST_text_animation_1', clbk_anim_flag, text_substitution);
         }, 
@@ -1920,7 +1902,52 @@ function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', fo
 
     return label;
 }
-function CreateLabelMsdf(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, font_size=20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, temp_flag=false) {
+function CreateLabelMsdf(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, font_size=20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
+
+    const pos = [x, y, 2];
+    const label = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, .3), WHITE, [0, 0], .5, _, font, );
+    label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+    label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+    label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+    // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
+    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+    // label.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+
+    if (vb_groupidx !== INT_NULL) label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
+    else label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    label.Render()
+
+    label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
+
+    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(label);
+    Construct_listen_events_relations_from_mesh_tree(label);
+
+    { // abilities
+        // Shader_bit_flags_print_enabled_attributes(label.sid.attr, `ATTR:  ${label.GetName()}`)
+        // Shader_bit_flags_print_enabled_attributes(label.sid.pass, `PASS:  ${label.GetName()}`)
+        // Shader_bit_flags_print_enabled_attributes(label.text_mesh.sid.attr, `ATTR:  ${label.text_mesh.GetName()}`)
+        // Shader_bit_flags_print_enabled_attributes(label.text_mesh.sid.pass, `PASS:  ${label.text_mesh.GetName()}`)
+    
+        // label.text_mesh.SetColorRGB(REDL);
+        // label.text_mesh.RenderTextFromString('REDL');
+        // if(temp_flag) label.text_mesh.RenderTextFromString('AA AS');
+    
+        // label.Align(ALIGN.BOTTOM | ALIGN.LEFT, [0, 0]);
+        // label.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
+        // label.Align(ALIGN.HOR_CENTER | ALIGN.RIGHT, [0, 0]);
+        // label.Align(ALIGN.TOP | ALIGN.LEFT, [10, 10]);
+        // label.Align(ALIGN.TOP | ALIGN.RIGHT, [0, 0]);
+        // label.Align(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0]);
+    }
+
+
+    return label;
+}
+function CreateLabelMsdfWithScale(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, font_size=20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, temp_flag=false) {
 
     let slider = null
 
@@ -3378,7 +3405,7 @@ function CreateScrollerClampAlphaTest(num_items = 10, root_widget = ROOT_WIDGETS
     const fontsize = 34;
 
     const is_root = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? root_widget : _;
-    const section = Create_widget_section(is_root, SECTION.VERTICAL, [5, 5], [30, 30, 0], [20, 20], TRANSPARENCY(GREY[1], .8));
+    const section = Create_widget_section(is_root, SECTION.VERTICAL, [10, 10], [30, 30, 0], [20, 20], TRANSPARENCY(GREY[0], 1.));
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
@@ -3387,8 +3414,8 @@ function CreateScrollerClampAlphaTest(num_items = 10, root_widget = ROOT_WIDGETS
     const count = num_items;
     for (let i = 0; i < count; i++) {
 
-        // const label = Create_widget_label(_, `${i} and `, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
-        const label = Create_widget_label(_, `!${i} and \n000\n888`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
+        const label = Create_widget_label(_, `${i} and `, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
+        // const label = Create_widget_label(_, `!${i} and \n000\n888`, _, [0, 0, 2], fontsize, TRANSPARENCY(colors[i], 1.7), WHITE, [6, 4], _, _, TEXTURES.CONSOLAS_32px)
         section.AddItem(label);
         label.SetName(`${i}`);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)

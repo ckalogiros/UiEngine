@@ -21,12 +21,32 @@ import { Shaders_build_vertex_shader, Shaders_build_fragment_shader } from './Sh
  * 
  */
 
+
+
+// Store shader code for debug-print only
+const _vertex_shader_buffer = [];
+const _fragment_shader_buffer = [];
+
+
+function filterEmptyLine(string) {
+   return string !== '';
+}
+
+
+
 export function Shaders_load(gl, sid, uniforms_info) {
 
 	const vShader = Shaders_build_vertex_shader(sid, uniforms_info);
 	const fShader = Shaders_build_fragment_shader(sid, uniforms_info);
 
-	const shader_program = Load_shaders(gl, vShader.vs, fShader, sid);
+	// _vertex_shader_buffer.push({vShader:vShader});
+	// _fragment_shader_buffer.push({fShader:fShader});
+	_vertex_shader_buffer.push(vShader.vs);
+	_fragment_shader_buffer.push(fShader.fs);
+	// _vertex_shader_buffer.push(vShader.code);
+	// _fragment_shader_buffer.push(fShader.code);
+
+	const shader_program = Load_shaders(gl, vShader.vs, fShader.fs, sid);
 	if (shader_program) {
 		if (dbg.GL_DEBUG_SHADERS) console.log('Shader Program Created Successfully!\nShader Type ID: ', SID.GetTypeToString(sid));
 	} 
@@ -141,3 +161,19 @@ function Load_shader(gl, shaderType, source, type) {
 /*********************************************************************************************************************************************/
 // DEBUG
 /*********************************************************************************************************************************************/
+export function Shaders_print_loop() {
+
+	for(let i=0; i<_vertex_shader_buffer.length; i++) {
+
+		console.log(
+			'vbidx', i,
+			'Vertex shader', _vertex_shader_buffer[i].vShader,
+			'Fragment shader', _fragment_shader_buffer[i].fShader,
+		);
+
+	}
+	// console.log( '----- Shader Code -----',
+	// 	'\nVertex shader', _vertex_shader_buffer,
+	// 	'\nFragment shader', _fragment_shader_buffer,
+	// );
+}

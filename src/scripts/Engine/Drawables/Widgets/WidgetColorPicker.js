@@ -148,7 +148,7 @@ export class Widget_Color_Picker extends Section {
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
             
-            this.label_r = Create_widget_label(_, 'R1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style);
+            this.label_r = Create_widget_label(_, 'R1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style, );
             this.label_r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             this.label_r.temp_align |= SECTION.HORIZONTAL;
             this.label_r.StylesSetMargin([label_pad[0], 0]);
@@ -208,7 +208,7 @@ export class Widget_Color_Picker extends Section {
          GREY[3],
       ];
 
-      const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12 * scale, 150 * scale], TRANSPARENCY_BAR_COLOR, [0, 0], [16 * scale, 3 * scale], WHITE, 1);
+      const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12 * scale, 150 * scale], TRANSPARENCY_BAR_COLOR, [10, 10], [16 * scale, 3 * scale], WHITE, 1);
       // slider_tran.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       // slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
       slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
@@ -238,7 +238,7 @@ export class Widget_Color_Picker extends Section {
 
       const vertices_count = (HUE_COLOR.length / 2) - 1;
       // const slider_hue = Create_widget_slider_simple(_, [0, 0, 2], [dim[0] * scale, 20 * scale], HUE_COLOR, [0, 0], [4 * scale, 24 * scale], WHITE, vertices_count);
-      const slider_hue = Create_widget_slider_simple(_, [0, 0, 2], [dim[0] * scale, 20 * scale], HUE_COLOR, [0, 0], [4 * scale, 24 * scale], WHITE, vertices_count);
+      const slider_hue = Create_widget_slider_simple(_, [0, 0, 2], [dim[0] * scale, 20 * scale], HUE_COLOR, [10, 10], [4 * scale, 24 * scale], WHITE, vertices_count);
 
       slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       slider_hue.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX);

@@ -96,7 +96,7 @@ export function Sattelite_rotation(x=0, y=0) {
 
    // Render
    controls_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-   controls_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   controls_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    controls_section.Calc_no_gfx_update();
    controls_section.Render();
    Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
@@ -163,7 +163,7 @@ export function Sattelite_rotation(x=0, y=0) {
 
    // Render
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
@@ -357,7 +357,7 @@ export function Sattelite_rotation(x=0, y=0) {
       // Render
       info_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-      info_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      info_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
       info_section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
       info_section.Calc_no_gfx_update();
@@ -527,6 +527,7 @@ const random_positions = [
 
 
 let collision = false;
+let in_scale_adjustment = false;
 
 
 
@@ -553,7 +554,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
    const balls_buffer = [], physics = [], info_buffer = [];
 
-   const test = Create_widget_text(_, `Normal Vector Calculation: n is computed as the difference between positions x1 and x2.`, [0, 400, 10], _, WHITE, _, _, TEXTURES.CONSOLAS_12px);
+   const test = Create_widget_text(_, `Explanation Here.`, [0, 400, 10], _, WHITE, _, _, TEXTURES.CONSOLAS_12px);
    test.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.AddItem(test);
 
@@ -623,6 +624,9 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       scale_down:scale_down,
       initial_speed:physics[0].speed,
       physics: physics,
+      in_scale_adjustment:in_scale_adjustment,
+      // scale_factor:0,
+
    };
 
    const params = {
@@ -657,7 +661,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
          /****************************************************************************************************************/
          // Render 
-         controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
+         controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
          controls_section.GenGfxCtx();
          controls_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
          controls_section.Calc_no_gfx_update();
@@ -684,7 +688,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    /****************************************************************************************************************/
    // Render
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
@@ -816,7 +820,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       info_section_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       
       // info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-      info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC);
+      info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       // info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, info_section_panel.mesh_bufferidx, true);
 
    
@@ -899,6 +903,7 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
          slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
          contols_buffer.push(slider);
          slider.SetInitialValue(slider_init_values?slider_init_values[0]:.08);
+         // params.mnemonics.scale_factor =  (slider_init_values?slider_init_values[0]:.08);
          slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          Slider_connect(slider, (params, slider_val) => {
@@ -910,6 +915,9 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
             Vertex_buffer_set_and_update_uniform(target_mesh.gfx.vb.groupidx, ubidx, slider_val, val_idx);
             
             params.clbk_params.mnemonics.scale_down = slider_val;
+
+            params.clbk_params.mnemonics.in_scale_adjustment = true;
+            // params.clbk_params.mnemonics.scale_factor = true;
 
          }, { mnemonics:params.mnemonics, target_mesh:ball_mesh, val_idx:0,}, false);
       }
@@ -955,6 +963,13 @@ function Animate_elastic_collisions_balls(params) {
       collision = false
    }
 
+   const in_adjusting_scale = params.params.mnemonics.in_scale_adjustment;
+   const scale_factor = params.params.mnemonics.scale_factor;
+   // console.log(scale_factor)
+   // if(in_adjusting_scale) return;
+
+   // let overlap = 0;
+
    const section = params.params.section;
    const scale_down = params.params.mnemonics.scale_down;
 
@@ -963,7 +978,6 @@ function Animate_elastic_collisions_balls(params) {
    const left_bound = 0;
    const right_bound = section.geom.dim[0] * 2;
 
-   let overlap = 0;
 
    const len = params.params.balls_buffer.length;
    for (let i = 0; i < len - 1; i++) {
@@ -979,6 +993,8 @@ function Animate_elastic_collisions_balls(params) {
          // Calculate the scaled ball size
          const ball_size = ball.geom.dim[0] * scale_down;
          const ball2_size = ball2.geom.dim[0] * scale_down;
+         // const ball_size = ball.geom.dim[0] * scale_factor;
+         // const ball2_size = ball2.geom.dim[0] * scale_factor;
 
          // Calculate position relative to the new scaled size
          const ball_pos = [
@@ -1015,7 +1031,7 @@ function Animate_elastic_collisions_balls(params) {
          if (impact_mag <= radii) {
 
             // The overlap distance of the 2 balls, coinciding with the line of impact 
-            overlap = (impact_mag - radii);
+            // overlap = (impact_mag - radii);
 
             const n = [impact_vector[0] / impact_mag, impact_vector[1] / impact_mag];
             const d = radii - impact_mag;
@@ -1114,34 +1130,26 @@ function Animate_elastic_collisions_balls(params) {
       ball.geom.pos[1] += y;
 
       // Check boundaries
-      // const ball_top    = ball_pos[1] + y;
-      // const ball_bot    = ball_pos[1] + (ball_size * 2) + y;
-      // const ball_left   = ball_pos[0] + x;
-      // const ball_right  = ball_pos[0] + (ball_size * 2) + x;
-      const ball_top    = ball_pos[1] - (ball_size) + y;
-      const ball_bot    = ball_pos[1] + (ball_size) + y;
-      const ball_left   = ball_pos[0] - (ball_size) + x;
-      const ball_right  = ball_pos[0] + (ball_size) + x;
+      const ball_top    = ball_pos[1] - ball_size + y;
+      const ball_bot    = ball_pos[1] + ball_size + y;
+      const ball_left   = ball_pos[0] - ball_size + x;
+      const ball_right  = ball_pos[0] + ball_size + x;
 
       if (ball_bot > bot_bound) {
-         phys1.vel[1] *= -1; // Reverse velocity
+         phys1.vel[1] = -1; // Reverse velocity
          ball_pos[1] = bot_bound - (ball_size * 2) - 3; // Put back inside the panel area
-         // STATE.loop.paused = true
       }
       else if (ball_top < top_bound) {
-         phys1.vel[1] *= -1;
+         phys1.vel[1] = 1;
          ball_pos[1] = 0;
-         // STATE.loop.paused = true
       }
       if (ball_right > right_bound) {
-         phys1.vel[0] *= -1;
+         phys1.vel[0] = -1;
          ball_pos[0] = right_bound - (ball_size * 2) - 3;
-         // STATE.loop.paused = true
       }
       else if (ball_left < left_bound) {
-         phys1.vel[0] *= -1;
+         phys1.vel[0] = 1;
          ball_pos[0] = 0;
-         // STATE.loop.paused = true
       }
 
 
@@ -1156,168 +1164,3 @@ function Animate_elastic_collisions_balls(params) {
 
 }
 
-/**SAVE!!! */
-
-// /****************************************************************************************************************/
-// // Create the ball's animation callback
-// function Animate_elastic_collisions_balls(params) {
-
-
-
-//    // STATE.loop.paused = true;
-//    if(collision===true){
-//       STATE.loop.paused = true;
-//       collision=false
-//    }
-
-//    const section = params.params.section;
-//    const scale_down = params.params.scale_down;
-
-//    const top_bound = 0;
-//    const bot_bound = section.geom.dim[1] * 2;
-//    const left_bound = 0;
-//    const right_bound = section.geom.dim[0] * 2;
-
-//    let overlap = 0;
-
-//    const len = params.params.balls_buffer.length;
-//    for (let i = 0; i < len-1; i++) {
-//       for (let j = i+1; j < len; j++) {
-         
-//          const ball = params.params.balls_buffer[i];
-//          const ball2 = params.params.balls_buffer[j];
-         
-//          const phys1 = params.params.physics[i];
-//          const phys2 = params.params.physics[j];
-
-//          const ball_size = ball.geom.dim[0] * scale_down;
-//          const ball2_size = ball2.geom.dim[0] * scale_down;
-  
-   
-//          // Cache the ball 1 and ball 2 center positions
-//          const p1 = [
-//             (ball.geom.pos[0] + ball_size) ,
-//             (ball.geom.pos[1] + ball_size) 
-//          ];
-//          const p2 = [
-//             (ball2.geom.pos[0] + ball2.geom.dim[0]),
-//             (ball2.geom.pos[1] + ball2.geom.dim[1])
-//          ];
-//          const radii = (ball_size + ball2_size);
-   
-         
-//          // Calc the vector of the impact line and the magnitude of that vector...
-//          const impact_vector = [p1[0]-p2[0], p1[1]-p2[1]];
-//          const impact_mag = Magnitude(impact_vector[0], impact_vector[1]);
-         
-//          // If the vector magnitude is less than the 2 radii of the balls, we have a collision
-//          if (impact_mag <= radii)  {
-   
-//             // The overlap distance of the 2 balls, coinciding with the line of impact 
-//             overlap = (impact_mag-radii);
-
-//             const n = [impact_vector[0] / impact_mag, impact_vector[1] / impact_mag];
-//             const d = radii - impact_mag;
-//             // console.log('n', n, 'd', d)
-            
-//             phys1.overlap[0] = .5*d*n[0];
-//             phys1.overlap[1] = .5*d*n[1];
-//             phys2.overlap[0] = -.5*d*n[0];
-//             phys2.overlap[1] = -.5*d*n[1];
-            
-
-            
-//             // Cache the current velocity vectors of the 2 balls to be compared
-//             // Caution! Must copy the values 
-//             const velx1 = phys1.vel[0], vely1 = phys1.vel[1];
-//             const velx2 = phys2.vel[0], vely2 = phys2.vel[1];
-            
-            
-//             /**
-//              * Elastic collision Resoluution
-//              * u1` = u1+ ( ( (u2-u1) DOT (x2-x1) ) / (|x2-x1|)^2 ) * (x2-x1)
-//              * x:vector position, |x2-x1|)^2 : the magnitude of the resulted vector
-//             */
-           
-//            // Get the distance vector of the 2 balls
-//             // Must check for equal positions, and set to small value, to avoid devide by 0)
-//             const dx = (p2[0] === p1[0]) ? .0001 : (p2[0] - p1[0]);
-//             const dy = (p2[1] === p1[1]) ? .0001 : (p2[1] - p1[1]);
-//             const mag = Magnitude_2vectors(p2, p1)
-//             { // Ball 1: velocity calculation
-//                const dot_product = Dot(velx2-velx1, vely2-vely1, dx, dy);
-//                phys1.vel[0] = velx1 +  (( dot_product / (mag*mag) ) * dx); 
-//                phys1.vel[1] = vely1 +  (( dot_product / (mag*mag) ) * dy);
-               
-//             }
-//             { // Ball 2: velocity calculation
-//                const dot_product = Dot(velx1-velx2, vely1-vely2, -dx, -dy);
-//                phys2.vel[0] = velx2 +  (( dot_product / (mag*mag) ) * -dx); 
-//                phys2.vel[1] = vely2 +  (( dot_product / (mag*mag) ) * -dy);
-//             }
-            
-//             // phys1.accel[0] = 2;
-//             // phys1.accel[1] = 2;
-//             // phys2.accel[0] = 2;
-//             // phys2.accel[1] = 2;
-            
-//             // STATE.loop.paused = true;
-//             // collision = true;
-            
-//          }
-//       }
-//    }
-
-//    // TODO: Combine the 2 for loops
-//    // Check Boundary Collisions
-//    for (let i = 0; i < len; i++) {
-
-
-//       const ball = params.params.balls_buffer[i];
-//       const phys1 = params.params.physics[i];
-
-//       ball.geom.pos[0] += phys1.overlap[0];
-//       ball.geom.pos[1] += phys1.overlap[1];
-
-//       // Move the ball
-//       const x = (phys1.vel[0]) * (phys1.speed+ phys1.accel[0]);
-//       const y = (phys1.vel[1]) * (phys1.speed+ phys1.accel[1]);
-//       ball.geom.pos[0] += x;
-//       ball.geom.pos[1] += y;
-
-//       // Check boundaries
-//       const ball_radius = ball.geom.dim[0] * scale_down;
-//       const ball_top = ball.geom.pos[1] + y;
-//       const ball_bot = ball.geom.pos[1] + ball_radius * 2 + y;
-//       const ball_left = ball.geom.pos[0] + x;
-//       const ball_right = ball.geom.pos[0] + ball_radius * 2 + x;
-
-
-//       if (ball_bot > bot_bound) {
-//          phys1.vel[1] *= -1; // Reverse velocity
-//          ball.geom.pos[1] =  bot_bound-ball_radius*2-3; // Puut back inside the panel area
-//       }
-//       else if (ball_top < top_bound) {
-//          phys1.vel[1] *= -1;
-//          ball.geom.pos[1] = 0;
-//       }
-//       if (ball_right > right_bound) {
-//          phys1.vel[0] *= -1;
-//          ball.geom.pos[0] =  right_bound-ball_radius*2-3;
-//       }
-//       else if (ball_left < left_bound) {
-//          phys1.vel[0] *= -1;
-//          ball.geom.pos[0] = 0;
-//       }
-
-
-//       ball.geom.SetWposXY(ball.gfx, ball.geom.pos[0], ball.geom.pos[1]);
-      
-//       phys1.overlap[0] = 0;
-//       phys1.overlap[1] = 0;
-
-//       if(phys1.accel[0] > 0) phys1.accel[0] -= .05;
-//       if(phys1.accel[1] > 0) phys1.accel[1] -= .05;
-//    }
-
-// }

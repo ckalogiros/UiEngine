@@ -5,7 +5,7 @@ import { MouseGetPos } from "../Controls/Input/Mouse.js";
 import { Free_generic_buffer, New_generic_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
-import { Mesh_buffer_get_mesh_bounding_box, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_name_byidx } from "../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_bounding_box, Mesh_buffer_get_mesh_byidx } from "../Core/MeshBuffer.js";
 
 
 
@@ -87,8 +87,6 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
    });
 
 
-   // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx].event_idx = event_idx;
-
    LISTENERS_FLAGS[TYPE_IDX] = true;
 
    return event_idx;
@@ -121,20 +119,8 @@ export function Listener_create_root_view(TYPE_IDX, event_idx) {
 
    const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
 
-
    // Avoid creating duplicate root views of the same event
    if (event.view) {
-
-      if(_listeners_buffer_view_storage.buffer[TYPE_IDX].buffer[event.view.view_idx]===null || 
-         _listeners_buffer_view_storage.buffer[TYPE_IDX].buffer[event.view.view_idx]===undefined
-      ){
-         console.log(
-            'param:TYPE_IDX', TYPE_IDX,
-            'param:event_idx', event_idx,
-            'event', event,
-            '_listeners_buffer_view_storage', _listeners_buffer_view_storage,
-         )
-      }
 
       // Get the event index out of the view event, and compare it with the current event idxe we try to set as root view event
       // If it is equal, meaning the current event is already a root view event, DO NOTHING 
@@ -172,12 +158,9 @@ export function Listener_assign_parent_event(TYPE_IDX, event_idx, parent_event_i
 
    if (event_idx === parent_event_idx) return
    const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_event_idx];
-   if (parent_event === null || parent_event === undefined)
-      alert('000111333')
-
-
+   
    const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
-
+   
 
    // TODO: Resolve any null so we do not check
    if (parent_event === null || parent_event.view === null) {
@@ -197,7 +180,6 @@ export function Listener_assign_parent_event(TYPE_IDX, event_idx, parent_event_i
    if (parent_event.view && event.view) {
       if (parent_event.view.children.buffer[event.view.view_idx]) { // NOT NULL
          if (parent_event.view.children.buffer[event.view.view_idx].event_idx === event_idx) { // NOT the same event
-            // console.log('ADDED index', 'event', event.name, 'parent', parent_event.name)
             return;
          }
       }
@@ -261,7 +243,6 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
       alert('1092873 \nTrying to remove an event that does not exist')
    }
 
-
    // If event is root, has no 'parent_idx', then destroy its children from the view storage buffer
    if (event.parent_idx === INT_NULL) {
 
@@ -281,11 +262,11 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
       // TODO: Resolve any null so we do not check
       if (parent === null || parent.view === null || parent.view.children === null) {
 
-         console.error('1 Remove View', 'type', TYPE_IDX, 'event', event, 'parent', parent)
+         console.error('1 Remove Listener View', 'type', TYPE_IDX, 'event', event, 'parent', parent)
          // alert('listeners: parent.view.children === null'); // console.log()
          return;
       }
-      // console.log('1 Remove View', 'type', TYPE_IDX, 'view_idx', event.view)
+
       parent.view.children.RemoveByIdx(event.view.view_idx);
 
    }
@@ -309,7 +290,7 @@ export function Listener_disable_event_view_and_all_children(TYPE_IDX, event_idx
 
    const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_idx];
 
-   if (event === null || event === undefined) {
+   /**DEBUG*/if (event === null || event === undefined) {
       console.error('1092873 \nTrying to remove an event that does not exist', 'Event type', TYPE_IDX, 'event idx', event_idx, '\nbuffer:', _listeners_buffer_storage.buffer[TYPE_IDX].buffer)
       alert('1092873 \nTrying to remove an event that does not exist')
    }
@@ -331,7 +312,6 @@ export function Listener_disable_event_view_and_all_children(TYPE_IDX, event_idx
 
 
    // Remove event from the listeners storage buffer
-   console.log('Set view children to null', event,)
    event.view = null;
 
 }
@@ -349,7 +329,6 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
             Listener_remove_all_children_events_from_view(TYPE_IDX, view.buffer[i].children);
          }
 
-         // _listeners_buffer_view_storage.buffer[TYPE_IDX].RemoveByIdx(event.view.view_idx)
          _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view.buffer[i].event_idx].view = null; // Set the 'view' field to null, removing any refference to this event's tree view
          _listeners_buffer_storage.buffer[TYPE_IDX].RemoveByIdx(view.buffer[i].event_idx); // Remove the event from the listeners storage buffer
 
@@ -359,9 +338,11 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
       }
    }
 
-   // Free the memory of this view.buffer after we have removed all elements in the loop above.
-   // This is only to set the 'DEBUG_INFO_STRUCTS.BUFFER.GENERIC.COUNTER'.
-   // The actual view is removed-destroyed from it's parent, in the caller function
+   /** // NOTE 
+    * Free the memory of this view.buffer after we have removed all elements in the loop above.
+    * This is only to set the 'DEBUG_INFO_STRUCTS.BUFFER.GENERIC.COUNTER'.
+    * The actual view is removed-destroyed from it's parent, in the caller function
+    */
    Free_generic_buffer(view);
 }
 
@@ -462,12 +443,9 @@ export function Listener_dispatch_check_hover_event() {
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          intersects = Intersection_point_rect(point, bounding_box);
-         // console.log(bounding_box[0][0], bounding_box[1][0], point[0], 'intersects', intersects)
-
 
 
          if (intersects) {
-            // console.log(view_buffer.buffer[i])
 
             if (view_buffer.buffer[i] !== null) {
 
@@ -475,7 +453,6 @@ export function Listener_dispatch_check_hover_event() {
 
                   if (Check_hover_recursive(view_buffer.buffer[i].children, point)) {
                      intersects = true;
-                     // mesh.SetUpdateFrameBuffer();
                      return;
                   }
 
@@ -487,7 +464,6 @@ export function Listener_dispatch_check_hover_event() {
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
 
             Events_handle_immidiate({ type: 'hover', params: { mesh: mesh } });
-            // mesh.SetUpdateFrameBuffer();
             intersects = true;
 
             break;
@@ -502,8 +478,7 @@ export function Listener_dispatch_check_hover_event() {
    if (!intersects && STATE.mesh.hovered) { // If mouse is not intersecting with any mesh and there still is a hovered mesh, unhover it.
       Events_handle_immidiate({ type: 'unhover', params: { mesh: STATE.mesh.hovered } });
    }
-   // _pt_hover_listener.timer.Stop();
-   // Performance_timer_detailed_stop(PERFORMANCE_TIMERS_IDXS.HoverListener);
+
    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.HoverListener);
 }
 
@@ -522,7 +497,6 @@ function Check_hover_recursive(view_children, point) {
          const intersects = Intersection_point_rect(point, bounding_box);
 
          if (intersects) {
-
 
             if (child_evt.children) {
                const ret = Check_hover_recursive(view_children.buffer[i].children, point);
@@ -636,13 +610,13 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
       if (view_buffer.buffer[i]) {
 
-         /**
-          * Catch Error
-          * It happens that we miss to remove an event tree view, on event listen destroy.
-          * This is a temporary guard, against null mesh.
-          * // FIXME: Find why the view did not removed.
-          */
-         if(_listeners_buffer_storage.buffer[TYPE_IDX].buffer[view_buffer.buffer[i].event_idx] === null){
+         /**DEBUG*/if(_listeners_buffer_storage.buffer[TYPE_IDX].buffer[view_buffer.buffer[i].event_idx] === null){
+            /**
+             * Catch Error Issue
+             * It happens that we miss to remove an event tree view, on event listen destroy.
+             * This is a temporary guard, against null mesh.
+             */
+
             console.error('671187334 \nEvent has been removed but the Listeners tree view still holds a refference');
             alert('671187334 \nEvent has been removed but the Listeners tree view still holds a refference');
 
@@ -650,7 +624,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
             console.error('listeners buffer:', _listeners_buffer_storage.buffer[TYPE_IDX].buffer);
             console.error('view_buffer:', view_buffer);
             console.error('REMOVING THE EVENT FROM THE VIEW');
-            // view_buffer.buffer[i] = null;
 
             Listener_debug_print_view_recursive();
 
@@ -670,7 +643,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
             // Check all children (recursive)
             if (view_buffer.buffer[i].children) {
-               // if (event.view.children) {
 
                const event_found = Check_child_events_recursive(view_buffer.buffer[i].children, point);
                if (event_found) { // If the child event is found but does not have a Callback, handle the parent event
@@ -697,7 +669,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
             }
 
             // Else handle this event
-
             if (event.Clbk) {
                // Else if no children event was triggered, run any events of the main event.
                const dispatch_params = {
@@ -715,7 +686,6 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
             }
          }
       }
-      // mesh.SetUpdateFrameBuffer();
    }
 
 }
@@ -729,9 +699,6 @@ function Check_child_events_recursive(view_children, point) {
 
       const child_evt = view_children.buffer[i];
       if (child_evt) {
-
-         // const name = Mesh_buffer_get_mesh_name_byidx(child_evt.meshidx)
-         // const mesh = Mesh_buffer_get_mesh_byidx(child_evt.meshidx)
 
          const bounding_box = Mesh_buffer_get_mesh_bounding_box(child_evt.meshidx);
 
@@ -806,7 +773,6 @@ export function Listeners_set_priority(TYPE_IDX, listeners) {
          const parent_event_idx = event.parent_idx;
          const child_view_idx = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_event_idx].view.view_idx;
          Set_priority_first(_listeners_buffer_view_storage.buffer[TYPE_IDX].buffer, child_view_idx, TYPE_IDX);
-         // alert('44182730046 \nImplement me')
       }
 
    }
@@ -822,8 +788,11 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
    // Case there is no prev elem from the current. Meaning it is already first in priority
    if(idx === INT_NULL) return;
 
+   const mesh = Mesh_buffer_get_mesh_byidx(buffer[idx].meshidx);
+   const is_scroller = mesh.GetName()==='ScrollBar'
 
-   // Store the element to be shifted first
+
+   // Store the element to be shifted 
    const temp = {
       event_idx: buffer[idx].event_idx,
       meshidx: buffer[idx].meshidx,
@@ -832,8 +801,12 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
    }
 
    let abort = false;
-   let cur_offset = 0; // Avoid null buffer elements
    let last_prev_elem_idx = INT_NULL; // Avoid null buffer elements
+   
+   if(is_scroller) console.log('--------------------------------------------------------------------------');
+   if(is_scroller) console.log('Set priority', buffer);
+   if(is_scroller) console.log('index', idx);
+   
    
    // Shift all elements to the right once
    for (let i = idx; i > 0; i--) {
@@ -843,6 +816,9 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
       if(cur_elem !== null) {
          
          let prev_elem = buffer[cur_elem.view_idx - 1]; // Always get the previous of the current
+         // if(is_scroller) console.log('prev idx', cur_elem.view_idx - 1, 'prev', prev_elem);
+         
+         if(prev_elem === undefined) return;
          
          /**
           * If the previous element is null,
@@ -850,7 +826,7 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
           */
         
         let prev_offset = 1; // Avoid null buffer elements
-        let gotto_end = false;
+        let gotto_end = false; // End the pririty function
 
          if(prev_elem === null) {
             
@@ -860,19 +836,50 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
                
                prev_elem = buffer[cur_elem.view_idx - prev_offset];
                
-               if(cur_elem.view_idx - prev_offset <= 0) {
+               if(cur_elem.view_idx - prev_offset === 0) {
 
-                  // Case there is no prev elem from the current. Meaning it is already first in priority
-                  if(last_prev_elem_idx === INT_NULL) return;
+                  if(prev_elem!==null) {
+                     // Case the found substitute is the first (0index) element. Swap with curr, and at the end of this function swap the prev with the 'temp'
+                     
+                     // if(is_scroller) console.log('1 STORE', 'curidx', cur_elem.view_idx, 'previdx', prev_elem.view_idx);
 
+                     last_prev_elem_idx = prev_elem.view_idx;
+
+                     cur_elem.event_idx = prev_elem.event_idx;
+                     cur_elem.meshidx = prev_elem.meshidx;
+                     cur_elem.view_idx = prev_elem.view_idx + prev_offset; // prev needs to add the offset which is all the null elems (acumulated) until the found prev_elem
+                     cur_elem.children = prev_elem.children;
+            
+                     _listeners_buffer_storage.buffer[TYPE_IDX].buffer[cur_elem.event_idx].view = cur_elem;
+                  }
                   gotto_end = true;
                   break; // Catch edge case of all null 
                }
+               
+               // Case no prev elem found cause they are all null.
+               else if(cur_elem.view_idx - prev_offset < 0) {
+                  // if(is_scroller) console.log('RETURN cur_elem.view_idx ', cur_elem.view_idx, 'prev_offset',  prev_offset, 'last_prev_elem_idx', last_prev_elem_idx)
+                  // if(is_scroller) console.log('3 STORE temp', 'lastidx', last_prev_elem_idx, 'temp', temp.view_idx, );
+
+                  if(last_prev_elem_idx !== INT_NULL) {
+
+                     // Finaly replace the first elem
+                     buffer[last_prev_elem_idx].event_idx = temp.event_idx;
+                     // buffer[last_prev_elem_idx]. = temp.view_idx;
+                     buffer[last_prev_elem_idx].meshidx = temp.meshidx;
+                     buffer[last_prev_elem_idx].children = temp.children;
+                     _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[last_prev_elem_idx].event_idx].view = buffer[last_prev_elem_idx];
+                  }
+                  return;
+               }
             }
 
-            if(gotto_end) break; // Skip all and go to assign the 'temp' with the last previous element
+            if(gotto_end) // Case the for is at 0 index
+               break; // Skip all and go to assign the 'temp' with the last previous element
 
-            last_prev_elem_idx = prev_elem.event_idx;
+            
+            // last_prev_elem_idx = prev_elem.event_idx;
+            last_prev_elem_idx = prev_elem.view_idx;
 
             cur_elem.event_idx = prev_elem.event_idx;
             cur_elem.meshidx = prev_elem.meshidx;
@@ -884,6 +891,7 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
          }
          else {
 
+            if(is_scroller) console.log('2 STORE', 'curidx', cur_elem.view_idx, 'previdx', prev_elem.view_idx);
             last_prev_elem_idx = prev_elem.view_idx;
 
             cur_elem.event_idx = prev_elem.event_idx;
@@ -898,17 +906,9 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
 
    if(last_prev_elem_idx === INT_NULL) return;
 
-   // if(buffer[last_prev_elem_idx]===_ || buffer[last_prev_elem_idx]===null){
-
-   //    console.log(
-   //       'last_prev_elem_idx', last_prev_elem_idx,
-   //       'buffer(of which the last_prev_elem_idx is taking of)', buffer,
-   //       'temp', temp,
-   //       _listeners_buffer_storage.buffer[TYPE_IDX]
-   //    );
-   // }
 
    if (!abort) {
+      if(is_scroller) console.log('3 STORE temp', 'lastidx', last_prev_elem_idx, 'temp', temp.view_idx, );
 
       // Finaly replace the first elem
       buffer[last_prev_elem_idx].event_idx = temp.event_idx;
@@ -917,112 +917,7 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
       _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[last_prev_elem_idx].event_idx].view = buffer[last_prev_elem_idx];
    }
 
-
-   // TODO: Implement the parent_idx substitution
-   // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[0].event_idx].parent_idx = ??????; 
-   // Substitute the children index of the event view 
-   // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[0].event_idx].view.view_idx = 0;
-   // _listeners_buffer_view_storage.buffer[TYPE_IDX].buffer[buffer[0].view_idx].view_idx = 0;
-
 }
-// function Set_priority_first(buffer, idx, TYPE_IDX) {
-
-//    // Store the element to be shifted first
-//    const temp = {
-//       event_idx: buffer[idx].event_idx,
-//       meshidx: buffer[idx].meshidx,
-//       view_idx: buffer[idx].view_idx,
-//       children: buffer[idx].children,
-//    }
-
-//    let abort = false;
-//    let prev_offset = 1; // Avoid null buffer elements
-//    let cur_offset = 0; // Avoid null buffer elements
-
-//    // Shift all elements to the right once
-//    for (let i = idx; i > 0; i--) {
-
-//       let cur_elem = buffer[i];
-//       let prev_elem = buffer[i - prev_offset];
-
-//       /**
-//        * If the previous element is null,
-//        * find the first non null.
-//        */
-
-//       if(cur_elem === null) {
-//          while(cur_elem === null) {
-            
-//             cur_offset++; // 
-//             // if(i - cur_offset <= 0) break; // Catch edge case of all null 
-            
-//             cur_elem = buffer[i - cur_offset]
-//          }
-//          cur_offset = 0;
-//       }
-
-//       if(prev_elem === null) {
-//          while(prev_elem === null && prev_elem.view_idx < cur_elem.view_idx) {
-            
-//             prev_offset++; // 
-//             if(i - prev_offset <= 0) break; // Catch edge case of all null 
-            
-//             prev_elem = buffer[i - prev_offset];
-            
-//          }
-//          prev_offset = 1;
-//       }
-
-
-
-
-
-//       // QUICK-FIX: Check the cur_elem for null
-
-//       if (cur_elem !== null && prev_elem !== null) { // Case the prev event has been destroyed. // TODO: Should we implement a re-ordering on event destroy????
-
-//          cur_elem.event_idx = prev_elem.event_idx;
-//          cur_elem.meshidx = prev_elem.meshidx;
-//          cur_elem.view_idx = prev_elem.view_idx + 1;
-//          cur_elem.children = prev_elem.children;
-
-//          _listeners_buffer_storage.buffer[TYPE_IDX].buffer[cur_elem.event_idx].view = cur_elem;
-//       }
-
-//       else abort = true;
-//       // if (prev_elem !== null && cur_elem !== null) { // Case the prev event has been destroyed. // TODO: Should we implement a re-ordering on event destroy????
-
-//       //    cur_elem.event_idx = prev_elem.event_idx;
-//       //    cur_elem.meshidx = prev_elem.meshidx;
-//       //    cur_elem.view_idx = prev_elem.view_idx + 1;
-//       //    cur_elem.children = prev_elem.children;
-
-//       //    _listeners_buffer_storage.buffer[TYPE_IDX].buffer[cur_elem.event_idx].view = cur_elem;
-//       // }
-//       // else abort = true;
-
-
-
-//    }
-
-//    if (!abort) {
-
-//       // Finaly replace the first elem
-//       buffer[0].event_idx = temp.event_idx;
-//       buffer[0].meshidx = temp.meshidx;
-//       buffer[0].children = temp.children;
-//       _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[0].event_idx].view = buffer[0];
-//    }
-
-
-
-//    // TODO: Implement the parent_idx substitution
-//    // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[0].event_idx].parent_idx = ??????; 
-//    // Substitute the children index of the event view 
-//    // _listeners_buffer_storage.buffer[TYPE_IDX].buffer[buffer[0].event_idx].view.view_idx = 0;
-//    // _listeners_buffer_view_storage.buffer[TYPE_IDX].buffer[buffer[0].view_idx].view_idx = 0;
-
-// }
 
 
 
@@ -1138,7 +1033,8 @@ function Listener_debug_print_info_recursive(TYPE_IDX, view, count) {
             const is_fake = event.is_fake;
             const has_view = event.view ? true : false;
 
-            console.log(`${r} :[${e.event_idx}] (is child:${is_child_event}) (is fake:${is_fake}) (has view:${has_view}) (parent:${event.parent_idx}) (${mesh.GetName()}) `);
+            // console.log(`${r} :[${e.event_idx}] (is child:${is_child_event}) (is fake:${is_fake}) (has view:${has_view}) (parent:${event.parent_idx}) (${mesh.GetName()}) `);
+            console.log(`${r} :[${e.event_idx}] (is child:${is_child_event}) (is fake:${is_fake}) (has view:${has_view}) (parent:${event.parent_idx}) (${mesh.GetName()}-${-mesh.mesh_bufferidx})`);
             total_count++;
          }
 

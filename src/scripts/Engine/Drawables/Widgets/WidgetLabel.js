@@ -48,6 +48,7 @@ export class Widget_Label extends Rect_Mesh {
         const dimentions = text_mesh.CalculateTextWidth();
         dim = [
             dimentions.w + (pad[0] * 2),
+            // dimentions.h/2 + (pad[1] * 2),
             dimentions.h + (pad[1] * 2),
         ];
 

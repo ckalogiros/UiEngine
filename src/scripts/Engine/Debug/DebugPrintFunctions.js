@@ -1,5 +1,5 @@
 
-export function Get_name_from_mesh_type(type) {
+export function Get_string_from_mesh_type(type) {
 
 	let meshType = []
 

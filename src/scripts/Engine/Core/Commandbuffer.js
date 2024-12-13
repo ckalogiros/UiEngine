@@ -2,7 +2,9 @@
 
 import { New_generic_buffer } from './Buffers.js';
 
-
+/**
+ * TO BE IMPLEMENT
+ */
 
 const COMMANDS = {
    ID: {

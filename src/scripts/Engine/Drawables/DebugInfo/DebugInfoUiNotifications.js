@@ -1,3 +1,14 @@
+/**
+ * Notification System
+ * 
+ * This is an internal notification system for the purpose of
+ * keeping track of some of the applications systems info.
+ * For example: if a new mesh is created, a notification is registered
+ * of that type (NOTIFICATION_TYPE.MESH_BUFFER).
+ * This functionality is mainly used for displaying debug info via rendering.
+ * For example if we want to display the number of total meshes of the app. 
+ */
+
 "use strict";
 
 import { New_generic_buffer } from "../../Core/Buffers.js";

@@ -759,7 +759,6 @@ export function Particle_system_update() {
          const particle = emitter.particles_buffer.buffer[j];
 
          if (particle.is_alive) {
-
             
 
             // TODO: For efficiency create 2 loops, and check which case is without if statement
@@ -854,14 +853,12 @@ export function Particle_system_update() {
             // Particle Fade
             const random = Math.random()*.4 + .5;
             if (particle.time > random) {
-            // if (particle.time > .5) {
-               // particle.col[3] *= .915;
-               particle.col[3] *= .85 ;
+               particle.col[3] *= .85;
             }
-            else if (particle.col[3] < .1) { 
-               // particle.col[3] *= 2.5;
-               // particle.col[3] *= .2;
-            }
+            // else if (particle.col[3] < .1) {  
+            //    particle.col[3] = .085;
+            // }
+
 
             if (particle.time >= .99) particle.col[3] = 0.0;
 
@@ -870,7 +867,6 @@ export function Particle_system_update() {
             // Render Particles
             emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time, particle.dim, particle.rot, particle.uv);
 
-            // particle.time += emitter.t_step * speed_ratio;
             particle.time += emitter.t_step;
 
             if (particle.time >= emitter.life_time) {

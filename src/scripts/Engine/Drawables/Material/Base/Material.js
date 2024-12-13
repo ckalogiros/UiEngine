@@ -2,7 +2,7 @@
 
 import * as math from '../../../../Helpers/Math/MathOperations.js'
 import { Gl_set_rgb, Gl_set_rgba } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
-import { Texture_get_texture_byidx, Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
+import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 import { New_generic_char_buffer } from '../../../Core/Buffers.js';
 
 
@@ -19,7 +19,7 @@ export class Material {
    // defCol;  Array: Store the initial color, used as a storage buffer
    // style;  Array: of [];
    // uv;  Array: of [v1,u1,v2,u2]
-   // uvIdx;  Value: The index of the uvmap data for the texture 
+   // fontidx;  Value: The index of the uvmap data for the texture 
    // textureid;  Value: The textuure id of type 'TEXTURE.'
    // texidx;  Value: The index of the texture
 
@@ -41,7 +41,7 @@ export class Material {
       this.type = MESH_TYPE.MATERIAL;
       this.style = {rcorners:0, feather:0, border:0};
       this.uv = [0, 1, 0, 1];
-      this.uvIdx = INT_NULL;
+      this.fontidx= INT_NULL;
       this.textureid = INT_NULL;
       this.texidx = INT_NULL;
 
@@ -131,7 +131,7 @@ export class Material {
          this.type = mat.type;
          this.textureid = mat.textureid;
          this.texidx = mat.texidx;
-         this.uvIdx = mat.uvIdx;
+         this.fontidx= mat.fontidx;
 
       }
    }
@@ -142,10 +142,6 @@ export class Material {
 
 export class FontMaterial extends Material {
 
-   // text;
-   // char_buffer;
-   // temp_max_chars_inserted_in_gfx;
-   // sdf_params;
 
    constructor(col = [1, 1, 1, 1], textureid = INT_NULL, text = '', sdf_params = [.5, .5]) {
 
@@ -175,13 +171,13 @@ export class FontMaterial extends Material {
 
       // Load texture and uv map, via indexes to the actual buffers
       const texture = Texture_load_texture_byid(this.textureid, TEXTURE_TYPE.TYPE_FONT);
-      this.texidx = texture.texidx;
-      this.uvIdx = texture.uvmapidx;
+      this.texidx = texture.webGl_texture_idx;
+      this.fontidx= texture.fontidx;
 
 
       { // Debug
          /**DEBUG*/if (DEBUG.MATERIAL && this.texidx === INT_NULL) console.error('Texture Index is NULL')
-         /**DEBUG*/if (DEBUG.MATERIAL && this.uvIdx === INT_NULL) console.error('Uvs Index is NULL')
+         /**DEBUG*/if (DEBUG.MATERIAL && this.fontidx=== INT_NULL) console.error('Uvs Index is NULL')
       }
    }
 }
@@ -204,14 +200,14 @@ export class Texture_Material extends Material {
       this.type |= MESH_TYPE.TEXTURE_MATERIAL;
 
       const texture = Texture_load_texture_byid(textureid, TEXTURE_TYPE.TYPE_TEXTURE);
-      this.texidx = texture.texidx;
+      this.texidx = texture.webGl_texture_idx;
       this.textureId = textureid;
       // NOTE: Simple texture does not have a uvmap
 
 
       { // Debug
          /**DEBUG*/if (DEBUG.MATERIAL && this.texidx === INT_NULL) console.error('Texture Index is NULL')
-         /**DEBUG*/if (DEBUG.MATERIAL && this.uvIdx === INT_NULL) console.error('Uvs Index is NULL')
+         /**DEBUG*/if (DEBUG.MATERIAL && this.fontidx=== INT_NULL) console.error('Uvs Index is NULL')
       }
    }
 }

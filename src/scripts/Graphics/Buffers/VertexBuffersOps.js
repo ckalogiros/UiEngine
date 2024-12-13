@@ -54,6 +54,33 @@ export function Gl_set_rgb(gfxInfo, color, num_faces = 1) {
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
+export function Gl_set_rgb_specific_index(gfxInfo, color, num_faces = 1, start_face) {
+
+   /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_rgba()'); }
+
+   const vbidx = gfxInfo.vb.which_vb.col_buf;
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+   // let index = gfxInfo.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[vbidx];
+   let index = gfxInfo.vb.starts.buffer[vbidx] + (start_face*gfxInfo.vertsPerRect*vb_info.attribs_info.count) + vb_info.attribs_info.offsets[vbidx];
+   let loop_count = num_faces;
+   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   let stride = vb_info.attribs_info.count - (vb_info.attribs_info.sizes[vbidx]-1);
+
+
+   while (loop_count) {
+
+      vb_data[index++] = color[0];
+      vb_data[index++] = color[1];
+      vb_data[index++] = color[2];
+
+      index += stride; // Go to next vertice's pos. +1 for skipping pos.z
+      loop_count--;
+   }
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+}
 export function Gl_set_rgba(gfxInfo, color, num_faces = 1) {
 
    /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_rgba()'); }
@@ -190,7 +217,7 @@ export function Gl_set_rgba_specify_attribute(gfxInfo, value, num_faces = 1, ver
 
    /**DEBUG*/if (gfxInfo === null) { alert('GFX is null. @ Gl_set_rgba_per_vertex()'); }
 
-   console.error('SEE the implementation of Gl_set_rgba_specify_attribute() function for color picker')
+   // console.error('SEE the implementation of Gl_set_rgba_specify_attribute() function for color picker')
 
    const vbidx = gfxInfo.vb.which_vb.col_buf;
    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);

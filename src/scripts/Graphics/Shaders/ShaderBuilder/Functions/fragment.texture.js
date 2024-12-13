@@ -26,7 +26,7 @@ export const frag_msdf = `
 
 // set to distance fields pixel range
 // float pxRange = 16.5;
-// float pxRange = 8.5;
+// float pxRange = .5;
 float pxRange = 15.5;
 
 float median(float r, float g, float b) {

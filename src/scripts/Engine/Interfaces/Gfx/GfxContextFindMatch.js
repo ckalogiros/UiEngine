@@ -37,7 +37,7 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
       else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC) {
 
          if (parent === null) {
-            console.warn(parent)
+
             if (GFX_CONEXT_DEBUG) console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', mesh.GetName(), mesh);
 
             // Case the mesh is a text mesh, and there is a gfx buffer to be found, then because we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
@@ -80,7 +80,7 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
       if (_vb_groupidx !== null) {
          
             // We need to have knowledge if the meshes of the vb stored, have absolute position or not
-            const has_vb_absolute_pos = Mesh_unif_get_vb_root_wpos_has_absolute_pos(i);
+            // const has_vb_absolute_pos = Mesh_unif_get_vb_root_wpos_has_absolute_pos(i);
 
             if(_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(_vb_groupidx) === true)) {
                if (GFX_CONEXT_DEBUG) console.error('INCORRECT _vb_groupidx passed for generating SPECIFIC gfx.\n_gfxidxs:', _vb_groupidx);

@@ -53,8 +53,9 @@ export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
 if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === undefined || mesh_bufferidx===INT_NULL) {
 
    console.error('441552413332', 'mesh_bufferidx', mesh_bufferidx, '_mesh_buffer.buffer', _mesh_buffer.buffer)
-   // console.trace();
-   alert('441552413332')
+   alert('441552413332');
+   STATE.loop.paused = true;
+   return;
 }
 
    const hover_margin = _mesh_buffer.buffer[mesh_bufferidx].StylesGetHoverMargin();
@@ -64,7 +65,6 @@ if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_buff
    temp_no_allocation_buffer[1][0] = pos[1] - hover_margin[1];
    // TODO: For meshes with more than 4 vertices we must multiply the dimention with the number of faces. So we need to know which coordinate the mesh has the extra vertices towards to, and then mult that coord with the num faces. Currently the only coord to expand is the x axis(for colorpicker HUE bar) 
    temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + hover_margin[1];
-   // temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + hover_margin[1];
 
    return temp_no_allocation_buffer;
 }
@@ -100,8 +100,8 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx, root_bufferidx) {
          'root_group_view_buffer', Root_group_view_buffer_get(),
       );
 
+      // alert('Mesh is NULL.\n@ Mesh_buffer_remove_mesh_byidx()\nSEE console error');
       return;
-      alert('Mesh is NULL.\n@ Mesh_buffer_remove_mesh_byidx()\nSEE console error');
    }
 
 
@@ -115,7 +115,6 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx, root_bufferidx) {
    else { // ...remove element, BUT the removed mesh may be root of a batch-vb or group-groupdata-vb
 
       // Root_group_view_buffer_remove_element_byidx(mesh.root_bufferidx, mesh_bufferidx);
-      // if (mesh.batch_buffer_vbidx !== INT_NULL)
       Root_group_view_buffer_remove_element_byidx(mesh.root_bufferidx, mesh.batch_buffer_vbidx, mesh_bufferidx, mesh.geom.num_faces);
 
    }
@@ -485,12 +484,14 @@ export function Mesh_buffer_print_loop() {
 
       if (_mesh_buffer.buffer[i]) {
 
+         const vb_groupidx = (_mesh_buffer.buffer[i].gfx !== null) ? _mesh_buffer.buffer[i].gfx.vb.groupidx : -1
+
+
          console.log(i,
             'mbidx:', _mesh_buffer.buffer[i].mesh_bufferidx,
             'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
-            'vbgroupidx:', _mesh_buffer.buffer[i].gfx.vb.groupidx,
+            'vbgroupidx:', vb_groupidx,
             'per_vb_idx', _mesh_buffer.buffer[i].per_vb_bufferidx,
-            // 'gfxidx', _widget_root_gfx.buffer[_mesh_buffer.buffer[i].root_bufferidx],
             'batchidx:', _mesh_buffer.buffer[i].batch_buffer_vbidx,
             'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1], _mesh_buffer.buffer[i].group_bufferidxs[2],
             'child idx:', _mesh_buffer.buffer[i].idx,

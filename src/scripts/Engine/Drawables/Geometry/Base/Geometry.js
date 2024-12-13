@@ -50,7 +50,7 @@ export class Geometry2D {
 
     }
 
-    SetDefaultPosXY(gfx)    { glBufferOps.Gl_set_wpos_xy    (gfx, this.pos[0], this.pos[1], this.pos[2]); }
+    SetDefaultPosXY(gfx)    { glBufferOps.Gl_set_wpos_xy    (gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], this.pos[2]); }
 
     AddDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_vpos_xy(gfx, x, y, num_faces); }
     AddDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_vpos_x( gfx, x, num_faces); }
@@ -66,12 +66,25 @@ export class Geometry2D {
     UpdateSetDimX   (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_x( gfx, this.dim[0], num_faces); }
     UpdateSetDimY   (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_y( gfx, this.dim[1], num_faces); }
 
-    UpdateAddWposXY (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_xy(gfx, this.pos[0], this.pos[1], num_faces); }
-    UpdateAddWposX  (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_x( gfx, this.pos[0], num_faces); }
-    UpdateAddWposY  (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_y( gfx, this.pos[1], num_faces); }
-    UpdateSetWposXY (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_xy(gfx, this.pos[0], this.pos[1], num_faces); }
-    UpdateSetWposX  (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_x( gfx, this.pos[0], num_faces); }
-    UpdateSetWposY  (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_y( gfx, this.pos[1], num_faces); }
+    UpdateAddWposXY (gfx, num_faces=1)  { 
+        glBufferOps.Gl_add_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); 
+    }
+    UpdateAddWposX  (gfx, num_faces=1)  { 
+        glBufferOps.Gl_add_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); 
+    }
+    UpdateAddWposY  (gfx, num_faces=1)  { 
+        glBufferOps.Gl_add_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); 
+    }
+    // UpdateSetWposXY (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_xy(gfx, this.pos[0], this.pos[1], num_faces); }
+    UpdateSetWposXY (gfx, num_faces=1)  { 
+        glBufferOps.Gl_set_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); 
+    }
+    UpdateSetWposX  (gfx, num_faces=1)  { 
+        glBufferOps.Gl_set_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); 
+    }
+    UpdateSetWposY  (gfx, num_faces=1)  { 
+        glBufferOps.Gl_set_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); 
+    }
     
     AddWposXY   (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_wpos_xy(gfx, x, y, num_faces); }
     AddWposX    (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_wpos_x( gfx, x, num_faces); }

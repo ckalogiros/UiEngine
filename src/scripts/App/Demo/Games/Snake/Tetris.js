@@ -656,12 +656,6 @@ class Token {
       
       if(DEBUG_PRINT2) console.log('this.right_most_col', this.right_most_col);
 
-      // if(this.left_most_col <= 2) {
-      //    if(this.cols[0] > 0)
-      //       pivot = 2;
-      //    else pivot = 1
-      // }
-
       const px = this.cols[pivot], py = this.rows[pivot];
 
 
@@ -736,8 +730,8 @@ class Token {
 
       if(DEBUG_PRINT2) console.log('this.right_most_col', this.right_most_col);
 
-      if(this.left_most_col === 0) pivot = 1;
-      if(this.right_most_col === 0) pivot = 2;
+      // if(this.left_most_col === 0) pivot = 1;
+      // if(this.right_most_col === 0) pivot = 2;
 
 
       const px = this.cols[pivot], py = this.rows[pivot];

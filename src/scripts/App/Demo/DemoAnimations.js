@@ -372,17 +372,11 @@ export function Demo_animations_text(x = 0, y = 0, create_controls=true) {
 
    /**********************************************************************************************************/
    // Scale
-   // const anim_ret = Clbk_animations_text_counter(ROOT_WIDGETS.CREATE_ROOT, true, 0, 0 );
    const anim_ret = Clbk_animations_text_counter(0x0, create_controls, 0, 0 );
    panel.AddItem(anim_ret.target_mesh);
    if(create_controls) panel.AddItem(anim_ret.controls_section);
    
    
-   // panel.geom.pos[0] += x;
-   // panel.geom.pos[1] += y;
-   
-
-
 
    /**********************************************************************************************************/
    // Render
@@ -657,14 +651,12 @@ export function Clbk_animations_rotate(root_widget = 0x0, create_slider = false,
    if (create_slider) {
 
       const slider_dim = (200 * 2 < VIEWPORT.WIDTH) ? [200, 10] : [VIEWPORT.WIDTH / 2 - 10, 10];
-      // slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [x, y, 0], slider_dim, _, _, 'Log Function Slope');
       slider = Create_widget_slider(root_widget, [x, y, 0], slider_dim, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), _, 'Log Function Slope');
       slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
       slider.SetInitialValue(slope_const);
-      // slider.GfxUniformsEnable({ unif: SID.UNIF.FS_GENERIC_FLOAT, pass: SID.PASS.WPOS3, }, 'u_generic_float', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
       total_height += slider.geom.dim[1] * 2;
 
@@ -683,10 +675,8 @@ export function Clbk_animations_rotate(root_widget = 0x0, create_slider = false,
    mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2.5);
    mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, MULTI_COLOR);
-
    mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_ANGLE);
 
-   // mesh.GfxUniformsEnable({ unif: SID.UNIF.FS_GENERIC_FLOAT, pass: SID.PASS.WPOS3, }, 'u_generic_float', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
 
    total_height += mesh.geom.dim[1] * 2;
@@ -699,7 +689,6 @@ export function Clbk_animations_rotate(root_widget = 0x0, create_slider = false,
          slider.Render();
          Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
          slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
-         // slider.GfxUniformSetAndUpdate('u_generic_float', Math.PI);
 
          Construct_listen_events_from_mesh_tree(slider)
          Construct_listen_events_relations_from_mesh_tree(slider);
@@ -714,7 +703,6 @@ export function Clbk_animations_rotate(root_widget = 0x0, create_slider = false,
       Construct_listen_events_from_mesh_tree(mesh);
       Construct_listen_events_relations_from_mesh_tree(mesh);
       mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
-      // mesh.GfxUniformSetAndUpdate('u_generic_float', Math.PI);
    }
 
 
@@ -816,7 +804,6 @@ function Animation_rotate_back_stop(params) {
 /**************************************************************************************************************************************************************/
 /**************************************************************************************************************************************************************/
 /**************************************************************************************************************************************************************/
-// ...
 
 export function Clbk_animations_text_counter(root_widget = 0x0, create_contols = false, x = 0, y = 0, clbk_anim_flag=CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, size = 20, time_step = 0.01, slope = .2, speed = 20,) {
 
@@ -840,11 +827,9 @@ export function Clbk_animations_text_counter(root_widget = 0x0, create_contols =
 
    /*************************************************************************************************/
    // Create controls
-   // const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 3], [0, 0], BLACK, 'Controls Section', [0, 10, 2],);
    const controls_section = Create_widget_section(root_widget, SECTION.VERTICAL, [10, 10], [0, 0, 3], [0, 0], BLACK, 'Controls Section', [0, 10, 2],);
    controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   // controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    if (create_contols) { // Create slider controls only if this is to be rendered from this function
@@ -892,7 +877,6 @@ export function Clbk_animations_text_counter(root_widget = 0x0, create_contols =
    // Create animated meshes
 
    // Create panel
-   // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20,20], [x,y,0], _, GREY[2]);
    const section = Create_widget_section(root_widget, _, [20,20], [0,0,0], _, GREY[2]);
    {
       section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -965,8 +949,8 @@ export function Clbk_animations_text_counter(root_widget = 0x0, create_contols =
 
             let limit_ = 0;
             const text_substitution_ = `${params.params.counter2++}`
-            if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(digit2_mesh.text_mesh.mat.uvIdx, text_substitution_) / 2;
-            else if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(digit2_mesh.text_mesh.mat.uvIdx) / 2;
+            if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(digit2_mesh.text_mesh.mat.fontidx, text_substitution_) / 2;
+            else if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(digit2_mesh.text_mesh.mat.fontidx) / 2;
             
             const anim_idx = Clbk_animations_text_create(digit2_mesh, slope_params_pointer, limit_, 'TEST_text_animation_2', anim_flag, text_substitution_);
             params.params.counter1 = 0;
@@ -979,8 +963,8 @@ export function Clbk_animations_text_counter(root_widget = 0x0, create_contols =
          const text_substitution = `${params.params.counter1++}`
 
          let limit = 0;
-         if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(digit1_mesh.text_mesh.mat.uvIdx, text_substitution) / 2;
-         else if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(digit1_mesh.text_mesh.mat.uvIdx) / 2;
+         if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X|CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(digit1_mesh.text_mesh.mat.fontidx, text_substitution) / 2;
+         else if(anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y|CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(digit1_mesh.text_mesh.mat.fontidx) / 2;
          
          const anim_idx = Clbk_animations_text_create(digit1_mesh, slope_params_pointer, limit, 'TEST_text_animation_1', anim_flag, text_substitution);
       }, 
@@ -999,117 +983,6 @@ export function Clbk_animations_text_counter(root_widget = 0x0, create_contols =
 
 }
 
-/**SAVE: DO NOT DELETE
- * A Generic function to create text animations 
- * Use as a function to quickly set up an animation of a button/label widget's text on the fly  
- */
-// export function Clbk_animations_text_counter(root_widget = 0x0, target_mesh_ = null, create_slider = false, x = 100, y = 100, size = 20, time_step = 0.01, slope_const = .2, speed = 20,) {
-
-//    const feather = 2;
-//    const rcorners = 10;
-//    let total_height = 0;
-
-//    let target_mesh = target_mesh_;
-//    let target_mesh_created = false;
-//    let slider = null;
-
-//    /*************************************************************************************************/
-//    // Constant value slope_constant slider
-//    if (create_slider) {
-
-//       const slider_dim = (200 * 2 < VIEWPORT.WIDTH) ? [200, 10] : [VIEWPORT.WIDTH / 2 - 10, 10];
-//       // slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [x, y, 0], slider_dim, _, _, 'Log Function Slope');
-//       slider = Create_widget_slider(root_widget, [x, y, 0], slider_dim, _, _, 'Log Function Slope');
-//       slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-//       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
-//       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-//       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
-//       slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-//       slider.SetInitialValue(slope_const);
-//       // slider.GfxUniformsEnable({ unif: SID.UNIF.FS_GENERIC_FLOAT, pass: SID.PASS.WPOS3, }, 'u_generic_float', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
-
-//       total_height += slider.geom.dim[1] * 2;
-
-//       if (create_slider && (root_widget & ROOT_WIDGETS.CREATE_ROOT)) {
-
-//          slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-//          slider.Render();
-//          Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
-//          slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
-//          // slider.GfxUniformSetAndUpdate('u_generic_float', Math.PI);
-
-//          Construct_listen_events_from_mesh_tree(slider)
-//          Construct_listen_events_relations_from_mesh_tree(slider);
-//       }
-//    }
-
-
-//    if (target_mesh === null) {
-
-//       // Create the label to animate the text's vertex position
-//       const mesh = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, '0', _, [140, 180, 0], _, BLUEL[9], WHITE, [10, 86], _, _, TEXTURES.CONSOLAS_32px);
-//       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-//       mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-//       mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-//       mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(BLUEL[3], BLUEL[9]));
-//       mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-//       target_mesh = mesh;
-//       target_mesh_created = true;
-
-//    }
-
-
-
-
-//    if (target_mesh_created && (root_widget & ROOT_WIDGETS.CREATE_ROOT)) {
-
-//       total_height += target_mesh.geom.dim[1] * 2;
-
-//       target_mesh.GenGfxCtx();
-//       target_mesh.Render()
-//       target_mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, target_mesh.gfx.vb.groupidx)
-//       Construct_listen_events_from_mesh_tree(target_mesh);
-//       Construct_listen_events_relations_from_mesh_tree(target_mesh);
-//       Root_group_activate_all_vbs_in_renderqueue(target_mesh.root_bufferidx);
-
-//    }
-
-
-
-
-//    const slope_params_pointer = new Function_Slope(slope_const, time_step, speed);
-
-
-//    if (target_mesh_created) {
-
-//       const limit = Font_metrics_get_row_height(target_mesh.text_mesh.mat.texidx) / 2;
-
-//       if ((target_mesh instanceof Widget_Button) === false) alert('61554100987 target mesh is not of class Widget_Button');
-
-//       target_mesh.Bind(() => {
-//          Clbk_animations_text_create(target_mesh, slope_params_pointer, limit, 'sjdskjdkjsd', CLBK_ANIMATIONS.TEXT_TRANSLATE_Y);
-//       }, _, _, _);
-
-//    }
-
-//    if (create_slider) {
-
-//       const slider_params = slope_params_pointer;
-//       Slider_connect(slider, (params, slider_val) => {
-//          params.clbk_params.SetSlope(slider_val);
-//       }, slider_params);
-//    }
-
-
-
-//    return {
-//       target_mesh: target_mesh,
-//       slider_mesh: slider,
-//       total_height: total_height,
-//    };
-
-// }
 
 
 
@@ -1133,7 +1006,6 @@ export function Clbk_animations_text_create_contols(slope_params_pointer, animat
       const slider_feather = 2;
       const slider_rcorners = 10;
       
-      // slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [x, y, 0], slider_dim, _, _, 'Log Function Slope');
       const slider = Create_widget_slider(_, [0, 0, zpos+1], slider_dim, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), _, 'Animation Slope');
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
@@ -1157,12 +1029,10 @@ export function Clbk_animations_text_create_contols(slope_params_pointer, animat
       const slider_feather = 2;
       const slider_rcorners = 10;
       
-      // slider = Create_widget_slider(ROOT_WIDGETS.CREATE_ROOT, [x, y, 0], slider_dim, _, _, 'Log Function Slope');
       const slider = Create_widget_slider(_, [0, 0, zpos+1], slider_dim, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), _, 'Animation Speed');
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-      // slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[9]), COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
       slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), );
       slider.SetInitialValue(slope_params_pointer.GetSlope());
    
@@ -1177,7 +1047,6 @@ export function Clbk_animations_text_create_contols(slope_params_pointer, animat
       Slider_connect(slider, (params, slider_val) => {
          const min = params.clbk_params.min, max = params.clbk_params.max;
          const val = Linear_interpolation(min, max, slider_val);
-         console.log(val)
          params.clbk_params.slope_params_pointer.SetValueChange(val);
       }, slider_params);
    }
@@ -1226,10 +1095,8 @@ export function Clbk_animations_text_create_contols(slope_params_pointer, animat
             }
          },
          null, _, _,
-         // null, {mnemonics:{transparency:0.5, hue:0.5, color:null},}, _,
       );
    
-      // panel.Calc_no_gfx_update();
    } 
    { // Sqeeze switch animations switch
       const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10,10], [0, 0, zpos + 1], [0, 0], COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), 'anim_type_panel');
@@ -1272,10 +1139,8 @@ export function Clbk_animations_text_create_contols(slope_params_pointer, animat
             }
          },
          null, _, _,
-         // null, {mnemonics:{transparency:0.5, hue:0.5, color:null},}, _,
       );
    
-      // panel.Calc_no_gfx_update();
    } 
 
    return contols_buffer;
@@ -1347,7 +1212,6 @@ function Animation_text_run_squeeze_x(params) {
       text.RenderTextFromString(text_substitution);
 
       text_animation_gfx_vertex_set_sqeeze_x_axis(text, -limit);
-      // pos_x_set_default(text);
 
 
       return false;
@@ -1419,7 +1283,6 @@ function Animation_text_run_squeeze_y(params) {
 
    // Squeeze text down to a limit
    const a = move_y_upper_vertices_down(text, val, limit);
-   // move_y(text, val*.5, mesh.geom.pos[0]+mesh.geom.dim[0]*2);
 
    // if limit height reached,
    if (a === false) {
@@ -1430,7 +1293,6 @@ function Animation_text_run_squeeze_y(params) {
       text.RenderTextFromString(text_substitution);
 
       vertex_y_set(text, -limit);
-      // pos_y_set_default(text);
 
 
       return false;
@@ -1463,15 +1325,11 @@ function Animation_text_back_run_squeeze_y(params) {
 
 
    // Squeeze text down to a limit
-   // const a = squeeze_y_to_bottom_vertices_move_to_bottom(mesh, val, limit);
    const a = move_y_bottom_vertices_up(text, val, limit);
-   // move_y(text, val, mesh.geom.pos[0]+mesh.geom.dim[0]);
 
    if (a === false) {
 
       vertex_y_set_default(text);
-      // pos_y_set_default(text);
-
       return false;
    }
    return true
@@ -1519,7 +1377,6 @@ function Animation_text_run_translation_x(params) {
 
       // Also substitute the text
       text.RenderTextFromString(text_substitution);
-      // pos_x_set(text, center-(mesh.geom.dim[0])+text.geom.dim[0]*1);
       // TODO: The dimention of the text changes according to the rendered character, and not the INITIAL character
       pos_x_set(text, mesh.geom.pos[0]+text.geom.dim[0]);
 
@@ -1646,402 +1503,7 @@ function Animation_text_back_run_translation_y(params) {
 
 function Animation_text_back_stop_translation_y(params) {
 
-   // Callback_animations_create(Animation_text_run_translation_y, Animation_text_stop_translation_y, params, `Run:${params.name}`);
    params.function_slope.SetTimer(0);
    return false;
 }
 
-
-
-
-
-
-
-
-
-
-
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-// ...
-
-// export function Clbk_animations_rotate_perimetric(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 - 10, height = VIEWPORT.HEIGHT / 2 - 150, num_balls = 1, root_widget = ROOT_WIDGETS.CREATE_ROOT, controls_create_but_not_render = true) {
-
-//    let balls_buffer = [];
-//    let dirs_buffer = [];
-//    let noise_particles_buffer = [];
-//    let glow_particles_buffer = [];
-
-//    const glow_size = 20;
-//    const scale_down = .22;
-
-//    const u_wpos_flags = {
-//       unif: SID.UNIF.ROOT_WPOS2,
-//       pass: SID.PASS.WPOS3,
-//    }
-
-
-//    const particles_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [x, y, 0], [width, height], TRANSPARENCY(GREY[1], 1.), 'Particles Bouncing Ball Tail',)
-//    particles_panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-//    particles_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-//    particles_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 20);
-
-
-
-//    let swap_dir = 1; // Create direction variation in case of rendering many balls 
-//    for (let i = 0; i < num_balls; i++) {
-
-//       /****************************************************************************************************************/
-//       // Balltail particles
-//       const dim = [30, 30]
-//       const pos = GetRandomPos([0, 0], [particles_panel.geom.dim[0], particles_panel.geom.dim[1]])
-
-//       const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, WHITE, 'Ball', [0, dim[0], 2]);
-//       ball.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-//       ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-//       ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-//       ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
-//       particles_panel.AddItem(ball);
-
-//       balls_buffer[i] = ball
-
-//       // const color = GetSequencedColor()
-//       const color = YELLOWR[9];
-//       // const color = ORANGER[9];
-
-//       const scale = 2.;
-//       const particles_size = dim[1] * scale;
-//       // const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 2, 2, _, _, _, 4);
-//       const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 2, 2, _, _, _, 4);
-//       const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
-
-
-
-//       tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
-//       tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
-//       tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
-
-
-//       tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-
-
-
-
-
-
-
-
-//       /****************************************************************************************************************/
-//       // Secondary particles
-
-//       // const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .5, 1., 2, .989, 0, 8);
-//       const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .5, 1., 1.8, .99, 0, 16);
-//       const glow_emitter = Particles_get_particle_system(glow_emitter_idx);
-//       glow_emitter.flags |= PARTICLES.HAS_START_POS_VARIATION;
-
-//       glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
-//       glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, glow_size);
-//       glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-//       glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
-//       glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
-
-//       glow_emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-//       glow_emitter.EnableGfxUniforms({ fx: SID.FX.FS_GLOW_VEC3, }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-
-
-
-//       glow_emitter.SetDir(-1, -1);
-//       const amt = .05;
-//       glow_emitter.SetConeOfDirection(-amt, amt, amt, -amt);
-//       glow_particles_buffer[i] = glow_emitter;
-
-
-
-//       tail_emitter.SetDir(1, 1 * swap_dir);
-
-
-//       noise_particles_buffer[i] = tail_emitter;
-//       dirs_buffer[i] = [1, 1 * swap_dir]
-
-//       swap_dir *= -1;
-
-
-//    }
-
-
-
-
-
-
-
-
-//    /****************************************************************************************************************/
-//    // Render 
-
-//    particles_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, particles_panel.mesh_bufferidx, true);
-//    particles_panel.GenGfxCtx();
-
-//    particles_panel.Render();
-//    Root_group_activate_all_vbs_in_renderqueue(particles_panel.root_bufferidx);
-
-//    particles_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, particles_panel.gfx.vb.groupidx);
-
-//    Construct_listen_events_from_mesh_tree(particles_panel);
-//    Construct_listen_events_relations_from_mesh_tree(particles_panel);
-
-
-
-
-//    // IMPORTANT: Generate particles gfx after the generation of any parent mesh, so that the particles system unif_wpos has a parent root_posidx
-//    for (let i = 0; i < num_balls; i++) {
-
-//       const glow_emitter = glow_particles_buffer[i];
-//       Particles_gen_gfx_ctx(glow_emitter, particles_panel);
-//       // Initialize values to uniforms
-//       glow_emitter.GfxUniformSetAndUpdate('u_scale2', [.1, 1]);
-//       glow_emitter.GfxUniformSetAndUpdate('u_glow_params', [.3, 1, .2]);
-
-
-//       // Render Ball tail particles on top of the glow particles
-//       const tail_emitter = noise_particles_buffer[i];
-//       Particles_gen_gfx_ctx(tail_emitter, particles_panel);
-//       // Initialize values to uniforms
-//       tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [1, 0, .12]);
-
-//    }
-
-
-//    const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], BLACK, 'Emitter Window Panel', [0, 10, 2],);
-//    controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-//    controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-//    controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-//    controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   
-//    const zpos = -1
-
-//    { // Create color picker panel
-//       const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10,10], [0, 0, zpos + 1], [0, 0], YELLOWL[4], 'color_picker_panel');
-//       panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-//       panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-//       panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
-//       panel.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-//       controls_section.AddItem(panel);
-   
-//       // Create label
-//       const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, PURPLEB[6], WHITE, [5, 5], _, _, _, _);
-//       label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-//       label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-//       label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
-//       panel.AddItem(label);
-
-//       const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, PURPLEB[6], _);
-//       colorpicker_switch.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-//       colorpicker_switch.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
-//       colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-//       colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
-//       colorpicker_switch.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-//       colorpicker_switch.SetName('color_picker_switch');
-//       panel.AddItem(colorpicker_switch);
-      
-//       const cp_params = {
-//          noise_particles_buffer:noise_particles_buffer,
-//          glow_particles_buffer:glow_particles_buffer,
-//          mnemonics:{transparency:0.5, hue:0.5, color:null},
-//       };
-//       colorpicker_switch.Bind(
-//          (params) => {
-   
-//             /**
-//              * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'eventCallbacks' of the switch widget??????
-//              * Explanation:
-//              * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
-//              * 
-//              */
-//             const switch_mesh = params.target_mesh;
-//             const isOn = switch_mesh.isOn;
-
-//             const x = 0;
-//             const y = VIEWPORT.HEIGHT - 300;
-   
-   
-//             if (isOn) {
-   
-//                const transparency = params.params.mnemonics.transparency;
-//                const hue = params.params.mnemonics.hue;
-//                const color = params.params.mnemonics.color;
-
-//                const colorpicker = Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, x, y, 300, 300, );
-//                colorpicker.SetTransparencySliderSetInitialValue(transparency);
-//                colorpicker.SetHueSliderSetInitialValue(hue);
-
-//                colorpicker.AssignTargetMeshClbk((col, params) => {
-
-//                   const noise_particles_buffer = params.noise_particles_buffer;
-//                   const glow_particles_buffer = params.glow_particles_buffer;
-//                   const color = col;
-                  
-//                   const len = noise_particles_buffer.length;
-//                   for(let i=0; i<len; i++){
-
-//                      const tail_emitter = noise_particles_buffer[i];
-//                      const glow_emitter = glow_particles_buffer[i];
-                     
-//                      CopyArr4(tail_emitter.mat.col, color);
-//                      CopyArr4(glow_emitter.mat.col, color);
-//                   }
-//                   // TODO: store all the colorpicker params in mnemonics
-//                   // params.mnemonics.color = color;
-//                }, params.params);
-//                switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
-//             }
-//             else {
-   
-//                const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.temporary_renameme)
-//                colorpicker.Destroy();
-//             }
-//          },
-//          null, cp_params, _,
-//       );
-   
-//       // panel.Calc_no_gfx_update();
-//    }
-
-
-
-
-
-
-//    if (controls_create_but_not_render) { // Create slider controls only if this is to be rendered from this function
-
-
-//       /****************************************************************************************************************/
-//       // Tail Particle System: Contol Sliders 
-
-//       const comet_contols_buffer = Create_comet_noise_contols(noise_particles_buffer, YELLOWL[2], _);
-//       const len = comet_contols_buffer.length;
-//       for(let i=0; i<len; i++){
-//          const ctrl = comet_contols_buffer[i];
-//          controls_section.AddItem(ctrl);
-//       }
-
-//       controls_section.MoveNoGfxUpdate(VIEWPORT.WIDTH-250, 400)
-
-
-
-
-//       /****************************************************************************************************************/
-//       // Glow Particle System: Contol Sliders 
-      
-//       const glow_contols_buffer = Create_comet_glow_contols(glow_particles_buffer, YELLOWL[2], _);
-//       const glow_len = glow_contols_buffer.length;
-//       for(let i=0; i<glow_len; i++){
-//          const ctrl = glow_contols_buffer[i];
-//          controls_section.AddItem(ctrl);
-//       }
-
-
-//    }
-
-
-//    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
-
-
-
-//       /****************************************************************************************************************/
-//       // Render 
-      
-//       controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
-//       controls_section.GenGfxCtx();
-//       // controls_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-//       controls_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-//       controls_section.Calc_no_gfx_update();
-
-//       controls_section.Render();
-//       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
-
-//       controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-
-//       Construct_listen_events_from_mesh_tree(controls_section);
-//       Construct_listen_events_relations_from_mesh_tree(controls_section);
-
-//    }
-
-
-
-
-//    const params = {
-//       particles_panel: particles_panel,
-//       ball: balls_buffer,
-//       dir: dirs_buffer,
-//       noise_particles_buffer: noise_particles_buffer,
-//       glow_particles: glow_particles_buffer,
-//    }
-
-//    // Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_comet, params);
-
-
-//    return {
-//       particles_panel: particles_panel,
-//       controls_section:controls_section,
-//       noise_particles_buffer: noise_particles_buffer,
-//       glow_particles_buffer: glow_particles_buffer,
-//    };
-// }
-
-// function Animation_rotate_perimetric_run(params) {
-
-//    const mesh = params.mesh;
-//    const slope_constant = params.function_slope.GetSlope();
-//    const angle = params.function_slope.GetValueChange();
-//    params.function_slope.IncrementTimer();
-//    const timer = params.function_slope.GetTimer();
-
-//    const slope = Logarithmic_interpolation(timer, slope_constant);
-
-//    const rot = (slope * angle);
-
-//    mesh.RotateZ(rot);
-//    Gl_set_angle(mesh.gfx, rot);
-//    rotation = rot;
-
-//    if (slope < 1.) return true;
-//    else return false
-
-// }
-
-// function Animation_rotate_perimetric_stop(params) {
-
-//    Callback_animations_create(Animation_rotate_perimetric_back_run, Animation_rotate_perimetric_back_stop, params, `Stop${params.function_slope.slope_constant}`);
-//    params.function_slope.SetTimer(0);
-
-//    return false;
-// }
-
-// function Animation_rotate_perimetric_back_run(params) {
-
-//    const mesh = params.mesh;
-//    const slope_constant = params.function_slope.GetSlope();
-//    const angle = params.function_slope.GetValueChange();
-//    params.function_slope.IncrementTimer();
-//    const timer = params.function_slope.GetTimer();
-
-//    const slope = Logarithmic_interpolation(timer, slope_constant);
-
-//    const rot = ((1. - slope) * angle);
-
-//    mesh.RotateZ(rot);
-//    Gl_set_angle(mesh.gfx, rot);
-//    rotation = rot;
-
-//    if (slope < 1.) return true;
-//    else return false
-// }
-
-// function Animation_rotate_perimetric_back_stop(params) {
-
-//    Callback_animations_create(Animation_rotate_perimetric_run, Animation_rotate_perimetric_stop, params, `Stop:${params.function_slope.slope_constant}`);
-//    params.function_slope.SetTimer(0);
-
-//    return false;
-// }

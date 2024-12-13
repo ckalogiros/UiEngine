@@ -60,7 +60,7 @@ export function Dbg_ui_info_all_reset() {
 /************************************************************************************************************************************************/
 export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x=0, y=0){
 
-   const transp = .8;
+   const transp = .9;
    const zpos = 0;
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, zpos], [0, 0], TRANSPARENCY(GREY[2], transp), 'ui performance timers panel', _, _, _);
    section.SetName('InfoUi-static');
@@ -272,16 +272,16 @@ export function Debug_info_ui(is_root_widget = undefined, pos=[300,80,0]) {
 
       const section_col = GREY[1];
 
-      // /************************************************************************************************************************************************/
-      // // Performance timers
-      // const stats_ui = Ui_create_label_switch('Stats', fontsize, switch_size, Debug_info_create_ui_stats, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      // dp.AddToMenu(stats_ui);
+      /************************************************************************************************************************************************/
+      // Performance timers
+      const stats_ui = Ui_create_label_switch('Stats', fontsize, switch_size, Debug_info_create_ui_stats, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      dp.AddToMenu(stats_ui);
 
 
-      // /************************************************************************************************************************************************/
-      // // Performance timers
-      // const perf_timers_ui = Ui_create_label_switch('Performance', fontsize, switch_size, Debug_info_create_ui_performance_timers, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      // dp.AddToMenu(perf_timers_ui);
+      /************************************************************************************************************************************************/
+      // Performance timers
+      const perf_timers_ui = Ui_create_label_switch('Performance', fontsize, switch_size, Debug_info_create_ui_performance_timers, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      dp.AddToMenu(perf_timers_ui);
 
 
       /************************************************************************************************************************************************/
@@ -1364,7 +1364,7 @@ function Debug_info_update_ui_focused(params) {
             this.type = MESH_TYPE.MATERIAL;
             this.style = [0, 0, 0];
             this.uv = [0, 1, 0, 1];
-            this.uvIdx = INT_NULL;
+            this.fontidx = INT_NULL;
             this.texidx = INT_NULL;
          };
 
@@ -1601,7 +1601,7 @@ function Ui_focused_create_info_mat(mesh, zpos){
    //    this.type = MESH_TYPE.MATERIAL;
    //    this.style = [0, 0, 0];
    //    this.uv = [0, 1, 0, 1];
-   //    this.uvIdx = INT_NULL;
+   //    this.fontidx = INT_NULL;
    //    this.texidx = INT_NULL;
    // };
 
@@ -1619,7 +1619,7 @@ function Ui_focused_create_info_mat(mesh, zpos){
 
    info_text.CreateNewText(`style:[${mesh.mat.style.rcorners}, ${mesh.mat.style.feather}, ${mesh.mat.style.border}]`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
    info_text.CreateNewText(`uv:[${mesh.mat.uv[0]}, ${mesh.mat.uv[1]}, ${mesh.mat.uv[2]}, ${mesh.mat.uv[3]}]`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
-   info_text.CreateNewText(`uvIdx:${mesh.mat.uvIdx}`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
+   info_text.CreateNewText(`fontidx:${mesh.mat.fontidx}`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
    info_text.CreateNewText(`texidx:${mesh.mat.textureid}`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
 
    section.AddItem(info_text);

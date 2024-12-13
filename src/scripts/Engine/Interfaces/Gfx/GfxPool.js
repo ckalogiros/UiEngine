@@ -7,9 +7,9 @@ import { VBI_get_byidx, Vertex_buffer_group_get, Vertex_buffer_group_reset, Vert
 import { Gl_remove_geometry } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Shader_attributes_reset } from "../../../Graphics/ShaderAttributes.js";
 import { Program_reset } from "../../../Graphics/ShaderPrograms.js";
-import { Bubble_sort } from "../../../Helpers/Helpers.js";
 import { Mesh_unif_get_vb_root_wpos_has_absolute_pos } from "../../Core/MeshUniformsBuffer.js";
 import { Texture_buffer_reset } from "../../Loaders/Textures/Texture.js";
+import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 
 
 /**
@@ -72,6 +72,7 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, 
             if(SID.CheckSidMatch(sid, vb_group_buffer.buffer[i].sid)){
    
                vb_group_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
+               Renderqueue_set_active(i, true);
                return i;
             }
          }
@@ -151,6 +152,7 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, 
 
       if(found !== INT_NULL){
          vb_group_buffer.buffer[found].state.mask |= BUFFER_STATE.IS_ACTIVE;
+         Renderqueue_set_active(found, true);
          return found;
       }
    }
@@ -179,6 +181,7 @@ export function Gfx_pool_find_vb_notPrivate(sid, pool_request_flags, has_absolut
             if((has_absolute_pos === has_vb_absolute_pos) && SID.CheckSidMatch(sid, vb_group_buffer.buffer[i].sid)){
    
                vb_group_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
+               Renderqueue_set_active(i, true);
                return i;
             }
          }

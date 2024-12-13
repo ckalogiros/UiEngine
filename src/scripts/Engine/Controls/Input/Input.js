@@ -211,7 +211,7 @@ export function Device_set_up() {
   // window.location.reload():
 
   const body = document.querySelector("html");
-  console.log('getBoundingClientRect()', body.getBoundingClientRect())
+  // console.log('getBoundingClientRect()', body.getBoundingClientRect())
   {
     // alert(`top: ${body.getBoundingClientRect().top}`);
     // alert(`left: ${body.getBoundingClientRect().left}`);
@@ -229,11 +229,11 @@ export function Device_set_up() {
     // alert(`y: ${canvas.getBoundingClientRect().y}`);
 
   }
-  console.log('DEVICE.info', DEVICE.info)
-  console.log('WINDOW', window)
-  console.log('DOCUMENT', document);
-  console.log('VIEWPORT', VIEWPORT);
-  console.log('DEVICE', DEVICE);
+  // console.log('DEVICE.info', DEVICE.info)
+  // console.log('WINDOW', window)
+  // console.log('DOCUMENT', document);
+  // console.log('VIEWPORT', VIEWPORT);
+  // console.log('DEVICE', DEVICE);
   
   /**
     offsetHeight: 1032
@@ -247,8 +247,8 @@ export function Device_set_up() {
     clientTop: 0
     clientWidth: 799
    */
-  console.log('document.documentElement', document.documentElement);
-  console.log('document.documentElement.clientWidth', document.documentElement.clientWidth);
+  // console.log('document.documentElement', document.documentElement);
+  // console.log('document.documentElement.clientWidth', document.documentElement.clientWidth);
 
 
 
@@ -352,6 +352,8 @@ export function Detect_host_platform() {
   const wn = window.navigator;
   // console.debug(wn)
 
+  const msg = 'The engine is not fully suported';
+
   /** Windows Smartphone
    * Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 950) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Mobile Safari/537.36 Edge/14.14263
    */
@@ -359,19 +361,19 @@ export function Detect_host_platform() {
     PLATFORM.WIN_PHONE_IMPL = true;
     PLATFORM.ANY_SMARTPHONE_DEVICE = true;
     console.log('-- Windows Phone Platform --');
-    alert('-- Windows Phone Platform --');
+    alert(`-- Windows Phone Platform --\n${msg}`);
   }
   else if (/Android/i.test(wn.userAgent)) {
     PLATFORM.ANDROID_IMPL = true;
     PLATFORM.ANY_SMARTPHONE_DEVICE = true;
     console.log('-- Android Phone Platform --')
-    alert('-- Android Phone Platform --')
+    alert(`-- Android Phone Platform --\n${msg}`, )
   }
   else if (/iPhone|iPad|iPod/i.test(wn.userAgent)) {
     PLATFORM.I_PHONE_IMPL = true;
     PLATFORM.ANY_SMARTPHONE_DEVICE = true;
     console.log('-- Iphone Phone Platform --')
-    // alert('-- Iphone Phone Platform --')
+    alert(`-- Iphone Phone Platform --\n${msg}`)
   }
   /** Windows NT
    * Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0 

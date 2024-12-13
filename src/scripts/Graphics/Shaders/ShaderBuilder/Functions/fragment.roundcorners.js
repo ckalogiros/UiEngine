@@ -205,6 +205,7 @@ vec4 Round_corners(float scale_down)
 
     // return vec4(src_color);
     return vec4(color, alpha * src_color.a);
+    // return vec4(color, alpha);
     // return vec4(color, src_color.a);
 }
 `;
