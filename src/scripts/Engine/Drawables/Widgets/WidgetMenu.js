@@ -11,6 +11,7 @@ import { Styles_pad_set } from "../../Styles.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/Views/MeshBufferViews.js";
 import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
+import { Mesh_create_style_from_values } from "../Operations/MeshHelperFunctions.js";
 
 
 
@@ -34,7 +35,7 @@ export class Widget_Menu_Bar extends Section {
    close_btn_idx;
    minimize_btn_idx;
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = {rcorners:5, feather:2, border:0}, num_faces, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = { rcorners: 5, feather: 2, border: 0 }, num_faces, is_debug_mesh) {
 
       const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, col, text_col, _, _, _, _, is_debug_mesh);
 
@@ -50,7 +51,8 @@ export class Widget_Menu_Bar extends Section {
       this.StylesSetPad(pad)
 
 
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
+      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
+      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
       this.SetStyle(style);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -62,7 +64,7 @@ export class Widget_Menu_Bar extends Section {
 
 
       this.label = label;
-      this.AddChild(label);
+      this.AddItem(label);
 
 
       this.close_btn_idx = INT_NULL;
@@ -229,7 +231,7 @@ export class Widget_Menu_Bar extends Section {
    /****************************************************************************************************************************************************/
 
 
-   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = {rcorners:5, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT) {
+   AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = { rcorners: 5, feather: 2, border: 0 }, font = TEXTURES.DEFAULT_FONT) {
 
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
 
@@ -280,7 +282,7 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
-   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[1], text_col = WHITE, _pad, bold = .4, font = TEXTURES.DEFAULT_FONT, style = {rcorners:5, feather:2, border:0}) {
+   AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[1], text_col = WHITE, _pad, bold = .4, font = TEXTURES.DEFAULT_FONT, style = { rcorners: 5, feather: 2, border: 0 }) {
 
       if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
 
@@ -396,7 +398,7 @@ export class Widget_Menu_Bar extends Section {
 export class Close_Button extends Widget_Button {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE,
-      pad = [0, 0], bold = .4, style = {rcorners:6, feather:5, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+      pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
 
@@ -448,7 +450,7 @@ export class Close_Button extends Widget_Button {
       const root = params.evt_params
       root.Destroy(root);
 
-      if(root.eventCallbacks){
+      if (root.eventCallbacks) {
          root.eventCallbacks.buffer[0].evt_clbks();
       }
 
@@ -461,7 +463,7 @@ export class Widget_Minimize extends Widget_Button {
 
    // toggle; // On/Off
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = {rcorners:4, feather:2, border:0}, font, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos = [100, 200, 0], fontsize = 5, col = GREY[3], text_col, pad = [6, 2], bold = .5, style = { rcorners: 4, feather: 2, border: 0 }, font, is_debug_mesh) {
 
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, '_', _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
 

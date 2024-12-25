@@ -1,6 +1,6 @@
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Mesh_animations_create } from "../../../../Engine/Animations/MeshAnimations.js";
-import { Android_deactivate_scrolling, MouseGetPosDifX } from "../../../../Engine/Controls/Input/Mouse.js";
+import { Mouse_android_deactivate_scrolling, Mouse_get_pos_difx } from "../../../../Engine/Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_section, Create_widget_slider, Create_widget_switch_simple } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
@@ -182,7 +182,7 @@ export function Game_snake(y = 0, controls_create=true) {
 
    // TODO: If android: deactivate scrolling
    if (PLATFORM.ANY_SMARTPHONE_DEVICE) {
-      Android_deactivate_scrolling();
+      Mouse_android_deactivate_scrolling();
       board_width - DEVICE.info.canvas_left + DEVICE.info.canvas_right;
       board_height - DEVICE.info.canvas_top + DEVICE.info.canvas_bot;
    }
@@ -304,7 +304,7 @@ export function Game_snake(y = 0, controls_create=true) {
    section.Bind(
       (params) => { // Click callback
 
-         const mouse_xdif = MouseGetPosDifX();
+         const mouse_xdif = Mouse_get_pos_difx();
          if (Abs(mouse_xdif) > .5) {
 
 

@@ -114,9 +114,16 @@ const SID = {
         INDEXED_PATT_DISCONTINUE_6: BIT1 <<= 1, // Break vertex indices
         PRE_MULTIPLIED_ALPHA: BIT1 <<= 1,
 
-        // Color Manipulation Functions
+        // Shader Color Manipulation Functions
+        FN_INNER_SHADOW: BIT1 <<= 1,
+        FN_EXPLOSION_CIRCLE: BIT1 <<= 1,
         FN_GLOW_SPHERE: BIT1 <<= 1,
-        FN_NOISE_WORLEY: BIT1 <<= 1,
+        FN_NOISE_WORLEY_1: BIT1 <<= 1,
+        FN_NOISE_WORLEY_2: BIT1 <<= 1,
+        FN_NOISE_WORLEY_3_TYPES: BIT1 <<= 1,
+        FN_NOISE_VORONOI_1: BIT1 <<= 1,
+        FN_NOISE_VORONOI_2: BIT1 <<= 1,
+        
 
         // Test Shaders
         FS_TEST1: BIT1 <<= 1,
@@ -187,7 +194,7 @@ const SID = {
         DIM2: BIT5 <<= 0x1,         // u_dim2
         SCALE2: BIT5 <<= 0x1,       // u_scale2
         ROOT_WPOS2: BIT5 <<= 0x1,   // u_wposxy
-        TIME: BIT5 <<= 0x1,         // u_time
+        FS_TIME_FLOAT: BIT5 <<= 0x1,         // u_time
         FS_RCORNERS_FLOAT: BIT5<<=0x1,
         FS_RCORNERS_VEC2: BIT5<<=0x1,
         FS_RCORNERS_VEC3: BIT5<<=0x1,
@@ -206,6 +213,7 @@ const SID = {
         FS_GLOW_VEC3: BIT6,
         FS_GLOW_VEC2: BIT6<<=0x1,
         FS_NOISE: BIT6<<=0x1,
+        FS_NOISE_2: BIT6<<=0x1,
         FS_SMOKE_VEC3: BIT6<<=0x1,
         FS_SMOKE_VEC2: BIT6<<=0x1,
     },
@@ -215,7 +223,7 @@ const SID = {
         BLEND_MODE_ADD: BIT7 <<= 0x1, 
         BLEND_MODE_LIGHTEN: BIT7 <<= 0x1, 
         BLEND_MODE_MULTIPLY: BIT7 <<= 0x1, 
-        BLEND_MODE_DEVIDE: BIT7 <<= 0x1, 
+        BLEND_MODE_DIVIDE: BIT7 <<= 0x1, 
         BLEND_MODE_SUBTRACT: BIT7 <<= 0x1, 
         BLEND_MODE_DARKEN: BIT7 <<= 0x1, 
         BLEND_MODE_COLOR_BURN: BIT7 <<= 0x1, 
@@ -223,6 +231,8 @@ const SID = {
         BLEND_MODE_SCREEN: BIT7 <<= 0x1, 
         BLEND_MODE_OVERLAY: BIT7 <<= 0x1, 
         BLEND_MODE_MIX: BIT7 <<= 0x1, 
+        BLEND_MODE_MASK: BIT7 <<= 0x1, 
+        BLEND_MODE_ALPHA: BIT7 <<= 0x1, 
     },
 
 
@@ -441,8 +451,8 @@ const MESH_ENABLE = {
         ATTR_COL4_PER_VERTEX: _CNT++,
         
         UNIF_RESOLUTION: _CNT++,
-        UNIFORM: _CNT++,
-        UNIF_TIMER: _CNT++,
+        UNIFORM: _CNT++, // TODO: NOT NEEDED????
+        UNIF_TIME: _CNT++,
         
         FX_GLOW: _CNT++,
         FX_NOISE: _CNT++,
@@ -459,8 +469,11 @@ const MESH_ENABLE = {
         BLEND_OPTIONS: _CNT++, 
 
         // Shader Color Functions
+        FN_EXPLOSION_CIRCLE: _CNT++,
+        FN_INNER_SHADOW: _CNT++,
         FN_GLOW_SPHERE: _CNT++,
         FN_NOISE_WORLEY: _CNT++,
+        FN_NOISE_VORONOI: _CNT++,
 
         TEST_SHADERS_1: _CNT++,
         TEST_SHADERS_2: _CNT++,

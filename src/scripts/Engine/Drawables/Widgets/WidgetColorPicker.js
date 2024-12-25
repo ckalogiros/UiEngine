@@ -2,7 +2,7 @@
 
 import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { CopyArr3, CopyArr4, CopyMat4_arr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations.js";
-import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
+import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Create_rect_mesh, Create_widget_label, Create_widget_section, Create_widget_slider_simple } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
@@ -591,7 +591,7 @@ export class Widget_Color_Picker extends Section {
        * 
        * Formula:
        * res=(x/w) * P  =>  Ceil(res)  :  x->handle_pos, w->hue_bar_width, P->part_index(the part of the hue bar that represents the interpolation of 2 colors)
-       * P=(num_vertices-2)/2: we subtract the last(rightmost) 2 vertices, we devide by 2 up and down verts
+       * P=(num_vertices-2)/2: we subtract the last(rightmost) 2 vertices, we divide by 2 up and down verts
        * Or in our case: P=num_faces, where num_faces is equal to the total parts of the hue bar.
        * 
        * Compacted
@@ -982,7 +982,7 @@ function On_move_clbk(params) {
       return;
    }
 
-   const mouse_dif = MouseGetPosDif();
+   const mouse_dif = Mouse_get_pos_dif();
    if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
 
    Mesh_unif_add_vb_root_wpos(widget.root_posidx, mouse_dif.x, -mouse_dif.y)

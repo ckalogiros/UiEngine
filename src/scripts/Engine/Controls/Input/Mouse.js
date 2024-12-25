@@ -17,7 +17,7 @@ const mouse = {
     *    Now if the mouse enters from a different x-y coordinate, then the xdiff is calculated as pos - prevPos,
     *    which takes into account the coordinates before the mouse leaved the 'html-body'.
     *    This produces huge ammounts of difference. To avoid that, whenever the mouse leaves the 'html-body' area,
-    *    we set the prevPos to INT_NULL, so that uppon OnMouseMove() callback we check if the value is NOT INT_NULL 
+    *    we set the prevPos to INT_NULL, so that uppon Mouse_on_move() callback we check if the value is NOT INT_NULL 
     *    in order to procceed and do the dif calculation. If it is INT_NULL (means that mouse left the area), then we
     *    just store the new pos in the prevPos variable. 
     */
@@ -32,6 +32,12 @@ const mouse = {
             this.x,
             this.y,
          ]);
+      },
+      GetPosX(){
+         return this.x;
+      },
+      GetPosY(){
+         return this.y;
       },
       GetDif(){
          return {
@@ -131,12 +137,18 @@ const mouse = {
  * 
  * @returns {Obj:{x,y}} 
  */
-export function MouseGetPos() {
+export function Mouse_get_pos() {
    return mouse.pos.GetPos();
+}
+export function Mouse_get_posx() {
+   return mouse.pos.GetPosX();
+}
+export function Mouse_get_posy() {
+   return mouse.pos.GetPosY();
 }
 
 
-export function MouseGetPosDif() {
+export function Mouse_get_pos_dif() {
    return {
       x:mouse.pos.xdiff,
       y:mouse.pos.ydiff,
@@ -144,12 +156,12 @@ export function MouseGetPosDif() {
 }
 
 
-export function MouseGetPosDifX() {
+export function Mouse_get_pos_difx() {
    return mouse.pos.xdiff;
 }
 
 
-export function MouseGetPosDifY() {
+export function Mouse_get_pos_dify() {
    return mouse.pos.ydiff;
 }
 
@@ -174,13 +186,13 @@ function MouseGetArea() {
 }
 
 
-export function MouseResetDif(factor) {  // HOT-PATH
+export function Mouse_reset_dif(factor) {  // HOT-PATH
    mouse.pos.DampenDif(factor)
    // mouse.pos.ResetDif()
 }
 
 
-export function MouseGetWheel(){
+export function Mouse_get_wheel(){
    return mouse.wheel;
 }
 
@@ -197,7 +209,7 @@ export function MouseResetWheel(){  // HOT-PATH
  * Mouse Events
  */
 
-export function MouseSetCoords(coord){
+export function Mouse_set_coordinates(coord){
     
    mouse.pos.xprev = mouse.pos.x;
    mouse.pos.yprev = mouse.pos.y;
@@ -212,10 +224,11 @@ export function MouseSetCoords(coord){
 
 
 
-export function OnMouseMove(e) {
+export function Mouse_on_move(e) {
 
    e.stopPropagation();
    e.preventDefault(); 
+
 
    const newPosX = e.clientX - VIEWPORT.MARGIN.LEFT;
    const newPosY = e.clientY + VIEWPORT.MARGIN.TOP;
@@ -249,13 +262,13 @@ export function OnMouseMove(e) {
 
 
 
-export function OnMouseOut(e){
+export function Mouse_on_out(e){
    
    e.stopPropagation();
    e.preventDefault();
 
    mouse.pos.SetPrevPos(INT_NULL, INT_NULL);
-   mouse.pos.ResetPos();
+   // mouse.pos.ResetPos();
 }
 
 
@@ -267,7 +280,7 @@ let temp_scroll_speed = 0;
 let temp_prev_dir = 1;
 let in_scolling = false;
 
-export function OnMouseWheel(e){
+export function Mouse_on_wheel(e){
 
    e.stopPropagation();
    e.preventDefault();
@@ -332,7 +345,7 @@ export function OnMouseWheel(e){
 
 
 
-export function OnMouseDown(e) {
+export function Mouse_on_down(e) {
    
    e.stopPropagation();
    e.preventDefault(); 
@@ -349,7 +362,7 @@ export function OnMouseDown(e) {
 
 
 
-export function OnMouseUp(e) {
+export function Mouse_on_up(e) {
    
    e.stopPropagation();
    e.preventDefault(); 
@@ -372,13 +385,13 @@ export function OnMouseUp(e) {
 /*
  * On Mouse Events 
  * When a touch screen exists, then on touchClick event both functions are called,
- * the OnMouseMove or OnMouseMove_Android event AND the onMouseClick event,
- * as the OnTouchStart and OnTouchEnd events. 
+ * the Mouse_on_move or Mouse_on_move_android event AND the onMouseClick event,
+ * as the Mouse_on_touch_start and Mouse_on_touch_end events. 
  */
 
-export function OnMouseMove_Android(e) {
-   MouseSetCoords([e.clientX, e.clientY]);
-   console.log('OnMouseMove_Android: ', mouse.pos.x, mouse.pos.y)
+export function Mouse_on_move_android(e) {
+   Mouse_set_coordinates([e.clientX, e.clientY]);
+   console.log('Mouse_on_move_android: ', mouse.pos.x, mouse.pos.y)
    console.log('000000')
 }
 
@@ -399,15 +412,15 @@ export function OnMouseMove_Android(e) {
 * touchend is fired when the user stops touching the screen
 * touchcancel is fired when a touch is cancelled, for example when the user moves their finger out of the screen.
 */
-export function OnTouchStart(e) {
+export function Mouse_on_touch_start(e) {
    
    e.stopPropagation();
    e.preventDefault(); 
 
    const x = e.changedTouches[0].clientX + DEVICE.info.canvas_left;
    const y = e.changedTouches[0].clientY + DEVICE.info.canvas_top ;
-   MouseSetCoords([x,y]); // IMPORTANT: Must set the mouse position on click, because touch screens do not track any position
-   // console.log('OnTouchStart:', [x,y])
+   Mouse_set_coordinates([x,y]); // IMPORTANT: Must set the mouse position on click, because touch screens do not track any position
+   // console.log('Mouse_on_touch_start:', [x,y])
    
    mouse.click.down.Set(MOUSE.BTN_ID.LEFT);
 
@@ -425,15 +438,15 @@ export function OnTouchStart(e) {
 
 
 
-export function OnTouchEnd(e) {
+export function Mouse_on_touch_end(e) {
 
    e.stopPropagation();
    e.preventDefault(); 
    
    const x = e.changedTouches[0].clientX + DEVICE.info.canvas_left;
    const y = e.changedTouches[0].clientY + DEVICE.info.canvas_top ;
-   MouseSetCoords([x,y]);
-   // console.log('OnTouchEnd:',[x, y]);
+   Mouse_set_coordinates([x,y]);
+   // console.log('Mouse_on_touch_end:',[x, y]);
 
    mouse.click.down.Set(MOUSE.BTN_ID.LEFT);
 
@@ -447,15 +460,15 @@ export function OnTouchEnd(e) {
 
 
 
-export function OnTouchCancel(e) {
+export function Mouse_on_touch_cancel(e) {
    e.stopPropagation();
    e.preventDefault(); 
-   console.log(`OnTouchCancel`);
+   console.log(`Mouse_on_touch_cancel`);
 }
 
 
 
-export function OnTouchMove(e) {
+export function Mouse_on_touch_move(e) {
    e.stopPropagation();
    e.preventDefault(); 
 
@@ -470,7 +483,7 @@ export function OnTouchMove(e) {
    
    if(Abs(delta) < 1) return;
    
-   MouseSetCoords([x,y]);
+   Mouse_set_coordinates([x,y]);
    
    mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
    mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
@@ -530,7 +543,7 @@ export function OnTouchMove(e) {
 
 
 
-export function Android_deactivate_scrolling(){
+export function Mouse_android_deactivate_scrolling(){
 
    STATE.scene.scroll_enable = false;
 }

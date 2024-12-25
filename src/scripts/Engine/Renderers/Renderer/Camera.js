@@ -1,4 +1,4 @@
-import { MouseGetPosDif } from '../../Controls/Input/Mouse.js';
+import { Mouse_get_pos_dif } from '../../Controls/Input/Mouse.js';
 import { Timer_get_global_timer } from '../../Timers/Timers.js';
 import { Matrix4 } from '../../../Helpers/Math/Matrix4.js';
 
@@ -84,7 +84,7 @@ export class Camera extends Matrix4 {
 
 
 	Pan() {
-		const mouseDif = MouseGetPosDif();
+		const mouseDif = Mouse_get_pos_dif();
 		mouseDif.x /= VIEWPORT.WIDTH / 2;
 		mouseDif.y /= VIEWPORT.HEIGHT / 2;
 		this.Translate(mouseDif.x, mouseDif.y, 0);
@@ -92,21 +92,21 @@ export class Camera extends Matrix4 {
 
 
 	// Zoom() {
-	// 	const mouseWheel = MouseGetWheel();
+	// 	const mouseWheel = Mouse_get_wheel();
 	// 	this.Translate(0, 0, mouseWheel.delta);
 	// 	console.log(mouseWheel.delta)
 	// }
 
 
 	Zoom(value) {
-		// const mouseWheel = MouseGetWheel();
+		// const mouseWheel = Mouse_get_wheel();
 		this.Translate(0, 0, value);
 		console.log(value, this.matrix[14])
 	}
 
 
 	Scroll(value) {
-		// const mouseWheel = MouseGetWheel();
+		// const mouseWheel = Mouse_get_wheel();
 		this.Translate(0, value, 0);
 		// console.log(value, this.matrix[13])
 	}

@@ -313,17 +313,17 @@ export class Mesh {
         // A mesh maybe active buut not inserted in vertex buffer
         if (this.is_gfx_inserted && this.state.mask & MESH_STATE.ACTIVE) {
 
-            if (this.type & (MESH_TYPE.WIDGET_TEXT | MESH_TYPE.WIDGET_TEXT_DYNAMIC | MESH_TYPE.TEXT_MESH)) { // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
 
-                // Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
-                Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
-            }
-            else {
+            /* DO NOT DELETE: dealing with text meshes */
+            // if (this.type & (MESH_TYPE.WIDGET_TEXT | MESH_TYPE.WIDGET_TEXT_DYNAMIC | MESH_TYPE.TEXT_MESH)) { // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
+            //     // Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
+            //     Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
+            // }
+            // else {
+            //     Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
+            // }
 
-                Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
-            }
-
-            // Remove from 'mesh_per_vb_buffer'
+            Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
 
         }
 
@@ -566,7 +566,7 @@ export class Mesh {
     SetPosY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y,); }
 
 
-    SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY(this.gfxdim[0], dim[1],); }
+    SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY(this.gfx, dim[0], dim[1],); }
 
 
     GetName() { return Str_buffer_mesh_names_get_by_idx(this.nameidx); }
@@ -613,10 +613,16 @@ export class Mesh {
 
 
     AddWposXY(x, y) {
-        this.SetUpdateFrameBuffer();
-        this.geom.pos[0] = x-this.geom.dim[0];
-        this.geom.pos[1] = y-this.geom.dim[1];
-        this.geom.AddWposXY(this.gfx, x, y, _, this.state.mask & MESH_STATE.ACTIVE); // console.log('Mesh AddWposXY')
+        alert('776557776556 NOT TO BE USED')
+        // this.SetUpdateFrameBuffer();
+        // this.geom.pos[0] = x-this.geom.dim[0];
+        // this.geom.pos[1] = y-this.geom.dim[1];
+        // this.geom.AddWposXY(this.gfx, x, y);
+    }
+
+
+    SetTime(t) {
+        this.geom.time = t;
     }
     
 
@@ -648,36 +654,40 @@ export class Mesh {
         if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
     }
 
-
+    
     SetName(name = null) {
         if (name !== '' && name) this.nameidx = Str_buffer_mesh_names_store(name, this.mesh_bufferidx, this.type & MESH_TYPE.DEBUG_MESH);
         /**DEBUG*/this.name = name
     }
-
-
+    
+    
     /**
      * Enable shader properties.
      * In order for a mesh to be drawn in a certain way, specific shaders must be build.
      * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
-     */
-    EnableGfxAttributes(which, params = null) {
-
-        switch (which) {
-
-            case MESH_ENABLE.GFX.ATTR_STYLE: {
-                alert('33149981083 \n MESH_ENABLE Style is not implemented ')
-                // this.sid.attr |= (SID.ATTR.BORDER | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER) | SID.ATTR.STYLE | SID.ATTR.DIM2;
-                // this.sid.pass |= SID.PASS.BORDER | SID.PASS.R_CORNERS | SID.PASS.FEATHER | SID.PASS.WPOS2 | SID.PASS.DIM2;
-                // if (Array.isArray(params)) this.SetStyle(params);
-                // break;
+    */
+   EnableGfxAttributes(which, params = null) {
+       
+       switch (which) {
+           
+           case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
+           case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
+           case MESH_ENABLE.GFX.ATTR_TIME: { 
+               this.sid.attr |= SID.ATTR.TIME; 
+                this.sid.pass |= SID.PASS.TIME; 
+                if (params !== null) {
+                    this.geom.time = params;
+                }
+                break; 
             }
-
-            case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
-            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
-            case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; this.sid.pass |= SID.PASS.TIME; break; }
             case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.PASS.ANGLE; break; }
             case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
+            
+            // case MESH_ENABLE.GFX.UNIF_TIME: { this.sid.pass |= SID.PASS.RES2; break; }
+            
+            case MESH_ENABLE.GFX.FN_INNER_SHADOW: { this.sid.shad |= SID.SHAD.FN_INNER_SHADOW; break; }
+            case MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE; break; }
 
             case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
                 this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
@@ -714,12 +724,27 @@ export class Mesh {
 
 
             // Shader Color Functions
+            case MESH_ENABLE.GFX.FX_NOISE: { 
+                // Exception: Use the 'params' to distinguish different worley noises 
+                if(!params || params===1) { this.sid.fx |= SID.FX.FS_NOISE; break; }
+                else if(params===2) { this.sid.fx |= SID.FX.FS_NOISE_2; break; }
+            }
             case MESH_ENABLE.GFX.FN_GLOW_SPHERE: { 
                 if(this.sid.blend_options===0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
                 // if(params===null) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
                 this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break; 
             }
-            case MESH_ENABLE.GFX.FN_NOISE_WORLEY: { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY; break; }
+            case MESH_ENABLE.GFX.FN_NOISE_WORLEY: { 
+                // Exception: Use the 'params' to distinguish different worley noises 
+                if(!params || params===1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
+                else if(params===2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; break; }
+                else if(params===3) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; break; }
+            }
+            case MESH_ENABLE.GFX.FN_NOISE_VORONOI: { 
+                // Exception: Use the 'params' to distinguish different worley noises 
+                if(!params || params===1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; break; }
+                else if(params===2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; break; }
+            }
 
             case MESH_ENABLE.GFX.BLEND_OPTIONS: { if(params===null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
 
@@ -836,6 +861,18 @@ export class Mesh {
         for (let i = 0; i < len; i++) {
             if (this.uniforms[i].name === unif_name) {
                 const ubidx = this.uniforms[i].ubidx;
+                if(ubidx===INT_NULL) {
+
+
+                    console.error('334334334334 ubidx is null.',
+                        '\nPossible error: mesh is not the root mesh of the vertex buffer, and there is no ubidx store that is why ubidx is null', 
+                        '\nuniform name', unif_name, 
+                        '\nubidx', ubidx, 
+                        '\nmesh all uniforms', this.uniforms, 
+
+                    )
+                    alert('334334334334 ubidx is null. Check if mesh is the root mesh of the vertex buffer')
+                }
                 Vertex_buffer_set_and_update_uniform(this.gfx.vb.groupidx, ubidx, value, value_idx);
                 break;
             }

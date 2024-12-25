@@ -640,7 +640,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME(vb_data, geom, mat, start
    }
    
    Set_vertex_position_VPOS2(vb_data, start+a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
-   Set_vertex_uv_coordinates_TEX2(vb_data, start+a_uv_offset, stride, mat.uv);
+   // Set_vertex_uv_coordinates_TEX2(vb_data, start+a_uv_offset, stride, mat.uv);
 
 }
 function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TIME(vb_data, geom, mat, start, num_faces, stride , verts_per_rect, a_vpos_offset, a_uv_offset) {

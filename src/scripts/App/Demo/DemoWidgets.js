@@ -1473,17 +1473,7 @@ Adjust the font size using the slider.
 
 
    info1.text_mesh.SetColorRGBSpecificIndex(YELLOWL[7], 0, 14);
-   // info1.text_mesh.SetColorRGBSpecificIndex(BLUEL[9], 94, 5);
-   // info1.text_mesh.SetColorRGBSpecificIndex(BLUEL[9], 101, 4);
-   // info1.text_mesh.SetColorRGBSpecificIndex(BLUEL[9], 109, 4);
-   
-   // info2.text_mesh.SetColorRGBSpecificIndex(BLUEL[9], 0, 18);
-   // info2.text_mesh.SetColorRGBSpecificIndex(YELLOWR[9], 85, 10);
-   // info2.text_mesh.SetColorRGBSpecificIndex(GREEN[7], 261, 3);
-   
-   // info3.text_mesh.SetColorRGBSpecificIndex(BLUEL[9], 8, 11);
-   
-   // info4.text_mesh.SetColorRGBSpecificIndex(PURPLE[9], 48, 3);
+
 
 
 
@@ -1492,17 +1482,7 @@ Adjust the font size using the slider.
    /********************************************************************************************************************************/
    // Msdf text and scale slider
 
-   // const section_msdf = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [x + l_pad, y + t_pad, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
-   // // const section_msdf = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
-   // section_msdf.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // section_msdf.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   // section_msdf.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   // if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section_msdf.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   // section_msdf.SetName('Msdf_text_render');
-  
-//    const text = `\
-// The quick\nbrown fox\njumps over\nthe lazy dog!\
-//    `;
+
    const text = `\
 The quick brown fox jumps over the lazy dog[!]
 The quick brown fox jumps over the lazy dog[!]
@@ -1522,27 +1502,6 @@ The quick brown fox jumps over the lazy dog[!]\
    const ret = Widget_msdf_text_with_scale_slider(ROOT_WIDGETS.CREATE_ROOT, text, TEXTURES.MSDF_CONSOLAS_1024, x, y, 20, GREY[0], 300, _);
    const slider = ret.slider;
    const msdf_text = ret.msdf_text;
-   // section_msdf.AddItem(slider);
-   // section_msdf.AddItem(msdf_text);
-
-   /**************************************************************************************************************************************************/
-   // Render
-   // section_msdf.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-   // section_msdf.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section_msdf.mesh_bufferidx, true);
-   // section_msdf.GenGfxCtx();
-
-   // // section_msdf.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-   // section_msdf.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
-   // section_msdf.Calc_no_gfx_update();
-
-   // section_msdf.Render()
-   // Root_group_activate_all_vbs_in_renderqueue(section_msdf.root_bufferidx);
-
-   // Construct_listen_events_from_mesh_tree(section_msdf)
-   // Construct_listen_events_relations_from_mesh_tree(section_msdf);
-
-   // section_msdf.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section_msdf.gfx.vb.groupidx)
 
 
 }

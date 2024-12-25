@@ -1074,7 +1074,7 @@ function Animate_elastic_collisions_balls(params) {
             */
 
             // Get the distance vector of the 2 balls
-            // Must check for equal positions, and set to small value, to avoid devide by 0)
+            // Must check for equal positions, and set to small value, to avoid divide by 0)
             const dx = (p2[0] === p1[0]) ? .0001 : (p2[0] - p1[0]);
             const dy = (p2[1] === p1[1]) ? .0001 : (p2[1] - p1[1]);
             const mag = Magnitude_2vectors(p2, p1)

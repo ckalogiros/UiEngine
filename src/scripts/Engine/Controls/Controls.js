@@ -1,6 +1,6 @@
 "use strict";
 
-import { MouseGetPosDif } from "./Input/Mouse.js";
+import { Mouse_get_pos_dif } from "./Input/Mouse.js";
 
 /**
  * Contols-Input is set via a callback function or an object
@@ -42,7 +42,7 @@ export class OrbitControls extends Controller {
 
 
    Pan(){
-      const mouseDif = MouseGetPosDif();
+      const mouseDif = Mouse_get_pos_dif();
 		mouseDif.x /= VIEWPORT.WIDTH/2;
 		mouseDif.y /= VIEWPORT.HEIGHT/2;
 		target.Translate(mouseDif.x, mouseDif.y, 0)

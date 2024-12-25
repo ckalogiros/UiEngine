@@ -16,7 +16,7 @@ import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../../Engine/Drawables/Widgets/WidgetSwitch.js';
 import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gen_gfx_ctx } from '../../Engine/ParticlesSystem/ParticlesSystem.js';
 import { Time_intervals_create } from '../../Engine/Timers/TimeIntervals.js';
-import { Timer_get_global_timer, TimerGetGlobalTimerCycle } from '../../Engine/Timers/Timers.js';
+import { Timer_get_global_timer, Timer_get_global_timer_cycle } from '../../Engine/Timers/Timers.js';
 import { Vertex_buffer_set_and_update_uniform } from '../../Graphics/Buffers/VertexBuffers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
 import { Demo_widgets_colorpicker } from './DemoWidgets.js';
@@ -182,11 +182,14 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
                colorpicker.SetTransparencySliderSetInitialValue(transparency);
                colorpicker.SetHueSliderSetInitialValue(hue);
 
-               colorpicker.AssignTargetMeshClbk((col, params) => {
-                  const color = col;
-                  CopyArr4(emitter.mat.col, color);
-                  params.mnemonics.color = color;
-               }, params.params);
+               colorpicker.AssignTargetMeshClbk(
+                  (col, params) => {
+                     const color = col;
+                     CopyArr4(emitter.mat.col, color);
+                     params.mnemonics.color = color;
+                  }, 
+                  params.params
+               );
                switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
             }
             else {
@@ -1086,7 +1089,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       
       tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
       tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
-      tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE);
+      tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE); // TODO: Does nothing, there is no enable for '.FX_NOISE'
       
       
       tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
@@ -1662,7 +1665,7 @@ function Animate_comet(params) {
 
 
       // Move the ball
-      const variation = TimerGetGlobalTimerCycle() * .3 + .5;
+      const variation = Timer_get_global_timer_cycle() * .3 + .5;
       const x = dir[0] * tail_emitter.speed * variation;
       // const x = dir[0] * tail_emitter.speed * .5;
       const y = dir[1] * tail_emitter.speed * .5;
@@ -1740,7 +1743,7 @@ function Animate_comet_perimetric(params) {
 
 
       // Move the ball
-      const variation = TimerGetGlobalTimerCycle() * .3 + .5;
+      const variation = Timer_get_global_timer_cycle() * .3 + .5;
       // const x = 1 * dir[0] * tail_emitter.speed * variation;
       // const x = (i+.3)*(dir[0] * tail_emitter.speed ) * Math.sin(Timer_get_global_timer() * 6);
       const x = (dir[0] * tail_emitter.speed ) * Math.sin(Timer_get_global_timer() * 6);

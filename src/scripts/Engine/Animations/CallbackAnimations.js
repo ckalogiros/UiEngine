@@ -42,6 +42,7 @@ class Callback_Animation {
    Stop() {
       this.is_active = false;
       this.stopAnimationClbk(this.params);
+      // this.in_animation = this.stopAnimationClbk(this.params);
       // this.Remove();
       // this.in_animation = false;
    }

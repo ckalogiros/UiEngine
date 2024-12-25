@@ -593,6 +593,8 @@ export class M_Buffer {
          this.free_buffer.buffer[i] = INT_NULL;
       }
 
+      this.free_buffer.Add(0);
+
       /**DEBUG*/this.buffer_container_idx = INT_NULL; // Store 'this' index of the container buffer. Only for debug 
 
       if (m_buffer)
@@ -814,7 +816,7 @@ export class M_Buffer {
    }
 
 
-   // TODO: APPLIES ONLY FOR MESH TYPE ELEMENTS. Call this on every Destroy, to have all M_Buffer elements not sparsed
+   // TODO: APPLIES ONLY FOR MESH TYPE ELEMENTS AND THE SUBSTITUTION INDEX UPDATE IS FOR THE MESHES IDX FIELD. Call this on every Destroy, to have all M_Buffer elements not sparsed
    ShiftElementOnDestroy(destroyed_idx) {
 
       if (destroyed_idx < this.boundary) {

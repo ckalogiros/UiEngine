@@ -34,7 +34,7 @@ export function Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, unif_name) {
     alert('Mesh_set_uniform_ubidx_from_name()\nNo mesh with uniform found.')
 }
 
-export function Mesh_set_and_update_wpos_uniform(progidx, vb_groupidx, unif_val, val_idx){
+export function Mesh_set_and_update_wpos_uniform(progidx, vb_groupidx, unif_val, val_idx) {
 
     const ubidx = Program_find_uniform_ubidx_from_name(progidx, 'u_wposxy');
     Vertex_buffer_set_and_update_uniform(vb_groupidx, ubidx, unif_val, val_idx);
@@ -179,11 +179,11 @@ export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_N
 
 
 
-export function Mesh_create_style_from_values(rcorners=0, feather=0, border=0){
+export function Mesh_create_style_from_values(rcorners = 0, feather = 0, border = 0) {
 
     return {
-       rcorners:rcorners,
-       feather:feather,
-       border:border,
+        rcorners: rcorners,
+        feather: feather,
+        border: border,
     };
- }
+}

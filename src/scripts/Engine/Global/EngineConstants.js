@@ -804,7 +804,7 @@ const FONT_MSDF_COMIC = 'comicz';
 const TEST_MSDF_FONT_1 = 'msdf_a_char';
 // Textures
 const TEXTURE_SMOKE1 = 'smoke';
-const TEXTURE_TEST = 'Coin_1_64x64';
+const TEXTURE_COIN = 'Coin_1_64x64';
 const TEXTURE_TEST_APPLE = 'apple1_64x73';
 
 
@@ -911,7 +911,7 @@ const TEXTURE_PATHS = [
 	},
 	{
 		imgPath: 'textures',
-		imgName: TEXTURE_TEST,
+		imgName: TEXTURE_COIN,
 		imgType: 'png',
 		metrics: null, 
 	},
@@ -958,7 +958,7 @@ const TEXTURES = {
 
 	// Image Textures
 	SMOKE_1:g_cnt++, // g_cnt must be the index of the element in 'TEXTURE_PATHS'. // TODO: Either create the 'TEXTURE_PATHS' element at g_cnt OR set the g_cnt equual to the index this texture represents
-	TEST:g_cnt++, 
+	COIN:g_cnt++, 
 	TEST_APPLE:g_cnt++, 
 
 	COUNT: g_cnt,

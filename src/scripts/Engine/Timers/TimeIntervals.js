@@ -171,6 +171,8 @@ class TimeIntervals {
 
       for (let i = 0; i < this.count; i++) {
          this.ti[i].Update(); // Update and calls a callback if the time interval has completed a cycle
+         // const is_running = this.ti[i].Update();
+         // if(!is_running) this.DestroyByIdx(i);
       }
    }
 
@@ -206,7 +208,6 @@ class TimeIntervals {
       this.ti[idx].isActive = false;
       this.ti[idx].idx = INT_NULL;
       Str_buffer_destroy(this.ti[idx].nameidx);
-      this.ti[idx].nameidx;
    }
 
 

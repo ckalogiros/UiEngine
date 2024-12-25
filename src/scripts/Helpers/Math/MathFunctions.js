@@ -27,37 +27,60 @@ easeInOutSine
 
 // Logarithmic function
 
-export function Logarithmic_interpolation(t, a){
+export function Logarithmic_interpolation(t, a) {
 
-   if(a+t === 0) return 0;
-   const res = Math.log((a*t) + t + 1) / Math.log(a + t + 1);
+   if (a + t === 0) return 0;
+   const res = Math.log((a * t) + t + 1) / Math.log(a + t + 1);
    // const res = Math.log((a*t) + 1) / Math.log(a + 1);
    return res;
 }
 
-export function Linear_interpolation(min, max, t) {
-   return min + (t * (max-min));
+export function Linear_interpolation(min, max, val) {
+   // /**ERROR*/if(val<min || val>max) alert('776776776 Linear interpolation: val is not in the boundaries of min-max')
+   // return min + (val * (max - min));
+   return ((max - min) * val) - min;
+}
+export function Linear_interpolation_vector2(p0, p1, val) {
+
+   const x = p0[0] + (p1[0] - p0[0]) * val;
+   const y = p0[1] + (p1[1] - p0[1]) * val;
+
+   return [x, y];
+}
+/** Return max at the ends od a range and drop to a minimum at the range's mid point */
+export function Quadratic_interpolation(min_, max_, val_) {
+   // (max-min)*4*(x-1.)^{2}+min
+
+   const max = 1;
+   const min = 0;
+   const val = (val_-min_)/(max_-min_);
+   const res = ( (max-min) * 4 * ((val - (max/2))*(val - (max/2))) ) + min;
+   // const res = ( (max-min) * 4 * ((val)*(val)) ) + min;
+   // const res = ((max - min) * (val * val)) + min;
+   return res;
 }
 
 export function Normalize(min, max, t) {
-   if(t===min) return 0;
-   return (t-min) / (max-min);
+   if (t === min) return 0;
+   return (t - min) / (max - min);
 }
 
+
+
 // Analyze a number into discrete digits
-export function Digitize(n, base=10){
+export function Digitize(n, base = 10) {
 
    // Analyze a decimal number to its digit components
-   if(n===0) return [0];
+   if (n === 0) return [0];
 
    const arr = [];
 
-   while(n > 0){
-      
-      const d = n%base;
+   while (n > 0) {
+
+      const d = n % base;
       arr.push(d);
 
-      n = Floor(n/base); 
+      n = Floor(n / base);
    }
    return arr;
 
@@ -67,9 +90,9 @@ export function Digitize(n, base=10){
    // let k = len-1;
 
    // for(let i=0; i<len; i++){
-      
+
    //    result[i] = arr[k--];
- 
+
    // }
    // return result;
 
@@ -124,7 +147,7 @@ export class Function_Slope {
    SetValueChange(val) {
       this.value_change = val;
    }
-   
+
    GetInAnimation() {
       return this.in_animation;
    }

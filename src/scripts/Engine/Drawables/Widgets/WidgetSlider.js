@@ -1,7 +1,7 @@
 "use strict";
 
 import { Rect_Mesh } from '../Meshes/Rect_Mesh.js';
-import { MouseGetPosDif } from '../../Controls/Input/Mouse.js';
+import { Mouse_get_pos_dif } from '../../Controls/Input/Mouse.js';
 import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { AddArr2, CopyArr4, Min } from '../../../Helpers/Math/MathOperations.js';
@@ -35,7 +35,8 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[8], hover_margin = [0, 0], handle_dim = [10, 10], handle_col = WHITE, num_faces = 1, is_debug_mesh) {
 
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, _, _, _, num_faces, is_debug_mesh);
+      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, _, _, _, num_faces, is_debug_mesh);
+      super(mesh_bufferidx, _, pos, dim, col, _, _, _, num_faces, is_debug_mesh);
 
 
       this.mesh_bufferidx = mesh_bufferidx;
@@ -50,10 +51,10 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       const handle_color = (col[0] instanceof Float32Array) ? [handle_col, handle_col, handle_col, handle_col] : handle_col;
 
       const handle = Create_rect_mesh(_, [pos[0] - handle_dim[0] + dim[0], pos[1] - handle_dim[1] + dim[1], pos[2] + 1], handle_dim, handle_color, _, _, _, 1, is_debug_mesh);
+
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
       if(col[0] instanceof Float32Array) handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
 
-      // handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_STYLE);
       handle.SetStyle(Mesh_create_style_from_values(Min(handle_dim[0], handle_dim[1]), 3., 4));
 
 
@@ -447,7 +448,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
 function Slider_horizontal_move_handle(bar, handle) {
 
-   const x = MouseGetPosDif().x;
+   const x = Mouse_get_pos_dif().x;
    if (x === 0) return;
 
    // const bar_length = bar.geom.dim[0] * 2 * bar.geom.num_faces;
@@ -467,7 +468,7 @@ function Slider_horizontal_move_handle(bar, handle) {
 
 function Slider_vertical_move_handle(bar, handle) {
 
-   const y = -MouseGetPosDif().y;
+   const y = -Mouse_get_pos_dif().y;
    if (y === 0) return;
 
    const bar_length = bar.geom.dim[1] * 2 * bar.geom.num_faces;
@@ -758,7 +759,9 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       /** Label area mesh */
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col, _, _, [pad, pad], 1, is_debug_mesh);
+      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col, _, _, [pad, pad], 1, is_debug_mesh);
+      // Dont forget NOT to pass as 'ROOT_WIDGET', since this class will handle the root_widget creation
+      super(mesh_bufferidx, _, _pos, dim, col, _, _, [pad, pad], 1, is_debug_mesh);
 
 
 
@@ -1275,7 +1278,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
          return;
       }
 
-      const mouse_pos = MouseGetPosDif();
+      const mouse_pos = Mouse_get_pos_dif();
       if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
 
       // Avoid moving when slider is child of another mesh. {{In order to work, slider must have a Move Event}}

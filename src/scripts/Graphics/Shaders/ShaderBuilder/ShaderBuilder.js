@@ -5,12 +5,14 @@ import { shader_chunks } from './ShaderChunks/ShaderChunks.js'
 import { frag_feather, frag_feather_call, frag_round_corners, frag_round_corners_call, frag_style_call, frag_style_corners } from './Functions/fragment.roundcorners.js'
 import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './Functions/fragment.texture.js'
 import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
-import { frag_noise, frag_noise_call, frag_worley_noise, frag_worley_noise_call } from './Functions/fragment.noise.js';
+import { frag_noise, frag_noise_2, frag_noise_2_call, frag_noise_call } from './Functions/fragment.noise.js';
 import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
 import { frag_test1, frag_test1_call, frag_test2, frag_test2_call, frag_test3, frag_test3_call } from './Functions/fragment.tests.js';
 import { Shader_attributes_create } from '../../ShaderAttributes.js';
-import { frag_glow_sphere, frag_glow_sphere_call } from './Functions/fragment.misc.js';
+import { frag_explosion_circle, frag_explosion_circle_call, frag_glow_sphere, frag_glow_sphere_call, frag_inner_shadow_rhomboid, frag_inner_shadow_rhomboid_call } from './Functions/fragment.misc.js';
 import { Attribute_get_type_extension, Shader_Attributes, Shader_bit_flags_get_attr_info_from_index, Shader_bit_flags_get_attr_key_name_from_flag, Shader_bit_flags_get_attr_size } from '../../ShaderBitFlags.js';
+import { frag_noise_voronoi_1, frag_noise_voronoi_1_call, frag_noise_voronoi_2, frag_noise_voronoi_2_call } from './Functions/fragment.noise_voronoi.js';
+import { frag_noise_worley_1, frag_noise_worley_1_call, frag_noise_worley_2, frag_noise_worley_2_call, frag_noise_worley_3_types, frag_noise_worley_3_types_call } from './Functions/fragment.noise_worley.js';
 
 
 
@@ -546,7 +548,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
       
       '/********************************************************************************************/',
       '/********************************************************************************************/',
-      '// VERTEX SHADER {{ ${ID} }}',
+      `// VERTEX SHADER {{ ${ID} }}`,
       '/********************************************************************************************/',
       '/********************************************************************************************/',
 
@@ -692,12 +694,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       
       '/********************************************************************************************/',
       '/********************************************************************************************/',
-      '// FRAGMENT SHADER {{ ${ID} }}',
+      `// FRAGMENT SHADER {{ ${ID} }}`,
       '/********************************************************************************************/',
       '/********************************************************************************************/',
 
 
-
+      '#define PI 3.14159',
 
 
 
@@ -714,7 +716,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.fx & SID.FX.FS_GLOW_VEC2) ? '#define U_GLOW_PARAMS_VEC2 1' : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '',
-      (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '',
+      (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '', // TODO: We need to resolve same uniform parameters if both noises are in the same program
+      (sid.fx & SID.FX.FS_NOISE_2) ? '#define U_NOISE_PARAMS 1' : '',
       (sid.attr & SID.ATTR.TEX2) ? '#define A_TEX_COORD 1' : '',
       (sid.attr & SID.ATTR.TIME) ? '#define A_TIME 1' : '',
       (sid.attr & SID.ATTR.ANGLE) ? '#define A_ANGLE 1' : '',
@@ -726,7 +729,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_ADD) ? '#define BLEND_MODE_ADD 1' : '',
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_LIGHTEN) ? '#define BLEND_MODE_LIGHTEN 1' : '',
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY) ? '#define BLEND_MODE_MULTIPLY 1' : '',
-      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_DEVIDE) ? '#define BLEND_MODE_DEVIDE 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_DIVIDE) ? '#define BLEND_MODE_DIVIDE 1' : '',
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_SUBTRACT) ? '#define BLEND_MODE_SUBTRACT 1' : '',
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_DARKEN) ? '#define BLEND_MODE_DARKEN 1' : '',
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_COLOR_BURN) ? '#define BLEND_MODE_COLOR_BURN 1' : '',
@@ -734,6 +737,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_SCREEN) ? '#define BLEND_MODE_SCREEN 1' : '',
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_OVERLAY) ? '#define BLEND_MODE_OVERLAY 1' : '',
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MIX) ? '#define BLEND_MODE_MIX 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MASK) ? '#define BLEND_MODE_MASK 1' : '',
+      (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_ALPHA) ? '#define BLEND_MODE_ALPHA 1' : '',
 
 
 
@@ -772,6 +777,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
 
       // Generic Uniforms
+      (sid.unif & SID.UNIF.FS_TIME_FLOAT) ? '#define U_TIME_FLOAT 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '#define U_GENERIC_VEC2 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '#define U_GENERIC_VEC3 1' : '',
@@ -794,7 +800,13 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       '#define RED vec4(1.0, 0.0, 0.0, 1.0)',
       '#define GREEN vec4(0.0, 1.0, 0.0, 1.0)',
       '#define YELLOW vec4(1.0, 1.0, 0.0, 1.0)',
+      '#define BLUE vec4(0.0, 0.0, 1.0, 1.0)',
       '#define CYAN vec4(0.0, 0.5, 1.0, 1.0)',
+
+      'float median(float r, float g, float b) { return max(min(r, g), min(max(r, g), b)); }',
+      'float median(vec3 c) { return max(min(c.r, c.g), min(max(c.r, c.g), c.b)); }',
+      'float avarage(float r, float g, float b) { return (r+g+b)/3.0; }',
+      'float avarage(vec3 c) { return (c.r+c.g+c.b)/3.0; }',
 
       '#include <coordinate_system_functions>',
 
@@ -813,14 +825,22 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // Fx shader functions
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
+      (sid.fx & SID.FX.FS_NOISE_2) ? frag_noise_2 : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke : '',
-
-
+      
+      
       /********************************************************************************************************/
       // Shader Color Functions
+      (sid.shad & SID.SHAD.FN_INNER_SHADOW) ? frag_inner_shadow_rhomboid : '',
+      (sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) ? frag_explosion_circle : '',
       (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere : '',
-      (sid.shad & SID.SHAD.FN_NOISE_WORLEY) ? frag_worley_noise : '',
-
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY_1) ? frag_noise_worley_1 : '',
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY_2) ? frag_noise_worley_2 : '',
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY_3_TYPES) ? frag_noise_worley_3_types : '',
+      (sid.shad & SID.SHAD.FN_NOISE_VORONOI_1) ? frag_noise_voronoi_1 : '',
+      (sid.shad & SID.SHAD.FN_NOISE_VORONOI_2) ? frag_noise_voronoi_2 : '',
+      
+      // (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
 
       /********************************************************** **********************************************/
       // Test shader functions
@@ -855,13 +875,22 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '   float alpha = color.a;' : '',
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
+      (sid.fx & SID.FX.FS_NOISE_2) ? frag_noise_2_call : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '',
-
+      //TODO: Resolve the naming FS_ and FN_ and FX_ for SID
+      
       // Shader Color Functions
+      (sid.shad & SID.SHAD.FN_INNER_SHADOW) ? frag_inner_shadow_rhomboid_call : '',
+      (sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) ? frag_explosion_circle_call : '',
       (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere_call : '',
-      (sid.shad & SID.SHAD.FN_NOISE_WORLEY) ? frag_worley_noise_call : '',
-
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY_1) ? frag_noise_worley_1_call : '',
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY_2) ? frag_noise_worley_2_call : '',
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY_3_TYPES) ? frag_noise_worley_3_types_call : '',
+      (sid.shad & SID.SHAD.FN_NOISE_VORONOI_1) ? frag_noise_voronoi_1_call : '',
+      (sid.shad & SID.SHAD.FN_NOISE_VORONOI_2) ? frag_noise_voronoi_2_call : '',
+      
+      // (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
       // Test Shaders
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2_call : '',
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
@@ -904,7 +933,17 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // // '   frag_color = mix(color, final_with_lum, smoothstep(0., 1., balance));',
       // // '   frag_color = final_with_lum;',
       // // '   color.rgb *= color.a; ',
+      
+      // // '   color.a = 1.-median(color.rgb);',
+      // // '   color.a = median(color.rgb);',
+      // '   color.a = 1.;',
+      // // '   color.rgb = max(1.-color.rgb, .7);',
+      // '   color.rgb = 1.-color.rgb;',
+      // '   color.rgb *= vec3(v_col4_x, v_col4_y, v_col4_z);',
+      
       '   frag_color = color;',
+      // '   frag_color = 1.- color;',
+      // '   frag_color.rgb = 1.- color.rgb;',
 
 
 

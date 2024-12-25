@@ -2,7 +2,7 @@
 
 
 
-import { MouseGetPos } from "../../Engine/Controls/Input/Mouse.js";
+import { Mouse_get_pos } from "../../Engine/Controls/Input/Mouse.js";
 import { Create_widget_section } from "../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
@@ -108,7 +108,7 @@ function Animate_chain_link(params) {
    const head = params.params.head;
    const size = head.geom.dim[0];
 
-   const mouse_pos = MouseGetPos();
+   const mouse_pos = Mouse_get_pos();
 
    // Abort if mouse outside canvas
    if(mouse_pos[0] <= 0 || mouse_pos[1] <= 0) return;

@@ -262,7 +262,7 @@ export class Rect extends Mesh {
 // TODO: IMPLEMENT
 export class Rect_Mesh extends Rect {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS,
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS=0x0,
       pos = [0, 0, 0], dim = [10, 10],
       col = TRANSPARENCY(BLUEL[6], .6), name = 'Rect_Mesh UNNAMED',
       style = {rcorners:10, feather:2, border:0}, pad = [4, 4], num_faces = 1, is_debug_mesh) {

@@ -29,9 +29,6 @@ export const frag_msdf = `
 // float pxRange = .5;
 float pxRange = 15.5;
 
-float median(float r, float g, float b) {
-  return max(min(r, g), min(max(r, g), b));
-}
 
 float screenPxRange(vec2 v_tex_coord) {
   vec2 unitRange = vec2(pxRange)/vec2(textureSize(u_sampler0, 0));
@@ -57,6 +54,7 @@ float screenPxRange(vec2 v_tex_coord) {
 vec4 Msdf(vec2 v_tex_coord) {
 
   // return vec4(1., 1., 1., 1.);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
 
   vec4 texel = texture(u_sampler0, v_tex_coord);
   float dist = median(texel.r, texel.g, texel.b);
@@ -65,7 +63,7 @@ vec4 Msdf(vec2 v_tex_coord) {
   // opacity += Glow() * 2.4; // Combine the original texture with the blurred alpha
  
   // vec4 alpha = vec4(opacity+.2); 
-  vec4 alpha = vec4(opacity+.0); 
+  vec4 alpha = vec4((opacity+.0) * src_color.a); 
   return alpha; 
 }
 `;
@@ -119,6 +117,7 @@ export const frag_tex = `
   float distance = max(texture(u_sampler0, v_tex_coord).r, max(texture(u_sampler0, v_tex_coord).g, texture(u_sampler0, v_tex_coord).b));
   
   color.a *= distance; // Remove all black color from the rgb channels
+  // color.a = 1.;
   
 
   `;

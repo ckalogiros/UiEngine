@@ -1,7 +1,7 @@
 "use strict";
 
 import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
-import { MouseGetPosDif } from "../../Controls/Input/Mouse.js";
+import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh } from "../../Core/Views/RootView.js";
@@ -756,7 +756,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		// The 'OnMove' function is called by the timeInterval.
 		// The timeInterval has been set by an 'OnClick' event.
 		const mesh = params.params;
-		const mouse_pos = MouseGetPosDif();
+		const mouse_pos = Mouse_get_pos_dif();
 
 		if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
 

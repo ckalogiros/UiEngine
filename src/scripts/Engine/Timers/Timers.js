@@ -11,15 +11,15 @@ import { Str_buffer_store } from "../Core/StringBuffer.js";
 let g_timer_linear = 0;
 
 
-export function Timer_update_global_timer(){  g_timer_linear += .01; }  // HOT-PATH
+export function Timer_update_global_timer() { g_timer_linear += .01; }  // HOT-PATH
 
 
 
-export function Timer_get_global_timer(){ return g_timer_linear; }
+export function Timer_get_global_timer() { return g_timer_linear; }
 
 
 
-export function Timer_reset_global_timer(){ g_timer_linear = 0.0; }
+export function Timer_reset_global_timer() { g_timer_linear = 0.0; }
 
 
 
@@ -29,26 +29,48 @@ let g_timer_cycle_lower_limit = .01;
 let g_timer_cycle = g_timer_cycle_lower_limit;
 let g_timer_cycle_rate = 0.01;
 
-export function Timer_update_global_timer_cycle(){  // HOT-PATH
+export function Timer_update_global_timer_cycle() {  // HOT-PATH
 
-    if(g_timer_cycle > g_timer_cycle_upper_limit)
-        g_timer_cycle_rate  =  -0.01;
-    else if(g_timer_cycle < g_timer_cycle_lower_limit)
-        g_timer_cycle_rate =  0.01;
+    if (g_timer_cycle > g_timer_cycle_upper_limit)
+        g_timer_cycle_rate = -0.01;
+    else if (g_timer_cycle < g_timer_cycle_lower_limit)
+        g_timer_cycle_rate = 0.01;
     g_timer_cycle += g_timer_cycle_rate;
 }
 
 
 
-export function TimerGetGlobalTimerCycle(){
+export function Timer_get_global_timer_cycle() {
     return g_timer_cycle;
 }
 
 
 
-export function TimersUpdateGlobalTimer(){
+
+
+let g_timer_0_1 = 0.0;
+const g_timer_0_1_rate = 0.01;
+
+export function Timer_update_global_timer_0_1() {  // HOT-PATH
+
+    if (g_timer_0_1 > 1.0)
+        g_timer_0_1 = 0.0;
+    g_timer_0_1 += g_timer_0_1_rate;
+}
+
+
+
+export function Timer_get_global_timer_0_1() {
+    return g_timer_0_1;
+}
+
+
+
+
+export function Timers_update_global_timer() {
     Timer_update_global_timer();
     Timer_update_global_timer_cycle();
+    Timer_update_global_timer_0_1();
     Timer_update_global_timer_sine();
     Timer_update_global_timer_cosine();
 }
@@ -56,14 +78,14 @@ export function TimersUpdateGlobalTimer(){
 
 
 let g_timer_sine = 0;
-export function Timer_get_global_timer_sine(){ return g_timer_sine; }
-export function Timer_update_global_timer_sine(){ g_timer_sine = Math.sin(g_timer_linear*4); }
+export function Timer_get_global_timer_sine() { return g_timer_sine; }
+export function Timer_update_global_timer_sine() { g_timer_sine = Math.sin(g_timer_linear); }
 
 
 
 let g_timer_cosine = 0;
-export function Timer_get_global_timer_cosine(){ return g_timer_cosine; }
-export function Timer_update_global_timer_cosine(){ g_timer_cosine = Math.cos(g_timer_linear*4);}
+export function Timer_get_global_timer_cosine() { return g_timer_cosine; }
+export function Timer_update_global_timer_cosine() { g_timer_cosine = Math.cos(g_timer_linear * 4); }
 
 
 
@@ -103,7 +125,7 @@ class Timer {
     // Debbug 
     nameidx;
 
-    constructor(start, duration, step, isActive){
+    constructor(start, duration, step, isActive) {
 
         this.t = start;
         this.duration = duration;
@@ -116,7 +138,7 @@ class Timer {
     }
 
 
-    SetTimer(start, duration, step, idx, name='Timers UNAMED', clbk, params){
+    SetTimer(start, duration, step, idx, name = 'Timers UNAMED', clbk, params) {
 
         this.t = start;
         this.duration = duration;
@@ -124,12 +146,12 @@ class Timer {
         this.isActive = true;
         this.idx = idx;
         this.nameidx = Str_buffer_store(name);
-        if(clbk) this.clbk = clbk; // Callback for when the timer has finished.
-        if(params !== null && params !==undefined ) this.params = params; // Callback parameters, if any.
+        if (clbk) this.clbk = clbk; // Callback for when the timer has finished.
+        if (params !== null && params !== undefined) this.params = params; // Callback parameters, if any.
     }
-    
-        
-    Clear(){
+
+
+    Clear() {
 
         this.t = this.duration; // The timer stays at the max duration. Up until now there are cases where the fragment shader will 'end' at 'duration' value.
         this.duration = 0;
@@ -141,7 +163,7 @@ class Timer {
     }
 
 
-    SetClbk(clbk){
+    SetClbk(clbk) {
 
         this.clbk = clbk;
     }
@@ -158,58 +180,58 @@ class Timers {
 
     buffer = [];
     size = MAX_TIMERS_COUNT;
-    count   = 0;
+    count = 0;
 
-    constructor(){}
+    constructor() { }
 
 
-    CreateTimer(start, duration, step, name, clbk, params){
+    CreateTimer(start, duration, step, name, clbk, params) {
 
         const idx = this.GetFreeTimer(); // Get the first not active timer 
-        this.buffer[idx].SetTimer(start, duration, step, idx, name, clbk, params); 
+        this.buffer[idx].SetTimer(start, duration, step, idx, name, clbk, params);
         this.count++;
 
         // Catch buffer overflow
-        if(this.count >= this.size) {
+        if (this.count >= this.size) {
             console.log(`Max Size:${this.size}  current count:${this.count}`);
             alert('ERROR. Buffer overflow for Timers');
         }
-        
+
         return this.buffer[idx];
     }
 
 
-    ClearTimer(idx){
+    ClearTimer(idx) {
 
         this.buffer[idx].Clear();
         this.count--;
     }
-    
 
-    GetFreeTimer(){
 
-        for(let i=0; i<this.size; i++)
-            if(this.buffer[i].isActive === false)
+    GetFreeTimer() {
+
+        for (let i = 0; i < this.size; i++)
+            if (this.buffer[i].isActive === false)
                 return i;
         alert('No Space for new Timer. Timer.js');
     }
 
 
-    Init(){
+    Init() {
 
-        for(let i=0; i<this.size; i++)
+        for (let i = 0; i < this.size; i++)
             this.buffer[i] = new Timer(0., 0., 0., false);
     }
 
 
-    OnCompleted(idx){
+    OnCompleted(idx) {
 
-        if(this.buffer[idx].clbk) // If a callback exists, call it
+        if (this.buffer[idx].clbk) // If a callback exists, call it
             this.buffer[idx].clbk(this.buffer[idx].params);
     }
 
 
-    SetClbk(clbk, idx){
+    SetClbk(clbk, idx) {
 
         this.buffer[idx].SetClbk(clbk);
     }
@@ -230,22 +252,22 @@ _timers.Init();
  */
 
 /** Getters-Setters */
-export function Timers_get_timers(){
+export function Timers_get_timers() {
     return _timers;
 }
 
 
 
-export function Timers_get_timer(idx){
+export function Timers_get_timer(idx) {
     return _timers.buffer[idx];
 }
 
 
 
-export function Timers_create_timer(start, duration, step, name, clbk, params){
+export function Timers_create_timer(start, duration, step, name, clbk, params) {
     // Catch wrong parameters(name is a valid param only for debugging)
-    if(!(typeof name === 'string' || name instanceof String))
-    alert('--NAME FOR TIMERS NOT PASSED--')
+    if (!(typeof name === 'string' || name instanceof String))
+        alert('--NAME FOR TIMERS NOT PASSED--')
     return _timers.CreateTimer(start, duration, step, name, clbk, params);
 }
 
@@ -257,13 +279,13 @@ export function Timers_create_timer(start, duration, step, name, clbk, params){
  * 
  * // TODO !!!: Not efficient, it runs 350 elements without any being active
  */
-export function Timers_update(){
+export function Timers_update() {
 
-    for(let i=0; i<_timers.size; i++){
+    for (let i = 0; i < _timers.size; i++) {
         const t = _timers.buffer[i]; // Cash
-        if(t.isActive){
+        if (t.isActive) {
             // Stop timer if the duration cycle has been completed
-            if(t.t >= t.duration){
+            if (t.t >= t.duration) {
                 _timers.OnCompleted(i)
                 _timers.ClearTimer(i);
             }
@@ -277,11 +299,11 @@ export function Timers_update(){
 /**
  * Debug
  */
-export function Timers_print_timers(){
+export function Timers_print_timers() {
 
-    for(let i=0; i<_timers.size; i++){
+    for (let i = 0; i < _timers.size; i++) {
         const t = _timers.buffer[i]; // Cash
-        if(t.isActive){
+        if (t.isActive) {
             console.log(`${i}:t:${t.t.toFixed(2)}|d:${t.duration}|name:${t.GetName()}`)
         }
     }

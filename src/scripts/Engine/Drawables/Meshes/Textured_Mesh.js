@@ -2,7 +2,7 @@
 
 import { Mesh } from "./Base/Mesh.js";
 import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
+import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
@@ -130,7 +130,7 @@ export class Textured_Mesh extends Mesh {
       const mesh = params.evt_params.target_mesh;
       const OnMoveFn = mesh.OnMove;
 
-      const point = MouseGetPos();
+      const point = Mouse_get_pos();
       const g = mesh.geom;
       // TODO: Isn't the mesh already been checked for collision??????
       if (Check_intersection_point_rect(g.pos, g.dim, point, [0, 8])) {
@@ -184,7 +184,7 @@ export class Textured_Mesh extends Mesh {
       }
 
       // Move 
-      const mouse_pos = MouseGetPosDif();
+      const mouse_pos = Mouse_get_pos_dif();
 
       mesh.geom.AddWposXY( mesh.gfx, mouse_pos.x, -mouse_pos.y);
 

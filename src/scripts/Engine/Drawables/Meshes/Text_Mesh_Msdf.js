@@ -321,125 +321,6 @@ export class Text_Mesh_Msdf extends Mesh {
    }
 
 
-   // // EFFICIENCY: Implement to update only for the changed characters, not all the characters
-   // /**
-   //  * Also very memory heavy, shown in firefox profiler tools.
-   //  * Probably because of the new GfxInfoMesh and new Geometry2D_Text.
-   //  * Concider building the structs localy.
-   //  */
-   // UpdateText(_text) {
-
-   //    if (!this.gfx) return; // Case replace text before insert to gfx buffers;
-
-   //    let text = (typeof (_text) === 'number') ? `${_text}` : _text; // Takes arithmetic values or just a char.
-
-   //    const gfx_copy = {
-   //       vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
-   //       prog: { attribsidx: this.gfx.prog.attribsidx },
-   //       vertsPerRect: this.gfx.vertsPerRect,
-   //       attribsPerVertex: this.gfx.attribsPerVertex,
-   //    }
-
-   //    const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-   //       pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
-   //       dim: [this.geom.dim[0], this.geom.dim[1]],
-   //    }
-
-
-   //    const advancex = Msdf_Font_get_font_advancex(this.mat.texidx);
-
-   //    const numchars = text.length;
-   //    // NOTE: We want to run for max chars to reset any extra from the current text
-   //    const len = (this.geom.num_faces > numchars) ? this.geom.num_faces :
-   //       (numchars > this.geom.num_faces ? this.geom.num_faces : numchars);
-
-
-
-   //    const attr = Shader_attributes_get_attribs_offset_size(gfx_copy.prog.attribsidx, SHADER_ATTRIBUTES.TEX2);
-
-   //    let prev_half_dim_x = 0;
-   //    let posx = 0;
-
-   //    // Update text faces
-   //    for (let i = 0; i < len; i++) {
-
-   //       let uvs = [0, 0, 0, 0]; // Set uvs to ' ' space char, to replace any extra previous text's characters
-
-   //       if (text[i] !== undefined) // If char=' ' space, just render [0,0] uv coordinates.
-   //       {
-   //          // Set character dimentions.
-   //          const plane_bounds = Msdf_Font_get_char_plane_bounds(this.mat.fontidx, text[i]);
-   //          geom_copy.dim[0] *= plane_bounds.width;
-   //          geom_copy.dim[1] *= plane_bounds.height;
-   //          Gl_set_dim_xy(gfx_copy, geom_copy.dim);
-
-   //          // // Set character y position and advance.
-   //          geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
-   //          Gl_set_wpos_xy(gfx_copy, geom_copy.pos);
-   //          posx = geom_copy.dim[0] + prev_half_dim_x;
-   //          geom_copy.pos[0] += posx;
-   //          prev_half_dim_x = geom_copy.dim[0];
-
-   //          // Get the correct uv coordinates.
-   //          uvs = Msdf_Font_get_char_uv_coords(this.mat.fontidx, text[i]);
-
-   //          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = this.geom.pos[1]; // Reset 
-   //       }
-
-   //       Gl_set_uv(gfx_copy.vb.idx, uvs, gfx_copy.vb.start, attr.offset, attr.size, gfx_copy.attribsPerVertex)
-
-   //       gfx_copy.vb.start += gfx_copy.vb.count
-   //    }
-
-   //    Vertex_buffer_state_enable(gfx_copy.vb.idx, BUFFER_STATE.NEEDS_UPDATE);
-   // }
-
-
-   // /** Update a specific character in text char array */
-   // UpdateTextCharacter(_text, idx) {
-
-   //    /**DEBUG */ if (_text.length > 1) alert('Try to use a char update function but string is passed');
-   //    if (!this.gfx) return; // Case this called before text is inserted to gfx buffers.
-
-   //    const text = (typeof (_text) === 'number') ? `${_text}` : _text; // Takes arithmetic values or just a char.
-
-   //    // Make a copy to not change the default .start value of the first char(face).
-   //    const gfx_copy = {
-   //       vb: { idx: this.gfx.vb.idx, start: this.gfx.vb.start, count: this.gfx.vb.count },
-   //       prog: { attribsidx: this.gfx.prog.attribsidx },
-   //       vertsPerRect: this.gfx.vertsPerRect,
-   //       attribsPerVertex: this.gfx.attribsPerVertex,
-   //    }
-   //    gfx_copy.vb.start = this.gfx.vb.start + (gfx_copy.vb.count * idx); // Calc the characters position inside the char array.
-
-
-   //    // Make a copy to not change the default face.
-   //    const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.
-   //       pos: [this.geom.pos[0], this.geom.pos[1], this.geom.pos[2]],
-   //       dim: [this.geom.dim[0], this.geom.dim[1]],
-   //    }
-
-   //    const advancex = Msdf_Font_get_font_advancex(this.mat.texidx);
-
-   //    const plane_bounds = Msdf_Font_get_char_plane_bounds(this.mat.fontidx, text);
-
-   //    // Set character dimentions. 
-   //    geom_copy.dim[0] *= plane_bounds.width;
-   //    geom_copy.dim[1] *= plane_bounds.height;
-   //    Gl_set_dim_XY(gfx_copy, geom_copy.dim);
-
-   //    // Set character y position and advance.
-   //    geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
-   //    geom_copy.pos[0] += this.geom.dim[0];
-   //    geom_copy.pos[0] += Floor(this.fontsize * advancex);
-
-   //    // Set the correct uv coordinates.
-   //    const uvs = Msdf_Font_get_char_uv_coords(this.mat.fontidx, _text);
-   //    Gl_set_uv(gfx_copy, uvs);
-
-   // }
-
-
 
    /*******************************************************************************************************************************************************/
    // Setters-Getters
@@ -528,7 +409,7 @@ export class Text_Mesh_Msdf extends Mesh {
    }
 
 
-   SetTextScale(scale){
+   ScaleText(scale){
 
       if (!this.gfx) {
          console.error('98776\nTrying to Render Text before vertex buffer creation\ntext:', this.mat.char_buffer.buffer); return;
@@ -546,8 +427,19 @@ export class Text_Mesh_Msdf extends Mesh {
 
       let line = 0;
 
-      let posx = this.geom.pos[0];
-      let posy = this.geom.pos[1];
+      const text_width = ((this.text_width) * scale) - this.parent.geom.dim[0]; 
+      const text_height = ((this.text_height) * scale) - this.parent.geom.dim[1]; 
+
+      // const difx = this.geom.dim[0]-sizex;
+      // const dify = this.geom.dim[0]-sizey;
+      // let posx = this.geom.pos[0] - difx*2;
+      // let posy = this.geom.pos[1] - dify/2;
+
+      // let posx = center ? this.geom.pos[0]+this.text_width : this.geom.pos[0];
+      let posx = this.geom.pos[0]-text_width;
+      let posy = this.geom.pos[1]-text_height;
+      // let posy = center ? this.geom.pos[1]+this.text_height : this.geom.pos[1];
+      // let posy = this.geom.pos[1];
 
 
       // const gfx_copy = { vb: this.gfx.CopyVb() } 
@@ -580,7 +472,8 @@ export class Text_Mesh_Msdf extends Mesh {
             Gl_set_wpos_xy(this.gfx, posx + width, posy + height);
             posx += width * 2;
    
-            posy = this.geom.pos[1]; // Reset yh position
+            // posy = this.geom.pos[1]; // Reset yh position
+            posy = this.geom.pos[1]-text_height;; // Reset yh position
    
             this.gfx.vb.starts.buffer[0] += attribs_count;
          }

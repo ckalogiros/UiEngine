@@ -2,7 +2,7 @@
 
 import { Gl_draw } from "../../Graphics/GlDraw.js";
 import { TimeSample, TimeUpdate } from "../Timers/Time.js";
-import { TimersUpdateGlobalTimer, Timers_update } from "../Timers/Timers.js";
+import { Timers_update_global_timer, Timers_update } from "../Timers/Timers.js";
 import { Time_intervals_update } from "../Timers/TimeIntervals.js";
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
 import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
@@ -94,7 +94,7 @@ export class Renderer {
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
          Time_intervals_update(); // Update and run callbacks for each interval timer that has been set.
-         TimersUpdateGlobalTimer(); // This is a globbal timer, going only forward
+         Timers_update_global_timer(); // This is a globbal timer, going only forward
          Timers_update();
          // Step_timers_update();
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);

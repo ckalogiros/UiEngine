@@ -1,7 +1,7 @@
 "use strict";
 
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
-import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
+import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
@@ -295,17 +295,6 @@ export class Widget_Label extends Rect_Mesh {
     /*******************************************************************************************************************************************************/
     // Transformations
 
-    Move(x, y) {
-        alert('14321009465 \n USE THE AddWposXY() instead ')
-        console.error('UNUSED FUNC, CHECK IT')
-
-        if (x === 0 && y === 0) return;
-        this.geom.AddWposXY(this.gfx, x, y, );
-        this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y);
-
-    }
-
-
     AddWposXY(x, y) {
 
         this.geom.AddWposXY(this.gfx, x, y,);
@@ -334,6 +323,29 @@ export class Widget_Label extends Rect_Mesh {
         //     this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y, );
         // }
     }
+    
+
+    SetWposXY(x, y) {
+        super.SetWposXY(x, y);
+        this.text_mesh.geom.pos[0] = x-this.text_mesh.text_width;
+        this.text_mesh.geom.pos[1] = y-this.text_mesh.text_height;
+        this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y);
+    }
+    
+    
+    SetWposX(x) {
+        super.SetWposX(x);
+        this.text_mesh.geom.pos[0] = x-this.text_mesh.text_width;
+        this.text_mesh.geom.AddWposX(this.text_mesh.gfx, x);
+    }
+    
+    
+    SetWposY(y) {
+        super.SetWposY(y);
+        this.text_mesh.geom.pos[1] = y-this.text_mesh.text_height;
+        this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y);
+    }
+
 
 
     MoveNoGfxUpdate(x, y) {
@@ -436,27 +448,6 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    SetWposXY(x, y) {
-        // const xx = x-this.geom.dim[0];
-        // const yy = y-this.geom.dim[1];
-        // super.SetWposXY(xx, yy);
-        super.SetWposXY(x, y);
-        this.text_mesh.AddWposXY(x, y);
-    }
-    
-    
-    SetWposX(x) {
-        super.SetWposX(x);
-        this.text_mesh.AddWposX(x);
-    }
-    
-    
-    SetWposY(y) {
-        super.SetWposY(y);
-        this.text_mesh.AddWposY(y);
-    }
-
-
     SetGfxInserted(flag) {
 
         if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
@@ -556,7 +547,7 @@ export class Widget_Label extends Rect_Mesh {
             // Check for Resize
             if (mesh.StateCheck(MESH_STATE.IS_RESIZEABLE)) {
 
-                const point = MouseGetPos();
+                const point = Mouse_get_pos();
 
                 const right = mesh.geom.pos[0] + mesh.geom.dim[0];
                 const bottom = mesh.geom.pos[1] + mesh.geom.dim[1];
@@ -617,7 +608,7 @@ export class Widget_Label extends Rect_Mesh {
         }
 
         // console.log('RESIZING ', mesh.GetName());
-        const mouse_pos = MouseGetPosDif();
+        const mouse_pos = Mouse_get_pos_dif();
 
         if (mouse_pos.x !== 0 || mouse_pos.y !== 0) {
 
@@ -672,7 +663,7 @@ function Label_on_move_clbk(params) {
     }
 
 
-    const mouse_dif = MouseGetPosDif();
+    const mouse_dif = Mouse_get_pos_dif();
     if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
 
     if (Mesh_unif_is_vb_root_wpos(mesh.root_posidx, mesh.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.

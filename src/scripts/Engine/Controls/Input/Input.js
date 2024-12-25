@@ -2,8 +2,8 @@
 "use strict";
 
 
-import { OnTouchStart, OnTouchEnd, OnTouchCancel, OnTouchMove, MouseResetDif, MouseResetWheel } from "../Input/Mouse.js";
-import { OnMouseMove, OnMouseDown, OnMouseUp, OnMouseOut, OnMouseWheel } from "./Mouse.js";
+import { Mouse_on_touch_start, Mouse_on_touch_end, Mouse_on_touch_cancel, Mouse_on_touch_move, Mouse_reset_dif, MouseResetWheel } from "../Input/Mouse.js";
+import { Mouse_on_move, Mouse_on_down, Mouse_on_up, Mouse_on_out, Mouse_on_wheel } from "./Mouse.js";
 import { OnKeyDown, OnKeyUp } from "./Keyboard.js";
 import { Renderer_set_canvas_size } from "../../Renderers/Renderer.js";
 import { Mesh_unif_update_sticky_pos } from "../../Core/MeshUniformsBuffer.js";
@@ -15,7 +15,7 @@ import { Mesh_unif_update_sticky_pos } from "../../Core/MeshUniformsBuffer.js";
 
 
 export function Input_reset() {  // HOT-PATH
-  MouseResetDif(.5);
+  Mouse_reset_dif(.5);
   MouseResetWheel();
 }
 
@@ -86,10 +86,10 @@ export function Input_create_user_input_listeners() {
     // else if (canvas.msRequestFullscreen) canvas.msRequestFullscreen();
 
     // Touch screen events
-    canvas.addEventListener("touchstart", OnTouchStart, { passive: false });
-    canvas.addEventListener("touchend", OnTouchEnd, { passive: false });
-    canvas.addEventListener("touchcancel", OnTouchCancel, { passive: false });
-    canvas.addEventListener("touchmove", OnTouchMove, { passive: false });
+    canvas.addEventListener("touchstart", Mouse_on_touch_start, { passive: false });
+    canvas.addEventListener("touchend", Mouse_on_touch_end, { passive: false });
+    canvas.addEventListener("touchcancel", Mouse_on_touch_cancel, { passive: false });
+    canvas.addEventListener("touchmove", Mouse_on_touch_move, { passive: false });
 
     canvas.addEventListener('gesturestart', function (event) {
       event.preventDefault();
@@ -113,14 +113,14 @@ export function Input_create_user_input_listeners() {
   }
   else {
 
-    canvas.addEventListener('mousemove', OnMouseMove, false);
-    canvas.addEventListener('mouseout', OnMouseOut, false);
-    canvas.addEventListener('wheel', OnMouseWheel, false);
+    canvas.addEventListener('mousemove', Mouse_on_move, false);
+    canvas.addEventListener('mouseout', Mouse_on_out, false);
+    canvas.addEventListener('wheel', Mouse_on_wheel, false);
 
   }
 
-  window.addEventListener('mousedown', OnMouseDown, false);
-  window.addEventListener('mouseup', OnMouseUp, false);
+  window.addEventListener('mousedown', Mouse_on_down, false);
+  window.addEventListener('mouseup', Mouse_on_up, false);
   window.addEventListener("resize", OnWindowResize, false);
 
   // Disabling the context menu on long taps on Android. 

@@ -1,7 +1,7 @@
 "use strict";
 
 import { CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
-import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
+import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
@@ -518,7 +518,7 @@ export class Section extends Mesh {
          const right = pos[0] + section.geom.dim[0] * 2;
          const bottom = pos[1] + section.geom.dim[1] * 2;
 
-         const point = MouseGetPos();
+         const point = Mouse_get_pos();
          // console.log(section)
          if (section.state.mask & MESH_STATE.IS_RESIZEABLE && (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1])) {
 
@@ -588,7 +588,7 @@ export class Section extends Mesh {
          return;
       }
 
-      const mouse_pos = MouseGetPos();
+      const mouse_pos = Mouse_get_pos();
 
 
       // Set min dimentions. // TODO: Who decides for the minimum dimentions??????
@@ -636,7 +636,7 @@ export class Section extends Mesh {
          Root_group_vbidx_view_reset_mesh_per_vb_buffer(root.root_bufferidx);
 
 
-         const mouse_dif = MouseGetPosDif()
+         const mouse_dif = Mouse_get_pos_dif()
          const dif = { x: mouse_dif.x / 2, y: -mouse_dif.y / 2 };
          // const dif = {x:mouse_dif.x, y: -mouse_dif.y};  
          Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
@@ -999,7 +999,7 @@ export function Section_on_move_clbk(params) {
       return;
    }
 
-   const mouse_dif = MouseGetPosDif();
+   const mouse_dif = Mouse_get_pos_dif();
    if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
 
    Mesh_unif_add_vb_root_wpos(section.root_posidx, mouse_dif.x, -mouse_dif.y);

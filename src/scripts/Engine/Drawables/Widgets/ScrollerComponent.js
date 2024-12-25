@@ -1,7 +1,7 @@
 "use strict";
 
 import { Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { MouseGetPos, MouseGetPosDif } from "../../Controls/Input/Mouse.js";
+import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_unif_add_vb_root_wposy, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
@@ -309,7 +309,7 @@ function Scroller_component_move_handle(bar, handle) {
    // Dont include handle pad to align scrolled section top and bot to scrollbars top and bot
    const handle_pad = handle.StylesGetPad(STYLES.AXIS.Y);
 
-   const y = -MouseGetPosDif().y;
+   const y = -Mouse_get_pos_dif().y;
    if (y === 0) return;
 
 
@@ -360,7 +360,7 @@ function Scroller_component_onClick(params) {
 
    
    const bar = params.evt_params.target_mesh;
-   const point = MouseGetPos();
+   const point = Mouse_get_pos();
    
    
    

@@ -1,7 +1,7 @@
 "use strict";
 
 import { Intersection_point_rect } from "../Drawables/Operations/Collisions.js";
-import { MouseGetPos } from "../Controls/Input/Mouse.js";
+import { Mouse_get_pos } from "../Controls/Input/Mouse.js";
 import { Free_generic_buffer, New_generic_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
@@ -399,7 +399,7 @@ export function Listener_dispatch_check_hover_event() {
    
       //    const bounding_box = Mesh_buffer_get_mesh_bounding_box(STATE.mesh.focusedIdx);
    
-      //    const point = MouseGetPos();
+      //    const point = Mouse_get_pos();
    
       //    // If and only if mouse is intersecting with the current mesh(mouse hover) ...
       //    intersects = Intersection_point_rect(point, bounding_box);
@@ -432,7 +432,7 @@ export function Listener_dispatch_check_hover_event() {
       if (view_buffer.buffer[i]) {
 
          const bounding_box = Mesh_buffer_get_mesh_bounding_box(view_buffer.buffer[i].meshidx);
-         const point = MouseGetPos();
+         const point = Mouse_get_pos();
 
          /**DEBUG*/if (bounding_box === false) {
             console.log('i', i, 'view_buffer.buffer[i]', view_buffer.buffer[i], 'view_buffer', view_buffer);
@@ -548,7 +548,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
       // if(STATE.mesh.focused && STATE.mesh.focused.listeners){ 
    
       //    const bounding_box = Mesh_buffer_get_mesh_bounding_box(STATE.mesh.focusedIdx);
-      //    const point = MouseGetPos();
+      //    const point = Mouse_get_pos();
    
       //    // If and only if mouse is intersecting with the current mesh(mouse hover) ...
       //    intersects = Intersection_point_rect(point, bounding_box);
@@ -631,7 +631,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
          }
 
          const bounding_box = Mesh_buffer_get_mesh_bounding_box(view_buffer.buffer[i].meshidx);
-         const point = MouseGetPos();
+         const point = Mouse_get_pos();
 
          // If and only if mouse is intersecting with the current mesh(mouse hover) ...
          intersects = Intersection_point_rect(point, bounding_box);

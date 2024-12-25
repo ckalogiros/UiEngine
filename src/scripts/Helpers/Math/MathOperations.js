@@ -229,7 +229,8 @@ export function RoundArr3(arr){
     return [Math.round(arr[0]), Math.round(arr[1]), Math.round(arr[2])];
 }
 export function Abs(a){
-    return a > 0 ? a : -a;
+    // return (a <= -0) ? -a : a;
+    return (a < -0) ? -a : a;
 }
 export function Max(val1, val2) {
     return val1 > val2 ? val1 : val2;
@@ -243,23 +244,11 @@ export function Max3(val1, val2, val3) {
 export function Min3(val1, val2, val3) {
     return val1 < val2 ? Min(val1, val3) : Min(val2, val3);
 }
+export function Min4(val1, val2, val3, val4) {
+    return val1 < val2 ? Min3(val1, val3, val4) : Min3(val2, val3, val4);
+}
 export function RoundFloat1Decimal(val) {
     return Math.round(val * 10) / 10;
-}
-
-export function InterpolateToRange(value, resolution, maxVal) {
-
-    const res = maxVal / resolution;
-    // console.log('res:', res);
-    const interpolatedVal = value * res;
-    return interpolatedVal;
-}
-
-export function InterpolateToRange01Inverted(value) {
-    return 1/value;
-}
-export function InterpolateToRange01(value, max) {
-    return (1.0/max) * value;
 }
 
 
@@ -309,29 +298,39 @@ export function Lerp( x0, x1, t ) {
 	return x0 + (x1 - x0) * t; // 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * 
- * @param {float} p0 Array of 2. [0]: x point, [1]: y point
- * @param {float} p1 Array of 2. [0]: x point, [1]: y point
- * @param {float} t The percenage. From t=0(0%) to t=1(100%) 
- */
-export function Lerp2D( p0, p1, t ) {
+export function InterpolateToRange(value, resolution, maxVal) {
 
-	const x = p0[0] + (p1[0] - p0[0]) * t;
-	const y = p0[1] + (p1[1] - p0[1]) * t;
-
-    return [x, y];
+    const res = maxVal / resolution;
+    // console.log('res:', res);
+    const interpolatedVal = value * res;
+    return interpolatedVal;
 }
 
+// export function InterpolateToRange01Inverted(value) {
+//     return 1/value;
+// }
+// export function InterpolateToRange01(value, max) {
+//     return (1.0/max) * value;
+// }
 
 
-export function Map(min, max, t) {
-    return min + (t * (max-min));
-}
 
 
 
+// export function Map(min, max, t) {
+//     return min + (t * (max-min));
+// }
+
+
+
+// export function Range(val, min, max){
+
+//     return min + (val * (max - min));
+// }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // http://en.wikipedia.org/wiki/Smoothstep
 export function Smoothstep( x, min, max ) {
 
@@ -423,13 +422,6 @@ export function Normalize_vec2(vx, vy){
 
 
 
-export function Range(val, min, max){
-
-    return min + (val * (max - min));
-}
-
-
-
 
 export function Fract(f) {
     return f % 1;
@@ -443,4 +435,4 @@ export function Mod(a, b) {
 }
 
 
-
+// TODO: rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing. By IQ for smooth color transition: https://www.shadertoy.com/view/MsS3Wc
