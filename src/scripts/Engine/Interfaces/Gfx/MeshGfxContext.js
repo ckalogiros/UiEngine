@@ -218,6 +218,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    const root_bufferidx = mesh.root_bufferidx;
    const mesh_bufferidx = mesh.mesh_bufferidx;
    const uniforms = mesh.uniforms;
+   const shader_ops_idxs = mesh.shader_ops_idxs;
 
    const flags = (mesh.gfx_ctx_flags !== 0x0) ? mesh.gfx_ctx_flags : FLAGS;
 
@@ -243,7 +244,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
    if (progidx === INT_NULL) { // If shader program does not exist, create new program.
 
-      progidx = Program_create_program(sid, uniforms);
+      progidx = Program_create_program(sid, uniforms, shader_ops_idxs);
 
       Scene_set_projection_matrix(sceneidx)
 

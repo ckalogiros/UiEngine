@@ -8,15 +8,20 @@ const version                    = "#version 300 es";
 const precision_medium           = "precision mediump float;";
 const precision_high             = "precision highp float;";
 
+
+
 /**************************************************************************************************************************************/
 // Vertex Shader Shader 
 const u_orthoProj_in             = 'uniform mat4 u_projection;';
+
 
 
 /**************************************************************************************************************************************/
 // Fragment Shader 
 const out_frag_color     = 'out vec4 frag_color;';
 const frag_u_sampler0    = 'uniform sampler2D u_sampler0;';
+
+
 
 /**************************************************************************************************************************************/
 // Generic Uniforms Includes
@@ -49,9 +54,12 @@ float inner  = u_rcorners.y;
 float intensity  = u_rcorners.z;`;
 
 
+
+
+
+
 /**************************************************************************************************************************************/
 // Misc Shader Functions
-
 
 const coordinate_system_functions = 
 `// Coordinate System Functions
@@ -345,33 +353,9 @@ vec3 blend_color_screen(vec3 a, vec3 b) { return ${blend_color_screen_vec3   }; 
 vec4 blend_color_overlay(vec4 a, vec4 b) { return ${blend_color_overlay_vec4   }; }
 vec4 blend_color_overlay(vec4 a, vec3 b) { return ${blend_color_overlay_vec4_3 }; }
 vec3 blend_color_overlay(vec3 a, vec3 b) { return ${blend_color_overlay_vec3   }; }
-
-vec4 blend_color_mask(vec4 a, vec4 b) { 
-  // float m = avarage(a.r, a.g, a.b); 
-  float m = median(a.r, a.g, a.b); 
-  // float m = min(a.r, min(a.g, a.b));
-  // float m = max(a.r, max(a.g, a.b));
-  // m*=a.a;
-  // m*=m; 
-
-  // b*=b;
-
-  // if(m<.1) return vec4(0.);
-  return b*m;
-  // return b*(1.-m);
-  // return vec4(b.rgb, m);
-  // return vec4(b.rgb*m, .0); 
-  }
-
-  vec4 blend_color_alpha(vec4 a, vec4 b) { 
-    float alpha = a.r*a.g*a.b;
-    return vec4(b.rgb*alpha*6., alpha);
-  }
-  `;
-  // vec4 blend_color_mask(vec4 a, vec4 b) { float m = max(a.r, max(a.g, a.b)); return vec4(b.rgb, m); }
-  // vec4 blend_color_mask(vec4 a, vec4 b) { float m = max(a.r, max(a.g, a.b)); return vec4(b.rgb*m, .0); }
-  // vec4 blend_color_mask(vec4 a, vec4 b) { float m = min(a.r, min(a.g, a.b)); m*=m*m; return b*m; }
-  // vec4 blend_color_mask(vec4 a, vec4 b) { float m = median(a.r, a.g, a.b); m*=m*m; return b*m; }
+vec4 blend_color_mask(vec4 a, vec4 b) { float m = median(a.r, a.g, a.b); return b*m; }
+vec4 blend_color_alpha(vec4 a, vec4 b) { float alpha = a.r*a.g*a.b; return vec4(b.rgb*alpha*6., alpha); }
+`;
 
 
 

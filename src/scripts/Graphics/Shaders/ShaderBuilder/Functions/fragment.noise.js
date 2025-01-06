@@ -26,9 +26,12 @@ vec4 Noise_procedural(float scale_down)
 {
 
     #ifdef U_NOISE_PARAMS
-        vec3 controls = u_noise_params;
+      float ctrl1 = u_noise_params[0];
+      float ctrl2 = u_noise_params[1];
+      float ctrl3 = u_noise_params[2];
+      float ctrl4 = u_noise_params[3];
     #else
-        vec3 controls = vec2(1.);
+      vec3 controls = vec2(1.);
     #endif
         
 
@@ -57,7 +60,7 @@ vec4 Noise_procedural(float scale_down)
     
     
     float complexity = 2.;
-    vec2 ratio = vec2(dim.y,dim.x*2.)*controls.z*.25; 
+    vec2 ratio = vec2(dim.y,dim.x*2.)*ctrl3*.25; 
     float noise1 = fbm(complexity * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) ;
     float noise2 = fbm(5. * uv2 * vec2(2.* ratio.x, 2.* ratio.x));
     float n1 = noise1*revT*d2; // +1 for non negative values
@@ -95,18 +98,21 @@ vec4 Noise_procedural(float scale_down)
     
     // Final Color
     // vec4 c = mix(s1, s2, F);
-    vec4 c = mix(s1, s2, mixer);
+    // vec4 c = mix(s1, s2, mixer);
+    vec4 c = mix(s1, mix(s1, s2, mixer), ctrl4);
+    // vec4 c = mix(s1, mix(s1, s2, mixer), 1.);
+    // vec4 c = mix(s1, s2, ctrl4);
     
     
     // // Brightness effect
     vec4 bright2 = mix(s1, vec4(vec3(mixer2), 1.-F*3.3), mixer); 
     // vec4 bright2 = mix(s1, vec4(vec3(mixer2), F*6.3), mixer); 
-    c += mix(c, bright2, controls.x);
+    c += mix(c, bright2, ctrl1);
 
     
     // vec4 bright1 = mix(s1, vec4(vec3(mixer), F), mixer); // EFFECT VERY BRIGHT
     vec4 bright1 = mix(s1, vec4(vec3(mixer), F), F); // EFFECT VERY BRIGHT
-    c += bright1*revT*revT*revT*revT*revT*revT*revT*revT*6.*controls.y;
+    c += bright1*revT*revT*revT*revT*revT*revT*revT*revT*6.*ctrl2;
     
     return c;
 }
@@ -163,9 +169,13 @@ vec4 Noise_procedural_2(float scale_down)
 {
 
     #ifdef U_NOISE_PARAMS
-        vec3 controls = u_noise_params;
+      vec3 controls = u_noise_params;
+      // #include <u_noise_params_array_6f>
+      // float ctrl1 = u_noise_params[0];
+      // float ctrl2 = u_noise_params[1];
+      // float ctrl3 = u_noise_params[2];
     #else
-        vec3 controls = vec2(1.);
+      vec3 controls = vec2(1.);
     #endif
         
 

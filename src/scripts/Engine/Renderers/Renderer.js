@@ -114,9 +114,9 @@ export class Renderer {
 
          Uniforms_block_update_uniform();
 
-         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles)
+         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles)
          Particle_system_update()
-         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles)
+         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles)
 
 
          // Uniforms_buffer_update_uniforms_all();

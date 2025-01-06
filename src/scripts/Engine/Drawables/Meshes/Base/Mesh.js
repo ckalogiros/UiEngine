@@ -1,5 +1,4 @@
 "use strict";
-import { Timer_get_global_timer } from "../../../Timers/Timers.js";
 import { Time_intervals_destroy_byidx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_rotate_add_z_2d, Gl_rotate_y_2d, Gl_rotate_z_2d } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -9,12 +8,13 @@ import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from ".
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_create, Styles_remove_byidx, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy, Screen_wpos_get_y } from "../../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from "../../../Core/MeshUniformsBuffer.js";
 import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_group_remove_scissorbox } from "../../../../Graphics/Buffers/VertexBuffers.js";
-import { Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "../../../../Graphics/Buffers/UniformBuffers.js";
+import { Uniforms_buffer_find_ubidx_from_name } from "../../../../Graphics/Buffers/UniformBuffers.js";
 import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
 import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
-import { CopyArr4, CopyMat4 } from "../../../../Helpers/Math/MathOperations.js";
+import { CopyMat4 } from "../../../../Helpers/Math/MathOperations.js";
+import { Program_store_shader_operations } from "../../../../Graphics/ShaderPrograms.js";
 
 
 
@@ -92,6 +92,7 @@ export class Mesh {
 
     // attrParams1; // Array: A vec4 array which a mesh can pass any values to the shaders.
     uniforms;   // Array: Uniform info: {name, type, flags}. It is set only for mesh that is the first mesh for a Program to be created
+    shader_ops_idxs; // Array: An array to store indexes. These indexes are part of a Shader's Program.shader_ops array. 
 
     listeners;      // Buffer: Indexes to the EventListeners class.
     eventCallbacks; // Buffer: A buffer to store all callbacks, for any event enabled for the mesh.
@@ -144,6 +145,8 @@ export class Mesh {
 
 
 
+        // this.shader_ops_idxs = new Int8Array([INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, ]);
+        this.shader_ops_idxs = New_int8_buffer(8, 'Mesh.shader_ops_idxs');
         this.uniforms = [];
         if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
             this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
@@ -666,14 +669,14 @@ export class Mesh {
      * In order for a mesh to be drawn in a certain way, specific shaders must be build.
      * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
     */
-   EnableGfxAttributes(which, params = null) {
+    EnableGfxAttributes(which, params = null) {
        
-       switch (which) {
+        switch (which) {
            
-           case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
-           case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
-           case MESH_ENABLE.GFX.ATTR_TIME: { 
-               this.sid.attr |= SID.ATTR.TIME; 
+            case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
+            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
+            case MESH_ENABLE.GFX.ATTR_TIME: { 
+                this.sid.attr |= SID.ATTR.TIME; 
                 this.sid.pass |= SID.PASS.TIME; 
                 if (params !== null) {
                     this.geom.time = params;
@@ -684,10 +687,10 @@ export class Mesh {
             case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
             
-            // case MESH_ENABLE.GFX.UNIF_TIME: { this.sid.pass |= SID.PASS.RES2; break; }
             
             case MESH_ENABLE.GFX.FN_INNER_SHADOW: { this.sid.shad |= SID.SHAD.FN_INNER_SHADOW; break; }
             case MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE; break; }
+            case MESH_ENABLE.GFX.FN_EXPLOSION_GLOW: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW; break; }
 
             case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
                 this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
@@ -753,13 +756,20 @@ export class Mesh {
             case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
             case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
             case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
+            case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
+            case MESH_ENABLE.GFX.FLARE: { 
+                this.sid.shad |= SID.SHADER_OPERATIONS.FLARE; 
+                // if(params === null) alert('665518665518 params should not be null');
+                if(params !== null) this.shader_ops_idxs.Add( Program_store_shader_operations(params.function_operation, params.blend_mode) );
+                break; 
+            }
 
         }
 
     }
 
 
-    EnableGfxUniforms(flags = 0x0, name, type, shader_flags) {
+    EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size=0) {
 
 
         /**
@@ -788,18 +798,13 @@ export class Mesh {
         }
 
         if (!skip) {
-
-            const idx = this.uniforms.push({
+            this.uniforms.push({
                 name: name,
                 type: type,
                 ubidx: INT_NULL, // Should be set by the Gl Program creation. So the first mesh that will push to create the program will have the ubidx
                 shader: shader_flags,
-                // vertex_buffer_store_idx: INT_NULL,
+                arr_size: arr_size,
             });
-
-
-            // this.temp_unif_wpos = idx - 1;
-
         }
 
     }

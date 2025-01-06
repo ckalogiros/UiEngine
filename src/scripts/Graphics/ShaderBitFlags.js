@@ -43,7 +43,7 @@ if(BIT_FLAGS[BIT_FLAGS_SIZE] > MAX_BIT_MASK || BIT_FLAGS[BIT_FLAGS_SIZE] <= 0 ) 
 
 _CNT = 0;
 
-// Contructs a table off all App's attributes as indexes OR bit flags, to use accordingly
+// Contructs a table off all App's attributes as indexes OR bit flags accordingly
 export class Shader_Attributes {
 
    constructor(initialize_for_indexing=false, init_val={}){

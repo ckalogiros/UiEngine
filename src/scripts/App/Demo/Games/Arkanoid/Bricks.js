@@ -3,20 +3,17 @@
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { New_generic_buffer, New_int16_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
-import { Effects_create, Effects_get_fx_mesh_byidx, Effects_remove_fx_mesh_byidx, EFFECTS_TYPES } from "../../../../Engine/Drawables/Effects/Effects.js";
+import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_explosion_glow_get_mesh_byidx, Effects_explosion_glow_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREEN, GREY, PURPLE, WHITE, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Particle_system_emitter_get_size, Particles_get_particle_system, Particle_system_emitter_set_size } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
-import { Time_intervals_create } from "../../../../Engine/Timers/TimeIntervals.js";
-import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_add_wpos_xy, Gl_set_attr_round_corners, Gl_set_dim_x, Gl_set_dim_xy, Gl_set_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Floor, Min } from "../../../../Helpers/Math/MathOperations.js";
-import { Arkanoid_get_panel_center_pos_x, Arkanoid_get_panel_right } from "./Arkanoid.js";
-import { Ball_get } from "./Ball.js";
+import { Arkanoid_get_main_panel_padx, Arkanoid_get_main_panel_padxy, Arkanoid_get_main_panel_pady, Arkanoid_get_panel_center_pos_x, Arkanoid_get_panel_right } from "./Arkanoid.js";
+import { Ball_get_dim_xy, Ball_get_pos_xy } from "./Ball.js";
 import { Coin_create, Coin_get_byidx, Coin_remove_byidx } from "./Coin.js";
-import { Player_check_coin_collision, Player_get_dimy, Player_get, Player_get_top } from "./Player.js";
+import { Player_check_coin_collision, Player_get_dimy, Player_get_top, Player_check_powup_collision } from "./Player.js";
+import { Powup_create, Powup_get_byidx, Powup_remove_byidx, Powup_resolve_hit, POWUP_TYPE_IDXS } from "./PowerUps.js";
 import { Score_mod_create, Score_mod_get_text_mesh_byidx, Score_mod_remove_text_mesh_byidx } from "./ScoreMod.js";
 
 
@@ -28,7 +25,14 @@ import { Score_mod_create, Score_mod_get_text_mesh_byidx, Score_mod_remove_text_
 
 
 const BRICKS_SCHEMA0 = [
-   [1, 0, 0, 0, 0,],
+   [1, 0, 0, 0, 0, 0, 0,],
+   [1, 0, 0, 0, 0, 0, 0,],
+   [1, 0, 0, 0, 0, 0, 0,],
+   [1, 0, 0, 0, 0, 0, 0,],
+   [1, 0, 0, 0, 0, 0, 0,],
+   [1, 0, 0, 0, 0, 0, 0,],
+   [1, 1, 1, 1, 1, 0, 0,],
+   [1, 1, 1, 1, 1, 0, 0,],
 ];
 const BRICKS_SCHEMA1 = [
    [1, 1, 1, 1, 1,],
@@ -70,11 +74,11 @@ const BRICKS_SCHEMA3 = [
 
 _CNT = 1;
 const BRICK_TYPES = [
-   {color: BLUEL[9]},
-   {color: GREEN[9]},
-   {color: YELLOWR[9]},
-   {color: PURPLE[9]},
-   {color: WHITE},
+   {color: BLUEL[9],},
+   {color: GREEN[9],},
+   {color: YELLOWR[9],},
+   {color: PURPLE[9],},
+   {color: WHITE,},
 ];
 
 const BRICK_HIT_SIDE = {
@@ -91,8 +95,8 @@ const BRICK_SIZE1 = 22;
 const BRICK_SIZE2 = 18;
 const BRICK_SIZE3 = 9.4;
 const BRICKS = {
-   SCHEMA:BRICKS_SCHEMA3,
-   SIZE:BRICK_SIZE3,
+   SCHEMA:BRICKS_SCHEMA2,
+   SIZE:BRICK_SIZE2,
 };
 
 const BRICK_DIM_X = BRICKS.SIZE * RATIO, BRICK_DIM_Y = BRICKS.SIZE;
@@ -105,15 +109,17 @@ const _bricks_buffer = New_generic_buffer(_, 'Arkanoid-BricksBuffer');
 const _bricks_rows = New_generic_buffer(_, '_bricks_rows');
 
 
+const _main_panel_pad = {x:0, y:0};
+
 
 export class Brick {
 
-   constructor(x, y, name, type) {
+   constructor(x, y, name, type_id, gfx_ctx_flags, vb_grouidx=INT_NULL, gfx_ctx_parent=INT_NULL) {
 
       const posx = x;
       const posy = y;
 
-      const mesh = Create_rect_mesh(_, [posx, posy, 1], [BRICK_DIM_X, BRICK_DIM_Y], type.color, name,);
+      const mesh = Create_rect_mesh(_, [posx, posy, 1], [BRICK_DIM_X, BRICK_DIM_Y],  BRICK_TYPES[type_id-1].color, name,);
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, BRICK_FEATHER);
       mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, BRICK_R_CORNERS);
@@ -123,12 +129,34 @@ export class Brick {
       mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
       // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(BLUEL[3], BLUEL[9]));
 
-      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, _, false)
+      // mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, _, false)
+      mesh.gfx_ctx_parent = gfx_ctx_parent;
+      mesh.GfxCtxSetFlag(gfx_ctx_flags, gfx_ctx_parent, false)
+
+      mesh.GenGfxCtx(_, vb_grouidx)
 
       this.mesh = mesh;
 
       this.is_active = true;
+      this.lock_squash_anim = false;
       this.hit_side = BRICK_HIT_SIDE.NONE;
+
+      if(type_id===1) {
+
+         this.powup_type_idx = POWUP_TYPE_IDXS.NEW_BALL;
+      }
+      else if(type_id===2) {
+         
+         this.powup_type_idx = POWUP_TYPE_IDXS.SCALE_BALL;
+      }
+      else if(type_id===3) { 
+         
+         this.powup_type_idx = POWUP_TYPE_IDXS.SCALE_PLAYER;
+      }
+      else if(type_id===4) {
+
+         this.powup_type_idx = POWUP_TYPE_IDXS.FIRE_BULLET;
+      }
 
    }
 
@@ -150,6 +178,10 @@ export function Bricks_create(x, y) {
 
    let posx = x + bricks_row_0_x, posy = y + bricks_row_0_y;
 
+   let gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
+   let vb_grouidx = INT_NULL;
+   let gfx_ctx_parent = INT_NULL;
+
    const rows_len = BRICKS.SCHEMA.length;
    for (let i = 0; i < rows_len; i++) {
 
@@ -161,9 +193,9 @@ export function Bricks_create(x, y) {
          const type_id = BRICKS.SCHEMA[i][j];
          if (type_id !== 0) {
 
-            const idx = _bricks_buffer.Add(new Brick(posx, posy, `br-${i}-${j}`, BRICK_TYPES[type_id-1]) );
+            const idx = _bricks_buffer.Add(new Brick(posx, posy, `br-${i}-${j}`, type_id,) );
+            gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC
             _bricks_rows[i].AddAtIndex(j, idx);
-
          }
 
          posx += (BRICK_DIM_X * 2) + BRICK_PAD_X;
@@ -174,6 +206,9 @@ export function Bricks_create(x, y) {
 
    }
 
+
+   _main_panel_pad.x = Arkanoid_get_main_panel_padx();
+   _main_panel_pad.y = Arkanoid_get_main_panel_pady();
 
    return _bricks_buffer;
 }
@@ -262,7 +297,7 @@ function Bricks_find_rows_from_pos(ballx, bally, ball_size) {
  * @param {*} dify The difference of ball's pos current pos with ball's next pos
  * @returns 
  */
-export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx, diry) {
+export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx, diry, ball_idx) {
 
    const ret = [1, 1];
 
@@ -328,11 +363,15 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
                // DO NOT DELETE: Diagonal point of contact
                // if(Abs(x-y) < 10) { ret[0] = -1; ret[1] = -1; } // Diagonal point of contact
 
+               // HERE
+               // TODO: Create squash for the ball. Stop the ball's move on hit, run squash animation, return to move
 
                // Remove mesh from the brick row(by setting the index to INT_NULL)
                rowidxs.buffer[cols_found[j]] = INT_NULL;
 
-               Clbk_animation_push(brick)
+               Clbk_animation_push(brick, ball_idx);
+
+               
 
                return ret;
             }
@@ -349,14 +388,20 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
 /**************************************************************************************************************************************************************/
 // Brick Push-Pull animation
 
-function Clbk_animation_push(brick, time_step = 0.02, slope_const = 0.2, scale = 2) {
+function Clbk_animation_push(brick, ball_idx, time_step = 0.02, slope_const = 0.2, scale = 2) {
    
    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
 
-   const x = brick.mesh.GetPosX()+brick.mesh.geom.dim[0];
-   const y = brick.mesh.GetPosY()+brick.mesh.geom.dim[1];
+   
+   const w = brick.mesh.geom.dim[0];
+   const h = brick.mesh.geom.dim[1];
+   const x = brick.mesh.GetPosX()+_main_panel_pad.x;
+   const y = brick.mesh.GetPosY()+_main_panel_pad.y;
 
-   const text_mesh_idx = Score_mod_create('x1.2', x, y, TEXTURES.MSDF_COMIC_1024, 5, _, YELLOW[9]);
+   // const x = brick.mesh.GetPosX()+brick.mesh.geom.dim[0];
+   // const y = brick.mesh.GetPosY()+brick.mesh.geom.dim[1];
+
+   const text_mesh_idx = Score_mod_create(1.2, 'x1.2', x+w, y+h, TEXTURES.MSDF_COMIC_1024, 5, _, YELLOW[9]);
    const label = Score_mod_get_text_mesh_byidx(text_mesh_idx);
 
    // Resolve the hit direction to move the brick
@@ -366,8 +411,13 @@ function Clbk_animation_push(brick, time_step = 0.02, slope_const = 0.2, scale =
    const params = {
       brick: brick,
       direction: { x: dirx, y: diry },
+      // target_dist: 50, // in pixels
       target_dist: 30, // in pixels
       move_dist: 2.5, // in pixels
+      brick_dim_ratio: w/h,
+      brick_squash_lim: 7,
+      brick_dim_x_initial: w,
+      brick_dim_y_initial: h,
 
       score_mod:label,
       function_slope:slope_params_pointer,
@@ -375,6 +425,23 @@ function Clbk_animation_push(brick, time_step = 0.02, slope_const = 0.2, scale =
    };
 
    Callback_animations_create(Animation_push_up_run, Animation_push_up_stop, params,);
+
+   const color = params.brick.mesh.mat.col;
+
+
+   // Create explosion glow mesh
+   const ball_pos = Ball_get_pos_xy(ball_idx);
+   const ball_dim = Ball_get_dim_xy(ball_idx);
+   const explosion_glow_size = h*3;
+   // const ball_x = ball_pos[0]+ball_dim[0]+_main_panel_pad.x - explosion_glow_size;
+   // const ball_y = ball_pos[1]+ball_dim[1]+_main_panel_pad.y;
+   // const ex_glow_y = (ball_y) + (((y+h) - (ball_y))/2 - explosion_glow_size);
+   const ball_x = ball_pos[0]+_main_panel_pad.x;
+   const ball_y = ball_pos[1]+_main_panel_pad.y;
+   const ex_glow_y = (ball_y) + (((y+h) - (ball_y))/2);
+   // const x = coin.geom.pos[0];
+   // const y = coin.geom.pos[1];
+   Effects_create_explosion_glow(ball_x, ex_glow_y, explosion_glow_size, explosion_glow_size, ball_dim[0], h, WHITE);
 
 }
 
@@ -389,6 +456,7 @@ function Animation_push_up_run(params) {
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
    
+   const slope = Logarithmic_interpolation(timer, slope_constant);
 
 
    // Direction of movement
@@ -396,6 +464,8 @@ function Animation_push_up_run(params) {
    const diry = params.direction.y;
    const movex = params.move_dist * dirx;
    const movey = params.move_dist * diry;
+
+
 
    if (dirx !== 0 && diry !== 0) {
 
@@ -406,45 +476,75 @@ function Animation_push_up_run(params) {
       
       mesh.geom.AddWposX(mesh.gfx, movex);
       params.target_dist -= params.move_dist;
+
+      // Create brick squash
+      const lim = params.brick_squash_lim;
+      const size = 2*(slope*.25+.3);
+      // const size = slope;
+      if(!brick.lock_squash_anim && mesh.geom.dim[0] > params.brick_dim_x_initial - lim) {
+         mesh.geom.dim[0] -= size;
+         mesh.geom.dim[1] += size;
+         if(mesh.geom.dim[0] <= params.brick_dim_x_initial - lim) brick.lock_squash_anim = true;
+      }
+      else if(brick.lock_squash_anim && mesh.geom.dim[0] < params.brick_dim_x_initial + lim){
+         mesh.geom.dim[0] += size;
+         mesh.geom.dim[1] -= size;
+         if(mesh.geom.dim[0] >= params.brick_dim_x_initial + lim) brick.lock_squash_anim = false;
+      }
+      mesh.geom.SetDimXY(mesh.gfx,  mesh.geom.dim[0],  mesh.geom.dim[1]);
+      Gl_set_dim_xy(mesh.gfx,  mesh.geom.dim[0],  mesh.geom.dim[1]);
    }
    else if (diry !== 0) {
       
       mesh.geom.AddWposY(mesh.gfx, movey);
       params.target_dist -= params.move_dist;
+
+
+      // Create brick squash
+      const lim = params.brick_squash_lim;
+      const size = 2*(slope*.25+.3);
+      // const size = slope;
+      if(!brick.lock_squash_anim && mesh.geom.dim[0] < params.brick_dim_x_initial + lim) {
+         mesh.geom.dim[0] += size;
+         mesh.geom.dim[1] -= size;
+         if(mesh.geom.dim[0] >= params.brick_dim_x_initial + lim) brick.lock_squash_anim = true;
+      }
+      else if(brick.lock_squash_anim && mesh.geom.dim[0] > params.brick_dim_x_initial - lim){
+         mesh.geom.dim[0] -= size;
+         mesh.geom.dim[1] += size;
+         if(mesh.geom.dim[0] <= params.brick_dim_x_initial - lim) brick.lock_squash_anim = false;
+      }
+      mesh.geom.SetDimXY(mesh.gfx,  mesh.geom.dim[0],  mesh.geom.dim[1]);
+      Gl_set_dim_xy(mesh.gfx,  mesh.geom.dim[0],  mesh.geom.dim[1]);
+
    }
    
-   const slope = Logarithmic_interpolation(timer, slope_constant);
-   {
-      // const sizex = mesh.geom.dim[0] + (slope * scale);
-      // const sizey = mesh.geom.dim[1] + (slope * scale);
+   { // Score modifier
       const sizex = score_mod.geom.dim[0] * (slope * scale);
       const sizey = score_mod.geom.dim[1] * (slope * scale);
       score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
       Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
    
-      // const diffx = score_mod.geom.pos[0] + (slope * scale);
-      // const diffy = score_mod.geom.pos[1] + (slope * scale);
-      // score_mod.geom.SetWposXY(score_mod.gfx, diffx, diffy);
-   
       if (score_mod.sid.attr & SID.ATTR.R_CORNERS) {
          Gl_set_attr_round_corners(score_mod.gfx, score_mod.mat.style.rcorners * (slope + 1));
       }
-      // // score_mod.text_mesh.ScaleText((slope * scale))
+
       score_mod.text_mesh.ScaleText(slope * scale)
       score_mod.AddWposY(-params.move_amt);
    }
 
-   // if (slope < 1.) return true;
    if (params.target_dist > 0) return true;
    return false
-   // return true
 
 }
 
 function Animation_push_up_stop(params) {
 
-   params.move_dist = 3;
-   params.target_dist = 25;
+   // params.move_dist = 3;
+   // params.target_dist = 25;
+   params.move_dist = 2.5;
+   params.target_dist = 30;
+   // params.target_dist = 50;
 
    Callback_animations_create(Animation_pull_run, Animation_pull_stop, params,);
    return false;
@@ -460,6 +560,9 @@ function Animation_pull_run(params) {
    const scale = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
+
+   const slope = Logarithmic_interpolation(timer, slope_constant);
+
 
    // Direction of movement
    const dirx = params.direction.x;
@@ -478,17 +581,51 @@ function Animation_pull_run(params) {
    
          mesh.geom.AddWposX(mesh.gfx, -movex);
          params.target_dist -= params.move_dist;
+
+         // Create brick squash
+         const lim = params.brick_squash_lim;
+         const size = 2*(slope*.3+.3);
+         // const size = slope;
+         if(!brick.lock_squash_anim && mesh.geom.dim[0] > params.brick_dim_x_initial - lim) {
+            mesh.geom.dim[0] -= size;
+            mesh.geom.dim[1] += size;
+            if(mesh.geom.dim[0] <= params.brick_dim_x_initial - lim) brick.lock_squash_anim = true;
+         }
+         else if(brick.lock_squash_anim && mesh.geom.dim[0] < params.brick_dim_x_initial + lim){
+            mesh.geom.dim[0] += size;
+            mesh.geom.dim[1] -= size;
+            if(mesh.geom.dim[0] >= params.brick_dim_x_initial + lim) brick.lock_squash_anim = false;
+         }
+         mesh.geom.SetDimXY(mesh.gfx,  mesh.geom.dim[0],  mesh.geom.dim[1]);
+         Gl_set_dim_xy(mesh.gfx,  mesh.geom.dim[0],  mesh.geom.dim[1]);
       }
       else if (diry !== 0) {
-   
+         
          mesh.geom.AddWposY(mesh.gfx, -movey);
          params.target_dist -= params.move_dist;
-         // score_mod.AddWposY(movey);
+         
+         // Create brick squash
+         const lim = params.brick_squash_lim;
+         const size = 2*(slope*.3+.3);;
+         // const size = slope;
+         // const size = timer*2;
+         if(!brick.lock_squash_anim && mesh.geom.dim[0] < params.brick_dim_x_initial + lim) {
+            mesh.geom.dim[0] += size;
+            mesh.geom.dim[1] -= size;
+            if(mesh.geom.dim[0] >= params.brick_dim_x_initial + lim) brick.lock_squash_anim = true;
+         }
+         // else if((mesh.geom.dim[0]/mesh.geom.dim[1]) > params.brick_dim_ratio +.8) {
+            else if(brick.lock_squash_anim && mesh.geom.dim[0] > params.brick_dim_x_initial - lim){
+            mesh.geom.dim[0] -= size;
+            mesh.geom.dim[1] += size;
+            if(mesh.geom.dim[0] <= params.brick_dim_x_initial - lim) brick.lock_squash_anim = false;
+         }
+         mesh.geom.SetDimXY(mesh.gfx,  mesh.geom.dim[0],  mesh.geom.dim[1]);
+         Gl_set_dim_xy(mesh.gfx,  mesh.geom.dim[0],  mesh.geom.dim[1]);
       }
    }
 
-   const slope = Logarithmic_interpolation(timer, slope_constant);
-   {
+   { // Score modifier
       const sizex = score_mod.geom.dim[0] * (slope * scale);
       const sizey = score_mod.geom.dim[1] * (slope * scale);
       score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
@@ -513,15 +650,23 @@ function Animation_pull_run(params) {
 
 function Animation_pull_stop(params) {
 
+   // Brick set back initial dimentions
+   params.brick.mesh.geom.dim[0] = params.brick_dim_x_initial;
+   params.brick.mesh.geom.dim[1] = params.brick_dim_y_initial;
+   params.brick.mesh.geom.SetDimXY(params.brick.mesh.gfx, params.brick.mesh.geom.dim[0],  params.brick.mesh.geom.dim[1]);
+   Gl_set_dim_xy(params.brick.mesh.gfx,  params.brick.mesh.geom.dim[0],  params.brick.mesh.geom.dim[1]);
+
    // Set to initial position
    params.brick.mesh.geom.SetWposXY(params.brick.mesh.gfx, params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0], params.brick.mesh.geom.pos[1] + params.brick.mesh.geom.dim[1]);
 
-   // Create explosion circle
-   const explosion_fx = Arkanoid_create_explosion_circle( params.brick.mesh.mat.col, params, );
-
-
    params.brick.mesh.SetColorRGBA(TRANSPARENCY(GREY[2], .3));
+   // params.brick.mesh.SetColorRGBA(TRANSPARENCY(GREY[2], 1.));
    params.brick.is_active = false;
+   params.brick.lock_squash_anim = false;
+
+   // Create explosion circle
+   Arkanoid_create_explosion_circle( params.brick.mesh.mat.defCol, params, );
+
 
    return false;
 }
@@ -539,15 +684,17 @@ function Animation_pull_stop(params) {
 
 function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
 
+   const _main_panel_pad = Arkanoid_get_main_panel_padxy();
    const w = params.brick.mesh.geom.dim[0];
    const h = params.brick.mesh.geom.dim[1];
-   const x = params.brick.mesh.GetPosX();
-   const y = params.brick.mesh.GetPosY();
+   const x = params.brick.mesh.GetPosX()+_main_panel_pad.x;
+   const y = params.brick.mesh.GetPosY()+_main_panel_pad.y;
 
 
-   // Create explosion mesh and animation
-   const explosion_fx_idx = Effects_create(EFFECTS_TYPES.EXPLOSION_CIRCLE, x, y, h*4, h*4, w, h, color)
-   const explosion_fx = Effects_get_fx_mesh_byidx(explosion_fx_idx);
+   // Create explosion glow mesh
+   // const explosion_fx_idx = Effects_create_explosion_circle(x, y, h*4, h*4, w, h, params.brick.mesh.mat.col)
+   const explosion_fx_idx = Effects_create_explosion_circle(x, y, h*4, h*4, w, h, color)
+   const explosion_fx = Effect_explosion_circle_get_mesh_byidx(explosion_fx_idx);
    
    
    const params_explosion = {
@@ -566,14 +713,23 @@ function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
    
    
    // Create coin mesh, coin glow mesh and animation
-   const coin_idx = Coin_create(x, y, 16, 16, w, h);
+   const coin_size = 16;
+   const coin_idx = Coin_create(x, y, coin_size, coin_size, w, h);
    const coin = Coin_get_byidx(coin_idx);
    
    // Coin Glow effect
-   const coin_glow_fx_idx = Effects_create(EFFECTS_TYPES.EXPLOSION_CIRCLE, x, y, 16*1.6, 16*1.6, w, h, YELLOW[9])
-   const coin_glow_fx = Effects_get_fx_mesh_byidx(coin_glow_fx_idx);
-   coin_glow_fx.mesh.timer = 0.01;
-   Gl_set_time(coin_glow_fx.mesh.gfx, 0.01); // Reset attribute time
+   const coin_glow_fx_idx = Effects_create_explosion_circle(x, y, coin_size*1.6, coin_size*1.6, w, h, YELLOW[9])
+   const coin_glow_fx = Effect_explosion_circle_get_mesh_byidx(coin_glow_fx_idx);
+   
+   // Create power up
+   const powup_size = 16;
+   const powup_idx = Powup_create(x, y, powup_size, powup_size, w, h, params.brick.powup_type_idx);
+   const powup = Powup_get_byidx(powup_idx);
+
+   
+   // Powup Glow effect
+   const powup_glow_fx_idx = Effects_create_explosion_circle(x, y, powup_size*1.6, powup_size*1.6, w, h, WHITE)
+   const powup_glow_fx = Effect_explosion_circle_get_mesh_byidx(powup_glow_fx_idx);
    
    const arkanoid_panel_center_posx = Arkanoid_get_panel_center_pos_x();
    const arkanoid_panel_right = Arkanoid_get_panel_right();
@@ -582,6 +738,7 @@ function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
 
    const params_coin = {
       coin:coin,
+      powup:powup,
       timer: 0, 
       timer_limit: 1, 
       timer_step: .01, 
@@ -594,11 +751,15 @@ function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
    };
    Callback_animations_create(Animation_coin_run, Animation_coin_stop, params_coin,);
 
-   return explosion_fx;
+   const params_powup = {
+      powup:powup,
+      brick_center_ratio:Quadratic_interpolation(0, arkanoid_panel_right, params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0]),
+
+      powup_glow_fx: powup_glow_fx, 
+   };
+   Callback_animations_create(Animation_powup_run, Animation_powup_stop, params_powup,);
+
 }
-
-
-
 function Animation_explosion_circle_run(params) {
    
    
@@ -631,10 +792,6 @@ function Animation_explosion_circle_run(params) {
       score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
       Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
 
-      // if (score_mod.sid.attr & SID.ATTR.R_CORNERS) { // This is only if the label's rect(score mod text) is rendered
-      //    Gl_set_attr_round_corners(score_mod.gfx, score_mod.mat.style.rcorners * (slope + 1));
-      // }
-      
       // Update text
       Set_color_a(score_mod.text_mesh, 1-params.timer, score_mod.text_mesh.geom.num_faces);
       score_mod.text_mesh.ScaleText(slope * scale)
@@ -645,11 +802,10 @@ function Animation_explosion_circle_run(params) {
    return true
    
 }
-
 function Animation_explosion_circle_stop(params) {
    
    // Remove the explosion effect
-   Effects_remove_fx_mesh_byidx(params.explosion_fx.idx);
+   Effect_explosion_circle_remove_mesh_byidx(params.explosion_fx.idx);
    
    // Remove the score modifier text
    Score_mod_remove_text_mesh_byidx(params.score_mod.idx);
@@ -662,10 +818,6 @@ function Animation_coin_run(params) {
    
    const coin = params.coin.mesh;
 
-
-
-
-
    // Check player-coin collision
    const player_top = Player_get_top();
    const player_dimy = Player_get_dimy();
@@ -677,20 +829,30 @@ function Animation_coin_run(params) {
          const player_hit = Player_check_coin_collision(coin.geom.pos[0], coin.geom.pos[0]+coin.geom.dim[0]*2, );
          
          if(player_hit) { // Remove the coin and run coin glow animation
+
             Coin_remove_byidx(params.coin.idx);
+            
             // Set up the coin's glow animation
             Animation_coin_hit(params.coin_glow_fx);
-   
-            // Animation_test_player_scale();
+
+            // Create explosion glow mesh
+            const explosion_glow_size =  coin.geom.dim[0]*3;
+            // const x = (coin.geom.pos[0]+coin.geom.dim[0]) - explosion_glow_size;
+            // const y = (coin.geom.pos[1]+coin.geom.dim[1]) - explosion_glow_size;
+            const x = coin.geom.pos[0];
+            const y = coin.geom.pos[1];
+            Effects_create_explosion_glow(x, y, explosion_glow_size, explosion_glow_size, coin.geom.dim[0], player_dimy, GREY[7]);
+            
             return false;
          }
       }
 
       else if (coin.geom.pos[1] > VIEWPORT.BOTTOM + 100) { // else if coin exceeds limit y pos, remove it
          Coin_remove_byidx(params.coin.idx);
-         Effects_remove_fx_mesh_byidx(params.coin_glow_fx.idx);
+         Effect_explosion_circle_remove_mesh_byidx(params.coin_glow_fx.idx);
          return false;
       }
+
    }
 
 
@@ -728,14 +890,86 @@ function Animation_coin_run(params) {
    return true
    
 }
-
 function Animation_coin_stop(params) {
    
    return false;
 }
 
+function Animation_powup_run(params) {
+   
+   const powup = params.powup.mesh;
 
-export function Animation_coin_hit(coin_glow_fx) {
+
+   // Check player-powup collision
+   const player_top = Player_get_top();
+   const player_dimy = Player_get_dimy();
+
+   if(powup.geom.pos[1]+powup.geom.dim[1]*2 > player_top) {
+
+      if(powup.geom.pos[1] < player_top+player_dimy*2){
+         
+         const player_hit = Player_check_powup_collision(powup.geom.pos[0], powup.geom.pos[0]+powup.geom.dim[0]*2, );
+         
+         if(player_hit) { // Remove the powup and run powup glow animation
+
+            Powup_remove_byidx(params.powup.idx);
+            Effect_explosion_circle_remove_mesh_byidx(params.powup_glow_fx.idx);
+            
+            // Set up the powup's glow animation
+            const x = powup.GetPosX()+powup.geom.dim[0];
+            const y = powup.GetPosY()+powup.geom.dim[1];
+            Animation_powup_hit(x, y);
+
+            // Resolve any powup
+            Powup_resolve_hit(params.powup.idx, params.powup.type_idx);
+
+            
+   
+            // Create explosion glow mesh
+            const explosion_glow_size =  powup.geom.dim[0]*3;
+            // const xx = (powup.geom.pos[0]+powup.geom.dim[0]) - explosion_glow_size;
+            // const yy = (powup.geom.pos[1]+powup.geom.dim[1]) - explosion_glow_size;
+            const xx = powup.geom.pos[0];
+            const yy = powup.geom.pos[1];
+            Effects_create_explosion_glow(xx, yy, explosion_glow_size, explosion_glow_size, powup.geom.dim[0], player_dimy, GREY[7]);
+            // Effects_create_explosion_glow(x, y, explosion_glow_size, explosion_glow_size, powup.geom.dim[0], player_dimy, GREY[7]);
+   
+            return false;
+         }
+      }
+
+      else if (powup.geom.pos[1] > VIEWPORT.BOTTOM + 100) { // else if powup exceeds limit y pos, remove it
+         Powup_remove_byidx(params.powup.idx);
+         Effect_explosion_circle_remove_mesh_byidx(params.powup_glow_fx.idx);
+         return false;
+      }
+
+   }
+
+
+
+   const powup_glow_fx = params.powup_glow_fx.mesh;
+   
+   const y = 6;
+
+   // Update powup animation position
+   powup.geom.pos[1] += y;
+   Gl_add_wpos_y(powup.gfx, y);
+   
+   // Update powup glow animation position
+   powup_glow_fx.geom.pos[1] += y;
+   Gl_add_wpos_y(powup_glow_fx.gfx, y);
+   
+   return true
+   
+}
+function Animation_powup_stop(params) {
+   
+   return false;
+}
+
+
+function Animation_coin_hit(coin_glow_fx) {
 
 
    //TODO: Also set up a player-coin hit glow + a score mod for the hit
@@ -745,7 +979,7 @@ export function Animation_coin_hit(coin_glow_fx) {
    const x = coin_glow_fx.mesh.GetPosX()+coin_glow_fx.mesh.geom.dim[0];
    const y = coin_glow_fx.mesh.GetPosY()+coin_glow_fx.mesh.geom.dim[1];
 
-   const text_mesh_idx = Score_mod_create('+0.5', x, y, TEXTURES.MSDF_COMIC_1024, 5, _, YELLOW[9]);
+   const text_mesh_idx = Score_mod_create(0.5, '+0.5', x, y, TEXTURES.MSDF_COMIC_1024, 5, _, YELLOW[9]);
    const label = Score_mod_get_text_mesh_byidx(text_mesh_idx);
 
 
@@ -760,7 +994,6 @@ export function Animation_coin_hit(coin_glow_fx) {
    };
    Callback_animations_create(Animation_coin_hit_run, Animation_coin_hit_stop, params_coin_glow_fx,);
 }
-
 function Animation_coin_hit_run(params) {
    
    // Update score mode text glow position
@@ -771,24 +1004,11 @@ function Animation_coin_hit_run(params) {
    const timer = params.function_slope.GetTimer(); 
 
 
-   // IMIDIATELY: Find a way to diminish the if statements and separate functionality into three parts
-
    if(timer<1) {
 
       const slope = Logarithmic_interpolation(timer, slope_constant);
-      
-      // DO NOT DELETE: UPDATE LABEL RECT
-      // const sizex = score_mod.geom.dim[0] * (slope * scale);
-      // const sizey = score_mod.geom.dim[1] * (slope * scale);
-      // score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
-      // Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
-      
       score_mod.text_mesh.ScaleText(slope * scale)
-      
       score_mod.AddWposY(-params.move_amt*10*(1-slope));
-      
-      // TODO: Unecessary calls. MUST BE CALLED ONCE
-      // params.alpha_timer = 0;
    }
    else if(params.alpha_timer<1){
       
@@ -800,7 +1020,7 @@ function Animation_coin_hit_run(params) {
       
       Set_color_a(score_mod.text_mesh, 1-params.alpha_timer, score_mod.text_mesh.geom.num_faces);
       
-      score_mod.AddWposY(-params.move_amt*2);
+      // score_mod.AddWposY(-params.move_amt*2);
       params.alpha_timer += params.alpha_timer_step;
    }
 
@@ -813,7 +1033,7 @@ function Animation_coin_hit_run(params) {
 
    // Return if destination position of the coin glow is reached
    if(Abs(dist[1]) < 10) {
-      Effects_remove_fx_mesh_byidx(params.coin_glow_fx.idx);
+      Effect_explosion_circle_remove_mesh_byidx(params.coin_glow_fx.idx);
       return false;
    }
 
@@ -841,176 +1061,77 @@ function Animation_coin_hit_stop(params) {
 }
 
 
+function Animation_powup_hit(x, y) {
 
 
-/**********************************************************************************************************************************/
-// TESTS
-
-export function Animation_test_player_scale() {
-   
-   const player = Player_get();
-   const ball = Ball_get();
-
-   if(player.in_scale_animation) return;
-
-   player.in_scale_animation = true;
-
-   // const time_step = 0.01, slope_const = 0.2, scale = .5;
-   const time_step = 0.005, slope_const = 1., scale = .5;
+   //TODO: Also set up a player-coin hit glow + a score mod for the hit
+   const time_step = 0.03, slope_const = 0.5, scale = 3;
    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
 
-   const emitter_size = Particle_system_emitter_get_size(ball.tail_emitter_idx);
-   const emitter = Particles_get_particle_system(ball.tail_emitter_idx);
 
-   const params_player = {
-      player:player,
-      ball:ball,
-      emitter: {
-         size:emitter_size,
-         current_size:emitter_size,
-         vb_groupidx:emitter.gfx.vb.groupidx,
-         ubidx:Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_noise_params'),
-         shader_uniform_index:2,
-      },
+   const text_mesh_idx = Score_mod_create(0.2, '+0.2', x, y, TEXTURES.MSDF_COMIC_1024, 5, _, WHITE);
+   const label = Score_mod_get_text_mesh_byidx(text_mesh_idx);
+
+
+   // console.log('---Create', text_mesh_idx)
+   const params_powup = {
+      score_mod:label,
       function_slope:slope_params_pointer,
-      player_initial_dimx:player.mesh.geom.dim[0],
-      player_current_dimx:player.mesh.geom.dim[0],
-      ball_initial_dimx:ball.mesh.geom.dim[0],
-      ball_current_dimx:ball.mesh.geom.dim[0],
+      move_amt: .25,
+      alpha_timer:0,
+      alpha_timer_step:0.02,
    };
-
-   Callback_animations_create(Animation_test_player_scale_up_run, Animation_test_player_scale_up_stop, params_player,);
-   
+   Callback_animations_create(Animation_powup_hit_run, Animation_powup_hit_stop, params_powup,);
 }
-function Animation_test_player_scale_up_run(params) {
+function Animation_powup_hit_run(params) {
    
-   const player = params.player.mesh; 
-   const player_initial_dimx = params.player_initial_dimx;
-   const player_current_dimx = params.player_current_dimx;
-   const ball = params.ball.mesh; 
-   const ball_initial_dimx = params.ball_initial_dimx;
-   const ball_current_dimx = params.ball_current_dimx;
-   
-   const timer = params.function_slope.GetTimer();
+   // Update score mode text glow position
+   const score_mod = params.score_mod.mesh;
    const slope_constant = params.function_slope.GetSlope();
    const scale = params.function_slope.GetValueChange();
    params.function_slope.IncrementTimer();
-   
-   
-   const slope = Logarithmic_interpolation(timer, slope_constant);
-   const scale_factor = slope*scale;
+   const timer = params.function_slope.GetTimer(); 
+
+
+
+   if(timer<1) {
+
+      const slope = Logarithmic_interpolation(timer, slope_constant);
+      score_mod.text_mesh.ScaleText(slope * scale)
+      score_mod.AddWposY(-params.move_amt*10*(1-slope));
       
+   }
+   else if(params.alpha_timer<1){
+      
+      // TODO: Unecessary calls. MUST BE CALLED ONCE
+      params.function_slope.SetSlope(1);
+      
+      score_mod.text_mesh.ScaleText((params.alpha_timer+1) * scale)
+      Set_color_a(score_mod.text_mesh, 1-params.alpha_timer, score_mod.text_mesh.geom.num_faces);
+      // score_mod.AddWposY(-params.move_amt*2);
+      params.alpha_timer += params.alpha_timer_step;
+   }
+   else return false;
 
-   // Update player x dir scale
-   const sizex = player_current_dimx + (player_initial_dimx * scale_factor);
-   player.geom.dim[0] = sizex;
-   
-   player.geom.SetDimX(player.gfx, sizex,);
-   Gl_set_dim_x(player.gfx, sizex, );
-   Gl_set_attr_round_corners(player.gfx, player.mat.style.rcorners + scale_factor);
- 
-   // Update ball x dir scale
-   const ball_size = ball_current_dimx + (ball_initial_dimx * scale_factor * 2);
-   ball.geom.dim[0] = ball_size;
-   
-   ball.geom.SetDimXY(ball.gfx, ball_size, ball_size);
-   Gl_set_dim_xy(ball.gfx, ball_size, ball_size);
-   Gl_set_attr_round_corners(ball.gfx, ball.geom.dim[0]);
-
-   // // Update ball tail particle emitter
-   // // const emitter_size = params.emitter.size * (scale_factor+1) * 2; // Calculate the scaled size from the original size
-   // const emitter_size = params.emitter.current_size + (params.emitter.size * scale_factor * 2); // Calculate the scaled size from the original size
-   // Particle_system_emitter_set_size(params.ball.tail_emitter_idx, emitter_size); // Scale up emitter and its particles
-   // const noise_reduction = (1-scale_factor)*0.1 + .03;
-   // // console.log('noise_reduction', noise_reduction)
-   // Vertex_buffer_set_and_update_uniform(params.emitter.vb_groupidx, params.emitter.ubidx, noise_reduction, params.emitter.shader_uniform_index); // Scale down the precedural noise 
- 
-   if(slope > 1) 
-      return false;
 
    return true;
 }
-function Animation_test_player_scale_up_stop(params) {
+function Animation_powup_hit_stop(params) {
    
-   params.function_slope.SetTimer(0);
-
-   // Set the scale down as the inverse of scale up
-   const scale = params.function_slope.GetValueChange();
-   params.function_slope.SetValueChange(-scale);
-
-   // Store current player dimention
-   params.player_current_dimx = params.player.mesh.geom.dim[0];
-   params.ball_current_dimx = params.ball.mesh.geom.dim[0];
-   params.emitter.current_size = Particle_system_emitter_get_size(params.ball.tail_emitter_idx);
-   
-   // Set the scale down animation
-   Time_intervals_create(5000, 'player_scale_up', 1, Animation_test_player_scale_down, params)
-   // Callback_animations_create(Animation_test_player_scale_down_run, Animation_test_player_scale_down_stop, params,);
-
-   return true;
-}
-
-function Animation_test_player_scale_down(params) {
-   Callback_animations_create(Animation_test_player_scale_down_run, Animation_test_player_scale_down_stop, params.params,);
-}
-
-function Animation_test_player_scale_down_run(params) {
-   
-   const player = params.player.mesh; 
-   const player_initial_dimx = params.player_initial_dimx;
-   const player_current_dimx = params.player_current_dimx;
-   const ball = params.ball.mesh; 
-   const ball_initial_dimx = params.ball_initial_dimx;
-   const ball_current_dimx = params.ball_initial_dimx;
-
-   const timer = params.function_slope.GetTimer();
-   const slope_constant = params.function_slope.GetSlope();
-   const scale = params.function_slope.GetValueChange();
-   params.function_slope.IncrementTimer();
-   
-   const slope = Logarithmic_interpolation(timer, slope_constant);
-   const scale_factor = slope * scale;
-
-   // Update coin glow position
-   const sizex = player_current_dimx + (player_initial_dimx * scale_factor);
-   player.geom.dim[0] = sizex;
-   
-   player.geom.SetDimX(player.gfx, sizex,);
-   Gl_set_dim_x(player.gfx, sizex, );
-   Gl_set_attr_round_corners(player.gfx, player.mat.style.rcorners + scale_factor);
- 
- 
-   // Update ball x dir scale
-   const ball_size = ball_current_dimx + (ball_initial_dimx * scale_factor * 2);
-   ball.geom.dim[0] = ball_size;
-   
-   ball.geom.SetDimXY(ball.gfx, ball_size, ball_size);
-   Gl_set_dim_xy(ball.gfx, ball_size, ball_size);
-   Gl_set_attr_round_corners(ball.gfx, ball.geom.dim[0]);
-
-   // // Update ball tail particle emitter
-   // // const emitter_size = params.emitter.size * (scale_factor+1) * 2;
-   // const emitter_size = params.emitter.current_size + (params.emitter.size * scale_factor * 2); // Calculate the scaled size from the original size
-   // Particle_system_emitter_set_size(params.ball.tail_emitter_idx, emitter_size);
-   // const noise_reduction = (slope)*0.27 + .03;
-   // // console.log('---noise_reduction', noise_reduction)
-   // Vertex_buffer_set_and_update_uniform(params.emitter.vb_groupidx, params.emitter.ubidx, noise_reduction, params.emitter.shader_uniform_index);
-
-   if(slope > 1) 
-      return false;
-
-   
-   return true;
-}
-function Animation_test_player_scale_down_stop(params) {
-   
-   // params.player.geom.SetDimX(player.mesh.gfx, sizex,);
-   // Gl_set_dim_x(params.player.mesh.gfx, sizex, );
-   // Gl_set_attr_round_corners(params.player.mesh.gfx, params.player.mesh.mat.style.rcorners);
-   params.player.in_scale_animation = false;
+   // Remove the score modifier text
+   const score_mod = params.score_mod;
+   Score_mod_remove_text_mesh_byidx(score_mod.idx);
    
    return false;
 }
+
+
+
+
+
+
+/**********************************************************************************************************************************/
+// TESTS animations
 
 
 

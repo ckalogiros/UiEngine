@@ -33,7 +33,7 @@ export const frag_test1 = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifndef SMOOTH_MIN 
+#ifdef SMOOTH_MIN 
   #include <smoothmin>
 #endif
 
@@ -45,11 +45,11 @@ export const frag_test1 = `
 #endif
 
 
-#ifndef GAMMA_CORRECTION 
+#ifdef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
 
-#ifndef BRIGHTNESS_CONTRAST 
+#ifdef BRIGHTNESS_CONTRAST 
   #include <brightness_contrast>
 #endif
 
@@ -174,7 +174,7 @@ export const frag_test3 = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifndef SMOOTH_MIN 
+#ifdef SMOOTH_MIN 
   #include <smoothmin>
 #endif
 
@@ -186,11 +186,11 @@ export const frag_test3 = `
 #endif
 
 
-#ifndef GAMMA_CORRECTION 
+#ifdef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
 
-#ifndef BRIGHTNESS_CONTRAST 
+#ifdef BRIGHTNESS_CONTRAST 
   #include <brightness_contrast>
 #endif
 
@@ -294,7 +294,7 @@ export const frag_test2 = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifndef SMOOTH_MIN 
+#ifdef SMOOTH_MIN 
   #include <smoothmin>
 #endif
 
@@ -307,11 +307,11 @@ export const frag_test2 = `
 #endif
 
 
-#ifndef GAMMA_CORRECTION 
+#ifdef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
 
-#ifndef BRIGHTNESS_CONTRAST 
+#ifdef BRIGHTNESS_CONTRAST 
   #include <brightness_contrast>
 #endif
 
@@ -415,7 +415,7 @@ vec4 frag_test2()
 
 // /*****************************************************/
 // // FUNCTION DECLERATIONS
-// #ifndef SMOOTH_MIN 
+// #ifdef SMOOTH_MIN 
 //   #include <smoothmin>
 // #endif
 
@@ -431,13 +431,13 @@ vec4 frag_test2()
 // // #define time control1*1.1
 
 
-// #ifndef HASH_FUNCTION 
+// #ifdef HASH_FUNCTION 
 //   #include <hash_function>
 // #endif
-// #ifndef NOISE_HASH 
+// #ifdef NOISE_HASH 
 //   #include <noise_hash>
 // #endif
-// #ifndef NOISE_FBM 
+// #ifdef NOISE_FBM 
 //   #include <noise_fbm>
 // #endif
 
@@ -615,8 +615,8 @@ vec4 frag_test2()
 //     pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
 //   // #endif 
 
-//   vec2 uv1 = vec2(uv);
-//   uv_map_coordinates_zero_one(uv1, local_res);
+//   vec2 uv = vec2(uv);
+//   uv_map_coordinates_zero_one(uv, local_res);
 
 
 //   // uv = gl_FragCoord.xy;
@@ -637,7 +637,7 @@ vec4 frag_test2()
 // 	p.x*=u_screen_res.x/u_screen_res.y;
 // 	vec2 um = iMouse.xy / u_screen_res.xy-.5;
     
-//   p = uv1;
+//   p = uv;
 
 // 	//camera
 // 	vec3 ro = vec3(0., 0. ,5.);
@@ -703,7 +703,7 @@ vec4 frag_test2()
 //   // float repeatx = 1.;
 //   // float repeaty = 1.;
 
-//   // float dd = 1.-length( vec2( abs((fract(uv1.x*repeatx) - .5)* 2.), abs((fract(uv1.y*repeaty) - .5)* 2.) ));
+//   // float dd = 1.-length( vec2( abs((fract(uv.x*repeatx) - .5)* 2.), abs((fract(uv.y*repeaty) - .5)* 2.) ));
 //   // dd = smoothstep(0., control1, dd);
   
 //   // float c = dd;
@@ -731,3 +731,513 @@ vec4 frag_test2()
 // }
 // `;
 
+
+
+
+
+
+
+
+
+/*************************************************************************************************************************/
+/*************************************************************************************************************************/
+
+
+export const frag_test4_call = `
+  color = frag_test4();
+  // vec4 new_color = frag_test4();
+  // // color = blend_color_mix( color, new_color, color.a );
+  // color = blend_color_multiply( color, new_color );
+`;
+
+// export const frag_test4 = `
+
+// /********************************************************************************************/
+// // SHADER UNIT: frag_test4
+// /********************************************************************************************/
+
+
+// /*****************************************************/
+// // GENERIC GLOBAL VARIABLES DECLERATIONS
+// #ifndef UV_READY
+//   vec2 uv = vec2(0,0);
+// #endif
+
+
+// /*****************************************************/
+// // FUNCTION DECLERATIONS
+// #ifdef SMOOTH_MIN 
+//   #include <smoothmin>
+// #endif
+
+
+// /*****************************************************/
+// // BLEND MODES FUNCTION DECLERATIONS
+// #ifdef BLEND_MODE 
+//    #include <blend_mode_directives>
+// #endif
+
+
+// #ifdef GAMMA_CORRECTION 
+//   #include <gamma_correction>
+// #endif
+
+// #ifdef BRIGHTNESS_CONTRAST 
+//   #include <brightness_contrast>
+// #endif
+
+
+
+
+
+
+// vec4 frag_test4()
+// {
+
+//   #ifdef U_GENERIC_CONTROLS
+//     float ctrl1 = u_generic_controls[0];
+//     float ctrl2 = u_generic_controls[1];
+//     float ctrl3 = u_generic_controls[2];
+//     float ctrl4 = u_generic_controls[3];
+//     float ctrl5 = u_generic_controls[4];
+//     // float ctrl6 = u_generic_controls[5];
+//   #endif
+
+//   vec2 res = u_screen_res;
+//   vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
+//   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
+  
+  
+//   #define UV_READY 1
+//   uv = gl_FragCoord.xy;
+//   pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
+  
+//   uv_map_coordinates_zero_one( uv, local_res );
+  
+//   /*
+//     Animate the ctrl1 from high to low
+//     Animate the ctrl2(smoothstep inner) from low to high
+//   */
+//   float d = (1.) - length(uv)*2.*ctrl1;
+  
+//   float c = d * smoothstep(ctrl2, ctrl3, (d));
+  
+//   c *=c;
+
+//   /* Animate a control from high to low for the third parameters of the smoothmin function */
+//   c = smoothmin(c,  2.*ctrl4, c*ctrl5);
+
+
+//   return vec4(c);
+    
+// }
+// `;
+/**SAVE - DO NOT DELETE - see picture Shield_1 and Shield_2*/
+export const frag_test4 = `
+
+
+/********************************************************************************************/
+// SHADER UNIT: frag_test4
+/********************************************************************************************/
+
+
+/*****************************************************/
+// GENERIC GLOBAL VARIABLES DECLERATIONS
+#ifndef UV_READY
+  vec2 uv = vec2(0,0);
+#endif
+
+
+/*****************************************************/
+// FUNCTION DECLERATIONS
+#ifdef SMOOTH_MIN 
+  #include <smoothmin>
+#endif
+
+
+/*****************************************************/
+// BLEND MODES FUNCTION DECLERATIONS
+#ifdef BLEND_MODE 
+   #include <blend_mode_directives>
+#endif
+
+
+#ifdef GAMMA_CORRECTION 
+  #include <gamma_correction>
+#endif
+
+#ifdef BRIGHTNESS_CONTRAST 
+  #include <brightness_contrast>
+#endif
+
+
+
+
+
+
+vec4 frag_test4()
+{
+
+  #ifdef U_GENERIC_CONTROLS
+    float ctrl1 = u_generic_controls[0];
+    float ctrl2 = u_generic_controls[1];
+    float ctrl3 = u_generic_controls[2];
+    float ctrl4 = u_generic_controls[3];
+    float ctrl5 = u_generic_controls[4];
+    float ctrl6 = u_generic_controls[5];
+  #endif
+
+
+  vec2 res = u_screen_res;
+  // vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
+  vec2 local_res = vec2(v_dim2_x, v_dim2_y);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
+  
+  
+  #define UV_READY 1
+  uv = gl_FragCoord.xy;
+  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
+  
+  uv_map_coordinates_zero_one( uv, local_res );
+
+  uv.y += 1.;
+  uv.y -= 1.;
+
+  /************************************************/
+  // Shield
+
+  // float repeat = 10.*(ctrl3);
+  // float d = repeat- length(uv)*repeat;
+  // // float d = 1.- length(uv);
+  
+  // float c1 = d*smoothstep(ctrl2, ctrl1, fract(d));
+  // float c2 = d*smoothstep(.8*ctrl1, .1*ctrl2, fract(d));
+  // // float c2 = d*smoothstep(1., .4, fract(d));
+  // // float c2 = d*smoothstep(.3*ctrl1, .1*ctrl2, fract(d));
+  
+  // float c = max(c1, c2);
+  /************************************************/
+  
+  
+  /************************************************/
+  // Shiny Ball
+
+  // float exposure = 1.2*ctrl1;
+  // float d = 1.+exposure - length(uv);
+  // // float c = d*smoothstep(ctrl2, ctrl1, d);
+  // float c = d*smoothstep(exposure, exposure+.01, d);
+
+  /************************************************/
+  
+  
+  /************************************************/
+  // Shiny Ball - Specular+Shadow
+
+  float d = length(uv);
+  float c = smoothstep(1., .98*ctrl1, d);
+  
+  vec3 color = vec3(c)*src_color.rgb;
+  
+  // Shadow
+  float radius = d;
+  float f = smoothstep(1.*ctrl2, 1., radius);
+  color = mix(color, color * ctrl3, f);
+  
+  // Specular
+  vec3 sphereSpec = vec3(1.0, 1.0, 1.0);
+  vec2 specPoint = vec2(.5, -.5);
+  // float sphereShine = 12.9*ctrl6;
+  float sphereShine = 2.9*ctrl6;
+  // float sphereShine = .7;
+  // f = 1.0 - smoothstep(-0.5*ctrl4, 0.5*ctrl5, length(uv - specPoint));
+  // f = 1.0 - smoothstep(-0.5*ctrl4, 1.5*ctrl5, length(uv - specPoint));
+  f = 1.0 - smoothstep(-2.*ctrl4, 1.5*ctrl5, length(uv - specPoint));
+  color += f * sphereShine * sphereSpec * c;
+
+  return vec4(color, c);
+  /************************************************/
+
+
+  // return vec4(c,c,c,1.)*src_color;
+  return vec4(c)*src_color;
+}
+`;
+
+
+
+
+
+
+
+
+
+/*************************************************************************************************************************/
+/*************************************************************************************************************************/
+
+// export const frag_test5_bubble_call = '   color = blend_color_multiply( color, frag_test5_bubble() );'
+export const frag_test5_bubble_call = '   color = frag_test5_bubble();'
+
+export const frag_test5_bubble = `
+
+/********************************************************************************************/
+// SHADER UNIT: frag_test5_bubble
+/********************************************************************************************/
+
+/*****************************************************/
+// GENERIC GLOBAL VARIABLES DECLERATIONS
+#ifndef UV_READY
+  vec2 uv = vec2(0,0);
+#endif
+
+
+/*****************************************************/
+// FUNCTION DECLERATIONS
+#ifdef SMOOTH_MIN 
+  #include <smoothmin>
+#endif
+#ifdef GAMMA_CORRECTION 
+  #include <gamma_correction>
+#endif
+// #ifdef OP_FLARE 
+//   #include <op_flare>
+// #endif
+
+/*****************************************************/
+// BLEND MODES FUNCTION DECLERATIONS: Include ONLY if this function needs to blend CONDITIONALY or DYNAMICALY any colors INTERNALY, else just use the global blending function calls directly 
+#ifdef BLEND_MODE 
+  #include <blend_mode_directives>
+#endif
+
+
+vec3 Op_flare(in vec2 uv)
+{
+#ifdef U_GENERIC_CONTROLS
+  float ctrl1 = u_generic_controls[0];
+  float ctrl2 = u_generic_controls[1];
+  float ctrl3 = u_generic_controls[2];
+  float ctrl4 = u_generic_controls[3];
+  float ctrl5 = u_generic_controls[4];
+  float ctrl6 = u_generic_controls[5];
+#endif
+
+  vec2 point = vec2(.5, .6);
+  // vec2 point = vec2(.0, .1);
+
+
+  vec2 uv2 = uv;
+  float d2 = length(uv);
+  d2 = smoothstep(1., .9, d2);
+
+  float f0 = 1.0/(length(uv2-point)*32.0+1.0);
+  f0 *= d2;
+
+
+  vec2 uvd = uv2*(length(uv2));
+
+  float f2  = max(1.0/(1.0+32.0*pow(length(uvd+0.8*point),2.0)), .0)*0.25*(ctrl4*2.)*(d2);
+  float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*point),2.0)),.0)*0.23*(ctrl4*2.)*(d2);
+  float f23 = max(1.0/(1.0+32.0*pow(length(uvd+0.9*point),2.0)), .0)*0.21*(ctrl4*2.)*(d2);
+
+  vec2 uvx = uv2;
+
+  float f4  = max(0.01-pow(length(uvx+0.4*point),2.4), .0)*6.0;
+  float f42 = max(0.01-pow(length(uvx+0.45*point),2.4),.0)*5.0;
+  float f43 = max(0.01-pow(length(uvx+0.5*point),2.4), .0)*3.0;
+
+  float f5  = max(0.01-pow(length(uvx+0.2*point),5.5),.0)*2.0;
+  float f52 = max(0.01-pow(length(uvx+0.4*point),5.5),.0)*2.0;
+  float f53 = max(0.01-pow(length(uvx+0.6*point),5.5),.0)*2.0;
+
+  float f6 = max(0.01-pow(length(uvx-0.3*point),1.6),.0)*6.0;
+  float f62 = max(0.01-pow(length(uvx-0.325*point),1.6),.0)*3.0;
+  float f63 = max(0.01-pow(length(uvx-0.35*point),1.6),.0)*5.0;
+
+  vec3 flare = vec3(.0);
+
+  flare.r+=f2+f4+f5+f6; 
+  flare.g+=f22+f42+f52+f62; 
+  flare.b+=f23+f43+f53+f63;
+	flare = flare*1.3 - vec3(length(uvd)*.05) ;
+	flare+=vec3(f0*ctrl6);
+
+  flare *= ctrl5;
+
+  return flare;
+}
+
+
+
+
+vec4 frag_test5_bubble()
+{
+
+  #ifdef U_GENERIC_CONTROLS
+    float ctrl1 = u_generic_controls[0];
+    float ctrl2 = u_generic_controls[1];
+    float ctrl3 = u_generic_controls[2];
+    float ctrl4 = u_generic_controls[3];
+    float ctrl5 = u_generic_controls[4];
+    float ctrl6 = u_generic_controls[5];
+  #endif
+  
+  
+  
+  vec2 res = u_screen_res;
+  // vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
+  vec2 local_res = vec2(v_dim2_x, v_dim2_y);
+  vec2 dim = vec2(v_dim2_x, v_dim2_y);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
+  
+  vec2 uv = gl_FragCoord.xy / local_res;                   // Map pixel: from {0 -> dim} to {0 -> 1} 
+  uv.y -= 1.;
+  uv.x -= v_wpos3_x / local_res.x;                         // Invalidate any mesh world position, so that 'first' gl_FragCoord is always the meshes 'first' pixel
+  uv.y -= (res.y - (v_wpos3_y+local_res.y)) / local_res.y; // Invalidate any mesh world position.
+
+
+  
+  /**********************************************/
+  // Distance
+  float dist = length(uv);
+  
+  float inner_feather = 25. * ctrl1;
+  float outer_feather = .5*ctrl2;
+  vec3 c = vec3(pow(dist, inner_feather) * smoothstep(1., 1. - outer_feather, dist));
+  
+    
+  /**********************************************/
+  // Mix Colors
+  vec3 color = c*ctrl3*4.*src_color.rgb;
+
+
+  
+  /************************************************/
+  // Lens Flare. FROM: https://www.shadertoy.com/view/4sX3Rs
+
+  vec3 flare = Op_flare(uv);
+
+  // color = max(color,flare);
+  // color = min(color,flare);
+  // color = mix(color,flare,dist);
+  // color = mix(color,flare,d2);
+  // color = mix(color,flare,.5);
+  color += flare;
+
+  /************************************************/
+  
+  // return vec4(color, 1.);
+  return vec4(color, c);
+}
+`;
+
+
+
+
+
+
+
+
+
+/*************************************************************************************************************************/
+/*************************************************************************************************************************/
+
+export const frag_test6_ring_feathered_call = '   color = blend_color_multiply( color, frag_test6_ring_feathered() );'
+
+export const frag_test6_ring_feathered = `
+
+/********************************************************************************************/
+// SHADER UNIT: frag_test6_ring_feathered
+/********************************************************************************************/
+
+/*****************************************************/
+// GENERIC GLOBAL VARIABLES DECLERATIONS
+#ifndef UV_READY
+  vec2 uv = vec2(0,0);
+#endif
+
+
+/*****************************************************/
+// FUNCTION DECLERATIONS
+#ifdef SMOOTH_MIN 
+  #include <smoothmin>
+#endif
+#ifdef GAMMA_CORRECTION 
+  #include <gamma_correction>
+#endif
+
+/*****************************************************/
+// BLEND MODES FUNCTION DECLERATIONS: Include ONLY if this function needs to blend CONDITIONALY or DYNAMICALY any colors INTERNALY, else just use the global blending function calls directly 
+#ifdef BLEND_MODE 
+  #include <blend_mode_directives>
+#endif
+
+
+
+
+
+
+vec4 frag_test6_ring_feathered()
+{
+
+  #ifdef U_GENERIC_CONTROLS
+    float ctrl1 = u_generic_controls[0];
+    float ctrl2 = u_generic_controls[1];
+    float ctrl3 = u_generic_controls[2];
+    // float ctrl4 = u_generic_controls[3];
+    // float ctrl5 = u_generic_controls[4];
+    // float ctrl6 = u_generic_controls[5];
+  #endif
+  
+  
+  
+  vec2 res = u_screen_res;
+  vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
+  vec2 dim = vec2(v_dim2_x, v_dim2_y);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
+  
+  vec2 uv = gl_FragCoord.xy / local_res;                   // Map pixel: from {0 -> dim} to {0 -> 1} 
+  uv.x -= v_wpos3_x / local_res.x;                         // Invalidate any mesh world position, so that 'first' gl_FragCoord is always the meshes 'first' pixel
+  uv.y -= (res.y - (v_wpos3_y+local_res.y)) / local_res.y; // Invalidate any mesh world position.
+  uv.y -= 1.;
+
+  uv *= 2.;
+
+
+  
+  /**********************************************/
+  // Distance
+  float dd = 1.-length( vec2(uv.x, uv.y ));
+  // float dd = 1.-length( vec2( abs((uv.x - .5)* 2.), abs(uv.y - .5)* 2. ));
+  // dd = smoothstep(0., ctrl1, dd);
+  
+  // float PARTICLE_EDGE_SMOOTHING = .003*ctrl3;
+  float PARTICLE_EDGE_SMOOTHING = .5*ctrl3;
+  float WALL_THINNESS = 6.*ctrl2;
+  float dist = dd;
+  float size = 2.*ctrl2;
+  vec3 c = vec3(pow(dist / size, WALL_THINNESS) * smoothstep(size, size - PARTICLE_EDGE_SMOOTHING, dist));
+  return vec4(c, 0.);
+  
+  
+  /**********************************************/
+  // Color 1
+  float c1 = dd;
+  c1 = pow(c1, .4);
+  c1 += dd*ctrl2*2.;
+  
+  /**********************************************/
+  // Color 2
+  float c2 = 1.;
+  // c2 = clamp(0., 1., (dd+dd) * ctrl3 * 5.);
+  c2 = (dd+dd) * ctrl3 * 5.;
+  // c2 = pow(c2, ctrl3*4.) * c2;
+  
+  /**********************************************/
+  // Mix Colors
+  c1 = blend_mode(c1, c2);
+  
+  vec3 color = vec3(c1);
+  return vec4(color, 0.);
+  // return vec4(color, src_color.rgb, src_color.a);
+  // return vec4(color*src_color.rgb, src_color.a);
+}
+`;

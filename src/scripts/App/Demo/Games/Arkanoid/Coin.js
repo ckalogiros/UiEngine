@@ -5,7 +5,7 @@ import { Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { WHITE } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_dim_xy, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 
 
 
@@ -30,11 +30,10 @@ class Coin {
       this.id = ID++;
       
       
-      const mesh = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 3], [COIN_SIZE, COIN_SIZE], TRANSPARENCY(WHITE, 1.), 'CoinMesh', _, _, texture_id, );
+      const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [COIN_SIZE, COIN_SIZE], TRANSPARENCY(WHITE, 1.), 'CoinMesh', _, _, texture_id, );
       
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME, .0);
 
 
       mesh.geom.pos[0] = x;
@@ -117,15 +116,18 @@ export function Coin_create(x, y, w, h, w_src=0, h_src=0, ) {
       idx = _free_coin_idx_buffer.buffer[freeidx];
       const coin = _coin_buffer.buffer[idx].mesh;
       
-      coin.geom.pos[0] = x-COIN_SIZE+w_src;
-      coin.geom.pos[1] = y-COIN_SIZE+h_src;
-      Gl_set_wpos_xy(coin.gfx, coin.geom.pos[0]+COIN_SIZE, coin.geom.pos[1]+COIN_SIZE);
+      coin.geom.pos[0] = x-w+w_src;
+      coin.geom.pos[1] = y-h+h_src;
+      Gl_set_wpos_xy(coin.gfx, coin.geom.pos[0]+w, coin.geom.pos[1]+h);
 
-            
-      coin.timer = 0.01;
-      Gl_set_time(coin.gfx, 0.01); // Reset attribute time
+      coin.geom.dim[0] = w;
+      coin.geom.dim[1] = h;
+      
+      coin.geom.SetDimXY(coin.gfx, w, h);
 
-      // console.log('Create', idx, _free_coin_idx_buffer.buffer)
+      _coin_buffer.buffer[idx].is_active = true;
+
+
       // Remove from the free idxs buffer
       _free_coin_idx_buffer.RemoveByIdx(freeidx);
    }
@@ -135,8 +137,8 @@ export function Coin_create(x, y, w, h, w_src=0, h_src=0, ) {
 
       // TODO: How to find the vb idx if a new text needs to be created in the already created vb?
 
-      // const coin = new Coin(x-COIN_SIZE+w_src, y-COIN_SIZE+h_src, _, coin_vb_groupidx);
-      const coin = new Coin(x-COIN_SIZE+w_src,  y-COIN_SIZE+h_src, _, coin_vb_groupidx);
+      // const coin = new Coin(x-COIN_SIZE+w_src,  y-COIN_SIZE+h_src, _, coin_vb_groupidx);
+      const coin = new Coin(x-w+w_src,  y-h+h_src, _, coin_vb_groupidx);
       idx = coin.idx;
    }
 

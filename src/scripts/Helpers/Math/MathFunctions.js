@@ -37,8 +37,7 @@ export function Logarithmic_interpolation(t, a) {
 
 export function Linear_interpolation(min, max, val) {
    // /**ERROR*/if(val<min || val>max) alert('776776776 Linear interpolation: val is not in the boundaries of min-max')
-   // return min + (val * (max - min));
-   return ((max - min) * val) - min;
+   return min + (val * (max - min));
 }
 export function Linear_interpolation_vector2(p0, p1, val) {
 

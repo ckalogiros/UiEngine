@@ -569,6 +569,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    const emitter = Particles_get_particle_system(emitter1_idx);
    // emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
    emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
+   emitter.EnableProperties(PARTICLES.HAS_FADE);
    // emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:2, jiggley:1});
    // emitter.EnableProperties(PARTICLES.HAS_SCALE, 10);
 
@@ -1092,7 +1093,8 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE); // TODO: Does nothing, there is no enable for '.FX_NOISE'
       
       
-      tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      // tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
       
       
       // tail_emitter.SetConeOfDirection(-1, 1, 1, -1);
@@ -1105,10 +1107,11 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       // Secondary particles
       
       // const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .5, 1., 2, .989, 0, 8);
-      const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .005, 1., 1.8, .99, 0, 16, _, 2);
+      const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .005, 1., 1.8, .99, 0, 16, _, 1);
       const glow_emitter = Particles_get_particle_system(glow_emitter_idx);
       glow_emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
       glow_emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:1, jiggley:2});
+      glow_emitter.EnableProperties(PARTICLES.HAS_FADE);
       
       glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_GLOW);
       glow_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, glow_size);
@@ -1177,7 +1180,8 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       const tail_emitter = noise_particles_buffer[i];
       Particles_gen_gfx_ctx(tail_emitter, particles_panel);
       // Initialize values to uniforms
-      tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [1, 0, .12]);
+      // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [1, 0, .12]);
+      tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [1, 0, .12, 1]);
 
    }
 
@@ -1715,7 +1719,7 @@ function Animate_comet(params) {
       glow_particles.pos[0] = pos[0];
       glow_particles.pos[1] = pos[1];
 
-      Particle_system_emitt({ params: { target_params: [glow_particles.idx], } }, 10);
+      Particle_system_emitt({ params: { target_params: [glow_particles.idx], } });
    }
 
 }
@@ -1798,11 +1802,11 @@ function Animate_comet_perimetric(params) {
       }
       Particle_system_emitt(particles_params);
       /*********************************************************************************************************/
-      // // Secondary Particles
-      // glow_particles.pos[0] = pos[0];
-      // glow_particles.pos[1] = pos[1];
+      // Secondary Particles
+      glow_particles.pos[0] = pos[0];
+      glow_particles.pos[1] = pos[1];
 
-      // Particle_system_emitt({ params: { target_params: [glow_particles.idx], } });
+      Particle_system_emitt({ params: { target_params: [glow_particles.idx], } });
    }
 
 }
@@ -1854,6 +1858,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget=ROOT_WIDGETS.CR
    emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
    emitter.EnableProperties(PARTICLES.HAS_ROTATION);
    emitter.EnableProperties(PARTICLES.HAS_SCALE, 10);
+   emitter.EnableProperties(PARTICLES.HAS_FADE);
    emitter.speed = speed;
 
    emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);

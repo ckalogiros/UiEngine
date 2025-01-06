@@ -3,7 +3,7 @@
    Need to use a 'crack' texture (SEE: 'Create brick texture procedurally')
 
 
-
+* The 'new Function_Slope()' class should be implemented as a preallocated buffer for quick creation-destruction
 
 
 

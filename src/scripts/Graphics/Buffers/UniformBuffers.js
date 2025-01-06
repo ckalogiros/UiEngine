@@ -31,10 +31,10 @@ const DISABLE_DEBUG = true;
  */
 
 // Array of scalars
-// function SetValueV1f(gl, loc, val) { gl.uniform1fv(loc, val); }
-function SetValueV1f(gl, loc, val) { gl.uniform1f(loc, val); }
+function SetValue1f(gl, loc, val) { gl.uniform1fv(loc, val); }
 
 // Array of vectors (from flat array or array of THREE.VectorN)
+function SetValueV1f(gl, loc, val) { gl.uniform1f(loc, val); } // Update 1 float in a vector array of floats, with index
 function SetValueV2f(gl, loc, val) { gl.uniform2fv(loc, val); }
 function SetValueV3f(gl, loc, val) { gl.uniform3fv(loc, val); }
 function SetValueV4f(gl, loc, val) { gl.uniform4fv(loc, val); }
@@ -113,10 +113,12 @@ class Uniform {
       switch (type) {
          // From THREE.js
          // TODO: Initialize the rest of the Arrays
-         case UNIF_TYPE.FLOAT: { this.UpdateUniform = SetValueV1f; this.val = 0; break; } // FLOAT
-         case UNIF_TYPE.FVEC2: { this.UpdateUniform = SetValueV2f; this.val = new Array(1.1,2); break; } // F_VEC2
-         case UNIF_TYPE.FVEC3: { this.UpdateUniform = SetValueV3f; this.val = new Array(0,0,0); break; } // F_VEC3
-         case UNIF_TYPE.FVEC4: { this.UpdateUniform = SetValueV4f; this.val = new Array(0,0,0,0); break; } // F_VEC4
+         case UNIF_TYPE.FLOAT: { this.UpdateUniform = SetValue1f; this.val = 0; break; } // FLOAT
+         // case UNIF_TYPE.FVEC1: { this.UpdateUniform = SetValueV1f; this.val = 0; break; } // FLOAT
+         case UNIF_TYPE.FVEC2: { this.UpdateUniform = SetValueV2f; this.val = new Float32Array(1.1,2); break; } // F_VEC2
+         case UNIF_TYPE.FVEC3: { this.UpdateUniform = SetValueV3f; this.val = new Float32Array(0,0,0); break; } // F_VEC3
+         case UNIF_TYPE.FVEC4: { this.UpdateUniform = SetValueV4f; this.val = new Float32Array(0,0,0,0); break; } // F_VEC4
+         case UNIF_TYPE.FARR: { this.UpdateUniform = SetValue1f; this.val = new Float32Array(0,0,0,0,0); break; } // F_ARRAY
 
          case UNIF_TYPE.MAT2: { this.UpdateUniform = SetValueM2; break; } // F_MAT2
          case UNIF_TYPE.MAT3: { this.UpdateUniform = SetValueM3; break; } // F_MAT3
@@ -146,37 +148,19 @@ class Uniform {
          this.val[idx] = val;
       else this.val = val;
       this.needs_update = true;
-      // any_needs_update = true;
-      // to_update_counter++;
-      // console.log('{$$$$$} UNIFORMS SET FROM INDEX', this.val, 'name:', this.name, 'progidx:', this.progidx)
    }
 
 
    Set(val) {
       this.val = val;
       this.needs_update = true;
-      // any_needs_update = true;
-      // to_update_counter++;
-      // console.log('{$$$$$} UNIFORMS SET', this.val, 'name:', this.name, 'progidx:', this.progidx)
    }
 
 
    Update() {
       this.UpdateUniform(gfxCtx.gl, this.loc, this.val);
       this.needs_update = false;
-      
-      
-      // to_update_counter--;
-      // if(to_update_counter === 0) {
-      //    any_needs_update = false;
-      //    return true;
-      // }
-      
-      // if(to_update_counter < 0) alert('487653990 \nUniforms counter is negative');
-
       return false;
-
-      // console.log('{$$$$$} UNIFORMS UPDATE', this.val, 'name:', this.name, 'progidx:', this.progidx)
    }
 }
 

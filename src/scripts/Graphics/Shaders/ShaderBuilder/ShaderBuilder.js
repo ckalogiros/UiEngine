@@ -7,12 +7,13 @@ import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './
 import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
 import { frag_noise, frag_noise_2, frag_noise_2_call, frag_noise_call } from './Functions/fragment.noise.js';
 import { frag_smoke, frag_smoke_call } from './Functions/fragment.smoke.js';
-import { frag_test1, frag_test1_call, frag_test2, frag_test2_call, frag_test3, frag_test3_call } from './Functions/fragment.tests.js';
+import { frag_test1, frag_test1_call, frag_test2, frag_test2_call, frag_test3, frag_test3_call, frag_test4, frag_test4_call, frag_test5_bubble, frag_test5_bubble_call } from './Functions/fragment.tests.js';
 import { Shader_attributes_create } from '../../ShaderAttributes.js';
-import { frag_explosion_circle, frag_explosion_circle_call, frag_glow_sphere, frag_glow_sphere_call, frag_inner_shadow_rhomboid, frag_inner_shadow_rhomboid_call } from './Functions/fragment.misc.js';
+import { frag_explosion_circle, frag_explosion_circle_call, frag_explosion_glow, frag_explosion_glow_call, frag_glow_sphere, frag_glow_sphere_call, frag_inner_shadow_rhomboid, frag_inner_shadow_rhomboid_call } from './Functions/fragment.misc.js';
 import { Attribute_get_type_extension, Shader_Attributes, Shader_bit_flags_get_attr_info_from_index, Shader_bit_flags_get_attr_key_name_from_flag, Shader_bit_flags_get_attr_size } from '../../ShaderBitFlags.js';
 import { frag_noise_voronoi_1, frag_noise_voronoi_1_call, frag_noise_voronoi_2, frag_noise_voronoi_2_call } from './Functions/fragment.noise_voronoi.js';
 import { frag_noise_worley_1, frag_noise_worley_1_call, frag_noise_worley_2, frag_noise_worley_2_call, frag_noise_worley_3_types, frag_noise_worley_3_types_call } from './Functions/fragment.noise_worley.js';
+import { shader_operations } from './ShaderChunks/ShaderOperations.js';
 
 
 
@@ -115,8 +116,10 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
       }
       else if ((_uniforms_info[i].shader & UNIFORM.IN_FS) && (which_shader & UNIFORM.IN_FS)) {
 
+         // if(_uniforms_info[i].name === 'u_generic_controls') continue;
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
-         uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`;
+         const arr_extra = (_uniforms_info[i].type === UNIF_TYPE.FARR) ? `[${_uniforms_info[i].arr_size}]` : '';
+         uniforms_code += `uniform ${type} ${_uniforms_info[i].name}${arr_extra};\n`;
          console.log('<<<<<<<<<<<<<<< FRAGMENT SHADER UNIFORM ENABLE:', _uniforms_info[i].name)
       }
    }
@@ -124,6 +127,100 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
    return uniforms_code;
 
    // Extension: For lights
+}
+
+function Resolve_function_operations(shader_ops) {
+
+   let shader_ops_code = '';
+
+   const len = shader_ops.length;
+
+   for (let i = 0; i < len; i++) {
+
+      const fn_op = shader_ops[i].fn_op;
+      const blend_mode = shader_ops[i].blend_mode;
+      if(fn_op & SID.SHADER_OPERATIONS.FLARE){
+
+         shader_ops_code += frag_test5_bubble;
+      }
+
+   }
+
+   return shader_ops_code;
+
+}
+/**
+ * Construct a function with a switch that resolves the blendin function name
+ * 
+ */
+function Resolve_blending_mode(blend_mode) {
+
+   /**
+      blend_color_add
+      blend_color_subtract
+      blend_color_multiply
+      blend_color_divide
+      blend_color_lighten
+      blend_color_darken
+      blend_color_burn
+      blend_color_dodge
+      blend_color_mix
+      blend_color_screen
+      blend_color_overlay
+      blend_color_mask
+      blend_color_alpha 
+   */
+
+   switch(blend_mode) {
+      case SID.BLEND_OPTIONS.BLEND_MODE_ADD: { return 'blend_color_add'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_LIGHTEN: { return 'blend_color_lighten'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY: { return 'blend_color_multiply'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_DIVIDE: { return 'blend_color_divide'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_SUBTRACT: { return 'blend_color_subtract'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_DARKEN: { return 'blend_color_darken'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_COLOR_BURN: { return 'blend_color_burn'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_COLOR_DODGE: { return 'blend_color_dodge'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_SCREEN: { return 'blend_color_screen'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_OVERLAY: { return 'blend_color_overlay'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_MIX: { return 'blend_color_mix'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_MASK: { return 'blend_color_mask'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_ALPHA: { return 'blend_color_alpha'; };
+   }
+}
+
+function Resolve_function_operations_called_from_main(shader_ops) {
+
+   let shader_ops_code = '';
+
+   const len = shader_ops.length;
+
+   for (let i = 0; i < len; i++) {
+
+      const fn_op = shader_ops[i].fn_op;
+      const blend_mode = shader_ops[i].blend_mode;
+      if(fn_op & SID.SHADER_OPERATIONS.BUBBLE){
+
+         shader_ops_code += shader_operations.fs_op_bubble;
+         
+         // SEE Blending function overloads
+         // The fist assignment to var color from a shader operation must replace the source color
+         if(i===0) shader_ops_code += `   color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_MIX)}( color, bubble_color, 1.0 );`;
+         else shader_ops_code += `  color = ${Resolve_blending_mode(blend_mode)}( color, bubble_color );`;
+      }
+      if(fn_op & SID.SHADER_OPERATIONS.FLARE){
+
+         shader_ops_code += shader_operations.fs_op_flare;
+         
+         // SEE Blending function overloads
+         // The fist assignment to var color from a shader operation must replace the source color
+         if(i===0) shader_ops_code += `   color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_MIX)}( color, flare_color, 1.0 );`;
+         else shader_ops_code += `  color = ${Resolve_blending_mode(blend_mode)}( color, flare_color );`;
+      }
+
+   }
+
+   return shader_ops_code;
+
 }
 
 
@@ -685,10 +782,10 @@ function Fragment_shader_resolve_attributes_in() {
    // console.log('-------------------------------------------------------\nResolver: Fragment Shader Inputs:\n', fs_attribs_in_code);
 }
 
-export function Shaders_build_fragment_shader(sid, uniforms_info) {
+export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=null) {
 
    Fragment_shader_resolve_attributes_in();
-
+   console.log(shader_operations.fs_op_flare)
    const fs_chunks = [
       '#version 300 es',
       
@@ -782,11 +879,15 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '#define U_GENERIC_VEC2 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '#define U_GENERIC_VEC3 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '#define U_GENERIC_VEC4 1' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_CONTROLS) ? '#define U_GENERIC_CONTROLS 1' : '',
 
       // Uniforms for testing
       // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '#define U_GENERIC_VEC2 1' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '#define U_GENERIC_VEC3 1' : '', 
+
+      // Resolve function operations shader code 
+      // (shader_ops!==null) ? Resolve_function_operations(shader_ops) : '',
 
 
 
@@ -833,6 +934,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // Shader Color Functions
       (sid.shad & SID.SHAD.FN_INNER_SHADOW) ? frag_inner_shadow_rhomboid : '',
       (sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) ? frag_explosion_circle : '',
+      (sid.shad & SID.SHAD.FN_EXPLOSION_GLOW) ? frag_explosion_glow : '',
       (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere : '',
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_1) ? frag_noise_worley_1 : '',
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_2) ? frag_noise_worley_2 : '',
@@ -847,6 +949,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1 : '',
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2 : '',
       (sid.shad & SID.SHAD.FS_TEST3) ? frag_test3 : '',
+      (sid.shad & SID.SHAD.FS_TEST4) ? frag_test4 : '',
+      // (sid.shad & SID.SHAD.FS_TEST5) ? frag_test5_bubble : '',
 
 
 
@@ -855,17 +959,37 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
       /********************************************************************************************************/
       // Main
+      /**
+       * Fragment Shader often used variables:
+       * vec2 uv
+       * vec2 res
+       * vec2 dim
+       */
       '\n/********************************************************************************************/\n// FRAGMENT: MAIN()\n/********************************************************************************************/',
 
       true ? 'void main(void) ' : '',
       '{',
-
+      // Include uniforms-controls
+      `  #ifdef U_GENERIC_CONTROLS
+      float ctrl1 = u_generic_controls[0];
+      float ctrl2 = u_generic_controls[1];
+      float ctrl3 = u_generic_controls[2];
+      float ctrl4 = u_generic_controls[3];
+      float ctrl5 = u_generic_controls[4];
+      float ctrl6 = u_generic_controls[5];
+   #endif`,
+      (sid.pass & SID.PASS.DIM2) ? '   vec2 dim = vec2(v_dim2_x, v_dim2_y); vec2 local_res = vec2(dim.x, dim.y);' : '',
       '   #ifdef U_SCALE\n     float scale_down = u_scale2.x;\n   #else\n      float scale_down = 1.;\n   #endif\n',
       '   #ifdef A_TEX_COORD\n      vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);\n   #endif\n',
-
-
-
       '   vec4 color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);',
+      // Initialize uv coordinates variable
+      '  vec2 uv = vec2(0.0, 0.0);',
+      // Initialize screen resolution variable
+      '  vec2 res = u_screen_res;',
+      '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);',
+
+
+      Resolve_function_operations_called_from_main(shader_ops),
 
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_call :
          ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
@@ -883,6 +1007,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       // Shader Color Functions
       (sid.shad & SID.SHAD.FN_INNER_SHADOW) ? frag_inner_shadow_rhomboid_call : '',
       (sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) ? frag_explosion_circle_call : '',
+      (sid.shad & SID.SHAD.FN_EXPLOSION_GLOW) ? frag_explosion_glow_call : '',
       (sid.shad & SID.SHAD.FN_GLOW_SPHERE) ? frag_glow_sphere_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_1) ? frag_noise_worley_1_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_2) ? frag_noise_worley_2_call : '',
@@ -895,6 +1020,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2_call : '',
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
       (sid.shad & SID.SHAD.FS_TEST3) ? frag_test3_call : '',
+      (sid.shad & SID.SHAD.FS_TEST4) ? frag_test4_call : '',
+      // (sid.shad & SID.SHAD.FS_TEST5) ? frag_test5_bubble_call : '',
 
 
 
@@ -952,7 +1079,6 @@ export function Shaders_build_fragment_shader(sid, uniforms_info) {
 
       /********************************************************************************************************/
       // HACK: prevent optimizer from removing the uniform u_scale2
-      '    // HACK: prevent optimizer from removing the uniform u_scale2',
       // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', 
       (sid.unif & SID.UNIF.TIME) ? '   if(u_time == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '   if(u_generic_float == 0.) ;' : '',

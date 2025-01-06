@@ -4,8 +4,8 @@ import { New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buf
 import { Create_widget_label } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Gl_set_alpha, Gl_set_dim_xy, Gl_set_vpos_xy, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_alpha } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Arkanoid_calc_score } from "./Arkanoid.js";
 
 
 
@@ -23,14 +23,11 @@ const vb_groupidxs = {
 /**************************************************************************************************************************************/
 // Effects Meshes
 
-let ID = 0;
 
 class Score_Mod {
 
-   constructor(text, x=0, y=0, font=TEXTURES.MSDF_COMIC_1024, font_size=6, color, text_color, vb_groupidxs=INT_NULL) {
+   constructor(score_mod_num, text, x=0, y=0, font=TEXTURES.MSDF_COMIC_1024, font_size=6, color, text_color, vb_groupidxs=INT_NULL) {
 
-      this.id = ID++;
-      
       // const pos = [x, y, 2];
       const mesh = Create_widget_label(_, text, _, [0,0, 4], font_size, TRANSPARENT, text_color, [0, 0], .5, _, font,);
       // const mesh = Create_widget_label(_, text, _, [0,0, 2], font_size, WHITE, text_color, [0, 0], .5, _, font,);
@@ -78,6 +75,8 @@ class Score_Mod {
       //    Renderqueue_set_active(mesh.text_mesh.gfx.vb.groupidx, true);
       // }
       
+      this.number = score_mod_num;
+
       this.idx = _text_mesh_buffer.Add(this);
 
       this.mesh = mesh;
@@ -123,7 +122,7 @@ export function Score_mod_init_buffer(num_effect_meshes=PRE_INITIALIZED_SCORE_MO
 
 
    for(let i=0; i<num_effect_meshes; i++) {
-      const score_mod = new Score_Mod('x1.2', _, _, SCORE_TEXT_MOD_FONT, SCORE_TEXT_MOD_INITIAL_FONT_SIZE, _, SCORE_TEXT_MOD_TEXT_COLOR, vb_groupidxs); 
+      const score_mod = new Score_Mod(1.2, 'x1.2', _, _, SCORE_TEXT_MOD_FONT, SCORE_TEXT_MOD_INITIAL_FONT_SIZE, _, SCORE_TEXT_MOD_TEXT_COLOR, vb_groupidxs); 
 
       if(vb_groupidxs.label===INT_NULL) {
 
@@ -137,7 +136,7 @@ export function Score_mod_init_buffer(num_effect_meshes=PRE_INITIALIZED_SCORE_MO
 }
 
 
-export function Score_mod_create(text, x, y, font, font_size, color, text_color=WHITE) {
+export function Score_mod_create(score_mod_number, text, x, y, font, font_size, color, text_color=WHITE) {
 
    let idx = INT_NULL;
 
@@ -149,17 +148,12 @@ export function Score_mod_create(text, x, y, font, font_size, color, text_color=
       idx = _free_text_idx_buffer.buffer[freeidx];
       const score_mod = _text_mesh_buffer.buffer[idx];
       
-         // Gl_set_dim_xy(score_mod.mesh.gfx, w, h);
-         // Gl_set_vpos_xy(score_mod.mesh.text_mesh.gfx, w, h);
-
-         // Gl_set_wpos_xy(score_mod.mesh.gfx, score_mod.mesh.geom.pos[0]+w, score_mod.mesh.geom.pos[1]+h);
-
-      // score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
-      // Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
 
       score_mod.mesh.SetWposXY(x, y);
       score_mod.mesh.text_mesh.RenderTextFromString(text);
 
+      // score_mod.mesh.text_mesh.mat.col = text_color;
+      // Gl_set_rgba(score_mod.mesh.text_mesh.gfx, text_color, score_mod.mesh.text_mesh.geom.num_faces);
       score_mod.mesh.text_mesh.mat.col[3] = 1;
       Gl_set_alpha(score_mod.mesh.text_mesh.gfx, 1, score_mod.mesh.text_mesh.geom.num_faces);
       
@@ -168,16 +162,6 @@ export function Score_mod_create(text, x, y, font, font_size, color, text_color=
       // Remove from the free idxs buffer
       _free_text_idx_buffer.RemoveByIdx(freeidx);
 
-      // if(text === '+0.5')
-      // console.log(
-      //    'id', score_mod.idx,
-      //    'x', score_mod.mesh.text_mesh.geom.pos[0],
-      //    'y', score_mod.mesh.text_mesh.geom.pos[1],
-      //    'w', score_mod.mesh.text_mesh.geom.dim[0],
-      //    'h', score_mod.mesh.text_mesh.geom.dim[1],
-      //    'alpha', score_mod.mesh.text_mesh.mat.col[3],
-      //    // 'alpha', score_mod.mesh.text_mesh.mat.col[3],
-      // )
    }
    else { // If no apropriate free mesh was found, create new mesh
 
@@ -185,10 +169,12 @@ export function Score_mod_create(text, x, y, font, font_size, color, text_color=
 
       // TODO: How to find the vb idx if a new text needs to be created in the already created vb?
 
-      const score_mod = new Score_Mod(text, x, y, font, font_size, color, text_color, vb_groupidxs);
+      const score_mod = new Score_Mod(score_mod_number, text, x, y, font, font_size, color, text_color, vb_groupidxs);
       idx = score_mod.idx;
    }
 
+   _text_mesh_buffer.buffer[idx].number = score_mod_number;
+   Arkanoid_calc_score(score_mod_number);
 
    return idx;
 

@@ -35,6 +35,8 @@ export class Text_Mesh_Msdf extends Mesh {
       this.type |= MESH_TYPE.TEXT_MESH;
       this.fontsize = fontsize;
       this.advancex = Msdf_Font_get_font_advancex(mat.fontidx);
+
+      this.text_width = 0;
    }
 
 

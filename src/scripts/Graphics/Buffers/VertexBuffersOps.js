@@ -670,16 +670,16 @@ export function Gl_add_vpos_y(gfxInfo, y, num_faces = 1) {
 
    while (loop_count) {
 
+      vb_data[index++] += -y;
+      index += stride;
+      
       vb_data[index++] += y;
       index += stride;
 
       vb_data[index++] += -y;
       index += stride;
-
+      
       vb_data[index++] += y;
-      index += stride;
-
-      vb_data[index++] += -y;
 
       index += stride;
       loop_count--;
@@ -687,6 +687,217 @@ export function Gl_add_vpos_y(gfxInfo, y, num_faces = 1) {
 
    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
+
+
+
+export function Gl_add_vpos_xy_right(gfxInfo, x, y, num_faces = 1) {
+
+   const vbidx = gfxInfo.vb.which_vb.dim_buf;
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
+   const a_offset = vb_info.attribs_info.offsets[attr_idx];
+   const a_size = vb_info.attribs_info.sizes[attr_idx];
+
+   const start = gfxInfo.vb.starts.buffer[vbidx];
+
+   
+   let index = start + a_offset;
+   let stride = vb_info.attribs_info.count - a_size;
+   
+   // Devide cause we use twice the x and y, once for minus and once for plus
+   const xx = x;
+   const yy = y;
+   
+   // const len = (num_faces * gfxInfo.verts_per_rect)+2;
+   // Set_vertex_position_VPOS2(vb_data, start + a_offset, vb_info.attribs_info.count, xx, yy, num_faces, len)
+
+
+   /**Contol point of resize left-top */
+   index++;
+   index++;
+   index += stride;
+
+   index++;
+   index++;
+   index += stride;
+
+   vb_data[index++] = xx;
+   vb_data[index++] = -yy;
+   index += stride;
+
+   vb_data[index++] = xx;
+   vb_data[index++] = yy;
+
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+}
+export function Gl_add_vpos_xy_left(gfxInfo, x, y, num_faces = 1) {
+
+   const vbidx = gfxInfo.vb.which_vb.dim_buf;
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
+   const a_offset = vb_info.attribs_info.offsets[attr_idx];
+   const a_size = vb_info.attribs_info.sizes[attr_idx];
+
+   const start = gfxInfo.vb.starts.buffer[vbidx];
+
+   
+   let index = start + a_offset;
+   let stride = vb_info.attribs_info.count - a_size;
+   
+   // Devide cause we use twice the x and y, once for minus and once for plus
+   const xx = x;
+   const yy = y;
+   
+   // const len = (num_faces * gfxInfo.verts_per_rect)+2;
+   // Set_vertex_position_VPOS2(vb_data, start + a_offset, vb_info.attribs_info.count, xx, yy, num_faces, len)
+
+
+   /**Contol point of resize left-top */
+   vb_data[index++] = -xx;
+   vb_data[index++] = -yy;
+   index += stride;
+
+   vb_data[index++] = -xx;
+   vb_data[index++] = yy;
+   index += stride;
+
+   index++;
+   index++;
+   index += stride;
+   
+   index++;
+   index++;
+
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+}
+export function Gl_add_vpos_xy_diag_1(gfxInfo, x, y, num_faces = 1) {
+
+   const vbidx = gfxInfo.vb.which_vb.dim_buf;
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
+   const a_offset = vb_info.attribs_info.offsets[attr_idx];
+   const a_size = vb_info.attribs_info.sizes[attr_idx];
+
+   const start = gfxInfo.vb.starts.buffer[vbidx];
+
+   let index = start + a_offset;
+   let loop_count = num_faces;
+   let stride = vb_info.attribs_info.count - a_size;
+
+
+   while (loop_count) {
+
+      vb_data[index++] += -x;
+      vb_data[index++] += -y;
+      index += stride;
+      
+      index++;
+      index++;
+      // vb_data[index++] += -x;
+      // vb_data[index++] += y;
+      index += stride;
+      
+      index++;
+      index++;
+      // vb_data[index++] += x;
+      // vb_data[index++] += -y;
+      index += stride;
+
+      vb_data[index++] += x;
+      vb_data[index++] += y;
+      index += stride;
+
+      loop_count--;
+   }
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+}
+
+export function Gl_add_vpos_x_right(gfxInfo, x, num_faces = 1) {
+
+   const vbidx = gfxInfo.vb.which_vb.dim_buf;
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
+   const a_offset = vb_info.attribs_info.offsets[attr_idx];
+   const a_size = vb_info.attribs_info.sizes[attr_idx] - 1;
+
+   const start = gfxInfo.vb.starts.buffer[vbidx];
+
+   let index = start + a_offset;
+   let loop_count = num_faces;
+   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   let stride = vb_info.attribs_info.count - a_size;
+
+   while (loop_count) {
+
+      index++;
+      index += stride;
+
+      index++;
+      index += stride;
+
+      vb_data[index++] += x;
+      index += stride;
+
+      vb_data[index++] += x;
+      index += stride;
+
+      index += stride;
+      loop_count--;
+   }
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+}
+export function Gl_add_vpos_x_left(gfxInfo, x, num_faces = 1) {
+
+   const vbidx = gfxInfo.vb.which_vb.dim_buf;
+   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
+   const a_offset = vb_info.attribs_info.offsets[attr_idx];
+   const a_size = vb_info.attribs_info.sizes[attr_idx] - 1;
+
+   const start = gfxInfo.vb.starts.buffer[vbidx];
+
+   let index = start + a_offset;
+   let loop_count = num_faces;
+   // if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+   let stride = vb_info.attribs_info.count - a_size;
+
+   while (loop_count) {
+
+      vb_data[index++] += -x;
+      index += stride;
+
+      vb_data[index++] += -x;
+      index += stride;
+
+      index++;
+      index += stride;
+      
+      index++;
+      index += stride;
+
+      index += stride;
+      loop_count--;
+   }
+
+   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+}
+
+
+
 
 
 
@@ -1624,7 +1835,7 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_tex2_rot4(vbidx, start, c
 
 
 export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors, positions, time, dimentions) {
-   // console.error('CALCULATE THE STRIDE CORRECTLY')
+
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
 
    let index = start;
@@ -1635,7 +1846,6 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors
       const col = colors;
       const pos = positions;
       const dim = dimentions;
-      // const vpos = [dimentions[0]/2, dimentions[1]/2];
       const vpos = [dimentions[0], dimentions[1]];
       const t = time;
 
@@ -1649,9 +1859,9 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors
       vb_data[index++] = pos[1];
       vb_data[index++] = pos[2];
       // index += V_POS_COUNT;
+      // index += 2; // FOR DIM2
       vb_data[index++] = -vpos[0];
       vb_data[index++] = -vpos[1];
-      // index += 2; // FOR DIM2
       vb_data[index++] = dim[0];
       vb_data[index++] = dim[1];
       vb_data[index++] = t;
@@ -1667,9 +1877,9 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors
       vb_data[index++] = pos[1];
       vb_data[index++] = pos[2];
       // index += V_POS_COUNT;
+      // index += 2; // FOR DIM2
       vb_data[index++] = -vpos[0];
       vb_data[index++] =  vpos[1];
-      // index += 2; // FOR DIM2
       vb_data[index++] = dim[0];
       vb_data[index++] = dim[1];
       vb_data[index++] = t;
@@ -1685,9 +1895,9 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors
       vb_data[index++] = pos[1];
       vb_data[index++] = pos[2];
       // index += V_POS_COUNT;
+      // index += 2; // FOR DIM2
       vb_data[index++] =  vpos[0];
       vb_data[index++] = -vpos[1];
-      // index += 2; // FOR DIM2
       vb_data[index++] = dim[0];
       vb_data[index++] = dim[1];
       vb_data[index++] = t;
@@ -1703,18 +1913,21 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors
       vb_data[index++] = pos[1];
       vb_data[index++] = pos[2];
       // index += V_POS_COUNT;
+      // index += 2; // FOR DIM2
       vb_data[index++] = vpos[0];
       vb_data[index++] = vpos[1];
-      // index += 2; // FOR DIM2
       vb_data[index++] = dim[0];
       vb_data[index++] = dim[1];
       vb_data[index++] = t;
    }
+
    // for (let i = 0; i < len; i++) {
 
    //    const col = colors;
    //    const pos = positions;
    //    const dim = dimentions;
+   //    // const vpos = [dimentions[0]/2, dimentions[1]/2];
+   //    const vpos = [dimentions[0], dimentions[1]];
    //    const t = time;
 
    //    // V1
@@ -1723,10 +1936,12 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors
    //    vb_data[index++] = col[2];
    //    vb_data[index++] = col[3];
 
-   //    vb_data[index++] = pos[0];
-   //    vb_data[index++] = pos[1];
+   //    vb_data[index++] = pos[0]+dim[0];
+   //    vb_data[index++] = pos[1]+dim[1];
    //    vb_data[index++] = pos[2];
-   //    index += V_POS_COUNT;
+   //    // index += V_POS_COUNT;
+   //    vb_data[index++] = -vpos[0];
+   //    vb_data[index++] = -vpos[1];
    //    // index += 2; // FOR DIM2
    //    vb_data[index++] = dim[0];
    //    vb_data[index++] = dim[1];
@@ -1739,10 +1954,12 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors
    //    vb_data[index++] = col[2];
    //    vb_data[index++] = col[3];
       
-   //    vb_data[index++] = pos[0];
-   //    vb_data[index++] = pos[1];
+   //    vb_data[index++] = pos[0]+dim[0];
+   //    vb_data[index++] = pos[1]+dim[1];
    //    vb_data[index++] = pos[2];
-   //    index += V_POS_COUNT;
+   //    // index += V_POS_COUNT;
+   //    vb_data[index++] = -vpos[0];
+   //    vb_data[index++] =  vpos[1];
    //    // index += 2; // FOR DIM2
    //    vb_data[index++] = dim[0];
    //    vb_data[index++] = dim[1];
@@ -1755,10 +1972,12 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors
    //    vb_data[index++] = col[2];
    //    vb_data[index++] = col[3];
       
-   //    vb_data[index++] = pos[0];
-   //    vb_data[index++] = pos[1];
+   //    vb_data[index++] = pos[0]+dim[0];
+   //    vb_data[index++] = pos[1]+dim[1];
    //    vb_data[index++] = pos[2];
-   //    index += V_POS_COUNT;
+   //    // index += V_POS_COUNT;
+   //    vb_data[index++] =  vpos[0];
+   //    vb_data[index++] = -vpos[1];
    //    // index += 2; // FOR DIM2
    //    vb_data[index++] = dim[0];
    //    vb_data[index++] = dim[1];
@@ -1771,16 +1990,18 @@ export function Gl_particles_batch_set_col4_wpos4_dim2_time(vbidx, start, colors
    //    vb_data[index++] = col[2];
    //    vb_data[index++] = col[3];
       
-   //    vb_data[index++] = pos[0];
-   //    vb_data[index++] = pos[1];
+   //    vb_data[index++] = pos[0]+dim[0];
+   //    vb_data[index++] = pos[1]+dim[1];
    //    vb_data[index++] = pos[2];
-   //    index += V_POS_COUNT;
+   //    // index += V_POS_COUNT;
+   //    vb_data[index++] = vpos[0];
+   //    vb_data[index++] = vpos[1];
    //    // index += 2; // FOR DIM2
    //    vb_data[index++] = dim[0];
    //    vb_data[index++] = dim[1];
    //    vb_data[index++] = t;
    // }
-   
+
 }
 
 

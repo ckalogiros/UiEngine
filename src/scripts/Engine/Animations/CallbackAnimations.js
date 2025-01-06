@@ -67,6 +67,7 @@ const _clbk_animations_buffer = New_generic_buffer(_, 'Callback Animations Buffe
 
 
 export function Callback_animations_get() { return _clbk_animations_buffer; }
+export function Callback_animations_get_byidx(idx) { return _clbk_animations_buffer.buffer[idx]; }
 
 
 export function Callback_animations_is_animation_active(anim_idx){

@@ -34,10 +34,10 @@ function filterEmptyLine(string) {
 
 
 
-export function Shaders_load(gl, sid, uniforms_info) {
+export function Shaders_load(gl, sid, uniforms_info, shader_ops) {
 
 	const vShader = Shaders_build_vertex_shader(sid, uniforms_info);
-	const fShader = Shaders_build_fragment_shader(sid, uniforms_info);
+	const fShader = Shaders_build_fragment_shader(sid, uniforms_info, shader_ops);
 
 	// _vertex_shader_buffer.push({vShader:vShader});
 	// _fragment_shader_buffer.push({fShader:fShader});

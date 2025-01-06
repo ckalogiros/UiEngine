@@ -66,19 +66,20 @@ vec4 frag_glow_sphere()
   vec2 res = u_screen_res;
   vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
-  vec2 uv1 = (gl_FragCoord.xy / local_res);               // Map pixel: from {0 -> dim} to {0 -> 1} 
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   
-  
-  
-  uv1.x -= v_wpos3_x / local_res.x;             // Invalidate any mesh world position, so that 'first' gl_FragCoord is always the meshes 'first' pixel
+  vec2 uv1 = gl_FragCoord.xy / local_res;                   // Map pixel: from {0 -> dim} to {0 -> 1} 
+  uv1.x -= v_wpos3_x / local_res.x;                         // Invalidate any mesh world position, so that 'first' gl_FragCoord is always the meshes 'first' pixel
   uv1.y -= (res.y - (v_wpos3_y+local_res.y)) / local_res.y; // Invalidate any mesh world position.
-  float repeatx = 1.;
-  float repeaty = 1.;
-  
+  uv1.y -= 1.;
+
+  uv1 *= 2.;
+
+
   /**********************************************/
   // Distance
-  float dd = 1.-length( vec2( abs((fract(uv1.x*repeatx) - .5)* 2.), abs((fract(uv1.y*repeaty) - .5)* 2.) ));
+  float dd = 1.-length( vec2(uv1.x, uv1.y ));
+  // float dd = 1.-length( vec2( abs((uv1.x - .5)* 2.), abs(uv1.y - .5)* 2. ));
   dd = smoothstep(0., control1, dd);
   
   
@@ -413,71 +414,94 @@ vec4 frag_explosion_circle()
  */
 
 
-  
-export const FS_GLOW = `#version 300 es
 
-precision mediump float;
+/*************************************************************************************************************************/
+/*************************************************************************************************************************/
 
-in mediump vec4  v_Col;
-in mediump vec2  v_Dim;
-in mediump vec2  v_Wpos;
-in mediump float v_Size;
-in mediump float v_Time;
+export const frag_explosion_glow_call = `
+  vec4 new_color = frag_explosion_glow();
+  // color = blend_color_mix( color, new_color, color.a );
+  color = blend_color_multiply( color, new_color );
+`;
 
-in mediump vec2  u_Res;
+export const frag_explosion_glow = `
+
+/********************************************************************************************/
+// SHADER UNIT: frag_explosion_glow
+/********************************************************************************************/
 
 
-out vec4 FragColor;
+/*****************************************************/
+// GENERIC GLOBAL VARIABLES DECLERATIONS
+#ifndef UV_READY
+  vec2 uv = vec2(0,0);
+#endif
 
-void main()
+
+/*****************************************************/
+// FUNCTION DECLERATIONS
+#ifndef SMOOTH_MIN 
+  #include <smoothmin>
+#endif
+
+
+/*****************************************************/
+// BLEND MODES FUNCTION DECLERATIONS
+#ifdef BLEND_MODE 
+   #include <blend_mode_directives>
+#endif
+
+
+
+
+
+vec4 frag_explosion_glow()
 {
-  #ifdef A_TIME
-    float a_time = v_time;
+  #ifdef U_GENERIC_CONTROLS
+    float ctrl1 = u_generic_controls[0];
+    float ctrl2 = u_generic_controls[1];
+    float ctrl3 = u_generic_controls[2];
+    float ctrl4 = u_generic_controls[3];
+    float ctrl5 = u_generic_controls[4];
+    // float ctrl6 = u_generic_controls[5];
   #endif
-
-  #ifdef U_TIME_FLOAT
-    float u_time = u_time_float;
-  #endif
-
-  #ifdef U_GENERIC_VEC3
-    #include <u_generic_vec3>
-  #elif defined(U_GENERIC_VEC2)
-    #include <u_generic_vec2>
-  #elif defined(U_GENERIC_FLOAT)
-    #include <u_generic_float>
-  #endif
-
 
   vec2 res = u_screen_res;
-  vec2 dim = vec2(v_dim2_x, v_dim2_y);
+  vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
-
-  float time = a_time;
-
-
-
-  // vec2 res = u_Res;
-  // // float t = v_Time;
-  // float t = .5;
-  // float size = v_Size;
-  // vec2 uv = v_Dim/res.x;
-
-  vec3 color = vec3(.0);
-
-  float len = length(uv);
-  float reduced = t*size; // 0.0 to .25
-  // float reduced = size; // 0.0 to .25
-  float d = 1.-smoothstep(.0, reduced, len);
+  float time = v_time;
+  float rev_time = 1. - time;
   
-  float diffuse = 1.8; // The Smaller the value, the greater the flash in the center ring
-  // float diffuse = .8; // The Smaller the value, the greater the flash in the center ring
-  // float ex = abs(len * fract(t) * diffuse); // GOOD!
-  float ex = abs(len  * diffuse); // GOOD!
+  #define UV_READY 1
+  uv = gl_FragCoord.xy;
+  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
   
-  color = vec3(.2) / (ex);
-  // color = mix(color, v_Col.rgb, 1.-t);
-  color = mix(color, v_Col.rgb, t);
-	
-	FragColor = vec4(color*d*(1.-t), color*d*(1.-t));
+  uv_map_coordinates_zero_one( uv, local_res );
+  
+  /*
+    Animate the ctrl1 from high to low
+    Animate the ctrl2(smoothstep inner) from low to high
+  */
+  // float d = 2. - length(uv)*6.*ctrl1+rev_time;
+  float d = .7 - length(uv)*2.*ctrl1+(rev_time*.5);
+  // float d = 1. - length(uv)*3.*ctrl1+(rev_time*.5);
+  // float d = 1. - length(uv)*2.5*ctrl1;
+  // float d = .7 - length(uv)*ctrl1;
+  
+  // float c = d * smoothstep(ctrl2, ctrl3, (d));
+  // float c = d * smoothstep(.8, ctrl3, (d));
+  // float c = d * smoothstep(ctrl2, .6*time*time, (d));
+  float c = d * smoothstep(ctrl2, 1.*rev_time, (d));
+  
+  c *=c;
+
+  /* Animate a control from high to low for the third parameters of the smoothmin function */
+  // c = smoothmin(c,  2.*ctrl4, c*ctrl5);
+
+
+  // return vec4(c);
+  return vec4(c*rev_time*rev_time);
+  // return vec4(vec3(c), c*time*time);
+    
 }
 `;

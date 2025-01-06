@@ -260,8 +260,9 @@ Explore the demos and discover the possibilities!`;
    
 }
 
-export function Demo_page(create_demo_id = category_widgets.id) {
+// export function Demo_page(create_demo_id = category_widgets.id) {
 // export function Demo_page(create_demo_id = subcategory_snake.id) {
+export function Demo_page(create_demo_id = subcategory_tetris.id) {
 
    let comet_particles_struct = null;
    let glow_particles_struct = null;

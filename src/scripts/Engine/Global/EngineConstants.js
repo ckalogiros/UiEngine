@@ -616,6 +616,7 @@ const PERFORMANCE_TIMERS_IDXS = {
 	AddToGfxText: INT_NULL,
 	Animations: INT_NULL,
 	Particles: INT_NULL,
+	Particles2: INT_NULL,
 	MiscTest1: INT_NULL,
 	MiscTest2: INT_NULL,
 	MiscTest3: INT_NULL,
@@ -637,6 +638,7 @@ const PERFORMANCE_TIMERS_IDXS = {
 			case this.AddToGfxText: return 'AddToGfxText';
 			case this.Animations: return 'Animations';
 			case this.Particles: return 'Particles';
+			case this.Particles: return 'Particles2';
 			case this.MiscTest1: return 'MiscTest1';
 			case this.MiscTest2: return 'MiscTest2';
 			case this.MiscTest3: return 'MiscTest3';
@@ -1166,6 +1168,7 @@ const PARTICLES = {
    HAS_JIGGLE: _CNT<<=0x1,
    HAS_ROTATION: _CNT<<=0x1,
    HAS_SCALE: _CNT<<=0x1,
+   HAS_FADE: _CNT<<=0x1,
 
 }
 

@@ -1,16 +1,19 @@
 "use strict";
 
-import { New_generic_buffer } from "../../../../Engine/Core/Buffers.js";
+import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
+import { New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
-import { BLUEL, WHITE } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Particle_system_create_emitter, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
-import { Renderqueue_set_priority_by_vb } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
+import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
+import { Particle_system_create_emitter, Particle_system_emitt, Particle_system_emitter_enable_intermidiate_emission, Particle_system_emitter_get_position_xy, Particle_system_emitter_get_size, Particle_system_emitter_set_position_xy, Particle_system_emitter_set_prev_position_xy, Particle_system_emitter_set_size, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
+import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgba, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
+import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Min } from "../../../../Helpers/Math/MathOperations.js";
-import { ARK_STATE, ARK_STATE_IN_GAME } from "./ArkanoisConstants.js";
+import { Arkanoid_get_main_panel_padx, Arkanoid_get_main_panel_pady } from "./Arkanoid.js";
 import { Bricks_check_collision } from "./Bricks.js";
 import { Physics } from "./HelperClasses.js";
-import { Player_get_dimy, Player_get_pad } from "./Player.js";
+import { Player_get, Player_get_dimy, Player_get_pad } from "./Player.js";
 
 
 
@@ -19,31 +22,50 @@ import { Player_get_dimy, Player_get_pad } from "./Player.js";
 
 
 
-const BALL_DIM_X = 10; 
+const BALL_DIM_X = 12; 
 const BALL_DIM_Y = BALL_DIM_X;
 const BALL_SPEED = 4;
+const MAX_BALLS_COUNT = 3;
 
 
 const ACCEL_FROM_BOUNDS = 1;
-const ACCEL_FROM_PLAYER = 3;
+const ACCEL_FROM_PLAYER = 2;
 
-const _balls_buffer = New_generic_buffer(_, 'Arkanoid-BallsBuffer');
 
+const BALL_COLORS = [BLUEL[9], YELLOWR[9], PURPLEB[9]];
+
+
+
+const _balls_buffer = New_generic_buffer(_, '_balls_buffer');
+const _free_balls_buffer_idxs = New_int8_buffer(_, '_free_balls_buffer_idxs');
+let balls_vb_groupidx = INT_NULL;
+
+const _main_panel_pad = {x:0, y:0};
+
+// export function Ball_get_buffer() { return _balls_buffer; }
 /**Get the main ball */
-export function Ball_get() { return _balls_buffer.buffer[0]; }
+// export function Ball_get() { return _balls_buffer.buffer[0]; }
 /**Get any ball by index */
 export function Ball_get_byidx(idx=0) { return _balls_buffer.buffer[idx]; }
+export function Ball_get_pos_xy(idx) { return _balls_buffer.buffer[idx].mesh.geom.pos; }
+export function Ball_get_dim_xy(idx) { return _balls_buffer.buffer[idx].mesh.geom.dim; }
 
 
-
+let TEST = true
 export class Ball {
 
-   constructor(x, y) {
+   constructor(x, y, color=WHITE) {
 
       const posx = x-BALL_DIM_X;
       const posy = y-(BALL_DIM_Y*2 + Player_get_dimy()*2 + Player_get_pad());
 
-      const mesh = Create_rect_mesh(_, [posx, posy, 1], [BALL_DIM_X, BALL_DIM_Y], WHITE, 'Ball', );
+      const mesh = Create_rect_mesh(_, [1, 1, 1], [BALL_DIM_X, BALL_DIM_Y], color, 'Ball', );
+      if(TEST) { // TODO: Remove this
+         mesh.geom.pos[0] = posx;
+         mesh.geom.pos[1] = posy;
+         TEST = false
+      }
+      // const mesh = Create_rect_mesh(_, [posx, posy, 1], [BALL_DIM_X, BALL_DIM_Y], WHITE, 'Ball', );
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, BALL_DIM_X);
@@ -53,17 +75,26 @@ export class Ball {
       this.mesh = mesh;
 
 
-      this.physics = new Physics(_, _, _,_, BALL_SPEED);
+      // this.physics = new Physics(0, 0, _, _, BALL_SPEED);
+      this.physics = new Physics(0, 0, _, _, BALL_SPEED);
 
       this.scale_down = 1;
       this.in_move = false;
-      // this.accelx_default = 3;
-      // this.accely_default = 3;
+      this.in_scale_animation = false;
+      this.lock_squash_anim = false;
+      this.in_squash_anim = false;
+      
+
+      this.is_active = false;
+
+      this.idx = _balls_buffer.Add(this);
+
 
       const scale = 2.;
       const particles_size = BALL_DIM_X * scale;
       // const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles`, GREY[3], [0, 0, 1], [particles_size, particles_size], 0.015, 1, 0, _, _, 4, _, 1);
-      const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles`, BLUEL[9], [0, 0, 1], [particles_size, particles_size], 0.015, 1, 0, _, _, 4, _, 1);
+      const mod = BALL_SPEED*.002; // Avoid very long tails with increased speed// HACK: configure the ball tail according to ball speed(Thats if the particles system has the creation of intermidiate particles creation enabled)
+      const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles`, color, [0, 0, 1], [particles_size, particles_size], 0.015+mod, 1, 0, _, _, 4, _, 1);
       const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
       // tail_emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
       // tail_emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
@@ -76,9 +107,10 @@ export class Ball {
       tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE); // TODO: Does nothing, there is no enable for '.FX_NOISE'
       
       
-      tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
 
       tail_emitter.SetDir(1, 1);
+
 
       this.tail_emitter_idx = tail_emitter_idx;
 
@@ -91,8 +123,17 @@ export class Ball {
       Particles_gen_gfx_ctx(tail_emitter, particles_panel);
       // Particles_gen_gfx_ctx(tail_emitter, this.mesh);
       // Initialize values to uniforms
-      // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.2, 0.4, .12]);
-      tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.0, 0.9, .12]);
+      tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.2, 0.4, .12, 0]);
+      // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.0, 0.2, .0]);
+      // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.0, 0.9, .02]);
+      // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.0, 0.0, .0]);
+
+      
+      Particle_system_emitter_set_position_xy(this.tail_emitter_idx, this.mesh.geom.pos[0], this.mesh.geom.pos[1]);
+      Particle_system_emitter_set_prev_position_xy(this.tail_emitter_idx);
+      Particle_system_emitter_enable_intermidiate_emission(this.tail_emitter_idx);
+
+      balls_vb_groupidx = this.mesh.gfx.vb.groupidx;
    
    }
 
@@ -102,41 +143,135 @@ export class Ball {
 
 }
 
+export function Ball_tail_emitter_gengfx(particles_panel) {
 
+   for (let i = 0; i <= _balls_buffer.boundary; i++) {
 
-export function Ball_create(x, y) {
+      const ball = _balls_buffer.buffer[i];
 
-   const idx = _balls_buffer.Add(new Ball(x, y));
-   return _balls_buffer.buffer[idx];
+      // Render Ball tail particles on top of the glow particles
+      const tail_emitter = Particles_get_particle_system(ball.tail_emitter_idx);
+      Particles_gen_gfx_ctx(tail_emitter, particles_panel);
+
+      // Initialize values to uniforms
+      tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.2, 0.4, .12, 0]);
+      
+      Particle_system_emitter_set_position_xy(ball.tail_emitter_idx, ball.mesh.geom.pos[0], ball.mesh.geom.pos[1]);
+      Particle_system_emitter_set_prev_position_xy(ball.tail_emitter_idx);
+      Particle_system_emitter_enable_intermidiate_emission(ball.tail_emitter_idx);
+
+      
+   }
+   balls_vb_groupidx = _balls_buffer.buffer[0].mesh.gfx.vb.groupidx;
+}
+
+export function Ball_init_buffer(x, y) {
+
+   let idx = 0;
+   for(let i=0; i<MAX_BALLS_COUNT; i++) {
+      
+      // const color = GetSequencedColor();
+      idx = idx >= BALL_COLORS.length ? 0 : idx;
+      const color = BALL_COLORS[idx];
+      const ball = new Ball(x, y, color); 
+      Ball_remove_mesh_byidx(ball.idx);
+
+      idx++;
+   }
+
+   _main_panel_pad.x = Arkanoid_get_main_panel_padx();
+   _main_panel_pad.y = Arkanoid_get_main_panel_pady();
+
+   return _balls_buffer;
+}
+
+// Removes the effect mesh from the storage buffer and from rendering, but mesh still remains in the application
+export function Ball_remove_mesh_byidx(idx = INT_NULL) {
+   /**DEBUG */ if (idx === INT_NULL || _balls_buffer.buffer[idx] === undefined) alert('0101010101 Wrong index for _balls_buffer')
+   
+   const mesh = _balls_buffer.buffer[idx].mesh;
+   if(mesh.gfx !== null) {
+      // Gl_set_wpos_y(mesh.gfx, OUT_OF_VIEW);
+      Gl_set_alpha(mesh.gfx, 0);
+   }
+   else {
+      mesh.mat.col[3] = 0;
+   }
+
+   _balls_buffer.buffer[idx].is_active = false;
+   _free_balls_buffer_idxs.Add(idx);
+   
 }
 
 
-export function Ball_release(params) {
-   console.log('CLICK!')
+export function Ball_create2(x, y, color=WHITE) {
+
+   let idx = INT_NULL;
+
+   const freeidx = _free_balls_buffer_idxs.boundary;
+   
+   
+   if (freeidx >= 0) {
+      
+      idx = _free_balls_buffer_idxs.buffer[freeidx];
+      const ball = _balls_buffer.buffer[idx];
+
+      ball.is_active = true;
+      
+      const player = Player_get();
+      // ball.mesh.geom.pos[0] = x - _main_panel_pad.x - ball.mesh.geom.dim[0]*2; 
+      // ball.mesh.geom.pos[1] = y - _main_panel_pad.y - ball.mesh.geom.dim[1]*2; 
+      ball.mesh.geom.pos[0] = x - _main_panel_pad.x - ball.mesh.geom.dim[0]; 
+      ball.mesh.geom.pos[1] = y - _main_panel_pad.y - ball.mesh.geom.dim[1]; 
+      Gl_set_wpos_xy(ball.mesh.gfx, ball.mesh.geom.pos[0]+BALL_DIM_X, ball.mesh.geom.pos[1]+BALL_DIM_X);
+
+      ball.mesh.mat.col = color;
+      Gl_set_rgba(ball.mesh.gfx, color);
+
+      const dif = (ball.mesh.geom.pos[0]) - (player.mesh.geom.pos[0]+player.mesh.geom.dim[0]);
+      const dif_norm = dif / (player.mesh.geom.dim[0]*2);
+      const dirx = dif_norm*2.;
+      const diry = 2. - Abs(dif_norm)*2.;
+      ball.physics.SetVelocityXY(dirx, -diry);
+
+      const tail_emitter_idx = ball.tail_emitter_idx;
+      const emitter_pos = Particle_system_emitter_get_position_xy(tail_emitter_idx);
+      const xx = emitter_pos[0] = ball.mesh.geom.pos[0] + ball.mesh.geom.dim[0];
+      const yy = ball.mesh.geom.pos[1] + ball.mesh.geom.dim[1];
+      Particle_system_emitter_set_position_xy(tail_emitter_idx, xx, yy);
+      Particle_system_emitter_set_prev_position_xy(tail_emitter_idx)
+
+      // Remove from the free idxs buffer
+      _free_balls_buffer_idxs.RemoveByIdx(freeidx);
+
+      return ball;
+   }
+
+}
+
+
+// export function Ball_release(params) {
+export function Ball_release(ball_idx, player) {
 
    
-   const ball = _balls_buffer.buffer[0];
+   const ball = _balls_buffer.buffer[ball_idx];
    if(ball.in_move) return;
 
    ball.in_move = true;
    
 
    // Find the point of contact to calculate the balls direction
-   const player = params.evt_params.player;
+   // const player = player;
    const dif = (ball.mesh.geom.pos[0]) - (player.mesh.geom.pos[0]+player.mesh.geom.dim[0]);
 
    // Normalize dif to -1,0,1
    const dif_norm = dif / (player.mesh.geom.dim[0]*2);
-
-   // const interpolated_dif = Linear_interpolation(-1, 1, dif);
-   // const dirx = interpolated_dif
    const dirx = dif_norm*2.;
    const diry = 2. - Abs(dif_norm)*2.;
 
    
    ball.physics.SetVelocityXY(dirx, -diry);
-
-   ARK_STATE.SET(ARK_STATE_IN_GAME);
+ 
 }
 
 
@@ -147,7 +282,13 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
 
 
       const ball = _balls_buffer.buffer[i];
+
+      if(!ball.is_active) continue;
+
       const ph = ball.physics;
+
+      /**Squash animation */
+      // if(ball.in_squash_anim) return; 
       
       // Move the ball
       const x = ph.velx * (ph.speed + ph.accelx);
@@ -165,66 +306,97 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
       const ball_left   = ball_pos[0];
       const ball_right  = ball_pos[0] + ball_size*2;
       
+      let hit = false;
       // Check boundaries collision
       {
          if (ball_bot > bound_bottom) {
             ph.vely *= -1; 
             ball_pos[1] = bound_bottom - (ball_size * 2) - 3; // Put back inside the panel area
             // ph.accely += ACCEL_FROM_BOUNDS;
+            hit = true;
          }
          else if (ball_top < bound_top) {
             ph.vely *= -1;
             ball_pos[1] = ball_size;
             // ph.accely += ACCEL_FROM_BOUNDS;
+            hit = true;
          }
          if (ball_right > bound_right) {
             ph.velx *= -1;
             ball_pos[0] = bound_right - (ball_size * 2) - 3;
             // ph.accely += ACCEL_FROM_BOUNDS;
+            hit = true;
          }
          else if (ball_left < bound_left) {
             ph.velx *= -1;
             ball_pos[0] = ball_size;
             // ph.accely += ACCEL_FROM_BOUNDS;
+            hit = true;
          }
       }
 
+      /** Squash animation */
+      // // if(hit && !ball.in_squash_anim) {
+      // if(hit ) {
+
+      //    ball.in_squash_anim = true;
+
+      //    const time_step = 0.02, slope_const = .2, scale = .5;
+      //    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
+
+      //    const params = {
+      //       ball: ball,
+      //       direction: { x: GetSign(ph.velx), y: -GetSign(ph.vely) },
+      //       // direction: { x: (ph.velx), y: -(ph.vely) },
+      //       target_dist: 30, // in pixels
+      //       move_dist: 2.5, // in pixels
+      //       ball_squash_lim: ball.mesh.geom.dim[0]*.34,
+      //       ball_initial_size: ball.mesh.geom.dim[0],
+      
+      //       function_slope:slope_params_pointer,
+      //    };
+      
+      //    Callback_animations_create(Ball_animation_squash_run, Ball_animation_squash_stop, params,);
+      //    return;
+      // }
 
 
       // Check Player collision
       {
          const plw = player_dim[0]*2;
-         if (ball_bot > player_pos[1] && ball_left < player_pos[0] + plw && ball_right > player_pos[0]) {
-            
+         if (ball_bot > player_pos[1]) {
 
-            // Guarantee only one ball-player hit, between frames
-            ball_pos[1] = player_pos[1] - ball_size -3;
-            
+            if (ball_left < player_pos[0] + plw && ball_right > player_pos[0]) {
+               
+               // Guarantee only one ball-player hit, between frames
+               ball_pos[1] = player_pos[1] - ball_size -3;
+               
+   
+               const hit_dif = ((ball_pos[0]+ball_size) - (player_pos[0]+player_dim[0])) *2;
+               
+               
+               let amt = Abs(Min(hit_dif / plw, 1.0));
+               if(amt>1) amt = 1;
+               const ball_dir = GetSign(hit_dif); // If the ball hit the left part of player
+               
+               let xamt = amt; // Let x amt be lower
+               let yamt = (1-amt) + 0.2;
+               
+   
+               ph.velx = xamt*ball_dir;
+               ph.vely = -yamt;
+   
+               ph.accely += ACCEL_FROM_PLAYER*(1+xamt);
+               ph.accelx += ACCEL_FROM_PLAYER*(1+yamt);
 
-            const hit_dif = ((ball_pos[0]+ball_size) - (player_pos[0]+player_dim[0])) *2;
-            
-            
-            let amt = Abs(Min(hit_dif / plw, 1.0));
-            if(amt>1) amt = 1;
-            const ball_dir = GetSign(hit_dif); // If the ball hit the left part of player
-            
-            let xamt = amt; // Let x amt be lower
-            let yamt = (1-amt) + 0.2;
-            
-
-            ph.velx = xamt*ball_dir;
-            ph.vely = -yamt;
-
-            ph.accely += ACCEL_FROM_PLAYER*(1+xamt);
-            ph.accelx += ACCEL_FROM_PLAYER*(1+yamt);
-
+            }
          }
       }
 
       // Check Bricks collision
       {
          const ball_dir = ball.GetDir();
-         const point_of_contact = Bricks_check_collision(ball_pos[0], ball_pos[1], ball_size, ball_size, x, y, ball_dir.x, ball_dir.y);
+         const point_of_contact = Bricks_check_collision(ball_pos[0], ball_pos[1], ball_size, ball_size, x, y, ball_dir.x, ball_dir.y, ball.idx);
 
          ph.velx *= point_of_contact[0];
          ph.vely *= point_of_contact[1];
@@ -234,6 +406,8 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
       ball.mesh.geom.pos[0] += ph.velx * (ph.speed + ph.accelx);
       ball.mesh.geom.pos[1] += ph.vely * (ph.speed + ph.accely);
       ball.mesh.geom.SetWposXY(ball.mesh.gfx, ball.mesh.geom.pos[0]+ball_size, ball.mesh.geom.pos[1]+ball_size);
+      // Particle_system_emitter_set_position_xy(ball.tail_emitter_idx, x, y);
+      // Particle_system_emitter_set_prev_position_xy(ball.tail_emitter_idx);
       // ball.mesh.geom.SetWposXY(ball.mesh.gfx, ball.mesh.geom.pos[0], ball.mesh.geom.pos[1]);
       
       {
@@ -242,10 +416,293 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
          // console.log('θ=', angle/Math.PI)
       }
 
-      if (ph.accelx > 0) ph.accelx *= .99; //else console.log('Accel x is diminished')
-      if (ph.accely > 0) ph.accely *= .99; //else console.log('Accel y is diminished')
+      if(ph.accelx < .1) ph.accelx = 0; // Avoid accel from reaching very small floating point values
+      else if (ph.accelx > 0) ph.accelx *= .99; //else console.log('Accel x is diminished')
+      if(ph.accely < .1) ph.accely = 0; // Avoid accel from reaching very small floating point values
+      else if (ph.accely > 0) ph.accely *= .99; //else console.log('Accel y is diminished')
+
+      
+
+
+      /*********************************************************************************************************/
+      // Update Particles
+
+      const tail_emitter_idx = ball.tail_emitter_idx;
+      const emitter_pos = Particle_system_emitter_get_position_xy(tail_emitter_idx);
+      const xx = emitter_pos[0] = ball.mesh.geom.pos[0] + ball.mesh.geom.dim[0];
+      const yy = ball.mesh.geom.pos[1] + ball.mesh.geom.dim[1];
+      Particle_system_emitter_set_position_xy(tail_emitter_idx, xx, yy);
+      
+      
+      
+      Particle_system_emitt({ params: { target_params: [tail_emitter_idx], } });
    }
 
 
 }
 
+
+
+
+
+
+
+/************************************************************************************************************************************************/
+// Power up animations
+
+
+export function Ball_animation_scale() {
+   
+   const ball = _balls_buffer.buffer[0];
+
+   if(ball.in_scale_animation) return;
+
+   ball.in_scale_animation = true;
+
+   // const time_step = 0.01, slope_const = 0.2, scale = .5;
+   const time_step = 0.005, slope_const = 1., scale = .5;
+   const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
+
+   const emitter_size = Particle_system_emitter_get_size(ball.tail_emitter_idx);
+   const emitter = Particles_get_particle_system(ball.tail_emitter_idx);
+
+   const params = {
+      ball:ball,
+      emitter: {
+         size:emitter_size,
+         current_size:emitter_size,
+         vb_groupidx:emitter.gfx.vb.groupidx,
+         ubidx:Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_noise_params'),
+         shader_uniform_index:2,
+      },
+      function_slope:slope_params_pointer,
+      ball_initial_dimx:ball.mesh.geom.dim[0],
+      ball_current_dimx:ball.mesh.geom.dim[0],
+   };
+
+   Callback_animations_create(Ball_animation_scale_up_run, Ball_animation_scale_up_stop, params,);
+   
+}
+function Ball_animation_scale_up_run(params) {
+   
+   const ball = params.ball.mesh; 
+   const ball_initial_dimx = params.ball_initial_dimx;
+   const ball_current_dimx = params.ball_current_dimx;
+   
+   const timer = params.function_slope.GetTimer();
+   const slope_constant = params.function_slope.GetSlope();
+   const scale = params.function_slope.GetValueChange();
+   params.function_slope.IncrementTimer();
+   
+   
+   const slope = Logarithmic_interpolation(timer, slope_constant);
+   const scale_factor = slope*scale;
+      
+
+   // Update ball x dir scale
+   const ball_size = ball_current_dimx + (ball_initial_dimx * scale_factor * 4);
+   ball.geom.dim[0] = ball_size;
+   ball.geom.dim[1] = ball_size;
+   
+   ball.geom.SetDimXY(ball.gfx, ball_size, ball_size);
+   Gl_set_dim_xy(ball.gfx, ball_size, ball_size);
+   Gl_set_attr_round_corners(ball.gfx, ball.geom.dim[0]);
+
+   // Update ball tail particle emitter
+   const emitter_size = params.emitter.current_size + (params.emitter.size * scale_factor * 4); // Calculate the scaled size from the original size
+   Particle_system_emitter_set_size(params.ball.tail_emitter_idx, emitter_size); // Scale up emitter and its particles
+   // const noise_reduction = (1-scale_factor)*0.1 + .03;
+   // Vertex_buffer_set_and_update_uniform(params.emitter.vb_groupidx, params.emitter.ubidx, noise_reduction, params.emitter.shader_uniform_index); // Scale down the precedural noise 
+ 
+   if(slope > 1) return false;
+
+   return true;
+}
+function Ball_animation_scale_up_stop(params) {
+   
+   params.function_slope.SetTimer(0);
+
+   // Set the scale down as the inverse of scale up
+   const scale = params.function_slope.GetValueChange();
+   params.function_slope.SetValueChange(-scale);
+
+   // Store current ball dimention
+   params.ball_current_dimx = params.ball.mesh.geom.dim[0];
+   params.emitter.current_size = Particle_system_emitter_get_size(params.ball.tail_emitter_idx);
+   
+   // Set the scale down animation
+   Callback_animations_create(Ball_animation_scale_down_run, Ball_animation_scale_down_stop, params,);
+
+   return false;
+}
+function Ball_animation_scale_down_run(params) {
+   
+   const ball = params.ball.mesh; 
+   const ball_initial_dimx = params.ball_initial_dimx;
+   const ball_current_dimx = params.ball_current_dimx;
+
+   const timer = params.function_slope.GetTimer();
+   const slope_constant = params.function_slope.GetSlope();
+   const scale = params.function_slope.GetValueChange();
+   params.function_slope.IncrementTimer();
+   
+   const slope = Logarithmic_interpolation(timer, slope_constant);
+   const scale_factor = slope * scale;
+
+   // Update ball x dir scale
+   const ball_size = ball_current_dimx + (ball_initial_dimx * scale_factor * 4);
+   ball.geom.dim[0] = ball_size;
+   ball.geom.dim[1] = ball_size;
+   
+   ball.geom.SetDimXY(ball.gfx, ball_size, ball_size);
+   Gl_set_dim_xy(ball.gfx, ball_size, ball_size);
+   Gl_set_attr_round_corners(ball.gfx, ball.geom.dim[0]);
+
+   // Update ball tail particle emitter
+   const emitter_size = params.emitter.current_size + (params.emitter.size * scale_factor * 4); // Calculate the scaled size from the original size
+   Particle_system_emitter_set_size(params.ball.tail_emitter_idx, emitter_size);
+   // const noise_reduction = (slope)*0.27 + .03;
+   // Vertex_buffer_set_and_update_uniform(params.emitter.vb_groupidx, params.emitter.ubidx, noise_reduction, params.emitter.shader_uniform_index);
+
+   if(slope > 1) return false;
+
+   
+   return true;
+}
+function Ball_animation_scale_down_stop(params) {
+   
+   const ball_initial_dimx = params.ball_initial_dimx;
+   params.ball.mesh.geom.dim[0] = ball_initial_dimx;
+   params.ball.mesh.geom.dim[1] = ball_initial_dimx;
+
+   params.ball.mesh.geom.SetDimXY(params.ball.mesh.gfx, ball_initial_dimx, ball_initial_dimx);
+   Gl_set_dim_xy(params.ball.mesh.gfx, ball_initial_dimx, ball_initial_dimx);
+   Gl_set_attr_round_corners(params.ball.mesh.gfx, ball_initial_dimx);
+
+   Particle_system_emitter_set_size(params.ball.tail_emitter_idx, params.emitter.size); // Scale up emitter and its particles
+
+   params.ball.in_scale_animation = false;
+   
+   return false;
+}
+
+
+
+// function Ball_animation_squash_run(params) {
+   
+//    const ball = params.ball.mesh; 
+
+//    // const size = slope;
+//    // const size = timer*2;
+//    const sizex = 4;
+//    const sizey = 4;
+   
+
+//    if(params.direction.y < 0) {
+//       // ball.geom.dim[0] += size;
+//       // ball.geom.dim[1] -= size;
+      
+//       Gl_add_vpos_xy_diag_1(ball.gfx, -sizex, -sizey);
+//       // Gl_set_dim_xy(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
+//       // Gl_set_attr_round_corners(ball.gfx, Min(ball.geom.dim[0], ball.geom.dim[1]));
+      
+//       // Update ball tail particle emitter
+//       Particle_system_emitter_set_size(params.ball.tail_emitter_idx, -sizex, -sizey); // Scale up emitter and its particlesp
+//       // Particle_system_emitter_add_size_xy(params.ball.tail_emitter_idx, -size, size); // Scale up emitter and its particles
+//    }
+//    else if(params.direction.y > 0) {
+
+//    }
+
+
+//    return true;
+// }
+function Ball_animation_squash_run(params) {
+   
+   const ball = params.ball.mesh; 
+
+   // params.direction
+   // params.target_dist
+   // params.move_dist
+   // params.ball_squash_lim
+   // params.ball_initial_size;
+   
+   const timer = params.function_slope.GetTimer();
+   const slope_constant = params.function_slope.GetSlope();
+   params.function_slope.IncrementTimer();
+   
+   
+   
+   // const slope = Logarithmic_interpolation(timer, slope_constant);
+
+   // Create ball squash
+   const lim = params.ball_squash_lim;
+   // const size = 2*(slope*.3+.3);;
+   // const size = slope;
+   // const size = timer*2;
+   const size = 4;
+   
+   if(!params.ball.lock_squash_anim && ball.geom.dim[1] > params.ball_initial_size - lim) {
+      
+      // const slope = Logarithmic_interpolation(timer, slope_constant);
+      // const size = slope*2;
+      
+      
+      ball.geom.dim[1] -= size;
+      ball.geom.dim[0] += size;
+      
+      // ball.geom.AddWposY(ball.gfx, -size);
+      // ball.geom.AddWposY(ball.gfx, size*params.direction.y);
+      // ball.geom.AddWposXY(ball.gfx, -size*params.direction.x, size*params.direction.y);
+      // ball.geom.AddWposXY(ball.gfx, 0, size*params.direction.y);
+      if(ball.geom.dim[1] <= params.ball_initial_size - lim) {
+         params.ball.lock_squash_anim = true;
+         // params.function_slope.SetTimer(0);
+      }
+      
+      // Update ball tail particle emitter
+      Particle_system_emitter_set_size(params.ball.tail_emitter_idx, -size, size); // Scale up emitter and its particles
+      // Particle_system_emitter_add_size_xy(params.ball.tail_emitter_idx, -size, size); // Scale up emitter and its particles
+      
+   }
+
+   // else if(params.ball.lock_squash_anim && ball.geom.dim[1] < params.ball_initial_size + lim) {
+      
+   //    const slope = Logarithmic_interpolation(timer, slope_constant);
+   //    const size = slope*2;
+      
+   //    ball.geom.dim[1] += size;
+   //    ball.geom.dim[0] -= size;
+   //    // ball.geom.AddWposY(ball.gfx, size);
+   //    // ball.geom.AddWposY(ball.gfx, size*-params.direction.y);
+   //    // ball.geom.AddWposXY(ball.gfx, -size*params.direction.x, -size*params.direction.y);
+   //    // if(ball.geom.dim[1] >= params.ball_initial_size + lim) params.ball.lock_squash_anim = false;
+      
+   //    // Update ball tail particle emitter
+   //    // Particle_system_emitter_add_size_xy(params.ball.tail_emitter_idx, size, -size); // Scale up emitter and its particles
+   // }
+   else {
+      ball.geom.dim[1] = params.ball_initial_size;
+      ball.geom.dim[0] = params.ball_initial_size;
+      // ball.geom.AddWposY(ball.gfx, size);
+      ball.geom.SetDimXY(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
+      Gl_set_dim_xy(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
+      Gl_set_attr_round_corners(ball.gfx, params.ball_initial_size);
+
+      // Particle_system_emitter_set_size(params.ball.tail_emitter_idx, ball.geom.dim[0]*2, ball.geom.dim[1]*2); // Scale up emitter and its particles
+      
+      params.ball.in_squash_anim = false;
+      params.ball.lock_squash_anim = false;
+      
+      return false;
+   }
+   ball.geom.SetDimXY(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
+   Gl_set_dim_xy(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
+   Gl_set_attr_round_corners(ball.gfx, Min(ball.geom.dim[0], ball.geom.dim[1]));
+
+   return true;
+}
+function Ball_animation_squash_stop(params) {
+   
+   return false;
+}

@@ -129,11 +129,11 @@ export function Program_fx_program_exists_from_sid(sid) {
 
 
 
-function Create_program(sid, uniforms) {
+function Create_program(sid, uniforms, shader_ops_idxs) {
 
 	/***************************************************************************************************/
 	// Create Shader Program
-	const prog = new Gl_Program(gfxCtx.gl, sid, uniforms);
+	const prog = new Gl_Program(gfxCtx.gl, sid, uniforms, shader_ops_idxs);
 	const progidx = _programs.Add(prog);
 	prog.idx = progidx; // Store the programs index to self
 
@@ -162,9 +162,9 @@ function Create_program(sid, uniforms) {
 
 
 
-export function Program_create_program(sid, uniforms) {
+export function Program_create_program(sid, uniforms, shader_ops_idxs) {
 
-	const progidx = Create_program(sid, uniforms);
+	const progidx = Create_program(sid, uniforms, shader_ops_idxs);
 	const prog = _programs.buffer[progidx];
 
 
@@ -182,7 +182,7 @@ export function Program_create_program(sid, uniforms) {
 
 class Gl_Program {
 
-	constructor(gl, sid, uniforms) {
+	constructor(gl, sid, uniforms, shader_ops_idxs=null) {
 
 		this.sid = sid; // Shader Type ID (E.g. ATTR_COL4 | ATTR_POS2 | INDEXED)
 		this.state = { mask: 0x0 };
@@ -190,8 +190,12 @@ class Gl_Program {
 		this.idx = INT_NULL; // Self index to the Programs buffer
 
 		this.uniforms = uniforms;
+		this.shader_ops = null; // Init the array
+		if(shader_ops_idxs!==null) 
+			this.AddShaderOperation(shader_ops_idxs); // Build the array
 
-		const ret = Shaders_load(gfxCtx.gl, sid, uniforms);
+
+		const ret = Shaders_load(gfxCtx.gl, sid, uniforms, this.shader_ops);
 
 		this.shader_program = ret.shader_program;
 		this.attribsidx = ret.attribsidx;
@@ -221,6 +225,23 @@ class Gl_Program {
 	// Check id sid matches with the program's sid.
 	CheckSidMatch(sid) {
 		return SID.CheckSidMatch(sid, this.sid);
+	}
+
+
+	// Build an array of shader function operations, so the shader builder can resolve the necessary shader code for the shader program.
+	// -The sequence matters-
+	AddShaderOperation(shader_operations_idxs) {
+
+		if(shader_operations_idxs.active_count > 0) {
+
+			this.shader_ops = [];
+	
+			for(let i=0; i <= shader_operations_idxs.boundary; i++) {
+	
+				if(shader_operations_idxs.buffer[i] !== INT_NULL)
+					this.shader_ops[i] = Program_get_stored_shader_operation_byidx(shader_operations_idxs.buffer[i]);
+			}
+		}
 	}
 
 
@@ -277,6 +298,7 @@ export function Program_use_program2(progidx) {
 
 
 
+
 /****************************************************************************************************************************************************/
 // Uniforms
 /****************************************************************************************************************************************************/
@@ -298,6 +320,40 @@ export function Program_find_uniform_ubidx_from_name(progidx, unif_name) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************************************************************************************************************************************/
+// Pre-Shader Program Init Storages 
+/****************************************************************************************************************************************************/
+
+const _shader_operations = New_generic_buffer(_, 'Program shader_ops storage buffer');
+
+export function Program_store_shader_operations(function_operation, blend_mode) {
+	// 'fn_op' Type of: 'SID.SHADER_OPERATIONS.'
+	// 'blend_mode' Type of: 'SID.BLEND_OPTIONS.'
+	const idx = _shader_operations.Add( { fn_op:function_operation, blend_mode:blend_mode } );
+	return idx; // Caller must store the index and send it back from MeshGfxContext.js to provide all necessary shader function operations for the shader program
+}
+
+
+
+function Program_get_stored_shader_operation_byidx(shader_op_idx) {
+	return _shader_operations.buffer[shader_op_idx];
+}
 
 
 

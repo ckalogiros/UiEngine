@@ -376,11 +376,11 @@ export const COLOR_ARRAY3 = [
 	YELLOW,
 	PURPLEB,
 	GREEN,
-	PURPLER,
 	CYAN,
+	PURPLER,
 	ORANGE,
 	ORANGEL,
-	RED,
+	// RED,
 ];
 // export const COLOR_ARRAY = {
 

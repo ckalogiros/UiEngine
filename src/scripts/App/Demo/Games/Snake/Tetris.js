@@ -24,7 +24,7 @@ import { Demo_page } from "../../../DemoPage.js";
 
 
 
-const DEBUG_PRINT = true;
+const DEBUG_PRINT = false;
 const DEBUG_PRINT2 = false;
 // const DEBUG_NOT_MOVE_DOWN = true;
 const DEBUG_NOT_MOVE_DOWN = false;
@@ -59,16 +59,16 @@ const GRID = {
    top_row:0
 };
 
-const MAX_COLUMNS = 5;
-const TOKEN_SIZE = 30;
-const MAX_TOKENS_IN_Y_AXIS = 10;
+const MAX_COLUMNS = 7;
+const TOKEN_SIZE = 25;
+const MAX_TOKENS_IN_Y_AXIS = 12;
 const TOP_ROW = MAX_TOKENS_IN_Y_AXIS-1;
 const ROW_HEIGHT = TOKEN_SIZE*2;
 const COL_WIDTH = TOKEN_SIZE*2;
 const TETRIS_PANEL_HEIGHT = MAX_TOKENS_IN_Y_AXIS*TOKEN_SIZE;
 const TETRIS_PANEL_WIDTH = TOKEN_SIZE*MAX_COLUMNS;
 const tetris_panel_pad = 10;
-let speed = .5;
+let speed = 1.;
 const def_speed = speed;
 // const cell_round_corners = TOKEN_SIZE;
 // const cell_round_corners = TOKEN_SIZE/2;
@@ -1912,7 +1912,7 @@ export function Tetris_reset(){
 }
 function Tetris_end(section, emitter) {
    
-   console.log('------------------------------- END -------------------------------');
+   if(DEBUG_PRINT) console.log('------------------------------- END -------------------------------');
 
    // Grey out token
 
@@ -2285,7 +2285,7 @@ function Animation_scale_up_stop(params) {
    
       for(let i=boundary; i>=0; i--){
    
-         console.log('Removing Row:', rowidxs[i])
+         if(DEBUG_PRINT) console.log('Removing Row:', rowidxs[i])
          Grid_remove_row(rowidxs[i]);
       }
       
@@ -2301,7 +2301,7 @@ function Animation_scale_up_stop(params) {
       complete_rows_cell_idxs = [];
       complete_rows_idxs = [];
 
-      console.log('complete_rows_cell_idxs', complete_rows_cell_idxs, 'complete_rows_idxs', complete_rows_idxs);
+      if(DEBUG_PRINT) console.log('complete_rows_cell_idxs', complete_rows_cell_idxs, 'complete_rows_idxs', complete_rows_idxs);
    }
 
 

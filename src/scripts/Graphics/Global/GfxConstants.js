@@ -104,7 +104,7 @@ const SID_ATTR_NAMES_BUFFER = [
 
 ];
 
-let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1, BIT7 = 0x1, BITTEST = 0x1;
+let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1, BIT7 = 0x1, BIT8 = 0x1, BITTEST = 0x1;
 const SID = {
 
     SHAD: {
@@ -117,6 +117,7 @@ const SID = {
         // Shader Color Manipulation Functions
         FN_INNER_SHADOW: BIT1 <<= 1,
         FN_EXPLOSION_CIRCLE: BIT1 <<= 1,
+        FN_EXPLOSION_GLOW: BIT1 <<= 1,
         FN_GLOW_SPHERE: BIT1 <<= 1,
         FN_NOISE_WORLEY_1: BIT1 <<= 1,
         FN_NOISE_WORLEY_2: BIT1 <<= 1,
@@ -129,27 +130,18 @@ const SID = {
         FS_TEST1: BIT1 <<= 1,
         FS_TEST2: BIT1 <<= 1,
         FS_TEST3: BIT1 <<= 1,
+        FS_TEST4: BIT1 <<= 1,
+        FS_TEST5: BIT1 <<= 1,
+    },
+    
+    SHADER_OPERATIONS: {
+        BUBBLE: BIT8 <<= 1,
+        FLARE: BIT8 <<= 1,
+
     },
 
-    ATTR: {
-        // COL4: BIT2,
-        // WPOS3: BIT2 <<= 1,
-        // VPOS2: BIT2 <<= 1,
-        // DIM2: BIT2 <<= 1,
-        // TIME: BIT2 <<= 1,
-        // R_CORNERS: BIT2 <<= 1,
-        // BORDER: BIT2 <<= 1,
-        // FEATHER: BIT2 <<= 1,
-        // GLOW_INTENSITY: BIT2 <<= 1,
-        // TEX2: BIT2 <<= 1,
-        // SCALE2: BIT2 <<= 1,
-        // SDF: BIT2 <<= 1,
-        // MSDF: BIT2 <<= 1,
-        // STYLE: BIT2 <<= 1,
-        // COL4_PER_VERTEX: BIT2 <<= 1,
-        // EMPTY: BIT2 <<= 1,
-        // TEST_MULTI_VERTEX: BIT2 <<= 1,
-    },
+    ATTR: {},
+    PASS: {},
 
     INST:{
         COL4: BIT3,
@@ -163,24 +155,6 @@ const SID = {
         POS3: BIT3 <<= 1,
         COL4_PER_VERTEX: BIT3 <<= 1,
         EMPTY: BIT3 <<= 1,
-    },
-    
-    PASS: {
-        // COL4: BIT4,
-        // COL4_PER_VERTEX: BIT4<<= 1,
-        // VPOS2: BIT4 <<= 1,
-        // DIM2: BIT4 <<= 1,
-        // TEX2: BIT4 <<= 1,
-        // WPOS2: BIT4 <<= 1,
-        // WPOS3: BIT4 <<= 1,
-        // TIME: BIT4 <<= 1,
-        // BORDER: BIT2 <<= 1,
-        // R_CORNERS: BIT2 <<= 1,
-        // FEATHER: BIT2 <<= 1,
-        // GLOW_INTENSITY: BIT2 <<= 1,
-        // RES2: BIT4 <<= 1,
-        // STYLE3: BIT4 <<= 1,
-        // SDF2: BIT4 <<= 1,
     },
 
     UNIF: {
@@ -204,6 +178,7 @@ const SID = {
         FS_GENERIC_VEC2: BIT5<<=0x1,
         FS_GENERIC_VEC3: BIT5<<=0x1,
         FS_GENERIC_VEC4: BIT5<<=0x1,
+        FS_GENERIC_CONTROLS: BIT5<<=0x1,
 
 
     },
@@ -470,6 +445,7 @@ const MESH_ENABLE = {
 
         // Shader Color Functions
         FN_EXPLOSION_CIRCLE: _CNT++,
+        FN_EXPLOSION_GLOW: _CNT++,
         FN_INNER_SHADOW: _CNT++,
         FN_GLOW_SPHERE: _CNT++,
         FN_NOISE_WORLEY: _CNT++,
@@ -478,6 +454,9 @@ const MESH_ENABLE = {
         TEST_SHADERS_1: _CNT++,
         TEST_SHADERS_2: _CNT++,
         TEST_SHADERS_3: _CNT++,
+        TEST_SHADERS_4: _CNT++,
+        TEST_SHADERS_5: _CNT++,
+        FLARE: _CNT++,
 
 
         NONE: 0,
@@ -658,28 +637,49 @@ const Texture = {
 
 
 
-
+_CNT=0x1;
 const UNIF_TYPE = {
 
     ID:'UNIF_TYPE',
 
-    FLOAT: 0x1406, // FLOAT
-    FVEC2: 0x8b50, // _VEC2
-    FVEC3: 0x8b51, // _VEC3
-    FVEC4: 0x8b52, // _VEC4
-    MAT2: 0x8b5a, // _MAT2
-    MAT3: 0x8b5b, // _MAT3
-    MAT4: 0x8b5c, // _MAT4
-    INT: 0x8b56, // INT, 
-    BOOL: 0x8b53, // BOOL 
-    IVEC2: 0x8b57, // _VEC2
-    IVEC3: 0x8b58, // _VEC3
-    UIVEC4: 0x8b59, // _VEC4
+    FLOAT: _CNT, // FLOAT
+    FVEC1: _CNT<<=0x1, // _VEC1
+    FVEC2: _CNT<<=0x1, // _VEC2
+    FVEC3: _CNT<<=0x1, // _VEC3
+    FVEC4: _CNT<<=0x1, // _VEC4
+    FARR: _CNT<<=0x1, // FLOAT ARRAY
+    MAT2: _CNT<<=0x1, // _MAT2
+    MAT3: _CNT<<=0x1, // _MAT3
+    MAT4: _CNT<<=0x1, // _MAT4
+    INT: _CNT<<=0x1, // INT, 
+    BOOL: _CNT<<=0x1, // BOOL 
+    IVEC2: _CNT<<=0x1, // _VEC2
+    IVEC3: _CNT<<=0x1, // _VEC3
+    UIVEC4: _CNT<<=0x1, // _VEC4
 
-    UINT: 0x1405, // UINT
-    UIVEC2: 0x8dc6, // _VEC2
-    UIVEC3: 0x8dc7, // _VEC3
-    UIVEC4: 0x8dc8, // _VEC4
+    UINT: _CNT<<=0x1, // UINT
+    UIVEC2: _CNT<<=0x1, // _VEC2
+    UIVEC3: _CNT<<=0x1, // _VEC3
+    UIVEC4: _CNT<<=0x1, // _VEC4
+    
+    // FLOAT: 0x1406, // FLOAT
+    // FVEC2: 0x8b50, // _VEC2
+    // FVEC3: 0x8b51, // _VEC3
+    // FVEC4: 0x8b52, // _VEC4
+    // FVEC6: 0x8b52, // _VEC5
+    // MAT2: 0x8b5a, // _MAT2
+    // MAT3: 0x8b5b, // _MAT3
+    // MAT4: 0x8b5c, // _MAT4
+    // INT: 0x8b56, // INT, 
+    // BOOL: 0x8b53, // BOOL 
+    // IVEC2: 0x8b57, // _VEC2
+    // IVEC3: 0x8b58, // _VEC3
+    // UIVEC4: 0x8b59, // _VEC4
+
+    // UINT: 0x1405, // UINT
+    // UIVEC2: 0x8dc6, // _VEC2
+    // UIVEC3: 0x8dc7, // _VEC3
+    // UIVEC4: 0x8dc8, // _VEC4
 
 
 	GetSizeInBytes(type, id) {
@@ -707,6 +707,7 @@ const UNIF_TYPE = {
             case this.FVEC2:  return 'vec2';
             case this.FVEC3:  return 'vec3';
             case this.FVEC4:  return 'vec4';
+            case this.FARR:  return 'float';
             case this.MAT2:  return 'mat2';
             case this.MAT3:  return 'mat3';
             case this.MAT4:  return 'mat4';

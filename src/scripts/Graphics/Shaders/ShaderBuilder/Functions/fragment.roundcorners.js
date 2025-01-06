@@ -91,16 +91,6 @@ export const frag_round_corners = `
 
 vec4 Round_corners(float scale_down)
 {
-    // #ifdef U_GENERIC_VEC3
-    //     include <u_generic_vec3>
-    // #elif defined(U_GENERIC_VEC2)
-    //     #include <u_generic_vec2>
-    // #elif defined(U_GENERIC_FLOAT)
-    //     #include <u_generic_float>
-    // #else
-    //     float control1 = 0.;
-    // #endif
-    
     float control1 = 0.;
     #ifdef A_ANGLE
         control1 = v_angle;
@@ -127,7 +117,6 @@ vec4 Round_corners(float scale_down)
 
     // Re-create the rotation matrix
     float angle = control1;
-    // float angle = 1.2;
     float c = 0.0;
     float s = 0.0;
     if(angle > 0.) {
@@ -152,12 +141,9 @@ vec4 Round_corners(float scale_down)
     float alpha = clamp(-d / feather, 0.0, 1.0);
     // src_color.a *= alpha;
     vec3 color = src_color.rgb * alpha * src_color.a;
-    // vec3 color = src_color.rgb * src_color.a;
-    // vec3 color = src_color.rgb ;
-    // vec3 color = RED.rgb ;
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     float slider = .2;
     float smoothness = 2.;
@@ -166,35 +152,19 @@ vec4 Round_corners(float scale_down)
 
     float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
     float strength = 2.2 * ((slider+1.)*.5);                        /* Creates a stronger shadow on full slider */
-    //     // float strength = 1.;
-        
-    //     // power *= 2.;
-    //     // power += 1.;
         
     float balance_dim_ratio = max(min_dim, 1.);
     float round_preserv = rCorners.x * .5;
-    // float round_preserv = rCorners.x - (1.-(smoothness))*4.;
 
     float depth = balance_dim_ratio * 1.; // Balance the shadow depth to the mesh dimentions
-    // depth *= balance_dim_ratio * ((smoothness+1.)*4.*smoothness); // Balance the shadow depth to the mesh dimentions
-    // // depth *= slider / rCorners.x * 4.;
-    // // depth *= slider * round_preserv * 1.;
-    // depth *= slider;
 
 
     /* Shadow effect depth */
-    // float shad_len = length(max((abs_uv - dim) + rCorners.x + depth, 0.0))  - rCorners.x;
     float shad_len = length(max((abs_uv - dim) + round_preserv + depth, 0.0))  - round_preserv;
 
 
     float g = smoothstep(.0, min_dim * smoothness, shad_len); // Always returns interpolated value {0, 1}
 
-
-    // if(g > 0.5) return vec4(1., 0., 0., 1.);
-    // // if(shad_len > 10.) return vec4(1., 0., 0., 1.);
-
-
-    // strength = power*min(balance_dim_ratio*.1, 1.);
     strength = power*blm_darken(balance_dim_ratio*.1, 1.);
 
     color = mix( color, pow(color, vec3(strength)), g );

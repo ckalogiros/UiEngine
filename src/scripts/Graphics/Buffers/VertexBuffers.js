@@ -3,18 +3,17 @@
 
 import { New_generic_buffer, New_int8_buffer } from "../../Engine/Core/Buffers.js";
 import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex, Vertex_buffer_create_attribs_info_per_vb_instanced } from "../ShaderAttributes.js";
-import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index, Program_use_program, Program_use_program2 } from "../ShaderPrograms.js";
+import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index, Program_use_program2 } from "../ShaderPrograms.js";
 import { Typed_array_create_from_type } from "./TypedArrayBuffersInterface.js";
-import { Gl_vertex_array_object_create, Gl_vertex_array_object_find_compatible, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays.js";
+import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays.js";
 import { Floor } from "../../Helpers/Math/MathOperations.js";
 import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Uniforms_buffer_destroy_uniform, Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
+import { Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
 import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBufferFillOps.js";
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Engine/Core/MeshBuffer.js";
-import { Root_group_vbidx_view_get } from "../../Engine/Core/Views/RootView.js";
-import { Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Screen_wpos_get, Screen_wpos_get_y } from "../../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Engine/Core/MeshUniformsBuffer.js";
 
 
 

@@ -1,7 +1,10 @@
 "use strict";
 
+import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
 import { BLUEL } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Gl_set_attr_round_corners, Gl_set_dim_x } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 
 
 
@@ -45,19 +48,137 @@ export class Player {
 
 export function Player_check_coin_collision(coin_left, coin_right) {
 
-      // const pl_left = _player.mesh.geom.pos[0];
-      // const pl_right = _player.mesh.geom.pos[0]+_player.mesh.geom.dim[0]*2;
-      // const pl_top = _player.mesh.geom.pos[1];
-      const pl_left = _player.mesh.GetPosX();
-      const pl_right = pl_left+_player.mesh.geom.dim[0]*2;
-      const pl_top = _player.mesh.GetPosY();
-   
-      // if (ball_bot > player_pos[1] && coin_left < player_pos[0] + plw && coin_right > player_pos[0]) {
-      // if (coin_bottom > pl_top && coin_left < pl_right && coin_right > pl_left) {
-      if (coin_left < pl_right && coin_right > pl_left) {
-         return true;
-      }
+   const pl_left = _player.mesh.GetPosX();
+   const pl_right = pl_left+_player.mesh.geom.dim[0]*2;
 
-      return false;
+   if (coin_left < pl_right && coin_right > pl_left) {
+      return true;
+   }
+
+   return false;
 }
 
+
+export function Player_check_powup_collision(powup_left, powup_right) {
+
+   const pl_left = _player.mesh.GetPosX();
+   const pl_right = pl_left+_player.mesh.geom.dim[0]*2;
+
+   if (powup_left < pl_right && powup_right > pl_left) {
+      return true;
+   }
+
+   return false;
+}
+
+
+
+
+
+
+
+/************************************************************************************************************************************************/
+// Power up animations
+
+
+export function Player_create_animation_scale() {
+   
+   const player = _player;
+
+   if(player.in_scale_animation) return;
+
+   player.in_scale_animation = true;
+
+   // const time_step = 0.01, slope_const = 0.2, scale = .5;
+   const time_step = 0.005, slope_const = 1., scale = .5;
+   const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
+
+
+   const params_player = {
+      player:player,
+      function_slope:slope_params_pointer,
+      player_initial_dimx:player.mesh.geom.dim[0],
+      player_current_dimx:player.mesh.geom.dim[0],
+   };
+
+   Callback_animations_create(Player_animation_scale_up_run, Player_animation_scale_up_stop, params_player,);
+   
+}
+function Player_animation_scale_up_run(params) {
+   
+   const player = params.player.mesh; 
+   const player_initial_dimx = params.player_initial_dimx;
+   const player_current_dimx = params.player_current_dimx;
+   
+   const timer = params.function_slope.GetTimer();
+   const slope_constant = params.function_slope.GetSlope();
+   const scale = params.function_slope.GetValueChange();
+   params.function_slope.IncrementTimer();
+   
+   
+   const slope = Logarithmic_interpolation(timer, slope_constant);
+   const scale_factor = slope*scale;
+      
+
+   // Update player x dir scale
+   const sizex = player_current_dimx + (player_initial_dimx * scale_factor);
+   player.geom.dim[0] = sizex;
+   
+   player.geom.SetDimX(player.gfx, sizex,);
+   Gl_set_dim_x(player.gfx, sizex, );
+   Gl_set_attr_round_corners(player.gfx, player.mat.style.rcorners + scale_factor);
+ 
+ 
+   if(slope > 1) return false;
+
+   return true;
+}
+function Player_animation_scale_up_stop(params) {
+   
+   params.function_slope.SetTimer(0);
+
+   // Set the scale down as the inverse of scale up
+   const scale = params.function_slope.GetValueChange();
+   params.function_slope.SetValueChange(-scale);
+
+   // Store current player dimention
+   params.player_current_dimx = params.player.mesh.geom.dim[0];
+   
+   Callback_animations_create(Player_animation_scale_down_run, Player_animation_scale_down_stop, params,);
+   return false;
+}
+function Player_animation_scale_down_run(params) {
+   
+   const player = params.player.mesh; 
+   const player_initial_dimx = params.player_initial_dimx;
+   const player_current_dimx = params.player_current_dimx;
+
+
+   const timer = params.function_slope.GetTimer();
+   const slope_constant = params.function_slope.GetSlope();
+   const scale = params.function_slope.GetValueChange();
+   params.function_slope.IncrementTimer();
+   
+   const slope = Logarithmic_interpolation(timer, slope_constant);
+   const scale_factor = slope * scale;
+
+   // Update coin glow position
+   const sizex = player_current_dimx + (player_initial_dimx * scale_factor);
+   player.geom.dim[0] = sizex;
+   
+   player.geom.SetDimX(player.gfx, sizex,);
+   Gl_set_dim_x(player.gfx, sizex, );
+   Gl_set_attr_round_corners(player.gfx, player.mat.style.rcorners + scale_factor);
+ 
+
+   if(slope > 1) return false;
+
+   
+   return true;
+}
+function Player_animation_scale_down_stop(params) {
+   
+   params.player.in_scale_animation = false;
+   
+   return false;
+}
