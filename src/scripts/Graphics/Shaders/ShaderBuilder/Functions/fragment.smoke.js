@@ -2,7 +2,7 @@
 export const frag_smoke_call = `
 
    vec4 shader_col = Smoke(scale_down);
-   color = shader_col;
+   final_color = shader_col;
 `;
 
 export const frag_smoke = `

@@ -22,3 +22,5 @@ Create brick texture procedurally
    Try to render the alpha mask noise to a texture.
    But the mask could not be updated dynamically.
    In that case re-render the noise with the different params 
+
+   

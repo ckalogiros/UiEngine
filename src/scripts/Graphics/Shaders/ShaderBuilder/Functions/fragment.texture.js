@@ -1,7 +1,7 @@
 /**************************************************************************************************
  * SDF Text Rendering Shader
  */
-export const frag_sdf_call = '   color *= Sdf(v_sdf.x, v_sdf.y);';
+export const frag_sdf_call = '   final_color = Sdf(v_sdf.x, v_sdf.y) * src_color;';
 export const frag_sdf = `
 vec4 Sdf(float inner, float outer){
 
@@ -21,7 +21,7 @@ vec4 Sdf(float inner, float outer){
 /**************************************************************************************************
  * MSDF Text Rendering Shader
 */
-export const frag_msdf_call = '   color *= Msdf(v_tex_coord);';
+export const frag_msdf_call = '   final_color = Msdf(v_tex_coord) * src_color;';
 export const frag_msdf = `
 
 // set to distance fields pixel range
@@ -109,15 +109,15 @@ export const frag_tex = `
   vec4 texel = texture( u_sampler0, v_tex_coord);
   
   // Premutiply alpha destination
-  texel.rgb *= texel.a; // Remove rgb color with the alpha channel
+  texel.rgb *= texel.a; // Remove rgb final_color with the alpha channel
 
-  color *= texel;
-  color.rgb *= color.a; // Include alpha from user input color
+  final_color = texel * src_color;
+  final_color.rgb *= final_color.a; // Include alpha from user input final_color
   
   float distance = max(texture(u_sampler0, v_tex_coord).r, max(texture(u_sampler0, v_tex_coord).g, texture(u_sampler0, v_tex_coord).b));
   
-  color.a *= distance; // Remove all black color from the rgb channels
-  // color.a = 1.;
+  final_color.a *= distance; // Remove all black final_color from the rgb channels
+  // final_color.a = 1.;
   
 
   `;

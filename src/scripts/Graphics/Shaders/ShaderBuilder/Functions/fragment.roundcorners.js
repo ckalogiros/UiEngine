@@ -74,7 +74,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 
 // export const frag_round_corners_call = '  color = blend_color_multiply( color, Round_corners(scale_down) );';
-export const frag_round_corners_call = '  color = Round_corners(scale_down);';
+export const frag_round_corners_call = '  final_color = Round_corners(scale_down);';
 export const frag_round_corners = `
 
 /********************************************************************************************/
@@ -138,7 +138,9 @@ vec4 Round_corners(float scale_down)
     // Create the render distance limit 
     float d = length(max((localPos - dim) + rCorners.x, 0.0)) - rCorners.x;
     
+    // Use the -d/feather for nice effects on rects and circles
     float alpha = clamp(-d / feather, 0.0, 1.0);
+    // float alpha = -d / feather;
     // src_color.a *= alpha;
     vec3 color = src_color.rgb * alpha * src_color.a;
 
@@ -315,7 +317,7 @@ vec4 Round_corners(float scale_down)
 
 
 
-export const frag_feather_call = '  color = blend_color_multiply( color, Feather(scale_down) );';
+export const frag_feather_call = '  final_color = blend_color_multiply( final_color, Feather(scale_down) );';
 export const frag_feather = `
 
 #ifndef UV_READY
@@ -349,7 +351,7 @@ float Feather(float scale_down)
 `;
 
 
-export const frag_style_call = '  color = blend_color_multiply( color, Stylize(scale_down) );';
+export const frag_style_call = '  final_color = blend_color_multiply( final_color, Stylize(scale_down) );';
 export const frag_style_corners = `
 
 vec2 pos = vec2(.0);

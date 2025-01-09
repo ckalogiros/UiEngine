@@ -72,7 +72,7 @@ const POWUP_TYPES = [
       COLOR:PURPLER[9],
    },
 ];
-const POWUP_INIT_SIZE = 16;
+const POWUP_INIT_SIZE = 32;
 const PRE_INITIALIZED_POWUP_MESHES = 12;
 
 let powup_vb_groupidx = INT_NULL;
@@ -89,11 +89,21 @@ class Powup {
    constructor(x=0, y=0, texture_id=INT_NULL, vb_groupidx=INT_NULL, type_idx=0x0) {
 
       // const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [POWUP_INIT_SIZE, POWUP_INIT_SIZE], TRANSPARENCY(WHITE, 1.), 'PowupMesh', _, _, texture_id, );
-      const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [POWUP_INIT_SIZE, POWUP_INIT_SIZE], TRANSPARENCY(WHITE, .0), 'PowupMesh', _, _, _, );
-      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
-      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, POWUP_INIT_SIZE);
-      
+      const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [POWUP_INIT_SIZE, POWUP_INIT_SIZE], TRANSPARENCY(WHITE, 1.0), 'PowupMesh', _, _, _, );
+      // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
+      // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, POWUP_INIT_SIZE);
+      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+      // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.PASS_VPOS2);
+      // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.PASS_WPOS2);
+      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+      // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.BUBBLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
+      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 8);
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
       // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME, .0);
 
@@ -102,8 +112,9 @@ class Powup {
       mesh.geom.pos[1] = y;
 
       mesh.Render()
-
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx)
+      
+      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+      // mesh.GfxUniformSetAndUpdate('u_generic_controls', [1, .04, .45]);
 
       if(powup_vb_groupidx===INT_NULL) powup_vb_groupidx = mesh.gfx.vb.groupidx;
          
@@ -120,6 +131,12 @@ class Powup {
       this.is_active = true;
 
       this.type_idx = type_idx;
+   }
+
+   UniformSetAndUpdate() {
+
+      // this.mesh.GfxUniformSetAndUpdate('u_generic_controls', [.22, .24, .34]);
+      this.mesh.GfxUniformSetAndUpdate('u_generic_controls', [.22, .24, .34, 1, 1, 1, 1, 1]);
    }
 }
 
@@ -164,6 +181,8 @@ export function Powup_init_buffer(num_effect_meshes=PRE_INITIALIZED_POWUP_MESHES
       Powup_remove_byidx(powup.idx);
    }
 
+   _powup_buffer.buffer[0].UniformSetAndUpdate();
+
    return vb_groupidx;
 }
 
@@ -174,6 +193,8 @@ export function Powup_create(x, y, w, h, w_src=0, h_src=0, type_idx) {
 
    const freeidx = _free_powup_idx_buffer.boundary;
    
+   w=POWUP_INIT_SIZE;
+   h=POWUP_INIT_SIZE;
    
    if (freeidx >= 0) {
 

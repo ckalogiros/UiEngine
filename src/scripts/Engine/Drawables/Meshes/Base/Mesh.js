@@ -134,6 +134,7 @@ export class Mesh {
             inst: (this.geom.sid.inst | this.mat.sid.inst),
             unif: this.mat.sid.unif,
             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
+            shad_ops: 0x0,
             fx: 0x0,
             blend_options: 0x0,
             gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
@@ -669,10 +670,18 @@ export class Mesh {
      * In order for a mesh to be drawn in a certain way, specific shaders must be build.
      * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
     */
+    EnableGfxOperations(function_operation, blend_mode=SID.BLEND_OPTIONS.BLEND_MODE_ADD) {
+       
+        this.sid.shad_ops |= function_operation;
+        this.shader_ops_idxs.Add( Program_store_shader_operations(function_operation, blend_mode) );
+    }
     EnableGfxAttributes(which, params = null) {
        
         switch (which) {
            
+            // case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.attr |= SID.ATTR.VPOS2; this.sid.pass |= SID.PASS.VPOS2; break; }
+            case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.PASS.VPOS2; break; }
+            // case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS2; break; }
             case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
             case MESH_ENABLE.GFX.ATTR_TIME: { 
@@ -758,7 +767,7 @@ export class Mesh {
             case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
             case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
             case MESH_ENABLE.GFX.FLARE: { 
-                this.sid.shad |= SID.SHADER_OPERATIONS.FLARE; 
+                // this.sid.shad |= SID.SHADER_OPERATIONS.FLARE; 
                 // if(params === null) alert('665518665518 params should not be null');
                 if(params !== null) this.shader_ops_idxs.Add( Program_store_shader_operations(params.function_operation, params.blend_mode) );
                 break; 

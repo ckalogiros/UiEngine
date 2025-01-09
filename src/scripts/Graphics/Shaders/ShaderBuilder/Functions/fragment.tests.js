@@ -13,8 +13,8 @@
 
 export const frag_test1_call = `
   vec4 new_color = frag_test1();
-  color = blend_mode_vec4( color, new_color );
-  // color = blend_color_mix( color, new_color, color.a );
+  final_color = blend_mode_vec4( final_color, new_color );
+  // final_color = blend_color_mix( final_color, new_color, final_color.a );
 `;
 
 export const frag_test1 = `
@@ -26,9 +26,9 @@ export const frag_test1 = `
 
 /*****************************************************/
 // GENERIC GLOBAL VARIABLES DECLERATIONS
-#ifndef UV_READY
-  vec2 uv = vec2(0,0);
-#endif
+// #ifndef UV_READY
+//   vec2 uv = vec2(0,0);
+// #endif
 
 
 /*****************************************************/
@@ -154,8 +154,8 @@ vec4 frag_test1()
 
 export const frag_test3_call = `
   vec4 new_color = frag_test3();
-  // color = blend_color_mix( color, new_color, color.a );
-  color = blend_color_multiply( color, new_color );
+  // final_color = blend_color_mix( final_color, new_color, final_color.a );
+  final_color = blend_color_multiply( final_color, new_color );
 `;
 
 export const frag_test3 = `
@@ -278,7 +278,7 @@ vec4 frag_test3()
 /*************************************************************************************************************************/
 
 /** Round Game-Map like shape */
-export const frag_test2_call = '   color = frag_test2();'
+export const frag_test2_call = '   final_color = frag_test2();'
 export const frag_test2 = `
 
 /********************************************************************************************/
@@ -399,7 +399,7 @@ vec4 frag_test2()
 `;
 
 /**Neuro - From ShaderToy */
-// export const frag_test2_call = '   color = frag_test2();'
+// export const frag_test2_call = '   final_color = frag_test2();'
 // export const frag_test2 = `
 
 // /********************************************************************************************/
@@ -744,10 +744,10 @@ vec4 frag_test2()
 
 
 export const frag_test4_call = `
-  color = frag_test4();
+  final_color = frag_test4();
   // vec4 new_color = frag_test4();
-  // // color = blend_color_mix( color, new_color, color.a );
-  // color = blend_color_multiply( color, new_color );
+  // // final_color = blend_color_mix( final_color, new_color, final_color.a );
+  // final_color = blend_color_multiply( final_color, new_color );
 `;
 
 // export const frag_test4 = `
@@ -974,8 +974,8 @@ vec4 frag_test4()
 /*************************************************************************************************************************/
 /*************************************************************************************************************************/
 
-// export const frag_test5_bubble_call = '   color = blend_color_multiply( color, frag_test5_bubble() );'
-export const frag_test5_bubble_call = '   color = frag_test5_bubble();'
+// export const frag_test5_bubble_call = '   final_color = blend_color_multiply( final_color, frag_test5_bubble() );'
+export const frag_test5_bubble_call = '   final_color = frag_test5_bubble();'
 
 export const frag_test5_bubble = `
 
@@ -1140,7 +1140,7 @@ vec4 frag_test5_bubble()
 /*************************************************************************************************************************/
 /*************************************************************************************************************************/
 
-export const frag_test6_ring_feathered_call = '   color = blend_color_multiply( color, frag_test6_ring_feathered() );'
+export const frag_test6_ring_feathered_call = '   final_color = blend_color_multiply( final_color, frag_test6_ring_feathered() );'
 
 export const frag_test6_ring_feathered = `
 

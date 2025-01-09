@@ -129,26 +129,26 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
    // Extension: For lights
 }
 
-function Resolve_function_operations(shader_ops) {
+// function Resolve_function_operations(shader_ops) {
 
-   let shader_ops_code = '';
+//    let shader_ops_code = '';
 
-   const len = shader_ops.length;
+//    const len = shader_ops.length;
 
-   for (let i = 0; i < len; i++) {
+//    for (let i = 0; i < len; i++) {
 
-      const fn_op = shader_ops[i].fn_op;
-      const blend_mode = shader_ops[i].blend_mode;
-      if(fn_op & SID.SHADER_OPERATIONS.FLARE){
+//       const fn_op = shader_ops[i].fn_op;
+//       const blend_mode = shader_ops[i].blend_mode;
+//       if(fn_op & SID.SHADER_OPERATIONS.FLARE){
 
-         shader_ops_code += frag_test5_bubble;
-      }
+//          shader_ops_code += frag_test5_bubble;
+//       }
 
-   }
+//    }
 
-   return shader_ops_code;
+//    return shader_ops_code;
 
-}
+// }
 /**
  * Construct a function with a switch that resolves the blendin function name
  * 
@@ -188,9 +188,16 @@ function Resolve_blending_mode(blend_mode) {
    }
 }
 
-function Resolve_function_operations_called_from_main(shader_ops) {
+function Resolve_function_operations_called_from_main(shader_ops=null) {
+   
+   /*
+   Be aware the first operation in the main function of the fragment,
+   since the blend function will be used to assign to the 'color' variable 
+   */
+  
+  let shader_ops_code = '';
 
-   let shader_ops_code = '';
+   if(shader_ops === null) return shader_ops_code;
 
    const len = shader_ops.length;
 
@@ -198,23 +205,53 @@ function Resolve_function_operations_called_from_main(shader_ops) {
 
       const fn_op = shader_ops[i].fn_op;
       const blend_mode = shader_ops[i].blend_mode;
-      if(fn_op & SID.SHADER_OPERATIONS.BUBBLE){
+      if(fn_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW){
+
+         shader_ops_code += shader_operations.fs_op_simple_glow;
+         if(i===0) shader_ops_code += `   final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, simple_glow_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, simple_glow_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.DIST_RECT_FILLED){
+
+         shader_ops_code += shader_operations.fs_op_distance_rect_filled;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, distance_rect_filled_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, distance_rect_filled_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW2){
+
+         shader_ops_code += shader_operations.fs_op_simple_glow2;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, simple_glow2_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, simple_glow2_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.BUBBLE){
 
          shader_ops_code += shader_operations.fs_op_bubble;
-         
-         // SEE Blending function overloads
-         // The fist assignment to var color from a shader operation must replace the source color
-         if(i===0) shader_ops_code += `   color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_MIX)}( color, bubble_color, 1.0 );`;
-         else shader_ops_code += `  color = ${Resolve_blending_mode(blend_mode)}( color, bubble_color );`;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, bubble_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, bubble_color );`;
       }
-      if(fn_op & SID.SHADER_OPERATIONS.FLARE){
+      else if(fn_op & SID.SHADER_OPERATIONS.FLARE){
 
          shader_ops_code += shader_operations.fs_op_flare;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, flare_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, flare_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.INNER_SHADOW_CIRCLE){
          
-         // SEE Blending function overloads
-         // The fist assignment to var color from a shader operation must replace the source color
-         if(i===0) shader_ops_code += `   color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_MIX)}( color, flare_color, 1.0 );`;
-         else shader_ops_code += `  color = ${Resolve_blending_mode(blend_mode)}( color, flare_color );`;
+         shader_ops_code += shader_operations.fs_op_inner_shadow_circle;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_circle_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_circle_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.INNER_SPECULAR_CIRCLE){
+         
+         shader_ops_code += shader_operations.fs_op_inner_specular_circle;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_specular_circle_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_specular_circle_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT){
+
+         shader_ops_code += shader_operations.fs_op_inner_shadow_rect_filled;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_rect_filled_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_rect_filled_color );`;
       }
 
    }
@@ -379,7 +416,6 @@ function Vertex_shader_resolve_attributes_in(sid) {
    ];
 
 
-   // const prog_attribs_indexing = new Attributes_indexing(); // Specific to gl Program. Store the connection of shader attrib location to the SID flag(E.x. .COL4:loc=2)
    const prog_attribs_indexing = new Shader_Attributes(true, INT_NULL); // Specific to gl Program. Store the connection of shader attrib location to the SID flag(E.x. .COL4:loc=2)
    let attribs_idx = 0;
    let loc_idx = -1;
@@ -482,10 +518,6 @@ function Vertex_shader_resolve_attributes_in(sid) {
          const attr_type = attr_info.TYPE;
          const attr_type_size = attr_info.TYPE_SIZE;
 
-
-         // const pass_to_fs = (attr_flag & SID.ATTR.WPOS3) ? ((sid.pass & attr_info.FLAG) | (sid.pass & SID.PASS.WPOS3)) : sid.pass & attr_info.FLAG;
-
-
          // TODO: Look if the attrib_flag or any other info is already accessible from the ShaderBitFlags file for efficiency
          const mesh_attribute = new Mesh_attribute();
          mesh_attribute.name = attr_name; // console.log(attr_name)
@@ -520,7 +552,6 @@ function Vertex_shader_resolve_attributes_in(sid) {
          }
          
          mesh_attribute.loc = loc_idx;
-         // mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
          attribs_info.mesh_attribs.push(mesh_attribute);
          
          // Enable attribute in the Program's attrib_indexing, by setting to the attribute key it's shader location index. E.x. prog_attribs_indexing.COL4 = 0 (loc)
@@ -656,7 +687,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
       '\n// DIRECTIVES',
       '#define PI 3.14159',
       ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
-      ((sid.unif & SID.UNIF.SCREEN_RESOLUTION)) ? '#define U_SCREEN_RESOLUTION 1' : '',
+      (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '#define U_SCREEN_RESOLUTION 1' : '',
 
 
 
@@ -797,6 +828,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
 
       '#define PI 3.14159',
+      (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '#define U_SCREEN_RESOLUTION 1' : '',
 
 
 
@@ -971,22 +1003,29 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '{',
       // Include uniforms-controls
       `  #ifdef U_GENERIC_CONTROLS
-      float ctrl1 = u_generic_controls[0];
-      float ctrl2 = u_generic_controls[1];
-      float ctrl3 = u_generic_controls[2];
-      float ctrl4 = u_generic_controls[3];
-      float ctrl5 = u_generic_controls[4];
-      float ctrl6 = u_generic_controls[5];
-   #endif`,
-      (sid.pass & SID.PASS.DIM2) ? '   vec2 dim = vec2(v_dim2_x, v_dim2_y); vec2 local_res = vec2(dim.x, dim.y);' : '',
-      '   #ifdef U_SCALE\n     float scale_down = u_scale2.x;\n   #else\n      float scale_down = 1.;\n   #endif\n',
-      '   #ifdef A_TEX_COORD\n      vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);\n   #endif\n',
-      '   vec4 color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);',
-      // Initialize uv coordinates variable
-      '  vec2 uv = vec2(0.0, 0.0);',
-      // Initialize screen resolution variable
-      '  vec2 res = u_screen_res;',
-      '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);',
+   //  float ctrl1 = u_generic_controls[0];
+   //  float ctrl2 = u_generic_controls[1];
+   //  float ctrl3 = u_generic_controls[2];
+   //  float ctrl4 = u_generic_controls[3];
+   //  float ctrl5 = u_generic_controls[4];
+   //  float ctrl6 = u_generic_controls[5];
+    int u_gen_ctrl_map_cnt = 0;
+  #endif`,
+      (sid.pass & SID.PASS.DIM2) ? `   vec2 dim = vec2(v_dim2_x, v_dim2_y); 
+      vec2 local_res = vec2(dim.x, dim.y);` : '',
+
+      (sid.unif & SID.UNIF.SCALE2) ? '  float scale_down = u_scale2.x;' : '  float scale_down = 1.;', // Initialize scale down variable
+      (sid.attr & SID.ATTR.TEX2) ? '  vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);' : '', // Initialize texture coordinates variable
+      (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '  vec2 res = u_screen_res;' : '', // Initialize screen resolution variable
+      // '  #ifdef U_SCALE\n    float scale_down = u_scale2.x;\n  #else\n    float scale_down = 1.;\n  #endif\n',
+      // '  #ifdef A_TEX_COORD\n    vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);\n  #endif\n',
+      // '  #ifdef U_SCREEN_RESOLUTION\n    vec2 res = u_screen_res;\n  #endif', // Initialize screen resolution variable
+      
+      // '  vec2 vpos = vec2(v_pos2_x, v_pos2_y);' , // Initialize pixel coordinates variable
+      (sid.pass & SID.PASS.VPOS2) ? '  vec2 vpos = vec2(v_pos2_x, v_pos2_y);' : '', // Initialize pixel coordinates variable
+      '  vec2 uv = vec2(0.0, 0.0);', // Initialize pixel coordinates variable
+      '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);', // The users color
+      '  vec4 final_color = vec4(0.0);', // The final output color
 
 
       Resolve_function_operations_called_from_main(shader_ops),
@@ -996,7 +1035,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
             (sid.attr & SID.ATTR.FEATHER) ? frag_feather_call : '',
       // (sid.attr & (SID.ATTR.GLOW_INTENSITY)) ? frag_glow_call : '',
 
-      (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '   float alpha = color.a;' : '',
+      (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '  float alpha = final_color.a;' : '',
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
       (sid.fx & SID.FX.FS_NOISE_2) ? frag_noise_2_call : '',
@@ -1030,7 +1069,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
       /********************************************************************************************************/
       // Color fragment
-      (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   color.rgb *= color.a; ' : '',
+      (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   final_color.rgb *= final_color.a; ' : '',
       // '   color.rgb *= color.a; ',
 
       /**
@@ -1068,7 +1107,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // '   color.rgb = 1.-color.rgb;',
       // '   color.rgb *= vec3(v_col4_x, v_col4_y, v_col4_z);',
       
-      '   frag_color = color;',
+      '  frag_color = final_color;',
       // '   frag_color = 1.- color;',
       // '   frag_color.rgb = 1.- color.rgb;',
 
@@ -1080,11 +1119,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       /********************************************************************************************************/
       // HACK: prevent optimizer from removing the uniform u_scale2
       // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', 
-      (sid.unif & SID.UNIF.TIME) ? '   if(u_time == 0.) ;' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '   if(u_generic_float == 0.) ;' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '   if(u_generic_vec4.x == 0.) ;' : '',
+      (sid.unif & SID.UNIF.TIME) ? '  if(u_time == 0.) ;' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '  if(u_generic_float == 0.) ;' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '  if(u_generic_vec2.x == 0.) ;' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '  if(u_generic_vec3.x == 0.) ;' : '',
+      (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '  if(u_generic_vec4.x == 0.) ;' : '',
       // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '', 
@@ -1120,4 +1159,18 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
    };
 }
 
+
+function Resolve_uniform_generic_contols_map(uniforms_info) {
+
+   // let code = '';
+   // let u_generic_controls = null;
+   // const unif_len = uniforms_info.length;
+   // for(let i=0; i<unif_len; i++) {
+   //    if(uniforms_info[i].name === 'u_generic_controls')
+   //       u_generic_controls = uniforms_info[i];
+   // }
+   // for(let i=0; i<u_generic_controls.arr_size; i++) {
+   //    code += `float ctrl${cnt}`;
+   // }
+}
 

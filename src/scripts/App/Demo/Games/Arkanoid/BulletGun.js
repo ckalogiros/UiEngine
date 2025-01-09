@@ -6,10 +6,11 @@ import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Gl_add_dim_y, Gl_add_wpos_y, Gl_set_alpha, Gl_set_dim_y, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_add_wpos_y, Gl_set_alpha, Gl_set_dim_y, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
-import { Arkanoid_get_main_panel_padxy } from "./Arkanoid.js";
+import { Arkanoid_get_main_panel_padx, Arkanoid_get_main_panel_padxy, Arkanoid_get_main_panel_pady } from "./Arkanoid.js";
 import { ARK_STATE } from "./ArkanoisConstants.js";
+import { Bricks_check_collision_column_only } from "./Bricks.js";
 import { Player_get } from "./Player.js";
 
 
@@ -38,6 +39,8 @@ const _gun = {
 
    push_back_anim_clbk_idx: INT_NULL,
 };
+
+const _main_panel_pad = {x:0, y:0};
 
 export function Gun_enable() {
 
@@ -213,6 +216,9 @@ export function Bullet_init_buffer(num_effect_meshes=PRE_INITIALIZED_BULLET_MESH
 
    Gun_create(vb_groupidx);
 
+   _main_panel_pad.x = Arkanoid_get_main_panel_padx();
+   _main_panel_pad.y = Arkanoid_get_main_panel_pady();
+
    return vb_groupidx;
 }
 
@@ -263,21 +269,26 @@ export function Bullet_update() {
 
       if(bullet.is_active) {
 
-         if (bullet.mesh.geom.pos[1] < -20) {
+         const y = BULLET_SPEED;
+
+         // Check bricks colission
+         const posx = bullet.mesh.geom.pos[0] - _main_panel_pad.x, 
+            posy = bullet.mesh.geom.pos[1] - bullet.mesh.geom.dim[1] - _main_panel_pad.y, 
+            dimx = bullet.mesh.geom.dim[0], 
+            dimy = bullet.mesh.geom.dim[1], 
+            difx = 0, 
+            dify = y, 
+            diry = -1;
+
+         const colision = Bricks_check_collision_column_only(posx, posy, dimx, dimy, diry)
+
+         if (colision || bullet.mesh.geom.pos[1] < -20) {
             Bullet_remove_byidx(bullet.idx);
+            return;
          }
 
-         bullet.mesh.geom.pos[1] -= BULLET_SPEED;
-         Gl_add_wpos_y(bullet.mesh.gfx, -BULLET_SPEED);
-
-         // if (bullet.timer >= bullet.timer_limit + bullet.timer_step) {
-         //    Effects_explosion_glow_remove_mesh_byidx(ex.idx);
-         // }
-         
-         // bullet.timer += bullet.timer_step;
-         
-         // // Update  time(attribute) for explosion animation
-         // Gl_set_time(bullet.mesh.gfx, bullet.timer); // Update attribute time
+         bullet.mesh.geom.pos[1] -= y;
+         Gl_add_wpos_y(bullet.mesh.gfx, -y);
       }
    }
    

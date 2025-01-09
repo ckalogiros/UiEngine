@@ -255,6 +255,7 @@ export function Mesh_unif_get_vb_root_wpos_has_absolute_pos(root_posidx) {
 // EFFICIENCY: Pass a buffer to store the positions. Too much 'heat' of the js GarbageColector
 
 export function Mesh_unif_get_vb_root_wpos(root_posidx) {
+   
    const pos = Mesh_unif_get_vb_root_wpos_recursive(root_posidx);
 
    if( _per_vb_mesh_unif_wpos.buffer[root_posidx].has_absolute_pos === 0){

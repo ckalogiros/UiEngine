@@ -135,8 +135,14 @@ const SID = {
     },
     
     SHADER_OPERATIONS: {
+        DIST_RECT_FILLED: BIT8 <<= 1,
+        SIMPLE_GLOW: BIT8 <<= 1,
+        SIMPLE_GLOW2: BIT8 <<= 1,
         BUBBLE: BIT8 <<= 1,
         FLARE: BIT8 <<= 1,
+        INNER_SHADOW_CIRCLE: BIT8 <<= 1,
+        INNER_SPECULAR_CIRCLE: BIT8 <<= 1,
+        INNER_SHADOW_RECT: BIT8 <<= 1,
 
     },
 
@@ -226,6 +232,8 @@ const SID = {
 
         const  shad1 = sid1.shad;
         const  shad2 = sid2.shad;
+        const  shader_ops1 = sid1.shad_ops;
+        const  shader_ops2 = sid2.shad_ops;
         // const  shad1 = sid1.shad & ~(this.SHAD.INDEXED_PATT_CONNECTED_FACES_X);
         // const  shad2 = sid2.shad & ~(this.SHAD.INDEXED_PATT_CONNECTED_FACES_X);
         /**
@@ -237,6 +245,7 @@ const SID = {
             shad1 === shad2 &&
             attr1 === attr2 &&
             unif1 === unif2 && 
+            shader_ops1 === shader_ops2 && 
             sid1.pass === sid2.pass
             // sid1.fx === sid2.fx
         ) {
@@ -415,6 +424,7 @@ const MESH_ENABLE = {
 
     GFX: {
 
+        // ATTR_VPOS2: _CNT++,
         ATTR_DIM2: _CNT++,
         ATTR_TEX2: _CNT++,
         ATTR_TIME: _CNT++,
@@ -432,10 +442,11 @@ const MESH_ENABLE = {
         FX_GLOW: _CNT++,
         FX_NOISE: _CNT++,
         FX_SMOKE: _CNT++,
-
+        
         // Pass from vertex to fragment shader
         PASS_COL4: _CNT++,
         PASS_WPOS2: _CNT++,
+        PASS_VPOS2: _CNT++,
         PASS_DIM2: _CNT++,
         PASS_TIME1: _CNT++,
         PASS_RES2: _CNT++,

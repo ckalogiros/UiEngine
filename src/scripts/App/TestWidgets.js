@@ -665,14 +665,14 @@ export function TestWidgetsGeneric(createId = 1) {
 
     // Bitwise_operations_run_test();
 
-    // Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
-    // Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);
+    Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
+    Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);
     // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
 
     // Demo_page();
     // Demos_welcome_menu();
 
-    // Arkanoid_initialize();
+    Arkanoid_initialize();
 
 
     // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
@@ -1151,13 +1151,14 @@ export function TestWidgetsGeneric(createId = 1) {
         // Test_shaders_test2();
         // Test_shaders_test4();
         // Test_shaders_test5();
+        // Test_shaders_operations();
     }
     
     { // Shader Color Functions
         
         // Test_shaders_inner_shadow_rhomboid_effect();
         // Test_shaders_Shadow_specular();
-        Test_shaders_bubble_flare();
+        // Test_shaders_bubble_flare();
 
         // Shader_color_functions_glow_sphere();
         // Shader_color_functions_worley_1_noise();
@@ -1172,6 +1173,7 @@ export function TestWidgetsGeneric(createId = 1) {
         // Shader_color_functions_noise_test();
 
         // Shader_color_functions_explosion_circle(100, 0);
+
     }
 
     { // Textured Section
@@ -3550,23 +3552,11 @@ function Create3DCubes(scene) {
 function Test_shaders_test1() { // Shaders Tests
 
     const dim = 200
-    // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT - dim * 2, 0], [dim, dim], BLACK, 'TEST-SHADERS',);
     const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT - dim * 2, 0], [75 * 1, 40 * 1], YELLOW[9], 'TEST-SHADERS',);
-    // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT - dim * 2, 0], [75*5, 40*3], YELLOW[9], 'TEST-SHADERS',);
-    // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT - dim * 2, 0], [50*7, 50*2], YELLOW[9], 'TEST-SHADERS',);
-    // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT - dim * 2, 0], [50*4, 50*2], YELLOW[9], 'TEST-SHADERS',);
-    // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [20, VIEWPORT.HEIGHT -( dim * 2 + 20), 0], [50*8, 50*4], YELLOW[9], 'TEST-SHADERS',);
-    // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [20, VIEWPORT.HEIGHT -( dim * 2 + 20), 0], [50*6, 50*4], YELLOW[9], 'TEST-SHADERS',);
-    // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT - dim * 2, 0], [55*5, 55*5], YELLOW[9], 'TEST-SHADERS',);
-    // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT - dim * 2, 0], [50*2, 50*4], YELLOW[9], 'TEST-SHADERS',);
     rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-    // rect.EnableGfxAttributes(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_MIX, .0);
-    // rect.EnableGfxAttributes(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_MASK);
-    // rect.EnableGfxAttributes(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_SUBTRACT); // 
 
     rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
     rect.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_1);
@@ -3590,51 +3580,51 @@ function Test_shaders_test1() { // Shaders Tests
 
 
 
-    { // Slider: unif 1
-        const slider = CreateSlider(_, 10, 20, .0, 'Smooth');
+    // { // Slider: unif 1
+    //     const slider = CreateSlider(_, 10, 20, .0, 'Smooth');
 
-        const params = {
-            target_mesh: rect,
-        };
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
+    //     const params = {
+    //         target_mesh: rect,
+    //     };
+    //     // Connect sliders to gfx program uniforms 
+    //     Slider_connect(slider, (params, slider_val) => {
 
-            const target_mesh = params.clbk_params.target_mesh;
-            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val * 2, 0);
+    //         const target_mesh = params.clbk_params.target_mesh;
+    //         target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val * 2, 0);
 
-        }, params,
-        );
-    }
-    { // Slider: unif 2
-        const slider = CreateSlider(_, 20, 100, 1.0, 'Range');
+    //     }, params,
+    //     );
+    // }
+    // { // Slider: unif 2
+    //     const slider = CreateSlider(_, 20, 100, 1.0, 'Range');
 
-        const params = {
-            target_mesh: rect,
-        };
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
+    //     const params = {
+    //         target_mesh: rect,
+    //     };
+    //     // Connect sliders to gfx program uniforms 
+    //     Slider_connect(slider, (params, slider_val) => {
 
-            const target_mesh = params.clbk_params.target_mesh;
-            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
+    //         const target_mesh = params.clbk_params.target_mesh;
+    //         target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
 
-        }, params,
-        );
-    }
-    { // Slider: unif 2
-        const slider = CreateSlider(_, 30, 200, 1.0, 'Brightness/Contrast');
+    //     }, params,
+    //     );
+    // }
+    // { // Slider: unif 2
+    //     const slider = CreateSlider(_, 30, 200, 1.0, 'Brightness/Contrast');
 
-        const params = {
-            target_mesh: rect,
-        };
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
+    //     const params = {
+    //         target_mesh: rect,
+    //     };
+    //     // Connect sliders to gfx program uniforms 
+    //     Slider_connect(slider, (params, slider_val) => {
 
-            const target_mesh = params.clbk_params.target_mesh;
-            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
+    //         const target_mesh = params.clbk_params.target_mesh;
+    //         target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
 
-        }, params,
-        );
-    }
+    //     }, params,
+    //     );
+    // }
 
 }
 function Test_shaders_test3() { // Shaders Tests
@@ -4062,13 +4052,13 @@ function Test_shaders_Shadow_specular() { // Shaders Tests
         rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
         // rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+        rect.EnableGfxAttributes(MESH_ENABLE.GFX.PASS_VPOS2);
         rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
-        rect.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_4);
+        // rect.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_4);
+        rect.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_CIRCLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+        rect.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SPECULAR_CIRCLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
 
         // Use u_time to quicly establish a uniform for the testing
-        // rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-        // rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
-        // rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FVEC6, UNIFORM.IN_FS);
         rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 6);
 
         // Render
@@ -4079,8 +4069,6 @@ function Test_shaders_Shadow_specular() { // Shaders Tests
 
 
         rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
-        // rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1]);
-        // rect.GfxUniformSetAndUpdate('u_generic_controls', [1, 1, 1, 1, 1, 1, 1, 1, 1]);
         rect.GfxUniformSetAndUpdate('u_generic_controls', [1, 1, 1, 1, 1, 1]);
 
         Construct_listen_events_from_mesh_tree(rect);
@@ -4170,13 +4158,16 @@ function Test_shaders_Shadow_specular() { // Shaders Tests
         }, params,
         );
     } ypos += height;
+
+
 }
 function Test_shaders_bubble_flare() { // Shaders Tests
 
     let rect1 = null;
     {
         // const dim=300
-        const dim = 150
+        // const dim = 150
+        const dim = 16
         // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], PURPLE[1], 'TEST-SHADERS',);
         // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 300, 0], [dim, dim], PURPLE[9], 'TEST-SHADERS',);
         const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 300, 0], [dim, dim], WHITE, 'TEST-SHADERS',);
@@ -4187,15 +4178,14 @@ function Test_shaders_bubble_flare() { // Shaders Tests
         // rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
         rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
         rect.EnableGfxAttributes(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-        // rect.EnableGfxAttributes(MESH_ENABLE.GFX.TEST_SHADERS_5, {function_operation:SID.SHADER_OPERATIONS.FLARE, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-        rect.EnableGfxAttributes(MESH_ENABLE.GFX.FLARE, {function_operation:SID.SHADER_OPERATIONS.BUBBLE, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-        rect.EnableGfxAttributes(MESH_ENABLE.GFX.FLARE, {function_operation:SID.SHADER_OPERATIONS.FLARE, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+        // rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+
+        // rect.EnableGfxOperations(SID.SHADER_OPERATIONS.SIMPLE_GLOW, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+        // rect.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+        rect.EnableGfxOperations(SID.SHADER_OPERATIONS.BUBBLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
 
         // Use u_time to quicly establish a uniform for the testing
-        // rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-        // rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
-        // rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FVEC6, UNIFORM.IN_FS);
-        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 65);
+        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 6);
 
         // Render
         rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
@@ -4206,9 +4196,9 @@ function Test_shaders_bubble_flare() { // Shaders Tests
 
         rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
         // rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1]);
-        // rect.GfxUniformSetAndUpdate('u_generic_controls', [1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        rect.GfxUniformSetAndUpdate('u_generic_controls', [1, .04, .45, 1, 1, 1, 1, 1, 1]);
         // rect.GfxUniformSetAndUpdate('u_generic_controls', [1.0, 0.02, 1]);
-        rect.GfxUniformSetAndUpdate('u_generic_controls', [1.0, 0.02, 1, 1, 1, 1]);
+        // rect.GfxUniformSetAndUpdate('u_generic_controls', [1.0, 0.02, 1, 1, 1, 1]);
 
         Construct_listen_events_from_mesh_tree(rect);
         Construct_listen_events_relations_from_mesh_tree(rect);
@@ -4225,78 +4215,80 @@ function Test_shaders_bubble_flare() { // Shaders Tests
     let ypos = 20;
     const height = 45;
 
-    // { // Slider: unif 1
-    //     const slider = CreateSlider(_, 10, ypos, .59, 'inner feather');
+    { // Slider: unif 1
+        const slider = CreateSlider(_, 10, ypos, .59, 'inner feather');
 
-    //     // Connect sliders to gfx program uniforms 
-    //     Slider_connect(slider, (params, slider_val) => {
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
 
-    //         const target_mesh1 = params.clbk_params.target_mesh1;
-    //         target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 0);
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 0);
 
-    //     }, params,
-    //     );
-    // } ypos += height;
-    // { // Slider: unif 2
-    //     const slider = CreateSlider(_, 10, ypos, .06, 'outer feather');
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 2
+        const slider = CreateSlider(_, 10, ypos, .06, 'outer feather');
 
-    //     // Connect sliders to gfx program uniforms 
-    //     Slider_connect(slider, (params, slider_val) => {
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
 
-    //         const target_mesh1 = params.clbk_params.target_mesh1;
-    //         target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 1);
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 1);
 
-    //     }, params,
-    //     );
-    // } ypos += height;
-    // { // Slider: unif 3
-    //     const slider = CreateSlider(_, 10, ypos, .28, '...');
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 3
+        const slider = CreateSlider(_, 10, ypos, .28, '...');
 
-    //     // Connect sliders to gfx program uniforms 
-    //     Slider_connect(slider, (params, slider_val) => {
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
 
-    //         const target_mesh1 = params.clbk_params.target_mesh1;
-    //         target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 2);
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 2);
 
-    //     }, params,
-    //     );
-    // } ypos += height;
-    // { // Slider: unif 4
-    //     const slider = CreateSlider(_, 10, ypos, 1., 'Specular-Ineer Feather');
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 4
+        const slider = CreateSlider(_, 10, ypos, 1., 'Specular-Ineer Feather');
 
-    //     // Connect sliders to gfx program uniforms 
-    //     Slider_connect(slider, (params, slider_val) => {
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
 
-    //         const target_mesh1 = params.clbk_params.target_mesh1;
-    //         target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 3);
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 3);
 
-    //     }, params,
-    //     );
-    // } ypos += height;
-    // { // Slider: unif 5
-    //     const slider = CreateSlider(_, 10, ypos, 1., 'Specular-Outer Feather');
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 5
+        const slider = CreateSlider(_, 10, ypos, 1., 'Specular-Outer Feather');
 
-    //     // Connect sliders to gfx program uniforms 
-    //     Slider_connect(slider, (params, slider_val) => {
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
 
-    //         const target_mesh1 = params.clbk_params.target_mesh1;
-    //         target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 4);
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 4);
 
-    //     }, params,
-    //     );
-    // } ypos += height;
-    // { // Slider: unif 6
-    //     const slider = CreateSlider(_, 10, ypos, 1., 'Specular-Intensity');
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 6
+        const slider = CreateSlider(_, 10, ypos, 1., 'Specular-Intensity');
 
-    //     // Connect sliders to gfx program uniforms 
-    //     Slider_connect(slider, (params, slider_val) => {
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
 
-    //         const target_mesh1 = params.clbk_params.target_mesh1;
-    //         target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 5);
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 5);
 
-    //     }, params,
-    //     );
-    // } ypos += height;
+        }, params,
+        );
+    } ypos += height;
+
+
 }
 
 
@@ -4968,10 +4960,12 @@ function Shader_color_functions_glow_sphere() { // Shaders Tests
         rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
         rect.EnableGfxAttributes(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
         // rect.EnableGfxAttributes(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_MIX);
-        rect.EnableGfxAttributes(MESH_ENABLE.GFX.FN_GLOW_SPHERE);
+        // rect.EnableGfxAttributes(MESH_ENABLE.GFX.FN_GLOW_SPHERE);
+        // rect.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+        rect.EnableGfxOperations(SID.SHADER_OPERATIONS.SIMPLE_GLOW2, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
 
         // Use u_time to quicly establish a uniform for the testing
-        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 6);
 
         // Render
         rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
@@ -4981,7 +4975,7 @@ function Shader_color_functions_glow_sphere() { // Shaders Tests
 
 
         rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
-        rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1]);
+        rect.GfxUniformSetAndUpdate('u_generic_controls', [4, 1, 0, 1, 1, 1]);
 
         Construct_listen_events_from_mesh_tree(rect);
         Construct_listen_events_relations_from_mesh_tree(rect);
@@ -4998,7 +4992,7 @@ function Shader_color_functions_glow_sphere() { // Shaders Tests
             Slider_connect(slider, (params, slider_val) => {
 
                 const target_mesh = params.clbk_params.target_mesh;
-                target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val * 2, 0);
+                target_mesh.GfxUniformSetAndUpdate('u_generic_controls', slider_val * 2, 0);
 
             }, params,
             );
@@ -5013,7 +5007,7 @@ function Shader_color_functions_glow_sphere() { // Shaders Tests
             Slider_connect(slider, (params, slider_val) => {
 
                 const target_mesh = params.clbk_params.target_mesh;
-                target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
+                target_mesh.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 1);
 
             }, params,
             );
@@ -5028,7 +5022,7 @@ function Shader_color_functions_glow_sphere() { // Shaders Tests
             Slider_connect(slider, (params, slider_val) => {
 
                 const target_mesh = params.clbk_params.target_mesh;
-                target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
+                target_mesh.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 2);
 
             }, params,
             );
@@ -5130,6 +5124,131 @@ function Shader_color_functions_explosion_circle(x, y, w, h, color = BLUEL[9]) {
 
 }
 
+
+function Test_shaders_operations() { // Shaders Tests
+
+    let rect1 = null;
+    {
+        // const dim=300
+        const dim = 80
+        // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], PURPLE[1], 'TEST-SHADERS',);
+        const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], PURPLE[9], 'TEST-SHADERS',);
+        // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], WHITE, 'TEST-SHADERS',);
+        // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 300, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
+        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+        rect.EnableGfxAttributes(MESH_ENABLE.GFX.PASS_VPOS2);
+        rect.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+
+        rect.EnableGfxOperations(SID.SHADER_OPERATIONS.DIST_RECT_FILLED, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+        rect.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+        // rect.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+        // rect.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_CIRCLE, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+        // rect.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SPECULAR_CIRCLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+        // Use u_time to quicly establish a uniform for the testing
+        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 6);
+
+        // Render
+        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+
+        rect.Render();
+        Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
+
+        rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
+        rect.GfxUniformSetAndUpdate('u_generic_controls', [1, 1, 1, 1, 1, 1]);
+
+        Construct_listen_events_from_mesh_tree(rect);
+        Construct_listen_events_relations_from_mesh_tree(rect);
+
+        rect1 = rect;
+
+    }
+
+
+    const params = {
+        target_mesh1: rect1,
+    };
+
+    let ypos = 20;
+    const height = 45;
+
+    { // Slider: unif 1
+        const slider = CreateSlider(_, 10, ypos, .5, 'Corner Roundness');
+
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
+
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 0);
+
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 2
+        const slider = CreateSlider(_, 10, ypos, 1., 'Min Size');
+
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
+
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 1);
+
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 3
+        const slider = CreateSlider(_, 10, ypos, .0, 'Feather');
+
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
+
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 2);
+
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 4
+        const slider = CreateSlider(_, 10, ypos, .45, '...');
+
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
+
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 3);
+
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 5
+        const slider = CreateSlider(_, 10, ypos, .75, '...');
+
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
+
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 4);
+
+        }, params,
+        );
+    } ypos += height;
+    { // Slider: unif 6
+        const slider = CreateSlider(_, 10, ypos, .1, '...');
+
+        // Connect sliders to gfx program uniforms 
+        Slider_connect(slider, (params, slider_val) => {
+
+            const target_mesh1 = params.clbk_params.target_mesh1;
+            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 5);
+
+        }, params,
+        );
+    } ypos += height;
+
+
+}
 
 
 

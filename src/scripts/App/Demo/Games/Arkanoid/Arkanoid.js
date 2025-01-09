@@ -19,6 +19,7 @@ import { Bullet_create, Bullet_init_buffer, Bullet_update, Gun_update_pos_x } fr
 import { Player, Player_get_pad } from "./Player.js";
 import { Powup_init_buffer } from "./PowerUps.js";
 import { Score_mod_init_buffer } from "./ScoreMod.js";
+import { New_generic_buffer } from "../../../../Engine/Core/Buffers.js";
 
 
 
@@ -44,6 +45,8 @@ const _arkanoid_struct = {
    score_num:0,
    score_mod_num:0,
    score_base_num:10, 
+
+   vertex_buffers:New_generic_buffer(_, 'Akanoid all Vb indexes'),
    
 };
 
@@ -177,7 +180,7 @@ export function Arkanoid_initialize() {
    
    // Pre initialize buffers
    // Explosions
-   const fx_vb_grouidx = Effects_explosion_circle_init_buffer()
+   const fx_explosion_circle_vb_grouidx = Effects_explosion_circle_init_buffer()
    const fx_explosion_glow_vb_grouidx = Effects_explosion_glow_init_buffer()
    // Coin
    const coin_vb_grouidx = Coin_init_buffer(_);
@@ -214,9 +217,9 @@ export function Arkanoid_initialize() {
    
    
    Renderqueue_set_priority_by_vb(LAST, bricks_buffer.buffer[0].mesh.gfx.vb.groupidx);
-   Renderqueue_set_priority_by_vb(LAST, fx_vb_grouidx);
-   Renderqueue_set_priority_by_vb(LAST, fx_explosion_glow_vb_grouidx);
+   Renderqueue_set_priority_by_vb(LAST, fx_explosion_circle_vb_grouidx);
    Renderqueue_set_priority_by_vb(LAST, powup_vb_grouidx);
+   Renderqueue_set_priority_by_vb(LAST, fx_explosion_glow_vb_grouidx);
    Renderqueue_set_priority_by_vb(LAST, coin_vb_grouidx);
    Renderqueue_set_priority_by_vb(LAST, score_vb_grouidxs.label);
    Renderqueue_set_priority_by_vb(LAST, score_vb_grouidxs.text_mesh);
@@ -244,7 +247,7 @@ export function Arkanoid_initialize() {
 
 }
 
-
+// Mouse click event callback
 function Arkanoid_on_click_callback(params) {
 
    if(ARK_STATE.IS(ARK_STATE.IN_START)) { // Case the ball is at start position
@@ -259,6 +262,10 @@ function Arkanoid_on_click_callback(params) {
 
 
 
+function Arkanoid_start_menu(params) {
+
+
+}
 function Arkanoid_run(params) {
 
    const panel = params.params.panel;

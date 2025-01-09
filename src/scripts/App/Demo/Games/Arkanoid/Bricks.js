@@ -6,11 +6,12 @@ import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_explosion_glow_get_mesh_byidx, Effects_explosion_glow_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREEN, GREY, PURPLE, WHITE, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Timer_get_global_timer } from "../../../../Engine/Timers/Timers.js";
+import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_particles_batch_set_col4_wpos4_dim2_tex2_rot4, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { GetRandomInt, GetSign } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Floor, Min } from "../../../../Helpers/Math/MathOperations.js";
 import { Arkanoid_get_main_panel_padx, Arkanoid_get_main_panel_padxy, Arkanoid_get_main_panel_pady, Arkanoid_get_panel_center_pos_x, Arkanoid_get_panel_right } from "./Arkanoid.js";
-import { Ball_get_dim_xy, Ball_get_pos_xy } from "./Ball.js";
 import { Coin_create, Coin_get_byidx, Coin_remove_byidx } from "./Coin.js";
 import { Player_check_coin_collision, Player_get_dimy, Player_get_top, Player_check_powup_collision } from "./Player.js";
 import { Powup_create, Powup_get_byidx, Powup_remove_byidx, Powup_resolve_hit, POWUP_TYPE_IDXS } from "./PowerUps.js";
@@ -141,19 +142,22 @@ export class Brick {
       this.lock_squash_anim = false;
       this.hit_side = BRICK_HIT_SIDE.NONE;
 
-      if(type_id===1) {
+      this.powup_type_idx = INT_NULL;
 
-         this.powup_type_idx = POWUP_TYPE_IDXS.NEW_BALL;
-      }
-      else if(type_id===2) {
+      // if(type_id===1) {
+
+      //    this.powup_type_idx = POWUP_TYPE_IDXS.NEW_BALL;
+      // }
+      // else if(type_id===2) {
          
-         this.powup_type_idx = POWUP_TYPE_IDXS.SCALE_BALL;
-      }
-      else if(type_id===3) { 
+      //    this.powup_type_idx = POWUP_TYPE_IDXS.SCALE_BALL;
+      // }
+      // else if(type_id===3) { 
          
-         this.powup_type_idx = POWUP_TYPE_IDXS.SCALE_PLAYER;
-      }
-      else if(type_id===4) {
+      //    this.powup_type_idx = POWUP_TYPE_IDXS.SCALE_PLAYER;
+      // }
+      // else 
+      if(type_id===4) {
 
          this.powup_type_idx = POWUP_TYPE_IDXS.FIRE_BULLET;
       }
@@ -297,7 +301,7 @@ function Bricks_find_rows_from_pos(ballx, bally, ball_size) {
  * @param {*} dify The difference of ball's pos current pos with ball's next pos
  * @returns 
  */
-export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx, diry, ball_idx) {
+export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx, diry) {
 
    const ret = [1, 1];
 
@@ -323,12 +327,12 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
             const br_r = brick.mesh.geom.pos[0] + brick.mesh.geom.dim[0] * 2;
             const br_t = brick.mesh.geom.pos[1];
             const br_b = brick.mesh.geom.pos[1] + brick.mesh.geom.dim[1] * 2;
-            const bl_l = posx;
-            const bl_r = posx + (dimx * 2);
-            const bl_t = posy;
-            const bl_b = posy + (dimy * 2);
+            const l = posx;
+            const r = posx + (dimx * 2);
+            const t = posy;
+            const b = posy + (dimy * 2);
 
-            if (bl_r > br_l && bl_l < br_r && bl_b > br_t && bl_t < br_b) {
+            if (r > br_l && l < br_r && b > br_t && t < br_b) {
 
                /**
                 * // TODO: Since we need to resolve the hit side by conventional means, maybe the fancy point of collision calculation must go!
@@ -336,13 +340,13 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
 
                // Find the point of contact
 
-               let l = Abs(bl_r - difx - br_l); // From brick's left side
-               let r = Abs(bl_l - difx - br_r); // From brick's right side
-               let t = Abs(bl_b - dify - br_t); // From brick's top side
-               let b = Abs(bl_t - dify - br_b); // From brick's bottom side
+               let l2 = Abs(r - difx - br_l); // From brick's left side
+               let r2 = Abs(l - difx - br_r); // From brick's right side
+               let t2 = Abs(b - dify - br_t); // From brick's top side
+               let b2 = Abs(t - dify - br_b); // From brick's bottom side
 
-               const x = Abs(Min(l, r));
-               const y = Abs(Min(t, b));
+               const x = Abs(Min(l2, r2));
+               const y = Abs(Min(t2, b2));
 
                /** // TODO: We need the balls direction in the point of contact to correctly calculate for diagonal collisions */
 
@@ -369,9 +373,7 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
                // Remove mesh from the brick row(by setting the index to INT_NULL)
                rowidxs.buffer[cols_found[j]] = INT_NULL;
 
-               Clbk_animation_push(brick, ball_idx);
-
-               
+               Clbk_animation_push(brick, posx, posy, dimx, dimy);
 
                return ret;
             }
@@ -379,6 +381,56 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
       }
    }
    return ret;
+}
+export function Bricks_check_collision_column_only(posx, posy, dimx, dimy, diry) {
+
+   const ret = [1, 1];
+
+   const rc = Bricks_find_rows_from_pos(posx, posy, dimx, dimy);
+   const rows_found = rc.rows;
+   const cols_found = rc.cols;
+   const rows_len = rc.rows_len;
+   const cols_len = rc.cols_len;
+
+   for (let i = 0; i < rows_len; i++) {
+
+      const rowidxs = _bricks_rows[rows_found[i]]; // Get the row of brick indexes
+
+      for (let j = 0; j < cols_len; j++) {
+
+         const elem_idx = rowidxs.buffer[cols_found[j]]; // elem_idx is the index of the brick in the _bricks_buffer
+         if (elem_idx !== INT_NULL) { // If there is no brick at this row-column, elem_idx should be INT_NULL
+
+            const brick = _bricks_buffer.buffer[elem_idx];
+
+            // check the actual ball-brick meshes collision
+            const br_l = brick.mesh.geom.pos[0];
+            const br_r = brick.mesh.geom.pos[0] + brick.mesh.geom.dim[0] * 2;
+            const br_t = brick.mesh.geom.pos[1];
+            const br_b = brick.mesh.geom.pos[1] + brick.mesh.geom.dim[1] * 2;
+            const l = posx;
+            const r = posx + (dimx * 2);
+            const t = posy;
+            const b = posy + (dimy * 2);
+
+            if (r > br_l && l < br_r && b > br_t && t < br_b) {
+
+               ret[1] = -1;
+               if (diry < 0) brick.hit_side = BRICK_HIT_SIDE.BOTTOM;
+               else if (diry > 0) brick.hit_side = BRICK_HIT_SIDE.TOP;
+               else alert('887766 NO Y DIR WAS RESOLVED. PROBABLY DIR=0 ')
+
+               // Remove mesh from the brick row(by setting the index to INT_NULL)
+               rowidxs.buffer[cols_found[j]] = INT_NULL;
+
+               Clbk_animation_push(brick, posx, posy, dimx, dimy);
+
+               return true;
+            }
+         }
+      }
+   }
+   return false;
 }
 
 
@@ -388,7 +440,7 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
 /**************************************************************************************************************************************************************/
 // Brick Push-Pull animation
 
-function Clbk_animation_push(brick, ball_idx, time_step = 0.02, slope_const = 0.2, scale = 2) {
+function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step = 0.02, slope_const = 0.2, scale = 2) {
    
    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
 
@@ -430,18 +482,18 @@ function Clbk_animation_push(brick, ball_idx, time_step = 0.02, slope_const = 0.
 
 
    // Create explosion glow mesh
-   const ball_pos = Ball_get_pos_xy(ball_idx);
-   const ball_dim = Ball_get_dim_xy(ball_idx);
+   // const ball_pos = Ball_get_pos_xy(ball_idx);
+   // const ball_dim = Ball_get_dim_xy(ball_idx);
    const explosion_glow_size = h*3;
    // const ball_x = ball_pos[0]+ball_dim[0]+_main_panel_pad.x - explosion_glow_size;
    // const ball_y = ball_pos[1]+ball_dim[1]+_main_panel_pad.y;
    // const ex_glow_y = (ball_y) + (((y+h) - (ball_y))/2 - explosion_glow_size);
-   const ball_x = ball_pos[0]+_main_panel_pad.x;
-   const ball_y = ball_pos[1]+_main_panel_pad.y;
-   const ex_glow_y = (ball_y) + (((y+h) - (ball_y))/2);
+   const xx = hit_posx+_main_panel_pad.x;
+   const yy = hit_posy+_main_panel_pad.y;
+   const ex_glow_y = (yy) + (((y+h) - (yy))/2);
    // const x = coin.geom.pos[0];
    // const y = coin.geom.pos[1];
-   Effects_create_explosion_glow(ball_x, ex_glow_y, explosion_glow_size, explosion_glow_size, ball_dim[0], h, WHITE);
+   Effects_create_explosion_glow(xx, ex_glow_y, explosion_glow_size, explosion_glow_size, hit_w, h, WHITE);
 
 }
 
@@ -720,16 +772,12 @@ function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
    // Coin Glow effect
    const coin_glow_fx_idx = Effects_create_explosion_circle(x, y, coin_size*1.6, coin_size*1.6, w, h, YELLOW[9])
    const coin_glow_fx = Effect_explosion_circle_get_mesh_byidx(coin_glow_fx_idx);
-   
-   // Create power up
-   const powup_size = 16;
-   const powup_idx = Powup_create(x, y, powup_size, powup_size, w, h, params.brick.powup_type_idx);
-   const powup = Powup_get_byidx(powup_idx);
+
 
    
    // Powup Glow effect
-   const powup_glow_fx_idx = Effects_create_explosion_circle(x, y, powup_size*1.6, powup_size*1.6, w, h, WHITE)
-   const powup_glow_fx = Effect_explosion_circle_get_mesh_byidx(powup_glow_fx_idx);
+   // const powup_glow_fx_idx = Effects_create_explosion_circle(x, y, powup_size*1.6, powup_size*1.6, w, h, WHITE)
+   // const powup_glow_fx = Effect_explosion_circle_get_mesh_byidx(powup_glow_fx_idx);
    
    const arkanoid_panel_center_posx = Arkanoid_get_panel_center_pos_x();
    const arkanoid_panel_right = Arkanoid_get_panel_right();
@@ -738,7 +786,7 @@ function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
 
    const params_coin = {
       coin:coin,
-      powup:powup,
+      // powup:powup,
       timer: 0, 
       timer_limit: 1, 
       timer_step: .01, 
@@ -751,13 +799,28 @@ function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
    };
    Callback_animations_create(Animation_coin_run, Animation_coin_stop, params_coin,);
 
-   const params_powup = {
-      powup:powup,
-      brick_center_ratio:Quadratic_interpolation(0, arkanoid_panel_right, params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0]),
 
-      powup_glow_fx: powup_glow_fx, 
-   };
-   Callback_animations_create(Animation_powup_run, Animation_powup_stop, params_powup,);
+      
+   // Create power up
+   if(params.brick.powup_type_idx !== INT_NULL) {
+      
+      const powup_size = 16;
+      const powup_idx = Powup_create(x, y, powup_size, powup_size, w, h, params.brick.powup_type_idx);
+      const powup = Powup_get_byidx(powup_idx);
+      const params_powup = {
+         powup:powup,
+         brick_center_ratio:Quadratic_interpolation(0, arkanoid_panel_right, params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0]),
+         timer: 1, 
+         timer_step: .01, 
+         dir: 1, 
+         // rand: GetRandomInt(10, 100) * .01,
+         rand: 0,
+   
+         // powup_glow_fx: powup_glow_fx, 
+         powup_glow_fx: null, 
+      };
+      Callback_animations_create(Animation_powup_run, Animation_powup_stop, params_powup,);
+   }
 
 }
 function Animation_explosion_circle_run(params) {
@@ -913,7 +976,7 @@ function Animation_powup_run(params) {
          if(player_hit) { // Remove the powup and run powup glow animation
 
             Powup_remove_byidx(params.powup.idx);
-            Effect_explosion_circle_remove_mesh_byidx(params.powup_glow_fx.idx);
+            // Effect_explosion_circle_remove_mesh_byidx(params.powup_glow_fx.idx);
             
             // Set up the powup's glow animation
             const x = powup.GetPosX()+powup.geom.dim[0];
@@ -940,7 +1003,7 @@ function Animation_powup_run(params) {
 
       else if (powup.geom.pos[1] > VIEWPORT.BOTTOM + 100) { // else if powup exceeds limit y pos, remove it
          Powup_remove_byidx(params.powup.idx);
-         Effect_explosion_circle_remove_mesh_byidx(params.powup_glow_fx.idx);
+         // Effect_explosion_circle_remove_mesh_byidx(params.powup_glow_fx.idx);
          return false;
       }
 
@@ -948,17 +1011,57 @@ function Animation_powup_run(params) {
 
 
 
-   const powup_glow_fx = params.powup_glow_fx.mesh;
    
-   const y = 6;
+   // const sin = Math.sin(Timer_get_global_timer()*5)*2;
+   // const sin = Math.sin(Timer_get_global_timer()*2)*1;
+   // const x = Math.sin(((4*sin)*(4*sin))-(4*sin)+1);
+   // const t = Timer_get_global_timer()*100;
+   params.timer += params.timer_step;
+   // if(params.dir === 1 && params.timer >= 1) {
+   if(params.timer >= 1) {
+      params.dir = -1;
+      params.timer_step = -.03;
+      // params.timer=.0
+      
+   }
+   // if(params.dir === -1 && params.timer <= -1) {
+   if(params.timer <= -1) {
+      params.dir = 1;
+      params.timer_step = .03;
+      // params.timer=.0
+   }
+   // const t = (params.timer-.5)*2.;
+   const t = (params.timer)*.5;
+   // const a = ((8*(t*t))-(8*t))+1;
+   
+   const a = GetSign(t);
+   const b = Abs(t);
+   const x = b*a*8; // Bounce
+   // if(params.powup.idx===11)
+   //    console.log(b)
+   const c = Abs((1*b)-1); // 0,2,0
 
-   // Update powup animation position
-   powup.geom.pos[1] += y;
-   Gl_add_wpos_y(powup.gfx, y);
+   const f = 1;
+   const bb = Abs(params.timer * f);
+   const d = (bb)-f;
+   // const y = (-((d+d*d+d)*d*4) ) + (bb*bb*4+bb+bb+bb+bb) + rand;
+   // const y = (-((d+d*d+d)*d*4) ) + (bb*bb*8) + params.rand;
+   // const y = ((-((d+d*d+d)*((d-.5)*2)) ) + (bb*bb*5)) * params.rand;
+   // const y = ((-((d+d*d+d)*((d-.5)*1)) ) + (bb*bb*12)) + params.rand;
+   const y = 1-(d + params.rand);
    
-   // Update powup glow animation position
-   powup_glow_fx.geom.pos[1] += y;
-   Gl_add_wpos_y(powup_glow_fx.gfx, y);
+   // Update powup animation position
+   powup.geom.pos[0] += x;
+   powup.geom.pos[1] += y;
+   Gl_add_wpos_xy(powup.gfx, x, y);
+   // Gl_add_wpos_y(powup.gfx, y);
+   
+   // const powup_glow_fx = params.powup_glow_fx.mesh;
+   // // Update powup glow animation position
+   // powup_glow_fx.geom.pos[0] += x;
+   // powup_glow_fx.geom.pos[1] += y;
+   // // Gl_add_wpos_y(powup_glow_fx.gfx, y);
+   // Gl_add_wpos_xy(powup_glow_fx.gfx, x, y);
    
    return true
    

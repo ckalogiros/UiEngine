@@ -240,8 +240,6 @@ const blend_color_overlay_vec3    = `vec3( blm_overlay(a.r, b.r), blm_overlay(a.
 const blend_color_overlay_vec4_3  = `vec4( blm_overlay(a.r, b.r), blm_overlay(a.g, b.g), blm_overlay(a.b, b.b), a.a )`;
 
 
-// #define blm_multiply(a, b) \\
-// #include <blend_mode_multiply>
 const blend_mode_functions   = 
 `
 #define blm_add(a, b)         ${blend_mode_add}

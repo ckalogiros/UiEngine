@@ -1,5 +1,5 @@
-// export const frag_noise_call = `   color = blend_mode_vec4( color, Noise_procedural(scale_down) );`;
-export const frag_noise_call = `   color = Noise_procedural(scale_down);`;
+// export const frag_noise_call = `   color = blend_mode_vec4( final_color, Noise_procedural(scale_down) );`;
+export const frag_noise_call = `   final_color = Noise_procedural(scale_down);`;
 export const frag_noise = `\
 
 
@@ -120,8 +120,8 @@ vec4 Noise_procedural(float scale_down)
 
 
 // NOTE: This is still a test noise shader function and it is not used
-// export const frag_noise_call = `   color = blend_mode_vec4( color, Noise_procedural(scale_down) );`;
-export const frag_noise_2_call = `   color = Noise_procedural_2(scale_down);`;
+// export const frag_noise_call = `   final_color = blend_mode_vec4( final_color, Noise_procedural(scale_down) );`;
+export const frag_noise_2_call = `   final_color = Noise_procedural_2(scale_down);`;
 export const frag_noise_2 = `\
 
 

@@ -24,7 +24,7 @@ import { BLUEL, GREY, WHITE } from "../Material/Base/Colors.js";
 
 
 
-const PRE_INITIALIZED_EXPLOSION_MESHES = 1;
+const PRE_INITIALIZED_EXPLOSION_MESHES = 12;
 
 
 

@@ -13,9 +13,9 @@
 
 
 
-export const frag_glow_sphere_call = '   color = blend_color_multiply( color, frag_glow_sphere() );'
-// export const frag_glow_sphere_call = '   color = blend_color_add( color, frag_glow_sphere() );'
-// export const frag_glow_sphere_call = '   color = blend_mode_vec4( color, frag_glow_sphere() );'
+export const frag_glow_sphere_call = '   final_color = blend_color_multiply( final_color, frag_glow_sphere() );'
+// export const frag_glow_sphere_call = '   final_color = blend_color_add( final_color, frag_glow_sphere() );'
+// export const frag_glow_sphere_call = '   final_color = blend_mode_vec4( final_color, frag_glow_sphere() );'
 
 export const frag_glow_sphere = `
 
@@ -53,18 +53,19 @@ export const frag_glow_sphere = `
 vec4 frag_glow_sphere()
 {
 
-  #ifdef U_GENERIC_VEC3
-    #include <u_generic_vec3>
-  #elif defined(U_GENERIC_VEC2)
-    #include <u_generic_vec2>
-  #elif defined(U_GENERIC_FLOAT)
-    #include <u_generic_float>
+  #ifdef U_GENERIC_CONTROLS
+    float ctrl1 = u_generic_controls[0];
+    float ctrl2 = u_generic_controls[1];
+    float ctrl3 = u_generic_controls[2];
+    float ctrl4 = u_generic_controls[3];
+    float ctrl5 = u_generic_controls[4];
+    float ctrl6 = u_generic_controls[5];
   #endif
   
   
   
   vec2 res = u_screen_res;
-  vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
+  vec2 local_res = vec2(v_dim2_x, v_dim2_y);
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   
@@ -73,35 +74,35 @@ vec4 frag_glow_sphere()
   uv1.y -= (res.y - (v_wpos3_y+local_res.y)) / local_res.y; // Invalidate any mesh world position.
   uv1.y -= 1.;
 
-  uv1 *= 2.;
-
 
   /**********************************************/
   // Distance
   float dd = 1.-length( vec2(uv1.x, uv1.y ));
   // float dd = 1.-length( vec2( abs((uv1.x - .5)* 2.), abs(uv1.y - .5)* 2. ));
-  dd = smoothstep(0., control1, dd);
+  dd = smoothstep(0., ctrl1, dd);
   
   
   /**********************************************/
   // Color 1
   float c1 = dd;
   c1 = pow(c1, .4);
-  c1 += dd*control2*2.;
+  c1 += dd*ctrl2*2.;
   
   /**********************************************/
   // Color 2
   float c2 = 1.;
-  // c2 = clamp(0., 1., (dd+dd) * control3 * 5.);
-  c2 = (dd+dd) * control3 * 5.;
-  // c2 = pow(c2, control3*4.) * c2;
+  // c2 = clamp(0., 1., (dd+dd) * ctrl3 * 5.);
+  c2 = (dd+dd) * ctrl3 * 5.;
+  // c2 = pow(c2, ctrl3*4.) * c2;
   
   /**********************************************/
   // Mix Colors
-  c1 = blend_mode(c1, c2);
+  // c1 = blend_mode(c1, c2);
+  c1 += c2;
   
   vec3 color = vec3(c1);
-  return vec4(color, 1.);
+  // return vec4(color, 1.);
+  return vec4(color, .0);
   // return vec4(color, src_color.rgb, src_color.a);
   // return vec4(color*src_color.rgb, src_color.a);
 }
@@ -114,8 +115,8 @@ vec4 frag_glow_sphere()
 
 export const frag_inner_shadow_rhomboid_call = `
   vec4 new_color = inner_shadow_rhomboid();
-  color = blend_mode_vec4( color, new_color );
-  // color = blend_color_mix( color, new_color, color.a );
+  final_color = blend_mode_vec4( final_color, new_color );
+  // final_color = blend_color_mix( final_color, new_color, final_color.a );
 `;
 
 export const frag_inner_shadow_rhomboid = `
@@ -248,8 +249,8 @@ vec4 inner_shadow_rhomboid()
 /*************************************************************************************************************************/
 
 export const frag_explosion_circle_call = `
-  // color = blend_mode_vec4( color, frag_explosion_circle() );
-  color = frag_explosion_circle();
+  // final_color = blend_mode_vec4( final_color, frag_explosion_circle() );
+  final_color = frag_explosion_circle();
 `;
 
 export const frag_explosion_circle = `
@@ -420,8 +421,9 @@ vec4 frag_explosion_circle()
 
 export const frag_explosion_glow_call = `
   vec4 new_color = frag_explosion_glow();
-  // color = blend_color_mix( color, new_color, color.a );
-  color = blend_color_multiply( color, new_color );
+  // final_color = blend_color_mix( final_color, new_color, final_color.a );
+  // final_color = blend_color_multiply( final_color, new_color );
+  final_color = new_color;
 `;
 
 export const frag_explosion_glow = `
@@ -457,13 +459,15 @@ export const frag_explosion_glow = `
 
 vec4 frag_explosion_glow()
 {
+// TODO: Implement with u_generic_controls[counter++] from fragment main() 
   #ifdef U_GENERIC_CONTROLS
-    float ctrl1 = u_generic_controls[0];
-    float ctrl2 = u_generic_controls[1];
-    float ctrl3 = u_generic_controls[2];
-    float ctrl4 = u_generic_controls[3];
-    float ctrl5 = u_generic_controls[4];
-    // float ctrl6 = u_generic_controls[5];
+  //   float ctrl1 = u_generic_controls[0];
+  //   float ctrl2 = u_generic_controls[1];
+  //   float ctrl3 = u_generic_controls[2];
+  //   float ctrl4 = u_generic_controls[3];
+  //   float ctrl5 = u_generic_controls[4];
+  //   // float ctrl6 = u_generic_controls[5];
+  int u_gen_ctrl_map_cnt = 0;
   #endif
 
   vec2 res = u_screen_res;
@@ -482,25 +486,26 @@ vec4 frag_explosion_glow()
     Animate the ctrl1 from high to low
     Animate the ctrl2(smoothstep inner) from low to high
   */
-  // float d = 2. - length(uv)*6.*ctrl1+rev_time;
-  float d = .7 - length(uv)*2.*ctrl1+(rev_time*.5);
-  // float d = 1. - length(uv)*3.*ctrl1+(rev_time*.5);
-  // float d = 1. - length(uv)*2.5*ctrl1;
-  // float d = .7 - length(uv)*ctrl1;
+  // float d = 2. - length(uv)*6.*u_generic_controls[u_gen_ctrl_map_cnt++]+rev_time;
+  float d = .7 - length(uv)*2.*u_generic_controls[u_gen_ctrl_map_cnt++]+(rev_time*.5);
+  // float d = 1. - length(uv)*3.*u_generic_controls[u_gen_ctrl_map_cnt++]+(rev_time*.5);
+  // float d = 1. - length(uv)*2.5*u_generic_controls[u_gen_ctrl_map_cnt++];
+  // float d = .7 - length(uv)*u_generic_controls[u_gen_ctrl_map_cnt++];
   
-  // float c = d * smoothstep(ctrl2, ctrl3, (d));
-  // float c = d * smoothstep(.8, ctrl3, (d));
-  // float c = d * smoothstep(ctrl2, .6*time*time, (d));
-  float c = d * smoothstep(ctrl2, 1.*rev_time, (d));
+  // float c = d * smoothstep(u_generic_controls[u_gen_ctrl_map_cnt++], u_generic_controls[u_gen_ctrl_map_cnt++], (d));
+  // float c = d * smoothstep(.8, u_generic_controls[u_gen_ctrl_map_cnt++], (d));
+  // float c = d * smoothstep(u_generic_controls[u_gen_ctrl_map_cnt++], .6*time*time, (d));
+  float c = d * smoothstep(u_generic_controls[u_gen_ctrl_map_cnt++], 1.*rev_time, (d));
   
   c *=c;
 
   /* Animate a control from high to low for the third parameters of the smoothmin function */
-  // c = smoothmin(c,  2.*ctrl4, c*ctrl5);
+  // c = smoothmin(c,  2.*u_generic_controls[u_gen_ctrl_map_cnt++], c*u_generic_controls[u_gen_ctrl_map_cnt++]);
 
 
   // return vec4(c);
   return vec4(c*rev_time*rev_time);
+  // return RED;
   // return vec4(vec3(c), c*time*time);
     
 }
