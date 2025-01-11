@@ -665,8 +665,8 @@ export function TestWidgetsGeneric(createId = 1) {
 
     // Bitwise_operations_run_test();
 
-    Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
-    Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);
+    // Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT);
+    // Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);
     // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
 
     // Demo_page();

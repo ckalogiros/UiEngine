@@ -816,7 +816,7 @@ function Fragment_shader_resolve_attributes_in() {
 export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=null) {
 
    Fragment_shader_resolve_attributes_in();
-   console.log(shader_operations.fs_op_flare)
+
    const fs_chunks = [
       '#version 300 es',
       

@@ -12,10 +12,12 @@
 
 "use strict";
 
+import { ARK_STATE } from "../../../App/Demo/Games/Arkanoid/ArkanoisConstants.js";
 import { Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_vpos_xy, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { View_add_to_group, View_build_group_from_root_mesh } from "../../Core/Views/MeshBufferViews.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { BLUEL, GREY, WHITE } from "../Material/Base/Colors.js";
 
@@ -55,9 +57,9 @@ class Effect_Mesh_Explosion_Circle {
 
    constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], vb_groupidx=INT_NULL) {
 
-      this.timer = 0;
-      this.timer_limit = 0;
-      this.timer_step = 0;
+      // this.timer = 0;
+      // this.timer_limit = 0;
+      // this.timer_step = 0;
 
       const mesh = Create_rect_mesh(_, [0, 0, 1], [w, h], color, 'ExplosionMeshCircle',);
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -128,19 +130,33 @@ export function Effect_explosion_circle_destroy_mesh_byidx(idx = INT_NULL) {
       _effect_explosion_circle_mesh_buffer.RemoveByIdx(idx);
    const mesh = _effect_explosion_circle_mesh_buffer.buffer[idx].mesh;
    mesh.Destroy();
+
+
 }
 
 
-export function Effects_explosion_circle_init_buffer(num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h,  vb_grouidx=INT_NULL) {
+export function Effects_explosion_circle_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h) {
 
+   let vb_groupidx = INT_NULL;
+   let effect = null;
+   
    for(let i=0; i<num_effect_meshes; i++) {
-      const effect = new Effect_Mesh_Explosion_Circle(_, _, w, h, _, vb_grouidx); 
-      vb_grouidx = effect.mesh.gfx.vb.groupidx;
+
+      effect = new Effect_Mesh_Explosion_Circle(_, _, w, h, _, vb_groupidx); 
+      vb_groupidx = effect.mesh.gfx.vb.groupidx;
+
+      // Add to View Group
+      View_add_to_group(effect.mesh, group_idx);
+      // Implement to draw wpos from a root uniform wpos 
+      if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(effect.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+
+
       Effect_explosion_circle_remove_mesh_byidx(effect.idx);
    }
-   EFFECTS_TYPES.EXPLOSION_CIRCLE.VB_GROUP_IDX = vb_grouidx;
+   EFFECTS_TYPES.EXPLOSION_CIRCLE.VB_GROUP_IDX = vb_groupidx;
 
-   return vb_grouidx;
+   // return vb_groupidx;
+   return effect;
 
 }
 
@@ -157,9 +173,9 @@ export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, co
       idx = _free_effect_explosion_circle_idx_buffer.buffer[freeidx];
       const effect = _effect_explosion_circle_mesh_buffer.buffer[idx];
 
-      effect.timer = 0;
-      effect.timer_limit = 1;
-      effect.timer_step = 0.01;
+      // effect.timer = 0;
+      // effect.timer_limit = 1;
+      // effect.timer_step = 0.01;
       effect.is_active = true;
 
       // TODO: Create a Gl_ function to update all attributes in one go
@@ -276,7 +292,6 @@ class Effect_Mesh_Explosion_Glow {
       
       
       mesh.Render();
-      
       mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
       
       // Initialize generic uniforms, only once(first mesh initialization)
@@ -322,17 +337,28 @@ export function Effects_explosion_glow_destroy_mesh_byidx(idx = INT_NULL) {
    mesh.Destroy();
 }
 
-
-export function Effects_explosion_glow_init_buffer(num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h,  vb_grouidx=INT_NULL) {
+export function Effects_explosion_glow_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h) {
+      
+   let vb_groupidx = INT_NULL;
+   let effect = null;
 
    for(let i=0; i<num_effect_meshes; i++) {
-      const effect = new Effect_Mesh_Explosion_Glow(_, _, w, h, _, vb_grouidx); 
-      vb_grouidx = effect.mesh.gfx.vb.groupidx;
-      Effects_explosion_glow_remove_mesh_byidx(effect.idx);
-   }
-   EFFECTS_TYPES.EXPLOSION_GLOW.VB_GROUP_IDX = vb_grouidx;
 
-   return vb_grouidx;
+      effect = new Effect_Mesh_Explosion_Glow(_, _, w, h, _, vb_groupidx); 
+      vb_groupidx = effect.mesh.gfx.vb.groupidx;
+
+      // Add to View Group
+      View_add_to_group(effect.mesh, group_idx);
+      // Implement to draw wpos from a root uniform wpos 
+      if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(effect.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+
+
+      Effect_explosion_circle_remove_mesh_byidx(effect.idx);
+   }
+   EFFECTS_TYPES.EXPLOSION_GLOW.VB_GROUP_IDX = vb_groupidx;
+
+   // return vb_groupidx;
+   return effect;
 
 }
 
@@ -404,8 +430,12 @@ export function Effects_explosion_glow_update() {
    for(let i=0; i <= _effect_explosion_glow_mesh_buffer.boundary; i++) {
 
       const ex = _effect_explosion_glow_mesh_buffer.buffer[i];
-
+      
       if(ex.is_active) {
+   
+         if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) {
+            ex.timer = ex.timer_limit;
+         }
 
          // Stop exlposion animation if time limit is reached   
          if (ex.timer >= ex.timer_limit + ex.timer_step) {
@@ -419,4 +449,19 @@ export function Effects_explosion_glow_update() {
       }
    }
    
+}
+
+
+
+
+
+
+
+/*******************************************************************************************************/
+// Debug Print
+export function Effects_print() {
+   console.log(
+      'Effects circle buffer', _effect_explosion_circle_mesh_buffer.buffer,
+      'Effects glow buffer', _effect_explosion_glow_mesh_buffer.buffer,
+   );
 }

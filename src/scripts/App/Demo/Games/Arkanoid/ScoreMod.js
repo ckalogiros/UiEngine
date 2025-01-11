@@ -2,7 +2,8 @@
 
 import { New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_widget_label } from "../../../../Engine/Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Gl_set_alpha } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Arkanoid_calc_score } from "./Arkanoid.js";
@@ -29,7 +30,7 @@ class Score_Mod {
    constructor(score_mod_num, text, x=0, y=0, font=TEXTURES.MSDF_COMIC_1024, font_size=6, color, text_color, vb_groupidxs=INT_NULL) {
 
       // const pos = [x, y, 2];
-      const mesh = Create_widget_label(_, text, _, [0,0, 4], font_size, TRANSPARENT, text_color, [0, 0], .5, _, font,);
+      const mesh = Create_widget_label(_, text, _, [0, 0, 4], font_size, TRANSPARENT, text_color, [0, 0], .5, _, font,);
       // const mesh = Create_widget_label(_, text, _, [0,0, 2], font_size, WHITE, text_color, [0, 0], .5, _, font,);
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 30);
@@ -118,10 +119,11 @@ export function Score_mod_destroy_text_mesh_byidx(idx = INT_NULL) {
    mesh.Destroy();
 }
 
-export function Score_mod_init_buffer(num_effect_meshes=PRE_INITIALIZED_SCORE_MOD_TEXT_MESHES) {
+export function Score_mod_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes=PRE_INITIALIZED_SCORE_MOD_TEXT_MESHES) {
 
 
    for(let i=0; i<num_effect_meshes; i++) {
+
       const score_mod = new Score_Mod(1.2, 'x1.2', _, _, SCORE_TEXT_MOD_FONT, SCORE_TEXT_MOD_INITIAL_FONT_SIZE, _, SCORE_TEXT_MOD_TEXT_COLOR, vb_groupidxs); 
 
       if(vb_groupidxs.label===INT_NULL) {
@@ -129,6 +131,12 @@ export function Score_mod_init_buffer(num_effect_meshes=PRE_INITIALIZED_SCORE_MO
          vb_groupidxs.label = score_mod.mesh.gfx.vb.groupidx;
          vb_groupidxs.text_mesh = score_mod.mesh.text_mesh.gfx.vb.groupidx;
       }
+      
+      // Add to View Group
+      View_add_to_group(score_mod.mesh, group_idx);
+      // Implement to draw wpos from a root uniform wpos 
+      if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(score_mod.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+
       Score_mod_remove_text_mesh_byidx(score_mod.idx);
    }
 

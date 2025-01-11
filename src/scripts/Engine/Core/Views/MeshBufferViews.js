@@ -1,6 +1,7 @@
 "use strict";
 
 import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { New_generic_buffer, New_int16_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_mesh } from "../MeshBuffer.js";
 
@@ -88,6 +89,7 @@ export function View_destroy_view() { /*// TODO: IMPLEMENT: Destroy the M_Buffer
 
 
 export function View_get_count() { return _view_buffer.active_count; }
+export function View_get_by_viewidx(group_bufferidx) { return _view_buffer.buffer[group_bufferidx]; }
 
 
 
@@ -150,6 +152,13 @@ export function View_set_view_vb_start(group_bufferidxs, start) {
 
 
 
+export function View_get_view_vbidx(group_bufferidxs) {
+   // TODO: Buffer Error Check
+   return _view_buffer.buffer[group_bufferidxs[0]].vb.buffer[group_bufferidxs[1]].info[VIEW_INFO.VB_GROUP_IDX];
+}
+
+
+
 
 
 
@@ -196,7 +205,7 @@ function View_add_mesh(groupidx, mesh) {
       const view_vb_buffer = view.vb.buffer[view_vbidx];
 
       if (view_vb_buffer.data.active_count !== view_vb_buffer.data.boundary + 1)
-         console.log()
+         console.error('551144314152')
 
       const mesh_groupidx = view_vb_buffer.data.Add(mesh_bufferidx);
 
@@ -531,6 +540,21 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
 
 }
 
+
+
+
+/** Render all group's meshes from all vertex buffers via AddToGfxFromReset()  */
+export function View_activate_all_vbs(group_bufferidxs, activate_flag) {
+
+   const view = _view_buffer.buffer[group_bufferidxs[0]];
+
+   for (let i = 0; i <= view.vb.boundary; i++) { // All vertex buffer groups
+
+      const info = view.vb.buffer[i].info;
+      const vb_groupidx = info[VIEW_INFO.VB_GROUP_IDX];
+      Renderqueue_set_active(vb_groupidx, activate_flag)
+   }
+}
 
 
 

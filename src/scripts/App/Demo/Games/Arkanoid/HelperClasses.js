@@ -23,6 +23,16 @@ export class Physics {
       // this.mass = 0;
    }
 
+   Reset(velx=0, vely=0, accelx=0, accely=0, speed=1) {
+      this.velx = velx;
+      this.vely = vely;
+
+      this.accelx = accelx;
+      this.accely = accely;
+      
+      this.speed = speed;
+   }
+
    SetVelocityXY(velx, vely) { this.velx = velx; this.vely = vely; }
    // SetVelocityX(velx) { this.velx = velx; }
    // SetVelocityY(vely) { this.vely = vely; }

@@ -23,13 +23,14 @@
 
 import { New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { BLUEL, GREEN, PURPLEB, PURPLER, WHITE, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { View_add_to_group, View_build_group_from_root_mesh } from "../../../../Engine/Core/Views/MeshBufferViews.js";
+import { BLACK, BLUEL, GREEN, PURPLEB, PURPLER, WHITE, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_set_rgba, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { ARK_STATE } from "./ArkanoisConstants.js";
-import { Ball_animation_scale, Ball_create2 } from "./Ball.js";
-import { Gun_create_animation, Gun_enable } from "./BulletGun.js";
+import { Ball_animation_scale, Ball_create } from "./Ball.js";
+import { Gun_create_animation } from "./BulletGun.js";
 import { Player_create_animation_scale } from "./Player.js";
 
 
@@ -171,23 +172,32 @@ export function Powup_destroy_byidx(idx = INT_NULL) {
    mesh.Destroy();
 }
 
-export function Powup_init_buffer(num_effect_meshes=PRE_INITIALIZED_POWUP_MESHES) {
+
+export function Powup_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes=PRE_INITIALIZED_POWUP_MESHES) {
 
    let vb_groupidx = INT_NULL;
-
+   let powup = null;
+   
    for(let i=0; i<num_effect_meshes; i++) {
-      const powup = new Powup(_, _, _, vb_groupidx); 
+
+      powup = new Powup(_, _, _, vb_groupidx); 
       vb_groupidx = powup.mesh.gfx.vb.groupidx;
+      
+      // Add to View Group
+      View_add_to_group(powup.mesh, group_idx);
+      // Implement to draw wpos from a root uniform wpos 
+      if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(powup.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+      
       Powup_remove_byidx(powup.idx);
    }
 
    _powup_buffer.buffer[0].UniformSetAndUpdate();
 
-   return vb_groupidx;
+   return powup;
 }
 
 
-export function Powup_create(x, y, w, h, w_src=0, h_src=0, type_idx) {
+export function Powup_create(x, y, w, h, w_src=0, h_src=0, type_idx, col=BLACK) {
 
    let idx = INT_NULL;
 
@@ -212,6 +222,7 @@ export function Powup_create(x, y, w, h, w_src=0, h_src=0, type_idx) {
       // Gl_set_dim_xy(powup.gfx, w, h);
 
       const color = POWUP_TYPES[type_idx].COLOR;
+      // const color = col;
       powup.mat.col = color;
       Gl_set_rgba(powup.gfx, color)
       
@@ -255,14 +266,27 @@ export function Powup_resolve_hit(powup_idx, powup_typeidx) {
    }
    else if(powup_typeidx === POWUP_TYPE_IDXS.NEW_BALL){
       const powup = _powup_buffer.buffer[powup_idx];
-      Ball_create2(powup.mesh.geom.pos[0]+powup.mesh.geom.dim[0], powup.mesh.geom.pos[1]+powup.mesh.geom.dim[1], POWUP_TYPES[powup_typeidx].COLOR);
+      Ball_create(powup.mesh.geom.pos[0]+powup.mesh.geom.dim[0], powup.mesh.geom.pos[1]+powup.mesh.geom.dim[1], POWUP_TYPES[powup_typeidx].COLOR);
    }
    else if(powup_typeidx === POWUP_TYPE_IDXS.FIRE_BULLET){
       // const powup = _powup_buffer.buffer[powup_idx];
       // ARK_STATE.ADD(ARK_STATE.FIRE_BULLET_ENABLED);
-      // Gun_enable();
       Gun_create_animation();
       
    }
 }
 // @ C:\Users\ckalo\BakedUp\Projects\VsCode\WebGL\UIEngine\UiEngine\src\scripts\App\Demo\Games\Arkanoid\Ball.js:168
+
+
+
+
+
+
+
+/*******************************************************************************************************/
+// Debug Print
+export function Powup_print() {
+   console.log(
+      'Powerup buffer', _powup_buffer.buffer,
+   );
+}

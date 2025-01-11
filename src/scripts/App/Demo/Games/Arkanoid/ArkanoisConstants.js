@@ -16,9 +16,12 @@
 _CNT = 0x1;
 export const ARK_STATE = {
    
-   IN_START: _CNT,
-   IN_GAME: _CNT<<=0x1,
-   IN_FINISH: _CNT<<=0x1,
+   START: _CNT,
+   IN_GAME_START: _CNT<<=0x1,
+   IN_GAME_PLAY: _CNT<<=0x1,
+   IN_GAME_FINISH: _CNT<<=0x1,
+
+   STAGE_COMPLETED_INITIATED: _CNT<<=0x1,
 
    FIRE_BULLET_ENABLED: _CNT<<=0x1,
    GUN_ENABLED: _CNT<<=0x1,
@@ -32,5 +35,5 @@ export const ARK_STATE = {
    IS(flag) { return flag & this.state; }
 };
 
-ARK_STATE.RESET(ARK_STATE.IN_START);
+ARK_STATE.RESET(ARK_STATE.IN_GAME_START);
 

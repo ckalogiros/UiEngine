@@ -2,7 +2,8 @@
 
 import { New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { View_add_to_group, View_build_group_from_root_mesh } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { WHITE } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_set_dim_xy, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -90,17 +91,27 @@ export function Coin_destroy_byidx(idx = INT_NULL) {
    mesh.Destroy();
 }
 
-export function Coin_init_buffer(num_effect_meshes=PRE_INITIALIZED_COIN_MESHES) {
+
+export function Coin_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes=PRE_INITIALIZED_COIN_MESHES) {
 
    let vb_groupidx = INT_NULL;
+   let coin = null;
 
    for(let i=0; i<num_effect_meshes; i++) {
-      const coin = new Coin(_, _, _, vb_groupidx); 
+
+      coin = new Coin(_, _, _, vb_groupidx); 
       vb_groupidx = coin.mesh.gfx.vb.groupidx;
+
+      // Add to View Group
+      View_add_to_group(coin.mesh, group_idx);
+      // Implement to draw wpos from a root uniform wpos 
+      if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(coin.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+      
       Coin_remove_byidx(coin.idx);
    }
-
-   return vb_groupidx;
+   
+   // return vb_groupidx;
+   return coin;
 }
 
 
@@ -147,3 +158,17 @@ export function Coin_create(x, y, w, h, w_src=0, h_src=0, ) {
 
 }
 
+
+
+
+
+
+
+
+/*******************************************************************************************************/
+// Debug Print
+export function Coin_print() {
+   console.log(
+      'Coin buffer', _coin_buffer.buffer,
+   );
+}

@@ -92,6 +92,8 @@ export class ArrayBufferInterface {
       
       this.active_count++;
       this.buffer[idx] = elem; // We need to add At index
+      // IMPORTANT: If we add to a specific index, the we need to deactivate the freeidx, else an error occurs SEE error: '5545567556445'
+      this.freeidx = INT_NULL;
 
       return idx;
    }

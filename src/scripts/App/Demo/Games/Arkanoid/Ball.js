@@ -3,6 +3,8 @@
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Particle_system_create_emitter, Particle_system_emitt, Particle_system_emitter_enable_intermidiate_emission, Particle_system_emitter_get_position_xy, Particle_system_emitter_get_size, Particle_system_emitter_set_position_xy, Particle_system_emitter_set_prev_position_xy, Particle_system_emitter_set_size, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
@@ -22,8 +24,9 @@ import { Player_get, Player_get_dimy, Player_get_pad } from "./Player.js";
 
 
 
-const BALL_DIM_X = 12; 
-const BALL_DIM_Y = BALL_DIM_X;
+export const BALL_SIZE = 12; 
+const BALL_DIM_X = BALL_SIZE; 
+const BALL_DIM_Y = BALL_SIZE;
 const BALL_SPEED = 4;
 const MAX_BALLS_COUNT = 3;
 
@@ -54,22 +57,29 @@ export function Ball_get_dim_xy(idx) { return _balls_buffer.buffer[idx].mesh.geo
 let TEST = true
 export class Ball {
 
-   constructor(x, y, color=WHITE) {
+   constructor(x, y, color=WHITE, vb_groupidx=INT_NULL) {
 
-      const posx = x-BALL_DIM_X;
-      const posy = y-(BALL_DIM_Y*2 + Player_get_dimy()*2 + Player_get_pad());
+      // const posx = x-BALL_DIM_X;
+      // const posy = y-(BALL_DIM_Y*2);
+      const posx = x;
+      const posy = y;
 
-      const mesh = Create_rect_mesh(_, [1, 1, 1], [BALL_DIM_X, BALL_DIM_Y], color, 'Ball', );
-      if(TEST) { // TODO: Remove this
-         mesh.geom.pos[0] = posx;
-         mesh.geom.pos[1] = posy;
-         TEST = false
-      }
+      // const mesh = Create_rect_mesh(_, [0, 0, 1], [BALL_DIM_X, BALL_DIM_Y], color, 'Ball', );
+      const mesh = Create_rect_mesh(_, [posx, posy, 1], [BALL_DIM_X, BALL_DIM_Y], color, 'Ball', );
+
       // const mesh = Create_rect_mesh(_, [posx, posy, 1], [BALL_DIM_X, BALL_DIM_Y], WHITE, 'Ball', );
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, BALL_DIM_X);
       // mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(BLUEL[3], BLUEL[9]));
+
+      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, vb_groupidx);
+
+      // mesh.geom.pos[0] = posx;
+      // mesh.geom.pos[1] = posy;
+
+      mesh.Render();
+      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
 
 
       this.mesh = mesh;
@@ -90,90 +100,81 @@ export class Ball {
       this.idx = _balls_buffer.Add(this);
 
 
-      const scale = 2.;
-      const particles_size = BALL_DIM_X * scale;
-      // const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles`, GREY[3], [0, 0, 1], [particles_size, particles_size], 0.015, 1, 0, _, _, 4, _, 1);
-      const mod = BALL_SPEED*.002; // Avoid very long tails with increased speed// HACK: configure the ball tail according to ball speed(Thats if the particles system has the creation of intermidiate particles creation enabled)
-      const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles`, color, [0, 0, 1], [particles_size, particles_size], 0.015+mod, 1, 0, _, _, 4, _, 1);
-      const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
-      // tail_emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
-      // tail_emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
-      // tail_emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:10, jiggley:10});
-      
-      
-      
-      tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
-      tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
-      tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE); // TODO: Does nothing, there is no enable for '.FX_NOISE'
-      
-      
-      tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
-
-      tail_emitter.SetDir(1, 1);
-
-
-      this.tail_emitter_idx = tail_emitter_idx;
-
-   }
-
-   TempMakeUpdatesAfterGfxGen(particles_panel){
-
-      // Render Ball tail particles on top of the glow particles
-      const tail_emitter = Particles_get_particle_system(this.tail_emitter_idx);
-      Particles_gen_gfx_ctx(tail_emitter, particles_panel);
-      // Particles_gen_gfx_ctx(tail_emitter, this.mesh);
-      // Initialize values to uniforms
-      tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.2, 0.4, .12, 0]);
-      // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.0, 0.2, .0]);
-      // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.0, 0.9, .02]);
-      // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.0, 0.0, .0]);
-
-      
-      Particle_system_emitter_set_position_xy(this.tail_emitter_idx, this.mesh.geom.pos[0], this.mesh.geom.pos[1]);
-      Particle_system_emitter_set_prev_position_xy(this.tail_emitter_idx);
-      Particle_system_emitter_enable_intermidiate_emission(this.tail_emitter_idx);
-
-      balls_vb_groupidx = this.mesh.gfx.vb.groupidx;
+      // Tail Particles Emitter
+      {
+         const scale = 2.;
+         const particles_size = BALL_DIM_X * scale;
+         // const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles`, GREY[3], [0, 0, 1], [particles_size, particles_size], 0.015, 1, 0, _, _, 4, _, 1);
+         const mod = BALL_SPEED*.002; // Avoid very long tails with increased speed// HACK: configure the ball tail according to ball speed(Thats if the particles system has the creation of intermidiate particles creation enabled)
+         const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles`, color, [0, 0, 1], [particles_size, particles_size], 0.015+mod, 1, 0, _, _, 4, _, 1);
+         const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
+         // tail_emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
+         // tail_emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+         // tail_emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:10, jiggley:10});
+         
+         
+         
+         tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_TIME);
+         tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_DIM2);
+         tail_emitter.EnableGfxAttributes(MESH_ENABLE.GFX.FX_NOISE); // TODO: Does nothing, there is no enable for '.FX_NOISE'
+         
+         
+         tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
    
+         tail_emitter.SetDir(1, 1);
+   
+         // Render 
+         Particles_gen_gfx_ctx(tail_emitter, this.mesh);
+         // Initialize values to uniforms
+         tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.2, 0.4, .12, 0]);
+   
+         
+         Particle_system_emitter_set_position_xy(tail_emitter_idx, this.mesh.geom.pos[0], this.mesh.geom.pos[1]);
+         Particle_system_emitter_set_prev_position_xy(tail_emitter_idx);
+         Particle_system_emitter_enable_intermidiate_emission(tail_emitter_idx);
+   
+   
+         this.tail_emitter_idx = tail_emitter_idx;
+      }
+
    }
 
    GetDir() {
       return this.physics.GetVelocityXY();
    }
 
-}
+   Reset() {
 
-export function Ball_tail_emitter_gengfx(particles_panel) {
+      this.in_move = false;
+      this.in_scale_animation = false;
+      this.lock_squash_anim = false;
+      this.in_squash_anim = false;
+      this.is_active = false;
 
-   for (let i = 0; i <= _balls_buffer.boundary; i++) {
-
-      const ball = _balls_buffer.buffer[i];
-
-      // Render Ball tail particles on top of the glow particles
-      const tail_emitter = Particles_get_particle_system(ball.tail_emitter_idx);
-      Particles_gen_gfx_ctx(tail_emitter, particles_panel);
-
-      // Initialize values to uniforms
-      tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.2, 0.4, .12, 0]);
-      
-      Particle_system_emitter_set_position_xy(ball.tail_emitter_idx, ball.mesh.geom.pos[0], ball.mesh.geom.pos[1]);
-      Particle_system_emitter_set_prev_position_xy(ball.tail_emitter_idx);
-      Particle_system_emitter_enable_intermidiate_emission(ball.tail_emitter_idx);
-
-      
+      this.physics.Reset(_, _, _, _, BALL_SPEED);
    }
-   balls_vb_groupidx = _balls_buffer.buffer[0].mesh.gfx.vb.groupidx;
+
 }
 
-export function Ball_init_buffer(x, y) {
 
+export function Ball_init_buffer(x, y, group_idx, parent_root_posidx=INT_NULL, parent_mesh_bufferidx) {
+   
    let idx = 0;
-   for(let i=0; i<MAX_BALLS_COUNT; i++) {
+   const ball = new Ball(x, y, BALL_COLORS[idx]); 
+   let vb_groupidx = ball.mesh.gfx.vb.groupidx;
+
+   // Implement to draw wpos from a root uniform wpos
+   if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(ball.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+   
+   Ball_remove_mesh_byidx(ball.idx);
+   idx++;
+
+   for(let i=1; i<MAX_BALLS_COUNT; i++) {
       
-      // const color = GetSequencedColor();
       idx = idx >= BALL_COLORS.length ? 0 : idx;
       const color = BALL_COLORS[idx];
-      const ball = new Ball(x, y, color); 
+      const ball = new Ball(x, y, color, vb_groupidx); 
+      View_add_to_group(ball.mesh, group_idx); // Add to View Group
       Ball_remove_mesh_byidx(ball.idx);
 
       idx++;
@@ -198,13 +199,32 @@ export function Ball_remove_mesh_byidx(idx = INT_NULL) {
       mesh.mat.col[3] = 0;
    }
 
-   _balls_buffer.buffer[idx].is_active = false;
+   _balls_buffer.buffer[idx].Reset();
    _free_balls_buffer_idxs.Add(idx);
    
 }
 
 
-export function Ball_create2(x, y, color=WHITE) {
+export function Ball_reset(x, y, color=WHITE) {
+
+   const last_ball_idx = _balls_buffer.boundary;
+   for(let i=0; i < last_ball_idx; i++) {
+      
+      const ball = _balls_buffer.buffer[i];
+      if(ball !== null) {
+
+         Ball_remove_mesh_byidx(i);
+      }
+   }
+   
+   const ball = _balls_buffer.buffer[last_ball_idx];
+   ball.Reset();
+   ball.mesh.geom.pos[0] = x;
+   ball.mesh.geom.pos[1] = y;
+   Gl_set_wpos_xy(ball.mesh.gfx, ball.mesh.geom.pos[0]+BALL_DIM_X, ball.mesh.geom.pos[1]+BALL_DIM_X);
+   ball.is_active = true;
+}
+export function Ball_create(x, y, color=WHITE) {
 
    let idx = INT_NULL;
 
@@ -218,16 +238,17 @@ export function Ball_create2(x, y, color=WHITE) {
 
       ball.is_active = true;
       
-      const player = Player_get();
-      // ball.mesh.geom.pos[0] = x - _main_panel_pad.x - ball.mesh.geom.dim[0]*2; 
-      // ball.mesh.geom.pos[1] = y - _main_panel_pad.y - ball.mesh.geom.dim[1]*2; 
-      ball.mesh.geom.pos[0] = x - _main_panel_pad.x - ball.mesh.geom.dim[0]; 
-      ball.mesh.geom.pos[1] = y - _main_panel_pad.y - ball.mesh.geom.dim[1]; 
+      // ball.mesh.geom.pos[0] = x - ball.mesh.geom.dim[0]; 
+      // ball.mesh.geom.pos[1] = y - ball.mesh.geom.dim[1]; 
+      ball.mesh.geom.pos[0] = x;
+      ball.mesh.geom.pos[1] = y;
       Gl_set_wpos_xy(ball.mesh.gfx, ball.mesh.geom.pos[0]+BALL_DIM_X, ball.mesh.geom.pos[1]+BALL_DIM_X);
-
+      
       ball.mesh.mat.col = color;
       Gl_set_rgba(ball.mesh.gfx, color);
-
+      
+      // Calculate ball velocity vector according to player's position
+      const player = Player_get();
       const dif = (ball.mesh.geom.pos[0]) - (player.mesh.geom.pos[0]+player.mesh.geom.dim[0]);
       const dif_norm = dif / (player.mesh.geom.dim[0]*2);
       const dirx = dif_norm*2.;
@@ -255,7 +276,7 @@ export function Ball_release(ball_idx, player) {
 
    
    const ball = _balls_buffer.buffer[ball_idx];
-   if(ball.in_move) return;
+   if(ball.in_move || !ball.is_active) return;
 
    ball.in_move = true;
    
@@ -705,4 +726,17 @@ function Ball_animation_squash_run(params) {
 function Ball_animation_squash_stop(params) {
    
    return false;
+}
+
+
+
+
+
+
+/*******************************************************************************************************/
+// Debug Print
+export function Ball_print() {
+   console.log(
+      'Balls buffer', _balls_buffer.buffer,
+   );
 }

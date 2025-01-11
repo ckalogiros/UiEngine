@@ -238,6 +238,21 @@ export function Mesh_unif_remove_root_wpos(root_posidx) {
 }
 
 
+// HACK: Manually add a parent from wich to draw the uniform wpos
+export function Mesh_unif_hack_parent_root_wpos(root_posidx, parent_root_posidx, parent_mesh_bufferidx) {
+
+   const root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx];
+   root_wpos.parent_posidx = parent_root_posidx;
+
+   // const parent_root_wpos = _per_vb_mesh_unif_wpos.buffer[parent_root_posidx];
+   // root_wpos.wpos[0] += parent_root_wpos.wpos[0];
+   // root_wpos.wpos[1] += parent_root_wpos.wpos[1];
+
+   // Update the debugging info buffer
+   _debug_names_per_vb_mesh_unif_wpos.buffer[root_posidx].parent_meshidx = parent_mesh_bufferidx;
+}
+
+
 
 
 
@@ -254,8 +269,19 @@ export function Mesh_unif_get_vb_root_wpos_has_absolute_pos(root_posidx) {
 // TODO: 
 // EFFICIENCY: Pass a buffer to store the positions. Too much 'heat' of the js GarbageColector
 
+// export function Mesh_unif_get_vb_root_wpos(root_posidx) {
+
+//    const pos = Mesh_unif_get_vb_root_wpos_recursive(root_posidx);
+
+//    if( _per_vb_mesh_unif_wpos.buffer[root_posidx].has_absolute_pos === 0){
+//       pos[0] += _screen_wpos[0];
+//       pos[1] += _screen_wpos[1];
+//    }
+//    return pos;
+// }
+
 export function Mesh_unif_get_vb_root_wpos(root_posidx) {
-   
+
    const pos = Mesh_unif_get_vb_root_wpos_recursive(root_posidx);
 
    if( _per_vb_mesh_unif_wpos.buffer[root_posidx].has_absolute_pos === 0){
@@ -649,6 +675,13 @@ export function Root_uniforms_for_wpos() {
 
       const unif_obj = _per_vb_mesh_unif_wpos.buffer[i];
 
+      let mesh_posx = -1, mesh_posy = -1;
+      if(unif_obj.meshidx != INT_NULL) {
+
+         const mesh = Mesh_buffer_get_mesh_byidx(unif_obj.meshidx);
+         mesh_posx = mesh.geom.pos[0], mesh_posy = mesh.geom.pos[1]
+      }
+
       console.log(i,
          '| meshidx:', unif_obj.meshidx,
          'vbidx:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
@@ -657,7 +690,8 @@ export function Root_uniforms_for_wpos() {
          // '| STICK:', (unif_obj.sticky_pos & MESH_STATE.STICKY_POSX) ? true : false,
          // '| scroll:', unif_obj.scroll_bar,
          'par_posidx:', unif_obj.parent_posidx,
-         '| pos:', unif_obj.wpos,
+         '| unifpos:', unif_obj.wpos,
+         '| wpos:', mesh_posx, mesh_posy,
          '| vb_groups:', vb_groups.buffer[i].name,
          '| name:', Str_buffer_mesh_names_get_by_idx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].nameidx),
          '| parent:', parent_name,
