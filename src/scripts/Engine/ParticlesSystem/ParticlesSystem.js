@@ -619,7 +619,7 @@ export function Particle_system_emitt(params) {
 
          emitter.is_active = true;
          Renderqueue_set_active(emitter.gfx.vb.groupidx, true);
-         console.error('Renderqueue ACTIVATED')
+         // console.error('Renderqueue ACTIVATED')
       }
 
       // let is_particle_created = false;
@@ -755,7 +755,7 @@ export function Particle_system_emitt(params) {
                last_elem = emitter.free_particles_idxs_buffer.boundary
             }
             else {
-               console.error('UNDEFINED')
+               console.error('0099890099889 UNDEFINED')
             }
          }
 
@@ -929,7 +929,7 @@ export function Particle_system_update() {
 
                   emitter.is_active = false;
                   Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
-                  console.error('Renderqueue DEACTIVATED')
+                  // console.error('Renderqueue DEACTIVATED')
                }
 
                // rotation_speed = initial_rotation_speed;

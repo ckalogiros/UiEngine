@@ -13,12 +13,13 @@ import { Arkanoid_calc_score } from "./Arkanoid.js";
 const SCORE_TEXT_MOD_INITIAL_FONT_SIZE = 5;
 const SCORE_TEXT_MOD_FONT = TEXTURES.MSDF_COMIC_1024;
 const SCORE_TEXT_MOD_TEXT_COLOR = YELLOWR[9];
-const PRE_INITIALIZED_SCORE_MOD_TEXT_MESHES = 16;
+const PRE_INITIALIZED_SCORE_MOD_TEXT_MESHES = 32;
 
 const vb_groupidxs = {
    label:INT_NULL,
    text_mesh:INT_NULL,
 }
+let score_mod_view_group_idx = INT_NULL;
 
 
 /**************************************************************************************************************************************/
@@ -70,12 +71,7 @@ class Score_Mod {
          // mesh.Align(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0]);
       }
          
-            
-      // if(vb_groupidxs.label===INT_NULL) {
-      //    Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
-      //    Renderqueue_set_active(mesh.text_mesh.gfx.vb.groupidx, true);
-      // }
-      
+
       this.number = score_mod_num;
 
       this.idx = _text_mesh_buffer.Add(this);
@@ -121,10 +117,11 @@ export function Score_mod_destroy_text_mesh_byidx(idx = INT_NULL) {
 
 export function Score_mod_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes=PRE_INITIALIZED_SCORE_MOD_TEXT_MESHES) {
 
+   let score_mod = null;
 
    for(let i=0; i<num_effect_meshes; i++) {
 
-      const score_mod = new Score_Mod(1.2, 'x1.2', _, _, SCORE_TEXT_MOD_FONT, SCORE_TEXT_MOD_INITIAL_FONT_SIZE, _, SCORE_TEXT_MOD_TEXT_COLOR, vb_groupidxs); 
+      score_mod = new Score_Mod(1.2, 'x1.2', _, _, SCORE_TEXT_MOD_FONT, SCORE_TEXT_MOD_INITIAL_FONT_SIZE, _, SCORE_TEXT_MOD_TEXT_COLOR, vb_groupidxs); 
 
       if(vb_groupidxs.label===INT_NULL) {
 
@@ -134,17 +131,19 @@ export function Score_mod_init_buffer(group_idx, parent_root_posidx, parent_mesh
       
       // Add to View Group
       View_add_to_group(score_mod.mesh, group_idx);
-      // Implement to draw wpos from a root uniform wpos 
-      if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(score_mod.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
-
+      
       Score_mod_remove_text_mesh_byidx(score_mod.idx);
    }
+   
+   score_mod_view_group_idx = group_idx;
+   // Implement to draw wpos from a root uniform wpos 
+   if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(score_mod.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 
    return vb_groupidxs;
 }
 
 
-export function Score_mod_create(score_mod_number, text, x, y, font, font_size, color, text_color=WHITE) {
+export function Score_mod_create(score_mod_number, text, x, y, font, font_size, color=TRANSPARENT, text_color=WHITE) {
 
    let idx = INT_NULL;
 
@@ -179,6 +178,10 @@ export function Score_mod_create(score_mod_number, text, x, y, font, font_size, 
 
       const score_mod = new Score_Mod(score_mod_number, text, x, y, font, font_size, color, text_color, vb_groupidxs);
       idx = score_mod.idx;
+
+            
+      // Add to View Group
+      View_add_to_group(score_mod.mesh, score_mod_view_group_idx);
    }
 
    _text_mesh_buffer.buffer[idx].number = score_mod_number;

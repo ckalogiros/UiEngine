@@ -12,7 +12,7 @@ import { Gl_add_wpos_xy, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgba, 
 import { GetSign } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Floor, Min } from "../../../../Helpers/Math/MathOperations.js";
-import { Arkanoid_get_panel_center_pos_x, Arkanoid_get_panel_right } from "./Arkanoid.js";
+import { Arkanoid_get_panel_center_pos_x, Arkanoid_get_panel_dim_x, Arkanoid_get_panel_pos_x, Arkanoid_get_panel_right } from "./Arkanoid.js";
 import { ARK_STATE } from "./ArkanoisConstants.js";
 import { Coin_create, Coin_get_byidx, Coin_remove_byidx } from "./Coin.js";
 import { Player_check_coin_collision, Player_get_dimy, Player_get_top, Player_check_powup_collision } from "./Player.js";
@@ -382,7 +382,7 @@ function Bricks_set_alive_rows_counter() {
       }
    }
 
-   console.warn('_bricks_counter', _bricks_counter);
+   // console.warn('_bricks_counter', _bricks_counter);
 }
 export function Bricks_get_alive_rows_counter() {
    return _bricks_counter.rows_alive;
@@ -478,6 +478,11 @@ function Bricks_find_rows_from_pos(ballx, bally, ball_size) {
  */
 export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx, diry) {
 
+   const is_any_brick_alive = Bricks_is_any_brick_alive();
+   // if(!is_any_brick_alive) ARK_STATE.RESET(ARK_STATE.STAGE_COMPLETED_INITIATED);
+   if(!is_any_brick_alive) 
+      ARK_STATE.ADD(ARK_STATE.STAGE_COMPLETED_INITIATED);
+
    const ret = [1, 1];
 
    const rc = Bricks_find_rows_from_pos(posx, posy, dimx, dimy);
@@ -551,7 +556,7 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
                rowidxs.RemoveByIdx(cols_found[j]);
                if(rowidxs.boundary < 0) {
                   _bricks_counter.rows_alive--;
-                  console.warn(_bricks_counter)
+                  // console.warn(_bricks_counter)
                }
 
                _free_brick_idxs_buffer.Add(brick.idx)
@@ -630,7 +635,7 @@ export function Bricks_check_collision_column_only(posx, posy, dimx, dimy, diry)
 // Brick Push-Pull animation
 
 function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step = 0.02, slope_const = 0.2, scale = 2) {
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
+   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
    
    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
    
@@ -639,8 +644,8 @@ function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step 
    const x = brick.mesh.geom.pos[0];
    const y = brick.mesh.geom.pos[1];
 
-   const text_mesh_idx = Score_mod_create(1.2, 'x1.2', x+w, y+h, TEXTURES.MSDF_COMIC_1024, 5, _, YELLOW[9]);
-   const label = Score_mod_get_text_mesh_byidx(text_mesh_idx);
+   // const text_mesh_idx = Score_mod_create(1.2, 'x1.2', x+w, y+h, TEXTURES.MSDF_COMIC_1024, 5, _, YELLOW[9]);
+   // const label = Score_mod_get_text_mesh_byidx(text_mesh_idx);
 
    // Resolve the hit direction to move the brick
    const dirx = (brick.hit_side & BRICK_HIT_SIDE.LEFT) ? 1 : ((brick.hit_side & BRICK_HIT_SIDE.RIGHT) ? -1 : 0)
@@ -657,7 +662,7 @@ function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step 
       brick_dim_x_initial: w,
       brick_dim_y_initial: h,
 
-      score_mod:label,
+      // score_mod:label,
       function_slope:slope_params_pointer,
       move_amt: 2.5,
    };
@@ -675,11 +680,11 @@ function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step 
 
 function Animation_push_up_run(params) {
 
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
+   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
 
 
    const brick = params.brick;
-   const score_mod = params.score_mod.mesh;
+   // const score_mod = params.score_mod.mesh;
    const mesh = brick.mesh;
 
    const slope_constant = params.function_slope.GetSlope();
@@ -751,17 +756,17 @@ function Animation_push_up_run(params) {
    }
    
    { // Score modifier
-      const sizex = score_mod.geom.dim[0] * (slope * scale);
-      const sizey = score_mod.geom.dim[1] * (slope * scale);
-      score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
-      Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
+      // const sizex = score_mod.geom.dim[0] * (slope * scale);
+      // const sizey = score_mod.geom.dim[1] * (slope * scale);
+      // score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
+      // Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
    
-      if (score_mod.sid.attr & SID.ATTR.R_CORNERS) {
-         Gl_set_attr_round_corners(score_mod.gfx, score_mod.mat.style.rcorners * (slope + 1));
-      }
+      // if (score_mod.sid.attr & SID.ATTR.R_CORNERS) {
+      //    Gl_set_attr_round_corners(score_mod.gfx, score_mod.mat.style.rcorners * (slope + 1));
+      // }
 
-      score_mod.text_mesh.ScaleText(slope * scale)
-      score_mod.AddWposY(-params.move_amt);
+      // score_mod.text_mesh.ScaleText(slope * scale)
+      // score_mod.AddWposY(-params.move_amt);
    }
 
    if (params.target_dist > 0) return true;
@@ -770,9 +775,6 @@ function Animation_push_up_run(params) {
 }
 
 function Animation_push_up_stop(params) {
-
-   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
-
 
    // params.move_dist = 3;
    // params.target_dist = 25;
@@ -786,12 +788,12 @@ function Animation_push_up_stop(params) {
 
 function Animation_pull_run(params) {
 
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
+   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
 
 
    const brick = params.brick;
    const mesh = brick.mesh;
-   const score_mod = params.score_mod.mesh;
+   // const score_mod = params.score_mod.mesh;
 
    const slope_constant = params.function_slope.GetSlope();
    const scale = params.function_slope.GetValueChange();
@@ -863,17 +865,17 @@ function Animation_pull_run(params) {
    }
 
    { // Score modifier
-      const sizex = score_mod.geom.dim[0] * (slope * scale);
-      const sizey = score_mod.geom.dim[1] * (slope * scale);
-      score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
-      Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
+      // const sizex = score_mod.geom.dim[0] * (slope * scale);
+      // const sizey = score_mod.geom.dim[1] * (slope * scale);
+      // score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
+      // Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
 
-      if (score_mod.sid.attr & SID.ATTR.R_CORNERS) {
-         Gl_set_attr_round_corners(score_mod.gfx, score_mod.mat.style.rcorners * (slope + 1));
-      }
+      // if (score_mod.sid.attr & SID.ATTR.R_CORNERS) {
+      //    Gl_set_attr_round_corners(score_mod.gfx, score_mod.mat.style.rcorners * (slope + 1));
+      // }
    
-      score_mod.text_mesh.ScaleText(slope * scale)
-      score_mod.AddWposY(-params.move_amt);
+      // score_mod.text_mesh.ScaleText(slope * scale)
+      // score_mod.AddWposY(-params.move_amt);
    }
 
 
@@ -924,9 +926,6 @@ function Animation_pull_stop(params) {
 
 function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
 
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
-
-
    const w = params.brick.mesh.geom.dim[0];
    const h = params.brick.mesh.geom.dim[1];
    const x = params.brick.mesh.geom.pos[0];
@@ -934,58 +933,61 @@ function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
 
 
    // Create explosion glow mesh
-   const explosion_fx_idx = Effects_create_explosion_circle(x, y, h*4, h*4, w, h, color)
-   const explosion_fx = Effect_explosion_circle_get_mesh_byidx(explosion_fx_idx);
-   
-   
-   const params_explosion = {
-      explosion_fx: explosion_fx, 
-      timer: 0, 
-      timer_limit: 1, 
-      timer_step: .01, 
-      move_amt: .15,
+   {
+      // const explosion_fx_idx = Effects_create_explosion_circle(x, y, h*4, h*4, w, h, color)
+      // const explosion_fx = Effect_explosion_circle_get_mesh_byidx(explosion_fx_idx);
       
-      function_slope: params.function_slope,
-      score_mod: params.score_mod, 
-   };
+      // const params_explosion = {
+      //    explosion_fx: explosion_fx, 
+      //    timer: 0, 
+      //    timer_limit: 1, 
+      //    timer_step: .01, 
+      //    move_amt: .15,
+         
+      //    function_slope: params.function_slope,
+      //    score_mod: params.score_mod, 
+      // };
+      // Callback_animations_create(Animation_explosion_circle_run, Animation_explosion_circle_stop, params_explosion,);
+   }
    
-   
-   Callback_animations_create(Animation_explosion_circle_run, Animation_explosion_circle_stop, params_explosion,);
    
    
    // Create coin mesh, coin glow mesh and animation
-   const coin_size = 16;
-   const coin_idx = Coin_create(x, y, coin_size, coin_size, w, h);
-   const coin = Coin_get_byidx(coin_idx);
    
-   // Coin Glow effect
-   const coin_glow_fx_idx = Effects_create_explosion_circle(x, y, coin_size*1.6, coin_size*1.6, w, h, YELLOW[9])
-   const coin_glow_fx = Effect_explosion_circle_get_mesh_byidx(coin_glow_fx_idx);
-
-
+   const coin_size = 16;
+   const game_panel_posx = Arkanoid_get_panel_pos_x();
+   const game_panel_dimx = Arkanoid_get_panel_dim_x();
+   const coin_idx = Coin_create(x, y, coin_size, coin_size, w, h, game_panel_posx, game_panel_dimx, params.brick.mesh.geom.pos[0], params.brick.mesh.geom.dim[0]);
+   // const coin = Coin_get_byidx(coin_idx);
+   
+   // // Coin Glow effect
+   // const coin_glow_fx_idx = Effects_create_explosion_circle(x, y, coin_size*1.6, coin_size*1.6, w, h, YELLOW[9])
+   // const coin_glow_fx = Effect_explosion_circle_get_mesh_byidx(coin_glow_fx_idx);
+   
+   
    
    // Powup Glow effect
    // const powup_glow_fx_idx = Effects_create_explosion_circle(x, y, powup_size*1.6, powup_size*1.6, w, h, WHITE)
    // const powup_glow_fx = Effect_explosion_circle_get_mesh_byidx(powup_glow_fx_idx);
    
-   const arkanoid_panel_center_posx = Arkanoid_get_panel_center_pos_x();
+   // const coin_center_posx = params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0];
    const arkanoid_panel_right = Arkanoid_get_panel_right();
-   const coin_center_posx = params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0];
-   const dirx = (coin_center_posx < arkanoid_panel_center_posx) ? 1 : -1;
+   // const arkanoid_panel_center_posx = Arkanoid_get_panel_center_pos_x();
+   // const dirx = (coin_center_posx < arkanoid_panel_center_posx) ? 1 : -1;
 
-   const params_coins = {
-      coin:coin,
-      timer: 0, 
-      timer_limit: 1, 
-      timer_step: .01, 
-      move_amt: .15,
-      dirx: dirx,
-      // Calc a max value on left and right position ends, and a min value in the middle, as a ratio
-      coin_center_ratio:Quadratic_interpolation(0, arkanoid_panel_right, params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0]),
+   // const params_coins = {
+   //    coin:coin,
+   //    timer: 0, 
+   //    timer_limit: 1, 
+   //    timer_step: .01, 
+   //    move_amt: .15,
+   //    dirx: dirx,
+   //    // Calc a max value on left and right position ends, and a min value in the middle, as a ratio
+   //    coin_center_ratio:Quadratic_interpolation(0, arkanoid_panel_right, params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0]),
 
-      coin_glow_fx: coin_glow_fx, 
-   };
-   Callback_animations_create(Animation_coin_run, Animation_coin_stop, params_coins,);
+   //    // coin_glow_fx: coin_glow_fx, 
+   // };
+   // Callback_animations_create(Animation_coin_run, Animation_coin_stop, params_coins,);
 
 
       
@@ -1012,8 +1014,6 @@ function Arkanoid_create_explosion_circle(color=BLUEL[9], params) {
 
 }
 function Animation_explosion_circle_run(params) {
-   
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
    
    const explosion_fx = params.explosion_fx;
    const score_mod = params.score_mod.mesh;
@@ -1055,7 +1055,6 @@ function Animation_explosion_circle_run(params) {
    
 }
 function Animation_explosion_circle_stop(params) {
-   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
    
    // Remove the explosion effect
    Effect_explosion_circle_remove_mesh_byidx(params.explosion_fx.idx);
@@ -1086,7 +1085,8 @@ function Animation_coin_run(params) {
             Coin_remove_byidx(params.coin.idx);
             
             // Set up the coin's glow animation
-            Animation_coin_hit(params.coin_glow_fx);
+            // Animation_coin_hit(params.coin_glow_fx);
+            Animation_coin_hit(params.coin.glow_mesh);
 
             // Create explosion glow mesh
             const explosion_glow_size =  coin.geom.dim[0]*3;
@@ -1100,7 +1100,8 @@ function Animation_coin_run(params) {
 
       else if (coin.geom.pos[1] > VIEWPORT.BOTTOM + 100) { // else if coin exceeds limit y pos, remove it
          Coin_remove_byidx(params.coin.idx);
-         Effect_explosion_circle_remove_mesh_byidx(params.coin_glow_fx.idx);
+         // Effect_explosion_circle_remove_mesh_byidx(params.coin_glow_fx.idx);
+         Effect_explosion_circle_remove_mesh_byidx(params.coin.glow_mesh.idx);
          return false;
       }
 
@@ -1109,9 +1110,10 @@ function Animation_coin_run(params) {
 
 
 
-   const coin_center_ratio = params.coin_center_ratio; // The more at the edges a coin is, the more of x dir movment the coin has. The more at the center the less x dir move.
+   const coin_center_ratio = params.coin_center_ratio; // The more at the edges a coin is, the more of x dir movement the coin has. The more at the center the less x dir move.
 
-   const coin_glow_fx = params.coin_glow_fx.mesh;
+   // const coin_glow_fx = params.coin_glow_fx.mesh;
+   const coin_glow_fx = params.coin.glow_mesh.mesh;
    
    params.timer += params.timer_step;
 
@@ -1143,16 +1145,11 @@ function Animation_coin_run(params) {
 }
 function Animation_coin_stop(params) {
       
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) {
-      Coin_remove_byidx(params.coin.idx);
-   }
-
    return false;
 }
 
 
 function Animation_powup_run(params) {
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
    
    const powup = params.powup.mesh;
 
@@ -1239,9 +1236,9 @@ function Animation_powup_run(params) {
 }
 function Animation_powup_stop(params) {
    
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) {
-      Powup_remove_byidx(params.powup.idx);
-   }
+   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) {
+   //    Powup_remove_byidx(params.powup.idx);
+   // }
 
    return false;
 }
@@ -1249,7 +1246,7 @@ function Animation_powup_stop(params) {
 
 function Animation_coin_hit(coin_glow_fx) {
 
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
+   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
 
    //TODO: Also set up a player-coin hit glow + a score mod for the hit
    const time_step = 0.03, slope_const = 0.5, scale = 3;
@@ -1274,7 +1271,6 @@ function Animation_coin_hit(coin_glow_fx) {
    Callback_animations_create(Animation_coin_hit_run, Animation_coin_hit_stop, params_coin_glow_fx,);
 }
 function Animation_coin_hit_run(params) {
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
    
    // Update score mode text glow position
    const score_mod = params.score_mod.mesh;
@@ -1332,17 +1328,16 @@ function Animation_coin_hit_run(params) {
    return true;
 }
 function Animation_coin_hit_stop(params) {
-   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
    
    // Remove the score modifier text
    const score_mod = params.score_mod;
 
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) {
-      // score_mod.text_mesh.ScaleText((params.alpha_timer+1) * scale)
-      Set_color_a(score_mod.mesh.text_mesh, 0, score_mod.mesh.text_mesh.geom.num_faces);
+   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) {
+   //    // score_mod.text_mesh.ScaleText((params.alpha_timer+1) * scale)
+   //    Set_color_a(score_mod.mesh.text_mesh, 0, score_mod.mesh.text_mesh.geom.num_faces);
 
-      Effect_explosion_circle_remove_mesh_byidx(params.coin_glow_fx.idx);
-   }
+   //    Effect_explosion_circle_remove_mesh_byidx(params.coin_glow_fx.idx);
+   // }
 
    Score_mod_remove_text_mesh_byidx(score_mod.idx);
    
@@ -1351,8 +1346,6 @@ function Animation_coin_hit_stop(params) {
 
 
 function Animation_powup_hit(x, y) {
-
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
 
    //TODO: Also set up a player-brick hit glow + a score mod for the hit
    const time_step = 0.03, slope_const = 0.5, scale = 3;
@@ -1374,7 +1367,6 @@ function Animation_powup_hit(x, y) {
    Callback_animations_create(Animation_powup_hit_run, Animation_powup_hit_stop, params_powup,);
 }
 function Animation_powup_hit_run(params) {
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) return false;
    
    // Update score mode text glow position
    const score_mod = params.score_mod.mesh;
@@ -1411,10 +1403,10 @@ function Animation_powup_hit_stop(params) {
    
    const score_mod = params.score_mod;
    
-   if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) {
-      // score_mod.text_mesh.ScaleText((params.alpha_timer+1) * scale)
-      Set_color_a(score_mod.mesh.text_mesh, 0, score_mod.mesh.text_mesh.geom.num_faces);
-   }
+   // if(ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) {
+   //    // score_mod.text_mesh.ScaleText((params.alpha_timer+1) * scale)
+   //    Set_color_a(score_mod.mesh.text_mesh, 0, score_mod.mesh.text_mesh.geom.num_faces);
+   // }
 
    // Remove the score modifier text
    Score_mod_remove_text_mesh_byidx(score_mod.idx);

@@ -13,7 +13,7 @@ import { Floor } from "../../../../Helpers/Math/MathOperations.js";
 import { ARK_STATE } from "./ArkanoisConstants.js";
 import { Ball_create, Ball_init_buffer, Ball_print, Ball_release, Ball_reset, BALL_SIZE, Ball_update } from "./Ball.js";
 import { Bricks_init_buffer, Bricks_is_any_brick_alive, Bricks_reset_all_deactivated_bricks, Bricks_set_stage_bricks } from "./Bricks.js";
-import { Coin_init_buffer, Coin_print } from "./Coin.js";
+import { Coin_init_buffer, Coin_is_all_animations_finished, Coin_print, Coin_remove_all, Coin_set_false_is_all_animations_finished, Coin_update } from "./Coin.js";
 import { Bullet_create, Bullet_init_buffer, Bullet_update, Gun_disable, Gun_update_pos_x } from "./BulletGun.js";
 import { Player_init, Player_set_position } from "./Player.js";
 import { Powup_init_buffer, Powup_print } from "./PowerUps.js";
@@ -91,6 +91,7 @@ export function Arkanoid_get_main_panel_padxy() { return {x:ARKANOID_SECTION_PAD
 export function Arkanoid_get_main_panel_padx() { return ARKANOID_SECTION_PAD_X; }
 export function Arkanoid_get_main_panel_pady() { return ARKANOID_SECTION_PAD_Y + ARKANOIS_MENU_DIM_Y*2; }
 export function TEMP_Arkanoid_get_main_panel() { return arkanoid_panel_mesh; }
+export function Arkanoid_get_panel_pos_x() { return arkanoid_panel_mesh.geom.pos[0]; }
 export function Arkanoid_get_panel_center_pos_x() { return arkanoid_panel_mesh.geom.pos[0] + arkanoid_panel_mesh.geom.dim[0]; }
 export function Arkanoid_get_panel_dim_x() { return arkanoid_panel_mesh.geom.dim[0]; }
 export function Arkanoid_get_panel_dim_y() { return arkanoid_panel_mesh.geom.dim[1]; }
@@ -120,7 +121,7 @@ function Arkanoid_load_state(state) {
    }
    else if(ARK_STATE.IS(ARK_STATE.IN_GAME_PLAY)) {
       View_activate_all_vbs(_arkanoid_struct.game_panel.panel.view_group, false);
-      // Time_intervals_destroy_byidx(_arkanoid_struct.in_game.update_loop_time_interval_idx);
+      Time_intervals_destroy_byidx(_arkanoid_struct.in_game.update_loop_time_interval_idx);
       _arkanoid_struct.in_game.update_loop_time_interval_idx = INT_NULL;
    }
    
@@ -129,6 +130,7 @@ function Arkanoid_load_state(state) {
    // Load
    if(ARK_STATE.IS(ARK_STATE.START)) { // Case the ball is at start position
       View_activate_all_vbs(_arkanoid_struct.start_menu.panel.view_group, true);
+      Coin_set_false_is_all_animations_finished();
    }
    else if(ARK_STATE.IS(ARK_STATE.IN_GAME_START)) {
       View_activate_all_vbs(_arkanoid_struct.game_panel.panel.view_group, true);
@@ -144,11 +146,11 @@ function Arkanoid_on_click_callback(params) {
       Ball_release(params.evt_params.ball_idx, params.evt_params.player);
       ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
    }
-   else if(ARK_STATE.IS(ARK_STATE.FIRE_BULLET_ENABLED)) {
-      Bullet_create();
-   }
    else if(ARK_STATE.IS(ARK_STATE.START)) {
       Arkanoid_load_state(ARK_STATE.IN_GAME_START);
+   }
+   else if(ARK_STATE.IS(ARK_STATE.FIRE_BULLET_ENABLED)) {
+      Bullet_create();
    }
 }
 
@@ -393,6 +395,8 @@ function Arkanoid_initialize_game(x, y) {
    
    
    // Pre initialize buffers
+   // Score modifier text
+   const score_vb_grouidxs = Score_mod_init_buffer(group_idx, parent.root_posidx, parent.mesh_bufferidx, _);
    // Explosions
    const fx_explosion_circle = Effects_explosion_circle_init_buffer(group_idx, parent.root_posidx, parent.mesh_bufferidx);
    _arkanoid_struct.game_panel.fx_explosion_circle.view_group = fx_explosion_circle.mesh.group_bufferidxs;
@@ -407,8 +411,7 @@ function Arkanoid_initialize_game(x, y) {
    // Fire bullet power up
    const gun = Bullet_init_buffer(0, 0, group_idx, parent.root_posidx, parent.mesh_bufferidx);
    _arkanoid_struct.game_panel.gun.view_group = gun.mesh.group_bufferidxs;
-   // Score modifier text
-   const score_vb_grouidxs = Score_mod_init_buffer(group_idx, parent.root_posidx, parent.mesh_bufferidx, _);
+
 
 
 
@@ -447,11 +450,6 @@ function Arkanoid_create_update_game_loop() {
    _arkanoid_struct.in_game.update_loop_time_interval_idx = Time_intervals_create(1, 'Arkanoid Update', TIME_INTERVAL_REPEAT_ALWAYS, Arkanoid_run, params,);
 }
 function Arkanoid_run(params) {
-
-   const is_any_brick_alive = Bricks_is_any_brick_alive();
-   // if(!is_any_brick_alive && !_arkanoid_struct.is_stage_completed_initiated) 
-   if(!is_any_brick_alive && !ARK_STATE.IS(ARK_STATE.STAGE_COMPLETED_INITIATED)) 
-      Arkanoid_initiate_stage_completed(params.params.panel, params.params.player);
 
    const panel = params.params.panel;
    const player = params.params.player;
@@ -499,6 +497,8 @@ function Arkanoid_run(params) {
          Bullet_update();
       }
 
+      Coin_update();
+
 
       /*********************************************************************************************************/
       // Update Effects
@@ -523,26 +523,38 @@ function Arkanoid_run(params) {
 
    }
 
+   if(Coin_is_all_animations_finished()) {
+      Arkanoid_initiate_stage_completed(params.params.panel, params.params.player);
+   }
 
 }
 
 
 function Arkanoid_initiate_stage_completed(game_panel, player) {
 
-   // _arkanoid_struct.is_stage_completed_initiated = true;
-   ARK_STATE.ADD(ARK_STATE.STAGE_COMPLETED_INITIATED);
+   // ARK_STATE.RESET(ARK_STATE.STAGE_COMPLETED_INITIATED);
+
+   // Coin_remove_all();
    
-   const params = {
-      game_panel:game_panel,
-      player:player,
-      // ball:ball,
-   };
-   Callback_animations_create(Animation_stage_completed_run, Animation_stage_completed_stop, params,);
+   // const params = {
+   //    game_panel:game_panel,
+   //    player:player,
+   //    // ball:ball,
+   // };
+   // Callback_animations_create(Animation_stage_completed_run, Animation_stage_completed_stop, params,);
 
    Ball_print();
    Coin_print();
    Powup_print();
    Effects_print();
+
+
+
+   // Reset all game meshes
+   Ball_reset(player.mesh.geom.pos[0] + BALL_SIZE*2, player.mesh.geom.pos[1] - BALL_SIZE*2);
+   Gun_disable();
+
+   Arkanoid_load_state(ARK_STATE.START);
 }
 
 function Animation_stage_completed_run(params){

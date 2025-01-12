@@ -301,16 +301,12 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
    // Check Boundary Collisions
    for (let i = 0; i <= _balls_buffer.boundary; i++) {
 
-
       const ball = _balls_buffer.buffer[i];
 
       if(!ball.is_active) continue;
 
       const ph = ball.physics;
 
-      /**Squash animation */
-      // if(ball.in_squash_anim) return; 
-      
       // Move the ball
       const x = ph.velx * (ph.speed + ph.accelx);
       const y = ph.vely * (ph.speed + ph.accely);
@@ -357,29 +353,31 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
       }
 
       /** Squash animation */
-      // // if(hit && !ball.in_squash_anim) {
-      // if(hit ) {
-
-      //    ball.in_squash_anim = true;
-
-      //    const time_step = 0.02, slope_const = .2, scale = .5;
-      //    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
-
-      //    const params = {
-      //       ball: ball,
-      //       direction: { x: GetSign(ph.velx), y: -GetSign(ph.vely) },
-      //       // direction: { x: (ph.velx), y: -(ph.vely) },
-      //       target_dist: 30, // in pixels
-      //       move_dist: 2.5, // in pixels
-      //       ball_squash_lim: ball.mesh.geom.dim[0]*.34,
-      //       ball_initial_size: ball.mesh.geom.dim[0],
-      
-      //       function_slope:slope_params_pointer,
-      //    };
-      
-      //    Callback_animations_create(Ball_animation_squash_run, Ball_animation_squash_stop, params,);
-      //    return;
-      // }
+      {
+         // if(hit && !ball.in_squash_anim) {
+         // if(hit ) {
+   
+         //    ball.in_squash_anim = true;
+   
+         //    const time_step = 0.02, slope_const = .2, scale = .5;
+         //    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
+   
+         //    const params = {
+         //       ball: ball,
+         //       direction: { x: GetSign(ph.velx), y: -GetSign(ph.vely) },
+         //       // direction: { x: (ph.velx), y: -(ph.vely) },
+         //       target_dist: 30, // in pixels
+         //       move_dist: 2.5, // in pixels
+         //       ball_squash_lim: ball.mesh.geom.dim[0]*.34,
+         //       ball_initial_size: ball.mesh.geom.dim[0],
+         
+         //       function_slope:slope_params_pointer,
+         //    };
+         
+         //    Callback_animations_create(Ball_animation_squash_run, Ball_animation_squash_stop, params,);
+         //    return;
+         // }
+      }
 
 
       // Check Player collision
@@ -427,15 +425,6 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
       ball.mesh.geom.pos[0] += ph.velx * (ph.speed + ph.accelx);
       ball.mesh.geom.pos[1] += ph.vely * (ph.speed + ph.accely);
       ball.mesh.geom.SetWposXY(ball.mesh.gfx, ball.mesh.geom.pos[0]+ball_size, ball.mesh.geom.pos[1]+ball_size);
-      // Particle_system_emitter_set_position_xy(ball.tail_emitter_idx, x, y);
-      // Particle_system_emitter_set_prev_position_xy(ball.tail_emitter_idx);
-      // ball.mesh.geom.SetWposXY(ball.mesh.gfx, ball.mesh.geom.pos[0], ball.mesh.geom.pos[1]);
-      
-      {
-         // const angle = Math.atan2(ph.velx, ph.vely);
-         // const normalizedAngle = angle >= 0 ? angle : (2 * Math.PI + angle); // Normalize from -π,π to 0,π
-         // console.log('θ=', angle/Math.PI)
-      }
 
       if(ph.accelx < .1) ph.accelx = 0; // Avoid accel from reaching very small floating point values
       else if (ph.accelx > 0) ph.accelx *= .99; //else console.log('Accel x is diminished')

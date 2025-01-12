@@ -26,7 +26,7 @@ import { BLUEL, GREY, WHITE } from "../Material/Base/Colors.js";
 
 
 
-const PRE_INITIALIZED_EXPLOSION_MESHES = 12;
+const PRE_INITIALIZED_EXPLOSION_MESHES = 32;
 
 
 
@@ -208,12 +208,14 @@ export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, co
       const new_effect = new Effect_Mesh_Explosion_Circle(x-w+w_src, y-h+h_src, w, h, color, vb_groupidx); 
       idx = new_effect.idx;
 
-      new_effect.mesh.timer = 0.01;
+      // new_effect.mesh.timer = 0.01;
       Gl_set_time(new_effect.mesh.gfx, 0.01); // Reset attribute time
+      
       
       // new_effect.timer = 0;
       // new_effect.timer_limit = 1;
       // new_effect.timer_step = 0.01;
+      // Gl_set_time(new_effect.mesh.gfx, 0.01); // Reset attribute time
       // new_effect.is_active = true;
       // console.log('idx', freeidx, 'vb start', new_effect.mesh.gfx.vb.starts.buffer[0])
    }
@@ -353,7 +355,7 @@ export function Effects_explosion_glow_init_buffer(group_idx, parent_root_posidx
       if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(effect.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 
 
-      Effect_explosion_circle_remove_mesh_byidx(effect.idx);
+      Effects_explosion_glow_remove_mesh_byidx(effect.idx);
    }
    EFFECTS_TYPES.EXPLOSION_GLOW.VB_GROUP_IDX = vb_groupidx;
 
