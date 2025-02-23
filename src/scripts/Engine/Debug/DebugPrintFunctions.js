@@ -8,7 +8,7 @@ export function Get_string_from_mesh_type(type) {
 	if (type & MESH_TYPE.GEOMETRY3D) { meshType.push('Geometry3D'); }
 	if (type & MESH_TYPE.CUBE_GEOMETRY) { meshType.push('CubeGeometry'); }
 	if (type & MESH_TYPE.MATERIAL) { meshType.push('Material'); }
-	if (type & MESH_TYPE.FONT_MATERIAL) { meshType.push('FontMaterial'); }
+	if (type & MESH_TYPE.FONT_MATERIAL) { meshType.push('Material_Font'); }
 	if (type & MESH_TYPE.MESH) { meshType.push('Mesh'); }
 	if (type & MESH_TYPE.TEXT_MESH) { meshType.push('Text_Mesh'); }
 	if (type & MESH_TYPE.RECT_MESH) { meshType.push('RECT_MESH'); }

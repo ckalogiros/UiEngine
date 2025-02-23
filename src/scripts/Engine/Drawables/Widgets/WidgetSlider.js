@@ -53,7 +53,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       const handle = Create_rect_mesh(_, [pos[0] - handle_dim[0] + dim[0], pos[1] - handle_dim[1] + dim[1], pos[2] + 1], handle_dim, handle_color, _, _, _, 1, is_debug_mesh);
 
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
-      if(col[0] instanceof Float32Array) handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      if(col[0] instanceof Float32Array) handle.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
 
       handle.SetStyle(Mesh_create_style_from_values(Min(handle_dim[0], handle_dim[1]), 3., 4));
 
@@ -144,18 +144,25 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    }
 
 
-   EnableGfxAttributes(which, bar_params = null, handle_params = null) {
+   EnableGfx(which, bar_params = null, handle_params = null) {
 
-      super.EnableGfxAttributes(which, bar_params);
+      super.EnableGfx(which, bar_params);
       const handle = this.children.buffer[0];
-      handle.EnableGfxAttributes(which, handle_params);
+      handle.EnableGfx(which, handle_params);
+   }
+
+
+   EnableGfxOperations(function_operation, blend_mode) {
+
+      super.EnableGfxOperations(function_operation, blend_mode);
+      const handle = this.children.buffer[0];
+      handle.EnableGfxOperations(function_operation, blend_mode);
    }
 
 
    GfxUniformsEnable(flags, name, type, shader_flags) {
 
       super.EnableGfxUniforms(flags, name, type, shader_flags);
-
       const handle = this.children.buffer[0];
       handle.EnableGfxUniforms(flags, name, type, shader_flags);
 
@@ -523,7 +530,7 @@ export function Slider_horizontal_on_update_handle(_params) {
     * The function is called by the timeInterval.
     * The timeInterval has been set by the 'Slider_create_on_click_event',
     * that is called from 'HandleEvents()' 
-    * as 'mesh.eventCallbacks.buffer[i].Clbk(target, Clbk);'
+    * as 'mesh.event_clbks.buffer[i].Clbk(target, Clbk);'
     * The 'HandleEvents()' passes the param '_params' to this function.
     */
 
@@ -551,16 +558,16 @@ export function Slider_horizontal_on_update_handle(_params) {
    }
 
    /**
-    * Dispatch all callbacks for all targets, that are stored in eventCallbacks[] buffer.
+    * Dispatch all callbacks for all targets, that are stored in event_clbks[] buffer.
     * E.x. Slider binding callback on slider value change.
     */
-   if (bar.eventCallbacks) {
-      for (let i = 0; i <= bar.eventCallbacks.boundary; i++) {
+   if (bar.event_clbks) {
+      for (let i = 0; i <= bar.event_clbks.boundary; i++) {
 
-         if (bar.eventCallbacks.buffer[i] !== null) {
+         if (bar.event_clbks.buffer[i] !== null) {
 
-            const params = bar.eventCallbacks.buffer[i];
-            const Clbk = bar.eventCallbacks.buffer[i].Clbk;
+            const params = bar.event_clbks.buffer[i];
+            const Clbk = bar.event_clbks.buffer[i].Clbk;
             Clbk(params, val);
          }
       }
@@ -577,7 +584,7 @@ export function Slider_vertical_on_update_handle(_params) {
     * The function is called by the timeInterval.
     * The timeInterval has been set by the 'Slider_create_on_click_event',
     * that is called from 'HandleEvents()' 
-    * as 'mesh.eventCallbacks.buffer[i].Clbk(target, Clbk);'
+    * as 'mesh.event_clbks.buffer[i].Clbk(target, Clbk);'
     * The 'HandleEvents()' passes the param '_params' to this function.
    */
 
@@ -605,16 +612,16 @@ export function Slider_vertical_on_update_handle(_params) {
 
    /**
     * Dispatch all callbacks for all targets, that are
-    * stored in eventCallbacks[] buffer.  
+    * stored in event_clbks[] buffer.  
    */
-   if (bar.eventCallbacks) {
-      for (let i = 0; i <= bar.eventCallbacks.boundary; i++) {
+   if (bar.event_clbks) {
+      for (let i = 0; i <= bar.event_clbks.boundary; i++) {
 
-         if (bar.eventCallbacks.buffer[i] !== null) {
+         if (bar.event_clbks.buffer[i] !== null) {
 
-            // const params = bar.eventCallbacks.buffer[i].clbk_params;
-            const params = bar.eventCallbacks.buffer[i];
-            const Clbk = bar.eventCallbacks.buffer[i].Clbk;
+            // const params = bar.event_clbks.buffer[i].clbk_params;
+            const params = bar.event_clbks.buffer[i];
+            const Clbk = bar.event_clbks.buffer[i].Clbk;
             Clbk(params, val);
          }
       }
@@ -837,7 +844,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.SetName('Widget_Slider_XX1');
 
 
-      this.SetGfxEnableAttributes(MESH_ENABLE.GFX.ATTR_DIM2)
+      this.SetGfxEnable(MESH_ENABLE.GFX.ATTR_DIM2)
 
       bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
 
@@ -889,12 +896,12 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
-   SetGfxEnableAttributes(which, params) {
+   SetGfxEnable(which, params) {
 
-      this.EnableGfxAttributes(which, params);
+      this.EnableGfx(which, params);
 
       const bar = this.children.buffer[this.bar_idx];
-      bar.EnableGfxAttributes(which, params);
+      bar.EnableGfx(which, params);
 
    }
 
@@ -1055,18 +1062,23 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
-   EnableGfxAttributes(which, slider_params = null, bar_params = null, handle_params = null) {
+   EnableGfx(which, slider_params = null, bar_params = null, handle_params = null) {
 
-      super.EnableGfxAttributes(which, slider_params);
+      super.EnableGfx(which, slider_params);
 
       const bar = this.children.buffer[this.bar_idx];
-      bar.EnableGfxAttributes(which, bar_params);
+      bar.EnableGfx(which, bar_params);
 
-      const handle = bar.children.buffer[0];
-      handle.EnableGfxAttributes(which, handle_params);
    }
 
 
+   EnableGfxOperations(function_operation, blend_mode) {
+
+      super.EnableGfxOperations(function_operation, blend_mode);
+      const bar = this.children.buffer[this.bar_idx];
+      bar.EnableGfxOperations(function_operation, blend_mode);
+      
+   }
 
 
    /*******************************************************************************************************************************************************/
@@ -1092,6 +1104,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       handle.gfx = Gfx_generate_context(FLAGS, handle, rect_igfx);
 
       const value_text = this.children.buffer[this.value_text_idx];
+      
       value_text.gfx = Gfx_generate_context(FLAGS | GFX_CTX_FLAGS.SPECIFIC, value_text, text_igfx);
 
       return this.gfx;

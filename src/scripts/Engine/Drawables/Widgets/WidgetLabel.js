@@ -152,7 +152,7 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    SetGfxEnableAttributes(which, params) {
+    SetGfxEnable(which, params) {
         alert('777\nSetGfxEnableAttributes\nWidgetLabel')
     }
 

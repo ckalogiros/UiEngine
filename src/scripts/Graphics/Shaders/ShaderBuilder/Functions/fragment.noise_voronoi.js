@@ -1,6 +1,6 @@
-export const frag_noise_voronoi_1_call = '   color = blend_mode_vec4( color, frag_noise_voronoi_1() );'
-// export const frag_noise_voronoi_1_call = '   color = blend_color_multiply( color, frag_noise_voronoi_1() );'
-// export const frag_noise_voronoi_1_call = '   color = frag_noise_voronoi_1();'
+// export const frag_noise_voronoi_1_call = '   final_color = blend_mode_vec4( final_color, frag_noise_voronoi_1() );'
+// export const frag_noise_voronoi_1_call = '   final_color = blend_color_multiply( final_color, frag_noise_voronoi_1() );'
+export const frag_noise_voronoi_1_call = '   final_color = frag_noise_voronoi_1();'
 
 /**WorleyNoise 2 - Works with mesh world pos move */
 export const frag_noise_voronoi_1 = `
@@ -66,7 +66,7 @@ vec4 frag_noise_voronoi_1()
   // #ifndef UV_READY
   #define UV_READY 1
   uv = gl_FragCoord.xy;
-  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
   uv_map_coordinates_zero_one(uv, dim);
   // #endif
   
@@ -185,7 +185,7 @@ vec4 frag_noise_voronoi_1()
 //   #ifndef UV_READY
 //   #define UV_READY 1
 //   uv = gl_FragCoord.xy;
-//   pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+//   pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
 //   uv_map_coordinates_zero_one(uv, dim);
 //   #endif
   
@@ -250,9 +250,9 @@ vec4 frag_noise_voronoi_1()
 
 
 /**********************************************************************************************************************************************************************************/
-// export const frag_noise_voronoi_2_call = '   color = blend_color_multiply( color, frag_noise_voronoi_2() );'
-// export const frag_noise_voronoi_2_call = '   color = frag_noise_voronoi_2();'
-export const frag_noise_voronoi_2_call = '   color = blend_mode_vec4( color, frag_noise_voronoi_2() );'
+// export const frag_noise_voronoi_2_call = '   final_color = blend_color_multiply( final_color, frag_noise_voronoi_2() );'
+export const frag_noise_voronoi_2_call = '   final_color = frag_noise_voronoi_2();'
+// export const frag_noise_voronoi_2_call = '   final_color = blend_mode_vec4( final_color, frag_noise_voronoi_2() );'
 
 /**WorleyNoise 2 - Works with mesh world pos move */
 export const frag_noise_voronoi_2 = `
@@ -396,7 +396,7 @@ vec4 frag_noise_voronoi_2()
   // #ifndef UV_READY
     #define UV_READY 1
     uv = gl_FragCoord.xy;
-    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
     uv_map_coordinates_zero_one(uv, dim);
   // #endif
   

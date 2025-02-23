@@ -52,6 +52,7 @@ export function Mesh_get_uniform_ubidx_from_name(uniforms_buffer, unif_name) {
         }
     }
 
+    console.error('unif_name', unif_name, '\nuniforms_buffer', uniforms_buffer);
     alert('Mesh_get_uniform_ubidx_from_name()\nNo mesh with uniform found.')
 }
 

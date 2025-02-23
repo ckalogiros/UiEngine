@@ -114,9 +114,8 @@ vec4 frag_glow_sphere()
 /*************************************************************************************************************************/
 
 export const frag_inner_shadow_rhomboid_call = `
-  vec4 new_color = inner_shadow_rhomboid();
+  vec4 new_color = inner_shadow_rhomboid(scale_down);
   final_color = blend_mode_vec4( final_color, new_color );
-  // final_color = blend_color_mix( final_color, new_color, final_color.a );
 `;
 
 export const frag_inner_shadow_rhomboid = `
@@ -160,7 +159,7 @@ export const frag_inner_shadow_rhomboid = `
 
 
 
-vec4 inner_shadow_rhomboid()
+vec4 inner_shadow_rhomboid(in float scale_down)
 {
 
   #ifdef U_GENERIC_VEC3
@@ -171,6 +170,12 @@ vec4 inner_shadow_rhomboid()
     #include <u_generic_float>
   #endif
 
+  int u_gen_ctrl_map_cnt = 0;
+
+  float control1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float control2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float control3 = u_generic_controls[u_gen_ctrl_map_cnt++];
+
 
   vec2 res = u_screen_res;
   vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
@@ -178,11 +183,25 @@ vec4 inner_shadow_rhomboid()
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   
   
-  #ifndef UV_READY
-    #define UV_READY 1
-    uv = gl_FragCoord.xy;
-    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
-  #endif 
+  // #ifndef UV_READY
+  //   #define UV_READY 1
+  //   uv = gl_FragCoord.xy;
+  //   pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
+  //   uv *= scale_down; // HACK: For cases that the object is scaled down
+  //   // pixel_apply_world_position_offset_x(m_uv, wpos) ( (m_uv) -= (wpos) )
+  //   // pixel_apply_reverse_y_coordinates(m_uv, resolution_height) ( (m_uv) = (resolution_height) - (m_uv) )
+  //   // pixel_apply_world_position_offset_y(m_uv, wpos) ( (m_uv) -= (wpos) )
+  // #endif 
+    
+  uv = gl_FragCoord.xy;
+  uv.x -= v_wpos3_x;
+  uv.y = u_screen_res.y - uv.y;
+  uv.y -= v_wpos3_y;
+  // float ratio = local_res.x / local_res.y;
+  // uv /= local_res; 
+  // uv.x *= ratio;
+  // uv.y *= -1.; // Reverse y coord. bottom:-1 up:1
+  uv *= scale_down; // HACK: For cases that the object is scaled down
   
   uv.x += v_dim2_x;
   uv.y += v_dim2_y;
@@ -204,6 +223,7 @@ vec4 inner_shadow_rhomboid()
   float c_hor = abs((fract(uv.x*repeatx) - .5)* 2.);
   float c_vert = abs((fract(uv.y*repeaty) - .5)* 2.);
 
+  // TODO: Remove condition
   if(local_res.x > local_res.y) {
     c_hor = smoothstep(1.+(.4*ratio_min), ratio_inv, c_hor);
     c_vert = smoothstep(1.4, 0., c_vert);
@@ -214,10 +234,7 @@ vec4 inner_shadow_rhomboid()
   }
   
 
-  // if(ratio_inv==.0) return RED;
-
   float c = smoothmin(c_vert, c_hor, control1);
-  
 
 
   float to_min=0., to_max=1., from_min=0., from_max=(control2);
@@ -227,18 +244,10 @@ vec4 inner_shadow_rhomboid()
   result = clamp(result, 0., 1.);
   
   vec3 color = vec3(mix(c, result, .5));
-  // vec3 color = vec3(max(c, result));
-
-  // if(uv.x<.33*ratio_min) color.r = .2;
-  // if(uv.y<.33 && uv.x<.5) color.b = .2;
-  
   color = brightness_contrast(color, control3*.5, control3*2.);
-  // color = gamma_correction(color);
-  
   float alpha = min(color.r, min(color.b, color.g));
 
   return vec4(color*src_color.rgb, 1.);
-  // return vec4(color*src_color.rgb, alpha);
     
 }
 `;
@@ -249,8 +258,10 @@ vec4 inner_shadow_rhomboid()
 /*************************************************************************************************************************/
 
 export const frag_explosion_circle_call = `
-  // final_color = blend_mode_vec4( final_color, frag_explosion_circle() );
-  final_color = frag_explosion_circle();
+  // final_color = blend_mode_vec4( final_color, frag_explosion_circle(u_gen_ctrl_map_cnt) );
+  // final_color = frag_explosion_circle(u_gen_ctrl_map_cnt);
+  final_color = blend_color_add( final_color, frag_explosion_circle(scale_down, u_gen_ctrl_map_cnt) );
+  // final_color = blend_color_multiply( final_color, frag_explosion_circle(u_gen_ctrl_map_cnt) );
 `;
 
 export const frag_explosion_circle = `
@@ -276,7 +287,7 @@ export const frag_explosion_circle = `
 
 
 
-vec4 frag_explosion_circle()
+vec4 frag_explosion_circle(in float scale_down, inout int u_gen_ctrl_map_cnt)
 {
   #ifdef A_TIME
     float a_time = v_time;
@@ -286,14 +297,20 @@ vec4 frag_explosion_circle()
     float u_time = u_time_float;
   #endif
 
-  #ifdef U_GENERIC_VEC3
-    #include <u_generic_vec3>
-  #elif defined(U_GENERIC_VEC2)
-    #include <u_generic_vec2>
-  #elif defined(U_GENERIC_FLOAT)
-    #include <u_generic_float>
-  #endif
+  // #ifdef U_GENERIC_VEC3
+  //   #include <u_generic_vec3>
+  // #elif defined(U_GENERIC_VEC2)
+  //   #include <u_generic_vec2>
+  // #elif defined(U_GENERIC_FLOAT)
+  //   #include <u_generic_float>
+  // #endif
 
+
+  float smoothstep_outer = u_generic_controls[u_gen_ctrl_map_cnt++];
+  // float ringDiameter = 1.5*v_generic2_x; // The smaller the value, the smaller the explosion ring.
+  float ringDiameter = u_generic_controls[u_gen_ctrl_map_cnt++] * 1.5; // The smaller the value, the smaller the explosion ring.
+  float intensity = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float center_glow_start = u_generic_controls[u_gen_ctrl_map_cnt++]; // start: between 0-1; If start=0.8, then 0.8-1.0 will give a smaller center glow
 
   vec2 res = u_screen_res;
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
@@ -305,50 +322,44 @@ vec4 frag_explosion_circle()
   
   #define UV_READY 1
   uv = gl_FragCoord.xy;
-  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
 
+  float mod = src_color.a;
   vec3 color = vec3(.0);
-
   
-  float d = length(uv/dim);
+  float d = length(uv/dim) / scale_down;
 
-  float c = 1.-smoothstep(.0, control1, d);
+  float c = 1.-smoothstep(.0, smoothstep_outer, d);
 
   // Normalize time from [0.0, 1.0] to [0.1, 0.3]
   float nt = time*.55 + .1; // To [0.1, 0.75] 
   
-  float ringDiameter = 1.5*control2; // The smaller the value, the smaller the explosion ring.
   float tt = time*.8 + .2; // To [0.3, 1.] 
   float ring = smoothstep(0.0, tt, abs(d * 1.- (time*ringDiameter)));
-  // return vec4(vec3(ring), 0.);
+  
+  
+  
+  float centerFlash = .2*nt; // The Smaller the value, the greater the flash in the center ring
+  float cg = (time*(1.0-center_glow_start) + center_glow_start); // 'Delay' the center glow (smaller) 
+  float ex = (d * cg * centerFlash); 
+  
+  float dim_down = 4.1;
 
-  float centerFlash = .6*nt; // The Smaller the value, the greater the flash in the center ring
-  // float ex = abs(d * fract(time) * centerFlash); 
-  float ex = abs(d * time * centerFlash); 
-  // return vec4(vec3(ex), 0.);
+  float ring_width = .5; // Small values, larger width
+  // color = vec3(v_generic2_y) / min(ring*ring_width, ex);
+  color = vec3(intensity) / min(ring*ring_width, ex);
+
   
-  
-  // float a = time*.85 + .2; // To [0.3, 1.] 
-  // color = vec3(control3*a) / min(ring*.5, ex*1.5);
-  color = vec3(control3) / min(ring*.5, ex*1.5);
-  
-  
-  
-  // color = mix(color * time, src_color.rgb, 1.-(time*.2));
   color = mix(color, src_color.rgb, 1.-(time*.2));
   
-
-  float rev_t = 1.-time;
-  // float a = (time*.8) + .2; // To [0.3, 1.] 
-  // vec4 final = vec4(color*c*a*(rev_t), c*(rev_t));
-
-  // vec4 final = vec4(color*c*(rev_t), c*(rev_t));
-  vec4 final = vec4((src_color.rgb * ((rev_t*time)+.2) * c) + color*c*rev_t, c*rev_t);
-  // vec4 final = vec4((src_color.rgb * ((rev_t*.5)+.3) * c) + color*c*rev_t, c*rev_t);
-  // vec4 final = vec4((src_color.rgb * time*.5 * c) + color*c*rev_t, c*rev_t);
-  // vec4 final = (src_color * time*.5 * c) + vec4(color*c*rev_t, c*rev_t);
   
-  // final.a = .3;
+  
+  // float rev_t = 1.-(time*.8+.1);
+  float rev_t = 1.-(time*1.+.1);
+  vec4 final = vec4((src_color.rgb * ((rev_t*time)+.2) * c) + color*c*rev_t, c*rev_t);
+  // vec4 final = vec4(color*c*rev_t, c*rev_t);
+  
+  final *= src_color.a;
   return final; 
 }
 `;
@@ -461,13 +472,7 @@ vec4 frag_explosion_glow()
 {
 // TODO: Implement with u_generic_controls[counter++] from fragment main() 
   #ifdef U_GENERIC_CONTROLS
-  //   float ctrl1 = u_generic_controls[0];
-  //   float ctrl2 = u_generic_controls[1];
-  //   float ctrl3 = u_generic_controls[2];
-  //   float ctrl4 = u_generic_controls[3];
-  //   float ctrl5 = u_generic_controls[4];
-  //   // float ctrl6 = u_generic_controls[5];
-  int u_gen_ctrl_map_cnt = 0;
+    int u_gen_ctrl_map_cnt = 0;
   #endif
 
   vec2 res = u_screen_res;
@@ -478,23 +483,14 @@ vec4 frag_explosion_glow()
   
   #define UV_READY 1
   uv = gl_FragCoord.xy;
-  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
+  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
   
   uv_map_coordinates_zero_one( uv, local_res );
   
-  /*
-    Animate the ctrl1 from high to low
-    Animate the ctrl2(smoothstep inner) from low to high
-  */
-  // float d = 2. - length(uv)*6.*u_generic_controls[u_gen_ctrl_map_cnt++]+rev_time;
+  // ctrl1
   float d = .7 - length(uv)*2.*u_generic_controls[u_gen_ctrl_map_cnt++]+(rev_time*.5);
-  // float d = 1. - length(uv)*3.*u_generic_controls[u_gen_ctrl_map_cnt++]+(rev_time*.5);
-  // float d = 1. - length(uv)*2.5*u_generic_controls[u_gen_ctrl_map_cnt++];
-  // float d = .7 - length(uv)*u_generic_controls[u_gen_ctrl_map_cnt++];
   
-  // float c = d * smoothstep(u_generic_controls[u_gen_ctrl_map_cnt++], u_generic_controls[u_gen_ctrl_map_cnt++], (d));
-  // float c = d * smoothstep(.8, u_generic_controls[u_gen_ctrl_map_cnt++], (d));
-  // float c = d * smoothstep(u_generic_controls[u_gen_ctrl_map_cnt++], .6*time*time, (d));
+  // ctrl2
   float c = d * smoothstep(u_generic_controls[u_gen_ctrl_map_cnt++], 1.*rev_time, (d));
   
   c *=c;
@@ -503,8 +499,9 @@ vec4 frag_explosion_glow()
   // c = smoothmin(c,  2.*u_generic_controls[u_gen_ctrl_map_cnt++], c*u_generic_controls[u_gen_ctrl_map_cnt++]);
 
 
+  return vec4(c*rev_time*rev_time) * src_color;
+  // return vec4(c*rev_time*rev_time);
   // return vec4(c);
-  return vec4(c*rev_time*rev_time);
   // return RED;
   // return vec4(vec3(c), c*time*time);
     

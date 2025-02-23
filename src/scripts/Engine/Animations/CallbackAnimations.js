@@ -1,6 +1,6 @@
 "use strict";
 
-import { New_generic_buffer } from "../Core/Buffers.js";
+import { Free_generic_buffer, New_generic_buffer } from "../Core/Buffers.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
 
 
@@ -11,8 +11,9 @@ const MAX_ANIMATIONS_SIZE = 80;
 
 
 
-/**SAVE OLD CODE */
 
+
+/** */
 class Callback_Animation {
 
    constructor() {
@@ -56,20 +57,31 @@ class Callback_Animation {
       this.nameidx = INT_NULL;
    }
 
+   Replace(animationClbk, stopAnimationClbk, params){
+      this.params = params;
+      this.animationClbk = animationClbk;
+      this.stopAnimationClbk = stopAnimationClbk;
+      this.is_active = true;
+      this.in_animation = true;
+   }
+
 }
 
 
 
 
 
+/** */
 const _clbk_animations_buffer = New_generic_buffer(_, 'Callback Animations Buffer');
 
 
-
+/** */
+export function Callback_animations_free() { return Free_generic_buffer(_clbk_animations_buffer); }
+/** */
 export function Callback_animations_get() { return _clbk_animations_buffer; }
+/** */
 export function Callback_animations_get_byidx(idx) { return _clbk_animations_buffer.buffer[idx]; }
-
-
+/** */
 export function Callback_animations_is_animation_active(anim_idx){
    if(anim_idx === INT_NULL) {
       console.error('887691443 \nAnimation index if INT_NULL');
@@ -79,6 +91,7 @@ export function Callback_animations_is_animation_active(anim_idx){
    if(anim!==null && anim.is_active) return true;
    return false;
 }
+/** */
 export function Callback_animations_is_animation_in_play(anim_idx){
    if(anim_idx === INT_NULL) {
       console.error('887691444 \nAnimation index if INT_NULL');
@@ -88,8 +101,7 @@ export function Callback_animations_is_animation_in_play(anim_idx){
    if(anim!==null && anim.in_animation) return true;
    return false;
 }
-
-
+/** */
 export function Callback_animations_initialize() {
 
    for (let i = 0; i < MAX_ANIMATIONS_SIZE; i++) {
@@ -98,9 +110,7 @@ export function Callback_animations_initialize() {
    }
 
 }
-
-
-
+/** */
 export function Callback_animations_destroy() {
    for (let i = 0; i <= _clbk_animations_buffer.boundary; i++) {
       
@@ -112,9 +122,7 @@ export function Callback_animations_destroy() {
       }
    }
 }
-
-
-
+/** */
 export function Callback_animations_destroy_byidx(anim_idx) {
    if(anim_idx === INT_NULL) {
       console.error('887691445 \nAnimation index if INT_NULL');
@@ -127,9 +135,18 @@ export function Callback_animations_destroy_byidx(anim_idx) {
       // anim.Stop();
    }
 }
-
-
-
+/** */
+export function Callback_animations_replace_byidx(anim_idx, animationClbk, stopAnimationClbk, params) {
+   if(anim_idx === INT_NULL) {
+      console.error('887691446 \nAnimation index if INT_NULL');
+      return;
+   }
+   const anim = _clbk_animations_buffer.buffer[anim_idx];
+   if (anim!==null && anim.is_active) {
+      anim.Replace(animationClbk, stopAnimationClbk, params);
+   }
+}
+/** */
 function Get_next_free() {
 
    for (let i = 0; i <= _clbk_animations_buffer.boundary; i++) {
@@ -144,9 +161,7 @@ function Get_next_free() {
    alert('Not enough space for new Callback_Animation. At Callback_Animations.js:Callback_Animations.Create()')
    return INT_NULL;
 }
-
-
-
+/** */
 export function Callback_animations_create(animationClbk, stopAnimationClbk, params, name) {
 
 
@@ -162,9 +177,7 @@ export function Callback_animations_create(animationClbk, stopAnimationClbk, par
    }
    alert('666555444');
 }
-
-
-
+/** */
 export function Callback_animations_run() {
 
 
@@ -194,6 +207,7 @@ export function Callback_animations_run() {
 /**********************************************************************************************************************************/
 // Debug-Print
 
+/** */
 export function Callback_animations_print(){
 
    for(let i=0; i <= _clbk_animations_buffer.boundary; i++){
@@ -207,9 +221,7 @@ export function Callback_animations_print(){
       );
    }
 }
-
-
-
+/** */
 export function Callback_animations_print_size(){
 
    let count = 0;

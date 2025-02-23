@@ -6,7 +6,7 @@ import { Vertex_buffer_create_attribs_info_per_vb_instanced } from "../../../Gra
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Drawables/Operations/Recursions.js";
 import { Relative_pos_comp_move_right_buffer } from "../../Drawables/Operations/RelativePosComponent.js";
 import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
-import { Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
+import { Free_int16_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb_remove_all_from_index, Mesh_per_vb_reset_buffer } from "../MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
 
@@ -32,6 +32,24 @@ const _root_vbidx_buffer = New_generic_buffer(_, 'Root vbidx view');
 export function Root_group_gfx_buffer_reset() { _root_vbidx_buffer.ResetFull(); }
 const _root_per_vb_meshidx_buffer = New_generic_buffer(_, 'Root pervb view');
 export function Root_group_batch_buffer_reset() { _root_per_vb_meshidx_buffer.ResetFull(); }
+
+export function Root_group_buffer_reset_dealocate() {
+
+   for (let i = 0; i <= root_group_view_buffer.boundary; i++) {
+      const group = root_group_view_buffer.buffer[i];
+      Free_int16_buffer(group);
+   }
+   root_group_view_buffer.ResetFull();
+}
+
+export function Root_group_gfx_buffer_reset_dealocate() {
+
+   for (let i = 0; i <= _root_vbidx_buffer.boundary; i++) {
+      const group = _root_vbidx_buffer.buffer[i];
+      Free_int8_buffer(group);
+   }
+   _root_vbidx_buffer.ResetFull();
+}
 
 
 
@@ -202,7 +220,7 @@ export function Root_group_view_buffer_remove_element_byidx(root_bufferidx, batc
          root_group_view_buffer.buffer[root_bufferidx].RemoveByIdxNoGapsVersion(elem_found, root_bufferidx, 'Root_group_view_buffer_remove_element_byidx');
 
       }
-      else 
+      else
          console.error('Widget root FAILED to remove element. root idx:', root_bufferidx, 'mesh_bufferidx', mesh_bufferidx, ' element idx:', elem_found,);
 
    }
@@ -446,7 +464,8 @@ function Root_group_per_vb_meshidx_view_create_root(root_bufferidx, mesh_bufferi
 
    const idx = _root_per_vb_meshidx_buffer.Add(root_batch_vb);
 
-   if (root_bufferidx !== idx) alert('Widget root batch buffer not the same with the Widget root buffer');
+   if (root_bufferidx !== idx)
+      alert('Widget root batch buffer not the same with the Widget root buffer');
 }
 
 
@@ -477,7 +496,7 @@ export function Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_buffe
 
       if (gfxidxs.buffer[i] === vbidx) {
 
-         const mesh =Mesh_buffer_get_mesh_byidx(mesh_bufferidx);
+         const mesh = Mesh_buffer_get_mesh_byidx(mesh_bufferidx);
          if (_root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[i].meshidx === mesh_bufferidx && _root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[i].num_faces > 0) {
             // Just assign the batch index to the mesh
             mesh.batch_buffer_vbidx = i;
@@ -543,7 +562,8 @@ export function Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_buffe
 
 
 /*******************************************************************************************************************************************************************************/
-// Global Update Functions
+// Global Mesh Update Operations
+// Operate on meshes through the root view's mesh indexes
 /*******************************************************************************************************************************************************************************/
 
 
@@ -560,11 +580,11 @@ export function Root_group_reset_gfxs(root_bufferidx) {
       // console.log('root_mesh_per_vb_idx', root_mesh_per_vb_idx)
 
       // TODO: We call 'Vertex_buffer_reset_to_index' because there is no vb reset to 0. Create that function
-      Vertex_buffer_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer); 
+      Vertex_buffer_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer);
       Vertex_buffer_create_attribs_info_per_vb_instanced(mesh.gfx.prog.attribsidx, mesh.gfx.vb.starts.buffer);
 
       Index_buffer_reset(mesh.gfx.ib.idx); // BUG: The vertex buffer is getting reset to specific index, although the index buffer is reset to 0
-      
+
       // Reset the mesh per vb buffer of each vb
       Mesh_per_vb_remove_all_from_index(mesh.gfx.vb.groupidx);
    }
@@ -666,6 +686,23 @@ export function Root_group_resize_and_rerender(root_bufferidx, x, y, do_reconstr
 
          // Rerender
          mesh.AddToGfxFromReset();
+      }
+   }
+}
+/** */
+export function Root_group_destroy_meshes_buffer_alocations() {
+
+
+   // Do children
+   for (let i = 0; i <= root_group_view_buffer.boundary; i++) {
+
+      const root = root_group_view_buffer.buffer[i];
+      for (let i = 0; i <= root.boundary; i++) {
+
+         const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
+         // if(mesh) 
+         mesh.DestroyAlocatedBuffers();
+         // if (mesh.state.mask & MESH_STATE.ACTIVE) {
       }
    }
 }

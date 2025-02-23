@@ -30,7 +30,7 @@ export class Widget_Button extends Widget_Label {
    /****************************************************************************************************************************************************/
 
 
-   SetGfxEnableAttributes(which, params) {
+   SetGfxEnable(which, params) {
       alert('777\nSetGfxEnableAttributes\nWidgeButton')
    }
 
@@ -183,7 +183,7 @@ export class Widget_Switch extends Widget_Button {
    /****************************************************************************************************************************************************/
 
 
-   SetGfxEnableAttributes(which, params) {
+   SetGfxEnable(which, params) {
       alert('777\nSetGfxEnableAttributes\nWidgetSwitch')
    }
 

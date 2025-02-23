@@ -140,7 +140,7 @@ export class Material {
 
 
 
-export class FontMaterial extends Material {
+export class Material_Font extends Material {
 
 
    constructor(col = [1, 1, 1, 1], textureid = INT_NULL, text = '', sdf_params = [.5, .5]) {
@@ -189,7 +189,7 @@ export class FontMaterial extends Material {
  *    1. If it is an atlas texture, the uvs are calculated at the creation site of the framebuffer,
  *    2. Else the uvs are [0,1,0,1] covering the whole texture. 
  */
-export class Texture_Material extends Material {
+export class Material_Texture extends Material {
 
    constructor(col = [1, 1, 1, 1], textureid = INT_NULL) {
 

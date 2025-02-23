@@ -2,7 +2,7 @@
 
 import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
-import { New_generic_buffer, New_int16_buffer } from "../Buffers.js";
+import { Free_generic_buffer, Free_int16_buffer, New_generic_buffer, New_int16_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_mesh } from "../MeshBuffer.js";
 
 
@@ -15,8 +15,8 @@ import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_mesh } from "../MeshBuff
       meshidx,
       numfaces,
       data:[
-         Int16Buffer:[], the last element will be an accumulator of num faces
-         Int16Buffer:[], the last element will be an accumulator of num faces
+         Int16_Buffer:[], the last element will be an accumulator of num faces
+         Int16_Buffer:[], the last element will be an accumulator of num faces
          ...
       ],
    }
@@ -61,7 +61,7 @@ export const VIEW_INFO = {
  *  
  *  view:[]
  *     .buffer[i]:       {vb:[]GenericBuffer} Stores all vb_groupidxs that the meshes of the group belong.
- *        .vb.buffer[i]: {info:[]Int16Array, data:[]Int16Buffer}
+ *        .vb.buffer[i]: {info:[]Int16Array, data:[]Int16_Buffer}
  *           .info:      {num_faces:int, starts:[]},
  *           .mesh_data: [meshidx, meshidx, ...]
  *
@@ -80,7 +80,18 @@ class View {
 
 
 const _view_buffer = New_generic_buffer(_, 'Mesh buffer Views');
-export function View_buffer_reset() { _view_buffer.ResetFull(); }
+export function View_buffer_reset() {
+
+   for (let i = 0; i <= _view_buffer.boundary; i++) {
+      const vb = _view_buffer.buffer[i].vb;
+      for (let j = 0; j <= vb.boundary; j++) {
+
+         Free_int16_buffer(vb.buffer[j].data);
+      }
+      Free_generic_buffer(vb);
+   }
+   _view_buffer.ResetFull();
+}
 
 
 

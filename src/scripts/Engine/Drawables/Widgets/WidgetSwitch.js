@@ -18,7 +18,7 @@ import { Mesh_create_style_from_values } from "../Operations/MeshHelperFunctions
  * There is an issue with rendering PER_VERTEX_COLOR.
  * If it is the case that the color array is not set on widget switch creation,
  * then the col and defCol are set to a simple color.
- * The user calls 'EnableGfxAttributes' to enable the PER_VERTEX_COLOR, passint the new color array.
+ * The user calls 'EnableGfx' to enable the PER_VERTEX_COLOR, passint the new color array.
  * But the default color remains a simple color.
  * // FIXME
  */
@@ -32,10 +32,10 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    color_active;
    pad; // int, not array for x-y pad
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = {rcorners:15, feather:2, border:0}, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = { rcorners: 15, feather: 2, border: 0 }, is_debug_mesh) {
 
       const ratio = .2;
-      const pad = (_pad !== 0) ? _pad : size*ratio;
+      const pad = (_pad !== 0) ? _pad : size * ratio;
       const switch_dim = [size * 2, size]
       style.rcorners = size;
 
@@ -54,18 +54,20 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.pad = pad;
 
 
-      this.EnableGfxUniforms({unif:SID.UNIF.SCREEN_RESOLUTION}, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
-      
+
       const switch_pos = [pad, pad, pos[2] + 1];
-      const switch0 = Create_rect_mesh(_, switch_pos, [size-pad, size-pad], GREY[10], _, _, _, _, is_debug_mesh);
+      const switch0 = Create_rect_mesh(_, switch_pos, [size - pad, size - pad], GREY[10], _, _, _, _, is_debug_mesh);
       this.AddChild(switch0);
-      switch0.SetStyle(Mesh_create_style_from_values(size * (1-ratio), style.feather, style.border));
+      switch0.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, size * (1 - ratio));
+      switch0.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // switch0.SetStyle(Mesh_create_style_from_values(size * (1-ratio), style.feather, style.border));
       switch0.SetName('switch');
-      switch0.mat.style.rcorners = size-pad;
+      switch0.mat.style.rcorners = size - pad;
       switch0.state.mask &= ~MESH_STATE.ACTIVE;
-      
+
       this.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
 
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
@@ -112,9 +114,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    /****************************************************************************************************************************************************/
    // INHERITED METHODS
    /****************************************************************************************************************************************************/
-   
 
-   
+
+
 
    AddToWidgetRootBuffer(root_bufferidx) {
 
@@ -125,7 +127,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 
-   SetGfxEnableAttributes(which, params) {
+   SetGfxEnable(which, params) {
       alert('777\nSetGfxEnableAttributes\WidgetSwitch')
    }
 
@@ -145,11 +147,11 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       super.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
    }
 
-   
-   GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false){
-      
-      if(this.gfx_ctx_parent === INT_NULL) {
-         
+
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) {
+
          this.gfx_ctx_flags = FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
          this.children.buffer[0].gfx_ctx_flags = FLAGS;
@@ -157,11 +159,11 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       }
    }
 
-   
-   GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false){
-      
-      if(this.gfx_ctx_parent === INT_NULL) {
-         
+
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) {
+
          this.gfx_ctx_flags |= FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
          this.children.buffer[0].gfx_ctx_flags |= FLAGS;
@@ -170,29 +172,39 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 
-   EnableGfxAttributes(which, params=null, params2=null){
-      
-      super.EnableGfxAttributes(which, params);
-      
+   EnableGfx(which, params = null, params2 = null) {
+
+      super.EnableGfx(which, params);
+
       // HACK: We must chnge the switch's color_active color to a PER_VERTEX_COLOR, ONLY if the user hasn't pass a PER_VERTEX_COLOR in the switch creation
       // if(!(this.color_active[0] instanceof Float32Array))
       // this.color_active = COLOR_GRADIENT_HORIZONTAL(GREEN[3], GREEN[1]);
       // this.color_active = COLOR_GRADIENT_VERTICAL(GREEN[4], GREEN[2]);
-      
-      if(which === MESH_ENABLE.GFX.ATTR_R_CORNERS) params2 = this.children.buffer[0].geom.dim[1];
 
-      this.children.buffer[0].EnableGfxAttributes(which, params2);
+      // HERE: // TODO: Check if the code below is needed
+      if (which === MESH_ENABLE.GFX.ATTR_R_CORNERS)
+         // params2 = 13;
+         params2 = this.children.buffer[0].geom.dim[1];
+
+      this.children.buffer[0].EnableGfx(which, params2);
    }
 
 
-   
+   // EnableGfxOperations(function_operation, blend_mode) {
+
+   //    super.EnableGfxOperations(function_operation, blend_mode);
+   //    const handle = this.children.buffer[0];
+   //    handle.EnableGfxOperations(function_operation, blend_mode);
+   // }
+
+
    /*******************************************************************************************************************************************************/
    // Graphics
    /*******************************************************************************************************************************************************/
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
-      
+      if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+
       const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
       this.children.buffer[0].GenGfxCtx(FLAGS, specific_vb_groupidx);
 
@@ -229,33 +241,33 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       this.geom.pos[0] += x;
       this.geom.pos[1] += y;
-      this.geom.AddWposXY(this.gfx, x, y, );
+      this.geom.AddWposXY(this.gfx, x, y,);
       this.children.buffer[0].geom.pos[0] += x;
       this.children.buffer[0].geom.pos[1] += y;
-      this.children.buffer[0].geom.AddWposXY(this.gfx, x, y, );
-      
+      this.children.buffer[0].geom.AddWposXY(this.gfx, x, y,);
+
    }
-   
-   
+
+
    AddWposX(x) {
-      
+
       if (x === 0) return;
-      
+
       this.geom.pos[0] += x;
       this.geom.AddWposX(this.gfx, x,);
       this.children.buffer[0].geom.pos[0] += x;
       this.children.buffer[0].geom.AddWposX(this.gfx, x,);
    }
-   
-   
+
+
    AddWposY(y) {
-      
+
       if (y === 0) return;
-      
+
       this.geom.pos[1] += y;
-      this.geom.AddWposY(this.gfx, y, );
+      this.geom.AddWposY(this.gfx, y,);
       this.children.buffer[0].geom.pos[1] += y;
-      this.children.buffer[0].geom.AddWposY(this.gfx, y, );
+      this.children.buffer[0].geom.AddWposY(this.gfx, y,);
 
    }
 
@@ -336,7 +348,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.children.buffer[0].geom.pos[1] = y + dy;
    }
 
-   
+
    SetHoverColor() { this.SetUpdateFrameBuffer(); Set_hover_color_rgba(this.children.buffer[0]); }
 
 
@@ -350,7 +362,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
    // Listeners
    /*******************************************************************************************************************************************************/
-   
+
 
    /**
     * Constructs all listen events enabled for this classs widget.
@@ -368,7 +380,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       const mesh = this;
 
       if (mesh.state.mask & MESH_STATE.ACTIVE) {
-         
+
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
             mesh.AddListenEvent(E.H, null, null);
@@ -379,11 +391,11 @@ export class Widget_Switch_Simple extends Rect_Mesh {
             mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
          }
       }
-      
+
       return false;
    }
 
-   
+
    OnClick(params) {
 
 
@@ -397,23 +409,23 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       if (mesh.isOn) {
          Set_color_rgba(mesh, mesh.color_active);
          switch0.geom.pos[0] += mesh.geom.dim[0];
-         switch0.geom.AddWposX(switch0.gfx, mesh.geom.dim[0], );
+         switch0.geom.AddWposX(switch0.gfx, mesh.geom.dim[0],);
       }
       else {
          Set_default_color_rgba(mesh);
          switch0.geom.pos[0] -= mesh.geom.dim[0];
-         switch0.geom.AddWposX(switch0.gfx, -mesh.geom.dim[0], );
+         switch0.geom.AddWposX(switch0.gfx, -mesh.geom.dim[0],);
       }
 
-      
-      if (params===null || params.evt_params===null || params.evt_params.EventClbk===null){
+
+      if (params === null || params.evt_params === null || params.evt_params.EventClbk === null) {
          console.error('No Callback function has been set for switch widget\nSet up one');
          return;
       }
 
       if (mesh.evt_params) {
          if (mesh.evt_params.EventClbk) {
-   
+
             const EventClbk = mesh.evt_params.EventClbk;
             EventClbk(mesh.evt_params);
          }
@@ -453,7 +465,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 /** A callback function calls another callback that must be called via 'timeInterval'. 
  * Is responsible for creation/destruction of the timeInterval that in its turn 
  * will run automaticaly a callback from the application */
-export function Switch_simple_time_interval_callback(params){
+export function Switch_simple_time_interval_callback(params) {
 
    const this_switch = params.target_mesh;
 
@@ -480,11 +492,11 @@ export function Switch_set_listeners_priority(switch1) {
 
    const handle = switch1.children.buffer[0];
 
-   if(switch1.listeners!==null ) {
+   if (switch1.listeners !== null) {
 
-      if(switch1.listeners.buffer[E.H]!==INT_NULL) Listeners_set_priority(E.H, switch1.listeners);
-      if(switch1.listeners.buffer[E.C]!==INT_NULL) Listeners_set_priority(E.C, switch1.listeners);
-   } 
+      if (switch1.listeners.buffer[E.H] !== INT_NULL) Listeners_set_priority(E.H, switch1.listeners);
+      if (switch1.listeners.buffer[E.C] !== INT_NULL) Listeners_set_priority(E.C, switch1.listeners);
+   }
    // if(handle.listeners!==null ) {
 
    //    if(handle.listeners.buffer[E.H]!==INT_NULL) Listeners_set_priority(E.H, handle.listeners);

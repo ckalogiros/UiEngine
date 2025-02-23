@@ -7,7 +7,7 @@ import { HandleEvents } from './Events/Events.js';
 
 
 
-export class Scene {
+class Scene {
 
     // sceneidx: Scene ID (of type: SCENE const structure).
     // camera: Cameras buffer used by the scene

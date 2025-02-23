@@ -229,7 +229,7 @@ export class Widget_Dropdown extends Section {
    }
    
 
-   SetGfxEnableAttributes(which, params) {
+   SetGfxEnable(which, params) {
       alert('777\nSetGfxEnableAttributes\nWidgetDropdown')
    }
 
@@ -288,14 +288,14 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   EnableGfxAttributes(which, params=null){
+   EnableGfx(which, params=null){
       
-      super.EnableGfxAttributes(which, params);
+      super.EnableGfx(which, params);
       
-      if(this.menu) this.menu.EnableGfxAttributes(which, params);
+      if(this.menu) this.menu.EnableGfx(which, params);
       
       const btn = this.children.buffer[0];
-      btn.EnableGfxAttributes(which, params);
+      btn.EnableGfx(which, params);
       
    }
    

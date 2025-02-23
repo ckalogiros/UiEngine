@@ -1272,6 +1272,22 @@ function Listeners_get_event_type_string(event_type_idx) {
 
 
 _CNT = 0x1;
+const EVENT_HANDLER_TYPE = {
+	MOUSE_MOVE: _CNT,
+	MOUSE_CLICK_DOWN: _CNT <<= 0x1,
+	MOUSE_CLICK_UP: _CNT <<= 0x1,
+	MOUSE_HOVER: _CNT <<= 0x1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
+	MOUSE_UNHOVER: _CNT <<= 0x1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
+
+};
+
+
+
+
+
+
+
+_CNT = 0x1;
 const INFO_LISTEN_EVENT_TYPE = {
 
 	UI_INFO_MESH: _CNT <<= 0x1,
@@ -1314,7 +1330,16 @@ const INTERVALS = {
 const DEBUG = {
 
 	DEFENSIVE: true, // For code that will slow down the app, but essential for critical errors
-	CORE: false,
+	CORE: {
+		BUFFERS: {
+
+			GENERIC_ALLOCATIONS: true,
+			CHARACTER_ALLOCATIONS: false,
+			INT32_ALLOCATIONS: false,
+			INT16_ALLOCATIONS: false,
+			INT8_ALLOCATIONS: false,
+		}
+	},
 	MATERIAL: false,
 	GEOMETRY: false,
 	MESH: true,
@@ -1507,24 +1532,29 @@ const DEBUG_INFO_STRUCTS = {
 
 	BUFFER: {
 		GENERIC: {
-			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
-			TOTAL_BUFFER_SIZE: 0, // The total ammount of all buffers size. 
-			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
+			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		CHARACTER: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
+			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
 		},
 		INT8: {
-			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
 			TOTAL_BUFFER_SIZE: 0,
-			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
 		},
 		INT16: {
-			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
 			TOTAL_BUFFER_SIZE: 0,
-			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
 		},
 		INT32: {
-			BUFFER_COUNT: 0, // Count how many instantiations of Generic_Buffer class
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
 			TOTAL_BUFFER_SIZE: 0,
-			TOTAL_ELEM_COUNT: 0, // The total ammount of added elements in all buffers of the application
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
 		},
 
 	},

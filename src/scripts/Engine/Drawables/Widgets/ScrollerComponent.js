@@ -2,7 +2,7 @@
 
 import { Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
-import { New_generic_buffer } from "../../Core/Buffers.js";
+import { Free_generic_buffer, New_generic_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_unif_add_vb_root_wposy, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
@@ -32,6 +32,11 @@ export function Components_get_scroller_component(scroller_comp_idx=INT_NULL){
    return scroller;
 }
 
+export function Components_scroller_component_destroy(scroller_comp_idx=INT_NULL){
+
+   Free_generic_buffer(_scrollers_buffer);
+}
+
 
 
 
@@ -46,8 +51,8 @@ export function Components_create_scroller_component(width = 12, height=100, mes
 
    const bar = Create_rect_mesh(_, pos, [width, height], col_bar )
    bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   bar.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
+   bar.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   bar.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
    bar.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
    bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
    bar.SetName('ScrollBar');
@@ -68,8 +73,8 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    const handle_pos = [handle_height+handle_pad[0], handle_pad[1], pos[2]+1]
    const handle = Create_rect_mesh(_, handle_pos, [handle_width, handle_height], col_handle, )
    handle.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   handle.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
+   handle.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   handle.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
    handle.SetName('Handle');
    handle.StylesSetPad(handle_pad);
 

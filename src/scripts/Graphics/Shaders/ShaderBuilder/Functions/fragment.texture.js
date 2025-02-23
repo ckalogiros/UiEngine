@@ -62,7 +62,6 @@ vec4 Msdf(vec2 v_tex_coord) {
   float opacity = clamp(pxDist + 0.5, 0.0, 1.0);
   // opacity += Glow() * 2.4; // Combine the original texture with the blurred alpha
  
-  // vec4 alpha = vec4(opacity+.2); 
   vec4 alpha = vec4((opacity+.0) * src_color.a); 
   return alpha; 
 }

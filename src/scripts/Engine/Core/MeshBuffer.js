@@ -1,6 +1,6 @@
 "use strict";
 
-import { New_generic_buffer, New_int16_buffer } from "./Buffers.js";
+import { Free_int16_buffer, New_generic_buffer, New_int16_buffer } from "./Buffers.js";
 import { BLUEL, GREEN, GREY } from "../Drawables/Material/Base/Colors.js";
 import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Create_widget_text } from "./CreateWidget.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
@@ -21,6 +21,12 @@ const _mesh_buffer = New_generic_buffer(_, 'Mesh Buffer');
 export function Mesh_buffer_reset() { _mesh_buffer.ResetFull(); }
 const _mesh_per_vertex_buffer = New_generic_buffer(_, 'Mesh per Vertex buffer');
 export function Mesh_per_vb_reset() { _mesh_per_vertex_buffer.ResetFull(); }
+export function Mesh_per_vb_reset_dealocate() { 
+   for(let i=0; i<=_mesh_per_vertex_buffer.boundary; i++) {
+      Free_int16_buffer(_mesh_per_vertex_buffer.buffer[i]); 
+   }
+   _mesh_per_vertex_buffer.ResetFull(); 
+}
 
 
 

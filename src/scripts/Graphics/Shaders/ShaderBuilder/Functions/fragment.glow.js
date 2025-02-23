@@ -13,7 +13,8 @@
  */
 
 export const frag_glow_call = `
-  vec4 glowcol = Glow(final_color.a, scale_down);
+  // vec4 glowcol = Glow(final_color.a, scale_down);
+  vec4 glowcol = Glow(final_color.a, scale_down, u_gen_ctrl_map_cnt);
   final_color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
   // final_color.rgb *= glowcol.rgb; // Adds the glow to the any previous function calculations
   // final_color = blend_color_multiply( final_color, glowcol ); 
@@ -26,27 +27,18 @@ export const frag_glow = `
   vec2 uv = vec2(0,0);
 #endif
 
-vec4 Glow(float alpha, float scale_down)
+vec4 Glow(in float alpha, in float scale_down, inout int u_gen_ctrl_map_cnt)
 {
-  #ifdef U_GLOW_PARAMS_VEC3
-    #include <u_glow_params_vec3>
-  #endif
-  
-  #ifdef U_GENERIC_VEC3
-    include <u_generic_vec3>
-  #elif defined(U_GENERIC_VEC2)
-    #include <u_generic_vec2>
-  #elif defined(U_GENERIC_FLOAT)
-    #include <u_generic_float>
-  #endif
-  
-  
   #ifdef A_TIME
     float time = v_time;
   #else
     float time = 0.;
   #endif
-  
+
+  // Create uniform controls
+  float outer = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float inner = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float intensity = u_generic_controls[u_gen_ctrl_map_cnt++];
   
   vec2 res = u_screen_res;
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
@@ -55,7 +47,7 @@ vec4 Glow(float alpha, float scale_down)
   #ifndef UV_READY
     #define UV_READY 1
     uv = gl_FragCoord.xy;
-    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
   #endif  
   
   
@@ -64,14 +56,11 @@ vec4 Glow(float alpha, float scale_down)
   
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   vec3 color = src_color.rgb*d*intensity*(1. - time);
-  // vec3 color = src_color.rgb*intensity*(1. - time);
   
   
-  // color = min(src_color.rgb, d*intensity); // WEIRD NICE EFFECT!!!
+  // WEIRD NICE EFFECT!!!
+  // color = min(src_color.rgb, d*intensity);
   
-  // d = 1.0;
-  // return RED*d;
   return vec4(color, d);
-  // return vec4(color, 1.);
 }
 `;

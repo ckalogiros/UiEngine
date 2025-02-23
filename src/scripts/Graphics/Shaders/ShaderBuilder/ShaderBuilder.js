@@ -2,7 +2,7 @@
 
 
 import { shader_chunks } from './ShaderChunks/ShaderChunks.js'
-import { frag_feather, frag_feather_call, frag_round_corners, frag_round_corners_call, frag_style_call, frag_style_corners } from './Functions/fragment.roundcorners.js'
+import { frag_round_corners, frag_round_corners_call, frag_style_call, frag_style_corners } from './Functions/fragment.roundcorners.js'
 import { frag_msdf, frag_msdf_call, frag_sdf, frag_sdf_call, frag_tex } from './Functions/fragment.texture.js'
 import { frag_glow, frag_glow_call } from './Functions/fragment.glow.js';
 import { frag_noise, frag_noise_2, frag_noise_2_call, frag_noise_call } from './Functions/fragment.noise.js';
@@ -129,26 +129,6 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
    // Extension: For lights
 }
 
-// function Resolve_function_operations(shader_ops) {
-
-//    let shader_ops_code = '';
-
-//    const len = shader_ops.length;
-
-//    for (let i = 0; i < len; i++) {
-
-//       const fn_op = shader_ops[i].fn_op;
-//       const blend_mode = shader_ops[i].blend_mode;
-//       if(fn_op & SID.SHADER_OPERATIONS.FLARE){
-
-//          shader_ops_code += frag_test5_bubble;
-//       }
-
-//    }
-
-//    return shader_ops_code;
-
-// }
 /**
  * Construct a function with a switch that resolves the blendin function name
  * 
@@ -185,7 +165,86 @@ function Resolve_blending_mode(blend_mode) {
       case SID.BLEND_OPTIONS.BLEND_MODE_MIX: { return 'blend_color_mix'; };
       case SID.BLEND_OPTIONS.BLEND_MODE_MASK: { return 'blend_color_mask'; };
       case SID.BLEND_OPTIONS.BLEND_MODE_ALPHA: { return 'blend_color_alpha'; };
+      case SID.BLEND_OPTIONS.BLEND_MODE_REMOVE_B_FROM_A: { return 'blend_color_remove_b_from_a'; };
    }
+}
+
+
+// TODO: Abstarct function to another file
+function Find_field_by_name(file, word, at_line=0, start_from=0) {
+
+	const wordpos = { start: -1, end: -1, len: 0, line: -1 };
+	const wordlen = word.length;
+	
+	let line = at_line;
+	let i = start_from;
+	
+	const filelen = file.length;
+	while (i <= filelen) {
+
+		let k = 0;
+		if (file[i] == '\n') line++;
+
+		if (file[i] == word[k]) {
+
+			wordpos.start = i;
+			wordpos.len = 0;
+			i++; k++;
+
+			while (file[i] == word[k]) {
+
+				wordpos.len++;
+				if (k >= wordlen - 1) {
+					wordpos.line = line;
+					wordpos.len++;
+					wordpos.end = i + 1;
+					return wordpos;
+				}
+				i++; k++;
+			}
+		}
+		i++;
+	}
+	return wordpos;
+}
+
+function Resolve_generic_uniforms_count(shader_code) {
+
+   /**
+    * // TODO: In search also include:
+    * The name for the uniform
+    * Store the name of the shader operation
+    * Extract an initial value for the uniform(AN INIT VAL MUST BE SET IN THE SHADER CODE)
+    * 
+    * // IMPORTANT: These operation must happen before shader-load, so that the uniform-enable can pass the count of the total generic uniforms
+    */
+
+   const word = 'u_generic_controls';
+   let uniform_count = 0;
+
+
+   // const file_size = shader_code.length;
+   let word_position = Find_field_by_name(shader_code, word, 0, 0);
+   
+   console.log(word_position);
+   for(let i=word_position.start; i<word_position.start+word_position.len; i++) console.log(shader_code[i]);
+   
+   
+   
+   let file_completed = word_position.len; // Break if the returned word len is 0
+   while(file_completed) {
+      
+      uniform_count++;
+      word_position = Find_field_by_name(shader_code, word, word_position.line, word_position.end );
+      console.log(word_position);
+      for(let i=word_position.start; i<word_position.start+word_position.len; i++) console.log(shader_code[i]);
+
+      file_completed = word_position.len; // Break if the returned word len is 0
+   }
+
+   console.log('uniform_count', uniform_count);
+
+   return uniform_count;
 }
 
 function Resolve_function_operations_called_from_main(shader_ops=null) {
@@ -203,8 +262,19 @@ function Resolve_function_operations_called_from_main(shader_ops=null) {
 
    for (let i = 0; i < len; i++) {
 
+      if(shader_ops[i]===_)
+         console.log()
+
       const fn_op = shader_ops[i].fn_op;
       const blend_mode = shader_ops[i].blend_mode;
+
+
+
+      // if(blend_mode & SID.BLEND_OPTIONS.BLEND_MODE_MIX) {
+      //    enable_param
+      // }
+
+
       if(fn_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW){
 
          shader_ops_code += shader_operations.fs_op_simple_glow;
@@ -222,6 +292,12 @@ function Resolve_function_operations_called_from_main(shader_ops=null) {
          shader_ops_code += shader_operations.fs_op_simple_glow2;
          if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, simple_glow2_color );`;
          else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, simple_glow2_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW2_RECT){
+
+         shader_ops_code += shader_operations.fs_op_simple_glow2_rect;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, simple_glow2_rect_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, simple_glow2_rect_color );`;
       }
       else if(fn_op & SID.SHADER_OPERATIONS.BUBBLE){
 
@@ -247,11 +323,53 @@ function Resolve_function_operations_called_from_main(shader_ops=null) {
          if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_specular_circle_color );`;
          else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_specular_circle_color );`;
       }
-      else if(fn_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT){
+      else if(fn_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT2){
 
          shader_ops_code += shader_operations.fs_op_inner_shadow_rect_filled;
+         // if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_rect_filled_color );`;
+         // else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_rect_filled_color );`;
          if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_rect_filled_color );`;
          else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_rect_filled_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.OUTER_SHADOW_RECT){
+
+         shader_ops_code += shader_operations.fs_op_outer_shadow_rect;
+         // if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_rect_filled_color );`;
+         // else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_rect_filled_color );`;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, sdf_rect_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, sdf_rect_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.SDF_RECT){
+
+         shader_ops_code += shader_operations.fs_op_sdf_rect;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, sdf_rect_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, sdf_rect_color );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.OUTER_GLOW_RECT){
+
+         shader_ops_code += shader_operations.fs_op_outer_glow_rect;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, outer_glow_rect_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, outer_glow_rect_color );`;
+
+         Resolve_generic_uniforms_count(shader_operations.fs_op_outer_glow_rect);
+
+         // shader_ops_code += `  final_color = blend_color_mix( outer_glow_rect_color, final_color, final_color );`;
+         // shader_ops_code += `  final_color = blend_color_mix( final_color, outer_glow_rect_color, c );`;
+      }
+      else if(fn_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT){
+
+         shader_ops_code += shader_operations.fs_op_inner_shadow_rect;
+         // if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, sdf_rect_color );`;
+         // else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, sdf_rect_color );`;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_rect_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_rect_color );`;
+      }
+      // Test Copies
+      else if(fn_op & SID.SHADER_OPERATIONS.SDF_RECT_TEST_WITH_GENERIC_SLIDERS){
+
+         shader_ops_code += shader_operations.fs_op_sdf_rect_test_with_generic_sliders;
+         if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, sdf_rect_color );`;
+         else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, sdf_rect_color );`;
       }
 
    }
@@ -838,6 +956,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '#include <precision_high>',
 
       (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
+      // TODO: Make use of 'U_RCORNERS_...' ready uniform
       (sid.unif & SID.UNIF.FS_RCORNERS_FLOAT) ? '#define U_RCORNERS_FLOAT 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
       (sid.unif & SID.UNIF.FS_RCORNERS_VEC2) ? '#define U_RCORNERS_VEC2 1' : '',
       (sid.unif & SID.UNIF.FS_RCORNERS_VEC3) ? '#define U_RCORNERS_VEC3 1' : '',
@@ -947,9 +1066,14 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
       '\n#include <blend_color_functions_overloads>',
 
+
+      '\n#include <smoothmin>',
+      '\n#include <brightness_contrast>',
+
+      // IMPORTANT: Ca;;s the old 'frag_round_corners()' only if both rcorners and feather are enabled.
+      // FIXME: Repeal 'frag_round_corners()', but think if we need the feather effect or the SFD_RECT satisfies the feathering
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_corners :
-         ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners :
-            (sid.attr & SID.ATTR.FEATHER) ? frag_feather : '',
+         ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners : '',
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
       (sid.attr & SID.ATTR.MSDF) ? frag_msdf : '',
 
@@ -964,6 +1088,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       
       /********************************************************************************************************/
       // Shader Color Functions
+      (sid.shad & SID.SHAD.FN_GLOW) ? frag_glow : '',
       (sid.shad & SID.SHAD.FN_INNER_SHADOW) ? frag_inner_shadow_rhomboid : '',
       (sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) ? frag_explosion_circle : '',
       (sid.shad & SID.SHAD.FN_EXPLOSION_GLOW) ? frag_explosion_glow : '',
@@ -1003,40 +1128,30 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '{',
       // Include uniforms-controls
       `  #ifdef U_GENERIC_CONTROLS
-   //  float ctrl1 = u_generic_controls[0];
-   //  float ctrl2 = u_generic_controls[1];
-   //  float ctrl3 = u_generic_controls[2];
-   //  float ctrl4 = u_generic_controls[3];
-   //  float ctrl5 = u_generic_controls[4];
-   //  float ctrl6 = u_generic_controls[5];
-    int u_gen_ctrl_map_cnt = 0;
+   //  u_generic_controls[];
+  int u_gen_ctrl_map_cnt = 0;
   #endif`,
-      (sid.pass & SID.PASS.DIM2) ? `   vec2 dim = vec2(v_dim2_x, v_dim2_y); 
-      vec2 local_res = vec2(dim.x, dim.y);` : '',
+      (sid.pass & SID.PASS.DIM2) ? `  vec2 dim = vec2(v_dim2_x, v_dim2_y);\n  vec2 local_res = vec2(dim.x, dim.y);` : '',
 
       (sid.unif & SID.UNIF.SCALE2) ? '  float scale_down = u_scale2.x;' : '  float scale_down = 1.;', // Initialize scale down variable
       (sid.attr & SID.ATTR.TEX2) ? '  vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);' : '', // Initialize texture coordinates variable
       (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '  vec2 res = u_screen_res;' : '', // Initialize screen resolution variable
-      // '  #ifdef U_SCALE\n    float scale_down = u_scale2.x;\n  #else\n    float scale_down = 1.;\n  #endif\n',
-      // '  #ifdef A_TEX_COORD\n    vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);\n  #endif\n',
-      // '  #ifdef U_SCREEN_RESOLUTION\n    vec2 res = u_screen_res;\n  #endif', // Initialize screen resolution variable
       
-      // '  vec2 vpos = vec2(v_pos2_x, v_pos2_y);' , // Initialize pixel coordinates variable
       (sid.pass & SID.PASS.VPOS2) ? '  vec2 vpos = vec2(v_pos2_x, v_pos2_y);' : '', // Initialize pixel coordinates variable
       '  vec2 uv = vec2(0.0, 0.0);', // Initialize pixel coordinates variable
+      // '  vec2 uv = gl_FragCoord.xy;', // Initialize pixel coordinates variable
       '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);', // The users color
       '  vec4 final_color = vec4(0.0);', // The final output color
+
 
 
       Resolve_function_operations_called_from_main(shader_ops),
 
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_call :
          ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
-            (sid.attr & SID.ATTR.FEATHER) ? frag_feather_call : '',
-      // (sid.attr & (SID.ATTR.GLOW_INTENSITY)) ? frag_glow_call : '',
 
       (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '  float alpha = final_color.a;' : '',
-      (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
+      // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
       (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
       (sid.fx & SID.FX.FS_NOISE_2) ? frag_noise_2_call : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
@@ -1044,6 +1159,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       //TODO: Resolve the naming FS_ and FN_ and FX_ for SID
       
       // Shader Color Functions
+      (sid.shad & SID.SHAD.FN_GLOW) ? frag_glow_call : '',
       (sid.shad & SID.SHAD.FN_INNER_SHADOW) ? frag_inner_shadow_rhomboid_call : '',
       (sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) ? frag_explosion_circle_call : '',
       (sid.shad & SID.SHAD.FN_EXPLOSION_GLOW) ? frag_explosion_glow_call : '',
@@ -1107,9 +1223,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // '   color.rgb = 1.-color.rgb;',
       // '   color.rgb *= vec3(v_col4_x, v_col4_y, v_col4_z);',
       
+      // '  frag_color = src_color;',
+      // '  frag_color = final_color * src_color;',
       '  frag_color = final_color;',
-      // '   frag_color = 1.- color;',
-      // '   frag_color.rgb = 1.- color.rgb;',
+      // '   frag_color = 1.- final_color;',
+      // '   frag_color.rgb = 1.- final_color.rgb;',
 
 
 

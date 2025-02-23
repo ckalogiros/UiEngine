@@ -7,7 +7,7 @@ import { Time_intervals_update } from "../Timers/TimeIntervals.js";
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
 import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Performance_timer_start, Performance_timer_stop, Performance_timers_update_tick, PerformanceTimersGetFps, PerformanceTimersGetMilisec } from "../Timers/PerformanceTimers.js";
+import { Performance_timer_start, Performance_timer_stop, Performance_timers_update_tick } from "../Timers/PerformanceTimers.js";
 import { Command_buffer_run } from "../Core/Commandbuffer.js";
 import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../Scenes.js";
 import { Input_reset } from "../Controls/Input/Input.js";
@@ -110,7 +110,7 @@ export class Renderer {
 
          Notifications_update();
 
-         Command_buffer_run()
+         // Command_buffer_run()
 
          Uniforms_block_update_uniform();
 

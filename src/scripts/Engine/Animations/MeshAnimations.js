@@ -133,7 +133,7 @@ class VB_DATA {
         this.data.values_indices.push((this.data_count/this.values_len)-1); // RGBA:4 values -> values_indices = 4/4-1=0idx, next 8/4-1=1idx, next 12/4-1=2idx, ... 
     }
 }
-class AnimationData {
+class Animation_Data {
 
     constructor(){
 
@@ -149,7 +149,7 @@ class AnimationData {
 
 
 
-class MeshAnimation{
+class Mesh_Animation{
 
     constructor(anim_type_flag=0x0, anim_data_type){
         
@@ -278,7 +278,7 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
         }
         else {
             
-            anim = new MeshAnimation(anim_type_flag);
+            anim = new Mesh_Animation(anim_type_flag);
             anim_type_idx = _mesh_animations_buffer.Add(anim);
             ANIMATIONS.INDEX.COLOR = anim_type_idx;
             
@@ -295,7 +295,7 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
         }
         else {
             
-            anim = new MeshAnimation(anim_type_flag);
+            anim = new Mesh_Animation(anim_type_flag);
             anim_type_idx = _mesh_animations_buffer.Add(anim);
             ANIMATIONS.INDEX.WPOS = anim_type_idx;
         }
@@ -328,7 +328,7 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
         vb_data_idx = anim.SetVbData(vb_data);
         
         // vb and anim data supose to be 1 to 1 element count
-        const anim_data = new AnimationData();
+        const anim_data = new Animation_Data();
         anim.SetAnimData(anim_data);
     }
     

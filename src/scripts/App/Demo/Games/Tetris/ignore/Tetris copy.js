@@ -175,7 +175,7 @@ function Keyboard_input_keyup(params) {
 
 /*********************************************************************************************************/
 // Mesh-Cell Properties Class
-class Cell_mesh_properties {
+class Cell_Mesh_Properties {
 
    constructor(_mesh = null, glow_intensity = 1) {
 
@@ -594,10 +594,10 @@ function Cell_create(offsetx=0, offsety=0, col){
    const color = col!==undefined ? col : YELLOW[9];
    const mesh = Create_widget_section(_, _, [0, 0], [10+(TOKEN_SIZE*2*offsetx), 10+(TOKEN_SIZE*2*offsety),0], [TOKEN_SIZE, TOKEN_SIZE], color, 'mesh');
    mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, cell_round_corners);
+   mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, cell_round_corners);
 
-   const cell = new Cell_mesh_properties(mesh);
+   const cell = new Cell_Mesh_Properties(mesh);
 
    console.log('CREATING NEW CELL', cell)
    
@@ -1601,8 +1601,8 @@ export function Tetris(root_widget=0x0, x, y){
 
    const section = Create_widget_section(root_widget, _, [10, 10], [x,y,0], [TETRIS_PANEL_WIDTH+tetris_panel_pad, TETRIS_PANEL_HEIGHT+tetris_panel_pad], GREY[0], 'TetrisSection');
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 20);
+   section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 20);
 
 
 

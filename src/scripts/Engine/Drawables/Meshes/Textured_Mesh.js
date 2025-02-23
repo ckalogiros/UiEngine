@@ -6,7 +6,7 @@ import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js"
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
-import { Texture_Material } from "../Material/Base/Material.js";
+import { Material_Texture } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
@@ -17,7 +17,7 @@ export class Textured_Mesh extends Mesh {
 
    constructor(pos = [0, 0, 0], dim, color = WHITE, textureid = INT_NULL, name = 'UNDEFINED_TEXTURED_MESH_NAME', is_debug_mesh) {
 
-      const mat = new Texture_Material(color, textureid);
+      const mat = new Material_Texture(color, textureid);
       const geom = new Geometry2D(pos, dim);
 
       super(geom, mat);

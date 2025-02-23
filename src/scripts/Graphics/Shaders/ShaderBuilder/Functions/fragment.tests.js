@@ -33,7 +33,7 @@ export const frag_test1 = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifdef SMOOTH_MIN 
+#ifndef SMOOTH_MIN 
   #include <smoothmin>
 #endif
 
@@ -45,11 +45,11 @@ export const frag_test1 = `
 #endif
 
 
-#ifdef GAMMA_CORRECTION 
+#ifndef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
 
-#ifdef BRIGHTNESS_CONTRAST 
+#ifndef BRIGHTNESS_CONTRAST 
   #include <brightness_contrast>
 #endif
 
@@ -79,7 +79,7 @@ vec4 frag_test1()
   #ifndef UV_READY
     #define UV_READY 1
     uv = gl_FragCoord.xy;
-    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
   #endif 
   
   uv.x += v_dim2_x;
@@ -174,7 +174,7 @@ export const frag_test3 = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifdef SMOOTH_MIN 
+#ifndef SMOOTH_MIN 
   #include <smoothmin>
 #endif
 
@@ -186,11 +186,11 @@ export const frag_test3 = `
 #endif
 
 
-#ifdef GAMMA_CORRECTION 
+#ifndef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
 
-#ifdef BRIGHTNESS_CONTRAST 
+#ifndef BRIGHTNESS_CONTRAST 
   #include <brightness_contrast>
 #endif
 
@@ -219,7 +219,7 @@ vec4 frag_test3()
   // #ifndef UV_READY
     #define UV_READY 1
     uv = gl_FragCoord.xy;
-    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
   // #endif 
   
   // vec2 uv = uv;
@@ -294,7 +294,7 @@ export const frag_test2 = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifdef SMOOTH_MIN 
+#ifndef SMOOTH_MIN 
   #include <smoothmin>
 #endif
 
@@ -307,11 +307,11 @@ export const frag_test2 = `
 #endif
 
 
-#ifdef GAMMA_CORRECTION 
+#ifndef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
 
-#ifdef BRIGHTNESS_CONTRAST 
+#ifndef BRIGHTNESS_CONTRAST 
   #include <brightness_contrast>
 #endif
 
@@ -341,7 +341,7 @@ vec4 frag_test2()
   // #ifndef UV_READY
   #define UV_READY 1
   uv = gl_FragCoord.xy;
-  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
+  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
   // #endif 
   
   uv.x += v_dim2_x;
@@ -415,7 +415,7 @@ vec4 frag_test2()
 
 // /*****************************************************/
 // // FUNCTION DECLERATIONS
-// #ifdef SMOOTH_MIN 
+// #ifndef SMOOTH_MIN 
 //   #include <smoothmin>
 // #endif
 
@@ -612,7 +612,7 @@ vec4 frag_test2()
 //   // #ifndef UV_READY
 //     #define UV_READY 1
 //     uv = gl_FragCoord.xy;
-//     pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+//     pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
 //   // #endif 
 
 //   vec2 uv = vec2(uv);
@@ -766,7 +766,7 @@ export const frag_test4_call = `
 
 // /*****************************************************/
 // // FUNCTION DECLERATIONS
-// #ifdef SMOOTH_MIN 
+// #ifndef SMOOTH_MIN 
 //   #include <smoothmin>
 // #endif
 
@@ -778,11 +778,11 @@ export const frag_test4_call = `
 // #endif
 
 
-// #ifdef GAMMA_CORRECTION 
+// #ifndef GAMMA_CORRECTION 
 //   #include <gamma_correction>
 // #endif
 
-// #ifdef BRIGHTNESS_CONTRAST 
+// #ifndef BRIGHTNESS_CONTRAST 
 //   #include <brightness_contrast>
 // #endif
 
@@ -810,7 +810,7 @@ export const frag_test4_call = `
   
 //   #define UV_READY 1
 //   uv = gl_FragCoord.xy;
-//   pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
+//   pixel_map_model_space_coordinates(uv, res, v_wpos3_x);
   
 //   uv_map_coordinates_zero_one( uv, local_res );
   
@@ -850,7 +850,7 @@ export const frag_test4 = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifdef SMOOTH_MIN 
+#ifndef SMOOTH_MIN 
   #include <smoothmin>
 #endif
 
@@ -862,11 +862,11 @@ export const frag_test4 = `
 #endif
 
 
-#ifdef GAMMA_CORRECTION 
+#ifndef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
 
-#ifdef BRIGHTNESS_CONTRAST 
+#ifndef BRIGHTNESS_CONTRAST 
   #include <brightness_contrast>
 #endif
 
@@ -896,7 +896,7 @@ vec4 frag_test4()
   
   #define UV_READY 1
   uv = gl_FragCoord.xy;
-  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, local_res);
+  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
   
   uv_map_coordinates_zero_one( uv, local_res );
 
@@ -992,10 +992,10 @@ export const frag_test5_bubble = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifdef SMOOTH_MIN 
+#ifndef SMOOTH_MIN 
   #include <smoothmin>
 #endif
-#ifdef GAMMA_CORRECTION 
+#ifndef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
 // #ifdef OP_FLARE 
@@ -1157,10 +1157,10 @@ export const frag_test6_ring_feathered = `
 
 /*****************************************************/
 // FUNCTION DECLERATIONS
-#ifdef SMOOTH_MIN 
+#ifndef SMOOTH_MIN 
   #include <smoothmin>
 #endif
-#ifdef GAMMA_CORRECTION 
+#ifndef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
 

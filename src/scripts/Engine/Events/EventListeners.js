@@ -43,6 +43,21 @@ export function Listener_reset_event_storage_buffers() {
 
 
 
+export function Listener_reset_event_storage_buffers_dealocate() {
+
+   for (let i = 0; i < LISTEN_EVENT_TYPES_INDEX.SIZE; i++) {
+
+      for (let j = 0; j <= _listeners_buffer_storage.buffer[i].boundary; j++) {
+         Free_generic_buffer(_listeners_buffer_storage.buffer[i]);
+         Free_generic_buffer(_listeners_buffer_view_storage.buffer[i]);
+      }
+      _listeners_buffer_storage.buffer[i].ResetFull();
+      _listeners_buffer_view_storage.buffer[i].ResetFull();
+   }
+}
+
+
+
 export function Listener_get_parent_event(TYPE_IDX, idx) {
    const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].parent_idx;
    return parent_event;
@@ -419,7 +434,7 @@ export function Listener_dispatch_check_hover_event() {
       //             }
       //          }
    
-      //          Events_handle_immidiate({ type: 'hover', params: { mesh: mesh } });
+      //          Events_handle_immidiate({ type: EVENT_HANDLER_TYPE.MOUSE_HOVER, params: { mesh: mesh } });
       //       }
    
       //       return;
@@ -463,7 +478,7 @@ export function Listener_dispatch_check_hover_event() {
             const meshidx = view_buffer.buffer[i].meshidx;
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
 
-            Events_handle_immidiate({ type: 'hover', params: { mesh: mesh } });
+            Events_handle_immidiate({ type: EVENT_HANDLER_TYPE.MOUSE_HOVER, params: { mesh: mesh } });
             intersects = true;
 
             break;
@@ -476,7 +491,8 @@ export function Listener_dispatch_check_hover_event() {
 
    // NOTE: The only way to avoid meshes remain hovered, after mouse hover skiping over the root mesh's listener.
    if (!intersects && STATE.mesh.hovered) { // If mouse is not intersecting with any mesh and there still is a hovered mesh, unhover it.
-      Events_handle_immidiate({ type: 'unhover', params: { mesh: STATE.mesh.hovered } });
+      // Events_handle_immidiate({ type: 'unhover', params: { mesh: STATE.mesh.hovered } });
+      Events_handle_immidiate({ type: EVENT_HANDLER_TYPE.MOUSE_UNHOVER, params: { mesh: STATE.mesh.hovered } });
    }
 
    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.HoverListener);
@@ -506,7 +522,7 @@ function Check_hover_recursive(view_children, point) {
             const meshidx = view_children.buffer[i].meshidx;
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
 
-            Events_handle_immidiate({ type: 'hover', params: { mesh: mesh } });
+            Events_handle_immidiate({ type: EVENT_HANDLER_TYPE.MOUSE_HOVER, params: { mesh: mesh } });
             return true;
          }
       }

@@ -10,8 +10,6 @@
 
 
 
-const DEBUG_PRINT_ALLOCATIONS = false;
-
 
 
 
@@ -22,7 +20,8 @@ const DEBUG_PRINT_ALLOCATIONS = false;
 /**********************************************************************************************************************************************/
 
 let dubg = 0;
-export class ArrayBufferInterface {
+/** */
+class Array_Buffer_Integer_Interface {
 
 
    constructor() {
@@ -300,8 +299,6 @@ export class ArrayBufferInterface {
 
    }
 
-
-
 }
 
 
@@ -327,7 +324,8 @@ export class ArrayBufferInterface {
 // Int8
 /**********************************************************************************************************************************************/
 // TODO: Instead use Uint8 and set the NULL value with uin8_max: 255-0xff
-export class Int8Buffer extends ArrayBufferInterface {
+/** */
+class Int8_Buffer extends Array_Buffer_Integer_Interface {
 
    constructor(size = 1, debug_name) {
 
@@ -363,28 +361,26 @@ export class Int8Buffer extends ArrayBufferInterface {
    }
 
 }
-
-
-
+/** */
 export function New_int8_buffer(size=1, debug_name='INT8 DEBUB UNAMED') {
 
-   DEBUG_INFO_STRUCTS.BUFFER.INT8.BUFFER_COUNT++;
+   DEBUG_INFO_STRUCTS.BUFFER.INT8.NUM_BUFFERS++;
    DEBUG_INFO_STRUCTS.BUFFER.INT8.TOTAL_BUFFER_SIZE+=size;
    // console.log('MemAlloc idx', debug_name, 'size', size)
 
-   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:Int8. name', debug_name);
+   if(DEBUG.CORE.BUFFERS.INT8_ALLOCATIONS) console.warn('allocation:Int8. name', debug_name);
 
 
-   return new Int8Buffer(size, debug_name);
+   return new Int8_Buffer(size, debug_name);
 }
-
-
+/** */
 export function Free_int8_buffer(buffer){
-
+   if(!buffer || buffer===_)
+      console.log()
    DEBUG_INFO_STRUCTS.BUFFER.INT8.TOTAL_BUFFER_SIZE -= buffer.size;
-   DEBUG_INFO_STRUCTS.BUFFER.INT8.BUFFER_COUNT--;
-   // DEBUG_INFO_STRUCTS.BUFFER.INT8.BUFFER_COUNT = 0;
-   // console.log('Mem-DE-Alloc', buffer.debug_name, 'size', buffer.size)
+   DEBUG_INFO_STRUCTS.BUFFER.INT8.NUM_BUFFERS--;
+   // DEBUG_INFO_STRUCTS.BUFFER.INT8.NUM_BUFFERS = 0;
+    // console.log('Mem-DE-Alloc', buffer.debug_name, 'size', buffer.size)
    buffer = null;
 }
 
@@ -410,7 +406,8 @@ export function Free_int8_buffer(buffer){
 /**********************************************************************************************************************************************/
 // Int16
 /**********************************************************************************************************************************************/
-export class Int16Buffer extends ArrayBufferInterface {
+/** */
+class Int16_Buffer extends Array_Buffer_Integer_Interface {
 
    constructor(size = 1, debug_name) {
 
@@ -449,27 +446,24 @@ export class Int16Buffer extends ArrayBufferInterface {
    }
 
 }
-
-
-
+/** */
 export function New_int16_buffer(size=1, debug_name='INT16 DEBUB UNAMED') {
 
-   DEBUG_INFO_STRUCTS.BUFFER.INT16.BUFFER_COUNT++;
+   DEBUG_INFO_STRUCTS.BUFFER.INT16.NUM_BUFFERS++;
    DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE += size;
    // console.log('MemAlloc idx', debug_name, 'size', size)
    // console.error('ppppppppppppppppppp', debug_name)
 
-   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:Int16. name', debug_name);
+   if(DEBUG.CORE.BUFFERS.INT16_ALLOCATIONS) console.warn('allocation:Int16. name', debug_name);
    
-   return new Int16Buffer(size, debug_name);
+   return new Int16_Buffer(size, debug_name);
 }
-
-
-
+/** */
 export function Free_int16_buffer(buffer){
-   
+   if(!buffer || buffer===_)
+      console.log()
    DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= buffer.size;
-   DEBUG_INFO_STRUCTS.BUFFER.INT16.BUFFER_COUNT--;
+   DEBUG_INFO_STRUCTS.BUFFER.INT16.NUM_BUFFERS--;
    // console.warn('ppppppppppppppppppp', buffer.debug_name)
    // console.log('Mem-DE-Alloc', buffer.debug_name, 'size', buffer.size)
    buffer = null;
@@ -483,7 +477,8 @@ export function Free_int16_buffer(buffer){
 /**********************************************************************************************************************************************/
 // Int32
 /**********************************************************************************************************************************************/
-export class Int32Buffer extends ArrayBufferInterface {
+/** */
+class Int32_Buffer extends Array_Buffer_Integer_Interface {
 
    constructor(size = 1, debug_name) {
 
@@ -522,27 +517,23 @@ export class Int32Buffer extends ArrayBufferInterface {
    }
 
 }
-
-
-
+/** */
 export function New_int32_buffer(size=1, debug_name='INT32 DEBUB UNAMED') {
 
-   DEBUG_INFO_STRUCTS.BUFFER.INT32.BUFFER_COUNT++;
+   DEBUG_INFO_STRUCTS.BUFFER.INT32.NUM_BUFFERS++;
    DEBUG_INFO_STRUCTS.BUFFER.INT32.TOTAL_BUFFER_SIZE += size;
    // console.log('MemAlloc idx', debug_name, 'size', size)
    // console.error('ppppppppppppppppppp', debug_name)
 
-   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:Int32. name', debug_name);
+   if(DEBUG.CORE.BUFFERS.INT32_ALLOCATIONS) console.warn('allocation:Int32. name', debug_name);
    
-   return new Int32Buffer(size, debug_name);
+   return new Int32_Buffer(size, debug_name);
 }
-
-
-
+/** */
 export function Free_int32_buffer(buffer){
    
    DEBUG_INFO_STRUCTS.BUFFER.INT32.TOTAL_BUFFER_SIZE -= buffer.size;
-   DEBUG_INFO_STRUCTS.BUFFER.INT32.BUFFER_COUNT--;
+   DEBUG_INFO_STRUCTS.BUFFER.INT32.NUM_BUFFERS--;
    // console.warn('ppppppppppppppppppp', buffer.debug_name)
    // console.log('Mem-DE-Alloc', buffer.debug_name, 'size', buffer.size)
    buffer = null;
@@ -572,6 +563,7 @@ export function Free_int32_buffer(buffer){
 /**********************************************************************************************************************************************/
 
 // IMPORTANT: DO NOT USE M_BUFFER CLASS AS AN ARRAY OF INTEGERS, UNTIL CORRECT IMPLEMENTATION. SEE BUG AT 'Buffer_Interface, GetNextFree()'.
+/** */
 export class M_Buffer {
 
    buffer;
@@ -681,7 +673,30 @@ export class M_Buffer {
 
    ResetFull() {
 
-      // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT -= this.active_count;
+      // If buffer element is another buffer type, destroy it. Always get a valid active element with index=boundary
+      if(this.buffer[this.boundary] instanceof Int32_Buffer) {
+
+         for(let i = 0; i <= this.boundary; i++) {
+            Free_int32_buffer(this.buffer[i]);
+         }
+         console.error('ResetFull()->M_BUFFER->Int32_Buffer')
+      }
+      if(this.buffer[this.boundary] instanceof Int16_Buffer) {
+         
+         for(let i = 0; i <= this.boundary; i++) {
+            Free_int16_buffer(this.buffer[i]);
+         }
+         console.error('ResetFull()->M_BUFFER->Int16_Buffer')
+      }
+      if(this.buffer[this.boundary] instanceof Int8_Buffer) {
+         
+         for(let i = 0; i <= this.boundary; i++) {
+            Free_int8_buffer(this.buffer[i]);
+         }
+         console.error('ResetFull()->M_BUFFER->Int8_Buffer')
+      }
+
+      DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT -= this.active_count;
 
       this.boundary = -1;
       this.active_count = 0;
@@ -695,7 +710,30 @@ export class M_Buffer {
 
    Reset() {
 
-      // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT -= this.active_count;
+      //  If buffer element is another buffer type, destroy it. Always get a valid active element with index=boundary
+      if(this.buffer[this.boundary] instanceof Int32_Buffer) {
+
+         for(let i = 0; i <= this.boundary; i++) {
+            Free_int32_buffer(this.buffer[i]);
+         }
+         console.error('Reset()->M_BUFFER->Int32_Buffer')
+      }
+      if(this.buffer[this.boundary] instanceof Int16_Buffer) {
+         
+         for(let i = 0; i <= this.boundary; i++) {
+            Free_int16_buffer(this.buffer[i]);
+         }
+         console.error('Reset()->M_BUFFER->Int16_Buffer')
+      }
+      if(this.buffer[this.boundary] instanceof Int8_Buffer) {
+         
+         for(let i = 0; i <= this.boundary; i++) {
+            Free_int8_buffer(this.buffer[i]);
+         }
+         console.error('Reset()->M_BUFFER->Int8_Buffer')
+      }
+
+      DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT -= this.active_count;
       
       this.boundary = -1;
       this.active_count = 0;
@@ -893,16 +931,19 @@ export class M_Buffer {
       console.log(this.buffer)
    }
 }
-
-
-
-
 const _generic_buffers_container = new M_Buffer();
+/** */
+export function Generic_buffers_container_get_size(){ return _generic_buffers_container.size }
+/** */
+export function Generic_buffers_container_get_active_count(){ return _generic_buffers_container.active_count }
+/** */
+export function Generic_buffers_container_get_boundary(){ return _generic_buffers_container.boundary }
+
+/** */
 export function Generic_buffers_container_reset() { _generic_buffers_container.ResetFull(); }
-
+/** */
 export function Get_generic_buffers_container_get_total_allocations() { return _generic_buffers_container.active_count; }
-
-
+/** */
 export function New_generic_buffer(obj, debug_name = 'UNAMED BUFFER') {
    
    const buffer = new M_Buffer(obj, debug_name);
@@ -913,24 +954,50 @@ export function New_generic_buffer(obj, debug_name = 'UNAMED BUFFER') {
    });
 
    DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE += buffer.size;
-   DEBUG_INFO_STRUCTS.BUFFER.GENERIC.BUFFER_COUNT++;
+   DEBUG_INFO_STRUCTS.BUFFER.GENERIC.NUM_BUFFERS++;
 
-   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:Generic. name', debug_name);
+   if(DEBUG.CORE.BUFFERS.GENERIC_ALLOCATIONS) console.warn('allocation:Generic. name', debug_name);
 
    return buffer;
 }
-
-
+/** */
 export function Free_generic_buffer(buffer) {
 
+   if(!buffer)
+      console.log()
+   //  If buffer element is another buffer type, destroy it. Always get a valid active element with index=boundary
+   if(buffer.buffer[buffer.boundary] instanceof Int32_Buffer) {
+
+      for(let i = 0; i <= buffer.boundary; i++) {
+         Free_int32_buffer(buffer.buffer[i]);
+      }
+      console.error('Free_generic_buffer()->M_BUFFER->Int32_Buffer')
+   }
+   if(buffer.buffer[buffer.boundary] instanceof Int16_Buffer) {
+      
+      for(let i = 0; i <= buffer.boundary; i++) {
+         Free_int16_buffer(buffer.buffer[i]);
+      }
+      console.error('Free_generic_buffer()->M_BUFFER->Int16_Buffer')
+   }
+   if(buffer.buffer[buffer.boundary] instanceof Int8_Buffer) {
+      
+      for(let i = 0; i <= buffer.boundary; i++) {
+         Free_int8_buffer(buffer.buffer[i]);
+      }
+      console.error('Free_generic_buffer()->M_BUFFER->Int8_Buffer')
+   }
+
    DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE -= buffer.size;
-   DEBUG_INFO_STRUCTS.BUFFER.GENERIC.BUFFER_COUNT--;
+   DEBUG_INFO_STRUCTS.BUFFER.GENERIC.NUM_BUFFERS--;
 
    _generic_buffers_container.RemoveByIdx(buffer.buffer_container_idx);
 
    Free_int16_buffer(buffer.free_buffer);
 
    buffer = null;
+
+   return buffer;
 }
 
 
@@ -952,7 +1019,8 @@ export function Free_generic_buffer(buffer) {
 
 
 
-export class CharBuffer extends M_Buffer {
+/** */
+export class Char_Buffer extends M_Buffer {
 
    constructor(char_buffer = null, name) {
 
@@ -978,7 +1046,7 @@ export class CharBuffer extends M_Buffer {
       this.active_count = i;
       this.boundary = i - 1;
       
-      // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE += this.size;
+      DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE += this.size;
    }
 
    Add(elem) {
@@ -986,7 +1054,7 @@ export class CharBuffer extends M_Buffer {
       const idx = super.GetNextFree();
       this.buffer[idx] = elem;
       this.active_count++;
-      // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT++;
+      DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT++;
       return idx;
    }
 
@@ -1016,14 +1084,14 @@ export class CharBuffer extends M_Buffer {
          if (this.boundary < INT_NULL) alert('M_Buffer boundary = -1')
          ERROR_NULL(this.active_count);
 
-         // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT--;
+         DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_ELEM_COUNT--;
       }
    }
 
 
 
 
-   // TODO: Call this on every Destroy, to have all M_Buffer elements not sparsed
+   // TODO: Call this on every Destroy, to have all Char_Buffer elements not sparsed
    ShiftElementOnDestroy(destroyed_idx) {
 
       /**DEBUG*/ if (destroyed_idx > this.boundary && this.boundary >= 0) {
@@ -1045,31 +1113,28 @@ export class CharBuffer extends M_Buffer {
    }
 
 }
-
-
-
+/** */
 export function New_generic_char_buffer(obj, debug_name = 'UNAMED BUFFER') {
    
-   const buffer = new CharBuffer(obj, debug_name);
+   const buffer = new Char_Buffer(obj, debug_name);
    buffer.buffer_container_idx = _generic_buffers_container.Add({
       buffer: buffer,
       name: name,
       type: 'Char Buffer',
    });
 
-   // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE += buffer.size;
-   // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.BUFFER_COUNT++;
+   DEBUG_INFO_STRUCTS.BUFFER.CHARACTER.TOTAL_BUFFER_SIZE += buffer.size;
+   DEBUG_INFO_STRUCTS.BUFFER.CHARACTER.NUM_BUFFERS++;
 
-   if(DEBUG_PRINT_ALLOCATIONS) console.warn('allocation:CharBuffer. name', debug_name);
+   if(DEBUG.CORE.BUFFERS.CHARACTER_ALLOCATIONS) console.warn('allocation:Char_Buffer. name', debug_name);
 
    return buffer;
 }
-
-
+/** */
 export function Free_generic_char_buffer(buffer) {
 
-   // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE -= buffer.size; // Remove from the total allocations size the size of the buffer that is destroyed
-   // DEBUG_INFO_STRUCTS.BUFFER.GENERIC.BUFFER_COUNT--;
+   DEBUG_INFO_STRUCTS.BUFFER.CHARACTER.TOTAL_BUFFER_SIZE -= buffer.size; // Remove from the total allocations size the size of the buffer that is destroyed
+   DEBUG_INFO_STRUCTS.BUFFER.CHARACTER.NUM_BUFFERS--;
 
    _generic_buffers_container.RemoveByIdx(buffer.buffer_container_idx);
 
@@ -1097,13 +1162,12 @@ export function Free_generic_char_buffer(buffer) {
 /****************************************************************************************************************************************************/
 // DEBUG-PRINT
 /****************************************************************************************************************************************************/
-
-
+/** */
 export function DEBUG_INFO_BUFFERS_PRINT() {
    console.log(
-      'GENERIC: number of buffers:', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.BUFFER_COUNT, 'total elements count', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE,
-      '\nINT16: number of buffers:', DEBUG_INFO_STRUCTS.BUFFER.INT16.BUFFER_COUNT, 'total elements count', DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE,
-      '\nINT8: number of buffers:', DEBUG_INFO_STRUCTS.BUFFER.INT8.BUFFER_COUNT, 'total elements count', DEBUG_INFO_STRUCTS.BUFFER.INT8.TOTAL_BUFFER_SIZE,
+      'GENERIC: number of buffers:', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.NUM_BUFFERS, 'total elements count', DEBUG_INFO_STRUCTS.BUFFER.GENERIC.TOTAL_BUFFER_SIZE,
+      '\nINT16: number of buffers:', DEBUG_INFO_STRUCTS.BUFFER.INT16.NUM_BUFFERS, 'total elements count', DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE,
+      '\nINT8: number of buffers:', DEBUG_INFO_STRUCTS.BUFFER.INT8.NUM_BUFFERS, 'total elements count', DEBUG_INFO_STRUCTS.BUFFER.INT8.TOTAL_BUFFER_SIZE,
       '\n_generic_buffers_container: boundary', _generic_buffers_container.boundary, 'active', _generic_buffers_container.active_count, 'size', _generic_buffers_container.size,
    );
 
@@ -1116,8 +1180,7 @@ export function DEBUG_INFO_BUFFERS_PRINT() {
       'From loop: Total sizes', size, 'Total actives', actives,
    );
 }
-
-
+/** */
 export function DEBUG_INFO_BUFFERS_PRINT2() {
    console.log(
       _generic_buffers_container

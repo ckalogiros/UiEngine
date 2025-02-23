@@ -42,8 +42,8 @@ export function Demo_chain_link(x=0, y=0) {
    const head = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [next_posx, y, 1], [size,size], TRANSPARENCY(color,tr), 'head', _);
    head.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    head.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   head.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   head.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, size);
+   head.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   head.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, size);
    head.SetName('head');
    
    head.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
@@ -58,8 +58,8 @@ export function Demo_chain_link(x=0, y=0) {
       const c = Get_fasma_color(i, count, 2);
       const body_child = Create_widget_section(_, _, [0,0], [next_posx, 0, 1], [size,size], TRANSPARENCY(c,tr), 'head', style);
       body_child.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      body_child.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-      body_child.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, size);
+      body_child.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      body_child.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, size);
       body_child.SetName(`body${i}`);
       
       head.AddItem(body_child);

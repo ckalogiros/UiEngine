@@ -37,8 +37,8 @@ export function Collision_PointTriangle(p, t){
 export function Check_intersection_point_rect(pos, dim, point, margin = [0,0]){
 
    const rect = [
-       [pos[0]-dim[0]-margin[0], pos[0]+dim[0]+margin[0]],     // Left  Right 
-       [pos[1]-dim[1]-margin[1], pos[1]+dim[1]+margin[1]], // Top  Bottom
+       [pos[0]-margin[0], pos[0]+dim[0]*2+margin[0]], // Left  Right 
+       [pos[1]-margin[1], pos[1]+dim[1]*2+margin[1]], // Top  Bottom
    ];
    
    return Intersection_point_rect(point, rect);

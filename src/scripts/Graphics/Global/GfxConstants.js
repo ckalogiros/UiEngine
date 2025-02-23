@@ -115,6 +115,7 @@ const SID = {
         PRE_MULTIPLIED_ALPHA: BIT1 <<= 1,
 
         // Shader Color Manipulation Functions
+        FN_GLOW: BIT1 <<= 1,
         FN_INNER_SHADOW: BIT1 <<= 1,
         FN_EXPLOSION_CIRCLE: BIT1 <<= 1,
         FN_EXPLOSION_GLOW: BIT1 <<= 1,
@@ -138,12 +139,23 @@ const SID = {
         DIST_RECT_FILLED: BIT8 <<= 1,
         SIMPLE_GLOW: BIT8 <<= 1,
         SIMPLE_GLOW2: BIT8 <<= 1,
+        SIMPLE_GLOW2_RECT: BIT8 <<= 1,
         BUBBLE: BIT8 <<= 1,
         FLARE: BIT8 <<= 1,
         INNER_SHADOW_CIRCLE: BIT8 <<= 1,
         INNER_SPECULAR_CIRCLE: BIT8 <<= 1,
+        
+        SDF_RECT: BIT8 <<= 1,
+        OUTER_GLOW_RECT: BIT8 <<= 1,
         INNER_SHADOW_RECT: BIT8 <<= 1,
+        OUTER_SHADOW_RECT: BIT8 <<= 1,
+        INNER_SHADOW_RECT2: BIT8 <<= 1,
+        
+        // Test Copies
+        SDF_RECT_TEST_WITH_GENERIC_SLIDERS: BIT8 <<= 1,
 
+
+        GROUP_SDF_RECT:0x0,
     },
 
     ATTR: {},
@@ -214,9 +226,22 @@ const SID = {
         BLEND_MODE_MIX: BIT7 <<= 0x1, 
         BLEND_MODE_MASK: BIT7 <<= 0x1, 
         BLEND_MODE_ALPHA: BIT7 <<= 0x1, 
+
+        BLEND_MODE_REMOVE_B_FROM_A: BIT7 <<= 0x1, 
     },
 
 
+    Init() {
+      
+        // Set prerequisites for shader operations that need sdf_rect operation 
+        SID.SHADER_OPERATIONS.GROUP_SDF_RECT = (
+            SID.SHADER_OPERATIONS |
+            SID.SHADER_OPERATIONS.OUTER_GLOW_RECT |
+            SID.SHADER_OPERATIONS.INNER_SHADOW_RECT |
+            SID.SHADER_OPERATIONS.OUTER_SHADOW_RECT |
+            SID.SHADER_OPERATIONS.INNER_SHADOW_RECT2
+        );
+    },
 
     CheckSidMatch(sid1, sid2) {
 
@@ -262,21 +287,24 @@ const SID = {
         dst.pass = 0x0;        dst.pass |= src.pass;
         dst.inst = 0x0;        dst.inst |= src.inst;
         dst.fx   = 0x0;        dst.fx   |= src.fx;
+        shad_ops = 0x0;        shad_ops |= src.shad_ops,
         dst.blend_options = 0x0;  dst.blend_options   |= src.blend_options;
         dst.gfx_group = 0x0;
     },
 
     CreateCopy(src){
-        return {
+        const sid =  {
             shad: src.shad,
             attr: src.attr,
             unif: src.unif,
             pass: src.pass,
             inst: src.inst,
+            shad_ops: src.shad_ops,
             fx:   src.fx,
             blend_options:   src.blend_options,
             gfx_group: 0x0,
         };
+        return sid;
     },
 
     ToString(sid){
@@ -367,6 +395,8 @@ const SID = {
     },
 };
 
+
+
 // if(SID.ATTR > MAX_BIT_MASK) alert('SID ATTR exceeding javascript\'s max number value');
 // if(SID.UNIF > MAX_BIT_MASK) alert('SID UNIF exceeding javascript\'s max number value');
 // if(SID.PASS > MAX_BIT_MASK) alert('SID PASS exceeding javascript\'s max number value');
@@ -406,6 +436,7 @@ const V_BORDER_WIDTH = 1, V_BORDER_FEATHER = 1, V_ROUND_CORNERS = 1;
 const V_TIME_COUNT = 1;
 const V_GENERIC_ATTR1_VEC4_COUNT = 4;
 const V_SDF_COUNT = 2;
+const V_GENERIC2_COUNT = 2;
 
 // The style's buffer attribute strides(buffer indexes) 
 const V_ROUND_CORNER_STRIDE = 0;
@@ -434,12 +465,13 @@ const MESH_ENABLE = {
         ATTR_BORDER: _CNT++,
         ATTR_GLOW_INTENSITY: _CNT++,
         ATTR_COL4_PER_VERTEX: _CNT++,
+        ATTR_GENERIC_VEC2: _CNT++,
         
         UNIF_RESOLUTION: _CNT++,
         UNIFORM: _CNT++, // TODO: NOT NEEDED????
         UNIF_TIME: _CNT++,
         
-        FX_GLOW: _CNT++,
+        // FX_GLOW: _CNT++,
         FX_NOISE: _CNT++,
         FX_SMOKE: _CNT++,
         
@@ -455,6 +487,7 @@ const MESH_ENABLE = {
         BLEND_OPTIONS: _CNT++, 
 
         // Shader Color Functions
+        FN_GLOW: _CNT++,
         FN_EXPLOSION_CIRCLE: _CNT++,
         FN_EXPLOSION_GLOW: _CNT++,
         FN_INNER_SHADOW: _CNT++,
@@ -467,7 +500,7 @@ const MESH_ENABLE = {
         TEST_SHADERS_3: _CNT++,
         TEST_SHADERS_4: _CNT++,
         TEST_SHADERS_5: _CNT++,
-        FLARE: _CNT++,
+        // FLARE: _CNT++,
 
 
         NONE: 0,

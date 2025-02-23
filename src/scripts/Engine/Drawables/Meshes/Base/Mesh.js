@@ -1,6 +1,6 @@
 "use strict";
 import { Time_intervals_destroy_byidx } from "../../../Timers/TimeIntervals.js";
-import { Free_generic_buffer, Free_generic_char_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
+import { Free_generic_buffer, Free_generic_char_buffer, Free_int16_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
 import { Gl_rotate_add_z_2d, Gl_rotate_y_2d, Gl_rotate_z_2d } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Listener_change_child_event, Listener_create_child_event, Listener_remove_event_by_idx } from "../../../Events/EventListeners.js";
 import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh } from "../../../Core/MeshBuffer.js";
@@ -95,7 +95,8 @@ export class Mesh {
     shader_ops_idxs; // Array: An array to store indexes. These indexes are part of a Shader's Program.shader_ops array. 
 
     listeners;      // Buffer: Indexes to the EventListeners class.
-    eventCallbacks; // Buffer: A buffer to store all callbacks, for any event enabled for the mesh.
+    event_clbks; // Buffer: A buffer to store all callbacks, for any event enabled for the mesh.
+    current_event_callback_idx; // Index: A way to choose between different event callback functions.
     timeIntervalsIdxBuffer; // Buffer: This buffer stores indexes of the timeIntervals this mesh is using.
 
     rel_comp; // A component to position this mesh's children relative to the position of one of 'LEFT-CENTER-RIGHT' and relative all other children's position
@@ -180,7 +181,9 @@ export class Mesh {
 
         this.listeners = null;
 
-        this.eventCallbacks = null;
+        this.event_clbks = null;
+        this.event_clbks_resolve_fn = null;
+        this.current_event_callback_idx = INT_NULL;
         this.children = New_generic_buffer(_, 'Mesh children');
         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'Mesh time_intervals');
 
@@ -198,9 +201,9 @@ export class Mesh {
 
         // TODO: IMPLEMENT
         this.properties = {
-            padd:{x:0, y:0},
-            margin:{x:0, y:0},
-            hover_margin:{x:0, y:0},
+            padd: { x: 0, y: 0 },
+            margin: { x: 0, y: 0 },
+            hover_margin: { x: 0, y: 0 },
         };
 
 
@@ -356,7 +359,7 @@ export class Mesh {
         else alert()
 
         // Destroy Generic Buffers
-        if (this.eventCallbacks) Free_generic_buffer(this.eventCallbacks);
+        if (this.event_clbks) Free_generic_buffer(this.event_clbks);
         Free_generic_buffer(this.children);
         Free_int8_buffer(this.timeIntervalsIdxBuffer);
         Styles_remove_byidx(this.styles);
@@ -374,6 +377,28 @@ export class Mesh {
 
 
         return shift_children;
+    }
+
+
+    /** Destoys only alocated buffers by the Mesh */
+    DestroyAlocatedBuffers() {
+
+        /*************************************************************************************/
+        if (this.listeners) this.listeners = Free_generic_buffer(this.listeners);
+        if (this.event_clbks) this.event_clbks = Free_generic_buffer(this.event_clbks);
+        if (this.mat.char_buffer) this.mat.char_buffer = Free_generic_char_buffer(this.mat.char_buffer)
+        if (this.children) this.children = Free_generic_buffer(this.children);
+
+
+        // IMPORTANT!!! Why the timeIntervalsIdxBuffer is undefined???? Where does timeIntervalsIdxBuffer gets undefined??? 
+        if (this.timeIntervalsIdxBuffer !== undefined) this.timeIntervalsIdxBuffer = Free_int8_buffer(this.timeIntervalsIdxBuffer);
+        // IMPORTANT! Same happens with children_scrollers_buffer
+        if (this.children_scrollers_buffer !== undefined) this.children_scrollers_buffer = Free_int16_buffer(this.children_scrollers_buffer);
+
+        this.gfx.Destroy();
+        Free_int8_buffer(this.shader_ops_idxs);
+        // if (this.rel_comp) this.rel_comp.Destroy();
+
     }
 
 
@@ -517,12 +542,24 @@ export class Mesh {
     }
 
 
-    CreateEventCallback(params = null) {
+    CreateEventCallback(params = null, event_clbks_resolve_fn = null) {
 
         if (!params) alert('CreateEventCallback(params = null). @ Mesh.js')
-        if (this.eventCallbacks === null) this.eventCallbacks = New_generic_buffer(_, 'Mesh eventCallbacks');
-        const eventIdx = this.eventCallbacks.Add(params);
-        return eventIdx;
+        if (this.event_clbks === null) this.event_clbks = New_generic_buffer(_, 'Mesh event_clbks');
+        
+        // Automaticaly enable event callback if the first event callback is activated. 
+        // For the rest of the callback events, the user is responsible to set the current active by setting current_event_callback_idx
+        const evt_clbk_idx = this.event_clbks.Add(params);
+        if (evt_clbk_idx === 0) this.current_event_callback_idx = evt_clbk_idx;
+        
+        // User created function to resolve the event callback
+        if(event_clbks_resolve_fn) this.event_clbks_resolve_fn = event_clbks_resolve_fn; 
+        return evt_clbk_idx;
+    }
+
+
+    SetActiveEventCallback(evt_clbk_idx) {
+        this.current_event_callback_idx = evt_clbk_idx;
     }
 
 
@@ -540,7 +577,11 @@ export class Mesh {
     SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
 
 
-    SetStyle(style) { this.SetUpdateFrameBuffer(); this.mat.SetStyle(style); }
+    SetStyle(style) {
+        this.SetUpdateFrameBuffer(); this.mat.SetStyle(style);
+        // this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
+        // this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+    }
 
 
     SetDefaultPosXY() { this.SetUpdateFrameBuffer(); this.geom.SetDefaultPosXY(this.gfx); }
@@ -549,18 +590,18 @@ export class Mesh {
     // TODO: Update the .pos of the mesh for the rest of the methods
     SetWposXY(x, y) {
         this.SetUpdateFrameBuffer();
-        this.geom.pos[0] = x-this.geom.dim[0];
-        this.geom.pos[1] = y-this.geom.dim[1];
-        this.geom.SetWposXY(this.gfx, x, y, );
+        this.geom.pos[0] = x - this.geom.dim[0];
+        this.geom.pos[1] = y - this.geom.dim[1];
+        this.geom.SetWposXY(this.gfx, x, y,);
     }
     SetWposX(x) {
         this.SetUpdateFrameBuffer();
-        this.geom.pos[0] = x-this.geom.dim[0];
+        this.geom.pos[0] = x - this.geom.dim[0];
         this.geom.SetWposX(this.gfx, x);
     }
     SetWposY(y) {
         this.SetUpdateFrameBuffer();
-        this.geom.pos[1] = y-this.geom.dim[1];
+        this.geom.pos[1] = y - this.geom.dim[1];
         this.geom.SetWposY(this.gfx, y);
     }
 
@@ -628,7 +669,7 @@ export class Mesh {
     SetTime(t) {
         this.geom.time = t;
     }
-    
+
 
 
     RotateZ(angle) { Gl_rotate_z_2d(this.gfx, this.geom.dim, angle); }
@@ -658,45 +699,59 @@ export class Mesh {
         if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
     }
 
-    
+
     SetName(name = null) {
         if (name !== '' && name) this.nameidx = Str_buffer_mesh_names_store(name, this.mesh_bufferidx, this.type & MESH_TYPE.DEBUG_MESH);
         /**DEBUG*/this.name = name
     }
-    
-    
+
+
     /**
      * Enable shader properties.
      * In order for a mesh to be drawn in a certain way, specific shaders must be build.
      * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
     */
-    EnableGfxOperations(function_operation, blend_mode=SID.BLEND_OPTIONS.BLEND_MODE_ADD) {
-       
+    EnableGfxOperations(function_operation, blend_mode = SID.BLEND_OPTIONS.BLEND_MODE_ADD) {
+
         this.sid.shad_ops |= function_operation;
-        this.shader_ops_idxs.Add( Program_store_shader_operations(function_operation, blend_mode) );
+        this.shader_ops_idxs.Add(Program_store_shader_operations(function_operation, blend_mode));
+
+        if ((function_operation & SID.SHADER_OPERATIONS.GROUP_SDF_RECT) && (this.sid.shad_ops & SID.SHADER_OPERATIONS.SDF_RECT) === 0) {
+            console.error('Shader Operation detected: Need SDF_RECT to function.');
+            alert('Shader Operation detected: Need SDF_RECT to function.');
+        }
     }
-    EnableGfxAttributes(which, params = null) {
-       
+    EnableGfx(which, params = null) {
+
         switch (which) {
-           
+
             // case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.attr |= SID.ATTR.VPOS2; this.sid.pass |= SID.PASS.VPOS2; break; }
             case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.PASS.VPOS2; break; }
             // case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS2; break; }
             case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
-            case MESH_ENABLE.GFX.ATTR_TIME: { 
-                this.sid.attr |= SID.ATTR.TIME; 
-                this.sid.pass |= SID.PASS.TIME; 
+            case MESH_ENABLE.GFX.ATTR_GENERIC_VEC2: {
+                this.sid.attr |= SID.ATTR.GENERIC2;
+                this.sid.pass |= SID.PASS.GENERIC2;
+                if (params !== null) {
+                    this.geom.generic = params;
+                }
+                break;
+            }
+            case MESH_ENABLE.GFX.ATTR_TIME: {
+                this.sid.attr |= SID.ATTR.TIME;
+                this.sid.pass |= SID.PASS.TIME;
                 if (params !== null) {
                     this.geom.time = params;
                 }
-                break; 
+                break;
             }
             case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.PASS.ANGLE; break; }
             case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
-            
-            
+
+
+            case MESH_ENABLE.GFX.FN_GLOW: { this.sid.shad |= SID.SHAD.FN_GLOW; break; }
             case MESH_ENABLE.GFX.FN_INNER_SHADOW: { this.sid.shad |= SID.SHAD.FN_INNER_SHADOW; break; }
             case MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE; break; }
             case MESH_ENABLE.GFX.FN_EXPLOSION_GLOW: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW; break; }
@@ -705,30 +760,30 @@ export class Mesh {
                 this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
                 this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
                 if (params !== null) {
-                    if((params[0] instanceof Float32Array)=== false) alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
-                    if(this.mat.col[0] instanceof Float32Array) CopyMat4(this.mat.col, params);
+                    if ((params[0] instanceof Float32Array) === false) alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
+                    if (this.mat.col[0] instanceof Float32Array) CopyMat4(this.mat.col, params);
                     else { this.mat.col = params; }
                 }
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
+                this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
+                this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
                 this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.PASS.R_CORNERS;
-                this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
-                this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
                 this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
                 if (params !== null) this.mat.style.rcorners = params;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_FEATHER: {
                 this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.PASS.FEATHER;
-                this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
+                this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
                 this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
                 if (params !== null) this.mat.style.feather = params;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_BORDER: {
                 this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.PASS.BORDER;
-                this.sid.pass |= SID.PASS.VPOS2|SID.PASS.WPOS3;
+                this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
                 this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
                 if (params !== null) this.mat.style.border = params;
                 break;
@@ -736,29 +791,29 @@ export class Mesh {
 
 
             // Shader Color Functions
-            case MESH_ENABLE.GFX.FX_NOISE: { 
+            case MESH_ENABLE.GFX.FX_NOISE: {
                 // Exception: Use the 'params' to distinguish different worley noises 
-                if(!params || params===1) { this.sid.fx |= SID.FX.FS_NOISE; break; }
-                else if(params===2) { this.sid.fx |= SID.FX.FS_NOISE_2; break; }
+                if (!params || params === 1) { this.sid.fx |= SID.FX.FS_NOISE; break; }
+                else if (params === 2) { this.sid.fx |= SID.FX.FS_NOISE_2; break; }
             }
-            case MESH_ENABLE.GFX.FN_GLOW_SPHERE: { 
-                if(this.sid.blend_options===0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
+            case MESH_ENABLE.GFX.FN_GLOW_SPHERE: {
+                if (this.sid.blend_options === 0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
                 // if(params===null) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
-                this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break; 
+                this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break;
             }
-            case MESH_ENABLE.GFX.FN_NOISE_WORLEY: { 
+            case MESH_ENABLE.GFX.FN_NOISE_WORLEY: {
                 // Exception: Use the 'params' to distinguish different worley noises 
-                if(!params || params===1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
-                else if(params===2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; break; }
-                else if(params===3) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; break; }
+                if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
+                else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; break; }
+                else if (params === 3) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; break; }
             }
-            case MESH_ENABLE.GFX.FN_NOISE_VORONOI: { 
+            case MESH_ENABLE.GFX.FN_NOISE_VORONOI: {
                 // Exception: Use the 'params' to distinguish different worley noises 
-                if(!params || params===1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; break; }
-                else if(params===2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; break; }
+                if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; break; }
+                else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; break; }
             }
 
-            case MESH_ENABLE.GFX.BLEND_OPTIONS: { if(params===null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
+            case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
 
 
 
@@ -766,19 +821,19 @@ export class Mesh {
             case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
             case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
             case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-            case MESH_ENABLE.GFX.FLARE: { 
-                // this.sid.shad |= SID.SHADER_OPERATIONS.FLARE; 
-                // if(params === null) alert('665518665518 params should not be null');
-                if(params !== null) this.shader_ops_idxs.Add( Program_store_shader_operations(params.function_operation, params.blend_mode) );
-                break; 
-            }
+            // case MESH_ENABLE.GFX.FLARE: {
+            //     // this.sid.shad |= SID.SHADER_OPERATIONS.FLARE; 
+            //     // if(params === null) alert('665518665518 params should not be null');
+            //     if (params !== null) this.shader_ops_idxs.Add(Program_store_shader_operations(params.function_operation, params.blend_mode));
+            //     break;
+            // }
 
         }
 
     }
 
 
-    EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size=0) {
+    EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size = 0) {
 
 
         /**
@@ -818,8 +873,8 @@ export class Mesh {
 
     }
 
-    EnableGfxPass(flags){
-        
+    EnableGfxPass(flags) {
+
         this.sid.pass |= flags;
     }
 
@@ -875,14 +930,14 @@ export class Mesh {
         for (let i = 0; i < len; i++) {
             if (this.uniforms[i].name === unif_name) {
                 const ubidx = this.uniforms[i].ubidx;
-                if(ubidx===INT_NULL) {
+                if (ubidx === INT_NULL) {
 
 
                     console.error('334334334334 ubidx is null.',
-                        '\nPossible error: mesh is not the root mesh of the vertex buffer, and there is no ubidx store that is why ubidx is null', 
-                        '\nuniform name', unif_name, 
-                        '\nubidx', ubidx, 
-                        '\nmesh all uniforms', this.uniforms, 
+                        '\nPossible error: mesh is not the root mesh of the vertex buffer, and there is no ubidx store that is why ubidx is null',
+                        '\nuniform name', unif_name,
+                        '\nubidx', ubidx,
+                        '\nmesh all uniforms', this.uniforms,
 
                     )
                     alert('334334334334 ubidx is null. Check if mesh is the root mesh of the vertex buffer')

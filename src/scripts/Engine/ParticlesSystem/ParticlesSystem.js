@@ -1,18 +1,19 @@
 "use strict";
 
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_particles_batch_set_col4_wpos4_dim2_time, Gl_particles_batch_set_col4_wpos4_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_dim2_style2_time } from "../../Graphics/Buffers/VertexBuffersOps.js";
-import { GetRandomInt, GetSequencedColor, GetSign } from "../../Helpers/Helpers.js";
-import { Abs, Floor, Hash, Magnitude, Magnitude_2vectors, Max, Min } from "../../Helpers/Math/MathOperations.js";
+import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time, Gl_particles_batch_set_col4_wpos4_dim2_style1_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2 } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
+import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
+import { Abs, Floor, Hash, Magnitude } from "../../Helpers/Math/MathOperations.js";
 import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
-import { New_generic_buffer, New_int16_buffer, New_int32_buffer } from "../Core/Buffers.js";
+import { New_generic_buffer, New_int32_buffer, New_int8_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
-import { Material, Texture_Material } from "../Drawables/Material/Base/Material.js";
+import { Material, Material_Texture } from "../Drawables/Material/Base/Material.js";
 import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
-import { Performance_timer_start, Performance_timer_stop, Performance_timers_get_avg_1sec_reset, PerformanceTimersGetMilisec, PerformanceTimersGetNanosec } from "../Timers/PerformanceTimers.js";
+import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 
 
@@ -103,6 +104,7 @@ class Particle {
       this.start = INT_NULL; // The start index in the vertex buffer
 
       this.time = emitter.time;
+      this.generic = { a: emitter.generic.a, b: emitter.generic.b };
       // Deep Copy values from emitter
       this.pos[0] = emitter.pos[0];
       this.pos[1] = emitter.pos[1];
@@ -195,10 +197,10 @@ class Emitter {
       this.jigglex = 4;
       this.jiggley = 3;
       this.rotation = 0; // TODO: IMPLEMENT
-      
+
       this.left_over = 0;
       this.time = 0; // Only purpose of 'this.time', is to initialize a particle's .time on new creation
-
+      this.generic = { a: 0, b: 0 };
 
 
       this.UpdateGfxBuffersFn = null; // Function pointer to update the vertex buffer of the particle system
@@ -213,19 +215,21 @@ class Emitter {
 
       this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
       this.free_particles_idxs_buffer = New_int32_buffer(_, 'ParticlesSystem-free_particles_idxs_buffer');
+      this.shader_ops_idxs = New_int8_buffer(8, 'ParticleSystem.shader_ops_idxs');
 
 
       this.sid = {
          shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          attr: SID.ATTR.COL4 | SID.ATTR.VPOS2 | SID.ATTR.WPOS3,
          unif: 0x0,
+         shad_ops: 0x0,
          pass: SID.PASS.COL4,
          blend_options: 0x0,
          fx: 0x0,
       };
 
 
-      const mat = (this.textureId === INT_NULL) ? new Material(col) : new Texture_Material(col, this.textureId);
+      const mat = (this.textureId === INT_NULL) ? new Material(col) : new Material_Texture(col, this.textureId);
       this.mat = mat;
       this.sid.attr |= mat.sid.attr;
       this.sid.unif |= mat.sid.unif;
@@ -271,6 +275,7 @@ class Emitter {
          pos: this.particles_buffer.buffer[particle_idx].pos,
          dim: this.particles_buffer.buffer[particle_idx].dim,
          time: this.particles_buffer.buffer[particle_idx].time,
+         generic: this.particles_buffer.buffer[particle_idx].generic,
       }
 
       const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, this.mat, _);
@@ -297,27 +302,70 @@ class Emitter {
    }
 
 
-   EnableGfxAttributes(which, params = null) {
+   /**
+    * Enable shader properties.
+    * In order for a mesh to be drawn in a certain way, specific shaders must be build.
+    * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
+   */
+   EnableGfxOperations(function_operation, blend_mode = SID.BLEND_OPTIONS.BLEND_MODE_ADD) {
+
+      this.sid.shad_ops |= function_operation;
+      this.shader_ops_idxs.Add(Program_store_shader_operations(function_operation, blend_mode));
+
+      if((function_operation & SID.SHADER_OPERATIONS.GROUP_SDF_RECT) && (this.sid.shad_ops & SID.SHADER_OPERATIONS.SDF_RECT)===0) {
+         console.error('Shader Operation detected: Need SDF_RECT to function.');
+         alert('Shader Operation detected: Need SDF_RECT to function.');
+      }
+   }
+   EnableGfx(which, params = null) {
 
       switch (which) {
 
+         // case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.attr |= SID.ATTR.VPOS2; this.sid.pass |= SID.PASS.VPOS2; break; }
+         case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.PASS.VPOS2; break; }
+         // case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS2; break; }
          case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
          case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
-         case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; this.sid.pass |= SID.PASS.TIME; break; }
+         case MESH_ENABLE.GFX.ATTR_GENERIC_VEC2: {
+            this.sid.attr |= SID.ATTR.GENERIC2;
+            this.sid.pass |= SID.PASS.GENERIC2;
+            if (params !== null) {
+               this.generic.a = params.a;
+               this.generic.b = params.b;
+            }
+            break;
+         }
+         case MESH_ENABLE.GFX.ATTR_TIME: {
+            this.sid.attr |= SID.ATTR.TIME;
+            this.sid.pass |= SID.PASS.TIME;
+            if (params !== null) {
+               this.time = params;
+            }
+            break;
+         }
          case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.PASS.ANGLE; break; }
          case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
          case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
 
+         case MESH_ENABLE.GFX.FN_GLOW: { this.sid.shad |= SID.SHAD.FN_GLOW; break; }
+         case MESH_ENABLE.GFX.FN_INNER_SHADOW: { this.sid.shad |= SID.SHAD.FN_INNER_SHADOW; break; }
+         case MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE; break; }
+         case MESH_ENABLE.GFX.FN_EXPLOSION_GLOW: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW; break; }
+
          case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
             this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
             this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
-            if (params !== null) this.mat.col = params;
+            if (params !== null) {
+               if ((params[0] instanceof Float32Array) === false) alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
+               if (this.mat.col[0] instanceof Float32Array) CopyMat4(this.mat.col, params);
+               else { this.mat.col = params; }
+            }
             break;
          }
          case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
+            this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
+            this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
             this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.PASS.R_CORNERS;
-            this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
-            this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
             if (params !== null) this.mat.style.rcorners = params;
             break;
@@ -339,12 +387,27 @@ class Emitter {
 
 
          // Shader Color Functions
+         case MESH_ENABLE.GFX.FX_NOISE: {
+            // Exception: Use the 'params' to distinguish different worley noises 
+            if (!params || params === 1) { this.sid.fx |= SID.FX.FS_NOISE; break; }
+            else if (params === 2) { this.sid.fx |= SID.FX.FS_NOISE_2; break; }
+         }
          case MESH_ENABLE.GFX.FN_GLOW_SPHERE: {
             if (this.sid.blend_options === 0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
             // if(params===null) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
             this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break;
          }
-         case MESH_ENABLE.GFX.FN_NOISE_WORLEY: { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
+         case MESH_ENABLE.GFX.FN_NOISE_WORLEY: {
+            // Exception: Use the 'params' to distinguish different worley noises 
+            if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
+            else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; break; }
+            else if (params === 3) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; break; }
+         }
+         case MESH_ENABLE.GFX.FN_NOISE_VORONOI: {
+            // Exception: Use the 'params' to distinguish different worley noises 
+            if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; break; }
+            else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; break; }
+         }
 
          case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
 
@@ -352,19 +415,86 @@ class Emitter {
 
          case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
          case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
+         case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
+         case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
+         case MESH_ENABLE.GFX.FLARE: {
+            // this.sid.shad |= SID.SHADER_OPERATIONS.FLARE; 
+            // if(params === null) alert('665518665518 params should not be null');
+            if (params !== null) this.shader_ops_idxs.Add(Program_store_shader_operations(params.function_operation, params.blend_mode));
+            break;
+         }
+
       }
 
    }
+   // EnableGfx(which, params = null) {
+
+   //    switch (which) {
+
+   //       case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
+   //       case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
+   //       case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; this.sid.pass |= SID.PASS.TIME; break; }
+   //       case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.PASS.ANGLE; break; }
+   //       case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
+   //       case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
+
+   //       case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
+   //          this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
+   //          this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
+   //          if (params !== null) this.mat.col = params;
+   //          break;
+   //       }
+   //       case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
+   //          this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.PASS.R_CORNERS;
+   //          this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
+   //          this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
+   //          this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
+   //          if (params !== null) this.mat.style.rcorners = params;
+   //          break;
+   //       }
+   //       case MESH_ENABLE.GFX.ATTR_FEATHER: {
+   //          this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.PASS.FEATHER;
+   //          this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
+   //          this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
+   //          if (params !== null) this.mat.style.feather = params;
+   //          break;
+   //       }
+   //       case MESH_ENABLE.GFX.ATTR_BORDER: {
+   //          this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.PASS.BORDER;
+   //          this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
+   //          this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
+   //          if (params !== null) this.mat.style.border = params;
+   //          break;
+   //       }
 
 
-   EnableGfxUniforms(flags = 0x0, name, type, shader_flags) {
+   //       // Shader Color Functions
+   //       case MESH_ENABLE.GFX.FN_GLOW_SPHERE: {
+   //          if (this.sid.blend_options === 0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
+   //          // if(params===null) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
+   //          this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break;
+   //       }
+   //       case MESH_ENABLE.GFX.FN_NOISE_WORLEY: { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
+
+   //       case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
+
+
+
+   //       case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
+   //       case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
+   //    }
+
+   // }
+
+
+   EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size = 0) {
+
 
       /**
        * How to set up a uniform:
        * 1. Call this, with uniform name and a gl:SID.UNIF. the type of uniform to enable.
        *      This means that the user is responsible to add any new uniform type in 'SID' global object.
        *      That is so we can check and enable code in the shader builder. 
-       *       Also User must create the apropriate conditionals and glsl code in 'ShaderBuilder.js' for the uniform
        * 2. We need to bind the 'Set' and 'Update' functions for the uniforms to be usefull.
        *      . For the block uniforms, we only need to 'Set' the value via 'Uniforms_block_set_uniform()' 
        *          function, the Update happens by gl.bindBuffer.
@@ -386,16 +516,13 @@ class Emitter {
       }
 
       if (!skip) {
-
-         const idx = this.uniforms.push({
+         this.uniforms.push({
             name: name,
             type: type,
-            ubidx: INT_NULL, // Shoud be set by the Gl Program creation. So the first mesh that will push to create the program will have the ubidx
+            ubidx: INT_NULL, // Should be set by the Gl Program creation. So the first mesh that will push to create the program will have the ubidx
             shader: shader_flags,
+            arr_size: arr_size,
          });
-
-         // this.temp_unif_wpos = idx - 1;
-
       }
 
    }
@@ -505,7 +632,8 @@ class Emitter {
    // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)
 
 
-   SetStyle(style) { this.mat.SetStyle(style); }
+   // SetStyle(style) { this.mat.SetStyle(style); }
+   SetStyle(style) { alert('this.mat.SetStyle(style);') }
 
 
    GetName() {
@@ -560,22 +688,27 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
    emitter.parent = parent;
 
    const FLAGS = GFX_CTX_FLAGS.PRIVATE;
-   console.error(
-      SID.GetTypeToString(emitter.sid)
-   );
+   // console.error(
+   //    SID.GetTypeToString(emitter.sid)
+   // );
    emitter.gfx = Gfx_generate_context_for_particle_system(FLAGS, emitter, _, specific_vb_groupidx,);
 
    emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
 
 
    // TODO: Temporary implementation of assigning the correct gfx update function pointer
-   if (emitter.sid.fx & SID.FX.FS_GLOW_VEC3) {
-      emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_style2_time;
+   // if (emitter.sid.fx & SID.FX.FS_GLOW_VEC3) {
+   if (emitter.sid.fx & SID.SHAD.FN_EXPLOSION_CIRCLE) {
+      if (emitter.sid.attr & SID.ATTR.FEATHER) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time;
+      else emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_style1_time;
    }
-   else if (emitter.sid.fx & SID.FX.FS_NOISE) {
-      emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_time;
-   }
-   else emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_tex2_rot4;
+   else if (emitter.sid.fx & SID.FX.FS_NOISE) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time;
+   else if (emitter.sid.attr & SID.ATTR.GENERIC2 && emitter.sid.attr & SID.ATTR.R_CORNERS) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2;
+   else if (emitter.sid.attr & (SID.ATTR.GENERIC2)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2;
+   else if (emitter.sid.attr & SID.ATTR.TEX2) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4;
+   else if (emitter.sid.attr & (SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.TIME)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_style1_time;
+   // else if (emitter.sid.attr & (SID.ATTR.DIM2 | SID.ATTR._R_CORNERS)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_style1_time;
+   else alert('Particles-System: No VertexBufferFillOperation function selected.')
 
 
    return emitter.gfx.vb.groupidx;
@@ -639,56 +772,54 @@ export function Particle_system_emitt(params) {
        *    repeat until the magnitude-distance is 0
        * 
       */
-     
-      let mag = 0, // The vector magnitude of the difference of the previous and current emitter position
-         angle = 0, 
-         intermediate_num_particles = 0, // Store the number of total particles to be created in a frame
-         dist=0, // A minimum distance in which a particle must be created
-         mag_partition=0; // This will cary the next reduced magnitude distance
 
-      if(has_intermidiate_emission) {
+      let mag = 0, // The vector magnitude of the difference of the previous and current emitter position
+         angle = 0,
+         intermediate_num_particles = 0, // Store the number of total particles to be created in a frame
+         dist = 0, // A minimum distance in which a particle must be created
+         mag_partition = 0; // This will cary the next reduced magnitude distance
+
+      if (has_intermidiate_emission) {
 
          const y = emitter.pos[1]
          const x = emitter.pos[0]
-         const pos_dif = [emitter.prev_pos[0]-x, emitter.prev_pos[1]-y];
+         const pos_dif = [emitter.prev_pos[0] - x, emitter.prev_pos[1] - y];
          angle = Math.atan2(pos_dif[0], pos_dif[1])
          mag = Magnitude(pos_dif[0], pos_dif[1]);
 
          mag += emitter.left_over;
-         
+
          // const dist = 2;
-         dist = emitter.dim[0]/6;
+         dist = emitter.dim[0] / 6;
          const ratio = mag / dist;
          intermediate_num_particles = Floor(ratio);
          emitter.left_over = ratio - intermediate_num_particles; // Save any fraction value of the distance magnitude for later use
-   
-         if(intermediate_num_particles===0) intermediate_num_particles = 1; // Emitt a particle at least once per frame
+
+         if (intermediate_num_particles === 0) intermediate_num_particles = 1; // Emitt a particle at least once per frame
 
          // emitter.mat.col = GetSequencedColor();
 
       }
-      
-      
 
-      
+
+
+
       const stored_pos = [emitter.pos[0], emitter.pos[1]]; // Store the emitters's pos to re-set it
 
       // Choise: If has intermidiate_emission, calculate the num particles from the prev_pos-pos magnitude. Else use the 'num_particles_per_frame' variable
       const num_particles = has_intermidiate_emission ? intermediate_num_particles : emitter.num_particles_per_frame;
 
-      // console.log(num_particles)
-
 
       for (let j = 0; j < num_particles; j++) {
-      // for (let j = 0; j < 1; j++) {
+         // for (let j = 0; j < 1; j++) {
 
 
-         if(has_intermidiate_emission) {
+         if (has_intermidiate_emission) {
 
             const new_pos = [(mag_partition * Math.sin(angle)), (mag_partition * Math.cos(angle))];
             emitter.pos[0] = stored_pos[0] + new_pos[0];
             emitter.pos[1] = stored_pos[1] + new_pos[1];
-            emitter.time = emitter.t_step*j;
+            emitter.time = emitter.t_step * j;
          }
 
          if (last_elem === INT_NULL) {
@@ -716,13 +847,14 @@ export function Particle_system_emitt(params) {
                // particle.scale = initial_scale;
                particle.scale = emitter.max_scale;
 
-               if(has_intermidiate_emission) particle.time = emitter.t_step*j;
-               else particle.time = 0;
+               if (has_intermidiate_emission) particle.time = emitter.t_step * j;
+               // else particle.time = 0;
+               else particle.time = emitter.time;
                // particle.col[3] -= .2*j;
 
                particle.pos[0] = emitter.pos[0];
                particle.pos[1] = emitter.pos[1];
-               
+
                particle.dim[0] = emitter.dim[0];
                particle.dim[1] = emitter.dim[1];
 
@@ -730,7 +862,7 @@ export function Particle_system_emitt(params) {
                particle.col[1] = emitter.mat.col[1];
                particle.col[2] = emitter.mat.col[2];
                particle.col[3] = emitter.mat.col[3];
-               
+
                if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
 
                   const dir = Random_coordinates(emitter.variation_emission.xdir_neg, emitter.variation_emission.xdir_pos, emitter.variation_emission.ydir_neg, emitter.variation_emission.ydir_pos);
@@ -792,21 +924,21 @@ export function Particle_system_update() {
    if (_emitters.active_count === 0) return;
 
    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles2);
-   
+
    for (let i = 0; i <= _emitters.boundary; i++) {
-      
+
       const emitter = _emitters.buffer[i];
-      
+
       if (!emitter.is_active) continue;
 
       let needs_update = false;
-      
+
       for (let j = 0; j <= emitter.particles_buffer.boundary; j++) {
-         
+
          const particle = emitter.particles_buffer.buffer[j];
-         
+
          if (particle.is_alive) {
-            
+
             // TODO: For efficiency create 2 loops, and check which case is without if statement
             if (emitter.properties_flags & (PARTICLES.HAS_START_POS_VARIATION | PARTICLES.HAS_RANDOM_POLAR_COORD)) {
                const speed = emitter.speed * particle.accel;
@@ -912,7 +1044,7 @@ export function Particle_system_update() {
 
             // Render Particles
             emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time, particle.dim, particle.rot, particle.uv);
-   
+
             // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles2);
 
             particle.time += emitter.t_step;
@@ -921,7 +1053,8 @@ export function Particle_system_update() {
 
                // Reset particle for reuse
                particle.is_alive = false;
-               particle.time = 0;
+               // particle.time = 0;
+               particle.time = emitter.time;
 
                emitter.free_particles_idxs_buffer.Add(j);
 
@@ -939,19 +1072,19 @@ export function Particle_system_update() {
             needs_update = true;
          }
       }
-      
+
       if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 
 
    }
-   
+
    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles2);
 
-   
+
 }
 
 // Emitter function pointers to update particle functions. It is to replace any if statements inside the 'Update loop'
-function Particle_update_position(emitter, particle){
+function Particle_update_position(emitter, particle) {
    const speed = emitter.speed * particle.accel;
    particle.pos[0] += speed * particle.dirx;
    particle.pos[1] += speed * particle.diry;
@@ -961,8 +1094,8 @@ function Particle_update_position(emitter, particle){
 
    particle.accel *= emitter.deccel;
 }
-function Particle_update_jiggle(emitter, particle){
-   
+function Particle_update_jiggle(emitter, particle) {
+
    // TODO: Make jiggle slower. Must include time, expand the jiggle through frames
    const jigglex = emitter.jigglex;
    const jiggley = emitter.jiggley;
@@ -1012,14 +1145,14 @@ function Particle_update_jiggle(emitter, particle){
       //    // particle.pos[1] += (y-particle.pos[1])*.02;
    }
 }
-function Particle_update_rotation(emitter, particle){
+function Particle_update_rotation(emitter, particle) {
    let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
       ? (emitter.life_time - (particle.time + .8) * .9) * .1
       : (((particle.time + .8) * .9) * .1) - emitter.life_time;
    if (rotspeed > 0) particle.angle -= rotspeed * 1.;
    particle.rot = Rotation_z_get_2D_matrix(particle.angle);
 }
-function Particle_update_scale(emitter, particle){
+function Particle_update_scale(emitter, particle) {
    // For smoke enlarge effect 
    particle.dim[0] *= particle.scale * .0055 + 1;
    particle.dim[1] *= particle.scale * .0055 + 1;
@@ -1028,17 +1161,17 @@ function Particle_update_scale(emitter, particle){
       particle.scale *= .98;
    }
 }
-function Particle_update_fade(emitter, particle){
+function Particle_update_fade(emitter, particle) {
    const random = Math.random() * .4 + .5;
    if (particle.time > random) {
       particle.col[3] *= .85;
    }
 }
-function Particle_update_position_empty(){}
-function Particle_update_jiggle_empty(){}
-function Particle_update_rotation_empty(){}
-function Particle_update_scale_empty(){}
-function Particle_update_fade_empty(){}
+function Particle_update_position_empty() { }
+function Particle_update_jiggle_empty() { }
+function Particle_update_rotation_empty() { }
+function Particle_update_scale_empty() { }
+function Particle_update_fade_empty() { }
 
 
 export function Particle_system_emitter_set_size(emitter_idx, size) {

@@ -52,6 +52,7 @@ class RelativePosition extends M_Buffer {
 
 
 
+
 export function Relative_pos_comp_create_new_comp(){
    return new RelativePosition();
 }

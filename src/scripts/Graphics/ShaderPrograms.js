@@ -14,7 +14,9 @@ const DISABLE_DEBUG = true;
 
 
 const _programs = New_generic_buffer(_, 'Shader Programs');
-export function Program_reset() { _programs.ResetFull(); }
+export function Program_reset() {
+	_programs.ResetFull();
+}
 
 
 
@@ -106,10 +108,10 @@ export function Program_program_exists_from_sid(sid) {
 
 
 export function Program_program_exists_from_index(progidx) {
-	
-	if (_programs.buffer[progidx] === null || _programs.buffer[progidx] === undefined) 
+
+	if (_programs.buffer[progidx] === null || _programs.buffer[progidx] === undefined)
 		return false;
-	
+
 	return true;
 }
 
@@ -182,7 +184,7 @@ export function Program_create_program(sid, uniforms, shader_ops_idxs) {
 
 class Gl_Program {
 
-	constructor(gl, sid, uniforms, shader_ops_idxs=null) {
+	constructor(gl, sid, uniforms, shader_ops_idxs = null) {
 
 		this.sid = sid; // Shader Type ID (E.g. ATTR_COL4 | ATTR_POS2 | INDEXED)
 		this.state = { mask: 0x0 };
@@ -191,7 +193,7 @@ class Gl_Program {
 
 		this.uniforms = uniforms;
 		this.shader_ops = null; // Init the array
-		if(shader_ops_idxs!==null) 
+		if (shader_ops_idxs !== null)
 			this.AddShaderOperation(shader_ops_idxs); // Build the array
 
 
@@ -232,13 +234,13 @@ class Gl_Program {
 	// -The sequence matters-
 	AddShaderOperation(shader_operations_idxs) {
 
-		if(shader_operations_idxs.active_count > 0) {
+		if (shader_operations_idxs.active_count > 0) {
 
 			this.shader_ops = [];
-	
-			for(let i=0; i <= shader_operations_idxs.boundary; i++) {
-	
-				if(shader_operations_idxs.buffer[i] !== INT_NULL)
+
+			for (let i = 0; i <= shader_operations_idxs.boundary; i++) {
+
+				if (shader_operations_idxs.buffer[i] !== INT_NULL)
 					this.shader_ops[i] = Program_get_stored_shader_operation_byidx(shader_operations_idxs.buffer[i]);
 			}
 		}
@@ -310,12 +312,12 @@ export function Program_find_uniform_ubidx_from_name(progidx, unif_name) {
 	const program_uniforms = _programs.buffer[progidx].uniforms;
 	const len = program_uniforms.length;
 	for (let i = 0; i < len; i++) {
-		 if (program_uniforms[i].name === unif_name) {
-			  return program_uniforms[i].ubidx;
-		 }
+		if (program_uniforms[i].name === unif_name) {
+			return program_uniforms[i].ubidx;
+		}
 	}
 
-	console.error('Program_find_uniform_ubidx_from_name() \nNo uniform found with name:', unif_name, 'progidx:', progidx, 'programs buffer:', _programs, )
+	console.error('Program_find_uniform_ubidx_from_name() \nNo uniform found with name:', unif_name, 'progidx:', progidx, 'programs buffer:', _programs,)
 	alert('Program_find_uniform_ubidx_from_name() \nNo uniform found.')
 }
 
@@ -345,13 +347,21 @@ const _shader_operations = New_generic_buffer(_, 'Program shader_ops storage buf
 export function Program_store_shader_operations(function_operation, blend_mode) {
 	// 'fn_op' Type of: 'SID.SHADER_OPERATIONS.'
 	// 'blend_mode' Type of: 'SID.BLEND_OPTIONS.'
-	const idx = _shader_operations.Add( { fn_op:function_operation, blend_mode:blend_mode } );
+	const idx = _shader_operations.Add({ fn_op: function_operation, blend_mode: blend_mode });
 	return idx; // Caller must store the index and send it back from MeshGfxContext.js to provide all necessary shader function operations for the shader program
 }
 
 
 
+export function Program_reset_stored_shader_operation() {
+	_shader_operations.ResetFull();
+}
+
+
+
 function Program_get_stored_shader_operation_byidx(shader_op_idx) {
+	if (_shader_operations.buffer[shader_op_idx] === _)
+		console.error()
 	return _shader_operations.buffer[shader_op_idx];
 }
 

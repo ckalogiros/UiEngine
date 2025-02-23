@@ -105,18 +105,37 @@ function Get_ID() { return ID++; }
 
 
 // TODO: Maybe have a buffer of 'Function_Slope' objects, and recycle through unused
-
+/**
+ * @constructor:
+ * @param {float[0,1]} slope_constant: The slope at which the animation will progress from start to stop
+ * @param {float} time_step: The ammount in which the timer will be increased each frame of the animation
+ * @param {number} ammount: Ammount of change in animation. Typicaly goes as -> slope_constant * ammount = animation's total value
+ * @param {string} name: for debugging
+ * @returns 
+ */
 export class Function_Slope {
-   constructor(slope_constant = 1.0, time_step = 0.1, value_change = 100, name = ID) {
+   constructor(slope_constant = 1.0, time_step = 0.1, ammount = 100, name = ID) {
 
       this.slope_constant = slope_constant;
       this.time_step = time_step;
       this.timer = 0.0;
-      this.value_change = value_change;
+      this.steps = 0;
+      this.ammount = ammount;
       this.in_animation = false;
 
       if (name) this.name = name;
       else name = Get_ID();
+
+      // Calculate the number of frame steps based on the current slope
+      let t = 0.0;
+      let slope = Logarithmic_interpolation(t, this.slope_constant)
+      while(slope < 1.0) {
+         
+         t += this.time_step;
+         this.steps++;
+         slope = Logarithmic_interpolation(t, this.slope_constant)
+      }
+
    }
 
    GetSlope() {
@@ -139,12 +158,12 @@ export class Function_Slope {
       this.timer += this.time_step;
    }
 
-   GetValueChange() {
-      return this.value_change;
+   GetAmmount() {
+      return this.ammount;
    }
 
-   SetValueChange(val) {
-      this.value_change = val;
+   SetAmmount(val) {
+      this.ammount = val;
    }
 
    GetInAnimation() {
@@ -153,5 +172,13 @@ export class Function_Slope {
 
    SetInAnimation(val) {
       this.in_animation = val;
+   }
+
+   GetTotalSteps() {
+      return this.steps;
+   }
+
+   GetTotalTime() {
+      return this.time_step * this.steps;
    }
 }

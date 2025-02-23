@@ -11,9 +11,10 @@ import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/
 import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_rotate_z_2d } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_rotate_z_2d, Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
+import { Contols_generic_uniforms_buffer } from "../Widgets/ControlWidgets.js";
 
 
 
@@ -50,7 +51,7 @@ const random_velocities = [
 // TODO: Must correct the issue of balls overlaping. 
 
 
-export function Sattelite_rotation(x=0, y=0) {
+export function Sattelite_rotation(x = 0, y = 0) {
 
 
    let total_height = 20;
@@ -63,8 +64,9 @@ export function Sattelite_rotation(x=0, y=0) {
    /**********************************************************************************************************************************************/
    // Controls
    const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [x + pad, y, 0], [0, 0], GREY[1]);
-   controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    controls_section.SetName('Sattelite_rotation->controls_section');
    controls_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -75,20 +77,22 @@ export function Sattelite_rotation(x=0, y=0) {
    };
 
    const slider_dim = [300, 10];
-   if (PLATFORM.ANY_SMARTPHONE_DEVICE) slider_dim[0] = VIEWPORT.WIDTH/2 - 10;
+   if (PLATFORM.ANY_SMARTPHONE_DEVICE) slider_dim[0] = VIEWPORT.WIDTH / 2 - 10;
 
    // Rotation slider
    const rot_slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Rotation');
-   rot_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   rot_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   // rot_slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   rot_slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   rot_slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    controls_section.AddItem(rot_slider);
    rot_slider.SetInitialValue(0);
    rot_slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    // Speed slider
    const spd_slider = Create_widget_slider(_, [0, 0, 0], slider_dim, _, _, 'Speed');
-   spd_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   spd_slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   // spd_slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   spd_slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   spd_slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    controls_section.AddItem(spd_slider);
    spd_slider.SetInitialValue(0.01);
    spd_slider.GfxUniformsEnable(flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -111,8 +115,9 @@ export function Sattelite_rotation(x=0, y=0) {
    // Main Panel Section
 
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [x + pad, y + total_height * 2, 0], [panel_height, panel_height], GREY[1]);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
    section.SetName('Sattelite_rotation->panel');
@@ -132,8 +137,9 @@ export function Sattelite_rotation(x=0, y=0) {
 
       const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, BLUEL[9], 'Ball', [0, dim[0], 2]);
       ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
+      // ball.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      ball.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
+      ball.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       section.AddItem(ball);
 
       balls_buffer[i] = ball;
@@ -157,8 +163,10 @@ export function Sattelite_rotation(x=0, y=0) {
 
    const sat = Create_rect_mesh(_, _, [6, 12], YELLOWL[9]);
    sat.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   // sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   // sat.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   sat.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 6);
+   sat.EnableGfx(MESH_ENABLE.GFX.ATTR_ANGLE, 0);
+   sat.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    section.AddItem(sat);
 
    // Render
@@ -270,8 +278,9 @@ export function Sattelite_rotation(x=0, y=0) {
    // Create Info Panel
    {
       const info_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x + pad, y + total_height * 2, 0], [0, 0], GREY[1]);
-      sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-      sat.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+      // sat.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      sat.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+      sat.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       if (!PLATFORM.ANY_SMARTPHONE_DEVICE) info_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       info_section.SetName('Sattelite_rotation->InfoUi-panel');
 
@@ -420,22 +429,18 @@ function Animate_sattelite(params) {
 
       if (ball_bot > bot_bound) {
          phys.vel[1] *= -1; // Reverse velocity
-         // ball.geom.pos[1] = bot_bound-ball_radius*2; // Puut back inside the panel area
          hit = true;
       }
       else if (ball_top < top_bound) {
          phys.vel[1] *= -1;
-         // ball.geom.pos[1] = 0;
          hit = true;
       }
       if (ball_right > right_bound) {
          phys.vel[0] *= -1;
-         // ball.geom.pos[0] =  right_bound-ball_radius*2-3;
          hit = true;
       }
       else if (ball_left < left_bound) {
          phys.vel[0] *= -1;
-         // ball.geom.pos[0] = 0;
          hit = true;
       }
 
@@ -448,11 +453,10 @@ function Animate_sattelite(params) {
       // }
 
       const angle = Math.atan2(x, y); // !!! Get the angle of rotation from two [x,y] vector points with ATAN2 !!!
+      const normalizedAngle = angle >= 0 ? angle : (2 * Math.PI + angle); // Normalize from -π,π to 0,π
+      Gl_set_angle(sat.gfx, normalizedAngle);
       Gl_rotate_z_2d(sat.gfx, sat.geom.dim, angle, 1);
-      /* Use for rendering sattelite with GFX.ATTR_STYLE */
-      // const cx = sat.geom.pos[0] - sat.geom.dim[0] 
-      // const cy = sat.geom.pos[1] - sat.geom.dim[1]
-      /* Use for rendering sattelite without GFX.ATTR_STYLE */
+
       const cx = sat.geom.pos[0]; // Center to sattelites position
       const cy = sat.geom.pos[1]
       const r = ball.geom.dim[0] + sat.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
@@ -461,6 +465,8 @@ function Animate_sattelite(params) {
 
       sat.geom.SetWposXY(sat.gfx, ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]);
       sat.geom.AddWposXY(sat.gfx, a, b);
+
+
 
 
       /** if the ball has hitted the wall boundaries, set the slider (value and position) according to the new direction */
@@ -509,18 +515,18 @@ const ball_dim = 20;
 const pad = 15;
 
 const random_positions = [
-   [ball_dim * 2 + pad,     ball_dim*2],
-   [ball_dim * 2 * 3 + pad, ball_dim*2],
-   [ball_dim * 2 * 5 + pad, ball_dim*2],
-   [ball_dim * 2 + pad,     ball_dim*4],
-   [ball_dim * 2 * 3 + pad, ball_dim*4],
-   [ball_dim * 2 * 5 + pad, ball_dim*4],
-   [ball_dim * 2 + pad,     ball_dim*6],
-   [ball_dim * 2 * 3 + pad, ball_dim*6],
-   [ball_dim * 2 * 5 + pad, ball_dim*6],
-   [ball_dim * 2 + pad,     ball_dim*8],
-   [ball_dim * 2 * 3 + pad, ball_dim*8],
-   [ball_dim * 2 * 5 + pad, ball_dim*8],
+   [ball_dim * 2 + pad, ball_dim * 2],
+   [ball_dim * 2 * 3 + pad, ball_dim * 2],
+   [ball_dim * 2 * 5 + pad, ball_dim * 2],
+   [ball_dim * 2 + pad, ball_dim * 4],
+   [ball_dim * 2 * 3 + pad, ball_dim * 4],
+   [ball_dim * 2 * 5 + pad, ball_dim * 4],
+   [ball_dim * 2 + pad, ball_dim * 6],
+   [ball_dim * 2 * 3 + pad, ball_dim * 6],
+   [ball_dim * 2 * 5 + pad, ball_dim * 6],
+   [ball_dim * 2 + pad, ball_dim * 8],
+   [ball_dim * 2 * 3 + pad, ball_dim * 8],
+   [ball_dim * 2 * 5 + pad, ball_dim * 8],
 
 
 ];
@@ -532,11 +538,11 @@ let in_scale_adjustment = false;
 
 
 
-export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_create = true, controls_render=false) {
+export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_create = true, controls_render = false) {
 
    let total_height = 20;
 
-   const scale_down = .5;
+   const scale_down = .6;
    const feather = 2;
    const rcorners = 10;
 
@@ -545,8 +551,9 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
    const pad = 10;
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [x + pad, y + total_height * 2, 0], elastic_collisions_panel_dim, GREY[1]);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
    section.SetName('Elastic_collisions');
@@ -574,11 +581,25 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       const color = GetSequencedColor(9);
       // const color = RGB(i, 0.15, 0, 1.3);
       const ball = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [pos[0], pos[1], zpos++], dim, color, 'Ball' + i, [0, dim[0], 2]);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-      ball.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
       ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       ball.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      ball.EnableGfxUniforms({ fx: SID.FX.FS_GLOW_VEC3 }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      ball.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
+
+      ball.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
+      ball.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+
+      // ball.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
+      // ball.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+      // ball.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, 0.4);
+
+      { // Test Shaders
+         // ball.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE);
+         // ball.EnableGfx(MESH_ENABLE.GFX.ATTR_GENERIC_VEC2, { a:0.01, b:0.0 });
+      }
+
+      ball.EnableGfx(MESH_ENABLE.GFX.FN_GLOW);
+
       section.AddItem(ball);
 
       balls_buffer[i] = ball;
@@ -621,56 +642,56 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    }
 
    const mnemonics = {
-      scale_down:scale_down,
-      initial_speed:physics[0].speed,
+      scale_down: scale_down,
+      initial_speed: physics[0].speed,
       physics: physics,
-      in_scale_adjustment:in_scale_adjustment,
+      in_scale_adjustment: in_scale_adjustment,
       // scale_factor:0,
 
    };
 
    const params = {
-      mnemonics:mnemonics,
+      mnemonics: mnemonics,
    }
 
 
    /****************************************************************************************************************/
    // Create slider controls
 
-   
 
-   
+
+
    if (controls_create) { // Create slider controls only if this is to be rendered from this function
-      
+
       const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, 500, 1], [0, 0], GREY[1], 'Emitter Window Panel', [0, 10, 2],);
-      controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      controls_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-      // const controls_buffer = Create_elastic_collisions_controls(balls_buffer[0], YELLOWL[3], [scale_down], mnemonics);
       const controls_buffer = Create_elastic_collisions_controls(balls_buffer, YELLOWL[3], [scale_down], params);
-      
+
       const len = controls_buffer.length;
-      for(let i=0; i<len; i++){
+      for (let i = 0; i < len; i++) {
          const ctrl = controls_buffer[i];
          controls_section.AddItem(ctrl);
       }
 
-      if(controls_render) {
+      if (controls_render) {
 
          /****************************************************************************************************************/
          // Render 
-         controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
+         controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
          controls_section.GenGfxCtx();
          controls_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
          controls_section.Calc_no_gfx_update();
-   
+
          controls_section.Render();
          Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
-   
+
          controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-   
+
          Construct_listen_events_from_mesh_tree(controls_section);
          Construct_listen_events_relations_from_mesh_tree(controls_section);
       }
@@ -698,7 +719,8 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
    // Initialize values to uniforms
    balls_buffer[0].GfxUniformSetAndUpdate('u_scale2', [scale_down, 1]);
-   balls_buffer[0].GfxUniformSetAndUpdate('u_glow_params', [.7, 1., .4]);
+   // balls_buffer[0].GfxUniformSetAndUpdate('u_glow_params', [.7, 1., .4]);
+   balls_buffer[0].GfxUniformSetAndUpdate('u_generic_controls', [1., .0, 1.]);
 
    total_height += elastic_collisions_panel_dim[1];
 
@@ -730,26 +752,28 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    ];
    const info_section_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [5, 5], pos, [0, 0], GREY[1]);
    {
-      info_section_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-      info_section_panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+      // info_section_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      info_section_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+      info_section_panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       if (!PLATFORM.ANY_SMARTPHONE_DEVICE) info_section_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       info_section_panel.SetName(`InfoUi-info_section_panel`);
       for (let i = 0; i < num_balls; i++) {
-   
+
          const pos = [
             section.geom.pos[0] + section.geom.dim[0] * 2 + pad + pad,
             section.GetPosY() + yy,
             0
          ];
          const info_section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [0, 0], GREY[2]);
-         info_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-         info_section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+         // info_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+         info_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+         info_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
          info_section.SetName(`InfoUi-panel${i}`);
          const ball = balls_buffer[i];
-   
+
          yy += 40
-   
-   
+
+
          const font = TEXTURES.CONSOLAS_12px;
          const font_size = 0;
          const pad1 = [6, 1];
@@ -762,26 +786,26 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
          { // Info
             const nfo = Create_widget_multi_text(_, 'px:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1, font);
             info_section.AddItem(nfo);
-   
+
             nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
             nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return ball.geom.pos[0]; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
             generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-   
+
             nfo.CreateNewText('py:', font_size, WHITE, pad2, .9,);
             nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
             nfo.SetDynamicText(`ms${ms} -`, ms, () => { return ball.geom.pos[1]; }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
             generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-   
+
             info_text_mesh = nfo;
          }
          { // Info
             const nfo = Create_widget_multi_text(_, 'vx:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1, font);
             info_section.AddItem(nfo);
-   
+
             nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
             nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return physics[i].vel[0]; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
             generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-   
+
             nfo.CreateNewText('vy:', font_size, WHITE, pad2, .9,);
             nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
             nfo.SetDynamicText(`ms${ms} -`, ms, () => { return physics[i].vel[1]; }, _, _, _); // idx param is for use in creating separate nfo for each widget dynamic text.
@@ -790,11 +814,11 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
          { // Info
             const nfo = Create_widget_multi_text(_, 'accel x:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1, font);
             info_section.AddItem(nfo);
-   
+
             nfo.CreateNewText('000', font_size, COLOR, pad2, .9);
             nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return physics[i].accel[0]; }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
             generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-   
+
             nfo.CreateNewText('y:', font_size, WHITE, pad2, .9,);
             nfo.CreateNewText('000', font_size, COLOR, pad2, .9);
             nfo.SetDynamicText(`ms${ms} -`, ms, () => { return physics[i].accel[1]; }, _, _, _);
@@ -805,42 +829,42 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
             // const imag = Magnitude(ball.geom.pos[0], ball.geom.pos[1]);
             const nfo = Create_widget_multi_text(_, 'magnitude: ', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1, font);
             info_section.AddItem(nfo);
-   
+
             nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
             nfo.SetDynamicText(`ms${ms} TEST_ball_velocity_with_trigonometrics`, ms, () => { return Magnitude(ball.geom.pos[0], ball.geom.pos[1]); }, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo for each widget dynamic text.
             generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
-   
+
          }
-   
+
          info_section_panel.AddItem(info_section)
       }
-   
-   
+
+
       // Render
       info_section_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      
+
       // info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-      info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       // info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, info_section_panel.mesh_bufferidx, true);
 
-   
+
       info_section_panel.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
       info_section_panel.Calc_no_gfx_update();
-   
+
       info_section_panel.Render();
       Root_group_activate_all_vbs_in_renderqueue(info_section_panel.root_bufferidx);
-   
+
       info_section_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, info_section_panel.gfx.vb.groupidx);
-   
-   
+
+
       Construct_listen_events_from_mesh_tree(info_section_panel)
       Construct_listen_events_relations_from_mesh_tree(info_section_panel);
-      
-      
+
+
       // Create scroller
-      const needs_scroller = (info_section_panel.geom.dim[1] > elastic_collisions_panel_dim[1]) ? true : false 
-      if(needs_scroller){
-   
+      const needs_scroller = (info_section_panel.geom.dim[1] > elastic_collisions_panel_dim[1]) ? true : false
+      if (needs_scroller) {
+
          // const scroller_component = Components_create_scroller_component(10, elastic_collisions_panel_dim[1], info_section_panel, info_section_panel.GetPosY(),);
          const scroller_component = Components_create_scroller_component(10, elastic_collisions_panel_dim[1], info_section_panel, _,);
          Scoller_component_gengfx_and_render(scroller_component, info_section_panel);
@@ -848,8 +872,8 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
          Listeners_set_priority(E.C, scroller_component.listeners)
          info_section_panel.AddChildScrollerIdx(info_section_panel.scroller_comp_idx);
          Scroller_component_calculate_handle_pos_dim(info_section_panel, scroller_component);
-      
-      
+
+
          // Set scissor box
          const mx = info_section_panel.mesh_bufferidx;
          const my = scroller_component.mesh_bufferidx;
@@ -857,8 +881,8 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
          const mh = scroller_component.mesh_bufferidx;
          Vertex_buffer_group_create_scissorbox(info_section_panel.gfx.vb.groupidx, mx, my, mw, mh);
          Vertex_buffer_group_create_scissorbox(info_text_mesh.gfx.vb.groupidx, mx, my, mw, mh);
-      
-      
+
+
          // Unfortunately must Re-render the section for the clipping of the scroller to take place
          Root_group_reset_gfxs(info_section_panel.root_bufferidx);
          Root_group_rerender_from_root_reconstruct_listeners(info_section_panel.root_bufferidx);
@@ -866,10 +890,10 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    }
 
    return {
-      ellastic_collisions_balls:balls_buffer,
-      controls_section:controls_section,
-      info_section_panel:info_section_panel,
-      mnemonics:mnemonics,
+      ellastic_collisions_balls: balls_buffer,
+      controls_section: controls_section,
+      info_section_panel: info_section_panel,
+      mnemonics: mnemonics,
    };
 }
 
@@ -877,10 +901,20 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
 
 /** For rendering the slider controls seperately from the ellastic collisions */
-export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], slider_init_values=null, params=null) {
-   
-   const contols_buffer = [];
+export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], slider_init_values = null, params = null) {
 
+   let contols_buffer = [];
+
+
+   /****************************************************************************************************************/
+   // Create Graphics controls
+   if (ball_mesh[0].sid.unif & SID.UNIF.FS_GENERIC_CONTROLS) { // Create slider controls only if this is to be rendered from this function
+
+      const slider_size = 120 * DEVICE.device_scale; // y:10 * DEVICE.device_scale;
+      // const parameters = [0.2, .48, .5, .19, .08, .4, .04, .04, .55];
+      const generic_controls_parameters = [1., 0., 1.];
+      contols_buffer = Contols_generic_uniforms_buffer(ball_mesh[0], slider_size, generic_controls_parameters);
+   }
 
    const u_wpos_flags = {
       unif: SID.UNIF.ROOT_WPOS2,
@@ -899,10 +933,11 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
 
       { // Set Scale
          const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, color, _, 'Particle Scale');
-         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
+         // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
+         slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
+         slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
          contols_buffer.push(slider);
-         slider.SetInitialValue(slider_init_values?slider_init_values[0]:.08);
+         slider.SetInitialValue(slider_init_values ? slider_init_values[0] : .08);
          // params.mnemonics.scale_factor =  (slider_init_values?slider_init_values[0]:.08);
          slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -913,20 +948,21 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
             // Find the ubidx
             const ubidx = Mesh_get_uniform_ubidx_from_name(target_mesh.uniforms, 'u_scale2');
             Vertex_buffer_set_and_update_uniform(target_mesh.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-            
+
             params.clbk_params.mnemonics.scale_down = slider_val;
 
             params.clbk_params.mnemonics.in_scale_adjustment = true;
             // params.clbk_params.mnemonics.scale_factor = true;
 
-         }, { mnemonics:params.mnemonics, target_mesh:ball_mesh, val_idx:0,}, false);
+         }, { mnemonics: params.mnemonics, target_mesh: ball_mesh, val_idx: 0, }, false);
       }
       { // Set Speed
          const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, color, _, 'Speed');
-         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-         slider.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners)
+         // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
+         slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
+         slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
          contols_buffer.push(slider);
-         slider.SetInitialValue(slider_init_values[1]?slider_init_values[1]:.08);
+         slider.SetInitialValue(slider_init_values[1] ? slider_init_values[1] : .08);
          slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          Slider_connect(slider, (params, slider_val) => {
@@ -934,13 +970,13 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
             const physics = params.clbk_params.mnemonics.physics;
             const inital_speed = params.clbk_params.mnemonics.initial_speed;
             const len = physics.length;
-            for(let i=0; i<len; i++){
+            for (let i = 0; i < len; i++) {
 
-               physics[i].speed = inital_speed * (slider_val+1);
+               physics[i].speed = inital_speed * (slider_val + 1);
             }
             // params.clbk_params.mnemonics.scale_down = slider_val;
 
-         }, { mnemonics:params.mnemonics, target_mesh:ball_mesh, }, true);
+         }, { mnemonics: params.mnemonics, target_mesh: ball_mesh, }, true);
       }
 
 
@@ -955,20 +991,10 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
 // Create the ball's animation callback
 function Animate_elastic_collisions_balls(params) {
 
-
-
-   // STATE.loop.paused = true;
    if (collision === true) {
       STATE.loop.paused = true;
       collision = false
    }
-
-   const in_adjusting_scale = params.params.mnemonics.in_scale_adjustment;
-   const scale_factor = params.params.mnemonics.scale_factor;
-   // console.log(scale_factor)
-   // if(in_adjusting_scale) return;
-
-   // let overlap = 0;
 
    const section = params.params.section;
    const scale_down = params.params.mnemonics.scale_down;
@@ -1110,8 +1136,6 @@ function Animate_elastic_collisions_balls(params) {
 
       // Calculate position relative to the new scaled size
       const ball_pos = [
-         // (ball.geom.pos[0] + ball.geom.dim[0]) - ball_size,
-         // (ball.geom.pos[1] + ball.geom.dim[1]) - ball_size,
          ball.geom.pos[0],
          ball.geom.pos[1],
       ];
@@ -1130,10 +1154,10 @@ function Animate_elastic_collisions_balls(params) {
       ball.geom.pos[1] += y;
 
       // Check boundaries
-      const ball_top    = ball_pos[1] - ball_size + y;
-      const ball_bot    = ball_pos[1] + ball_size + y;
-      const ball_left   = ball_pos[0] - ball_size + x;
-      const ball_right  = ball_pos[0] + ball_size + x;
+      const ball_top = ball_pos[1] - ball_size + y;
+      const ball_bot = ball_pos[1] + ball_size + y;
+      const ball_left = ball_pos[0] - ball_size + x;
+      const ball_right = ball_pos[0] + ball_size + x;
 
       if (ball_bot > bot_bound) {
          phys1.vel[1] = -1; // Reverse velocity

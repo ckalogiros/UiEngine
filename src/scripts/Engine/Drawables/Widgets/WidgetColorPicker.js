@@ -65,7 +65,7 @@ export class Widget_Color_Picker extends Section {
 
       // Multi color vertex
       // this.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      super.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[1], GREY[3], GREY[1], GREY[3]]);
+      super.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[1], GREY[3], GREY[1], GREY[3]]);
       this.options |= SECTION.RESIZE_PARENT;
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -87,7 +87,7 @@ export class Widget_Color_Picker extends Section {
       
       const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10 * scale, 10 * scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
       // panel.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      panel.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[1], GREY[3], GREY[1], GREY[3]]);
+      panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[1], GREY[3], GREY[1], GREY[3]]);
       panel.options |= SECTION.RESIZE_PARENT;
       panel_idx = this.AddItem(panel)
 
@@ -100,8 +100,8 @@ export class Widget_Color_Picker extends Section {
       // Create the color picker panel
       const color_pick = Create_rect_mesh(_, [0, 0, 2], [150 * scale, 150 * scale], [WHITE, BLACK, YELLOW[9], BLACK,], 'Color Picker', style, [0, 0], 1, is_debug_mesh);
       // color_pick.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      // color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [WHITE, BLACK, YELLOW[9], BLACK,]);
-      color_pick.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      // color_pick.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [WHITE, BLACK, YELLOW[9], BLACK,]);
+      color_pick.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       // color_pick.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
       color_pick.state.mask &= ~MESH_STATE.ACTIVE;
@@ -113,7 +113,7 @@ export class Widget_Color_Picker extends Section {
       // Create panel for the color presentation and info labels
       const panel2 = Create_widget_section(_, SECTION.VERTICAL, [10 * scale, 10 * scale], [0, 0, 1], _, COLOR_GRADIENT_VERTICAL(GREY[2], GREY[4]), 'Inner Panel 1', style, 1, _, is_debug_mesh);
       // panel2.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      panel2.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      panel2.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       panel2.options |= SECTION.RESIZE_PARENT;
       panel2.StylesSetMargin([10, 0]);
       panel2_idx = panel.AddItem(panel2)
@@ -125,7 +125,7 @@ export class Widget_Color_Picker extends Section {
       // const color_present_mesh = Create_rect_mesh(_, [20, 20, 2], [80*scale, 60*scale], YELLOW[9], 'Color Present', style, [0, 0], 1, is_debug_mesh);
       const color_present_mesh = Create_rect_mesh(_, [0, 0, 2], [75 * scale, 45 * scale], [YELLOW[9], YELLOW[9], YELLOW[9], YELLOW[9]], 'Color Present', style, [0, 0], 1, is_debug_mesh);
       // color_present_mesh.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      color_present_mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      color_present_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       color_present_mesh.StylesSetMargin([0, 0]);
       
       this.color_pick_click_pos = [color_pick.geom.dim[0] * 2, 0];
@@ -143,52 +143,52 @@ export class Widget_Color_Picker extends Section {
          {
             const label = Create_widget_label(_, 'R', _, [0, 0, 3], fontsize, [REDL[5], REDL[5], REDL[5], REDL[5]], WHITE, label_pad, _, label_style);
             label.temp_align |= SECTION.VERTICAL;
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             // label.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
             
             this.label_r = Create_widget_label(_, 'R1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style, );
-            this.label_r.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            this.label_r.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             this.label_r.temp_align |= SECTION.HORIZONTAL;
             this.label_r.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_r);
          }
          {
             const label = Create_widget_label(_, 'G', _, [0, 0, 3], fontsize, [GREEN[4], GREEN[4], GREEN[4], GREEN[4]], WHITE, label_pad, _, label_style);
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             label.temp_align |= SECTION.VERTICAL;
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
             
             this.label_g = Create_widget_label(_, 'G1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style);
-            this.label_g.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            this.label_g.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             this.label_g.temp_align |= SECTION.HORIZONTAL;
             this.label_g.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_g);
          }
          {
             const label = Create_widget_label(_, 'B', _, [0, 0, 3], fontsize, [BLUEL[6], BLUEL[6], BLUEL[6], BLUEL[6]], WHITE, label_pad, _, label_style);
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             label.temp_align |= SECTION.VERTICAL;
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
             
             this.label_b = Create_widget_label(_, 'B1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style);
-            this.label_b.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            this.label_b.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             this.label_b.temp_align |= SECTION.HORIZONTAL;
             this.label_b.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_b);
          }
          {
             const label = Create_widget_label(_, 'A', _, [0, 0, 3], fontsize, [GREY[8], GREY[8], GREY[8], GREY[8]], WHITE, label_pad, _, label_style);
-            label.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             label.temp_align |= SECTION.VERTICAL;
             label.StylesSetMargin(label_pad);
             panel2.AddItem(label);
             
             this.label_a = Create_widget_label(_, 'A1111', _, [0, 0, 3], fontsize, COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), WHITE, label_pad, _, label_style);
-            this.label_a.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            this.label_a.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
             this.label_a.temp_align |= SECTION.HORIZONTAL;
             this.label_a.StylesSetMargin([label_pad[0], 0]);
             panel2.AddItem(this.label_a);
@@ -211,7 +211,7 @@ export class Widget_Color_Picker extends Section {
       const slider_tran = Create_widget_slider_simple(_, [0, 0, 13], [12 * scale, 150 * scale], TRANSPARENCY_BAR_COLOR, [10, 10], [16 * scale, 3 * scale], WHITE, 1);
       // slider_tran.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
       // slider_tran.children.buffer[0].sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X; // Set the handle
-      slider_tran.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      slider_tran.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       slider_tran.StylesSetMargin([10, 0]);
       slider_tran.SetName('Slider Transparency');
 
@@ -241,7 +241,7 @@ export class Widget_Color_Picker extends Section {
       const slider_hue = Create_widget_slider_simple(_, [0, 0, 2], [dim[0] * scale, 20 * scale], HUE_COLOR, [10, 10], [4 * scale, 24 * scale], WHITE, vertices_count);
 
       slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      slider_hue.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX);
+      slider_hue.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX);
       slider_hue.StylesSetMargin([0, 20]);
       slider_hue.SetName('Slider Hue');
       slider_hue_idx = this.AddItem(slider_hue);
@@ -274,7 +274,7 @@ export class Widget_Color_Picker extends Section {
    }
 
 
-   SetGfxEnableAttributes(which, params) {
+   SetGfxEnable(which, params) {
       alert('777\nSetGfxEnableAttributes\nWidgetColorpicker')
    }
 
@@ -299,29 +299,29 @@ export class Widget_Color_Picker extends Section {
    }
 
 
-   EnableGfxAttributes(which, self_params = null, panel_params = null, color_pick_params = null, pane2_params = null, color_present_params = null, slider_trans_params = null, slider_hue_params = null, labels_params = null) {
+   EnableGfx(which, self_params = null, panel_params = null, color_pick_params = null, pane2_params = null, color_present_params = null, slider_trans_params = null, slider_hue_params = null, labels_params = null) {
 
-      super.EnableGfxAttributes(which, self_params);
+      super.EnableGfx(which, self_params);
 
       const slider_hue = this.children.buffer[slider_hue_idx];
-      slider_hue.EnableGfxAttributes(which, slider_hue_params, 1);
+      slider_hue.EnableGfx(which, slider_hue_params, 1);
 
       const panel = this.children.buffer[panel_idx];
-      panel.EnableGfxAttributes(which, panel_params);
+      panel.EnableGfx(which, panel_params);
       const color_pick = panel.children.buffer[color_pick_idx];
-      color_pick.EnableGfxAttributes(which, color_pick_params);
+      color_pick.EnableGfx(which, color_pick_params);
       const slider_trans = panel.children.buffer[slider_trans_idx];
-      slider_trans.EnableGfxAttributes(which, slider_trans_params, 1);
+      slider_trans.EnableGfx(which, slider_trans_params, 1);
 
       const panel2 = panel.children.buffer[panel2_idx];
-      panel2.EnableGfxAttributes(which, pane2_params);
+      panel2.EnableGfx(which, pane2_params);
       const color_present = panel2.children.buffer[color_present_idx];
-      color_present.EnableGfxAttributes(which, color_present_params);
+      color_present.EnableGfx(which, color_present_params);
 
 
       for (let i = color_present_idx + 1; i <= panel2.children.boundary; i++) {
          const label = panel2.children.buffer[i];
-         label.EnableGfxAttributes(which, labels_params);
+         label.EnableGfx(which, labels_params);
       }
    }
 

@@ -2,12 +2,12 @@
 
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
-import { Abs, AddArr3, CopyArr3, Floor } from "../../../Helpers/Math/MathOperations.js";
+import { AddArr3, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Gfx_generate_context, GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js"; ``
 import { Geometry2D_msdf_text } from "../Geometry/Geometry2DText.js";
-import { FontMaterial } from "../Material/Base/Material.js";
+import { Material_Font } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
-import { Gl_set_rgb, Gl_set_rgb_specific_index, Gl_set_uv, Gl_set_vpos_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_rgb_specific_index, Gl_set_uv, Gl_set_vpos_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Msdf_Font_get_char_plane_bounds, Msdf_Font_get_char_uv_coords, Msdf_Font_get_font_advancex, Msdf_Font_get_font_base_line, Msdf_Font_get_font_line_height } from "../../Loaders/Font/Font.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
@@ -25,7 +25,7 @@ export class Text_Mesh_Msdf extends Mesh {
 
       const sdfouter = CalculateSdfOuterFromDim(fontsize);
       if (sdfouter + bold > 1) bold = 1 - sdfouter;
-      const mat = new FontMaterial(color, font, text, [bold, sdfouter])
+      const mat = new Material_Font(color, font, text, [bold, sdfouter])
       const geom = new Geometry2D_msdf_text(pos, fontsize, scale, text, font, mat.fontidx);
 
       super(geom, mat);
@@ -560,7 +560,7 @@ export class Text_Mesh_Msdf extends Mesh {
 
 
 
-   RenderText(text) {
+   RenderText() {
       if (!this.gfx) {
          console.error('98776\nTrying to Render Text before vertex buffer creation\ntext:', this.mat.char_buffer.buffer); return;
       }
@@ -678,7 +678,7 @@ export class Text_Mesh_Msdf extends Mesh {
    ResetText(new_text) {
 
       const len = new_text.length;
-      if (len > this.mat.char_buffer.size) alert('[][][]]sdklljsdm')
+      if (len > this.mat.char_buffer.size) alert('7716524431234')
       for (let i = 0; i < len; i++) {
          this.mat.char_buffer.buffer[i] = new_text[i];
       }

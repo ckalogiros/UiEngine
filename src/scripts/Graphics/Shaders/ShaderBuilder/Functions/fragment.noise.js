@@ -1,4 +1,4 @@
-// export const frag_noise_call = `   color = blend_mode_vec4( final_color, Noise_procedural(scale_down) );`;
+// export const frag_noise_call = `   final_color = blend_mode_vec4( final_color, Noise_procedural(scale_down) );`;
 export const frag_noise_call = `   final_color = Noise_procedural(scale_down);`;
 export const frag_noise = `\
 
@@ -44,7 +44,7 @@ vec4 Noise_procedural(float scale_down)
     // #ifndef UV_READY
       #define UV_READY 1
       uv = gl_FragCoord.xy;
-      pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+      pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
       // uv_map_coordinates_zero_one(uv, dim);
     // #endif
     
@@ -187,7 +187,7 @@ vec4 Noise_procedural_2(float scale_down)
     
     #define UV_READY 1
     uv = gl_FragCoord.xy;
-    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
     uv_map_coordinates_zero_one(uv, dim);
     
     // vec2 uv2 = gl_FragCoord.xy;

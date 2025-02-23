@@ -2,8 +2,8 @@
 /** Analytical Smooth Lines:  https://www.shadertoy.com/view/tsyfDm
  
 #define COLOR_RED   		vec3(1.0, 0.0, 0.0)
-#define COLOR_GREEN 		vec3(0.0, 1.0, 0.0)
-#define COLOR_BLUE  		vec3(0.0, 0.0, 1.0)
+#define BRICK_COLOR_GREEN 		vec3(0.0, 1.0, 0.0)
+#define BRICK_COLOR_BLUE  		vec3(0.0, 0.0, 1.0)
 #define LINE_THICKNESS_MIN 	1.5
 #define LINE_THICKNESS_MAX 	50.0
 #define M_PI				3.141592654
@@ -51,13 +51,13 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         iResolution.xy/2.0 + vec2(   0.0, +150.0),
         iResolution.xy/2.0 + vec2(+150.0, -150.0),
         thickness,
-        COLOR_GREEN
+        BRICK_COLOR_GREEN
           );
     SMOOTH_LINE(
         iResolution.xy/2.0 + vec2(-150.0, -150.0),
         iResolution.xy/2.0 + vec2(+150.0, -150.0),
         thickness,
-        COLOR_BLUE
+        BRICK_COLOR_BLUE
           );
     
     fragColor = vec4(col, 1.0);
@@ -91,9 +91,10 @@ export const frag_round_corners = `
 
 vec4 Round_corners(float scale_down)
 {
-    float control1 = 0.;
+    float angle = 0.0;
+    // float control1 = 0.;
     #ifdef A_ANGLE
-        control1 = v_angle;
+        angle = v_angle;
     #endif
 
     float scale_up = 1./scale_down;
@@ -109,19 +110,18 @@ vec4 Round_corners(float scale_down)
     #ifndef UV_READY
         #define UV_READY 1
         uv = gl_FragCoord.xy;
-        pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
-        // pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+        pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
+        // pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
     #endif   
 
     vec2 localPos;
 
     // Re-create the rotation matrix
-    float angle = control1;
     float c = 0.0;
     float s = 0.0;
     if(angle > 0.) {
-        float c = cos(angle);
-        float s = sin(angle);
+        c = cos(angle);
+        s = sin(angle);
         mat2 rot = mat2(s, -c, c, s);
         localPos = abs(vpos.yx*rot);
     }
@@ -147,29 +147,29 @@ vec4 Round_corners(float scale_down)
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    float slider = .2;
-    float smoothness = 2.;
-    float power = 1.;
-    vec2 abs_uv = abs(uv);
+    // float slider = .2;
+    // float smoothness = 2.;
+    // float power = 1.;
+    // vec2 abs_uv = abs(uv);
 
-    float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
-    float strength = 2.2 * ((slider+1.)*.5);                        /* Creates a stronger shadow on full slider */
+    // float min_dim = (dim.x < dim.y) ? dim.x : dim.y;
+    // float strength = 2.2 * ((slider+1.)*.5);                        /* Creates a stronger shadow on full slider */
         
-    float balance_dim_ratio = max(min_dim, 1.);
-    float round_preserv = rCorners.x * .5;
+    // float balance_dim_ratio = max(min_dim, 1.);
+    // float round_preserv = rCorners.x * .5;
 
-    float depth = balance_dim_ratio * 1.; // Balance the shadow depth to the mesh dimentions
-
-
-    /* Shadow effect depth */
-    float shad_len = length(max((abs_uv - dim) + round_preserv + depth, 0.0))  - round_preserv;
+    // float depth = balance_dim_ratio * 1.; // Balance the shadow depth to the mesh dimentions
 
 
-    float g = smoothstep(.0, min_dim * smoothness, shad_len); // Always returns interpolated value {0, 1}
+    // /* Shadow effect depth */
+    // float shad_len = length(max((abs_uv - dim) + round_preserv + depth, 0.0))  - round_preserv;
 
-    strength = power*blm_darken(balance_dim_ratio*.1, 1.);
 
-    color = mix( color, pow(color, vec3(strength)), g );
+    // float g = smoothstep(.0, min_dim * smoothness, shad_len); // Always returns interpolated value {0, 1}
+
+    // strength = power*blm_darken(balance_dim_ratio*.1, 1.);
+
+    // color = mix( color, pow(color, vec3(strength)), g );
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -229,7 +229,7 @@ vec4 Round_corners(float scale_down)
 //     #ifndef UV_READY
 //         #define UV_READY 1
 //         uv = gl_FragCoord.xy;
-//         pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
+//         pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
 //     #endif   
 
 //     vec2 abs_uv = abs(uv);
@@ -317,40 +317,6 @@ vec4 Round_corners(float scale_down)
 
 
 
-export const frag_feather_call = '  final_color = blend_color_multiply( final_color, Feather(scale_down) );';
-export const frag_feather = `
-
-#ifndef UV_READY
-    vec2 uv = vec2(0,0);
-#endif
-
-float Feather(float scale_down)
-{
-    vec2 res = u_screen_res;
-    vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-    // vec2 dim = DIM * scale_down;
-    float feather = (v_feather <= 0.0) ? 0.00001 : v_feather;
-    float scale_up = 1./scale_down;
-
-
-    #ifndef UV_READY
-        #define UV_READY 1
-        uv = gl_FragCoord.xy;
-        pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
-    #endif  
-
-
-
-    float width = feather;
-    vec2 q = (abs(uv) - dim) + width;
-    float d = length(max(q, 0.0)) - width;
-    float alpha = clamp(-d/feather, 0.0, 1.0);
-
-    return alpha;
-}
-`;
-
-
 export const frag_style_call = '  final_color = blend_color_multiply( final_color, Stylize(scale_down) );';
 export const frag_style_corners = `
 
@@ -381,7 +347,7 @@ vec4 Stylize(float scale_down)
     #ifndef UV_READY
         #define UV_READY 1
         uv = gl_FragCoord.xy;
-        pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim*scale_up);
+        pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
     #endif 
     
     vec2 q = (abs(uv) - dim) + rCorners.x; // Again Subtract constant dimention

@@ -2,7 +2,7 @@
 
 import { Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { GetSign } from "../../../Helpers/Helpers.js";
-import { Abs, Floor, FloorArr2, Round, RoundArr2 } from "../../../Helpers/Math/MathOperations.js";
+import { Abs, Round, RoundArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Callback_animations_create } from "../../Animations/CallbackAnimations.js";
 import { Info_listener_dispatch_event } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { RegisterEvent } from "../../Events/Events.js";
@@ -253,7 +253,7 @@ export function Mouse_on_move(e) {
    mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
    // console.log(mouse.pos.xdiff, mouse.pos.ydiff)
 
-   RegisterEvent('mouse-move', null);
+   RegisterEvent(EVENT_HANDLER_TYPE.MOUSE_MOVE, null);
 
    // console.log(mouse.pos.x, mouse.pos.y)
 
@@ -356,7 +356,7 @@ export function Mouse_on_down(e) {
       mouseButton: e.which-1
    };
    
-   RegisterEvent('mouse-click-down', params);
+   RegisterEvent(EVENT_HANDLER_TYPE.MOUSE_CLICK_DOWN, params);
    // console.log(`MOUSE pos: ${e.x} ${e.y}`)
 }
 
@@ -374,7 +374,7 @@ export function Mouse_on_up(e) {
       mouseButton: e.which-1
    };
 
-   RegisterEvent('mouse-click-up', params)
+   RegisterEvent(EVENT_HANDLER_TYPE.MOUSE_CLICK_UP, params)
 }
 
 
@@ -429,7 +429,7 @@ export function Mouse_on_touch_start(e) {
       mouseButton: mouse.click.down.btn,
    };
    
-   RegisterEvent('mouse-click-down', params);
+   RegisterEvent(EVENT_HANDLER_TYPE.MOUSE_CLICK_DOWN, params);
 
    // alert(`Touch coordinates:${x}, ${y}`);
    
@@ -454,7 +454,7 @@ export function Mouse_on_touch_end(e) {
       mouseButton: mouse.click.down.btn,
    };
    
-   RegisterEvent('mouse-click-up', params);
+   RegisterEvent(EVENT_HANDLER_TYPE.MOUSE_CLICK_UP, params);
    // console.log(e);
 }
 

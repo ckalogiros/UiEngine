@@ -1,0 +1,1 @@
+* In particles system, the glow effects need sdf_rect alpha animation to create fade effect

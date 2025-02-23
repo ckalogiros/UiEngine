@@ -61,7 +61,7 @@ vec4 Smoke(float scale_down)
     // #ifndef UV_READY
     //     #define UV_READY 1
     //     uv = gl_FragCoord.xy;
-    //     pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y, dim);
+    //     pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
     // #endif  
 
 

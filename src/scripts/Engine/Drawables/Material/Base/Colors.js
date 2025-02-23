@@ -151,8 +151,6 @@ const ORANGEL8 = new Float32Array([0.9, 0.225, 0.0, 1.0]);
 const ORANGEL9 = new Float32Array([1.0, 0.250, 0.0, 1.0]);
 export const ORANGEL = [ORANGEL0, ORANGEL1, ORANGEL2, ORANGEL3, ORANGEL4, ORANGEL5, ORANGEL6, ORANGEL7, ORANGEL8, ORANGEL9,];
 
-
-
 const ORANGER0 = new Float32Array([0.1, 0.075, 0.0, 1.0]);
 const ORANGER1 = new Float32Array([0.2, 0.150, 0.0, 1.0]);
 const ORANGER2 = new Float32Array([0.3, 0.225, 0.0, 1.0]);
@@ -164,6 +162,9 @@ const ORANGER7 = new Float32Array([0.8, 0.600, 0.0, 1.0]);
 const ORANGER8 = new Float32Array([0.9, 0.675, 0.0, 1.0]);
 const ORANGER9 = new Float32Array([1.0, 0.750, 0.0, 1.0]);
 export const ORANGER = [ORANGER0, ORANGER1, ORANGER2, ORANGER3, ORANGER4, ORANGER5, ORANGER6, ORANGER7, ORANGER8, ORANGER9,];
+
+
+
 
 
 const RED0 = new Float32Array([0.1, 0.0, 0.0, 1.0]);
@@ -189,6 +190,10 @@ const REDL7 = new Float32Array([0.8, 0.08, 0.0, 1.0]);
 const REDL8 = new Float32Array([0.9, 0.09, 0.0, 1.0]);
 const REDL9 = new Float32Array([1.0, 0.10, 0.0, 1.0]);
 export const REDL = [REDL0, REDL1, REDL2, REDL3, REDL4, REDL5, REDL6, REDL7, REDL8, REDL9,];
+
+
+
+
 
 const BLUE0 = new Float32Array([0.0, 0.0, 0.1, 1.0]);
 const BLUE1 = new Float32Array([0.0, 0.0, 0.2, 1.0]);
@@ -227,6 +232,9 @@ const BLUER9 = new Float32Array([0.150, 0.200, 1.0, 1.0]);
 export const BLUER = [BLUER0, BLUER1, BLUER2, BLUER3, BLUER4, BLUER5, BLUER6, BLUER7, BLUER8, BLUER9,];
 
 
+
+
+
 const GREENL0 = new Float32Array([0.05, 0.1, 0.0, 1.0]);
 const GREENL1 = new Float32Array([0.10, 0.2, 0.0, 1.0]);
 const GREENL2 = new Float32Array([0.15, 0.3, 0.0, 1.0]);
@@ -262,6 +270,10 @@ const GREENR7 = new Float32Array([0.0, 0.8, 0.40, 1.0]);
 const GREENR8 = new Float32Array([0.0, 0.9, 0.45, 1.0]);
 const GREENR9 = new Float32Array([0.0, 1.0, 0.50, 1.0]);
 export const GREENR = [GREENR0, GREENR1, GREENR2, GREENR3, GREENR4, GREENR5, GREENR6, GREENR7, GREENR8, GREENR9,];
+
+
+
+
 
 const YELLOW0 = new Float32Array([0.1, 0.1, 0.0, 1.0]);
 const YELLOW1 = new Float32Array([0.2, 0.2, 0.0, 1.0]);
@@ -299,6 +311,10 @@ const YELLOWL8 = new Float32Array([0.675, 0.9, 0.0, 1.0]);
 const YELLOWL9 = new Float32Array([0.65, 1.0, 0.0, 1.0]);
 export const YELLOWL = [YELLOWL0, YELLOWL1, YELLOWL2, YELLOWL3, YELLOWL4, YELLOWL5, YELLOWL6, YELLOWL7, YELLOWL8, YELLOWL9,];
 
+
+
+
+
 const GREY0 = new Float32Array([0.04, 0.04, 0.04, 1.0]);
 const GREY1 = new Float32Array([0.08, 0.08, 0.08, 1.0]);
 const GREY2 = new Float32Array([0.13, 0.13, 0.13, 1.0]);
@@ -311,6 +327,10 @@ const GREY8 = new Float32Array([0.7, 0.7, 0.7, 1.0]);
 const GREY9 = new Float32Array([0.8, 0.8, 0.8, 1.0]);
 const GREY10 = new Float32Array([0.9, 0.9, 0.9, 1.0]);
 export const GREY = [GREY0, GREY1, GREY2, GREY3, GREY4, GREY5, GREY6, GREY7, GREY8, GREY9, GREY10];
+
+
+
+
 
 const PURPLE0 = new Float32Array([0.1, 0.0, 0.1, 1.0]);
 const PURPLE1 = new Float32Array([0.2, 0.0, 0.2, 1.0]);
@@ -347,6 +367,10 @@ const PURPLER7 = new Float32Array([0.8, 0.0, 0.4, 1.0]);
 const PURPLER8 = new Float32Array([0.9, 0.0, 0.45, 1.0]);
 const PURPLER9 = new Float32Array([1.0, 0.0, 0.5, 1.0]);
 export const PURPLER = [PURPLER0, PURPLER1, PURPLER2, PURPLER3, PURPLER4, PURPLER5, PURPLER6, PURPLER7, PURPLER8, PURPLER9,];
+
+
+
+
 
 const CYAN0 = new Float32Array([0.0, 0.1, 0.1,  1.0]);
 const CYAN1 = new Float32Array([0.0, 0.2, 0.2, 1.0]);

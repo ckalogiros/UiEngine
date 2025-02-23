@@ -23,4 +23,5 @@ Create brick texture procedurally
    But the mask could not be updated dynamically.
    In that case re-render the noise with the different params 
 
-   
+Signed Distance Map - GIMP
+https://docs.gimp.org/2.10/en/gimp-filter-distance-map.html

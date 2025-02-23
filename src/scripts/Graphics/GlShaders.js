@@ -112,7 +112,7 @@ function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 	
 	// Bind attribute locations before linking the program
 	// Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid);
-	console.error('881766293 Bind_attributes_at_specific_locations_based_on_sid() has been deactivated \nThe new implementation of predetermine attribute locations are in the ShaderBitFlags.js file')
+	// console.error('881766293 Bind_attributes_at_specific_locations_based_on_sid() has been deactivated \nThe new implementation of predetermine attribute locations are in the ShaderBitFlags.js file')
 
 	gl.linkProgram(shader_program);
 

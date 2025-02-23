@@ -82,3 +82,40 @@ export function Bitwise_operations_run_test() {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Calculate index from flag
+export function Bitwise_calc_bit_length_from_flag(flag) {
+
+   if (flag === 0) return 0; // Edge case: 0 has no bits set
+
+   // Count the number of leading zeros and subtract from 32 (for 32-bit integers)
+   // return (32 - Math.clz32(flag));
+   return (32 - Math.clz32(flag));
+}
+
+// Calculate index from flag starting from a base(subtracting all previous indexes and start from 0-th index at base)
+export function Bitwise_calc_bit_length_from_flag_base(flag, base) {
+
+   if (flag === 0) return 0; // Edge case: 0 has no bits set
+
+   // Count the number of leading zeros and subtract from 32 (for 32-bit integers)
+   const  index = 32 - Math.clz32(flag);
+   const  base_index = 32 - Math.clz32(base);
+   return index-base_index;
+}

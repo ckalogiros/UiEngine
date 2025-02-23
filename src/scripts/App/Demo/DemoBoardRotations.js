@@ -57,11 +57,11 @@ let rotation = 0;
 //       this.timer += this.time_step;
 //    }
 
-//    GetValueChange() {
+//    GetAmmount() {
 //       return this.scale;
 //    }
 
-//    SetValueChange(val) {
+//    SetAmmount(val) {
 //       this.scale = val;
 //    }
 
@@ -91,8 +91,8 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
    const pad = 10;
    const section_size = 200-15;
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [x + pad, y + total_height * 2, 0], [section_size, section_size], GREY[3]);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   section.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
+   section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
    section.SetName('BoardRotationsPanel');
@@ -114,16 +114,13 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
       color[2] = color_arr[k++]; if(k>=4) k=0;
       color[3] = color_arr[k++]; if(k>=4) k=0;
 
-      // const mesh = Create_widget_section(_, SECTION.VERTICAL|SECTION.RESIZE_PARENT, [0, 0], [pos[0], pos[1], zpos], dim, GREY[7], 'rect' + i, );
       const mesh = Create_widget_section(_, SECTION.VERTICAL|SECTION.RESIZE_PARENT, [0, 0], [pos[0], pos[1], zpos], dim, color, 'rect' + i, );
-      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
+      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_ANGLE);
+      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_ANGLE);
       mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      mesh.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX)
-      // ball.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      // ball.EnableGfxUniforms({ fx: SID.FX.FS_GLOW_VEC3 }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX)
       section.AddItem(mesh);
 
 
@@ -208,7 +205,7 @@ function Animation_rotate_run(params) {
 
    const mesh = params.mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const angle = params.function_slope.GetValueChange();
+   const angle = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
    params.function_slope.SetInAnimation(true);
@@ -242,7 +239,7 @@ function Animation_rotate_back_run(params) {
 
    const mesh = params.mesh;
    const slope_constant = params.function_slope.GetSlope();
-   const angle = params.function_slope.GetValueChange();
+   const angle = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
 

@@ -4,7 +4,7 @@ import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } fro
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D_Text } from "../Geometry/Geometry2DText.js";
-import { FontMaterial } from "../Material/Base/Material.js";
+import { Material_Font } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { WHITE } from "../Material/Base/Colors.js";
@@ -36,7 +36,7 @@ export class Text_Mesh extends Mesh {
       if (sdfouter + bold > 1) bold = 1 - sdfouter;
       
       
-      const mat = new FontMaterial(color, font, text, [bold, sdfouter])
+      const mat = new Material_Font(color, font, text, [bold, sdfouter])
       const geom = new Geometry2D_Text(pos, fontsize, scale, text, font, mat.fontidx);
       
       super(geom, mat);

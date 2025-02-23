@@ -51,8 +51,8 @@ export class Widget_Menu_Bar extends Section {
       this.StylesSetPad(pad)
 
 
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
-      this.EnableGfxAttributes(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
+      this.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
+      this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
       this.SetStyle(style);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -120,7 +120,7 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
-   SetGfxEnableAttributes(which, params) {
+   SetGfxEnable(which, params) {
       alert('777\nSetGfxEnableAttributes\nWidgetMenu')
    }
 
@@ -442,16 +442,16 @@ export class Close_Button extends Widget_Button {
 
    OnClose() {
 
-      /** The Scema of the 'params', constructed for the 'eventCallbacks'
+      /** The Scema of the 'params', constructed for the 'event_clbks'
         * source_params: this,
         * evt_params: root,
        */
-      const params = this.eventCallbacks.buffer[0]; // HACK: We must set up an index clarification for eventCallbacks buffer. 
+      const params = this.event_clbks.buffer[0]; // HACK: We must set up an index clarification for event_clbks buffer. 
       const root = params.evt_params
       root.Destroy(root);
 
-      if (root.eventCallbacks) {
-         root.eventCallbacks.buffer[0].evt_clbks();
+      if (root.event_clbks) {
+         root.event_clbks.buffer[0].evt_clbks();
       }
 
    }
@@ -494,7 +494,7 @@ export class Widget_Minimize extends Widget_Button {
    OnClick(_params) {
 
       const widget_minimize_btn = _params.evt_params.target_mesh;
-      const params = widget_minimize_btn.eventCallbacks.buffer[0]; // HACK: We must set up an index clarification for eventCallbacks buffer. 
+      const params = widget_minimize_btn.event_clbks.buffer[0]; // HACK: We must set up an index clarification for event_clbks buffer. 
       widget_minimize_btn.OnMinimize(params);
       return true; // Needed for the listen event not to propagate further, after widget destruction
    }

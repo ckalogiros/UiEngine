@@ -18,7 +18,7 @@ import { Renderer_webgl_begin_timer_query, Renderer_webgl_end_timer_query } from
 // const R = (1/255) * 32;
 // const G = (1/255) * 32;
 // const B = (1/255) * 32;
-const R = (1/255) * 32;
+const R = (1/255) * 72;
 const G = (1/255) * 32;
 const B = (1/255) * 72;
 
