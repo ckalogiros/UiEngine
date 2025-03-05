@@ -55,8 +55,10 @@ export class Mesh {
     // alignment;  // BitField: Control this mesh's children alignment.
     gfx_pool_request;  // BitField: 
 
-    gfx_ctx_flags;     // BitField: Help on chosing the gfx buffers conditionaly 
+    gfx_ctx_flags;     // BitField: Help on choosing the gfx buffers conditionaly 
     gfx_ctx_parent;     // Value: The index of the parent from which to start search mesh tree for finding gfx context 
+    
+    align_flags;     // BitField: Flags for alignment, of type: 
 
 
 
@@ -176,6 +178,8 @@ export class Mesh {
         this.batchidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL];
         this.nameidx = INT_NULL;
+        
+        this.align_flags = 0x0;
 
         this.parent = null;
 
@@ -721,6 +725,8 @@ export class Mesh {
             alert('Shader Operation detected: Need SDF_RECT to function.');
         }
     }
+
+
     EnableGfx(which, params = null) {
 
         switch (which) {
@@ -873,6 +879,7 @@ export class Mesh {
 
     }
 
+    
     EnableGfxPass(flags) {
 
         this.sid.pass |= flags;
@@ -924,7 +931,7 @@ export class Mesh {
 
     GfxUniformSetAndUpdate(unif_name, value, value_idx = null) {
 
-        /**ERROR */ if (this.gfx === null) alert('Try to update uniform befor mesh has gfx.')
+        /**ERROR */ if (this.gfx === null) alert('Try to update uniform before mesh has gfx.')
 
         const len = this.uniforms.length;
         for (let i = 0; i < len; i++) {

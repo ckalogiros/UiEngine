@@ -43,16 +43,19 @@ export class Widget_Menu_Bar extends Section {
       // const dim = [label.GetMaxWidth(), 10];
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [5, 5], [0, 0, pos[2]], dim, col, _, style, num_faces, _, is_debug_mesh);
 
-      Styles_pad_set(this.styles, pad)
-      Styles_pad_set(label.styles, pad)
+      // Styles_pad_set(this.styles, pad)
+      // Styles_pad_set(label.styles, pad)
 
       this.geom.dim[1] = label.geom.dim[1];
 
       this.StylesSetPad(pad)
 
 
-      this.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
-      this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
+      // this.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
+      // this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
+      this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
       this.SetStyle(style);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -195,7 +198,7 @@ export class Widget_Menu_Bar extends Section {
     *  This fuction must be called through 'Construct_listen_events_from_mesh_tree()', because it does not check if 'mesh.listeners' is null buffer
     */
    ListenEventConstruct() {
-      alert('556172834 \n Implement me')
+      // alert('556172834 \n Implement me')
 
 
       const mesh = this;
@@ -242,6 +245,7 @@ export class Widget_Menu_Bar extends Section {
       if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
       const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, style, font);
+      close_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       close_btn.SetName('close_btn');
 
 

@@ -427,64 +427,7 @@ class Emitter {
       }
 
    }
-   // EnableGfx(which, params = null) {
 
-   //    switch (which) {
-
-   //       case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
-   //       case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
-   //       case MESH_ENABLE.GFX.ATTR_TIME: { this.sid.attr |= SID.ATTR.TIME; this.sid.pass |= SID.PASS.TIME; break; }
-   //       case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.PASS.ANGLE; break; }
-   //       case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
-   //       case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
-
-   //       case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
-   //          this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-   //          this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
-   //          if (params !== null) this.mat.col = params;
-   //          break;
-   //       }
-   //       case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
-   //          this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.PASS.R_CORNERS;
-   //          this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
-   //          this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
-   //          this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
-   //          if (params !== null) this.mat.style.rcorners = params;
-   //          break;
-   //       }
-   //       case MESH_ENABLE.GFX.ATTR_FEATHER: {
-   //          this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.PASS.FEATHER;
-   //          this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
-   //          this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
-   //          if (params !== null) this.mat.style.feather = params;
-   //          break;
-   //       }
-   //       case MESH_ENABLE.GFX.ATTR_BORDER: {
-   //          this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.PASS.BORDER;
-   //          this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
-   //          this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
-   //          if (params !== null) this.mat.style.border = params;
-   //          break;
-   //       }
-
-
-   //       // Shader Color Functions
-   //       case MESH_ENABLE.GFX.FN_GLOW_SPHERE: {
-   //          if (this.sid.blend_options === 0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
-   //          // if(params===null) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
-   //          this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break;
-   //       }
-   //       case MESH_ENABLE.GFX.FN_NOISE_WORLEY: { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
-
-   //       case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
-
-
-
-   //       case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
-   //       case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
-   //    }
-
-   // }
 
 
    EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size = 0) {
@@ -569,7 +512,7 @@ class Emitter {
 
    GfxUniformSetAndUpdate(unif_name, value, value_idx = null) {
 
-      /**ERROR */ if (this.gfx === null) alert('Try to update uniform befor mesh has gfx.')
+      /**ERROR */ if (this.gfx === null) alert('Try to update uniform befores mesh has gfx.')
 
       const len = this.uniforms.length;
       for (let i = 0; i < len; i++) {
@@ -686,18 +629,15 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
    if (!parent) console.error('4431623 \nEmmiter should have a parent mesh.')
 
    emitter.parent = parent;
-
    const FLAGS = GFX_CTX_FLAGS.PRIVATE;
-   // console.error(
-   //    SID.GetTypeToString(emitter.sid)
-   // );
    emitter.gfx = Gfx_generate_context_for_particle_system(FLAGS, emitter, _, specific_vb_groupidx,);
-
    emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
+
+   // emitter.per_vb_bufferidx = Mesh_per_vb_store_mesh(emitter.gfx.vb.groupidx, emitter.mesh_bufferidx);
 
 
    // TODO: Temporary implementation of assigning the correct gfx update function pointer
-   // if (emitter.sid.fx & SID.FX.FS_GLOW_VEC3) {
+
    if (emitter.sid.fx & SID.SHAD.FN_EXPLOSION_CIRCLE) {
       if (emitter.sid.attr & SID.ATTR.FEATHER) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time;
       else emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_style1_time;

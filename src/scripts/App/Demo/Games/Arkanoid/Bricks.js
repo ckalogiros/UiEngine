@@ -869,7 +869,9 @@ function Arkanoid_create_explosion_circle(color = BLUEL[9], params) {
    // Create explosion glow mesh
    {
       const ring_diameter = .4, intensity = .03;
+      // const ring_diameter = .4, intensity = .3;
       const explosion_fx_idx = Effects_create_explosion_circle(x, y, h * 4, h * 4, w, h, color, ring_diameter, intensity);
+      // const explosion_fx_idx = Effects_create_explosion_circle(x, y, h * 4, h * 4, w, h, YELLOWR[9], ring_diameter, intensity);
       const explosion_fx = Effect_explosion_circle_get_mesh_byidx(explosion_fx_idx);
 
       const params_explosion = {

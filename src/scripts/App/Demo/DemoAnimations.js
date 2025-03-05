@@ -347,7 +347,6 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
 
    const panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 0], _, GREY[1]);
    panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2]));
@@ -357,7 +356,6 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
    const text = 'Use the "Options" menu to change properties.';
    const label = Create_widget_label(_, text, _, [0, 0, 1], _, GREENL[5]);
    label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[4]));
@@ -411,11 +409,10 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
 
    const panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 0], _, GREY[1]);
    panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2]));
-   panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    panel.SetName('Demo_animations_ready_button_with_panel');
 
 
@@ -1107,10 +1104,11 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    /*************************************************************************************************/
    // Create controls
    const controls_section = Create_widget_section(root_widget, SECTION.VERTICAL, [10, 10], [0, 0, 3], [0, 0], BLACK, 'Controls Section', [0, 10, 2],);
-   // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2;
    controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3]));
 
    if (create_contols) { // Create slider controls only if this is to be rendered from this function
 
@@ -1133,7 +1131,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Render 
    if (create_contols && (root_widget & ROOT_WIDGETS.CREATE_ROOT)) { // Create slider controls only if this is to be rendered from this function
 
-      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
+      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
       // controls_section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT | SECTION.EXPAND;
@@ -1160,7 +1158,6 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    const section = Create_widget_section(root_widget, _, [20, 20], [0, 0, 0], _, GREY[2]);
    {
       section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       section.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[1], GREY[4]));
@@ -1174,7 +1171,6 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    const mesh2 = Create_widget_label(_, '-', _, [0, 0, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
    {
       mesh2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      //  mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       mesh2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(PURPLER[2], PURPLER[7]));
@@ -1183,7 +1179,6 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    const mesh1 = Create_widget_label(_, '.', _, [0, 0, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
    {
       mesh1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      //  mesh1.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       mesh1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       mesh1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       mesh1.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(PURPLEB[2], PURPLEB[9]));
@@ -1198,7 +1193,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Render animated meshes
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+      section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
       section.Calc_no_gfx_update();
 
@@ -1281,12 +1276,10 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    // Slider for controling the slope
    {
       const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
-      const slider_feather = 2;
       const slider_rcorners = 10;
 
       const slider = Create_widget_slider(_, [0, 0, zpos + 1], slider_dim, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), _, 'Animation Slope');
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       slider.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
@@ -1305,12 +1298,10 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    // Slider for controling the animation speed
    {
       const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
-      const slider_feather = 2;
       const slider_rcorners = 10;
 
       const slider = Create_widget_slider(_, [0, 0, zpos + 1], slider_dim, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), _, 'Animation Speed');
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
       slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
       slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       slider.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]),);

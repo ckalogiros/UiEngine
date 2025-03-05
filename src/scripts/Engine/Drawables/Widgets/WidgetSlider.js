@@ -53,7 +53,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       const handle = Create_rect_mesh(_, [pos[0] - handle_dim[0] + dim[0], pos[1] - handle_dim[1] + dim[1], pos[2] + 1], handle_dim, handle_color, _, _, _, 1, is_debug_mesh);
 
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
-      if(col[0] instanceof Float32Array) handle.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      if (col[0] instanceof Float32Array) handle.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX,);
 
       handle.SetStyle(Mesh_create_style_from_values(Min(handle_dim[0], handle_dim[1]), 3., 4));
 
@@ -284,7 +284,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    RemoveAllListenEvents() {
 
       const handle = this.children.buffer[0];
-      if(handle!==null) handle.RemoveAllListenEvents();
+      if (handle !== null) handle.RemoveAllListenEvents();
       super.RemoveAllListenEvents();
    }
 
@@ -682,7 +682,7 @@ export function Slider_simple_connect(slider_bar, Clbk, clbk_params) {
 
 
 /** Connect a slider of class Slider, with panel and text name/value */
-export function Slider_connect(slider, Clbk, clbk_params, call_immediately=true) {
+export function Slider_connect(slider, Clbk, clbk_params, call_immediately = true) {
 
    const bar = slider.children.buffer[slider.bar_idx];
 
@@ -695,7 +695,7 @@ export function Slider_connect(slider, Clbk, clbk_params, call_immediately=true)
    bar.CreateEventCallback(params);
 
    // Run the callback to set the sliders initial value.
-   if(call_immediately) Clbk(params, bar.slider_val);
+   if (call_immediately) Clbk(params, bar.slider_val);
 
 }
 
@@ -743,7 +743,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    value_text_idx; // Slider's value text mesh index in children buffer
    bar_idx; // Slider's bar and handle mesh index in children buffer
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS=0x0, _pos = [0, 0, 0], dim = [120, 10], col = TRANSPARENCY(GREY[0], .6), hover_margin = [5, 16], name = 'SLIDER UNAMED', is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS = 0x0, _pos = [0, 0, 0], dim = [120, 10], col = TRANSPARENCY(GREY[0], .6), hover_margin = [5, 16], name = 'SLIDER UNAMED', is_debug_mesh) {
 
       // Calculate the bar's and handle's horizontal pading.
       const ratio = dim[0] / dim[1];
@@ -758,19 +758,17 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       const fontSize = max_font_size < (dim[1] / r) ? max_font_size : (min_font_size > (dim[1] / r) ? min_font_size : (dim[1] / r));
 
 
-      const pos = ((ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT)===0) ? _pos : [0, 0, _pos[2]];
+      const pos = ((ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) === 0) ? _pos : [0, 0, _pos[2]];
 
 
       // Create slider_name_text (it is the text_mesh of the extended Widget_Label class)
       const name_text = Create_widget_text(ROOT_WIDGET_FLAGS, name, pos, fontSize, GREY[8], .4, _, _, is_debug_mesh);
+      name_text.StylesSetPad([outside_pad, outside_pad]);
 
+      // dim[1] = name_text.GetMaxHeight() + pad[1] * 2;
 
-      /** Label area mesh */
-      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col, _, _, [pad, pad], 1, is_debug_mesh);
       // Dont forget NOT to pass as 'ROOT_WIDGET', since this class will handle the root_widget creation
       super(mesh_bufferidx, _, _pos, dim, col, _, _, [pad, pad], 1, is_debug_mesh);
-
-
 
 
       this.mesh_bufferidx = mesh_bufferidx;
@@ -778,6 +776,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       // this.SetStyle(Mesh_create_style_from_values(6, 2, 0));
       this.SetStyle(Mesh_create_style_from_values(6, 2, 0));
+      // this.StylesSetPad([outside_pad, outside_pad]);
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -786,9 +785,11 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       // Slider Bar: Bar is child of the slider mesh
       const bar_width = dim[0] - 8;
       const bar_color = (col[0] instanceof Float32Array) ? [GREY[8], GREY[8], GREY[8], GREY[8]] : GREY[8];
-      const bar = Create_widget_slider_simple(_, [outside_pad, dim[1] * 4, _pos[2] + 1], [bar_width, 2], bar_color, hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
+      // const bar = Create_widget_slider_simple(_, [outside_pad, dim[1] * 4, _pos[2] + 1], [bar_width, 2], bar_color, hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
+      const bar = Create_widget_slider_simple(_, [outside_pad, dim[1] * 4 - pad[1] * 2, _pos[2] + 1], [bar_width, 2], bar_color, hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
       // const bar = Create_widget_slider_simple(_, [0, dim[1] * 4, _pos[2] + 1], [dim[0], 2], GREY[8], hover_margin, [10, 10], BLUEL[8], 1, is_debug_mesh);
       bar.SetStyle(Mesh_create_style_from_values(2, .6, 0));
+      bar.StylesSetPad([outside_pad, outside_pad]);
 
 
       /*****************************************************************************************************************/
@@ -798,16 +799,19 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       // Create value_text
       const value_text = Create_widget_text(ROOT_WIDGET_FLAGS, '0000', pos, fontSize, WHITE, .4, _, _, is_debug_mesh);
+      value_text.StylesSetPad([outside_pad, outside_pad]);
 
 
       // Make the vertical area of the bar larger for hover and handle moving.
-      bar.MoveYNoGfxUpdate(-handle.geom.dim[0])
+      // bar.MoveYNoGfxUpdate(-handle.geom.dim[0])
 
 
       /*****************************************************************************************************************/
       // Align
-      const totalheight = (handle.geom.dim[1] + name_text.geom.dim[1] + value_text.geom.dim[1]);
+      // const totalheight = (handle.geom.dim[1] + name_text.geom.dim[1] + value_text.geom.dim[1]);
+      const totalheight = (name_text.geom.dim[1] + handle.geom.dim[1] + pad[1] * 1);
       this.geom.dim[1] = totalheight;
+      // this.geom.pos[1] = 0;
 
 
       value_text.geom.pos[0] = this.geom.dim[0] * 2 - (value_text.GetMaxWidth() * 2);
@@ -815,7 +819,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       value_text.geom.pos[2] = bar.geom.pos[2] + 1;
 
 
-      name_text.geom.pos[0] = outside_pad*2;
+      name_text.geom.pos[0] = outside_pad * 2;
       name_text.geom.pos[1] = outside_pad;
       name_text.geom.pos[2] = this.geom.pos[2] + 1;
       name_text.parent = this;
@@ -1018,23 +1022,42 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
-   GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+   AlignAddFlags(MASK = 0x0) {
 
-      if(this.gfx_ctx_parent === INT_NULL) {
+      this.align_flags |= MASK;
+
+      const bar = this.children.buffer[this.bar_idx];
+      bar.align_flags |= MASK;
+
+      const name_text = this.text_mesh;
+      name_text.align_flags |= MASK;
+
+      const handle = bar.children.buffer[0];
+      handle.align_flags |= MASK;
+
+      const value_text = this.children.buffer[this.value_text_idx];
+      value_text.align_flags |= MASK;
+
+   }
+
+
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) {
          this.gfx_ctx_flags = FLAGS;
-   
+
          const bar = this.children.buffer[this.bar_idx];
          bar.gfx_ctx_flags = FLAGS;
          bar.gfx_ctx_parent = gfx_ctx_parent;
-         
+
          const name_text = this.text_mesh;
          name_text.gfx_ctx_flags = FLAGS;
          name_text.gfx_ctx_parent = gfx_ctx_parent;
-         
+
          const handle = bar.children.buffer[0];
          handle.gfx_ctx_flags = FLAGS;
          handle.gfx_ctx_parent = gfx_ctx_parent;
-         
+
          const value_text = this.children.buffer[this.value_text_idx];
          value_text.gfx_ctx_flags = FLAGS;
          value_text.gfx_ctx_parent = gfx_ctx_parent;
@@ -1042,20 +1065,20 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
-   GfxCtxAddFlag(FLAGS=null, gfx_ctx_parent=INT_NULL, recurse=false) {
+   GfxCtxAddFlag(FLAGS = null, gfx_ctx_parent = INT_NULL, recurse = false) {
 
-      if(this.gfx_ctx_parent === INT_NULL) {
+      if (this.gfx_ctx_parent === INT_NULL) {
          this.gfx_ctx_flags |= FLAGS;
-   
+
          const bar = this.children.buffer[this.bar_idx];
          bar.gfx_ctx_flags |= FLAGS;
-   
+
          const name_text = this.text_mesh;
          name_text.gfx_ctx_flags |= FLAGS;
-   
+
          const handle = bar.children.buffer[0];
          handle.gfx_ctx_flags |= FLAGS;
-   
+
          const value_text = this.children.buffer[this.value_text_idx];
          value_text.gfx_ctx_flags |= FLAGS;
       }
@@ -1077,7 +1100,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       super.EnableGfxOperations(function_operation, blend_mode);
       const bar = this.children.buffer[this.bar_idx];
       bar.EnableGfxOperations(function_operation, blend_mode);
-      
+
    }
 
 
@@ -1104,7 +1127,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       handle.gfx = Gfx_generate_context(FLAGS, handle, rect_igfx);
 
       const value_text = this.children.buffer[this.value_text_idx];
-      
+
       value_text.gfx = Gfx_generate_context(FLAGS | GFX_CTX_FLAGS.SPECIFIC, value_text, text_igfx);
 
       return this.gfx;
@@ -1570,8 +1593,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
    // Setters-Getters
 
-
-
    SetGfxInserted(flag) {
 
       this.is_gfx_inserted = flag;
@@ -1617,6 +1638,56 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       value_text.isFramebufferRendered = fbidx;
    }
 
+
+
+
+
+   /*******************************************************************************************************************************************************/
+   // Alignment
+   /*******************************************************************************************************************************************************/
+
+   AlignNEW(pos_x, pos_y) {
+
+      const pad_x = this.StylesGetPad(STYLES.AXIS.X);
+      const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+      this.geom.pos[0] = pos_x + pad_x;
+      this.geom.pos[1] = pos_y + pad_y;
+
+      const bar = this.children.buffer[this.bar_idx];
+      // const bar_pad_x = bar.StylesGetPad(STYLES.AXIS.X);
+      // const bar_pad_y = bar.StylesGetPad(STYLES.AXIS.Y);
+      bar.geom.pos[0] += pos_x + pad_x;
+      bar.geom.pos[1] += pos_y + pad_y;
+
+
+      const handle = bar.children.buffer[0];
+      // const handle_pad_x = handle.StylesGetPad(STYLES.AXIS.X);
+      // const handle_pad_y = handle.StylesGetPad(STYLES.AXIS.Y);
+      handle.geom.pos[0] += pos_x + pad_x;
+      handle.geom.pos[1] += pos_y + pad_y;
+
+
+      const name_text = this.text_mesh;
+      const name_text_x = name_text.StylesGetPad(STYLES.AXIS.X);
+      // const name_text_y = name_text.StylesGetPad(STYLES.AXIS.Y);
+      name_text.geom.pos[0] = pos_x + pad_x + name_text_x;
+      name_text.geom.pos[1] += pos_y + pad_y;
+
+
+      const value_text = this.children.buffer[this.value_text_idx];
+      const value_text_x = value_text.StylesGetPad(STYLES.AXIS.X);
+      // const value_text_y = value_text.StylesGetPad(STYLES.AXIS.Y);
+      value_text.geom.pos[0] += pos_x;
+      // value_text.geom.pos[0] += pad_x;
+      value_text.geom.pos[1] += pos_y + pad_y;
+
+      return {
+         dim_x: this.geom.dim[0] + pad_x / 2,
+         dim_y: this.geom.dim[1] + pad_y / 2,
+         pad_x: pad_x / 2,
+         pad_y: pad_y / 2,
+      };
+   }
 
 
 
@@ -1679,7 +1750,7 @@ export function Slider_set_listeners_priority(slider) {
 
    const bar = slider.children.buffer[slider.bar_idx];
 
-   if(bar.listeners!==null && bar.listeners.buffer[E.C]!==INT_NULL) Listeners_set_priority(E.C, bar.listeners);
+   if (bar.listeners !== null && bar.listeners.buffer[E.C] !== INT_NULL) Listeners_set_priority(E.C, bar.listeners);
 
 }
 

@@ -231,15 +231,15 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9,);
-      // timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.Particles, 0], _, generic_time_interval, ); // idx param is for use in creating separate timer for each widget dynamic text.
-      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.Particles, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
+      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.Particles, 0], _, generic_time_interval, ); // idx param is for use in creating separate timer for each widget dynamic text.
+      // timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.Particles, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
 
       timer.CreateNewText('Particles Update:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
       timer.CreateNewText('000000', fontsizedynamic, YELLOW[9], pad2, .9);
-      // timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.Particles2, 0], _, generic_time_interval, ); // idx param is for use in creating separate timer for each widget dynamic text.
-      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.Particles2, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
+      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.Particles2, 0], _, generic_time_interval, ); // idx param is for use in creating separate timer for each widget dynamic text.
+      // timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.Particles2, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
    }
@@ -1461,7 +1461,7 @@ function Debug_info_create_ui_performance_timers() {
 // Mouse Info
 /************************************************************************************************************************************************/
 
-export function Debug_info_create_ui_mouse() {
+export function Debug_info_create_ui_mouse(x=0, y=0) {
 
 
    if (DEBUG_INFO.UI_MOUSE.IS_ON) {
@@ -1479,7 +1479,7 @@ export function Debug_info_create_ui_mouse() {
       return;
    }
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [10, 8], [0, 0, DEBUG_INFO.UI_MOUSE.POS[2]], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui mouse info panel');
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [10, 8], [x, y, DEBUG_INFO.UI_MOUSE.POS[2]], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui mouse info panel');
    section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);

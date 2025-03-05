@@ -683,6 +683,8 @@ export class M_Buffer {
       }
       if(this.buffer[this.boundary] instanceof Int16_Buffer) {
          
+         if(!this.buffer)
+            console.log()
          for(let i = 0; i <= this.boundary; i++) {
             Free_int16_buffer(this.buffer[i]);
          }

@@ -116,7 +116,7 @@ export const frag_tex = `
   float distance = max(texture(u_sampler0, v_tex_coord).r, max(texture(u_sampler0, v_tex_coord).g, texture(u_sampler0, v_tex_coord).b));
   
   final_color.a *= distance; // Remove all black final_color from the rgb channels
-  // final_color.a = 1.;
+  // final_color.a = .9;
   
 
   `;

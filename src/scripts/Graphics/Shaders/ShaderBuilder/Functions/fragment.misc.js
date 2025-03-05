@@ -258,10 +258,8 @@ vec4 inner_shadow_rhomboid(in float scale_down)
 /*************************************************************************************************************************/
 
 export const frag_explosion_circle_call = `
-  // final_color = blend_mode_vec4( final_color, frag_explosion_circle(u_gen_ctrl_map_cnt) );
-  // final_color = frag_explosion_circle(u_gen_ctrl_map_cnt);
-  final_color = blend_color_add( final_color, frag_explosion_circle(scale_down, u_gen_ctrl_map_cnt) );
-  // final_color = blend_color_multiply( final_color, frag_explosion_circle(u_gen_ctrl_map_cnt) );
+  // final_color = blend_color_add( final_color, frag_explosion_circle(scale_down, u_gen_ctrl_map_cnt) );
+  final_color = blend_color_add( final_color, frag_explosion_circle(scale_down) );
 `;
 
 export const frag_explosion_circle = `
@@ -287,7 +285,8 @@ export const frag_explosion_circle = `
 
 
 
-vec4 frag_explosion_circle(in float scale_down, inout int u_gen_ctrl_map_cnt)
+// vec4 frag_explosion_circle(in float scale_down, inout int u_gen_ctrl_map_cnt)
+vec4 frag_explosion_circle(in float scale_down)
 {
   #ifdef A_TIME
     float a_time = v_time;
@@ -297,20 +296,15 @@ vec4 frag_explosion_circle(in float scale_down, inout int u_gen_ctrl_map_cnt)
     float u_time = u_time_float;
   #endif
 
-  // #ifdef U_GENERIC_VEC3
-  //   #include <u_generic_vec3>
-  // #elif defined(U_GENERIC_VEC2)
-  //   #include <u_generic_vec2>
-  // #elif defined(U_GENERIC_FLOAT)
-  //   #include <u_generic_float>
-  // #endif
 
-
-  float smoothstep_outer = u_generic_controls[u_gen_ctrl_map_cnt++];
-  // float ringDiameter = 1.5*v_generic2_x; // The smaller the value, the smaller the explosion ring.
-  float ringDiameter = u_generic_controls[u_gen_ctrl_map_cnt++] * 1.5; // The smaller the value, the smaller the explosion ring.
-  float intensity = u_generic_controls[u_gen_ctrl_map_cnt++];
-  float center_glow_start = u_generic_controls[u_gen_ctrl_map_cnt++]; // start: between 0-1; If start=0.8, then 0.8-1.0 will give a smaller center glow
+  // float smoothstep_outer = u_generic_controls[u_gen_ctrl_map_cnt++];
+  // float ringDiameter = u_generic_controls[u_gen_ctrl_map_cnt++] * 1.5; // The smaller the value, the smaller the explosion ring.
+  // float intensity = u_generic_controls[u_gen_ctrl_map_cnt++];
+  // float center_glow_start = u_generic_controls[u_gen_ctrl_map_cnt++]; // start: between 0-1; If start=0.8, then 0.8-1.0 will give a smaller center glow
+  float smoothstep_outer = 1.;
+  float ringDiameter = 1.5*v_generic2_x; // The smaller the value, the smaller the explosion ring.
+  float intensity = v_generic2_y;
+  float center_glow_start = .9; // start: between 0-1; If start=0.8, then 0.8-1.0 will give a smaller center glow
 
   vec2 res = u_screen_res;
   vec2 dim = vec2(v_dim2_x, v_dim2_y);

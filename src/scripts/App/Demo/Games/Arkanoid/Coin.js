@@ -114,7 +114,7 @@ class Coin {
    CreateGlowFx(x, y) {
 
       // Coin Glow effect mesh
-      const ring_diameter = 1.0, intensity = .01;
+      const ring_diameter = 1.0, intensity = .4;
       const coin_glow_fx_idx = Effects_create_explosion_circle(x + COIN_SIZE, y + COIN_SIZE, COIN_SIZE * 1.6, COIN_SIZE * 1.6, 0, 0, YELLOWR[9], ring_diameter, intensity)
       const coin_glow_fx = Effect_explosion_circle_get_mesh_byidx(coin_glow_fx_idx);
       this.glow_mesh = coin_glow_fx;

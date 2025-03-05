@@ -107,7 +107,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    /****************************************************************************************************************/
    // Create Particles Control Panel
 
-   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], BLACK, 'Emitter Window Panel', [0, 10, 2],);
+   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], TRANSPARENCY(GREY[1], .5), 'Emitter Window Panel', [0, 10, 2],);
    controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -168,13 +168,13 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
       controls_section.AddItem(panel);
 
       // Create label
-      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, PURPLEB[6], WHITE, [5, 5], _, _, _, _);
+      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, GREY[1], WHITE, [5, 5], _, _, _, _);
       label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       panel.AddItem(label);
 
-      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, PURPLEB[6], _);
+      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, GREY[1], _);
       // colorpicker_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       colorpicker_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 18);
       colorpicker_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -365,7 +365,7 @@ export function Demo_glow_particles_test_dif_shaders(x = 0, y = 0, root_widget =
    /****************************************************************************************************************/
    // Create Particles Control Panel
 
-   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], BLACK, 'Emitter Window Panel', [0, 10, 2],);
+   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], TRANSPARENCY(GREY[1], .5), 'Emitter Window Panel', [0, 10, 2],);
    // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -396,14 +396,14 @@ export function Demo_glow_particles_test_dif_shaders(x = 0, y = 0, root_widget =
       controls_section.AddItem(panel);
 
       // Create label
-      const label = Create_widget_label(_, 'Emitt', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, YELLOWR[8], WHITE, [5, 5], _, _, _, _);
+      const label = Create_widget_label(_, 'Emitt', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _,  GREY[1], WHITE, [5, 5], _, _, _, _);
       label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       panel.AddItem(label);
 
-      const emitt_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, YELLOWR[8], _);
+      const emitt_switch = Create_widget_switch_simple(_, [0, 0, 1], 18,  GREY[1], _);
       // emitt_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       emitt_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 18);
       emitt_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -428,14 +428,14 @@ export function Demo_glow_particles_test_dif_shaders(x = 0, y = 0, root_widget =
       controls_section.AddItem(panel);
 
       // Create label
-      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, PURPLEB[6], WHITE, [5, 5], _, _, _, _);
+      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _,  GREY[1], WHITE, [5, 5], _, _, _, _);
       label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       panel.AddItem(label);
 
-      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, PURPLEB[6], _);
+      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18,  GREY[1], _);
       // colorpicker_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       colorpicker_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       colorpicker_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -608,7 +608,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    /****************************************************************************************************************/
    // Create Particles Control Panel
 
-   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], BLACK, 'Emitter Window Panel', [0, 10, 2],);
+   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], TRANSPARENCY(GREY[1], .5), 'Emitter Window Panel', [0, 10, 2],);
    controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -660,13 +660,13 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
       controls_section.AddItem(panel);
 
       // Create label
-      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, PURPLEB[6], WHITE, [5, 5], _, _, _, _);
+      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, GREY[1], WHITE, [5, 5], _, _, _, _);
       label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       panel.AddItem(label);
 
-      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, PURPLEB[6], _);
+      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, GREY[1], _);
       colorpicker_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       colorpicker_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
@@ -1239,7 +1239,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    }
 
 
-   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], BLACK, 'Emitter Window Panel', [0, 10, 2],);
+   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], TRANSPARENCY(GREY[1], .5), 'Emitter Window Panel', [0, 10, 2],);
    // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -1258,14 +1258,14 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       controls_section.AddItem(panel);
 
       // Create label
-      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, PURPLE[3], WHITE, [5, 5], _, _, _, _);
+      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, GREY[1], WHITE, [5, 5], _, _, _, _);
       label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       panel.AddItem(label);
 
-      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, PURPLE[3], _);
+      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, GREY[1], _);
       // colorpicker_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       colorpicker_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       colorpicker_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -1975,7 +1975,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
    }
 
 
-   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], GREY[1], 'SliderSection', [0, 10, 2],);
+   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, 1], [0, 0], TRANSPARENCY(GREY[1], .5), 'SliderSection', [0, 10, 2],);
    // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -2059,14 +2059,14 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
       controls_section.AddItem(panel);
 
       // Create label
-      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, PURPLEB[6], WHITE, [5, 5], _, _, _, _);
+      const label = Create_widget_label(_, 'Colorpicker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, GREY[1], WHITE, [5, 5], _, _, _, _);
       label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       panel.AddItem(label);
 
-      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, PURPLEB[6], _);
+      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, GREY[1], _);
       // colorpicker_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       colorpicker_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 16);
       colorpicker_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);

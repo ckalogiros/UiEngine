@@ -148,7 +148,7 @@ export function Arkanoid_initialize_stages() {
       [a|o,___,c|o,d|o,___,b|o,c|o,___,d|i], // 11
       [c|i,___,c|o,d|o,___,b|o,c|o,___,b|o], // 12
       [c|o,___,c|l,d|o,___,b|o,c|o,___,b|o], // 13
-      [c|o,___,c|o,d|i,___,b|o,c|o,___,b|o], // 14
+      // [c|o,___,c|o,d|i,___,b|o,c|o,___,b|o], // 14
    ];
    const BRICKS_STAGE_2 = [
       [___,___,___,___,a|o,___,___,___,___], // 1
@@ -163,7 +163,7 @@ export function Arkanoid_initialize_stages() {
       [___,___,___,a|o,b|o,a|o,___,___,___], // 10
       [___,___,a|i,c|o,b|o,c|o,a|o,___,___], // 11
       [___,a|o,c|o,d|o,b|o,d|i,c|o,a|o,___], // 12
-      [a|o,c|o,d|o,d|o,b|o,d|o,d|i,c|o,a|o], // 13
+      // [a|o,c|o,d|o,d|o,b|o,d|o,d|i,c|o,a|o], // 13
    ];
    // const BRICKS_STAGE_1 = [
    //    [a|o,___,c|o,___,b|o,___,c|o,___,d|o], // 1
@@ -191,7 +191,7 @@ export function Arkanoid_initialize_stages() {
       [___,b|o,___,d|i,___,b|o,___,b|k,___], // 11
       [___,b|o,___,a|o,___,a|j,___,c|o,___], // 12
       [a|o,___,c|o,___,b|o,___,c|o,___,d|o], // 13
-      [a|o,___,c|o,___,b|o,___,c|o,___,d|o], // 14 
+      // [a|o,___,c|o,___,b|o,___,c|o,___,d|o], // 14 
    ];
 
    let cnt = 0;

@@ -20,11 +20,8 @@ export function Widget_ready_slider(root_widget = 0x0, x = 0, y = 0, initial_val
 
    const pos = [x, y, 0];
    const slider = Create_widget_slider(root_widget, pos, [size, 10], _, _, name);
-   // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   // slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    slider.SetInitialValue(initial_val);
@@ -46,30 +43,38 @@ export function Widget_ready_slider(root_widget = 0x0, x = 0, y = 0, initial_val
 
 
 
-export function Widget_ready_label(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
+export function Widget_ready_label(root_widget = 0x0, name = 'Label', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
 
    const pos = [x, y, 2];
-   const label = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, 1.), WHITE, [0, 0], .5, _, font,);
+
+   /********************************************************************************************************************************************************/
+   // Create
+   const label = Create_widget_label(root_widget, name, _, pos, font_size, color, WHITE, [10, 6], .5, _, font,);
+   // const label = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, 1.), WHITE, [0, 0], .5, _, font,);
    label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+   // label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
    // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
    // label.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
 
-   if (vb_groupidx !== INT_NULL) label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
-   else label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-   label.Render()
+   /********************************************************************************************************************************************************/
+   // Render
+   if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-   label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
-
-   if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(label);
-   Construct_listen_events_relations_from_mesh_tree(label);
+      if (vb_groupidx !== INT_NULL) label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
+      else label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+      label.Render()
+   
+      label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
+   
+      if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+      Construct_listen_events_from_mesh_tree(label);
+      Construct_listen_events_relations_from_mesh_tree(label);
+   }
 
    { // abilities
       // Shader_bit_flags_print_enabled_attributes(label.sid.attr, `ATTR:  ${label.GetName()}`)

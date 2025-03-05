@@ -24,7 +24,7 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } f
 // export class Widget_Label extends Rect {
 export class Widget_Label extends Rect_Mesh {
 
-    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = {rcorners:4, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = { rcorners: 4, feather: 2, border: 0 }, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
 
         const sdfouter = CalculateSdfOuterFromDim(fontSize);
         if (sdfouter + bold > 1) bold = 1 - sdfouter;
@@ -34,22 +34,24 @@ export class Widget_Label extends Rect_Mesh {
 
         // Create the text, to calculate its dimensions, then createthe label
         let text_mesh = null;
-        let dim = [0,0];
+        let dim = [0, 0];
 
-        if((font === TEXTURES.MSDF_COMIC_1024) || (font === TEXTURES.MSDF_CONSOLAS_1024)) {
+        if ((font === TEXTURES.MSDF_COMIC_1024) || (font === TEXTURES.MSDF_CONSOLAS_1024)) {
             text_mesh = Create_text_mesh_msdf(text, [0, 0, _pos[2]], fontSize, text_col, _, font, is_debug_mesh);
         }
         else {
             text_mesh = Create_text_mesh(text, [0, 0, _pos[2]], fontSize, text_col, _, font, is_debug_mesh);
         }
-        
+        text_mesh.StylesSetPad(pad);
+
         _pos[2] -= 1; // Set z for area 'behind' this.text_mesh
-        
+
         const dimentions = text_mesh.CalculateTextWidth();
         dim = [
-            dimentions.w + (pad[0] * 2),
-            // dimentions.h/2 + (pad[1] * 2),
-            dimentions.h + (pad[1] * 2),
+            // dimentions.w + (pad[0] * 2),
+            // dimentions.h + (pad[1] * 2),
+            dimentions.w + (pad[0]),
+            dimentions.h + (pad[1]),
         ];
 
 
@@ -61,7 +63,7 @@ export class Widget_Label extends Rect_Mesh {
 
         this.text_mesh = text_mesh;
 
-        const text_pos = ((ROOT_WIDGET_FLAGS&ROOT_WIDGETS.CREATE_ROOT)===0) ? [_pos[0], _pos[1]] : [0, 0]; // If label is NOT root, add the position offset to its text
+        const text_pos = ((ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) === 0) ? [_pos[0], _pos[1]] : [0, 0]; // If label is NOT root, add the position offset to its text
         Align_text_in_rect_parent(Align, this, text_pos)
 
 
@@ -174,7 +176,7 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+    GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
         if (this.gfx_ctx_parent === INT_NULL) {
 
@@ -186,10 +188,10 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+    GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
         if (this.gfx_ctx_parent === INT_NULL) { // Set for the first time, if gfx_ctx_parent=INT_NULL from initialization
-                
+
             this.gfx_ctx_flags |= FLAGS;
             this.gfx_ctx_parent = gfx_ctx_parent;
             this.text_mesh.gfx_ctx_flags |= FLAGS;
@@ -210,10 +212,10 @@ export class Widget_Label extends Rect_Mesh {
         if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
         this.gfx = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
-        
-        if (this.text_mesh.gfx_ctx_flags) 
+
+        if (this.text_mesh.gfx_ctx_flags)
             this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh);
-        else if (text_specific_vb_groupidx !== INT_NULL){
+        else if (text_specific_vb_groupidx !== INT_NULL) {
             this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
         }
         else {
@@ -291,6 +293,26 @@ export class Widget_Label extends Rect_Mesh {
 
     }
 
+    AlignNEW(pos_x, pos_y) {
+
+        const pad_x = this.StylesGetPad(STYLES.AXIS.X);
+        const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+        this.geom.pos[0] = pos_x + pad_x;
+        this.geom.pos[1] = pos_y + pad_y;
+
+        const text_pad_x = this.text_mesh.StylesGetPad(STYLES.AXIS.X);
+        const text_pad_y = this.text_mesh.StylesGetPad(STYLES.AXIS.Y);
+        this.text_mesh.geom.pos[0] = pos_x + pad_x + text_pad_x;
+        this.text_mesh.geom.pos[1] = pos_y + pad_y + text_pad_y;
+
+        return {
+            dim_x: this.geom.dim[0] + pad_x / 2,
+            dim_y: this.geom.dim[1] + pad_y / 2,
+            pad_x: pad_x / 2,
+            pad_y: pad_y / 2,
+        };
+    }
+
 
     /*******************************************************************************************************************************************************/
     // Transformations
@@ -304,7 +326,7 @@ export class Widget_Label extends Rect_Mesh {
 
     AddWposX(x) {
 
-        this.geom.AddWposX(this.gfx, x, );
+        this.geom.AddWposX(this.gfx, x,);
         this.text_mesh.AddWposX(x);
     }
 
@@ -312,9 +334,9 @@ export class Widget_Label extends Rect_Mesh {
     AddWposY(y) {
 
         this.geom.pos[1] += y;
-        this.geom.AddWposY(this.gfx, y, );
+        this.geom.AddWposY(this.gfx, y,);
         this.text_mesh.geom.pos[1] += y;
-        this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y, );
+        this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y,);
         // if(this.state.mask & MESH_STATE.ACTIVE) {
         //     this.geom.AddWposY(this.gfx, y, );
         // }
@@ -323,26 +345,26 @@ export class Widget_Label extends Rect_Mesh {
         //     this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y, );
         // }
     }
-    
+
 
     SetWposXY(x, y) {
         super.SetWposXY(x, y);
-        this.text_mesh.geom.pos[0] = x-this.text_mesh.text_width;
-        this.text_mesh.geom.pos[1] = y-this.text_mesh.text_height;
+        this.text_mesh.geom.pos[0] = x - this.text_mesh.text_width;
+        this.text_mesh.geom.pos[1] = y - this.text_mesh.text_height;
         this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y);
     }
-    
-    
+
+
     SetWposX(x) {
         super.SetWposX(x);
-        this.text_mesh.geom.pos[0] = x-this.text_mesh.text_width;
+        this.text_mesh.geom.pos[0] = x - this.text_mesh.text_width;
         this.text_mesh.geom.AddWposX(this.text_mesh.gfx, x);
     }
-    
-    
+
+
     SetWposY(y) {
         super.SetWposY(y);
-        this.text_mesh.geom.pos[1] = y-this.text_mesh.text_height;
+        this.text_mesh.geom.pos[1] = y - this.text_mesh.text_height;
         this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y);
     }
 
@@ -671,7 +693,7 @@ function Label_on_move_clbk(params) {
     }
     else { // Else update the label alone 
 
-        mesh.geom.AddWposXY( mesh.gfx, mouse_dif.x, -mouse_dif.y);
+        mesh.geom.AddWposXY(mesh.gfx, mouse_dif.x, -mouse_dif.y);
         mesh.text_mesh.geom.AddWposXY(mesh.text_mesh.gfx, mouse_dif.x, -mouse_dif.y);
     }
 

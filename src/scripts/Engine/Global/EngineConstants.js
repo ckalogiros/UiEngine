@@ -521,6 +521,24 @@ const ALIGN = {
 
 
 
+_CNT = 0x1;
+const ALIGN_2 = {
+
+	RESIZE_PARENT: _CNT,
+	HORIZONTAL: _CNT <<= 0x1,
+	VERTICAL: _CNT <<= 0x1,
+	RESIZE_SELF: _CNT <<= 0x1,
+	EXPAND: _CNT <<= 0x1,
+	PRESERVE_SELF_POS: _CNT <<= 0x1,
+}
+
+
+
+
+
+
+
+
 const POSITION_CENTER = [0, 0, 0];
 const TEMP_RESIZE_MARGIN = [15, 15];
 const POSSITIVE = 0;
@@ -1333,7 +1351,7 @@ const DEBUG = {
 	CORE: {
 		BUFFERS: {
 
-			GENERIC_ALLOCATIONS: true,
+			GENERIC_ALLOCATIONS: false,
 			CHARACTER_ALLOCATIONS: false,
 			INT32_ALLOCATIONS: false,
 			INT16_ALLOCATIONS: false,

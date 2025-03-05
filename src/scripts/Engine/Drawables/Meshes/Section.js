@@ -658,6 +658,27 @@ export class Section extends Mesh {
 
 
    /*******************************************************************************************************************************************************/
+   // Align
+   /*******************************************************************************************************************************************************/
+   AlignNEW(pos_x, pos_y) {
+
+      const pad_x = this.StylesGetPad(STYLES.AXIS.X);
+      const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+
+      this.geom.pos[0] = pos_x;
+      this.geom.pos[1] = pos_y;
+
+      return {
+         dim_x: 0,
+         dim_y: 0,
+         pad_x: pad_x / 2,
+         pad_y: pad_y / 2,
+      };
+   }
+
+
+
+   /*******************************************************************************************************************************************************/
    // Transformations
    /*******************************************************************************************************************************************************/
 
@@ -1132,13 +1153,7 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
 
          const marg = mesh.StylesGetMargin();
          const pad = mesh.StylesGetPad();
-
-         // IMPORTANT: margin is to increase the PARENTS size, padd is for the mesh position inside parent
-
-
          let cur_align = 0x0
-
-         // if(mesh.temp_align) opt // TODO: Copy align from mesh. So we need to add .Vertical/.Horizontal and remove .Vertical/.Horizontal from opt, cause the options and the .temp_align are not the same
 
          if (mesh.type & MESH_TYPE.WIDGET_MENU_BAR) {
             if ((mesh.options & SECTION.INHERIT) === 0) opt = mesh.options;
@@ -1177,40 +1192,17 @@ export function Calculate_sizes_recursive(parent, options, target_child_idx, rec
 
                if ((mesh.options & SECTION.INHERIT) === 0) opt = mesh.options;
 
-               // console.error('RECURSION', mesh.GetName())
-               // if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) === 0) Calculate_sizes_recursive(mesh, opt, _, recur_cnt++); // Recurse if child mesh is of type of Section
                Calculate_sizes_recursive(mesh, opt, _, recur_cnt++); // Recurse if child mesh is of type of Section
 
                if ((mesh.options & SECTION.INHERIT) === 0) opt = parent.options; // Roll back to the options
 
-
-               // if ((mesh.type & MESH_TYPE.WIDGET_SCROLLER) === 0) 
-               // {
-               // if (mesh.scroller_comp !== null) {
-
-               // mesh.geom.dim[0] = mesh.max_size[0];
-               // mesh.geom.dim[1] = mesh.scroller_comp.geom.dim[1];
-               // parent.min_size[1] = mesh.scroller_comp.geom.dim[1];
-
-
+               mesh.geom.dim[0] = mesh.max_size[0];
+               mesh.geom.dim[1] = mesh.max_size[1];
                // Update mesh's default dim
-               // mesh.geom.defDim[0] = mesh.max_size[0];
-               // mesh.geom.defDim[1] = mesh.scroller_comp.geom.dim[1];
-               // }
-               // else 
-               {
+               mesh.geom.defDim[0] = mesh.max_size[0];
+               mesh.geom.defDim[1] = mesh.max_size[1];
 
-                  mesh.geom.dim[0] = mesh.max_size[0];
-                  mesh.geom.dim[1] = mesh.max_size[1];
-
-
-                  // Update mesh's default dim
-                  mesh.geom.defDim[0] = mesh.max_size[0];
-                  mesh.geom.defDim[1] = mesh.max_size[1];
-
-                  mesh.SectionSetPad(); // Must not update for scrollers 
-               }
-
+               mesh.SectionSetPad(); // Must not update for scrollers 
 
                if (opt & SECTION.VERTICAL) {
                   if ((parent.options & SECTION.FIXED_W) === 0 && parent.max_size[0] < mesh.geom.dim[0])

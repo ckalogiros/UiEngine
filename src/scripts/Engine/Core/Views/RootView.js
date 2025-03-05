@@ -37,7 +37,7 @@ export function Root_group_buffer_reset_dealocate() {
 
    for (let i = 0; i <= root_group_view_buffer.boundary; i++) {
       const group = root_group_view_buffer.buffer[i];
-      Free_int16_buffer(group);
+      if(group) Free_int16_buffer(group);
    }
    root_group_view_buffer.ResetFull();
 }
@@ -46,7 +46,7 @@ export function Root_group_gfx_buffer_reset_dealocate() {
 
    for (let i = 0; i <= _root_vbidx_buffer.boundary; i++) {
       const group = _root_vbidx_buffer.buffer[i];
-      Free_int8_buffer(group);
+      if(group) Free_int8_buffer(group);
    }
    _root_vbidx_buffer.ResetFull();
 }
@@ -697,12 +697,12 @@ export function Root_group_destroy_meshes_buffer_alocations() {
    for (let i = 0; i <= root_group_view_buffer.boundary; i++) {
 
       const root = root_group_view_buffer.buffer[i];
-      for (let i = 0; i <= root.boundary; i++) {
 
-         const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
-         // if(mesh) 
-         mesh.DestroyAlocatedBuffers();
-         // if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if(root) {
+         for (let i = 0; i <= root.boundary; i++) {
+            const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
+            if(mesh) mesh.DestroyAlocatedBuffers();
+         }
       }
    }
 }

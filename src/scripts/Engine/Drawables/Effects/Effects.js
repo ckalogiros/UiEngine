@@ -66,8 +66,7 @@ class Effect_Mesh_Explosion_Circle {
       mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
       
       // TODO: Remove uniform. Attribute is anabled
-      // mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
+      // mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
       
       // Render
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
@@ -82,9 +81,10 @@ class Effect_Mesh_Explosion_Circle {
       
       // Initialize generic uniforms, only once(first mesh initialization)
       if(vb_groupidx===INT_NULL) {
-         // mesh.GfxUniformSetAndUpdate('u_generic_vec3', [1, 1.3, .02]);
-         // mesh.GfxUniformSetAndUpdate('u_generic_vec3', [1, 0, 0]);
-         mesh.GfxUniformSetAndUpdate('u_generic_controls', [1, 0, 0]);
+         // mesh.GfxUniformSetAndUpdate('u_generic_vec3', [1, .5, .2]);
+         // mesh.GfxUniformSetAndUpdate('u_generic_controls', [1, 0, 0]);
+         // mesh.GfxUniformSetAndUpdate('u_generic_controls', [1, ring_diameter, intensity]);
+         // mesh.GfxUniformSetAndUpdate('u_generic_controls', [1, 1, 1]);
          Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
       }
       

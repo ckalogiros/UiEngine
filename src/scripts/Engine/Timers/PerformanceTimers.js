@@ -282,5 +282,13 @@ export function Performance_timers_init_all() {
       const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest2');
       PERFORMANCE_TIMERS_IDXS.MiscTest2 = idx;
    }
+   {
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest3');
+      PERFORMANCE_TIMERS_IDXS.MiscTest3 = idx;
+   }
+   {
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'MiscTest4');
+      PERFORMANCE_TIMERS_IDXS.MiscTest4 = idx;
+   }
 }
 

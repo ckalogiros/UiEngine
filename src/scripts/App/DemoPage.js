@@ -6,12 +6,12 @@ import { View_build_group_from_root_mesh } from "../Engine/Core/Views/MeshBuffer
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static, Debug_info_ui_static_app_generic_buffers_container, Debug_info_ui_static_app_generic_buffers, Debug_info_ui_static_app_int8_buffers, Debug_info_ui_static_app_int16_buffers } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { BLUEL, GREEN, GREENR, GREY, ORANGER, TRANSPARENT, WHITE, YELLOW } from "../Engine/Drawables/Material/Base/Colors.js";
+import { BLUEL, GREEN, GREENR, GREY, ORANGER, PURPLEB, PURPLER, TRANSPARENT, WHITE, YELLOW, YELLOWR } from "../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_set_root_in_focus } from "../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
-import { Renderqueue_set_active } from "../Engine/Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_set_active, Renderqueue_set_priority_by_program, Renderqueue_set_priority_by_vb } from "../Engine/Renderers/Renderer/RenderQueue.js";
 import { Scene_camera_scroll_add, Scene_camera_scroll_set } from "../Engine/Scenes.js";
 import { Vertex_buffer_group_create_scissorbox } from "../Graphics/Buffers/VertexBuffers.js";
 import { Abs } from "../Helpers/Math/MathOperations.js";
@@ -274,11 +274,11 @@ Explore the demos and discover the possibilities!`;
 // export function Demo_page(create_demo_id = category_widgets.id) {
 // export function Demo_page(create_demo_id = subcategory_glow.id) {
 // export function Demo_page(create_demo_id = subcategory_animations1.id) {
-export function Demo_page(create_demo_id = subcategory_animations_button.id) {
+// export function Demo_page(create_demo_id = subcategory_animations_button.id) {
    // export function Demo_page(create_demo_id = subcategory_animations_text.id) {
    // export function Demo_page(create_demo_id = subcategory_snake.id) {
    // export function Demo_page(create_demo_id = subcategory_comet.id) {
-   // export function Demo_page(create_demo_id = subcategory_arkanoid.id) {
+   export function Demo_page(create_demo_id = subcategory_arkanoid.id) {
 
    let comet_particles_struct = null;
    let glow_particles_struct = null;
@@ -430,7 +430,7 @@ export function Demo_page(create_demo_id = subcategory_animations_button.id) {
    // Particles
    else if (create_demo_id & (category_particles.id | subcategory_comet.id)) { // Demo Particles - Ball tail particles 
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_particles_demo, subcategory_comet.id, window_menu);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_particles_demo, subcategory_comet.id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       comet_particles_struct = Create_comet_particles(0, total_height, _, _, 1, ROOT_WIDGETS.CREATE_ROOT, false);
@@ -441,21 +441,25 @@ export function Demo_page(create_demo_id = subcategory_animations_button.id) {
          comet_particles_struct.controls_section.push(comet_glow_contols[i]);
       }
 
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
    }
    else if (create_demo_id & subcategory_glow.id) { // Demo Particles - Glow particles 
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_particles_demo, create_demo_id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_particles_demo, create_demo_id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
-      glow_particles_struct = Create_glow_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, 1);
+      glow_particles_struct = Create_glow_particles(0, total_height+150, ROOT_WIDGETS.CREATE_ROOT, false, 1);
       // emitter, scale_down, color = GREY[2], parameters=null, u_scale_create=false, generic_contols_parameters=null
       glow_particles_struct.controls_section = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, glow_slider_values, true, glow_generic_controls_parameters);
 
 
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
    }
    else if (create_demo_id & subcategory_explosion.id) { // Demo Particles - Glow particles 
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_particles_demo, create_demo_id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_particles_demo, create_demo_id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       explosion_particles_struct = Create_explosion_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, 256);
@@ -464,47 +468,57 @@ export function Demo_page(create_demo_id = subcategory_animations_button.id) {
       explosion_particles_struct.controls_section = Create_glow_particles_controls(explosion_particles_struct.emitter, .2, _, explosion_slider_values, true, explosion_generic_controls_parameters);
 
 
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
    }
    else if (create_demo_id & subcategory_smoke.id) { // Demos Particles - Smoke particles
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_particles_demo, create_demo_id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_particles_demo, create_demo_id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       smoke_particles_struct = Create_smoke_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false);
       Create_smoke_particles_controls(smoke_particles_struct.emitter, _, smoke_slider_values_transform_parameters, _);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
    }
    /*****************************************************************************************************************************/
    // Physics
    else if (create_demo_id & (category_physics.id | subcategory_elastic_collisions.id)) { // Demos Physics
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, subcategory_elastic_collisions.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, subcategory_elastic_collisions.id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       ellastic_collisions_struct = Elastic_collisions(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, false);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    else if (create_demo_id & subcategory_perimetric_rotation.id) { // Demos Physics
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, create_demo_id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, create_demo_id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       total_height += Sattelite_rotation(0, total_height);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    else if (create_demo_id & subcategory_velocity_verlet.id) { // Demos Physics - Chain link
 
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, create_demo_id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_physics_demo, create_demo_id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       Demo_chain_link(_, total_height);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    /*****************************************************************************************************************************/
    // Animations
    else if (create_demo_id & (category_animations.id | subcategory_animations_button.id)) { // Demos Physics - Chain link
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations_button.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations_button.id, BLUEL[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       // const panel1 = Demo_animations_ready_button_anim(ROOT_WIDGETS.CREATE_ROOT, 20, total_height, CALLBACK_ANIMATION_TYPE_FLAGS.SCALE, 'Scale Animation');
@@ -514,6 +528,8 @@ export function Demo_page(create_demo_id = subcategory_animations_button.id) {
 
       const panel = Demo_animations_ready_button_with_panel(ROOT_WIDGETS.CREATE_ROOT, 20, total_height);
       total_height += panel.geom.dim[1];
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    else if (create_demo_id & (subcategory_animations1.id)) { // Demos Physics - Chain link
@@ -527,64 +543,76 @@ export function Demo_page(create_demo_id = subcategory_animations_button.id) {
        * Instead, we call Reset from the App, that deals with all structures,
        * except from the generic,int32-16-8 buffers 
        */
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations1.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations1.id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       total_height += Demo_animations(0, total_height);
       total_height += 20;
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    else if (create_demo_id & (subcategory_animations2.id)) { // Demos Physics - Chain link
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations2.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations2.id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       Demo_animations_with_slider_slope(0, total_height);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    else if (create_demo_id & (subcategory_animations_text.id)) { // Demos Physics - Chain link
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations_text.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_animations_text.id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       animations_text_struct = Demo_animations_text(0, total_height, false);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    else if (create_demo_id & (subcategory_rotating_rects.id)) { // Demos Physics - Snake
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_rotating_rects.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_animations_demo, subcategory_rotating_rects.id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       Board_rotations(0, total_height, ROOT_WIDGETS.CREATE_ROOT);
 
       total_height += 20;
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    /*****************************************************************************************************************************/
    // In Practise
    else if (create_demo_id & (category_in_practise.id | subcategory_snake.id)) { // Demos Physics - Snake
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_snake.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_snake.id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       snake_struct = Game_snake(total_height, false);
       total_height += 20;
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    else if (create_demo_id & (subcategory_tetris.id)) { // Demos Physics - Snake
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_tetris.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_tetris.id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       Tetris_reset();
       Tetris(ROOT_WIDGETS.CREATE_ROOT, 0, total_height, true, subcategory_tetris.id);
 
       total_height += 20;
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
    else if (create_demo_id & (subcategory_arkanoid.id)) { // Demos Physics - Snake
 
-      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_arkanoid.id);
+      const secondary_menu = Create_menu_horizontal_buttons(_, total_height, Create_menu_items_in_practise_demo, subcategory_arkanoid.id, YELLOWR[6]);
       total_height += secondary_menu.geom.dim[1] * 2 + 10; // Space for the debug_info ui
 
       // Tetris_reset();
@@ -594,6 +622,8 @@ export function Demo_page(create_demo_id = subcategory_animations_button.id) {
       Arkanoid_initialize();
 
       total_height += 20;
+      // Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
+      // Renderqueue_set_priority_by_vb(LAST, secondary_menu.children.buffer[0].text_mesh.gfx.vb.groupidx);
 
    }
 
@@ -831,7 +861,7 @@ function Create_menu_popup(params) {
 
 
 /**This is a generic function for creating this type of menu. The menu items are created from a callback function passed in 'params' from the caller function */
-function Create_menu_horizontal_buttons(x = 0, y = 0, Create_menu_items_callback, demo_id, parent_menu) {
+function Create_menu_horizontal_buttons(x = 0, y = 0, Create_menu_items_callback, demo_id, btn_col=WHITE) {
 
 
    const dim = [
@@ -841,7 +871,7 @@ function Create_menu_horizontal_buttons(x = 0, y = 0, Create_menu_items_callback
 
    let zpos = 10;
 
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 10], [0, 0], TRANSPARENCY(YELLOW[9], .9), 'section',);
+   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 10], [0, 0], TRANSPARENCY(GREY[1], .6), 'section',);
    menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -849,7 +879,9 @@ function Create_menu_horizontal_buttons(x = 0, y = 0, Create_menu_items_callback
    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    menu_panel.SetName('HorizontalMenuLoadPanel');
 
-   menu_panel.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+   // menu_panel.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+   // menu_panel.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT | SECTION.EXPAND;
+   menu_panel.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
 
    zpos++;
 
@@ -863,6 +895,8 @@ function Create_menu_horizontal_buttons(x = 0, y = 0, Create_menu_items_callback
    const params = {
 
       menu_panel: menu_panel, // A pointer to the future created menu panel
+      btn_col: btn_col,
+      text_col: GREY[1],
       mnemonics: { demo_id: demo_id, }, // Remember variable values between different pages
    };
    const menu_items = Create_menu_items_callback(params, demo_id);
@@ -1327,8 +1361,10 @@ function Create_menu_items_demos(params) {
    const feather = 2;
    const rcorners = 8;
    const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
-   const text_col = WHITE;
-   const btn_col = TRANSPARENCY(GREY[1], .8);
+   // const text_col = WHITE;
+   const text_col = params.text_col;
+   // const btn_col = TRANSPARENCY(GREY[1], .8);
+   const btn_col = params.btn_col;
 
 
    /*******************************************************************************************/
@@ -1429,13 +1465,14 @@ function Create_menu_items_particles_demo(params, demo_id) {
    const feather = 2;
    const rcorners = 8;
    const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
-   const text_col = WHITE;
-
+   // const text_col = WHITE;
+   const text_col = params.text_col;
+   const btn_col = params.btn_col;
 
 
    /*******************************************************************************************/
    // Item 1 button
-   const c1 = (demo_id & subcategory_comet.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c1 = (demo_id & subcategory_comet.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item1_btn = Create_widget_button(_, subcategory_comet.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
    item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1449,7 +1486,7 @@ function Create_menu_items_particles_demo(params, demo_id) {
 
    /*******************************************************************************************/
    // Item 2 button
-   const c2 = (demo_id & subcategory_glow.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c2 = (demo_id & subcategory_glow.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item2_btn = Create_widget_button(_, subcategory_glow.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1462,7 +1499,7 @@ function Create_menu_items_particles_demo(params, demo_id) {
 
    /*******************************************************************************************/
    // Item 2 button
-   const c3 = (demo_id & subcategory_explosion.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c3 = (demo_id & subcategory_explosion.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item3_btn = Create_widget_button(_, subcategory_explosion.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
    item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1475,7 +1512,7 @@ function Create_menu_items_particles_demo(params, demo_id) {
 
    /*******************************************************************************************/
    //  Item 3 button
-   const c4 = (demo_id & subcategory_smoke.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c4 = (demo_id & subcategory_smoke.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item4_btn = Create_widget_button(_, subcategory_smoke.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c4, text_col, [15, 8], .5, _, font);
    item4_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item4_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1503,13 +1540,14 @@ function Create_menu_items_physics_demo(params, demo_id) {
    const feather = 2;
    const rcorners = 8;
    const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
-   const text_col = WHITE;
-
+   // const text_col = WHITE;
+   const text_col = params.text_col;
+   const btn_col = params.btn_col;
 
 
    /*******************************************************************************************/
    // Item 1 button
-   const c1 = (demo_id & subcategory_elastic_collisions.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c1 = (demo_id & subcategory_elastic_collisions.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item1_btn = Create_widget_button(_, subcategory_elastic_collisions.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
    item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1522,7 +1560,7 @@ function Create_menu_items_physics_demo(params, demo_id) {
 
    /*******************************************************************************************/
    // Item 2 button
-   const c2 = (demo_id & subcategory_perimetric_rotation.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c2 = (demo_id & subcategory_perimetric_rotation.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item2_btn = Create_widget_button(_, subcategory_perimetric_rotation.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1535,7 +1573,7 @@ function Create_menu_items_physics_demo(params, demo_id) {
 
    /*******************************************************************************************/
    //  Item 3 button
-   const c3 = (demo_id & subcategory_velocity_verlet.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c3 = (demo_id & subcategory_velocity_verlet.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item3_btn = Create_widget_button(_, subcategory_velocity_verlet.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
    item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1565,12 +1603,14 @@ function Create_menu_items_animations_demo(params, demo_id) {
    const feather = 2;
    const rcorners = 8;
    const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
-   const text_col = WHITE;
+   // const text_col = WHITE;
+   const text_col = params.text_col;
+   const btn_col = params.btn_col;
 
 
    /*******************************************************************************************/
    // Item 5 button
-   const c5 = (demo_id & subcategory_animations_button.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c5 = (demo_id & subcategory_animations_button.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item5_btn = Create_widget_button(_, subcategory_animations_button.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c5, text_col, [15, 8], .5, _, font);
    item5_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item5_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1582,7 +1622,7 @@ function Create_menu_items_animations_demo(params, demo_id) {
 
    /*******************************************************************************************/
    // Item 1 button
-   const c1 = (demo_id & subcategory_animations1.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c1 = (demo_id & subcategory_animations1.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item1_btn = Create_widget_button(_, subcategory_animations1.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
    item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1594,7 +1634,7 @@ function Create_menu_items_animations_demo(params, demo_id) {
 
    /*******************************************************************************************/
    // Item 1 button
-   const c2 = (demo_id & subcategory_animations2.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c2 = (demo_id & subcategory_animations2.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item2_btn = Create_widget_button(_, subcategory_animations2.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1606,7 +1646,7 @@ function Create_menu_items_animations_demo(params, demo_id) {
 
    /*******************************************************************************************/
    // Item 3 button
-   const c3 = (demo_id & subcategory_animations_text.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c3 = (demo_id & subcategory_animations_text.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item3_btn = Create_widget_button(_, subcategory_animations_text.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
    item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1618,7 +1658,7 @@ function Create_menu_items_animations_demo(params, demo_id) {
 
    /*******************************************************************************************/
    // Item 4 button
-   const c4 = (demo_id & subcategory_rotating_rects.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c4 = (demo_id & subcategory_rotating_rects.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item4_btn = Create_widget_button(_, subcategory_rotating_rects.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c4, text_col, [15, 8], .5, _, font);
    item4_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item4_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1650,13 +1690,14 @@ function Create_menu_items_in_practise_demo(params, demo_id) {
    const rcorners = 8;
    // const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
    const font = TEXTURES.CONSOLAS_16px;
-   const text_col = WHITE;
-
+   // const text_col = WHITE;
+   const text_col = params.text_col;
+   const btn_col = params.btn_col;
 
 
    /*******************************************************************************************/
    // Item 1 button
-   const c1 = (demo_id & subcategory_snake.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c1 = (demo_id & subcategory_snake.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item1_btn = Create_widget_button(_, subcategory_snake.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
    item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1668,7 +1709,7 @@ function Create_menu_items_in_practise_demo(params, demo_id) {
 
    /*******************************************************************************************/
    // Item 2 button
-   const c2 = (demo_id & subcategory_tetris.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c2 = (demo_id & subcategory_tetris.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item2_btn = Create_widget_button(_, subcategory_tetris.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1680,7 +1721,7 @@ function Create_menu_items_in_practise_demo(params, demo_id) {
 
    /*******************************************************************************************/
    // Item 3 button
-   const c3 = (demo_id & subcategory_arkanoid.id) ? TRANSPARENCY(GREY[1], .4) : TRANSPARENCY(GREY[1], 1.);
+   const c3 = (demo_id & subcategory_arkanoid.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
    const item3_btn = Create_widget_button(_, subcategory_arkanoid.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
    item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
