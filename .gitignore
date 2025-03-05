@@ -17,3 +17,4 @@ src/scripts/Helpers/ignore/*
 build
 node_modules
 resources/ignore/*
+.snowpack
