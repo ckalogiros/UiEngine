@@ -528,6 +528,9 @@ const ALIGN_2 = {
 	HORIZONTAL: _CNT <<= 0x1,
 	VERTICAL: _CNT <<= 0x1,
 	RESIZE_SELF: _CNT <<= 0x1,
+	FIXED_WIDTH: _CNT <<= 0x1,
+	FIXED_HEIGHT: _CNT <<= 0x1,
+	FLOAT_RIGHT: _CNT <<= 0x1,
 	EXPAND: _CNT <<= 0x1,
 	PRESERVE_SELF_POS: _CNT <<= 0x1,
 }
@@ -796,6 +799,7 @@ const RESOURCES_PATH = '/resources';
 let g_cnt = 0;
 const TEXTURE_TYPE = {
 	TYPE_FONT: 0x1,
+	TYPE_FONT_SYMBOL: 0x1,
 	TYPE_TEXTURE: 0x2,
 };
 
@@ -826,6 +830,7 @@ const TEST_MSDF_FONT_1 = 'msdf_a_char';
 const TEXTURE_SMOKE1 = 'smoke';
 const TEXTURE_COIN = 'Coin_1_64x64';
 const TEXTURE_TEST_APPLE = 'apple1_64x73';
+const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
 
 
 
@@ -921,6 +926,12 @@ const TEXTURE_PATHS = [
 		imgType: 'png',
 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
+	{ // 14
+		imgPath: 'fonts/symbol_fonts/test_symbol_fonts',
+		imgName: TEXTURE_LEFT_ARROW,
+		imgType: 'png',
+		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
+	},
 	/***************************************************************************************************/
 	// Textures
 	{
@@ -941,6 +952,12 @@ const TEXTURE_PATHS = [
 		imgType: 'png',
 		metrics: null, 
 	},
+	// {
+	// 	imgPath: 'textures',
+	// 	imgName: TEXTURE_LEFT_ARROW,
+	// 	imgType: 'png',
+	// 	metrics: null, 
+	// },
 ];
 
 
@@ -972,15 +989,16 @@ const TEXTURES = {
 	MSDF_CONSOLAS_1024: g_cnt++,
 	MSDF_COMIC_1024: g_cnt++,
 	FONT_COUNT: g_cnt,
-
+	ARROW_LEFT:g_cnt++, 
+	
 	// IS_MSDF: 0x0, 
 	DEFAULT_FONT: 0x0, 
-
+	
 	// Image Textures
 	SMOKE_1:g_cnt++, // g_cnt must be the index of the element in 'TEXTURE_PATHS'. // TODO: Either create the 'TEXTURE_PATHS' element at g_cnt OR set the g_cnt equual to the index this texture represents
 	COIN:g_cnt++, 
 	TEST_APPLE:g_cnt++, 
-
+	
 	COUNT: g_cnt,
 }
 
@@ -992,7 +1010,8 @@ TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_16px;
 function FONT_IS_MSDF(texture_id) {
 	if(
 		texture_id === TEXTURES.MSDF_COMIC_1024 ||
-		texture_id === TEXTURES.MSDF_CONSOLAS_1024
+		texture_id === TEXTURES.MSDF_CONSOLAS_1024 ||
+		texture_id === TEXTURES.ARROW_LEFT
 	) return true;
 
 	return false;
@@ -1112,6 +1131,7 @@ const MESH_TYPE = {
 
 	MATERIAL: _CNT <<= 1,
 	FONT_MATERIAL: _CNT <<= 1,
+	FONT_SYMBOL_MATERIAL: _CNT <<= 1,
 	TEXTURE_MATERIAL: _CNT <<= 1,
 
 	MESH: _CNT <<= 1,
@@ -1371,7 +1391,7 @@ const DEBUG = {
 	// Graphics
 	WEB_GL: false,
 	SHADER_INFO: false,
-	SHADERS: true,
+	SHADERS: false,
 
 	BINDING_FUNCTIONS: false,
 

@@ -6,7 +6,7 @@ import { Listener_change_child_event, Listener_create_child_event, Listener_remo
 import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh } from "../../../Core/MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_store } from "../../../Core/StringBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
-import { Styles_create, Styles_remove_byidx, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set } from "../../../Styles.js";
+import { Styles_create, Styles_remove_byidx, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set, Styles_pad_x_set, Styles_pad_y_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from "../../../Core/MeshUniformsBuffer.js";
 import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_group_remove_scissorbox } from "../../../../Graphics/Buffers/VertexBuffers.js";
@@ -58,7 +58,8 @@ export class Mesh {
     gfx_ctx_flags;     // BitField: Help on choosing the gfx buffers conditionaly 
     gfx_ctx_parent;     // Value: The index of the parent from which to start search mesh tree for finding gfx context 
     
-    align_flags;     // BitField: Flags for alignment, of type: 
+    // align_flags;     // BitField: Flags for alignment, of type: 
+    align;           // Struct: Variables to define mesh's alignment
 
 
 
@@ -179,7 +180,16 @@ export class Mesh {
         this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL];
         this.nameidx = INT_NULL;
         
-        this.align_flags = 0x0;
+        // this.align_flags = 0x0;
+        this.align = {
+            flags:0x0, // SEE: ALIGN_2 constant
+            pad_x:0,
+            pad_y:0,
+            margin_x:0,
+            margin_y:0,
+            margin_y:0,
+            row:0, // Value of the current meshe's row. Set by Align_ functions, based on mesh's .VERTICAL align flag.
+        };
 
         this.parent = null;
 
@@ -697,6 +707,8 @@ export class Mesh {
 
 
     StylesSetPad(pad) { Styles_pad_set(this.styles, pad); }
+    StylesSetPadX(pad_x) { Styles_pad_x_set(this.styles, pad_x); }
+    StylesSetPadY(pad_y) { Styles_pad_y_set(this.styles, pad_y); }
 
 
     SetUpdateFrameBuffer() {

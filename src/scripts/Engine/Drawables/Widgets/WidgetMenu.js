@@ -38,6 +38,7 @@ export class Widget_Menu_Bar extends Section {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = { rcorners: 5, feather: 2, border: 0 }, num_faces, is_debug_mesh) {
 
       const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, col, text_col, _, _, _, _, is_debug_mesh);
+      label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
       // const dim = [label.GetMaxWidth(), 10];

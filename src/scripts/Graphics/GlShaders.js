@@ -108,7 +108,7 @@ function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 
 	const success = gl.validateProgram(shader_program);
 	const msg = (success === undefined) ? 'Success!' : success;
-	console.log('Validate program', msg);
+	if(DEBUG.SHADERS) console.log('Validate program', msg);
 	
 	// Bind attribute locations before linking the program
 	// Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid);
@@ -118,13 +118,13 @@ function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 
 	const status = gl.getProgramParameter(shader_program, gl.LINK_STATUS);
 	if (!status) {
-		console.error('Unable to LINK the shader program: ' + gl.getProgramInfoLog(shader_program));
+		if(DEBUG.SHADERS) console.error('Unable to LINK the shader program: ' + gl.getProgramInfoLog(shader_program));
 		gl.deleteProgram(shader_program);
 		shader_program = null;
 		return null;
 	} 
 	else {
-		console.log('Shaders Linked Successfully!\n status:', msg);
+		if(DEBUG.SHADERS) console.log('Shaders Linked Successfully!\n status:', msg);
 	}
 
 	return shader_program;
@@ -145,7 +145,7 @@ function Load_shader(gl, shaderType, source, type) {
 		gl.deleteShader(shader);
 		return null;
 	} 
-	else console.log('Shader Compiled Successfully!');
+	else if(DEBUG.SHADERS) console.log('Shader Compiled Successfully!');
 
 	return shader;
 }

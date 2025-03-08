@@ -17,7 +17,7 @@ import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
 import { Mesh_create_style_from_values } from '../../Engine/Drawables/Operations/MeshHelperFunctions.js';
 import { Widget_msdf_text_with_scale_slider } from '../Widgets/ReadyWidgets.js';
 import { Renderqueue_set_priority_by_vb } from '../../Engine/Renderers/Renderer/RenderQueue.js';
-import { Align_pre_simple } from '../Tests.js';
+import { Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
 
 
 
@@ -693,7 +693,7 @@ nested layouts with well-aligned items.\
    root_s.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    root_s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    root_s.SetName('Demo_widgets_sections');
-   root_s.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   root_s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) root_s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
@@ -713,74 +713,74 @@ nested layouts with well-aligned items.\
    l1_s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    l1_s.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l1_s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    l1_s.SetName('Section l1_s');
-   l1_s.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   l1_s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    root_s.AddItem(l1_s);
    
    
    const l1_s1 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], min_size, TRANSPARENCY(GREY[2], tr));
    l1_s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    l1_s1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l1_s1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
-   l1_s1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   l1_s1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    l1_s.AddItem(l1_s1);
    {
       {
          const l1_s3 = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
          l1_s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         l1_s3.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+         l1_s3.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
          l1_s3.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l1_s3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l1_s1.AddItem(l1_s3);
          const red111 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(YELLOWL[9], tr));
          red111.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         red111.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+         red111.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
          red111.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); red111.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l1_s3.AddItem(red111);
          const yel_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(YELLOWR[9], tr));
          yel_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         yel_1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+         yel_1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
          yel_1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); yel_1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l1_s3.AddItem(yel_1);
       }
       {
          const l4_s1 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
          l4_s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         l4_s1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+         l4_s1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
          l4_s1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l4_s1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l1_s1.AddItem(l4_s1);
          const purp12 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLE[7], tr));
          purp12.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         purp12.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+         purp12.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
          purp12.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); purp12.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l4_s1.AddItem(purp12);
          const blue13 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(BLUEL[9], tr));
          blue13.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         blue13.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+         blue13.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
          blue13.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); blue13.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l4_s1.AddItem(blue13);
          const green14 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(GREEN[7], tr));
          green14.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         green14.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+         green14.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
          green14.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); green14.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l4_s1.AddItem(green14);
       }
       {
          const l4_s1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
          l4_s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         l4_s1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+         l4_s1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
          l4_s1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l4_s1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l1_s1.AddItem(l4_s1);
          const purp12 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLE[7], tr));
          purp12.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         purp12.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+         purp12.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
          purp12.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); purp12.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l4_s1.AddItem(purp12);
          const blue13 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(BLUEL[9], tr));
          blue13.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         blue13.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+         blue13.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
          blue13.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); blue13.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l4_s1.AddItem(blue13);
          const green14 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(GREEN[7], tr));
          green14.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         green14.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+         green14.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
          green14.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); green14.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
          l4_s1.AddItem(green14);
       }
@@ -789,38 +789,38 @@ nested layouts with well-aligned items.\
 
    // const l1_s2 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], min_size, TRANSPARENCY(GREY[2], tr));
    // l1_s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   // l1_s2.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   // l1_s2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    // l1_s2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l1_s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    // l1_s.AddItem(l1_s2);
    // {
    //    const l1_s3 = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
    //    l1_s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    l1_s3.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    l1_s3.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    l1_s3.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l1_s3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s2.AddItem(l1_s3);
    //    const purp12 = Create_widget_section(_, SECTION.HORIZONTAL, [13, 21], [0, 0, 0], min_size, TRANSPARENCY(PURPLE[7], tr));
    //    purp12.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    purp12.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    purp12.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    purp12.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); purp12.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(purp12);
    //    const blue13 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(BLUEL[9], tr));
    //    blue13.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    blue13.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    blue13.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    blue13.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); blue13.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(blue13);
    //    const red_4 = Create_widget_section(_, SECTION.VERTICAL, [30, 14], [0, 0, 0], min_size, TRANSPARENCY(PURPLER[7], tr));
    //    red_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    red_4.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    red_4.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    red_4.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); red_4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(red_4);
    //    const green14 = Create_widget_section(_, SECTION.VERTICAL, [20, 20], [0, 0, 0], min_size, TRANSPARENCY(GREEN[7], tr));
    //    green14.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    green14.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    green14.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    green14.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); green14.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(green14);
    //    const yel_2 = Create_widget_section(_, SECTION.VERTICAL, [25, 10], [0, 0, 0], min_size, TRANSPARENCY(YELLOWR[8], tr));
    //    yel_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    yel_2.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    yel_2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    yel_2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); yel_2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(yel_2);
    // }
@@ -828,47 +828,47 @@ nested layouts with well-aligned items.\
    // {
    //    const l1_s3 = Create_widget_section(_, SECTION.VERTICAL, [12, 12], [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
    //    l1_s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    l1_s3.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    l1_s3.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    l1_s3.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l1_s3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s2.AddItem(l1_s3);
    //    const purp12 = Create_widget_section(_, SECTION.HORIZONTAL, [14, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLE[7], tr));
    //    purp12.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    purp12.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    purp12.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    purp12.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); purp12.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(purp12);
    //    const blue13 = Create_widget_section(_, SECTION.HORIZONTAL, [14, 10], [0, 0, 0], min_size, TRANSPARENCY(BLUEL[9], tr));
    //    blue13.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    blue13.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    blue13.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    blue13.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); blue13.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(blue13);
    //    const green14 = Create_widget_section(_, SECTION.VERTICAL, [14, 10], [0, 0, 0], min_size, TRANSPARENCY(GREEN[7], tr));
    //    green14.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    green14.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    green14.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    green14.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); green14.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(green14);
    //    const yel_2 = Create_widget_section(_, SECTION.VERTICAL, [14, 10], [0, 0, 0], min_size, TRANSPARENCY(YELLOWR[8], tr));
    //    yel_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    yel_2.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    yel_2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    yel_2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); yel_2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(yel_2);
    //    const red_4 = Create_widget_section(_, SECTION.VERTICAL, [14, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLER[7], tr));
    //    red_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    red_4.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    red_4.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    red_4.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); red_4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(red_4);
    //    const yel_4 = Create_widget_section(_, SECTION.VERTICAL, [14, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLEB[9], tr));
    //    yel_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    yel_4.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    yel_4.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    yel_4.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); yel_4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(yel_4);
    //    const ora_4 = Create_widget_section(_, SECTION.VERTICAL, [14, 10], [0, 0, 0], min_size, TRANSPARENCY(ORANGEL[8], tr));
    //    ora_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    ora_4.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    ora_4.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    ora_4.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); ora_4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(ora_4);
    //    const yel = Create_widget_section(_, SECTION.VERTICAL, [14, 10], [0, 0, 0], min_size, TRANSPARENCY(YELLOW[8], tr));
    //    yel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    yel.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //    yel.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //    yel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); yel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s3.AddItem(yel);
    // }
@@ -876,14 +876,14 @@ nested layouts with well-aligned items.\
 
    // const l1_s3 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(GREY[2], tr));
    // l1_s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   // l1_s3.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   // l1_s3.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    // l1_s3.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l1_s3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    // l1_s.AddItem(l1_s3);
    // {
    //    {
    //       const l2_s1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(GREY[3], tr));
    //       l2_s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //       l2_s1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //       l2_s1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //       l2_s1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l2_s1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //       l1_s3.AddItem(l2_s1);
    //       {
@@ -891,24 +891,24 @@ nested layouts with well-aligned items.\
 
    //             const gry1_1 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(ORANGEL[9], tr));
    //             gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //             gry1_1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //             gry1_1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //             gry1_1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); gry1_1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //             l2_s1.AddItem(gry1_1);
    //             {
 
    //                const _0 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[8], tr));
    //                _0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _0.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //                _0.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //                _0.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _0.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_0);
    //                const _1 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[6], tr));
    //                _1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //                _1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //                _1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_1);
    //                const _2 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
    //                _2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _2.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //                _2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //                _2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_2);
    //             }
@@ -917,24 +917,24 @@ nested layouts with well-aligned items.\
 
    //             const gry1_1 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(GREENL[7], tr));
    //             gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //             gry1_1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //             gry1_1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //             gry1_1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); gry1_1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //             l2_s1.AddItem(gry1_1);
    //             {
 
    //                const _0 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[5], tr));
    //                _0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _0.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //                _0.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //                _0.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _0.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_0);
    //                const _1 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[3], tr));
    //                _1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //                _1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //                _1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_1);
    //                const _2 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[1], tr));
    //                _2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _2.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //                _2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //                _2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_2);
    //             }
@@ -945,7 +945,7 @@ nested layouts with well-aligned items.\
    //    {
    //       const l2_s1 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(GREY[4], tr));
    //       l2_s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //       l2_s1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //       l2_s1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //       l2_s1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l2_s1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //       l1_s3.AddItem(l2_s1);
    //       {
@@ -953,24 +953,24 @@ nested layouts with well-aligned items.\
 
    //             const gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLER[8], tr));
    //             gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //             gry1_1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //             gry1_1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //             gry1_1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); gry1_1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //             l2_s1.AddItem(gry1_1);
    //             {
 
    //                const _0 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[9], tr));
    //                _0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _0.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //                _0.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //                _0.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _0.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_0);
    //                const _1 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[7], tr));
    //                _1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //                _1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //                _1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_1);
    //                const _2 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[5], tr));
    //                _2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _2.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //                _2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //                _2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_2);
    //             }
@@ -979,24 +979,24 @@ nested layouts with well-aligned items.\
 
    //             const gry1_1 = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], min_size, TRANSPARENCY(PURPLEB[9], tr));
    //             gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //             gry1_1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //             gry1_1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //             gry1_1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); gry1_1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //             l2_s1.AddItem(gry1_1);
    //             {
 
    //                const _0 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[3], tr));
    //                _0.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _0.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //                _0.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //                _0.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _0.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_0);
    //                const _1 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[6], tr));
    //                _1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _1.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //                _1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //                _1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_1);
    //                const _2 = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, TRANSPARENCY(GREY[9], tr));
    //                _2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //                _2.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   //                _2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    //                _2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); _2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //                gry1_1.AddItem(_2);
    //             }
@@ -1008,56 +1008,56 @@ nested layouts with well-aligned items.\
 
    // const l1_s4 = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(GREY[2], tr));
    // l1_s4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   // l1_s4.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   // l1_s4.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    // l1_s4.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l1_s4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    // l1_s.AddItem(l1_s4);
    // {
    //    const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, RED[9]);
    //    r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s4.AddItem(r);
    //    const rg = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[9]);
    //    rg.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    rg.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    rg.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    rg.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); rg.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s4.AddItem(rg);
    //    const g = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, GREEN[9]);
    //    g.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    g.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    g.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    g.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); g.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s4.AddItem(g);
    //    const gb = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, CYAN[9]);
    //    gb.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    gb.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    gb.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    gb.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); gb.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s4.AddItem(gb);
    //    const b = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, BLUE[9]);
    //    b.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    b.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    b.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    b.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); b.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s4.AddItem(b);
    //    const br = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, MAGENTA);
-   //    br.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   //    br.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    //    br.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); br.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    //    l1_s4.AddItem(br);
    // }
    // const l1_s5 = Create_widget_section(_, SECTION.VERTICAL, [15, 15], [0, 0, 0], min_size, TRANSPARENCY(GREY[2], tr));
    // l1_s5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   // l1_s5.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   // l1_s5.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
    // l1_s5.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); l1_s5.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
    // l1_s.AddItem(l1_s5);
    // {
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[0]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[1]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[2]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[3]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[4]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[5]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[6]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[7]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[8]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
-   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[9]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align_flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[0]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[1]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[2]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[3]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[4]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[5]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[6]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[7]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[8]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
+   //    { const r = Create_widget_section(_, SECTION.VERTICAL, min_size, [0, 0, 0], min_size, YELLOW[9]); r.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); r.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; r.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD); r.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners); l1_s5.AddItem(r); }
    // }
 
 

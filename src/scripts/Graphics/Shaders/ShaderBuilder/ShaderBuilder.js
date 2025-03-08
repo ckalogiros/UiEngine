@@ -112,7 +112,7 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
 
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name};\n`;
-         console.log('<<<<<<<<<<<<<<< VERTEX SHADER UNIFORM ENABLE:', _uniforms_info[i].name)
+         if(DEBUG.SHADERS) console.log('<<<<<<<<<<<<<<< VERTEX SHADER UNIFORM ENABLE:', _uniforms_info[i].name)
       }
       else if ((_uniforms_info[i].shader & UNIFORM.IN_FS) && (which_shader & UNIFORM.IN_FS)) {
 
@@ -120,7 +120,7 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          const arr_extra = (_uniforms_info[i].type === UNIF_TYPE.FARR) ? `[${_uniforms_info[i].arr_size}]` : '';
          uniforms_code += `uniform ${type} ${_uniforms_info[i].name}${arr_extra};\n`;
-         console.log('<<<<<<<<<<<<<<< FRAGMENT SHADER UNIFORM ENABLE:', _uniforms_info[i].name)
+         if(DEBUG.SHADERS) console.log('<<<<<<<<<<<<<<< FRAGMENT SHADER UNIFORM ENABLE:', _uniforms_info[i].name)
       }
    }
 
@@ -226,8 +226,8 @@ function Resolve_generic_uniforms_count(shader_code) {
    // const file_size = shader_code.length;
    let word_position = Find_field_by_name(shader_code, word, 0, 0);
    
-   console.log(word_position);
-   for(let i=word_position.start; i<word_position.start+word_position.len; i++) console.log(shader_code[i]);
+   if(DEBUG.SHADERS) console.log(word_position);
+   if(DEBUG.SHADERS) for(let i=word_position.start; i<word_position.start+word_position.len; i++) console.log(shader_code[i]);
    
    
    
@@ -236,13 +236,13 @@ function Resolve_generic_uniforms_count(shader_code) {
       
       uniform_count++;
       word_position = Find_field_by_name(shader_code, word, word_position.line, word_position.end );
-      console.log(word_position);
-      for(let i=word_position.start; i<word_position.start+word_position.len; i++) console.log(shader_code[i]);
+      if(DEBUG.SHADERS) console.log(word_position);
+      if(DEBUG.SHADERS) for(let i=word_position.start; i<word_position.start+word_position.len; i++) console.log(shader_code[i]);
 
       file_completed = word_position.len; // Break if the returned word len is 0
    }
 
-   console.log('uniform_count', uniform_count);
+   if(DEBUG.SHADERS) console.log('uniform_count', uniform_count);
 
    return uniform_count;
 }
@@ -262,17 +262,8 @@ function Resolve_function_operations_called_from_main(shader_ops=null) {
 
    for (let i = 0; i < len; i++) {
 
-      if(shader_ops[i]===_)
-         console.log()
-
       const fn_op = shader_ops[i].fn_op;
       const blend_mode = shader_ops[i].blend_mode;
-
-
-
-      // if(blend_mode & SID.BLEND_OPTIONS.BLEND_MODE_MIX) {
-      //    enable_param
-      // }
 
 
       if(fn_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW){
@@ -544,7 +535,7 @@ function Vertex_shader_resolve_attributes_in(sid) {
    loc[loc_idx].attrib_data_on_different_vb = false;
    loc[loc_idx].is_instanced_buffer = true;
 
-   console.log('----------------------------------------------------------------------------------------------------------------------------------------------')
+   if(DEBUG.SHADERS) console.log('----------------------------------------------------------------------------------------------------------------------------------------------')
 
    // TODO: Create separate for for constructing the pass attribute in_name and out_name
    /**
@@ -723,7 +714,7 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
 
    // DEBUG-PRINT
-   console.log('{{{{{{{{{{ PROGRAMS ATTRIBUTES }}}}}}}}}}', '\n attribs_info', attribs_info, '\n attribs_indexing', prog_attribs_indexing.PrintEnabled())
+   if(DEBUG.SHADERS) console.log('{{{{{{{{{{ PROGRAMS ATTRIBUTES }}}}}}}}}}', '\n attribs_info', attribs_info, '\n attribs_indexing', prog_attribs_indexing.PrintEnabled())
    // console.log('{{{{{{{{{{ PROGRAMS LOC INDEXING }}}}}}}}}}\n  prog_attribs_indexing', prog_attribs_indexing);
 
    return {

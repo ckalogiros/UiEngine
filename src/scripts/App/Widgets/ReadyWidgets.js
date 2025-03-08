@@ -43,13 +43,13 @@ export function Widget_ready_slider(root_widget = 0x0, x = 0, y = 0, initial_val
 
 
 
-export function Widget_ready_label(root_widget = 0x0, name = 'Label', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
+export function Widget_ready_label(root_widget = 0x0, name = 'Label', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, inner_pad=[10, 6], color_text=WHITE) {
 
    const pos = [x, y, 2];
 
    /********************************************************************************************************************************************************/
    // Create
-   const label = Create_widget_label(root_widget, name, _, pos, font_size, color, WHITE, [10, 6], .5, _, font,);
+   const label = Create_widget_label(root_widget, name, _, pos, font_size, color, color_text, inner_pad, .5, _, font,);
    // const label = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, 1.), WHITE, [0, 0], .5, _, font,);
    label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);

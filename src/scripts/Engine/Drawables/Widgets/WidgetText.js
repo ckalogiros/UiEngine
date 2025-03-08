@@ -310,8 +310,6 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	// NOTE: The Text_Mesh and Textured_Mesh classes don't have an AddItem() method.
-	// TODO: Maybe add one ????
 	AddChild(text_mesh) {
 
 		text_mesh.idx = this.children.Add(text_mesh);

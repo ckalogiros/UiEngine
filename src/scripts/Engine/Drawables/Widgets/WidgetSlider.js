@@ -1024,19 +1024,19 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
    AlignAddFlags(MASK = 0x0) {
 
-      this.align_flags |= MASK;
+      this.align.flags |= MASK;
 
       const bar = this.children.buffer[this.bar_idx];
-      bar.align_flags |= MASK;
+      bar.align.flags |= MASK;
 
       const name_text = this.text_mesh;
-      name_text.align_flags |= MASK;
+      name_text.align.flags |= MASK;
 
       const handle = bar.children.buffer[0];
-      handle.align_flags |= MASK;
+      handle.align.flags |= MASK;
 
       const value_text = this.children.buffer[this.value_text_idx];
-      value_text.align_flags |= MASK;
+      value_text.align.flags |= MASK;
 
    }
 

@@ -182,6 +182,40 @@ export class Material_Font extends Material {
    }
 }
 
+
+
+
+export class Material_Font_Symbol extends Material {
+
+
+   constructor(col = [1, 1, 1, 1], textureid = INT_NULL, text = '', sdf_params = [.5, .5]) {
+
+      super(col, textureid);
+
+      this.sdf_params = [0, 0];
+      math.CopyArr2(this.sdf_params, sdf_params);
+      
+      this.sid.attr |= SID.ATTR.TEX2; // 
+      this.sid.pass |= SID.PASS.TEX2; //
+      if(FONT_IS_MSDF(textureid)) {
+         this.sid.attr |= SID.ATTR.MSDF; // 
+      } 
+      this.type |= MESH_TYPE.FONT_SYMBOL_MATERIAL;
+      
+      // Load texture and uv map, via indexes to the actual buffers
+      const texture = Texture_load_texture_byid(this.textureid, texture_type.TYPE_FONT);
+      this.texidx = texture.webGl_texture_idx;
+      this.fontidx = texture.fontidx;
+      this.textureid = textureid;
+
+
+      { // Debug
+         /**DEBUG*/if (DEBUG.MATERIAL && this.texidx === INT_NULL) console.error('Texture Index is NULL')
+         /**DEBUG*/if (DEBUG.MATERIAL && this.fontidx=== INT_NULL) console.error('Uvs Index is NULL')
+      }
+   }
+}
+
 /**
  * If texture is an atlas imported from the engine,
  *    we should have metrics for it, so we get the uvs from it's metrics storage.
@@ -199,7 +233,14 @@ export class Material_Texture extends Material {
       this.sid.pass |= SID.PASS.TEX2;
       this.type |= MESH_TYPE.TEXTURE_MATERIAL;
 
-      const texture = Texture_load_texture_byid(textureid, TEXTURE_TYPE.TYPE_TEXTURE);
+      let texture_type = TEXTURE_TYPE.TYPE_TEXTURE; // Initialize to comon texture
+      
+      if(FONT_IS_MSDF(textureid)) {
+         this.sid.attr |= SID.ATTR.MSDF; // 
+         texture_type = TEXTURE_TYPE.TYPE_FONT_SYMBOL; // Case texture is type of font symbol with metrics
+      } 
+
+      const texture = Texture_load_texture_byid(textureid, texture_type);
       this.texidx = texture.webGl_texture_idx;
       this.textureId = textureid;
       // NOTE: Simple texture does not have a uvmap

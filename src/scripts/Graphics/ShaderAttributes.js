@@ -7,7 +7,7 @@ import { Shader_Attributes } from "./ShaderBitFlags.js";
 
 
 const DISABLE_DEBUG = true;
-const DEBUG_IFO = false;
+const DEBUG_INFO = false;
 
 
 
@@ -170,7 +170,7 @@ export function Shader_attributes_create(attribs_info) {
       attribs_loc:attribs_info.attribs_loc,
    });
 
-   console.log('--- Shader Attributes ---', _shader_attribs_buffer.buffer[idx])
+   if(DEBUG.SHADERS) console.log('--- Shader Attributes ---', _shader_attribs_buffer.buffer[idx])
 
    return idx;
 
@@ -231,8 +231,8 @@ export function Vertex_buffer_create_attribs_info_per_vb_instanced(attribsidx, s
 /**WITH PARAM attribs_info from create vertex buffer*/
 export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_info, vbidx) {
 
-   if(DEBUG_IFO) console.log('-------------------------------------------------------------------------')
-      if(DEBUG_IFO) console.log('VERTEX ATTRIBUTES ENABLE')
+   if(DEBUG_INFO) console.log('-------------------------------------------------------------------------')
+      if(DEBUG_INFO) console.log('VERTEX ATTRIBUTES ENABLE')
    
    const gl_type = gfxCtx.gl.FLOAT; // TODO: store the gl.type inside the shaderinfo???
 
@@ -261,7 +261,7 @@ export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_in
       gfxCtx.gl.vertexAttribPointer(location, size, gl_type, false, stride * FLOAT32_BYTE_SIZE, offset * FLOAT32_BYTE_SIZE);
       gfxCtx.gl.vertexAttribDivisor(location, attribs_divisor);
 
-      if(DEBUG_IFO) console.log(
+      if(DEBUG_INFO) console.log(
          'loc', location,
          'size', size,
          'offset', offset,

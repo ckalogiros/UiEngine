@@ -1,5 +1,4 @@
 "use strict";
-import { comic_sans_ms_gras } from '../../../../../resources/fonts/comic_sans_ms/metrics/comicsansmsgras.js';
 import { comic_sans_cz } from '../../../../../resources/fonts/comic_sans_ms/comicz.js';
 import { CONSOLAS_40Hpx } from '../../../../../resources/fonts/consolas_10/metrics/consolas_10.js';
 import { CONSOLAS_49Hpx } from '../../../../../resources/fonts/consolas_12/metrics/consolas_12.js';
@@ -15,7 +14,7 @@ import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metric
 import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
 import { consola_msdf_test_1024_metrics } from '../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js';
 import { Load_msdf_font_metrics_new } from './ChlumskyFontMetricsLoader.js';
-import { CONSOLAS_MSDF_FONT_METRICS } from '../../../../../resources/fonts/consolas_sdf/consola_msdf__metrics_temp.js';
+import { arrow_left } from '../../../../../resources/fonts/symbol_fonts/test_symbol_fonts/arrow_left_256x256.js';
 
 
 
@@ -56,6 +55,7 @@ export function Font_texture_images_init_metrics_files() {
 	TEXTURE_PATHS[counter++].metrics = CONSOLAS_157Hpx;
 	TEXTURE_PATHS[counter++].metrics = consola_msdf_test_1024_metrics;
 	TEXTURE_PATHS[counter++].metrics = comic_sans_cz;
+	TEXTURE_PATHS[counter++].metrics = arrow_left;
 
 }
 
@@ -90,6 +90,7 @@ function Font_get_metrics_by_texid(texture_id){
       case TEXTURES.CONSOLAS_157px: return CONSOLAS_157Hpx;
       case TEXTURES.MSDF_CONSOLAS_1024: return consola_msdf_test_1024_metrics;
       case TEXTURES.MSDF_COMIC_1024: return comic_sans_cz;
+      case TEXTURES.ARROW_LEFT: return arrow_left;
       default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_id:', texture_id);
    }
 }
@@ -201,18 +202,9 @@ export function Font_metrics_calculate_width_from_text(str, font_idx){
 
 export function Font_load_uvs(textureid) {
 
-	// // Create new font metrics and uvmap
-	// const ret = Font_create_storage_buffer_font();
-
-	// const font_idx = _font_metrics_buffer.push(ret.metrics) -1;
+	// Create new font metrics and uvmap
 	const font_idx = _font_uvmaps_buffer.length;
 	_font_active_textures_buffer[textureid] = font_idx; // Update the 'active' fonts
-	
-	
-	
-	// const uvmap_idx = _font_uvmaps_buffer.push(ret.uvMap) -1;
-	
-
 	
 	
 	if(FONT_IS_MSDF(textureid)) {
@@ -220,7 +212,6 @@ export function Font_load_uvs(textureid) {
 		const msdf_metrics = Load_msdf_font_metrics_new(textureid);
 		_font_metrics_buffer[font_idx] = msdf_metrics;
 		_font_uvmaps_buffer[font_idx] =  msdf_metrics.uvmap
-		// Create_uv_map(font_idx);
 		
 		console.log(
 			'==========================================================================',
@@ -246,9 +237,6 @@ export function Font_load_uvs(textureid) {
 		Create_uv_map(font_idx);
 		
 	}
-	
-	// if(font_idx !== uvmap_idx) alert('6111282237 \nFont index and uvmap index must be equal.');
-
 	
 	return font_idx;
 }

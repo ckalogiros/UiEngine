@@ -484,7 +484,7 @@ export function Uniforms_block_buffer_create(sid, program, uniforms) {
          _uniform_blocks.buffer[0].AddLayout(gl, uniforms[i].type, UNIF_TYPE.ID, uniforms[i].name);
    }
 
-   console.log('---- Uniform Shared Block ----\n', _uniform_blocks)
+   if(DEBUG.SHADERS) console.log('---- Uniform Shared Block ----\n', _uniform_blocks)
 
    return ub_idx;
 

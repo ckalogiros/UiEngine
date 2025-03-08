@@ -88,13 +88,12 @@ export function Texture_get_texture_byidx(idx) {
 
 
 function Texture_is_loaded(textureid, TEX_TYPE) {
-
+	// TODO: Code below always returns i despite the TEX_TYPE
 	for (let i = 0; i < _textureBufferCount; i++) {
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) {
 			if (_textureBuffer[i] && _textureBuffer[i].textureid === textureid)
 				return i
 		}
-		// TODO: Maybe create a spesific to framebuffers TEXTURE_TYPE constant
 		else if (TEX_TYPE & TEXTURE_TYPE.TYPE_TEXTURE) {
 			if (_textureBuffer[i] && _textureBuffer[i].textureid === textureid)
 				return i
@@ -121,7 +120,7 @@ export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 		// Create webGl texture
 		webGl_texture_idx = Texture_create_texture(gfxCtx.gl, textureid, img, TEXTURE_PATHS[textureid].imgName);
 
-		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) {
+		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT || TEX_TYPE & TEXTURE_TYPE.TYPE_FONT_SYMBOL) {
 			fontidx = Font_load_uvs(textureid);
 		}
 	}

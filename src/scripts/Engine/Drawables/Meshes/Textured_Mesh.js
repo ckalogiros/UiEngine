@@ -6,7 +6,7 @@ import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js"
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
-import { Material_Texture } from "../Material/Base/Material.js";
+import { Material_Font_Symbol, Material_Texture } from "../Material/Base/Material.js";
 import { Check_intersection_point_rect } from "../Operations/Collisions.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
@@ -26,10 +26,6 @@ export class Textured_Mesh extends Mesh {
 
    }
 
-
-
-
-   
 
    SetTypeDebug() {
       this.type |= MESH_TYPE.DEBUG_MESH;
@@ -237,6 +233,217 @@ export class Textured_Mesh extends Mesh {
    // UNIQUE METHODS
    /****************************************************************************************************************************************************/
 }
+
+
+
+// export class Textured_Mesh_Msdf extends Mesh {
+
+//    constructor(pos = [0, 0, 0], dim, color = WHITE, textureid = INT_NULL, name = 'UNDEFINED_TEXTURED_MESH_NAME', is_debug_mesh) {
+
+//       const mat = new Material_Font_Symbol(color, textureid);
+//       const geom = new Geometry2D(pos, dim);
+
+//       super(geom, mat);
+//       this.SetName(name);
+//       this.type |= MESH_TYPE.TEXT_MESH | is_debug_mesh;
+
+//    }
+
+   
+//    SetTypeDebug() {
+//       this.type |= MESH_TYPE.DEBUG_MESH;
+//    }
+
+
+
+
+   
+//    /*******************************************************************************************************************************************************/
+//    // Graphics
+//    /*******************************************************************************************************************************************************/
+
+
+//    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
+
+//       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+
+//       return this.gfx;
+//    }
+
+
+//    AddToGfx() { // TODO: Should be named 'AddToGfx' like Rect_Mesh and Text_Mesh
+
+//       // Get the starting index of the text in the vertex buffer.
+//       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
+//       this.is_gfx_inserted = true;
+
+//       // Add entry to Gfx Buffer
+//       this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+
+//       return this.gfx;
+//    }
+
+
+//    AddToGfxFromReset() {
+
+//       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
+//       this.StateEnable(MESH_STATE.ACTIVE);
+//       this.is_gfx_inserted = true;
+
+//       // Add entry to Gfx Buffer
+//       this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+
+//    }
+
+
+//    UpdateGfx() {
+
+//       alert('Implement me\nUpdateGfx() @ Textured_Mesh_Msdf.js')
+
+//    }
+
+
+
+
+
+//    /*******************************************************************************************************************************************************/
+//    // Listeners
+//    /*******************************************************************************************************************************************************/
+
+//    ListenEventConstruct() {
+
+//       const mesh = this;
+
+//       if (mesh.state.mask & MESH_STATE.ACTIVE) {
+         
+//          // Construct HOVER event
+//          if (mesh.listeners.buffer[E.H] === INT_NULL) {
+//             mesh.AddListenEvent(E.H, null, null);
+//          }
+//          // Construct CLICK_UP/MOVE event
+//          if (mesh.listeners.buffer[E.C] === INT_NULL) {
+//             const evt_params = { target_mesh: mesh, };
+//             mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+//          }
+//       }
+
+//       return false;
+//    }
+
+
+//    OnClick(params) {
+//       alert('7123451 \n Implement me')
+
+//       const mesh = params.evt_params.target_mesh;
+//       const OnMoveFn = mesh.OnMove;
+
+//       const point = Mouse_get_pos();
+//       const g = mesh.geom;
+//       // TODO: Isn't the mesh already been checked for collision??????
+//       if (Check_intersection_point_rect(g.pos, g.dim, point, [0, 8])) {
+
+//          STATE.mesh.SetClicked(mesh);
+//          console.log('Clicked:', mesh.GetName())
+
+//          if (mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+
+//             /**
+//                * Create Move event.
+//                * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
+//                * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
+//             */
+//             const idx = Time_intervals_create(10, 'Move Textured_Mesh_Msdf', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
+//             console.log('Time interval idx:', idx)
+//             // mesh.timeIntervalsIdxBuffer.Add(idx);
+//             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+
+//             if (mesh.StateCheck(MESH_STATE.IS_GRABABLE)) {
+
+//                STATE.mesh.SetGrabed(mesh);
+//                STATE.mesh.SetFocused(mesh);
+//                mesh.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
+//                // Mesh_set_root_in_focus(mesh.root_bufferidx);
+//             }
+
+//          }
+//          return true;
+//       }
+//       return false;
+//    }
+
+
+//    // SEE ### OnMove Events Implementation Logic
+//    OnMove(params) {
+
+//       // The 'OnMove' function is called by the timeInterval.
+//       // The timeInterval has been set by the 'OnClick' event.
+//       const mesh = params.params;
+
+//       // Destroy the time interval and the Move operation, if the mesh is not grabed
+//       // MESH_STATE.IN_GRAB is deactivated upon mouse 'click up' in Events.js.
+//       if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+
+//          const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+//          Time_intervals_destroy_byidx(intervalIdx);
+//          mesh.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
+
+//          return;
+//       }
+
+//       // Move 
+//       const mouse_pos = Mouse_get_pos_dif();
+
+//       mesh.geom.AddWposXY( mesh.gfx, mouse_pos.x, -mouse_pos.y);
+
+//    }
+
+
+//    SetPosZNoGfxUpdate(z) {
+//       this.geom.pos[2] = z;
+//    }
+
+
+//    SetFrameBufferIdx(fbidx) {
+//       this.isFramebufferRendered = fbidx;
+//    }
+
+
+//    SetPosXNoGfxUpdate(x) {
+//       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+//          Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
+//       }
+//       else this.geom.pos[0] = x;
+//    }
+
+
+//    SetPosYNoGfxUpdate(y) {
+//       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+//          Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
+//       }
+//       else this.geom.pos[1] = y;
+//    }
+
+
+//    SetPosXYNoGfxUpdate(x, y) {
+//       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
+//          Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
+//       }
+//       else {
+//          this.geom.pos[0] = x;
+//          this.geom.pos[1] = y;
+//       }
+//    }
+
+
+
+
+
+
+//    /****************************************************************************************************************************************************/
+//    /****************************************************************************************************************************************************/
+//    // UNIQUE METHODS
+//    /****************************************************************************************************************************************************/
+// }
 
 
 
