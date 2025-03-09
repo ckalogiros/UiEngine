@@ -182,6 +182,7 @@ vec4 sdf_rect_color = vec4(.0);
 
 
 `;
+/** */
 const fs_op_sdf_rect = `
 /*** Operation sdf_rect ***/
 vec4 sdf_rect_color = vec4(.0);
@@ -250,158 +251,7 @@ float d = 0.0;
 
 
 `;
-/**SAVE-2 */
-// const fs_op_sdf_rect = `
-// /*** Operation sdf_rect ***/
-// vec4 sdf_rect_color = vec4(.0);
-// float c = 0.0;
-// float d = 0.0;
-// {
-
-//   // FOR TESTING
-//   scale_down = 1.0;
-//   scale_down *= u_generic_controls[u_gen_ctrl_map_cnt++];
-//   // FOR TESTING
-  
-//   local_res *= scale_down;
-//   // dim *= scale_down;
-//   vec2 rCorners = vec2(v_rcorners) * scale_down * .2;
-//   // vec2 rCorners = vec2(v_rcorners) ;
-
-//   float min_side = min(local_res.x, local_res.y);
-//   float max_side = max(local_res.x, local_res.y);
-//   // float ratio = max_side / min_side;
-//   float ratio = min_side/max_side;
-//   vec2 dimentions = vec2(local_res.x/min_side, local_res.y/min_side);
-//   // vec2 dimentions = vec2(local_res.x/local_res.x, local_res.y/local_res.x);
-//   // vec2 dimentions = vec2(local_res.x/local_res.y, local_res.y/local_res.y);
-  
-//   #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations
-//     #define UV_READY_MODEL_SPACE_0_1
-//     uv = gl_FragCoord.xy;
-//     uv.x -= v_wpos3_x;
-//     uv.y = u_screen_res.y - uv.y;
-//     uv.y -= v_wpos3_y;
-//     uv /= local_res; // -1 to 1 coords
-//     // uv /= dimentions; // -1 to 1 coords
-//     // uv.x *= ratio; // To calculate the distance for round corners
-//     uv.y *= -1.; // Reverse y coord. bottom:-1 up:1
-    
-//     // uv /= min_side; // -1 to 1 coords
-//     // uv.x *= ratio; // To calculate the distance for round corners
-//     // if(dimentions.x > dimentions.y) uv.x *= ratio * 1.;
-//     // if(dimentions.y > dimentions.x) uv.y *= ratio;
-//     // if(dimentions.x > dimentions.y) uv.y *= ratio * 1.;
-//     // if(dimentions.y > dimentions.x) uv.x *= ratio;
-//   #endif
-    
-
-//   vec2 abs_uv = abs(uv);
-
-//   float mod = u_generic_controls[u_gen_ctrl_map_cnt++];
-//   d = (length( max((abs_uv - (dimentions*u_generic_controls[u_gen_ctrl_map_cnt++])) + rCorners.x*mod, 0.0) ) - rCorners.x*mod);
-
-//   c = d;
-
-//   c = 1.-c;
-  
-//   vec3 color = vec3(c);
-//   sdf_rect_color = vec4(color, c) * src_color;
-
-//   final_color.a *= c;
-
-
-//   /***********************************************/
-//   // TEST
-//   vec2 uv_test = gl_FragCoord.xy;
-//   uv_test.x -= v_wpos3_x;
-//   uv_test.y = u_screen_res.y - uv_test.y;
-//   uv_test.y -= v_wpos3_y;
-//   uv_test /= dim;
-//   uv_test.y *= -1.; // Reverse y coord. bottom:-1 up:1
-//   if(abs(uv_test.x) > 1. * u_generic_controls[u_gen_ctrl_map_cnt++]) sdf_rect_color = RED;
-//   if(abs(uv_test.y) > 1.  * u_generic_controls[u_gen_ctrl_map_cnt++]) sdf_rect_color = BLUE;
-// }
-// /*** Operation sdf_rect End ***/
-
-
-// `;
-/**SAVE-OLD */
-// const fs_op_sdf_rect = `
-// /*** Operation sdf_rect ***/
-// vec4 sdf_rect_color = vec4(.0);
-// float c = 0.0;
-// float d = 0.0;
-// {
-
-//   // FOR TESTING
-//   scale_down *= u_generic_controls[u_gen_ctrl_map_cnt++];
-//   // int scale_dim_control = u_gen_ctrl_map_cnt++;
-//   // local_res *= u_generic_controls[scale_dim_control];
-//   // dim *= u_generic_controls[scale_dim_control];
-//   local_res *= scale_down;
-//   dim *= scale_down;
-//   // FOR TESTING
-  
-//   vec2 rCorners = vec2(v_rcorners) * scale_down;
-
-//   #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations
-//     #define UV_READY_MODEL_SPACE_0_1
-//     uv = gl_FragCoord.xy;
-//     uv.x -= v_wpos3_x;
-//     uv.y = u_screen_res.y - uv.y;
-//     uv.y -= v_wpos3_y;
-//     uv /= local_res; 
-//     float ratio = local_res.x / local_res.y;
-//     uv.x *= ratio;
-//     uv.y *= -1.; // Reverse y coord. bottom:-1 up:1
-//     rCorners /= local_res;
-//   #endif
-    
-//   // dim /= local_res; 
-//   dim = vec2(1.); 
-//   dim.x *= ratio;
-
-//   vec2 abs_uv = abs(uv);
-
-//   // rCorners.x = min(rCorners.y, min(dim.x, dim.y)); // Do not allow greater rounding than the min dimention
-//   rCorners.x = rCorners.y;
-
-//   // HERE : implement feather for all sizes and round corners
-//   // float feather = 0.02 * max(dim.x, dim.y);
-//   // float feather = (2. / (min(local_res.x, local_res.y))); // TEMPORARY, until feather is passed as attrib or calculated correctly
-//   // float feather = (.002 * (min(local_res.x, local_res.y))) * scale_down; // TEMPORARY, until feather is passed as attrib or calculated correctly
-//   // float feather = (.002 * (min(local_res.x, local_res.y)));
-//   // float feather = (.01 * (min(abs_uv.x- (dim.x * scale_down), abs_uv.y- (dim.y * scale_down))));
-//   // float feather = (.4 * (min((dim.x * scale_down), (dim.y * scale_down))));
-  
-//   // float feather = .4 * min(dim.x, dim.y);
-//   float feather = 1.0 - (.04 * max(dim.x, dim.y));
-//   // float feather = .02 * min(local_res.x, local_res.y);
-  
-//   // d = (length( max((abs_uv - (dim * scale_down)) + rCorners.x + feather, 0.0) ) - rCorners.x);
-//   d = (length( max((abs_uv - (dim)) + rCorners.x, 0.0) ) - rCorners.x);
-
-//   c = d;
-//   // c = smoothstep(.0, feather, c);
-//   // c = smoothstep(u_generic_controls[u_gen_ctrl_map_cnt++], u_generic_controls[u_gen_ctrl_map_cnt++], c);
-//   // c = smoothstep(.94, 1., c);
-//   // c = smoothstep(1.0-feather, 1.0, c);
-//   c = smoothstep(feather, 1.0, c);
-//   // c = smoothstep(.0, .06, c);
-
-//   c = 1.-c;
-  
-//   vec3 color = vec3(c);
-//   sdf_rect_color = vec4(color, c) * src_color;
-//   // sdf_rect_color = vec4(color, 1.) * src_color;
-
-//   final_color.a *= c;
-// }
-// /*** Operation sdf_rect End ***/
-
-
-// `;
+/** */
 const fs_op_outer_glow_rect = `
 /*** Operation outer_glow_rect ***/
 #ifndef INTERNAL_OUTER_GLOW_RECT // Use this effect many times over with different blending modes
@@ -504,8 +354,7 @@ const fs_op_outer_glow_rect = `
 
 
 // `;
-
-
+/** */
 const fs_op_inner_shadow_rect = `
 /*** Operation inner_shadow_rect ***/
   vec4 inner_shadow_rect_color = vec4(.0);
@@ -578,77 +427,7 @@ const fs_op_inner_shadow_rect = `
 
 
 `;
-// const fs_op_inner_shadow_rect = `
-// /*** Operation inner_shadow_rect ***/
-//   vec4 inner_shadow_rect_color = vec4(.0);
-//   {
-//     float control1 = u_generic_controls[u_gen_ctrl_map_cnt++];
-//     float control2 = u_generic_controls[u_gen_ctrl_map_cnt++];
-//     float control3 = u_generic_controls[u_gen_ctrl_map_cnt++];
-//     // float control4 = u_generic_controls[u_gen_ctrl_map_cnt++];
-//     // float control5 = u_generic_controls[u_gen_ctrl_map_cnt++];
-
-//     vec2 res = u_screen_res;
-//     vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
-//     vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
-
-//     uv = gl_FragCoord.xy;
-//     uv.x -= v_wpos3_x;
-//     uv.y = u_screen_res.y - uv.y;
-//     uv.y -= v_wpos3_y;
-//     uv *= scale_down; // Case that the object is scaled down
-
-//     uv.x += v_dim2_x;
-//     uv.y += v_dim2_y;
-//     uv /= local_res; 
-
-
-//     float repeatx = 1.;
-//     float repeaty = 1.;
-
-//     float mn = min(local_res.x,local_res.y);
-//     float mx = max(local_res.x,local_res.y);
-
-//     float ratio_max = mx / mn;
-//     float ratio_min = mn / mx;
-//     float ratio_inv = 1.-ratio_min;
-
-
-//     float c_hor = abs((fract(uv.x*repeatx) - .5)* 2.);
-//     float c_vert = abs((fract(uv.y*repeaty) - .5)* 2.);
-
-//     // TODO: Remove condition
-//     if(local_res.x > local_res.y) {
-//       c_hor = smoothstep(1.+(.4*ratio_min), ratio_inv, c_hor);
-//       c_vert = smoothstep(1.4, 0., c_vert);
-//     }
-//     else { 
-//       c_hor = smoothstep(1.4, .0, c_hor);
-//       c_vert = smoothstep(1.+(.4*ratio_min), ratio_inv, c_vert);
-//     }
-
-
-//   float cis = smoothmin(c_vert, c_hor, control1);
-
-
-//   float to_min=0., to_max=1., from_min=0., from_max=(control2);
-//   float factor = (cis - from_min) / (from_max - from_min);
-//   float result = to_min + factor * (to_max - to_min);
-
-//   result *= c;
-
-//   vec3 color = vec3(result);
-//   color = brightness_contrast(color, control3*.5, control3*2.);
-
-//   inner_shadow_rect_color = vec4(color*src_color.rgb, 0.);
-
-//   }
-// /*** Operation inner_shadow_rect End ***/
-
-
-// `;
-
-
+/** */
 const fs_op_flare = `
 /*** Operation Flare ***/
   // dim = vec2(v_dim2_x, v_dim2_y);
@@ -709,8 +488,7 @@ const fs_op_flare = `
 
 
 `;
-
-
+/** */
 const fs_op_bubble = `
 /*** Operation Bubble ***/
   // #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations
@@ -735,8 +513,7 @@ const fs_op_bubble = `
 
 
 `;
-
-
+/** */
 const fs_op_simple_glow = `
 /*** Operation simple-glow End ***/
   // #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations
@@ -773,8 +550,7 @@ const fs_op_simple_glow = `
 
 
 `;
-
-
+/** */
 const fs_op_simple_glow2 = `
 /*** Operation simple-glow-2 End ***/
   // #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations
@@ -816,8 +592,7 @@ const fs_op_simple_glow2 = `
 
 
 `;
-
-
+/** */
 const fs_op_simple_glow2_rect = `
 /*** Operation simple-glow-2-rect End ***/
 // #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations
@@ -874,8 +649,7 @@ vec4 simple_glow2_rect_color = vec4(.0);
 
 
 `;
-
-
+/** */
 const fs_op_inner_shadow_circle = `
 /*** Operation inner-shadow-circle ***/
   // #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations
@@ -910,9 +684,7 @@ const fs_op_inner_shadow_circle = `
 
 
 `;
-
-
-
+/** */
 const fs_op_inner_specular_circle = `
 /*** Operation inner-specular-circle ***/
   // #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations
@@ -946,8 +718,7 @@ const fs_op_inner_specular_circle = `
 
 
 `;
-
-
+/** */
 const fs_op_outer_shadow_rect = `
 /*** Operation inner-shadow-rect-filled ***/
 
@@ -1059,6 +830,7 @@ const fs_op_outer_shadow_rect = `
 
 // `;
 /** */
+/** */
 const fs_op_inner_shadow_rect_filled = `
 /*** Operation inner-shadow-rect-filled ***/
 /*** Operation inner-shadow-rect-filled ***/
@@ -1115,9 +887,7 @@ vec4 inner_shadow_rect_filled_color = vec4(.0);
 
 
 `;
-
-
-
+/** */
 const fs_op_distance_rect_filled = `
 /*** Operation distance-rect-filled ***/
   #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations

@@ -282,7 +282,6 @@ export function Align_pre_simple(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
          if (cur_mesh.align.flags & ALIGN_2.VERTICAL) row_mesh++;
          cur_mesh.align.row = row_mesh;
 
-         // HERE: we need to pass widgets's position, but the FLOAT_RIGHT needs the dimention of the widget to be subtracted from parent dimx
          if ((cur_mesh.align.flags & ALIGN_2.FLOAT_RIGHT) && mesh.align.flags & ALIGN_2.FIXED_WIDTH) {
 
             const pos_x = Find_last_right_aligned_child_from_parent(cur_pos_x, mesh, cur_mesh, cur_pad_x, pad_x);
@@ -653,10 +652,9 @@ export function Test_alignment_nested_2(x = 50, y = 50) {
                { const label = Widget_ready_label(_, `1`, _, 0, 0, 14, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.VERTICAL; s.AddItem(label); }
                { const label = Widget_ready_label(_, `1`, _, 0, 0, 14, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.VERTICAL; s.AddItem(label); }
             }
-            { // HERE: Activating another section in horizontal, breaks the y-axis alignment 
+            {  
                const s = Create_section_t1(s1, YELLOWR[3], `Y${yellow_cnt++}`, ALIGN_2.HORIZONTAL, pad);
                { const label = Widget_ready_label(_, `1`, _, 0, 0, 14, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.HORIZONTAL; s.AddItem(label); }
-               // { const label = Widget_ready_label(_, `1`, _, 0, 0, 14, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.VERTICAL; s.AddItem(label); }
             }
             {
                const s = Create_section_t1(s1, YELLOWR[3], `Y${yellow_cnt++}`, ALIGN_2.VERTICAL, pad);

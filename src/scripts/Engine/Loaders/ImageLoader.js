@@ -3,9 +3,9 @@
 
 export class ImageLoader{
 
-   static Load(imgPath, imgName, imgType){
+   static Load(img_path, img_name, img_type){
       const image = new Image();
-      const src = `${RESOURCES_PATH}/${imgPath}/${imgName}.${imgType}`;
+      const src = `${RESOURCES_PATH}/${img_path}/${img_name}.${img_type}`;
       image.src = src;
       return image;
    }

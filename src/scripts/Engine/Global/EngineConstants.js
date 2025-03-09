@@ -881,119 +881,119 @@ const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
 // const TEXTURE_PATHS = [
 
 // 	{ // 0
-// 		imgPath: 'fonts/consolas_3',
-// 		imgName: FONT_CONSOLAS_12px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_3',
+// 		img_name: FONT_CONSOLAS_12px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 1
-// 		imgPath: 'fonts/consolas_4',
-// 		imgName: FONT_CONSOLAS_16px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_4',
+// 		img_name: FONT_CONSOLAS_16px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 2
-// 		imgPath: 'fonts/consolas_5',
-// 		imgName: FONT_CONSOLAS_20px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_5',
+// 		img_name: FONT_CONSOLAS_20px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 3
-// 		imgPath: 'fonts/consolas_6',
-// 		imgName: FONT_CONSOLAS_24px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_6',
+// 		img_name: FONT_CONSOLAS_24px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 4
-// 		imgPath: 'fonts/consolas_7',
-// 		imgName: FONT_CONSOLAS_28px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_7',
+// 		img_name: FONT_CONSOLAS_28px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 5
-// 		imgPath: 'fonts/consolas_8',
-// 		imgName: FONT_CONSOLAS_32px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_8',
+// 		img_name: FONT_CONSOLAS_32px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 6
-// 		imgPath: 'fonts/consolas_10',
-// 		imgName: FONT_CONSOLAS_40px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_10',
+// 		img_name: FONT_CONSOLAS_40px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 7
-// 		imgPath: 'fonts/consolas_12',
-// 		imgName: FONT_CONSOLAS_49px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_12',
+// 		img_name: FONT_CONSOLAS_49px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 8
-// 		imgPath: 'fonts/consolas_14',
-// 		imgName: FONT_CONSOLAS_58px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_14',
+// 		img_name: FONT_CONSOLAS_58px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 9
-// 		imgPath: 'fonts/consolas_16',
-// 		imgName: FONT_CONSOLAS_66px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_16',
+// 		img_name: FONT_CONSOLAS_66px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 10
-// 		imgPath: 'fonts/consolas_28',
-// 		imgName: FONT_CONSOLAS_116px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_28',
+// 		img_name: FONT_CONSOLAS_116px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 11
-// 		imgPath: 'fonts/consolas_38',
-// 		imgName: FONT_CONSOLAS_157px,
-// 		imgType: 'bmp',
+// 		img_path: 'fonts/consolas_38',
+// 		img_name: FONT_CONSOLAS_157px,
+// 		img_type: 'bmp',
 // 		metrics: null, 
 // 	},
 // 	{ // 12
-// 		imgPath: 'fonts/consolas_sdf',
-// 		imgName: TEST_MTSDF_FONT_TEST_1024DIM,
-// 		imgType: 'png',
+// 		img_path: 'fonts/consolas_sdf',
+// 		img_name: TEST_MTSDF_FONT_TEST_1024DIM,
+// 		img_type: 'png',
 // 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 // 	},
 // 	{ // 13
-// 		imgPath: 'fonts/comic_sans_ms',
-// 		imgName: FONT_MSDF_COMIC,
-// 		imgType: 'png',
+// 		img_path: 'fonts/comic_sans_ms',
+// 		img_name: FONT_MSDF_COMIC,
+// 		img_type: 'png',
 // 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 // 	},
 // 	{ // 14
-// 		imgPath: 'fonts/symbol_fonts/test_symbol_fonts',
-// 		imgName: TEXTURE_LEFT_ARROW,
-// 		imgType: 'png',
+// 		img_path: 'fonts/symbol_fonts/test_symbol_fonts',
+// 		img_name: TEXTURE_LEFT_ARROW,
+// 		img_type: 'png',
 // 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 // 	},
 // 	/***************************************************************************************************/
 // 	// Textures
 // 	{
-// 		imgPath: 'textures',
-// 		imgName: TEXTURE_SMOKE1,
-// 		imgType: 'png',
+// 		img_path: 'textures',
+// 		img_name: TEXTURE_SMOKE1,
+// 		img_type: 'png',
 // 		metrics: null, 
 // 	},
 // 	{
-// 		imgPath: 'textures',
-// 		imgName: TEXTURE_COIN,
-// 		imgType: 'png',
+// 		img_path: 'textures',
+// 		img_name: TEXTURE_COIN,
+// 		img_type: 'png',
 // 		metrics: null, 
 // 	},
 // 	{
-// 		imgPath: 'textures',
-// 		imgName: TEXTURE_TEST_APPLE,
-// 		imgType: 'png',
+// 		img_path: 'textures',
+// 		img_name: TEXTURE_TEST_APPLE,
+// 		img_type: 'png',
 // 		metrics: null, 
 // 	},
 // 	// {
-// 	// 	imgPath: 'textures',
-// 	// 	imgName: TEXTURE_LEFT_ARROW,
-// 	// 	imgType: 'png',
+// 	// 	img_path: 'textures',
+// 	// 	img_name: TEXTURE_LEFT_ARROW,
+// 	// 	img_type: 'png',
 // 	// 	metrics: null, 
 // 	// },
 // ];
@@ -1048,11 +1048,11 @@ TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_16px;
 // TEXTURES.DEFAULT_FONT = TEXTURES.MSDF_CONSOLAS_1024;
 
 
-function FONT_IS_MSDF(texture_id) {
+function FONT_IS_MSDF(texture_file_id) {
 	if(
-		texture_id === TEXTURES.MSDF_COMIC_1024 ||
-		texture_id === TEXTURES.MSDF_CONSOLAS_1024 ||
-		texture_id === TEXTURES.ARROW_LEFT
+		texture_file_id === TEXTURES.MSDF_COMIC_1024 ||
+		texture_file_id === TEXTURES.MSDF_CONSOLAS_1024 ||
+		texture_file_id === TEXTURES.ARROW_LEFT
 	) return true;
 
 	return false;
@@ -1172,7 +1172,7 @@ const MESH_TYPE = {
 
 	MATERIAL: _CNT <<= 1,
 	FONT_MATERIAL: _CNT <<= 1,
-	FONT_SYMBOL_MATERIAL: _CNT <<= 1,
+	ATLAS_TEXTURE_MATERIAL: _CNT <<= 1,
 	TEXTURE_MATERIAL: _CNT <<= 1,
 
 	MESH: _CNT <<= 1,

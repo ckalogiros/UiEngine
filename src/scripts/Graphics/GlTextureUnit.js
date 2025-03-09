@@ -13,7 +13,7 @@ class Texture_unit {
     /** The Graphic's texture_unit unit object. */
     tbo = null; 
 	tex_unit_id = -1; // Graphic's unique 'unsigned integer' id. 
-    textureid = INT_NULL; // The texture_unit id from the 'TEXTURES.' global contant
+    texture_file_id = INT_NULL; // The texture_unit id from the 'TEXTURES.' global contant
     texidx = INT_NULL; // Self refference index
 	width = 0;
 	height = 0;
@@ -29,7 +29,7 @@ class Texture_unit {
 
 
 
-export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=0) {
+export function Gl_texture_unit_create(gl, texture_file_id, idx, img, width=0, height=0) {
 /** gl.RGBA8
     gl.SRGB8_ALPHA8 (also available as an extension for WebGL 1, see below)
     gl.RGB10_A2
@@ -42,7 +42,7 @@ export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=
     gl.RGBA32UI */
     const texture_unit = new Texture_unit();
     texture_unit.tex_unit_id = gl.TEXTURE0 + idx; // WebGl texture_unit id.Advance the texture_unit ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
-    texture_unit.textureid = textureid; // Id from TEXTURES global object
+    texture_unit.texture_file_id = texture_file_id; // Id from TEXTURES global object
     texture_unit.texidx = idx; 
     texture_unit.level = 0;
     texture_unit.internalFormat = gl.RGBA;

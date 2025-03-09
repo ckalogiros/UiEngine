@@ -29,9 +29,9 @@
 // const ASCII_NUM_CHARACTERS = '~'.charCodeAt(0) - (' '.charCodeAt(0));
 // const FONTS_MAX_COUNT = TEXTURES.TEXTURE_ATLASES_COUNT; 
 
-// var _font_metrics_buffer = []; // Indexed via fontidx (SEE Material.js).
-// var _font_uvmaps_buffer = [];  // Indexed via fontidx (SEE Material.js).
-// var _font_active_textures_buffer = new Int8Array(FONTS_MAX_COUNT); // Indexed via textureid (SEE: TEXTURES global object)
+// var _font_metrics_buffer = []; // Indexed via metrics_idx (SEE Material.js).
+// var _font_uvmaps_buffer = [];  // Indexed via metrics_idx (SEE Material.js).
+// var _font_active_textures_buffer = new Int8Array(FONTS_MAX_COUNT); // Indexed via texture_file_id (SEE: TEXTURES global object)
 
 
 
@@ -74,8 +74,8 @@
 
 
 
-// function Font_get_metrics_by_texid(texture_id){
-//    switch(texture_id){
+// function Font_get_metrics_by_texid(texture_file_id){
+//    switch(texture_file_id){
 // 		case TEXTURES.CONSOLAS_12px: return CONSOLAS_12Hpx;
 //       case TEXTURES.CONSOLAS_16px: return CONSOLAS_16Hpx;
 //       case TEXTURES.CONSOLAS_20px: return CONSOLAS_20Hpx;
@@ -91,15 +91,15 @@
 //       case TEXTURES.MSDF_CONSOLAS_1024: return consola_msdf_test_1024_metrics;
 //       case TEXTURES.MSDF_COMIC_1024: return comic_sans_cz;
 //       case TEXTURES.ARROW_LEFT: return arrow_left;
-//       default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_id:', texture_id);
+//       default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_file_id:', texture_file_id);
 //    }
 // }
 
 
 
-// export function Font_create_uvmap(texture_id){
+// export function Font_create_uvmap(texture_file_id){
 
-//    Font_get_metrics_by_texid(texture_id); 
+//    Font_get_metrics_by_texid(texture_file_id); 
 // }
 
 
@@ -150,15 +150,15 @@
 
 
 
-// export function Font_is_loaded(textureid) {
-// 	if (_font_active_textures_buffer[textureid] === INT_NULL) return false;
+// export function Font_is_loaded(texture_file_id) {
+// 	if (_font_active_textures_buffer[texture_file_id] === INT_NULL) return false;
 // 	return true;
 // }
 
 
 
-// export function Font_retrieve_fontidx(textureid) {
-// 	return _font_active_textures_buffer[textureid];
+// export function Font_retrieve_fontidx(texture_file_id) {
+// 	return _font_active_textures_buffer[texture_file_id];
 // }
 
 
@@ -200,22 +200,22 @@
 // }
 
 
-// export function Font_load_uvs(textureid) {
+// export function Font_load_uvs(texture_file_id) {
 
 // 	// Create new font metrics and uvmap
 // 	const font_idx = _font_uvmaps_buffer.length;
-// 	_font_active_textures_buffer[textureid] = font_idx; // Update the 'active' fonts
+// 	_font_active_textures_buffer[texture_file_id] = font_idx; // Update the 'active' fonts
 	
 	
-// 	if(FONT_IS_MSDF(textureid)) {
+// 	if(FONT_IS_MSDF(texture_file_id)) {
 		
-// 		const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(textureid);
+// 		const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(texture_file_id);
 // 		_font_metrics_buffer[font_idx] = msdf_metrics;
 // 		_font_uvmaps_buffer[font_idx] =  msdf_metrics.uvmap
 		
 // 		console.log(
 // 			'==========================================================================',
-// 			'Load Font:', TEXTURE_PATHS[textureid].imgName,
+// 			'Load Font:', TEXTURE_PATHS[texture_file_id].img_name,
 // 			'Metrics:', _font_metrics_buffer[font_idx],
 // 			'Active Fonts idxs:', _font_active_textures_buffer,
 // 		)
@@ -224,7 +224,7 @@
 		
 // 		console.log(
 // 			'==========================================================================',
-// 			'Load Font:', TEXTURE_PATHS[textureid].imgName,
+// 			'Load Font:', TEXTURE_PATHS[texture_file_id].img_name,
 // 			'Metrics:', _font_metrics_buffer[font_idx],
 // 			'Active Fonts idxs:', _font_active_textures_buffer,
 // 		)
@@ -233,7 +233,7 @@
 // 		const ret = Font_create_storage_buffer_font();
 // 		_font_metrics_buffer[font_idx] = ret.metrics
 // 		_font_uvmaps_buffer[font_idx] = ret.uvMap;
-// 		Metrics_loader_load_custom_metrics(font_idx, textureid);
+// 		Metrics_loader_load_custom_metrics(font_idx, texture_file_id);
 // 		Create_uv_map(font_idx);
 		
 // 	}
@@ -245,12 +245,12 @@
 
 // // Read the text file using 'filePos' as guide of word-line
 // const filePos = { start: 0, end: 0, len: 0, line: 0 };
-// function Metrics_loader_load_custom_metrics(font_idx, textureid) {
+// function Metrics_loader_load_custom_metrics(font_idx, texture_file_id) {
 
 // 	const metrics = _font_metrics_buffer[font_idx];
 
 // 	const file = { content: '', name: '', pos: filePos, size: 0, };
-// 	file.content = TEXTURE_PATHS[textureid].metrics; 
+// 	file.content = TEXTURE_PATHS[texture_file_id].metrics; 
 // 	file.size = file.content.length;
 
 

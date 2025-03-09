@@ -1678,7 +1678,7 @@ let u = 0;
 //             this.type = MESH_TYPE.MATERIAL;
 //             this.style = [0, 0, 0];
 //             this.uv = [0, 1, 0, 1];
-//             this.fontidx = INT_NULL;
+//             this.metrics_idx = INT_NULL;
 //             this.texidx = INT_NULL;
 //          };
 
@@ -1915,7 +1915,7 @@ let u = 0;
 //    //    this.type = MESH_TYPE.MATERIAL;
 //    //    this.style = [0, 0, 0];
 //    //    this.uv = [0, 1, 0, 1];
-//    //    this.fontidx = INT_NULL;
+//    //    this.metrics_idx = INT_NULL;
 //    //    this.texidx = INT_NULL;
 //    // };
 
@@ -1933,8 +1933,8 @@ let u = 0;
 
 //    info_text.CreateNewText(`style:[${mesh.mat.style.rcorners}, ${mesh.mat.style.feather}, ${mesh.mat.style.border}]`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
 //    info_text.CreateNewText(`uv:[${mesh.mat.uv[0]}, ${mesh.mat.uv[1]}, ${mesh.mat.uv[2]}, ${mesh.mat.uv[3]}]`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
-//    info_text.CreateNewText(`fontidx:${mesh.mat.fontidx}`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
-//    info_text.CreateNewText(`texidx:${mesh.mat.textureid}`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
+//    info_text.CreateNewText(`metrics_idx:${mesh.mat.metrics_idx}`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
+//    info_text.CreateNewText(`texidx:${mesh.mat.texture_file_id}`, fontsizedynamic, YELLOW[9], extra_pad2, .9);
 
 //    section.AddItem(info_text);
 //    return section;
@@ -4006,7 +4006,7 @@ function Helper_vertex_buffer_info_create_more_info(parent, vb_group, zindex, co
    { const info = Create_widget_text(_, `render_queueidx:${vb_group.render_queueidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `progidx:${vb_group.progidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `ibidx:${vb_group.ibidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `texidx:${vb_group.textureid}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
+   { const info = Create_widget_text(_, `texidx:${vb_group.texture_file_id}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
    { const info = Create_widget_text(_, `vaoidx:${vb_group.vaoidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
 
 }

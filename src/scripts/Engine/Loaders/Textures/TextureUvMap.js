@@ -5,20 +5,14 @@ import { Metrics_loader_load_chlumsky_msdf_metrics, Metrics_loader_load_custom_m
 
 
 
-// POTENTIAL_BUG: 
-// The font texture buffer is build specificaly for fonts, but it gets the font textures from the application's texture buffer.
-// So the indexing is not guarantee to be 1to1 (texture buffer-font buffer).
-// It will work only if the font textures in the texture buffer preceding all the regular textures in the texture buffer
-
-
 
 // The maximum number of characters for ASCII
 const ASCII_NUM_CHARACTERS = '~'.charCodeAt(0) - (' '.charCodeAt(0));
 const TEXTURE_ATLASES_MAX_COUNT = TEXTURES.TEXTURE_ATLASES_COUNT; 
 
-var _metrics_buffer = []; // Indexed via fontidx (SEE Material.js).
-var _uvmap_buffer = [];  // Indexed via fontidx (SEE Material.js).
-var _uvmap_active_maps_buffer = new Int8Array(TEXTURE_ATLASES_MAX_COUNT); // Indexed via textureid (SEE: TEXTURES global object)
+var _metrics_buffer = []; // Indexed via metrics_idx (SEE Material.js).
+var _uvmap_buffer = [];  // Indexed via metrics_idx (SEE Material.js).
+var _uvmap_active_maps_buffer = new Int8Array(TEXTURE_ATLASES_MAX_COUNT); // Indexed via texture_file_id (SEE: TEXTURES global object)
 
 
 
@@ -40,9 +34,9 @@ export function Uv_texture_init_buffers() {
 
 
 
-// export function Uv_create_uvmap(texture_id){
+// export function Uv_create_uvmap(texture_file_id){
 
-//    Uv_get_metrics_by_texid(texture_id); 
+//    Uv_get_metrics_by_texid(texture_file_id); 
 // }
 
 
@@ -51,7 +45,7 @@ export function Uv_create_storage_buffer_font() {
 
 
    const metrics = {
-      ch: [],
+      sub_tex: [],
       size: 0,
       texWidth: 0,
       texHeight: 0,
@@ -68,7 +62,7 @@ export function Uv_create_storage_buffer_font() {
    // New font metrics for every character
    for (let j = 0; j <= ASCII_NUM_CHARACTERS; j++) {
       
-      metrics.ch[j] = {
+      metrics.sub_tex[j] = {
          left: 0,
          right: 0,
          top: 0,
@@ -93,15 +87,16 @@ export function Uv_create_storage_buffer_font() {
 
 
 
-// export function Texture_is_texture_loaded(textureid) {
-//    if (_uvmap_active_maps_buffer[textureid] === INT_NULL) return false;
+// export function Texture_is_texture_loaded(texture_file_id) {
+//    if (_uvmap_active_maps_buffer[texture_file_id] === INT_NULL) return false;
 //    return true;
 // }
 
 
 
-export function Uv_retrieve_uvidx(textureid) {
-   return _uvmap_active_maps_buffer[textureid];
+/** */
+export function Uv_retrieve_uvmap_idx(texture_file_id) {
+   return _uvmap_active_maps_buffer[texture_file_id];
 }
 
 
@@ -109,179 +104,80 @@ export function Uv_retrieve_uvidx(textureid) {
 /**
  * UV Coordinates Getters
  */
-export function Uv_get_uv_coords(sub_tex_idx, ch) {
+export function Uv_get_uv_coords(metrics_idx, sub_tex_idx) {
    
-   return _uvmap_buffer[sub_tex_idx][ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET];
+   return _uvmap_buffer[metrics_idx][sub_tex_idx];
 }
 
 
 
-export function FontGetFontDimRatio(sub_tex_idx) {
-   return _metrics_buffer[sub_tex_idx].ratio;
+/** */
+export function FontGetFontDimRatio(metrics_idx) {
+   return _metrics_buffer[metrics_idx].ratio;
 }
 
 
 
-export function Uv_metrics_get_face_advancex(sub_tex_idx) { return _metrics_buffer[sub_tex_idx].advancex; }
-export function Uv_metrics_get_texture_width(sub_tex_idx) { return _metrics_buffer[sub_tex_idx].texWidth; }
-export function Uv_metrics_get_texture_height(sub_tex_idx) { return _metrics_buffer[sub_tex_idx].texHeight; }
-export function Uv_metrics_get_char_width(sub_tex_idx, ch) { return _metrics_buffer[sub_tex_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
-export function Uv_metrics_get_char_height(sub_tex_idx, ch) { return _metrics_buffer[sub_tex_idx].ch[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].row_height; }
-export function Uv_metrics_get_row_height(sub_tex_idx) { return _metrics_buffer[sub_tex_idx].row_height; }
-export function Uv_metrics_get_interpolated_x(sub_tex_idx) { return 1.0 / _metrics_buffer[sub_tex_idx].texWidth; } // Transform to 0-1 coords 
+/** */
+export function Uv_metrics_get_face_advancex(metrics_idx) { return _metrics_buffer[metrics_idx].advancex; }
+/** */
+export function Uv_metrics_get_texture_width(metrics_idx) { return _metrics_buffer[metrics_idx].texWidth; }
+/** */
+export function Uv_metrics_get_texture_height(metrics_idx) { return _metrics_buffer[metrics_idx].texHeight; }
+/** */
+export function Uv_metrics_get_char_width(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].sub_tex[sub_tex_idx].width; }
+/** */
+export function Uv_metrics_get_char_height(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].sub_tex[sub_tex_idx].row_height; }
+/** */
+export function Uv_metrics_get_row_height(metrics_idx) { return _metrics_buffer[metrics_idx].row_height; }
+/** */
+export function Uv_metrics_get_interpolated_x(metrics_idx) { return 1.0 / _metrics_buffer[metrics_idx].texWidth; } // Transform to 0-1 coords 
 
-export function Uv_metrics_calculate_width_from_text(str, sub_tex_idx){
+/** */
+export function Uv_metrics_calculate_width_from_text(str, metrics_idx){
 
    let width = 0;
    const len = str.length;
    for(let i=0; i<len; i++){
 
-      width += Uv_metrics_get_char_width(sub_tex_idx, str[i]);
+      width += Uv_metrics_get_char_width(metrics_idx, str[i]);
    }
 
    return width;
 }
-
-// HERE: The UV_MAP buffer should be here and not in the metrics.js file. Also handle the uv_maps here
-
-export function Uv_load_uvs(textureid, metrics_file) {
+/** */
+export function Uv_load_uvs(texture_file_id, metrics_file) {
 
    // Create new font metrics and uvmap
-   const sub_tex_idx = _uvmap_buffer.length;
-   _uvmap_active_maps_buffer[textureid] = sub_tex_idx; // Update the 'active' fonts
+   const metrics_idx = _uvmap_buffer.length;
+   _uvmap_active_maps_buffer[texture_file_id] = metrics_idx; // Update the 'active' fonts
    
    
-   if(FONT_IS_MSDF(textureid)) {
-      
+   if(FONT_IS_MSDF(texture_file_id)) {
+      if(!metrics_file)
+         console.log(metrics_file)
       const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(metrics_file);
-      _metrics_buffer[sub_tex_idx] = msdf_metrics;
-      _uvmap_buffer[sub_tex_idx] =  msdf_metrics.uvmap
-      
-      // console.log(
-      //    '==========================================================================',
-      //    'Load Font:', TEXTURE_PATHS[textureid].imgName,
-      //    'Metrics:', _metrics_buffer[sub_tex_idx],
-      //    'Active Fonts idxs:', _uvmap_active_maps_buffer,
-      // )
+      _metrics_buffer[metrics_idx] = msdf_metrics;
+      _uvmap_buffer[metrics_idx] =  msdf_metrics.uvmap
    }
    else {
-      
-      // console.log(
-      //    '==========================================================================',
-      //    'Load Font:', TEXTURE_PATHS[textureid].imgName,
-      //    'Metrics:', _metrics_buffer[sub_tex_idx],
-      //    'Active Fonts idxs:', _uvmap_active_maps_buffer,
-      // )
-
       // Create new font metrics and uvmap
       const ret = Uv_create_storage_buffer_font();
-      _metrics_buffer[sub_tex_idx] = ret.metrics
-      _uvmap_buffer[sub_tex_idx] = ret.uvMap;
+      _metrics_buffer[metrics_idx] = ret.metrics
+      _uvmap_buffer[metrics_idx] = ret.uvMap;
       Metrics_loader_load_custom_metrics(ret.metrics, metrics_file);
-      Create_uv_map(sub_tex_idx);
+      Create_uv_map(metrics_idx);
       
    }
    
-   return sub_tex_idx;
+   return metrics_idx;
 }
+/** */
+function Create_uv_map(metrics_idx) {
 
-
-
-// // Read the text file using 'filePos' as guide of word-line
-// const filePos = { start: 0, end: 0, len: 0, line: 0 };
-// function Metrics_loader_load_custom_metrics(sub_tex_idx, textureid) {
-
-//    const metrics = _metrics_buffer[sub_tex_idx];
-
-//    const file = { content: '', name: '', pos: filePos, size: 0, };
-//    file.content = TEXTURE_PATHS[textureid].metrics; 
-//    file.size = file.content.length;
-
-
-//    let size = 0;
-//    // Get how many characters the font texture has 
-//    // by retrieving the line: "NumCharacters		:	[94]"
-//    file.pos = Find_field_by_name(file.content, "NumCharacters", file.pos);
-//    if (file.pos.len) size = Find_next_field(file, "[]");
-//    size++; // +1 for the ' ' space char
-
-//    metrics.size = size;
+   const metrics = _metrics_buffer[metrics_idx]; 
    
-   
-//    file.pos = Find_field_by_name(file.content, "Image Width", file.pos);
-//    if (file.pos.len) {
-//       metrics.texWidth = Find_next_field(file, "[]");
-//       // The next val inside [] is the height 
-//       metrics.texHeight = Find_next_field(file, "[]");
-//       metrics.row_height = Find_next_field(file, "[]");
-//    }
-
-//    // In monospace {Only} the advance x is the same for every character
-//    metrics.advancex = Find_next_field(file, "[]");
-//    // Space between the characters in the texture font
-//    metrics.padding = Find_next_field(file, "[]");
-
-//    file.pos = Find_field_by_name(file.content, "Mono Space", file.pos);
-//    metrics.isMonoSpace = Find_next_field(file, "[]");
-//    metrics.ratio = metrics.texHeight / metrics.advancex;
-
-//    let ii = 0;
-
-//    /**
-//     * // TODO: Set the start character=10->\n,
-//     * leave emty array elements to the ' '=32
-//     */
-//    // For char space character ' '
-//    metrics.ch[ii].left = 0;
-//    metrics.ch[ii].right = 0;
-//    metrics.ch[ii].top = 0;
-//    metrics.ch[ii].bottom = 0;
-//    metrics.ch[ii].width = metrics.advancex;
-//    metrics.ch[ii].height = 0;
-//    metrics.ch[ii].row_num = 0;
-//    if (!metrics.isMonoSpace) {
-//       metrics.ch[ii].advancex = metrics.advancex;
-//       metrics.ch[ii].ratio = metrics.texHeight / metrics.ch[0].advancex; // width to height ratio(and not the other way arround)
-//    }
-
-//    ii++;
-
-//    // Reset the file's pos
-//    file.pos.start = 0;
-
-//    // Load all property values to character map for each character
-//    for (let i = ii; i < size; i++) {
-//       file.pos = Find_field_by_name(file.content, "Face Left", file.pos);
-//       if (file.pos.len)
-//          metrics.ch[i].left = Find_next_field(file, "[]");
-
-//       // Because the file.pos retains the start position
-//       // we just call Find_next_field() to  get the next val
-//       metrics.ch[i].right 			= Find_next_field(file, "[]");
-//       metrics.ch[i].top 			= Find_next_field(file, "[]");
-//       metrics.ch[i].bottom 		= Find_next_field(file, "[]");
-//       metrics.ch[i].width 			= Find_next_field(file, "[]");
-//       metrics.ch[i].height 		= Find_next_field(file, "[]");
-//       metrics.ch[i].row_num 		= Find_next_field(file, "[]");
-//       metrics.ch[i].bearingleft 	= Find_next_field(file, "[]");
-//       metrics.ch[i].bearingtop 	= Find_next_field(file, "[]");
-//       if (!metrics.isMonoSpace) {
-//          metrics.ch[i].advancex = Find_next_field(file, "[]");
-//          metrics.ch[i].ratio = metrics.ch[i].height / metrics.ch[i].width; // width to height ratio(and not the other way arround)
-//       }
-//    }
-
-//    if(DEBUG.UVS){ console.log('metrics', metrics); }
-//    return sub_tex_idx;
-// }
-
-
-
-function Create_uv_map(sub_tex_idx, uvMap) {
-
-   const metrics = _metrics_buffer[sub_tex_idx]; 
-   
-   const uvmap = _uvmap_buffer[sub_tex_idx];
+   const uvmap = _uvmap_buffer[metrics_idx];
 
    let transormedU = 1.0 / metrics.texWidth;	// Transform to 0-1 coords
    let transormedV = 1.0 / metrics.texHeight;	// Transform to 0-1 coords
@@ -289,7 +185,7 @@ function Create_uv_map(sub_tex_idx, uvMap) {
    const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
    for (let j = 0; j < metrics.size; j++) {
       
-      const uv = metrics.ch[j]; // Get a characters pixel position in the font texture.
+      const uv = metrics.sub_tex[j]; // Get a characters pixel position in the font texture.
       
       // and store them to the uvmap
       uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new uvs for each character
@@ -346,13 +242,13 @@ function Create_uv_map(sub_tex_idx, uvMap) {
       line_height : obj.metrics.lineHeight,
       base_line   : base_line,
 */
-export function Msdf_Uv_get_char_uv_coords(fontIdx, ch) { return _metrics_buffer[fontIdx].uvmap[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET]; }
-export function Msdf_Uv_get_char_plane_bounds(fontIdx, ch) { return _metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET]; }
-export function Msdf_Uv_get_char_atlas_bounds(fontIdx, ch) { return _metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET]; }
-export function Msdf_Uv_get_atlas_texture_metrics(fontIdx) { return _metrics_buffer[fontIdx].texture; }
-export function Msdf_Uv_get_font_line_height(fontIdx) { return _metrics_buffer[fontIdx].texture.line_height; }
-export function Msdf_Uv_get_font_advancex(fontIdx) { return _metrics_buffer[fontIdx].texture.advance; }
-export function Msdf_Uv_get_font_base_line(fontIdx) { return _metrics_buffer[fontIdx].texture.base_line; }
+export function Msdf_Uv_get_char_uv_coords(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].uvmap[sub_tex_idx]; }
+export function Msdf_Uv_get_char_plane_bounds(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx]; }
+// export function Msdf_Uv_get_char_atlas_bounds(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx]; }
+// export function Msdf_Uv_get_atlas_texture_metrics(metrics_idx) { return _metrics_buffer[metrics_idx].texture; }
+export function Msdf_Uv_get_font_line_height(metrics_idx) { return _metrics_buffer[metrics_idx].texture.line_height; }
+export function Msdf_Uv_get_font_advancex(metrics_idx) { return _metrics_buffer[metrics_idx].texture.advance; }
+export function Msdf_Uv_get_font_base_line(metrics_idx) { return _metrics_buffer[metrics_idx].texture.base_line; }
 
 
 
@@ -366,24 +262,24 @@ export function Msdf_Uv_get_font_base_line(fontIdx) { return _metrics_buffer[fon
       width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
       height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
 */
-export function Msdf_ont_get_char_plane_bounds_width(fontIdx, ch) { 
-   return _metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; 
-}
-export function Msdf_ont_get_char_plane_bounds_height(fontIdx, ch) { 
-   return _metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].height; 
-}
-export function Msdf_ont_get_char_plane_bounds_left(fontIdx, ch) { 
-   return _metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].left; 
-}
-export function Msdf_ont_get_char_plane_bounds_right(fontIdx, ch) { 
-   return _metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].right; 
-}
-export function Msdf_ont_get_char_plane_bounds_top(fontIdx, ch) { 
-   return _metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].top; 
-}
-export function Msdf_ont_get_char_plane_bounds_bottom(fontIdx, ch) { 
-   return _metrics_buffer[fontIdx].plane_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].bottom; 
-}
+// export function Msdf_ont_get_char_plane_bounds_width(metrics_idx, sub_tex_idx) { 
+//    return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].width; 
+// }
+// export function Msdf_ont_get_char_plane_bounds_height(metrics_idx, sub_tex_idx) { 
+//    return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].height; 
+// }
+// export function Msdf_ont_get_char_plane_bounds_left(metrics_idx, sub_tex_idx) { 
+//    return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].left; 
+// }
+// export function Msdf_ont_get_char_plane_bounds_right(metrics_idx, sub_tex_idx) { 
+//    return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].right; 
+// }
+// export function Msdf_ont_get_char_plane_bounds_top(metrics_idx, sub_tex_idx) { 
+//    return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].top; 
+// }
+// export function Msdf_ont_get_char_plane_bounds_bottom(metrics_idx, sub_tex_idx) { 
+//    return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].bottom; 
+// }
 
 /**
    atlas_bounds[i]:
@@ -395,12 +291,12 @@ export function Msdf_ont_get_char_plane_bounds_bottom(fontIdx, ch) {
       height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
       yoffset: -((ascender-glyphs[i].planeBounds.top)+(descender-glyphs[i].planeBounds.bottom)) * scale,
    */
-export function Msdf_ont_get_char_atlas_bounds_width(fontIdx, ch) { return _metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].width; }
-export function Msdf_ont_get_char_atlas_bounds_height(fontIdx, ch) { return _metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].height; }
-export function Msdf_ont_get_char_atlas_bounds_left(fontIdx, ch) { return _metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].left; }
-export function Msdf_ont_get_char_atlas_bounds_right(fontIdx, ch) { return _metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].right; }
-export function Msdf_ont_get_char_atlas_bounds_top(fontIdx, ch) { return _metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].top; }
-export function Msdf_ont_get_char_atlas_bounds_bottom(fontIdx, ch) { return _metrics_buffer[fontIdx].atlas_bounds[ch.charCodeAt(0) - CHAR_ARRAY_START_OFFSET].bottom; }
+// export function Msdf_ont_get_char_atlas_bounds_width(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].width; }
+// export function Msdf_ont_get_char_atlas_bounds_height(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].height; }
+// export function Msdf_ont_get_char_atlas_bounds_left(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].left; }
+// export function Msdf_ont_get_char_atlas_bounds_right(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].right; }
+// export function Msdf_ont_get_char_atlas_bounds_top(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].top; }
+// export function Msdf_ont_get_char_atlas_bounds_bottom(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].bottom; }
 
 
 

@@ -203,8 +203,8 @@ function Gl_framebuffer_create(gl = null, TEMP_WHICH_RENDER_TARGET = null, ATTAC
    // Store the new framebuffer to the local _fb_buffer
    framebuffer.fbidx = _fb_buffer.push(framebuffer) - 1;
 
-   const name = `Framebuffer:${framebuffer.fbidx} Texidx:${texture.textureid}`;
-   Texture_set_texture_name(texture.textureid, name)
+   const name = `Framebuffer:${framebuffer.fbidx} Texidx:${texture.texture_file_id}`;
+   Texture_set_texture_name(texture.texture_file_id, name)
    framebuffer.ChangeName(name);
 
    // TODO: The TEMP_WHICH_RENDER_TARGET should be used in an if statement to chose between texture or renderbuffer creation

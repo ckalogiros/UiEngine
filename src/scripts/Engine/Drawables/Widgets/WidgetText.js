@@ -590,7 +590,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		// CopyArr3(pos, this.geom.pos); // Copy the dynamic's text mesh pos
 		// const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad, this.mat.);
-		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad, this.mat.textureid);
+		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad, this.mat.texture_file_id);
 		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
 		// Add the new new_text as a child of 'this'.

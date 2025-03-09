@@ -19,8 +19,8 @@ export class Material {
    // defCol;  Array: Store the initial color, used as a storage buffer
    // style;  Array: of [];
    // uv;  Array: of [v1,u1,v2,u2]
-   // fontidx;  Value: The index of the uvmap data for the texture 
-   // textureid;  Value: The textuure id of type 'TEXTURE.'
+   // metrics_idx;  Value: The index of the uvmap data for the texture 
+   // texture_file_id;  Value: The textuure id of type 'TEXTURE.'
    // texidx;  Value: The index of the texture
 
    // TODO
@@ -41,8 +41,8 @@ export class Material {
       this.type = MESH_TYPE.MATERIAL;
       this.style = {rcorners:0, feather:0, border:0};
       this.uv = [0, 1, 0, 1];
-      this.fontidx= INT_NULL;
-      this.textureid = INT_NULL;
+      this.metrics_idx= INT_NULL;
+      this.texture_file_id = INT_NULL;
       this.texidx = INT_NULL;
 
 
@@ -129,9 +129,9 @@ export class Material {
          math.CopyArr4(this.uv, mat.uv);
          math.CopyArr3(this.style, mat.style);
          this.type = mat.type;
-         this.textureid = mat.textureid;
+         this.texture_file_id = mat.texture_file_id;
          this.texidx = mat.texidx;
-         this.fontidx= mat.fontidx;
+         this.metrics_idx= mat.metrics_idx;
 
       }
    }
@@ -143,9 +143,9 @@ export class Material {
 export class Material_Font extends Material {
 
 
-   constructor(col = [1, 1, 1, 1], textureid = INT_NULL, text = '', sdf_params = [.5, .5]) {
+   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, text = '', sdf_params = [.5, .5]) {
 
-      super(col, textureid);
+      super(col, texture_file_id);
 
 
       const len = text.length;
@@ -158,11 +158,11 @@ export class Material_Font extends Material {
       this.text = text;
       this.sdf_params = [0, 0];
       math.CopyArr2(this.sdf_params, sdf_params);
-      this.textureid = textureid;
+      this.texture_file_id = texture_file_id;
 
       this.sid.attr |= SID.ATTR.TEX2; // 
       this.sid.pass |= SID.PASS.TEX2; //
-      if(FONT_IS_MSDF(textureid)) {
+      if(FONT_IS_MSDF(texture_file_id)) {
          this.sid.attr |= SID.ATTR.MSDF; // 
          // this.sid.pass |= SID.PASS.TEX2; //
 
@@ -170,14 +170,14 @@ export class Material_Font extends Material {
       this.type |= MESH_TYPE.FONT_MATERIAL;
 
       // Load texture and uv map, via indexes to the actual buffers
-      const texture = Texture_load_texture_byid(this.textureid, TEXTURE_TYPE.TYPE_FONT);
-      this.texidx = texture.webGl_texture_idx;
-      this.fontidx= texture.fontidx;
+      const texture = Texture_load_texture_byid(this.texture_file_id, TEXTURE_TYPE.TYPE_FONT);
+      this.texidx = texture.tex_idx;
+      this.metrics_idx= texture.metrics_idx;
 
 
       { // Debug
          /**DEBUG*/if (DEBUG.MATERIAL && this.texidx === INT_NULL) console.error('Texture Index is NULL')
-         /**DEBUG*/if (DEBUG.MATERIAL && this.fontidx=== INT_NULL) console.error('Uvs Index is NULL')
+         /**DEBUG*/if (DEBUG.MATERIAL && this.metrics_idx=== INT_NULL) console.error('Uvs Index is NULL')
       }
    }
 }
@@ -185,33 +185,34 @@ export class Material_Font extends Material {
 
 
 
-export class Material_Font_Symbol extends Material {
+export class Material_Atlas_Texture extends Material {
 
 
-   constructor(col = [1, 1, 1, 1], textureid = INT_NULL, text = '', sdf_params = [.5, .5]) {
+   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, sdf_params = [.5, .5], sub_tex_idx=INT_NULL) {
 
-      super(col, textureid);
+      super(col, texture_file_id);
 
       this.sdf_params = [0, 0];
       math.CopyArr2(this.sdf_params, sdf_params);
       
       this.sid.attr |= SID.ATTR.TEX2; // 
       this.sid.pass |= SID.PASS.TEX2; //
-      if(FONT_IS_MSDF(textureid)) {
+      if(FONT_IS_MSDF(texture_file_id)) {
          this.sid.attr |= SID.ATTR.MSDF; // 
       } 
-      this.type |= MESH_TYPE.FONT_SYMBOL_MATERIAL;
+      this.type |= MESH_TYPE.ATLAS_TEXTURE_MATERIAL;
       
       // Load texture and uv map, via indexes to the actual buffers
-      const texture = Texture_load_texture_byid(this.textureid, texture_type.TYPE_FONT);
-      this.texidx = texture.webGl_texture_idx;
-      this.fontidx = texture.fontidx;
-      this.textureid = textureid;
+      const texture = Texture_load_texture_byid(this.texture_file_id, texture_type.TYPE_FONT);
+      this.texidx = texture.tex_idx;
+      this.metrics_idx = texture.metrics_idx;
+      this.texture_file_id = texture_file_id;
+      this.sub_tex_idx = sub_tex_idx; // The index of the sub-texture in the Atlas texture
 
 
       { // Debug
          /**DEBUG*/if (DEBUG.MATERIAL && this.texidx === INT_NULL) console.error('Texture Index is NULL')
-         /**DEBUG*/if (DEBUG.MATERIAL && this.fontidx=== INT_NULL) console.error('Uvs Index is NULL')
+         /**DEBUG*/if (DEBUG.MATERIAL && this.metrics_idx=== INT_NULL) console.error('Uvs Index is NULL')
       }
    }
 }
@@ -225,7 +226,7 @@ export class Material_Font_Symbol extends Material {
  */
 export class Material_Texture extends Material {
 
-   constructor(col = [1, 1, 1, 1], textureid = INT_NULL) {
+   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL) {
 
       super(col);
 
@@ -235,20 +236,20 @@ export class Material_Texture extends Material {
 
       let texture_type = TEXTURE_TYPE.TYPE_TEXTURE; // Initialize to comon texture
       
-      if(FONT_IS_MSDF(textureid)) {
+      if(FONT_IS_MSDF(texture_file_id)) {
          this.sid.attr |= SID.ATTR.MSDF; // 
          texture_type = TEXTURE_TYPE.TYPE_FONT_SYMBOL; // Case texture is type of font symbol with metrics
       } 
 
-      const texture = Texture_load_texture_byid(textureid, texture_type);
-      this.texidx = texture.webGl_texture_idx;
-      this.textureId = textureid;
+      const texture = Texture_load_texture_byid(texture_file_id, texture_type);
+      this.texidx = texture.tex_idx;
+      this.textureId = texture_file_id;
       // NOTE: Simple texture does not have a uvmap
 
 
       { // Debug
          /**DEBUG*/if (DEBUG.MATERIAL && this.texidx === INT_NULL) console.error('Texture Index is NULL')
-         /**DEBUG*/if (DEBUG.MATERIAL && this.fontidx=== INT_NULL) console.error('Uvs Index is NULL')
+         /**DEBUG*/if (DEBUG.MATERIAL && this.metrics_idx=== INT_NULL) console.error('Uvs Index is NULL')
       }
    }
 }

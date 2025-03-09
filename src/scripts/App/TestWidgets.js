@@ -107,7 +107,7 @@ export function TestWidgetsGeneric() {
     CreateLabelMsdf(_, '123', TEXTURES.CONSOLAS_157px, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
 
 
-    // Demo_page();
+    Demo_page();
     // Demos_welcome_menu();
 
     { // Games
@@ -732,8 +732,8 @@ function Test_text_clbk_animations_with_counter(x, y, text_pad_x = 10, text_pad_
             const text_substitution = `${cnt++}`
 
             let limit = 0;
-            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Uv_metrics_get_char_width(mesh.text_mesh.mat.fontidx, text_substitution) / 2;
-            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Uv_metrics_get_row_height(mesh.text_mesh.mat.fontidx) / 2;
+            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Uv_metrics_get_char_width(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
+            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Uv_metrics_get_row_height(mesh.text_mesh.mat.metrics_idx) / 2;
 
             if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_X) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_X, text_substitution);
             if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, text_substitution);
@@ -805,8 +805,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
                 params.params.counter1 = 0;
                 let limit_ = 0;
                 const text_substitution_ = `${params.params.counter2++}`
-                if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Uv_metrics_get_char_width(mesh1.text_mesh.mat.fontidx, text_substitution_) / 2;
-                else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Uv_metrics_get_row_height(mesh1.text_mesh.mat.fontidx) / 2;
+                if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Uv_metrics_get_char_width(mesh1.text_mesh.mat.metrics_idx, text_substitution_.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
+                else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Uv_metrics_get_row_height(mesh1.text_mesh.mat.metrics_idx) / 2;
                 Demo_clbk_animations_text_create(mesh2, slope_params_pointer, limit_, 'TEST_text_animation_2', clbk_anim_flag, text_substitution_);
             }
             if (params.params.counter2 > 9) { params.params.counter2 = 0; }
@@ -814,8 +814,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
             const text_substitution = `${params.params.counter1++}`
 
             let limit = 0;
-            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Uv_metrics_get_char_width(mesh1.text_mesh.mat.fontidx, text_substitution) / 2;
-            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Uv_metrics_get_row_height(mesh1.text_mesh.mat.fontidx) / 2;
+            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Uv_metrics_get_char_width(mesh1.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
+            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Uv_metrics_get_row_height(mesh1.text_mesh.mat.metrics_idx) / 2;
 
             Demo_clbk_animations_text_create(mesh1, slope_params_pointer, limit, 'TEST_text_animation_1', clbk_anim_flag, text_substitution);
         },
@@ -827,9 +827,9 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
 
 
 
-function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y = 0, dim = [32 / 2, 32 / 2], color = WHITE, pad = [0, 0], textureid = TEXTURES.COIN) {
+function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y = 0, dim = [32 / 2, 32 / 2], color = WHITE, pad = [0, 0], texture_file_id = TEXTURES.COIN) {
 
-    const section = Create_widget_section(root_widget, _, pad, [x, y, 0], dim, color, _, _, _, textureid);
+    const section = Create_widget_section(root_widget, _, pad, [x, y, 0], dim, color, _, _, _, texture_file_id);
     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -856,10 +856,10 @@ function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y =
 
     return section;
 }
-function Section(root_widget = 0x0, name = 'Section ', x = 0, y = 0, dim = [20, 20], color = PURPLEB[6], pad = [10, 10], textureid = INT_NULL) {
+function Section(root_widget = 0x0, name = 'Section ', x = 0, y = 0, dim = [20, 20], color = PURPLEB[6], pad = [10, 10], texture_file_id = INT_NULL) {
 
     // const section = Create_widget_section(root_widget, _, pad, [x, y], dim, color, _, );
-    const section = Create_widget_section(root_widget, _, pad, [x, y, 0], dim, color, _, _, _, textureid);
+    const section = Create_widget_section(root_widget, _, pad, [x, y, 0], dim, color, _, _, _, texture_file_id);
     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);

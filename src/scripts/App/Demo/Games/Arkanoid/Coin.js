@@ -68,13 +68,13 @@ export function Arkanoid_coin_destroy() {
 /** */
 class Coin {
 
-   constructor(x = 0, y = 0, texture_id = COIN_TEXTURE, vb_groupidx = INT_NULL) {
+   constructor(x = 0, y = 0, texture_file_id = COIN_TEXTURE, vb_groupidx = INT_NULL) {
 
       this.is_active = false;
 
 
       // Coin textured mesh
-      const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [COIN_SIZE, COIN_SIZE], TRANSPARENCY(WHITE, 1.), 'CoinMesh', _, _, texture_id,);
+      const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [COIN_SIZE, COIN_SIZE], TRANSPARENCY(WHITE, 1.), 'CoinMesh', _, _, texture_file_id,);
 
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);

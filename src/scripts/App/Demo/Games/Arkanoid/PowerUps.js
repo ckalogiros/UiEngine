@@ -50,7 +50,7 @@ export function Arkanoid_powup_destroy() {
 /** */
 class Powup {
 
-   constructor(x = 0, y = 0, color = WHITE, texture_id = INT_NULL, vb_groupidx = INT_NULL) {
+   constructor(x = 0, y = 0, color = WHITE, texture_file_id = INT_NULL, vb_groupidx = INT_NULL) {
 
       const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [POWUP_INIT_SIZE, POWUP_INIT_SIZE], color, 'PowupMesh', _, _, _,);
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);

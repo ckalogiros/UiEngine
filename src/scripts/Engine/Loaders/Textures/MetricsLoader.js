@@ -10,8 +10,6 @@ import { Abs } from "../../../Helpers/Math/MathOperations.js";
 /** Load metrics from Chlumsky */
 export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file){
 
-   // const metrics_file = TEXTURE_PATHS[textureid].metrics;
-   // const metrics_file = metrics_file;
    const obj      = JSON.parse(metrics_file);
    const atlas    = obj.atlas;
    const glyphs   = obj.glyphs;
@@ -117,11 +115,9 @@ export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file){
 const filePos = { start: 0, end: 0, len: 0, line: 0 };
 export function Metrics_loader_load_custom_metrics(metrics, metrics_file) {
 
-   // const metrics = _font_metrics_buffer[font_idx];
-
 
    const file = { content: '', name: '', pos: filePos, size: 0, };
-   // file.content = TEXTURE_PATHS[textureid].metrics; 
+   // file.content = TEXTURE_PATHS[texture_file_id].metrics; 
    file.content = metrics_file; 
    file.size = file.content.length;
 
@@ -160,16 +156,16 @@ export function Metrics_loader_load_custom_metrics(metrics, metrics_file) {
     * leave emty array elements to the ' '=32
     */
    // For char space character ' '
-   metrics.ch[ii].left = 0;
-   metrics.ch[ii].right = 0;
-   metrics.ch[ii].top = 0;
-   metrics.ch[ii].bottom = 0;
-   metrics.ch[ii].width = metrics.advancex;
-   metrics.ch[ii].height = 0;
-   metrics.ch[ii].row_num = 0;
+   metrics.sub_tex[ii].left = 0;
+   metrics.sub_tex[ii].right = 0;
+   metrics.sub_tex[ii].top = 0;
+   metrics.sub_tex[ii].bottom = 0;
+   metrics.sub_tex[ii].width = metrics.advancex;
+   metrics.sub_tex[ii].height = 0;
+   metrics.sub_tex[ii].row_num = 0;
    if (!metrics.isMonoSpace) {
-      metrics.ch[ii].advancex = metrics.advancex;
-      metrics.ch[ii].ratio = metrics.texHeight / metrics.ch[0].advancex; // width to height ratio(and not the other way arround)
+      metrics.sub_tex[ii].advancex = metrics.advancex;
+      metrics.sub_tex[ii].ratio = metrics.texHeight / metrics.sub_tex[0].advancex; // width to height ratio(and not the other way arround)
    }
 
    ii++;
@@ -181,21 +177,21 @@ export function Metrics_loader_load_custom_metrics(metrics, metrics_file) {
    for (let i = ii; i < size; i++) {
       file.pos = Find_field_by_name(file.content, "Face Left", file.pos);
       if (file.pos.len)
-         metrics.ch[i].left = Find_next_field(file, "[]");
+         metrics.sub_tex[i].left = Find_next_field(file, "[]");
 
       // Because the file.pos retains the start position
       // we just call Find_next_field() to  get the next val
-      metrics.ch[i].right 			= Find_next_field(file, "[]");
-      metrics.ch[i].top 			= Find_next_field(file, "[]");
-      metrics.ch[i].bottom 		= Find_next_field(file, "[]");
-      metrics.ch[i].width 			= Find_next_field(file, "[]");
-      metrics.ch[i].height 		= Find_next_field(file, "[]");
-      metrics.ch[i].row_num 		= Find_next_field(file, "[]");
-      metrics.ch[i].bearingleft 	= Find_next_field(file, "[]");
-      metrics.ch[i].bearingtop 	= Find_next_field(file, "[]");
+      metrics.sub_tex[i].right 			= Find_next_field(file, "[]");
+      metrics.sub_tex[i].top 			= Find_next_field(file, "[]");
+      metrics.sub_tex[i].bottom 		= Find_next_field(file, "[]");
+      metrics.sub_tex[i].width 			= Find_next_field(file, "[]");
+      metrics.sub_tex[i].height 		= Find_next_field(file, "[]");
+      metrics.sub_tex[i].row_num 		= Find_next_field(file, "[]");
+      metrics.sub_tex[i].bearingleft 	= Find_next_field(file, "[]");
+      metrics.sub_tex[i].bearingtop 	= Find_next_field(file, "[]");
       if (!metrics.isMonoSpace) {
-         metrics.ch[i].advancex = Find_next_field(file, "[]");
-         metrics.ch[i].ratio = metrics.ch[i].height / metrics.ch[i].width; // width to height ratio(and not the other way arround)
+         metrics.sub_tex[i].advancex = Find_next_field(file, "[]");
+         metrics.sub_tex[i].ratio = metrics.sub_tex[i].height / metrics.sub_tex[i].width; // width to height ratio(and not the other way arround)
       }
    }
 

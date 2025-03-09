@@ -52,7 +52,6 @@ export const EFFECTS_TYPES = {
 /*************************************************************************************************************************************************************************/
 // Effects Meshes - Explosion Circle
 
-// HERE: replace the uniform with 'u_generic_controls'
 class Effect_Mesh_Explosion_Circle {
 
    constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], vb_groupidx=INT_NULL, ring_diameter, intensity) {
