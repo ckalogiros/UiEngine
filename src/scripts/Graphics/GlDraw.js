@@ -1,4 +1,4 @@
-import { Texture_get_texture_byidx } from '../Engine/Loaders/Textures/Texture.js';
+import { Texture_get_texture_unit_byidx } from '../Engine/Loaders/Textures/Texture.js';
 import { Renderqueue_get_active, Renderqueue_active_get_count } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
@@ -77,7 +77,7 @@ export function Gl_draw(gl) {
 
         // if (GL_STATE.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
         if (GL_STATE.BOUND_TEXTURE_IDX !== vb_group.texidx && vb_group.texidx !== INT_NULL ) {
-            const texture = Texture_get_texture_byidx(vb_group.texidx);
+            const texture = Texture_get_texture_unit_byidx(vb_group.texidx);
             Gl_texture_unit_bind(gl, texture);
             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
         }
@@ -186,7 +186,7 @@ export function Gl_draw_specific(gl, gfx_queue, w, h) {
 
     //     if (progs.buffer[progidx].sid.attr & SID.ATTR.TEX2) {
     //         if (vb.texidx !== INT_NULL) {
-    //             const texture = Texture_get_texture_byidx(vb.texidx);
+    //             const texture = Texture_get_texture_unit_byidx(vb.texidx);
     //             Gl_texture_unit_bind(gl, texture);
     //             gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
     //         }

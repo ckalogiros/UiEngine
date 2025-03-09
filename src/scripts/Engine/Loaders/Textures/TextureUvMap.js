@@ -7,117 +7,33 @@ import { Metrics_loader_load_chlumsky_msdf_metrics, Metrics_loader_load_custom_m
 
 
 // The maximum number of characters for ASCII
-const ASCII_NUM_CHARACTERS = '~'.charCodeAt(0) - (' '.charCodeAt(0));
+// const ASCII_NUM_CHARACTERS = '~'.charCodeAt(0) - (' '.charCodeAt(0));
 const TEXTURE_ATLASES_MAX_COUNT = TEXTURES.TEXTURE_ATLASES_COUNT; 
 
 var _metrics_buffer = []; // Indexed via metrics_idx (SEE Material.js).
 var _uvmap_buffer = [];  // Indexed via metrics_idx (SEE Material.js).
-var _uvmap_active_maps_buffer = new Int8Array(TEXTURE_ATLASES_MAX_COUNT); // Indexed via texture_file_id (SEE: TEXTURES global object)
+// var _uvmap_active_maps_buffer = new Int8Array(TEXTURE_ATLASES_MAX_COUNT); // Indexed via texture_file_id (SEE: TEXTURES global object)
 
 
-
-
+/** */
 export function Uv_texture_reset_buffers() {
    _metrics_buffer = [];
    _uvmap_buffer = [];
-   _uvmap_active_maps_buffer = new Int8Array(TEXTURE_ATLASES_MAX_COUNT); 
 }
 
 export function Uv_texture_init_buffers() {
    // Initialize active fonts buffer
    for(let i=0; i<TEXTURE_ATLASES_MAX_COUNT; i++) {
-      _uvmap_active_maps_buffer[i] = INT_NULL;
+      _metrics_buffer[i] = null;
    }
 }
 
-
-
-
-
-// export function Uv_create_uvmap(texture_file_id){
-
-//    Uv_get_metrics_by_texid(texture_file_id); 
-// }
-
-
-
-export function Uv_create_storage_buffer_font() {
-
-
-   const metrics = {
-      sub_tex: [],
-      size: 0,
-      texWidth: 0,
-      texHeight: 0,
-      row_height: 0,
-      advancex: 0, // Start (in pixels) of curr character unti the start of next character(in the texture)
-      padding: 0,
-      isMonoSpace: 0, // In non monospace fonts, the advancex variable is different from char to char (compare to monospace fonts)
-      ratio: 0,
-   };
-
-   // New uvMap for every font
-   const uvMap = [];
-   
-   // New font metrics for every character
-   for (let j = 0; j <= ASCII_NUM_CHARACTERS; j++) {
-      
-      metrics.sub_tex[j] = {
-         left: 0,
-         right: 0,
-         top: 0,
-         bottom: 0,
-         advancex: 0,
-         width: 0,
-         height: 0,
-         // bearingtop: 0,
-         // bearingleft: 0,
-         ratio: 0, // Ratio width to height, for each character's. Used for non monospace fonts
-      };
-      // New uv coordinates for every character
-      uvMap[j] = [0,0,0,0];
-   }
-
-
-   return {
-      metrics:metrics,
-      uvMap:uvMap,
-   };
-}
-
-
-
-// export function Texture_is_texture_loaded(texture_file_id) {
-//    if (_uvmap_active_maps_buffer[texture_file_id] === INT_NULL) return false;
-//    return true;
-// }
-
-
-
-/** */
-export function Uv_retrieve_uvmap_idx(texture_file_id) {
-   return _uvmap_active_maps_buffer[texture_file_id];
-}
-
-
-
-/**
- * UV Coordinates Getters
- */
+/************************************************************************************************************************************************/
+// Getters
 export function Uv_get_uv_coords(metrics_idx, sub_tex_idx) {
    
    return _uvmap_buffer[metrics_idx][sub_tex_idx];
 }
-
-
-
-/** */
-export function FontGetFontDimRatio(metrics_idx) {
-   return _metrics_buffer[metrics_idx].ratio;
-}
-
-
-
 /** */
 export function Uv_metrics_get_face_advancex(metrics_idx) { return _metrics_buffer[metrics_idx].advancex; }
 /** */
@@ -146,66 +62,29 @@ export function Uv_metrics_calculate_width_from_text(str, metrics_idx){
    return width;
 }
 /** */
-export function Uv_load_uvs(texture_file_id, metrics_file) {
+export function Uv_metrics_create_uvmap(texture_file_id, sub_tex_idx, metrics_file) {
 
    // Create new font metrics and uvmap
    const metrics_idx = _uvmap_buffer.length;
-   _uvmap_active_maps_buffer[texture_file_id] = metrics_idx; // Update the 'active' fonts
+   // _uvmap_active_maps_buffer[texture_file_id] = metrics_idx; // Update the 'active' fonts
    
    
    if(FONT_IS_MSDF(texture_file_id)) {
       if(!metrics_file)
          console.log(metrics_file)
-      const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(metrics_file);
+      const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, sub_tex_idx);
       _metrics_buffer[metrics_idx] = msdf_metrics;
       _uvmap_buffer[metrics_idx] =  msdf_metrics.uvmap
    }
    else {
-      // Create new font metrics and uvmap
-      const ret = Uv_create_storage_buffer_font();
+      const ret = Metrics_loader_load_custom_metrics(metrics_file);
       _metrics_buffer[metrics_idx] = ret.metrics
-      _uvmap_buffer[metrics_idx] = ret.uvMap;
-      Metrics_loader_load_custom_metrics(ret.metrics, metrics_file);
-      Create_uv_map(metrics_idx);
-      
+      _uvmap_buffer[metrics_idx] = ret.uv_map;
    }
    
    return metrics_idx;
 }
-/** */
-function Create_uv_map(metrics_idx) {
 
-   const metrics = _metrics_buffer[metrics_idx]; 
-   
-   const uvmap = _uvmap_buffer[metrics_idx];
-
-   let transormedU = 1.0 / metrics.texWidth;	// Transform to 0-1 coords
-   let transormedV = 1.0 / metrics.texHeight;	// Transform to 0-1 coords
-
-   const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
-   for (let j = 0; j < metrics.size; j++) {
-      
-      const uv = metrics.sub_tex[j]; // Get a characters pixel position in the font texture.
-      
-      // and store them to the uvmap
-      uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new uvs for each character
-      uvmap[j][U1] = transormedU * uv.left;
-      uvmap[j][U2] = transormedU * uv.right;
-      uvmap[j][V1] = metrics.row_height * transormedV * (uv.row_num);
-      uvmap[j][V2] = uvmap[j][V1] + (metrics.row_height * transormedV);
-      
-      // Round for any potential floating-point rounding errors
-      const round = 100000;
-      uvmap[j][V1] = Math.round(uvmap[j][V1] * round) / round;
-      uvmap[j][V2] = Math.round(uvmap[j][V2] * round) / round;
-      uvmap[j][U1] = Math.round(uvmap[j][U1] * round) / round;
-      uvmap[j][U2] = Math.round(uvmap[j][U2] * round) / round;
-   }
-
-   if(DEBUG.UVS){ console.log('uvmap:', uvmap); }
-   
-   return uvmap;
-}
 
 
 
@@ -315,16 +194,9 @@ export function Msdf_Uv_get_font_base_line(metrics_idx) { return _metrics_buffer
 
 /**Debug-Print */
 export function Uvmaps_print() {
-   /**
-      const TEXTURE_ATLASES_MAX_COUNT = TEXTURES.TEXTURE_ATLASES_COUNT; 
-      const _metrics_buffer = [];
-      const _uvmap_buffer = [];
-      const _uvmap_active_maps_buffer = new Int8Array(TEXTURE_ATLASES_MAX_COUNT); 
-   */
    console.log(
       '----------------------------------- Fonts -----------------------------------', 
       '\nMetrics', _metrics_buffer,
-      '\nActive Font idxs', _uvmap_active_maps_buffer,
       '\nUvMaps', _uvmap_buffer,
    );
 }

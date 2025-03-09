@@ -825,12 +825,12 @@ const FONT_CONSOLAS_116px = 'consolas_28';
 const FONT_CONSOLAS_157px = 'consolas_38';
 const TEST_MTSDF_FONT_TEST_1024DIM = 'consola_mtsdf_test_1024';
 const FONT_MSDF_COMIC = 'comicz';
-const TEST_MSDF_FONT_1 = 'msdf_a_char';
+// Textures Atlases
+const TEXTURE_ATLAS_MSDF_SYMBOLS = 'arrow_left_256x256';
 // Textures
 const TEXTURE_SMOKE1 = 'smoke';
 const TEXTURE_COIN = 'Coin_1_64x64';
 const TEXTURE_TEST_APPLE = 'apple1_64x73';
-const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
 /**
  * 	TEXTURE_PATHS[cnt++].metrics = CONSOLAS_12Hpx;
 	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_16Hpx;
@@ -868,7 +868,7 @@ const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
 // const TEXTURE_SMOKE1 = 'smoke';
 // const TEXTURE_COIN = 'Coin_1_64x64';
 // const TEXTURE_TEST_APPLE = 'apple1_64x73';
-// const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
+// const TEXTURE_ATLAS_MSDF_SYMBOLS = 'arrow_left_256x256';
 
 
 
@@ -966,7 +966,7 @@ const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
 // 	},
 // 	{ // 14
 // 		img_path: 'fonts/symbol_fonts/test_symbol_fonts',
-// 		img_name: TEXTURE_LEFT_ARROW,
+// 		img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
 // 		img_type: 'png',
 // 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 // 	},
@@ -992,7 +992,7 @@ const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
 // 	},
 // 	// {
 // 	// 	img_path: 'textures',
-// 	// 	img_name: TEXTURE_LEFT_ARROW,
+// 	// 	img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
 // 	// 	img_type: 'png',
 // 	// 	metrics: null, 
 // 	// },
@@ -1029,8 +1029,8 @@ const TEXTURES = {
 	CONSOLAS_157px: g_cnt++,
 	MSDF_CONSOLAS_1024: g_cnt++,
 	MSDF_COMIC_1024: g_cnt++,
+	MSDF_SYMBOLS:g_cnt++, 
 	TEXTURE_ATLASES_COUNT: g_cnt,
-	ARROW_LEFT:g_cnt++, 
 	
 	// IS_MSDF: 0x0, 
 	DEFAULT_FONT: 0x0, 
@@ -1047,12 +1047,19 @@ const TEXTURES = {
 TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_16px;
 // TEXTURES.DEFAULT_FONT = TEXTURES.MSDF_CONSOLAS_1024;
 
+const ATLASES_SUB_TEXTURES = {
+	MSDF_SYMBOLS: {
+		ARROW_LEFT: 0,
+		ARROW_UP: 1,
+	}
+}
+
 
 function FONT_IS_MSDF(texture_file_id) {
 	if(
 		texture_file_id === TEXTURES.MSDF_COMIC_1024 ||
 		texture_file_id === TEXTURES.MSDF_CONSOLAS_1024 ||
-		texture_file_id === TEXTURES.ARROW_LEFT
+		texture_file_id === TEXTURES.MSDF_SYMBOLS
 	) return true;
 
 	return false;

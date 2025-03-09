@@ -103,11 +103,11 @@ export function TestWidgetsGeneric() {
     }
 
     // CreateLabelMsdf(_, '>', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
-    CreateLabelMsdf(_, '123', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
-    CreateLabelMsdf(_, '123', TEXTURES.CONSOLAS_157px, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
+    // CreateLabelMsdf(_, '123', TEXTURES.CONSOLAS_157px, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
+    // CreateLabelMsdf(_, '123', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
 
 
-    Demo_page();
+    // Demo_page();
     // Demos_welcome_menu();
 
     { // Games
@@ -186,9 +186,11 @@ export function TestWidgetsGeneric() {
         // TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [64/2, 73/2], WHITE, [0,0], TEXTURES.TEST_APPLE);
 
         // TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [32/2, 32/2], WHITE, [0,0], TEXTURES.COIN);
-
-        // TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 80, [56/2, 56/2], WHITE, [0,0], TEXTURES.ARROW_LEFT);
-        // CreateLabel(_, '()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.ARROW_LEFT, 0, 250,);
+        
+        TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 80, [143, 111], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.ARROW_LEFT);
+        TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 80, [111, 181], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.ARROW_UP);
+        
+        // CreateLabelMsdf(_, 'ASSAASASAS', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
     }
 
     { // Test sdf lines
@@ -827,9 +829,9 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
 
 
 
-function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y = 0, dim = [32 / 2, 32 / 2], color = WHITE, pad = [0, 0], texture_file_id = TEXTURES.COIN) {
+function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y = 0, dim = [32 / 2, 32 / 2], color = WHITE, pad = [0, 0], texture_file_id = TEXTURES.COIN, sub_texture_id=INT_NULL) {
 
-    const section = Create_widget_section(root_widget, _, pad, [x, y, 0], dim, color, _, _, _, texture_file_id);
+    const section = Create_widget_section(root_widget, _, pad, [x, y, 0], dim, color, _, _, _, texture_file_id, sub_texture_id);
     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);

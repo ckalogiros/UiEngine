@@ -97,12 +97,12 @@ export function Create_text_mesh_msdf(text, pos, fontsize, col, bold, font, is_d
 
 
 
-// export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, dim, col, name, style, textureId, is_debug_mesh=0x0, num_faces) {
-export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, dim, col, name, style, num_faces, textureId, is_debug_mesh=0x0) {
+// export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, dim, col, name, style, texture_id, is_debug_mesh=0x0, num_faces) {
+export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, dim, col, name, style, num_faces, texture_id, sub_texture_id, is_debug_mesh=0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, pad, pos, dim, col, name, style, num_faces, textureId, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, pad, pos, dim, col, name, style, num_faces, texture_id, sub_texture_id, is_debug_mesh));
    
    if(NOTIFICATIONS_ON && !is_debug_mesh) 
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);

@@ -13,7 +13,7 @@ import { BLUEL } from "../Material/Base/Colors.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
-import { Material, Material_Texture } from "../Material/Base/Material.js";
+import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Base/Material.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
@@ -39,11 +39,11 @@ export class Section extends Mesh {
 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), pad = [4, 4], pos = [200, 400, 0],
-      dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = { rcorners: 4, feather: 2, border: 0 }, num_faces = 1, textureId = INT_NULL, is_debug_mesh) {
+      dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = { rcorners: 4, feather: 2, border: 0 }, num_faces = 1, texture_id = INT_NULL, sub_texture_id, is_debug_mesh) {
 
       const geom = new Geometry2D(pos, dim, _, num_faces);
       // Create texture if the user has passed a texture id of type:TEXTURES.
-      const mat = (textureId === INT_NULL) ? new Material(col) : new Material_Texture(col, textureId);
+      const mat = (texture_id === INT_NULL) ? new Material(col) : (sub_texture_id === INT_NULL) ? new Material_Texture(col, texture_id) : new Material_Atlas_Texture(col, texture_id, sub_texture_id, _);
 
       super(geom, mat);
 

@@ -8,7 +8,7 @@ import { Abs } from "../../../Helpers/Math/MathOperations.js";
 
 
 /** Load metrics from Chlumsky */
-export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file){
+export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, sub_tex_idx){
 
    const obj      = JSON.parse(metrics_file);
    const atlas    = obj.atlas;
@@ -49,7 +49,10 @@ export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file){
    let normalizedU = 1.0 / texture_width;	   // Normalize texture coords to 0-1 values.
    let normalizedV = 1.0 / texture_height;   // Normalize texture coords to 0-1 values.
 
-   for (let i = 1; i < glyphs.length; i++) {
+   // If the texture is a font texture, leave [0] element for the ' ' space character, else start inserting sub-texture coordinates from [0]
+   const start_idx = (sub_tex_idx !== INT_NULL) ? 0 : 1; 
+
+   for (let i = start_idx; i < glyphs.length; i++) {
       
       // glyph.advance  = glyphs[i].advance * size;
       glyph.char   = glyphs[i].unicode;
@@ -109,14 +112,24 @@ export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file){
       },
    }
 }
-
 /** Load metrics custom loader */
 // Read the text file using 'filePos' as guide of word-line
 const filePos = { start: 0, end: 0, len: 0, line: 0 };
-export function Metrics_loader_load_custom_metrics(metrics, metrics_file) {
+export function Metrics_loader_load_custom_metrics(metrics_file) {
 
+   const metrics = {
+      sub_tex: [],
+      size: 0,
+      texWidth: 0,
+      texHeight: 0,
+      row_height: 0,
+      advancex: 0, // Start (in pixels) of curr character unti the start of next character(in the texture)
+      padding: 0,
+      isMonoSpace: 0, // In non monospace fonts, the advancex variable is different from char to char (compare to monospace fonts)
+      ratio: 0,
+   };
 
-   const file = { content: '', name: '', pos: filePos, size: 0, };
+   const file = { content: {}, name: '', pos: filePos, size: 0, };
    // file.content = TEXTURE_PATHS[texture_file_id].metrics; 
    file.content = metrics_file; 
    file.size = file.content.length;
@@ -130,6 +143,7 @@ export function Metrics_loader_load_custom_metrics(metrics, metrics_file) {
    size++; // +1 for the ' ' space char
 
    metrics.size = size;
+
    
    
    file.pos = Find_field_by_name(file.content, "Image Width", file.pos);
@@ -155,6 +169,18 @@ export function Metrics_loader_load_custom_metrics(metrics, metrics_file) {
     * // TODO: Set the start character=10->\n,
     * leave emty array elements to the ' '=32
     */
+   metrics.sub_tex[ii] = {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      advancex: 0,
+      width: 0,
+      height: 0,
+      // bearingtop: 0,
+      // bearingleft: 0,
+      ratio: 0, // Ratio width to height, for each character's. Used for non monospace fonts
+   };
    // For char space character ' '
    metrics.sub_tex[ii].left = 0;
    metrics.sub_tex[ii].right = 0;
@@ -175,6 +201,20 @@ export function Metrics_loader_load_custom_metrics(metrics, metrics_file) {
 
    // Load all property values to character map for each character
    for (let i = ii; i < size; i++) {
+
+      metrics.sub_tex[i] = {
+         left: 0,
+         right: 0,
+         top: 0,
+         bottom: 0,
+         advancex: 0,
+         width: 0,
+         height: 0,
+         // bearingtop: 0,
+         // bearingleft: 0,
+         ratio: 0, // Ratio width to height, for each character's. Used for non monospace fonts
+      };
+
       file.pos = Find_field_by_name(file.content, "Face Left", file.pos);
       if (file.pos.len)
          metrics.sub_tex[i].left = Find_next_field(file, "[]");
@@ -196,14 +236,51 @@ export function Metrics_loader_load_custom_metrics(metrics, metrics_file) {
    }
 
    if(DEBUG.UVS){ console.log('metrics', metrics); }
+
+   const uv_map = Create_uv_map(metrics);
+   // return uv_map;
+
+   return {
+      metrics:metrics,
+      uv_map:uv_map,
+   };
 }
+/** */
+function Create_uv_map(metrics) {
 
+   const uvmap = [];
 
+   let transormedU = 1.0 / metrics.texWidth;	// Transform to 0-1 coords
+   let transormedV = 1.0 / metrics.texHeight;	// Transform to 0-1 coords
 
+   const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
+   for (let j = 0; j < metrics.size; j++) {
+      
+      const uv = metrics.sub_tex[j]; // Get a characters pixel position in the font texture.
+      
+      // New uv coordinates for every character
+      uvmap[j] = [0,0,0,0];
 
-/*
-   Finds text between delimiters, in a string buffer.
-*/
+      // and store them to the uvmap
+      uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new uvs for each character
+      uvmap[j][U1] = transormedU * uv.left;
+      uvmap[j][U2] = transormedU * uv.right;
+      uvmap[j][V1] = metrics.row_height * transormedV * (uv.row_num);
+      uvmap[j][V2] = uvmap[j][V1] + (metrics.row_height * transormedV);
+      
+      // Round for any potential floating-point rounding errors
+      const round = 100000;
+      uvmap[j][V1] = Math.round(uvmap[j][V1] * round) / round;
+      uvmap[j][V2] = Math.round(uvmap[j][V2] * round) / round;
+      uvmap[j][U1] = Math.round(uvmap[j][U1] * round) / round;
+      uvmap[j][U2] = Math.round(uvmap[j][U2] * round) / round;
+   }
+
+   if(DEBUG.UVS){ console.log('uvmap:', uvmap); }
+   
+   return uvmap;
+}
+/* Finds text between delimiters, in a string buffer. */
 function Find_next_field(file, delim) {
    /**
     * pos reference's indexes in the string buffer.
@@ -254,9 +331,7 @@ function Find_next_field(file, delim) {
 
    return val;
 }
-
-
-
+/** */
 function Find_field_by_name(file, word, pos) {
 
    const wordpos = { start: -1, end: -1, len: 0, line: -1 };

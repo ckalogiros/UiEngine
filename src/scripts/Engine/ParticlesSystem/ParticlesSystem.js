@@ -161,7 +161,7 @@ class Particle {
 
 class Emitter {
 
-   constructor(name, col, pos, dim, t_step = .0001, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, textureId = INT_NULL, num_particles_per_frame = 1) {
+   constructor(name, col, pos, dim, t_step = .0001, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, texture_id = INT_NULL, num_particles_per_frame = 1) {
 
       this.sid = 0x0;
       this.sceneidx = STATE.scene.active_idx;
@@ -180,7 +180,7 @@ class Emitter {
       this.t_step = t_step;
       this.life_time = life_time;
       this.speed = speed;
-      this.textureId = textureId;
+      this.texture_id = texture_id;
       this.texidx = INT_NULL;
 
       this.parent = null;
@@ -229,7 +229,7 @@ class Emitter {
       };
 
 
-      const mat = (this.textureId === INT_NULL) ? new Material(col) : new Material_Texture(col, this.textureId);
+      const mat = (this.texture_id === INT_NULL) ? new Material(col) : new Material_Texture(col, this.texture_id);
       this.mat = mat;
       this.sid.attr |= mat.sid.attr;
       this.sid.unif |= mat.sid.unif;
@@ -658,9 +658,9 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
 
 
 // TODO: pass an already created sid, for selecting from a gama of shader particles
-export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId, num_particles_per_frame) {
+export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame) {
 
-   const emitter = new Emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, textureId, num_particles_per_frame);
+   const emitter = new Emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame);
 
    const idx = _emitters.Add(emitter);
 

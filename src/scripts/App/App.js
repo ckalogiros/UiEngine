@@ -49,7 +49,7 @@ export function AppInit() {
 
     // Create and initialize the buffers that will be storing texture-font-uv data. 
     Texture_init_texture_storage_buffer();
-    Uv_texture_init_buffers();
+    // Uv_texture_init_buffers();
 
     
 
@@ -199,6 +199,6 @@ export function App_reinitialize(){
 
     Time_intervals_create(100, 'GPU performance timer query', TIME_INTERVAL_REPEAT_ALWAYS, Renderer_webgl_check_query_results, _);
 
-    Font_texture_init_buffers();
+    Texture_init_texture_storage_buffer();
 
 }

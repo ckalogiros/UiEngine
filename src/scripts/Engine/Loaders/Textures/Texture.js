@@ -27,49 +27,19 @@ import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metric
 import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
 import { consola_msdf_test_1024_metrics } from '../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js';
 import { arrow_left } from '../../../../../resources/fonts/symbol_fonts/test_symbol_fonts/arrow_left_256x256.js';
-import { Uv_load_uvs, Uv_retrieve_uvmap_idx } from "./TextureUvMap.js";
+import { Uv_metrics_create_uvmap, Uv_texture_init_buffers, Uvmaps_print } from "./TextureUvMap.js";
 
 // TODO: Make texture buffer from New_generic_buffer();
 // TODO: Rename all font words with atlas, since an atlas texture consists of subtextures and has uv coordinates from a metrics file
 // TODO: Instead of loading all metrics files (large data), get the file needed by function call. That means we need to create a new .js file where we load all metrics. At least they will be loaded if Get_metrics_file function is called
 // TODO: Metrics_file id duplicated, 1 inside Texture class and 2 in metrics buffer
 
-class Texture {
-
-    
-	constructor(texture_file_id, texture_unit, img_path='', img_name=INT_NULL, img_type='', metrics_file=null) {
-
-		this.texture_file_id = texture_file_id;
-
-		this.texture_unit = texture_unit; // The graphics API texture unit (webGl texture)
-
-		this.img_path = img_path,
-		this.img_name = img_name,
-		this.img_type = img_type;
-
-		this.metrics_file = metrics_file;
-		// The index to the metrics data in the metrics buffer
-		this.metrics_idx = INT_NULL; // metrics_idx and uvmap_idx are 1 to 1  sepsrate buffers
-
-	}
-
-	SetTextureUnit(texture_unit){
-		this.texture_unit = texture_unit;
-	}
-
-	SetMetricsIndex(metrics_idx){
-		this.metrics_idx = metrics_idx;
-	}
-
-};
-
 // HERE: We need to store the Texture and not just the texture_unit in the _textureBuffer. Also we must update all accesses of the _textureBuffer to match the new implementation
-const FONTS_MAX_COUNT = TEXTURES.TEXTURE_ATLASES_COUNT;
 const TEXTURES_MAX_COUNT = 16;
 var _textureBuffer = [];
 let _textureBufferCount = 0;
-var _font_active_textures_buffer = new Int8Array(FONTS_MAX_COUNT); // Indexed via texture_file_id (SEE: TEXTURES global object)
 
+/** */
 const TEXTURE_PATHS = [
 
 	{ // 0
@@ -158,7 +128,7 @@ const TEXTURE_PATHS = [
 	},
 	{ // 14
 		img_path: 'fonts/symbol_fonts/test_symbol_fonts',
-		img_name: TEXTURE_LEFT_ARROW,
+		img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
@@ -184,9 +154,36 @@ const TEXTURE_PATHS = [
 	},
 
 ];
+/** */
+class Texture {
 
+    
+	constructor(texture_file_id, texture_unit, img_path='', img_name=INT_NULL, img_type='', metrics_file=null) {
 
+		this.texture_file_id = texture_file_id;
 
+		this.texture_unit = texture_unit; // The graphics API texture unit (webGl texture)
+
+		this.img_path = img_path,
+		this.img_name = img_name,
+		this.img_type = img_type;
+
+		this.metrics_file = metrics_file;
+		// The index to the metrics data in the metrics buffer
+		this.metrics_idx = INT_NULL; // metrics_idx and uvmap_idx are 1 to 1  sepsrate buffers
+
+	}
+
+	SetTextureUnit(texture_unit){
+		this.texture_unit = texture_unit;
+	}
+
+	SetMetricsIndex(metrics_idx){
+		this.metrics_idx = metrics_idx;
+	}
+
+};
+/** */
 function Texture_pair_metrics_file_to_texture(img_name) {
 
 	switch(img_name) {
@@ -203,37 +200,69 @@ function Texture_pair_metrics_file_to_texture(img_name) {
 		case FONT_CONSOLAS_116px: { return CONSOLAS_116Hpx; }	
 		case FONT_CONSOLAS_157px: { return CONSOLAS_157Hpx; }	
 		case TEST_MTSDF_FONT_TEST_1024DIM: { return consola_msdf_test_1024_metrics; }	
-		case FONT_MSDF_COMIC: { return ; comic_sans_cz}	
-		case TEXTURE_LEFT_ARROW: { return ; arrow_left}	
-		default: alert('01928374655637.  Texture_pair_metrics_file_to_texture()')
+		case FONT_MSDF_COMIC: { return comic_sans_cz; }	
+		case TEXTURE_ATLAS_MSDF_SYMBOLS: { return arrow_left; }	
+		default: console.error('01928374655637.  Texture_pair_metrics_file_to_texture() failed to find metrics for texture:', img_name)
 
 	}
 }
+/** */
+export function Texture_load_texture_byid(texture_file_id, TEX_TYPE, sub_tex_idx=INT_NULL) {
 
+	let tex_idx = INT_NULL; 	// The index of the texture, that is stored(upon texture creation) in a buffer.
+	let metrics_idx = INT_NULL; 		// The index of the uv coordinates. All coordinates for all , 
 
+	const texture_idx = Texture_is_loaded(texture_file_id);
 
+	if (texture_idx === INT_NULL) {
 
+		// NOTE: If the texture is not an ATLAS texture, then the metrics_file is null
+		const metrics_file = Texture_pair_metrics_file_to_texture(TEXTURE_PATHS[texture_file_id].img_name);
+		
+		const texture = new Texture(texture_file_id, null, TEXTURE_PATHS[texture_file_id].img_path, TEXTURE_PATHS[texture_file_id].img_name, TEXTURE_PATHS[texture_file_id].img_type, metrics_file);
+		
+		const img = ImageLoader.Load(texture.img_path, texture.img_name, texture.img_type);
+		
+		tex_idx = Get_next_free_index();
+		const texture_unit = Texture_create_texture_unit(gfxCtx.gl, texture.texture_file_id, img, tex_idx);
+		
+		texture.SetTextureUnit(texture_unit);
+		
+		_textureBuffer[tex_idx] = texture;
+		
+		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT || TEX_TYPE & TEXTURE_TYPE.TYPE_FONT_SYMBOL) {
+			metrics_idx = Uv_metrics_create_uvmap(texture.texture_file_id, sub_tex_idx, texture.metrics_file);
+			texture.SetMetricsIndex(metrics_idx);
+		}
+	}
+	else {
+		tex_idx = texture_idx;
+		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT){
 
+			metrics_idx = _textureBuffer[texture_idx].metrics_idx
+			// metrics_idx = Uv_retrieve_uvmap_idx(texture_file_id);// the index for the texture metrics in the font metrics buffer
+			// _textureBuffer[texture_idx].SetMetricsIndex(metrics_idx);
+		}
+	}
 
-export function Texture_is_texture_loaded(texture_file_id) {
-	if (_font_active_textures_buffer[texture_file_id] === INT_NULL) return false;
-	return true;
+	return { tex_idx: tex_idx, metrics_idx: _textureBuffer[tex_idx].metrics_idx };
 }
-
-
+/** */
 export function Texture_buffer_reset() {
+	// Implement the deletion only for the .texture_unit field????
+	// alert('Texture_buffer_reset(), 77165524310987')
+	console.log(_textureBuffer)
 	Gl_texture_unit_delete_all();
 	_textureBuffer = [];
 	_textureBufferCount = 0;
 }
+/** */
+function Gl_texture_unit_delete(tex_idx) {
 
-function Gl_texture_unit_delete(NAME_ME) {
-
-	const tbo = _textureBuffer[NAME_ME];
+	const tbo = _textureBuffer[tex_idx].texture_unit;
 	gfxCtx.gl.deleteTexture(tbo);
 }
-
-
+/** */
 function Gl_texture_unit_delete_all() {
 
 	for (let i = 0; i < _textureBuffer.length; i++) {
@@ -247,8 +276,7 @@ function Gl_texture_unit_delete_all() {
 		}
 	}
 }
-
-
+/** */
 function Get_next_free_index() {
 
 	const idx = _textureBufferCount++;
@@ -258,110 +286,44 @@ function Get_next_free_index() {
 	}
 	return idx;
 }
+/** */
+function Texture_create_texture_unit(gl, texture_file_id, img, tex_idx) {
 
-
-
-function Texture_create_texture(gl, texture_file_id, img, name = 'Texture UNAMED') {
-
-	const idx = Get_next_free_index();
-	_textureBuffer[idx] = Gl_texture_unit_create(gl, texture_file_id, idx, img);
-	_textureBuffer[idx].nameidx = Str_buffer_store(name);
-
-	return idx;
+	const texture_unit = Gl_texture_unit_create(gl, texture_file_id, tex_idx, img);
+	return texture_unit;
 }
-
-
-
+/** */
 export function Texture_init_texture_storage_buffer() { // Initialize a buffer to store all the application's textures.
 
 	for (let i = 0; i < TEXTURES_MAX_COUNT; i++) {
 		_textureBuffer[i] = null;
 	}
-
-	// Texture_metrics_resolve_metric_files_pairing();
+	Uv_texture_init_buffers();
 }
-
-
-
-export function Texture_get_texture_byidx(idx) {
-	return _textureBuffer[idx];
+/** */
+export function Texture_get_texture_unit_byidx(idx) {
+	return _textureBuffer[idx].texture_unit;
 }
-
-
-
-
-function Texture_is_loaded(texture_file_id, TEX_TYPE) {
-	// TODO: Code below always returns i despite the TEX_TYPE
+/** */
+function Texture_is_loaded(texture_file_id) {
 	for (let i = 0; i < _textureBufferCount; i++) {
-		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) {
-			if (_textureBuffer[i] && _textureBuffer[i].texture_file_id === texture_file_id)
-				return i
-		}
-		else if (TEX_TYPE & TEXTURE_TYPE.TYPE_TEXTURE) {
-			if (_textureBuffer[i] && _textureBuffer[i].texture_file_id === texture_file_id)
-				return i
+		if (_textureBuffer[i]  && _textureBuffer[i].texture_file_id!== INT_NULL && _textureBuffer[i].texture_file_id === texture_file_id)
+			return i
 
-		}
 	}
 	return INT_NULL;
 }
-
-
-
-export function Texture_load_texture_byid(texture_file_id, TEX_TYPE) {
-
-	let tex_idx = INT_NULL; 	// The index of the texture, that is stored(upon texture creation) in a buffer.
-	let metrics_idx = INT_NULL; 		// The index of the uv coordinates. All coordinates for all , 
-
-	const texture_idx = Texture_is_loaded(texture_file_id, TEX_TYPE);
-
-	if (texture_idx === INT_NULL) {
-
-		// Load the texture image
-		
-		const metrics_file = Texture_pair_metrics_file_to_texture(TEXTURE_PATHS[texture_file_id].img_name);
-		
-		// Create webGl texture
-		const texture = new Texture(texture_file_id, null, TEXTURE_PATHS[texture_file_id].img_path, TEXTURE_PATHS[texture_file_id].img_name, TEXTURE_PATHS[texture_file_id].img_type, metrics_file);
-		
-		const img = ImageLoader.Load(texture.img_path, texture.img_name, texture.img_type);
-		tex_idx = Texture_create_texture(gfxCtx.gl, texture.texture_file_id, img, texture.img_name);
-		
-		// const texture_unit = Gl_texture_unit_create(gfxCtx.gl, texture_file_id, texture_file_id, img);
-		const texture_unit = _textureBuffer[tex_idx];
-		texture.SetTextureUnit(texture_unit);
-
-		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT || TEX_TYPE & TEXTURE_TYPE.TYPE_FONT_SYMBOL) {
-			// metrics_idx = Font_load_uvs(texture_file_id);
-			// metrics_idx = Uv_load_uvs(texture.texture_file_id, TEXTURE_PATHS[texture_file_id].metrics);
-			metrics_idx = Uv_load_uvs(texture.texture_file_id, texture.metrics_file);
-		}
-	}
-	else {
-		tex_idx = texture_idx;
-		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT){
-
-			metrics_idx = Uv_retrieve_uvmap_idx(texture_file_id);// the index for the texture metrics in the font metrics buffer
-			// _textureBuffer[texture_idx].SetMetricsIndex(metrics_idx);
-		}
-	}
-
-	return { tex_idx: tex_idx, metrics_idx: metrics_idx };
-}
-
-
-
+/** */
 export function Texture_create_renderbuffer_texture(gl, texture_file_id, width, height, name = 'Renderbuffer UNAMED') {
-
+alert('10092877899287653')
+// Do we need to create a full Texture class object and store it in the _textures_buffer OR just create the weGl texture_unit???? 
 	const idx = Get_next_free_index();
 	_textureBuffer[idx] = Gl_texture_unit_create(gl, texture_file_id, idx, null, width, height);
 	_textureBuffer[idx].nameidx = Str_buffer_store(name);
 
 	return _textureBuffer[idx];
 }
-
-
-
+/** */
 export function Texture_set_texture_name(idx, name = 'UNAMED') {
 
 	_textureBuffer[idx].nameidx = Str_buffer_store(name);
@@ -383,4 +345,6 @@ export function Texture_set_texture_name(idx, name = 'UNAMED') {
 // Debug Print
 export function Texture_buffer_print(){
 	console.log(_textureBuffer);
+
+	Uvmaps_print();
 }

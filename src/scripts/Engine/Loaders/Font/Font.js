@@ -90,7 +90,7 @@
 //       case TEXTURES.CONSOLAS_157px: return CONSOLAS_157Hpx;
 //       case TEXTURES.MSDF_CONSOLAS_1024: return consola_msdf_test_1024_metrics;
 //       case TEXTURES.MSDF_COMIC_1024: return comic_sans_cz;
-//       case TEXTURES.ARROW_LEFT: return arrow_left;
+//       case TEXTURES.MSDF_SYMBOLS: return arrow_left;
 //       default: alert('NO FONT METRICS FOUND. WRONG TEXID OR TEXTURE NOT ADDED TO THE SWITCH CASE. texture_file_id:', texture_file_id);
 //    }
 // }

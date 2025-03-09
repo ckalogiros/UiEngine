@@ -37,7 +37,7 @@ export class Text_Mesh extends Mesh {
       
       
       const mat = new Material_Font(color, font, text, [bold, sdfouter])
-      const geom = new Geometry2D_Text(pos, fontsize, scale, text, font, mat.metrics_idx);
+      const geom = new Geometry2D_Text(pos, scale, text, mat.metrics_idx);
       
       super(geom, mat);
 

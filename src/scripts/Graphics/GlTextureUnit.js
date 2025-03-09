@@ -28,26 +28,26 @@ class Texture_unit {
 };
 
 
-
 export function Gl_texture_unit_create(gl, texture_file_id, idx, img, width=0, height=0) {
-/** gl.RGBA8
-    gl.SRGB8_ALPHA8 (also available as an extension for WebGL 1, see below)
-    gl.RGB10_A2
-    gl.RGBA8UI
-    gl.RGBA8I
-    gl.RGB10_A2UI
-    gl.RGBA16UI
-    gl.RGBA16I
-    gl.RGBA32I
-    gl.RGBA32UI */
-    const texture_unit = new Texture_unit();
-    texture_unit.tex_unit_id = gl.TEXTURE0 + idx; // WebGl texture_unit id.Advance the texture_unit ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
-    texture_unit.texture_file_id = texture_file_id; // Id from TEXTURES global object
-    texture_unit.texidx = idx; 
-    texture_unit.level = 0;
-    texture_unit.internalFormat = gl.RGBA;
-    texture_unit.srcFormat = gl.RGBA;
-    texture_unit.srcType = gl.UNSIGNED_BYTE;
+    /** gl.RGBA8
+     gl.SRGB8_ALPHA8 (also available as an extension for WebGL 1, see below)
+     gl.RGB10_A2
+     gl.RGBA8UI
+     gl.RGBA8I
+     gl.RGB10_A2UI
+     gl.RGBA16UI
+     gl.RGBA16I
+     gl.RGBA32I
+     gl.RGBA32UI */
+     const texture_unit = new Texture_unit();
+     texture_unit.tex_unit_id = gl.TEXTURE0 + idx; // WebGl texture_unit id.Advance the texture_unit ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
+     texture_unit.texture_file_id = texture_file_id; // Id from TEXTURES global object
+     texture_unit.texidx = idx; 
+     texture_unit.level = 0;
+     texture_unit.internalFormat = gl.RGBA;
+     texture_unit.srcFormat = gl.RGBA;
+     texture_unit.srcType = gl.UNSIGNED_BYTE;
+     // TODO: is texture_file_id and tex_idx needed here too???
     
     gl.activeTexture(texture_unit.tex_unit_id);
     texture_unit.tbo = gl.createTexture();

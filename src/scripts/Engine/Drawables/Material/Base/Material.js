@@ -4,6 +4,7 @@ import * as math from '../../../../Helpers/Math/MathOperations.js'
 import { Gl_set_rgb, Gl_set_rgba } from '../../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 import { New_generic_char_buffer } from '../../../Core/Buffers.js';
+import { Uv_get_uv_coords } from '../../../Loaders/Textures/TextureUvMap.js';
 
 
 
@@ -188,7 +189,7 @@ export class Material_Font extends Material {
 export class Material_Atlas_Texture extends Material {
 
 
-   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, sdf_params = [.5, .5], sub_tex_idx=INT_NULL) {
+   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, sub_tex_idx=INT_NULL, sdf_params = [.5, .5]) {
 
       super(col, texture_file_id);
 
@@ -202,12 +203,16 @@ export class Material_Atlas_Texture extends Material {
       } 
       this.type |= MESH_TYPE.ATLAS_TEXTURE_MATERIAL;
       
+      let texture_type = TEXTURE_TYPE.TYPE_FONT_SYMBOL;
+      
       // Load texture and uv map, via indexes to the actual buffers
-      const texture = Texture_load_texture_byid(this.texture_file_id, texture_type.TYPE_FONT);
+      const texture = Texture_load_texture_byid(texture_file_id, texture_type, sub_tex_idx);
       this.texidx = texture.tex_idx;
       this.metrics_idx = texture.metrics_idx;
       this.texture_file_id = texture_file_id;
       this.sub_tex_idx = sub_tex_idx; // The index of the sub-texture in the Atlas texture
+
+      this.uv =  Uv_get_uv_coords(this.metrics_idx, this.sub_tex_idx);
 
 
       { // Debug
@@ -243,7 +248,7 @@ export class Material_Texture extends Material {
 
       const texture = Texture_load_texture_byid(texture_file_id, texture_type);
       this.texidx = texture.tex_idx;
-      this.textureId = texture_file_id;
+      this.texture_id = texture_file_id;
       // NOTE: Simple texture does not have a uvmap
 
 

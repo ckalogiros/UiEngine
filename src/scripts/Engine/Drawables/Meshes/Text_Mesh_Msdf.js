@@ -26,7 +26,7 @@ export class Text_Mesh_Msdf extends Mesh {
       const sdfouter = CalculateSdfOuterFromDim(fontsize);
       if (sdfouter + bold > 1) bold = 1 - sdfouter;
       const mat = new Material_Font(color, font, text, [bold, sdfouter])
-      const geom = new Geometry2D_msdf_text(pos, fontsize, scale, text, font, mat.metrics_idx);
+      const geom = new Geometry2D_msdf_text(pos, fontsize, scale, text, mat.metrics_idx);
 
       super(geom, mat);
 
