@@ -1,7 +1,6 @@
 "use strict"
 
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Font_metrics_get_row_height } from "../../Engine/Loaders/Font/Font.js";
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_state_enable } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Linear_interpolation } from "../../Helpers/Math/MathFunctions.js";
 

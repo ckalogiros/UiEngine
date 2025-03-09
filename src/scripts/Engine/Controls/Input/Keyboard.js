@@ -24,9 +24,9 @@ import { Particle_system_print_info } from "../../ParticlesSystem/ParticlesSyste
 import { Notifications_print, Notifications_print_loop } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Texture_buffer_print } from "../../Loaders/Textures/Texture.js";
 import { Widget_root_per_vb_meshidx_print_w4, Root_group_buffer_print_w1, Root_group_buffer_print_w6, Root_group_vbidx_buffer_print_loop_w2, Root_group_vbidx_buffer_print_w3 } from "../../Core/Views/RootView.js";
-import { Font_print } from "../../Loaders/Font/Font.js";
 import { Shaders_print_loop } from "../../../Graphics/GlShaders.js";
 import { Arkanois_print_scrore_mod } from "../../../App/Demo/Games/Arkanoid/ScoreMod.js";
+import { Uvmaps_print } from "../../Loaders/Textures/TextureUvMap.js";
 
 _CNT = 0;
 const p = _CNT++;
@@ -176,10 +176,10 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'f3',
-      discr: 'Font_print',
+      discr: 'Uvmaps_print',
       func: (e)=>{
-         console.log('------------------ Font_print ------------------');
-         Font_print();
+         console.log('------------------ Uvmaps_print ------------------');
+         Uvmaps_print();
       },
    },
    {

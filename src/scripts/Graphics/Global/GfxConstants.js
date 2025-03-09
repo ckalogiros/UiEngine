@@ -664,15 +664,15 @@ const UNIFORM = {
 
 // Store key-value pairs of texture name - texture index(for the global texture array. See GlTextures.js)
 // TODO: Create buffers of fonts and farmebuffers
-const Texture = {
-    atlas: INT_NULL,
-    font: INT_NULL,
-    frameBufferTexture0: INT_NULL,
+const Bound_texture = {
+    // atlas: INT_NULL,
+    // font: INT_NULL,
+    // frameBufferTexture0: INT_NULL,
 
     // Current Bound Texture's index(in the texture array. See GlTextures.js). 
     // Only one bound texture is allowed at any time by webGl, so this is a global access
     // to which texture is bound.
-    boundTexture: -1,
+    texidx: -1,
 };
 
 

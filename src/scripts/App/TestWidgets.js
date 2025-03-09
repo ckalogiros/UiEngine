@@ -40,7 +40,7 @@ import { App_reinitialize, App_reset } from './App.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_msdf_text_rendering, Demo_widgets_scrolled_labels, Demo_widgets_sections, Demo_widgets_sections_new_align } from './Demo/DemoWidgets.js';
 import { Board_rotations } from './Demo/DemoBoardRotations.js';
-import { Font_metrics_get_char_width, Font_metrics_get_face_advancex, Font_metrics_get_row_height } from '../Engine/Loaders/Font/Font.js';
+// import { Uv_metrics_get_char_width, Uv_metrics_get_face_advancex, Uv_metrics_get_row_height } from '../Engine/Loaders/Font/Font.js';
 import { Tetris } from './Demo/Games/Snake/Tetris.js';
 import { Bitwise_operations_run_test } from '../Engine/Core/BitwiseOps.js';
 import { Arkanoid_initialize } from './Demo/Games/Arkanoid/Arkanoid.js';
@@ -50,6 +50,7 @@ import { Style_widget_default } from './Widgets/WidgetStyles.js';
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
 import { Align_pre_simple, Test_alignment, Test_alignment_nested_2 } from './Tests/TestAlignNestedSections.js';
 import { Performance_timer_start, Performance_timer_stop, PerformanceTimersGetFps, PerformanceTimersGetMilisec } from '../Engine/Timers/PerformanceTimers.js';
+import { Uv_metrics_get_char_width, Uv_metrics_get_row_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
 
 
 {
@@ -184,7 +185,7 @@ export function TestWidgetsGeneric() {
 
         // TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [32/2, 32/2], WHITE, [0,0], TEXTURES.COIN);
 
-        TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 80, [56/2, 56/2], WHITE, [0,0], TEXTURES.ARROW_LEFT);
+        // TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 80, [56/2, 56/2], WHITE, [0,0], TEXTURES.ARROW_LEFT);
         // CreateLabel(_, '()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.ARROW_LEFT, 0, 250,);
     }
 
@@ -729,8 +730,8 @@ function Test_text_clbk_animations_with_counter(x, y, text_pad_x = 10, text_pad_
             const text_substitution = `${cnt++}`
 
             let limit = 0;
-            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh.text_mesh.mat.fontidx, text_substitution) / 2;
-            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh.text_mesh.mat.fontidx) / 2;
+            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Uv_metrics_get_char_width(mesh.text_mesh.mat.fontidx, text_substitution) / 2;
+            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Uv_metrics_get_row_height(mesh.text_mesh.mat.fontidx) / 2;
 
             if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_X) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_X, text_substitution);
             if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, text_substitution);
@@ -802,8 +803,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
                 params.params.counter1 = 0;
                 let limit_ = 0;
                 const text_substitution_ = `${params.params.counter2++}`
-                if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(mesh1.text_mesh.mat.fontidx, text_substitution_) / 2;
-                else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(mesh1.text_mesh.mat.fontidx) / 2;
+                if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Uv_metrics_get_char_width(mesh1.text_mesh.mat.fontidx, text_substitution_) / 2;
+                else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Uv_metrics_get_row_height(mesh1.text_mesh.mat.fontidx) / 2;
                 Demo_clbk_animations_text_create(mesh2, slope_params_pointer, limit_, 'TEST_text_animation_2', clbk_anim_flag, text_substitution_);
             }
             if (params.params.counter2 > 9) { params.params.counter2 = 0; }
@@ -811,8 +812,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
             const text_substitution = `${params.params.counter1++}`
 
             let limit = 0;
-            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(mesh1.text_mesh.mat.fontidx, text_substitution) / 2;
-            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(mesh1.text_mesh.mat.fontidx) / 2;
+            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Uv_metrics_get_char_width(mesh1.text_mesh.mat.fontidx, text_substitution) / 2;
+            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Uv_metrics_get_row_height(mesh1.text_mesh.mat.fontidx) / 2;
 
             Demo_clbk_animations_text_create(mesh1, slope_params_pointer, limit, 'TEST_text_animation_1', clbk_anim_flag, text_substitution);
         },

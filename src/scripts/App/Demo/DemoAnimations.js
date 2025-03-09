@@ -9,7 +9,8 @@ import { BLACK, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Get_f
 import { Mesh_set_root_in_focus } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Font_metrics_get_char_width, Font_metrics_get_row_height } from "../../Engine/Loaders/Font/Font.js";
+import { Uv_metrics_get_char_width, Uv_metrics_get_row_height } from "../../Engine/Loaders/Textures/TextureUvMap.js";
+// import { Uv_metrics_get_char_width, Uv_metrics_get_char_width } from "../../Engine/Loaders/Font/Font.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSequencedColor } from "../../Helpers/Helpers.js";
@@ -1227,8 +1228,8 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
             let limit_ = 0;
             const text_substitution_ = `${params.params.counter2++}`
-            if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Font_metrics_get_char_width(digit2_mesh.text_mesh.mat.fontidx, text_substitution_) / 2;
-            else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Font_metrics_get_row_height(digit2_mesh.text_mesh.mat.fontidx) / 2;
+            if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Uv_metrics_get_char_width(digit2_mesh.text_mesh.mat.fontidx, text_substitution_) / 2;
+            else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Uv_metrics_get_row_height(digit2_mesh.text_mesh.mat.fontidx) / 2;
 
             const anim_idx = Demo_clbk_animations_text_create(digit2_mesh, slope_params_pointer, limit_, 'TEST_text_animation_2', anim_flag, text_substitution_);
             params.params.counter1 = 0;
@@ -1241,8 +1242,8 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
          const text_substitution = `${params.params.counter1++}`
 
          let limit = 0;
-         if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Font_metrics_get_char_width(digit1_mesh.text_mesh.mat.fontidx, text_substitution) / 2;
-         else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Font_metrics_get_row_height(digit1_mesh.text_mesh.mat.fontidx) / 2;
+         if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Uv_metrics_get_char_width(digit1_mesh.text_mesh.mat.fontidx, text_substitution) / 2;
+         else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Uv_metrics_get_row_height(digit1_mesh.text_mesh.mat.fontidx) / 2;
 
          const anim_idx = Demo_clbk_animations_text_create(digit1_mesh, slope_params_pointer, limit, 'TEST_text_animation_1', anim_flag, text_substitution);
       },

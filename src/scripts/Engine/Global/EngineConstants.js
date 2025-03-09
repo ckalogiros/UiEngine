@@ -831,6 +831,44 @@ const TEXTURE_SMOKE1 = 'smoke';
 const TEXTURE_COIN = 'Coin_1_64x64';
 const TEXTURE_TEST_APPLE = 'apple1_64x73';
 const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
+/**
+ * 	TEXTURE_PATHS[cnt++].metrics = CONSOLAS_12Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_16Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_20Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_24Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_28Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_32Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_40Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_49Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_58Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_66Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_116Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_157Hpx;
+	 TEXTURE_PATHS[cnt++].metrics = consola_msdf_test_1024_metrics;
+	 TEXTURE_PATHS[cnt++].metrics = comic_sans_cz;
+	 TEXTURE_PATHS[cnt++].metrics = arrow_left;
+ */
+// // Font textures
+// const FONT_CONSOLAS_12px = { name:'consolas_3', metrics_file: CONSOLAS_12Hpx, };
+// const FONT_CONSOLAS_16px = 	{ name:'consolas_4', metrics_file: CONSOLAS_16Hpx, };
+// const FONT_CONSOLAS_20px = 	{ name:'consolas_5', metrics_file: CONSOLAS_20Hpx, };
+// const FONT_CONSOLAS_24px = 	{ name:'consolas_6', metrics_file: CONSOLAS_24Hpx, };
+// const FONT_CONSOLAS_28px = 	{ name:'consolas_7', metrics_file: CONSOLAS_28Hpx, };
+// const FONT_CONSOLAS_32px = 	{ name:'consolas_8', metrics_file: CONSOLAS_32Hpx, };
+// const FONT_CONSOLAS_40px = 	{ name:'consolas_9', metrics_file: CONSOLAS_40Hpx, };
+// const FONT_CONSOLAS_49px = 	{ name:'consolas_10', metrics_file: CONSOLAS_49Hpx, };
+// const FONT_CONSOLAS_58px = 	{ name:'consolas_11', metrics_file: CONSOLAS_58Hpx, };
+// const FONT_CONSOLAS_66px = 	{ name:'consolas_12', metrics_file: CONSOLAS_66Hpx, };
+// const FONT_CONSOLAS_116px = 	{ name:'consolas_13', metrics_file: CONSOLAS_116Hpx, };
+// const FONT_CONSOLAS_157px = 	{ name:'consolas_14', metrics_file: CONSOLAS_157Hpx, };
+// const TEST_MTSDF_FONT_TEST_1024DIM = { name:'consola_mtsdf_test_1024', metrics_file: consola_msdf_test_1024_metrics, };
+// const FONT_MSDF_COMIC = 'comicz';
+// const TEST_MSDF_FONT_1 = 'msdf_a_char';
+// // Textures
+// const TEXTURE_SMOKE1 = 'smoke';
+// const TEXTURE_COIN = 'Coin_1_64x64';
+// const TEXTURE_TEST_APPLE = 'apple1_64x73';
+// const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
 
 
 
@@ -839,134 +877,137 @@ const TEXTURE_LEFT_ARROW = 'arrow_left_256x256';
 
 
 
-// IMPORTANT: Every texture image file above, must be stored to the FONT_PATHS below as shown.
-const TEXTURE_PATHS = [
 
-	{ // 0
-		imgPath: 'fonts/consolas_3',
-		imgName: FONT_CONSOLAS_12px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 1
-		imgPath: 'fonts/consolas_4',
-		imgName: FONT_CONSOLAS_16px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 2
-		imgPath: 'fonts/consolas_5',
-		imgName: FONT_CONSOLAS_20px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 3
-		imgPath: 'fonts/consolas_6',
-		imgName: FONT_CONSOLAS_24px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 4
-		imgPath: 'fonts/consolas_7',
-		imgName: FONT_CONSOLAS_28px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 5
-		imgPath: 'fonts/consolas_8',
-		imgName: FONT_CONSOLAS_32px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 6
-		imgPath: 'fonts/consolas_10',
-		imgName: FONT_CONSOLAS_40px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 7
-		imgPath: 'fonts/consolas_12',
-		imgName: FONT_CONSOLAS_49px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 8
-		imgPath: 'fonts/consolas_14',
-		imgName: FONT_CONSOLAS_58px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 9
-		imgPath: 'fonts/consolas_16',
-		imgName: FONT_CONSOLAS_66px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 10
-		imgPath: 'fonts/consolas_28',
-		imgName: FONT_CONSOLAS_116px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 11
-		imgPath: 'fonts/consolas_38',
-		imgName: FONT_CONSOLAS_157px,
-		imgType: 'bmp',
-		metrics: null, 
-	},
-	{ // 12
-		imgPath: 'fonts/consolas_sdf',
-		imgName: TEST_MTSDF_FONT_TEST_1024DIM,
-		imgType: 'png',
-		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-	},
-	{ // 13
-		imgPath: 'fonts/comic_sans_ms',
-		imgName: FONT_MSDF_COMIC,
-		imgType: 'png',
-		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-	},
-	{ // 14
-		imgPath: 'fonts/symbol_fonts/test_symbol_fonts',
-		imgName: TEXTURE_LEFT_ARROW,
-		imgType: 'png',
-		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-	},
-	/***************************************************************************************************/
-	// Textures
-	{
-		imgPath: 'textures',
-		imgName: TEXTURE_SMOKE1,
-		imgType: 'png',
-		metrics: null, 
-	},
-	{
-		imgPath: 'textures',
-		imgName: TEXTURE_COIN,
-		imgType: 'png',
-		metrics: null, 
-	},
-	{
-		imgPath: 'textures',
-		imgName: TEXTURE_TEST_APPLE,
-		imgType: 'png',
-		metrics: null, 
-	},
-	// {
-	// 	imgPath: 'textures',
-	// 	imgName: TEXTURE_LEFT_ARROW,
-	// 	imgType: 'png',
-	// 	metrics: null, 
-	// },
-];
+// const TEXTURE_PATHS = [
 
-
+// 	{ // 0
+// 		imgPath: 'fonts/consolas_3',
+// 		imgName: FONT_CONSOLAS_12px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 1
+// 		imgPath: 'fonts/consolas_4',
+// 		imgName: FONT_CONSOLAS_16px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 2
+// 		imgPath: 'fonts/consolas_5',
+// 		imgName: FONT_CONSOLAS_20px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 3
+// 		imgPath: 'fonts/consolas_6',
+// 		imgName: FONT_CONSOLAS_24px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 4
+// 		imgPath: 'fonts/consolas_7',
+// 		imgName: FONT_CONSOLAS_28px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 5
+// 		imgPath: 'fonts/consolas_8',
+// 		imgName: FONT_CONSOLAS_32px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 6
+// 		imgPath: 'fonts/consolas_10',
+// 		imgName: FONT_CONSOLAS_40px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 7
+// 		imgPath: 'fonts/consolas_12',
+// 		imgName: FONT_CONSOLAS_49px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 8
+// 		imgPath: 'fonts/consolas_14',
+// 		imgName: FONT_CONSOLAS_58px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 9
+// 		imgPath: 'fonts/consolas_16',
+// 		imgName: FONT_CONSOLAS_66px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 10
+// 		imgPath: 'fonts/consolas_28',
+// 		imgName: FONT_CONSOLAS_116px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 11
+// 		imgPath: 'fonts/consolas_38',
+// 		imgName: FONT_CONSOLAS_157px,
+// 		imgType: 'bmp',
+// 		metrics: null, 
+// 	},
+// 	{ // 12
+// 		imgPath: 'fonts/consolas_sdf',
+// 		imgName: TEST_MTSDF_FONT_TEST_1024DIM,
+// 		imgType: 'png',
+// 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
+// 	},
+// 	{ // 13
+// 		imgPath: 'fonts/comic_sans_ms',
+// 		imgName: FONT_MSDF_COMIC,
+// 		imgType: 'png',
+// 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
+// 	},
+// 	{ // 14
+// 		imgPath: 'fonts/symbol_fonts/test_symbol_fonts',
+// 		imgName: TEXTURE_LEFT_ARROW,
+// 		imgType: 'png',
+// 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
+// 	},
+// 	/***************************************************************************************************/
+// 	// Textures
+// 	{
+// 		imgPath: 'textures',
+// 		imgName: TEXTURE_SMOKE1,
+// 		imgType: 'png',
+// 		metrics: null, 
+// 	},
+// 	{
+// 		imgPath: 'textures',
+// 		imgName: TEXTURE_COIN,
+// 		imgType: 'png',
+// 		metrics: null, 
+// 	},
+// 	{
+// 		imgPath: 'textures',
+// 		imgName: TEXTURE_TEST_APPLE,
+// 		imgType: 'png',
+// 		metrics: null, 
+// 	},
+// 	// {
+// 	// 	imgPath: 'textures',
+// 	// 	imgName: TEXTURE_LEFT_ARROW,
+// 	// 	imgType: 'png',
+// 	// 	metrics: null, 
+// 	// },
+// ];
 
 
 
 
 
 
+
+/**
+ * // TODO: Have the TEXTURES as a global var, and abstract the inner workings of texture paths, texture names, pairings and creation.
+ * Also set an Init function to resolve the index of each texture name below
+ */
 g_cnt = 0;
 const TEXTURES = {
 
@@ -988,7 +1029,7 @@ const TEXTURES = {
 	CONSOLAS_157px: g_cnt++,
 	MSDF_CONSOLAS_1024: g_cnt++,
 	MSDF_COMIC_1024: g_cnt++,
-	FONT_COUNT: g_cnt,
+	TEXTURE_ATLASES_COUNT: g_cnt,
 	ARROW_LEFT:g_cnt++, 
 	
 	// IS_MSDF: 0x0, 

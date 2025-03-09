@@ -7,13 +7,13 @@
 
 
 
-export class Gl_Texture {
+class Texture_unit {
 
     
-    /** The Graphic's texture unit object. */
+    /** The Graphic's texture_unit unit object. */
     tbo = null; 
 	tex_unit_id = -1; // Graphic's unique 'unsigned integer' id. 
-    textureid = INT_NULL; // The texture id from the 'TEXTURES.' global contant
+    textureid = INT_NULL; // The texture_unit id from the 'TEXTURES.' global contant
     texidx = INT_NULL; // Self refference index
 	width = 0;
 	height = 0;
@@ -40,35 +40,35 @@ export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=
     gl.RGBA16I
     gl.RGBA32I
     gl.RGBA32UI */
-    const texture = new Gl_Texture();
-    texture.tex_unit_id = gl.TEXTURE0 + idx; // WebGl texture id.Advance the texture ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
-    texture.textureid = textureid; // Id from TEXTURES global object
-    texture.texidx = idx; 
-    texture.level = 0;
-    texture.internalFormat = gl.RGBA;
-    texture.srcFormat = gl.RGBA;
-    texture.srcType = gl.UNSIGNED_BYTE;
+    const texture_unit = new Texture_unit();
+    texture_unit.tex_unit_id = gl.TEXTURE0 + idx; // WebGl texture_unit id.Advance the texture_unit ID to the next. // TODO: Should check for GL_MAX_ALLOWED_TEXTURE_UNITS.
+    texture_unit.textureid = textureid; // Id from TEXTURES global object
+    texture_unit.texidx = idx; 
+    texture_unit.level = 0;
+    texture_unit.internalFormat = gl.RGBA;
+    texture_unit.srcFormat = gl.RGBA;
+    texture_unit.srcType = gl.UNSIGNED_BYTE;
     
-    gl.activeTexture(texture.tex_unit_id);
-    texture.tbo = gl.createTexture();
+    gl.activeTexture(texture_unit.tex_unit_id);
+    texture_unit.tbo = gl.createTexture();
     
-    if (!texture.tbo) alert('Could not create Texture');
+    if (!texture_unit.tbo) alert('Could not create Texture');
 
-    texture.img = img; // Load the font image
+    texture_unit.img = img; // Load the font image
 
-    if(DEBUG.TEXTURE) console.log('texture:', texture)
+    if(DEBUG.TEXTURE) console.log('texture_unit:', texture_unit)
 
-    if(texture.img){
+    if(texture_unit.img){
 
-        if(DEBUG.TEXTURE) console.log('texture:', texture)
-        Gl_texture_unit_load(gl, texture);
+        if(DEBUG.TEXTURE) console.log('texture_unit:', texture_unit)
+        Gl_texture_unit_load(gl, texture_unit);
     }
     else{ // Must set the width and height
 
-        // gl.bindTexture(gl.TEXTURE_2D, texture.tbo);
-        Gl_texture_unit_bind(gl, texture);
-        gl.texImage2D(gl.TEXTURE_2D, texture.level, texture.internalFormat, width, 
-                                height, 0, texture.srcFormat, texture.srcType, null);
+        // gl.bindTexture(gl.TEXTURE_2D, texture_unit.tbo);
+        Gl_texture_unit_bind(gl, texture_unit);
+        gl.texImage2D(gl.TEXTURE_2D, texture_unit.level, texture_unit.internalFormat, width, 
+                                height, 0, texture_unit.srcFormat, texture_unit.srcType, null);
         
         // gl.generateMipmap(gl.TEXTURE_2D);
         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
@@ -98,22 +98,22 @@ export function Gl_texture_unit_create(gl, textureid, idx, img, width=0, height=
         // // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         // // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         
-        texture.width = width;
-        texture.height = height;
+        texture_unit.width = width;
+        texture_unit.height = height;
     }
     
-    return texture;
+    return texture_unit;
 }
 
 
 
-function Gl_texture_unit_load(gl, texture) {
+function Gl_texture_unit_load(gl, texture_unit) {
     
-    texture.img.onload = function(){
+    texture_unit.img.onload = function(){
         
-        Gl_texture_unit_bind(gl, texture);
-        gl.texImage2D(gl.TEXTURE_2D, texture.level, texture.internalFormat, texture.img.width, 
-            texture.img.height, 0, texture.srcFormat, texture.srcType, texture.img);
+        Gl_texture_unit_bind(gl, texture_unit);
+        gl.texImage2D(gl.TEXTURE_2D, texture_unit.level, texture_unit.internalFormat, texture_unit.img.width, 
+            texture_unit.img.height, 0, texture_unit.srcFormat, texture_unit.srcType, texture_unit.img);
             
         // gl.generateMipmap(gl.TEXTURE_2D);
         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
@@ -138,19 +138,19 @@ function Gl_texture_unit_load(gl, texture) {
 
 
 
-        texture.width = texture.img.width;
-        texture.height = texture.img.height;
+        texture_unit.width = texture_unit.img.width;
+        texture_unit.height = texture_unit.img.height;
     }
 }
 
 
 
-export function Gl_texture_unit_bind(gl, texture) {
+export function Gl_texture_unit_bind(gl, texture_unit) {
 
-    gl.activeTexture(texture.tex_unit_id);
-    gl.bindTexture(gl.TEXTURE_2D, texture.tbo);
+    gl.activeTexture(texture_unit.tex_unit_id);
+    gl.bindTexture(gl.TEXTURE_2D, texture_unit.tbo);
 
-    GL_STATE.BOUND_TEXTURE_IDX = texture.texidx;
-    Texture.boundTexture = texture.texidx; // Update the global Texture constant object
+    GL_STATE.BOUND_TEXTURE_IDX = texture_unit.texidx;
+    Bound_texture.texidx = texture_unit.texidx; // Update the global Texture constant object
 }
 

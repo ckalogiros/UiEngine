@@ -25,7 +25,8 @@ import { Styles_hover_margin_reset, Styles_margin_reset, Styles_pad_reset } from
 import { Generic_buffers_container_reset } from '../Engine/Core/Buffers.js';
 import { Root_group_batch_buffer_reset, Root_group_buffer_reset, Root_group_buffer_reset_dealocate, Root_group_destroy_meshes_buffer_alocations, Root_group_gfx_buffer_reset, Root_group_gfx_buffer_reset_dealocate } from '../Engine/Core/Views/RootView.js';
 import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
-import { Font_texture_init_buffers, Font_texture_reset_buffers } from '../Engine/Loaders/Font/Font.js';
+// import { Font_texture_init_buffers, Font_texture_reset_buffers } from '../Engine/Loaders/Font/Font.js';
+import { Uv_texture_init_buffers, Uv_texture_reset_buffers } from '../Engine/Loaders/Textures/TextureUvMap.js';
 
 
 // var osu = require('node-os-utils')
@@ -48,7 +49,7 @@ export function AppInit() {
 
     // Create and initialize the buffers that will be storing texture-font-uv data. 
     Texture_init_texture_storage_buffer();
-    Font_texture_init_buffers();
+    Uv_texture_init_buffers();
 
     
 
@@ -148,7 +149,7 @@ export function App_reset(){
     
     Gfx_pool_vb_reset();
 
-    Font_texture_reset_buffers();
+    Uv_texture_reset_buffers();
     
     Mesh_unif_wpos_reset();
     Mesh_unif_wpos_ubidxs_reset();
