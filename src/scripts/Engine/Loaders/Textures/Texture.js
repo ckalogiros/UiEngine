@@ -1,3 +1,11 @@
+/**
+ * texture_id: The id that is used to denote what texture we want to use for loading (Name of the texture file)
+ * tex_idx: The index of the loaded texture that exists in the _texture_buffer
+ * tex_unit_id: The webGl texture id, used for binding a specific texture to the gpu
+ * 
+ */
+
+
 "use strict";
 
 import { Gl_texture_unit_create } from "../../../Graphics/GlTextureUnit.js";
@@ -341,7 +349,8 @@ export function Texture_load_texture_byid(textureid, TEX_TYPE) {
 		const img = ImageLoader.Load(texture.imgPath, texture.imgName, texture.imgType);
 		webGl_texture_idx = Texture_create_texture(gfxCtx.gl, texture.textureid, img, texture.imgName);
 		
-		const texture_unit = Gl_texture_unit_create(gfxCtx.gl, textureid, textureid, img);
+		// const texture_unit = Gl_texture_unit_create(gfxCtx.gl, textureid, textureid, img);
+		const texture_unit = _textureBuffer[webGl_texture_idx];
 		texture.SetTextureUnit(texture_unit);
 
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT || TEX_TYPE & TEXTURE_TYPE.TYPE_FONT_SYMBOL) {

@@ -10,7 +10,7 @@ import { Mesh } from "./Base/Mesh.js";
 import { Gl_set_rgb_specific_index, Gl_set_uv, Gl_set_vpos_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { WHITE } from "../Material/Base/Colors.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Msdf_Uv_get_font_line_height, Msdf_Uv_get_font_advancex, Msdf_Uv_get_font_base_line, Uv_get_uv_coords, Msdf_Uv_get_char_uv_coords} from "../../Loaders/Textures/TextureUvMap.js";
+import { Msdf_Uv_get_font_line_height, Msdf_Uv_get_font_advancex, Msdf_Uv_get_font_base_line, Uv_get_uv_coords, Msdf_Uv_get_char_uv_coords, Msdf_Uv_get_char_plane_bounds} from "../../Loaders/Textures/TextureUvMap.js";
 
 
 const font_y_constant_temp = 2.25;
@@ -106,7 +106,7 @@ export class Text_Mesh_Msdf extends Mesh {
          if (char) { // If there is a text, get char uv and metrics
 
             this.mat.uv = Msdf_Uv_get_char_uv_coords(this.mat.fontidx, char);
-            const plane_bounds = Msdf_Uv_get_char_uv_coords(this.mat.fontidx, char);
+            const plane_bounds = Msdf_Uv_get_char_plane_bounds(this.mat.fontidx, char);
             geom_copy.dim[0] *= plane_bounds.width;
             geom_copy.dim[1] *= plane_bounds.height;
             geom_copy.pos[1] += plane_bounds.yoffset * this.fontsize;
@@ -391,7 +391,7 @@ export class Text_Mesh_Msdf extends Mesh {
       for (let i = 0; i < face_count; i++) {
 
          const char = this.mat.char_buffer.buffer[i];
-         const plane_bounds = Msdf_Uv_get_char_uv_coords(this.mat.fontidx, char);
+         const plane_bounds = Msdf_Uv_get_char_plane_bounds(this.mat.fontidx, char);
 
          if (char === '\n') {
 
@@ -459,7 +459,7 @@ export class Text_Mesh_Msdf extends Mesh {
          }
          else {
 
-            const plane_bounds = Msdf_Uv_get_char_uv_coords(this.mat.fontidx, char);
+            const plane_bounds = Msdf_Uv_get_char_plane_bounds(this.mat.fontidx, char);
    
             // TODO: For efficiency, create a dedicated Gl_ function to update all values
             // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
@@ -586,7 +586,7 @@ export class Text_Mesh_Msdf extends Mesh {
          this.mat.uv = Msdf_Uv_get_char_uv_coords(this.mat.fontidx, c[i]);
          Gl_set_uv(this.gfx, this.mat.uv);
 
-         const plane_bounds = Msdf_Uv_get_char_uv_coords(this.mat.fontidx, c[i]);
+         const plane_bounds = Msdf_Uv_get_char_plane_bounds(this.mat.fontidx, c[i]);
 
          // TODO: For efficiency, create a dedicated Gl_ function to update all values
          // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
@@ -721,7 +721,7 @@ export class Text_Mesh_Msdf extends Mesh {
          }
          else {
             
-            const plane_bounds = Msdf_Uv_get_char_uv_coords(this.mat.fontidx, char);
+            const plane_bounds = Msdf_Uv_get_char_plane_bounds(this.mat.fontidx, char);
    
             if (char) { // If there is a text, get char uv and metrics
    

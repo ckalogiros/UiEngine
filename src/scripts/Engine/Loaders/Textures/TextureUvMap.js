@@ -40,10 +40,10 @@ export function Uv_texture_init_buffers() {
 
 
 
-export function Uv_create_uvmap(texture_id){
+// export function Uv_create_uvmap(texture_id){
 
-   Uv_get_metrics_by_texid(texture_id); 
-}
+//    Uv_get_metrics_by_texid(texture_id); 
+// }
 
 
 
@@ -153,7 +153,7 @@ export function Uv_load_uvs(textureid, metrics_file) {
    
    if(FONT_IS_MSDF(textureid)) {
       
-      const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(textureid, metrics_file);
+      const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(metrics_file);
       _metrics_buffer[sub_tex_idx] = msdf_metrics;
       _uvmap_buffer[sub_tex_idx] =  msdf_metrics.uvmap
       
@@ -177,7 +177,7 @@ export function Uv_load_uvs(textureid, metrics_file) {
       const ret = Uv_create_storage_buffer_font();
       _metrics_buffer[sub_tex_idx] = ret.metrics
       _uvmap_buffer[sub_tex_idx] = ret.uvMap;
-      Metrics_loader_load_custom_metrics(sub_tex_idx, textureid, metrics_file);
+      Metrics_loader_load_custom_metrics(ret.metrics, metrics_file);
       Create_uv_map(sub_tex_idx);
       
    }
@@ -311,100 +311,6 @@ function Create_uv_map(sub_tex_idx, uvMap) {
    return uvmap;
 }
 
-
-
-/*
-   Finds text between delimiters, in a string buffer.
-*/
-function Find_next_field(file, delim) {
-   /**
-    * pos reference's indexes in the string buffer.
-    * 		pos.start:   the start index of the searched text in the string buffer
-    * 		pos.end:     the end index of the searched text in the string buffer
-    * 		pos.len:     the length of the searched text in the string buffer
-    * 		pos.line:    the line of the searched text in the string buffer
-    */
-   let pos = file.pos;
-
-   // Cash values
-   const data = file.content;
-   let i = file.pos.start;
-
-   // Find first delim
-   while (data[i++] != delim[0]) {
-      if (data[i] == '\n')
-         file.pos.line++;
-      if (i >= file.size) {
-         console.error("Delimiter does not exist. Returning");
-         return -1;
-      }
-   }
-   pos.start = i;
-
-   // Store to "charval" whatever lies in between the two delimiter characters
-   let charval = '';
-   let k = 0;
-   while (data[i] != delim[1]) {
-      charval += data[i];
-      pos.len++;
-      i++; k++;
-      if (i >= file.size) {
-         console.error("No value found. Reached the end of file.");
-      }
-   }
-   pos.end = i - 1;
-
-   // Store the "charval's" position (in the string buffer) to file.pos object
-   file.pos.start = pos.start;
-   file.pos.end = pos.end;
-   file.pos.len = pos.len;
-
-   // Convert String to Number
-   let val = 0;
-   for (i = 0; i < k; i++)
-      val = val * 10 + (charval[i] - '0');
-
-   return val;
-}
-
-
-
-function Find_field_by_name(file, word, pos) {
-
-   const wordpos = { start: -1, end: -1, len: 0, line: -1 };
-   const wordlen = word.length;
-   
-   let line = pos.line;
-   let i = pos.start;
-   
-   const filelen = file.length;
-   while (i <= filelen) {
-
-      let k = 0;
-      if (file[i] == '\n') line++;
-
-      if (file[i] == word[k]) {
-
-         wordpos.start = i;
-         wordpos.len = 0;
-         i++; k++;
-
-         while (file[i] == word[k]) {
-
-            wordpos.len++;
-            if (k >= wordlen - 1) {
-               wordpos.line = line;
-               wordpos.len++;
-               wordpos.end = i + 1;
-               return wordpos;
-            }
-            i++; k++;
-         }
-      }
-      i++;
-   }
-   return wordpos;
-}
 
 
 

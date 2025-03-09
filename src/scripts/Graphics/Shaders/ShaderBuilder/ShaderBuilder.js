@@ -884,7 +884,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
 
    const attribsidx = Shader_attributes_create(ret.attribs_info);
 
-   if (DEBUG.SHADERS) console.info(vs)
+   console.info(vs)
    return {
       vs: vs,
       attribsidx: attribsidx,
@@ -1261,7 +1261,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
    ID++;
 
-   if (DEBUG.SHADERS) console.info(fs);
+   console.info(fs);
    return {
       fs:fs,
       code:fs_chunks,

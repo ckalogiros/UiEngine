@@ -6,7 +6,8 @@ import * as glBufferOps from '../../../../Graphics/Buffers/VertexBuffersOps.js'
 
 
 
-
+// HERE: correct the scale field
+// 1: is it used? Is it passed as an array?
 
 
 

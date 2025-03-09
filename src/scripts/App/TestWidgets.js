@@ -102,7 +102,9 @@ export function TestWidgetsGeneric() {
         // Debug_info_ui_static_app_int8_buffers(ROOT_WIDGETS.CREATE_ROOT, 0, yy+=pp);
     }
 
-    CreateLabelMsdf(_, '>', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
+    // CreateLabelMsdf(_, '>', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
+    CreateLabelMsdf(_, '123', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
+    CreateLabelMsdf(_, '123', TEXTURES.CONSOLAS_157px, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
 
 
     // Demo_page();
@@ -1209,7 +1211,8 @@ function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', fo
 function CreateLabelMsdf(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], text_color = WHITE, vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
 
     const pos = [x, y, 2];
-    const label = Create_widget_label(root_widget, name, _, pos, font_size, color, text_color, [0, 0], .5, _, font,);
+    // const label = Create_widget_label(root_widget, name, _, pos, font_size, color, text_color, [0, 0], .5, _, font,);
+    const label = Create_widget_label(root_widget, name, _, pos, font_size, ORANGEL[9], WHITE, [0, 0], .5, _, font,);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
     label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
