@@ -1,6 +1,6 @@
 "use strict"
 
-import { Abs } from "../../../Helpers/Math/MathOperations.js";
+import { Abs, Max, Min } from "../../../Helpers/Math/MathOperations.js";
 
 
 
@@ -26,6 +26,7 @@ export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, sub_tex_
       bottom   : 0,
       width    : 0,
       height   : 0,
+      ratio   : 0,
    }
 
 
@@ -62,6 +63,7 @@ export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, sub_tex_
       glyph.bottom = glyphs[i].atlasBounds.bottom;
       glyph.width  = glyph.right  - glyph.left;
       glyph.height = glyph.bottom - glyph.top;
+
       
       
       // Calculate uvs
@@ -90,6 +92,7 @@ export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, sub_tex_
          bottom:  glyph.bottom,
          width:   glyph.width,
          height:  glyph.height,
+         ratio:   Max(glyph.height, glyph.width) / Min(glyph.height, glyph.width),
       };
 
    }

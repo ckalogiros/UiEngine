@@ -1,6 +1,6 @@
 "use strict";
 
-import { CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
+import { CopyArr2, Max, Min } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
@@ -20,6 +20,7 @@ import { Performance_timer_start, Performance_timer_stop } from "../../Timers/Pe
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_reset_gfxs, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_resize_and_rerender } from "../../Core/Views/RootView.js";
 import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
+import { Msdf_ont_get_char_atlas_bounds_width, Msdf_ont_get_char_plane_bounds_height, Msdf_ont_get_char_plane_bounds_width, Uv_metrics_get_char_width } from "../../Loaders/Textures/TextureUvMap.js";
 
 
 
@@ -39,7 +40,7 @@ export class Section extends Mesh {
 
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), pad = [4, 4], pos = [200, 400, 0],
-      dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = { rcorners: 4, feather: 2, border: 0 }, num_faces = 1, texture_id = INT_NULL, sub_texture_id, is_debug_mesh) {
+      dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = { rcorners: 4, feather: 2, border: 0 }, num_faces = 1, texture_id = INT_NULL, sub_texture_id = INT_NULL, is_debug_mesh) {
 
       const geom = new Geometry2D(pos, dim, _, num_faces);
       // Create texture if the user has passed a texture id of type:TEXTURES.
@@ -54,6 +55,19 @@ export class Section extends Mesh {
       this.max_size = [0, 0];
       this.min_size = [0, 0];
       this.last_pos = [0, 0];
+
+      // Create dimentions according to the sub-texture dimentions ratio
+      if(sub_texture_id!==INT_NULL) {
+         // TODO: Re-think the implementation
+         const font_width = Msdf_ont_get_char_plane_bounds_width(this.mat.metrics_idx, sub_texture_id);
+         const font_height = Msdf_ont_get_char_plane_bounds_height(this.mat.metrics_idx, sub_texture_id);
+         this.geom.dim[0] = font_width*dim[0];
+         this.geom.dim[1] = font_height*dim[0];
+         // this.geom.dim[1] *= font_height/font_width;
+         // this.geom.dim[0] *= font_width/font_height;
+         // this.geom.dim[1] *= Max(font_width, font_height) / Min(font_width,font_height);
+         // this.geom.dim[1] = (this.geom.dim[0] / font_width ) * this.geom.dim[1];
+      }
 
 
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.

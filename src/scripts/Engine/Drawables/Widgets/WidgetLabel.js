@@ -36,7 +36,8 @@ export class Widget_Label extends Rect_Mesh {
         let text_mesh = null;
         let dim = [0, 0];
 
-        if ((font === TEXTURES.MSDF_COMIC_1024) || (font === TEXTURES.MSDF_CONSOLAS_1024)) {
+        // if ((font === TEXTURES.MSDF_COMIC_1024) || (font === TEXTURES.MSDF_CONSOLAS_1024)) {
+        if (FONT_IS_MSDF(font)) {
             text_mesh = Create_text_mesh_msdf(text, [0, 0, _pos[2]], fontSize, text_col, _, font, is_debug_mesh);
         }
         else {

@@ -141,12 +141,12 @@ export function Msdf_Uv_get_font_base_line(metrics_idx) { return _metrics_buffer
       width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
       height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
 */
-// export function Msdf_ont_get_char_plane_bounds_width(metrics_idx, sub_tex_idx) { 
-//    return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].width; 
-// }
-// export function Msdf_ont_get_char_plane_bounds_height(metrics_idx, sub_tex_idx) { 
-//    return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].height; 
-// }
+export function Msdf_ont_get_char_plane_bounds_width(metrics_idx, sub_tex_idx) { 
+   return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].width; 
+}
+export function Msdf_ont_get_char_plane_bounds_height(metrics_idx, sub_tex_idx) { 
+   return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].height; 
+}
 // export function Msdf_ont_get_char_plane_bounds_left(metrics_idx, sub_tex_idx) { 
 //    return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].left; 
 // }
@@ -170,12 +170,12 @@ export function Msdf_Uv_get_font_base_line(metrics_idx) { return _metrics_buffer
       height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
       yoffset: -((ascender-glyphs[i].planeBounds.top)+(descender-glyphs[i].planeBounds.bottom)) * scale,
    */
-// export function Msdf_ont_get_char_atlas_bounds_width(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].width; }
+export function Msdf_ont_get_char_atlas_bounds_width(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].width; }
 // export function Msdf_ont_get_char_atlas_bounds_height(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].height; }
 // export function Msdf_ont_get_char_atlas_bounds_left(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].left; }
 // export function Msdf_ont_get_char_atlas_bounds_right(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].right; }
 // export function Msdf_ont_get_char_atlas_bounds_top(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].top; }
-// export function Msdf_ont_get_char_atlas_bounds_bottom(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].bottom; }
+export function Msdf_ont_get_char_atlas_bounds_bottom(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].atlas_bounds[sub_tex_idx].bottom; }
 
 
 

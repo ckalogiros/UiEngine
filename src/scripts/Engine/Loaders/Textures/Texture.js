@@ -26,8 +26,9 @@ import { CONSOLAS_24Hpx } from '../../../../../resources/fonts/consolas_6/metric
 import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metrics/consolas_7.js';
 import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
 import { consola_msdf_test_1024_metrics } from '../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js';
-import { arrow_left } from '../../../../../resources/fonts/symbol_fonts/test_symbol_fonts/arrow_left_256x256.js';
 import { Uv_metrics_create_uvmap, Uv_texture_init_buffers, Uvmaps_print } from "./TextureUvMap.js";
+import { test_arial_msdf } from "../../../../../resources/fonts/TEST/test_arial_msdf.js";
+import { symbols } from "../../../../../resources/fonts/symbols/metrics/symbols.js";
 
 // TODO: Make texture buffer from New_generic_buffer();
 // TODO: Rename all font words with atlas, since an atlas texture consists of subtextures and has uv coordinates from a metrics file
@@ -127,8 +128,14 @@ const TEXTURE_PATHS = [
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
 	{ // 14
-		img_path: 'fonts/symbol_fonts/test_symbol_fonts',
+		img_path: 'fonts/symbols',
 		img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
+		img_type: 'png',
+		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
+	},
+	{ // 14
+		img_path: 'fonts/TEST',
+		img_name: TEST_FONT_MSDF_ARIAL,
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
@@ -201,7 +208,8 @@ function Texture_pair_metrics_file_to_texture(img_name) {
 		case FONT_CONSOLAS_157px: { return CONSOLAS_157Hpx; }	
 		case TEST_MTSDF_FONT_TEST_1024DIM: { return consola_msdf_test_1024_metrics; }	
 		case FONT_MSDF_COMIC: { return comic_sans_cz; }	
-		case TEXTURE_ATLAS_MSDF_SYMBOLS: { return arrow_left; }	
+		case TEST_FONT_MSDF_ARIAL: { return test_arial_msdf; }	
+		case TEXTURE_ATLAS_MSDF_SYMBOLS: { return symbols; }	
 		default: console.error('01928374655637.  Texture_pair_metrics_file_to_texture() failed to find metrics for texture:', img_name)
 
 	}

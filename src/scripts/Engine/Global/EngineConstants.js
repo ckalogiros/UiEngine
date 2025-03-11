@@ -825,8 +825,9 @@ const FONT_CONSOLAS_116px = 'consolas_28';
 const FONT_CONSOLAS_157px = 'consolas_38';
 const TEST_MTSDF_FONT_TEST_1024DIM = 'consola_mtsdf_test_1024';
 const FONT_MSDF_COMIC = 'comicz';
+const TEST_FONT_MSDF_ARIAL = 'test_arial_msdf';
 // Textures Atlases
-const TEXTURE_ATLAS_MSDF_SYMBOLS = 'arrow_left_256x256';
+const TEXTURE_ATLAS_MSDF_SYMBOLS = 'symbols';
 // Textures
 const TEXTURE_SMOKE1 = 'smoke';
 const TEXTURE_COIN = 'Coin_1_64x64';
@@ -1030,6 +1031,7 @@ const TEXTURES = {
 	MSDF_CONSOLAS_1024: g_cnt++,
 	MSDF_COMIC_1024: g_cnt++,
 	MSDF_SYMBOLS:g_cnt++, 
+	TEST_MSDF_ARIAL: g_cnt,
 	TEXTURE_ATLASES_COUNT: g_cnt,
 	
 	// IS_MSDF: 0x0, 
@@ -1045,12 +1047,66 @@ const TEXTURES = {
 
 // Set default font texture
 TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_16px;
-// TEXTURES.DEFAULT_FONT = TEXTURES.MSDF_CONSOLAS_1024;
 
-const ATLASES_SUB_TEXTURES = {
+const ATLASES_SUB_TEXTURES = { // 58 total
 	MSDF_SYMBOLS: {
-		ARROW_LEFT: 0,
-		ARROW_UP: 1,
+		original 	: 0,
+		close_1 		: 1,
+		arrow_left 	: 2,
+		arrow_up 	: 3,
+		arrow_right : 4,
+		arrow_down 	: 5,
+		arrow_lr 	: 6,
+		arrow_ud 	: 7,
+		arrow_lu 	: 8,
+		arrow_ru		: 9,
+		arrow_clockwise_2		: 11,
+		arrow_clockwise		: 12,
+		arrow_anti_clockwise	: 13,
+		arrow_thick_left		: 14,
+		arrow_thick_up			: 15,
+		arrow_thick_right		: 16,
+		arrow_thick_down		: 17,
+		circle_1					: 18,
+		circle_2					: 19,
+		circle_3					: 20,
+		circle_4					: 21,
+		tie						: 22,
+		under_tie				: 23,
+		close_boxed				: 24,
+		diagonal_r	: 25,
+		diagonal_l	: 26,
+		cloase_2	: 27,
+		_8	: 28,
+		_9	: 29,
+		_10: 30,
+		_11: 31,
+		_12: 32,
+		_13: 33,
+		_14: 34,
+		_15: 35,
+		_16: 36,
+		_17: 37,
+		_18: 38,
+		_19: 39,
+		_20: 40,
+		_21: 41,
+		_22: 42,
+		_23: 43,
+		_24: 44,
+		_25: 45,
+		_26: 46,
+		_27: 47,
+		_28: 48,
+		_29: 49,
+		_30: 50,
+		_31: 51,
+		_32: 52,
+		_33: 53,
+		_34: 54,
+		_35: 55,
+		_36: 56,
+		_37: 57,
 	}
 }
 
@@ -1059,6 +1115,7 @@ function FONT_IS_MSDF(texture_file_id) {
 	if(
 		texture_file_id === TEXTURES.MSDF_COMIC_1024 ||
 		texture_file_id === TEXTURES.MSDF_CONSOLAS_1024 ||
+		texture_file_id === TEXTURES.TEST_MSDF_ARIAL ||
 		texture_file_id === TEXTURES.MSDF_SYMBOLS
 	) return true;
 

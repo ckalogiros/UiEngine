@@ -11,7 +11,7 @@ import { WHITE } from "../Material/Base/Colors.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Gl_set_vpos_x, Gl_set_uv, Gl_set_wpos_x, Gl_set_rgb_specific_index } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Uv_get_uv_coords, Uv_metrics_get_face_advancex, Uv_metrics_get_char_width, Uv_metrics_get_row_height } from "../../Loaders/Textures/TextureUvMap.js";
+import { Uv_get_uv_coords, Uv_metrics_get_face_advancex, Uv_metrics_get_char_width, Uv_metrics_get_row_height, Msdf_ont_get_char_plane_bounds_width, Msdf_ont_get_char_atlas_bounds_width } from "../../Loaders/Textures/TextureUvMap.js";
 
 
 
@@ -377,6 +377,7 @@ export class Text_Mesh extends Mesh {
          }
          else {
             width += Uv_metrics_get_char_width(this.mat.metrics_idx, this.mat.char_buffer.buffer[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
+            // width += Msdf_ont_get_char_atlas_bounds_width(this.mat.metrics_idx, this.mat.char_buffer.buffer[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
          }
       }
 
@@ -576,6 +577,7 @@ p
             // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
             this.mat.uv = space_char_uv;
             const width = Uv_metrics_get_char_width(this.mat.metrics_idx, char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
+            // const width = Msdf_ont_get_char_atlas_bounds_width(this.mat.metrics_idx, char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
    
             if (char !== '') { // If there is a text, get char uv and metrics
    
