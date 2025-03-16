@@ -22,6 +22,7 @@ vec4 Sdf(float inner, float outer){
  * MSDF Text Rendering Shader
 */
 export const frag_msdf_call = '   final_color = Msdf(v_tex_coord) * src_color;';
+// export const frag_msdf_call = '   final_color = Msdf(v_tex_coord) ;';
 export const frag_msdf = `
 
 // set to distance fields pixel range
@@ -53,8 +54,8 @@ float screenPxRange(vec2 v_tex_coord) {
 
 vec4 Msdf(vec2 v_tex_coord) {
 
-  // return vec4(1., 1., 1., 1.);
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
+  // vec4 src_color = vec4(1.);
 
   vec4 texel = texture(u_sampler0, v_tex_coord);
   float dist = median(texel.r, texel.g, texel.b);
@@ -62,7 +63,7 @@ vec4 Msdf(vec2 v_tex_coord) {
   float opacity = clamp(pxDist + 0.5, 0.0, 1.0);
   // opacity += Glow() * 2.4; // Combine the original texture with the blurred alpha
  
-  vec4 alpha = vec4((opacity+.4) * src_color.a); 
+  vec4 alpha = vec4((opacity+.0) * src_color.a); 
   return alpha; 
 }
 `;

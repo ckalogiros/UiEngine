@@ -26,7 +26,7 @@ function Text_get_all_new_lines(text) {
 
 export class Geometry2D_Text extends Geometry2D {
 
-   constructor(pos=[0,0,0], scale=[0,0], text='', uvmap_idx) {
+   constructor(pos=[0,0,0], fontsize=4, text='', uvmap_idx) {
 
 
       const width = Uv_metrics_get_texture_width(uvmap_idx, text[0])/2;
@@ -34,7 +34,7 @@ export class Geometry2D_Text extends Geometry2D {
 
       const dim = [width, font_height];
 
-      super(pos, dim, scale);
+      super(pos, dim);
 
       const new_lines = Text_get_all_new_lines(text)
 
@@ -69,11 +69,11 @@ export class Geometry2D_Text extends Geometry2D {
 
 export class Geometry2D_msdf_text extends Geometry2D {
 
-   constructor(pos=[0,0,0], fontsize=4, scale=[0,0], text='', uvmap_idx) {
+   constructor(pos=[0,0,0], fontsize=4, text='', uvmap_idx) {
 
       const dim = [fontsize, fontsize];
 
-      super(pos, dim, scale);
+      super(pos, dim);
 
       this.text = text;
       this.num_faces = text.length;

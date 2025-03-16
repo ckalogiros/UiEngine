@@ -1172,6 +1172,9 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
 
 
+      // Resolve_function_operations_called_from_main(shader_ops),
+
+
 
 
       /********************************************************************************************************/

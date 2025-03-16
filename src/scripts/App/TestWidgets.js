@@ -7,9 +7,9 @@ import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Debug_info_create_ui_focused, Debug_info_create_ui_mouse, Debug_info_ui, Debug_info_ui_static, Debug_info_ui_static_app_generic_buffers_container, Debug_info_ui_static_app_generic_buffers, Debug_info_ui_static_app_int16_buffers, Debug_info_ui_static_app_int8_buffers, Debug_info_ui_static_more_performance_timers } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { GetRandomColor, GetRandomInt, GetRandomPos, GetSequencedColor } from '../Helpers/Helpers.js';
-import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
+import { Create_rect_mesh, Create_text_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
-import { BLACK, BLUE, BLUEL, BLUER, BLUE_10_120_220, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREENL, GREENR, GREY, Get_fasma_color, MAGENTA, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, RED, REDL, RGB, TRANSPARENT, WHITE, YELLOW, YELLOWL, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
+import { BLACK, BLUE, BLUEL, BLUER, BLUE_10_120_220, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREENL, GREENR, GREY, Get_fasma_color, Interpolate_rgb_to_01, MAGENTA, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, RED, REDL, RGB, TRANSPARENT, WHITE, YELLOW, YELLOWL, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { View_build_group_from_root_mesh, View_set_view_vb_start } from '../Engine/Core/Views/MeshBufferViews.js';
 
 import { Mouse_get_pos } from '../Engine/Controls/Input/Mouse.js';
@@ -48,9 +48,10 @@ import { Widget_ready_slider } from './Widgets/ReadyWidgets.js';
 import { Effects_create_explosion_circle, Effect_explosion_circle_get_mesh_byidx } from '../Engine/Drawables/Effects/Effects.js';
 import { Style_widget_default } from './Widgets/WidgetStyles.js';
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
-import { Align_pre_simple, Test_alignment, Test_alignment_nested_2 } from './Tests/TestAlignNestedSections.js';
+import { Align_expand, Align_pre_simple, Test_alignment, Test_alignment_nested_2 } from './Tests/TestAlignNestedSections.js';
 import { Performance_timer_start, Performance_timer_stop, PerformanceTimersGetFps, PerformanceTimersGetMilisec } from '../Engine/Timers/PerformanceTimers.js';
 import { Uv_metrics_get_char_width, Uv_metrics_get_row_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
+import { Expand } from '../Engine/Drawables/Meshes/Section.js';
 
 
 {
@@ -59,15 +60,15 @@ import { Uv_metrics_get_char_width, Uv_metrics_get_row_height } from '../Engine/
     // import {osu} from 'node-os-utils'
     // import {osu} from '../node-os-utils/index.js'
     // import * as os from "../node-os-utils/index.js"
-    
+
     // import { Buffer } from 'buffer';
-    
+
     // import fs from 'fs';
     // import * as fs from 'node:fs';
-    
+
     // const data = { name: 'John', age: 30, city: 'New York' };
     // const jsonData = JSON.stringify(data);
-    
+
     // fs.writeFile('data.json', jsonData, (err) => {
     //     if (err) throw err;
     //     console.log('Data has been written to data.json');
@@ -104,7 +105,11 @@ export function TestWidgetsGeneric() {
     }
 
     // CreateLabelMsdf(_, '>', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, '123', TEXTURES.CONSOLAS_157px, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
+    // CreateLabelMsdf(_, '123', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
+    // CreateLabelMsdf(_, '123', TEXTURES.CONSOLAS_157px, 300, 250, 10, TRANSPARENT, BLUEL[9], _, );
+    // CreateLabel(_, '123', TEXTURES.CONSOLAS_157px, 300, 450);
+    // CreateLabel(_, '123', TEXTURES.MSDF_CONSOLAS_1024, 300, 650,_,_,_,75);
+    CreateLabel(_, '123', TEXTURES.CONSOLA_VARIANT_FONT, 300, 650,_,_,_,75);
     // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
     // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.MSDF_CONSOLAS_1024, 30, 80, 12, TRANSPARENT, BLUEL[9], _, );
     // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.MSDF_CONSOLAS_1024, 30, 60, 6, TRANSPARENT, BLUEL[9], _, );
@@ -134,7 +139,7 @@ export function TestWidgetsGeneric() {
     // Test: Set Focused
     // CreateSectionedWidgets([100, 20, 0], 'Section 1')
     // CreateSectionedWidgets([100, 170, 0], 'Section 2')
-    
+
 
 
 
@@ -142,7 +147,7 @@ export function TestWidgetsGeneric() {
 
     // Test: Alignment
     // Test_alignment();
-    
+
     // Test: Measure performance of the 2 kinds of section auto-alignment
     // Test_performance_align_functions()
 
@@ -195,106 +200,12 @@ export function TestWidgetsGeneric() {
         // TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [64/2, 73/2], WHITE, [0,0], TEXTURES.TEST_APPLE);
 
         // TexturedSection(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [32/2, 32/2], WHITE, [0,0], TEXTURES.COIN);
-        
-        { // Sumbols rendering
 
-            const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [100, 100], TRANSPARENCY(GREY[1], .8), 'Test symbols font rendering');
-            section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-            section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-            section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-            section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-            section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-            
-            section.StylesSetPad([10, 10]);
-            section.align.flags = ALIGN_2.RESIZE_SELF;
-            
-            let size=40;
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.original);             ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1);              ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_left);           ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_up);             ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_right);          ypos += s.geom.dim[1]*2;   /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_down);           ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lr);             ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ud);             ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lu);             ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ru);             ypos = 0;  xpos += 150;   /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise_2);    ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise);      ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_anti_clockwise); ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_left);     ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_up);       ypos += s.geom.dim[1]*2;   /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_right);    ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_down);     ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_1);             ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_2);             ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_3);             ypos = 0;  xpos += 150;   /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_4);             ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.tie);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.under_tie);            ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_boxed);          ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_r);           ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_l);           ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.cloase_2);             ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._8);                   ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._9);                   ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._10);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._11);                  ypos = 0;  xpos += 150;   /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._12);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._13);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._14);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._15);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._16);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._17);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._18);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._19);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._20);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._21);                  ypos = 0;  xpos += 150;   /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._22);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._23);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._24);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._25);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._26);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._27);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._28);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._29);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._30);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._31);                  ypos = 0;  xpos += 150;   /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._32);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._33);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._34);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._35);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._36);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._37);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            // { const s = TexturedSection(0x0, _, xpos, ypos, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._38);                  ypos += s.geom.dim[1]*2;  /*s.align_flags = ALIGN_2.VERTICAL;*/ section.AddItem(s);}
-            
-
-
-            
-            /********************************************************************************************************************************************************/
-            // Align
-            // const ret = Align_pre_simple(section);
-            // const pad_x = section.StylesGetPad(STYLES.AXIS.X);
-            // const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
-            // section.geom.dim[0] = ret.dim_x + pad_x;
-            // section.geom.dim[1] = ret.dim_y + pad_y;
-            // Expand(section, section.align.flags,)
-        
-            // Calculate from pos=[0,0], and then add the user's pos
-            section.geom.pos[0] = 30;
-            section.geom.pos[1] = 50;
-            
-            /********************************************************************************************************************************************************/
-            // Render
-            section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-            section.Render();
-            Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-            Construct_listen_events_from_mesh_tree(section)
-            Construct_listen_events_relations_from_mesh_tree(section);
-            section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-        }
-        
         // CreateLabelMsdf(_, 'ASSAASASAS', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
+    }
+
+    { // Render font symbols atlas texture
+        // Render_font_symbols_atlas_texture(30, 50);    
     }
 
     { // Test sdf lines
@@ -809,7 +720,7 @@ function Test_hsv_color_sequence_from_integer_input() {
 function Test_text_clbk_animations_with_counter(x, y, text_pad_x = 10, text_pad_y = 6, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, speed = 10, slope = .1) {
 
     // const mesh = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, '0', _, [140, 180, 0], _, BLUEL[9], WHITE, [10, 86], _, _, TEXTURES.CONSOLAS_32px);
-    const mesh = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, '1', _, [x, y, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
+    const mesh = Create_widget_label(ROOT_WIDGETS.CREATE_ROOT, '1', _, [x, y, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px,);
     mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -933,7 +844,7 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
 
 
 
-function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y = 0, dim = [32 / 2, 32 / 2], color = WHITE, pad = [0, 0], texture_file_id = TEXTURES.COIN, sub_texture_id=INT_NULL) {
+function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y = 0, dim = [32 / 2, 32 / 2], color = WHITE, pad = [0, 0], texture_file_id = TEXTURES.COIN, sub_texture_id = INT_NULL) {
 
     const section = Create_widget_section(root_widget, _, pad, [x, y, 0], dim, color, _, _, _, texture_file_id, sub_texture_id);
     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -1274,11 +1185,11 @@ function CreateSectionedWidgets(pos, name = 'NO NAME') {
 
     return section;
 }
-function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
+function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, font_size=20) {
 
     const pos = [x, y, 2];
     // const label = Create_widget_label(root_widget, name, _, pos, 0, TRANSPARENCY(color, .2), WHITE, [5, 5], .5, _, font);
-    const label = Create_widget_label(root_widget, name, _, pos, 0, TRANSPARENCY(color, .2), WHITE, [0, 0], .5, _, font);
+    const label = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, 1), WHITE, [0, 0], .5, _, font);
     // label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
@@ -1320,8 +1231,8 @@ function CreateLabelMsdf(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label '
     // const label = Create_widget_label(root_widget, name, _, pos, font_size, color, text_color, [0, 0], .5, _, font,);
     const label = Create_widget_label(root_widget, name, _, pos, font_size, ORANGEL[9], WHITE, [0, 0], .5, _, font,);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-    label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+    label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
     label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
@@ -1964,6 +1875,161 @@ function CreateDropdownWithScroller(pos = [0, 0, 0], id) {
 }
 
 
+function Render_font_symbols_atlas_texture(x, y) {
+
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [100, 100], TRANSPARENCY(GREY[1], .8), 'Test symbols font rendering');
+    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+    section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+    section.StylesSetPad([10, 10]);
+    section.align.flags = ALIGN_2.RESIZE_SELF;
+
+    let size = 40;
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.original); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_left); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_up); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_right); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_down); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lr); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ud); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lu); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ru); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise_2); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_anti_clockwise); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_left); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_up); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_right); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_down); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_1); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_2); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_3); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_4); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.tie); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.under_tie); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_boxed); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_r); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_l); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_2); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._8); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._9); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._10); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._11); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._12); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._13); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._14); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._15); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._16); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._17); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._18); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._19); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._20); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._21); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._22); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._23); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._24); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._25); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._26); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._27); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._28); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._29); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._30); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._31); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._32); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._33); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._34); s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._35); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._36); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._37); s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s); }
+
+    { /// SAVE
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.original);            s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1);             s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_left);          s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_up);            s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_right);         s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_down);          s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lr);            s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ud);            s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lu);            s.align.flags = ALIGN_2.VERTICAL; section.AddItem(s);}
+        // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ru);            s.align.flags = ALIGN_2.HORIZONTAL; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise_2);    y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise);      y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_anti_clockwise); y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_left);     y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_up);       y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_right);    y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_down);     y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_1);             y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_2);             y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_3);             y = 0;  x += 150;      s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_4);             y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.tie);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.under_tie);            y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_boxed);          y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_r);           y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_l);           y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_2);             y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._8);                   y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._9);                   y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._10);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._11);                  y = 0;  x += 150;      s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._12);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._13);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._14);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._15);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._16);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._17);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._18);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._19);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._20);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._21);                  y = 0;  x += 150;      s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._22);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._23);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._24);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._25);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._26);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._27);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._28);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._29);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._30);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._31);                  y = 0;  x += 150;      s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._32);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._33);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._34);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._35);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._36);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedSection(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._37);                  y += s.geom.dim[1]*2;  s.align.flags = ALIGN_2.VERTICAL|ALIGN_2.PRESERVE_SELF_POS|ALIGN_2.RESIZE_SELF; section.AddItem(s);}
+    }
+
+
+
+
+    /********************************************************************************************************************************************************/
+    // Align
+    const ret = Align_pre_simple(section);
+    const pad_x = section.StylesGetPad(STYLES.AXIS.X);
+    const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
+    section.geom.dim[0] = ret.dim_x + pad_x;
+    section.geom.dim[1] = ret.dim_y + pad_y;
+
+    // Calculate from pos=[0,0], and then add the user's pos
+    section.geom.pos[0] = 30;
+    section.geom.pos[1] = 50;
+
+    /********************************************************************************************************************************************************/
+    // Render
+    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    section.Render();
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(section)
+    Construct_listen_events_relations_from_mesh_tree(section);
+    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+}
 
 
 
@@ -2256,15 +2322,15 @@ function CreateManySections(scene) {
     black1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     black1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     red.AddItem(black1);
-    
-    
+
+
     const black2 = Create_widget_section(_, SECTION.HORIZONTAL, [12, 12], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr));
     black2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     black2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     black2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     black2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     red.AddItem(black2);
-    
+
     const black3 = Create_widget_section(_, SECTION.HORIZONTAL, [15, 15], [0, 0, 0], [20, 20], TRANSPARENCY(BLACK, tr));
     black3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     black3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -2405,7 +2471,7 @@ function CreateManySections(scene) {
 function Test_performance_align_functions() {
 
     const num = 15
-    const section1 = Test_performance_align_functions_1(20, 100,num);
+    const section1 = Test_performance_align_functions_1(20, 100, num);
     {
         const fps_label = Create_widget_label(_, '0000000', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 1], fontsize, BLUEL[1], WHITE, [20, 10], .5,);
         {
@@ -2428,7 +2494,7 @@ function Test_performance_align_functions() {
         section1.Calc_no_gfx_update();
         /********************************************************************************************************************************************************/
         // Align
-        const update = function(params) {
+        const update = function (params) {
             Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest3)
             const section = params.params.mesh;
             section.Calc_no_gfx_update();
@@ -2439,8 +2505,8 @@ function Test_performance_align_functions() {
             // const ms = PerformanceTimersGetMilisec([PERFORMANCE_TIMERS_IDXS.MiscTest3, 0])
             // params.params.fps_label.text_mesh.RenderTextFromNumber(ms);
         }
-        update({params:{ mesh: section1, fps_label:fps_label}})
-        Time_intervals_create(1, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, update, { mesh: section1, fps_label:fps_label });
+        update({ params: { mesh: section1, fps_label: fps_label } })
+        Time_intervals_create(1, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, update, { mesh: section1, fps_label: fps_label });
 
 
         // update({params:{ mesh: section1 }})
@@ -2448,16 +2514,16 @@ function Test_performance_align_functions() {
         section1.Render();
         Root_group_activate_all_vbs_in_renderqueue(section1.root_bufferidx);
         section1.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section1.gfx.vb.groupidx);
-    
+
         Construct_listen_events_from_mesh_tree(section1)
         Construct_listen_events_relations_from_mesh_tree(section1)
     }
-    const section2 = Test_performance_align_functions_2(220, 100,num);
+    const section2 = Test_performance_align_functions_2(220, 100, num);
     // const section2 = Test_alignment_nested_2(220, 100);
 
     {
 
-    
+
         const fps_label = Create_widget_label(_, '0000000', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 1], fontsize, PURPLER[1], WHITE, [20, 10], .5,);
         {
             fps_label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
@@ -2474,7 +2540,7 @@ function Test_performance_align_functions() {
 
         /********************************************************************************************************************************************************/
         // Align
-        const update = function(params) {
+        const update = function (params) {
             Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest4)
             const section = params.params.mesh;
             const ret = Align_pre_simple(section);
@@ -2490,8 +2556,8 @@ function Test_performance_align_functions() {
             // const ms = PerformanceTimersGetMilisec([PERFORMANCE_TIMERS_IDXS.MiscTest4, 0])
             // params.params.fps_label.text_mesh.RenderTextFromNumber(ms);
         }
-        update({params:{ mesh: section2, fps_label:fps_label}})
-        Time_intervals_create(1, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, update, { mesh: section2, fps_label:fps_label });
+        update({ params: { mesh: section2, fps_label: fps_label } })
+        Time_intervals_create(1, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, update, { mesh: section2, fps_label: fps_label });
 
         // blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         section2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -2500,15 +2566,15 @@ function Test_performance_align_functions() {
         section2.Render();
         // Root_group_activate_all_vbs_in_renderqueue(section2.root_bufferidx);
         section2.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section2.gfx.vb.groupidx);
-    
+
         Construct_listen_events_from_mesh_tree(section2)
         Construct_listen_events_relations_from_mesh_tree(section2)
     }
 
-    
+
 }
-function Test_performance_align_functions_1(x,y, num=10) {
-    
+function Test_performance_align_functions_1(x, y, num = 10) {
+
     const tr = 1.;
 
     // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr));
@@ -2536,25 +2602,29 @@ function Test_performance_align_functions_1(x,y, num=10) {
         s1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         s0.AddItem(s1);
-        for(let i=0; i<num; i++) {
-            {           const s3  = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 2], [0, 0], PURPLEB[7]); s1.AddItem(s3); s3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s3.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
-                {       const s2  = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
+        for (let i = 0; i < num; i++) {
+            {
+                const s3 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 2], [0, 0], PURPLEB[7]); s1.AddItem(s3); s3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s3.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                {
+                    const s2 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
                 }
-                {       const s2  = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
+                {
+                    const s2 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
                 }
-                {       const s2  = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
+                {
+                    const s2 = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
                 }
             }
         }
@@ -2563,7 +2633,7 @@ function Test_performance_align_functions_1(x,y, num=10) {
 
     return section;
 }
-function Test_performance_align_functions_2(x, y, num=10) {
+function Test_performance_align_functions_2(x, y, num = 10) {
 
     const tr = 1.;
 
@@ -2596,26 +2666,30 @@ function Test_performance_align_functions_2(x, y, num=10) {
         s1.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL
         s0.AddItem(s1);
 
-        for(let i=0; i<num; i++) {
+        for (let i = 0; i < num; i++) {
 
-            {           const s3  = Create_widget_section(_, _, [10, 10], [0, 0, 2], [0, 0], PURPLEB[7]); s1.AddItem(s3); s3.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL; s3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s3.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
-                {       const s2  = Create_widget_section(_, _, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
+            {
+                const s3 = Create_widget_section(_, _, [10, 10], [0, 0, 2], [0, 0], PURPLEB[7]); s1.AddItem(s3); s3.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL; s3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s3.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                {
+                    const s2 = Create_widget_section(_, _, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
                 }
-                {       const s2  = Create_widget_section(_, _, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
+                {
+                    const s2 = Create_widget_section(_, _, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
                 }
-                {       const s2  = Create_widget_section(_, _, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); 
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
-                    {   const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }    
+                {
+                    const s2 = Create_widget_section(_, _, [10, 10], [0, 0, 2], [0, 0], GREEN[5]); s3.AddItem(s2); s2.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+                    { const s = Create_widget_section(_, _, [10, 10], [0, 0, 3], [0, 0], GREY[4]); s2.AddItem(s); s.align.flags |= ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL; s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2); s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10); s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
                 }
             }
         }
@@ -3341,7 +3415,7 @@ function MeshInfo() {
     // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-    
+
     /********************************************************************************************************************************************************/
     // Menu bar and Minimizer
     const menu = Create_widget_menubar(_, pos, _, TRANSPARENCY(GREEN[4], .7), WHITE, 'Info tip', [10, 6],);
@@ -5381,33 +5455,120 @@ function Shader_color_functions_explosion_circle(x, y, w, h, color = BLUEL[9]) {
 }
 function Window_menu() {
 
-    const pos = [200, 200, 0]
+    const pos = [100, 100, 0]
 
-    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], pos, [20, 20], TRANSPARENCY(GREY[2], .9))
-    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [250, 0], TRANSPARENCY(ORANGER[7], .9))
+    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[1], .5))
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+    // section.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.FIXED_WIDTH;
+    section.align.flags = ALIGN_2.RESIZE_SELF;
 
-    const menu = Create_widget_menubar(_, [0, 0, pos[2]], _, TRANSPARENCY(GREY[1], .4), WHITE, 'Menu Bar', [10, 6]);
+    // const menu = Create_widget_menubar(_, [0, 0, pos[2]], [250, 0], TRANSPARENCY(GREY[2], 1.), WHITE, 'Menu Bar', [10, 10]);
+    // const menu = Create_widget_menubar(_, [0, 0, pos[2]], [250, 0], RGB(0, 0, 4.5, 1.), WHITE, 'Menu Bar', [10, 10]);
+    const menu = Create_widget_menubar(_, [0, 0, pos[2]], [250, 0], Interpolate_rgb_to_01(0, 100, 204, 1), WHITE, 'Menu Bar', [10, 10], );
     section.AddItem(menu);
-    // menu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
+    menu.AddCloseButton(_, section, 'close', 0, GREY[1], WHITE, [4, 2], _, _, TEXTURES.DEFAULT_FONT);
+    // menu.AddCloseButton(_, section, 'close', 0, GREY[1], WHITE, [4, 2], _, _, TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1);
+
+    const size = menu.children.buffer[0].text_mesh.geom.dim[1]*2 + 12/2
+    // const size = 90
+    { 
+        const close_btn = Create_widget_section(0x0, _, [5,5], [0,0,0], [size, size], WHITE, 'close btn',_, _, TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1);
+        // const close_btn = Create_widget_section(0x0, _, [5,5], [0,0,0], [size, size], BLUEL[1], 'close btn',_, _, TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1);
+        // close_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        close_btn.GfxUniformsEnable({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+        close_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        // close_btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        close_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        // close_btn.SetName(name);
+        close_btn.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.FLOAT_RIGHT; 
+        menu.AddItem(close_btn); 
+
+        // TODO: Add an add function for vbs with MSDF and ATTR_R_CORNERS-SDF_RECT
+        // close_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 3);
+        // close_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+        
+		
+
+        // {
+        //     const btn1 = Create_widget_section(0x0, _, [5,5], [0,0,0], [size, size], WHITE, 'circle_1',_, _, TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._28);
+        //     btn1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        //     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        //     btn1.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.FLOAT_RIGHT; 
+        //     menu.AddItem(btn1); 
+        // }
+        // {
+        //     const btn1 = Create_widget_section(0x0, _, [5,5], [0,0,0], [size, size], WHITE, 'circle_1',_, _, TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._25);
+        //     btn1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+        //     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+        //     btn1.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.FLOAT_RIGHT; 
+        //     menu.AddItem(btn1); 
+        // }
+
+    }
+
+    // { // main window panel
+    //     // const panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 100], TRANSPARENCY(RGB(0, 0, 4.5, .35), 1.))
+    //     // const panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 100], RGB(0, 0, 4.5, .3))
+    //     const panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 100], Interpolate_rgb_to_01(10, 44, 129, 1))
+    //     panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    //     // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    //     panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
+    //     panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+    //     // section.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.FIXED_WIDTH;
+    //     panel.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL|ALIGN_2.EXPAND|ALIGN_2.FIXED_HEIGHT;
+    //     section.AddItem(panel);
+
+    //     // const msg = 'aslpkpaosdksdk\nskdskdlklskd'
+    //     // const msg = 'aslpkpaosdksdk'
+    //     // const text = Create_widget_label(_, msg, _, [0, 0, 1], 20, TRANSPARENCY(BLUEL[7], .0), WHITE, [0,0], _, _, TEXTURES.MSDF_COMIC_1024, );
+    //     // text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //     // text.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    //     // text.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
+    //     // text.align.flags = ALIGN_2.HORIZONTAL;
+    //     // panel.AddItem(text)
+    // }
+
+    const close = section.children.buffer[0].children.buffer[1];
+
+    // HERE: We want the close to be positioned float_right.
+    // The menu_bar doesn't have a fixed_width but has expand.
+    // // by the time the Align_pre_simple() is called, the menu_bar hasn't been expanded, so the close isn't positoned float_right to the expanded rather the current menu_bar width
+    /**
+     * SOLUTIONS:
+     * 1. We could add re-position functionality (for float_right).
+     *  And the Align_expand could be called once, at the creation, set up the dimentions 
+     */
 
 
+    /********************************************************************************************************************************************************/
+    // Align
+    const ret = Align_pre_simple(section);
+    const pad_x = section.StylesGetPad(STYLES.AXIS.X);
+    const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
+    section.geom.dim[0] = ret.dim_x + pad_x;
+    section.geom.dim[1] = ret.dim_y + pad_y;
+    // section.geom.pos[0] = pos[0];
+    // section.geom.pos[1] = pos[1];
+    Align_expand(section, section.align.flags,)
 
-   /********************************************************************************************************************************************************/
-   // Render
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+
+    /********************************************************************************************************************************************************/
+    // Render
+    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
 
-   section.Render();
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+    section.Render();
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(section)
+    Construct_listen_events_relations_from_mesh_tree(section);
+    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 }
 
 function Test_shaders_operations() { // Shaders Tests

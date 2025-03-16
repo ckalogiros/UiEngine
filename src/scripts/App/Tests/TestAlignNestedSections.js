@@ -357,7 +357,7 @@ export function Align_pre_simple(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
  * @param {*} min_width 
  * @returns 
  */
-function Expand(parent, align_flags, min_width = 0) {
+export function Align_expand(parent, align_flags, min_width = 0) {
 
    let width = parent.geom.dim[0] - parent.StylesGetPad(STYLES.AXIS.X);
    if (width < min_width) width = min_width;
@@ -403,8 +403,8 @@ function Expand(parent, align_flags, min_width = 0) {
          //       }
          //    // }
 
-         //    // Expand(cur_mesh, opt, width);
-         //    width = Expand(cur_mesh, opt, width);
+         //    // Align_expand(cur_mesh, opt, width);
+         //    width = Align_expand(cur_mesh, opt, width);
          //    // if(width < min_width) width = min_width;
          // }
          // else {
@@ -422,7 +422,7 @@ function Expand(parent, align_flags, min_width = 0) {
          //    }
          // }
 
-         Expand(cur_mesh)
+         Align_expand(cur_mesh)
       }
    }
 
@@ -1641,7 +1641,7 @@ function Test_alignment_slider_vert_hor_with_expand(x, y) {
    const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
    section.geom.dim[0] = ret.dim_x + pad_x;
    section.geom.dim[1] = ret.dim_y + pad_y;
-   Expand(section, section.align.flags,)
+   Align_expand(section, section.align.flags,)
 
    // Calculate from pos=[0,0], and then add the user's pos
    section.geom.pos[0] = pos[0];
@@ -1764,7 +1764,7 @@ with right to left order`;
    const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
    section.geom.dim[0] = ret.dim_x + pad_x;
    section.geom.dim[1] = ret.dim_y + pad_y;
-   Expand(section, section.align.flags,)
+   Align_expand(section, section.align.flags,)
 
    // Calculate from pos=[0,0], and then add the user's pos
    section.geom.pos[0] = pos[0];
@@ -1861,7 +1861,7 @@ function Test_slider_control_pad(x, y) {
    const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
    section.geom.dim[0] = ret.dim_x + pad_x;
    section.geom.dim[1] = ret.dim_y + pad_y;
-   Expand(section, section.align.flags,)
+   Align_expand(section, section.align.flags,)
 
    // Calculate from pos=[0,0], and then add the user's pos
    section.geom.pos[0] = pos[0];
@@ -2063,7 +2063,7 @@ function Test_slider_control_pad(x, y) {
       const pad_y = ss.StylesGetPad(STYLES.AXIS.Y);
       ss.geom.dim[0] = ret.dim_x + pad_x;
       ss.geom.dim[1] = ret.dim_y + pad_y;
-      // Expand(ss, ss.align.flags,)
+      // Align_expand(ss, ss.align.flags,)
 
 
       

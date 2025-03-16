@@ -39,30 +39,33 @@ export class Section extends Mesh {
    // total_margin
 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), pad = [4, 4], pos = [200, 400, 0],
-      dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = { rcorners: 4, feather: 2, border: 0 }, num_faces = 1, texture_id = INT_NULL, sub_texture_id = INT_NULL, is_debug_mesh) {
+   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), pad = [4, 4], pos = [200, 400, 0],
+   //    dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = { rcorners: 4, feather: 2, border: 0 }, num_faces = 1, texture_id = INT_NULL, sub_texture_id = INT_NULL, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties) {
+      // {options:options, pad:pad, pos:pos, dim:dim, col:col, name:name, style:style, num_faces:num_faces, texture_id:texture_id, sub_texture_id:sub_texture_id, is_debug_mesh:is_debug_mesh
 
-      const geom = new Geometry2D(pos, dim, _, num_faces);
+
+      const geom = new Geometry2D(properties.pos, properties.dim, _, properties.num_faces);
       // Create texture if the user has passed a texture id of type:TEXTURES.
-      const mat = (texture_id === INT_NULL) ? new Material(col) : (sub_texture_id === INT_NULL) ? new Material_Texture(col, texture_id) : new Material_Atlas_Texture(col, texture_id, sub_texture_id, _);
+      const mat = (properties.texture_id === INT_NULL) ? new Material(properties.col) : (properties.sub_texture_id === INT_NULL) ? new Material_Texture(properties.col, properties.texture_id) : new Material_Atlas_Texture(properties.col, properties.texture_id, properties.sub_texture_id, _);
 
       super(geom, mat);
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.total_margin = [0, 0];
-      this.options = options;
-      this.StylesSetPad(pad);
+      this.options = properties.options;
+      this.StylesSetPad(properties.pad);
       this.max_size = [0, 0];
       this.min_size = [0, 0];
       this.last_pos = [0, 0];
 
       // Create dimentions according to the sub-texture dimentions ratio
-      if(sub_texture_id!==INT_NULL) {
+      if(properties.sub_texture_id!==INT_NULL) {
          // TODO: Re-think the implementation
-         const font_width = Msdf_ont_get_char_plane_bounds_width(this.mat.metrics_idx, sub_texture_id);
-         const font_height = Msdf_ont_get_char_plane_bounds_height(this.mat.metrics_idx, sub_texture_id);
-         this.geom.dim[0] = font_width*dim[0];
-         this.geom.dim[1] = font_height*dim[0];
+         const font_width = Msdf_ont_get_char_plane_bounds_width(this.mat.metrics_idx, properties.sub_texture_id);
+         const font_height = Msdf_ont_get_char_plane_bounds_height(this.mat.metrics_idx, properties.sub_texture_id);
+         this.geom.dim[0] = font_width*properties.dim[0];
+         this.geom.dim[1] = font_height*properties.dim[0];
          // this.geom.dim[1] *= font_height/font_width;
          // this.geom.dim[0] *= font_width/font_height;
          // this.geom.dim[1] *= Max(font_width, font_height) / Min(font_width,font_height);
@@ -77,9 +80,9 @@ export class Section extends Mesh {
       // extends section class, in order to call it's classes methods instead of the mother class(the Section)
       this.type |= MESH_TYPE.SECTION_MESH | MESH_TYPE.SECTION_MESH_ONLY; // FIXME: The SECTION_MESH_ONLY is set for a dropdown calling this constructor from super
 
-      this.SetName(`[${this.mesh_bufferidx}]{${name}}-SECTION`);
+      this.SetName(`[${this.mesh_bufferidx}]{${properties.name}}-SECTION`);
 
-      this.SetStyle(style);
+      this.SetStyle(properties.style);
 
 
       if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) {
@@ -683,8 +686,10 @@ export class Section extends Mesh {
       this.geom.pos[1] = pos_y;
 
       return {
-         dim_x: 0,
-         dim_y: 0,
+         // dim_x: 0,
+         // dim_y: 0,
+         dim_x: this.geom.dim[0],
+         dim_y: this.geom.dim[1],
          pad_x: pad_x / 2,
          pad_y: pad_y / 2,
       };

@@ -4,10 +4,9 @@ import { Widget_Button } from "./WidgetButton.js";
 import { Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { GREY, WHITE } from "../Material/Base/Colors.js";
+import { BLUEL, GREY, PURPLE, WHITE } from "../Material/Base/Colors.js";
 import { Section } from "../Meshes/Section.js";
 import { REL_POS, Relative_pos_comp_add_child_to_comp, Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
-import { Styles_pad_set } from "../../Styles.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/Views/MeshBufferViews.js";
 import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
@@ -16,17 +15,22 @@ import { Mesh_create_style_from_values } from "../Operations/MeshHelperFunctions
 
 
 /**
- * TODO:
+ * // TODO:
  * Menus should not have specific elements, like close and minimize, nor variables of the children elesments, neither should have the CreateCloseButton functionality.
  * They should be generic containers, ready to have any kind of elements-widgets.
  * 
+ * // TODO:
  * // IMIDIATELY:
- * For the close button
+ * Implement local-global indexes for all static meshes of a menu-bar(close, minimize, label,...) and store the meshes child-index to them
+ * instead of having pointers to fields for each Widget_Menu_Bar class invocation
  */
 
 
 
 const _fontsize = 8.5;
+let menu_label_idx = INT_NULL; // Index in the parents children buffer
+let menu_close_btn_idx = INT_NULL;
+let menu_min_btn = INT_NULL;
 
 
 export class Widget_Menu_Bar extends Section {
@@ -37,43 +41,33 @@ export class Widget_Menu_Bar extends Section {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = { rcorners: 5, feather: 2, border: 0 }, num_faces, is_debug_mesh) {
 
-      const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, col, text_col, _, _, _, _, is_debug_mesh);
-      label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-
-      // const dim = [label.GetMaxWidth(), 10];
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, [5, 5], [0, 0, pos[2]], dim, col, _, style, num_faces, _, is_debug_mesh);
-
-      // Styles_pad_set(this.styles, pad)
-      // Styles_pad_set(label.styles, pad)
+      
+      // const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, TRANSPARENCY(BLUEL[7], .9), text_col, pad, _, _, TEXTURES.MSDF_COMIC_1024, is_debug_mesh,);
+      // const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, TRANSPARENCY(BLUEL[7], .9), text_col, _, _, _, TEXTURES.MSDF_COMIC_1024, is_debug_mesh,);
+      const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, TRANSPARENCY(BLUEL[7], .0), text_col, [10,6], _, _, TEXTURES.MSDF_COMIC_1024, is_debug_mesh,);
+      
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, pad, [0, 0, pos[2]], dim, col, _, style, num_faces, _, _, is_debug_mesh);
+      
+      
+      menu_label_idx = this.AddItem(label);
 
       this.geom.dim[1] = label.geom.dim[1];
-
-      this.StylesSetPad(pad)
-
-
-      // this.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
-      // this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
-      this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-
-      this.SetStyle(style);
-      // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.options = SECTION.INDEPENDENT;
-
-
+      
       this.SetName('Widget_Menu_Bar');
       this.type |= MESH_TYPE.WIDGET_MENU_BAR;
-
-
-      this.label = label;
-      this.AddItem(label);
-
-
+      
+      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
+      this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      this.GfxUniformsEnable({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      
+      // this.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL | ALIGN_2.EXPAND;
+      this.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL | ALIGN_2.FIXED_WIDTH;
+      label.align.flags = ALIGN_2.HORIZONTAL;
+      
       this.close_btn_idx = INT_NULL;
       this.minimize_btn_idx = INT_NULL;
-
+      
    }
 
 
@@ -87,16 +81,35 @@ export class Widget_Menu_Bar extends Section {
    /****************************************************************************************************************************************************/
 
 
-   Destroy(_this) {
+   // Destroy(_this) {
+
+   //    // Menu's children(close/minimize etc) destruction
+   //    for (let i = 0; i <= _this.children.boundary; i++) {
+
+   //       const child = _this.children.buffer[i];
+   //       if (child) child.Destroy();
+   //    }
+
+   //    _this.label.Destroy();
+
+   //    // Menus's destruction
+   //    return super.Destroy();
+   // }
+   Destroy() {
 
       // Menu's children(close/minimize etc) destruction
-      for (let i = 0; i <= _this.children.boundary; i++) {
+      for (let i = 0; i <= this.children.boundary; i++) {
 
-         const child = _this.children.buffer[i];
+         const child = this.children.buffer[i];
          if (child) child.Destroy();
       }
 
-      _this.label.Destroy();
+      const label = this.children.buffer[menu_label_idx];
+      label.Destroy();
+      
+      const close_btn = this.children.buffer[menu_close_btn_idx];
+      if(close_btn !== undefined && close_btn !== null)
+         close_btn.Destroy();
 
       // Menus's destruction
       return super.Destroy();
@@ -108,7 +121,8 @@ export class Widget_Menu_Bar extends Section {
       this.root_bufferidx = root_bufferidx;
       Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 
-      this.label.AddToWidgetRootBuffer(root_bufferidx);
+      const label = this.children.buffer[menu_label_idx];
+      label.AddToWidgetRootBuffer(root_bufferidx);
 
       if (this.close_btn_idx !== INT_NULL) {
 
@@ -179,6 +193,45 @@ export class Widget_Menu_Bar extends Section {
    }
 
 
+   // GfxUniformsEnable(flags, name, type, shader_flags) {
+
+   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
+
+   //    const label = this.children.buffer[menu_label_idx];
+   //    label.EnableGfxUniforms(flags, name, type, shader_flags);
+
+   // }
+
+   EnableGfx(which, bar_params = null, handle_params = null) {
+
+      super.EnableGfx(which, bar_params);
+      const label = this.children.buffer[menu_label_idx];
+      label.EnableGfx(which, handle_params);
+   }
+
+
+   EnableGfxOperations(function_operation, blend_mode) {
+
+      super.EnableGfxOperations(function_operation, blend_mode);
+      const label = this.children.buffer[menu_label_idx];
+      label.EnableGfxOperations(function_operation, blend_mode);
+   }
+
+
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
+
+      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+      const label = this.children.buffer[menu_label_idx];
+      label.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+
+      const close_btn = this.children.buffer[menu_close_btn_idx];
+      if(close_btn !== undefined && close_btn !== null) {
+         close_btn.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      }
+   }
+
+
 
 
 
@@ -237,17 +290,19 @@ export class Widget_Menu_Bar extends Section {
 
    AddCloseButton(ROOT_WIDGET_FLAGS, root, text, fontsize = 0, col = GREY[1], text_col = WHITE, _pad = [4, 2], bold = .4, style = { rcorners: 5, feather: 2, border: 0 }, font = TEXTURES.DEFAULT_FONT) {
 
-      if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
+      if (!fontsize) {
+         const label = this.children.buffer[menu_label_idx];
+         fontsize = label.text_mesh.geom.dim[0];
+      }
 
       // Use only the top-down pad
       const pad = [0, 0]; // IMPORTANT: If we are to set the dim of the close_btn's to a 'y padding', we better set the close_btn.pad[1] to 0
 
 
-      if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
+      // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
       const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, style, font);
-      close_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      close_btn.SetName('close_btn');
+
 
 
       // Set the height of the menu item to be the same across all other items
@@ -274,28 +329,31 @@ export class Widget_Menu_Bar extends Section {
       else { // Set mesh height to the max height 
 
          close_btn.geom.dim[1] = this.geom.dim[1];
-         close_btn.geom.dim[0] = this.geom.dim[1];
+         // close_btn.geom.dim[0] = this.geom.dim[1];
          // Because we changed the size of the button, we need to realign the text
          Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, close_btn);
       }
 
 
-      this.AddItem(close_btn);
+      menu_close_btn_idx = this.AddItem(close_btn);
 
-      Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, close_btn.idx);
+      // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, close_btn.idx);
 
    }
 
 
    AddMinimizeButton(ROOT_WIDGET_FLAGS, root, fontsize = 0, col = GREY[1], text_col = WHITE, _pad, bold = .4, font = TEXTURES.DEFAULT_FONT, style = { rcorners: 5, feather: 2, border: 0 }) {
 
-      if (!fontsize) fontsize = this.label.text_mesh.geom.dim[0];
+      if (!fontsize) {
+         const label = this.children.buffer[menu_label_idx];
+         fontsize = label.text_mesh.geom.dim[0];
+      }
 
       // Use only the top-down pad
       const pad = [0, 0];
 
 
-      if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
+      // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
       if (root.mesh_bufferidx === this.mesh_bufferidx) {
          console.error('FAIL TO CREATE MINIMIZE BUTTON. REASON: The root passed should not be the menu');
@@ -341,7 +399,7 @@ export class Widget_Menu_Bar extends Section {
 
       this.AddItem(minimize_btn);
 
-      Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, minimize_btn.idx);
+      // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, minimize_btn.idx);
 
    }
 
@@ -349,7 +407,7 @@ export class Widget_Menu_Bar extends Section {
    // TODO: pass: REL_POS right-left-middle, so user can assign the rel pos of the mesh
    AddToMenuBar(mesh, RelPosAlign) {
 
-      if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
+      // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
       mesh.SetStyle(Mesh_create_style_from_values(5, 2, 2));
 
@@ -394,21 +452,31 @@ export class Widget_Menu_Bar extends Section {
 
       // TODO: Use the parem 'RelPosAlign', but first implement correctly the 'REL_POS.LEFT' alingment
       // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, mesh.idx);
-      if (RelPosAlign & REL_POS.RIGHT) Relative_pos_comp_add_child_to_comp(align_item_flag, this, mesh.idx);
+      // if (RelPosAlign & REL_POS.RIGHT) Relative_pos_comp_add_child_to_comp(align_item_flag, this, mesh.idx);
 
    }
 }
 
 
 export class Close_Button extends Widget_Button {
+// export class Close_Button extends Section {
 
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE,
-      pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+      // pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, texture_id=INT_NULL, sub_texture_id=INT_NULL, is_debug_mesh) {
+      pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, font = TEXTURES.DEFAULT_FONT, _, is_debug_mesh) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, [10,6], bold, style, font, is_debug_mesh);
+      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, pad, pos, _, col, _, style,_, texture_id, sub_texture_id, is_debug_mesh);
 
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+      this.GfxUniformsEnable({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+      this.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      this.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.FLOAT_RIGHT;
+      
+      this.SetName('close_btn');
 
       // Set a callback function for the destruction of the menu and its window on clicking the close button.
       const params = {

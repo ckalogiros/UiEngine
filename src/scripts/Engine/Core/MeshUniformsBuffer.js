@@ -238,7 +238,7 @@ export function Mesh_unif_remove_root_wpos(root_posidx) {
 }
 
 
-// HACK: Manually add a parent from wich to draw the uniform wpos
+// HACK: Manually add a parent from which to draw the uniform wpos
 export function Mesh_unif_hack_parent_root_wpos(root_posidx, parent_root_posidx, parent_mesh_bufferidx) {
 
    const root_wpos = _per_vb_mesh_unif_wpos.buffer[root_posidx];

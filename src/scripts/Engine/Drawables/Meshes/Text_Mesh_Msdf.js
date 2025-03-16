@@ -4,7 +4,7 @@ import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } fro
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { AddArr3, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Gfx_generate_context, GfxInfoMesh } from "../../Interfaces/Gfx/MeshGfxContext.js"; ``
-import { Geometry2D_msdf_text } from "../Geometry/Geometry2DText.js";
+import { Geometry2D_msdf_text, Geometry2D_Text } from "../Geometry/Geometry2DText.js";
 import { Material_Font } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Gl_set_rgb_specific_index, Gl_set_uv, Gl_set_vpos_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -26,7 +26,8 @@ export class Text_Mesh_Msdf extends Mesh {
       const sdfouter = CalculateSdfOuterFromDim(fontsize);
       if (sdfouter + bold > 1) bold = 1 - sdfouter;
       const mat = new Material_Font(color, font, text, [bold, sdfouter])
-      const geom = new Geometry2D_msdf_text(pos, fontsize, scale, text, mat.metrics_idx);
+      // const geom = new Geometry2D_msdf_text(pos, fontsize, text, mat.metrics_idx);
+      const geom = new Geometry2D_Text(pos, fontsize, text, mat.metrics_idx);
 
       super(geom, mat);
 

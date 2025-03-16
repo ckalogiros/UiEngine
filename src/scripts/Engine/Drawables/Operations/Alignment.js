@@ -12,6 +12,7 @@ export function Align_text_in_rect_parent(Align, parent, pos=[0,0]) {
         console.error('Handles only text as text_mesh of a mesh\nAlign_text_in_rect_parent()\nAlignment.js');
         return;
     }
+    // if(Align === undefined) Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER);
 
     const text_mesh = parent.text_mesh;
 
@@ -37,10 +38,10 @@ export function Align_text_in_rect_parent(Align, parent, pos=[0,0]) {
         text_mesh.geom.pos[0] = pos[0] + d/2;
     }
     if(Align & ALIGN.VERT_CENTER){
-        // const d = (parent.geom.dim[1] - text_mesh.geom.dim[1])
         const d = (parent.geom.dim[1]*2 - text_height);
-        // text_mesh.geom.pos[1] = d;
-        text_mesh.geom.pos[1] = pos[1] + d/2;
+        // const d = (parent.geom.dim[1] - text_height);
+        // text_mesh.geom.pos[1] = pos[1] + d/2;
+        text_mesh.geom.pos[1] = pos[1] + d+40;
     }
     else if(Align & ALIGN.BOTTOM){
         const d = pos[1] + parent.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1];

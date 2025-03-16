@@ -37,7 +37,7 @@ export class Text_Mesh extends Mesh {
       
       
       const mat = new Material_Font(color, font, text, [bold, sdfouter])
-      const geom = new Geometry2D_Text(pos, scale, text, mat.metrics_idx);
+      const geom = new Geometry2D_Text(pos, fontsize, text, mat.metrics_idx);
       
       super(geom, mat);
 
@@ -376,7 +376,8 @@ export class Text_Mesh extends Mesh {
             height += Uv_metrics_get_row_height(this.mat.metrics_idx)/2;
          }
          else {
-            width += Uv_metrics_get_char_width(this.mat.metrics_idx, this.mat.char_buffer.buffer[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
+            // width += Uv_metrics_get_char_width(this.mat.metrics_idx, this.mat.char_buffer.buffer[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
+            width += Uv_metrics_get_char_width(this.mat.metrics_idx, this.mat.char_buffer.buffer[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2 * this.geom.dim[0];
             // width += Msdf_ont_get_char_atlas_bounds_width(this.mat.metrics_idx, this.mat.char_buffer.buffer[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
          }
       }

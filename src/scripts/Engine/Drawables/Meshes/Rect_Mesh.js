@@ -262,20 +262,19 @@ export class Rect extends Mesh {
 // TODO: IMPLEMENT
 export class Rect_Mesh extends Rect {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS=0x0,
-      pos = [0, 0, 0], dim = [10, 10],
-      col = TRANSPARENCY(BLUEL[6], .6), name = 'Rect_Mesh UNNAMED',
-      style = {rcorners:10, feather:2, border:0}, pad = [4, 4], num_faces = 1, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS=0x0, properties) {
+      // pos = [0, 0, 0], dim = [10, 10],
+      // col = TRANSPARENCY(BLUEL[6], .6), name = 'Rect_Mesh UNNAMED',
+      // style = {rcorners:10, feather:2, border:0}, pad = [4, 4], num_faces = 1, is_debug_mesh) {
 
-      super(pos, dim, col, num_faces, is_debug_mesh);
+      super(properties.pos, properties.dim, properties.col, properties.num_faces, properties.is_debug_mesh);
 
       this.sid.unif |= SID.UNIF.ROOT_WPOS2;
-      // this.sid.pass |= SID.PASS.WPOS2
 
       this.mesh_bufferidx = mesh_bufferidx;
 
-      this.SetStyle(style);
-      this.SetName(`[${this.mesh_bufferidx}]{${name}}-RECT_MESH`);
+      this.SetStyle(properties.style);
+      this.SetName(`[${this.mesh_bufferidx}]{${properties.name}}-RECT_MESH`);
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 

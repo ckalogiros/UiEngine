@@ -12,9 +12,10 @@ import { Widget_Label } from './WidgetLabel.js';
 
 export class Widget_Button extends Widget_Label {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad = [20, 15], bold = .4, style = {rcorners:6, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad = [20, 15], bold = .4, style = {rcorners:6, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh)
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties);
       this.type |= MESH_TYPE.WIDGET_BUTTON;
 
    }

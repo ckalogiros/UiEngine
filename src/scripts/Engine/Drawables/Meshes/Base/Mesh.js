@@ -58,7 +58,6 @@ export class Mesh {
     gfx_ctx_flags;     // BitField: Help on choosing the gfx buffers conditionaly 
     gfx_ctx_parent;     // Value: The index of the parent from which to start search mesh tree for finding gfx context 
     
-    // align_flags;     // BitField: Flags for alignment, of type: 
     align;           // Struct: Variables to define mesh's alignment
 
 

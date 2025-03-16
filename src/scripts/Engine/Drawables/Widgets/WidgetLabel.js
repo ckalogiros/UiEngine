@@ -1,6 +1,5 @@
 "use strict";
 
-import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
@@ -9,8 +8,6 @@ import { Align_self_get_dif, Align_text_in_rect_parent } from "../Operations/Ali
 import { Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh, Create_text_mesh_msdf } from "../../Core/CreateWidget.js";
-import { Mesh_per_vb_remove_mesh } from "../../Core/MeshBuffer.js";
-import { GREY, WHITE } from "../Material/Base/Colors.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
@@ -24,48 +21,50 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } f
 // export class Widget_Label extends Rect {
 export class Widget_Label extends Rect_Mesh {
 
-    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, _text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), _pos = [0, 0, 0], fontSize = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = { rcorners: 4, feather: 2, border: 0 }, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties.text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), properties.pos = [0, 0, 0], properties.font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = { rcorners: 4, feather: 2, border: 0 }, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties) {
 
-        const sdfouter = CalculateSdfOuterFromDim(fontSize);
-        if (sdfouter + bold > 1) bold = 1 - sdfouter;
-        _pos[2] += 1; // Text in front of the label's area.
+        // if(properties.font === undefined) properties.font = TEXTURES.DEFAULT_FONT
 
-        const text = _text;
+        // const sdfouter = CalculateSdfOuterFromDim(properties.font_size);
+        // if (sdfouter + bold > 1) bold = 1 - sdfouter;
+        properties.pos[2] += 1; // Text in front of the label's area.
+
+        const text = properties.text;
 
         // Create the text, to calculate its dimensions, then createthe label
         let text_mesh = null;
         let dim = [0, 0];
 
         // if ((font === TEXTURES.MSDF_COMIC_1024) || (font === TEXTURES.MSDF_CONSOLAS_1024)) {
-        if (FONT_IS_MSDF(font)) {
-            text_mesh = Create_text_mesh_msdf(text, [0, 0, _pos[2]], fontSize, text_col, _, font, is_debug_mesh);
+        if (FONT_IS_MSDF(properties.font)) {
+            text_mesh = Create_text_mesh_msdf(text, [0, 0, properties.pos[2]], properties.font_size, properties.text_col, _, properties.font, properties.is_debug_mesh);
         }
         else {
-            text_mesh = Create_text_mesh(text, [0, 0, _pos[2]], fontSize, text_col, _, font, is_debug_mesh);
+            text_mesh = Create_text_mesh(text, [0, 0, properties.pos[2]], properties.font_size, properties.text_col, _, properties.font, properties.is_debug_mesh);
         }
-        text_mesh.StylesSetPad(pad);
+        text_mesh.StylesSetPad(properties.pad);
 
-        _pos[2] -= 1; // Set z for area 'behind' this.text_mesh
+        properties.pos[2] -= 1; // Set z for area 'behind' this.text_mesh
 
         const dimentions = text_mesh.CalculateTextWidth();
         dim = [
-            // dimentions.w + (pad[0] * 2),
-            // dimentions.h + (pad[1] * 2),
-            dimentions.w + (pad[0]),
-            dimentions.h + (pad[1]),
+            dimentions.w + (properties.pad[0]),
+            dimentions.h + (properties.pad[1]),
         ];
 
 
-        super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col, _, style, pad, 1, is_debug_mesh);
+        // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties.pos, dim, col, _, style, pad, 1, is_debug_mesh);
+        super(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties);
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
-        this.StylesSetPad(pad);
-        this.SetStyle(style)
-        this.SetName(_text)
+        // this.StylesSetPad(pad);
+        this.SetStyle(properties.style)
+        this.SetName(properties.text)
 
         this.text_mesh = text_mesh;
 
-        const text_pos = ((ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) === 0) ? [_pos[0], _pos[1]] : [0, 0]; // If label is NOT root, add the position offset to its text
-        Align_text_in_rect_parent(Align, this, text_pos)
+        const text_pos = ((ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) === 0) ? [properties.pos[0], properties.pos[1]] : [0, 0]; // If label is NOT root, add the position offset to its text
+        Align_text_in_rect_parent(properties.Align, this, text_pos)
 
 
         text_mesh.sceneidx = this.sceneidx;

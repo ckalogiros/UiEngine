@@ -1,6 +1,6 @@
 "use strict"
 
-import { Metrics_loader_load_chlumsky_msdf_metrics, Metrics_loader_load_custom_metrics } from "./MetricsLoader";
+import { Metrics_loader_load_chlumsky_msdf_metrics, Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics, Metrics_loader_load_custom_metrics } from "./MetricsLoader";
 
 
 
@@ -41,7 +41,12 @@ export function Uv_metrics_get_texture_width(metrics_idx) { return _metrics_buff
 /** */
 export function Uv_metrics_get_texture_height(metrics_idx) { return _metrics_buffer[metrics_idx].texHeight; }
 /** */
-export function Uv_metrics_get_char_width(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].sub_tex[sub_tex_idx].width; }
+// export function Uv_metrics_get_char_width(metrics_idx, sub_tex_idx) { 
+//    return _metrics_buffer[metrics_idx].sub_tex[sub_tex_idx].width; 
+// }
+export function Uv_metrics_get_char_width(metrics_idx, sub_tex_idx) { 
+   return _metrics_buffer[metrics_idx].plane_bounds[sub_tex_idx].width; 
+}
 /** */
 export function Uv_metrics_get_char_height(metrics_idx, sub_tex_idx) { return _metrics_buffer[metrics_idx].sub_tex[sub_tex_idx].row_height; }
 /** */
@@ -61,17 +66,19 @@ export function Uv_metrics_calculate_width_from_text(str, metrics_idx){
 
    return width;
 }
-/** */
-export function Uv_metrics_create_uvmap(texture_file_id, sub_tex_idx, metrics_file) {
+/** Create applications storage for font's metrics and its uvmap */
+export function Uv_metrics_create_uvmap(texture_file_id, variant_idx, sub_tex_idx, metrics_file) {
 
-   // Create new font metrics and uvmap
+   // Create index to address the specific font's metrics and uvmap buffers. Same index is used for both.
    const metrics_idx = _uvmap_buffer.length;
-   // _uvmap_active_maps_buffer[texture_file_id] = metrics_idx; // Update the 'active' fonts
    
    
-   if(FONT_IS_MSDF(texture_file_id)) {
-      if(!metrics_file)
-         console.log(metrics_file)
+   if(FONT_IS_VARIANT(texture_file_id)) {
+      const msdf_metrics = Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_file, variant_idx, sub_tex_idx);
+      _metrics_buffer[metrics_idx] = msdf_metrics;
+      _uvmap_buffer[metrics_idx] =  msdf_metrics.uvmap
+   }
+   else if(FONT_IS_MSDF(texture_file_id)) {
       const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, sub_tex_idx);
       _metrics_buffer[metrics_idx] = msdf_metrics;
       _uvmap_buffer[metrics_idx] =  msdf_metrics.uvmap

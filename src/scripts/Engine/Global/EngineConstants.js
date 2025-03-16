@@ -799,8 +799,9 @@ const RESOURCES_PATH = '/resources';
 let g_cnt = 0;
 const TEXTURE_TYPE = {
 	TYPE_FONT: 0x1,
-	TYPE_FONT_SYMBOL: 0x1,
-	TYPE_TEXTURE: 0x2,
+	TYPE_VARIANT_FONT: 0x1,
+	TYPE_FONT_SYMBOL: 0x2,
+	TYPE_TEXTURE: 0x4,
 };
 
 
@@ -832,44 +833,8 @@ const TEXTURE_ATLAS_MSDF_SYMBOLS = 'symbols';
 const TEXTURE_SMOKE1 = 'smoke';
 const TEXTURE_COIN = 'Coin_1_64x64';
 const TEXTURE_TEST_APPLE = 'apple1_64x73';
-/**
- * 	TEXTURE_PATHS[cnt++].metrics = CONSOLAS_12Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_16Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_20Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_24Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_28Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_32Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_40Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_49Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_58Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_66Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_116Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = CONSOLAS_157Hpx;
-	 TEXTURE_PATHS[cnt++].metrics = consola_msdf_test_1024_metrics;
-	 TEXTURE_PATHS[cnt++].metrics = comic_sans_cz;
-	 TEXTURE_PATHS[cnt++].metrics = arrow_left;
- */
-// // Font textures
-// const FONT_CONSOLAS_12px = { name:'consolas_3', metrics_file: CONSOLAS_12Hpx, };
-// const FONT_CONSOLAS_16px = 	{ name:'consolas_4', metrics_file: CONSOLAS_16Hpx, };
-// const FONT_CONSOLAS_20px = 	{ name:'consolas_5', metrics_file: CONSOLAS_20Hpx, };
-// const FONT_CONSOLAS_24px = 	{ name:'consolas_6', metrics_file: CONSOLAS_24Hpx, };
-// const FONT_CONSOLAS_28px = 	{ name:'consolas_7', metrics_file: CONSOLAS_28Hpx, };
-// const FONT_CONSOLAS_32px = 	{ name:'consolas_8', metrics_file: CONSOLAS_32Hpx, };
-// const FONT_CONSOLAS_40px = 	{ name:'consolas_9', metrics_file: CONSOLAS_40Hpx, };
-// const FONT_CONSOLAS_49px = 	{ name:'consolas_10', metrics_file: CONSOLAS_49Hpx, };
-// const FONT_CONSOLAS_58px = 	{ name:'consolas_11', metrics_file: CONSOLAS_58Hpx, };
-// const FONT_CONSOLAS_66px = 	{ name:'consolas_12', metrics_file: CONSOLAS_66Hpx, };
-// const FONT_CONSOLAS_116px = 	{ name:'consolas_13', metrics_file: CONSOLAS_116Hpx, };
-// const FONT_CONSOLAS_157px = 	{ name:'consolas_14', metrics_file: CONSOLAS_157Hpx, };
-// const TEST_MTSDF_FONT_TEST_1024DIM = { name:'consola_mtsdf_test_1024', metrics_file: consola_msdf_test_1024_metrics, };
-// const FONT_MSDF_COMIC = 'comicz';
-// const TEST_MSDF_FONT_1 = 'msdf_a_char';
-// // Textures
-// const TEXTURE_SMOKE1 = 'smoke';
-// const TEXTURE_COIN = 'Coin_1_64x64';
-// const TEXTURE_TEST_APPLE = 'apple1_64x73';
-// const TEXTURE_ATLAS_MSDF_SYMBOLS = 'arrow_left_256x256';
+// Textures Atlases with variant font sizes
+const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA = 'atlas_variants_consola_1024x1024_8px_scale12_extended_ascii';
 
 
 
@@ -1031,7 +996,8 @@ const TEXTURES = {
 	MSDF_CONSOLAS_1024: g_cnt++,
 	MSDF_COMIC_1024: g_cnt++,
 	MSDF_SYMBOLS:g_cnt++, 
-	TEST_MSDF_ARIAL: g_cnt,
+	TEST_MSDF_ARIAL: g_cnt++,
+	CONSOLA_VARIANT_FONT: g_cnt++,
 	TEXTURE_ATLASES_COUNT: g_cnt,
 	
 	// IS_MSDF: 0x0, 
@@ -1076,7 +1042,7 @@ const ATLASES_SUB_TEXTURES = { // 58 total
 		close_boxed				: 24,
 		diagonal_r	: 25,
 		diagonal_l	: 26,
-		cloase_2	: 27,
+		close_2	: 27,
 		_8	: 28,
 		_9	: 29,
 		_10: 30,
@@ -1117,6 +1083,13 @@ function FONT_IS_MSDF(texture_file_id) {
 		texture_file_id === TEXTURES.MSDF_CONSOLAS_1024 ||
 		texture_file_id === TEXTURES.TEST_MSDF_ARIAL ||
 		texture_file_id === TEXTURES.MSDF_SYMBOLS
+	) return true;
+
+	return false;
+}
+function FONT_IS_VARIANT(texture_file_id) {
+	if(
+		texture_file_id === TEXTURES.CONSOLA_VARIANT_FONT
 	) return true;
 
 	return false;

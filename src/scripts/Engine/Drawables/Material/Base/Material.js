@@ -91,9 +91,12 @@ export class Material {
 
    SetStyle(style) {
 
-      this.style.rcorners = style.rcorners;
-      this.style.feather = style.feather;
-      this.style.border = style.border;
+      if(style !== undefined) {
+
+         this.style.rcorners = style.rcorners;
+         this.style.feather = style.feather;
+         this.style.border = style.border;
+      }
    }
 
 
@@ -144,7 +147,7 @@ export class Material {
 export class Material_Font extends Material {
 
 
-   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, text = '', sdf_params = [.5, .5]) {
+   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, text = '', sdf_params = [.5, .5], variant_idx=0) {
 
       super(col, texture_file_id);
 
@@ -171,9 +174,30 @@ export class Material_Font extends Material {
       this.type |= MESH_TYPE.FONT_MATERIAL;
 
       // Load texture and uv map, via indexes to the actual buffers
-      const texture = Texture_load_texture_byid(this.texture_file_id, TEXTURE_TYPE.TYPE_FONT);
+      const texture = Texture_load_texture_byid( TEXTURE_TYPE.TYPE_FONT, this.texture_file_id, variant_idx, _);
       this.texidx = texture.tex_idx;
       this.metrics_idx= texture.metrics_idx;
+
+      // if(FONT_IS_VARIANT(texture_file_id)) {
+
+      //    // Load texture and uv map, via indexes to the actual buffers
+      //    const texture = Texture_load_texture_byid( TEXTURE_TYPE.TYPE_FONT, this.texture_file_id, _, _);
+      //    this.texidx = texture.tex_idx;
+      //    this.metrics_idx= texture.metrics_idx;
+
+      //    // Load texture and uv map, via indexes to the actual buffers
+      //    const texture = Texture_load_texture_byid( TEXTURE_TYPE.TYPE_FONT, this.texture_file_id, _, _);
+      //    this.texidx = texture.tex_idx;
+      //    this.metrics_idx= texture.metrics_idx;
+      // }
+      // else {
+
+      //    // Load texture and uv map, via indexes to the actual buffers
+      //    const texture = Texture_load_texture_byid( TEXTURE_TYPE.TYPE_FONT, this.texture_file_id, _, _);
+      //    this.texidx = texture.tex_idx;
+      //    this.metrics_idx= texture.metrics_idx;
+      // }
+
 
 
       { // Debug
@@ -206,7 +230,44 @@ export class Material_Atlas_Texture extends Material {
       let texture_type = TEXTURE_TYPE.TYPE_FONT_SYMBOL;
       
       // Load texture and uv map, via indexes to the actual buffers
-      const texture = Texture_load_texture_byid(texture_file_id, texture_type, sub_tex_idx);
+      const texture = Texture_load_texture_byid(texture_type, texture_file_id, _, sub_tex_idx);
+      this.texidx = texture.tex_idx;
+      this.metrics_idx = texture.metrics_idx;
+      this.texture_file_id = texture_file_id;
+      this.sub_tex_idx = sub_tex_idx; // The index of the sub-texture in the Atlas texture
+
+      this.uv =  Uv_get_uv_coords(this.metrics_idx, this.sub_tex_idx);
+
+
+      { // Debug
+         /**DEBUG*/if (DEBUG.MATERIAL && this.texidx === INT_NULL) console.error('Texture Index is NULL')
+         /**DEBUG*/if (DEBUG.MATERIAL && this.metrics_idx=== INT_NULL) console.error('Uvs Index is NULL')
+      }
+   }
+}
+
+
+export class Material_Atlas_Texture_Variant extends Material {
+
+
+   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, sub_tex_idx=INT_NULL, sdf_params = [.5, .5], variant_idx=0) {
+
+      super(col, texture_file_id);
+
+      this.sdf_params = [0, 0];
+      math.CopyArr2(this.sdf_params, sdf_params);
+      
+      this.sid.attr |= SID.ATTR.TEX2; // 
+      this.sid.pass |= SID.PASS.TEX2; //
+      if(FONT_IS_MSDF(texture_file_id)) {
+         this.sid.attr |= SID.ATTR.MSDF; // 
+      } 
+      this.type |= MESH_TYPE.ATLAS_TEXTURE_MATERIAL;
+      
+      let texture_type = TEXTURE_TYPE.TYPE_VARIANT_FONT;
+      
+      // Load texture and uv map, via indexes to the actual buffers
+      const texture = Texture_load_texture_byid(texture_type, texture_file_id, variant_idx, sub_tex_idx);
       this.texidx = texture.tex_idx;
       this.metrics_idx = texture.metrics_idx;
       this.texture_file_id = texture_file_id;
@@ -246,7 +307,7 @@ export class Material_Texture extends Material {
          texture_type = TEXTURE_TYPE.TYPE_FONT_SYMBOL; // Case texture is type of font symbol with metrics
       } 
 
-      const texture = Texture_load_texture_byid(texture_file_id, texture_type);
+      const texture = Texture_load_texture_byid(texture_type, texture_file_id, _, _);
       this.texidx = texture.tex_idx;
       this.texture_id = texture_file_id;
       // NOTE: Simple texture does not have a uvmap

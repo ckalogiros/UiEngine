@@ -60,7 +60,7 @@ export class Widget_Color_Picker extends Section {
       // style.feather = 15
 
       if (col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, [margin[0] * scale, margin[1] * scale], pos, [dim[0] * scale, dim[1] * scale], col, name, style, num_faces, _, is_debug_mesh);
+      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, [margin[0] * scale, margin[1] * scale], pos, [dim[0] * scale, dim[1] * scale], col, name, style, num_faces, _, _, is_debug_mesh);
 
 
       // Multi color vertex

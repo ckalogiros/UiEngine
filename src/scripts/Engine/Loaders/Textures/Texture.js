@@ -29,11 +29,19 @@ import { consola_msdf_test_1024_metrics } from '../../../../../resources/fonts/c
 import { Uv_metrics_create_uvmap, Uv_texture_init_buffers, Uvmaps_print } from "./TextureUvMap.js";
 import { test_arial_msdf } from "../../../../../resources/fonts/TEST/test_arial_msdf.js";
 import { symbols } from "../../../../../resources/fonts/symbols/metrics/symbols.js";
+import { atlas_variants_consola_1024x1024_8px_scale12_extended_ascii } from "../../../../../resources/fonts/atlas_variants/consola/atlas_variants_consola_1024x1024_8px_scale12_extended_ascii.js";
 
 // TODO: Make texture buffer from New_generic_buffer();
 // TODO: Rename all font words with atlas, since an atlas texture consists of subtextures and has uv coordinates from a metrics file
 // TODO: Instead of loading all metrics files (large data), get the file needed by function call. That means we need to create a new .js file where we load all metrics. At least they will be loaded if Get_metrics_file function is called
 // TODO: Metrics_file id duplicated, 1 inside Texture class and 2 in metrics buffer
+
+
+
+const MAX_VARIANTS_IN_ATLAS_TEXTURE = 16;
+
+
+
 
 // HERE: We need to store the Texture and not just the texture_unit in the _textureBuffer. Also we must update all accesses of the _textureBuffer to match the new implementation
 const TEXTURES_MAX_COUNT = 16;
@@ -140,6 +148,14 @@ const TEXTURE_PATHS = [
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
 	/***************************************************************************************************/
+	// Atlas textures variant font sizes
+	{ // 15
+		img_path: 'fonts/atlas_variants',
+		img_name: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA,
+		img_type: 'png',
+		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
+	},
+	/***************************************************************************************************/
 	// Textures
 	{
 		img_path: 'textures',
@@ -177,8 +193,9 @@ class Texture {
 
 		this.metrics_file = metrics_file;
 		// The index to the metrics data in the metrics buffer
-		this.metrics_idx = INT_NULL; // metrics_idx and uvmap_idx are 1 to 1  sepsrate buffers
-
+		this.metrics_idxs = new Int8Array(MAX_VARIANTS_IN_ATLAS_TEXTURE); // mbuffer to store textures metrics index or if a variant font texture store the all metrics indexes
+		for(let i=0; i<MAX_VARIANTS_IN_ATLAS_TEXTURE; i++) this.metrics_idxs[i] = INT_NULL; // Initialize
+		this.variants_cnt = 0; // An index counter
 	}
 
 	SetTextureUnit(texture_unit){
@@ -186,12 +203,18 @@ class Texture {
 	}
 
 	SetMetricsIndex(metrics_idx){
-		this.metrics_idx = metrics_idx;
+		// this.metrics_idxs = metrics_idx;
+		this.metrics_idxs[this.variants_cnt++] = metrics_idx;
+	}
+
+	IsMetricsLoaded(variant_idx){
+		if(this.metrics_idxs[variant_idx] === INT_NULL) return false;
+		return true;
 	}
 
 };
 /** */
-function Texture_pair_metrics_file_to_texture(img_name) {
+function Texture_pair_texture_to_metrics_file(img_name) {
 
 	switch(img_name) {
 		case FONT_CONSOLAS_12px: { return CONSOLAS_12Hpx; }	
@@ -210,12 +233,15 @@ function Texture_pair_metrics_file_to_texture(img_name) {
 		case FONT_MSDF_COMIC: { return comic_sans_cz; }	
 		case TEST_FONT_MSDF_ARIAL: { return test_arial_msdf; }	
 		case TEXTURE_ATLAS_MSDF_SYMBOLS: { return symbols; }	
-		default: console.error('01928374655637.  Texture_pair_metrics_file_to_texture() failed to find metrics for texture:', img_name)
+		case ATLAS_TEXTURE_VARIANT_FONT_CONSOLA: { return atlas_variants_consola_1024x1024_8px_scale12_extended_ascii; }	
+		default: console.error('01928374655637.  Texture_pair_texture_to_metrics_file() failed to find metrics for texture:', img_name)
 
 	}
 }
 /** */
-export function Texture_load_texture_byid(texture_file_id, TEX_TYPE, sub_tex_idx=INT_NULL) {
+// export function Texture_load_texture_byid(texture_file_id, TEX_TYPE, sub_tex_idx=INT_NULL) {
+// export function Texture_load_texture_byid(texture_params, TEX_TYPE, ) {
+export function Texture_load_texture_byid(TEX_TYPE, texture_file_id=INT_NULL, variant_idx=0, sub_tex_idx=INT_NULL,) {
 
 	let tex_idx = INT_NULL; 	// The index of the texture, that is stored(upon texture creation) in a buffer.
 	let metrics_idx = INT_NULL; 		// The index of the uv coordinates. All coordinates for all , 
@@ -225,7 +251,7 @@ export function Texture_load_texture_byid(texture_file_id, TEX_TYPE, sub_tex_idx
 	if (texture_idx === INT_NULL) {
 
 		// NOTE: If the texture is not an ATLAS texture, then the metrics_file is null
-		const metrics_file = Texture_pair_metrics_file_to_texture(TEXTURE_PATHS[texture_file_id].img_name);
+		const metrics_file = Texture_pair_texture_to_metrics_file(TEXTURE_PATHS[texture_file_id].img_name);
 		
 		const texture = new Texture(texture_file_id, null, TEXTURE_PATHS[texture_file_id].img_path, TEXTURE_PATHS[texture_file_id].img_name, TEXTURE_PATHS[texture_file_id].img_type, metrics_file);
 		
@@ -238,22 +264,44 @@ export function Texture_load_texture_byid(texture_file_id, TEX_TYPE, sub_tex_idx
 		
 		_textureBuffer[tex_idx] = texture;
 		
-		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT || TEX_TYPE & TEXTURE_TYPE.TYPE_FONT_SYMBOL) {
-			metrics_idx = Uv_metrics_create_uvmap(texture.texture_file_id, sub_tex_idx, texture.metrics_file);
+		// Load metrics if the texture is an atlas having sub-textures.
+		if ((TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) || (TEX_TYPE & TEXTURE_TYPE.TYPE_VARIANT_FONT) || (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT_SYMBOL)) {
+			metrics_idx = Uv_metrics_create_uvmap(texture.texture_file_id, variant_idx, sub_tex_idx, texture.metrics_file);
 			texture.SetMetricsIndex(metrics_idx);
 		}
 	}
 	else {
+		/**
+		 * HERE:
+		 * If we deal with texture variant, one texture atlas has many font sizes,
+		 * and if the texture is loaded, we need to check if the asked font variant is loaded.
+		 * If it is not, we need to create the metrics and uvmap of the variant,
+		 * else if it is loaded simplyreturn the metrics index for the metrics and uvmap 
+		 * 
+		 * Solution for one texture many metrics_idxs, is to have a buffer of metrics indexes.
+		 * Check if the texture is of type VARIANT_FONT, and make use of the variant_idx 
+		 * passed as param from caller function to return the correct metrics_idx.
+		 * In case of none variant textures, simply return either .metrics_idxs[0] element or .metrics_idxs,
+		 * depending on the implementation
+		 */
+
+		const is_metrics_loaded = _textureBuffer[texture_idx].IsMetricsLoaded(variant_idx);
+		if(!is_metrics_loaded) { // Load the metrics for the variant
+
+			metrics_idx = Uv_metrics_create_uvmap(_textureBuffer[texture_idx].texture_file_id, variant_idx, sub_tex_idx, _textureBuffer[texture_idx].metrics_file);
+			_textureBuffer[texture_idx].SetMetricsIndex(metrics_idx);
+		}
+
 		tex_idx = texture_idx;
 		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT){
 
-			metrics_idx = _textureBuffer[texture_idx].metrics_idx
+			metrics_idx = _textureBuffer[texture_idx].metrics_idxs[variant_idx];
 			// metrics_idx = Uv_retrieve_uvmap_idx(texture_file_id);// the index for the texture metrics in the font metrics buffer
 			// _textureBuffer[texture_idx].SetMetricsIndex(metrics_idx);
 		}
 	}
 
-	return { tex_idx: tex_idx, metrics_idx: _textureBuffer[tex_idx].metrics_idx };
+	return { tex_idx: tex_idx, metrics_idx: _textureBuffer[tex_idx].metrics_idxs[variant_idx] };
 }
 /** */
 export function Texture_buffer_reset() {
