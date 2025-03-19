@@ -1892,27 +1892,27 @@ Adjust the font size using the slider.
       info1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       s.AddItem(info1);
    }
-   const info2 = Create_widget_label(_, text_sample_explainer2, _, [0, 0, 0], default_font, TRANSPARENT, WHITE, [10, 10], _, _, font,);
-   {
-      info2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      info2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      info2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      s.AddItem(info2);
-   }
-   const info3 = Create_widget_label(_, text_sample_explainer3, _, [0, 0, 0], default_font, TRANSPARENT, WHITE, [10, 10], _, _, font,);
-   {
-      info3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      info3.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      info3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      s.AddItem(info3);
-   }
-   const info4 = Create_widget_label(_, text_sample_explainer4, _, [0, 0, 0], default_font, TRANSPARENT, WHITE, [10, 10], _, _, font,);
-   {
-      info4.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      info4.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      info4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      s.AddItem(info4);
-   }
+   // const info2 = Create_widget_label(_, text_sample_explainer2, _, [0, 0, 0], default_font, TRANSPARENT, WHITE, [10, 10], _, _, font,);
+   // {
+   //    info2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    info2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   //    info2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   //    s.AddItem(info2);
+   // }
+   // const info3 = Create_widget_label(_, text_sample_explainer3, _, [0, 0, 0], default_font, TRANSPARENT, WHITE, [10, 10], _, _, font,);
+   // {
+   //    info3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    info3.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   //    info3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   //    s.AddItem(info3);
+   // }
+   // const info4 = Create_widget_label(_, text_sample_explainer4, _, [0, 0, 0], default_font, TRANSPARENT, WHITE, [10, 10], _, _, font,);
+   // {
+   //    info4.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    info4.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   //    info4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   //    s.AddItem(info4);
+   // }
 
 
 

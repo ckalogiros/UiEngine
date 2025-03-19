@@ -107,17 +107,28 @@ vec4 Msdf(vec2 v_tex_coord) {
 export const frag_tex = `
 
   vec4 texel = texture( u_sampler0, v_tex_coord);
+
   
   // Premutiply alpha destination
   texel.rgb *= texel.a; // Remove rgb final_color with the alpha channel
 
   final_color = texel * src_color;
-  final_color.rgb *= final_color.a; // Include alpha from user input final_color
+  // final_color.rgb *= final_color.a; // Include alpha from user input final_color
   
-  float distance = max(texture(u_sampler0, v_tex_coord).r, max(texture(u_sampler0, v_tex_coord).g, texture(u_sampler0, v_tex_coord).b));
-  
+  // TODO: mult the resulted median color to get a border. 
+  // float distance = max(texel.r, max(texel.g, texel.b))*10.;
+
+
+  float distance = max(texel.r, max(texel.g, texel.b));
+
+  // distance *= distance*distance*distance;
+  // distance *= distance;
+
+  // TODO: Add to the final color to create thickness
+  // final_color.rgb += distance;
+
   final_color.a *= distance; // Remove all black final_color from the rgb channels
-  // final_color.a = .9;
+  // final_color.a = .4;
   
 
   `;

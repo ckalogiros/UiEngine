@@ -40,17 +40,17 @@ import { App_reinitialize, App_reset } from './App.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_msdf_text_rendering, Demo_widgets_scrolled_labels, Demo_widgets_sections, Demo_widgets_sections_new_align } from './Demo/DemoWidgets.js';
 import { Board_rotations } from './Demo/DemoBoardRotations.js';
-// import { Uv_metrics_get_char_width, Uv_metrics_get_face_advancex, Uv_metrics_get_row_height } from '../Engine/Loaders/Font/Font.js';
+// import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_face_advancex, Texture_metrics_get_line_height } from '../Engine/Loaders/Font/Font.js';
 import { Tetris } from './Demo/Games/Snake/Tetris.js';
 import { Bitwise_operations_run_test } from '../Engine/Core/BitwiseOps.js';
 import { Arkanoid_initialize } from './Demo/Games/Arkanoid/Arkanoid.js';
-import { Widget_ready_slider } from './Widgets/ReadyWidgets.js';
+import { Widget_ready_label, Widget_ready_slider } from './Widgets/ReadyWidgets.js';
 import { Effects_create_explosion_circle, Effect_explosion_circle_get_mesh_byidx } from '../Engine/Drawables/Effects/Effects.js';
 import { Style_widget_default } from './Widgets/WidgetStyles.js';
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
 import { Align_expand, Align_pre_simple, Test_alignment, Test_alignment_nested_2 } from './Tests/TestAlignNestedSections.js';
 import { Performance_timer_start, Performance_timer_stop, PerformanceTimersGetFps, PerformanceTimersGetMilisec } from '../Engine/Timers/PerformanceTimers.js';
-import { Uv_metrics_get_char_width, Uv_metrics_get_row_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
+import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { Expand } from '../Engine/Drawables/Meshes/Section.js';
 
 
@@ -94,31 +94,62 @@ export function TestWidgetsGeneric() {
 
     { // Statistics
         let yy = 0, pp = 23;
-        // Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT,);
-        // // Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);
-        // // Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);    
-        // Debug_info_create_ui_mouse(_, yy+=pp);
-        // // Debug_info_ui_static_app_generic_buffers_container(ROOT_WIDGETS.CREATE_ROOT, 0, yy+=pp);
-        // Debug_info_ui_static_app_generic_buffers(ROOT_WIDGETS.CREATE_ROOT, 0, yy+=pp);
-        // Debug_info_ui_static_app_int16_buffers(ROOT_WIDGETS.CREATE_ROOT, 0, yy+=pp);
-        // Debug_info_ui_static_app_int8_buffers(ROOT_WIDGETS.CREATE_ROOT, 0, yy+=pp);
+        const d1 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, yy); yy += d1.geom.dim[1]*2
+        // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
+        // // const d3 = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT);  d1.geom.dim[1]*2  d3.geom.dim[1]*2
+        // const d4 = Debug_info_create_ui_mouse(_, yy); yy += d4.geom.dim[1]*2
+        // const d5 = Debug_info_ui_static_app_generic_buffers_container(ROOT_WIDGETS.CREATE_ROOT, 0, yy);yy += d5.geom.dim[1]*2
+        // const d6 = Debug_info_ui_static_app_generic_buffers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d6.geom.dim[1]*2
+        // const d7 = Debug_info_ui_static_app_int16_buffers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d7.geom.dim[1]*2
+        // const d8 = Debug_info_ui_static_app_int8_buffers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d8.geom.dim[1]*2
     }
 
-    // CreateLabelMsdf(_, '>', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, '123', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, '123', TEXTURES.CONSOLAS_157px, 300, 250, 10, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabel(_, '123', TEXTURES.CONSOLAS_157px, 300, 450);
-    // CreateLabel(_, '123', TEXTURES.MSDF_CONSOLAS_1024, 300, 650,_,_,_,75);
-    CreateLabel(_, '123', TEXTURES.CONSOLA_VARIANT_FONT, 300, 650,_,_,_,75);
-    // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.MSDF_CONSOLAS_1024, 30, 80, 12, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.MSDF_CONSOLAS_1024, 30, 60, 6, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.TEST_MSDF_ARIAL, 300, 250, 175, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.TEST_MSDF_ARIAL, 30, 250, 75, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.TEST_MSDF_ARIAL, 30, 450, 50, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.TEST_MSDF_ARIAL, 30, 590, 25, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.TEST_MSDF_ARIAL, 30, 660, 12, TRANSPARENT, BLUEL[9], _, );
-    // CreateLabelMsdf(_, 'Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, 40);', TEXTURES.TEST_MSDF_ARIAL, 30, 660, 6, TRANSPARENT, BLUEL[9], _, );
+
+    // { // GOOD!! render text from widget text directly to a section or stand alone. ABLE TO create layout with VERTICAL alignment via the new implementation
+    //     const pos = [100, 500, 0]
+    //     const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [0, 0], [50, 250, 0], [0, 0], TRANSPARENCY(GREY[7], .5))
+    //     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    //     section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
+    //     section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+    //     section.align.flags = ALIGN_2.RESIZE_SELF;
+    
+    //     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+     
+     
+    //     const info1 = Create_widget_text(_, `|Widget_Text inside a Section\n| This is a new line @#-$%`, [0, 0, 10], 10, YELLOW[9], _, TEXTURES.CONSOLA_VARIANT_FONT, _, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S8_0, _,  [0, 0],);
+    //     info1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //     section.AddItem(info1);
+    //     info1.align.flags = ALIGN_2.HORIZONTAL
+
+    //     const info2 = Create_widget_text(_, `|This is a new widget_text,\naligned verticaly inside the section`, [0, 0, 10], 10, YELLOW[9], _, TEXTURES.CONSOLA_VARIANT_FONT, _, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S5_0, _,  [0, 0],);
+    //     info2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    //     section.AddItem(info2);
+    //     info2.align.flags = ALIGN_2.VERTICAL
+     
+
+    //     /********************************************************************************************************************************************************/
+    //     // Align
+    //     const ret = Align_pre_simple(section);
+    //     const pad_x = section.StylesGetPad(STYLES.AXIS.X);
+    //     const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
+    //     section.geom.dim[0] = ret.dim_x + pad_x;
+    //     section.geom.dim[1] = ret.dim_y + pad_y;
+    //     // section.geom.pos[0] = pos[0];
+    //     // section.geom.pos[1] = pos[1];
+    //     // Align_expand(section, section.align.flags,)
+
+
+    //     /********************************************************************************************************************************************************/
+    //     // Render
+    //     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+
+
+    //     section.Render();
+    //     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    //     Construct_listen_events_from_mesh_tree(section)
+    //     Construct_listen_events_relations_from_mesh_tree(section);
+    //     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+    // }
 
 
     // Demo_page();
@@ -152,6 +183,63 @@ export function TestWidgetsGeneric() {
     // Test_performance_align_functions()
 
 
+    { // Widget: Label-buttons
+
+        { // MSDF
+
+            // Demo_widgets_msdf_text_rendering(10, 100);
+
+
+            // CreateLabelMsdf(_, 'Absr', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 45, _, _, _);
+
+            // CreateLabelMsdf(_, 'The quick brown foxjums over the', TEXTURES.MSDF_COMIC_1024, 0, 550, 20, _, _, _);
+            // CreateLabelMsdfWithScale(_, 'The quick\nbrown fox\njumps over', TEXTURES.MSDF_COMIC_1024, 0, 550, 20, _, _, _);
+
+
+        }
+
+        // !\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+        // CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_28px, 0, 250);
+        // CreateLabel(_, '()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_157px, 0, 250,);
+        // const label = CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`~~{|}0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_66px, 0, 300);
+
+        // const label = CreateLabel('1');
+        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
+
+        // // CreateLabelMsdf(_, '>', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 75, TRANSPARENT, BLUEL[9], _, );
+        // // CreateLabelMsdf(_, '123', TEXTURES.MSDF_CONSOLAS_1024, 300, 50, 75, TRANSPARENT, BLUEL[9], _, );
+        // // CreateLabelMsdf(_, '123', TEXTURES.CONSOLAS_157px, 300, 250, 10, TRANSPARENT, BLUEL[9], _, );
+        // // CreateLabel(_, '123', TEXTURES.CONSOLAS_157px, 300, 450);
+        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MSDF_CONSOLAS_1024, _, 300, 700,_,_,_,18);
+        // CreateLabel(_, 'Widget_Label', TEXTURES.MSDF_CONSOLAS_1024, _, 300, 500,_,_,_,18);
+        // CreateLabel(_, '|float distance = max(texture(u_sampler0, v_tex_coord).r, max(texture(u_sampler0, v_tex_coord).g, texture(u_sampler0, v_tex_coord).b));', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0, 300, 650,_,_,_,75);
+        // CreateLabel(_, '| Initializing Graphics.', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0, 300, 50,_,_,_,75,);
+        CreateLabel(_, 'Widget_Label\n12345NaN', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S1_5, 300, 50,_,_,_);
+        // Widget_ready_label(ROOT_WIDGETS.CREATE_ROOT, 'lskdlksaldksd', TEXTURES.CONSOLA_VARIANT_FONT, 300, 50, 20, _, _, );
+
+
+
+        // CreateLabel(_, 'Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);');
+        // CreateLabel('Gl._framebuffer:-{render}|[mesh](FB.agqtpQji,TYPE.DIMENTION!,@23#scene,(label);');
+        // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, label);
+        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, label);
+
+        // const button = CreateButton(); 
+        // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, button);
+    }
+    
+    { // Widget: Slider-switch
+
+        // CreateSliderSimple();
+        // CreateSlider(_, 400, 100);
+        // CreateSlider(_, 400, 300);
+
+        
+
+        // CreateSwitchSimple([0, ypos, 0]);
+        // const switch1 = CreateSwitch();
+    }
+
     { // Window menu
         // Window_menu();
     }
@@ -179,11 +267,11 @@ export function TestWidgetsGeneric() {
 
             // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.X, line, .5, -5., 5., 0)
             // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.Y, line, .5, -5., 5., 0)
-            // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .1, .0, 1.,)
+            // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, line, .004, .4, .8, _, .8, true)
+            // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .05, .4, 1.,)
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, line, .005, .2, .5, .2)
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .0025, .2, .8, .2)
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RG, line, .01, .2, .8, _, .2, false)
-            // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, line, .01, .1, .1, _, .5, true)
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .001, .2, 1.4, _, .4, true)
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, line, .001, .2, 1.4, _, .4, true)
 
@@ -263,45 +351,8 @@ export function TestWidgetsGeneric() {
 
     }
 
-    { // Widget: Slider-switch
-
-        // CreateSliderSimple();
-        // CreateSlider();
-
-        // CreateSwitchSimple([0, ypos, 0]);
-        // const switch1 = CreateSwitch();
-    }
-
-    { // Widget: Label-buttons
-
-        { // MSDF
-
-            // Demo_widgets_msdf_text_rendering(10, 100);
-
-
-            // CreateLabelMsdf(_, 'Absr', TEXTURES.MSDF_CONSOLAS_1024, 300, 250, 45, _, _, _);
-
-            // CreateLabelMsdf(_, 'The quick brown foxjums over the', TEXTURES.MSDF_COMIC_1024, 0, 550, 20, _, _, _);
-            // CreateLabelMsdfWithScale(_, 'The quick\nbrown fox\njumps over', TEXTURES.MSDF_COMIC_1024, 0, 550, 20, _, _, _);
-
-
-        }
-
-        // !\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
-        // CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_28px, 0, 250);
-        // CreateLabel(_, '()*+,-./:;<=>?@[\\]^_\`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_157px, 0, 250,);
-        // const label = CreateLabel(_, '!\"#$%&\'()*+,-./:;<=>?@[\\]^_\`~~{|}0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', TEXTURES.CONSOLAS_66px, 0, 300);
-
-        // const label = CreateLabel('1');
-        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.B, label, .03, 0., 1.)
-
-        // CreateLabel(_, 'Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);');
-        // CreateLabel('Gl._framebuffer:-{render}|[mesh](FB.agqtpQji,TYPE.DIMENTION!,@23#scene,(label);');
-        // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, label);
-        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, label);
-
-        // const button = CreateButton(); 
-        // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, button);
+    { // widget plain text
+        // const plain_text = Create_widget_text(_, 'A', [0, 40, 50], _, WHITE, _, _, TEXTURES.MSDF_COMIC_1024);
     }
 
     { // Widget: Dropdown
@@ -749,8 +800,8 @@ function Test_text_clbk_animations_with_counter(x, y, text_pad_x = 10, text_pad_
             const text_substitution = `${cnt++}`
 
             let limit = 0;
-            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Uv_metrics_get_char_width(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
-            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Uv_metrics_get_row_height(mesh.text_mesh.mat.metrics_idx) / 2;
+            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
+            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Texture_metrics_get_line_height(mesh.text_mesh.mat.metrics_idx) / 2;
 
             if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_X) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_X, text_substitution);
             if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, text_substitution);
@@ -822,8 +873,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
                 params.params.counter1 = 0;
                 let limit_ = 0;
                 const text_substitution_ = `${params.params.counter2++}`
-                if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Uv_metrics_get_char_width(mesh1.text_mesh.mat.metrics_idx, text_substitution_.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
-                else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Uv_metrics_get_row_height(mesh1.text_mesh.mat.metrics_idx) / 2;
+                if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Texture_metrics_get_sub_tex_width(mesh1.text_mesh.mat.metrics_idx, text_substitution_.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
+                else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Texture_metrics_get_line_height(mesh1.text_mesh.mat.metrics_idx) / 2;
                 Demo_clbk_animations_text_create(mesh2, slope_params_pointer, limit_, 'TEST_text_animation_2', clbk_anim_flag, text_substitution_);
             }
             if (params.params.counter2 > 9) { params.params.counter2 = 0; }
@@ -831,8 +882,8 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
             const text_substitution = `${params.params.counter1++}`
 
             let limit = 0;
-            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Uv_metrics_get_char_width(mesh1.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
-            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Uv_metrics_get_row_height(mesh1.text_mesh.mat.metrics_idx) / 2;
+            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(mesh1.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
+            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Texture_metrics_get_line_height(mesh1.text_mesh.mat.metrics_idx) / 2;
 
             Demo_clbk_animations_text_create(mesh1, slope_params_pointer, limit, 'TEST_text_animation_1', clbk_anim_flag, text_substitution);
         },
@@ -844,9 +895,9 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
 
 
 
-function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y = 0, dim = [32 / 2, 32 / 2], color = WHITE, pad = [0, 0], texture_file_id = TEXTURES.COIN, sub_texture_id = INT_NULL) {
+function TexturedSection(is_root = 0x0, name = 'TexturedSection', x = 0, y = 0, dim = [32 / 2, 32 / 2], color = WHITE, pad = [0, 0], texture_file_id = TEXTURES.COIN, sub_texture_id = INT_NULL) {
 
-    const section = Create_widget_section(root_widget, _, pad, [x, y, 0], dim, color, _, _, _, texture_file_id, sub_texture_id);
+    const section = Create_widget_section(is_root, _, pad, [x, y, 0], dim, color, _, _, _, texture_file_id, sub_texture_id);
     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -857,7 +908,7 @@ function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y =
     // section.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3|SID.ATTR.DIM2|SID.ATTR.R_CORNERS|SID.ATTR.FEATHER);
     // section.sid.inst = (SID.ATTR.WPOS3|SID.ATTR.DIM2|SID.ATTR.R_CORNERS|SID.ATTR.FEATHER);
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
 
         section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
@@ -873,10 +924,10 @@ function TexturedSection(root_widget = 0x0, name = 'TexturedSection', x = 0, y =
 
     return section;
 }
-function Section(root_widget = 0x0, name = 'Section ', x = 0, y = 0, dim = [20, 20], color = PURPLEB[6], pad = [10, 10], texture_file_id = INT_NULL) {
+function Section(is_root = 0x0, name = 'Section ', x = 0, y = 0, dim = [20, 20], color = PURPLEB[6], pad = [10, 10], texture_file_id = INT_NULL) {
 
-    // const section = Create_widget_section(root_widget, _, pad, [x, y], dim, color, _, );
-    const section = Create_widget_section(root_widget, _, pad, [x, y, 0], dim, color, _, _, _, texture_file_id);
+    // const section = Create_widget_section(is_root, _, pad, [x, y], dim, color, _, );
+    const section = Create_widget_section(is_root, _, pad, [x, y, 0], dim, color, _, _, _, texture_file_id);
     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -891,7 +942,7 @@ function Section(root_widget = 0x0, name = 'Section ', x = 0, y = 0, dim = [20, 
     // section.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3|SID.ATTR.DIM2|SID.ATTR.R_CORNERS|SID.ATTR.FEATHER);
     // section.sid.inst = (SID.ATTR.WPOS3|SID.ATTR.DIM2|SID.ATTR.R_CORNERS|SID.ATTR.FEATHER);
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
 
         section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
@@ -1141,7 +1192,7 @@ function CreateSectionedWidgets(pos, name = 'NO NAME') {
 
     // Add widgets
     {
-        const btn = Create_widget_button(_, 'Button', _, [0, 0, 1], _, GREENL[6], WHITE, [5, 4]);
+        const btn = Create_widget_button(_, 'Button', _, [0, 0, 1], _, GREENL[6], WHITE, [5, 4], );
         btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS)
         btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
         btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 6);
@@ -1185,12 +1236,27 @@ function CreateSectionedWidgets(pos, name = 'NO NAME') {
 
     return section;
 }
-function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, font_size=20) {
+function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, variant_idx, x = 0, y = 0, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, font_size=20) {
 
     const pos = [x, y, 2];
-    // const label = Create_widget_label(root_widget, name, _, pos, 0, TRANSPARENCY(color, .2), WHITE, [5, 5], .5, _, font);
-    const label = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, 1), WHITE, [0, 0], .5, _, font);
-    // label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+    // const label = Create_widget_label(is_root, name, _, pos, 0, TRANSPARENCY(color, .2), WHITE, [5, 5], .5, _, font);
+    // const label = Create_widget_label(is_root, name, _, pos, font_size, TRANSPARENCY(color, 1), WHITE, [20, 10], .5, _, font, _, variant_idx);
+    const label = Create_widget_label({
+        is_root:is_root, 
+        pos:[x, y, 0], 
+        col:color, 
+        pad:[10,6],
+        text:name,
+        // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
+        // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
+        texture_id: TEXTURES.MSDF_CONSOLAS_1024,
+        // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
+        font_size:font_size,
+        text_col:_,
+        is_debug_mesh:false,
+     });
+
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -1211,7 +1277,7 @@ function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', fo
 
     label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
     Construct_listen_events_from_mesh_tree(label);
     Construct_listen_events_relations_from_mesh_tree(label);
 
@@ -1225,11 +1291,11 @@ function CreateLabel(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', fo
 
     return label;
 }
-function CreateLabelMsdf(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], text_color = WHITE, vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
+function CreateLabelMsdf(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], text_color = WHITE, vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL) {
 
     const pos = [x, y, 2];
-    // const label = Create_widget_label(root_widget, name, _, pos, font_size, color, text_color, [0, 0], .5, _, font,);
-    const label = Create_widget_label(root_widget, name, _, pos, font_size, ORANGEL[9], WHITE, [0, 0], .5, _, font,);
+    // const label = Create_widget_label(is_root, name, _, pos, font_size, color, text_color, [0, 0], .5, _, font,);
+    const label = Create_widget_label(is_root, name, _, pos, font_size, ORANGEL[9], WHITE, [0, 0], .5, _, font,);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -1246,7 +1312,7 @@ function CreateLabelMsdf(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label '
 
     label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
     Construct_listen_events_from_mesh_tree(label);
     Construct_listen_events_relations_from_mesh_tree(label);
 
@@ -1267,7 +1333,7 @@ function CreateLabelMsdf(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label '
 
     return label;
 }
-function CreateLabelMsdfWithScale(root_widget = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, temp_flag = false) {
+function CreateLabelMsdfWithScale(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label ', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, temp_flag = false) {
 
     let slider = null
 
@@ -1277,7 +1343,7 @@ function CreateLabelMsdfWithScale(root_widget = ROOT_WIDGETS.CREATE_ROOT, name =
     }
 
     const pos = [x, y, 2];
-    const label = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, .3), WHITE, [0, 0], .5, _, font,);
+    const label = Create_widget_label(is_root, name, _, pos, font_size, TRANSPARENCY(color, .3), WHITE, [0, 0], .5, _, font,);
     label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
     label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
@@ -1294,7 +1360,7 @@ function CreateLabelMsdfWithScale(root_widget = ROOT_WIDGETS.CREATE_ROOT, name =
 
     label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
     Construct_listen_events_from_mesh_tree(label);
     Construct_listen_events_relations_from_mesh_tree(label);
 
@@ -1368,16 +1434,16 @@ function CreateLabelMsdfWithScale(root_widget = ROOT_WIDGETS.CREATE_ROOT, name =
 
 
 
-function CreateButton(x = 20, y = 400, root_widget = ROOT_WIDGETS.CREATE_ROOT) {
+function CreateButton(x = 20, y = 400, is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
-    const btn = Create_widget_button(root_widget, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [x, y, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
+    const btn = Create_widget_button(is_root, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [x, y, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     // btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     // btn.Bind(()=>{console.log('HI')}, )
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -1408,17 +1474,17 @@ function CreateButton(x = 20, y = 400, root_widget = ROOT_WIDGETS.CREATE_ROOT) {
 
 
 
-function CreateSwitchSimple(pos, root_widget = ROOT_WIDGETS.CREATE_ROOT) {
+function CreateSwitchSimple(pos, is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     let ypos = 450
 
-    const switch1 = Create_widget_switch_simple(root_widget, pos, 34, _, _, 8);
+    const switch1 = Create_widget_switch_simple(is_root, pos, 34, _, _, 8);
     switch1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     // switch1.EnableGfxUniforms({ unif: SID.UNIF.FS_RCORNERS_VEC3, }, 'u_rcorners', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
     switch1.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     switch1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, switch1.geom.dim[1]);
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
         switch1.Render();
@@ -1461,16 +1527,19 @@ function CreateSwitch() {
 
 
 
-function CreateSliderSimple(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
+function CreateSliderSimple(is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
-    const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [200, 500, 0] : [0, 0, 0]
+    const pos = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? [200, 500, 0] : [0, 0, 0]
     const slider = Create_widget_slider_simple(ROOT_WIDGETS.CREATE_ROOT, [100, 100, 0], [150, 2], _, [10, 10]);
+    
+
+    
     slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.2);
     slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
@@ -1487,19 +1556,44 @@ function CreateSliderSimple(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
 
 
 
-function CreateSlider(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, initial_val = .5, name) {
+function CreateSlider(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, initial_val = .5, name) {
 
-    const pos = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? [x, y, 0] : [0, 0, 0]
-    const slider = Create_widget_slider(root_widget, pos, [250, 10], _, _, name);
-    // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-    slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+    const pos = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? [x, y, 0] : [0, 0, 0]
+    
+    
+    // const slider = Create_widget_slider(is_root, pos, [250, 10], _, _, name);
+    // ROOT_WIDGET_FLAGS = 0x0, _pos = [0, 0, 0], dim = [120, 10], col = TRANSPARENCY(GREY[0], .6), hover_margin = [5, 16], name = 'SLIDER UNAMED', is_debug_mesh
+    const slider = Create_widget_slider({
+        is_root:ROOT_WIDGETS.CREATE_ROOT, 
+        pos:pos, 
+        dim:[120, 15], 
+        col:GREY[4], 
+        hover_margin:[10, 6],
+        outer_pad:4,
+        name:'Slider Test',
+        // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
+        texture_id: TEXTURES.MSDF_CONSOLAS_1024,
+        font_size: 0,
+        // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
+
+        slider_bar: {
+            // col:BLUEL[7],
+            col:GREY[8],
+        },
+        slider_handle: {
+            // col:GREY[8],
+            col:BLUEL[7],
+        },
+    });
+    
+    slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10, 10);
     slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
     slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
     slider.SetInitialValue(initial_val);
 
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
@@ -1509,6 +1603,14 @@ function CreateSlider(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, init
 
         Construct_listen_events_from_mesh_tree(slider)
         Construct_listen_events_relations_from_mesh_tree(slider);
+
+
+        // Some Shader Effects
+        // const handle = slider.GetHandle();
+        // Gl_set_time(handle.gfx, 0.01); // Reset attribute time
+        // handle.GfxUniformSetAndUpdate('u_generic_controls', [1., .0, .23, 0, .0, 0.]);
+
+
     }
 
     return slider
@@ -1541,12 +1643,12 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0) {
 
 
 
-function CreateDropdownTree(pos = [0, 0, 0], root_widget = ROOT_WIDGETS.CREATE_ROOT) {
+function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     const pad = [10, 4];
     const margin = [5, 5];
     const style = { rcorners: 10, feather: 2, border: 0 };
-    const dp = Create_widget_dropdown(root_widget, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, _, margin);
+    const dp = Create_widget_dropdown(is_root, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, _, margin);
     dp.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -1612,7 +1714,7 @@ function CreateDropdownTree(pos = [0, 0, 0], root_widget = ROOT_WIDGETS.CREATE_R
     }
 
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         dp.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -1640,7 +1742,7 @@ function CreateDropdownTree(pos = [0, 0, 0], root_widget = ROOT_WIDGETS.CREATE_R
 
 
 
-function TEST_LISTENERS_CreateDropdown(pos = [0, 0, 0], root_widget = ROOT_WIDGETS.CREATE_ROOT) {
+function TEST_LISTENERS_CreateDropdown(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     // const pad = [10, 2.5]
     const pad = [10, 4]
@@ -1667,7 +1769,7 @@ function TEST_LISTENERS_CreateDropdown(pos = [0, 0, 0], root_widget = ROOT_WIDGE
 
 
     for (let i = 0; i < 2; i++) {
-        // const dp = Create_widget_dropdown(root_widget, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
+        // const dp = Create_widget_dropdown(is_root, `ROOT`, pos, YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
         const dp = Create_widget_dropdown(_, `dp${i}`, [0, 0, 0], YELLOWL[3], GREEN[4], WHITE, pad, _, _, _, margin);
         section.AddItem(dp);
         dp.SetName(`dp${i}`)
@@ -1700,7 +1802,7 @@ function TEST_LISTENERS_CreateDropdown(pos = [0, 0, 0], root_widget = ROOT_WIDGE
 
 
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -2216,11 +2318,11 @@ function CreateDropdown2InSection(pos, id) {
 
 
 
-function CreateManySectionsMinimal(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
+function CreateManySectionsMinimal(is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     const tr = .7;
 
-    const blu = Create_widget_section(root_widget, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr), 'blu');
+    const blu = Create_widget_section(is_root, SECTION.VERTICAL, [15, 15], [365, 400, 0], [100, 100], TRANSPARENCY(BLUEL[7], tr), 'blu');
     blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -2270,7 +2372,7 @@ function CreateManySectionsMinimal(root_widget = ROOT_WIDGETS.CREATE_ROOT) {
 
 
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         blu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -2704,7 +2806,7 @@ function Test_performance_align_functions_2(x, y, num = 10) {
 
 
 
-function CreateScrollerClampAlphaTest(num_items = 10, root_widget = ROOT_WIDGETS.CREATE_ROOT) {
+function CreateScrollerClampAlphaTest(num_items = 10, is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     const colors = [
         REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],
@@ -2742,7 +2844,7 @@ function CreateScrollerClampAlphaTest(num_items = 10, root_widget = ROOT_WIDGETS
     ];
     const fontsize = 34;
 
-    const is_root = (root_widget & ROOT_WIDGETS.CREATE_ROOT) ? root_widget : _;
+    const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
     const section = Create_widget_section(is_root, SECTION.VERTICAL, [10, 10], [30, 30, 0], [20, 20], TRANSPARENCY(GREY[0], 1.));
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
@@ -2769,7 +2871,7 @@ function CreateScrollerClampAlphaTest(num_items = 10, root_widget = ROOT_WIDGETS
 
 
 
-    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+    if (_is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
@@ -4687,6 +4789,7 @@ function Shader_color_functions_worley_2_noise() { // Shaders Tests
         // const dim=300
         const dim = 300
         // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT-dim*2, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
+        // const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], BLUEL[9], 'SHADER_FN:WORLEY-2-NOISE',);
         const rect = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], BLUEL[9], 'SHADER_FN:WORLEY-2-NOISE',);
         rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);

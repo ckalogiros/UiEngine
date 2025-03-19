@@ -838,6 +838,24 @@ const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA = 'atlas_variants_consola_1024x1024_8px
 
 
 
+// Atlas Textures Variant Scales <names>
+const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES = {
+	S1_0:0, 
+	S1_5:1, 
+	S2_0:2, 
+	S2_5:3, 
+	S3_0:4, 
+	S3_5:5, 
+	S4_0:6, 
+	S5_0:7, 
+	S6_0:8, 
+	S7_0:9, 
+	S8_0:10, 
+	S9_0:11, 
+	S10_0:12, 
+	S12_0:13, 
+};
+
 
 
 
@@ -1012,7 +1030,7 @@ const TEXTURES = {
 }
 
 // Set default font texture
-TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_16px;
+TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLA_VARIANT_FONT;
 
 const ATLASES_SUB_TEXTURES = { // 58 total
 	MSDF_SYMBOLS: {

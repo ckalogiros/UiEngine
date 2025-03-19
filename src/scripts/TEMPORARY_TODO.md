@@ -1,4 +1,22 @@
 TODO
+* Are we gonna implement all widget parameters as structs, on widget creation??? 
+
+* Implement NEW positioning architecture based on root widgets.
+   All children should have their position relative to the parent mesh
+
+* Currently we combined the msdf with regular texture font for text rendering
+and we use geom.font_size for a consice size. See if we can draw the size from the dim or implement correctly
+
+* REMOVE UNECESSARY:
+   export function Create_widget_multi_text({{{ROOT_WIDGET_FLAGS}}}} = 0x0,
+
+* RenderText() needs clean up
+   Needs // TODO: For efficiency, create a dedicated Gl_ function to update all values
+   Needs // TODO: Render_text. Move it to mat or geom or Mesh?
+
+* DEEP CLEANUP: Use debug to look into classes objects and remove any anecessary fiels
+
+* The char_buffer should be implemented as an Int8Array of code points
 
 * Remove all words 'font' and replace them with the word texture_id
    All font loadings happen in the same procedure as any texture loading

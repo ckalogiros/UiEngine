@@ -3,7 +3,7 @@
 import { Create_widget_label, Create_widget_slider } from "../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
-import { BLUEL, WHITE } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { BLUEL, GREY, WHITE } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Gl_set_attr_round_corners, Gl_set_dim_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
@@ -16,17 +16,39 @@ import { Linear_interpolation } from "../../Helpers/Math/MathFunctions.js";
 
 /*****************************************************************************************************************************************************/
 // Widget-Slider
-export function Widget_ready_slider(root_widget = 0x0, x = 0, y = 0, initial_val = .5, name, size = 250) {
+export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .5, name, size = 250) {
 
    const pos = [x, y, 0];
-   const slider = Create_widget_slider(root_widget, pos, [size, 10], _, _, name);
+   // const slider = Create_widget_slider(is_root, pos, [size, 10], _, _, name);
+   const slider = Create_widget_slider({
+      is_root:ROOT_WIDGETS.CREATE_ROOT, 
+      pos:pos, 
+      dim:[120, 15], 
+      col:GREY[4], 
+      hover_margin:[10, 10],
+      outer_pad:4,
+      name:'Slider Test',
+      // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
+      texture_id: TEXTURES.MSDF_CONSOLAS_1024,
+      font_size: 0,
+      variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
+
+      slider_bar: {
+         // col:BLUEL[7],
+         col:GREY[8],
+      },
+      slider_handle: {
+         // col:GREY[8],
+         col:BLUEL[9],
+      },
+   });
    slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    slider.SetInitialValue(initial_val);
 
-   if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+   if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
       slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       slider.Render();
@@ -43,18 +65,37 @@ export function Widget_ready_slider(root_widget = 0x0, x = 0, y = 0, initial_val
 
 
 
-export function Widget_ready_label(root_widget = 0x0, name = 'Label', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, inner_pad=[10, 6], color_text=WHITE) {
+export function Widget_ready_label(is_root = 0x0, name = 'Label', font, x = 0, y = 0, font_size = 10, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, inner_pad=[10, 6], color_text=WHITE) {
 
-   const pos = [x, y, 2];
+   // const pos = [x, y, 0];
 
    /********************************************************************************************************************************************************/
    // Create
-   const label = Create_widget_label(root_widget, name, _, pos, font_size, color, color_text, inner_pad, .5, _, font,);
-   // const label = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, 1.), WHITE, [0, 0], .5, _, font,);
+   // const label = Create_widget_label(is_root, name, _, pos, font_size, color, color_text, inner_pad, .5, _, font,);
+   // const label = Create_widget_label(is_root, name, _, pos, font_size, color, color_text, inner_pad, .5, _, TEXTURES.MSDF_CONSOLAS_1024, _, );
+   // const label = Create_widget_label(is_root, name, _, pos, font_size, color, color_text, inner_pad, .5, _, TEXTURES.CONSOLA_VARIANT_FONT, _, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0);
+
+   // _, `1`, _, 0, 0, 14, TRANSPARENCY(BLUEL[6], .7), _, _
+   const label = Create_widget_label({
+      is_root:is_root, 
+      pos:[x, y, 0], 
+      col:color, 
+      pad:inner_pad,
+      text:name,
+      // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
+      // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
+      texture_id: TEXTURES.MSDF_CONSOLAS_1024,
+      // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
+      font_size:font_size,
+      text_col:color_text,
+      is_debug_mesh:false,
+   });
+
+
    label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   // label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+   label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
    // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
@@ -63,7 +104,7 @@ export function Widget_ready_label(root_widget = 0x0, name = 'Label', font, x = 
 
    /********************************************************************************************************************************************************/
    // Render
-   if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+   if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
       if (vb_groupidx !== INT_NULL) label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
       else label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -71,7 +112,7 @@ export function Widget_ready_label(root_widget = 0x0, name = 'Label', font, x = 
    
       label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
    
-      if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+      if (is_root & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
       Construct_listen_events_from_mesh_tree(label);
       Construct_listen_events_relations_from_mesh_tree(label);
    }
@@ -129,25 +170,25 @@ export function Widget_ready_label(root_widget = 0x0, name = 'Label', font, x = 
 
 /*****************************************************************************************************************************************************/
 // MSDF Text Label
-export function Widget_msdf_text_with_scale_slider(root_widget = 0x0, name = 'Label ', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], slider_size, vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, temp_flag = false) {
+export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label ', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], slider_size, vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, temp_flag = false) {
 
    let posx = 0, posy = 0;
 
-   if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+   if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
       posx = x;
       posy = y;
    }
 
-   const slider = Widget_ready_slider(root_widget, x, y, .06, 'ScaleText', slider_size);
+   const slider = Widget_ready_slider(is_root, x, y, .06, 'ScaleText', slider_size);
 
-   // if(root_widget&ROOT_WIDGETS.CREATE_ROOT) {
+   // if(is_root&ROOT_WIDGETS.CREATE_ROOT) {
    //    posy += slider.geom.dim[1] * 2 + 30;
    // }
    posy += slider.geom.dim[1] * 2 + 30;
 
    const pos = [posx, posy, 2];
    const text_pad = 0;
-   const msdf_text = Create_widget_label(root_widget, name, _, pos, font_size, TRANSPARENCY(color, .3), WHITE, [text_pad, text_pad], .5, _, font,);
+   const msdf_text = Create_widget_label(is_root, name, _, pos, font_size, TRANSPARENCY(color, .3), WHITE, [text_pad, text_pad], .5, _, font,);
    msdf_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // msdf_text.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    msdf_text.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
@@ -159,7 +200,7 @@ export function Widget_msdf_text_with_scale_slider(root_widget = 0x0, name = 'La
    // msdf_text.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
    // msdf_text.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
 
-   if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+   if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
       if (vb_groupidx !== INT_NULL) msdf_text.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
       else msdf_text.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
@@ -167,7 +208,7 @@ export function Widget_msdf_text_with_scale_slider(root_widget = 0x0, name = 'La
 
       msdf_text.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, msdf_text.gfx.vb.groupidx)
 
-      if (root_widget & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(msdf_text.root_bufferidx);
+      if (is_root & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(msdf_text.root_bufferidx);
       Construct_listen_events_from_mesh_tree(msdf_text);
       Construct_listen_events_relations_from_mesh_tree(msdf_text);
 

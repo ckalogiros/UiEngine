@@ -1,5 +1,6 @@
 "use strict";
 
+import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
 import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
@@ -24,12 +25,13 @@ export class Widget_Text extends Text_Mesh {
 
 	// pad;
 
-	constructor(ROOT_WIDGET_FLAGS, text, pos, fontSize = 8, col = WHITE, bold = 4, pad = [0, 0], font, is_debug_mesh) {
+	constructor(properties) {
+		// { pos: pos, fontsize: fontsize, col: col, text: text, font: font, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
 
-		super(text, pos, fontSize, col, _, font, _, is_debug_mesh)
+		super(properties)
 		this.type |= MESH_TYPE.WIDGET_TEXT;
 
-		this.StylesSetPad(pad);
+		this.StylesSetPad(properties.pad);
 	}
 
 
@@ -86,26 +88,26 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
-   GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+	GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
-      if (this.gfx_ctx_parent === INT_NULL) {
+		if (this.gfx_ctx_parent === INT_NULL) {
 
-         this.gfx_ctx_flags |= FLAGS;
-         this.gfx_ctx_parent = gfx_ctx_parent;
+			this.gfx_ctx_flags |= FLAGS;
+			this.gfx_ctx_parent = gfx_ctx_parent;
 
-      }
-   }
+		}
+	}
 
 
-   GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+	GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
-      if (this.gfx_ctx_parent === INT_NULL) {
+		if (this.gfx_ctx_parent === INT_NULL) {
 
-         this.gfx_ctx_flags = FLAGS;
-         this.gfx_ctx_parent = gfx_ctx_parent;
+			this.gfx_ctx_flags = FLAGS;
+			this.gfx_ctx_parent = gfx_ctx_parent;
 
-      }
-   }
+		}
+	}
 
 
 	/*******************************************************************************************************************************************************/
@@ -147,6 +149,25 @@ export class Widget_Text extends Text_Mesh {
 		}
 	}
 
+	AlignNEW(pos_x, pos_y) {
+
+		const pad_x = this.StylesGetPad(STYLES.AXIS.X);
+		const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+		this.geom.pos[0] = pos_x + pad_x;
+		this.geom.pos[1] = pos_y + pad_y;
+
+		// const text_pad_x = this.text_mesh.StylesGetPad(STYLES.AXIS.X);
+		// const text_pad_y = this.text_mesh.StylesGetPad(STYLES.AXIS.Y);
+		// this.text_mesh.geom.pos[0] = pos_x + pad_x + text_pad_x;
+		// this.text_mesh.geom.pos[1] = pos_y + pad_y + text_pad_y;
+
+		return {
+			dim_x: this.text_width + pad_x / 2,
+			dim_y: this.text_height + pad_y / 1,
+			pad_x: pad_x / 2,
+			pad_y: pad_y / 2,
+		};
+	}
 
 
 	/*******************************************************************************************************************************************************/
@@ -280,14 +301,17 @@ export class Widget_Multi_Text extends Widget_Text {
 	alignment = 0x0;
 
 	/** Set the max number of characters for the dynamic text, by passing any text as 'dynamic_text' of length= dynamic text number of characters*/
-	constructor(ROOT_WIDGET_FLAGS, text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad, font, is_debug_mesh) {
+	// constructor(ROOT_WIDGET_FLAGS, text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad, font, is_debug_mesh) {
+	constructor(ROOT_WIDGET_FLAGS, properties) {
 
-		super(ROOT_WIDGET_FLAGS, text, pos, fontSize, text_col, bold, pad, font, is_debug_mesh);
+		// super(ROOT_WIDGET_FLAGS, text, pos, fontSize, text_col, bold, pad, font, is_debug_mesh);
+		super(properties);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
 		// Default alignment for all children text meshes
 		// this.alignment = ALIGN.VERTICAL;
-		this.alignment = ALIGNMENT;
+		this.alignment = properties.Align;
+		this.TEMPORARY_variant_idx = properties.variant_idx;
 		// this.Align_pre(this, this.alignment)
 
 	}
@@ -380,14 +404,14 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+	GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
 		if (this.gfx_ctx_parent === INT_NULL) {
 
 			this.gfx_ctx_flags = FLAGS;
 			this.gfx_ctx_parent = gfx_ctx_parent;
 
-			if(recurse){
+			if (recurse) {
 				for (let i = 0; i <= this.children.boundary; i++) {
 					if (this.children.buffer[i]) {
 						this.children.buffer[i].gfx_ctx_flags = FLAGS;
@@ -399,14 +423,14 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
+	GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
 		if (this.gfx_ctx_parent === INT_NULL) {
 
 			this.gfx_ctx_flags |= FLAGS;
 			this.gfx_ctx_parent = gfx_ctx_parent;
-			
-			if(recurse){
+
+			if (recurse) {
 				for (let i = 0; i <= this.children.boundary; i++) {
 					if (this.children.buffer[i]) {
 						this.children.buffer[i].gfx_ctx_flags |= FLAGS;
@@ -495,14 +519,37 @@ export class Widget_Multi_Text extends Widget_Text {
 	// Setters-Getters
 
 
+	// GetMaxWidth() {
+
+	// 	let max_width = super.GetMaxWidth();
+
+	// 	if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
+	// 		for (let i = 0; i <= this.children.boundary; i++) {
+	// 			// if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+	// 			if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+	// 		}
+	// 		return max_width;
+	// 	}
+	// 	else {
+	// 		for (let i = 0; i <= this.children.boundary; i++) {
+	// 			if (this.children.buffer[i]) {
+
+	// 				const w = this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+	// 				if (max_width < w)
+	// 					max_width = w;
+	// 			}
+	// 		}
+	// 		return max_width;
+	// 	}
+
+	// }
 	GetMaxWidth() {
 
 		let max_width = super.GetMaxWidth();
 
 		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
 			for (let i = 0; i <= this.children.boundary; i++) {
-				// if (this.children.buffer[i]) max_width += this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
-				if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+				if (this.children.buffer[i]) max_width += this.children.buffer[i].text_width + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 			}
 			return max_width;
 		}
@@ -510,8 +557,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			for (let i = 0; i <= this.children.boundary; i++) {
 				if (this.children.buffer[i]) {
 
-					// const w = this.children.buffer[i].GetMaxWidth() + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
-					const w = this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
+					const w = this.children.buffer[i].text_width + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 					if (max_width < w)
 						max_width = w;
 				}
@@ -522,6 +568,22 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
+	// GetMaxHeight() {
+
+	// 	let max_height = this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
+
+	// 	// HACK: TODO: Set only one of both(SECTION or ALIGN) as global align bit field
+	// 	if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
+	// 		return max_height;
+	// 	}
+	// 	else { // Else calculate all the lines of the text meshes
+	// 		for (let i = 0; i <= this.children.boundary; i++) {
+	// 			if (this.children.buffer[i]) max_height += this.children.buffer[i].geom.dim[1] + this.children.buffer[i].StylesGetPad(STYLES.AXIS.Y);
+	// 		}
+	// 		return max_height;
+	// 	}
+
+	// }
 	GetMaxHeight() {
 
 		let max_height = this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
@@ -532,7 +594,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 		else { // Else calculate all the lines of the text meshes
 			for (let i = 0; i <= this.children.boundary; i++) {
-				if (this.children.buffer[i]) max_height += this.children.buffer[i].geom.dim[1] + this.children.buffer[i].StylesGetPad(STYLES.AXIS.Y);
+				if (this.children.buffer[i]) max_height += this.children.buffer[i].text_height + this.children.buffer[i].StylesGetPad(STYLES.AXIS.Y);
 			}
 			return max_height;
 		}
@@ -571,7 +633,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	// TODO: Implement align self correctly
 	// TODO: Is there a way to align differently for each text mesh????
 
-	CreateNewText(dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL) {
+	CreateNewText(dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=ALIGN_2.HORIZONTAL) {
 
 		/** DEBUG ERROR*/ if (!Array.isArray(pad)) console.error('Pad is not of type array');
 
@@ -588,22 +650,22 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 		else prev_text_mesh = this;
 
-		// CopyArr3(pos, this.geom.pos); // Copy the dynamic's text mesh pos
-		// const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad, this.mat.);
-		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, pad, this.mat.texture_file_id);
+		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, this.mat.texture_file_id, _, this.TEMPORARY_variant_idx, _, pad);
 		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
+		new_text.align.flags = align_NEW;
+		// new_text.StylesSetPad(pad);
 
 		// Add the new new_text as a child of 'this'.
 		const idx = this.AddChild(new_text);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC | new_text.geom.type | new_text.mat.type;
 
-		this.CalculateTextWidth();
+		// this.CalculateTextWidth();
 
 
 		// Align text properly
-		if (prev_text_mesh.text_width === 0) {
-			prev_text_mesh.CalculateTextWidth().w;
-		}
+		// if (prev_text_mesh.text_width === 0) {
+		// 	prev_text_mesh.CalculateTextWidth().w;
+		// }
 
 		// Position horizontaly
 		// Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.StylesGetPad(), prev_text_mesh.advancex)
@@ -929,6 +991,61 @@ export class Widget_Multi_Text extends Widget_Text {
 		// TODO: Separate conceptualy the two alignments
 		super.Align_pre(target_mesh, flags, pad)
 
+	}
+
+	AlignNEW(pos_x, pos_y) {
+
+		const pad_x = this.StylesGetPad(STYLES.AXIS.X);
+		const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+		this.geom.pos[0] = pos_x + pad_x;
+		this.geom.pos[1] = pos_y + pad_y;
+
+		let max_width = this.text_width+pad_x;
+		let max_height = this.text_height;
+		let posx = this.geom.pos[0] + this.text_width * 2;
+		let posy = this.geom.pos[1];
+		let accum_row_width = 0;
+
+		for( let i=0; i<=this.children.boundary; i++) {
+			
+			const child = this.children.buffer[i];
+			const child_pad_x = child.StylesGetPad(STYLES.AXIS.X);
+			const child_pad_y = child.StylesGetPad(STYLES.AXIS.Y);
+
+			// Set max width before current child calculation
+			if(max_width < accum_row_width) max_width = accum_row_width;
+
+			if(child.align.flags & ALIGN_2.HORIZONTAL){
+				
+				// posx += child_pad_x; // Add the padding of the current child
+				posx = accum_row_width*2 + child_pad_x; // Add the padding of the current child
+				child.geom.pos[0] = posx;
+				child.geom.pos[1] = posy;
+				accum_row_width += child.text_width+child_pad_x/2;
+			}
+			else if(child.align.flags & ALIGN_2.VERTICAL){
+				
+				posx = pos_x+pad_x+child_pad_x;
+				posy = max_height*2 + child_pad_y
+				
+				child.geom.pos[0] = posx;
+				child.geom.pos[1] = posy;
+				
+				max_height += child.text_height + child_pad_y;
+				accum_row_width = child.text_width + child_pad_x/2;
+			}
+			
+			posx += child.text_width * 2; // advance posx for the next child
+			
+		}
+		
+		if(max_width < accum_row_width) max_width = accum_row_width;
+		return {
+			dim_x: max_width + pad_x,
+			dim_y: max_height + pad_y,
+			pad_x: pad_x / 2,
+			pad_y: pad_y / 2,
+		};
 	}
 
 

@@ -7,11 +7,10 @@ import { Geometry2D_Text } from "../Geometry/Geometry2DText.js";
 import { Material_Font } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { WHITE } from "../Material/Base/Colors.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
-import { Gl_set_vpos_x, Gl_set_uv, Gl_set_wpos_x, Gl_set_rgb_specific_index } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Uv_get_uv_coords, Uv_metrics_get_face_advancex, Uv_metrics_get_char_width, Uv_metrics_get_row_height, Msdf_ont_get_char_plane_bounds_width, Msdf_ont_get_char_atlas_bounds_width } from "../../Loaders/Textures/TextureUvMap.js";
+import { Gl_set_uv, Gl_set_rgb_specific_index, Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Uv_get_uv_coords, Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height, Msdf_Uv_get_sub_tex_bounds, Texture_metrics_get_sub_tex_height, Texture_metrics_get_texture, Texture_metrics_get_sub_tex_yoffset, Texture_metrics_get_calc_dim_from_string } from "../../Loaders/Textures/TextureUvMap.js";
 
 
 
@@ -23,37 +22,44 @@ import { Uv_get_uv_coords, Uv_metrics_get_face_advancex, Uv_metrics_get_char_wid
 
 export class Text_Mesh extends Mesh {
 
-   fontsize; // TODO: Render_text. Move it to mat or geom or Mesh?
-   advancex; // The advancex is a ratio with which we calculate the correct width of any text
-   last_charidx; // An index to the last char of each state of the current text.(dynamic text changes, so it is good to always have the last char).
-   text_width; // An extra var to store the width of the text(for efficiency reasons).
+   font_size; // TODO: Render_text. Move it to mat or geom or Mesh?
+   advancex; // The advancex is a ratio with which we calculate the correct width of any properties.text
+   last_charidx; // An index to the last char of each state of the current properties.text.(dynamic properties.text changes, so it is good to always have the last char).
+   text_width; // An extra var to store the width of the properties.text(for efficiency reasons).
    text_height; // An extra var to store the height including any new lines.
 
-   // constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.MSDF_CONSOLAS_1024, scale = [1, 1], is_debug_mesh) {
-   constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, bold = 4, font = TEXTURES.DEFAULT_FONT, scale = [1, 1], is_debug_mesh) {
+   
+   constructor(properties) {
+      // properties: { pos: pos, font_size: font_size, col: col, text: text, font: font, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
 
-      const sdfouter = CalculateSdfOuterFromDim(fontsize);
-      if (sdfouter + bold > 1) bold = 1 - sdfouter;
+      const sdfouter = CalculateSdfOuterFromDim(properties.font_size);
+      if (sdfouter + properties.bold > 1) properties.bold = 1 - sdfouter;
       
       
-      const mat = new Material_Font(color, font, text, [bold, sdfouter])
-      const geom = new Geometry2D_Text(pos, fontsize, text, mat.metrics_idx);
+      
+      const mat = new Material_Font(properties.col, properties.texture_id, properties.text, [properties.bold, sdfouter], properties.variant_idx)
+      const size = (FONT_IS_MSDF(properties.texture_id)) ? properties.font_size : mat.pixel_size;
+      const geom = new Geometry2D_Text(properties.pos, properties.text, size);
       
       super(geom, mat);
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       
-      this.last_charidx = text.length;
+      this.last_charidx = properties.text.length;
       
-      this.type |= MESH_TYPE.TEXT_MESH | is_debug_mesh;
-      this.fontsize = fontsize;
+      this.type |= MESH_TYPE.TEXT_MESH | properties.is_debug_mesh;
+      this.properties.font_size = properties.font_size;
 
-      const advancex = Uv_metrics_get_face_advancex(mat.metrics_idx)/2;
-      this.advancex = advancex;
+      // const advancex = Texture_metrics_get_face_advancex(mat.metrics_idx)/2;
+      //  this.advancex = advancex;
       
-      this.CalculateTextWidth()
-      // this.text_width = 0;
-      // this.text_height = Uv_metrics_get_row_height(mat.metrics_idx);
+      this.text_width = 0;
+      this.text_height = 0;
+      const ret = Texture_metrics_get_calc_dim_from_string(this.mat.metrics_idx, this.mat.text);
+      this.text_width = (this.text_width < ret.width * this.geom.font_size) ? ret.width * this.geom.font_size : this.text_width;
+      this.text_height = ret.height * this.geom.font_size;
+      // this.CalculateTextWidth();
+      // this.text_height = Texture_metrics_get_line_height(mat.metrics_idx);
 
    }
 
@@ -359,32 +365,21 @@ export class Text_Mesh extends Mesh {
 
    
 
-   CalculateTextWidth(){
+   // CalculateTextWidth(){
 
-      const face_count = this.mat.char_buffer.size; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
-      let width = 0;
-      let prevline_width = 0;
-      let height = Uv_metrics_get_row_height(this.mat.metrics_idx)/2;
-      // let height = 0;
+   //    const ret = Texture_metrics_get_calc_dim_from_string(this.mat.metrics_idx, this.mat.text);
+   //    this.text_width = (this.text_width < ret.width * this.geom.font_size) ? ret.width * this.geom.font_size : this.text_width;
+   //    this.text_height = ret.height * this.geom.font_size;
 
-      for (let i = 0; i < face_count; i++) {
+   // }
+   
 
-         if(this.mat.char_buffer.buffer[i] === '\n'){
-            
-            if(width > prevline_width) prevline_width = width;
-            width = 0;
-            height += Uv_metrics_get_row_height(this.mat.metrics_idx)/2;
-         }
-         else {
-            // width += Uv_metrics_get_char_width(this.mat.metrics_idx, this.mat.char_buffer.buffer[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
-            width += Uv_metrics_get_char_width(this.mat.metrics_idx, this.mat.char_buffer.buffer[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2 * this.geom.dim[0];
-            // width += Msdf_ont_get_char_atlas_bounds_width(this.mat.metrics_idx, this.mat.char_buffer.buffer[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
-         }
-      }
+   CalculateTextDimentions(){
 
-      this.text_width = (width > prevline_width) ? width : prevline_width;
-      this.text_height = height;
-      return {w:this.text_width, h:height};
+      const ret = Texture_metrics_get_calc_dim_from_string(this.mat.metrics_idx, this.mat.text);
+      this.text_width = (this.text_width < ret.width * this.geom.font_size) ? ret.width * this.geom.font_size : this.text_width;
+      this.text_height = ret.height * this.geom.font_size;
+
    }
 
 
@@ -445,6 +440,7 @@ export class Text_Mesh extends Mesh {
          // console.log(value, `${value}`)
          this.SetText(`${value}`)
          this.RenderText(value);
+         // this.#Render_text(value);
       }
    }
 p
@@ -465,35 +461,62 @@ p
 
       const store_start = this.gfx.vb.starts.buffer[0];
       const attribs_count = this.gfx.vb.counts.buffer[0];
-
+      
+      const size = this.geom.font_size;
       const c = this.mat.char_buffer.buffer;
       const space_char_uv = Uv_get_uv_coords(this.mat.metrics_idx, ' '.charCodeAt(0) - CHAR_ARRAY_START_OFFSET);
+      const texture = Texture_metrics_get_texture(this.mat.metrics_idx);
+      const line_height = texture.line_height * size * 2;
+
+      let cur_line_posy = this.geom.pos[1];
 
       let xpos = this.geom.pos[0];
+      let ypos = cur_line_posy;
+
 
       
       // Update text faces
       for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
-         
-         // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
-         this.mat.uv = space_char_uv;
-         const width = Uv_metrics_get_char_width(this.mat.metrics_idx, c[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
-         xpos += width; //+1;
-         
-         if (c[i] !== ' ') // If char=' ' space, just render [0,0] uv coordinates.
-            this.mat.uv = Uv_get_uv_coords(this.mat.metrics_idx, c[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET);
-         
-         // TODO: For efficiency, create a dedicated Gl_ function to update all values
-         Gl_set_uv(this.gfx, this.mat.uv);
-         Gl_set_vpos_x(this.gfx, width, 1);
 
-         Gl_set_wpos_x(this.gfx, xpos); 
-         xpos += width; //+1;
+         if(c[i]==='\n'){ // Case new line
+            
+            cur_line_posy += line_height;
+            xpos = this.geom.pos[0];
+         }
+         else {
+
+            const sub_tex_idx = c[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET;
+            
+            // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
+            this.mat.uv = space_char_uv;
+            const width = Texture_metrics_get_sub_tex_width(this.mat.metrics_idx, sub_tex_idx) * size;
+   
+            const plane_bounds = Msdf_Uv_get_sub_tex_bounds(this.mat.metrics_idx, sub_tex_idx);
+             
+            const height = plane_bounds.height * this.geom.font_size;
+            const yoffset = Texture_metrics_get_sub_tex_yoffset(this.mat.metrics_idx, sub_tex_idx);
+            ypos += (yoffset-texture.base_line ) * size * 2;
+   
+           
+            if (c[i] !== ' ') { // If char=' ' space, just render [0,0] uv coordinates.
+               this.mat.uv = Uv_get_uv_coords(this.mat.metrics_idx, sub_tex_idx);
+            }
+            
+            // TODO: For efficiency, create a dedicated Gl_ function to update all values
+            Gl_set_uv(this.gfx, this.mat.uv);
+            Gl_set_vpos_xy(this.gfx, width, height, 1);
+            Gl_set_wpos_xy(this.gfx, xpos+width, ypos+height); 
+            
+            xpos += width*2; // Second half width
+            
+            this.gfx.vb.starts.buffer[0] += attribs_count; // Advance to the next face(char) in vertex buffer
+            
+         }
          
-         this.gfx.vb.starts.buffer[0] += attribs_count;
-         
+         ypos = cur_line_posy;
       }
       
+               
       for (let i = this.mat.char_buffer.boundary + 1; i < this.mat.char_buffer.size; i++) {
          
          Gl_set_uv(this.gfx, space_char_uv);
@@ -558,52 +581,60 @@ p
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
+      let cur_line_posy = this.geom.pos[1];
+
       this.gfx.tb.idx = this.mat.texidx;
       
-      // Run for buffer size so that the vertex buffers have the neccessary space for the whole char_buffer.
-      const face_count = this.mat.char_buffer.size; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
-      
-      const space_char_uv = Uv_get_uv_coords(this.mat.metrics_idx, ' '.charCodeAt(0) - CHAR_ARRAY_START_OFFSET);
 
+      const size = this.geom.font_size;
+      const texture = Texture_metrics_get_texture(this.mat.metrics_idx);
+      const line_height = texture.line_height * size * 2;
+      
+      // Run for buffer size so that the vertex buffers have the neccessary space for the whole char_buffer.
+      const space_char_uv = Uv_get_uv_coords(this.mat.metrics_idx, ' '.charCodeAt(0) - CHAR_ARRAY_START_OFFSET);
+      
+      const face_count = this.mat.char_buffer.size; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
       for (let i = 0; i < face_count; i++) {
 
          const char = this.mat.char_buffer.buffer[i];
+         const sub_tex_idx = char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET;
+
          if(char==='\n'){ // Case new line
             
-            geom_copy.pos[1] += Uv_metrics_get_row_height(this.mat.metrics_idx);
+            cur_line_posy += line_height;
             geom_copy.pos[0] = this.geom.pos[0];
          }
          else {
             
             // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
             this.mat.uv = space_char_uv;
-            const width = Uv_metrics_get_char_width(this.mat.metrics_idx, char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
-            // const width = Msdf_ont_get_char_atlas_bounds_width(this.mat.metrics_idx, char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET)/2;
-   
-            if (char !== '') { // If there is a text, get char uv and metrics
-   
-               
-            }
-            this.mat.uv = Uv_get_uv_coords(this.mat.metrics_idx, char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET);
+            const width = Texture_metrics_get_sub_tex_width(this.mat.metrics_idx, sub_tex_idx);
             
-
-            geom_copy.dim[0] = width;
+            
+            if (char !== '') { // If there is a text, get char uv and metrics
+               
+               this.mat.uv = Uv_get_uv_coords(this.mat.metrics_idx, sub_tex_idx);
+               const height = Texture_metrics_get_sub_tex_height(this.mat.metrics_idx, sub_tex_idx);
+               geom_copy.dim[0] = width * size;
+               geom_copy.dim[1] = height * size;
+               const yoffset = Texture_metrics_get_sub_tex_yoffset(this.mat.metrics_idx, sub_tex_idx);
+               geom_copy.pos[1] += (yoffset-texture.base_line ) * size * 2;
+            }
+            
    
+            // The first face exists as an entity, the rest are constructed here and stored only to the vertex buffer
             if (i === 0) {
                Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${this.GetName()}`);
             }
-            else { // The first face exista as an entity, the rest are constructed here and store only to the vertex buffer
+            else { // Avoid function call to store any data to '.gfx.start' etc and to accumulate all char faces to the vertex buffer. 
                Vertex_buffer_add_vertices_from_reset(this.gfx, geom_copy, this.mat, 1, `${char} in: ${this.GetName()}`);
             }
    
             // Advance to next free char position
-            geom_copy.pos[0] += (width*2)+0;
-   
-            // Reset geometry copy
-            geom_copy.dim[0] = this.geom.dim[0]; 
-            geom_copy.dim[1] = this.geom.dim[1]; 
-
+            geom_copy.pos[0] += (width * size * 2)+0;
+            
          }
+         geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = cur_line_posy;
 
       }
       

@@ -26,7 +26,7 @@ import { CONSOLAS_24Hpx } from '../../../../../resources/fonts/consolas_6/metric
 import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metrics/consolas_7.js';
 import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
 import { consola_msdf_test_1024_metrics } from '../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js';
-import { Uv_metrics_create_uvmap, Uv_texture_init_buffers, Uvmaps_print } from "./TextureUvMap.js";
+import { Texture_metrics_create_uvmap, Uv_texture_init_buffers, Uvmaps_print } from "./TextureUvMap.js";
 import { test_arial_msdf } from "../../../../../resources/fonts/TEST/test_arial_msdf.js";
 import { symbols } from "../../../../../resources/fonts/symbols/metrics/symbols.js";
 import { atlas_variants_consola_1024x1024_8px_scale12_extended_ascii } from "../../../../../resources/fonts/atlas_variants/consola/atlas_variants_consola_1024x1024_8px_scale12_extended_ascii.js";
@@ -141,7 +141,7 @@ const TEXTURE_PATHS = [
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
-	{ // 14
+	{ // 15
 		img_path: 'fonts/TEST',
 		img_name: TEST_FONT_MSDF_ARIAL,
 		img_type: 'png',
@@ -149,8 +149,8 @@ const TEXTURE_PATHS = [
 	},
 	/***************************************************************************************************/
 	// Atlas textures variant font sizes
-	{ // 15
-		img_path: 'fonts/atlas_variants',
+	{ // 16
+		img_path: 'fonts/atlas_variants/consola',
 		img_name: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA,
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
@@ -202,9 +202,10 @@ class Texture {
 		this.texture_unit = texture_unit;
 	}
 
-	SetMetricsIndex(metrics_idx){
+	SetMetricsIndex(metrics_idx, variant_idx){
 		// this.metrics_idxs = metrics_idx;
-		this.metrics_idxs[this.variants_cnt++] = metrics_idx;
+		// this.metrics_idxs[this.variants_cnt++] = metrics_idx;
+		this.metrics_idxs[variant_idx] = metrics_idx;
 	}
 
 	IsMetricsLoaded(variant_idx){
@@ -266,8 +267,8 @@ export function Texture_load_texture_byid(TEX_TYPE, texture_file_id=INT_NULL, va
 		
 		// Load metrics if the texture is an atlas having sub-textures.
 		if ((TEX_TYPE & TEXTURE_TYPE.TYPE_FONT) || (TEX_TYPE & TEXTURE_TYPE.TYPE_VARIANT_FONT) || (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT_SYMBOL)) {
-			metrics_idx = Uv_metrics_create_uvmap(texture.texture_file_id, variant_idx, sub_tex_idx, texture.metrics_file);
-			texture.SetMetricsIndex(metrics_idx);
+			metrics_idx = Texture_metrics_create_uvmap(texture.texture_file_id, variant_idx, sub_tex_idx, texture.metrics_file);
+			texture.SetMetricsIndex(metrics_idx, variant_idx);
 		}
 	}
 	else {
@@ -288,8 +289,8 @@ export function Texture_load_texture_byid(TEX_TYPE, texture_file_id=INT_NULL, va
 		const is_metrics_loaded = _textureBuffer[texture_idx].IsMetricsLoaded(variant_idx);
 		if(!is_metrics_loaded) { // Load the metrics for the variant
 
-			metrics_idx = Uv_metrics_create_uvmap(_textureBuffer[texture_idx].texture_file_id, variant_idx, sub_tex_idx, _textureBuffer[texture_idx].metrics_file);
-			_textureBuffer[texture_idx].SetMetricsIndex(metrics_idx);
+			metrics_idx = Texture_metrics_create_uvmap(_textureBuffer[texture_idx].texture_file_id, variant_idx, sub_tex_idx, _textureBuffer[texture_idx].metrics_file);
+			_textureBuffer[texture_idx].SetMetricsIndex(metrics_idx, variant_idx);
 		}
 
 		tex_idx = texture_idx;

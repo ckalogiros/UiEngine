@@ -3,86 +3,77 @@
 import { Abs, Max, Min } from "../../../Helpers/Math/MathOperations.js";
 
 
-/** Atlas Texture Font Vvariants
- * 
-   .variants:[
-      .name
-      .metrics: {
-         emSize: scale
-      }
-      .glyphs
-   ]
- */
-
 
 
 /***********************************************************************************************************************/
 // Load metrics from Chlumsky MSDF generator
 
 /** Load metrics from atlas variants font sizes texture */
-export function Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_file, variant_idx, sub_tex_idx){
+export function Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_file, variant_idx, is_sdf_type = false) {
 
    /**
     * Use the variant_idx as an index to choose the font variant element which is stored int a variants array in the metrics_file.
     */
 
-   const obj      = JSON.parse(metrics_file);
-   const atlas    = obj.atlas;
-   const variants   = obj.variants[variant_idx]; // Array with all font sizes variants
-   const font_metrics   = variants.metrics; // Metrics of the whole font variant, lineHeight, etc
-   const glyphs   = variants.glyphs; // Metrics of each glyph of a font variant
+   const obj = JSON.parse(metrics_file);
+   const atlas = obj.atlas;
+   const variants = obj.variants[variant_idx]; // Array with all font sizes variants
+   const font_metrics = variants.metrics; // Metrics of the whole font variant, lineHeight, etc
+   const glyphs = variants.glyphs; // Metrics of each glyph of a font variant
 
    const texture_width = atlas.width;
    const texture_height = atlas.height;
 
    const glyph = {
-      advance  : 0,
-      char     : 0,
-      left     : 0,
-      right    : 0,
-      top      : 0,
-      bottom   : 0,
-      width    : 0,
-      height   : 0,
-      ratio   : 0,
+      advance: 0,
+      char: 0,
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      width: 0,
+      height: 0,
+      ratio: 0,
    }
 
 
-   const ascender    = font_metrics.ascender;
-   const descender   = font_metrics.descender;
-   const advance     = glyphs[0].advance;
+   const ascender = font_metrics.ascender;
+   const descender = font_metrics.descender;
+   const advance = glyphs[0].advance;
    const base_line = descender;
 
-
+   // Initialize 0th element (sub_tex[0]) with space character metrics, and the rest of the characters must start from sub_tex index 1. If texture is not a font texture, then the loop must start at sub_tex index 0.
    const uvmap = [];
    uvmap[0] = [0.0, 0.0, 0.0, 0.0];          // Set for space character
    const plane_bounds = [];
-   plane_bounds[0] = {left:0, right:advance, top:-font_metrics.lineHeight, bottom:0, width:advance, height:font_metrics.lineHeight, yoffset:0};   // Set for space character
+   plane_bounds[0] = { left: 0, right: advance, top: -font_metrics.lineHeight, bottom: 0, width: advance, height: font_metrics.lineHeight, yoffset: 0 };   // Set for space character
    const atlas_bounds = [];
-   atlas_bounds[0] = {left:0, right:0, top:0, bottom:0, width:0, height:0};   // Set for space character
+   atlas_bounds[0] = { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 };   // Set for space character
 
 
-   
+
    const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
 
    let normalizedU = 1.0 / texture_width;	   // Normalize texture coords to 0-1 values.
    let normalizedV = 1.0 / texture_height;   // Normalize texture coords to 0-1 values.
 
    // If the texture is a font texture, leave [0] element for the ' ' space character, else start inserting sub-texture coordinates from [0]
-   const start_idx = (sub_tex_idx !== INT_NULL) ? 0 : 1; 
+   // const start_idx = (sub_tex_idx !== INT_NULL) ? 0 : 1;
+   const start_idx = 1;
 
    for (let i = start_idx; i < glyphs.length; i++) {
-      
-      glyph.char   = glyphs[i].unicode;
-      glyph.left   = glyphs[i].atlasBounds.left;
-      glyph.right  = glyphs[i].atlasBounds.right;
-      glyph.top    = glyphs[i].atlasBounds.top;
+
+      glyph.char = glyphs[i].unicode;
+      glyph.left = glyphs[i].atlasBounds.left;
+      glyph.right = glyphs[i].atlasBounds.right;
+      glyph.top = glyphs[i].atlasBounds.top;
       glyph.bottom = glyphs[i].atlasBounds.bottom;
-      glyph.width  = glyph.right  - glyph.left;
+      glyph.width = glyph.right - glyph.left;
       glyph.height = glyph.bottom - glyph.top;
 
-      
-      
+
+
+
       // Calculate uvs
       uvmap[i] = [0.0, 0.0, 0.0, 0.0]; // Create new array for each character's uv coord.
       uvmap[i][U1] = normalizedU * glyph.left;
@@ -90,107 +81,148 @@ export function Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_
       uvmap[i][V1] = normalizedV * glyph.top;
       uvmap[i][V2] = normalizedV * glyph.bottom;
 
-      
+
       // Store
       plane_bounds[i] = {
-         left:    glyphs[i].planeBounds.left,
-         right:   glyphs[i].planeBounds.right,
-         top:     glyphs[i].planeBounds.top,
-         bottom:  glyphs[i].planeBounds.bottom,
-         width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
-         height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
-         yoffset: (Abs(font_metrics.lineHeight)-(Abs(glyphs[i].planeBounds.top) )),
+         left: glyphs[i].planeBounds.left,
+         right: glyphs[i].planeBounds.right,
+         top: glyphs[i].planeBounds.top,
+         bottom: glyphs[i].planeBounds.bottom,
+         width: glyphs[i].planeBounds.right - glyphs[i].planeBounds.left,
+         height: glyphs[i].planeBounds.bottom - glyphs[i].planeBounds.top,
+         yoffset: (Abs(font_metrics.lineHeight) - (Abs(glyphs[i].planeBounds.top))),
       };
-      
+
       atlas_bounds[i] = {
-         left:    glyph.left,
-         right:   glyph.right,
-         top:     glyph.top,
-         bottom:  glyph.bottom,
-         width:   glyph.width,
-         height:  glyph.height,
-         ratio:   Max(glyph.height, glyph.width) / Min(glyph.height, glyph.width),
+         left: glyph.left,
+         right: glyph.right,
+         top: glyph.top,
+         bottom: glyph.bottom,
+         width: glyph.width,
+         height: glyph.height,
+         ratio: Max(glyph.height, glyph.width) / Min(glyph.height, glyph.width),
       };
 
    }
-   
+   /**
+    * Stuct to return
+      metrics = {
+         atlas:{
+            type        : 
+            width       : 
+            height      : 
+            ascender    : 
+            descender   : 
+            advance     : 
+            base_line   : 
+         }
+         sub_tex: [
+            left:    ,
+            right:   ,
+            top:     ,
+            bottom:  ,
+            width:   ,
+            height:  ,
+            ratio:   ,
+         ],
+         uv_map:[
+            U1,
+            U2,
+            V1, 
+            V2
+         ]
+      }
+    */
+
+   // const glyph_metrics = (is_sdf_type) ? plane_bounds : atlas_bounds;
+   const glyph_metrics = plane_bounds;
+
    return {
-      uvmap       : uvmap,
-      plane_bounds: plane_bounds,
-      atlas_bounds: atlas_bounds,
-      texture:{
-         type        : obj.atlas.type,
-         width       : texture_width, 
-         height      : texture_height, 
-         ascender    : ascender,
-         descender   : descender,
-         advance     : advance, // For monospace fonts
-         
-         line_height : font_metrics.lineHeight,
-         base_line   : base_line,
-         
+      uvmap: uvmap,
+      sub_tex: glyph_metrics,
+      // plane_bounds: plane_bounds,
+      // atlas_bounds: atlas_bounds,
+      texture: {
+         // "type": "softmask",
+         // "size": 8,
+         // "width": 1024,
+         // "height": 1024,
+         // "yOrigin": "top"
+         type: atlas.type,
+         pixel_size: atlas.size,
+         scale: font_metrics.emSize,
+         width: texture_width,
+         height: texture_height,
+         ascender: ascender,
+         descender: descender,
+         advance: advance, // For monospace fonts
+         line_height: font_metrics.lineHeight,
+         base_line: base_line,
+
       },
    }
 }
 /** Load metrics from atlas font texture */
-export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, sub_tex_idx){
+export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, is_sdf_type = false) {
 
-   const obj      = JSON.parse(metrics_file);
-   const atlas    = obj.atlas;
-   const glyphs   = obj.glyphs;
+   const obj = JSON.parse(metrics_file);
+   const atlas = obj.atlas;
+   const font_metrics = obj.metrics; 
+   const glyphs = obj.glyphs;
 
    const texture_width = atlas.width;
    const texture_height = atlas.height;
 
    const glyph = {
-      advance  : 0,
-      char     : 0,
-      left     : 0,
-      right    : 0,
-      top      : 0,
-      bottom   : 0,
-      width    : 0,
-      height   : 0,
-      ratio   : 0,
+      advance: 0,
+      char: 0,
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      width: 0,
+      height: 0,
+      ratio: 0,
    }
 
 
-   const ascender    = obj.metrics.ascender;
-   const descender   = obj.metrics.descender;
-   const advance     = glyphs[0].advance;
+   const ascender = obj.metrics.ascender;
+   const descender = obj.metrics.descender;
+   const advance = glyphs[0].advance;
    const base_line = descender;
 
 
    const uvmap = [];
    uvmap[0] = [0.0, 0.0, 0.0, 0.0];          // Set for space character
    const plane_bounds = [];
-   plane_bounds[0] = {left:0, right:advance, top:-obj.metrics.lineHeight, bottom:0, width:advance, height:obj.metrics.lineHeight, yoffset:0};   // Set for space character
+   plane_bounds[0] = { left: 0, right: advance, top: -obj.metrics.lineHeight, bottom: 0, width: advance, height: obj.metrics.lineHeight, yoffset: 0 };   // Set for space character
    const atlas_bounds = [];
-   atlas_bounds[0] = {left:0, right:0, top:0, bottom:0, width:0, height:0};   // Set for space character
+   atlas_bounds[0] = { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 };   // Set for space character
 
 
-   
+
    const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
 
    let normalizedU = 1.0 / texture_width;	   // Normalize texture coords to 0-1 values.
    let normalizedV = 1.0 / texture_height;   // Normalize texture coords to 0-1 values.
 
    // If the texture is a font texture, leave [0] element for the ' ' space character, else start inserting sub-texture coordinates from [0]
-   const start_idx = (sub_tex_idx !== INT_NULL) ? 0 : 1; 
+   // const start_idx = (sub_tex_idx !== INT_NULL) ? 0 : 1;
+   const start_idx = 1;
 
    for (let i = start_idx; i < glyphs.length; i++) {
-      
+
       // glyph.advance  = glyphs[i].advance * size;
-      glyph.char   = glyphs[i].unicode;
-      glyph.left   = glyphs[i].atlasBounds.left;
-      glyph.right  = glyphs[i].atlasBounds.right;
-      glyph.top    = glyphs[i].atlasBounds.top;
+      glyph.char = glyphs[i].unicode;
+      glyph.left = glyphs[i].atlasBounds.left;
+      glyph.right = glyphs[i].atlasBounds.right;
+      glyph.top = glyphs[i].atlasBounds.top;
       glyph.bottom = glyphs[i].atlasBounds.bottom;
-      glyph.width  = glyph.right  - glyph.left;
+      glyph.width = glyph.right - glyph.left;
       glyph.height = glyph.bottom - glyph.top;
 
-      
-      
+
+
       // Calculate uvs
       uvmap[i] = [0.0, 0.0, 0.0, 0.0]; // Create new array for each character's uv coord.
       uvmap[i][U1] = normalizedU * glyph.left;
@@ -198,68 +230,102 @@ export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, sub_tex_
       uvmap[i][V1] = normalizedV * glyph.top;
       uvmap[i][V2] = normalizedV * glyph.bottom;
 
-      
+
       // Store
       plane_bounds[i] = {
-         left:    glyphs[i].planeBounds.left,
-         right:   glyphs[i].planeBounds.right,
-         top:     glyphs[i].planeBounds.top,
-         bottom:  glyphs[i].planeBounds.bottom,
-         width:   glyphs[i].planeBounds.right-glyphs[i].planeBounds.left,
-         height:  glyphs[i].planeBounds.bottom-glyphs[i].planeBounds.top,
-         yoffset: (Abs(obj.metrics.lineHeight)-(Abs(glyphs[i].planeBounds.top) )),
+         left: glyphs[i].planeBounds.left,
+         right: glyphs[i].planeBounds.right,
+         top: glyphs[i].planeBounds.top,
+         bottom: glyphs[i].planeBounds.bottom,
+         width: glyphs[i].planeBounds.right - glyphs[i].planeBounds.left,
+         height: glyphs[i].planeBounds.bottom - glyphs[i].planeBounds.top,
+         yoffset: (Abs(obj.metrics.lineHeight) - (Abs(glyphs[i].planeBounds.top))),
       };
-      
+
       atlas_bounds[i] = {
-         left:    glyph.left,
-         right:   glyph.right,
-         top:     glyph.top,
-         bottom:  glyph.bottom,
-         width:   glyph.width,
-         height:  glyph.height,
-         ratio:   Max(glyph.height, glyph.width) / Min(glyph.height, glyph.width),
+         left: glyph.left,
+         right: glyph.right,
+         top: glyph.top,
+         bottom: glyph.bottom,
+         width: glyph.width,
+         height: glyph.height,
+         ratio: Max(glyph.height, glyph.width) / Min(glyph.height, glyph.width),
       };
 
    }
-   
+
+   // const glyph_metrics = (is_sdf_type) ? plane_bounds : atlas_bounds;
+   const glyph_metrics = plane_bounds;
+
    return {
-      uvmap       : uvmap,
-      plane_bounds: plane_bounds,
-      atlas_bounds: atlas_bounds,
-      texture:{
-         type        : obj.atlas.type,
-         width       : texture_width, 
-         height      : texture_height, 
-         ascender    : ascender,
-         descender   : descender,
-         advance     : advance, // For monospace fonts
-         
-         line_height : obj.metrics.lineHeight,
-         base_line   : base_line,
-         
+      uvmap: uvmap,
+      sub_tex: glyph_metrics,
+      // plane_bounds: plane_bounds,
+      // atlas_bounds: atlas_bounds,
+      texture: {
+         // "type": "softmask",
+         // "size": 8,
+         // "width": 1024,
+         // "height": 1024,
+         // "yOrigin": "top"
+         type: atlas.type,
+         pixel_size: atlas.size,
+         width: texture_width,
+         height: texture_height,
+         ascender: ascender,
+         descender: descender,
+         advance: advance, // For monospace fonts
+         line_height: font_metrics.lineHeight,
+         base_line: base_line,
+
       },
    }
+   // return {
+   //    uvmap: uvmap,
+   //    plane_bounds: plane_bounds,
+   //    atlas_bounds: atlas_bounds,
+   //    texture: {
+   //       type: obj.atlas.type,
+   //       width: texture_width,
+   //       height: texture_height,
+   //       ascender: ascender,
+   //       descender: descender,
+   //       advance: advance, // For monospace fonts
+
+   //       line_height: obj.metrics.lineHeight,
+   //       base_line: base_line,
+
+   //    },
+   // }
 }
 /** Load metrics custom loader */
 // Read the text file using 'filePos' as guide of word-line
 const filePos = { start: 0, end: 0, len: 0, line: 0 };
 export function Metrics_loader_load_custom_metrics(metrics_file) {
-
+   /**
+    * Stuct to return
+      metrics = {
+         texture: { type width height ascender descender advance line_height base_line },
+         atlas:{ type width height ascender descender advance base_line }
+         sub_tex: [  left right top bottom width height ratio ],
+         uv_map:[ U1, U2, V1,  V2 ]
+      }
+    */
    const metrics = {
       sub_tex: [],
       size: 0,
       texWidth: 0,
       texHeight: 0,
-      row_height: 0,
-      advancex: 0, // Start (in pixels) of curr character unti the start of next character(in the texture)
+      line_height: 0,
+      advance: 0, // Start (in pixels) of curr character unti the start of next character(in the texture)
       padding: 0,
-      isMonoSpace: 0, // In non monospace fonts, the advancex variable is different from char to char (compare to monospace fonts)
+      isMonoSpace: 0, // In non monospace fonts, the advance variable is different from char to char (compare to monospace fonts)
       ratio: 0,
    };
 
    const file = { content: {}, name: '', pos: filePos, size: 0, };
    // file.content = TEXTURE_PATHS[texture_file_id].metrics; 
-   file.content = metrics_file; 
+   file.content = metrics_file;
    file.size = file.content.length;
 
 
@@ -272,24 +338,24 @@ export function Metrics_loader_load_custom_metrics(metrics_file) {
 
    metrics.size = size;
 
-   
-   
+
+
    file.pos = Find_field_by_name(file.content, "Image Width", file.pos);
    if (file.pos.len) {
       metrics.texWidth = Find_next_field(file, "[]");
       // The next val inside [] is the height 
       metrics.texHeight = Find_next_field(file, "[]");
-      metrics.row_height = Find_next_field(file, "[]");
+      metrics.line_height = Find_next_field(file, "[]");
    }
 
    // In monospace {Only} the advance x is the same for every character
-   metrics.advancex = Find_next_field(file, "[]");
+   metrics.advance = Find_next_field(file, "[]");
    // Space between the characters in the texture font
    metrics.padding = Find_next_field(file, "[]");
 
    file.pos = Find_field_by_name(file.content, "Mono Space", file.pos);
    metrics.isMonoSpace = Find_next_field(file, "[]");
-   metrics.ratio = metrics.texHeight / metrics.advancex;
+   metrics.ratio = metrics.texHeight / metrics.advance;
 
    let ii = 0;
 
@@ -302,7 +368,7 @@ export function Metrics_loader_load_custom_metrics(metrics_file) {
       right: 0,
       top: 0,
       bottom: 0,
-      advancex: 0,
+      advance: 0,
       width: 0,
       height: 0,
       // bearingtop: 0,
@@ -314,12 +380,12 @@ export function Metrics_loader_load_custom_metrics(metrics_file) {
    metrics.sub_tex[ii].right = 0;
    metrics.sub_tex[ii].top = 0;
    metrics.sub_tex[ii].bottom = 0;
-   metrics.sub_tex[ii].width = metrics.advancex;
+   metrics.sub_tex[ii].width = metrics.advance;
    metrics.sub_tex[ii].height = 0;
    metrics.sub_tex[ii].row_num = 0;
    if (!metrics.isMonoSpace) {
-      metrics.sub_tex[ii].advancex = metrics.advancex;
-      metrics.sub_tex[ii].ratio = metrics.texHeight / metrics.sub_tex[0].advancex; // width to height ratio(and not the other way arround)
+      metrics.sub_tex[ii].advance = metrics.advance;
+      metrics.sub_tex[ii].ratio = metrics.texHeight / metrics.sub_tex[0].advance; // width to height ratio(and not the other way arround)
    }
 
    ii++;
@@ -335,7 +401,7 @@ export function Metrics_loader_load_custom_metrics(metrics_file) {
          right: 0,
          top: 0,
          bottom: 0,
-         advancex: 0,
+         advance: 0,
          width: 0,
          height: 0,
          // bearingtop: 0,
@@ -349,28 +415,28 @@ export function Metrics_loader_load_custom_metrics(metrics_file) {
 
       // Because the file.pos retains the start position
       // we just call Find_next_field() to  get the next val
-      metrics.sub_tex[i].right 			= Find_next_field(file, "[]");
-      metrics.sub_tex[i].top 			= Find_next_field(file, "[]");
-      metrics.sub_tex[i].bottom 		= Find_next_field(file, "[]");
-      metrics.sub_tex[i].width 			= Find_next_field(file, "[]");
-      metrics.sub_tex[i].height 		= Find_next_field(file, "[]");
-      metrics.sub_tex[i].row_num 		= Find_next_field(file, "[]");
-      metrics.sub_tex[i].bearingleft 	= Find_next_field(file, "[]");
-      metrics.sub_tex[i].bearingtop 	= Find_next_field(file, "[]");
+      metrics.sub_tex[i].right = Find_next_field(file, "[]");
+      metrics.sub_tex[i].top = Find_next_field(file, "[]");
+      metrics.sub_tex[i].bottom = Find_next_field(file, "[]");
+      metrics.sub_tex[i].width = Find_next_field(file, "[]");
+      metrics.sub_tex[i].height = Find_next_field(file, "[]");
+      metrics.sub_tex[i].row_num = Find_next_field(file, "[]");
+      metrics.sub_tex[i].bearingleft = Find_next_field(file, "[]");
+      metrics.sub_tex[i].bearingtop = Find_next_field(file, "[]");
       if (!metrics.isMonoSpace) {
-         metrics.sub_tex[i].advancex = Find_next_field(file, "[]");
+         metrics.sub_tex[i].advance = Find_next_field(file, "[]");
          metrics.sub_tex[i].ratio = metrics.sub_tex[i].height / metrics.sub_tex[i].width; // width to height ratio(and not the other way arround)
       }
    }
 
-   if(DEBUG.UVS){ console.log('metrics', metrics); }
+   if (DEBUG.UVS) { console.log('metrics', metrics); }
 
    const uv_map = Create_uv_map(metrics);
    // return uv_map;
 
    return {
-      metrics:metrics,
-      uv_map:uv_map,
+      metrics: metrics,
+      uv_map: uv_map,
    };
 }
 /** */
@@ -383,19 +449,19 @@ function Create_uv_map(metrics) {
 
    const U1 = 0, U2 = 1, V1 = 2, V2 = 3;
    for (let j = 0; j < metrics.size; j++) {
-      
+
       const uv = metrics.sub_tex[j]; // Get a characters pixel position in the font texture.
-      
+
       // New uv coordinates for every character
-      uvmap[j] = [0,0,0,0];
+      uvmap[j] = [0, 0, 0, 0];
 
       // and store them to the uvmap
       uvmap[j] = [0.0, 0.0, 0.0, 0.0]; //  Create new uvs for each character
       uvmap[j][U1] = transormedU * uv.left;
       uvmap[j][U2] = transormedU * uv.right;
-      uvmap[j][V1] = metrics.row_height * transormedV * (uv.row_num);
-      uvmap[j][V2] = uvmap[j][V1] + (metrics.row_height * transormedV);
-      
+      uvmap[j][V1] = metrics.line_height * transormedV * (uv.row_num);
+      uvmap[j][V2] = uvmap[j][V1] + (metrics.line_height * transormedV);
+
       // Round for any potential floating-point rounding errors
       const round = 100000;
       uvmap[j][V1] = Math.round(uvmap[j][V1] * round) / round;
@@ -404,8 +470,8 @@ function Create_uv_map(metrics) {
       uvmap[j][U2] = Math.round(uvmap[j][U2] * round) / round;
    }
 
-   if(DEBUG.UVS){ console.log('uvmap:', uvmap); }
-   
+   if (DEBUG.UVS) { console.log('uvmap:', uvmap); }
+
    return uvmap;
 }
 /* Finds text between delimiters, in a string buffer. */
@@ -464,10 +530,10 @@ function Find_field_by_name(file, word, pos) {
 
    const wordpos = { start: -1, end: -1, len: 0, line: -1 };
    const wordlen = word.length;
-   
+
    let line = pos.line;
    let i = pos.start;
-   
+
    const filelen = file.length;
    while (i <= filelen) {
 

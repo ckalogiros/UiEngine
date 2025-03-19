@@ -23,6 +23,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Components_create_scroller_component, Scoller_component_destroy, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Widgets/ScrollerComponent.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_view_buffer_get, Root_group_view_buffer_get_byidx, Root_group_view_buffer_get_count, Root_group_rerender, Root_group_reset_gfxs, Root_group_set_render_queue_flags } from "../../Core/Views/RootView.js";
 import { Renderer_get_performance_timer_query_avaraged } from "../../Renderers/Renderer.js";
+import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
 
 
 
@@ -85,7 +86,7 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
 
       ms = (g_ms) ? g_ms : 1000;
       // const timer = Create_widget_multi_text(_, 'FPS:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, TEXTURES.CONSOLAS_32px);
-      const timer = Create_widget_multi_text(_, 'FPS:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, _);
+      const timer = Create_widget_multi_text(_, 'FPS:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, TEXTURES.CONSOLA_VARIANT_FONT, _, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_5);
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9,);
@@ -135,7 +136,7 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
        */
 
       // ms = (g_ms) ? g_ms : 1000;
-      // const nfo1 = Create_widget_multi_text(_, 'clientHeight:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1);
+      // const nfo1 = Create_widget_multi_text(_, 'clientHeight:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1,TEXTURES.CONSOLA_VARIANT_FONT, _, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_5);
       // section.AddItem(nfo1);
       // nfo1.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
       // nfo1.SetDynamicText(`ms${ms} Renderloop avg`, ms, ()=>{return DEVICE.info.clientHeight}, [PERFORMANCE_TIMER.BASE, 0], _, generic_time_interval); // idx param is for use in creating separate nfo1 for each widget dynamic text.
@@ -214,7 +215,7 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
-   const fontsizedynamic = 7.5;
+   const fontsizedynamic = 18.5;
    let pad1 = [4, 0];
    let pad2 = [4, 0];
    const g_ms = 0;
@@ -227,7 +228,7 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
    { // FPS average 1 second
 
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Particles Emitt:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, _);
+      const timer = Create_widget_multi_text(_, 'Particles Emitt:', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, TEXTURES.CONSOLA_VARIANT_FONT, _, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0);
       section.AddItem(timer);
 
       timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9,);
@@ -286,22 +287,22 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
    { // Generic Buffer
 
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Generic Buffers', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, _);
+      const timer = Create_widget_multi_text(_, 'Generic Buffers', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       section.AddItem(timer);
 
       // timer.CreateNewText('Size:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9,);
+      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Generic_buffers_container_get_size, [PERFORMANCE_TIMERS_IDXS.Particles, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
 
-      timer.CreateNewText('Count:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
+      timer.CreateNewText('Count:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9);
       timer.CreateNewText('000000', fontsizedynamic, YELLOW[9], pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Generic_buffers_container_get_active_count, [PERFORMANCE_TIMERS_IDXS.Particles2, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
 
-      timer.CreateNewText('Boundary:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
+      timer.CreateNewText('Boundary:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9);
       timer.CreateNewText('000000', fontsizedynamic, YELLOW[9], pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Generic_buffers_container_get_boundary, [PERFORMANCE_TIMERS_IDXS.Particles2, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
@@ -350,7 +351,7 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
    { // Generic Buffer
 
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Total Generic | Num buffers', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, _);
+      const timer = Create_widget_multi_text(_, 'Total Generic | Num buffers', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       section.AddItem(timer);
 
       // timer.CreateNewText('Size:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
@@ -414,22 +415,22 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
    { // Generic Buffer
       DEBUG_INFO_STRUCTS
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Total Int16 | Num buffers', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, _);
+      const timer = Create_widget_multi_text(_, 'Total Int16 | Num buffers', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       section.AddItem(timer);
 
       // timer.CreateNewText('Size:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9,);
+      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Get_debug_info_structs_int16_buffer_get_num_buffers, [PERFORMANCE_TIMERS_IDXS.Particles2, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
 
-      timer.CreateNewText('size:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
+      timer.CreateNewText('size:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9);
       timer.CreateNewText('000000', fontsizedynamic, YELLOW[9], pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Get_debug_info_structs_int16_buffer_get_size, [PERFORMANCE_TIMERS_IDXS.Particles, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
 
-      timer.CreateNewText('elems:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
+      timer.CreateNewText('elems:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
       timer.CreateNewText('000000', fontsizedynamic, YELLOW[9], pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Get_debug_info_structs_int16_buffer_get_elems_count, [PERFORMANCE_TIMERS_IDXS.Particles2, 0], _, generic_time_interval,); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
@@ -478,7 +479,7 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
    { // Generic Buffer
       DEBUG_INFO_STRUCTS
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text(_, 'Total Int8 | Num buffers', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, _);
+      const timer = Create_widget_multi_text(_, 'Total Int8 | Num buffers', align, [0, 0, zpos + 1], fontsizedynamic, TRANSPARENCY(WHITE, transp), .5, pad1, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       section.AddItem(timer);
 
       // timer.CreateNewText('Size:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9, );
@@ -540,7 +541,8 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
 /************************************************************************************************************************************************/
 // Debug Info Ui Widget: A widget to open many different debuging info widgets
 /************************************************************************************************************************************************/
-const _font_size = 8.5;
+// const _font_size = 100.47 / 5.556385362210606;
+const _font_size = 10. ;
 
 /** 'is_root_widget' can be two values: 1. ROOT_WIDGETS.CREATE_ROOT-which creates an independed widget, 2. undefined-which means that ths widget will belong to some parent structure */
 export function Debug_info_ui(is_root_widget = undefined, pos = [300, 80, 0]) {
@@ -760,7 +762,7 @@ function Debug_info_create_ui_stats() {
 
    {
       ms = (g_ms) ? g_ms : 500;
-      const i1 = Create_widget_multi_text(_, 'Meshes:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      const i1 = Create_widget_multi_text(_, 'Meshes:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       section.AddItem(i1);
 
       i1.CreateNewText('000000', fontsizedynamic, YELLOW[9], dt_pad, .9);
@@ -775,11 +777,11 @@ function Debug_info_create_ui_stats() {
 
    { // Listen Events Buffer
       ms = (g_ms) ? g_ms : 500;
-      // const i1 = Create_widget_text(_, 'Listeners:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      // const i1 = Create_widget_text(_, 'Listeners:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       // section.AddItem(i1);
 
       // Create info for Hover listeners
-      const i2 = Create_widget_multi_text(_, 'Listeners - Hover:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      const i2 = Create_widget_multi_text(_, 'Listeners - Hover:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       section.AddItem(i2);
 
       i2.CreateNewText('000000', fontsizedynamic, YELLOW[9], dt_pad, .9);
@@ -795,7 +797,7 @@ function Debug_info_create_ui_stats() {
    { // Mesh Per Vertex Buffer
       ms = (g_ms) ? g_ms : 500;
       // const i1 = Create_widget_text(_, 'Meshes Per VB:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
-      const i1 = Create_widget_multi_text(_, 'Meshes Per VB:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      const i1 = Create_widget_multi_text(_, 'Meshes Per VB:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       i1.CreateNewText('000000', fontsizedynamic, YELLOW[9], dt_pad, .9);
       i1.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_per_vb_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       section.AddItem(i1);
@@ -817,7 +819,7 @@ function Debug_info_create_ui_stats() {
 
    { // Widget Roots Buffer
       ms = (g_ms) ? g_ms : 500;
-      const i1 = Create_widget_multi_text(_, 'Widget Roots Buffer:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      const i1 = Create_widget_multi_text(_, 'Widget Roots Buffer:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       i1.CreateNewText('000000', fontsizedynamic, YELLOW[9], dt_pad, .9);
       i1.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Root_group_view_buffer_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       section.AddItem(i1);
@@ -827,7 +829,7 @@ function Debug_info_create_ui_stats() {
 
    { // View Buffer
       ms = (g_ms) ? g_ms : 500;
-      const i1 = Create_widget_multi_text(_, 'View Buffer:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      const i1 = Create_widget_multi_text(_, 'View Buffer:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       i1.CreateNewText('000000', fontsizedynamic, YELLOW[9], dt_pad, .9);
       i1.SetDynamicText(`ms${ms} Stats MeshCount`, ms, View_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       section.AddItem(i1);
@@ -837,16 +839,16 @@ function Debug_info_create_ui_stats() {
 
    { // Applications All Buffers Struct
       ms = (g_ms) ? g_ms : 500;
-      // const i1 = Create_widget_text(_, 'All App Buffers: Counts In Elements', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      // const i1 = Create_widget_text(_, 'All App Buffers: Counts In Elements', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       // section.AddItem(i1);
 
       { // Generic Buffers
-         // const text = Create_widget_text(_, 'Total Elems:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         // const text = Create_widget_text(_, 'Total Elems:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          // section.AddItem(text);
 
          // const text2 = Create_widget_text(_, '  Counts In Elements:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1);
          // section.AddItem(text2);
-         const i2 = Create_widget_multi_text(_, 'Generic - ', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         const i2 = Create_widget_multi_text(_, 'Generic - ', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          i2.CreateNewText('BufferCount:', fontsize, GREY[7], dt_pad, .9);
          i2.CreateNewText('00000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Get_debug_info_structs_generic_buffer_get_num_buffers, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
@@ -858,7 +860,7 @@ function Debug_info_create_ui_stats() {
          section.AddItem(i2);
       }
       { // INT16 Buffers
-         const i2 = Create_widget_multi_text(_, 'INT16 - ', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         const i2 = Create_widget_multi_text(_, 'INT16 - ', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          // i2.CreateNewText('000000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          // i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Get_debug_info_structs_int16_buffer_get_elems_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
@@ -874,7 +876,7 @@ function Debug_info_create_ui_stats() {
 
       }
       { // INT8 Buffers
-         const i2 = Create_widget_multi_text(_, 'INT8 - ', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         const i2 = Create_widget_multi_text(_, 'INT8 - ', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          // i2.CreateNewText('000000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          // i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Get_debug_info_structs_int8_buffer_get_elems_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
@@ -894,11 +896,11 @@ function Debug_info_create_ui_stats() {
 
    { // String Buffers
       ms = (g_ms) ? g_ms : 500;
-      // const i1 = Create_widget_text(_, 'String Buffers:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      // const i1 = Create_widget_text(_, 'String Buffers:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       // section.AddItem(i1);
 
       { // Generic Buffers
-         const i2 = Create_widget_multi_text(_, 'String Buffer:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         const i2 = Create_widget_multi_text(_, 'String Buffer:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Str_buffer_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
@@ -909,7 +911,7 @@ function Debug_info_create_ui_stats() {
 
       }
       { // Mesh Names Buffers
-         const i2 = Create_widget_multi_text(_, 'Mesh Names:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         const i2 = Create_widget_multi_text(_, 'Mesh Names:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Str_buffer_mesh_names_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
@@ -925,11 +927,11 @@ function Debug_info_create_ui_stats() {
 
    { // Root Attributes Buffers
       ms = (g_ms) ? g_ms : 500;
-      // const i1 = Create_widget_text(_, 'Root Attrib Buffers:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      // const i1 = Create_widget_text(_, 'Root Attrib Buffers:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       // section.AddItem(i1);
 
       { // WPOS Buffers
-         const i2 = Create_widget_multi_text(_, 'Root Attrib Buffers - WPOS:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         const i2 = Create_widget_multi_text(_, 'Root Attrib Buffers - WPOS:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_unif_wpos_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
@@ -940,7 +942,7 @@ function Debug_info_create_ui_stats() {
 
       }
       { // COL Buffers
-         const i2 = Create_widget_multi_text(_, 'COL:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         const i2 = Create_widget_multi_text(_, 'COL:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_unif_col_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
@@ -956,11 +958,11 @@ function Debug_info_create_ui_stats() {
 
    { // Render Queue Buffers
       ms = (g_ms) ? g_ms : 500;
-      // const i1 = Create_widget_text(_, 'Renderqueue Buffers:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+      // const i1 = Create_widget_text(_, 'Renderqueue Buffers:', [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
       // section.AddItem(i1);
 
       { // All Buffers
-         const i2 = Create_widget_multi_text(_, 'Renderqueue Buffers - All:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         const i2 = Create_widget_multi_text(_, 'Renderqueue Buffers - All:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          i2.CreateNewText('000000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Renderqueue_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
@@ -974,7 +976,7 @@ function Debug_info_create_ui_stats() {
 
       }
       { // Active Buffers
-         // const i2 = Create_widget_multi_text(_, 'Active:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1, font);
+         // const i2 = Create_widget_multi_text(_, 'Active:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MSDF_CONSOLAS_1024, _, _);
          // i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          // i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Renderqueue_active_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
@@ -1479,19 +1481,37 @@ export function Debug_info_create_ui_mouse(x=0, y=0) {
       return;
    }
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [10, 8], [x, y, DEBUG_INFO.UI_MOUSE.POS[2]], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui mouse info panel');
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [10, 10], [x, y, DEBUG_INFO.UI_MOUSE.POS[2]], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui mouse info panel');
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
+   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   section.align.flags = ALIGN_2.RESIZE_SELF;
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('InfoUi-Mouse section');
-
-
+   
+   
    const fontsize = _font_size;
-
-   const infomesh = Create_widget_multi_text(_, 'Mouse:', ALIGN.HORIZONTAL, [0, 0, DEBUG_INFO.UI_MOUSE.POS[2] + 1], fontsize, WHITE, .4, [10, 10]);
+   
+   const infomesh = Create_widget_multi_text(_, 'Mouse:', ALIGN.HORIZONTAL, [0, 0, DEBUG_INFO.UI_MOUSE.POS[2] + 1], fontsize, WHITE, .4, [0, 0], TEXTURES.MSDF_CONSOLAS_1024, _, _);
+   infomesh.align.flags = ALIGN_2.HORIZONTAL;
    section.AddItem(infomesh);
-   infomesh.CreateNewText('pos[-0000, -0000]', fontsize, GREEN[7], [8, 0], .9);
-   infomesh.CreateNewText('area[-0000, -0000]', fontsize, GREEN[7], [8, 0], .9);
+   infomesh.CreateNewText('pos\n[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, ALIGN_2.VERTICAL,);
+   infomesh.CreateNewText('area\n[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, ALIGN_2.VERTICAL);
+   infomesh.CreateNewText('222',        fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
+   infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
+   infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
+   infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
+   infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
+   infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
+   infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
+   infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
+   // infomesh.CreateNewText('555000000000000000000',       fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
+   infomesh.CreateNewText('3333',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
+   infomesh.CreateNewText('00',        fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
+   infomesh.CreateNewText('555',       fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
+   infomesh.CreateNewText('6',         fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
+   infomesh.CreateNewText('5', fontsize, GREEN[7], [8, 0], .9, _, ALIGN_2.VERTICAL);
 
 
    section.gfx_pool_request |= GFX_POOL_REQUESTS.SMALLEST; // Assign so the gfx pool requests the smalest buffers
@@ -1499,12 +1519,21 @@ export function Debug_info_create_ui_mouse(x=0, y=0) {
    infomesh.gfx_pool_request |= GFX_POOL_REQUESTS.SMALLEST; // Assign so the gfx pool requests the smalest buffers
    infomesh.gfx_pool_request &= ~GFX_POOL_REQUESTS.ANY; // Disable the default.
 
+
+      // Align
+   const ret = Align_pre_simple(section);
+   const pad_x = section.StylesGetPad(STYLES.AXIS.X);
+   const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
+   section.geom.dim[0] = ret.dim_x + pad_x;
+   section.geom.dim[1] = ret.dim_y + pad_y;
+   // Align_expand(section, section.align.flags,)
+
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
-   section.options |= SECTION.EXPAND | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-   section.Calc_no_gfx_update();
+   // section.options |= SECTION.EXPAND | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+   // section.Calc_no_gfx_update();
 
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -1520,6 +1549,7 @@ export function Debug_info_create_ui_mouse(x=0, y=0) {
    // Create an Info listener to update the mouse position ui text
    section.debug_info.evtidx = Info_listener_create_event(INFO_LISTEN_EVENT_TYPE.MOUSE, Debug_info_update_ui_mouse_pos, null, infomesh);
 
+   return section;
 }
 
 
@@ -1529,8 +1559,8 @@ function Debug_info_update_ui_mouse_pos(params) {
    const evt_params = params.evt_params;
    const info_data = params.trigger_params.mouse;
 
-   const mp = `pos:[${info_data.pos.x},${info_data.pos.y}]`;
-   const mpr = `area:[${info_data.pos.x - info_data.click.up.x}, ${info_data.pos.y - info_data.click.up.y}]`;
+   const mp = `pos:\n[${info_data.pos.x},${info_data.pos.y}]`;
+   const mpr = `area:\n[${info_data.pos.x - info_data.click.up.x}, ${info_data.pos.y - info_data.click.up.y}]`;
    // const mpr = `area:[${info_data.click.drag.x}, ${info_data.click.drag.y}]`;
 
    const mouse_pos_text = evt_params.children.buffer[0];
@@ -1590,7 +1620,7 @@ export function Debug_info_create_ui_focused() {
 
 
 
-   const infomesh = Create_widget_multi_text(_, 'Mouse:', ALIGN.HORIZONTAL, [0, 0, DEBUG_INFO.UI_FOCUSED.POS[2] + 1], fontsize, WHITE, .4, [10, 10]);
+   const infomesh = Create_widget_multi_text(_, 'Mouse:', ALIGN.HORIZONTAL, [0, 0, DEBUG_INFO.UI_FOCUSED.POS[2] + 1], fontsize, WHITE, .4, [10, 10], TEXTURES.MSDF_CONSOLAS_1024, _, _);
    section.AddItem(infomesh);
    infomesh.CreateNewText('pos[-0000, -0000]', fontsize, GREEN[7], [8, 0], .9);
    infomesh.CreateNewText('area[-0000, -0000]', fontsize, GREEN[7], [8, 0], .9);

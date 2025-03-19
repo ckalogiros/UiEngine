@@ -20,7 +20,7 @@ import { Performance_timer_start, Performance_timer_stop } from "../../Timers/Pe
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_reset_gfxs, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_resize_and_rerender } from "../../Core/Views/RootView.js";
 import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
-import { Msdf_ont_get_char_atlas_bounds_width, Msdf_ont_get_char_plane_bounds_height, Msdf_ont_get_char_plane_bounds_width, Uv_metrics_get_char_width } from "../../Loaders/Textures/TextureUvMap.js";
+import { Msdf_ont_get_char_atlas_bounds_width, Msdf_ont_get_char_plane_bounds_height, Msdf_ont_get_char_plane_bounds_width, Texture_metrics_get_sub_tex_width } from "../../Loaders/Textures/TextureUvMap.js";
 
 
 

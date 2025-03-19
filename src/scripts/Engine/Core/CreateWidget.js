@@ -11,7 +11,7 @@ import { Close_Button, Widget_Menu_Bar, Widget_Minimize } from "../Drawables/Wid
 import { Widget_Switch_Simple } from "../Drawables/Widgets/WidgetSwitch.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Widget_Color_Picker } from "../Drawables/Widgets/WidgetColorPicker.js";
-import { Text_Mesh_Msdf } from "../Drawables/Meshes/Text_Mesh_Msdf.js";
+// import { Text_Mesh_Msdf } from "../Drawables/Meshes/Text_Mesh_Msdf.js";
 import { GREY, WHITE } from "../Drawables/Material/Base/Colors.js";
 
 /**
@@ -66,11 +66,14 @@ export function Create_rect_mesh(ROOT_WIDGET_FLAGS = 0x0, pos, dim, col, name, s
 
 
 
-export function Create_text_mesh(text, pos, fontsize, col, bold, font, is_debug_mesh = 0x0) {
+export function Create_text_mesh(text, pos, font_size, col,bold, texture_id, sub_texture_id, is_debug_mesh = 0x0, variant_idx,  pad, ) {
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh(text, pos, fontsize, col, bold, font, is_debug_mesh));
+   // const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh(text, pos, font_size, col, bold, font, is_debug_mesh));
+   const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh(
+      { pos: pos, font_size: font_size, col: col, text: text, pad:pad, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
+   ));
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
@@ -84,11 +87,11 @@ export function Create_text_mesh(text, pos, fontsize, col, bold, font, is_debug_
 
 
 
-export function Create_text_mesh_msdf(text, pos, fontsize, col, bold, font, is_debug_mesh = 0x0) {
+export function Create_text_mesh_msdf(text, pos, font_size, col, bold, font, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh_Msdf(text, pos, fontsize, col, font, bold, is_debug_mesh));
+   const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh_Msdf(text, pos, font_size, col, font, bold, is_debug_mesh));
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
@@ -123,11 +126,14 @@ export function Create_widget_section(ROOT_WIDGET_FLAGS = 0x0, options = (SECTIO
 
 
 
-export function Create_widget_text(ROOT_WIDGET_FLAGS = 0x0, text, pos, fontSize, col, bold, pad, font, is_debug_mesh = 0x0) {
+export function Create_widget_text(ROOT_WIDGET_FLAGS = 0x0, text, pos, font_size, col, bold, texture_id, is_debug_mesh = 0x0, variant_idx, sub_texture_id, pad) {
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, fontSize, col, bold, pad, font, is_debug_mesh));
+   // const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, font_size, col, bold, pad, font, is_debug_mesh, variant_idx));
+   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(
+      { pos: pos, col: col, text: text, pad:pad, font_size:font_size, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
+   ));
 
 
    // Store the meshbuffer's index to the newly created mesh.
@@ -142,11 +148,14 @@ export function Create_widget_text(ROOT_WIDGET_FLAGS = 0x0, text, pos, fontSize,
 
 
 
-export function Create_widget_multi_text(ROOT_WIDGET_FLAGS = 0x0, text, ALIGNMENT, pos, fontSize, text_col, bold, pad, font, is_debug_mesh = 0x0) {
+export function Create_widget_multi_text(ROOT_WIDGET_FLAGS = 0x0, text, Align, pos, font_size, text_col, bold, pad, texture_id, is_debug_mesh = 0x0, variant_idx) {
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(ROOT_WIDGET_FLAGS, text, ALIGNMENT, pos, fontSize, text_col, bold, pad, font, is_debug_mesh));
+   // const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(ROOT_WIDGET_FLAGS, text, ALIGNMENT, pos, font_size, text_col, bold, pad, font, is_debug_mesh));
+   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(ROOT_WIDGET_FLAGS, 
+      { text: text, Align: Align, pos: pos, font_size: font_size, text_col: text_col, pad: pad, texture_id: texture_id, variant_idx:variant_idx, is_debug_mesh: is_debug_mesh },
+   ));
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
@@ -161,18 +170,20 @@ export function Create_widget_multi_text(ROOT_WIDGET_FLAGS = 0x0, text, ALIGNMEN
 
     // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties.text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), properties.pos = [0, 0, 0], properties.font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = { rcorners: 4, feather: 2, border: 0 }, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
 
-export function Create_widget_label(ROOT_WIDGET_FLAGS = 0x0, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [0, 0, 0], font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold, style, font = TEXTURES.DEFAULT_FONT, is_debug_mesh = 0x0) {
+// export function Create_widget_label(ROOT_WIDGET_FLAGS = 0x0, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [0, 0, 0], font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold, style, texture_id = TEXTURES.DEFAULT_FONT, is_debug_mesh = 0x0, variant_idx) {
+export function Create_widget_label(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontSize, col, text_col, pad, bold, style, font, is_debug_mesh));
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, ROOT_WIDGET_FLAGS,
-      { text: text, Align: Align, pos: pos, font_size: font_size, col: col, text_col: text_col, pad: pad, style: style, font: font, is_debug_mesh: is_debug_mesh },
-   ));
+   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
+   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, ROOT_WIDGET_FLAGS,
+   //    { text: text, Align: Align, pos: pos, font_size: font_size, col: col, text_col: text_col, pad: pad, style: style, texture_id: texture_id, variant_idx:variant_idx, is_debug_mesh: is_debug_mesh },
+   // ));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, properties));
 
-   _mesh_buffer.buffer[mesh_bufferidx].SetName(`LABEL[${mesh_bufferidx}]{${text}}`); // Set name after mesh_bufferidx is created
+   _mesh_buffer.buffer[mesh_bufferidx].SetName(`LABEL[${mesh_bufferidx}]{${properties.text}}`); // Set name after mesh_bufferidx is created
 
-   if (NOTIFICATIONS_ON && is_debug_mesh === 0x0)
+   if (NOTIFICATIONS_ON && properties.is_debug_mesh === 0x0)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
    return _mesh_buffer.buffer[mesh_bufferidx];
@@ -181,13 +192,13 @@ export function Create_widget_label(ROOT_WIDGET_FLAGS = 0x0, text = 'null', Alig
 
 
 // export function Create_widget_button(ROOT_WIDGET_FLAGS = 0x0, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
-export function Create_widget_button(ROOT_WIDGET_FLAGS = 0x0, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [0, 0, 0], font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold, style, font = TEXTURES.DEFAULT_FONT, is_debug_mesh = 0x0) {
+export function Create_widget_button(ROOT_WIDGET_FLAGS = 0x0, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [0, 0, 0], font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold, style, texture_id = TEXTURES.DEFAULT_FONT, is_debug_mesh = 0x0, variant_idx) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontSize, col, text_col, pad, bold, style, font, is_debug_mesh));
+   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, 
-      { text: text, Align: Align, pos: pos, font_size: font_size, col: col, text_col: text_col, pad: pad, style: style, font: font, is_debug_mesh: is_debug_mesh },
+      { text: text, Align: Align, pos: pos, font_size: font_size, col: col, text_col: text_col, pad: pad, style: style, texture_id: texture_id, variant_idx:variant_idx, is_debug_mesh: is_debug_mesh },
    ));
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)
@@ -198,11 +209,11 @@ export function Create_widget_button(ROOT_WIDGET_FLAGS = 0x0, text = 'null', Ali
 
 
 
-export function Create_widget_switch(ROOT_WIDGET_FLAGS = 0x0, text_on, text_off, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
+export function Create_widget_switch(ROOT_WIDGET_FLAGS = 0x0, text_on, text_off, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Switch(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Switch(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -240,13 +251,26 @@ export function Create_widget_slider_simple(ROOT_WIDGET_FLAGS = 0x0, pos, dim, c
 
 
 
-export function Create_widget_slider(ROOT_WIDGET_FLAGS = 0x0, pos, dim, col, hover_margin, name, is_debug_mesh = 0x0) {
+// export function Create_widget_slider(ROOT_WIDGET_FLAGS = 0x0, pos, dim, col, hover_margin, name, is_debug_mesh = 0x0) {
+
+//    const _mesh_buffer = Mesh_buffer_get();
+//    const mesh_bufferidx = _mesh_buffer.Reserve();
+//    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider_XX1(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, hover_margin, name, is_debug_mesh));
+
+//    if (NOTIFICATIONS_ON && !is_debug_mesh)
+//       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
+
+//    return _mesh_buffer.buffer[mesh_bufferidx];
+// }
+// export function Create_widget_slider(ROOT_WIDGET_FLAGS = 0x0, pos, dim, col, hover_margin, name, is_debug_mesh = 0x0) {
+export function Create_widget_slider(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider_XX1(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, hover_margin, name, is_debug_mesh));
+   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider_XX1(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col, hover_margin, name, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider_XX1(mesh_bufferidx, properties));
 
-   if (NOTIFICATIONS_ON && !is_debug_mesh)
+   if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
    return _mesh_buffer.buffer[mesh_bufferidx];
@@ -268,11 +292,11 @@ export function Create_widget_scroller(ROOT_WIDGET_FLAGS = 0x0, scrolled_section
 
 
 
-export function Create_widget_dropdown(ROOT_WIDGET_FLAGS = 0x0, text, pos, col1, col_menu, text_col, btn_pad, bold, font, fontsize, style, margin, is_debug_mesh = 0x0) {
+export function Create_widget_dropdown(ROOT_WIDGET_FLAGS = 0x0, text, pos, col1, col_menu, text_col, btn_pad, bold, font, font_size, style, margin, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Dropdown(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1, col_menu, text_col, btn_pad, bold, font, fontsize, style, margin, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Dropdown(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1, col_menu, text_col, btn_pad, bold, font, font_size, style, margin, is_debug_mesh));
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -297,11 +321,11 @@ export function Create_widget_menubar(ROOT_WIDGET_FLAGS = 0x0, pos, dim, col, te
 
 
 
-export function Create_widget_close_btn(ROOT_WIDGET_FLAGS = 0x0, root, text, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
+export function Create_widget_close_btn(ROOT_WIDGET_FLAGS = 0x0, root, text, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Close_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Close_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -311,11 +335,11 @@ export function Create_widget_close_btn(ROOT_WIDGET_FLAGS = 0x0, root, text, pos
 
 
 
-export function Create_widget_minimize_btn(ROOT_WIDGET_FLAGS = 0x0, root, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
+export function Create_widget_minimize_btn(ROOT_WIDGET_FLAGS = 0x0, root, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Minimize(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Minimize(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -327,11 +351,11 @@ export function Create_widget_minimize_btn(ROOT_WIDGET_FLAGS = 0x0, root, pos, f
 
 
 // It does not store mesh's name to str_buffer
-export function Create_widget_text_for_debug_ui_only(ROOT_WIDGET_FLAGS = 0x0, text, pos, fontSize, col, bold, pad, is_debug_mesh = 0x0) {
+export function Create_widget_text_for_debug_ui_only(ROOT_WIDGET_FLAGS = 0x0, text, pos, font_size, col, bold, pad, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, fontSize, col, bold, pad));
+   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, font_size, col, bold, pad));
 
 
    // Store the meshbuffer's index to the newly created mesh.
