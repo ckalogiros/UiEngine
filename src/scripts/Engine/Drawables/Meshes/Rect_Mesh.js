@@ -262,7 +262,7 @@ export class Rect extends Mesh {
 // TODO: IMPLEMENT
 export class Rect_Mesh extends Rect {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS=0x0, properties) {
+   constructor(mesh_bufferidx, is_root=0x0, properties) {
       // pos = [0, 0, 0], dim = [10, 10],
       // col = TRANSPARENCY(BLUEL[6], .6), name = 'Rect_Mesh UNNAMED',
       // style = {rcorners:10, feather:2, border:0}, pad = [4, 4], num_faces = 1, is_debug_mesh) {
@@ -278,7 +278,7 @@ export class Rect_Mesh extends Rect {
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
-      if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) {
+      if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
       }
    }

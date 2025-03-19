@@ -10,7 +10,7 @@ import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Gl_set_uv, Gl_set_rgb_specific_index, Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Uv_get_uv_coords, Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height, Msdf_Uv_get_sub_tex_bounds, Texture_metrics_get_sub_tex_height, Texture_metrics_get_texture, Texture_metrics_get_sub_tex_yoffset, Texture_metrics_get_calc_dim_from_string } from "../../Loaders/Textures/TextureUvMap.js";
+import { Uv_get_uv_coords, Texture_metrics_get_sub_tex_width, Msdf_Uv_get_sub_tex_bounds, Texture_metrics_get_sub_tex_height, Texture_metrics_get_texture, Texture_metrics_get_sub_tex_yoffset, Texture_metrics_get_calc_dim_from_string } from "../../Loaders/Textures/TextureUvMap.js";
 
 
 
@@ -428,6 +428,182 @@ export class Text_Mesh extends Mesh {
 
    }
 
+   ScaleText(scale) {
+
+      if (!this.gfx) {
+         console.error('98776\nTrying to Render Text before vertex buffer creation\ntext:', this.mat.char_buffer.buffer); return;
+      }
+
+      const store_start = this.gfx.vb.starts.buffer[0];
+      const attribs_count = this.gfx.vb.counts.buffer[0];
+
+      const sizex = this.geom.dim[0] * scale;
+      const sizey = this.geom.dim[1] * scale;
+
+      // const space_char_uv = Msdf_Uv_get_sub_tex_uv_coords(this.mat.metrics_idx, ' '.charCodeAt(0) - CHAR_ARRAY_START_OFFSET);
+      // const base_line = Msdf_Uv_get_font_base_line(this.mat.metrics_idx);
+      // const line_height = Msdf_Uv_get_font_line_height(this.mat.metrics_idx) * sizey;
+
+      
+      const size = this.geom.font_size * scale;
+      const texture = Texture_metrics_get_texture(this.mat.metrics_idx);
+      const line_height = texture.line_height * size;
+
+      let line = 0;
+
+      const text_width = ((this.text_width) * scale) - this.parent.geom.dim[0];
+      const text_height = ((this.text_height) * scale) - this.parent.geom.dim[1];
+
+      // const difx = this.geom.dim[0]-sizex;
+      // const dify = this.geom.dim[0]-sizey;
+      // let posx = this.geom.pos[0] - difx*2;
+      // let posy = this.geom.pos[1] - dify/2;
+
+      // let posx = center ? this.geom.pos[0]+this.text_width : this.geom.pos[0];
+      let posx = this.geom.pos[0] - text_width;
+      // let posy = this.geom.pos[1] - text_height;
+      // let posy = center ? this.geom.pos[1]+this.text_height : this.geom.pos[1];
+      let posy = this.geom.pos[1];
+
+
+      // const gfx_copy = { vb: this.gfx.CopyVb() } 
+
+
+      // Update text faces
+      for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
+
+         const char = this.mat.char_buffer.buffer[i];
+         const sub_tex_idx = char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET;
+
+         if (char === '\n') { // Case new line
+
+            posx = this.geom.pos[0];
+            line += line_height * 2;
+         }
+         else {
+
+            // const plane_bounds = Msdf_Uv_get_sub_tex_bounds(this.mat.metrics_idx, char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET);
+            const width = Texture_metrics_get_sub_tex_width(this.mat.metrics_idx, sub_tex_idx) * sizex;
+            const height = Texture_metrics_get_sub_tex_height(this.mat.metrics_idx, sub_tex_idx) * sizey;
+            const yoffset = Texture_metrics_get_sub_tex_yoffset(this.mat.metrics_idx, sub_tex_idx);
+
+            // TODO: For efficiency, create a dedicated Gl_ function to update all values
+            // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
+            // const width = plane_bounds.width * sizex;
+            // const height = plane_bounds.height * sizey;
+
+            Gl_set_vpos_xy(this.gfx, width, height, 1);
+
+            posy += line + (yoffset * sizey * 2);
+            // posy += line + (yoffset * sizey * 2);
+            // posy -= base_line * sizey * font_y_constant_temp;
+            // posy -= (yoffset-texture.base_line ) * sizey;
+            // posy += (yoffset-texture.base_line ) * size
+            // posy += (yoffset-texture.base_line ) * size * 2;
+
+            Gl_set_wpos_xy(this.gfx, posx + width, posy + height);
+            posx += width * 2;
+
+            posy = this.geom.pos[1] - text_height; // Reset yh position
+
+            this.gfx.vb.starts.buffer[0] += attribs_count;
+         }
+
+
+      }
+
+      // Reset this mesh's vb start index to that of the first character of the text 
+      this.gfx.vb.starts.buffer[0] = store_start;
+
+   }
+   // ScaleText(scale) {
+
+   //    if (!this.gfx) {
+   //       console.error('98776\nTrying to Render Text before vertex buffer creation\ntext:', this.mat.char_buffer.buffer); return;
+   //    }
+
+   //    const store_start = this.gfx.vb.starts.buffer[0];
+   //    const attribs_count = this.gfx.vb.counts.buffer[0];
+
+   //    const sizex = this.geom.dim[0] * scale;
+   //    const sizey = this.geom.dim[1] * scale;
+
+   //    // const space_char_uv = Msdf_Uv_get_sub_tex_uv_coords(this.mat.metrics_idx, ' '.charCodeAt(0) - CHAR_ARRAY_START_OFFSET);
+   //    // const base_line = Msdf_Uv_get_font_base_line(this.mat.metrics_idx);
+   //    // const line_height = Msdf_Uv_get_font_line_height(this.mat.metrics_idx) * sizey;
+
+      
+   //    const size = this.geom.font_size;
+   //    const texture = Texture_metrics_get_texture(this.mat.metrics_idx);
+   //    const line_height = texture.line_height * size * 2;
+
+   //    let line = 0;
+
+   //    const text_width = ((this.text_width) * scale) - this.parent.geom.dim[0];
+   //    const text_height = ((this.text_height) * scale) - this.parent.geom.dim[1];
+
+   //    // const difx = this.geom.dim[0]-sizex;
+   //    // const dify = this.geom.dim[0]-sizey;
+   //    // let posx = this.geom.pos[0] - difx*2;
+   //    // let posy = this.geom.pos[1] - dify/2;
+
+   //    // let posx = center ? this.geom.pos[0]+this.text_width : this.geom.pos[0];
+   //    let posx = this.geom.pos[0] - text_width;
+   //    // let posy = this.geom.pos[1] - text_height;
+   //    // let posy = center ? this.geom.pos[1]+this.text_height : this.geom.pos[1];
+   //    let posy = this.geom.pos[1];
+
+
+   //    // const gfx_copy = { vb: this.gfx.CopyVb() } 
+
+
+   //    // Update text faces
+   //    for (let i = 0; i <= this.mat.char_buffer.boundary; i++) {
+
+   //       const char = this.mat.char_buffer.buffer[i];
+   //       const sub_tex_idx = char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET;
+
+   //       if (char === '\n') { // Case new line
+
+   //          posx = this.geom.pos[0];
+   //          line += line_height * 2;
+   //       }
+   //       else {
+
+   //          // const plane_bounds = Msdf_Uv_get_sub_tex_bounds(this.mat.metrics_idx, char.charCodeAt(0) - CHAR_ARRAY_START_OFFSET);
+   //          const width = Texture_metrics_get_sub_tex_width(this.mat.metrics_idx, sub_tex_idx) * sizex;
+   //          const height = Texture_metrics_get_sub_tex_height(this.mat.metrics_idx, sub_tex_idx) * sizey;
+   //          const yoffset = Texture_metrics_get_sub_tex_yoffset(this.mat.metrics_idx, sub_tex_idx);
+
+   //          // TODO: For efficiency, create a dedicated Gl_ function to update all values
+   //          // Case the text changed to a shorter text, fill up the absent texts in the graphics buffer with empty text(space char).
+   //          // const width = plane_bounds.width * sizex;
+   //          // const height = plane_bounds.height * sizey;
+
+   //          Gl_set_vpos_xy(this.gfx, width, height, 1);
+
+   //          posy += line + (yoffset * sizey * 2);
+   //          // posy += line + (yoffset * sizey * 2);
+   //          // posy -= base_line * sizey * font_y_constant_temp;
+   //          // posy -= (yoffset-texture.base_line ) * sizey;
+   //          // posy += (yoffset-texture.base_line ) * size
+   //          // posy += (yoffset-texture.base_line ) * size * 2;
+
+   //          Gl_set_wpos_xy(this.gfx, posx + width, posy + height);
+   //          posx += width * 2;
+
+   //          posy = this.geom.pos[1] - text_height; // Reset yh position
+
+   //          this.gfx.vb.starts.buffer[0] += attribs_count;
+   //       }
+
+
+   //    }
+
+   //    // Reset this mesh's vb start index to that of the first character of the text 
+   //    this.gfx.vb.starts.buffer[0] = store_start;
+
+   // }
 
    // EFFICIENCY: Implement to update only for the changed characters, not all the characters
    /**
@@ -443,7 +619,7 @@ export class Text_Mesh extends Mesh {
          // this.#Render_text(value);
       }
    }
-p
+
 
    RenderTextFromString(text) {
       if (text.constructor === String) {
@@ -621,7 +797,6 @@ p
                geom_copy.pos[1] += (yoffset-texture.base_line ) * size * 2;
             }
             
-   
             // The first face exists as an entity, the rest are constructed here and stored only to the vertex buffer
             if (i === 0) {
                Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${this.GetName()}`);

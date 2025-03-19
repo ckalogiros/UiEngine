@@ -104,35 +104,7 @@ export function Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_
       };
 
    }
-   /**
-    * Stuct to return
-      metrics = {
-         atlas:{
-            type        : 
-            width       : 
-            height      : 
-            ascender    : 
-            descender   : 
-            advance     : 
-            base_line   : 
-         }
-         sub_tex: [
-            left:    ,
-            right:   ,
-            top:     ,
-            bottom:  ,
-            width:   ,
-            height:  ,
-            ratio:   ,
-         ],
-         uv_map:[
-            U1,
-            U2,
-            V1, 
-            V2
-         ]
-      }
-    */
+
 
    // const glyph_metrics = (is_sdf_type) ? plane_bounds : atlas_bounds;
    const glyph_metrics = plane_bounds;
@@ -140,14 +112,7 @@ export function Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_
    return {
       uvmap: uvmap,
       sub_tex: glyph_metrics,
-      // plane_bounds: plane_bounds,
-      // atlas_bounds: atlas_bounds,
       texture: {
-         // "type": "softmask",
-         // "size": 8,
-         // "width": 1024,
-         // "height": 1024,
-         // "yOrigin": "top"
          type: atlas.type,
          pixel_size: atlas.size,
          scale: font_metrics.emSize,

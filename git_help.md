@@ -1,6 +1,6 @@
+* Create new branch
 git checkout -b <branch-name"
 
-* Create new branch
 git switch <branch-name>
 
 

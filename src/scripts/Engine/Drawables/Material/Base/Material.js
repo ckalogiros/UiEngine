@@ -147,7 +147,7 @@ export class Material {
 export class Material_Font extends Material {
 
 
-   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, text = '', sdf_params = [.5, .5], variant_idx = 13) {
+   constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, text = '', sdf_params = [.5, .5], variant_idx) {
 
       super(col, texture_file_id);
 
@@ -169,6 +169,9 @@ export class Material_Font extends Material {
       if (FONT_IS_MSDF(texture_file_id)) {
          this.sid.attr |= SID.ATTR.MSDF; // 
          // this.sid.pass |= SID.PASS.TEX2; //
+
+         // Catch WRONG texture config
+         // if(variant_idx !== INT)
 
       }
       this.type |= MESH_TYPE.FONT_MATERIAL;

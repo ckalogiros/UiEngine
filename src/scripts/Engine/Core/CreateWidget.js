@@ -104,14 +104,10 @@ export function Create_text_mesh_msdf(text, pos, font_size, col, bold, font, is_
 }
 
 
-// options = (SECTION.VERTICAL), pad = [4, 4], pos = [200, 400, 0], dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = { rcorners: 4, feather: 2, border: 0 }, num_faces = 1, texture_id = INT_NULL, sub_texture_id = INT_NULL, is_debug_mesh
-// export function Create_widget_section(ROOT_WIDGET_FLAGS=0x0, options, pad, pos, dim, col, name, style, texture_id, is_debug_mesh=0x0, num_faces) {
-// export function Create_widget_section(ROOT_WIDGET_FLAGS = 0x0, options, pad, pos, dim, col, name, style, num_faces, texture_id = INT_NULL, sub_texture_id = INT_NULL, is_debug_mesh = 0x0) {
 export function Create_widget_section(ROOT_WIDGET_FLAGS = 0x0, options = (SECTION.VERTICAL), pad = [4, 4], pos = [0, 0, 0], dim = [40, 40], col = TRANSPARENCY(GREY[1], .6), name = 'SECTION UNAMED', style = { rcorners: 4, feather: 2, border: 0 }, num_faces = 1, texture_id = INT_NULL, sub_texture_id = INT_NULL, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS, options, pad, pos, dim, col, name, style, num_faces, texture_id, sub_texture_id, is_debug_mesh));
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx,
       new Section(mesh_bufferidx, ROOT_WIDGET_FLAGS,
          { options: options, pad: pad, pos: pos, dim: dim, col: col, name: name, style: style, num_faces: num_faces, texture_id: texture_id, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
@@ -126,21 +122,21 @@ export function Create_widget_section(ROOT_WIDGET_FLAGS = 0x0, options = (SECTIO
 
 
 
-export function Create_widget_text(ROOT_WIDGET_FLAGS = 0x0, text, pos, font_size, col, bold, texture_id, is_debug_mesh = 0x0, variant_idx, sub_texture_id, pad) {
+export function Create_widget_text(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   // const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(ROOT_WIDGET_FLAGS, text, pos, font_size, col, bold, pad, font, is_debug_mesh, variant_idx));
    const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(
-      { pos: pos, col: col, text: text, pad:pad, font_size:font_size, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
+      // { pos: pos, col: col, text: text, pad:pad, font_size:font_size, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
+      properties
    ));
 
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-   _mesh_buffer.buffer[mesh_bufferidx].SetName(`WidgetText[${mesh_bufferidx}]{${text}}`);
+   _mesh_buffer.buffer[mesh_bufferidx].SetName(`WidgetText[${mesh_bufferidx}]{${properties.text}}`);
 
-   if (NOTIFICATIONS_ON && !is_debug_mesh)
+   if (NOTIFICATIONS_ON && !properties.is_debug_mesh);
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
    return _mesh_buffer.buffer[mesh_bufferidx];
@@ -152,7 +148,6 @@ export function Create_widget_multi_text(ROOT_WIDGET_FLAGS = 0x0, text, Align, p
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   // const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(ROOT_WIDGET_FLAGS, text, ALIGNMENT, pos, font_size, text_col, bold, pad, font, is_debug_mesh));
    const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(ROOT_WIDGET_FLAGS, 
       { text: text, Align: Align, pos: pos, font_size: font_size, text_col: text_col, pad: pad, texture_id: texture_id, variant_idx:variant_idx, is_debug_mesh: is_debug_mesh },
    ));
@@ -168,19 +163,12 @@ export function Create_widget_multi_text(ROOT_WIDGET_FLAGS = 0x0, text, Align, p
 }
 
 
-    // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties.text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), properties.pos = [0, 0, 0], properties.font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = { rcorners: 4, feather: 2, border: 0 }, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
-
-// export function Create_widget_label(ROOT_WIDGET_FLAGS = 0x0, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [0, 0, 0], font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold, style, texture_id = TEXTURES.DEFAULT_FONT, is_debug_mesh = 0x0, variant_idx) {
 export function Create_widget_label(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, ROOT_WIDGET_FLAGS,
-   //    { text: text, Align: Align, pos: pos, font_size: font_size, col: col, text_col: text_col, pad: pad, style: style, texture_id: texture_id, variant_idx:variant_idx, is_debug_mesh: is_debug_mesh },
-   // ));
+   
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, properties));
-
    _mesh_buffer.buffer[mesh_bufferidx].SetName(`LABEL[${mesh_bufferidx}]{${properties.text}}`); // Set name after mesh_bufferidx is created
 
    if (NOTIFICATIONS_ON && properties.is_debug_mesh === 0x0)
@@ -192,16 +180,14 @@ export function Create_widget_label(properties) {
 
 
 // export function Create_widget_button(ROOT_WIDGET_FLAGS = 0x0, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
-export function Create_widget_button(ROOT_WIDGET_FLAGS = 0x0, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [0, 0, 0], font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold, style, texture_id = TEXTURES.DEFAULT_FONT, is_debug_mesh = 0x0, variant_idx) {
+// export function Create_widget_button(ROOT_WIDGET_FLAGS = 0x0, text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos = [0, 0, 0], font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold, style, texture_id = TEXTURES.DEFAULT_FONT, is_debug_mesh = 0x0, variant_idx) {
+export function Create_widget_button(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Button(mesh_bufferidx, ROOT_WIDGET_FLAGS, 
-      { text: text, Align: Align, pos: pos, font_size: font_size, col: col, text_col: text_col, pad: pad, style: style, texture_id: texture_id, variant_idx:variant_idx, is_debug_mesh: is_debug_mesh },
-   ));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Button(mesh_bufferidx, properties));
 
-   if (NOTIFICATIONS_ON && !is_debug_mesh)
+   if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
    return _mesh_buffer.buffer[mesh_bufferidx];

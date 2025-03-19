@@ -44,7 +44,7 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
    });
    slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    slider.SetInitialValue(initial_val);
 
@@ -65,7 +65,7 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
 
 
 
-export function Widget_ready_label(is_root = 0x0, name = 'Label', font, x = 0, y = 0, font_size = 10, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, inner_pad=[10, 6], color_text=WHITE) {
+export function Widget_ready_label(is_root = 0x0, name = 'Label', font, x = 0, y = 0, font_size = 10, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, text_pad=[10, 6], color_text=WHITE) {
 
    // const pos = [x, y, 0];
 
@@ -80,11 +80,12 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', font, x = 0, y
       is_root:is_root, 
       pos:[x, y, 0], 
       col:color, 
-      pad:inner_pad,
+      text_pad:text_pad,
       text:name,
       // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
       // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
-      texture_id: TEXTURES.MSDF_CONSOLAS_1024,
+      // texture_id: TEXTURES.MSDF_CONSOLAS_1024,
+      texture_id: font,
       // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
       font_size:font_size,
       text_col:color_text,
@@ -92,6 +93,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', font, x = 0, y
    });
 
 
+   
    label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -181,16 +183,22 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
 
    const slider = Widget_ready_slider(is_root, x, y, .06, 'ScaleText', slider_size);
 
-   // if(is_root&ROOT_WIDGETS.CREATE_ROOT) {
-   //    posy += slider.geom.dim[1] * 2 + 30;
-   // }
    posy += slider.geom.dim[1] * 2 + 30;
 
-   const pos = [posx, posy, 2];
-   const text_pad = 0;
-   const msdf_text = Create_widget_label(is_root, name, _, pos, font_size, TRANSPARENCY(color, .3), WHITE, [text_pad, text_pad], .5, _, font,);
+   const text_pad = [0,0];
+   // const msdf_text = Create_widget_label(is_root, name, _, pos, font_size, TRANSPARENCY(color, .3), WHITE, [text_pad, text_pad], .5, _, font,);
+   const msdf_text = Create_widget_label({
+      is_root:is_root, 
+      pos:[posx, posy, 2], 
+      col:TRANSPARENCY(color, 1.3), 
+      text_pad:text_pad,
+      text:name,
+      texture_id: font,
+      font_size:font_size,
+      text_col:WHITE,
+      is_debug_mesh:false,
+   });
    msdf_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // msdf_text.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    msdf_text.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    msdf_text.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) msdf_text.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
@@ -199,6 +207,8 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
    // msdf_text.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
    // msdf_text.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
    // msdf_text.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+
+   console.error(msdf_text.text_mesh.text_width)
 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 

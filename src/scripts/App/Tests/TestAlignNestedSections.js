@@ -219,9 +219,6 @@ export function Align_pre_simple(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
       const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
       const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
-      // const cur_pad_x = pad[0];
-      // const cur_pad_y = pad[1];
-      // cur_mesh.StylesSetPad([cur_pad_x,cur_pad_y]);
 
       if (cur_mesh.align.flags & ALIGN_2.RESIZE_SELF) {
 
@@ -277,7 +274,7 @@ export function Align_pre_simple(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
       }
       else {
 
-         var ret;
+         let ret;
          // Must calc the mesh's row before call to align FLOAT_RIGHT
          if (cur_mesh.align.flags & ALIGN_2.VERTICAL) row_mesh++;
          cur_mesh.align.row = row_mesh;
@@ -346,8 +343,10 @@ export function Align_pre_simple(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
    return {
       // dim: [accum_row_max_size_x, size_y],
       dim: [accum_row_size_x, size_y],
+      // dim: [accum_row_size_x, accum_row_size_y],
       dim_x: size_x,
       dim_y: size_y,
+      // dim_y: total_size_y,
       // accum_row_max_size_x: accum_row_max_size_x,
    }
 

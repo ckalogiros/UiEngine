@@ -25,7 +25,7 @@ export class Widget_Label extends Rect_Mesh {
     constructor(mesh_bufferidx, properties) {
 
         // HACK: 
-        if(properties.variant_idx === undefined) properties.variant_idx = ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0
+        // if(properties.variant_idx === undefined) properties.variant_idx = ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0
 
         // if(properties.font === undefined) properties.font = TEXTURES.DEFAULT_FONT
 
@@ -35,13 +35,13 @@ export class Widget_Label extends Rect_Mesh {
 
         const text = properties.text;
 
-        const text_mesh = Create_text_mesh(text, [0, 0, properties.pos[2]], properties.font_size, properties.text_col, _, properties.texture_id, properties.sub_texture_id, properties.is_debug_mesh, properties.variant_idx, properties.pad, );
+        const text_mesh = Create_text_mesh(text, [0, 0, properties.pos[2]], properties.font_size, properties.text_col, _, properties.texture_id, properties.sub_texture_id, properties.is_debug_mesh, properties.variant_idx, properties.text_pad, );
 
-        text_mesh.StylesSetPad(properties.pad);
+        text_mesh.StylesSetPad(properties.text_pad);
 
         // Align text to the center of the label
-        text_mesh.geom.pos[0] += properties.pad[0];
-        text_mesh.geom.pos[1] += properties.pad[1];
+        text_mesh.geom.pos[0] += properties.text_pad[0];
+        text_mesh.geom.pos[1] += properties.text_pad[1];
 
         properties.pos[2] -= 1; // Set z for area 'behind' this.text_mesh
 
@@ -54,8 +54,8 @@ export class Widget_Label extends Rect_Mesh {
         
         this.text_mesh = text_mesh;
         
-        this.geom.dim[0] = text_mesh.text_width + properties.pad[0];
-        this.geom.dim[1] = text_mesh.text_height + properties.pad[1];
+        this.geom.dim[0] = text_mesh.text_width + properties.text_pad[0];
+        this.geom.dim[1] = text_mesh.text_height + properties.text_pad[1];
         
 
         text_mesh.sceneidx = this.sceneidx;

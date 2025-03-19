@@ -15,9 +15,9 @@ import { Gl_set_rgba } from '../../Graphics/Buffers/VertexBuffersOps.js';
 import { GetRandomColor, GetSequencedColor } from '../../Helpers/Helpers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
 import { Mesh_create_style_from_values } from '../../Engine/Drawables/Operations/MeshHelperFunctions.js';
-import { Widget_msdf_text_with_scale_slider } from '../Widgets/ReadyWidgets.js';
+import { Widget_msdf_text_with_scale_slider, Widget_ready_label } from '../Widgets/ReadyWidgets.js';
 import { Renderqueue_set_priority_by_vb } from '../../Engine/Renderers/Renderer/RenderQueue.js';
-import { Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
+import { Align_expand, Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
 
 
 
@@ -1864,68 +1864,89 @@ Adjust the font size using the slider.
 
 
    const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [20, 20], [x + l_pad, y + t_pad, 0], [0, 0], TRANSPARENCY(GREY[3], .4));
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('Msdf_text_info');
+   section.align.flags |= ALIGN_2.RESIZE_SELF;
 
 
 
 
 
    /** Create the info for the user */
-   const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x + l_pad, y + t_pad, 0], [0, 0], TRANSPARENCY(GREY[1], .4));
-   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x + l_pad, y + t_pad, 0], [0, 0], TRANSPARENCY(GREY[1], .4));
+   const s = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [x + l_pad, y + t_pad, 0], [0, 0], TRANSPARENCY(GREY[1], .4));
+   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+   s.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    s.SetName('Msdf_text_info_sub_section');
+   s.align.flags |= ALIGN_2.RESIZE_SELF;
    section.AddItem(s);
 
    const font = TEXTURES.MSDF_CONSOLAS_1024;
-   const default_font = 10;
-   const info1 = Create_widget_label(_, text_sample_explainer1, _, [0, 0, 0], default_font, GREY[4], WHITE, [10, 10], _, _, font,);
+   const font_size = 10;
+   const info1 = Create_widget_label({ is_root:_, pos:[0, 0, 0], col:GREY[4], text_pad:[10, 10], text:text_sample_explainer1, texture_id: font, font_size:font_size, text_col:WHITE, is_debug_mesh:false, });
    {
-      info1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      info1.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      info1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      info1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+      info1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      info1.align.flags |= ALIGN_2.VERTICAL|ALIGN_2.EXPAND;
       s.AddItem(info1);
    }
-   // const info2 = Create_widget_label(_, text_sample_explainer2, _, [0, 0, 0], default_font, TRANSPARENT, WHITE, [10, 10], _, _, font,);
-   // {
-   //    info2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   //    info2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   //    info2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   //    s.AddItem(info2);
-   // }
-   // const info3 = Create_widget_label(_, text_sample_explainer3, _, [0, 0, 0], default_font, TRANSPARENT, WHITE, [10, 10], _, _, font,);
-   // {
-   //    info3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   //    info3.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   //    info3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   //    s.AddItem(info3);
-   // }
-   // const info4 = Create_widget_label(_, text_sample_explainer4, _, [0, 0, 0], default_font, TRANSPARENT, WHITE, [10, 10], _, _, font,);
-   // {
-   //    info4.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   //    info4.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   //    info4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   //    s.AddItem(info4);
-   // }
+   const info2 = Create_widget_label({ is_root:_, pos:[0, 0, 0], col:GREY[4], text_pad:[10, 10],text:text_sample_explainer2,texture_id: font,font_size:font_size,text_col:WHITE,is_debug_mesh:false,});
+   {
+      info2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+      info2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      info2.align.flags |= ALIGN_2.VERTICAL|ALIGN_2.EXPAND;
+      s.AddItem(info2);
+   }
+   const info3 = Create_widget_label({ is_root:_, pos:[0, 0, 0], col:GREY[4], text_pad:[10, 10],text:text_sample_explainer3,texture_id: font,font_size:font_size,text_col:WHITE,is_debug_mesh:false,});
+   {
+      info3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+      info3.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      info3.align.flags |= ALIGN_2.VERTICAL|ALIGN_2.EXPAND;
+      s.AddItem(info3);
+   }
+   const info4 = Create_widget_label({ is_root:_, pos:[0, 0, 0], col:GREY[4], text_pad:[10, 10],text:text_sample_explainer4,texture_id: font,font_size:font_size,text_col:WHITE,is_debug_mesh:false,});
+   {
+      info4.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+      info4.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      info4.align.flags |= ALIGN_2.VERTICAL|ALIGN_2.EXPAND;
+      s.AddItem(info4);
+   }
 
+   
+   /********************************************************************************************************************************************************/
+   // Align
+   const ret = Align_pre_simple(section);
+   const pad_x = section.StylesGetPad(STYLES.AXIS.X);
+   const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
+   section.geom.dim[0] = ret.dim_x + pad_x;
+   section.geom.dim[1] = ret.dim_y + pad_y;
+   Align_expand(section, section.align.flags,)
+
+   // Calculate from pos=[0,0], and then add the user's pos
+   // section.geom.pos[0] = pos[0];
+   // section.geom.pos[1] = pos[1];
 
 
 
    /**************************************************************************************************************************************************/
    // Render
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
 
-   section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-   section.Calc_no_gfx_update();
+   // section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT | SECTION.EXPAND;
+   // section.Calc_no_gfx_update();
 
    section.Render()
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -1961,12 +1982,12 @@ The quick brown fox jumps over the lazy dog[!]
 The quick brown fox jumps over the lazy dog[!]
 The quick brown fox jumps over the lazy dog[!]
 The quick brown fox jumps over the lazy dog[!]
-The quick brown fox jumps over the lazy dog[!]\
+The quick brown fox jumps over the lazy dog[!]
    `;
 
-   const ret = Widget_msdf_text_with_scale_slider(ROOT_WIDGETS.CREATE_ROOT, text, TEXTURES.MSDF_CONSOLAS_1024, x, y, 20, GREY[0], 300, _);
-   const slider = ret.slider;
-   const msdf_text = ret.msdf_text;
+   const ret2 = Widget_msdf_text_with_scale_slider(ROOT_WIDGETS.CREATE_ROOT, text, TEXTURES.MSDF_CONSOLAS_1024, x, y, 20, GREY[0], 300, _,_,_);
+   const slider = ret2.slider;
+   const msdf_text = ret2.msdf_text;
 
 
 }

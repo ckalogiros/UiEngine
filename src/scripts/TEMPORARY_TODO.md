@@ -1,4 +1,10 @@
 TODO
+* What is the difference of 
+GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+AND
+GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+I tthink the pass.wpos3 is curently unused
+
 * Are we gonna implement all widget parameters as structs, on widget creation??? 
 
 * Implement NEW positioning architecture based on root widgets.
