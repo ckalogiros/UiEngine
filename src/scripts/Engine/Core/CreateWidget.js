@@ -11,8 +11,6 @@ import { Close_Button, Widget_Menu_Bar, Widget_Minimize } from "../Drawables/Wid
 import { Widget_Switch_Simple } from "../Drawables/Widgets/WidgetSwitch.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Widget_Color_Picker } from "../Drawables/Widgets/WidgetColorPicker.js";
-// import { Text_Mesh_Msdf } from "../Drawables/Meshes/Text_Mesh_Msdf.js";
-import { GREY, WHITE } from "../Drawables/Material/Base/Colors.js";
 
 /**
  * All Functions to create widgets.
@@ -73,24 +71,6 @@ export function Create_text_mesh(properties) {
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
    const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh(properties));
-
-   // Store the meshbuffer's index to the newly created mesh.
-   _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-   _mesh_buffer.buffer[mesh_bufferidx].SetName(`TEXT_MESH[${mesh_bufferidx}]:{${text}}`);
-
-   if (NOTIFICATIONS_ON && !is_debug_mesh)
-      Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
-
-   return _mesh_buffer.buffer[mesh_bufferidx];
-}
-
-
-
-export function Create_text_mesh_msdf(text, pos, font_size, col, bold, font, is_debug_mesh = 0x0) {
-
-   const _mesh_buffer = Mesh_buffer_get();
-   // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh_Msdf(text, pos, font_size, col, font, bold, is_debug_mesh));
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;

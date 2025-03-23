@@ -1,4 +1,4 @@
-import { Textured_Mesh } from "./Textured_Mesh.js";
+// import { Textured_Mesh } from "./Textured_Mesh.js";
 import { Renderqueue_set_priority_by_program } from "../../Renderers/Renderer/RenderQueue.js";
 import { Framebuffer_get } from "../../../Graphics/Buffers/FrameBuffers.js";
 
@@ -7,7 +7,8 @@ import { Framebuffer_get } from "../../../Graphics/Buffers/FrameBuffers.js";
 
 export function Create_mesh_for_framebuffer(mesh, fb, pos, dim) {
 
-   const rect = new Textured_Mesh(pos, [dim[0], dim[1]], [1.0, 1., 1.0, 1.], fb.texture.texture_file_id, 'Framebuffer 0');
+   alert('3331444133321. Framebuffer: implement new ')
+   // const rect = new Textured_Mesh(pos, [dim[0], dim[1]], [1.0, 1., 1.0, 1.], fb.texture.texture_file_id, 'Framebuffer 0');
    // rect.sid.shad |= SID.SHAD.PRE_MULTIPLIED_ALPHA; // Enable premultiply alpha
 
    { // Test for scrolled section resize
