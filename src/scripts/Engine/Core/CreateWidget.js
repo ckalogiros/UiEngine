@@ -74,9 +74,9 @@ export function Create_text_mesh(properties) {
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-   _mesh_buffer.buffer[mesh_bufferidx].SetName(`TEXT_MESH[${mesh_bufferidx}]:{${text}}`);
+   _mesh_buffer.buffer[mesh_bufferidx].SetName(`TEXT_MESH[${mesh_bufferidx}]:{${properties.text}}`);
 
-   if (NOTIFICATIONS_ON && !is_debug_mesh)
+   if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
    return _mesh_buffer.buffer[mesh_bufferidx];

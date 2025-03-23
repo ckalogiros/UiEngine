@@ -9,6 +9,11 @@ import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vert
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Mesh_unif_is_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
+import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
+import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
+import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
+import { Mouse_get_pos } from "../../Controls/Input/Mouse.js";
+import { Calculate_positions_no_gfx_update_recursive, Calculate_sizes_recursive, Section_on_move_clbk } from "./Section.js";
 
 
 export class Rect extends Mesh {
@@ -283,6 +288,26 @@ export class Rect_Mesh extends Rect {
    }
 
 
+   
+
+   AddItem(mesh, options = 0x0) {
+
+      this.options |= options;
+
+      const idx = this.children.Add(mesh);
+      mesh.idx = idx;
+      mesh.parent = this;
+
+
+      if (this.root_bufferidx !== INT_NULL && mesh.root_bufferidx === INT_NULL) {
+         mesh.AddToWidgetRootBuffer(this.root_bufferidx)
+      }
+
+      mesh.StateEnable(this.state.mask & MESH_STATE.ACTIVE);
+
+      return idx;
+   }
+
 
 
 
@@ -486,6 +511,173 @@ export class Rect_Mesh extends Rect {
       }
 
       return true;
+   }
+
+   
+   
+   OnClick(params) {
+
+      const section = params.evt_params.target_mesh;
+
+      STATE.mesh.SetClicked(section);
+
+      // This is to bind a click event to a section.
+      if (section.evt_params && section.evt_params.EventClbk) {
+
+         // Create time interval to continuosly press the button
+         if (section.StateCheck(MESH_STATE.IS_HOLD_CLICK)) {
+
+            const EventClbk = section.evt_params.EventClbk;
+            const target_params = section.evt_params.params.target_params
+            const idx = Time_intervals_create(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
+            section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+
+            STATE.mesh.SetClickHold(section);
+         }
+         else {
+
+            const EventClbk = section.evt_params.EventClbk;
+            EventClbk(section.evt_params);
+         }
+      }
+      // This is for move and/or resize events
+      else if (section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+
+         const pos = section.GetPosXY();
+         const right = pos[0] + section.geom.dim[0] * 2;
+         const bottom = pos[1] + section.geom.dim[1] * 2;
+
+         const point = Mouse_get_pos();
+         if (section.state.mask & MESH_STATE.IS_RESIZEABLE && (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1])) {
+
+            // We have Resize
+            if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
+               // console.log('X Y RESIZE');
+
+               const OnResizeFn = section.OnResize;
+               const idx = Time_intervals_create(10, 'ResizeXY Section', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, section);
+               section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+            }
+            else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
+               // console.log('X RESIZE');
+            }
+            else { // Its a height resize
+               // console.log('Y RESIZE');
+            }
+
+            section.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS;
+            STATE.mesh.SetGrabed(section);
+            // STATE.mesh.SetFocused(section);
+            Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
+            Mesh_set_root_in_focus(section.root_bufferidx);
+
+            return true;
+         }
+
+
+         /** Create Move event.
+          * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
+          * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
+          */
+         const idx = Time_intervals_create(10, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, section);
+         section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+
+         if (section.StateCheck(MESH_STATE.IS_GRABABLE)) {
+
+            STATE.mesh.SetGrabed(section);
+            STATE.mesh.SetFocused(section);
+            Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
+            section.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
+            // Root_group_set_in_focus(section.root_bufferidx);
+            // Mesh_set_root_in_focus(section.root_bufferidx);
+
+         }
+
+      }
+
+
+      return true;
+
+   }
+
+
+   OnResize(params) {
+
+      const root = params.params;
+
+      // NOTE: We use the same element of the mesh's interval buffer for the resize event as the move event, they cannot both exist at the same time. 
+      if (root.StateCheck(MESH_STATE.IN_GRAB) === 0 && root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+
+         const intervalIdx = root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+         Time_intervals_destroy_byidx(intervalIdx);
+         root.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
+
+         return;
+      }
+
+      const mouse_pos = Mouse_get_pos();
+
+
+      // Set min dimentions. // TODO: Who decides for the minimum dimentions??????
+      const pos = root.GetPosXY();
+      const min_sizex = pos[0] + 80;
+      const min_sizey = pos[1] + 80;
+      let changes_hapened = false;
+
+
+
+      if (mouse_pos[0] > min_sizex) {
+
+         const sizex = mouse_pos[0] - pos[0];
+         root.geom.dim[0] = sizex / 2;
+         changes_hapened = true;
+      }
+
+      if (mouse_pos[1] > min_sizey) {
+
+         const sizey = mouse_pos[1] - pos[1];
+         root.geom.dim[1] = sizey / 2;
+         changes_hapened = true;
+      }
+
+
+
+      if (changes_hapened) {
+
+
+         Root_group_reset_gfxs(root.root_bufferidx)
+
+         const root_pos = root.GetPosXY();
+         const clip_top = root_pos[1];
+         const clip_bottom = root_pos[1] + root.geom.dim[1] * 2;
+         const clip_right = root_pos[0] + root.geom.dim[0] * 2;
+
+         // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+         for (let i = 0; i <= root.children.boundary; i++) {
+
+            Clipy_from_tree_recursive(root.children.buffer[i], clip_top, clip_bottom);
+         }
+         // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
+
+         // First reset the buffer that holds all meshes(per vertex buffer), because the 'AddFromGfx' is gonna populate the buuffer with the added mesh
+         Root_group_vbidx_view_reset_mesh_per_vb_buffer(root.root_bufferidx);
+
+
+         const mouse_dif = Mouse_get_pos_dif()
+         const dif = { x: mouse_dif.x / 2, y: -mouse_dif.y / 2 };
+         // const dif = {x:mouse_dif.x, y: -mouse_dif.y};  
+         Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
+         // Root_group_resize_and_rerender(root.root_bufferidx, root.geom.dim[0], root.geom.dim[1]);
+      }
+   }
+
+   RotateZ(angle) {
+
+      super.RotateZ(angle);
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) Section_rotatez_children_recursive(child, angle);
+      }
    }
 
 }

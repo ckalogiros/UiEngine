@@ -52,7 +52,7 @@ import { Align_expand, Align_pre_simple, Test_alignment, Test_alignment_nested_2
 import { Performance_timer_start, Performance_timer_stop, PerformanceTimersGetFps, PerformanceTimersGetMilisec } from '../Engine/Timers/PerformanceTimers.js';
 import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { Expand } from '../Engine/Drawables/Meshes/Section.js';
-import { Style_dropdown_default_properties, Style_label_default_properties, Style_section_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from '../Engine/Drawables/Widgets/WidgetReadyStyles.js';
+import { Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_section_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from '../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 
 
 {
@@ -79,7 +79,469 @@ import { Style_dropdown_default_properties, Style_label_default_properties, Styl
 
 
 
+function TEMP_join_rect_section_classes() {
 
+    /*********************************************************************************************************************/ 
+    // Rect-Section + Text class
+    // CreateSimpleWidgetText()
+    // CreateTextInSectionWithNewLine();
+    // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,18);
+    // CreateSlider(_, 400, 100);
+    
+
+
+    /*********************************************************************************************************************/ 
+    // Texture Symbols
+    // Render_font_symbols_atlas_texture(30, 50); 
+    
+
+
+
+
+    /*********************************************************************************************************************/ 
+    // Rect class
+    // const line1 = SdfLine(YELLOW[7], [50, 250, 1], [200, 15]);
+
+
+
+
+    /*********************************************************************************************************************/ 
+    // Section class
+    // Test_create_textured_mesh()
+    // TestSections1();
+    // CreateManySections();
+    
+
+    // TEMP_join_rect_section_classes_test_section()
+
+
+}
+function TEMP_join_rect_section_classes_test_section() {
+
+    const pos = [0, 0, 0];
+    const tex_id = TEXTURES.MTSDF_CONSOLAS_1024
+    const fonst_size = 8
+
+    const root = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(BLUEL[5], 1)}));
+    root.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    root.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+    root.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+    root.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    root.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    root.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF;
+    root.SetName('root');
+    root.StylesSetPad([10,10])
+    
+    {
+        { // Test 1
+            const r1 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(YELLOWL[5], 1)}));
+            r1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            r1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+            r1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            // r1.align.flags = ALIGN_2.HORIZONTAL;
+            r1.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF;
+            // r1.align.flags = ALIGN_2.RESIZE_SELF;
+            r1.SetName('1')
+            r1.StylesSetPad([10,10])
+            root.AddItem(r1)
+            // { const label = Widget_ready_label(_, `B`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.HORIZONTAL; r1.AddItem(label); }
+            // { const label = Widget_ready_label(_, `B`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.VERTICAL; r1.AddItem(label); }
+            
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('1-1')
+                r1.AddItem(r2)
+            }
+    
+        }
+        { // Test 1
+            const r1 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(ORANGER[5], 1)}));
+            r1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            r1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+            r1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            // r1.align.flags = ALIGN_2.HORIZONTAL;
+            r1.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF;
+            // r1.align.flags = ALIGN_2.RESIZE_SELF;
+            r1.SetName('ORANGER')
+            r1.StylesSetPad([10,10])
+            root.AddItem(r1)
+            // { const label = Widget_ready_label(_, `B`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.HORIZONTAL; r1.AddItem(label); }
+            // { const label = Widget_ready_label(_, `B`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.VERTICAL; r1.AddItem(label); }
+            
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(GREY[3], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF;
+                r2.SetName('ORANGER-1')
+                r2.StylesSetPad([25,25])
+                r1.AddItem(r2)
+                { const label = Widget_ready_label(_, `B1`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.HORIZONTAL; r2.AddItem(label); }
+                { const label = Widget_ready_label(_, `B2`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.HORIZONTAL; r2.AddItem(label); }
+                { const label = Widget_ready_label(_, `B3`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.HORIZONTAL; r2.AddItem(label); }
+                { const label = Widget_ready_label(_, `B4`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.HORIZONTAL; r2.AddItem(label); }
+                { const label = Widget_ready_label(_, `B5`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.HORIZONTAL; r2.AddItem(label); }
+                // { const label = Widget_ready_label(_, `B`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= ALIGN_2.VERTICAL; r2.AddItem(label); }
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('ORANGER-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('ORANGER-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('ORANGER-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('ORANGER-1')
+                r1.AddItem(r2)
+            }
+    
+        }        { 
+            const r1 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(YELLOWL[5], 1)}));
+            r1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            r1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+            r1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            // r1.align.flags = ALIGN_2.HORIZONTAL;
+            r1.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF;
+            r1.SetName('2')
+            r1.StylesSetPad([10,10])
+            root.AddItem(r1)
+
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('1-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('3-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('3-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('3-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('3-1')
+                r1.AddItem(r2)
+            }
+        }
+        { 
+            const r1 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(YELLOWL[5], 1)}));
+            r1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            r1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+            r1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            // r1.align.flags = ALIGN_2.HORIZONTAL;
+            r1.align.flags = ALIGN_2.VERTICAL|ALIGN_2.RESIZE_SELF;
+            r1.SetName('3')
+            r1.StylesSetPad([10,10])
+            root.AddItem(r1)
+
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('3-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('3-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('3-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('3-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('3-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('4-2')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('4-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('3-2')
+                r1.AddItem(r2)
+            }
+        }
+        { 
+            const r1 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(GREEN[5], 1)}));
+            r1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            r1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+            r1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            // r1.align.flags = ALIGN_2.HORIZONTAL;
+            r1.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF;
+            r1.SetName('4')
+            r1.StylesSetPad([10,10])
+            root.AddItem(r1)
+
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('4-1')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('4-2')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('4-2')
+                r1.AddItem(r2)
+            }
+            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('4-1')
+                r1.AddItem(r2)
+            }            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.HORIZONTAL;
+                r2.SetName('4-1')
+                r1.AddItem(r2)
+            }            { 
+                const r2 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(PURPLE[5], 1)}));
+                r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+                r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+                r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+                r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                r2.align.flags = ALIGN_2.VERTICAL;
+                r2.SetName('4-1')
+                r1.AddItem(r2)
+            }
+        }
+        { 
+            const r1 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(ORANGE[5], 1)}));
+            r1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            r1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+            r1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            r1.align.flags = ALIGN_2.VERTICAL;
+            r1.SetName('4')
+            // r1.StylesSetPad([10,10])
+            root.AddItem(r1)
+        }
+        { // Test 1
+            const r1 = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:pos, dim:[20, 20], col:TRANSPARENCY(YELLOW[5], 1)}));
+            r1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+            r1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+            r1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+            r1.align.flags = ALIGN_2.HORIZONTAL;
+            r1.SetName('5')
+            root.AddItem(r1)
+        }
+    }
+
+    /********************************************************************************************************************************************************/
+    // Align
+    const ret = Align_pre_simple(root);
+    const pad_x = root.StylesGetPad(STYLES.AXIS.X);
+    const pad_y = root.StylesGetPad(STYLES.AXIS.Y);
+    root.geom.dim[0] = ret.dim_x + pad_x;
+    root.geom.dim[1] = ret.dim_y + pad_y;
+
+
+    root.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+
+    // root.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+    // root.Calc_no_gfx_update();
+
+    root.Render();
+
+    root.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root.gfx.vb.groupidx);
+
+    Root_group_activate_all_vbs_in_renderqueue(root.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(root)
+    Construct_listen_events_relations_from_mesh_tree(root);
+}
+// function TEMP_join_rect_section_classes_test_section() {
+
+//     const marg = [10, 10];
+
+//     const pos = [0, 0, 0];
+
+//     const root = Create_widget_section(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, options:SECTION.VERTICAL, pad:marg, pos:pos, dim:[0, 0], col:TRANSPARENCY(BLUEL[5], 1)}));
+//     root.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+//     root.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+//     root.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+//     root.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+//     root.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+//     root.SetName('root_blue');
+
+//     { // Test 1
+//         const s1 = Sections4(_, SECTION.HORIZONTAL, pos);
+//         s1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+//         root.AddItem(s1);
+//         const s2 = Sections4(_, SECTION.HORIZONTAL, pos);
+//         s2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+//         root.AddItem(s2);
+//     }
+
+
+//     root.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+
+//     root.options = SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+//     root.Calc_no_gfx_update();
+
+//     root.Render();
+
+//     root.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root.gfx.vb.groupidx);
+
+//     Root_group_activate_all_vbs_in_renderqueue(root.root_bufferidx);
+//     Construct_listen_events_from_mesh_tree(root)
+//     Construct_listen_events_relations_from_mesh_tree(root);
+// }
 
 
 
@@ -107,7 +569,7 @@ export function TestWidgetsGeneric() {
 
 
 
-
+    TEMP_join_rect_section_classes()
 
     // Demo_page();
     // Demos_welcome_menu();
@@ -130,7 +592,7 @@ export function TestWidgetsGeneric() {
     // Test Widgets
     { // widget plain text
         // CreateSimpleWidgetText()
-        CreateTextInSectionWithNewLine();
+        // CreateTextInSectionWithNewLine();
     }
 
     
@@ -1570,6 +2032,7 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0, enable_angle=false
     if(enable_angle) line.EnableGfx(MESH_ENABLE.GFX.ATTR_ANGLE);
 
     line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+    line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
     // line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);

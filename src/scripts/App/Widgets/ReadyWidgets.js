@@ -76,7 +76,7 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
 
 
 
-export function Widget_ready_label(is_root = 0x0, name = 'Label', font, x = 0, y = 0, font_size = 10, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, text_pad=[10, 6], color_text=WHITE) {
+export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id, x = 0, y = 0, font_size = 10, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, text_pad=[10, 6], color_text=WHITE) {
 
    // const pos = [x, y, 0];
 
@@ -96,7 +96,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', font, x = 0, y
       // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
       // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
       // texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
-      texture_id: font,
+      texture_id: texture_id,
       // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
       font_size:font_size,
       text_col:color_text,
