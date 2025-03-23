@@ -129,8 +129,8 @@ export function TestWidgetsGeneric() {
     /*************************************************************************************************************************/
     // Test Widgets
     { // widget plain text
-        CreateSimpleWidgetText()
-        // CreateTextInSectionWithNewLine();
+        // CreateSimpleWidgetText()
+        CreateTextInSectionWithNewLine();
     }
 
     
