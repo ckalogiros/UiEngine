@@ -777,8 +777,9 @@ export class Mesh {
                 this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
                 this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
                 if (params !== null) {
-                    if ((params[0] instanceof Float32Array) === false) alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
-                    if (this.mat.col[0] instanceof Float32Array) CopyMat4(this.mat.col, params);
+                    if ((params[0] instanceof Float32Array) === false) 
+                        alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
+                    if (this.mat.col[0] instanceof Float32Array) { CopyMat4(this.mat.col, params); CopyMat4(this.mat.defCol, params); }
                     else { this.mat.col = params; }
                 }
                 break;

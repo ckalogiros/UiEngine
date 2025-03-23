@@ -181,7 +181,7 @@ function Arkanoid_initialize_start_menu(x, y) {
 
    /*******************************************************************************************/
    // Load menu button
-   const start_menu_btn = Create_widget_label(_, 'Start', _, [0, 0, 1], 40, GREEN[7], WHITE, [16, 16], .5, _, TEXTURES.MSDF_COMIC_1024);
+   const start_menu_btn = Create_widget_label(_, 'Start', _, [0, 0, 1], 40, GREEN[7], WHITE, [16, 16], .5, _, TEXTURES.MTSDF_COMIC_1024);
    start_menu_btn.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
    start_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    start_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -253,14 +253,14 @@ function Arkanoid_initialize_game(x, y) {
    y = pad;
 
    // Score text
-   const score_text = Create_widget_label(_, 'score', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MSDF_COMIC_1024,);
+   const score_text = Create_widget_label(_, 'score', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
    score_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu.AddItem(score_text);
    _arkanoid_struct.score_text = score_text;
    score_text.text_mesh.mat.x
 
    x += score_text.text_mesh.text_width * 2 + pad;
-   const score_num_text = Create_widget_label(_, '000000000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MSDF_COMIC_1024,);
+   const score_num_text = Create_widget_label(_, '000000000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
    score_num_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu.AddItem(score_num_text)
    _arkanoid_struct.score_num_text = score_num_text;
@@ -268,13 +268,13 @@ function Arkanoid_initialize_game(x, y) {
    // Score modifier
    x = pad;
    y += score_text.text_mesh.geom.dim[1] * 2 + pad;
-   const score_mod_text = Create_widget_label(_, 'score mod', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MSDF_COMIC_1024,);
+   const score_mod_text = Create_widget_label(_, 'score mod', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
    score_mod_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu.AddItem(score_mod_text);
    _arkanoid_struct.score_mod_text = score_mod_text;
 
    x += score_mod_text.text_mesh.text_width * 2 + pad;
-   const score_mod_num_text = Create_widget_label(_, '00000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MSDF_COMIC_1024,);
+   const score_mod_num_text = Create_widget_label(_, '00000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
    score_mod_num_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu.AddItem(score_mod_num_text)
    _arkanoid_struct.score_mod_num_text = score_mod_num_text;
@@ -289,7 +289,7 @@ function Arkanoid_initialize_game(x, y) {
    _arkanoid_struct.coins_texture = coins_texture;
 
    x += coins_texture.geom.dim[0] * 2 + pad;
-   const coins_texture_text = Create_widget_label(_, 'x000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MSDF_COMIC_1024,);
+   const coins_texture_text = Create_widget_label(_, 'x000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
    coins_texture_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu.AddItem(coins_texture_text)
    _arkanoid_struct.coins_num_text = coins_texture_text;
@@ -299,13 +299,13 @@ function Arkanoid_initialize_game(x, y) {
    y += coins_texture.geom.dim[1] * 2 + pad;
    // x = coins_texture.geom.pos[0] + score_mod_num_text.text_mesh.text_width*2+pad;
    x = coins_texture.geom.pos[0];
-   const combo_text = Create_widget_label(_, 'combo', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MSDF_COMIC_1024,);
+   const combo_text = Create_widget_label(_, 'combo', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
    combo_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu.AddItem(combo_text);
    _arkanoid_struct.combo_text = combo_text;
 
    x += combo_text.text_mesh.text_width * 2 + pad;
-   const combo_num_text = Create_widget_label(_, 'x000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MSDF_COMIC_1024,);
+   const combo_num_text = Create_widget_label(_, 'x000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
    combo_num_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu.AddItem(combo_num_text)
    _arkanoid_struct.combo_num_text = combo_num_text;

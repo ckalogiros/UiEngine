@@ -8,6 +8,7 @@ import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Vi
 import { BLACK, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Get_fasma_color, GREEN, GREENL, GREY, ORANGEL, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_set_root_in_focus } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
+import { Style_button_default_properties, Style_label_default_properties, Style_section_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height } from "../../Engine/Loaders/Textures/TextureUvMap.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
@@ -529,7 +530,7 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
    let zpos = 10;
 
    // const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 0], dim, TRANSPARENCY(GREY[1], .9), 'section',);
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 0], dim, TRANSPARENCY(GREY[1], .9), 'section',);
+   const menu_panel = Create_widget_section(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'section',}));
    menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0] / 10);
    menu_panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -543,7 +544,7 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
 
 
    if(create_label!=='') {
-      const label = Create_widget_label(_, create_label, _, [0, 0, 1], _, GREENL[5]);
+      const label = Create_widget_label(Style_label_default_properties({text:create_label, pos:[0, 0, 1], col:GREENL[5]}));
       label.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 7);
       label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -607,14 +608,16 @@ function Create_menu_items_buttons() {
    // Menu Items
    const feather = 2;
    const rcorners = 15;
-   const font = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? TEXTURES.CONSOLAS_12px : TEXTURES.CONSOLAS_16px;
+   const font = TEXTURES.MTSDF_CONSOLAS_1024;
+   const font_size = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? 6 : 10;
    const text_col = WHITE;
    let btn_col = TRANSPARENCY(GREY[1], 1.);
 
    /*******************************************************************************************/
    // Button 1
    btn_col = GetSequencedColor(7);
-   const button1 = Create_widget_button(_, 'Mathematics      ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   // const button1 = Create_widget_button(_, 'Mathematics      ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button1 = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
    button1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Style_widget_default(button1, rcorners);
    menu_items_array.push(button1);
@@ -623,7 +626,8 @@ function Create_menu_items_buttons() {
    /*******************************************************************************************/
    // Button 2
    btn_col = GetSequencedColor(7);
-   const button2 = Create_widget_button(_, 'Astronomy        ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   // const button2 = Create_widget_button(_, 'Astronomy        ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button2 = Create_widget_button(Style_button_default_properties({text:'Mathematics        ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
    button2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Style_widget_default(button2, rcorners);
    menu_items_array.push(button2);
@@ -631,7 +635,8 @@ function Create_menu_items_buttons() {
    /*******************************************************************************************/
    // Button 3
    btn_col = GetSequencedColor(7);
-   const button3 = Create_widget_button(_, 'Molecular Biology', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   // const button3 = Create_widget_button(_, 'Molecular Biology', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button3 = Create_widget_button(Style_button_default_properties({text:'Molecular Biology', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
    Style_widget_default(button3, rcorners);
    button3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    menu_items_array.push(button3);
@@ -639,7 +644,8 @@ function Create_menu_items_buttons() {
    /*******************************************************************************************/
    // Button 4
    btn_col = GetSequencedColor(7);
-   const button4 = Create_widget_button(_, 'Chemistry        ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   // const button4 = Create_widget_button(_, 'Chemistry        ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button4 = Create_widget_button(Style_button_default_properties({text:'Chemistry        ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
    button4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Style_widget_default(button4, rcorners);
    menu_items_array.push(button4);
@@ -648,7 +654,8 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 5
       btn_col = GetSequencedColor(7);
-      const button5 = Create_widget_button(_, 'Neuroscience     ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+      // const button5 = Create_widget_button(_, 'Neuroscience     ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+      const button5 = Create_widget_button(Style_button_default_properties({text:'Neuroscience     ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
       Style_widget_default(button5, rcorners);
       button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       menu_items_array.push(button5);
@@ -657,7 +664,8 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 5
       btn_col = GetSequencedColor(7);
-      const button5 = Create_widget_button(_, 'Physics          ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+      // const button5 = Create_widget_button(_, 'Physics          ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+      const button5 = Create_widget_button(Style_button_default_properties({text:'Physics          ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
       Style_widget_default(button5, rcorners);
       button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       menu_items_array.push(button5);
@@ -666,7 +674,8 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 5
       btn_col = GetSequencedColor(7);
-      const button5 = Create_widget_button(_, 'Biochemistry     ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+      // const button5 = Create_widget_button(_, 'Biochemistry     ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+      const button5 = Create_widget_button(Style_button_default_properties({text:'Biochemistry     ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
       Style_widget_default(button5, rcorners);
       button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       menu_items_array.push(button5);
@@ -675,7 +684,8 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 5
       btn_col = GetSequencedColor(7);
-      const button5 = Create_widget_button(_, 'Genetics         ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+      // const button5 = Create_widget_button(_, 'Genetics         ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+      const button5 = Create_widget_button(Style_button_default_properties({text:'Genetics         ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
       Style_widget_default(button5, rcorners);
       button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       menu_items_array.push(button5);
@@ -1103,7 +1113,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
    /*************************************************************************************************/
    // Create controls
-   const controls_section = Create_widget_section(root_widget, SECTION.VERTICAL, [10, 10], [0, 0, 3], [0, 0], BLACK, 'Controls Section', [0, 10, 2],);
+   const controls_section = Create_widget_section(Style_section_default_properties({is_root:root_widget, options:SECTION.VERTICAL, pad:[10, 10], pos:[0, 0, 3], dim:[0, 0], col:BLACK, name:'Controls Section', style:[0, 10, 2],}));
    controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2;
    controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -1155,7 +1165,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Create animated meshes
 
    // Create panel
-   const section = Create_widget_section(root_widget, _, [20, 20], [0, 0, 0], _, GREY[2]);
+   const section = Create_widget_section(Style_section_default_properties({is_root:root_widget, pad:[20, 20], pos:[0, 0, 0], col:GREY[2]}));
    {
       section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -1165,23 +1175,27 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
       section.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT;
    }
 
+   // ISSUE: Somehow the text on update shifts to the rigth in x-axis, but the first characters ar aligned correctly
+
 
    // Create animated meshes
    const text_pad_x = 10, text_pad_y = 6;
-   const mesh2 = Create_widget_label(_, '-', _, [0, 0, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
+   // const mesh2 = Create_widget_label(_, '-', _, [0, 0, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
+   const mesh2 = Create_widget_label(Style_label_default_properties({text:'-', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
    {
-      mesh2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      mesh2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
       mesh2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(PURPLER[2], PURPLER[7]));
+      mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(PURPLER[9], PURPLER[0]));
       section.AddItem(mesh2)
    }
-   const mesh1 = Create_widget_label(_, '.', _, [0, 0, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
+   // const mesh1 = Create_widget_label(_, '.', _, [0, 0, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.MTSDF_COMIC_1024);
+   const mesh1 = Create_widget_label(Style_label_default_properties({text:'.', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
    {
-      mesh1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      mesh1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      mesh1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      mesh1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
       mesh1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      mesh1.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(PURPLEB[2], PURPLEB[9]));
+      mesh1.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(PURPLEB[9], PURPLEB[0]));
       section.AddItem(mesh1)
    }
 
@@ -1274,13 +1288,14 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
 
    /*****************************************************************************************/
    // Slider for controling the slope
+   const slider_rcorners = 7;
+   const bar_rcorners = 6;
    {
       const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
-      const slider_rcorners = 10;
 
-      const slider = Create_widget_slider(_, [0, 0, zpos + 1], slider_dim, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), _, 'Animation Slope');
+      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], dim:slider_dim, col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), name:'Animation Slope', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
+      slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners, bar_rcorners);
       slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       slider.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
       slider.SetInitialValue(slope_params_pointer.GetSlope());
@@ -1298,11 +1313,11 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    // Slider for controling the animation speed
    {
       const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
-      const slider_rcorners = 10;
 
-      const slider = Create_widget_slider(_, [0, 0, zpos + 1], slider_dim, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), _, 'Animation Speed');
+      // const slider = Create_widget_slider(_, [0, 0, zpos + 1], slider_dim, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), _, 'Animation Speed');
+      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], dim:slider_dim, col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), name:'Animation Speed', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
+      slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners, bar_rcorners);
       slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       slider.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]),);
       slider.SetInitialValue(slope_params_pointer.GetSlope());
@@ -1323,102 +1338,102 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    }
 
 
-   /*****************************************************************************************/
-   // Switch for changing the animation type
-   { // Translate switch animations switch
+   // /*****************************************************************************************/
+   // // Switch for changing the animation type
+   // { // Translate switch animations switch
 
-      const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, zpos + 1], [0, 0], COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), 'anim_type_panel');
-      panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      panel.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-      panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
-      contols_buffer.push(panel);
+   //    const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, zpos + 1], [0, 0], COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), 'anim_type_panel');
+   //    panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   //    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   //    panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   //    panel.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+   //    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
+   //    contols_buffer.push(panel);
 
-      // Create label
-      const label = Create_widget_label(_, 'Type: Translate X:Y', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, COLOR_GRADIENT_HORIZONTAL(GREEN[5], GREEN[2]), WHITE, [5, 5], _, _, _, _);
-      label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREEN[5], GREEN[2]));
-      panel.AddItem(label);
+   //    // Create label
+   //    const label = Create_widget_label(_, 'Type: Translate X:Y', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, COLOR_GRADIENT_HORIZONTAL(GREEN[5], GREEN[2]), WHITE, [5, 5], _, _, _, _);
+   //    label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   //    label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   //    label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   //    label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREEN[5], GREEN[2]));
+   //    panel.AddItem(label);
 
-      const type_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), _);
-      // type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2, 2);
-      type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, type_switch.geom.dim[1]);
-      type_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), COLOR_GRADIENT_VERTICAL(GREY[5], GREY[9]));
-      type_switch.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      type_switch.SetName('anim_type_switch');
-      panel.AddItem(type_switch);
+   //    const type_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), _);
+   //    // type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2, 2);
+   //    type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, type_switch.geom.dim[1]);
+   //    type_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   //    type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), COLOR_GRADIENT_VERTICAL(GREY[5], GREY[9]));
+   //    type_switch.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    type_switch.SetName('anim_type_switch');
+   //    panel.AddItem(type_switch);
 
-      type_switch.Bind(
-         (params) => {
+   //    type_switch.Bind(
+   //       (params) => {
 
-            const switch_mesh = params.target_mesh;
-            const isOn = switch_mesh.isOn;
+   //          const switch_mesh = params.target_mesh;
+   //          const isOn = switch_mesh.isOn;
 
-            if (isOn) {
-               animation_properties.anim_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_X
-            }
-            else {
+   //          if (isOn) {
+   //             animation_properties.anim_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_X
+   //          }
+   //          else {
 
-               animation_properties.anim_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_Y
-            }
-         },
-         null, _, _,
-      );
+   //             animation_properties.anim_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_Y
+   //          }
+   //       },
+   //       null, _, _,
+   //    );
 
-   }
-   { // Sqeeze switch animations switch
-      const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, zpos + 1], [0, 0], COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), 'anim_type_panel');
-      panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      panel.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-      panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
-      contols_buffer.push(panel);
+   // }
+   // { // Sqeeze switch animations switch
+   //    const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], [0, 0, zpos + 1], [0, 0], COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), 'anim_type_panel');
+   //    panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   //    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   //    panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   //    panel.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
+   //    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
+   //    contols_buffer.push(panel);
 
-      // Create label
-      const label = Create_widget_label(_, 'Type: Squeeze X:Y', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, COLOR_GRADIENT_HORIZONTAL(YELLOWR[6], YELLOWR[3]), WHITE, [5, 5], _, _, _, _);
-      label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(YELLOWR[6], YELLOWR[3]));
-      panel.AddItem(label);
+   //    // Create label
+   //    const label = Create_widget_label(_, 'Type: Squeeze X:Y', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], _, COLOR_GRADIENT_HORIZONTAL(YELLOWR[6], YELLOWR[3]), WHITE, [5, 5], _, _, _, _);
+   //    label.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    // label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   //    label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   //    label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   //    label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(YELLOWR[6], YELLOWR[3]));
+   //    panel.AddItem(label);
 
-      const type_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), _);
-      // type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2, 2);
-      type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, type_switch.geom.dim[1]);
-      type_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), COLOR_GRADIENT_VERTICAL(GREY[5], GREY[9]));
-      type_switch.color_active = COLOR_GRADIENT_HORIZONTAL(YELLOWR[6], YELLOWR[3]);
-      type_switch.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      type_switch.SetName('anim_type_switch');
-      panel.AddItem(type_switch);
+   //    const type_switch = Create_widget_switch_simple(_, [0, 0, 1], 18, COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), _);
+   //    // type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2, 2);
+   //    type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, type_switch.geom.dim[1]);
+   //    type_switch.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   //    type_switch.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREY[5], GREY[2]), COLOR_GRADIENT_VERTICAL(GREY[5], GREY[9]));
+   //    type_switch.color_active = COLOR_GRADIENT_HORIZONTAL(YELLOWR[6], YELLOWR[3]);
+   //    type_switch.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    type_switch.SetName('anim_type_switch');
+   //    panel.AddItem(type_switch);
 
-      type_switch.Bind(
-         (params) => {
+   //    type_switch.Bind(
+   //       (params) => {
 
-            const switch_mesh = params.target_mesh;
-            const isOn = switch_mesh.isOn;
+   //          const switch_mesh = params.target_mesh;
+   //          const isOn = switch_mesh.isOn;
 
-            if (isOn) {
-               animation_properties.anim_flag = CLBK_ANIMATIONS.TEXT_SQUEEZE_X
-            }
-            else {
+   //          if (isOn) {
+   //             animation_properties.anim_flag = CLBK_ANIMATIONS.TEXT_SQUEEZE_X
+   //          }
+   //          else {
 
-               animation_properties.anim_flag = CLBK_ANIMATIONS.TEXT_SQUEEZE_Y
-            }
-         },
-         null, _, _,
-      );
+   //             animation_properties.anim_flag = CLBK_ANIMATIONS.TEXT_SQUEEZE_Y
+   //          }
+   //       },
+   //       null, _, _,
+   //    );
 
-   }
+   // }
 
    return contols_buffer;
 }

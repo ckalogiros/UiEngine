@@ -12,20 +12,20 @@ import { Gl_texture_unit_create } from "../../../Graphics/GlTextureUnit.js";
 import { Str_buffer_store } from "../../Core/StringBuffer.js";
 import { ImageLoader } from "../ImageLoader.js";
 
-import { comic_sans_cz } from '../../../../../resources/fonts/comic_sans_ms/comicz.js';
-import { CONSOLAS_40Hpx } from '../../../../../resources/fonts/consolas_10/metrics/consolas_10.js';
-import { CONSOLAS_49Hpx } from '../../../../../resources/fonts/consolas_12/metrics/consolas_12.js';
-import { CONSOLAS_58Hpx } from '../../../../../resources/fonts/consolas_14/metrics/consolas_14.js';
-import { CONSOLAS_66Hpx } from '../../../../../resources/fonts/consolas_16/metrics/consolas_16.js';
-import { CONSOLAS_116Hpx } from '../../../../../resources/fonts/consolas_28/metrics/consolas_28.js';
-import { CONSOLAS_12Hpx } from '../../../../../resources/fonts/consolas_3/metrics/consolas_3.js';
-import { CONSOLAS_157Hpx } from '../../../../../resources/fonts/consolas_38/metrics/consolas_38.js';
-import { CONSOLAS_16Hpx } from '../../../../../resources/fonts/consolas_4/metrics/consolas_4.js';
-import { CONSOLAS_20Hpx } from '../../../../../resources/fonts/consolas_5/metrics/consolas_5.js';
-import { CONSOLAS_24Hpx } from '../../../../../resources/fonts/consolas_6/metrics/consolas_6.js';
-import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metrics/consolas_7.js';
-import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
-import { consola_msdf_test_1024_metrics } from '../../../../../resources/fonts/consolas_sdf/metrics/consola_msdf_test_1024_metrics.js';
+import { metrics_comicsanscz_mtsdf_1024 } from '../../../../../resources/fonts/comic_sans_ms/metrics/metrics_comicsanscz_mtsdf_1024.js';
+// import { CONSOLAS_40Hpx } from '../../../../../resources/fonts/consolas_10/metrics/consolas_10.js';
+// import { CONSOLAS_49Hpx } from '../../../../../resources/fonts/consolas_12/metrics/consolas_12.js';
+// import { CONSOLAS_58Hpx } from '../../../../../resources/fonts/consolas_14/metrics/consolas_14.js';
+// import { CONSOLAS_66Hpx } from '../../../../../resources/fonts/consolas_16/metrics/consolas_16.js';
+// import { CONSOLAS_116Hpx } from '../../../../../resources/fonts/consolas_28/metrics/consolas_28.js';
+// import { CONSOLAS_12Hpx } from '../../../../../resources/fonts/consolas_3/metrics/consolas_3.js';
+// import { CONSOLAS_157Hpx } from '../../../../../resources/fonts/consolas_38/metrics/consolas_38.js';
+// import { CONSOLAS_16Hpx } from '../../../../../resources/fonts/consolas_4/metrics/consolas_4.js';
+// import { CONSOLAS_20Hpx } from '../../../../../resources/fonts/consolas_5/metrics/consolas_5.js';
+// import { CONSOLAS_24Hpx } from '../../../../../resources/fonts/consolas_6/metrics/consolas_6.js';
+// import { CONSOLAS_28Hpx } from '../../../../../resources/fonts/consolas_7/metrics/consolas_7.js';
+// import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
+import { metrics_consolas_mtsdf_1024 } from '../../../../../resources/fonts/consolas_mtsdf/metrics/metrics_consolas_mtsdf_1024.js';
 import { Texture_metrics_create_uvmap, Uv_texture_init_buffers, Uvmaps_print } from "./TextureUvMap.js";
 import { test_arial_msdf } from "../../../../../resources/fonts/TEST/test_arial_msdf.js";
 import { symbols } from "../../../../../resources/fonts/symbols/metrics/symbols.js";
@@ -51,107 +51,107 @@ let _textureBufferCount = 0;
 /** */
 const TEXTURE_PATHS = [
 
+	// { // 0
+	// 	img_path: 'fonts/consolas_3',
+	// 	img_name: FONT_CONSOLAS_12px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 1
+	// 	img_path: 'fonts/consolas_4',
+	// 	img_name: FONT_CONSOLAS_16px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 2
+	// 	img_path: 'fonts/consolas_5',
+	// 	img_name: FONT_CONSOLAS_20px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 3
+	// 	img_path: 'fonts/consolas_6',
+	// 	img_name: FONT_CONSOLAS_24px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 4
+	// 	img_path: 'fonts/consolas_7',
+	// 	img_name: FONT_CONSOLAS_28px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 5
+	// 	img_path: 'fonts/consolas_8',
+	// 	img_name: FONT_CONSOLAS_32px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 6
+	// 	img_path: 'fonts/consolas_10',
+	// 	img_name: FONT_CONSOLAS_40px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 7
+	// 	img_path: 'fonts/consolas_12',
+	// 	img_name: FONT_CONSOLAS_49px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 8
+	// 	img_path: 'fonts/consolas_14',
+	// 	img_name: FONT_CONSOLAS_58px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 9
+	// 	img_path: 'fonts/consolas_16',
+	// 	img_name: FONT_CONSOLAS_66px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 10
+	// 	img_path: 'fonts/consolas_28',
+	// 	img_name: FONT_CONSOLAS_116px,
+	// 	img_type: 'bmp',
+		
+	// },
+	// { // 11
+	// 	img_path: 'fonts/consolas_38',
+	// 	img_name: FONT_CONSOLAS_157px,
+	// 	img_type: 'bmp',
+		
+	// },
 	{ // 0
-		img_path: 'fonts/consolas_3',
-		img_name: FONT_CONSOLAS_12px,
-		img_type: 'bmp',
+		img_path: 'fonts/consolas_mtsdf',
+		img_name: FONT_CONSOLAS_MTSDF_1024,
+		img_type: 'png',
 		
 	},
 	{ // 1
-		img_path: 'fonts/consolas_4',
-		img_name: FONT_CONSOLAS_16px,
-		img_type: 'bmp',
-		
-	},
-	{ // 2
-		img_path: 'fonts/consolas_5',
-		img_name: FONT_CONSOLAS_20px,
-		img_type: 'bmp',
-		
-	},
-	{ // 3
-		img_path: 'fonts/consolas_6',
-		img_name: FONT_CONSOLAS_24px,
-		img_type: 'bmp',
-		
-	},
-	{ // 4
-		img_path: 'fonts/consolas_7',
-		img_name: FONT_CONSOLAS_28px,
-		img_type: 'bmp',
-		
-	},
-	{ // 5
-		img_path: 'fonts/consolas_8',
-		img_name: FONT_CONSOLAS_32px,
-		img_type: 'bmp',
-		
-	},
-	{ // 6
-		img_path: 'fonts/consolas_10',
-		img_name: FONT_CONSOLAS_40px,
-		img_type: 'bmp',
-		
-	},
-	{ // 7
-		img_path: 'fonts/consolas_12',
-		img_name: FONT_CONSOLAS_49px,
-		img_type: 'bmp',
-		
-	},
-	{ // 8
-		img_path: 'fonts/consolas_14',
-		img_name: FONT_CONSOLAS_58px,
-		img_type: 'bmp',
-		
-	},
-	{ // 9
-		img_path: 'fonts/consolas_16',
-		img_name: FONT_CONSOLAS_66px,
-		img_type: 'bmp',
-		
-	},
-	{ // 10
-		img_path: 'fonts/consolas_28',
-		img_name: FONT_CONSOLAS_116px,
-		img_type: 'bmp',
-		
-	},
-	{ // 11
-		img_path: 'fonts/consolas_38',
-		img_name: FONT_CONSOLAS_157px,
-		img_type: 'bmp',
-		
-	},
-	{ // 12
-		img_path: 'fonts/consolas_sdf',
-		img_name: TEST_MTSDF_FONT_TEST_1024DIM,
-		img_type: 'png',
-		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-	},
-	{ // 13
 		img_path: 'fonts/comic_sans_ms',
 		img_name: FONT_MSDF_COMIC,
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
-	{ // 14
-		img_path: 'fonts/symbols',
-		img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
-		img_type: 'png',
-		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-	},
-	{ // 15
+	{ // 2
 		img_path: 'fonts/TEST',
 		img_name: TEST_FONT_MSDF_ARIAL,
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
-	/***************************************************************************************************/
-	// Atlas textures variant font sizes
-	{ // 16
+	{ // 3
 		img_path: 'fonts/atlas_variants/consola',
 		img_name: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA,
+		img_type: 'png',
+		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
+	},
+	/***************************************************************************************************/
+	// Atlas textures variant font sizes
+	{ // 4
+		img_path: 'fonts/symbols',
+		img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
@@ -218,23 +218,23 @@ class Texture {
 function Texture_pair_texture_to_metrics_file(img_name) {
 
 	switch(img_name) {
-		case FONT_CONSOLAS_12px: { return CONSOLAS_12Hpx; }	
-		case FONT_CONSOLAS_16px: { return CONSOLAS_16Hpx; }	
-		case FONT_CONSOLAS_20px: { return CONSOLAS_20Hpx; }	
-		case FONT_CONSOLAS_24px: { return CONSOLAS_24Hpx; }	
-		case FONT_CONSOLAS_28px: { return CONSOLAS_28Hpx; }	
-		case FONT_CONSOLAS_32px: { return CONSOLAS_32Hpx; }	
-		case FONT_CONSOLAS_40px: { return CONSOLAS_40Hpx; }	
-		case FONT_CONSOLAS_49px: { return CONSOLAS_49Hpx; }	
-		case FONT_CONSOLAS_58px: { return CONSOLAS_58Hpx; }	
-		case FONT_CONSOLAS_66px: { return CONSOLAS_66Hpx; }	
-		case FONT_CONSOLAS_116px: { return CONSOLAS_116Hpx; }	
-		case FONT_CONSOLAS_157px: { return CONSOLAS_157Hpx; }	
-		case TEST_MTSDF_FONT_TEST_1024DIM: { return consola_msdf_test_1024_metrics; }	
-		case FONT_MSDF_COMIC: { return comic_sans_cz; }	
+		// case FONT_CONSOLAS_12px: { return CONSOLAS_12Hpx; }	
+		// case FONT_CONSOLAS_16px: { return CONSOLAS_16Hpx; }	
+		// case FONT_CONSOLAS_20px: { return CONSOLAS_20Hpx; }	
+		// case FONT_CONSOLAS_24px: { return CONSOLAS_24Hpx; }	
+		// case FONT_CONSOLAS_28px: { return CONSOLAS_28Hpx; }	
+		// case FONT_CONSOLAS_32px: { return CONSOLAS_32Hpx; }	
+		// case FONT_CONSOLAS_40px: { return CONSOLAS_40Hpx; }	
+		// case FONT_CONSOLAS_49px: { return CONSOLAS_49Hpx; }	
+		// case FONT_CONSOLAS_58px: { return CONSOLAS_58Hpx; }	
+		// case FONT_CONSOLAS_66px: { return CONSOLAS_66Hpx; }	
+		// case FONT_CONSOLAS_116px: { return CONSOLAS_116Hpx; }	
+		// case FONT_CONSOLAS_157px: { return CONSOLAS_157Hpx; }	
+		case FONT_CONSOLAS_MTSDF_1024: { return metrics_consolas_mtsdf_1024; }	
+		case FONT_MSDF_COMIC: { return metrics_comicsanscz_mtsdf_1024; }	
 		case TEST_FONT_MSDF_ARIAL: { return test_arial_msdf; }	
-		case TEXTURE_ATLAS_MSDF_SYMBOLS: { return symbols; }	
 		case ATLAS_TEXTURE_VARIANT_FONT_CONSOLA: { return atlas_variants_consola_1024x1024_8px_scale12_extended_ascii; }	
+		case TEXTURE_ATLAS_MSDF_SYMBOLS: { return symbols; }	
 		default: console.error('01928374655637.  Texture_pair_texture_to_metrics_file() failed to find metrics for texture:', img_name)
 
 	}

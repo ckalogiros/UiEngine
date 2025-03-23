@@ -181,7 +181,7 @@ export function Demos_welcome_menu() {
    {
       const col = BLUEL[7];
       // const welcome = Create_widget_label(_, 'Welcome,', _, _, _, TRANSPARENT, WHITE, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
-      const welcome = Create_widget_label(_, 'Welcome', _, _, 50, TRANSPARENT, WHITE, [11, 0], _, _, TEXTURES.MSDF_CONSOLAS_1024);
+      const welcome = Create_widget_label(_, 'Welcome', _, _, 50, TRANSPARENT, WHITE, [11, 0], _, _, TEXTURES.MTSDF_CONSOLAS_1024);
       welcome.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       welcome.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       welcome.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 31);
@@ -198,9 +198,9 @@ It's a testament to my passion for graphics programming
 and my dedication to performance-driven design.
 Explore the demos and discover the possibilities!`;
       const col = GREY[7];
-      const welcome = Create_widget_label(_, text, _, _, 10, TRANSPARENCY(col, .1), WHITE, [11, 6], _, _, TEXTURES.MSDF_CONSOLAS_1024);
+      const welcome = Create_widget_label(_, text, _, _, 10, TRANSPARENCY(col, .1), WHITE, [11, 6], _, _, TEXTURES.MTSDF_CONSOLAS_1024);
       // const welcome = Create_widget_label(_, text, _, _, _, TRANSPARENCY(col, .1), WHITE, [11, 6], _, _, TEXTURES.CONSOLAS_20px);
-      // const welcome = Create_widget_label(_, text, _, _, 20, TRANSPARENCY(col, .9), WHITE, [11, 6], _, _, TEXTURES.MSDF_COMIC_1024);
+      // const welcome = Create_widget_label(_, text, _, _, 20, TRANSPARENCY(col, .9), WHITE, [11, 6], _, _, TEXTURES.MTSDF_COMIC_1024);
       welcome.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       welcome.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 3);
       welcome.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 12);
@@ -218,8 +218,8 @@ Explore the demos and discover the possibilities!`;
    /*******************************************************************************************/
    // Start Game button
    // const continue_btn = Create_widget_close_btn(_, menu_panel, 'Continue', [0, 0, zpos], 30, ORANGER[8], WHITE, [10, 10], _, _, TEXTURES.CONSOLAS_32px);
-   // const continue_btn = Create_widget_close_btn(_, menu_panel, 'Continue', [0, 0, zpos], 24, ORANGER[8], WHITE, [10, 10], _, _, TEXTURES.MSDF_COMIC_1024);
-   const continue_btn = Create_widget_close_btn(_, menu_panel, 'Continue', [0, 0, zpos], 24, ORANGER[8], WHITE, [10, 10], _, _, TEXTURES.MSDF_CONSOLAS_1024);
+   // const continue_btn = Create_widget_close_btn(_, menu_panel, 'Continue', [0, 0, zpos], 24, ORANGER[8], WHITE, [10, 10], _, _, TEXTURES.MTSDF_COMIC_1024);
+   const continue_btn = Create_widget_close_btn(_, menu_panel, 'Continue', [0, 0, zpos], 24, ORANGER[8], WHITE, [10, 10], _, _, TEXTURES.MTSDF_CONSOLAS_1024);
    continue_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    continue_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    continue_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -422,7 +422,7 @@ Explore the demos and discover the possibilities!`;
    else if (create_demo_id & (category_msdf_text.id)) { // Demo Particles - Ball tail particles 
 
 
-      // const msdf_text = Widget_msdf_text_with_scale_slider(_, 'The quick\nbrown fox\njumps over', TEXTURES.MSDF_COMIC_1024, 0, 550, 20, _, _, _, true);
+      // const msdf_text = Widget_msdf_text_with_scale_slider(_, 'The quick\nbrown fox\njumps over', TEXTURES.MTSDF_COMIC_1024, 0, 550, 20, _, _, _, true);
       Demo_widgets_msdf_text_rendering(10, total_height);
 
    }

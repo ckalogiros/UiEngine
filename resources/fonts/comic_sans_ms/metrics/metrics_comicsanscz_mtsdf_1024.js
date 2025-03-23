@@ -1,4 +1,4 @@
-export const comic_sans_cz = `
+export const metrics_comicsanscz_mtsdf_1024 = `
 {
    "atlas": {
       "type": "mtsdf",

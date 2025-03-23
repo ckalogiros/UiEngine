@@ -16,6 +16,7 @@ import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos } from "./ScrollerComponent.js";
 import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
+import { Style_section_default_properties } from "./WidgetReadyStyles.js";
 
 
 
@@ -98,30 +99,36 @@ export class Widget_Dropdown extends Section {
    dp_symbols; // Text symbols for denoting a dropdown's Expanded/contracted menu. // TODO: Add textured symbols OR create a font texture with symbols for dropdown expansion/contraction.
 
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col1 = GREY[3], col_menu = PURPLER[7], text_col = WHITE, 
-               btn_pad = [3, 3], bold = .6, font = TEXTURES.DEFAULT_FONT, fontsize, style = {rcorners:5, feather:2, border:2}, pad = [10, 10], is_debug_mesh) {
+   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col = GREY[3], menu_col = PURPLER[7], text_col = WHITE, 
+   //             btn_pad = [3, 3], bold = .6, font = TEXTURES.MTSDF_CONSOLAS_1024, font_size, style = {rcorners:5, feather:2, border:2}, pad = [10, 10], is_debug_mesh) {
+   constructor(mesh_bufferidx, properties) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, SECTION.VERTICAL, pad, pos, [10, 10], col1, _, style, _, _, _, is_debug_mesh);
+      super(mesh_bufferidx, properties.dp)
 
       // NOTE: The mesh_bufferidx and the root_bufferidx as the root creation, happen in the Section from super(). 
 
-      AddArr2(this.total_margin, pad);
-      this.StylesSetPad(pad);
+      AddArr2(this.total_margin, properties.dp.pad);
+      this.StylesSetPad(properties.dp.pad);
       this.isOn = DP_MENU_STATE.OFF;
       this.type |= MESH_TYPE.WIDGET_DROP_DOWN;
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
       this.rootidx = INT_NULL;
 
-      pos[2] += 1;
-      this.menu = Create_widget_section(_, SECTION.VERTICAL, pad, [0, 0, pos[2]], [1, 1], col_menu, _, _, _, _, is_debug_mesh);
+      properties.dp.pos[2] += 1;
+      // this.menu = Create_widget_section(_, SECTION.VERTICAL, properties.pad, [0, 0, properties.pos[2]], [1, 1], properties.menu_col, _, _, _, _, _, properties.is_debug_mesh,);
+      // this.menu = Create_widget_section(_, properties.menu.options, properties.menu.pad, [0, 0, properties.menu.pos[2]], [1, 1], properties.menu.col, _, _, _, _, _, properties.menu.is_debug_mesh,);
+      this.menu = Create_widget_section(Style_section_default_properties(properties.menu));
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
+      this.menu.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT|SECTION.TOP_DOWN;
       this.menu.parent = this;
       AddArr2(this.menu.total_margin, this.menu.StylesGetPad());
       AddArr2(this.menu.total_margin, this.StylesGetPad());
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
 
       this.dp_symbols = ['+', '-'];
-      const btn = Create_widget_button(_, `${this.dp_symbols[0]} ${text}`, (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, this.menu.geom.pos[2] + 1], fontsize, col_menu, text_col, btn_pad, bold, style, font, is_debug_mesh);
+      properties.btn.text = `${this.dp_symbols[0]} ${properties.btn.text}`;
+      const btn = Create_widget_button(properties.btn);
+
 
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
 
@@ -129,9 +136,9 @@ export class Widget_Dropdown extends Section {
 
       this.menu_active = false;
 
-      btn.SetName(`Dp_Btn[${btn.mesh_bufferidx}]{${text}}`);
-      this.menu.SetName(`Dp_Menu[${this.menu.mesh_bufferidx}]{${text}}`);
-      this.SetName(`Dropdown[${this.mesh_bufferidx}]{${text}}`);
+      btn.SetName(`Dp_Btn[${btn.mesh_bufferidx}]{${properties.btn.text}}`);
+      this.menu.SetName(`Dp_Menu[${this.menu.mesh_bufferidx}]{${properties.btn.text}}`);
+      this.SetName(`Dropdown[${this.mesh_bufferidx}]{${properties.btn.text}}`);
 
       btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
 
@@ -347,6 +354,16 @@ export class Widget_Dropdown extends Section {
       }
    }
 
+   EnableGfxOperations(function_operation, blend_mode) {
+
+      super.EnableGfxOperations(function_operation, blend_mode);
+      if(this.menu) this.menu.EnableGfxOperations(function_operation, blend_mode);
+            
+      if(this.children){
+         const btn = this.children.buffer[0];
+         if(btn) btn.EnableGfxOperations(function_operation, blend_mode);
+      }
+   }
 
    
    /*******************************************************************************************************************************************************/

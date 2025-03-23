@@ -11,6 +11,7 @@ import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/Views/MeshBufferViews.js";
 import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
 import { Mesh_create_style_from_values } from "../Operations/MeshHelperFunctions.js";
+import { Style_label_default_properties, Style_section_default_properties } from "./WidgetReadyStyles.js";
 
 
 
@@ -42,11 +43,13 @@ export class Widget_Menu_Bar extends Section {
    constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, dim, col = GREY[3], text_col = WHITE, text, pad = [14, 6], bold = .4, style = { rcorners: 5, feather: 2, border: 0 }, num_faces, is_debug_mesh) {
 
       
-      // const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, TRANSPARENCY(BLUEL[7], .9), text_col, pad, _, _, TEXTURES.MSDF_COMIC_1024, is_debug_mesh,);
-      // const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, TRANSPARENCY(BLUEL[7], .9), text_col, _, _, _, TEXTURES.MSDF_COMIC_1024, is_debug_mesh,);
-      const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, TRANSPARENCY(BLUEL[7], .0), text_col, [10,6], _, _, TEXTURES.MSDF_COMIC_1024, is_debug_mesh,);
+      // const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, TRANSPARENCY(BLUEL[7], .9), text_col, pad, _, _, TEXTURES.MTSDF_COMIC_1024, is_debug_mesh,);
+      // const label = Create_widget_label(_, text, _, [0, 0, pos[2]], _fontsize, TRANSPARENCY(BLUEL[7], .9), text_col, _, _, _, TEXTURES.MTSDF_COMIC_1024, is_debug_mesh,);
+      // const label = Create_widget_label( _, text, _, [0, 0, pos[2]], _fontsize, TRANSPARENCY(BLUEL[7], .0), text_col, [10,6], _, _, TEXTURES.MTSDF_COMIC_1024, is_debug_mesh,);
+      const label = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, pos[2]], font_size:_fontsize, col:TRANSPARENCY(BLUEL[7], .0), text_col:text_col, text_pad:[10,6], texture_id:TEXTURES.MTSDF_COMIC_1024, is_debug_mesh:is_debug_mesh,}));
       
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, pad, [0, 0, pos[2]], dim, col, _, style, num_faces, _, _, is_debug_mesh);
+      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, pad, [0, 0, pos[2]], dim, col, _, style, num_faces, _, _, is_debug_mesh);
+      super(mesh_bufferidx, Style_section_default_properties({ is_root:ROOT_WIDGET_FLAGS, pad:pad, pos:[0, 0, pos[2]], dim:dim, col:col, style:style, num_faces:num_faces, is_debug_mesh:is_debug_mesh}));
       
       
       menu_label_idx = this.AddItem(label);

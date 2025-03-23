@@ -615,7 +615,7 @@ function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step 
    const x = brick.mesh.geom.pos[0];
    const y = brick.mesh.geom.pos[1];
 
-   const score_mod_idx = Score_mod_create(1.2, 'x1.2', x + w, y + h, TEXTURES.MSDF_COMIC_1024, 5, _, YELLOW[9]);
+   const score_mod_idx = Score_mod_create(1.2, 'x1.2', x + w, y + h, TEXTURES.MTSDF_COMIC_1024, 5, _, YELLOW[9]);
    const score_mod = Score_mod_get_text_mesh_byidx(score_mod_idx);
 
    // Resolve the hit direction to move the brick
@@ -1063,7 +1063,7 @@ function Animation_powup_hit(x, y) {
    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
 
 
-   const text_mesh_idx = Score_mod_create(0.2, '+0.2', x, y, TEXTURES.MSDF_COMIC_1024, 5, _, PURPLE[9]);
+   const text_mesh_idx = Score_mod_create(0.2, '+0.2', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, PURPLE[9]);
    const label = Score_mod_get_text_mesh_byidx(text_mesh_idx);
 
 

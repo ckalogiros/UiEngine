@@ -155,6 +155,7 @@ export function Gl_set_rgba_per_vertex(gfxInfo, color, num_faces = 1) {
    if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
    let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[vbidx];
 
+   // console.log(color)
 
    let k = 0;
 

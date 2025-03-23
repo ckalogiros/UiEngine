@@ -21,7 +21,7 @@ export class Text_Mesh_Msdf extends Mesh {
    advancex; // The advancex is a ratio with which we calculate the correct width of any text
    last_charidx; // An index to the last char of each state of the current text.(dynamic text changes, so it is good to always have the last char).
 
-   constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, font = TEXTURES.MSDF_CONSOLAS_1024, bold = 4, variant_idx) {
+   constructor(text, pos = [0, 0, 0], fontsize = 8, color = WHITE, font = TEXTURES.MTSDF_CONSOLAS_1024, bold = 4, variant_idx) {
 
       const sdfouter = CalculateSdfOuterFromDim(fontsize);
       if (sdfouter + bold > 1) bold = 1 - sdfouter;

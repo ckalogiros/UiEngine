@@ -922,7 +922,7 @@ function Animate_snake(params) {
             pos[0] = last_digit_label.geom.pos[0] - (last_digit_label.geom.dim[0] * 2) - pad;
 
             const digit_label = Create_widget_label(_, '0', _, pos, score_size, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [7, 3], _, _, score_font);
-            // const digit_label = Create_widget_label(_, '0', _, pos, 24, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [7, 3], _, _, TEXTURES.MSDF_CONSOLAS_1024);
+            // const digit_label = Create_widget_label(_, '0', _, pos, 24, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [7, 3], _, _, TEXTURES.MTSDF_CONSOLAS_1024);
             digit_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
             digit_label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 12);
             digit_label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, digit_label.geom.dim[0]);

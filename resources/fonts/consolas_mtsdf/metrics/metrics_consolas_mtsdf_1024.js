@@ -1,4 +1,4 @@
-export const consola_msdf_test_1024_metrics = `
+export const metrics_consolas_mtsdf_1024 = `
 {
    "atlas": {
       "type": "mtsdf",

@@ -7,10 +7,8 @@ import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
-import { COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, GREEN, GREY } from "../Material/Base/Colors.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
-import { Mesh_create_style_from_values } from "../Operations/MeshHelperFunctions.js";
 
 
 /**
@@ -32,17 +30,20 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    color_active;
    pad; // int, not array for x-y pad
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = { rcorners: 15, feather: 2, border: 0 }, is_debug_mesh) {
+   // constructor(mesh_bufferidx, is_root, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = { rcorners: 15, feather: 2, border: 0 }, is_debug_mesh) {
+   constructor(mesh_bufferidx, properties) {
 
       const ratio = .2;
-      const pad = (_pad !== 0) ? _pad : size * ratio;
-      const switch_dim = [size * 2, size]
-      style.rcorners = size;
+      const pad = (properties.pad !== 0) ? properties.pad : properties.size * ratio;
+      // const pad = properties.size * ratio;
+      const switch_dim = [properties.size * 2, properties.size]
+      properties.style.rcorners = properties.size;
+      properties.dim = switch_dim;
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, pos, switch_dim, col, _, style, _pad, 1, is_debug_mesh)
+      super(mesh_bufferidx, properties)
 
       this.color_active = [0, 0, 0, 0];
-      CopyArr4(this.color_active, col2);
+      CopyArr4(this.color_active, properties.col);
 
 
       this.mesh_bufferidx = mesh_bufferidx;
@@ -53,24 +54,24 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.evt_params = null;
       this.pad = pad;
 
+      
+      const switch_pos = [pad, pad, properties.pos[2] + 1];
+      const switch0 = Create_rect_mesh({pos:switch_pos, dim:[properties.size - pad, properties.size - pad], col:properties.handle.col, hover_margin:properties.handle.hover_margin, is_debug_mesh:properties.is_debug_mesh});
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
-
-      const switch_pos = [pad, pad, pos[2] + 1];
-      const switch0 = Create_rect_mesh(_, switch_pos, [size - pad, size - pad], GREY[10], _, _, _, _, is_debug_mesh);
-      this.AddChild(switch0);
-      switch0.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, size * (1 - ratio));
+      switch0.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, properties.size * (1 - ratio));
       switch0.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      // switch0.SetStyle(Mesh_create_style_from_values(size * (1-ratio), style.feather, style.border));
       switch0.SetName('switch');
-      switch0.mat.style.rcorners = size - pad;
+
+      switch0.mat.style.rcorners = properties.size - pad;
       switch0.state.mask &= ~MESH_STATE.ACTIVE;
 
+      this.AddChild(switch0);
       this.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
 
-      if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT && this) {
+      if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT && this) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
          switch0.root_bufferidx = this.root_bufferidx;
       }
@@ -457,6 +458,31 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       };
    }
 
+
+
+
+   /*******************************************************************************************************************************************************/
+   // Alignment
+   /*******************************************************************************************************************************************************/
+
+   AlignNEW(pos_x, pos_y) {
+
+      const pad_x = this.StylesGetPad(STYLES.AXIS.X);
+      const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+      this.geom.pos[0] = pos_x + pad_x;
+      this.geom.pos[1] = pos_y + pad_y;
+
+      const switch_handle = this.children.buffer[0];
+      switch_handle.geom.pos[0] += pos_x + pad_x;
+      switch_handle.geom.pos[1] += pos_y + pad_y;
+
+      return {
+         dim_x: this.geom.dim[0] + pad_x / 2,
+         dim_y: this.geom.dim[1] + pad_y / 2,
+         pad_x: pad_x / 2,
+         pad_y: pad_y / 2,
+      };
+   }
 
 }
 

@@ -28,8 +28,6 @@ import { Msdf_ont_get_char_atlas_bounds_width, Msdf_ont_get_char_plane_bounds_he
 
 
 
-// export class Section extends Rect {
-// export class Section extends Rect_Mesh {
 export class Section extends Mesh {
 
    // options: BIT-FIELD. Stores some state for 'this'.
@@ -39,15 +37,13 @@ export class Section extends Mesh {
    // total_margin
 
 
-   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, options = (SECTION.VERTICAL), pad = [4, 4], pos = [200, 400, 0],
-   //    dim = [40, 40], col = TRANSPARENCY(BLUEL[6], .6), name = 'SECTION UNAMED', style = { rcorners: 4, feather: 2, border: 0 }, num_faces = 1, texture_id = INT_NULL, sub_texture_id = INT_NULL, is_debug_mesh) {
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, properties) {
-      // {options:options, pad:pad, pos:pos, dim:dim, col:col, name:name, style:style, num_faces:num_faces, texture_id:texture_id, sub_texture_id:sub_texture_id, is_debug_mesh:is_debug_mesh
+   constructor(mesh_bufferidx, properties) {
 
 
       const geom = new Geometry2D(properties.pos, properties.dim, _, properties.num_faces);
       // Create texture if the user has passed a texture id of type:TEXTURES.
-      const mat = (properties.texture_id === INT_NULL) ? new Material(properties.col) : (properties.sub_texture_id === INT_NULL) ? new Material_Texture(properties.col, properties.texture_id) : new Material_Atlas_Texture(properties.col, properties.texture_id, properties.sub_texture_id, _);
+      const mat = (properties.texture_id === undefined) ? new Material(properties.col) : 
+               (properties.sub_texture_id === undefined) ? new Material_Texture(properties.col, properties.texture_id) : new Material_Atlas_Texture(properties.col, properties.texture_id, properties.sub_texture_id, _);
 
       super(geom, mat);
 
@@ -60,7 +56,7 @@ export class Section extends Mesh {
       this.last_pos = [0, 0];
 
       // Create dimentions according to the sub-texture dimentions ratio
-      if(properties.sub_texture_id!==INT_NULL) {
+      if(properties.sub_texture_id !== undefined) {
          // TODO: Re-think the implementation
          const font_width = Msdf_ont_get_char_plane_bounds_width(this.mat.metrics_idx, properties.sub_texture_id);
          const font_height = Msdf_ont_get_char_plane_bounds_height(this.mat.metrics_idx, properties.sub_texture_id);
@@ -85,7 +81,7 @@ export class Section extends Mesh {
       this.SetStyle(properties.style);
 
 
-      if (ROOT_WIDGET_FLAGS & ROOT_WIDGETS.CREATE_ROOT) {
+      if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
       }
    }

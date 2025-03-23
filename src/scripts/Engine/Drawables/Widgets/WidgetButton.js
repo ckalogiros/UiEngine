@@ -3,6 +3,7 @@
 import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
 import { GREY, WHITE } from '../Material/Base/Colors.js';
 import { Widget_Label } from './WidgetLabel.js';
+import { Style_button_default_properties } from './WidgetReadyStyles.js';
 
 
 
@@ -12,7 +13,7 @@ import { Widget_Label } from './WidgetLabel.js';
 
 export class Widget_Button extends Widget_Label {
 
-   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, Align, pos, fontsize, col, text_col, pad = [20, 15], bold = .4, style = {rcorners:6, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
+   // constructor(mesh_bufferidx, is_root, text, Align, pos, fontsize, col, text_col, pad = [20, 15], bold = .4, style = {rcorners:6, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
    constructor(mesh_bufferidx, properties) {
 
       super(mesh_bufferidx, properties);
@@ -154,16 +155,16 @@ export class Widget_Button extends Widget_Label {
 /** DO NOT DELETE - WIDGET SWITCH - With text on/off */
 export class Widget_Switch extends Widget_Button {
 
-   // isOn;
-   // state_text;
-   // evt_params;
+   constructor(mesh_bufferidx, properties) {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_on, text_off, pos, fontsize = 5, col = GREY[1], text_col = WHITE, pad = [fontsize, fontsize], bold, style = {rcorners:6, feather:2, border:3}, font, is_debug_mesh) {
+      const max_text = properties.text_on.length > properties.text_off.length ? properties.text_on : properties.text_off;
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text_off, _, pos, fontsize, col, text_col, pad, bold, style, font, is_debug_mesh)
+      super(mesh_bufferidx, Style_button_default_properties({is_root:properties.is_root, text:max_text, align:properties.align, pos:properties.pos, col:properties.col, text_col:properties.text_col, text_pad:properties.text_pad, font_size:properties.font_size,  texture_id:properties.txture_id}))
+
+      this.text_mesh.ReplaceText(properties.text_on);
 
       this.isOn = 0x0;
-      this.state_text = [text_off, text_on];
+      this.state_text = [properties.text_off, properties.text_on];
       this.evt_params = null;
 
       this.type |= MESH_TYPE.WIDGET_BUTTON;

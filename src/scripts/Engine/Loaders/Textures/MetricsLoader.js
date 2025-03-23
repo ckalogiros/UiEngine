@@ -9,7 +9,7 @@ import { Abs, Max, Min } from "../../../Helpers/Math/MathOperations.js";
 // Load metrics from Chlumsky MSDF generator
 
 /** Load metrics from atlas variants font sizes texture */
-export function Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_file, variant_idx, is_sdf_type = false) {
+export function Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_file, variant_idx, is_texture_font_type) {
 
    /**
     * Use the variant_idx as an index to choose the font variant element which is stored int a variants array in the metrics_file.
@@ -57,9 +57,8 @@ export function Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_
    let normalizedU = 1.0 / texture_width;	   // Normalize texture coords to 0-1 values.
    let normalizedV = 1.0 / texture_height;   // Normalize texture coords to 0-1 values.
 
-   // If the texture is a font texture, leave [0] element for the ' ' space character, else start inserting sub-texture coordinates from [0]
-   // const start_idx = (sub_tex_idx !== INT_NULL) ? 0 : 1;
-   const start_idx = 1;
+   // If the texture is a font texture, leave [0] element for the ' ' space character, else start inserting sub-texture coordinates from [0] element
+   const start_idx = is_texture_font_type ? 1 : 0;
 
    for (let i = start_idx; i < glyphs.length; i++) {
 
@@ -128,7 +127,7 @@ export function Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_
    }
 }
 /** Load metrics from atlas font texture */
-export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, is_sdf_type = false) {
+export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, is_texture_font_type) {
 
    const obj = JSON.parse(metrics_file);
    const atlas = obj.atlas;
@@ -171,9 +170,8 @@ export function Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, is_sdf_t
    let normalizedU = 1.0 / texture_width;	   // Normalize texture coords to 0-1 values.
    let normalizedV = 1.0 / texture_height;   // Normalize texture coords to 0-1 values.
 
-   // If the texture is a font texture, leave [0] element for the ' ' space character, else start inserting sub-texture coordinates from [0]
-   // const start_idx = (sub_tex_idx !== INT_NULL) ? 0 : 1;
-   const start_idx = 1;
+   // If the texture is a font texture, leave [0] element for the ' ' space character, else start inserting sub-texture coordinates from [0] element
+   const start_idx = is_texture_font_type ? 1 : 0;
 
    for (let i = start_idx; i < glyphs.length; i++) {
 

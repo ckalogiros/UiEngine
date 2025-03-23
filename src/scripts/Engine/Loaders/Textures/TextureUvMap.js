@@ -37,12 +37,12 @@ export function Texture_metrics_create_uvmap(texture_file_id, variant_idx, sub_t
    
    
    if(FONT_IS_VARIANT(texture_file_id)) {
-      const msdf_metrics = Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_file, variant_idx, FONT_IS_MSDF(texture_file_id));
+      const msdf_metrics = Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics(metrics_file, variant_idx, TEXTURE_IS_FONT(texture_file_id));
       _metrics_buffer[metrics_idx] = msdf_metrics;
       _uvmap_buffer[metrics_idx] =  msdf_metrics.uvmap
    }
    else if(FONT_IS_MSDF(texture_file_id)) {
-      const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, FONT_IS_MSDF(texture_file_id));
+      const msdf_metrics = Metrics_loader_load_chlumsky_msdf_metrics(metrics_file, TEXTURE_IS_FONT(texture_file_id));
       _metrics_buffer[metrics_idx] = msdf_metrics;
       _uvmap_buffer[metrics_idx] =  msdf_metrics.uvmap
    }

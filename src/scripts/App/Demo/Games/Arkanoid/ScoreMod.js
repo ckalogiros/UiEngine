@@ -11,7 +11,7 @@ import { Arkanoid_score_calc } from "./Arkanoid.js";
 
 
 const SCORE_TEXT_MOD_INITIAL_FONT_SIZE = 5;
-const SCORE_TEXT_MOD_FONT = TEXTURES.MSDF_COMIC_1024;
+const SCORE_TEXT_MOD_FONT = TEXTURES.MTSDF_COMIC_1024;
 const SCORE_TEXT_MOD_TEXT_COLOR = YELLOWR[9];
 const PRE_INITIALIZED_SCORE_MOD_TEXT_MESHES = 32;
 
@@ -46,7 +46,7 @@ export function Arkanoid_scoremod_destroy() {
 /** */
 class Score_Mod {
 
-   constructor(score_mod_num, text, x = 0, y = 0, font = TEXTURES.MSDF_COMIC_1024, font_size = 6, color, text_color, vb_groupidxs = INT_NULL) {
+   constructor(score_mod_num, text, x = 0, y = 0, font = TEXTURES.MTSDF_COMIC_1024, font_size = 6, color, text_color, vb_groupidxs = INT_NULL) {
 
       const mesh = Create_widget_label(_, text, _, [0, 0, 4], font_size, TRANSPARENT, text_color, [0, 0], .5, _, font,);
       mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);

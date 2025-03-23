@@ -127,7 +127,7 @@ class Coin {
       const x = this.glow_mesh.mesh.geom.pos[0] + this.glow_mesh.mesh.geom.dim[0];
       const y = this.glow_mesh.mesh.geom.pos[1] + this.glow_mesh.mesh.geom.dim[1];
 
-      const text_mesh_idx = Score_mod_create(0.5, '+0.5', x, y, TEXTURES.MSDF_COMIC_1024, 5, _, color);
+      const text_mesh_idx = Score_mod_create(0.5, '+0.5', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, color);
       const score_mod = Score_mod_get_text_mesh_byidx(text_mesh_idx);
       this.score_mod = score_mod;
       return score_mod;

@@ -8,7 +8,6 @@ import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Mesh_unif_is_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
-import { BLUEL } from "../Material/Base/Colors.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 
 
@@ -262,7 +261,7 @@ export class Rect extends Mesh {
 // TODO: IMPLEMENT
 export class Rect_Mesh extends Rect {
 
-   constructor(mesh_bufferidx, is_root=0x0, properties) {
+   constructor(mesh_bufferidx, properties) {
       // pos = [0, 0, 0], dim = [10, 10],
       // col = TRANSPARENCY(BLUEL[6], .6), name = 'Rect_Mesh UNNAMED',
       // style = {rcorners:10, feather:2, border:0}, pad = [4, 4], num_faces = 1, is_debug_mesh) {
@@ -278,7 +277,7 @@ export class Rect_Mesh extends Rect {
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
-      if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
+      if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
       }
    }
@@ -428,6 +427,27 @@ export class Rect_Mesh extends Rect {
       super.AddToGfxFromReset();
    }
 
+
+
+
+   /*******************************************************************************************************************************************************/
+   // Alignment
+   /*******************************************************************************************************************************************************/
+
+   AlignNEW(pos_x, pos_y) {
+
+      const pad_x = this.StylesGetPad(STYLES.AXIS.X);
+      const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+      this.geom.pos[0] = pos_x + pad_x;
+      this.geom.pos[1] = pos_y + pad_y;
+
+      return {
+         dim_x: this.geom.dim[0] + pad_x / 2,
+         dim_y: this.geom.dim[1] + pad_y / 2,
+         pad_x: pad_x / 2,
+         pad_y: pad_y / 2,
+      };
+   }
 
 
 

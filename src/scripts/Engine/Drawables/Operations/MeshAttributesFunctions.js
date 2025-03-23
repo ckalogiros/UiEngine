@@ -75,8 +75,7 @@ export function Set_color_rgb(mesh, col) {
 
 export function Set_hover_color_rgba(mesh) {
 
-   // this.SetUpdateFrameBuffer();
-   const intensity = 1.4;
+   const intensity = 1.1;
    const mesh_unif_buffer = mesh.uniforms;
    
    

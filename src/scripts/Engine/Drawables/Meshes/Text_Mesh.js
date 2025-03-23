@@ -383,6 +383,21 @@ export class Text_Mesh extends Mesh {
    }
 
 
+   /** Replace existing text with another text of  equal size or smaller, assuming the text mesh have already registered to the gfx buffers */
+   ReplaceText(str) {
+
+      if(str.length > this.mat.char_buffer.size) alert('8871698876543. Cannot Replace text with a text larger than the original one.')
+
+      this.mat.char_buffer.Reset();
+
+      for (let i = 0; i < this.mat.char_buffer.size; i++) {
+
+         if(str[i] !== undefined) this.mat.char_buffer.Add(str[i]);
+         else this.mat.char_buffer.Add(' ');
+      }
+   }
+
+
    /** Pass array[] of { strings or arrays } */
    SetTextConcat(str_array) {
 

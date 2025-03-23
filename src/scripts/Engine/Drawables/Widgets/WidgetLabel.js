@@ -18,10 +18,8 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } f
 
 
 
-// export class Widget_Label extends Rect {
 export class Widget_Label extends Rect_Mesh {
 
-    // constructor(mesh_bufferidx, is_root, properties.text = 'null', Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), properties.pos = [0, 0, 0], properties.font_size = 10, col = GREY[1], text_col = WHITE, pad = [10, 5], bold = .4, style = { rcorners: 4, feather: 2, border: 0 }, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
     constructor(mesh_bufferidx, properties) {
 
         // HACK: 
@@ -31,11 +29,11 @@ export class Widget_Label extends Rect_Mesh {
 
         // const sdfouter = CalculateSdfOuterFromDim(properties.font_size);
         // if (sdfouter + bold > 1) bold = 1 - sdfouter;
-        properties.pos[2] += 1; // Text in front of the label's area.
+        // properties.pos[2] += 1; // Text in front of the label's area.
 
         const text = properties.text;
 
-        const text_mesh = Create_text_mesh(text, [0, 0, properties.pos[2]], properties.font_size, properties.text_col, _, properties.texture_id, properties.sub_texture_id, properties.is_debug_mesh, properties.variant_idx, properties.text_pad, );
+        const text_mesh = Create_text_mesh(text, [0, 0, properties.pos[2]+1], properties.font_size, properties.text_col, _, properties.texture_id, properties.sub_texture_id, properties.is_debug_mesh, properties.variant_idx, properties.text_pad, );
 
         text_mesh.StylesSetPad(properties.text_pad);
 
@@ -43,11 +41,11 @@ export class Widget_Label extends Rect_Mesh {
         text_mesh.geom.pos[0] += properties.text_pad[0];
         text_mesh.geom.pos[1] += properties.text_pad[1];
 
-        properties.pos[2] -= 1; // Set z for area 'behind' this.text_mesh
+        // properties.pos[2] -= 1; // Set z for area 'behind' this.text_mesh
 
 
         
-        super(mesh_bufferidx, properties.is_root, properties);
+        super(mesh_bufferidx, properties);
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
         this.SetStyle(properties.style)
         this.SetName(properties.text)

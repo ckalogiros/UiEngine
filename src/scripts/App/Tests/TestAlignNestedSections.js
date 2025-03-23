@@ -311,8 +311,8 @@ export function Align_pre_simple(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
             }
             else if (next_mesh.align.flags & ALIGN_2.VERTICAL) {
                cur_pos_y += ret.dim_y * 2;
-               // cur_pos_x = mesh.geom.pos[0] + pad_x;
-               cur_pos_x = pad_x;
+               cur_pos_x = mesh.geom.pos[0] + pad_x;
+               // cur_pos_x = pad_x;
                // cur_pos_x = 0;
             }
          }

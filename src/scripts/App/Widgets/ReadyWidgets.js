@@ -5,6 +5,7 @@ import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREY, WHITE } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
+import { Style_slider_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Gl_set_attr_round_corners, Gl_set_dim_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Linear_interpolation } from "../../Helpers/Math/MathFunctions.js";
@@ -20,28 +21,38 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
 
    const pos = [x, y, 0];
    // const slider = Create_widget_slider(is_root, pos, [size, 10], _, _, name);
-   const slider = Create_widget_slider({
+   const slider = Create_widget_slider(Style_slider_default_properties({
       is_root:ROOT_WIDGETS.CREATE_ROOT, 
       pos:pos, 
       dim:[120, 15], 
-      col:GREY[4], 
-      hover_margin:[10, 10],
-      outer_pad:4,
-      name:'Slider Test',
-      // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
-      texture_id: TEXTURES.MSDF_CONSOLAS_1024,
-      font_size: 0,
-      variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
+      col:GREY[3], 
+      name:'SliderText', 
+      name_text:'SSS', 
+      texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+      font_size:8, 
+   }));
+   // const slider = Create_widget_slider({
+   //    is_root:ROOT_WIDGETS.CREATE_ROOT, 
+   //    pos:pos, 
+   //    dim:[120, 15], 
+   //    col:GREY[4], 
+   //    hover_margin:[10, 10],
+   //    outer_pad:4,
+   //    name:'Slider Test',
+   //    // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
+   //    texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
+   //    font_size: 0,
+   //    variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
 
-      slider_bar: {
-         // col:BLUEL[7],
-         col:GREY[8],
-      },
-      slider_handle: {
-         // col:GREY[8],
-         col:BLUEL[9],
-      },
-   });
+   //    slider_bar: {
+   //       // col:BLUEL[7],
+   //       col:GREY[8],
+   //    },
+   //    slider_handle: {
+   //       // col:GREY[8],
+   //       col:BLUEL[9],
+   //    },
+   // });
    slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -72,7 +83,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', font, x = 0, y
    /********************************************************************************************************************************************************/
    // Create
    // const label = Create_widget_label(is_root, name, _, pos, font_size, color, color_text, inner_pad, .5, _, font,);
-   // const label = Create_widget_label(is_root, name, _, pos, font_size, color, color_text, inner_pad, .5, _, TEXTURES.MSDF_CONSOLAS_1024, _, );
+   // const label = Create_widget_label(is_root, name, _, pos, font_size, color, color_text, inner_pad, .5, _, TEXTURES.MTSDF_CONSOLAS_1024, _, );
    // const label = Create_widget_label(is_root, name, _, pos, font_size, color, color_text, inner_pad, .5, _, TEXTURES.CONSOLA_VARIANT_FONT, _, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0);
 
    // _, `1`, _, 0, 0, 14, TRANSPARENCY(BLUEL[6], .7), _, _
@@ -84,7 +95,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', font, x = 0, y
       text:name,
       // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
       // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
-      // texture_id: TEXTURES.MSDF_CONSOLAS_1024,
+      // texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
       texture_id: font,
       // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
       font_size:font_size,

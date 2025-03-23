@@ -1,13 +1,11 @@
 "use strict";
 
-import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
 import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
-import { Root_group_view_buffer_add_mesh } from "../../Core/Views/RootView.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx, Time_intervals_get_byidx } from "../../Timers/TimeIntervals.js";
-import { WHITE } from "../Material/Base/Colors.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
 import { Align_self_get_dif } from "../Operations/Alignment.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
@@ -23,8 +21,6 @@ import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
  */
 export class Widget_Text extends Text_Mesh {
 
-	// pad;
-
 	constructor(properties) {
 		// { pos: pos, fontsize: fontsize, col: col, text: text, font: font, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
 
@@ -32,6 +28,10 @@ export class Widget_Text extends Text_Mesh {
 		this.type |= MESH_TYPE.WIDGET_TEXT;
 
 		this.StylesSetPad(properties.pad);
+
+		if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
+			this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
+		}
 	}
 
 
@@ -301,18 +301,13 @@ export class Widget_Multi_Text extends Widget_Text {
 	alignment = 0x0;
 
 	/** Set the max number of characters for the dynamic text, by passing any text as 'dynamic_text' of length= dynamic text number of characters*/
-	// constructor(ROOT_WIDGET_FLAGS, text, ALIGNMENT = ALIGN.HORIZONTAL, pos, fontSize, text_col, bold, pad, font, is_debug_mesh) {
-	constructor(ROOT_WIDGET_FLAGS, properties) {
+	constructor(properties) {
 
-		// super(ROOT_WIDGET_FLAGS, text, pos, fontSize, text_col, bold, pad, font, is_debug_mesh);
 		super(properties);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
-		// Default alignment for all children text meshes
-		// this.alignment = ALIGN.VERTICAL;
-		this.alignment = properties.Align;
+		this.alignment = properties.align;
 		this.TEMPORARY_variant_idx = properties.variant_idx;
-		// this.Align_pre(this, this.alignment)
 
 	}
 
@@ -633,7 +628,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	// TODO: Implement align self correctly
 	// TODO: Is there a way to align differently for each text mesh????
 
-	CreateNewText(dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=ALIGN_2.HORIZONTAL) {
+	CreateNewText(dynamic_text, font_size, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=ALIGN_2.HORIZONTAL) {
 
 		/** DEBUG ERROR*/ if (!Array.isArray(pad)) console.error('Pad is not of type array');
 
@@ -650,7 +645,19 @@ export class Widget_Multi_Text extends Widget_Text {
 		}
 		else prev_text_mesh = this;
 
-		const new_text = Create_widget_text(_, dynamic_text, pos, fontSize, text_col2, bold, this.mat.texture_file_id, _, this.TEMPORARY_variant_idx, _, pad);
+		// const new_text = Create_widget_text(_, dynamic_text, pos, font_size, text_col2, bold, this.mat.texture_file_id, _, this.TEMPORARY_variant_idx, _, pad);
+		const new_text = Create_widget_text({
+			is_root:0x0,
+			text:dynamic_text, 
+			pos:pos, 
+			font_size:font_size, 
+			col:text_col2, 
+			bold:bold, 
+			texture_id:this.mat.texture_file_id, 
+			variant_idx:this.TEMPORARY_variant_idx,
+			pad:pad,
+			is_debug_mesh:false,
+		});
 		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 		new_text.align.flags = align_NEW;
 		// new_text.StylesSetPad(pad);
