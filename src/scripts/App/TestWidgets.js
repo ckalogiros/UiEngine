@@ -129,8 +129,8 @@ export function TestWidgetsGeneric() {
     /*************************************************************************************************************************/
     // Test Widgets
     { // widget plain text
-        // CreateSimpleWidgetText()
-        CreateTextInSectionWithNewLine();
+        CreateSimpleWidgetText()
+        // CreateTextInSectionWithNewLine();
     }
 
     
@@ -140,7 +140,7 @@ export function TestWidgetsGeneric() {
             // Demo_widgets_msdf_text_rendering(10, 100);
         }
         
-        CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,18);
+        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,18);
         // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_COMIC_1024, _, 300, 700,_,_,_,18);
         // CreateLabel(_, '| Initializing Graphics.', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0, 300, 50,_,_,_,75,);
         // CreateLabel(_, 'Widget_Label\n12345\nppao918827', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 50,_,_,_);
@@ -171,7 +171,7 @@ export function TestWidgetsGeneric() {
     { // Widget: Slider-switch
 
         // CreateSliderSimple();
-        CreateSlider(_, 400, 100);
+        // CreateSlider(_, 400, 100);
 
         // CreateSwitchSimple([0, ypos, 0]);
         // const switch1 = CreateSwitch();

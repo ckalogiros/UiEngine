@@ -63,14 +63,16 @@ export function Create_rect_mesh(properties) {
 }
 
 
-
-export function Create_text_mesh(text, pos, font_size, col,bold, texture_id, sub_texture_id, is_debug_mesh = 0x0, variant_idx,  pad, ) {
+/**
+ * This function calculates the area of a rectangle.
+ * @param {*} properties { pos, dim, col, pad, text, font_size, texture_id, sub_texture_id, variant_idx, is_debug_mesh, }
+ * @see {@link Text_Mesh}
+ */
+export function Create_text_mesh(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh(
-      { pos: pos, font_size: font_size, col: col, text: text, pad:pad, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
-   ));
+   const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh(properties));
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;

@@ -28,14 +28,13 @@ export class Text_Mesh extends Mesh {
    text_width; // An extra var to store the width of the properties.text(for efficiency reasons).
    text_height; // An extra var to store the height including any new lines.
 
-   
+   /**
+    * @param {*} properties { pos, dim, col, pad, text, font_size, texture_id, sub_texture_id, variant_idx, is_debug_mesh, } 
+    */
    constructor(properties) {
-      // properties: { pos: pos, font_size: font_size, col: col, text: text, font: font, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
 
       const sdfouter = CalculateSdfOuterFromDim(properties.font_size);
       if (sdfouter + properties.bold > 1) properties.bold = 1 - sdfouter;
-      
-      
       
       const mat = new Material_Font(properties.col, properties.texture_id, properties.text, [properties.bold, sdfouter], properties.variant_idx)
       const size = (FONT_IS_MSDF(properties.texture_id)) ? properties.font_size : mat.pixel_size;
@@ -50,16 +49,11 @@ export class Text_Mesh extends Mesh {
       this.type |= MESH_TYPE.TEXT_MESH | properties.is_debug_mesh;
       this.properties.font_size = properties.font_size;
 
-      // const advancex = Texture_metrics_get_face_advancex(mat.metrics_idx)/2;
-      //  this.advancex = advancex;
-      
       this.text_width = 0;
       this.text_height = 0;
       const ret = Texture_metrics_get_calc_dim_from_string(this.mat.metrics_idx, this.mat.text);
       this.text_width = (this.text_width < ret.width * this.geom.font_size) ? ret.width * this.geom.font_size : this.text_width;
       this.text_height = ret.height * this.geom.font_size;
-      // this.CalculateTextWidth();
-      // this.text_height = Texture_metrics_get_line_height(mat.metrics_idx);
 
    }
 

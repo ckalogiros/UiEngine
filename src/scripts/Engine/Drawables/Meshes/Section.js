@@ -62,10 +62,6 @@ export class Section extends Mesh {
          const font_height = Msdf_ont_get_char_plane_bounds_height(this.mat.metrics_idx, properties.sub_texture_id);
          this.geom.dim[0] = font_width*properties.dim[0];
          this.geom.dim[1] = font_height*properties.dim[0];
-         // this.geom.dim[1] *= font_height/font_width;
-         // this.geom.dim[0] *= font_width/font_height;
-         // this.geom.dim[1] *= Max(font_width, font_height) / Min(font_width,font_height);
-         // this.geom.dim[1] = (this.geom.dim[0] / font_width ) * this.geom.dim[1];
       }
 
 

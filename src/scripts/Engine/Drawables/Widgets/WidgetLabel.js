@@ -29,20 +29,16 @@ export class Widget_Label extends Rect_Mesh {
 
         // const sdfouter = CalculateSdfOuterFromDim(properties.font_size);
         // if (sdfouter + bold > 1) bold = 1 - sdfouter;
-        // properties.pos[2] += 1; // Text in front of the label's area.
 
         const text = properties.text;
 
-        const text_mesh = Create_text_mesh(text, [0, 0, properties.pos[2]+1], properties.font_size, properties.text_col, _, properties.texture_id, properties.sub_texture_id, properties.is_debug_mesh, properties.variant_idx, properties.text_pad, );
+        const text_mesh = Create_text_mesh({text:text, pos:[0, 0, properties.pos[2]+1], col:properties.text_col, pad:properties.text_pad, font_size:properties.font_size, texture_id:properties.texture_id, sub_texture_id:properties.sub_texture_id, variant_idx:properties.variant_idx, is_debug_mesh:properties.is_debug_mesh});
 
         text_mesh.StylesSetPad(properties.text_pad);
 
         // Align text to the center of the label
         text_mesh.geom.pos[0] += properties.text_pad[0];
         text_mesh.geom.pos[1] += properties.text_pad[1];
-
-        // properties.pos[2] -= 1; // Set z for area 'behind' this.text_mesh
-
 
         
         super(mesh_bufferidx, properties);
