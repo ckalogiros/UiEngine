@@ -83,6 +83,11 @@ export function Style_rect_default_properties(user_properties) {
       num_faces: user_properties.num_faces !== undefined ? user_properties.num_faces : 1,
       name: user_properties.name !== undefined ? user_properties.name : 'Rect Mesh UNAMED',
       // rcorners: user_properties.bar_rcorners !== undefined ? user_properties.bar_rcorners : 4,
+      pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
+
+      texture_id:user_properties.texture_id, 
+      sub_texture_id: user_properties.sub_texture_id,
+      variant_idx: user_properties.variant_idx,
 
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
@@ -102,6 +107,7 @@ export function Style_slider_simple_default_properties(user_properties) {
       name: user_properties.name !== undefined ? user_properties.name : 'Slider Simple UNAMED',
       num_faces: user_properties.num_faces !== undefined ? user_properties.num_faces : 1,
       rcorners: user_properties.bar_rcorners !== undefined ? user_properties.bar_rcorners : 4,
+      pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
 
       handle: {
          col: user_properties.handle_col !== undefined ? user_properties.handle_col : BLUEL[7],
@@ -138,6 +144,7 @@ export function Style_slider_default_properties(user_properties) {
       hover_margin: user_properties.hover_margin !== undefined ? user_properties.hover_margin : [7, 7],
       outer_pad: user_properties.outer_pad !== undefined ? user_properties.outer_pad : 4,
       name: user_properties.name !== undefined ? user_properties.name : 'Slider UNAMED',
+      pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
       // For image texture rendering. Also can be used to pass texture_id for the slider's text meshes, if the texture_id is a font texture 
       // set this to undefined and store the texture_id to the value_text/name_text fields to be consumed in the slider constructor
       texture_id: user_properties.texture_id <= TEXTURES.TEXTURE_FONTS_COUNT ? _ : user_properties.texture_id,
@@ -209,7 +216,7 @@ export function Style_label_default_properties(user_properties) {
    const properties = { // Button||Label class
 
       // is_root, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh
-      is_root:0x0,
+      is_root:user_properties.is_root,
       
       pos:user_properties.pos !== undefined ? [0, 0, user_properties.pos[2]] : [0,0,0], 
       col: user_properties.col !== undefined ? user_properties.col : BLUEL[4],
@@ -217,6 +224,7 @@ export function Style_label_default_properties(user_properties) {
       text_col:WHITE, 
 
       align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
+      pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
       
       text:user_properties.text, 
       text_pad:user_properties.text_pad !== undefined ? user_properties.text_pad : [10, 6], 
@@ -246,6 +254,7 @@ export function Style_button_default_properties(user_properties) {
       dim:_,
       text_col:user_properties.text_col !== undefined ? user_properties.text_col : WHITE, 
 
+      pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
       align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
       
       text:user_properties.text, 
@@ -305,7 +314,8 @@ export function Style_switch_default_properties(user_properties) {
       pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
       col: user_properties.col !== undefined ? user_properties.col : GREY[4],
       size:user_properties.size !== undefined ? user_properties.size : 40,
-      pad:user_properties.pad !== undefined ? user_properties.pad : 0,
+      // pad:user_properties.pad !== undefined ? user_properties.pad : 0,
+      pad:user_properties.pad !== undefined ? user_properties.pad : [0,0],
       style:user_properties.style !== undefined ? user_properties.style : style,
       
       handle: {
@@ -395,7 +405,7 @@ export function Style_dropdown_default_properties(user_properties) {
          dim:_,
          col:GREY[2],
          
-         pad:user_properties.pad, 
+         pad:user_properties.pad !== undefined ? user_properties.pad : [10,10],
          name:user_properties.name,
          num_face:1,
          style:style, 
@@ -415,7 +425,7 @@ export function Style_dropdown_default_properties(user_properties) {
          col:GREY[4],
          // col:TRANSPARENCY(BLUEL[9], 1.),
          
-         pad:user_properties.pad, 
+         pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
          // name:user_properties.name,
          num_face:1,
          style:style, 
@@ -436,10 +446,11 @@ export function Style_dropdown_default_properties(user_properties) {
          // col: BLUEL[4],
          dim:_,
          text_col:WHITE, 
+         pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
 
          align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
          
-         text:user_properties.text, 
+         text:user_properties.text!==undefined ? user_properties.text : user_properties.name, 
          text_pad:user_properties.text_pad, 
          style:style, 
          

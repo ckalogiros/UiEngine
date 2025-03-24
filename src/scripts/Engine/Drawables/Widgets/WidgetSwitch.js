@@ -9,6 +9,7 @@ import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
+import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 
 
 /**
@@ -34,8 +35,8 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    constructor(mesh_bufferidx, properties) {
 
       const ratio = .2;
-      const pad = (properties.pad !== 0) ? properties.pad : properties.size * ratio;
-      // const pad = properties.size * ratio;
+      // const pad = (properties.pad !== 0) ? properties.pad : properties.size * ratio;
+      const pad = properties.size * ratio;
       const switch_dim = [properties.size * 2, properties.size]
       properties.style.rcorners = properties.size;
       properties.dim = switch_dim;
@@ -52,11 +53,11 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.SetName('Switch Widget');
 
       this.evt_params = null;
-      this.pad = pad;
+      // this.pad = pad;
 
       
       const switch_pos = [pad, pad, properties.pos[2] + 1];
-      const switch0 = Create_rect_mesh({pos:switch_pos, dim:[properties.size - pad, properties.size - pad], col:properties.handle.col, hover_margin:properties.handle.hover_margin, is_debug_mesh:properties.is_debug_mesh});
+      const switch0 = Create_rect_mesh(Style_rect_default_properties({pos:switch_pos, dim:[properties.size - pad, properties.size - pad], col:properties.handle.col, hover_margin:properties.handle.hover_margin, is_debug_mesh:properties.is_debug_mesh}));
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);

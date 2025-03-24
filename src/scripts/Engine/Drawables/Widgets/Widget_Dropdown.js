@@ -4,7 +4,7 @@ import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
 import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
-import { Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Calculate_sizes_recursive, Expand, Section, Section_on_move_clbk } from "../Meshes/Section.js";
 import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
@@ -16,7 +16,7 @@ import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos } from "./ScrollerComponent.js";
 import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
-import { Style_section_default_properties } from "./WidgetReadyStyles.js";
+import { Style_rect_default_properties, Style_section_default_properties } from "./WidgetReadyStyles.js";
 
 
 
@@ -99,35 +99,34 @@ export class Widget_Dropdown extends Section {
    dp_symbols; // Text symbols for denoting a dropdown's Expanded/contracted menu. // TODO: Add textured symbols OR create a font texture with symbols for dropdown expansion/contraction.
 
 
-   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, pos, col = GREY[3], menu_col = PURPLER[7], text_col = WHITE, 
-   //             btn_pad = [3, 3], bold = .6, font = TEXTURES.MTSDF_CONSOLAS_1024, font_size, style = {rcorners:5, feather:2, border:2}, pad = [10, 10], is_debug_mesh) {
    constructor(mesh_bufferidx, properties) {
 
       super(mesh_bufferidx, properties.dp)
 
       // NOTE: The mesh_bufferidx and the root_bufferidx as the root creation, happen in the Section from super(). 
 
-      AddArr2(this.total_margin, properties.dp.pad);
       this.StylesSetPad(properties.dp.pad);
       this.isOn = DP_MENU_STATE.OFF;
       this.type |= MESH_TYPE.WIDGET_DROP_DOWN;
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
       this.rootidx = INT_NULL;
 
+      this.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_PARENT
+
       properties.dp.pos[2] += 1;
-      // this.menu = Create_widget_section(_, SECTION.VERTICAL, properties.pad, [0, 0, properties.pos[2]], [1, 1], properties.menu_col, _, _, _, _, _, properties.is_debug_mesh,);
-      // this.menu = Create_widget_section(_, properties.menu.options, properties.menu.pad, [0, 0, properties.menu.pos[2]], [1, 1], properties.menu.col, _, _, _, _, _, properties.menu.is_debug_mesh,);
-      this.menu = Create_widget_section(Style_section_default_properties(properties.menu));
+      // this.menu = Create_widget_section(Style_section_default_properties(properties.menu));
+      // this.menu = Create_rect_mesh(Style_rect_default_properties(properties.menu));
+      this.menu = Create_rect_mesh(properties.menu);
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT|SECTION.TOP_DOWN;
       this.menu.parent = this;
-      AddArr2(this.menu.total_margin, this.menu.StylesGetPad());
-      AddArr2(this.menu.total_margin, this.StylesGetPad());
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
-
+      this.menu.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_PARENT
+      
       this.dp_symbols = ['+', '-'];
       properties.btn.text = `${this.dp_symbols[0]} ${properties.btn.text}`;
       const btn = Create_widget_button(properties.btn);
+      btn.align.flags = ALIGN_2.VERTICAL
 
 
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
@@ -1393,7 +1392,7 @@ function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is
          else{
    
             // mesh.TEMP_recalc(rel_pos[0] + pad[0], rel_pos[1] + pad[1]);
-            mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
+            // mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
    
             if(mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
             if(mesh.text_mesh) continue_recur = false;

@@ -11,6 +11,7 @@ import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timer
 import { GREY } from "../Material/Base/Colors.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
+import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 
 
 
@@ -49,7 +50,7 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    const pos = [0,0,20];
 
 
-   const bar = Create_rect_mesh(_, pos, [width, height], col_bar )
+   const bar = Create_rect_mesh(Style_rect_default_properties({pos:pos, dim:[width, height], col:col_bar}));
    bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    bar.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    bar.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
@@ -71,7 +72,7 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    const handle_width = bar.geom.dim[0] - handle_pad[0];
    const handle_height = bar.geom.dim[1] - handle_pad[1];
    const handle_pos = [handle_height+handle_pad[0], handle_pad[1], pos[2]+1]
-   const handle = Create_rect_mesh(_, handle_pos, [handle_width, handle_height], col_handle, )
+   const handle = Create_rect_mesh(Style_rect_default_properties({pos:handle_pos, dim:[handle_width, handle_height], col:col_handle,}));
    handle.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    handle.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    handle.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);

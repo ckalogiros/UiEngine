@@ -179,13 +179,10 @@ export function Create_widget_switch(properties) {
 }
 
 
-
-// properties: { is_root, pos, size, col, col2, pad, bold, style, is_debug_mesh }
 export function Create_widget_switch_simple(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Switch_Simple(mesh_bufferidx, is_root, pos, size, col, col2, pad, bold, style, is_debug_mesh));
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Switch_Simple(mesh_bufferidx, properties));
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
@@ -194,15 +191,14 @@ export function Create_widget_switch_simple(properties) {
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
 
-
-
-// properties: {is_root, pos, dim, col, hover_margin, handle_dim, handle_col, faces, is_debug_mesh }
-//{ is_root:is_root, pos: pos, dim: dim, col: col, name: name, style: style, num_faces: num_faces, texture_id: INT_NULL, sub_texture_id: INT_NULL, is_debug_mesh: is_debug_mesh 
+/**
+ * @param {*} properties { is_root, pos, dim, col, hover_margin, handle_pos, handle_dim, handle_col, is_debug_mesh, } 
+ * @see {@link Widget_Slider_Simple}
+ */
 export function Create_widget_slider_simple(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider_Simple(mesh_bufferidx, is_root, pos, dim, col, hover_margin, handle_dim, handle_col, faces, is_debug_mesh));
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider_Simple(mesh_bufferidx, properties));
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)

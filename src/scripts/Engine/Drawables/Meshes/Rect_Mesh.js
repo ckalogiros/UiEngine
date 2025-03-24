@@ -2,18 +2,19 @@
 
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D } from "../Geometry/Base/Geometry.js";
-import { Material } from "../Material/Base/Material.js";
+import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Mesh_unif_is_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
-import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
+import { Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
-import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
-import { Mouse_get_pos } from "../../Controls/Input/Mouse.js";
+import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
+import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Calculate_positions_no_gfx_update_recursive, Calculate_sizes_recursive, Section_on_move_clbk } from "./Section.js";
+import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 
 
 export class Rect extends Mesh {
@@ -263,21 +264,41 @@ export class Rect extends Mesh {
 
 
 
-// TODO: IMPLEMENT
-export class Rect_Mesh extends Rect {
 
+
+// TODOS: 
+/**
+ * Remove class Rect
+ * Deal with the AddItem() and AddChild methods
+ * What about the variable 'options'?
+ */
+// export class Rect_Mesh extends Rect {
+export class Rect_Mesh extends Mesh {
+
+   /**
+    * @param {*} properties { is_root, pos, dim, col, num_faces, pad, style, is_debug_mesh, } 
+    */
    constructor(mesh_bufferidx, properties) {
-      // pos = [0, 0, 0], dim = [10, 10],
-      // col = TRANSPARENCY(BLUEL[6], .6), name = 'Rect_Mesh UNNAMED',
-      // style = {rcorners:10, feather:2, border:0}, pad = [4, 4], num_faces = 1, is_debug_mesh) {
 
-      super(properties.pos, properties.dim, properties.col, properties.num_faces, properties.is_debug_mesh);
+      const geom = new Geometry2D(properties.pos, properties.dim, _, properties.num_faces);
+
+      // // Create texture if the user has passed a texture id of type:TEXTURES.
+      // const mat = (!TEXTURE_IS_FONT(properties.texture_id)) ? new Material_Texture(properties.col, properties.texture_id) : FONT_IS_VARIANT(properties.texture_id) ? new Material_Atlas_Texture(properties.col, properties.texture_id, properties.sub_texture_id, _) 
+      // : new Material(properties.col);
+
+      // Create texture if the user has passed a texture id of type:TEXTURES.
+      const mat = (properties.texture_id === undefined) ? new Material(properties.col) : 
+      (properties.sub_texture_id === undefined) ? new Material_Texture(properties.col, properties.texture_id) : new Material_Atlas_Texture(properties.col, properties.texture_id, properties.sub_texture_id, _);
+
+
+      super(geom, mat);
 
       this.sid.unif |= SID.UNIF.ROOT_WPOS2;
 
       this.mesh_bufferidx = mesh_bufferidx;
 
       this.SetStyle(properties.style);
+      this.StylesSetPad(properties.pad);
       this.SetName(`[${this.mesh_bufferidx}]{${properties.name}}-RECT_MESH`);
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -285,6 +306,8 @@ export class Rect_Mesh extends Rect {
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
       }
+
+      this.type |= MESH_TYPE.RECT_MESH | properties.is_debug_mesh;
    }
 
 
@@ -306,6 +329,17 @@ export class Rect_Mesh extends Rect {
       mesh.StateEnable(this.state.mask & MESH_STATE.ACTIVE);
 
       return idx;
+   }
+
+   
+
+   AddChild(mesh) {
+
+      mesh.idx = this.children.Add(mesh);
+
+      mesh.parent = this;
+
+      return mesh.idx;
    }
 
 
@@ -341,6 +375,23 @@ export class Rect_Mesh extends Rect {
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].Deactivate();
       }
+   }
+
+
+   StateEnable(MASK = 0x0) {
+
+      this.state.mask |= MASK;
+   }
+
+
+   StateDisable(MASK = 0x0) {
+
+      this.state.mask &= ~MASK;
+   }
+
+
+   SetTypeDebug() {
+      this.type |= MESH_TYPE.DEBUG_MESH;
    }
 
 
@@ -400,7 +451,8 @@ export class Rect_Mesh extends Rect {
       super.EnableGfxUniforms(flags, name, type, shader_flags);
       for (let i = 0; i <= this.children.boundary; i++) {
          const child = this.children.buffer[i];
-         if (child) child.EnableGfxUniforms(flags, name, type, shader_flags);
+         if (child) child.GfxUniformsEnable(flags, name, type, shader_flags);
+         // if (child) child.EnableGfxUniforms(flags, name, type, shader_flags);
       }
 
    }
@@ -417,41 +469,85 @@ export class Rect_Mesh extends Rect {
    }
 
 
+
+
+
    /*******************************************************************************************************************************************************/
    // Graphics
    /*******************************************************************************************************************************************************/
 
+   // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
+
+   //    // if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+
+   //    const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
+   //    for (let i = 0; i <= this.children.boundary; i++) {
+   //       const child = this.children.buffer[i];
+   //       if (child) child.GenGfxCtx(FLAGS, specific_vb_groupidx);
+   //    }
+   //    return gfx;
+   // }
+
+
+
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      // if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
+      if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
+      // const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
+      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+
       for (let i = 0; i <= this.children.boundary; i++) {
+
          const child = this.children.buffer[i];
-         if (child) child.GenGfxCtx(FLAGS, specific_vb_groupidx);
+         if (child.gfx_ctx_flags) FLAGS = child.gfx_ctx_flags;
+         child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
-      return gfx;
+
    }
 
+   Render(run_for_children = true) {
 
-   Render() {
-
-      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) 
-         super.AddToGfx();
-      // if (this.state.mask & MESH_STATE.ACTIVE) 
-      //    super.AddToGfx();
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) child.Render();
+      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) {
+         this.AddToGfx();
       }
+
+      if (run_for_children) {
+         for (let i = 0; i <= this.children.boundary; i++) {
+            const child = this.children.buffer[i];
+            if (child) child.Render();
+            // console.log('2', child.GetName())
+         }
+      }
+
+   }
+   AddToGfx() {
+
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
+      this.is_gfx_inserted = true;
+
+      // Add entry to Gfx Buffer
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+
+      return this.gfx.vb.start;
    }
 
+   // Rerender() {
 
-   Rerender() {
+   //    super.AddToGfxFromReset();
+   // }
+   AddToGfxFromReset() {
 
-      super.AddToGfxFromReset();
+      Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
+      Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, this.GetName())
+
+      Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
+      this.is_gfx_inserted = true;
+
+      // Add entry to Gfx Buffer
+      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+
    }
-
 
 
 

@@ -188,12 +188,17 @@ function Find_last_right_aligned_child_from_parent(cur_pos_x=0, parent=null, cur
 export function Align_pre_simple(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
    const root_pos = [mesh.geom.pos[0], mesh.geom.pos[1]];
-   pos_x = mesh.geom.pos[0]
+   // pos_x = mesh.geom.pos[0]
    // mesh.geom.pos[0] = 0;
    // mesh.geom.pos[1] = 0;
    const ret = Align_pre_simple___(mesh, pos_x, pos_y, pad);
    mesh.geom.pos[0] = root_pos[0];
    mesh.geom.pos[1] = root_pos[1];
+
+   const pad_x = mesh.StylesGetPad(STYLES.AXIS.X);
+   const pad_y = mesh.StylesGetPad(STYLES.AXIS.Y);
+   mesh.geom.dim[0] = ret.dim_x + pad_x;
+   mesh.geom.dim[1] = ret.dim_y + pad_y;
 
    return ret;
 
@@ -233,11 +238,8 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
          cur_mesh.geom.pos[0] = cur_pos_x;
          cur_mesh.geom.pos[1] = cur_pos_y;
-         // cur_mesh.align.row = row_counter;
 
-         // cur_pos_x+=cur_pad_x
-         const ret = Align_pre_simple(cur_mesh, cur_pos_x, cur_pos_y, pad);
-         // cur_pos_x-=cur_pad_x
+         const ret = Align_pre_simple___(cur_mesh, cur_pos_x, cur_pos_y, pad);
          // console.log('ret', ret.dim_y, cur_mesh.GetName())
 
 
@@ -250,7 +252,7 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
          }
          else if (cur_mesh.align.flags & ALIGN_2.HORIZONTAL) {
 
-            // total_size_x += ret.dim_x + cur_pad_x; // Set in x-axis
+            total_size_x += ret.dim_x + cur_pad_x; // Set in x-axis
             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
             if (i !== 0) accum_row_size_y = 0;
          }
@@ -279,11 +281,11 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
                }
                else cur_pos_y += cur_mesh.geom.dim[1] * 2;
                row_max_size_y = 0;
-               console.log('cur_pos_y', cur_pos_y, cur_mesh.GetName(), mesh.GetName(), '\n', cur_mesh.geom.dim[1] * 2, ret.dim_y * 2)
             }
             else if (next_mesh.align.flags & ALIGN_2.HORIZONTAL) {
                cur_pos_x += cur_mesh.geom.dim[0] * 2;
             }
+            console.log('cur_pos_y', cur_pos_y, cur_mesh.GetName(), mesh.GetName(), '\n', cur_mesh.geom.dim[1] * 2, ret.dim_y * 2)
          }
       }
       else {
@@ -309,7 +311,8 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
          // Update the total size accumulator according to widget's align flags
          if (cur_mesh.align.flags & ALIGN_2.HORIZONTAL) {
             total_size_x += ret.dim_x; // Set in x-axis
-            total_size_y = (total_size_y < ret.dim_y) ? ret.dim_y : total_size_y; // Set in y-axis
+            // total_size_x += ret.dim_x+cur_pad_x; // Set in x-axis
+            total_size_y = (total_size_y < ret.dim_y) ? ret.dim_y+cur_pad_y : total_size_y; // Set in y-axis
             if (i !== 0) accum_row_size_x = 0;
          }
          else if (cur_mesh.align.flags & ALIGN_2.VERTICAL) {
@@ -337,11 +340,11 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
                // cur_pos_y += accum_row_size_y * 2;
 
                // if(mesh)
-               cur_pos_x = mesh.geom.pos[0] + pad_x;
+               // cur_pos_x = mesh.geom.pos[0] + pad_x;
                // cur_pos_x = mesh.geom.pos[0];
-               // console.log('cur_pos_x', cur_pos_x, cur_mesh.GetName(), mesh.GetName())
-               // cur_pos_x = pad_x;
+               cur_pos_x = pad_x;
                // cur_pos_x = 0;
+               // console.log('cur_pos_x', cur_pos_x, cur_mesh.GetName(), mesh.GetName())
             }
          }
 
@@ -353,14 +356,14 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
    }
 
-   // Update vertex buffers, if meshes already rendered
-   if (mesh.gfx) {
-      Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+mesh.geom.dim[0], mesh.geom.pos[1]+mesh.geom.dim[1])
-      // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0], mesh.geom.pos[1]);
-      // mesh.geom.UpdateSetWposXY(mesh.gfx);
-      mesh.geom.SetDim([mesh.geom.dim[0], mesh.geom.dim[1]], mesh.gfx);
-      Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
-   }
+   // // Update vertex buffers, if meshes already rendered
+   // if (mesh.gfx) {
+   //    Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+mesh.geom.dim[0], mesh.geom.pos[1]+mesh.geom.dim[1])
+   //    // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0], mesh.geom.pos[1]);
+   //    // mesh.geom.UpdateSetWposXY(mesh.gfx);
+   //    mesh.geom.SetDim([mesh.geom.dim[0], mesh.geom.dim[1]], mesh.gfx);
+   //    Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
+   // }
    // console.log('###', mesh.geom.dim[0], mesh.GetName())
    
    // console.log('total_size_y', total_size_y, mesh.GetName())

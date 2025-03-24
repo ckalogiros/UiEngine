@@ -11,6 +11,7 @@ import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
+import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 
 
 
@@ -41,7 +42,22 @@ export class Widget_Label extends Rect_Mesh {
         text_mesh.geom.pos[1] += properties.text_pad[1];
 
         
-        super(mesh_bufferidx, properties);
+        // HERE: Do not send any texture to Rect_Mesh. This is the labels rect panel
+        // super(mesh_bufferidx, properties);
+        super(mesh_bufferidx, Style_rect_default_properties({
+            is_root:properties.is_root,
+            pos:properties.pos,
+            dim:properties.dim,
+            col:properties.col,
+            pad:properties.pad,
+
+            name:properties.pad,
+            style:properties.pad,
+            num_faces:properties.num_faces,
+
+            is_debug_mesh:properties.is_debug_mesh,
+
+        }));
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
         this.SetStyle(properties.style)
         this.SetName(properties.text)

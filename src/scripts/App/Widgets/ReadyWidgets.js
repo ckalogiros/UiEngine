@@ -5,10 +5,11 @@ import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREY, WHITE } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
-import { Style_slider_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
+import { Style_label_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Gl_set_attr_round_corners, Gl_set_dim_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
-import { Linear_interpolation } from "../../Helpers/Math/MathFunctions.js";
+import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
+import { Max } from "../../Helpers/Math/MathOperations.js";
 
 
 
@@ -17,12 +18,12 @@ import { Linear_interpolation } from "../../Helpers/Math/MathFunctions.js";
 
 /*****************************************************************************************************************************************************/
 // Widget-Slider
+/** */
 export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .5, name, size = 250) {
 
    const pos = [x, y, 0];
-   // const slider = Create_widget_slider(is_root, pos, [size, 10], _, _, name);
    const slider = Create_widget_slider(Style_slider_default_properties({
-      is_root:ROOT_WIDGETS.CREATE_ROOT, 
+      is_root:is_root, 
       pos:pos, 
       dim:[120, 15], 
       col:GREY[3], 
@@ -31,28 +32,7 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
       texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
       font_size:8, 
    }));
-   // const slider = Create_widget_slider({
-   //    is_root:ROOT_WIDGETS.CREATE_ROOT, 
-   //    pos:pos, 
-   //    dim:[120, 15], 
-   //    col:GREY[4], 
-   //    hover_margin:[10, 10],
-   //    outer_pad:4,
-   //    name:'Slider Test',
-   //    // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
-   //    texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
-   //    font_size: 0,
-   //    variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
 
-   //    slider_bar: {
-   //       // col:BLUEL[7],
-   //       col:GREY[8],
-   //    },
-   //    slider_handle: {
-   //       // col:GREY[8],
-   //       col:BLUEL[9],
-   //    },
-   // });
    slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -73,9 +53,7 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
    return slider
 
 }
-
-
-
+/** */
 export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id, x = 0, y = 0, font_size = 10, color = BLUEL[5], vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, text_pad=[10, 6], color_text=WHITE) {
 
    // const pos = [x, y, 0];
@@ -87,7 +65,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id, x 
    // const label = Create_widget_label(is_root, name, _, pos, font_size, color, color_text, inner_pad, .5, _, TEXTURES.CONSOLA_VARIANT_FONT, _, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0);
 
    // _, `1`, _, 0, 0, 14, TRANSPARENCY(BLUEL[6], .7), _, _
-   const label = Create_widget_label({
+   const label = Create_widget_label(Style_label_default_properties({
       is_root:is_root, 
       pos:[x, y, 0], 
       col:color, 
@@ -101,7 +79,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id, x 
       font_size:font_size,
       text_col:color_text,
       is_debug_mesh:false,
-   });
+   }));
 
 
    
@@ -183,6 +161,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id, x 
 
 /*****************************************************************************************************************************************************/
 // MSDF Text Label
+/** */
 export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label ', font, x = 0, y = 0, font_size = 20, color = BLUEL[5], slider_size, vb_groupidx = INT_NULL, text_vb_groupidx = INT_NULL, temp_flag = false) {
 
    let posx = 0, posy = 0;
@@ -198,17 +177,17 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
 
    const text_pad = [0,0];
    // const msdf_text = Create_widget_label(is_root, name, _, pos, font_size, TRANSPARENCY(color, .3), WHITE, [text_pad, text_pad], .5, _, font,);
-   const msdf_text = Create_widget_label({
+   const msdf_text = Create_widget_label(Style_label_default_properties({
       is_root:is_root, 
       pos:[posx, posy, 2], 
-      col:TRANSPARENCY(color, 1.3), 
+      col:TRANSPARENCY(color, .6), 
       text_pad:text_pad,
       text:name,
       texture_id: font,
       font_size:font_size,
       text_col:WHITE,
       is_debug_mesh:false,
-   });
+   }));
    msdf_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    msdf_text.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
    msdf_text.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -256,12 +235,16 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
 
    if (slider) { // Scale Text
 
+      const slope_const=.5, time_step=.01, scale=1;
+      const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
+
       const params = {
          target_mesh: msdf_text,
+         function_slope:slope_params_pointer,
          mnemonics: {
             sizex: msdf_text.geom.dim[0],
             sizey: msdf_text.geom.dim[1],
-            rcorners: msdf_text.mat.style.rcorners
+            rcorners: msdf_text.mat.style.rcorners,
          },
       };
 
@@ -273,12 +256,26 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
          const target_mesh = params.clbk_params.target_mesh;
          const rcorners = params.clbk_params.mnemonics.rcorners;
 
-         const max = 18, min = .1;
-         const val = Linear_interpolation(min, max, slider_val);
+         // const max = 18, min = .01;
+         // const val = Linear_interpolation(min, max, slider_val);
+         // const val = Logarithmic_interpolation(1-slider_val, max);
+         // const max = 2, min = .01;
+         // const val = 1-Quadratic_interpolation(min, max, slider_val);
+
+         const slope_constant = params.clbk_params.function_slope.GetSlope();
+         const scale = params.clbk_params.function_slope.GetAmmount();
+         params.clbk_params.function_slope.IncrementTimer();
+         const timer = params.clbk_params.function_slope.GetTimer();
+         // const slope = Logarithmic_interpolation(timer, slope_constant);
+         const val = (.1/Logarithmic_interpolation(1 - slider_val, slope_constant));
+         const max = val !== Infinity ? val >= 0 ? val : .01 : 23
+
+         // console.log(slope)
+         // console.log(max)
 
          {
-            const sizex = params.clbk_params.mnemonics.sizex * val;
-            const sizey = params.clbk_params.mnemonics.sizey * val;
+            const sizex = params.clbk_params.mnemonics.sizex * max;
+            const sizey = params.clbk_params.mnemonics.sizey * max;
             const difx = sizex - target_mesh.geom.dim[0];
             const dify = sizey - target_mesh.geom.dim[1];
 
@@ -290,14 +287,14 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
             target_mesh.geom.AddWposXY(target_mesh.gfx, difx, dify);
 
             if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
-               target_mesh.mat.style.rcorners = rcorners * val;
+               target_mesh.mat.style.rcorners = rcorners * Max(max, 2);
                Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners);
             }
          }
 
          {
             const text = target_mesh.text_mesh;
-            text.ScaleText(val)
+            text.ScaleText(max)
          }
 
 

@@ -32,7 +32,9 @@ import { Style_rect_default_properties, Style_slider_simple_default_properties }
 
 export class Widget_Slider_Simple extends Rect_Mesh {
 
-
+   /**
+    * @param {*} properties { is_root, pos, dim, col, hover_margin, handle_pos, handle_dim, handle_col, is_debug_mesh, } 
+    */
    constructor(mesh_bufferidx, properties) {
 
 
@@ -140,6 +142,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       const pad_x = this.StylesGetPad(STYLES.AXIS.X);
       const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
       this.geom.pos[0] = pos_x + pad_x;
+      // this.geom.pos[0] = pos_x ;
       this.geom.pos[1] = pos_y + pad_y;
 
       const handle = this.children.buffer[0];

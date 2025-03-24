@@ -830,9 +830,9 @@ const TEST_FONT_MSDF_ARIAL = 'test_arial_msdf';
 // Textures Atlases
 const TEXTURE_ATLAS_MSDF_SYMBOLS = 'symbols';
 // Textures
-const TEXTURE_SMOKE1 = 'smoke';
-const TEXTURE_COIN = 'Coin_1_64x64';
-const TEXTURE_TEST_APPLE = 'apple1_64x73';
+const TEXTURE_SMOKE1 = 'smoke_1_256';
+const TEXTURE_COIN = 'Coin_1_32';
+const TEXTURE_TEST_APPLE = 'apple_1_64x73';
 // Textures Atlases with variant font sizes
 const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA = 'atlas_variants_consola_1024x1024_8px_scale12_extended_ascii';
 
